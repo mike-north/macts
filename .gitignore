@@ -144,3 +144,16 @@ vite.config.ts.timestamp-*
 .vite/
 
 .claude/*.local.json
+
+# Nx cache
+.nx/
+
+# API Extractor
+api-report/
+temp/
+!temp/.gitkeep
+
+# IDE
+.idea/
+# Claude Code local configuration (auto-added)
+.claude/*.local.*

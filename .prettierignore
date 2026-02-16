@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Nx
+.nx/
+
+# Lockfiles
+pnpm-lock.yaml
+
+# Generated
+api-report/
+coverage/

@@ -1,0 +1,19 @@
+/**
+ * Core runtime and manifest parsing for macts.
+ *
+ * Provides the foundational functionality for all macts packages:
+ * - Manifest parsing and validation using Zod schemas
+ * - JXA bridge for executing AppleScript operations
+ * - Shared runtime utilities for TypeScript SDK generation
+ *
+ * This package is the execution layer that all integration surfaces
+ * (CLI, MCP, HTTP API) depend on.
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * Current version of the macts packages.
+ * All `@macts/*` packages use fixed versioning and stay in sync.
+ */
+export const VERSION = '0.0.0';

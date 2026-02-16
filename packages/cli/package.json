@@ -1,0 +1,36 @@
+{
+  "name": "@macts/cli",
+  "version": "0.0.0",
+  "description": "Command-line interface for macOS app automation via TypeScript-based SDKs",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "macts": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@macts/core": "workspace:*",
+    "clipanion": "^4.0.0-rc.4"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "vitest": "catalog:",
+    "typescript": "catalog:"
+  }
+}
