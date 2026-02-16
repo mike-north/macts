@@ -24,3 +24,9 @@ export type * from './types/manifest.js';
 
 // SDEF parser and types
 export * from './sdef/index.js';
+
+// JXA bridge
+export * from './jxa/index.js';
+
+// Standardized types
+export * from './types/standardized.js';
