@@ -1,0 +1,16 @@
+{
+  "name": "@macts/manifest-calendar",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Calendar.app manifest for macts",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@macts/core": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "yaml": "catalog:"
+  }
+}

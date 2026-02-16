@@ -1,0 +1,452 @@
+version: "1.0"
+
+app:
+  bundleId: com.apple.iCal
+  name: Calendar
+  displayName: Calendar
+  tccEntitlements:
+    - calendar
+    - automation
+  distributionModel: system
+
+suites:
+  - name: Standard Suite
+    code: "????"
+    description: Common classes and commands for all applications
+  - name: iCal
+    code: wrbt
+    description: iCal classes and commands
+    resources:
+      - Calendar
+      - Event
+      - Attendee
+      - DisplayAlarm
+      - MailAlarm
+      - SoundAlarm
+      - OpenFileAlarm
+    commands:
+      - reloadCalendars
+      - switchView
+      - viewCalendar
+      - show
+    enums:
+      - ParticipationStatus
+      - EventStatus
+      - CalendarPriority
+      - ViewType
+
+resources:
+  Calendar:
+    name: Calendar
+    plural: Calendars
+    description: A calendar containing events
+    code: wres
+    identifiers:
+      - property: calendarIdentifier
+        primary: true
+    properties:
+      name:
+        access: rw
+        type: string
+        description: The calendar title
+        code: pnam
+      title:
+        access: rw
+        type: string
+        description: The calendar title (synonym for name)
+        code: wr02
+        deprecated:
+          message: Use 'name' instead
+          upstream: true
+      color:
+        access: rw
+        type: rgb
+        description: The calendar color
+        code: colr
+      calendarIdentifier:
+        access: r
+        type: string
+        description: A unique calendar key
+        code: "ID  "
+      writable:
+        access: r
+        type: boolean
+        description: Whether the calendar can be modified
+        code: wr05
+      description:
+        access: rw
+        type: string
+        description: The calendar description
+        code: wr12
+
+  Event:
+    name: Event
+    plural: Events
+    description: A calendar event
+    code: wrev
+    identifiers:
+      - property: uid
+        primary: true
+    properties:
+      summary:
+        access: rw
+        type: string
+        description: The event summary/title
+        code: wr11
+      description:
+        access: rw
+        type: string
+        description: The event notes
+        code: wr12
+      location:
+        access: rw
+        type: string
+        description: The event location
+        code: wr14
+      startDate:
+        access: rw
+        type: date
+        description: The event start date
+        code: wr1s
+      endDate:
+        access: rw
+        type: date
+        description: The event end date
+        code: wr5s
+      alldayEvent:
+        access: rw
+        type: boolean
+        description: True if the event is an all-day event
+        code: wrad
+      recurrence:
+        access: rw
+        type: string
+        description: The iCalendar (RFC 2445) string describing the event recurrence, if defined
+        code: wr15
+      status:
+        access: rw
+        type:
+          enum: EventStatus
+        description: The event status
+        code: wre4
+      sequence:
+        access: r
+        type: integer
+        description: The event version
+        code: wr13
+      stampDate:
+        access: rw
+        type: date
+        description: The event modification date
+        code: wr4s
+      excludedDates:
+        access: rw
+        type:
+          array: date
+        description: The exception dates for recurring events
+        code: wr2s
+      uid:
+        access: r
+        type: string
+        description: A unique event key
+        code: "ID  "
+      url:
+        access: rw
+        type: string
+        description: The URL associated with the event
+        code: wr16
+
+  Attendee:
+    name: Attendee
+    plural: Attendees
+    description: An event attendee
+    code: wrea
+    properties:
+      displayName:
+        access: r
+        type: string
+        description: The first and last name of the attendee
+        code: wra1
+      email:
+        access: r
+        type: string
+        description: Email address of the attendee
+        code: wra2
+      participationStatus:
+        access: r
+        type:
+          enum: ParticipationStatus
+        description: The invitation status for the attendee
+        code: wra3
+
+  DisplayAlarm:
+    name: DisplayAlarm
+    plural: DisplayAlarms
+    description: A message/display alarm
+    code: wal1
+    properties:
+      triggerInterval:
+        access: rw
+        type: integer
+        description: The interval in minutes between the event and the alarm (positive for after, negative for before)
+        code: wald
+      triggerDate:
+        access: rw
+        type: date
+        description: An absolute alarm date
+        code: wale
+
+  MailAlarm:
+    name: MailAlarm
+    plural: MailAlarms
+    description: A mail/email alarm
+    code: wal2
+    properties:
+      triggerInterval:
+        access: rw
+        type: integer
+        description: The interval in minutes between the event and the alarm (positive for after, negative for before)
+        code: wald
+      triggerDate:
+        access: rw
+        type: date
+        description: An absolute alarm date
+        code: wale
+
+  SoundAlarm:
+    name: SoundAlarm
+    plural: SoundAlarms
+    description: A sound alarm
+    code: wal4
+    properties:
+      triggerInterval:
+        access: rw
+        type: integer
+        description: The interval in minutes between the event and the alarm (positive for after, negative for before)
+        code: wald
+      triggerDate:
+        access: rw
+        type: date
+        description: An absolute alarm date
+        code: wale
+      soundName:
+        access: rw
+        type: string
+        description: The system sound name to be used for the alarm
+        code: wals
+      soundFile:
+        access: rw
+        type: string
+        description: The (POSIX) path to the sound file to be used for the alarm
+        code: walf
+
+  OpenFileAlarm:
+    name: OpenFileAlarm
+    plural: OpenFileAlarms
+    description: An 'open file' alarm
+    code: wal3
+    properties:
+      triggerInterval:
+        access: rw
+        type: integer
+        description: The interval in minutes between the event and the alarm (positive for after, negative for before)
+        code: wald
+        deprecated:
+          message: Starting with OS X 10.14, it is not possible to create new open file alarms. Trying to save or modify an open file alarm will result in a save error.
+          since: "10.14"
+          upstream: true
+      triggerDate:
+        access: rw
+        type: date
+        description: An absolute alarm date
+        code: wale
+        deprecated:
+          message: Starting with OS X 10.14, it is not possible to create new open file alarms. Trying to save or modify an open file alarm will result in a save error.
+          since: "10.14"
+          upstream: true
+      filepath:
+        access: rw
+        type: string
+        description: The (POSIX) path to be opened by the alarm
+        code: walp
+        deprecated:
+          message: Starting with OS X 10.14, it is not possible to view URLs for existing open file alarms
+          since: "10.14"
+          upstream: true
+
+enums:
+  ParticipationStatus:
+    name: ParticipationStatus
+    description: Status of an attendee's response to an invitation
+    code: wre6
+    values:
+      - name: unknown
+        value: unknown
+        description: No answer yet
+        code: E6na
+      - name: accepted
+        value: accepted
+        description: Invitation has been accepted
+        code: E6ap
+      - name: declined
+        value: declined
+        description: Invitation has been declined
+        code: E6dp
+      - name: tentative
+        value: tentative
+        description: Invitation has been tentatively accepted
+        code: E6tp
+
+  EventStatus:
+    name: EventStatus
+    description: Status of a calendar event
+    code: wre4
+    values:
+      - name: cancelled
+        value: cancelled
+        description: A cancelled event
+        code: E4ca
+      - name: confirmed
+        value: confirmed
+        description: A confirmed event
+        code: E4cn
+      - name: none
+        value: none
+        description: An event without status
+        code: E4no
+      - name: tentative
+        value: tentative
+        description: A tentative event
+        code: E4te
+
+  CalendarPriority:
+    name: CalendarPriority
+    description: Priority level for calendar items
+    code: wrp1
+    values:
+      - name: noPriority
+        value: 0
+        description: No priority
+        code: tdp0
+      - name: lowPriority
+        value: 9
+        description: Low priority
+        code: tdp9
+      - name: mediumPriority
+        value: 5
+        description: Medium priority
+        code: tdp5
+      - name: highPriority
+        value: 1
+        description: High priority
+        code: tdp1
+
+  ViewType:
+    name: ViewType
+    description: Calendar view type
+    code: wre5
+    values:
+      - name: dayView
+        value: dayView
+        description: The iCal day view
+        code: E5da
+      - name: weekView
+        value: weekView
+        description: The iCal week view
+        code: E5we
+      - name: monthView
+        value: monthView
+        description: The iCal month view
+        code: E5mo
+
+hierarchy:
+  children:
+    calendars:
+      resource: Calendar
+      access: rw
+      description: Calendars in the application
+      children:
+        events:
+          resource: Event
+          access: rw
+          description: Events within a calendar
+          children:
+            attendees:
+              resource: Attendee
+              access: r
+              description: Attendees of an event
+            displayAlarms:
+              resource: DisplayAlarm
+              access: rw
+              description: Display alarms for an event
+            mailAlarms:
+              resource: MailAlarm
+              access: rw
+              description: Mail alarms for an event
+            soundAlarms:
+              resource: SoundAlarm
+              access: rw
+              description: Sound alarms for an event
+            openFileAlarms:
+              resource: OpenFileAlarm
+              access: rw
+              description: Open file alarms for an event (deprecated)
+
+commands:
+  reloadCalendars:
+    name: reloadCalendars
+    description: Tell the application to reload all calendar files contents
+    scope: application
+    code: aec8
+    parameters: []
+
+  switchView:
+    name: switchView
+    description: Show calendar on the given view
+    scope: application
+    code: aeca
+    parameters:
+      - name: to
+        type: ViewType
+        description: The calendar view to be displayed
+        required: true
+        code: wre5
+
+  viewCalendar:
+    name: viewCalendar
+    description: Show calendar on the given date
+    scope: application
+    code: aec9
+    parameters:
+      - name: at
+        type: date
+        description: The date to be displayed
+        required: true
+        code: wtdt
+
+  show:
+    name: show
+    description: Show the event or to-do in the calendar window
+    scope: resource
+    resourceType: Event
+    code: aec3
+    parameters: []
+
+extraction:
+  sourceFile: source.sdef
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 0.95
+      commands: 0.95
+  openQuestions:
+    - question: Should CalendarPriority enum be exposed or is it unused in modern Calendar.app?
+      context: The enum is defined in the SDEF but no properties reference it
+      relatedTo: CalendarPriority
+    - question: Are there additional Standard Suite commands (like make, delete, save) that should be explicitly documented?
+      context: Standard Suite is included via xi:include reference
+      suggestions:
+        - Include standard commands explicitly
+        - Reference Standard Suite documentation separately

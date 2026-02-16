@@ -50,7 +50,8 @@ export function propertyTypeToZod(type: PropertyType | undefined, optional: bool
         break;
       default:
         // Reference to another schema (shouldn't happen with current types)
-        schema = `${type as string}Schema`;
+        // Exhaustive check - this should never happen with current PrimitiveType
+        schema = `${String(type)}Schema`;
         break;
     }
   } else if ('array' in type) {

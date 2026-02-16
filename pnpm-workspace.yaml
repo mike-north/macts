@@ -1,6 +1,7 @@
 # pnpm workspace configuration
 packages:
   - 'packages/*'
+  - 'manifests/*'
 
 # Allow build scripts for approved packages
 onlyBuiltDependencies:
@@ -13,3 +14,4 @@ catalog:
   tsup: ^8.5.1
   vitest: ^3.1.0
   typescript: 5.9.3
+  yaml: ^2.7.0

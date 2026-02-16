@@ -45,5 +45,5 @@ export {
   type GeneratedApplication,
 } from './application.js';
 
-// Re-export main generation function
-export { generateSdk } from './generate.js';
+// Re-export main generation functions
+export { generateSdk, writeSdk, type GenerateSdkResult } from './generate.js';
