@@ -30,3 +30,6 @@ export * from './jxa/index.js';
 
 // Standardized types
 export * from './types/standardized.js';
+
+// Generator
+export * from './generator/index.js';
