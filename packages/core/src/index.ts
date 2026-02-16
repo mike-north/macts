@@ -21,3 +21,6 @@ export const VERSION = '0.0.0';
 // Manifest schemas and types
 export * from './manifest/index.js';
 export type * from './types/manifest.js';
+
+// SDEF parser and types
+export * from './sdef/index.js';
