@@ -9,8 +9,9 @@ export interface GeneratedType {
 
 /**
  * Convert manifest property type to TypeScript type string.
+ * Accepts PropertyType union or plain strings (for command parameter types).
  */
-export function propertyTypeToTs(type: PropertyType | undefined): string {
+export function propertyTypeToTs(type: PropertyType | string | undefined): string {
   if (!type) return 'unknown';
 
   if (typeof type === 'string') {

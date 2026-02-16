@@ -9,8 +9,9 @@ export interface GeneratedSchema {
 
 /**
  * Convert manifest property type to Zod schema code.
+ * Accepts PropertyType union or plain strings (for command parameter types).
  */
-export function propertyTypeToZod(type: PropertyType | undefined, optional: boolean): string {
+export function propertyTypeToZod(type: PropertyType | string | undefined, optional: boolean): string {
   let schema: string;
 
   if (!type) {

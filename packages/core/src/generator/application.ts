@@ -41,9 +41,15 @@ export function generateApplicationClass(ctx: GeneratorContext): GeneratedApplic
 
     const returnType = cmd.returns ? propertyTypeToTs(cmd.returns) : 'void';
 
+    // Build parameter object for executor
+    const paramNames = cmd.parameters.map(p => p.name);
+    const argsObj = paramNames.length > 0
+      ? `, { ${paramNames.join(', ')} }`
+      : '';
+
     return `  /** ${cmd.description} */
   async ${cmd.name}(${params}): Promise<${returnType}> {
-    return this.#executor.command(this.#specifier, '${cmd.name}');
+    return this.#executor.command(this.#specifier, '${cmd.name}'${argsObj});
   }`;
   });
 

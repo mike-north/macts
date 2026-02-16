@@ -49,8 +49,12 @@ export class ${className} {
         this.#specifier.byId(id)
       ) as ${resource.name};
       return new ${instanceClass}(this.#executor, this.#specifier.byId(id), data);
-    } catch {
-      return null;
+    } catch (error) {
+      // Return null for "not found" errors, rethrow others
+      if (error instanceof Error && error.message.includes('Can\\'t get')) {
+        return null;
+      }
+      throw error;
     }
   }
 
@@ -61,8 +65,12 @@ export class ${className} {
         this.#specifier.byName(name)
       ) as ${resource.name};
       return new ${instanceClass}(this.#executor, this.#specifier.byName(name), data);
-    } catch {
-      return null;
+    } catch (error) {
+      // Return null for "not found" errors, rethrow others
+      if (error instanceof Error && error.message.includes('Can\\'t get')) {
+        return null;
+      }
+      throw error;
     }
   }
 
