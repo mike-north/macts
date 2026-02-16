@@ -8,30 +8,50 @@ export interface GeneratedType {
 }
 
 /**
- * Convert manifest property type to TypeScript type string.
- * Accepts PropertyType union or plain strings (for command parameter types).
+ * Map of primitive type names to their TypeScript representations.
  */
-export function propertyTypeToTs(type: PropertyType | string | undefined): string {
+const PRIMITIVE_TYPE_MAP: Record<string, string> = {
+  string: 'string',
+  number: 'number',
+  integer: 'number',
+  boolean: 'boolean',
+  date: 'Date',
+  data: 'ArrayBuffer',
+  file: 'string', // Path
+  any: 'unknown',
+  point: '{ x: number; y: number }',
+  rect: '{ x: number; y: number; width: number; height: number }',
+  rgb: '{ r: number; g: number; b: number }',
+};
+
+/**
+ * Convert manifest property type to TypeScript type string.
+ *
+ * Handles three categories of types:
+ * - Primitive types (string, number, boolean, date, etc.)
+ * - Complex types (arrays, resource references, enum references)
+ * - Custom type references (arbitrary strings referencing resources/enums)
+ *
+ * @param type - The property type from the manifest, or undefined
+ * @returns TypeScript type string representation
+ *
+ * @example
+ * ```typescript
+ * propertyTypeToTs('string')           // => 'string'
+ * propertyTypeToTs({ array: 'number' }) // => 'number[]'
+ * propertyTypeToTs({ resource: 'Event' }) // => 'Event'
+ * propertyTypeToTs('Calendar')         // => 'Calendar' (custom reference)
+ * ```
+ */
+export function propertyTypeToTs(type: PropertyType | undefined): string {
   if (!type) return 'unknown';
 
   if (typeof type === 'string') {
-    // Primitive types
-    switch (type) {
-      case 'string': return 'string';
-      case 'number': return 'number';
-      case 'integer': return 'number';
-      case 'boolean': return 'boolean';
-      case 'date': return 'Date';
-      case 'data': return 'ArrayBuffer';
-      case 'file': return 'string'; // Path
-      case 'any': return 'unknown';
-      case 'point': return '{ x: number; y: number }';
-      case 'rect': return '{ x: number; y: number; width: number; height: number }';
-      case 'rgb': return '{ r: number; g: number; b: number }';
-      default:
-        // Could be a custom type (resource or enum reference)
-        return type;
-    }
+    // Check if it's a known primitive type
+    const mapped = PRIMITIVE_TYPE_MAP[type];
+    if (mapped) return mapped;
+    // Otherwise treat as custom type reference (resource or enum name)
+    return type;
   }
 
   if ('array' in type) {
@@ -51,7 +71,24 @@ export function propertyTypeToTs(type: PropertyType | string | undefined): strin
 }
 
 /**
- * Generate read type for a resource.
+ * Generate TypeScript interface for reading a resource.
+ *
+ * Creates an interface containing all properties from the resource definition,
+ * with read-only properties marked with the `readonly` modifier.
+ *
+ * @param resource - The resource definition from the manifest
+ * @param _ctx - Generator context (unused but maintained for API consistency)
+ * @returns Generated type with interface definition
+ *
+ * @example
+ * ```typescript
+ * // For a Calendar resource with name (rw) and uid (r) properties:
+ * // Generates:
+ * // export interface Calendar {
+ * //   name: string;
+ * //   readonly uid: string;
+ * // }
+ * ```
  */
 export function generateReadType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
   const properties = Object.entries(resource.properties);
@@ -70,7 +107,24 @@ export function generateReadType(resource: Resource, _ctx: GeneratorContext): Ge
 }
 
 /**
- * Generate create input type for a resource.
+ * Generate TypeScript interface for creating a resource.
+ *
+ * Creates an interface containing only writable properties. Properties are
+ * marked optional if they have a default value or are explicitly optional.
+ *
+ * @param resource - The resource definition from the manifest
+ * @param _ctx - Generator context (unused but maintained for API consistency)
+ * @returns Generated type with create input interface
+ *
+ * @example
+ * ```typescript
+ * // For a Calendar resource with name (rw, required) and color (rw, optional):
+ * // Generates:
+ * // export interface CalendarCreateInput {
+ * //   name: string;
+ * //   color?: string;
+ * // }
+ * ```
  */
 export function generateCreateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
   const properties = Object.entries(resource.properties);
@@ -93,7 +147,24 @@ export function generateCreateInputType(resource: Resource, _ctx: GeneratorConte
 }
 
 /**
- * Generate update input type for a resource (all properties optional).
+ * Generate TypeScript interface for updating a resource.
+ *
+ * Creates an interface containing only writable properties, with all
+ * properties marked as optional (partial update semantics).
+ *
+ * @param resource - The resource definition from the manifest
+ * @param _ctx - Generator context (unused but maintained for API consistency)
+ * @returns Generated type with update input interface
+ *
+ * @example
+ * ```typescript
+ * // For a Calendar resource with name (rw) and color (rw):
+ * // Generates:
+ * // export interface CalendarUpdateInput {
+ * //   name?: string;
+ * //   color?: string;
+ * // }
+ * ```
  */
 export function generateUpdateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
   const properties = Object.entries(resource.properties);
@@ -114,7 +185,17 @@ export function generateUpdateInputType(resource: Resource, _ctx: GeneratorConte
 }
 
 /**
- * Generate enum type as string literal union.
+ * Generate TypeScript type alias for an enum as a string literal union.
+ *
+ * @param enumDef - The enum definition from the manifest
+ * @returns Generated type with string literal union
+ *
+ * @example
+ * ```typescript
+ * // For an enum with values 'active' and 'inactive':
+ * // Generates:
+ * // export type Status = 'active' | 'inactive';
+ * ```
  */
 export function generateEnumType(enumDef: Enum): GeneratedType {
   const values = enumDef.values.map((v: { name: string }) => `'${v.name}'`).join(' | ');
@@ -124,7 +205,14 @@ export function generateEnumType(enumDef: Enum): GeneratedType {
 }
 
 /**
- * Generate all types for a context.
+ * Generate all TypeScript types for a generator context.
+ *
+ * Produces three types per resource (read, create input, update input) plus
+ * one type per enum. Types are generated in a consistent order: resources
+ * first (with their variants), then enums.
+ *
+ * @param ctx - Generator context containing the manifest and options
+ * @returns Array of generated types
  */
 export function generateTypes(ctx: GeneratorContext): GeneratedType[] {
   const types: GeneratedType[] = [];

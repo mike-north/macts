@@ -42,6 +42,24 @@ describe('propertyTypeToTs', () => {
   it('should handle custom type names', () => {
     expect(propertyTypeToTs('CustomType')).toBe('CustomType');
   });
+
+  // Negative tests - edge cases and unusual inputs
+  it('should return unknown for empty object', () => {
+    // An object that doesn't match any known pattern
+    expect(propertyTypeToTs({} as never)).toBe('unknown');
+  });
+
+  it('should handle deeply nested arrays', () => {
+    expect(propertyTypeToTs({ array: { array: { array: 'string' } } })).toBe('string[][][]');
+  });
+
+  it('should handle array of resource references', () => {
+    expect(propertyTypeToTs({ array: { resource: 'Event' } })).toBe('Event[]');
+  });
+
+  it('should handle array of enum references', () => {
+    expect(propertyTypeToTs({ array: { enum: 'Status' } })).toBe('Status[]');
+  });
 });
 
 describe('generateReadType', () => {

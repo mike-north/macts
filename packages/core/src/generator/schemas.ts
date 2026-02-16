@@ -8,52 +8,54 @@ export interface GeneratedSchema {
 }
 
 /**
- * Convert manifest property type to Zod schema code.
- * Accepts PropertyType union or plain strings (for command parameter types).
+ * Map of primitive type names to their Zod schema representations.
  */
-export function propertyTypeToZod(type: PropertyType | string | undefined, optional: boolean): string {
+const PRIMITIVE_TYPE_ZOD_MAP: Record<string, string> = {
+  string: 'z.string()',
+  number: 'z.number()',
+  integer: 'z.number()',
+  boolean: 'z.boolean()',
+  date: 'z.date()',
+  data: 'z.instanceof(ArrayBuffer)',
+  file: 'z.string()', // Path
+  any: 'z.unknown()',
+  point: 'z.object({ x: z.number(), y: z.number() })',
+  rect: 'z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })',
+  rgb: 'z.object({ r: z.number(), g: z.number(), b: z.number() })',
+};
+
+/**
+ * Convert manifest property type to Zod schema code.
+ *
+ * Handles three categories of types:
+ * - Primitive types (string, number, boolean, date, etc.)
+ * - Complex types (arrays, resource references, enum references)
+ * - Custom type references (arbitrary strings referencing resources/enums)
+ *
+ * @param type - The property type from the manifest, or undefined
+ * @param optional - Whether to wrap the schema in .optional()
+ * @returns Zod schema code string
+ *
+ * @example
+ * ```typescript
+ * propertyTypeToZod('string', false)           // => 'z.string()'
+ * propertyTypeToZod({ array: 'number' }, false) // => 'z.array(z.number())'
+ * propertyTypeToZod({ enum: 'Priority' }, true) // => 'PrioritySchema.optional()'
+ * ```
+ */
+export function propertyTypeToZod(type: PropertyType | undefined, optional: boolean): string {
   let schema: string;
 
   if (!type) {
     schema = 'z.unknown()';
   } else if (typeof type === 'string') {
-    switch (type) {
-      case 'string':
-        schema = 'z.string()';
-        break;
-      case 'number':
-      case 'integer':
-        schema = 'z.number()';
-        break;
-      case 'boolean':
-        schema = 'z.boolean()';
-        break;
-      case 'date':
-        schema = 'z.date()';
-        break;
-      case 'data':
-        schema = 'z.instanceof(ArrayBuffer)';
-        break;
-      case 'file':
-        schema = 'z.string()'; // Path
-        break;
-      case 'any':
-        schema = 'z.unknown()';
-        break;
-      case 'point':
-        schema = 'z.object({ x: z.number(), y: z.number() })';
-        break;
-      case 'rect':
-        schema = 'z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() })';
-        break;
-      case 'rgb':
-        schema = 'z.object({ r: z.number(), g: z.number(), b: z.number() })';
-        break;
-      default:
-        // Reference to another schema (shouldn't happen with current types)
-        // Exhaustive check - this should never happen with current PrimitiveType
-        schema = `${String(type)}Schema`;
-        break;
+    // Check if it's a known primitive type
+    const mapped = PRIMITIVE_TYPE_ZOD_MAP[type];
+    if (mapped) {
+      schema = mapped;
+    } else {
+      // Custom type reference (resource or enum name)
+      schema = `${type}Schema`;
     }
   } else if ('array' in type) {
     const elementSchema = propertyTypeToZod(type.array, false);

@@ -117,6 +117,28 @@ describe('propertyTypeToZod', () => {
     it('should treat unrecognized strings as schema references', () => {
       expect(propertyTypeToZod('UnknownType', false)).toBe('UnknownTypeSchema');
     });
+
+    it('should return unknown for empty object', () => {
+      expect(propertyTypeToZod({} as never, false)).toBe('z.unknown()');
+    });
+
+    it('should handle deeply nested arrays', () => {
+      expect(propertyTypeToZod({ array: { array: { array: 'string' } } }, false)).toBe(
+        'z.array(z.array(z.array(z.string())))'
+      );
+    });
+
+    it('should handle array of resource references', () => {
+      expect(propertyTypeToZod({ array: { resource: 'Event' } }, false)).toBe(
+        'z.array(EventSchema)'
+      );
+    });
+
+    it('should handle array of enum references', () => {
+      expect(propertyTypeToZod({ array: { enum: 'Status' } }, false)).toBe(
+        'z.array(StatusSchema)'
+      );
+    });
   });
 });
 

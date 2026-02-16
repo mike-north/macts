@@ -1,5 +1,5 @@
 import type { GeneratorContext } from './context.js';
-import type { Resource, HierarchyChild } from '../manifest/index.js';
+import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js';
 import { propertyTypeToTs } from './types.js';
 
 export interface GeneratedClass {
@@ -81,12 +81,14 @@ export function generateResourceClass(resource: Resource, ctx: GeneratorContext)
   const commands = ctx.getResourceCommands(resource.name);
   const commandMethods = commands.map(cmd => {
     const params = cmd.parameters.map(p => {
-      const tsType = propertyTypeToTs(p.type);
+      // Cast string to PropertyType - command types are always valid primitive or reference types
+      const tsType = propertyTypeToTs(p.type as PropertyType);
       const optional = !p.required ? '?' : '';
       return `${p.name}${optional}: ${tsType}`;
     }).join(', ');
 
-    const returnType = cmd.returns ? propertyTypeToTs(cmd.returns) : 'void';
+    // Cast return type similarly
+    const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void';
 
     // Build parameter object for executor
     const paramNames = cmd.parameters.map(p => p.name);
