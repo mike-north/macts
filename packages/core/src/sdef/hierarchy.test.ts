@@ -2,9 +2,9 @@
  * Tests for hierarchy builder.
  */
 
-import { describe, it, expect } from 'vitest';
-import { buildHierarchy } from './hierarchy.js';
-import type { RawSdefData } from './types.js';
+import { describe, it, expect } from 'vitest'
+import { buildHierarchy } from './hierarchy.js'
+import type { RawSdefData } from './types.js'
 
 describe('buildHierarchy', () => {
   describe('simple two-level hierarchy', () => {
@@ -37,22 +37,22 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBe('application');
-      expect(result.resources).toEqual(new Set(['application']));
-      expect(result.valueTypes).toEqual(new Set(['document']));
-      expect(result.ambiguousClasses.size).toBe(0);
+      expect(result.rootClass).toBe('application')
+      expect(result.resources).toEqual(new Set(['application']))
+      expect(result.valueTypes).toEqual(new Set(['document']))
+      expect(result.ambiguousClasses.size).toBe(0)
 
-      expect(result.hierarchy.children).toHaveProperty('documents');
+      expect(result.hierarchy.children).toHaveProperty('documents')
       expect(result.hierarchy.children['documents']).toEqual({
         resource: 'document',
         access: 'rw',
         description: 'A document',
-      });
-    });
+      })
+    })
 
     it('should handle read-only access mode', () => {
       const sdef: RawSdefData = {
@@ -83,17 +83,17 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
       expect(result.hierarchy.children['windows']).toEqual({
         resource: 'window',
         access: 'r',
         description: 'A window',
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('deep hierarchy', () => {
     it('should build application → calendars → events → attendees', () => {
@@ -141,42 +141,42 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBe('application');
-      expect(result.resources).toEqual(new Set(['application', 'calendar', 'event']));
-      expect(result.valueTypes).toEqual(new Set(['attendee']));
+      expect(result.rootClass).toBe('application')
+      expect(result.resources).toEqual(new Set(['application', 'calendar', 'event']))
+      expect(result.valueTypes).toEqual(new Set(['attendee']))
 
       // Check root level
-      expect(result.hierarchy.children).toHaveProperty('calendars');
-      const calendar = result.hierarchy.children['calendars'];
-      expect(calendar).toBeDefined();
-      if (!calendar) throw new Error('calendar should be defined');
-      expect(calendar.resource).toBe('calendar');
-      expect(calendar.access).toBe('rw');
+      expect(result.hierarchy.children).toHaveProperty('calendars')
+      const calendar = result.hierarchy.children['calendars']
+      expect(calendar).toBeDefined()
+      if (!calendar) throw new Error('calendar should be defined')
+      expect(calendar.resource).toBe('calendar')
+      expect(calendar.access).toBe('rw')
 
       // Check second level
-      expect(calendar.children).toHaveProperty('events');
-      if (!calendar.children) throw new Error('calendar.children should be defined');
-      const event = calendar.children['events'];
-      expect(event).toBeDefined();
-      if (!event) throw new Error('event should be defined');
-      expect(event.resource).toBe('event');
-      expect(event.access).toBe('rw');
+      expect(calendar.children).toHaveProperty('events')
+      if (!calendar.children) throw new Error('calendar.children should be defined')
+      const event = calendar.children['events']
+      expect(event).toBeDefined()
+      if (!event) throw new Error('event should be defined')
+      expect(event.resource).toBe('event')
+      expect(event.access).toBe('rw')
 
       // Check third level
-      expect(event.children).toHaveProperty('attendees');
-      if (!event.children) throw new Error('event.children should be defined');
-      const attendee = event.children['attendees'];
-      expect(attendee).toBeDefined();
-      if (!attendee) throw new Error('attendee should be defined');
-      expect(attendee.resource).toBe('attendee');
-      expect(attendee.access).toBe('r');
-      expect(attendee.children).toBeUndefined();
-    });
-  });
+      expect(event.children).toHaveProperty('attendees')
+      if (!event.children) throw new Error('event.children should be defined')
+      const attendee = event.children['attendees']
+      expect(attendee).toBeDefined()
+      if (!attendee) throw new Error('attendee should be defined')
+      expect(attendee.resource).toBe('attendee')
+      expect(attendee.access).toBe('r')
+      expect(attendee.children).toBeUndefined()
+    })
+  })
 
   describe('resource vs value type detection', () => {
     it('should identify resources (classes with elements)', () => {
@@ -216,13 +216,13 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.resources).toEqual(new Set(['application', 'document']));
-      expect(result.valueTypes).toEqual(new Set(['paragraph']));
-    });
+      expect(result.resources).toEqual(new Set(['application', 'document']))
+      expect(result.valueTypes).toEqual(new Set(['paragraph']))
+    })
 
     it('should identify value types (classes with no elements)', () => {
       const sdef: RawSdefData = {
@@ -252,14 +252,14 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.resources).toEqual(new Set());
-      expect(result.valueTypes).toEqual(new Set(['application', 'color']));
-    });
-  });
+      expect(result.resources).toEqual(new Set())
+      expect(result.valueTypes).toEqual(new Set(['application', 'color']))
+    })
+  })
 
   describe('ambiguous classes detection', () => {
     it('should detect classes with multiple parents', () => {
@@ -310,14 +310,14 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.ambiguousClasses.size).toBe(1);
-      expect(result.ambiguousClasses.has('tag')).toBe(true);
-      expect(result.ambiguousClasses.get('tag')).toEqual(['project', 'task']);
-    });
+      expect(result.ambiguousClasses.size).toBe(1)
+      expect(result.ambiguousClasses.has('tag')).toBe(true)
+      expect(result.ambiguousClasses.get('tag')).toEqual(['project', 'task'])
+    })
 
     it('should not detect single-parent classes as ambiguous', () => {
       const sdef: RawSdefData = {
@@ -348,13 +348,13 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.ambiguousClasses.size).toBe(0);
-    });
-  });
+      expect(result.ambiguousClasses.size).toBe(0)
+    })
+  })
 
   describe('circular reference handling', () => {
     it('should handle circular references gracefully', () => {
@@ -387,21 +387,21 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
       // Should not throw or infinitely loop
-      expect(result.hierarchy.children).toHaveProperty('nodes');
-      const node = result.hierarchy.children['nodes'];
-      expect(node).toBeDefined();
-      if (!node) throw new Error('node should be defined');
-      expect(node.resource).toBe('node');
+      expect(result.hierarchy.children).toHaveProperty('nodes')
+      const node = result.hierarchy.children['nodes']
+      expect(node).toBeDefined()
+      if (!node) throw new Error('node should be defined')
+      expect(node.resource).toBe('node')
 
       // The circular reference should be excluded
-      expect(node.children).toBeUndefined();
-    });
-  });
+      expect(node.children).toBeUndefined()
+    })
+  })
 
   describe('root class detection', () => {
     it('should find "application" as root class', () => {
@@ -432,12 +432,12 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBe('application');
-    });
+      expect(result.rootClass).toBe('application')
+    })
 
     it('should find class with no parents as root', () => {
       const sdef: RawSdefData = {
@@ -468,13 +468,13 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBe('root');
-    });
-  });
+      expect(result.rootClass).toBe('root')
+    })
+  })
 
   describe('plural name handling', () => {
     it('should use plural name as key when available', () => {
@@ -506,17 +506,17 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
       // Should use "people" as key, not "person"
-      expect(result.hierarchy.children).toHaveProperty('people');
-      const people = result.hierarchy.children['people'];
-      expect(people).toBeDefined();
-      if (!people) throw new Error('people should be defined');
-      expect(people.resource).toBe('person');
-    });
+      expect(result.hierarchy.children).toHaveProperty('people')
+      const people = result.hierarchy.children['people']
+      expect(people).toBeDefined()
+      if (!people) throw new Error('people should be defined')
+      expect(people.resource).toBe('person')
+    })
 
     it('should fall back to class name if no plural provided', () => {
       const sdef: RawSdefData = {
@@ -547,18 +547,18 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
       // Should use "item" as key since no plural
-      expect(result.hierarchy.children).toHaveProperty('item');
-      const item = result.hierarchy.children['item'];
-      expect(item).toBeDefined();
-      if (!item) throw new Error('item should be defined');
-      expect(item.resource).toBe('item');
-    });
-  });
+      expect(result.hierarchy.children).toHaveProperty('item')
+      const item = result.hierarchy.children['item']
+      expect(item).toBeDefined()
+      if (!item) throw new Error('item should be defined')
+      expect(item.resource).toBe('item')
+    })
+  })
 
   describe('multi-suite handling', () => {
     it('should collect classes from all suites', () => {
@@ -610,39 +610,39 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
-
-      const result = buildHierarchy(sdef);
-
-      expect(result.hierarchy.children).toHaveProperty('documents');
-      expect(result.hierarchy.children).toHaveProperty('windows');
-      const documents = result.hierarchy.children['documents'];
-      const windows = result.hierarchy.children['windows'];
-      expect(documents).toBeDefined();
-      expect(windows).toBeDefined();
-      if (!documents || !windows) {
-        throw new Error('documents and windows should be defined');
       }
-      expect(documents.resource).toBe('document');
-      expect(windows.resource).toBe('window');
-    });
-  });
+
+      const result = buildHierarchy(sdef)
+
+      expect(result.hierarchy.children).toHaveProperty('documents')
+      expect(result.hierarchy.children).toHaveProperty('windows')
+      const documents = result.hierarchy.children['documents']
+      const windows = result.hierarchy.children['windows']
+      expect(documents).toBeDefined()
+      expect(windows).toBeDefined()
+      if (!documents || !windows) {
+        throw new Error('documents and windows should be defined')
+      }
+      expect(documents.resource).toBe('document')
+      expect(windows.resource).toBe('window')
+    })
+  })
 
   describe('empty cases', () => {
     it('should handle empty suites array', () => {
       const sdef: RawSdefData = {
         title: 'Empty App',
         suites: [],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBeUndefined();
-      expect(result.resources.size).toBe(0);
-      expect(result.valueTypes.size).toBe(0);
-      expect(result.ambiguousClasses.size).toBe(0);
-      expect(result.hierarchy.children).toEqual({});
-    });
+      expect(result.rootClass).toBeUndefined()
+      expect(result.resources.size).toBe(0)
+      expect(result.valueTypes.size).toBe(0)
+      expect(result.ambiguousClasses.size).toBe(0)
+      expect(result.hierarchy.children).toEqual({})
+    })
 
     it('should handle suite with no classes', () => {
       const sdef: RawSdefData = {
@@ -657,14 +657,14 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      expect(result.rootClass).toBeUndefined();
-      expect(result.hierarchy.children).toEqual({});
-    });
-  });
+      expect(result.rootClass).toBeUndefined()
+      expect(result.hierarchy.children).toEqual({})
+    })
+  })
 
   describe('description handling', () => {
     it('should preserve descriptions in hierarchy', () => {
@@ -696,15 +696,15 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      const calendars = result.hierarchy.children['calendars'];
-      expect(calendars).toBeDefined();
-      if (!calendars) throw new Error('calendars should be defined');
-      expect(calendars.description).toBe('A calendar that contains events');
-    });
+      const calendars = result.hierarchy.children['calendars']
+      expect(calendars).toBeDefined()
+      if (!calendars) throw new Error('calendars should be defined')
+      expect(calendars.description).toBe('A calendar that contains events')
+    })
 
     it('should handle missing descriptions', () => {
       const sdef: RawSdefData = {
@@ -735,14 +735,14 @@ describe('buildHierarchy', () => {
             enumerations: [],
           },
         ],
-      };
+      }
 
-      const result = buildHierarchy(sdef);
+      const result = buildHierarchy(sdef)
 
-      const documents = result.hierarchy.children['documents'];
-      expect(documents).toBeDefined();
-      if (!documents) throw new Error('documents should be defined');
-      expect(documents.description).toBeUndefined();
-    });
-  });
-});
+      const documents = result.hierarchy.children['documents']
+      expect(documents).toBeDefined()
+      if (!documents) throw new Error('documents should be defined')
+      expect(documents.description).toBeUndefined()
+    })
+  })
+})

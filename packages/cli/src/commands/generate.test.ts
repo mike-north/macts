@@ -1,338 +1,313 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { GenerateCommand } from './generate.js';
-import * as core from '@macts/core';
-import type { Writable } from 'node:stream';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { GenerateCommand } from './generate.js'
+import * as core from '@macts/core'
+import type { Writable } from 'node:stream'
+import type { BaseContext } from 'clipanion'
 
 // Mock the core module
 vi.mock('@macts/core', async () => {
-  const actual = await vi.importActual<typeof core>('@macts/core');
+  const actual = await vi.importActual<typeof core>('@macts/core')
   return {
     ...actual,
     loadManifest: vi.fn(),
-    generateSdk: vi.fn(),
-    writeSdk: vi.fn(),
-  };
-});
+    generateConsolidatedPackages: vi.fn(),
+    generateClientPackage: vi.fn(),
+    generateServerPackage: vi.fn(),
+    writeFiles: vi.fn(),
+  }
+})
 
 describe('GenerateCommand', () => {
-  let stdout: string[];
-  let stderr: string[];
-  let mockStdout: Writable;
-  let mockStderr: Writable;
+  let stdout: string[]
+  let stderr: string[]
+  let mockStdout: Writable
+  let mockStderr: Writable
 
   beforeEach(() => {
-    stdout = [];
-    stderr = [];
+    stdout = []
+    stderr = []
 
     // Create mock writable streams
     mockStdout = {
       write: (chunk: string) => {
-        stdout.push(chunk);
-        return true;
+        stdout.push(chunk)
+        return true
       },
-    } as Writable;
+    } as Writable
 
     mockStderr = {
       write: (chunk: string) => {
-        stderr.push(chunk);
-        return true;
+        stderr.push(chunk)
+        return true
       },
-    } as Writable;
+    } as Writable
 
     // Reset mocks
-    vi.clearAllMocks();
-  });
+    vi.clearAllMocks()
+  })
 
   afterEach(() => {
-    vi.restoreAllMocks();
-  });
+    vi.restoreAllMocks()
+  })
+
+  // Helper to create a properly typed test context
+  function createTestContext(): BaseContext {
+    return {
+      stdin: process.stdin,
+      stdout: mockStdout,
+      stderr: mockStderr,
+      env: process.env,
+      colorDepth: 8,
+    }
+  }
+
+  const mockManifest = {
+    version: '1.0' as const,
+    app: {
+      name: 'Calendar',
+      bundleId: 'com.apple.Calendar',
+      tccEntitlements: [],
+    },
+    suites: [],
+    resources: {},
+    commands: {},
+    enums: {},
+    hierarchy: { children: {} },
+    relationships: [],
+  }
 
   describe('command parsing', () => {
     it('should have correct command path', () => {
-      expect(GenerateCommand.paths).toEqual([['generate']]);
-    });
+      expect(GenerateCommand.paths).toEqual([['generate']])
+    })
 
     it('should define usage information', () => {
-      expect(GenerateCommand.usage).toBeDefined();
-      expect(GenerateCommand.usage?.description).toContain('Generate');
-    });
-  });
+      expect(GenerateCommand.usage).toBeDefined()
+      expect(GenerateCommand.usage.description).toContain('Generate')
+    })
+  })
 
-  describe('execute', () => {
-    const mockManifest = {
-      app: {
-        name: 'Calendar',
-        bundleId: 'com.apple.Calendar',
-      },
-      resources: {},
-      commands: {},
-      enums: {},
-    };
-
-    it('should load manifest and generate SDK successfully', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest);
-      vi.mocked(core.generateSdk).mockReturnValue({
-        files: [
-          { path: 'src/index.ts', content: 'export {}' },
-          { path: 'package.json', content: '{}' },
-        ],
+  describe('--target all', () => {
+    it('should generate all packages successfully', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateConsolidatedPackages).mockReturnValue({
+        client: { dir: 'calendar', files: [{ path: 'src/index.ts', content: '' }] },
+        server: { dir: 'calendar-server', files: [{ path: 'src/index.ts', content: '' }] },
         errors: [],
-      });
-      vi.mocked(core.writeSdk).mockResolvedValue(undefined);
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
 
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/calendar/app.yaml';
-      command.outDir = 'packages/sdk-calendar';
-      command.packageName = '@macts/sdk-calendar';
-      command.version = undefined as unknown as string;
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages'
+      command.target = 'all'
+      command.context = createTestContext()
 
-      // Execute
-      const exitCode = await command.execute();
+      const exitCode = await command.execute()
 
-      // Assertions
-      expect(exitCode).toBe(0);
-      expect(core.loadManifest).toHaveBeenCalledWith(
-        expect.stringContaining('manifests/calendar/app.yaml')
-      );
-      expect(core.generateSdk).toHaveBeenCalledWith(mockManifest, {
-        outDir: expect.stringContaining('packages/sdk-calendar'),
-        packageName: '@macts/sdk-calendar',
-        version: undefined,
-      });
-      expect(core.writeSdk).toHaveBeenCalledWith(
-        expect.objectContaining({
-          files: expect.arrayContaining([
-            expect.objectContaining({ path: 'src/index.ts' }),
-          ]),
-        }),
-        expect.stringContaining('packages/sdk-calendar')
-      );
-
-      // Check output
-      expect(stdout.join('')).toContain('Loading manifest');
-      expect(stdout.join('')).toContain('Generating SDK for Calendar');
-      expect(stdout.join('')).toContain('Writing 2 files');
-      expect(stdout.join('')).toContain('SDK generated successfully!');
-    });
-
-    it('should pass version option to generator', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest);
-      vi.mocked(core.generateSdk).mockReturnValue({
-        files: [{ path: 'src/index.ts', content: 'export {}' }],
-        errors: [],
-      });
-      vi.mocked(core.writeSdk).mockResolvedValue(undefined);
-
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/calendar/app.yaml';
-      command.outDir = 'packages/sdk-calendar';
-      command.packageName = '@macts/sdk-calendar';
-      command.version = '1.2.3';
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
-
-      // Execute
-      await command.execute();
-
-      // Assertions
-      expect(core.generateSdk).toHaveBeenCalledWith(
+      expect(exitCode).toBe(0)
+      expect(core.generateConsolidatedPackages).toHaveBeenCalledWith(
         mockManifest,
         expect.objectContaining({
-          version: '1.2.3',
+          appName: 'calendar',
         })
-      );
-    });
+      )
+      expect(core.writeFiles).toHaveBeenCalledTimes(2)
+      expect(stdout.join('')).toContain('Writing 2 files')
+      expect(stdout.join('')).toContain('Generated packages')
+    })
 
-    it('should return error code when generation has errors', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest);
-      vi.mocked(core.generateSdk).mockReturnValue({
-        files: [],
-        errors: ['Failed to generate types', 'Invalid resource schema'],
-      });
+    it('should report errors from all-target generation', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateConsolidatedPackages).mockReturnValue({
+        client: { dir: 'calendar', files: [] },
+        server: { dir: 'calendar-server', files: [] },
+        errors: ['SDK generation failed'],
+      })
 
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/calendar/app.yaml';
-      command.outDir = 'packages/sdk-calendar';
-      command.packageName = '@macts/sdk-calendar';
-      command.version = undefined as unknown as string;
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages'
+      command.target = 'all'
+      command.context = createTestContext()
 
-      // Execute
-      const exitCode = await command.execute();
+      const exitCode = await command.execute()
 
-      // Assertions
-      expect(exitCode).toBe(1);
-      expect(stderr.join('')).toContain('Errors during generation');
-      expect(stderr.join('')).toContain('Failed to generate types');
-      expect(stderr.join('')).toContain('Invalid resource schema');
-      expect(core.writeSdk).not.toHaveBeenCalled();
-    });
+      expect(exitCode).toBe(1)
+      expect(stderr.join('')).toContain('SDK generation failed')
+    })
 
-    it('should handle manifest load errors', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockRejectedValue(
-        new Error('Invalid manifest: missing app.bundleId')
-      );
-
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/invalid/app.yaml';
-      command.outDir = 'packages/sdk-invalid';
-      command.packageName = '@macts/sdk-invalid';
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
-
-      // Execute
-      const exitCode = await command.execute();
-
-      // Assertions
-      expect(exitCode).toBe(1);
-      expect(stderr.join('')).toContain('Error:');
-      expect(stderr.join('')).toContain('Invalid manifest: missing app.bundleId');
-    });
-
-    it('should handle write errors', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest);
-      vi.mocked(core.generateSdk).mockReturnValue({
-        files: [{ path: 'src/index.ts', content: 'export {}' }],
+    it('should default to all target when not specified', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateConsolidatedPackages).mockReturnValue({
+        client: { dir: 'calendar', files: [] },
+        server: { dir: 'calendar-server', files: [] },
         errors: [],
-      });
-      vi.mocked(core.writeSdk).mockRejectedValue(
-        new Error('EACCES: permission denied')
-      );
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
 
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/calendar/app.yaml';
-      command.outDir = '/protected/sdk-calendar';
-      command.packageName = '@macts/sdk-calendar';
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages'
+      // target not set — should default to 'all'
+      command.context = createTestContext()
 
-      // Execute
-      const exitCode = await command.execute();
+      const exitCode = await command.execute()
 
-      // Assertions
-      expect(exitCode).toBe(1);
-      expect(stderr.join('')).toContain('Error:');
-      expect(stderr.join('')).toContain('EACCES: permission denied');
-    });
+      expect(exitCode).toBe(0)
+      expect(core.generateConsolidatedPackages).toHaveBeenCalled()
+    })
+  })
 
-    it('should handle non-Error exceptions', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockRejectedValue('Something went wrong');
-
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/calendar/app.yaml';
-      command.outDir = 'packages/sdk-calendar';
-      command.packageName = '@macts/sdk-calendar';
-      command.version = undefined as unknown as string;
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
-
-      // Execute
-      const exitCode = await command.execute();
-
-      // Assertions
-      expect(exitCode).toBe(1);
-      expect(stderr.join('')).toContain('Unknown error:');
-      expect(stderr.join('')).toContain('Something went wrong');
-    });
-  });
-
-  describe('edge cases', () => {
-    it('should handle empty files array', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue({
-        app: { name: 'Empty', bundleId: 'com.test.empty' },
-        resources: {},
-        commands: {},
-        enums: {},
-      });
-      vi.mocked(core.generateSdk).mockReturnValue({
-        files: [],
-        errors: [],
-      });
-      vi.mocked(core.writeSdk).mockResolvedValue(undefined);
-
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = 'manifests/empty/app.yaml';
-      command.outDir = 'packages/sdk-empty';
-      command.packageName = '@macts/sdk-empty';
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
-
-      // Execute
-      const exitCode = await command.execute();
-
-      // Assertions
-      expect(exitCode).toBe(0);
-      expect(stdout.join('')).toContain('Writing 0 files');
-    });
-
-    it('should resolve relative paths', async () => {
-      // Setup mocks
-      vi.mocked(core.loadManifest).mockResolvedValue({
-        app: { name: 'Test', bundleId: 'com.test.app' },
-        resources: {},
-        commands: {},
-        enums: {},
-      });
-      vi.mocked(core.generateSdk).mockReturnValue({
+  describe('--target client', () => {
+    it('should generate client package', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateClientPackage).mockReturnValue({
+        dir: 'calendar',
         files: [{ path: 'src/index.ts', content: '' }],
         errors: [],
-      });
-      vi.mocked(core.writeSdk).mockResolvedValue(undefined);
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
 
-      // Create and configure command
-      const command = new GenerateCommand();
-      command.manifestPath = './manifests/test/app.yaml';
-      command.outDir = './packages/sdk-test';
-      command.packageName = '@macts/sdk-test';
-      command.context = {
-        stdout: mockStdout,
-        stderr: mockStderr,
-      } as any;
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'client'
+      command.context = createTestContext()
 
-      // Execute
-      await command.execute();
+      const exitCode = await command.execute()
 
-      // Assertions - paths should be resolved to absolute
-      expect(core.loadManifest).toHaveBeenCalledWith(
-        expect.not.stringMatching(/^\.\//)
-      );
-      expect(core.generateSdk).toHaveBeenCalledWith(
-        expect.anything(),
+      expect(exitCode).toBe(0)
+      expect(core.generateClientPackage).toHaveBeenCalled()
+      expect(core.writeFiles).toHaveBeenCalled()
+      expect(stdout.join('')).toContain('Package generated successfully!')
+    })
+
+    it('should use custom package name', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateClientPackage).mockReturnValue({
+        dir: 'calendar',
+        files: [{ path: 'src/index.ts', content: '' }],
+        errors: [],
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'client'
+      command.packageName = '@custom/calendar'
+      command.context = createTestContext()
+
+      await command.execute()
+
+      expect(core.generateClientPackage).toHaveBeenCalledWith(
+        mockManifest,
         expect.objectContaining({
-          outDir: expect.not.stringMatching(/^\.\/./),
+          clientPackageName: '@custom/calendar',
         })
-      );
-    });
-  });
-});
+      )
+    })
+
+    it('should report client generation errors', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateClientPackage).mockReturnValue({
+        dir: 'calendar',
+        files: [],
+        errors: ['Resource not found'],
+      })
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'client'
+      command.context = createTestContext()
+
+      const exitCode = await command.execute()
+
+      expect(exitCode).toBe(1)
+      expect(stderr.join('')).toContain('Resource not found')
+    })
+  })
+
+  describe('--target server', () => {
+    it('should generate server package', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateServerPackage).mockReturnValue({
+        dir: 'calendar-server',
+        files: [{ path: 'src/index.ts', content: '' }],
+        errors: [],
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar-server'
+      command.target = 'server'
+      command.context = createTestContext()
+
+      const exitCode = await command.execute()
+
+      expect(exitCode).toBe(0)
+      expect(core.generateServerPackage).toHaveBeenCalled()
+      expect(core.writeFiles).toHaveBeenCalled()
+      expect(stdout.join('')).toContain('Package generated successfully!')
+    })
+
+    it('should report server generation errors', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateServerPackage).mockReturnValue({
+        dir: 'calendar-server',
+        files: [],
+        errors: ['Manifest serialization failed'],
+      })
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar-server'
+      command.target = 'server'
+      command.context = createTestContext()
+
+      const exitCode = await command.execute()
+
+      expect(exitCode).toBe(1)
+      expect(stderr.join('')).toContain('Manifest serialization failed')
+    })
+  })
+
+  describe('error handling', () => {
+    it('should handle manifest load errors', async () => {
+      vi.mocked(core.loadManifest).mockRejectedValue(
+        new Error('Invalid manifest: missing app.bundleId')
+      )
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/invalid/app.yaml'
+      command.outDir = 'packages/invalid'
+      command.target = 'all'
+      command.context = createTestContext()
+
+      const exitCode = await command.execute()
+
+      expect(exitCode).toBe(1)
+      expect(stderr.join('')).toContain('Error:')
+      expect(stderr.join('')).toContain('Invalid manifest: missing app.bundleId')
+    })
+
+    it('should handle non-Error exceptions', async () => {
+      vi.mocked(core.loadManifest).mockRejectedValue('Something went wrong')
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'all'
+      command.context = createTestContext()
+
+      const exitCode = await command.execute()
+
+      expect(exitCode).toBe(1)
+      expect(stderr.join('')).toContain('Unknown error:')
+      expect(stderr.join('')).toContain('Something went wrong')
+    })
+  })
+})

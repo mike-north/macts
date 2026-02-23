@@ -1,44 +1,44 @@
-import { describe, it, expect } from 'vitest';
-import { IdentifierSchema, ResourceSchema } from './resource.js';
-import { ZodError } from 'zod';
+import { describe, it, expect } from 'vitest'
+import { IdentifierSchema, ResourceSchema } from './resource.js'
+import { ZodError } from 'zod'
 
 describe('IdentifierSchema', () => {
   describe('positive cases', () => {
     it('should accept minimal valid identifier', () => {
       const result = IdentifierSchema.parse({
         property: 'id',
-      });
+      })
 
       expect(result).toEqual({
         property: 'id',
         primary: false, // default value
-      });
-    });
+      })
+    })
 
     it('should accept identifier with primary flag', () => {
       const result = IdentifierSchema.parse({
         property: 'id',
         primary: true,
-      });
+      })
 
       expect(result).toEqual({
         property: 'id',
         primary: true,
-      });
-    });
+      })
+    })
 
     it('should accept identifier with explicit false primary', () => {
       const result = IdentifierSchema.parse({
         property: 'name',
         primary: false,
-      });
+      })
 
       expect(result).toEqual({
         property: 'name',
         primary: false,
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject identifier without property', () => {
@@ -46,8 +46,8 @@ describe('IdentifierSchema', () => {
         IdentifierSchema.parse({
           primary: true,
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject identifier with non-string property', () => {
       expect(() =>
@@ -55,8 +55,8 @@ describe('IdentifierSchema', () => {
           property: 123,
           primary: true,
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject identifier with non-boolean primary', () => {
       expect(() =>
@@ -64,38 +64,38 @@ describe('IdentifierSchema', () => {
           property: 'id',
           primary: 'yes',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject empty object', () => {
-      expect(() => IdentifierSchema.parse({})).toThrow(ZodError);
-    });
-  });
+      expect(() => IdentifierSchema.parse({})).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
     it('should accept empty string property', () => {
       const result = IdentifierSchema.parse({
         property: '',
-      });
+      })
 
-      expect(result.property).toBe('');
-    });
+      expect(result.property).toBe('')
+    })
 
     it('should handle extra properties by ignoring them', () => {
       const result = IdentifierSchema.parse({
         property: 'id',
         primary: true,
         extra: 'ignored',
-      });
+      })
 
       // Zod strips unknown properties by default
       expect(result).toEqual({
         property: 'id',
         primary: true,
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})
 
 describe('ResourceSchema', () => {
   describe('positive cases', () => {
@@ -105,15 +105,15 @@ describe('ResourceSchema', () => {
         plural: 'calendars',
         description: 'A calendar container',
         properties: {},
-      });
+      })
 
       expect(result).toEqual({
         name: 'Calendar',
         plural: 'calendars',
         description: 'A calendar container',
         properties: {},
-      });
-    });
+      })
+    })
 
     it('should accept complete resource with all optional fields', () => {
       const result = ResourceSchema.parse({
@@ -135,13 +135,13 @@ describe('ResourceSchema', () => {
             primary: true,
           },
         ],
-      });
+      })
 
-      expect(result.name).toBe('Event');
-      expect(result.schema).toBe('./schemas/event.json');
-      expect(result.code).toBe('wrev');
-      expect(result.identifiers).toHaveLength(1);
-    });
+      expect(result.name).toBe('Event')
+      expect(result.schema).toBe('./schemas/event.json')
+      expect(result.code).toBe('wrev')
+      expect(result.identifiers).toHaveLength(1)
+    })
 
     it('should accept resource with multiple identifiers', () => {
       const result = ResourceSchema.parse({
@@ -150,12 +150,12 @@ describe('ResourceSchema', () => {
         description: 'A calendar event',
         properties: {},
         identifiers: [{ property: 'uid', primary: true }, { property: 'id' }],
-      });
+      })
 
-      expect(result.identifiers).toHaveLength(2);
-      expect(result.identifiers?.[0]?.primary).toBe(true);
-      expect(result.identifiers?.[1]?.primary).toBe(false);
-    });
+      expect(result.identifiers).toHaveLength(2)
+      expect(result.identifiers?.[0]?.primary).toBe(true)
+      expect(result.identifiers?.[1]?.primary).toBe(false)
+    })
 
     it('should accept resource with empty properties', () => {
       const result = ResourceSchema.parse({
@@ -163,11 +163,11 @@ describe('ResourceSchema', () => {
         plural: 'calendars',
         description: 'A calendar',
         properties: {},
-      });
+      })
 
-      expect(result.properties).toEqual({});
-    });
-  });
+      expect(result.properties).toEqual({})
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject resource without name', () => {
@@ -177,8 +177,8 @@ describe('ResourceSchema', () => {
           description: 'A calendar',
           properties: {},
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource without plural', () => {
       expect(() =>
@@ -187,8 +187,8 @@ describe('ResourceSchema', () => {
           description: 'A calendar',
           properties: {},
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource without description', () => {
       expect(() =>
@@ -197,40 +197,42 @@ describe('ResourceSchema', () => {
           plural: 'calendars',
           properties: {},
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
-    it('should reject resource without properties', () => {
-      expect(() =>
-        ResourceSchema.parse({
-          name: 'Calendar',
-          plural: 'calendars',
-          description: 'A calendar',
-        })
-      ).toThrow(ZodError);
-    });
+    it('should accept resource without properties (defaults to empty object)', () => {
+      // Properties field uses z.preprocess to default to {} when missing
+      const result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+      })
+      expect(result.properties).toEqual({})
+    })
 
     it('should reject resource with invalid code length', () => {
+      // Empty string should be rejected
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
           plural: 'calendars',
           description: 'A calendar',
           properties: {},
-          code: 'abc', // too short
+          code: '',
         })
-      ).toThrow(ZodError);
+      ).toThrow(ZodError)
 
+      // Too long (5+ chars) should be rejected
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
           plural: 'calendars',
           description: 'A calendar',
           properties: {},
-          code: 'abcde', // too long
+          code: 'abcde',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource with non-string name', () => {
       expect(() =>
@@ -240,8 +242,8 @@ describe('ResourceSchema', () => {
           description: 'A calendar',
           properties: {},
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource with non-object properties', () => {
       expect(() =>
@@ -251,8 +253,8 @@ describe('ResourceSchema', () => {
           description: 'A calendar',
           properties: 'not-an-object',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource with non-array identifiers', () => {
       expect(() =>
@@ -263,8 +265,8 @@ describe('ResourceSchema', () => {
           properties: {},
           identifiers: 'not-an-array',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject resource with invalid identifier in array', () => {
       expect(() =>
@@ -278,23 +280,65 @@ describe('ResourceSchema', () => {
             { primary: true }, // missing property
           ],
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
+    it('should accept code with 1-4 characters', () => {
+      // 1 character
+      let result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        code: 'a',
+      })
+      expect(result.code).toBe('a')
+
+      // 2 characters
+      result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        code: 'ab',
+      })
+      expect(result.code).toBe('ab')
+
+      // 3 characters
+      result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        code: 'abc',
+      })
+      expect(result.code).toBe('abc')
+
+      // 4 characters
+      result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        code: 'abcd',
+      })
+      expect(result.code).toBe('abcd')
+    })
+
     it('should accept empty string values', () => {
       const result = ResourceSchema.parse({
         name: '',
         plural: '',
         description: '',
         properties: {},
-      });
+      })
 
-      expect(result.name).toBe('');
-      expect(result.plural).toBe('');
-      expect(result.description).toBe('');
-    });
+      expect(result.name).toBe('')
+      expect(result.plural).toBe('')
+      expect(result.description).toBe('')
+    })
 
     it('should accept empty identifiers array', () => {
       const result = ResourceSchema.parse({
@@ -303,10 +347,10 @@ describe('ResourceSchema', () => {
         description: 'A calendar',
         properties: {},
         identifiers: [],
-      });
+      })
 
-      expect(result.identifiers).toEqual([]);
-    });
+      expect(result.identifiers).toEqual([])
+    })
 
     it('should accept four-character code', () => {
       const result = ResourceSchema.parse({
@@ -315,10 +359,10 @@ describe('ResourceSchema', () => {
         description: 'A calendar',
         properties: {},
         code: 'wrcl',
-      });
+      })
 
-      expect(result.code).toBe('wrcl');
-    });
+      expect(result.code).toBe('wrcl')
+    })
 
     it('should accept undefined optional fields', () => {
       const result = ResourceSchema.parse({
@@ -329,11 +373,11 @@ describe('ResourceSchema', () => {
         schema: undefined,
         code: undefined,
         identifiers: undefined,
-      });
+      })
 
-      expect(result.schema).toBeUndefined();
-      expect(result.code).toBeUndefined();
-      expect(result.identifiers).toBeUndefined();
-    });
-  });
-});
+      expect(result.schema).toBeUndefined()
+      expect(result.code).toBeUndefined()
+      expect(result.identifiers).toBeUndefined()
+    })
+  })
+})

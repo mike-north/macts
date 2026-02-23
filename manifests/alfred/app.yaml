@@ -1,0 +1,230 @@
+version: '1.0'
+
+app:
+  bundleId: com.runningwithcrayons.Alfred
+  name: Alfred
+  displayName: Alfred 5
+  tccEntitlements:
+    - automation
+  distributionModel: developer-id
+
+suites:
+  - name: Alfred Suite
+    code: Alfr
+    description: Alfred Scripts
+    commands:
+      - search
+      - action
+      - browse
+      - runTrigger
+      - reloadWorkflow
+      - revealWorkflow
+      - setConfiguration
+      - removeConfiguration
+      - setTheme
+
+resources:
+  Application:
+    name: Application
+    plural: Applications
+    description: The Alfred application
+    code: capp
+    identifiers:
+      - property: name
+        primary: true
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the application
+        code: pnam
+
+hierarchy:
+  children: {}
+
+commands:
+  search:
+    name: search
+    description: Show Alfred with the given text
+    scope: application
+    code: aevt
+    parameters:
+      - name: query
+        type: string
+        description: The search string to populate Alfred with
+        required: false
+    permission: alfred:app:search
+
+  action:
+    name: action
+    description: Show Alfred actions for the given file
+    scope: application
+    code: aact
+    parameters:
+      - name: items
+        type:
+          array: string
+        description: The items to show actions for
+        required: true
+      - name: asType
+        type: string
+        description: An optional type for the items - file, url or text
+        required: false
+        code: uaty
+    permission: alfred:app:action
+
+  browse:
+    name: browse
+    description: Show Alfred file system navigation for given path
+    scope: application
+    code: abro
+    parameters:
+      - name: path
+        type: string
+        description: The path or search string to browse
+        required: true
+    permission: alfred:app:browse
+
+  runTrigger:
+    name: runTrigger
+    description: Run Alfred workflow trigger
+    scope: application
+    code: arnt
+    parameters:
+      - name: trigger
+        type: string
+        description: The identifier of the trigger
+        required: true
+      - name: inWorkflow
+        type: string
+        description: The workflow bundle identifier
+        required: true
+        code: work
+      - name: withArgument
+        type: string
+        description: An optional argument
+        required: false
+        code: argu
+    permission: alfred:workflows:runTrigger
+
+  reloadWorkflow:
+    name: reloadWorkflow
+    description: Reload Workflow with given UID (folder name) or Bundle ID
+    scope: application
+    code: arlw
+    parameters:
+      - name: workflow
+        type: string
+        description: The UID (folder name), or the Bundle ID of the workflow to reload
+        required: true
+    permission: alfred:workflows:reload
+
+  revealWorkflow:
+    name: revealWorkflow
+    description: Reveal Workflow with given UID (folder name) or Bundle ID
+    scope: application
+    code: arvw
+    parameters:
+      - name: workflow
+        type: string
+        description: The UID (folder name), or the Bundle ID of the workflow to reveal
+        required: true
+      - name: configuration
+        type: boolean
+        description: Optionally open the configuration for this workflow
+        required: false
+        code: opco
+      - name: details
+        type: boolean
+        description: Optionally open the details for this workflow
+        required: false
+        code: opde
+    permission: alfred:workflows:reveal
+
+  setConfiguration:
+    name: setConfiguration
+    description: Modify workflow configuration value, or set environment variable
+    scope: application
+    code: awsc
+    parameters:
+      - name: variable
+        type: string
+        description: The name of the variable
+        required: true
+      - name: toValue
+        type: string
+        description: The value to set
+        required: true
+        code: valu
+      - name: inWorkflow
+        type: string
+        description: The workflow bundle identifier
+        required: true
+        code: work
+      - name: exportable
+        type: boolean
+        description: If this environment variable is fine for export, i.e. the Don't Export box is left unchecked (Defaults to Don't Export). This option is ignored for workflow configuration items
+        required: false
+        code: expo
+    permission: alfred:workflows:setConfiguration
+
+  removeConfiguration:
+    name: removeConfiguration
+    description: Revert workflow configuration value to default, or delete environment variable
+    scope: application
+    code: awrc
+    parameters:
+      - name: variable
+        type: string
+        description: The name of the variable
+        required: true
+      - name: inWorkflow
+        type: string
+        description: The workflow bundle identifier
+        required: true
+        code: work
+    permission: alfred:workflows:removeConfiguration
+
+  setTheme:
+    name: setTheme
+    description: Change theme in Alfred
+    scope: application
+    code: asth
+    parameters:
+      - name: theme
+        type: string
+        description: The name of the theme to switch to
+        required: true
+    permission: alfred:app:setTheme
+
+# Permissions mapping
+permissions:
+  app:
+    read:
+      - alfred:app:search
+      - alfred:app:action
+      - alfred:app:browse
+      - alfred:app:setTheme
+
+  workflows:
+    read:
+      - alfred:workflows:runTrigger
+      - alfred:workflows:reload
+      - alfred:workflows:reveal
+    write:
+      - alfred:workflows:setConfiguration
+      - alfred:workflows:removeConfiguration
+
+extraction:
+  sourceFile: source.sdef
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 1.0
+      commands: 0.95
+  openQuestions:
+    - question: Are the 4-char command codes correct?
+      context: Some codes were truncated or abbreviated from the sdef
+      relatedTo: commands

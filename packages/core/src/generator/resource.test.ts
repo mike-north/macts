@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { generateResourceClass } from './resource.js';
-import { createGeneratorContext } from './context.js';
-import type { AppManifest } from '../manifest/index.js';
+import { describe, it, expect } from 'vitest'
+import { generateResourceClass } from './resource.js'
+import { createGeneratorContext } from './context.js'
+import type { AppManifest } from '../manifest/index.js'
 
 const mockManifest: AppManifest = {
   version: '1.0',
@@ -52,65 +52,65 @@ const mockManifest: AppManifest = {
       parameters: [],
     },
   },
-};
+}
 
 describe('generateResourceClass', () => {
   const ctx = createGeneratorContext(mockManifest, {
     outDir: '/tmp/out',
     packageName: '@macts/sdk-test',
-  });
+  })
 
   it('should generate class with name', () => {
-    const resource = ctx.getResource('Calendar');
-    expect(resource).toBeDefined();
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    expect(resource).toBeDefined()
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.name).toBe('CalendarInstance');
-    expect(result.content).toContain('class CalendarInstance');
-  });
+    const result = generateResourceClass(resource, ctx)
+    expect(result.name).toBe('CalendarInstance')
+    expect(result.content).toContain('class CalendarInstance')
+  })
 
   it('should generate property getters', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.content).toContain('get name()');
-    expect(result.content).toContain('get uid()');
-  });
+    const result = generateResourceClass(resource, ctx)
+    expect(result.content).toContain('get name()')
+    expect(result.content).toContain('get uid()')
+  })
 
   it('should generate setters for writable properties', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.content).toContain('set name(value:');
-    expect(result.content).not.toContain('set uid('); // Read-only
-  });
+    const result = generateResourceClass(resource, ctx)
+    expect(result.content).toContain('set name(value:')
+    expect(result.content).not.toContain('set uid(') // Read-only
+  })
 
   it('should generate child collection accessors', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.content).toContain('get events()');
-    expect(result.content).toContain('EventCollection');
-  });
+    const result = generateResourceClass(resource, ctx)
+    expect(result.content).toContain('get events()')
+    expect(result.content).toContain('EventCollection')
+  })
 
   it('should generate resource commands', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.content).toContain('async show(');
-  });
+    const result = generateResourceClass(resource, ctx)
+    expect(result.content).toContain('async show(')
+  })
 
   it('should generate save and delete methods', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateResourceClass(resource, ctx);
-    expect(result.content).toContain('async save()');
-    expect(result.content).toContain('async delete()');
-  });
-});
+    const result = generateResourceClass(resource, ctx)
+    expect(result.content).toContain('async save()')
+    expect(result.content).toContain('async delete()')
+  })
+})

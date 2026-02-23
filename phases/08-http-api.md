@@ -125,10 +125,10 @@ GET     /calendar/docs                                → Swagger UI
 ```typescript
 // @macts/api exports this interface
 interface ApiPlugin {
-  name: string; // 'calendar'
-  description: string;
-  router: Hono; // Hono router instance
-  openApiSpec: OpenAPIObject;
+  name: string // 'calendar'
+  description: string
+  router: Hono // Hono router instance
+  openApiSpec: OpenAPIObject
 }
 ```
 
@@ -136,55 +136,55 @@ interface ApiPlugin {
 
 ```typescript
 // Generated: calendars.ts
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { Calendar, CalendarCreateInputSchema } from '@macts/sdk-calendar';
+import { Hono } from 'hono'
+import { zValidator } from '@hono/zod-validator'
+import { Calendar, CalendarCreateInputSchema } from '@macts/sdk-calendar'
 
-const router = new Hono();
+const router = new Hono()
 
 // GET /calendars
 router.get('/', async (c) => {
-  const app = new Calendar();
-  const calendars = await app.calendars.list();
-  return c.json({ calendars });
-});
+  const app = new Calendar()
+  const calendars = await app.calendars.list()
+  return c.json({ calendars })
+})
 
 // GET /calendars/:uid
 router.get('/:uid', async (c) => {
-  const { uid } = c.req.param();
-  const app = new Calendar();
-  const calendar = await app.calendars.get(uid);
-  return c.json({ calendar });
-});
+  const { uid } = c.req.param()
+  const app = new Calendar()
+  const calendar = await app.calendars.get(uid)
+  return c.json({ calendar })
+})
 
 // POST /calendars
 router.post('/', zValidator('json', CalendarCreateInputSchema), async (c) => {
-  const input = c.req.valid('json');
-  const app = new Calendar();
-  const calendar = await app.calendars.create(input);
-  return c.json({ calendar }, 201);
-});
+  const input = c.req.valid('json')
+  const app = new Calendar()
+  const calendar = await app.calendars.create(input)
+  return c.json({ calendar }, 201)
+})
 
 // PATCH /calendars/:uid
 router.patch('/:uid', zValidator('json', CalendarUpdateInputSchema), async (c) => {
-  const { uid } = c.req.param();
-  const input = c.req.valid('json');
-  const app = new Calendar();
-  const calendar = await app.calendars.get(uid);
-  await calendar.update(input);
-  return c.json({ calendar });
-});
+  const { uid } = c.req.param()
+  const input = c.req.valid('json')
+  const app = new Calendar()
+  const calendar = await app.calendars.get(uid)
+  await calendar.update(input)
+  return c.json({ calendar })
+})
 
 // DELETE /calendars/:uid
 router.delete('/:uid', async (c) => {
-  const { uid } = c.req.param();
-  const app = new Calendar();
-  const calendar = await app.calendars.get(uid);
-  await calendar.delete();
-  return c.json({ success: true });
-});
+  const { uid } = c.req.param()
+  const app = new Calendar()
+  const calendar = await app.calendars.get(uid)
+  await calendar.delete()
+  return c.json({ success: true })
+})
 
-export { router as calendarsRouter };
+export { router as calendarsRouter }
 ```
 
 ## Error Response Format

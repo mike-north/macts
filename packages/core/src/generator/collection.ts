@@ -1,25 +1,28 @@
-import type { GeneratorContext } from './context.js';
-import type { Resource } from '../manifest/index.js';
+import type { GeneratorContext } from './context.js'
+import type { Resource } from '../manifest/index.js'
 
 export interface GeneratedCollection {
-  name: string;
-  content: string;
-  imports: string[];
+  name: string
+  content: string
+  imports: string[]
 }
 
 /**
  * Generate collection class code.
  */
-export function generateCollectionClass(resource: Resource, _ctx: GeneratorContext): GeneratedCollection {
-  const className = `${resource.name}Collection`;
-  const instanceClass = `${resource.name}Instance`;
-  const createInputType = `${resource.name}CreateInput`;
-  const createInputSchema = `${resource.name}CreateInputSchema`;
+export function generateCollectionClass(
+  resource: Resource,
+  _ctx: GeneratorContext
+): GeneratedCollection {
+  const className = `${resource.name}Collection`
+  const instanceClass = `${resource.name}Instance`
+  const createInputType = `${resource.name}CreateInput`
+  const createInputSchema = `${resource.name}CreateInputSchema`
 
   const imports = [
     "import type { JxaExecutor } from '@macts/core';",
     "import type { ObjectSpecifier } from '@macts/core';",
-  ];
+  ]
 
   const content = `${imports.join('\n')}
 
@@ -104,7 +107,7 @@ export class ${className} {
     }
     return null;
   }
-}`;
+}`
 
-  return { name: className, content, imports };
+  return { name: className, content, imports }
 }

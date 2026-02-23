@@ -70,7 +70,7 @@ packages/core/src/
 ### Property Access Model
 
 ```typescript
-const PropertyAccessSchema = z.enum(['r', 'rw']);
+const PropertyAccessSchema = z.enum(['r', 'rw'])
 
 const PropertySchema = z.object({
   access: PropertyAccessSchema,
@@ -79,7 +79,7 @@ const PropertySchema = z.object({
   description: z.string(),
   code: z.string().length(4).optional(), // AppleScript four-char code
   default: z.unknown().optional(),
-});
+})
 ```
 
 ### Inheritance Model
@@ -89,7 +89,7 @@ const InheritanceSchema = z.object({
   discriminator: z.string(),
   abstract: z.boolean().default(false),
   variants: z.record(z.lazy(() => ResourceSchema)),
-});
+})
 ```
 
 ### Hierarchy Access
@@ -98,7 +98,7 @@ const InheritanceSchema = z.object({
 const HierarchyChildSchema = z.object({
   resource: z.string(),
   access: PropertyAccessSchema, // rw = can create/delete, r = read-only
-});
+})
 ```
 
 ## Success Criteria

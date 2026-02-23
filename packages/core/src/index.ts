@@ -16,20 +16,23 @@
  * Current version of the macts packages.
  * All `@macts/*` packages use fixed versioning and stay in sync.
  */
-export const VERSION = '0.0.0';
+export const VERSION = '0.0.0'
 
 // Manifest schemas and types
-export * from './manifest/index.js';
-export type * from './types/manifest.js';
+export * from './manifest/index.js'
+export type * from './types/manifest.js'
 
 // SDEF parser and types
-export * from './sdef/index.js';
+export * from './sdef/index.js'
 
 // JXA bridge
-export * from './jxa/index.js';
+export * from './jxa/index.js'
 
 // Standardized types
-export * from './types/standardized.js';
+export * from './types/standardized.js'
 
 // Generator
-export * from './generator/index.js';
+export * from './generator/index.js'
+
+// Permissions
+export * from './permissions/index.js'

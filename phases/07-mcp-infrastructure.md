@@ -99,27 +99,27 @@ packages/mcp-calendar/        # Generated plugin
 ```typescript
 // @macts/mcp exports this interface
 interface McpPlugin {
-  name: string; // 'calendar'
-  description: string;
-  tools: ToolDefinition[];
-  handlers: Map<string, ToolHandler>;
+  name: string // 'calendar'
+  description: string
+  tools: ToolDefinition[]
+  handlers: Map<string, ToolHandler>
 }
 
 interface ToolDefinition {
-  name: string; // 'macts__calendar__calendars_list'
-  description: string;
-  inputSchema: JsonSchema;
+  name: string // 'macts__calendar__calendars_list'
+  description: string
+  inputSchema: JsonSchema
 }
 
-type ToolHandler = (input: unknown) => Promise<unknown>;
+type ToolHandler = (input: unknown) => Promise<unknown>
 ```
 
 ## Generated Tool Example
 
 ```typescript
 // Generated: calendars.ts
-import { Calendar } from '@macts/sdk-calendar';
-import { z } from 'zod';
+import { Calendar } from '@macts/sdk-calendar'
+import { z } from 'zod'
 
 export const calendarsListTool: ToolDefinition = {
   name: 'macts__calendar__calendars_list',
@@ -129,12 +129,12 @@ export const calendarsListTool: ToolDefinition = {
     properties: {},
     required: [],
   },
-};
+}
 
 export async function calendarsListHandler(_input: unknown): Promise<unknown> {
-  const app = new Calendar();
-  const calendars = await app.calendars.list();
-  return { calendars };
+  const app = new Calendar()
+  const calendars = await app.calendars.list()
+  return { calendars }
 }
 
 export const calendarsGetTool: ToolDefinition = {
@@ -150,12 +150,12 @@ export const calendarsGetTool: ToolDefinition = {
     },
     required: ['uid'],
   },
-};
+}
 
 export async function calendarsGetHandler(input: { uid: string }): Promise<unknown> {
-  const app = new Calendar();
-  const calendar = await app.calendars.get(input.uid);
-  return { calendar };
+  const app = new Calendar()
+  const calendar = await app.calendars.get(input.uid)
+  return { calendar }
 }
 
 // Event tools need parent context
@@ -182,7 +182,7 @@ export const eventsListTool: ToolDefinition = {
     },
     required: ['calendarUid'],
   },
-};
+}
 ```
 
 ## Integration with Claude Code

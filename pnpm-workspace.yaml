@@ -6,11 +6,13 @@ packages:
 # Allow build scripts for approved packages
 onlyBuiltDependencies:
   - '@withgraphite/graphite-cli'
+  - 'better-sqlite3'
   - 'esbuild'
   - 'nx'
 
 # Shared dependency versions across packages
 catalog:
+  tsd: ^0.31.2
   tsup: ^8.5.1
   vitest: ^3.1.0
   typescript: 5.9.3

@@ -1,0 +1,268 @@
+version: '1.0'
+app:
+  bundleId: company.thebrowser.Browser
+  name: Arc
+  displayName: Arc
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Standard Suite
+    code: core
+    description: Common classes and commands for all applications.
+    resources:
+      - Window
+      - Tab
+      - Space
+    commands:
+      - make
+      - count
+      - close
+      - select
+      - goBack
+      - goForward
+      - reload
+      - stop
+      - execute
+      - focus
+resources:
+  Window:
+    name: Window
+    plural: Windows
+    description: An application's window
+    code: WiND
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the window.
+        code: 'ID  '
+      name:
+        access: r
+        type: string
+        description: The full title of the window.
+        code: pnam
+      index:
+        access: rw
+        type: integer
+        description: The index of the window, ordered front to back.
+        code: pidx
+      closeable:
+        access: r
+        type: boolean
+        description: Whether the window has a close box.
+        code: hclb
+      minimizable:
+        access: r
+        type: boolean
+        description: Whether the window can be minimized.
+        code: ismn
+      minimized:
+        access: rw
+        type: boolean
+        description: Whether the window is currently minimized.
+        code: pmnd
+      resizable:
+        access: r
+        type: boolean
+        description: Whether the window can be resized.
+        code: prsz
+      visible:
+        access: rw
+        type: boolean
+        description: Whether the window is currently visible.
+        code: pvis
+      zoomable:
+        access: r
+        type: boolean
+        description: Whether the window can be zoomed.
+        code: iszm
+      zoomed:
+        access: rw
+        type: boolean
+        description: Whether the window is currently zoomed.
+        code: pzum
+      activeTab:
+        access: r
+        type:
+          resource: Tab
+        description: Returns the currently selected tab
+        code: acTa
+      activeSpace:
+        access: r
+        type:
+          resource: Space
+        description: Returns the currently active space
+        code: acSp
+      incognito:
+        access: rw
+        type: boolean
+        description: Whether the window is an incognito window.
+        code: inco
+      mode:
+        access: rw
+        type: string
+        description: Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
+        code: mode
+    identifiers:
+      - property: id
+        primary: true
+  Tab:
+    name: Tab
+    plural: Tabs
+    description: A window's tab
+    code: tAbB
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the tab.
+        code: 'ID  '
+      title:
+        access: r
+        type: string
+        description: The full title of the tab.
+        code: pnam
+      uRL:
+        access: rw
+        type: string
+        description: The url of the tab.
+        code: 'URL '
+      loading:
+        access: r
+        type: boolean
+        description: Is loading?
+        code: ldng
+      location:
+        access: rw
+        type: string
+        description: Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
+        code: loca
+    identifiers:
+      - property: id
+        primary: true
+  Space:
+    name: Space
+    plural: Spaces
+    description: A space
+    code: sPaC
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the space.
+        code: 'ID  '
+      title:
+        access: r
+        type: string
+        description: The full title of the space.
+        code: pnam
+    identifiers:
+      - property: id
+        primary: true
+enums: {}
+hierarchy:
+  children:
+    windows:
+      resource: Window
+      access: rw
+      description: An application's window
+      children:
+        tabs:
+          resource: Tab
+          access: rw
+          description: A window's tab
+        spaces:
+          resource: Space
+          access: rw
+          description: A space
+          children:
+            tabs:
+              resource: Tab
+              access: rw
+              description: A window's tab
+    tabs:
+      resource: Tab
+      access: rw
+      description: A window's tab
+commands:
+  make:
+    name: make
+    description: Make a new object.
+    scope: application
+    code: crel
+    parameters:
+      - name: new
+        type: string
+        description: The class of the new object.
+        required: true
+        code: kocl
+      - name: withProperties
+        type: any
+        description: The initial values for properties of the object.
+        required: false
+        code: prdt
+  count:
+    name: count
+    description: Return the number of elements of a particular class within an object.
+    scope: application
+    code: cnte
+    parameters:
+      - name: each
+        type: string
+        description: The class of objects to be counted.
+        required: false
+        code: kocl
+  close:
+    name: close
+    description: Close
+    scope: application
+    code: clos
+    parameters: []
+  select:
+    name: select
+    description: Select the tab.
+    scope: application
+    code: Sele
+    parameters: []
+  goBack:
+    name: goBack
+    description: Go Back (If Possible).
+    scope: application
+    code: Back
+    parameters: []
+  goForward:
+    name: goForward
+    description: Go Forward (If Possible).
+    scope: application
+    code: 'Fwd '
+    parameters: []
+  reload:
+    name: reload
+    description: Reload a tab.
+    scope: application
+    code: Rlod
+    parameters: []
+  stop:
+    name: stop
+    description: Stop the current tab from loading.
+    scope: application
+    code: stop
+    parameters: []
+  execute:
+    name: execute
+    description: Execute a piece of javascript.
+    scope: application
+    code: ExJa
+    parameters:
+      - name: javascript
+        type: string
+        description: The javascript code to execute.
+        required: true
+        code: JvSc
+  focus:
+    name: focus
+    description: Focus on a space.
+    scope: application
+    code: Focs
+    parameters: []

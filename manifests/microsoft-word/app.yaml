@@ -1,0 +1,1053 @@
+version: '1.0'
+
+app:
+  bundleId: com.microsoft.Word
+  name: Microsoft Word
+  displayName: Microsoft Word
+  tccEntitlements:
+    - automation
+  distributionModel: developer-id
+
+suites:
+  - name: Standard Suite
+    code: '????'
+    description: Common classes and commands for all applications
+  - name: Microsoft Word Suite
+    code: sWRD
+    description: Microsoft Word classes and commands
+    resources:
+      - Document
+      - Paragraph
+      - TextRange
+      - Selection
+      - Table
+      - Row
+      - Column
+      - Cell
+      - Font
+      - PageSetup
+      - Section
+      - Bookmark
+      - Field
+    commands:
+      - save
+      - saveAs
+      - close
+      - print
+      - activate
+      - undo
+      - redo
+      - copyObject
+      - cutObject
+      - pasteObject
+      - selectAll
+      - find
+      - replace
+      - insertText
+      - createNewDocument
+      - createRange
+    enums:
+      - SaveFormat
+      - ParagraphAlignment
+      - UnderlineType
+      - ViewType
+      - FieldType
+
+resources:
+  Document:
+    name: Document
+    plural: Documents
+    description: A Microsoft Word document
+    code: docu
+    identifiers:
+      - property: name
+        primary: true
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the document
+        code: pnam
+      fullName:
+        access: r
+        type: string
+        description: The full path of the document in HFS format
+        code: '1501'
+      posixFullName:
+        access: r
+        type: string
+        description: The full path of the document in POSIX format
+        code: '1500'
+      path:
+        access: r
+        type: string
+        description: The path to the document (HFS format)
+        code: FTPc
+      saved:
+        access: rw
+        type: boolean
+        description: Whether the document has been saved
+        code: '1303'
+      readOnly:
+        access: r
+        type: boolean
+        description: Whether the document is read-only
+        code: '1556'
+      active:
+        access: r
+        type: boolean
+        description: Whether this is the active document
+        code: '1004'
+      content:
+        access: r
+        type: string
+        description: The main document text
+        code: wTxR
+      trackRevisions:
+        access: rw
+        type: boolean
+        description: Whether changes are tracked in the document
+        code: '1410'
+      showRevisions:
+        access: rw
+        type: boolean
+        description: Whether tracked changes are shown
+        code: '1414'
+      defaultTabStop:
+        access: rw
+        type: number
+        description: The interval in points between default tab stops
+        code: '1312'
+
+  Paragraph:
+    name: Paragraph
+    plural: Paragraphs
+    description: A single paragraph in a document
+    code: cpar
+    identifiers:
+      - property: paragraphId
+        primary: true
+    properties:
+      alignment:
+        access: rw
+        type:
+          enum: ParagraphAlignment
+        description: The alignment for the paragraph
+        code: '1918'
+      firstLineIndent:
+        access: rw
+        type: number
+        description: The first-line or hanging indent value in points
+        code: '1932'
+      leftIndent:
+        access: rw
+        type: number
+        description: The left indent in points
+        code: '1930'
+      rightIndent:
+        access: rw
+        type: number
+        description: The right indent in points
+        code: '1928'
+      lineSpacing:
+        access: rw
+        type: number
+        description: The line spacing in points
+        code: '1934'
+      spaceAfter:
+        access: rw
+        type: number
+        description: The spacing in points after the paragraph
+        code: '1940'
+      spaceBefore:
+        access: rw
+        type: number
+        description: The spacing in points before the paragraph
+        code: '1938'
+      pageBreakBefore:
+        access: rw
+        type: boolean
+        description: Whether a page break is forced before the paragraph
+        code: '1924'
+      keepTogether:
+        access: rw
+        type: boolean
+        description: Whether all lines remain on the same page
+        code: '1920'
+      keepWithNext:
+        access: rw
+        type: boolean
+        description: Whether paragraph stays with next paragraph
+        code: '1922'
+      paragraphId:
+        access: r
+        type: integer
+        description: The paragraph ID
+        code: '1453'
+      content:
+        access: r
+        type: string
+        description: The text content of the paragraph
+        code: wTxR
+
+  TextRange:
+    name: TextRange
+    plural: TextRanges
+    description: A contiguous area in a document
+    code: w122
+    properties:
+      content:
+        access: rw
+        type: string
+        description: The text in the range
+        code: '1650'
+      bold:
+        access: rw
+        type: boolean
+        description: Whether the text is formatted as bold
+        code: bold
+      italic:
+        access: rw
+        type: boolean
+        description: Whether the text is formatted as italic
+        code: ital
+      underline:
+        access: rw
+        type:
+          enum: UnderlineType
+        description: The underline type
+        code: '1725'
+      fontSize:
+        access: rw
+        type: number
+        description: The font size in points
+        code: '1713'
+      fontName:
+        access: rw
+        type: string
+        description: The font name
+        code: '1711'
+      start:
+        access: rw
+        type: integer
+        description: The starting character position
+        code: '5263'
+      end:
+        access: rw
+        type: integer
+        description: The ending character position
+        code: '5264'
+
+  Selection:
+    name: Selection
+    plural: Selections
+    description: The current selection in a document
+    code: w210
+    properties:
+      content:
+        access: rw
+        type: string
+        description: The text in the selection
+        code: '1650'
+      bold:
+        access: rw
+        type: boolean
+        description: Whether the selection is formatted as bold
+        code: bold
+      italic:
+        access: rw
+        type: boolean
+        description: Whether the selection is formatted as italic
+        code: ital
+      fontSize:
+        access: rw
+        type: number
+        description: The font size of the selection in points
+        code: '1713'
+      fontName:
+        access: rw
+        type: string
+        description: The font name of the selection
+        code: '1711'
+      start:
+        access: r
+        type: integer
+        description: The starting character position of the selection
+        code: '5263'
+      end:
+        access: r
+        type: integer
+        description: The ending character position of the selection
+        code: '5264'
+      selectionType:
+        access: r
+        type: string
+        description: The type of selection (e.g., text, table, graphic)
+        code: '3012'
+
+  Table:
+    name: Table
+    plural: Tables
+    description: A table in a document
+    code: ctbl
+    properties:
+      rowCount:
+        access: r
+        type: integer
+        description: The number of rows in the table
+        code: crow
+      columnCount:
+        access: r
+        type: integer
+        description: The number of columns in the table
+        code: ccol
+      allowAutoFit:
+        access: rw
+        type: boolean
+        description: Whether the table is allowed to autofit
+        code: '3603'
+      borders:
+        access: rw
+        type: boolean
+        description: Whether the table has borders
+        code: '3611'
+
+  Row:
+    name: Row
+    plural: Rows
+    description: A row in a table
+    code: crow
+    properties:
+      height:
+        access: rw
+        type: number
+        description: The height of the row in points
+        code: hght
+      allowBreakAcrossPages:
+        access: rw
+        type: boolean
+        description: Whether the row can break across pages
+        code: '3671'
+      headingFormat:
+        access: rw
+        type: boolean
+        description: Whether the row is formatted as a heading
+        code: '3673'
+
+  Column:
+    name: Column
+    plural: Columns
+    description: A column in a table
+    code: ccol
+    properties:
+      width:
+        access: rw
+        type: number
+        description: The width of the column in points
+        code: pwid
+      preferredWidth:
+        access: rw
+        type: number
+        description: The preferred width of the column
+        code: '3632'
+
+  Cell:
+    name: Cell
+    plural: Cells
+    description: A cell in a table
+    code: ccel
+    properties:
+      content:
+        access: rw
+        type: string
+        description: The text content of the cell
+        code: wTxR
+      width:
+        access: rw
+        type: number
+        description: The width of the cell in points
+        code: pwid
+      height:
+        access: rw
+        type: number
+        description: The height of the cell in points
+        code: hght
+      verticalAlignment:
+        access: rw
+        type: string
+        description: The vertical alignment of text in the cell
+        code: '3652'
+      rowIndex:
+        access: r
+        type: integer
+        description: The row index of the cell
+        code: '3653'
+      columnIndex:
+        access: r
+        type: integer
+        description: The column index of the cell
+        code: '3654'
+
+  Font:
+    name: Font
+    plural: Fonts
+    description: Font formatting properties
+    code: w156
+    properties:
+      bold:
+        access: rw
+        type: boolean
+        description: Whether the font is bold
+        code: bold
+      italic:
+        access: rw
+        type: boolean
+        description: Whether the font is italic
+        code: ital
+      underline:
+        access: rw
+        type:
+          enum: UnderlineType
+        description: The underline type
+        code: '1725'
+      size:
+        access: rw
+        type: number
+        description: The font size in points
+        code: '1713'
+      name:
+        access: rw
+        type: string
+        description: The font name
+        code: '1711'
+      color:
+        access: rw
+        type: rgb
+        description: The font color
+        code: colr
+      subscript:
+        access: rw
+        type: boolean
+        description: Whether the font is subscript
+        code: '1729'
+      superscript:
+        access: rw
+        type: boolean
+        description: Whether the font is superscript
+        code: '1727'
+      strikethrough:
+        access: rw
+        type: boolean
+        description: Whether the font has strikethrough
+        code: '1731'
+      allCaps:
+        access: rw
+        type: boolean
+        description: Whether the font is all caps
+        code: '1719'
+
+  PageSetup:
+    name: PageSetup
+    plural: PageSetups
+    description: Page setup properties for a document or section
+    code: w203
+    properties:
+      topMargin:
+        access: rw
+        type: number
+        description: The top margin in points
+        code: '2200'
+      bottomMargin:
+        access: rw
+        type: number
+        description: The bottom margin in points
+        code: '2202'
+      leftMargin:
+        access: rw
+        type: number
+        description: The left margin in points
+        code: '2204'
+      rightMargin:
+        access: rw
+        type: number
+        description: The right margin in points
+        code: '2206'
+      pageHeight:
+        access: rw
+        type: number
+        description: The page height in points
+        code: '2210'
+      pageWidth:
+        access: rw
+        type: number
+        description: The page width in points
+        code: '2208'
+      orientation:
+        access: rw
+        type: string
+        description: The page orientation (portrait or landscape)
+        code: '2212'
+      paperSize:
+        access: rw
+        type: string
+        description: The paper size
+        code: '2214'
+
+  Section:
+    name: Section
+    plural: Sections
+    description: A section in a document
+    code: w130
+    properties:
+      sectionIndex:
+        access: r
+        type: integer
+        description: The index of the section
+        code: '1905'
+      protectedForForms:
+        access: rw
+        type: boolean
+        description: Whether the section is protected for forms
+        code: '1903'
+
+  Bookmark:
+    name: Bookmark
+    plural: Bookmarks
+    description: A bookmark in a document
+    code: w141
+    properties:
+      name:
+        access: rw
+        type: string
+        description: The name of the bookmark
+        code: pnam
+      start:
+        access: r
+        type: integer
+        description: The starting character position
+        code: '1648'
+      end:
+        access: r
+        type: integer
+        description: The ending character position
+        code: '1649'
+
+  Field:
+    name: Field
+    plural: Fields
+    description: A field in a document
+    code: w170
+    properties:
+      fieldType:
+        access: r
+        type:
+          enum: FieldType
+        description: The field type
+        code: wFtP
+      fieldCode:
+        access: rw
+        type: string
+        description: The field code
+        code: '2469'
+      fieldText:
+        access: rw
+        type: string
+        description: The field text
+        code: '2477'
+      locked:
+        access: rw
+        type: boolean
+        description: Whether the field is locked
+        code: '2444'
+      showCodes:
+        access: rw
+        type: boolean
+        description: Whether field codes are displayed
+        code: '2482'
+
+enums:
+  SaveFormat:
+    name: SaveFormat
+    description: Document save format
+    code: '1327'
+    values:
+      - name: document
+        value: document
+        description: Word document format
+        code: '1327'
+      - name: documentFormat97
+        value: documentFormat97
+        description: Word 97 format
+        code: docf
+      - name: template
+        value: template
+        description: Word template format
+        code: tmpl
+      - name: rtf
+        value: rtf
+        description: Rich Text Format
+        code: RTF_
+      - name: text
+        value: text
+        description: Plain text
+        code: TEXT
+      - name: html
+        value: html
+        description: HTML format
+        code: HTML
+      - name: pdf
+        value: pdf
+        description: PDF format
+        code: PDF_
+
+  ParagraphAlignment:
+    name: ParagraphAlignment
+    description: Paragraph alignment
+    code: '1918'
+    values:
+      - name: left
+        value: left
+        description: Left aligned
+        code: pa01
+      - name: center
+        value: center
+        description: Center aligned
+        code: pa02
+      - name: right
+        value: right
+        description: Right aligned
+        code: pa03
+      - name: justify
+        value: justify
+        description: Justified
+        code: pa04
+
+  UnderlineType:
+    name: UnderlineType
+    description: Text underline type
+    code: '1725'
+    values:
+      - name: none
+        value: none
+        description: No underline
+        code: un00
+      - name: single
+        value: single
+        description: Single underline
+        code: un01
+      - name: double
+        value: double
+        description: Double underline
+        code: un02
+      - name: dotted
+        value: dotted
+        description: Dotted underline
+        code: un03
+      - name: dashed
+        value: dashed
+        description: Dashed underline
+        code: un04
+
+  ViewType:
+    name: ViewType
+    description: Document view type
+    code: '3467'
+    values:
+      - name: normalView
+        value: normalView
+        description: Normal view
+        code: vt01
+      - name: outlineView
+        value: outlineView
+        description: Outline view
+        code: vt02
+      - name: printView
+        value: printView
+        description: Print layout view
+        code: vt03
+      - name: webView
+        value: webView
+        description: Web layout view
+        code: vt06
+
+  FieldType:
+    name: FieldType
+    description: Field type
+    code: wFtP
+    values:
+      - name: fieldAddin
+        value: fieldAddin
+        description: ADDIN field
+        code: ft01
+      - name: fieldDate
+        value: fieldDate
+        description: DATE field
+        code: ft03
+      - name: fieldHyperlink
+        value: fieldHyperlink
+        description: HYPERLINK field
+        code: ft05
+      - name: fieldPageNumber
+        value: fieldPageNumber
+        description: PAGE field
+        code: ft07
+      - name: fieldRef
+        value: fieldRef
+        description: REF field
+        code: ft09
+
+hierarchy:
+  children:
+    documents:
+      resource: Document
+      access: rw
+      description: Documents in the application
+      children:
+        paragraphs:
+          resource: Paragraph
+          access: rw
+          description: Paragraphs in the document
+        sections:
+          resource: Section
+          access: rw
+          description: Sections in the document
+        tables:
+          resource: Table
+          access: rw
+          description: Tables in the document
+          children:
+            rows:
+              resource: Row
+              access: rw
+              description: Rows in the table
+              children:
+                cells:
+                  resource: Cell
+                  access: rw
+                  description: Cells in the row
+            columns:
+              resource: Column
+              access: rw
+              description: Columns in the table
+        bookmarks:
+          resource: Bookmark
+          access: rw
+          description: Bookmarks in the document
+        fields:
+          resource: Field
+          access: rw
+          description: Fields in the document
+
+commands:
+  list:
+    name: list
+    description: List all documents
+    scope: resource
+    resourceType: Document
+    code: core
+    parameters: []
+    permission: word:documents:list
+
+  get:
+    name: get
+    description: Get a document by name
+    scope: resource
+    resourceType: Document
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Document name
+        required: true
+    permission: word:documents:get
+
+  save:
+    name: save
+    description: Save the specified document
+    scope: resource
+    resourceType: Document
+    code: save
+    parameters: []
+    permission: word:documents:save
+
+  saveAs:
+    name: saveAs
+    description: Save the document with a new name or format
+    scope: resource
+    resourceType: Document
+    code: sWRD
+    parameters:
+      - name: fileName
+        type: string
+        description: The file name for the document
+        required: true
+        code: '5015'
+      - name: fileFormat
+        type: SaveFormat
+        description: The file format for saving
+        required: false
+        code: '1327'
+    permission: word:documents:save
+
+  close:
+    name: close
+    description: Close the specified document
+    scope: resource
+    resourceType: Document
+    code: clos
+    parameters:
+      - name: saving
+        type: boolean
+        description: Whether to save changes before closing
+        required: false
+        code: savo
+    permission: word:documents:close
+
+  print:
+    name: print
+    description: Print the specified document
+    scope: resource
+    resourceType: Document
+    code: aevt
+    parameters: []
+    permission: word:documents:print
+
+  activate:
+    name: activate
+    description: Activate the specified document window
+    scope: resource
+    resourceType: Document
+    code: misc
+    parameters: []
+    permission: word:documents:activate
+
+  undo:
+    name: undo
+    description: Undo the last action
+    scope: application
+    code: sWRD
+    parameters: []
+    permission: word:app:undo
+
+  redo:
+    name: redo
+    description: Redo the last undone action
+    scope: application
+    code: sWRD
+    parameters: []
+    permission: word:app:redo
+
+  copyObject:
+    name: copyObject
+    description: Copy the selected content to the clipboard
+    scope: application
+    code: sWRD
+    parameters: []
+    permission: word:app:copy
+
+  cutObject:
+    name: cutObject
+    description: Cut the selected content to the clipboard
+    scope: application
+    code: sWRD
+    parameters: []
+    permission: word:app:cut
+
+  pasteObject:
+    name: pasteObject
+    description: Paste content from the clipboard
+    scope: application
+    code: sWRD
+    parameters: []
+    permission: word:app:paste
+
+  selectAll:
+    name: selectAll
+    description: Select all content in the document
+    scope: application
+    code: misc
+    parameters: []
+    permission: word:app:selectAll
+
+  find:
+    name: find
+    description: Find text in the document
+    scope: application
+    code: sWRD
+    parameters:
+      - name: findText
+        type: string
+        description: The text to search for
+        required: true
+        code: '5632'
+      - name: matchCase
+        type: boolean
+        description: Whether to match case
+        required: false
+        code: '5633'
+      - name: matchWholeWord
+        type: boolean
+        description: Whether to match whole words only
+        required: false
+        code: '5634'
+    permission: word:app:find
+
+  replace:
+    name: replace
+    description: Replace text in the document
+    scope: application
+    code: sWRD
+    parameters:
+      - name: findText
+        type: string
+        description: The text to search for
+        required: true
+        code: '5632'
+      - name: replaceWith
+        type: string
+        description: The replacement text
+        required: true
+        code: '5641'
+      - name: replaceAll
+        type: boolean
+        description: Whether to replace all occurrences
+        required: false
+        code: '5642'
+    permission: word:app:replace
+
+  insertText:
+    name: insertText
+    description: Insert text at the specified location
+    scope: application
+    code: sWRD
+    parameters:
+      - name: text
+        type: string
+        description: The text to insert
+        required: true
+        code: '5418'
+      - name: at
+        type: integer
+        description: The character position to insert at
+        required: false
+        code: insh
+    permission: word:documents:insert
+
+  createNewDocument:
+    name: createNewDocument
+    description: Create a new document
+    scope: application
+    code: sWRD
+    parameters:
+      - name: attachedTemplate
+        type: string
+        description: Path to template for the new document
+        required: false
+        code: '1335'
+    permission: word:documents:create
+
+  createRange:
+    name: createRange
+    description: Create a text range by character positions
+    scope: resource
+    resourceType: Document
+    code: sWRD
+    parameters:
+      - name: start
+        type: integer
+        description: The starting character position
+        required: false
+        code: '5263'
+      - name: end
+        type: integer
+        description: The ending character position
+        required: false
+        code: '5264'
+    permission: word:documents:read
+
+permissions:
+  documents:
+    read:
+      - word:documents:list
+      - word:documents:get
+      - word:documents:read
+    create:
+      - word:documents:create
+    write:
+      - word:documents:save
+      - word:documents:insert
+      - word:documents:update
+    delete:
+      - word:documents:close
+      - word:documents:delete
+
+  paragraphs:
+    read:
+      - word:paragraphs:list
+      - word:paragraphs:get
+    write:
+      - word:paragraphs:update
+
+  tables:
+    read:
+      - word:tables:list
+      - word:tables:get
+    create:
+      - word:tables:create
+    write:
+      - word:tables:update
+    delete:
+      - word:tables:delete
+
+  bookmarks:
+    read:
+      - word:bookmarks:list
+      - word:bookmarks:get
+    create:
+      - word:bookmarks:create
+    delete:
+      - word:bookmarks:delete
+
+  fields:
+    read:
+      - word:fields:list
+      - word:fields:get
+    create:
+      - word:fields:create
+    write:
+      - word:fields:update
+    delete:
+      - word:fields:delete
+
+  app:
+    read:
+      - word:app:find
+      - word:app:selectAll
+    write:
+      - word:app:undo
+      - word:app:redo
+      - word:app:copy
+      - word:app:cut
+      - word:app:paste
+      - word:app:replace
+
+extraction:
+  sourceFile: word.sdef
+  confidence:
+    overall: 0.85
+    fields:
+      resources: 0.9
+      enums: 0.85
+      hierarchy: 0.85
+      commands: 0.8
+  openQuestions:
+    - question: Are property codes accurate for all resources?
+      context: Word's sdef is extremely large (9661 lines) with 170+ classes and 352+ commands
+      suggestions:
+        - Verify property codes against actual Word AppleScript dictionary
+        - Test key operations to ensure codes are correct
+    - question: Should more table-related commands be included?
+      context: Tables are a core Word feature but commands were limited for scope
+      suggestions:
+        - Add table creation, deletion, and manipulation commands
+        - Include row/column insertion and deletion

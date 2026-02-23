@@ -1,0 +1,1037 @@
+version: '1.0'
+app:
+  bundleId: com.apple.TV
+  name: TV
+  displayName: TV
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Standard Suite
+    code: '****'
+    description: Common terms for most applications
+    commands:
+      - close
+      - count
+      - delete
+      - duplicate
+      - exists
+      - make
+      - move
+      - open
+      - run
+      - quit
+      - save
+  - name: TV Suite
+    code: hook
+    description: The event suite specific to TV
+    resources:
+      - Artwork
+      - BrowserWindow
+      - FileTrack
+      - LibraryPlaylist
+      - Playlist
+      - PlaylistWindow
+      - SharedTrack
+      - Source
+      - Track
+      - URLTrack
+      - UserPlaylist
+      - VideoWindow
+    enums:
+      - EPlS
+      - ESrc
+      - ESrA
+      - ESpK
+      - EMdK
+      - ERtK
+    commands:
+      - add
+      - backTrack
+      - convert
+      - download
+      - fastForward
+      - nextTrack
+      - pause
+      - play
+      - playpause
+      - previousTrack
+      - refresh
+      - resume
+      - reveal
+      - rewind
+      - search
+      - select
+      - stop
+  - name: Internet suite
+    code: gurl
+    description: Standard terms for Internet scripting
+    commands:
+      - openLocation
+resources:
+  Artwork:
+    name: Artwork
+    plural: Artworks
+    description: a piece of art within a track or playlist
+    code: cArt
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this artwork
+        optional: false
+        code: 'ID  '
+      data:
+        access: rw
+        type: string
+        description: data for this artwork, in the form of a picture
+        code: pPCT
+      description:
+        access: rw
+        type: string
+        description: description of artwork as a string
+        code: pDes
+      downloaded:
+        access: r
+        type: boolean
+        description: was this artwork downloaded by iTunes?
+        code: pDlA
+      format:
+        access: r
+        type: string
+        description: the data format for this piece of artwork
+        code: pFmt
+      kind:
+        access: rw
+        type: integer
+        description: kind or purpose of this piece of artwork
+        code: pKnd
+      rawData:
+        access: rw
+        type: any
+        description: data for this artwork, in original format
+        code: pRaw
+  BrowserWindow:
+    name: BrowserWindow
+    plural: BrowserWindows
+    description: the main window
+    code: cBrW
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this window
+        optional: false
+        code: 'ID  '
+      selection:
+        access: r
+        type: string
+        description: the selected tracks
+        code: sele
+      view:
+        access: rw
+        type:
+          resource: playlist
+        description: the playlist currently displayed in the window
+        code: pPly
+  FileTrack:
+    name: FileTrack
+    plural: FileTracks
+    description: a track representing a video file
+    code: cFlT
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this track
+        optional: false
+        code: 'ID  '
+      location:
+        access: rw
+        type: file
+        description: the location of the file represented by this track
+        code: pLoc
+  LibraryPlaylist:
+    name: LibraryPlaylist
+    plural: LibraryPlaylists
+    description: the main library playlist
+    code: cLiP
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this playlist
+        optional: false
+        code: 'ID  '
+
+  Playlist:
+    name: Playlist
+    plural: Playlists
+    description: a list of tracks/streams
+    code: cPly
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this playlist
+        optional: false
+        code: 'ID  '
+      description:
+        access: rw
+        type: string
+        description: the description of the playlist
+        code: pDes
+      duration:
+        access: r
+        type: integer
+        description: the total length of all tracks (in seconds)
+        code: pDur
+      name:
+        access: rw
+        type: string
+        description: the name of the playlist
+        code: pnam
+      parent:
+        access: r
+        type:
+          resource: playlist
+        description: folder which contains this playlist (if any)
+        code: pPlP
+      size:
+        access: r
+        type: integer
+        description: the total size of all tracks (in bytes)
+        code: pSiz
+      specialKind:
+        access: r
+        type: string
+        description: special playlist kind
+        code: pSpK
+      time:
+        access: r
+        type: string
+        description: 'the length of all tracks in MM:SS format'
+        code: pTim
+      visible:
+        access: r
+        type: boolean
+        description: is this playlist visible in the Source list?
+        code: pvis
+  PlaylistWindow:
+    name: PlaylistWindow
+    plural: PlaylistWindows
+    description: a sub-window showing a single playlist
+    code: cPlW
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this window
+        optional: false
+        code: 'ID  '
+      selection:
+        access: r
+        type: string
+        description: the selected tracks
+        code: sele
+      view:
+        access: r
+        type:
+          resource: playlist
+        description: the playlist displayed in the window
+        code: pPly
+  SharedTrack:
+    name: SharedTrack
+    plural: SharedTracks
+    description: a track residing in a shared library
+    code: cShT
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this track
+        optional: false
+        code: 'ID  '
+
+  Source:
+    name: Source
+    plural: Sources
+    description: a media source (library, CD, device, etc.)
+    code: cSrc
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this source
+        optional: false
+        code: 'ID  '
+      capacity:
+        access: r
+        type: number
+        description: the total size of the source if it has a fixed size
+        code: capa
+      freeSpace:
+        access: r
+        type: number
+        description: the free space on the source if it has a fixed size
+        code: frsp
+      kind:
+        access: r
+        type: string
+        description: The kind property
+        code: pKnd
+  Track:
+    name: Track
+    plural: Tracks
+    description: playable video source
+    code: cTrk
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this track
+        optional: false
+        code: 'ID  '
+      album:
+        access: rw
+        type: string
+        description: the album name of the track
+        code: pAlb
+      albumRating:
+        access: rw
+        type: integer
+        description: the rating of the album for this track (0 to 100)
+        code: pAlR
+      albumRatingKind:
+        access: r
+        type: string
+        description: the rating kind of the album rating for this track
+        code: pARk
+      bitRate:
+        access: r
+        type: integer
+        description: the bit rate of the track (in kbps)
+        code: pBRt
+      bookmark:
+        access: rw
+        type: number
+        description: the bookmark time of the track in seconds
+        code: pBkt
+      bookmarkable:
+        access: rw
+        type: boolean
+        description: is the playback position for this track remembered?
+        code: pBkm
+      category:
+        access: rw
+        type: string
+        description: the category of the track
+        code: pCat
+      comment:
+        access: rw
+        type: string
+        description: freeform notes about the track
+        code: pCmt
+      databaseID:
+        access: r
+        type: integer
+        description: the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.
+        code: pDID
+      dateAdded:
+        access: r
+        type: date
+        description: the date the track was added to the playlist
+        code: pAdd
+      description:
+        access: rw
+        type: string
+        description: the description of the track
+        code: pDes
+      director:
+        access: rw
+        type: string
+        description: the artist/source of the track
+        code: pArt
+      discCount:
+        access: rw
+        type: integer
+        description: the total number of discs in the source album
+        code: pDsC
+      discNumber:
+        access: rw
+        type: integer
+        description: the index of the disc containing this track on the source album
+        code: pDsN
+      downloaderAccount:
+        access: r
+        type: string
+        description: the account of the person who downloaded this track
+        code: pDAI
+      downloaderName:
+        access: r
+        type: string
+        description: the name of the person who downloaded this track
+        code: pDNm
+      duration:
+        access: r
+        type: number
+        description: the length of the track in seconds
+        code: pDur
+      enabled:
+        access: rw
+        type: boolean
+        description: is this track checked for playback?
+        code: enbl
+      episodeID:
+        access: rw
+        type: string
+        description: the episode ID of the track
+        code: pEpD
+      episodeNumber:
+        access: rw
+        type: integer
+        description: the episode number of the track
+        code: pEpN
+      finish:
+        access: rw
+        type: number
+        description: the stop time of the track in seconds
+        code: pStp
+      genre:
+        access: rw
+        type: string
+        description: the genre (category) of the track
+        code: pGen
+      grouping:
+        access: rw
+        type: string
+        description: the grouping (piece) of the track. Generally used to denote movements within a classical work.
+        code: pGrp
+      kind:
+        access: r
+        type: string
+        description: a text description of the track
+        code: pKnd
+      longDescription:
+        access: rw
+        type: string
+        description: the long description of the track
+        code: pLds
+      mediaKind:
+        access: rw
+        type: string
+        description: the media kind of the track
+        code: pMdK
+      modificationDate:
+        access: r
+        type: date
+        description: the modification date of the content of this track
+        code: asmo
+      playedCount:
+        access: rw
+        type: integer
+        description: number of times this track has been played
+        code: pPlC
+      playedDate:
+        access: rw
+        type: date
+        description: the date and time this track was last played
+        code: pPlD
+      purchaserAccount:
+        access: r
+        type: string
+        description: the account of the person who purchased this track
+        code: pPAI
+      purchaserName:
+        access: r
+        type: string
+        description: the name of the person who purchased this track
+        code: pPNm
+      rating:
+        access: rw
+        type: integer
+        description: the rating of this track (0 to 100)
+        code: pRte
+      ratingKind:
+        access: r
+        type: string
+        description: the rating kind of this track
+        code: pRtk
+      releaseDate:
+        access: r
+        type: date
+        description: the release date of this track
+        code: pRlD
+      sampleRate:
+        access: r
+        type: integer
+        description: the sample rate of the track (in Hz)
+        code: pSRt
+      seasonNumber:
+        access: rw
+        type: integer
+        description: the season number of the track
+        code: pSeN
+      skippedCount:
+        access: rw
+        type: integer
+        description: number of times this track has been skipped
+        code: pSkC
+      skippedDate:
+        access: rw
+        type: date
+        description: the date and time this track was last skipped
+        code: pSkD
+      show:
+        access: rw
+        type: string
+        description: the show name of the track
+        code: pShw
+      sortAlbum:
+        access: rw
+        type: string
+        description: override string to use for the track when sorting by album
+        code: pSAl
+      sortDirector:
+        access: rw
+        type: string
+        description: override string to use for the track when sorting by artist
+        code: pSAr
+      sortName:
+        access: rw
+        type: string
+        description: override string to use for the track when sorting by name
+        code: pSNm
+      sortShow:
+        access: rw
+        type: string
+        description: override string to use for the track when sorting by show name
+        code: pSSN
+      size:
+        access: r
+        type: number
+        description: the size of the track (in bytes)
+        code: pSiz
+      start:
+        access: rw
+        type: number
+        description: the start time of the track in seconds
+        code: pStr
+      time:
+        access: r
+        type: string
+        description: 'the length of the track in MM:SS format'
+        code: pTim
+      trackCount:
+        access: rw
+        type: integer
+        description: the total number of tracks on the source album
+        code: pTrC
+      trackNumber:
+        access: rw
+        type: integer
+        description: the index of the track on the source album
+        code: pTrN
+      unplayed:
+        access: rw
+        type: boolean
+        description: is this track unplayed?
+        code: pUnp
+      volumeAdjustment:
+        access: rw
+        type: integer
+        description: relative volume adjustment of the track (-100% to 100%)
+        code: pAdj
+      year:
+        access: rw
+        type: integer
+        description: the year the track was recorded/released
+        code: 'pYr '
+  URLTrack:
+    name: URLTrack
+    plural: URLTracks
+    description: a track representing a network stream
+    code: cURT
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this track
+        optional: false
+        code: 'ID  '
+      address:
+        access: rw
+        type: string
+        description: the URL for this track
+        code: pURL
+  UserPlaylist:
+    name: UserPlaylist
+    plural: UserPlaylists
+    description: custom playlists created by the user
+    code: cUsP
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this playlist
+        optional: false
+        code: 'ID  '
+      shared:
+        access: rw
+        type: boolean
+        description: is this playlist shared?
+        code: pShr
+      smart:
+        access: r
+        type: boolean
+        description: is this a Smart Playlist?
+        code: pSmt
+  VideoWindow:
+    name: VideoWindow
+    plural: VideoWindows
+    description: the video window
+    code: cNPW
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Unique identifier for this window
+        optional: false
+        code: 'ID  '
+
+enums:
+  EPlS:
+    name: EPlS
+    code: ePlS
+    values:
+      - name: stopped
+        value: stopped
+        code: kPSS
+      - name: playing
+        value: playing
+        code: kPSP
+      - name: paused
+        value: paused
+        code: kPSp
+      - name: fastForwarding
+        value: fastForwarding
+        code: kPSF
+      - name: rewinding
+        value: rewinding
+        code: kPSR
+  ESrc:
+    name: ESrc
+    code: eSrc
+    values:
+      - name: library
+        value: library
+        code: kLib
+      - name: sharedLibrary
+        value: sharedLibrary
+        code: kShd
+      - name: iTunesStore
+        value: iTunesStore
+        code: kITS
+      - name: unknown
+        value: unknown
+        code: kUnk
+  ESrA:
+    name: ESrA
+    code: eSrA
+    values:
+      - name: albums
+        value: albums
+        description: albums only
+        code: kSrL
+      - name: all
+        value: all
+        description: all text fields
+        code: kAll
+      - name: artists
+        value: artists
+        description: artists only
+        code: kSrR
+      - name: displayed
+        value: displayed
+        description: visible text fields
+        code: kSrV
+      - name: names
+        value: names
+        description: track names only
+        code: kSrS
+  ESpK:
+    name: ESpK
+    code: eSpK
+    values:
+      - name: none
+        value: none
+        code: kNon
+      - name: folder
+        value: folder
+        code: kSpF
+      - name: library
+        value: library
+        code: kSpL
+      - name: movies
+        value: movies
+        code: kSpI
+      - name: tVShows
+        value: tVShows
+        code: kSpT
+  EMdK:
+    name: EMdK
+    code: eMdK
+    values:
+      - name: homeVideo
+        value: homeVideo
+        description: home video track
+        code: kVdH
+      - name: movie
+        value: movie
+        description: movie track
+        code: kVdM
+      - name: tVShow
+        value: tVShow
+        description: TV show track
+        code: kVdT
+      - name: unknown
+        value: unknown
+        code: kUnk
+  ERtK:
+    name: ERtK
+    code: eRtK
+    values:
+      - name: user
+        value: user
+        description: user-specified rating
+        code: kRtU
+      - name: computed
+        value: computed
+        description: computed rating
+        code: kRtC
+hierarchy:
+  children:
+    browserWindows:
+      resource: BrowserWindow
+      access: rw
+      description: the main window
+    playlists:
+      resource: Playlist
+      access: rw
+      description: a list of tracks/streams
+      children:
+        tracks:
+          resource: Track
+          access: rw
+          description: playable video source
+          children:
+            artworks:
+              resource: Artwork
+              access: rw
+              description: a piece of art within a track or playlist
+        artworks:
+          resource: Artwork
+          access: rw
+          description: a piece of art within a track or playlist
+    playlistWindows:
+      resource: PlaylistWindow
+      access: rw
+      description: a sub-window showing a single playlist
+    sources:
+      resource: Source
+      access: rw
+      description: a media source (library, CD, device, etc.)
+      children:
+        libraryPlaylists:
+          resource: LibraryPlaylist
+          access: rw
+          description: the main library playlist
+          children:
+            fileTracks:
+              resource: FileTrack
+              access: rw
+              description: a track representing a video file
+            uRLTracks:
+              resource: URLTrack
+              access: rw
+              description: a track representing a network stream
+            sharedTracks:
+              resource: SharedTrack
+              access: rw
+              description: a track residing in a shared library
+        playlists:
+          resource: Playlist
+          access: rw
+          description: a list of tracks/streams
+          children:
+            tracks:
+              resource: Track
+              access: rw
+              description: playable video source
+              children:
+                artworks:
+                  resource: Artwork
+                  access: rw
+                  description: a piece of art within a track or playlist
+            artworks:
+              resource: Artwork
+              access: rw
+              description: a piece of art within a track or playlist
+        userPlaylists:
+          resource: UserPlaylist
+          access: rw
+          description: custom playlists created by the user
+          children:
+            fileTracks:
+              resource: FileTrack
+              access: rw
+              description: a track representing a video file
+            uRLTracks:
+              resource: URLTrack
+              access: rw
+              description: a track representing a network stream
+            sharedTracks:
+              resource: SharedTrack
+              access: rw
+              description: a track residing in a shared library
+    tracks:
+      resource: Track
+      access: rw
+      description: playable video source
+      children:
+        artworks:
+          resource: Artwork
+          access: rw
+          description: a piece of art within a track or playlist
+    videoWindows:
+      resource: VideoWindow
+      access: rw
+      description: the video window
+commands:
+  close:
+    name: close
+    description: Close an object
+    scope: application
+    code: clos
+    parameters: []
+  count:
+    name: count
+    description: Return the number of elements of a particular class within an object
+    scope: application
+    code: cnte
+    parameters:
+      - name: each
+        type: string
+        description: the class of the elements to be counted. Keyword 'each' is optional in AppleScript
+        required: true
+        code: kocl
+  delete:
+    name: delete
+    description: Delete an element from an object
+    scope: application
+    code: delo
+    parameters: []
+  duplicate:
+    name: duplicate
+    description: Duplicate one or more object(s)
+    scope: application
+    code: clon
+    parameters:
+      - name: to
+        type: string
+        description: the new location for the object(s)
+        required: false
+        code: insh
+  exists:
+    name: exists
+    description: Verify if an object exists
+    scope: application
+    code: doex
+    parameters: []
+  make:
+    name: make
+    description: Make a new element
+    scope: application
+    code: crel
+    parameters:
+      - name: new
+        type: string
+        description: the class of the new element. Keyword 'new' is optional in AppleScript
+        required: true
+        code: kocl
+      - name: at
+        type: string
+        description: the location at which to insert the element
+        required: false
+        code: insh
+      - name: withProperties
+        type: any
+        description: the initial values for the properties of the element
+        required: false
+        code: prdt
+  move:
+    name: move
+    description: Move playlist(s) to a new location
+    scope: resource
+    resourceType: Playlist
+    code: move
+    parameters:
+      - name: to
+        type: string
+        description: the new location for the playlist(s)
+        required: true
+        code: insh
+  open:
+    name: open
+    description: Open the specified object(s)
+    scope: application
+    code: odoc
+    parameters: []
+  run:
+    name: run
+    description: Run the application
+    scope: application
+    code: aevt
+    parameters: []
+  quit:
+    name: quit
+    description: Quit the application
+    scope: application
+    code: quit
+    parameters: []
+  save:
+    name: save
+    description: Save the specified object(s)
+    scope: application
+    code: save
+    parameters: []
+  add:
+    name: add
+    description: add one or more files to a playlist
+    scope: application
+    code: 'Add '
+    parameters:
+      - name: to
+        type: string
+        description: the location of the added file(s)
+        required: false
+        code: insh
+  backTrack:
+    name: backTrack
+    description: reposition to beginning of current track or go to previous track if already at start of current track
+    scope: application
+    code: Back
+    parameters: []
+  convert:
+    name: convert
+    description: convert one or more files or tracks
+    scope: application
+    code: Conv
+    parameters: []
+  download:
+    name: download
+    description: download a cloud track or playlist
+    scope: application
+    code: Dwnl
+    parameters: []
+  fastForward:
+    name: fastForward
+    description: skip forward in a playing track
+    scope: application
+    code: Fast
+    parameters: []
+  nextTrack:
+    name: nextTrack
+    description: advance to the next track in the current playlist
+    scope: application
+    code: Next
+    parameters: []
+  pause:
+    name: pause
+    description: pause playback
+    scope: application
+    code: Paus
+    parameters: []
+  play:
+    name: play
+    description: play the current track or the specified track or file.
+    scope: application
+    code: Play
+    parameters:
+      - name: once
+        type: boolean
+        description: If true, play this track once and then stop.
+        required: false
+        code: POne
+  playpause:
+    name: playpause
+    description: toggle the playing/paused state of the current track
+    scope: application
+    code: PlPs
+    parameters: []
+  previousTrack:
+    name: previousTrack
+    description: return to the previous track in the current playlist
+    scope: application
+    code: Prev
+    parameters: []
+  refresh:
+    name: refresh
+    description: update file track information from the current information in the track’s file
+    scope: resource
+    resourceType: FileTrack
+    code: Rfrs
+    parameters: []
+  resume:
+    name: resume
+    description: disable fast forward/rewind and resume playback, if playing.
+    scope: application
+    code: Resu
+    parameters: []
+  reveal:
+    name: reveal
+    description: reveal and select a track or playlist
+    scope: application
+    code: Revl
+    parameters: []
+  rewind:
+    name: rewind
+    description: skip backwards in a playing track
+    scope: application
+    code: Rwnd
+    parameters: []
+  search:
+    name: search
+    description: search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
+    scope: resource
+    resourceType: Playlist
+    code: Srch
+    parameters:
+      - name: for
+        type: string
+        description: the search text
+        required: true
+        code: pTrm
+      - name: only
+        type: string
+        description: area to search (default is all)
+        required: false
+        code: pAre
+  select:
+    name: select
+    description: select the specified object(s)
+    scope: application
+    code: slct
+    parameters: []
+  stop:
+    name: stop
+    description: stop playback
+    scope: application
+    code: Stop
+    parameters: []
+  openLocation:
+    name: openLocation
+    description: Opens an iTunes Store or stream URL
+    scope: application
+    code: GURL
+    parameters: []

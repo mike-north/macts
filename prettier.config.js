@@ -1,6 +1,6 @@
 export default {
   printWidth: 100,
-  semi: true,
+  semi: false,
   singleQuote: true,
   trailingComma: 'es5',
-};
+}

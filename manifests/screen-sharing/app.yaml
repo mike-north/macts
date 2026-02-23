@@ -1,0 +1,102 @@
+version: '1.0'
+app:
+  bundleId: com.apple.ScreenSharing
+  name: Screen Sharing
+  displayName: Screen Sharing
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Screen Sharing Suite
+    code: LAzn
+    description: Terms and Events for controlling the Screen Sharing application.
+    resources:
+      - Connection
+    commands:
+      - getURL
+resources:
+  Connection:
+    name: Connection
+    plural: Connections
+    description: A screen sharing connection
+    code: conn
+    properties:
+      name:
+        access: r
+        type: string
+        description: The connection name
+        code: pnam
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the connection
+        code: 'ID  '
+      url:
+        access: r
+        type: string
+        description: The VNC URL of the connection
+        code: 'url '
+    identifiers:
+      - property: id
+        primary: true
+enums: {}
+hierarchy:
+  children:
+    connections:
+      resource: Connection
+      access: r
+      description: Screen sharing connections
+commands:
+  list:
+    name: list
+    description: List all screen sharing connections
+    scope: resource
+    resourceType: Connection
+    code: core
+    parameters: []
+    permission: screen-sharing:connections:list
+
+  get:
+    name: get
+    description: Get a connection by ID
+    scope: resource
+    resourceType: Connection
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Connection identifier
+        required: true
+    permission: screen-sharing:connections:get
+
+  getURL:
+    name: getURL
+    description: Open a vnc URL
+    scope: application
+    code: GURL
+    parameters:
+      - name: url
+        type: string
+        description: The VNC URL to open
+        required: true
+    permission: screen-sharing:app:getURL
+
+permissions:
+  connections:
+    read:
+      - screen-sharing:connections:list
+      - screen-sharing:connections:get
+
+  app:
+    read:
+      - screen-sharing:app:getURL
+
+extraction:
+  sourceFile: source.sdef
+  confidence:
+    overall: 0.90
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 0.90
+      commands: 0.85

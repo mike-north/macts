@@ -1,25 +1,25 @@
-import * as pluralize from 'pluralize';
+import * as pluralize from 'pluralize'
 
 /**
  * Get the plural form of a word.
  * Uses library for common cases, handles edge cases.
  */
 export function toPlural(word: string): string {
-  return pluralize.plural(word);
+  return pluralize.plural(word)
 }
 
 /**
  * Get the singular form of a word.
  */
 export function toSingular(word: string): string {
-  return pluralize.singular(word);
+  return pluralize.singular(word)
 }
 
 /**
  * Check if a word is plural.
  */
 export function isPlural(word: string): boolean {
-  return pluralize.isPlural(word);
+  return pluralize.isPlural(word)
 }
 
 /**
@@ -32,7 +32,7 @@ export function normalizeResourceName(name: string): string {
   return name
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/\s+/g, '-')
-    .toLowerCase();
+    .toLowerCase()
 }
 
 /**
@@ -41,7 +41,7 @@ export function normalizeResourceName(name: string): string {
  */
 export function inferPlural(singular: string, providedPlural?: string): string {
   if (providedPlural) {
-    return providedPlural;
+    return providedPlural
   }
-  return toPlural(singular);
+  return toPlural(singular)
 }

@@ -1,48 +1,48 @@
-import { describe, it, expect } from 'vitest';
-import { CardinalitySchema, RelationshipSchema } from './relationship.js';
-import { ZodError } from 'zod';
+import { describe, it, expect } from 'vitest'
+import { CardinalitySchema, RelationshipSchema } from './relationship.js'
+import { ZodError } from 'zod'
 
 describe('CardinalitySchema', () => {
   describe('positive cases', () => {
     it('should accept one-to-one', () => {
-      const result = CardinalitySchema.parse('one-to-one');
-      expect(result).toBe('one-to-one');
-    });
+      const result = CardinalitySchema.parse('one-to-one')
+      expect(result).toBe('one-to-one')
+    })
 
     it('should accept one-to-many', () => {
-      const result = CardinalitySchema.parse('one-to-many');
-      expect(result).toBe('one-to-many');
-    });
+      const result = CardinalitySchema.parse('one-to-many')
+      expect(result).toBe('one-to-many')
+    })
 
     it('should accept many-to-one', () => {
-      const result = CardinalitySchema.parse('many-to-one');
-      expect(result).toBe('many-to-one');
-    });
+      const result = CardinalitySchema.parse('many-to-one')
+      expect(result).toBe('many-to-one')
+    })
 
     it('should accept many-to-many', () => {
-      const result = CardinalitySchema.parse('many-to-many');
-      expect(result).toBe('many-to-many');
-    });
-  });
+      const result = CardinalitySchema.parse('many-to-many')
+      expect(result).toBe('many-to-many')
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject invalid cardinality', () => {
-      expect(() => CardinalitySchema.parse('one-to-some')).toThrow(ZodError);
-    });
+      expect(() => CardinalitySchema.parse('one-to-some')).toThrow(ZodError)
+    })
 
     it('should reject empty string', () => {
-      expect(() => CardinalitySchema.parse('')).toThrow(ZodError);
-    });
+      expect(() => CardinalitySchema.parse('')).toThrow(ZodError)
+    })
 
     it('should reject number', () => {
-      expect(() => CardinalitySchema.parse(123)).toThrow(ZodError);
-    });
+      expect(() => CardinalitySchema.parse(123)).toThrow(ZodError)
+    })
 
     it('should reject object', () => {
-      expect(() => CardinalitySchema.parse({ from: 'one', to: 'many' })).toThrow(ZodError);
-    });
-  });
-});
+      expect(() => CardinalitySchema.parse({ from: 'one', to: 'many' })).toThrow(ZodError)
+    })
+  })
+})
 
 describe('RelationshipSchema', () => {
   describe('positive cases', () => {
@@ -52,15 +52,15 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'tag',
         cardinality: 'many-to-many',
-      });
+      })
 
       expect(result).toEqual({
         name: 'taskTags',
         from: 'task',
         to: 'tag',
         cardinality: 'many-to-many',
-      });
-    });
+      })
+    })
 
     it('should accept one-to-one relationship', () => {
       const result = RelationshipSchema.parse({
@@ -68,10 +68,10 @@ describe('RelationshipSchema', () => {
         from: 'user',
         to: 'profile',
         cardinality: 'one-to-one',
-      });
+      })
 
-      expect(result.cardinality).toBe('one-to-one');
-    });
+      expect(result.cardinality).toBe('one-to-one')
+    })
 
     it('should accept one-to-many relationship', () => {
       const result = RelationshipSchema.parse({
@@ -79,10 +79,10 @@ describe('RelationshipSchema', () => {
         from: 'project',
         to: 'task',
         cardinality: 'one-to-many',
-      });
+      })
 
-      expect(result.cardinality).toBe('one-to-many');
-    });
+      expect(result.cardinality).toBe('one-to-many')
+    })
 
     it('should accept many-to-one relationship', () => {
       const result = RelationshipSchema.parse({
@@ -90,10 +90,10 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'project',
         cardinality: 'many-to-one',
-      });
+      })
 
-      expect(result.cardinality).toBe('many-to-one');
-    });
+      expect(result.cardinality).toBe('many-to-one')
+    })
 
     it('should accept many-to-many relationship', () => {
       const result = RelationshipSchema.parse({
@@ -101,10 +101,10 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'tag',
         cardinality: 'many-to-many',
-      });
+      })
 
-      expect(result.cardinality).toBe('many-to-many');
-    });
+      expect(result.cardinality).toBe('many-to-many')
+    })
 
     it('should accept relationship with property', () => {
       const result = RelationshipSchema.parse({
@@ -113,10 +113,10 @@ describe('RelationshipSchema', () => {
         to: 'project',
         cardinality: 'many-to-one',
         property: 'projectId',
-      });
+      })
 
-      expect(result.property).toBe('projectId');
-    });
+      expect(result.property).toBe('projectId')
+    })
 
     it('should accept relationship with description', () => {
       const result = RelationshipSchema.parse({
@@ -125,10 +125,10 @@ describe('RelationshipSchema', () => {
         to: 'tag',
         cardinality: 'many-to-many',
         description: 'Tasks can have multiple tags, tags apply to multiple tasks',
-      });
+      })
 
-      expect(result.description).toBe('Tasks can have multiple tags, tags apply to multiple tasks');
-    });
+      expect(result.description).toBe('Tasks can have multiple tags, tags apply to multiple tasks')
+    })
 
     it('should accept relationship with all fields', () => {
       const result = RelationshipSchema.parse({
@@ -138,7 +138,7 @@ describe('RelationshipSchema', () => {
         cardinality: 'many-to-many',
         property: 'dependsOnIds',
         description: 'Tasks can depend on other tasks',
-      });
+      })
 
       expect(result).toEqual({
         name: 'taskDependencies',
@@ -147,8 +147,8 @@ describe('RelationshipSchema', () => {
         cardinality: 'many-to-many',
         property: 'dependsOnIds',
         description: 'Tasks can depend on other tasks',
-      });
-    });
+      })
+    })
 
     it('should accept self-referential relationship', () => {
       const result = RelationshipSchema.parse({
@@ -156,12 +156,12 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'task',
         cardinality: 'many-to-many',
-      });
+      })
 
-      expect(result.from).toBe('task');
-      expect(result.to).toBe('task');
-    });
-  });
+      expect(result.from).toBe('task')
+      expect(result.to).toBe('task')
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject relationship without name', () => {
@@ -171,8 +171,8 @@ describe('RelationshipSchema', () => {
           to: 'tag',
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship without from', () => {
       expect(() =>
@@ -181,8 +181,8 @@ describe('RelationshipSchema', () => {
           to: 'tag',
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship without to', () => {
       expect(() =>
@@ -191,8 +191,8 @@ describe('RelationshipSchema', () => {
           from: 'task',
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship without cardinality', () => {
       expect(() =>
@@ -201,8 +201,8 @@ describe('RelationshipSchema', () => {
           from: 'task',
           to: 'tag',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship with invalid cardinality', () => {
       expect(() =>
@@ -212,8 +212,8 @@ describe('RelationshipSchema', () => {
           to: 'tag',
           cardinality: 'one-to-some',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship with non-string name', () => {
       expect(() =>
@@ -223,8 +223,8 @@ describe('RelationshipSchema', () => {
           to: 'tag',
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship with non-string from', () => {
       expect(() =>
@@ -234,8 +234,8 @@ describe('RelationshipSchema', () => {
           to: 'tag',
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject relationship with non-string to', () => {
       expect(() =>
@@ -245,9 +245,9 @@ describe('RelationshipSchema', () => {
           to: 123,
           cardinality: 'many-to-many',
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
     it('should accept empty string name', () => {
@@ -256,10 +256,10 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'tag',
         cardinality: 'many-to-many',
-      });
+      })
 
-      expect(result.name).toBe('');
-    });
+      expect(result.name).toBe('')
+    })
 
     it('should accept empty string from', () => {
       const result = RelationshipSchema.parse({
@@ -267,10 +267,10 @@ describe('RelationshipSchema', () => {
         from: '',
         to: 'tag',
         cardinality: 'many-to-many',
-      });
+      })
 
-      expect(result.from).toBe('');
-    });
+      expect(result.from).toBe('')
+    })
 
     it('should accept empty string to', () => {
       const result = RelationshipSchema.parse({
@@ -278,10 +278,10 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: '',
         cardinality: 'many-to-many',
-      });
+      })
 
-      expect(result.to).toBe('');
-    });
+      expect(result.to).toBe('')
+    })
 
     it('should accept empty string property', () => {
       const result = RelationshipSchema.parse({
@@ -290,10 +290,10 @@ describe('RelationshipSchema', () => {
         to: 'tag',
         cardinality: 'many-to-many',
         property: '',
-      });
+      })
 
-      expect(result.property).toBe('');
-    });
+      expect(result.property).toBe('')
+    })
 
     it('should accept empty string description', () => {
       const result = RelationshipSchema.parse({
@@ -302,10 +302,10 @@ describe('RelationshipSchema', () => {
         to: 'tag',
         cardinality: 'many-to-many',
         description: '',
-      });
+      })
 
-      expect(result.description).toBe('');
-    });
+      expect(result.description).toBe('')
+    })
 
     it('should handle undefined optional fields', () => {
       const result = RelationshipSchema.parse({
@@ -315,12 +315,12 @@ describe('RelationshipSchema', () => {
         cardinality: 'many-to-many',
         property: undefined,
         description: undefined,
-      });
+      })
 
-      expect(result.property).toBeUndefined();
-      expect(result.description).toBeUndefined();
-    });
-  });
+      expect(result.property).toBeUndefined()
+      expect(result.description).toBeUndefined()
+    })
+  })
 
   describe('real-world examples', () => {
     it('should accept OmniFocus task-tag many-to-many relationship', () => {
@@ -330,10 +330,10 @@ describe('RelationshipSchema', () => {
         to: 'tag',
         cardinality: 'many-to-many',
         description: 'Tasks can have multiple tags, tags apply to multiple tasks',
-      });
+      })
 
-      expect(result.cardinality).toBe('many-to-many');
-    });
+      expect(result.cardinality).toBe('many-to-many')
+    })
 
     it('should accept task parent-child relationship', () => {
       const result = RelationshipSchema.parse({
@@ -343,12 +343,12 @@ describe('RelationshipSchema', () => {
         cardinality: 'many-to-one',
         property: 'parentTaskId',
         description: 'Tasks can have a parent task (subtask relationship)',
-      });
+      })
 
-      expect(result.from).toBe('task');
-      expect(result.to).toBe('task');
-      expect(result.cardinality).toBe('many-to-one');
-    });
+      expect(result.from).toBe('task')
+      expect(result.to).toBe('task')
+      expect(result.cardinality).toBe('many-to-one')
+    })
 
     it('should accept task dependencies relationship', () => {
       const result = RelationshipSchema.parse({
@@ -358,10 +358,10 @@ describe('RelationshipSchema', () => {
         cardinality: 'many-to-many',
         property: 'dependsOn',
         description: 'Tasks can depend on completion of other tasks',
-      });
+      })
 
-      expect(result.cardinality).toBe('many-to-many');
-    });
+      expect(result.cardinality).toBe('many-to-many')
+    })
 
     it('should accept project-context one-to-one relationship', () => {
       const result = RelationshipSchema.parse({
@@ -371,10 +371,10 @@ describe('RelationshipSchema', () => {
         cardinality: 'one-to-one',
         property: 'defaultContextId',
         description: 'Each project can have a default context',
-      });
+      })
 
-      expect(result.cardinality).toBe('one-to-one');
-    });
+      expect(result.cardinality).toBe('one-to-one')
+    })
 
     it('should accept note attachments one-to-many relationship', () => {
       const result = RelationshipSchema.parse({
@@ -384,11 +384,11 @@ describe('RelationshipSchema', () => {
         cardinality: 'one-to-many',
         property: 'attachmentIds',
         description: 'Notes can have multiple attachments',
-      });
+      })
 
-      expect(result.cardinality).toBe('one-to-many');
-    });
-  });
+      expect(result.cardinality).toBe('one-to-many')
+    })
+  })
 
   describe('validation scenarios', () => {
     it('should accept multiple relationships for same resource', () => {
@@ -411,11 +411,11 @@ describe('RelationshipSchema', () => {
           to: 'task',
           cardinality: 'many-to-many',
         }),
-      ];
+      ]
 
-      expect(relationships).toHaveLength(3);
-      expect(relationships.every((r) => r.from === 'task')).toBe(true);
-    });
+      expect(relationships).toHaveLength(3)
+      expect(relationships.every((r) => r.from === 'task')).toBe(true)
+    })
 
     it('should accept bidirectional relationships', () => {
       const forward = RelationshipSchema.parse({
@@ -423,18 +423,18 @@ describe('RelationshipSchema', () => {
         from: 'task',
         to: 'project',
         cardinality: 'many-to-one',
-      });
+      })
 
       const reverse = RelationshipSchema.parse({
         name: 'projectTasks',
         from: 'project',
         to: 'task',
         cardinality: 'one-to-many',
-      });
+      })
 
-      expect(forward.from).toBe(reverse.to);
-      expect(forward.to).toBe(reverse.from);
-    });
+      expect(forward.from).toBe(reverse.to)
+      expect(forward.to).toBe(reverse.from)
+    })
 
     it('should accept circular relationships', () => {
       const relationships = [
@@ -456,9 +456,9 @@ describe('RelationshipSchema', () => {
           to: 'resourceA',
           cardinality: 'many-to-one',
         }),
-      ];
+      ]
 
-      expect(relationships).toHaveLength(3);
-    });
-  });
-});
+      expect(relationships).toHaveLength(3)
+    })
+  })
+})

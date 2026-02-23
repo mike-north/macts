@@ -39,100 +39,100 @@ Produce the first complete, working SDK: `@macts/sdk-calendar`. This is the vert
 
 ```typescript
 describe('@macts/sdk-calendar', () => {
-  const calendar = new Calendar();
+  const calendar = new Calendar()
 
   describe('calendars', () => {
     it('lists all calendars', async () => {
-      const calendars = await calendar.calendars.list();
-      expect(calendars.length).toBeGreaterThan(0);
-      expect(calendars[0]).toHaveProperty('uid');
-      expect(calendars[0]).toHaveProperty('name');
-    });
+      const calendars = await calendar.calendars.list()
+      expect(calendars.length).toBeGreaterThan(0)
+      expect(calendars[0]).toHaveProperty('uid')
+      expect(calendars[0]).toHaveProperty('name')
+    })
 
     it('gets calendar by uid', async () => {
-      const calendars = await calendar.calendars.list();
-      const first = calendars[0];
-      const fetched = await calendar.calendars.get(first.uid);
-      expect(fetched.name).toBe(first.name);
-    });
+      const calendars = await calendar.calendars.list()
+      const first = calendars[0]
+      const fetched = await calendar.calendars.get(first.uid)
+      expect(fetched.name).toBe(first.name)
+    })
 
     it('creates and deletes a calendar', async () => {
       const created = await calendar.calendars.create({
         name: 'Test Calendar (macts)',
-      });
-      expect(created.name).toBe('Test Calendar (macts)');
+      })
+      expect(created.name).toBe('Test Calendar (macts)')
 
-      await created.delete();
+      await created.delete()
 
       // Verify deletion
-      await expect(calendar.calendars.get(created.uid)).rejects.toThrow();
-    });
-  });
+      await expect(calendar.calendars.get(created.uid)).rejects.toThrow()
+    })
+  })
 
   describe('events', () => {
-    let testCalendar: CalendarInstance;
+    let testCalendar: CalendarInstance
 
     beforeAll(async () => {
       testCalendar = await calendar.calendars.create({
         name: 'macts-test-calendar',
-      });
-    });
+      })
+    })
 
     afterAll(async () => {
-      await testCalendar.delete();
-    });
+      await testCalendar.delete()
+    })
 
     it('creates an event with required fields', async () => {
       const event = await testCalendar.events.create({
         summary: 'Test Event',
         startDate: new Date('2026-03-01T10:00:00'),
         endDate: new Date('2026-03-01T11:00:00'),
-      });
+      })
 
-      expect(event.summary).toBe('Test Event');
-      expect(event.uid).toBeDefined();
+      expect(event.summary).toBe('Test Event')
+      expect(event.uid).toBeDefined()
 
-      await event.delete();
-    });
+      await event.delete()
+    })
 
     it('updates event properties', async () => {
       const event = await testCalendar.events.create({
         summary: 'Original Title',
         startDate: new Date('2026-03-01T10:00:00'),
         endDate: new Date('2026-03-01T11:00:00'),
-      });
+      })
 
-      await event.update({ summary: 'Updated Title' });
+      await event.update({ summary: 'Updated Title' })
 
-      const fetched = await testCalendar.events.get(event.uid);
-      expect(fetched.summary).toBe('Updated Title');
+      const fetched = await testCalendar.events.get(event.uid)
+      expect(fetched.summary).toBe('Updated Title')
 
-      await event.delete();
-    });
+      await event.delete()
+    })
 
     it('lists attendees (read-only)', async () => {
       // Create event with attendee via Calendar UI first
-      const events = await testCalendar.events.list();
-      const withAttendees = events.find((e) => e.attendees?.length > 0);
+      const events = await testCalendar.events.list()
+      const withAttendees = events.find((e) => e.attendees?.length > 0)
 
       if (withAttendees) {
-        const attendees = await withAttendees.attendees.list();
-        expect(attendees[0]).toHaveProperty('email');
-        expect(attendees[0]).toHaveProperty('displayName');
+        const attendees = await withAttendees.attendees.list()
+        expect(attendees[0]).toHaveProperty('email')
+        expect(attendees[0]).toHaveProperty('displayName')
       }
-    });
-  });
+    })
+  })
 
   describe('app commands', () => {
     it('reloads calendars', async () => {
-      await expect(calendar.reloadCalendars()).resolves.not.toThrow();
-    });
+      await expect(calendar.reloadCalendars()).resolves.not.toThrow()
+    })
 
     it('switches view', async () => {
-      await expect(calendar.switchView({ to: 'week' })).resolves.not.toThrow();
-    });
-  });
-});
+      await expect(calendar.switchView({ to: 'week' })).resolves.not.toThrow()
+    })
+  })
+})
 ```
 
 ## Dependencies

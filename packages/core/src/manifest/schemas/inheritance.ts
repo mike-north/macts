@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * Schema for resource type inheritance/variants.
@@ -24,5 +24,5 @@ export const InheritanceSchema = z.object({
       description: z.string().optional(),
     })
   ),
-});
-export type Inheritance = z.infer<typeof InheritanceSchema>;
+})
+export type Inheritance = z.infer<typeof InheritanceSchema>

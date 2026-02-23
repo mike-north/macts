@@ -1,0 +1,141 @@
+version: '1.0'
+
+app:
+  bundleId: com.apple.SystemProfiler
+  name: System Information
+  displayName: System Information
+  tccEntitlements:
+    - automation
+  distributionModel: system
+
+suites:
+  - name: Standard Suite
+    code: '????'
+    description: Common classes and commands for all applications
+  - name: System Profiler Suite
+    code: ddap
+    description: System Profiler specific classes
+    resources:
+      - Document
+    commands:
+      - send
+    enums:
+      - DetailLevel
+
+resources:
+  Document:
+    name: Document
+    plural: Documents
+    description: A system profile document
+    code: docu
+    identifiers:
+      - property: name
+        primary: true
+    properties:
+      name:
+        access: r
+        type: string
+        description: The document name
+        code: pnam
+      plainText:
+        access: r
+        type: string
+        description: Plain text representation of the system profile document
+        code: ddta
+      xmlText:
+        access: r
+        type: string
+        description: XML representation of the system profile document
+        code: dxml
+      detailLevel:
+        access: rw
+        type:
+          enum: DetailLevel
+        description: The desired level of detail for the system profile document
+        code: ddtl
+
+enums:
+  DetailLevel:
+    name: DetailLevel
+    description: Level of detail for system profile information
+    code: edtl
+    values:
+      - name: mini
+        value: mini
+        description: A compact profile which does not include any personal identifying information
+        code: mini
+      - name: basic
+        value: basic
+        description: A version which includes the basic hardware, software and network information. Moderate in size.
+        code: basi
+      - name: full
+        value: full
+        description: A profile which includes all available information - can be quite large
+        code: full
+
+hierarchy:
+  children:
+    documents:
+      resource: Document
+      access: rw
+      description: System profile documents
+
+commands:
+  # Document commands
+  list:
+    name: list
+    description: List all system profile documents
+    scope: resource
+    resourceType: Document
+    code: core
+    parameters: []
+    permission: system-information:documents:list
+
+  get:
+    name: get
+    description: Get a system profile document by name
+    scope: resource
+    resourceType: Document
+    code: getd
+    parameters:
+      - name: name
+        type: string
+        description: Document name
+        required: true
+    permission: system-information:documents:get
+
+  # Application-level command
+  send:
+    name: send
+    description: Send system information to AppleCare
+    scope: application
+    code: spul
+    parameters: []
+    permission: system-information:app:send
+
+# Permissions mapping
+permissions:
+  documents:
+    read:
+      - system-information:documents:list
+      - system-information:documents:get
+
+  app:
+    read:
+      - system-information:app:send
+
+extraction:
+  sourceFile: System Profiler.scriptSuite + System Profiler.scriptTerminology
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 0.95
+      commands: 0.95
+  openQuestions:
+    - question: Should the systemProfile property on NSApplication be exposed?
+      context: The application class has a read-only systemProfile property (ddty) returning NSString with plain text representation
+      suggestions:
+        - Add as an application-level property
+        - Use the Document resource instead for accessing system profile data

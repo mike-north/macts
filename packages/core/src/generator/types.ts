@@ -1,10 +1,10 @@
-import type { GeneratorContext } from './context.js';
-import type { Resource, PropertyType, Enum } from '../manifest/index.js';
+import type { GeneratorContext } from './context.js'
+import type { Resource, PropertyType, Enum } from '../manifest/index.js'
 
 export interface GeneratedType {
-  name: string;
-  content: string;
-  imports: string[];
+  name: string
+  content: string
+  imports: string[]
 }
 
 /**
@@ -22,7 +22,7 @@ const PRIMITIVE_TYPE_MAP: Record<string, string> = {
   point: '{ x: number; y: number }',
   rect: '{ x: number; y: number; width: number; height: number }',
   rgb: '{ r: number; g: number; b: number }',
-};
+}
 
 /**
  * Convert manifest property type to TypeScript type string.
@@ -44,30 +44,35 @@ const PRIMITIVE_TYPE_MAP: Record<string, string> = {
  * ```
  */
 export function propertyTypeToTs(type: PropertyType | undefined): string {
-  if (!type) return 'unknown';
+  if (!type) return 'unknown'
 
   if (typeof type === 'string') {
     // Check if it's a known primitive type
-    const mapped = PRIMITIVE_TYPE_MAP[type];
-    if (mapped) return mapped;
+    const mapped = PRIMITIVE_TYPE_MAP[type]
+    if (mapped) return mapped
+    // Multi-word type names (e.g., "Rich text", "Icon view options") from SDEF
+    // are not valid TypeScript identifiers and have no defined interface
+    if (type.includes(' ')) return 'unknown'
     // Otherwise treat as custom type reference (resource or enum name)
-    return type;
+    return type
   }
 
   if ('array' in type) {
-    const elementType = propertyTypeToTs(type.array);
-    return `${elementType}[]`;
+    const elementType = propertyTypeToTs(type.array)
+    return `${elementType}[]`
   }
 
   if ('enum' in type) {
-    return type.enum;
+    if (type.enum.includes(' ')) return 'unknown'
+    return type.enum.charAt(0).toUpperCase() + type.enum.slice(1)
   }
 
   if ('resource' in type) {
-    return type.resource;
+    if (type.resource.includes(' ')) return 'unknown'
+    return type.resource.charAt(0).toUpperCase() + type.resource.slice(1)
   }
 
-  return 'unknown';
+  return 'unknown'
 }
 
 /**
@@ -91,19 +96,19 @@ export function propertyTypeToTs(type: PropertyType | undefined): string {
  * ```
  */
 export function generateReadType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties);
-  const imports: string[] = [];
+  const properties = Object.entries(resource.properties)
+  const imports: string[] = []
 
   const propLines = properties.map(([name, prop]) => {
-    const tsType = propertyTypeToTs(prop.type);
-    const optional = prop.optional ? '?' : '';
-    const readonly = prop.access === 'r' ? 'readonly ' : '';
-    return `  ${readonly}${name}${optional}: ${tsType};`;
-  });
+    const tsType = propertyTypeToTs(prop.type)
+    const optional = prop.optional ? '?' : ''
+    const readonly = prop.access === 'r' ? 'readonly ' : ''
+    return `  ${readonly}${name}${optional}: ${tsType};`
+  })
 
-  const content = `export interface ${resource.name} {\n${propLines.join('\n')}\n}`;
+  const content = `export interface ${resource.name} {\n${propLines.join('\n')}\n}`
 
-  return { name: resource.name, content, imports };
+  return { name: resource.name, content, imports }
 }
 
 /**
@@ -127,23 +132,23 @@ export function generateReadType(resource: Resource, _ctx: GeneratorContext): Ge
  * ```
  */
 export function generateCreateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties);
-  const imports: string[] = [];
+  const properties = Object.entries(resource.properties)
+  const imports: string[] = []
 
   // Only include writable properties
-  const writableProps = properties.filter(([_, prop]) => prop.access === 'rw');
+  const writableProps = properties.filter(([_, prop]) => prop.access === 'rw')
 
   const propLines = writableProps.map(([name, prop]) => {
-    const tsType = propertyTypeToTs(prop.type);
+    const tsType = propertyTypeToTs(prop.type)
     // Required unless optional or has default
-    const optional = prop.optional || prop.default !== undefined ? '?' : '';
-    return `  ${name}${optional}: ${tsType};`;
-  });
+    const optional = prop.optional || prop.default !== undefined ? '?' : ''
+    return `  ${name}${optional}: ${tsType};`
+  })
 
-  const typeName = `${resource.name}CreateInput`;
-  const content = `export interface ${typeName} {\n${propLines.join('\n')}\n}`;
+  const typeName = `${resource.name}CreateInput`
+  const content = `export interface ${typeName} {\n${propLines.join('\n')}\n}`
 
-  return { name: typeName, content, imports };
+  return { name: typeName, content, imports }
 }
 
 /**
@@ -167,21 +172,21 @@ export function generateCreateInputType(resource: Resource, _ctx: GeneratorConte
  * ```
  */
 export function generateUpdateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties);
-  const imports: string[] = [];
+  const properties = Object.entries(resource.properties)
+  const imports: string[] = []
 
   // Only include writable properties, all optional
-  const writableProps = properties.filter(([_, prop]) => prop.access === 'rw');
+  const writableProps = properties.filter(([_, prop]) => prop.access === 'rw')
 
   const propLines = writableProps.map(([name, prop]) => {
-    const tsType = propertyTypeToTs(prop.type);
-    return `  ${name}?: ${tsType};`;
-  });
+    const tsType = propertyTypeToTs(prop.type)
+    return `  ${name}?: ${tsType};`
+  })
 
-  const typeName = `${resource.name}UpdateInput`;
-  const content = `export interface ${typeName} {\n${propLines.join('\n')}\n}`;
+  const typeName = `${resource.name}UpdateInput`
+  const content = `export interface ${typeName} {\n${propLines.join('\n')}\n}`
 
-  return { name: typeName, content, imports };
+  return { name: typeName, content, imports }
 }
 
 /**
@@ -198,10 +203,10 @@ export function generateUpdateInputType(resource: Resource, _ctx: GeneratorConte
  * ```
  */
 export function generateEnumType(enumDef: Enum): GeneratedType {
-  const values = enumDef.values.map((v: { name: string }) => `'${v.name}'`).join(' | ');
-  const content = `export type ${enumDef.name} = ${values};`;
+  const values = enumDef.values.map((v: { name: string }) => `'${v.name}'`).join(' | ')
+  const content = `export type ${enumDef.name} = ${values};`
 
-  return { name: enumDef.name, content, imports: [] };
+  return { name: enumDef.name, content, imports: [] }
 }
 
 /**
@@ -215,19 +220,19 @@ export function generateEnumType(enumDef: Enum): GeneratedType {
  * @returns Array of generated types
  */
 export function generateTypes(ctx: GeneratorContext): GeneratedType[] {
-  const types: GeneratedType[] = [];
+  const types: GeneratedType[] = []
 
   // Generate resource types
   for (const resource of ctx.getResources()) {
-    types.push(generateReadType(resource, ctx));
-    types.push(generateCreateInputType(resource, ctx));
-    types.push(generateUpdateInputType(resource, ctx));
+    types.push(generateReadType(resource, ctx))
+    types.push(generateCreateInputType(resource, ctx))
+    types.push(generateUpdateInputType(resource, ctx))
   }
 
   // Generate enum types
   for (const enumDef of ctx.getEnums()) {
-    types.push(generateEnumType(enumDef));
+    types.push(generateEnumType(enumDef))
   }
 
-  return types;
+  return types
 }

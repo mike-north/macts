@@ -115,39 +115,39 @@ packages/sdk-calendar/
 ```typescript
 // Generated: CalendarResource.ts
 export class CalendarInstance {
-  readonly #executor: JxaExecutor;
-  readonly #specifier: ObjectSpecifier;
+  readonly #executor: JxaExecutor
+  readonly #specifier: ObjectSpecifier
 
   constructor(executor: JxaExecutor, specifier: ObjectSpecifier, data: Calendar) {
-    this.#executor = executor;
-    this.#specifier = specifier;
-    Object.assign(this, data);
+    this.#executor = executor
+    this.#specifier = specifier
+    Object.assign(this, data)
   }
 
   // Read-only property
   get uid(): string {
-    return this._data.uid;
+    return this._data.uid
   }
 
   // Read-write property
   get name(): string {
-    return this._data.name;
+    return this._data.name
   }
 
   // Child collection accessor
   get events(): EventCollection {
-    return new EventCollection(this.#executor, this.#specifier.collection('events'));
+    return new EventCollection(this.#executor, this.#specifier.collection('events'))
   }
 
   // Update method (only writable properties)
   async update(input: CalendarUpdateInput): Promise<void> {
-    CalendarUpdateInputSchema.parse(input);
+    CalendarUpdateInputSchema.parse(input)
     // ... generate JXA set commands
   }
 
   // Resource-scoped command
   async show(): Promise<void> {
-    await this.#executor.command(this.#specifier, 'show');
+    await this.#executor.command(this.#specifier, 'show')
   }
 }
 ```

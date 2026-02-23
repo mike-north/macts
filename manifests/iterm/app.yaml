@@ -1,0 +1,747 @@
+version: '1.0'
+app:
+  bundleId: com.googlecode.iterm2
+  name: iTerm
+  displayName: iTerm
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Standard Suite
+    code: ????
+    description: Common classes and commands for all applications.
+    resources:
+      - Window
+    enums:
+      - SaveOptions
+    commands:
+      - count
+      - delete
+      - duplicate
+      - exists
+      - make
+      - move
+  - name: iTerm2 Suite
+    code: Itrm
+    description: Classes just for the iTerm2 application.
+    resources:
+      - Tab
+      - Session
+    commands:
+      - close
+      - requestCookie
+      - createTab
+      - createTabWithDefaultProfile
+      - createWindowWithProfile
+      - createHotkeyWindowWithProfile
+      - launchAPIScriptNamed
+      - invokeAPIExpression
+      - createWindowWithDefaultProfile
+      - write
+      - select
+      - splitVertically
+      - splitVerticallyWithDefaultProfile
+      - splitVerticallyWithSameProfile
+      - splitHorizontally
+      - splitHorizontallyWithDefaultProfile
+      - splitHorizontallyWithSameProfile
+      - variable
+      - setVariable
+      - revealHotkeyWindow
+      - hideHotkeyWindow
+      - toggleHotkeyWindow
+resources:
+  Window:
+    name: Window
+    plural: Windows
+    description: A window.
+    code: cwin
+    properties:
+      id:
+        access: r
+        type: integer
+        description: The unique identifier of the session.
+        code: 'ID  '
+      alternateIdentifier:
+        access: r
+        type: string
+        description: The alternate unique identifier of the session.
+        code: Twid
+      name:
+        access: r
+        type: string
+        description: The full title of the window.
+        code: pnam
+      index:
+        access: rw
+        type: integer
+        description: The index of the window, ordered front to back.
+        code: pidx
+      bounds:
+        access: rw
+        type: rect
+        description: The bounding rectangle of the window.
+        code: pbnd
+      closeable:
+        access: r
+        type: boolean
+        description: Whether the window has a close box.
+        code: hclb
+      miniaturizable:
+        access: r
+        type: boolean
+        description: Whether the window can be minimized.
+        code: ismn
+      miniaturized:
+        access: rw
+        type: boolean
+        description: Whether the window is currently minimized.
+        code: pmnd
+      resizable:
+        access: r
+        type: boolean
+        description: Whether the window can be resized.
+        code: prsz
+      visible:
+        access: rw
+        type: boolean
+        description: Whether the window is currently visible.
+        code: pvis
+      zoomable:
+        access: r
+        type: boolean
+        description: Whether the window can be zoomed.
+        code: iszm
+      zoomed:
+        access: rw
+        type: boolean
+        description: Whether the window is currently zoomed.
+        code: pzum
+      frontmost:
+        access: rw
+        type: boolean
+        description: Whether the window is currently the frontmost window.
+        code: pisf
+      currentTab:
+        access: rw
+        type:
+          resource: tab
+        description: The currently selected tab
+        code: Crtb
+      currentSession:
+        access: rw
+        type:
+          resource: session
+        description: The current session in a window
+        code: Wcsn
+      isHotkeyWindow:
+        access: rw
+        type: boolean
+        description: Whether the window is a hotkey window.
+        code: ihkw
+      hotkeyWindowProfile:
+        access: rw
+        type: string
+        description: If the window is a hotkey window, this gives the name of the profile that created the window.
+        code: hkwp
+      position:
+        access: rw
+        type: point
+        description: The position of the window, relative to the upper left corner of the screen.
+        code: ppos
+      origin:
+        access: rw
+        type: point
+        description: The position of the window, relative to the lower left corner of the screen.
+        code: pori
+      size:
+        access: rw
+        type: point
+        description: The width and height of the window
+        code: psiz
+      frame:
+        access: rw
+        type: rect
+        description: The bounding rectangle, relative to the lower left corner of the screen.
+        code: pfra
+    identifiers:
+      - property: id
+        primary: true
+  Tab:
+    name: Tab
+    plural: Tabs
+    description: A terminal tab
+    code: Trmt
+    properties:
+      currentSession:
+        access: rw
+        type:
+          resource: session
+        description: The current session in a tab
+        code: Wcsn
+      index:
+        access: rw
+        type: integer
+        description: Index of tab in parent tab view control
+        code: Indx
+      title:
+        access: rw
+        type: string
+        description: The title property
+        code: titl
+  Session:
+    name: Session
+    plural: Sessions
+    description: A terminal session
+    code: Trms
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the session.
+        code: 'ID  '
+      isProcessing:
+        access: rw
+        type: boolean
+        description: The session has received output recently.
+        code: Prcs
+      isAtShellPrompt:
+        access: rw
+        type: boolean
+        description: The terminal is at the shell prompt. Requires shell integration.
+        code: Iaps
+      columns:
+        access: rw
+        type: integer
+        description: The columns property
+        code: Cols
+      rows:
+        access: rw
+        type: integer
+        description: The rows property
+        code: Rows
+      tty:
+        access: r
+        type: string
+        description: The tty property
+        code: Stty
+      contents:
+        access: rw
+        type: string
+        description: The currently visible contents of the session.
+        code: Cntt
+      text:
+        access: r
+        type: string
+        description: The currently visible contents of the session.
+        code: pcnt
+      colorPreset:
+        access: rw
+        type: string
+        description: The colorPreset property
+        code: Copr
+      backgroundColor:
+        access: rw
+        type: rgb
+        description: The backgroundColor property
+        code: Co00
+      boldColor:
+        access: rw
+        type: rgb
+        description: The boldColor property
+        code: Co01
+      cursorColor:
+        access: rw
+        type: rgb
+        description: The cursorColor property
+        code: Co02
+      cursorTextColor:
+        access: rw
+        type: rgb
+        description: The cursorTextColor property
+        code: Co03
+      foregroundColor:
+        access: rw
+        type: rgb
+        description: The foregroundColor property
+        code: Co04
+      selectedTextColor:
+        access: rw
+        type: rgb
+        description: The selectedTextColor property
+        code: Co05
+      selectionColor:
+        access: rw
+        type: rgb
+        description: The selectionColor property
+        code: Co06
+      aNSIBlackColor:
+        access: rw
+        type: rgb
+        description: The aNSIBlackColor property
+        code: Co07
+      aNSIRedColor:
+        access: rw
+        type: rgb
+        description: The aNSIRedColor property
+        code: Co08
+      aNSIGreenColor:
+        access: rw
+        type: rgb
+        description: The aNSIGreenColor property
+        code: Co09
+      aNSIYellowColor:
+        access: rw
+        type: rgb
+        description: The aNSIYellowColor property
+        code: Co10
+      aNSIBlueColor:
+        access: rw
+        type: rgb
+        description: The aNSIBlueColor property
+        code: Co11
+      aNSIMagentaColor:
+        access: rw
+        type: rgb
+        description: The aNSIMagentaColor property
+        code: Co12
+      aNSICyanColor:
+        access: rw
+        type: rgb
+        description: The aNSICyanColor property
+        code: Co13
+      aNSIWhiteColor:
+        access: rw
+        type: rgb
+        description: The aNSIWhiteColor property
+        code: Co14
+      aNSIBrightBlackColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightBlackColor property
+        code: Co15
+      aNSIBrightRedColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightRedColor property
+        code: Co16
+      aNSIBrightGreenColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightGreenColor property
+        code: Co17
+      aNSIBrightYellowColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightYellowColor property
+        code: Co18
+      aNSIBrightBlueColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightBlueColor property
+        code: Co19
+      aNSIBrightMagentaColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightMagentaColor property
+        code: Co20
+      aNSIBrightCyanColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightCyanColor property
+        code: Co21
+      aNSIBrightWhiteColor:
+        access: rw
+        type: rgb
+        description: The aNSIBrightWhiteColor property
+        code: Co22
+      underlineColor:
+        access: rw
+        type: rgb
+        description: The underlineColor property
+        code: Co23
+      useUnderlineColor:
+        access: rw
+        type: boolean
+        description: Whether the use a dedicated color for underlining.
+        code: Undl
+      backgroundImage:
+        access: rw
+        type: string
+        description: The backgroundImage property
+        code: Bgim
+      name:
+        access: rw
+        type: string
+        description: The name property
+        code: pnam
+      transparency:
+        access: rw
+        type: number
+        description: The transparency property
+        code: Trns
+      uniqueID:
+        access: r
+        type: string
+        description: The uniqueID property
+        code: Uniq
+      profileName:
+        access: r
+        type: string
+        description: The session's profile name
+        code: Pfnm
+      answerbackString:
+        access: rw
+        type: string
+        description: ENQ Answerback string
+        code: Answ
+    identifiers:
+      - property: id
+        primary: true
+enums:
+  SaveOptions:
+    name: SaveOptions
+    code: savo
+    values:
+      - name: Yes
+        value: yes
+        description: Save the file.
+        code: 'yes '
+      - name: No
+        value: no
+        description: Do not save the file.
+        code: 'no  '
+      - name: Ask
+        value: ask
+        description: Ask the user whether or not to save the file.
+        code: 'ask '
+hierarchy:
+  children:
+    windows:
+      resource: Window
+      access: r
+      description: A window.
+      children:
+        tabs:
+          resource: Tab
+          access: r
+          description: A terminal tab
+          children:
+            sessions:
+              resource: Session
+              access: r
+              description: A terminal session
+commands:
+  count:
+    name: count
+    description: Return the number of elements of a particular class within an object.
+    scope: application
+    code: cnte
+    parameters:
+      - name: each
+        type: string
+        description: The class of objects to be counted.
+        required: false
+        code: kocl
+  delete:
+    name: delete
+    description: Delete an object.
+    scope: application
+    code: delo
+    parameters: []
+  duplicate:
+    name: duplicate
+    description: Copy object(s) and put the copies at a new location.
+    scope: application
+    code: clon
+    parameters:
+      - name: to
+        type: string
+        description: The location for the new object(s).
+        required: true
+        code: insh
+      - name: withProperties
+        type: any
+        description: Properties to be set in the new duplicated object(s).
+        required: false
+        code: prdt
+  exists:
+    name: exists
+    description: Verify if an object exists.
+    scope: application
+    code: doex
+    parameters: []
+  make:
+    name: make
+    description: Make a new object.
+    scope: application
+    code: crel
+    parameters:
+      - name: new
+        type: string
+        description: The class of the new object.
+        required: true
+        code: kocl
+      - name: at
+        type: string
+        description: The location at which to insert the object.
+        required: false
+        code: insh
+      - name: withData
+        type: any
+        description: The initial contents of the object.
+        required: false
+        code: data
+      - name: withProperties
+        type: any
+        description: The initial values for properties of the object.
+        required: false
+        code: prdt
+  move:
+    name: move
+    description: Move object(s) to a new location.
+    scope: application
+    code: move
+    parameters:
+      - name: to
+        type: string
+        description: The new location for the object(s).
+        required: true
+        code: insh
+  close:
+    name: close
+    description: Close a document.
+    scope: application
+    code: clos
+    parameters: []
+  requestCookie:
+    name: requestCookie
+    description: Request a Python API cookie
+    scope: application
+    code: rqck
+    parameters:
+      - name: andKeyForAppNamed
+        type: string
+        description: Name of script using the cookie. This is shown in the console.
+        required: false
+        code: Rcsn
+  createTab:
+    name: createTab
+    description: Create a new tab
+    scope: application
+    code: ntwp
+    parameters:
+      - name: withProfile
+        type: string
+        description: The profile name
+        required: true
+        code: Ntwp
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  createTabWithDefaultProfile:
+    name: createTabWithDefaultProfile
+    description: Create a new tab with the default profile
+    scope: application
+    code: ntwn
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  createWindowWithProfile:
+    name: createWindowWithProfile
+    description: Create a new window
+    scope: application
+    code: nwwp
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  createHotkeyWindowWithProfile:
+    name: createHotkeyWindowWithProfile
+    description: Create a hotkey window
+    scope: application
+    code: nhwp
+    parameters: []
+  launchAPIScriptNamed:
+    name: launchAPIScriptNamed
+    description: Launch API script by name
+    scope: application
+    code: lasn
+    parameters:
+      - name: arguments
+        type: string
+        description: Arguments to pass to script
+        required: false
+        code: Asar
+  invokeAPIExpression:
+    name: invokeAPIExpression
+    description: Invokes an expression, such as a registered function.
+    scope: application
+    code: iaex
+    parameters: []
+  createWindowWithDefaultProfile:
+    name: createWindowWithDefaultProfile
+    description: Create a new window with the default profile
+    scope: application
+    code: nwwn
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  write:
+    name: write
+    description: Send text as though it was typed.
+    scope: application
+    code: sntx
+    parameters:
+      - name: contentsOfFile
+        type: file
+        description: Filename to send the contents of
+        required: false
+        code: Cofl
+      - name: text
+        type: string
+        description: Text to send
+        required: false
+        code: Text
+      - name: newline
+        type: boolean
+        description: 'If newline should be added to end of text (default: yes)'
+        required: false
+        code: Wtnl
+  select:
+    name: select
+    description: Make receiver visible and selected.
+    scope: application
+    code: slct
+    parameters: []
+  splitVertically:
+    name: splitVertically
+    description: Split a session vertically.
+    scope: application
+    code: splv
+    parameters:
+      - name: withProfile
+        type: string
+        description: Name of profile for new session.
+        required: true
+        code: Prfl
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  splitVerticallyWithDefaultProfile:
+    name: splitVerticallyWithDefaultProfile
+    description: Split a session vertically, using the default profile for the new session
+    scope: application
+    code: svdp
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  splitVerticallyWithSameProfile:
+    name: splitVerticallyWithSameProfile
+    description: Split a session vertically, using the original session's profile for the new session
+    scope: application
+    code: svsp
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  splitHorizontally:
+    name: splitHorizontally
+    description: Split a session horizontally.
+    scope: application
+    code: splh
+    parameters:
+      - name: withProfile
+        type: string
+        description: Name of profile for new session.
+        required: true
+        code: Prfl
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  splitHorizontallyWithDefaultProfile:
+    name: splitHorizontallyWithDefaultProfile
+    description: Split a session horizontally, using the default profile for the new session
+    scope: application
+    code: shdp
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  splitHorizontallyWithSameProfile:
+    name: splitHorizontallyWithSameProfile
+    description: Split a session horizontally, using the original session's profile for the new session
+    scope: application
+    code: shsp
+    parameters:
+      - name: command
+        type: string
+        description: Shell command to run
+        required: false
+        code: Nwcm
+  variable:
+    name: variable
+    description: Returns the value of a session variable with the given name
+    scope: application
+    code: varb
+    parameters:
+      - name: named
+        type: string
+        description: Name of variable
+        required: true
+        code: Namd
+  setVariable:
+    name: setVariable
+    description: Sets the value of a session variable
+    scope: application
+    code: svar
+    parameters:
+      - name: named
+        type: string
+        description: Name of variable
+        required: true
+        code: Namd
+      - name: to
+        type: string
+        description: New value
+        required: true
+        code: Tovl
+  revealHotkeyWindow:
+    name: revealHotkeyWindow
+    description: Reveals a hotkey window. Only to be called on windows that are hotkey windows.
+    scope: application
+    code: rhkw
+    parameters: []
+  hideHotkeyWindow:
+    name: hideHotkeyWindow
+    description: Hides a hotkey window. Only to be called on windows that are hotkey windows.
+    scope: application
+    code: hhkw
+    parameters: []
+  toggleHotkeyWindow:
+    name: toggleHotkeyWindow
+    description: Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.
+    scope: application
+    code: thkw
+    parameters: []

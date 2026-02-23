@@ -148,8 +148,7 @@ vite.config.ts.timestamp-*
 # Nx cache
 .nx/
 
-# API Extractor
-api-report/
+# API Extractor temp files (api-report is committed)
 temp/
 !temp/.gitkeep
 
@@ -157,3 +156,6 @@ temp/
 .idea/
 # Claude Code local configuration (auto-added)
 .claude/*.local.*
+
+# Scratch/working files
+scratch/

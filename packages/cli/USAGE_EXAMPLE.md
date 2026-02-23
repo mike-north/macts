@@ -43,14 +43,14 @@ macts generate calendar/app.yaml \
 You can also use the command programmatically:
 
 ```typescript
-import { GenerateCommand } from '@macts/cli';
-import { Cli } from 'clipanion';
+import { GenerateCommand } from '@macts/cli'
+import { Cli } from 'clipanion'
 
 const cli = new Cli({
   binaryName: 'my-tool',
-});
+})
 
-cli.register(GenerateCommand);
+cli.register(GenerateCommand)
 
 // Run the command
 await cli.run([
@@ -60,7 +60,7 @@ await cli.run([
   'packages/sdk-calendar',
   '--package-name',
   '@macts/sdk-calendar',
-]);
+])
 ```
 
 ## Expected Output
@@ -119,6 +119,7 @@ macts generate --help
 ```
 
 Output:
+
 ```
 Generate an SDK package from a manifest
 
@@ -214,6 +215,7 @@ pnpm dlx @macts/cli generate ...
 ### Manifest Validation Errors
 
 If your manifest fails validation, check:
+
 - `app.name` and `app.bundleId` are present
 - All resource names are in PascalCase
 - All property types are valid
@@ -223,6 +225,7 @@ If your manifest fails validation, check:
 ### Generated Files Don't Compile
 
 If the generated TypeScript doesn't compile:
+
 - Check that all custom types referenced in the manifest are defined
 - Verify that resource references are correct
 - Check for circular dependencies

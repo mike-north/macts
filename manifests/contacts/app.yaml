@@ -1,0 +1,806 @@
+version: '1.0'
+app:
+  bundleId: com.apple.AddressBook
+  name: Contacts
+  displayName: Contacts
+  tccEntitlements:
+    - automation
+    - contacts
+  distributionModel: system
+suites:
+  - name: Standard Suite
+    code: ????
+    description: Common classes and commands for all applications.
+    commands:
+      - make
+  - name: Contacts Script Suite
+    code: az00
+    description: commands and classes for Contacts scripting.
+    resources:
+      - Address
+      - AIMHandle
+      - CustomDate
+      - Email
+      - Group
+      - ICQHandle
+      - InstantMessage
+      - JabberHandle
+      - MSNHandle
+      - Person
+      - Phone
+      - RelatedName
+      - SocialProfile
+      - Url
+      - YahooHandle
+    enums:
+      - SaveableFileFormat
+      - InstantMessageServiceType
+    commands:
+      - add
+      - remove
+      - save
+  - name: Address Book Rollover Suite
+    code: az99
+    description: These event definitions are used for constructing Address Book Rollover plug-ins. They would not normally appear in a typical end user script.
+    commands:
+      - actionProperty
+      - actionTitle
+      - performAction
+      - shouldEnableAction
+resources:
+  Address:
+    name: Address
+    plural: Addresses
+    description: Address for the given record.
+    code: az27
+    properties:
+      city:
+        access: rw
+        type: string
+        description: City part of the address.
+        code: az29
+      formattedAddress:
+        access: r
+        type: string
+        description: properly formatted string for this address.
+        code: az65
+      street:
+        access: rw
+        type: string
+        description: Street part of the address, multiple lines separated by carriage returns.
+        code: az28
+      id:
+        access: rw
+        type: string
+        description: unique identifier for this address.
+        code: 'ID  '
+      zip:
+        access: rw
+        type: string
+        description: Zip or postal code of the address.
+        code: az31
+      country:
+        access: rw
+        type: string
+        description: Country part of the address.
+        code: az32
+      label:
+        access: rw
+        type: string
+        description: Label.
+        code: az18
+      countryCode:
+        access: rw
+        type: string
+        description: Country code part of the address (should be a two character iso country code).
+        code: az33
+      state:
+        access: rw
+        type: string
+        description: State, Province, or Region part of the address.
+        code: az30
+    identifiers:
+      - property: id
+        primary: true
+  AIMHandle:
+    name: AIMHandle
+    plural: AIMHandles
+    description: User name for America Online (AOL) instant messaging.
+    code: az22
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this handle
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this handle
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The AIM handle value
+        optional: false
+        code: valL
+
+  CustomDate:
+    name: CustomDate
+    plural: CustomDates
+    description: Arbitrary date associated with this person.
+    code: az52
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this date
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this date
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: date
+        description: The date value
+        optional: false
+        code: valL
+
+  Email:
+    name: Email
+    plural: Emails
+    description: Email address for a person.
+    code: az21
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this email
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this email
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The email address
+        optional: false
+        code: valL
+
+  Group:
+    name: Group
+    plural: Groups
+    description: A Group Record in the address book database
+    code: azf5
+    properties:
+      name:
+        access: rw
+        type: string
+        description: The name of this group.
+        code: pnam
+  ICQHandle:
+    name: ICQHandle
+    plural: ICQHandles
+    description: User name for ICQ instant messaging.
+    code: az26
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this handle
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this handle
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The ICQ handle value
+        optional: false
+        code: valL
+
+  InstantMessage:
+    name: InstantMessage
+    plural: InstantMessages
+    description: Address for instant messaging.
+    code: az80
+    properties:
+      serviceName:
+        access: r
+        type: string
+        description: The service name of this instant message address.
+        code: az81
+      serviceType:
+        access: rw
+        type: string
+        description: The service type of this instant message address.
+        code: az82
+      userName:
+        access: rw
+        type: string
+        description: The user name of this instant message address.
+        code: az83
+  JabberHandle:
+    name: JabberHandle
+    plural: JabberHandles
+    description: User name for Jabber instant messaging.
+    code: az23
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this handle
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this handle
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The Jabber handle value
+        optional: false
+        code: valL
+
+  MSNHandle:
+    name: MSNHandle
+    plural: MSNHandles
+    description: User name for Microsoft Network (MSN) instant messaging.
+    code: az24
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this handle
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this handle
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The MSN handle value
+        optional: false
+        code: valL
+
+  Person:
+    name: Person
+    plural: People
+    description: A person in the address book database.
+    code: azf4
+    properties:
+      nickname:
+        access: rw
+        type: string
+        description: The Nickname of this person.
+        code: az43
+      organization:
+        access: rw
+        type: string
+        description: Organization that employs this person.
+        code: az38
+      maidenName:
+        access: rw
+        type: string
+        description: The Maiden name of this person.
+        code: az42
+      suffix:
+        access: rw
+        type: string
+        description: The Suffix of this person.
+        code: az41
+      vcard:
+        access: r
+        type: string
+        description: Person information in vCard format, this always returns a card in version 3.0 format.
+        code: az49
+      homePage:
+        access: rw
+        type: string
+        description: The home page of this person.
+        code: az13
+      birthDate:
+        access: rw
+        type: string
+        description: The birth date of this person.
+        code: az11
+      phoneticLastName:
+        access: rw
+        type: string
+        description: The phonetic version of the Last name of this person.
+        code: az10
+      title:
+        access: rw
+        type: string
+        description: The title of this person.
+        code: az39
+      phoneticMiddleName:
+        access: rw
+        type: string
+        description: The Phonetic version of the Middle name of this person.
+        code: az56
+      department:
+        access: rw
+        type: string
+        description: Department that this person works for.
+        code: az55
+      image:
+        access: rw
+        type: string
+        description: Image for person.
+        code: az50
+      name:
+        access: r
+        type: string
+        description: First/Last name of the person, uses the name display order preference setting in Contacts.
+        code: pnam
+      note:
+        access: rw
+        type: string
+        description: Notes for this person.
+        code: az37
+      company:
+        access: rw
+        type: boolean
+        description: Is the current record a company or a person.
+        code: az51
+      middleName:
+        access: rw
+        type: string
+        description: The Middle name of this person.
+        code: az40
+      phoneticFirstName:
+        access: rw
+        type: string
+        description: The phonetic version of the First name of this person.
+        code: azf9
+      jobTitle:
+        access: rw
+        type: string
+        description: The job title of this person.
+        code: az12
+      lastName:
+        access: rw
+        type: string
+        description: The Last name of this person.
+        code: azf8
+      firstName:
+        access: rw
+        type: string
+        description: The First name of this person.
+        code: azf7
+  Phone:
+    name: Phone
+    plural: Phones
+    description: Phone number for a person.
+    code: az20
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this phone
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this phone
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The phone number
+        optional: false
+        code: valL
+
+  RelatedName:
+    name: RelatedName
+    plural: RelatedNames
+    description: Other names related to this person.
+    code: az53
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this name
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this name
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The related name value
+        optional: false
+        code: valL
+
+  SocialProfile:
+    name: SocialProfile
+    plural: SocialProfiles
+    description: Profile for social networks.
+    code: sp01
+    properties:
+      id:
+        access: r
+        type: string
+        description: The persistent unique identifier for this profile.
+        code: 'ID  '
+      serviceName:
+        access: rw
+        type: string
+        description: The service name of this social profile.
+        code: az81
+      userName:
+        access: rw
+        type: string
+        description: The username used with this social profile.
+        code: az83
+      userIdentifier:
+        access: rw
+        type: string
+        description: A service-specific identifier used with this social profile.
+        code: spid
+      url:
+        access: rw
+        type: string
+        description: The URL of this social profile.
+        code: spur
+    identifiers:
+      - property: id
+        primary: true
+  Url:
+    name: Url
+    plural: Urls
+    description: URLs for this person.
+    code: az70
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this URL
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this URL
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The URL value
+        optional: false
+        code: valL
+
+  YahooHandle:
+    name: YahooHandle
+    plural: YahooHandles
+    description: User name for Yahoo instant messaging.
+    code: az25
+    properties:
+      id:
+        access: r
+        type: string
+        description: Unique identifier for this handle
+        optional: false
+        code: 'ID  '
+      label:
+        access: rw
+        type: string
+        description: Label for this handle
+        optional: false
+        code: az18
+      value:
+        access: rw
+        type: string
+        description: The Yahoo handle value
+        optional: false
+        code: valL
+
+enums:
+  SaveableFileFormat:
+    name: SaveableFileFormat
+    code: savf
+    values:
+      - name: archive
+        value: archive
+        description: The native Contacts file format
+        code: abbu
+  InstantMessageServiceType:
+    name: InstantMessageServiceType
+    code: az84
+    values:
+      - name: aIM
+        value: aIM
+        code: az85
+      - name: facebook
+        value: facebook
+        code: az94
+      - name: gaduGadu
+        value: gaduGadu
+        code: az86
+      - name: googleTalk
+        value: googleTalk
+        code: az87
+      - name: iCQ
+        value: iCQ
+        code: az88
+      - name: jabber
+        value: jabber
+        code: az89
+      - name: mSN
+        value: mSN
+        code: az90
+      - name: qQ
+        value: qQ
+        code: az91
+      - name: skype
+        value: skype
+        code: az92
+      - name: yahoo
+        value: yahoo
+        code: az93
+hierarchy:
+  children:
+    groups:
+      resource: Group
+      access: rw
+      description: A Group Record in the address book database
+      children:
+        people:
+          resource: Person
+          access: r
+          description: A person in the address book database.
+          children:
+            mSNHandles:
+              resource: MSNHandle
+              access: rw
+              description: User name for Microsoft Network (MSN) instant messaging.
+            urls:
+              resource: Url
+              access: rw
+              description: URLs for this person.
+            addresses:
+              resource: Address
+              access: rw
+              description: Address for the given record.
+            phones:
+              resource: Phone
+              access: rw
+              description: Phone number for a person.
+            jabberHandles:
+              resource: JabberHandle
+              access: rw
+              description: User name for Jabber instant messaging.
+            customDates:
+              resource: CustomDate
+              access: rw
+              description: Arbitrary date associated with this person.
+            aIMHandles:
+              resource: AIMHandle
+              access: rw
+              description: User name for America Online (AOL) instant messaging.
+            yahooHandles:
+              resource: YahooHandle
+              access: rw
+              description: User name for Yahoo instant messaging.
+            iCQHandles:
+              resource: ICQHandle
+              access: rw
+              description: User name for ICQ instant messaging.
+            instantMessages:
+              resource: InstantMessage
+              access: rw
+              description: Address for instant messaging.
+            socialProfiles:
+              resource: SocialProfile
+              access: rw
+              description: Profile for social networks.
+            relatedNames:
+              resource: RelatedName
+              access: rw
+              description: Other names related to this person.
+            emails:
+              resource: Email
+              access: rw
+              description: Email address for a person.
+    people:
+      resource: Person
+      access: rw
+      description: A person in the address book database.
+      children:
+        mSNHandles:
+          resource: MSNHandle
+          access: rw
+          description: User name for Microsoft Network (MSN) instant messaging.
+        urls:
+          resource: Url
+          access: rw
+          description: URLs for this person.
+        addresses:
+          resource: Address
+          access: rw
+          description: Address for the given record.
+        phones:
+          resource: Phone
+          access: rw
+          description: Phone number for a person.
+        jabberHandles:
+          resource: JabberHandle
+          access: rw
+          description: User name for Jabber instant messaging.
+        groups:
+          resource: Group
+          access: r
+          description: A Group Record in the address book database
+        customDates:
+          resource: CustomDate
+          access: rw
+          description: Arbitrary date associated with this person.
+        aIMHandles:
+          resource: AIMHandle
+          access: rw
+          description: User name for America Online (AOL) instant messaging.
+        yahooHandles:
+          resource: YahooHandle
+          access: rw
+          description: User name for Yahoo instant messaging.
+        iCQHandles:
+          resource: ICQHandle
+          access: rw
+          description: User name for ICQ instant messaging.
+        instantMessages:
+          resource: InstantMessage
+          access: rw
+          description: Address for instant messaging.
+        socialProfiles:
+          resource: SocialProfile
+          access: rw
+          description: Profile for social networks.
+        relatedNames:
+          resource: RelatedName
+          access: rw
+          description: Other names related to this person.
+        emails:
+          resource: Email
+          access: rw
+          description: Email address for a person.
+commands:
+  make:
+    name: make
+    description: Create a new object.
+    scope: application
+    code: crel
+    parameters:
+      - name: new
+        type: string
+        description: The class of the new object.
+        required: true
+        code: kocl
+      - name: at
+        type: string
+        description: The location at which to insert the object.
+        required: false
+        code: insh
+      - name: withData
+        type: any
+        description: The initial contents of the object.
+        required: false
+        code: data
+      - name: withProperties
+        type: any
+        description: The initial values for properties of the object.
+        required: false
+        code: prdt
+  add:
+    name: add
+    description: Add a child object.
+    scope: application
+    code: az44
+    parameters:
+      - name: to
+        type: string
+        description: where to add this child to.
+        required: true
+        code: az45
+  remove:
+    name: remove
+    description: Remove a child object.
+    scope: application
+    code: az46
+    parameters:
+      - name: from
+        type: string
+        description: where to remove this child from.
+        required: true
+        code: az47
+  save:
+    name: save
+    description: Save all Contacts changes. Also see the unsaved property for the application class.
+    scope: application
+    code: save
+    parameters: []
+  actionProperty:
+    name: actionProperty
+    description: RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
+    scope: application
+    code: az57
+    parameters: []
+  actionTitle:
+    name: actionTitle
+    description: RollOver - Returns the title that will be placed in the menu for this roll over
+    scope: application
+    code: az58
+    parameters:
+      - name: with
+        type: any
+        description: property that that was returned from the "action property" handler.
+        required: true
+        code: az62
+      - name: for
+        type:
+          resource: person
+        description: Currently selected person.
+        required: true
+        code: az61
+  performAction:
+    name: performAction
+    description: RollOver - Performs the action on the given person and value
+    scope: application
+    code: az60
+    parameters:
+      - name: with
+        type: any
+        description: property that that was returned from the "action property" handler.
+        required: true
+        code: az62
+      - name: for
+        type:
+          resource: person
+        description: Currently selected person.
+        required: true
+        code: az61
+  shouldEnableAction:
+    name: shouldEnableAction
+    description: RollOver - Determines if the rollover action should be enabled for the given person and value
+    scope: application
+    code: az59
+    parameters:
+      - name: with
+        type: any
+        description: property that that was returned from the "action property" handler.
+        required: true
+        code: az62
+      - name: for
+        type:
+          resource: person
+        description: Currently selected person.
+        required: true
+        code: az61

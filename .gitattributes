@@ -1,7 +1,7 @@
 # API Extractor generated files
-api-report/** linguist-generated=true
 docs/** linguist-generated=true
 temp/** linguist-generated=true
+**/api-report/** linguist-generated=true
 
 # Build outputs
 **/dist/** linguist-generated=true

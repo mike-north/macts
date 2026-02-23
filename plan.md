@@ -396,13 +396,13 @@ alarms (id, event_id FK, type, trigger_interval, trigger_date, ...)
 **MCP tools:**
 
 ```jsx
-macts__calendar__calendars_list;
-macts__calendar__calendars_get;
-macts__calendar__calendars_create;
-macts__calendar__events_list;
-macts__calendar__events_get;
-macts__calendar__events_create;
-macts__calendar__attendees_list;
+macts__calendar__calendars_list
+macts__calendar__calendars_get
+macts__calendar__calendars_create
+macts__calendar__events_list
+macts__calendar__events_get
+macts__calendar__events_create
+macts__calendar__attendees_list
 ```
 
 ## Commands
@@ -470,9 +470,9 @@ POST /calendars/:calendarId/events/:eventId/actions/show
 **MCP:**
 
 ```jsx
-macts__calendar__reload_calendars;
-macts__calendar__switch_view;
-macts__calendar__events_show;
+macts__calendar__reload_calendars
+macts__calendar__switch_view
+macts__calendar__events_show
 ```
 
 ## Enums
@@ -708,34 +708,34 @@ Each app gets a published npm package (`@macts/sdk-<app>`) that provides a fully
 The SDK presents the app's object model as a natural TypeScript class hierarchy with fluent collection accessors:
 
 ```tsx
-import { Calendar } from '@macts/sdk-calendar';
+import { Calendar } from '@macts/sdk-calendar'
 
-const app = new Calendar();
+const app = new Calendar()
 
 // Collection accessors from hierarchy
-const calendars = await app.calendars.list();
-const work = await app.calendars.get('work-uid');
+const calendars = await app.calendars.list()
+const work = await app.calendars.get('work-uid')
 
 // Nested traversal
-const events = await work.events.list({ after: new Date('2026-01-01') });
+const events = await work.events.list({ after: new Date('2026-01-01') })
 const standup = await work.events.create({
   summary: 'Team standup',
   startDate: new Date('2026-02-16T09:00:00'),
   endDate: new Date('2026-02-16T09:30:00'),
-});
+})
 
 // Typed updates (only writable properties accepted)
-await standup.update({ location: 'Room 4B' });
+await standup.update({ location: 'Room 4B' })
 
 // Resource-scoped commands
-await standup.show();
+await standup.show()
 
 // Read-only nested collections
-const attendees = await standup.attendees.list();
+const attendees = await standup.attendees.list()
 
 // App-level commands
-await app.reloadCalendars();
-await app.switchView({ to: 'week' });
+await app.reloadCalendars()
+await app.switchView({ to: 'week' })
 ```
 
 ### What the SDK Generator Needs from the Manifest

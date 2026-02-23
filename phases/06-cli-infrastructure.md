@@ -130,9 +130,9 @@ packages/cli-calendar/        # Generated plugin
 ```typescript
 // @macts/cli exports this interface
 interface CliPlugin {
-  name: string; // 'calendar'
-  description: string;
-  commands: Command[]; // Clipanion command classes
+  name: string // 'calendar'
+  description: string
+  commands: Command[] // Clipanion command classes
 }
 
 // Each @macts/cli-<app> exports a plugin
@@ -144,41 +144,41 @@ export const plugin: CliPlugin = {
     CalendarsCreateCommand,
     // ...
   ],
-};
+}
 ```
 
 ## Generated Command Example
 
 ```typescript
 // Generated: CalendarsListCommand.ts
-import { Command, Option } from 'clipanion';
-import { Calendar } from '@macts/sdk-calendar';
+import { Command, Option } from 'clipanion'
+import { Calendar } from '@macts/sdk-calendar'
 
 export class CalendarsListCommand extends Command {
-  static paths = [['calendar', 'calendars', 'list']];
+  static paths = [['calendar', 'calendars', 'list']]
 
   static usage = Command.Usage({
     description: 'List all calendars',
-  });
+  })
 
   json = Option.Boolean('--json', false, {
     description: 'Output as JSON',
-  });
+  })
 
   async execute(): Promise<number> {
-    const app = new Calendar();
-    const calendars = await app.calendars.list();
+    const app = new Calendar()
+    const calendars = await app.calendars.list()
 
     if (this.json) {
-      this.context.stdout.write(JSON.stringify(calendars, null, 2));
+      this.context.stdout.write(JSON.stringify(calendars, null, 2))
     } else {
       // Human-readable table output
       for (const cal of calendars) {
-        this.context.stdout.write(`${cal.name} (${cal.uid})\n`);
+        this.context.stdout.write(`${cal.name} (${cal.uid})\n`)
       }
     }
 
-    return 0;
+    return 0
   }
 }
 ```

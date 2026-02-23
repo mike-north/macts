@@ -1,0 +1,209 @@
+version: '1.0'
+
+app:
+  bundleId: com.apple.shortcuts
+  name: Shortcuts
+  displayName: Shortcuts
+  tccEntitlements:
+    - automation
+  distributionModel: system
+
+suites:
+  - name: Standard Suite
+    code: '????'
+    description: Common classes and commands for all applications
+  - name: Shortcuts Suite
+    code: srct
+    description: Classes and Commands for working with Shortcuts
+    resources:
+      - Shortcut
+      - Folder
+    commands:
+      - run
+
+resources:
+  Shortcut:
+    name: Shortcut
+    plural: Shortcuts
+    description: A shortcut in the Shortcuts application
+    code: srct
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the shortcut
+        code: pnam
+      subtitle:
+        access: r
+        type: string
+        description: The shortcut's subtitle
+        code: subt
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the shortcut
+        code: 'ID  '
+      folder:
+        access: rw
+        type: string
+        description: The folder containing this shortcut (folder ID)
+        code: fldr
+      color:
+        access: r
+        type: rgb
+        description: The shortcut's color
+        code: colr
+      icon:
+        access: r
+        type: data
+        description: The shortcut's icon (TIFF image data)
+        code: sico
+      acceptsInput:
+        access: r
+        type: boolean
+        description: Indicates whether or not the shortcut accepts input data
+        code: anpt
+      actionCount:
+        access: r
+        type: integer
+        description: The number of actions in the shortcut
+        code: acnt
+
+  Folder:
+    name: Folder
+    plural: Folders
+    description: A folder containing shortcuts
+    code: fldr
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      name:
+        access: rw
+        type: string
+        description: The name of the folder
+        code: pnam
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the folder
+        code: 'ID  '
+
+hierarchy:
+  children:
+    shortcuts:
+      resource: Shortcut
+      access: rw
+      description: Shortcuts in the application
+    folders:
+      resource: Folder
+      access: rw
+      description: Folders in the application
+      children:
+        shortcuts:
+          resource: Shortcut
+          access: rw
+          description: Shortcuts within a folder
+
+commands:
+  # Shortcut commands
+  list:
+    name: list
+    description: List all shortcuts
+    scope: resource
+    resourceType: Shortcut
+    code: core
+    parameters: []
+    permission: shortcuts:shortcuts:list
+
+  get:
+    name: get
+    description: Get a shortcut by ID
+    scope: resource
+    resourceType: Shortcut
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Shortcut identifier
+        required: true
+    permission: shortcuts:shortcuts:get
+
+  run:
+    name: run
+    description: Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell 'Shortcuts Events' instead of 'Shortcuts'.
+    scope: resource
+    resourceType: Shortcut
+    code: srun
+    parameters:
+      - name: id
+        type: string
+        description: The shortcut to run
+        required: true
+      - name: withInput
+        type: any
+        description: The input to provide to the shortcut
+        required: false
+        code: inpt
+    permission: shortcuts:shortcuts:run
+
+  # Folder commands
+  listFolders:
+    name: list
+    description: List all folders
+    scope: resource
+    resourceType: Folder
+    code: core
+    parameters: []
+    permission: shortcuts:folders:list
+
+  getFolder:
+    name: get
+    description: Get a folder by ID
+    scope: resource
+    resourceType: Folder
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Folder identifier
+        required: true
+    permission: shortcuts:folders:get
+
+# Permissions mapping
+permissions:
+  shortcuts:
+    read:
+      - shortcuts:shortcuts:list
+      - shortcuts:shortcuts:get
+      - shortcuts:shortcuts:run
+    create:
+      - shortcuts:shortcuts:create
+    write:
+      - shortcuts:shortcuts:update
+    delete:
+      - shortcuts:shortcuts:delete
+
+  folders:
+    read:
+      - shortcuts:folders:list
+      - shortcuts:folders:get
+    create:
+      - shortcuts:folders:create
+    write:
+      - shortcuts:folders:update
+    delete:
+      - shortcuts:folders:delete
+
+extraction:
+  sourceFile: source.sdef
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 0.95
+      commands: 0.95

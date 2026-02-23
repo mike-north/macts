@@ -1,11 +1,11 @@
-import type { GeneratorContext } from './context.js';
-import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js';
-import { propertyTypeToTs } from './types.js';
+import type { GeneratorContext } from './context.js'
+import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js'
+import { propertyTypeToTs } from './types.js'
 
 export interface GeneratedClass {
-  name: string;
-  content: string;
-  imports: string[];
+  name: string
+  content: string
+  imports: string[]
 }
 
 /**
@@ -16,91 +16,91 @@ function getChildCollections(
   ctx: GeneratorContext
 ): { key: string; child: HierarchyChild }[] {
   // Walk hierarchy to find this resource and its children
-  const result: { key: string; child: HierarchyChild }[] = [];
+  const result: { key: string; child: HierarchyChild }[] = []
 
   function findChildren(children: Record<string, HierarchyChild>): void {
     for (const [_key, child] of Object.entries(children)) {
       if (child.resource === resourceName && child.children) {
         for (const [childKey, childChild] of Object.entries(child.children)) {
-          result.push({ key: childKey, child: childChild });
+          result.push({ key: childKey, child: childChild })
         }
       }
       if (child.children) {
-        findChildren(child.children);
+        findChildren(child.children)
       }
     }
   }
 
-  findChildren(ctx.manifest.hierarchy.children);
-  return result;
+  findChildren(ctx.manifest.hierarchy.children)
+  return result
 }
 
 /**
  * Generate resource instance class code.
  */
 export function generateResourceClass(resource: Resource, ctx: GeneratorContext): GeneratedClass {
-  const className = `${resource.name}Instance`;
+  const className = `${resource.name}Instance`
   const imports = [
     "import type { JxaExecutor } from '@macts/core';",
     "import type { ObjectSpecifier } from '@macts/core';",
-  ];
+  ]
 
   // Generate property getters
-  const properties = Object.entries(resource.properties);
+  const properties = Object.entries(resource.properties)
   const propertyGetters = properties.map(([name, prop]) => {
-    const tsType = propertyTypeToTs(prop.type);
-    const readonly = prop.access === 'r' ? ' (read-only)' : '';
+    const tsType = propertyTypeToTs(prop.type)
+    const readonly = prop.access === 'r' ? ' (read-only)' : ''
     return `  /** ${prop.description}${readonly} */
   get ${name}(): ${tsType} {
     return this.#data.${name};
-  }`;
-  });
+  }`
+  })
 
   // Generate setters for writable properties
   const propertySetters = properties
     .filter(([_, prop]) => prop.access === 'rw')
     .map(([name, prop]) => {
-      const tsType = propertyTypeToTs(prop.type);
+      const tsType = propertyTypeToTs(prop.type)
       return `  set ${name}(value: ${tsType}) {
     this.#data.${name} = value;
     this.#dirty.add('${name}');
-  }`;
-    });
+  }`
+    })
 
   // Get child collections from hierarchy
-  const childCollections = getChildCollections(resource.name, ctx);
+  const childCollections = getChildCollections(resource.name, ctx)
   const collectionAccessors = childCollections.map(({ key, child }) => {
-    const collectionClass = `${child.resource}Collection`;
+    const collectionClass = `${child.resource}Collection`
     return `  /** Access ${key} collection */
   get ${key}(): ${collectionClass} {
     return new ${collectionClass}(this.#executor, this.#specifier.collection('${key}'));
-  }`;
-  });
+  }`
+  })
 
   // Get resource commands
-  const commands = ctx.getResourceCommands(resource.name);
-  const commandMethods = commands.map(cmd => {
-    const params = cmd.parameters.map(p => {
-      // Cast string to PropertyType - command types are always valid primitive or reference types
-      const tsType = propertyTypeToTs(p.type as PropertyType);
-      const optional = !p.required ? '?' : '';
-      return `${p.name}${optional}: ${tsType}`;
-    }).join(', ');
+  const commands = ctx.getResourceCommands(resource.name)
+  const commandMethods = commands.map((cmd) => {
+    const params = cmd.parameters
+      .map((p) => {
+        // Cast string to PropertyType - command types are always valid primitive or reference types
+        const tsType = propertyTypeToTs(p.type as PropertyType)
+        const optional = !p.required ? '?' : ''
+        return `${p.name}${optional}: ${tsType}`
+      })
+      .join(', ')
 
     // Cast return type similarly
-    const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void';
+    const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
 
     // Build parameter object for executor
-    const paramNames = cmd.parameters.map(p => p.name);
-    const argsObj = paramNames.length > 0
-      ? `, { ${paramNames.join(', ')} }`
-      : '';
+    const paramNames = cmd.parameters.map((p) => p.name)
+    const argsObj = paramNames.length > 0 ? `, { ${paramNames.join(', ')} }` : ''
 
     return `  /** ${cmd.description} */
   async ${cmd.name}(${params}): Promise<${returnType}> {
     return this.#executor.command(this.#specifier, '${cmd.name}'${argsObj});
-  }`;
-  });
+  }`
+  })
 
   const content = `${imports.join('\n')}
 
@@ -142,7 +142,7 @@ ${collectionAccessors.join('\n\n')}
   }
 
 ${commandMethods.join('\n\n')}
-}`;
+}`
 
-  return { name: className, content, imports };
+  return { name: className, content, imports }
 }

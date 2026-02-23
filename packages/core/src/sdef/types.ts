@@ -9,17 +9,17 @@
  */
 export interface RawProperty {
   /** Property name (e.g., "name", "bounds") */
-  name: string;
+  name: string
   /** Four-character code for Apple Events (e.g., "pnam") */
-  code: string;
+  code: string
   /** Type of the property (e.g., "text", "integer", "rectangle") */
-  type: string;
+  type: string
   /** Access level: read-only or read-write */
-  access: 'r' | 'rw';
+  access: 'r' | 'rw'
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Whether this property is deprecated */
-  deprecated?: boolean;
+  deprecated?: boolean
 }
 
 /**
@@ -28,9 +28,9 @@ export interface RawProperty {
  */
 export interface RawElement {
   /** Type of element that can be contained (class name) */
-  type: string;
+  type: string
   /** Access level: read-only or read-write */
-  access: 'r' | 'rw';
+  access: 'r' | 'rw'
 }
 
 /**
@@ -38,21 +38,21 @@ export interface RawElement {
  */
 export interface RawClass {
   /** Class name (e.g., "document", "window") */
-  name: string;
+  name: string
   /** Four-character code for Apple Events (e.g., "docu") */
-  code: string;
+  code: string
   /** Plural form of the class name */
-  plural?: string;
+  plural?: string
   /** Name of parent class for inheritance */
-  inherits?: string;
+  inherits?: string
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Properties owned by this class */
-  properties: RawProperty[];
+  properties: RawProperty[]
   /** Elements that can be contained by this class */
-  elements: RawElement[];
+  elements: RawElement[]
   /** Whether this class is deprecated */
-  deprecated?: boolean;
+  deprecated?: boolean
 }
 
 /**
@@ -60,15 +60,15 @@ export interface RawClass {
  */
 export interface RawParameter {
   /** Parameter name */
-  name: string;
+  name: string
   /** Four-character code for Apple Events */
-  code: string;
+  code: string
   /** Type of the parameter */
-  type: string;
+  type: string
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Whether this parameter is optional */
-  optional?: boolean;
+  optional?: boolean
 }
 
 /**
@@ -76,17 +76,17 @@ export interface RawParameter {
  */
 export interface RawCommand {
   /** Command name (e.g., "open", "save") */
-  name: string;
+  name: string
   /** Four-character code for Apple Events (e.g., "aevtodoc") */
-  code: string;
+  code: string
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Direct parameter (the unnamed parameter after the command) */
-  directParameter?: { type: string; description?: string };
+  directParameter?: { type: string; description?: string }
   /** Named parameters */
-  parameters: RawParameter[];
+  parameters: RawParameter[]
   /** Return value specification */
-  result?: { type: string; description?: string };
+  result?: { type: string; description?: string }
 }
 
 /**
@@ -94,11 +94,11 @@ export interface RawCommand {
  */
 export interface RawEnumerator {
   /** Enumerator name (e.g., "yes", "no", "ask") */
-  name: string;
+  name: string
   /** Four-character code for Apple Events */
-  code: string;
+  code: string
   /** Human-readable description */
-  description?: string;
+  description?: string
 }
 
 /**
@@ -106,13 +106,13 @@ export interface RawEnumerator {
  */
 export interface RawEnumeration {
   /** Enumeration name (e.g., "save options") */
-  name: string;
+  name: string
   /** Four-character code for Apple Events */
-  code: string;
+  code: string
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Possible values for this enumeration */
-  values: RawEnumerator[];
+  values: RawEnumerator[]
 }
 
 /**
@@ -121,17 +121,17 @@ export interface RawEnumeration {
  */
 export interface RawSuite {
   /** Suite name */
-  name: string;
+  name: string
   /** Four-character code for Apple Events */
-  code: string;
+  code: string
   /** Human-readable description */
-  description?: string;
+  description?: string
   /** Classes defined in this suite */
-  classes: RawClass[];
+  classes: RawClass[]
   /** Commands defined in this suite */
-  commands: RawCommand[];
+  commands: RawCommand[]
   /** Enumerations defined in this suite */
-  enumerations: RawEnumeration[];
+  enumerations: RawEnumeration[]
 }
 
 /**
@@ -139,7 +139,7 @@ export interface RawSuite {
  */
 export interface RawSdefData {
   /** Title of the application/dictionary */
-  title: string;
+  title: string
   /** Suites containing the terminology */
-  suites: RawSuite[];
+  suites: RawSuite[]
 }

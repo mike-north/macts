@@ -73,36 +73,36 @@ packages/core/src/
 // High-level API the SDK will use
 interface JxaExecutor {
   // Execute raw JXA code
-  run<T>(code: string): Promise<T>;
+  run<T>(code: string): Promise<T>
 
   // Execute with context (app connection)
-  withApp<T>(bundleId: string, code: (app: Application) => T): Promise<T>;
+  withApp<T>(bundleId: string, code: (app: Application) => T): Promise<T>
 
   // Build and execute object specifier chain
-  query(specifier: ObjectSpecifier): Promise<unknown>;
+  query(specifier: ObjectSpecifier): Promise<unknown>
 
   // Execute command on object
   command(
     specifier: ObjectSpecifier,
     command: string,
     params?: Record<string, unknown>
-  ): Promise<unknown>;
+  ): Promise<unknown>
 }
 
 // Object specifier builder
 interface ObjectSpecifier {
-  app(bundleId: string): ObjectSpecifier;
-  collection(name: string): ObjectSpecifier;
-  byId(id: string): ObjectSpecifier;
-  byName(name: string): ObjectSpecifier;
-  whose(predicate: Record<string, unknown>): ObjectSpecifier;
-  property(name: string): ObjectSpecifier;
+  app(bundleId: string): ObjectSpecifier
+  collection(name: string): ObjectSpecifier
+  byId(id: string): ObjectSpecifier
+  byName(name: string): ObjectSpecifier
+  whose(predicate: Record<string, unknown>): ObjectSpecifier
+  property(name: string): ObjectSpecifier
 
   // Terminal operations
-  get(): string; // Generate JXA code to get value
-  set(value: unknown): string; // Generate JXA code to set value
-  make(properties: Record<string, unknown>): string; // Generate make command
-  delete(): string; // Generate delete command
+  get(): string // Generate JXA code to get value
+  set(value: unknown): string // Generate JXA code to set value
+  make(properties: Record<string, unknown>): string // Generate make command
+  delete(): string // Generate delete command
 }
 ```
 
@@ -113,22 +113,22 @@ interface ObjectSpecifier {
 const coerceDate = {
   toJxa: (d: Date) => `new Date("${d.toISOString()}")`,
   fromJxa: (v: string | number) => new Date(v),
-};
+}
 
 // Enum coercion (using manifest enum definitions)
 const coerceEnum = (enumDef: EnumDefinition) => ({
   toJxa: (v: string) => `"${enumDef.values.find((e) => e.name === v)?.code}"`,
   fromJxa: (code: string) => enumDef.values.find((e) => e.code === code)?.name,
-});
+})
 
 // Color coercion
 const coerceColor = {
   toJxa: (hex: string) => {
-    const [r, g, b] = hexToRgb(hex);
-    return `{${r * 257}, ${g * 257}, ${b * 257}}`; // AppleScript uses 16-bit color
+    const [r, g, b] = hexToRgb(hex)
+    return `{${r * 257}, ${g * 257}, ${b * 257}}` // AppleScript uses 16-bit color
   },
   fromJxa: (rgb: [number, number, number]) => rgbToHex(rgb.map((v) => v / 257)),
-};
+}
 ```
 
 ## Success Criteria

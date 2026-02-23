@@ -1,0 +1,86 @@
+version: '1.0'
+app:
+  bundleId: com.apple.systempreferences
+  name: System Settings
+  displayName: System Settings
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Standard Suite
+    code: ????
+  - name: System Settings
+    code: xpsp
+    description: Classes and Commands specific to System Settings
+    resources:
+      - Pane
+      - Anchor
+    commands:
+      - reveal
+      - authorize
+      - timedLoad
+resources:
+  Pane:
+    name: Pane
+    plural: Panes
+    description: A settings pane.
+    code: xppb
+    properties:
+      id:
+        access: r
+        type: string
+        description: The id of the settings pane.
+        code: 'ID  '
+      name:
+        access: r
+        type: string
+        description: The name of the settings pane.
+        code: pnam
+    identifiers:
+      - property: id
+        primary: true
+  Anchor:
+    name: Anchor
+    plural: Anchors
+    description: An anchor within a settings pane.
+    code: xppa
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the anchor.
+        code: pnam
+enums: {}
+
+hierarchy:
+  children:
+    panes:
+      resource: Pane
+      access: r
+      description: A settings pane.
+      children:
+        anchors:
+          resource: Anchor
+          access: r
+          description: An anchor within a settings pane.
+commands:
+  reveal:
+    name: reveal
+    description: Reveals a settings pane or an anchor within a pane.
+    scope: application
+    code: mvis
+    parameters: []
+  authorize:
+    name: authorize
+    description: 'Prompt for authorization for a settings pane. Deprecated: no longer does anything.'
+    scope: resource
+    resourceType: Pane
+    code: maut
+    parameters: []
+  timedLoad:
+    name: timedLoad
+    description: 'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.'
+    scope: resource
+    resourceType: Pane
+    code: 'mtml'
+    parameters: []

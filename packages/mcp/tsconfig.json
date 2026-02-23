@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // Required due to @modelcontextprotocol/sdk using DOM types (HeadersInit)
+    // in its type definitions without declaring them. This is an upstream
+    // issue in the MCP SDK package.
+    "skipLibCheck": true
   },
   "include": ["src"]
 }

@@ -1,0 +1,50 @@
+version: '1.0'
+app:
+  bundleId: com.apple.Console
+  name: Console
+  displayName: Console
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Console Suite
+    code: csls
+    description: Console commands.
+    resources:
+      - Device
+    commands:
+      - selectDevice
+resources:
+  Device:
+    name: Device
+    plural: Devices
+    description: A device in Console
+    code: devi
+    properties:
+      name:
+        access: r
+        type: string
+        description: The device name
+        code: pnam
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the device
+        code: 'ID  '
+    identifiers:
+      - property: id
+        primary: true
+enums: {}
+hierarchy:
+  children:
+    devices:
+      resource: Device
+      access: r
+      description: Devices in Console
+commands:
+  selectDevice:
+    name: selectDevice
+    description: Select a device.
+    scope: application
+    code: seld
+    parameters: []

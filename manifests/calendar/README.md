@@ -25,6 +25,7 @@ This manifest provides a structured, type-safe representation of Calendar.app's 
 A calendar containing events.
 
 **Key Properties:**
+
 - `name` (rw, string) - Calendar title
 - `calendarIdentifier` (r, string) - Unique identifier (primary key)
 - `color` (rw, rgb) - Calendar color
@@ -36,6 +37,7 @@ A calendar containing events.
 A calendar event with full scheduling details.
 
 **Key Properties:**
+
 - `uid` (r, string) - Unique identifier (primary key)
 - `summary` (rw, string) - Event title
 - `startDate` / `endDate` (rw, date) - Event timing
@@ -51,6 +53,7 @@ A calendar event with full scheduling details.
 An event attendee (read-only).
 
 **Key Properties:**
+
 - `displayName` (r, string) - Full name
 - `email` (r, string) - Email address
 - `participationStatus` (r, ParticipationStatus enum) - Response status
@@ -65,6 +68,7 @@ Four types of alarms, all with trigger timing:
 4. **OpenFileAlarm** - Opens a file (deprecated since macOS 10.14)
 
 All alarms support:
+
 - `triggerInterval` (rw, integer) - Minutes before/after event (negative = before, positive = after)
 - `triggerDate` (rw, date) - Absolute alarm time
 
@@ -73,6 +77,7 @@ All alarms support:
 ### ParticipationStatus
 
 Attendee response status:
+
 - `unknown` - No answer yet
 - `accepted` - Invitation accepted
 - `declined` - Invitation declined
@@ -81,6 +86,7 @@ Attendee response status:
 ### EventStatus
 
 Event confirmation status:
+
 - `none` - No status set
 - `tentative` - Tentative event
 - `confirmed` - Confirmed event
@@ -89,6 +95,7 @@ Event confirmation status:
 ### ViewType
 
 Calendar view modes:
+
 - `dayView` - Day view
 - `weekView` - Week view
 - `monthView` - Month view
@@ -96,6 +103,7 @@ Calendar view modes:
 ### CalendarPriority
 
 Priority levels (values are numeric):
+
 - `noPriority` (0)
 - `highPriority` (1)
 - `mediumPriority` (5)
@@ -116,6 +124,7 @@ Note: This enum is defined in the SDEF but not currently used by any properties.
 **Scope:** Application
 **Description:** Show calendar on the given view
 **Parameters:**
+
 - `to` (ViewType, required) - The calendar view to display
 
 ### viewCalendar
@@ -123,6 +132,7 @@ Note: This enum is defined in the SDEF but not currently used by any properties.
 **Scope:** Application
 **Description:** Show calendar on the given date
 **Parameters:**
+
 - `at` (date, required) - The date to display
 
 ### show
@@ -147,6 +157,7 @@ Application
 ## TCC Entitlements
 
 Required macOS permissions:
+
 - `calendar` - Access calendar data
 - `automation` - Script the Calendar application
 
@@ -155,6 +166,7 @@ Required macOS permissions:
 ### Confidence: 95%
 
 The manifest was extracted from Calendar.app's SDEF with high confidence. Field-level confidence:
+
 - Resources: 100%
 - Enums: 100%
 - Hierarchy: 95%
@@ -171,6 +183,7 @@ The manifest was extracted from Calendar.app's SDEF with high confidence. Field-
 ### OpenFileAlarm (macOS 10.14+)
 
 Starting with macOS 10.14 (Mojave):
+
 - Cannot create new open file alarms
 - Cannot view URLs for existing open file alarms
 - Attempting to save or modify open file alarms will result in a save error
@@ -187,6 +200,7 @@ pnpm test
 ```
 
 The test suite includes:
+
 - **Positive tests**: Verify all resources, enums, commands, and hierarchy are correctly defined
 - **Negative tests**: Ensure invalid manifests are rejected by the schema
 - **Edge cases**: Test complex types, deep nesting, and optional fields

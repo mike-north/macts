@@ -31,9 +31,21 @@
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^api-extractor"],
       "inputs": ["production", "^production"],
       "outputs": ["{projectRoot}/dist", "{projectRoot}/build", "{projectRoot}/*.tsbuildinfo"],
+      "cache": true
+    },
+    "api-extractor": {
+      "dependsOn": ["build"],
+      "inputs": ["production", "^production", "{workspaceRoot}/api-extractor.base.json"],
+      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp"],
+      "cache": true
+    },
+    "api-extractor:ci": {
+      "dependsOn": ["build"],
+      "inputs": ["production", "^production", "{workspaceRoot}/api-extractor.base.json"],
+      "outputs": ["{projectRoot}/api-report", "{projectRoot}/temp"],
       "cache": true
     },
     "lint": {
@@ -79,7 +91,7 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "type-check"]
+        "cacheableOperations": ["build", "lint", "test", "type-check", "api-extractor", "api-extractor:ci"]
       }
     }
   },

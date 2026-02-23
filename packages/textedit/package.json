@@ -1,0 +1,61 @@
+{
+  "name": "@macts/textedit",
+  "version": "0.0.0",
+  "description": "SDK and CLI for macOS textedit automation",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/textedit.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/textedit.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "macts-sdk",
+    "macts-cli-plugin"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "api-extractor": "api-extractor run --local",
+    "api-extractor:ci": "api-extractor run",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "@macts/cli": "*",
+    "clipanion": "^4.0.0-rc.4",
+    "typanion": "^3.14.0"
+  },
+  "peerDependenciesMeta": {
+    "@macts/cli": {
+      "optional": true
+    },
+    "clipanion": {
+      "optional": true
+    },
+    "typanion": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@macts/cli": "workspace:*",
+    "clipanion": "^4.0.0-rc.4",
+    "tsup": "catalog:",
+    "typanion": "^3.14.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

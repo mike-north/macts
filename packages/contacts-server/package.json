@@ -1,0 +1,48 @@
+{
+  "name": "@macts/contacts-server",
+  "version": "0.0.0",
+  "description": "Server package for macOS Contacts.app (API + MCP)",
+  "keywords": [
+    "macts-server"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/contacts-server.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp.d.ts",
+      "import": "./dist/mcp/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/contacts-server.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@macts/api": "workspace:*",
+    "@macts/core": "workspace:*",
+    "@macts/contacts": "workspace:*"
+  },
+  "peerDependencies": {
+    "@macts/mcp": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@macts/mcp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "vitest": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -8,10 +8,10 @@
  */
 
 // Re-export all schemas and types from schemas module
-export * from './schemas/index.js';
+export * from './schemas/index.js'
 
 // Manifest loading and parsing utilities
-export * from './loader.js';
+export * from './loader.js'
 
 // JSON Schema generation utilities
-export * from './json-schema.js';
+export * from './json-schema.js'

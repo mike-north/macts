@@ -1,0 +1,1913 @@
+/**
+ * API plugin for OmniGraffle.app.
+ *
+ * Provides the manifest for registering RPC endpoints.
+ *
+ * @packageDocumentation
+ */
+
+import type { AppManifest } from '@macts/core';
+
+/**
+ * API plugin for OmniGraffle.app.
+ *
+ * This plugin contains the app manifest and metadata needed by the @macts/api
+ * server to auto-generate RPC endpoints for OmniGraffle.app automation.
+ */
+export const omniGraffleApiPlugin = {
+  name: 'omnigraffle',
+  bundleId: 'com.omnigroup.OmniGraffle7',
+  manifest: {
+  "version": "1.0",
+  "app": {
+    "bundleId": "com.omnigroup.OmniGraffle7",
+    "name": "OmniGraffle",
+    "displayName": "OmniGraffle",
+    "tccEntitlements": [
+      "automation"
+    ],
+    "distributionModel": "developer-id"
+  },
+  "suites": [
+    {
+      "name": "Standard Suite",
+      "description": "Common classes and commands for all applications",
+      "code": "????",
+      "resources": [],
+      "commands": [],
+      "enums": []
+    },
+    {
+      "name": "OmniGraffle",
+      "description": "OmniGraffle scripting classes and commands",
+      "code": "OGSS",
+      "resources": [
+        "Canvas",
+        "Graphic",
+        "Shape",
+        "Line",
+        "Group",
+        "Layer",
+        "Subgraph",
+        "Label",
+        "Grid",
+        "Master",
+        "ExportSettings"
+      ],
+      "commands": [
+        "connect",
+        "layout",
+        "export",
+        "flip",
+        "slide",
+        "assemble",
+        "pageAdjust",
+        "evaluateJavascript"
+      ],
+      "enums": [
+        "HorizontalAlignment",
+        "VerticalAlignment",
+        "LayoutDirection",
+        "LayoutType",
+        "StrokeCap",
+        "StrokeJoin",
+        "FillType",
+        "ImageSizing",
+        "LineType",
+        "HopType",
+        "LabelOrientation",
+        "TextAutosizing",
+        "Orientation",
+        "ExportAreaType"
+      ]
+    }
+  ],
+  "resources": {
+    "Canvas": {
+      "name": "Canvas",
+      "plural": "Canvases",
+      "description": "A drawing page/canvas in OmniGraffle",
+      "code": "OGWS",
+      "properties": {
+        "id": {
+          "access": "rw",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "name": {
+          "access": "rw",
+          "type": "string",
+          "description": "Name of this canvas",
+          "code": "pnam",
+          "optional": false
+        },
+        "adjustsPages": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Adjust number of pages on the canvas automatically?",
+          "code": "OGlp",
+          "optional": false
+        },
+        "canvasSizeIsMeasuredInPages": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Whether canvas size is reported as multiples of page size",
+          "code": "OGcp",
+          "optional": false
+        },
+        "canvasSize": {
+          "access": "rw",
+          "type": "point",
+          "description": "Size of the canvas (page size multiplied by number of pages)",
+          "code": "OGcs",
+          "optional": false
+        },
+        "pageSize": {
+          "access": "r",
+          "type": "point",
+          "description": "Size of each page",
+          "code": "OGps",
+          "optional": false
+        },
+        "horizontalPages": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Horizontal pages",
+          "code": "OGhp",
+          "optional": false
+        },
+        "verticalPages": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Vertical pages",
+          "code": "OGvp",
+          "optional": false
+        },
+        "columnAlignment": {
+          "access": "rw",
+          "type": {
+            "enum": "HorizontalAlignment"
+          },
+          "description": "Column alignment",
+          "code": "OGCA",
+          "optional": false
+        },
+        "rowAlignment": {
+          "access": "rw",
+          "type": {
+            "enum": "VerticalAlignment"
+          },
+          "description": "Row alignment",
+          "code": "OGRA",
+          "optional": false
+        },
+        "columnSpacing": {
+          "access": "rw",
+          "type": "number",
+          "description": "Spacing between graphics in a column",
+          "code": "OGCs",
+          "optional": false
+        },
+        "rowSpacing": {
+          "access": "rw",
+          "type": "number",
+          "description": "Spacing between graphics in a row",
+          "code": "OGRs",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Graphic": {
+      "name": "Graphic",
+      "plural": "Graphics",
+      "description": "Base class for visual elements in OmniGraffle",
+      "code": "OGGr",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "origin": {
+          "access": "rw",
+          "type": "point",
+          "description": "Origin of the graphic (position of the upper-left corner of the bounding rectangle)",
+          "code": "Ogor",
+          "optional": false
+        },
+        "size": {
+          "access": "rw",
+          "type": "point",
+          "description": "Size of the graphic (width and height of the bounding rectangle)",
+          "code": "ptsz",
+          "optional": false
+        },
+        "locked": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Is this graphic locked?",
+          "code": "Oglo",
+          "optional": false
+        },
+        "allowsConnections": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does this graphic allow connections to it?",
+          "code": "Ogac",
+          "optional": false
+        },
+        "alignsEdgesToGrid": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "When snapped to the grid does this graphic align its edges to the grid?",
+          "code": "OGag",
+          "optional": false
+        },
+        "cornerRadius": {
+          "access": "rw",
+          "type": "number",
+          "description": "Curvature of corners in the stroke path",
+          "code": "Ogcr",
+          "optional": false
+        },
+        "drawsShadow": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does this graphic draw its shadow?",
+          "code": "Ogds",
+          "optional": false
+        },
+        "drawsStroke": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does this graphic draw its stroke?",
+          "code": "Ogdl",
+          "optional": false
+        },
+        "doubleStroke": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does this graphic have a double-lined stroke?",
+          "code": "OGDL",
+          "optional": false
+        },
+        "flippedHorizontally": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Is this graphic flipped horizontally?",
+          "code": "Oghf",
+          "optional": false
+        },
+        "flippedVertically": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Is this graphic flipped vertically?",
+          "code": "Ogvf",
+          "optional": false
+        },
+        "shadowColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "Color of the shadow",
+          "code": "Ogsc",
+          "optional": false
+        },
+        "shadowFuzziness": {
+          "access": "rw",
+          "type": "number",
+          "description": "The 'fuzziness' of the graphic's shadow",
+          "code": "Ogsf",
+          "optional": false
+        },
+        "shadowVector": {
+          "access": "rw",
+          "type": "point",
+          "description": "The direction of the graphic's shadow",
+          "code": "Ogsv",
+          "optional": false
+        },
+        "shadowBeneath": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does this graphic draw its shadow immediately beneath itself?",
+          "code": "Ogsb",
+          "optional": false
+        },
+        "strokeColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "Color of the stroke",
+          "code": "Oglc",
+          "optional": false
+        },
+        "strokeCap": {
+          "access": "rw",
+          "type": {
+            "enum": "StrokeCap"
+          },
+          "description": "Type of cap at ends of the stroke",
+          "code": "OGSC",
+          "optional": false
+        },
+        "strokeJoin": {
+          "access": "rw",
+          "type": {
+            "enum": "StrokeJoin"
+          },
+          "description": "Type of join between segments of the stroke",
+          "code": "OGSJ",
+          "optional": false
+        },
+        "strokePattern": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Dash pattern of the stroke",
+          "code": "OGLP",
+          "optional": false
+        },
+        "thickness": {
+          "access": "rw",
+          "type": "number",
+          "description": "Thickness of the stroke",
+          "code": "Ogth",
+          "optional": false
+        },
+        "notes": {
+          "access": "rw",
+          "type": "string",
+          "description": "Notes for this graphic",
+          "code": "Ognt",
+          "optional": false
+        },
+        "userName": {
+          "access": "rw",
+          "type": "string",
+          "description": "Name of a graphic",
+          "code": "Oggn",
+          "optional": false
+        },
+        "tag": {
+          "access": "rw",
+          "type": "string",
+          "description": "Arbitrary string tag attached to this graphic",
+          "code": "Ogtg",
+          "optional": false
+        },
+        "url": {
+          "access": "rw",
+          "type": "string",
+          "description": "Web link for this graphic",
+          "code": "Ogur",
+          "optional": false
+        },
+        "script": {
+          "access": "rw",
+          "type": "string",
+          "description": "Source of attached AppleScript",
+          "code": "scpt",
+          "optional": false
+        },
+        "rankGroup": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Rank group assigned to this graphic for hierarchical layout",
+          "code": "Ogrg",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Shape": {
+      "name": "Shape",
+      "plural": "Shapes",
+      "description": "A shape graphic in OmniGraffle",
+      "code": "OGSh",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "name": {
+          "access": "rw",
+          "type": "string",
+          "description": "Name of the shape",
+          "code": "pnam",
+          "optional": false
+        },
+        "text": {
+          "access": "rw",
+          "type": "string",
+          "description": "The text inside the shape",
+          "code": "ctxt",
+          "optional": false
+        },
+        "fill": {
+          "access": "rw",
+          "type": {
+            "enum": "FillType"
+          },
+          "description": "The type of fill for this shape",
+          "code": "Ogfi",
+          "optional": false
+        },
+        "fillColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "The fill color",
+          "code": "Ogfc",
+          "optional": false
+        },
+        "gradientColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "For linear and radial fills, this is the ending color",
+          "code": "Oggc",
+          "optional": false
+        },
+        "gradientAngle": {
+          "access": "rw",
+          "type": "number",
+          "description": "Angle of a linear gradient fill",
+          "code": "Ogga",
+          "optional": false
+        },
+        "rotation": {
+          "access": "rw",
+          "type": "number",
+          "description": "Rotation of the graphic in degrees",
+          "code": "Ogro",
+          "optional": false
+        },
+        "textPlacement": {
+          "access": "rw",
+          "type": {
+            "enum": "VerticalAlignment"
+          },
+          "description": "Placement of the text inside the shape",
+          "code": "Ogtp",
+          "optional": false
+        },
+        "autosizing": {
+          "access": "rw",
+          "type": {
+            "enum": "TextAutosizing"
+          },
+          "description": "Autosizing behavior of the shape around the text",
+          "code": "Ogas",
+          "optional": false
+        },
+        "sidePadding": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Padding at the left and right of the text space",
+          "code": "Ogsp",
+          "optional": false
+        },
+        "verticalPadding": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Padding at the top and bottom of the text space",
+          "code": "Ogtb",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Line": {
+      "name": "Line",
+      "plural": "Lines",
+      "description": "A line/connector in OmniGraffle",
+      "code": "OGLi",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "lineType": {
+          "access": "rw",
+          "type": {
+            "enum": "LineType"
+          },
+          "description": "Type of the line",
+          "code": "Ollt",
+          "optional": false
+        },
+        "hopType": {
+          "access": "rw",
+          "type": {
+            "enum": "HopType"
+          },
+          "description": "The behavior when one line crosses over another line",
+          "code": "OGHt",
+          "optional": false
+        },
+        "headType": {
+          "access": "rw",
+          "type": "string",
+          "description": "Type of line ending on the head of the line",
+          "code": "Olht",
+          "optional": false
+        },
+        "tailType": {
+          "access": "rw",
+          "type": "string",
+          "description": "Type of line ending on the tail of the line",
+          "code": "Oltt",
+          "optional": false
+        },
+        "headScale": {
+          "access": "rw",
+          "type": "number",
+          "description": "Scale of line ending on the head of the line",
+          "code": "Olhs",
+          "optional": false
+        },
+        "tailScale": {
+          "access": "rw",
+          "type": "number",
+          "description": "Scale of line ending on the tail of the line",
+          "code": "Olts",
+          "optional": false
+        },
+        "headMagnet": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Which magnet of the destination graphic the line attaches to",
+          "code": "Olhm",
+          "optional": false
+        },
+        "tailMagnet": {
+          "access": "rw",
+          "type": "integer",
+          "description": "Which magnet of the source graphic the line attaches to",
+          "code": "Oltm",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Group": {
+      "name": "Group",
+      "plural": "Groups",
+      "description": "A group of graphics in OmniGraffle",
+      "code": "OGGR",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "rotation": {
+          "access": "rw",
+          "type": "number",
+          "description": "Rotation of the group in degrees",
+          "code": "Ogro",
+          "optional": false
+        },
+        "connectToGroupOnly": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Only connect to the group?",
+          "code": "OGog",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Layer": {
+      "name": "Layer",
+      "plural": "Layers",
+      "description": "A drawing layer in OmniGraffle",
+      "code": "OGLa",
+      "properties": {
+        "name": {
+          "access": "rw",
+          "type": "string",
+          "description": "Name of the layer",
+          "code": "pnam",
+          "optional": false
+        },
+        "locked": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Are the layer's graphics locked?",
+          "code": "Oglo",
+          "optional": false
+        },
+        "visible": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Are the layer's graphics visible?",
+          "code": "pvis",
+          "optional": false
+        },
+        "prints": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Do the layer's graphics print?",
+          "code": "OGLp",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "name",
+          "primary": true
+        }
+      ]
+    },
+    "Subgraph": {
+      "name": "Subgraph",
+      "plural": "Subgraphs",
+      "description": "A subgraph container in OmniGraffle",
+      "code": "OGsg",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "collapsed": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Is the subgraph collapsed?",
+          "code": "OGsC",
+          "optional": false
+        },
+        "topMargin": {
+          "access": "rw",
+          "type": "number",
+          "description": "Top margin",
+          "code": "OGsT",
+          "optional": false
+        },
+        "bottomMargin": {
+          "access": "rw",
+          "type": "number",
+          "description": "Bottom margin",
+          "code": "OGsD",
+          "optional": false
+        },
+        "leftMargin": {
+          "access": "rw",
+          "type": "number",
+          "description": "Left margin",
+          "code": "OGsL",
+          "optional": false
+        },
+        "rightMargin": {
+          "access": "rw",
+          "type": "number",
+          "description": "Right margin",
+          "code": "OGsR",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Label": {
+      "name": "Label",
+      "plural": "Labels",
+      "description": "A text label on a line",
+      "code": "OGLB",
+      "properties": {
+        "id": {
+          "access": "r",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "text": {
+          "access": "rw",
+          "type": "string",
+          "description": "The text inside the label",
+          "code": "ctxt",
+          "optional": false
+        },
+        "labelPosition": {
+          "access": "rw",
+          "type": "number",
+          "description": "The position along the line",
+          "code": "Olap",
+          "optional": false
+        },
+        "labelOffset": {
+          "access": "rw",
+          "type": "number",
+          "description": "The offset from the line",
+          "code": "Olao",
+          "optional": false
+        },
+        "labelRotation": {
+          "access": "rw",
+          "type": {
+            "enum": "LabelOrientation"
+          },
+          "description": "The type of rotation around the line",
+          "code": "Olar",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "Grid": {
+      "name": "Grid",
+      "plural": "Grids",
+      "description": "Grid settings for a canvas",
+      "code": "OGgi",
+      "properties": {
+        "visible": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Is the grid visible?",
+          "code": "pvis",
+          "optional": false
+        },
+        "snaps": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Do points snap to the grid?",
+          "code": "OGgn",
+          "optional": false
+        },
+        "spacing": {
+          "access": "rw",
+          "type": "number",
+          "description": "Number of pixels between minor grid lines",
+          "code": "OGgp",
+          "optional": false
+        },
+        "major": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does the grid have 'major' lines?",
+          "code": "OGgm",
+          "optional": false
+        },
+        "majorSpacing": {
+          "access": "rw",
+          "type": "integer",
+          "description": "The number of minor grid lines for each major line",
+          "code": "OGga",
+          "optional": false
+        },
+        "drawsInFront": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Does the grid draw in front of all shapes?",
+          "code": "OGgf",
+          "optional": false
+        },
+        "scriptGridColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "Color of the grid",
+          "code": "colr",
+          "optional": false
+        },
+        "scriptMajorGridColor": {
+          "access": "rw",
+          "type": "rgb",
+          "description": "Color of major lines",
+          "code": "OGgj",
+          "optional": false
+        }
+      }
+    },
+    "Master": {
+      "name": "Master",
+      "plural": "Masters",
+      "description": "A reusable template/master in OmniGraffle",
+      "code": "OGMM",
+      "properties": {
+        "id": {
+          "access": "rw",
+          "type": "string",
+          "description": "Unique identifier",
+          "code": "ID  ",
+          "optional": false
+        },
+        "name": {
+          "access": "rw",
+          "type": "string",
+          "description": "Name of this master",
+          "code": "pnam",
+          "optional": false
+        }
+      },
+      "identifiers": [
+        {
+          "property": "id",
+          "primary": true
+        }
+      ]
+    },
+    "ExportSettings": {
+      "name": "ExportSettings",
+      "plural": "ExportSettings",
+      "description": "Export configuration settings",
+      "code": "OGex",
+      "properties": {
+        "areaType": {
+          "access": "rw",
+          "type": {
+            "enum": "ExportAreaType"
+          },
+          "description": "The type of area to be exported",
+          "code": "OGEa",
+          "optional": false
+        },
+        "exportScale": {
+          "access": "rw",
+          "type": "number",
+          "description": "The scale to use during export",
+          "code": "OGes",
+          "optional": false
+        },
+        "resolution": {
+          "access": "rw",
+          "type": "number",
+          "description": "The number of pixels per point in the resulting exported image",
+          "code": "OGpp",
+          "optional": false
+        },
+        "drawsBackground": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Draw the background canvas color",
+          "code": "OGeb",
+          "optional": false
+        },
+        "includeBorder": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Whether or not to include a border area",
+          "code": "OGbs",
+          "optional": false
+        },
+        "borderAmount": {
+          "access": "rw",
+          "type": "number",
+          "description": "The number of pixels of border area to include",
+          "code": "OGba",
+          "optional": false
+        },
+        "includeNonprintingLayers": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Whether to export with non printing layers",
+          "code": "OGnp",
+          "optional": false
+        },
+        "useArtboards": {
+          "access": "rw",
+          "type": "boolean",
+          "description": "Whether to export with artboards",
+          "code": "OGua",
+          "optional": false
+        }
+      }
+    }
+  },
+  "enums": {
+    "HorizontalAlignment": {
+      "name": "HorizontalAlignment",
+      "description": "Horizontal alignment options",
+      "code": "OGha",
+      "values": [
+        {
+          "name": "left",
+          "value": "left",
+          "description": "Left alignment",
+          "code": "OTa0"
+        },
+        {
+          "name": "center",
+          "value": "center",
+          "description": "Center alignment",
+          "code": "OTa1"
+        },
+        {
+          "name": "right",
+          "value": "right",
+          "description": "Right alignment",
+          "code": "OTa2"
+        }
+      ]
+    },
+    "VerticalAlignment": {
+      "name": "VerticalAlignment",
+      "description": "Vertical alignment options",
+      "code": "OGva",
+      "values": [
+        {
+          "name": "top",
+          "value": "top",
+          "description": "Top alignment",
+          "code": "OGv0"
+        },
+        {
+          "name": "center",
+          "value": "center",
+          "description": "Center alignment",
+          "code": "OTa1"
+        },
+        {
+          "name": "bottom",
+          "value": "bottom",
+          "description": "Bottom alignment",
+          "code": "OGv2"
+        }
+      ]
+    },
+    "LayoutDirection": {
+      "name": "LayoutDirection",
+      "description": "Hierarchical layout direction",
+      "code": "OGld",
+      "values": [
+        {
+          "name": "topToBottom",
+          "value": "topToBottom",
+          "description": "Top to bottom layout",
+          "code": "OGd1"
+        },
+        {
+          "name": "leftToRight",
+          "value": "leftToRight",
+          "description": "Left to right layout",
+          "code": "OGd2"
+        },
+        {
+          "name": "bottomToTop",
+          "value": "bottomToTop",
+          "description": "Bottom to top layout",
+          "code": "OGd3"
+        },
+        {
+          "name": "rightToLeft",
+          "value": "rightToLeft",
+          "description": "Right to left layout",
+          "code": "OGd4"
+        }
+      ]
+    },
+    "LayoutType": {
+      "name": "LayoutType",
+      "description": "Type of automatic layout",
+      "code": "OGlt",
+      "values": [
+        {
+          "name": "hierarchical",
+          "value": "hierarchical",
+          "description": "Hierarchical layout",
+          "code": "OGl0"
+        },
+        {
+          "name": "forceDirected",
+          "value": "forceDirected",
+          "description": "Force directed layout",
+          "code": "OGl1"
+        },
+        {
+          "name": "radial",
+          "value": "radial",
+          "description": "Radial layout",
+          "code": "OGl2"
+        },
+        {
+          "name": "circular",
+          "value": "circular",
+          "description": "Circular layout",
+          "code": "OGl3"
+        }
+      ]
+    },
+    "StrokeCap": {
+      "name": "StrokeCap",
+      "description": "Type of cap at ends of the stroke",
+      "code": "OGSC",
+      "values": [
+        {
+          "name": "butt",
+          "value": "butt",
+          "description": "Butt cap",
+          "code": "OGbu"
+        },
+        {
+          "name": "round",
+          "value": "round",
+          "description": "Round cap",
+          "code": "OGro"
+        },
+        {
+          "name": "square",
+          "value": "square",
+          "description": "Square cap",
+          "code": "OGsq"
+        }
+      ]
+    },
+    "StrokeJoin": {
+      "name": "StrokeJoin",
+      "description": "Type of join between segments of the stroke",
+      "code": "OGSJ",
+      "values": [
+        {
+          "name": "miter",
+          "value": "miter",
+          "description": "Miter join",
+          "code": "OGmi"
+        },
+        {
+          "name": "round",
+          "value": "round",
+          "description": "Round join",
+          "code": "OGro"
+        },
+        {
+          "name": "bevel",
+          "value": "bevel",
+          "description": "Bevel join",
+          "code": "OGbe"
+        }
+      ]
+    },
+    "FillType": {
+      "name": "FillType",
+      "description": "Type of fill for shapes",
+      "code": "OGFT",
+      "values": [
+        {
+          "name": "noFill",
+          "value": "noFill",
+          "description": "No fill",
+          "code": "OGf0"
+        },
+        {
+          "name": "solidFill",
+          "value": "solidFill",
+          "description": "Solid fill",
+          "code": "OGf1"
+        },
+        {
+          "name": "linearFill",
+          "value": "linearFill",
+          "description": "Linear gradient fill",
+          "code": "OGf2"
+        },
+        {
+          "name": "radialFill",
+          "value": "radialFill",
+          "description": "Radial gradient fill",
+          "code": "OGf3"
+        }
+      ]
+    },
+    "ImageSizing": {
+      "name": "ImageSizing",
+      "description": "How to size and display image fills",
+      "code": "OGIS",
+      "values": [
+        {
+          "name": "manual",
+          "value": "manual",
+          "description": "Manual sizing",
+          "code": "OGI0"
+        },
+        {
+          "name": "stretched",
+          "value": "stretched",
+          "description": "Stretched to fit",
+          "code": "OGI1"
+        },
+        {
+          "name": "tiled",
+          "value": "tiled",
+          "description": "Tiled",
+          "code": "OGI2"
+        }
+      ]
+    },
+    "LineType": {
+      "name": "LineType",
+      "description": "Type of line",
+      "code": "OGLT",
+      "values": [
+        {
+          "name": "straight",
+          "value": "straight",
+          "description": "Straight line",
+          "code": "OGL1"
+        },
+        {
+          "name": "curved",
+          "value": "curved",
+          "description": "Curved line",
+          "code": "OGL2"
+        },
+        {
+          "name": "orthogonal",
+          "value": "orthogonal",
+          "description": "Orthogonal line",
+          "code": "OGL3"
+        },
+        {
+          "name": "bezier",
+          "value": "bezier",
+          "description": "Bezier curve",
+          "code": "OGL4"
+        }
+      ]
+    },
+    "HopType": {
+      "name": "HopType",
+      "description": "Behavior when one line crosses another",
+      "code": "OGHT",
+      "values": [
+        {
+          "name": "noHop",
+          "value": "noHop",
+          "description": "No hop",
+          "code": "OGH0"
+        },
+        {
+          "name": "roundHop",
+          "value": "roundHop",
+          "description": "Round hop",
+          "code": "OGH1"
+        },
+        {
+          "name": "squareHop",
+          "value": "squareHop",
+          "description": "Square hop",
+          "code": "OGH2"
+        },
+        {
+          "name": "twoSideHop",
+          "value": "twoSideHop",
+          "description": "Two side hop",
+          "code": "OGH3"
+        },
+        {
+          "name": "threeSideHop",
+          "value": "threeSideHop",
+          "description": "Three side hop",
+          "code": "OGH4"
+        },
+        {
+          "name": "ignoreHop",
+          "value": "ignoreHop",
+          "description": "Ignore hop",
+          "code": "OGH5"
+        },
+        {
+          "name": "gapHop",
+          "value": "gapHop",
+          "description": "Gap hop",
+          "code": "OGH6"
+        },
+        {
+          "name": "bridgeHop",
+          "value": "bridgeHop",
+          "description": "Bridge hop",
+          "code": "OGH7"
+        }
+      ]
+    },
+    "LabelOrientation": {
+      "name": "LabelOrientation",
+      "description": "Rotation type for labels on lines",
+      "code": "OGLO",
+      "values": [
+        {
+          "name": "horizontal",
+          "value": "horizontal",
+          "description": "Horizontal orientation",
+          "code": "OGX0"
+        },
+        {
+          "name": "vertical",
+          "value": "vertical",
+          "description": "Vertical orientation",
+          "code": "OGX1"
+        },
+        {
+          "name": "parallel",
+          "value": "parallel",
+          "description": "Parallel to line",
+          "code": "OGX2"
+        },
+        {
+          "name": "perpendicular",
+          "value": "perpendicular",
+          "description": "Perpendicular to line",
+          "code": "OGX3"
+        },
+        {
+          "name": "custom",
+          "value": "custom",
+          "description": "Custom rotation",
+          "code": "OGX4"
+        }
+      ]
+    },
+    "TextAutosizing": {
+      "name": "TextAutosizing",
+      "description": "Autosizing behavior for text in shapes",
+      "code": "OGta",
+      "values": [
+        {
+          "name": "overflow",
+          "value": "overflow",
+          "description": "Text can overflow",
+          "code": "OGt0"
+        },
+        {
+          "name": "full",
+          "value": "full",
+          "description": "Shape resizes fully",
+          "code": "OGt1"
+        },
+        {
+          "name": "verticallyOnly",
+          "value": "verticallyOnly",
+          "description": "Shape resizes vertically only",
+          "code": "OGt2"
+        },
+        {
+          "name": "clip",
+          "value": "clip",
+          "description": "Text is clipped",
+          "code": "OGt3"
+        }
+      ]
+    },
+    "Orientation": {
+      "name": "Orientation",
+      "description": "Flip orientation",
+      "code": "OGOr",
+      "values": [
+        {
+          "name": "horizontally",
+          "value": "horizontally",
+          "description": "Flip horizontally",
+          "code": "OGO0"
+        },
+        {
+          "name": "vertically",
+          "value": "vertically",
+          "description": "Flip vertically",
+          "code": "OGO1"
+        }
+      ]
+    },
+    "ExportAreaType": {
+      "name": "ExportAreaType",
+      "description": "The type of area to be exported",
+      "code": "OGeA",
+      "values": [
+        {
+          "name": "selectedGraphics",
+          "value": "selectedGraphics",
+          "description": "Export selected graphics",
+          "code": "OGe0"
+        },
+        {
+          "name": "allGraphics",
+          "value": "allGraphics",
+          "description": "Export all graphics",
+          "code": "OGe1"
+        },
+        {
+          "name": "currentCanvas",
+          "value": "currentCanvas",
+          "description": "Export current canvas",
+          "code": "OGe3"
+        },
+        {
+          "name": "entireDocument",
+          "value": "entireDocument",
+          "description": "Export entire document",
+          "code": "OGe4"
+        }
+      ]
+    }
+  },
+  "hierarchy": {
+    "children": {
+      "canvases": {
+        "resource": "Canvas",
+        "access": "rw",
+        "description": "Canvases in the document",
+        "children": {
+          "graphics": {
+            "resource": "Graphic",
+            "access": "rw",
+            "description": "Graphics on the canvas"
+          },
+          "shapes": {
+            "resource": "Shape",
+            "access": "rw",
+            "description": "Shapes on the canvas"
+          },
+          "lines": {
+            "resource": "Line",
+            "access": "rw",
+            "description": "Lines on the canvas"
+          },
+          "groups": {
+            "resource": "Group",
+            "access": "rw",
+            "description": "Groups on the canvas"
+          },
+          "layers": {
+            "resource": "Layer",
+            "access": "rw",
+            "description": "Layers on the canvas"
+          },
+          "subgraphs": {
+            "resource": "Subgraph",
+            "access": "rw",
+            "description": "Subgraphs on the canvas"
+          }
+        }
+      },
+      "masters": {
+        "resource": "Master",
+        "access": "rw",
+        "description": "Master templates in the document"
+      }
+    }
+  },
+  "relationships": [],
+  "commands": {
+    "listCanvases": {
+      "name": "list",
+      "description": "List all canvases",
+      "scope": "resource",
+      "resourceType": "Canvas",
+      "parameters": [],
+      "code": "core",
+      "permission": "omnigraffle:canvases:list"
+    },
+    "getCanvas": {
+      "name": "get",
+      "description": "Get a canvas by ID",
+      "scope": "resource",
+      "resourceType": "Canvas",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Canvas identifier",
+          "required": true
+        }
+      ],
+      "code": "getd",
+      "permission": "omnigraffle:canvases:get"
+    },
+    "createCanvas": {
+      "name": "create",
+      "description": "Create a new canvas",
+      "scope": "resource",
+      "resourceType": "Canvas",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Canvas name",
+          "required": true
+        }
+      ],
+      "code": "crel",
+      "permission": "omnigraffle:canvases:create"
+    },
+    "listGraphics": {
+      "name": "list",
+      "description": "List all graphics on a canvas",
+      "scope": "resource",
+      "resourceType": "Graphic",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "string",
+          "description": "Canvas identifier",
+          "required": true
+        }
+      ],
+      "code": "core",
+      "permission": "omnigraffle:graphics:list"
+    },
+    "getGraphic": {
+      "name": "get",
+      "description": "Get a graphic by ID",
+      "scope": "resource",
+      "resourceType": "Graphic",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Graphic identifier",
+          "required": true
+        }
+      ],
+      "code": "getd",
+      "permission": "omnigraffle:graphics:get"
+    },
+    "listShapes": {
+      "name": "list",
+      "description": "List all shapes on a canvas",
+      "scope": "resource",
+      "resourceType": "Shape",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "string",
+          "description": "Canvas identifier",
+          "required": true
+        }
+      ],
+      "code": "core",
+      "permission": "omnigraffle:shapes:list"
+    },
+    "getShape": {
+      "name": "get",
+      "description": "Get a shape by ID",
+      "scope": "resource",
+      "resourceType": "Shape",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Shape identifier",
+          "required": true
+        }
+      ],
+      "code": "getd",
+      "permission": "omnigraffle:shapes:get"
+    },
+    "createShape": {
+      "name": "create",
+      "description": "Create a new shape",
+      "scope": "resource",
+      "resourceType": "Shape",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "integer",
+          "description": "Canvas identifier for the shape",
+          "required": true
+        },
+        {
+          "name": "origin",
+          "type": "point",
+          "description": "Shape origin",
+          "required": true
+        },
+        {
+          "name": "size",
+          "type": "point",
+          "description": "Shape size",
+          "required": true
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "description": "Text content",
+          "required": false
+        }
+      ],
+      "code": "crel",
+      "permission": "omnigraffle:shapes:create"
+    },
+    "listLines": {
+      "name": "list",
+      "description": "List all lines on a canvas",
+      "scope": "resource",
+      "resourceType": "Line",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "string",
+          "description": "Canvas identifier",
+          "required": true
+        }
+      ],
+      "code": "core",
+      "permission": "omnigraffle:lines:list"
+    },
+    "getLine": {
+      "name": "get",
+      "description": "Get a line by ID",
+      "scope": "resource",
+      "resourceType": "Line",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Line identifier",
+          "required": true
+        }
+      ],
+      "code": "getd",
+      "permission": "omnigraffle:lines:get"
+    },
+    "listLayers": {
+      "name": "list",
+      "description": "List all layers on a canvas",
+      "scope": "resource",
+      "resourceType": "Layer",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "string",
+          "description": "Canvas identifier",
+          "required": true
+        }
+      ],
+      "code": "core",
+      "permission": "omnigraffle:layers:list"
+    },
+    "getLayer": {
+      "name": "get",
+      "description": "Get a layer by name",
+      "scope": "resource",
+      "resourceType": "Layer",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Layer name",
+          "required": true
+        }
+      ],
+      "code": "getd",
+      "permission": "omnigraffle:layers:get"
+    },
+    "createLayer": {
+      "name": "create",
+      "description": "Create a new layer",
+      "scope": "resource",
+      "resourceType": "Layer",
+      "parameters": [
+        {
+          "name": "canvasId",
+          "type": "string",
+          "description": "Canvas identifier for the layer",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Layer name",
+          "required": true
+        }
+      ],
+      "code": "crel",
+      "permission": "omnigraffle:layers:create"
+    },
+    "connect": {
+      "name": "connect",
+      "description": "Draw a line between graphics",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "from",
+          "type": "string",
+          "description": "Source graphic ID",
+          "required": true
+        },
+        {
+          "name": "to",
+          "type": "string",
+          "description": "Destination graphic ID",
+          "required": true
+        }
+      ],
+      "code": "OGCo",
+      "permission": "omnigraffle:app:connect"
+    },
+    "layout": {
+      "name": "layout",
+      "description": "Layout graphics using the document's Layout Info",
+      "scope": "application",
+      "parameters": [],
+      "code": "OGLA",
+      "permission": "omnigraffle:app:layout"
+    },
+    "export": {
+      "name": "export",
+      "description": "Export documents",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "as",
+          "type": "string",
+          "description": "File type",
+          "required": true,
+          "code": "fltp"
+        },
+        {
+          "name": "scope",
+          "type": "ExportAreaType",
+          "description": "Area to export",
+          "required": true,
+          "code": "OGea"
+        },
+        {
+          "name": "to",
+          "type": "string",
+          "description": "Output file path",
+          "required": true,
+          "code": "kfil"
+        }
+      ],
+      "code": "OGEx",
+      "permission": "omnigraffle:app:export"
+    },
+    "flip": {
+      "name": "flip",
+      "description": "Flip graphics",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "over",
+          "type": "Orientation",
+          "description": "Flip orientation",
+          "required": true,
+          "code": "OGFo"
+        }
+      ],
+      "code": "OGFl",
+      "permission": "omnigraffle:app:flip"
+    },
+    "slide": {
+      "name": "slide",
+      "description": "Slide graphics by a vector amount",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "by",
+          "type": "point",
+          "description": "Vector to slide by",
+          "required": true,
+          "code": "OGSv"
+        }
+      ],
+      "code": "OGSl",
+      "permission": "omnigraffle:app:slide"
+    },
+    "assemble": {
+      "name": "assemble",
+      "description": "Group graphics",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "subgraph",
+          "type": "boolean",
+          "description": "Create as subgraph",
+          "required": false,
+          "code": "OGsA"
+        }
+      ],
+      "code": "OGGC",
+      "permission": "omnigraffle:app:assemble"
+    },
+    "pageAdjust": {
+      "name": "pageAdjust",
+      "description": "Change the number of pages to fit the current graphics",
+      "scope": "application",
+      "parameters": [],
+      "code": "OGPA",
+      "permission": "omnigraffle:app:pageAdjust"
+    },
+    "evaluateJavascript": {
+      "name": "evaluateJavascript",
+      "description": "Evaluate JavaScript and return the result",
+      "scope": "application",
+      "parameters": [
+        {
+          "name": "script",
+          "type": "string",
+          "description": "JavaScript code to evaluate",
+          "required": true
+        }
+      ],
+      "code": "OGEJ",
+      "permission": "omnigraffle:app:evaluateJavascript"
+    }
+  },
+  "permissions": {
+    "canvases": {
+      "read": [
+        "omnigraffle:canvases:list",
+        "omnigraffle:canvases:get"
+      ],
+      "create": [
+        "omnigraffle:canvases:create"
+      ],
+      "write": [
+        "omnigraffle:canvases:update"
+      ],
+      "delete": [
+        "omnigraffle:canvases:delete"
+      ]
+    },
+    "graphics": {
+      "read": [
+        "omnigraffle:graphics:list",
+        "omnigraffle:graphics:get"
+      ],
+      "create": [
+        "omnigraffle:graphics:create"
+      ],
+      "write": [
+        "omnigraffle:graphics:update"
+      ],
+      "delete": [
+        "omnigraffle:graphics:delete"
+      ]
+    },
+    "shapes": {
+      "read": [
+        "omnigraffle:shapes:list",
+        "omnigraffle:shapes:get"
+      ],
+      "create": [
+        "omnigraffle:shapes:create"
+      ],
+      "write": [
+        "omnigraffle:shapes:update"
+      ],
+      "delete": [
+        "omnigraffle:shapes:delete"
+      ]
+    },
+    "lines": {
+      "read": [
+        "omnigraffle:lines:list",
+        "omnigraffle:lines:get"
+      ],
+      "create": [
+        "omnigraffle:lines:create"
+      ],
+      "write": [
+        "omnigraffle:lines:update"
+      ],
+      "delete": [
+        "omnigraffle:lines:delete"
+      ]
+    },
+    "groups": {
+      "read": [
+        "omnigraffle:groups:list",
+        "omnigraffle:groups:get"
+      ],
+      "create": [
+        "omnigraffle:groups:create"
+      ],
+      "write": [
+        "omnigraffle:groups:update"
+      ],
+      "delete": [
+        "omnigraffle:groups:delete"
+      ]
+    },
+    "layers": {
+      "read": [
+        "omnigraffle:layers:list",
+        "omnigraffle:layers:get"
+      ],
+      "create": [
+        "omnigraffle:layers:create"
+      ],
+      "write": [
+        "omnigraffle:layers:update"
+      ],
+      "delete": [
+        "omnigraffle:layers:delete"
+      ]
+    },
+    "subgraphs": {
+      "read": [
+        "omnigraffle:subgraphs:list",
+        "omnigraffle:subgraphs:get"
+      ],
+      "create": [
+        "omnigraffle:subgraphs:create"
+      ],
+      "write": [
+        "omnigraffle:subgraphs:update"
+      ],
+      "delete": [
+        "omnigraffle:subgraphs:delete"
+      ]
+    },
+    "masters": {
+      "read": [
+        "omnigraffle:masters:list",
+        "omnigraffle:masters:get"
+      ],
+      "create": [
+        "omnigraffle:masters:create"
+      ],
+      "write": [
+        "omnigraffle:masters:update"
+      ],
+      "delete": [
+        "omnigraffle:masters:delete"
+      ]
+    },
+    "app": {
+      "execute": [
+        "omnigraffle:app:connect",
+        "omnigraffle:app:layout",
+        "omnigraffle:app:export",
+        "omnigraffle:app:flip",
+        "omnigraffle:app:slide",
+        "omnigraffle:app:assemble",
+        "omnigraffle:app:pageAdjust",
+        "omnigraffle:app:evaluateJavascript"
+      ]
+    }
+  },
+  "extraction": {
+    "sourceFile": "omnigraffle.sdef",
+    "confidence": {
+      "overall": 0.9,
+      "fields": {
+        "resources": 0.95,
+        "enums": 1,
+        "hierarchy": 0.9,
+        "commands": 0.95
+      }
+    },
+    "openQuestions": [
+      {
+        "question": "Should we include table-related resources (table, row, column)?",
+        "context": "Tables are defined in the sdef but may be less commonly used",
+        "relatedTo": "Table resources"
+      },
+      {
+        "question": "Should we include polygon as a separate resource or treat it as a shape variant?",
+        "context": "Polygon inherits from solid/shape with additional properties",
+        "suggestions": [
+          "Include polygon as separate resource",
+          "Document polygon-specific properties on Shape"
+        ]
+      }
+    ]
+  }
+} as AppManifest,
+} as const;

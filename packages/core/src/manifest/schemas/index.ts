@@ -8,18 +8,18 @@
  */
 
 // Top-level manifest
-export * from './app.js';
+export * from './app.js'
 
 // Foundational schemas
-export * from './property.js';
-export * from './resource.js';
-export * from './enum.js';
-export * from './inheritance.js';
+export * from './property.js'
+export * from './resource.js'
+export * from './enum.js'
+export * from './inheritance.js'
 
 // Structural schemas
-export * from './command.js';
-export * from './hierarchy.js';
-export * from './relationship.js';
+export * from './command.js'
+export * from './hierarchy.js'
+export * from './relationship.js'
 
 // Metadata schemas
-export * from './metadata.js';
+export * from './metadata.js'

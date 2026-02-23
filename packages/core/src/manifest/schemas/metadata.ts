@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * Schema for suite organization from AppleScript dictionary.
@@ -9,15 +9,15 @@ export const SuiteSchema = z.object({
   /** Human-readable description */
   description: z.string().optional(),
   /** AppleScript four-character code */
-  code: z.string().length(4).optional(),
+  code: z.string().min(1).max(4).optional(),
   /** Resources in this suite */
   resources: z.array(z.string()).default([]),
   /** Commands in this suite */
   commands: z.array(z.string()).default([]),
   /** Enums in this suite */
   enums: z.array(z.string()).default([]),
-});
-export type Suite = z.infer<typeof SuiteSchema>;
+})
+export type Suite = z.infer<typeof SuiteSchema>
 
 /**
  * Schema for deprecation information.
@@ -31,8 +31,8 @@ export const DeprecationSchema = z.object({
   upstream: z.boolean().default(true),
   /** Suggested replacement */
   replacement: z.string().optional(),
-});
-export type Deprecation = z.infer<typeof DeprecationSchema>;
+})
+export type Deprecation = z.infer<typeof DeprecationSchema>
 
 /**
  * Schema for extraction confidence scores.
@@ -43,8 +43,8 @@ export const ConfidenceSchema = z.object({
   overall: z.number().min(0).max(1),
   /** Per-field confidence scores */
   fields: z.record(z.string(), z.number().min(0).max(1)).optional(),
-});
-export type Confidence = z.infer<typeof ConfidenceSchema>;
+})
+export type Confidence = z.infer<typeof ConfidenceSchema>
 
 /**
  * Schema for open questions from extraction.
@@ -58,8 +58,8 @@ export const OpenQuestionSchema = z.object({
   suggestions: z.array(z.string()).optional(),
   /** Related resource/command/property */
   relatedTo: z.string().optional(),
-});
-export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
+})
+export type OpenQuestion = z.infer<typeof OpenQuestionSchema>
 
 /**
  * TCC (Transparency, Consent, and Control) entitlements.
@@ -73,14 +73,14 @@ export const TccEntitlementSchema = z.enum([
   'files',
   'accessibility',
   'automation',
-]);
-export type TccEntitlement = z.infer<typeof TccEntitlementSchema>;
+])
+export type TccEntitlement = z.infer<typeof TccEntitlementSchema>
 
 /**
  * App distribution model.
  */
-export const DistributionModelSchema = z.enum(['app-store', 'developer-id', 'system']);
-export type DistributionModel = z.infer<typeof DistributionModelSchema>;
+export const DistributionModelSchema = z.enum(['app-store', 'developer-id', 'system'])
+export type DistributionModel = z.infer<typeof DistributionModelSchema>
 
 /**
  * Schema for app-level metadata.
@@ -102,8 +102,8 @@ export const AppMetadataSchema = z.object({
   tccEntitlements: z.array(TccEntitlementSchema).default([]),
   /** Distribution model */
   distributionModel: DistributionModelSchema.optional(),
-});
-export type AppMetadata = z.infer<typeof AppMetadataSchema>;
+})
+export type AppMetadata = z.infer<typeof AppMetadataSchema>
 
 /**
  * Schema for extraction metadata.
@@ -119,5 +119,5 @@ export const ExtractionMetadataSchema = z.object({
   confidence: ConfidenceSchema.optional(),
   /** Open questions for human review */
   openQuestions: z.array(OpenQuestionSchema).default([]),
-});
-export type ExtractionMetadata = z.infer<typeof ExtractionMetadataSchema>;
+})
+export type ExtractionMetadata = z.infer<typeof ExtractionMetadataSchema>

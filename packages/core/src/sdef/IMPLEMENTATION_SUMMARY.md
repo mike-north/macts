@@ -88,8 +88,8 @@ The hierarchy builder integrates with:
 ## Usage Example
 
 ```typescript
-import { buildHierarchy } from '@macts/core';
-import type { RawSdefData } from '@macts/core';
+import { buildHierarchy } from '@macts/core'
+import type { RawSdefData } from '@macts/core'
 
 const sdef: RawSdefData = {
   title: 'Calendar',
@@ -117,13 +117,13 @@ const sdef: RawSdefData = {
       enumerations: [],
     },
   ],
-};
+}
 
-const result = buildHierarchy(sdef);
+const result = buildHierarchy(sdef)
 
-console.log(result.rootClass); // 'application'
-console.log(result.resources); // Set(['application', 'calendar'])
-console.log(result.hierarchy.children.calendars);
+console.log(result.rootClass) // 'application'
+console.log(result.resources) // Set(['application', 'calendar'])
+console.log(result.hierarchy.children.calendars)
 // {
 //   resource: 'calendar',
 //   access: 'rw',

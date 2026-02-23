@@ -1,0 +1,86 @@
+version: '1.0'
+
+app:
+  bundleId: com.apple.BluetoothFileExchange
+  name: Bluetooth File Exchange
+  displayName: Bluetooth File Exchange
+  tccEntitlements:
+    - automation
+  distributionModel: system
+
+suites:
+  - name: Bluetooth File Exchange Suite
+    code: btfe
+    description: The suite of commands for Bluetooth File Exchange
+    commands:
+      - browse
+      - send
+
+resources:
+  Application:
+    name: Application
+    plural: Applications
+    description: The Bluetooth File Exchange application
+    code: capp
+    identifiers:
+      - property: name
+        primary: true
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the application
+        code: pnam
+
+hierarchy:
+  children: {}
+
+commands:
+  browse:
+    name: browse
+    description: Browse a device
+    scope: application
+    code: toFT
+    parameters:
+      - name: device
+        type: string
+        description: The device to browse
+        required: false
+        code: bdAd
+    permission: bluetooth-file-exchange:app:browse
+
+  send:
+    name: send
+    description: Send a file to a bluetooth device
+    scope: application
+    code: toOP
+    parameters:
+      - name: file
+        type:
+          array: file
+        description: The file(s) to send
+        required: false
+        code: btFs
+      - name: toDevice
+        type: string
+        description: The device to send the file to
+        required: false
+        code: bdAd
+    permission: bluetooth-file-exchange:app:send
+
+# Permissions mapping
+permissions:
+  app:
+    read:
+      - bluetooth-file-exchange:app:browse
+      - bluetooth-file-exchange:app:send
+
+extraction:
+  sourceFile: source.sdef
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 1.0
+      commands: 0.95

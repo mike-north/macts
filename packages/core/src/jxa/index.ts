@@ -1,5 +1,5 @@
 // Executor
-export { runJxa, runWithApp, JxaExecutionError, type JxaExecutorOptions } from './executor.js';
+export { runJxa, runWithApp, JxaExecutionError, type JxaExecutorOptions } from './executor.js'
 
 // Connection
 export {
@@ -10,10 +10,10 @@ export {
   getAppName,
   type AppConnection,
   type AppConnectionOptions,
-} from './connection.js';
+} from './connection.js'
 
 // Object specifier
-export { ObjectSpecifier, type SpecifierStep, type Selector } from './specifier.js';
+export { ObjectSpecifier, type SpecifierStep, type Selector } from './specifier.js'
 
 // Type coercion
 export {
@@ -30,4 +30,4 @@ export {
   type TypeCoercer,
   type HexColor,
   type JxaEnumValue,
-} from './coercion.js';
+} from './coercion.js'

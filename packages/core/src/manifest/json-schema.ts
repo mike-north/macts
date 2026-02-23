@@ -1,17 +1,17 @@
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import type { z } from 'zod';
-import type { JsonSchema7Type } from 'zod-to-json-schema';
+import { zodToJsonSchema } from 'zod-to-json-schema'
+import type { z } from 'zod'
+import type { JsonSchema7Type } from 'zod-to-json-schema'
 
 /**
  * Options for JSON Schema generation.
  */
 export interface JsonSchemaOptions {
   /** App name for $id generation */
-  appName?: string;
+  appName?: string
   /** Schema name (e.g., 'resource', 'command') */
-  schemaName?: string;
+  schemaName?: string
   /** Full custom $id override */
-  id?: string;
+  id?: string
 }
 
 /**
@@ -22,23 +22,23 @@ export interface JsonSchemaOptions {
  * @returns JSON Schema object
  */
 export function toJsonSchema(schema: z.ZodType, options: JsonSchemaOptions = {}): JsonSchema7Type {
-  const { appName, schemaName, id } = options;
+  const { appName, schemaName, id } = options
 
   // Generate $id if components provided
-  const $id = id ?? (appName && schemaName ? `macts://${appName}/${schemaName}` : undefined);
+  const $id = id ?? (appName && schemaName ? `macts://${appName}/${schemaName}` : undefined)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
   const jsonSchema = zodToJsonSchema(schema as any, {
     $refStrategy: 'none', // Inline all definitions
     target: 'jsonSchema7', // JSON Schema Draft-07 (widely supported)
-  });
+  })
 
   // Add $id if provided
   if ($id && typeof jsonSchema === 'object') {
-    return { $id, ...jsonSchema } as unknown as JsonSchema7Type;
+    return { $id, ...jsonSchema } as unknown as JsonSchema7Type
   }
 
-  return jsonSchema;
+  return jsonSchema
 }
 
 /**
@@ -55,5 +55,5 @@ export function toJsonSchemaWithDefinitions(schema: z.ZodType, name: string): Js
     name,
     $refStrategy: 'root',
     target: 'jsonSchema7',
-  });
+  })
 }

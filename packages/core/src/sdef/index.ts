@@ -13,7 +13,7 @@ export type {
   RawEnumeration,
   RawSuite,
   RawSdefData,
-} from './types.js';
+} from './types.js'
 
-export type { HierarchyResult } from './hierarchy.js';
-export { buildHierarchy } from './hierarchy.js';
+export type { HierarchyResult } from './hierarchy.js'
+export { buildHierarchy } from './hierarchy.js'

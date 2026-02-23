@@ -1,34 +1,34 @@
-import { describe, it, expect } from 'vitest';
-import { CommandParameterSchema, CommandSchema, CommandScopeSchema } from './command.js';
-import { ZodError } from 'zod';
+import { describe, it, expect } from 'vitest'
+import { CommandParameterSchema, CommandSchema, CommandScopeSchema } from './command.js'
+import { ZodError } from 'zod'
 
 describe('CommandScopeSchema', () => {
   describe('positive cases', () => {
     it('should accept application scope', () => {
-      const result = CommandScopeSchema.parse('application');
-      expect(result).toBe('application');
-    });
+      const result = CommandScopeSchema.parse('application')
+      expect(result).toBe('application')
+    })
 
     it('should accept resource scope', () => {
-      const result = CommandScopeSchema.parse('resource');
-      expect(result).toBe('resource');
-    });
-  });
+      const result = CommandScopeSchema.parse('resource')
+      expect(result).toBe('resource')
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject invalid scope', () => {
-      expect(() => CommandScopeSchema.parse('global')).toThrow(ZodError);
-    });
+      expect(() => CommandScopeSchema.parse('global')).toThrow(ZodError)
+    })
 
     it('should reject empty string', () => {
-      expect(() => CommandScopeSchema.parse('')).toThrow(ZodError);
-    });
+      expect(() => CommandScopeSchema.parse('')).toThrow(ZodError)
+    })
 
     it('should reject number', () => {
-      expect(() => CommandScopeSchema.parse(123)).toThrow(ZodError);
-    });
-  });
-});
+      expect(() => CommandScopeSchema.parse(123)).toThrow(ZodError)
+    })
+  })
+})
 
 describe('CommandParameterSchema', () => {
   describe('positive cases', () => {
@@ -37,15 +37,15 @@ describe('CommandParameterSchema', () => {
         name: 'targetDate',
         type: 'date',
         description: 'The date to switch to',
-      });
+      })
 
       expect(result).toEqual({
         name: 'targetDate',
         type: 'date',
         description: 'The date to switch to',
         required: true, // default
-      });
-    });
+      })
+    })
 
     it('should accept parameter with required=false', () => {
       const result = CommandParameterSchema.parse({
@@ -53,10 +53,10 @@ describe('CommandParameterSchema', () => {
         type: 'string',
         description: 'Output format',
         required: false,
-      });
+      })
 
-      expect(result.required).toBe(false);
-    });
+      expect(result.required).toBe(false)
+    })
 
     it('should accept parameter with default value', () => {
       const result = CommandParameterSchema.parse({
@@ -65,10 +65,10 @@ describe('CommandParameterSchema', () => {
         description: 'Timeout in seconds',
         required: false,
         default: 30,
-      });
+      })
 
-      expect(result.default).toBe(30);
-    });
+      expect(result.default).toBe(30)
+    })
 
     it('should accept parameter with code', () => {
       const result = CommandParameterSchema.parse({
@@ -76,10 +76,10 @@ describe('CommandParameterSchema', () => {
         type: 'date',
         description: 'The date to switch to',
         code: 'tdat',
-      });
+      })
 
-      expect(result.code).toBe('tdat');
-    });
+      expect(result.code).toBe('tdat')
+    })
 
     it('should accept parameter with all fields', () => {
       const result = CommandParameterSchema.parse({
@@ -89,7 +89,7 @@ describe('CommandParameterSchema', () => {
         required: true,
         default: 'day',
         code: 'vwtp',
-      });
+      })
 
       expect(result).toEqual({
         name: 'view',
@@ -98,8 +98,8 @@ describe('CommandParameterSchema', () => {
         required: true,
         default: 'day',
         code: 'vwtp',
-      });
-    });
+      })
+    })
 
     it('should accept parameter with object as default', () => {
       const result = CommandParameterSchema.parse({
@@ -108,10 +108,10 @@ describe('CommandParameterSchema', () => {
         description: 'Configuration options',
         required: false,
         default: { verbose: true },
-      });
+      })
 
-      expect(result.default).toEqual({ verbose: true });
-    });
+      expect(result.default).toEqual({ verbose: true })
+    })
 
     it('should accept parameter with array as default', () => {
       const result = CommandParameterSchema.parse({
@@ -120,11 +120,11 @@ describe('CommandParameterSchema', () => {
         description: 'Tag list',
         required: false,
         default: [],
-      });
+      })
 
-      expect(result.default).toEqual([]);
-    });
-  });
+      expect(result.default).toEqual([])
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject parameter without name', () => {
@@ -133,8 +133,8 @@ describe('CommandParameterSchema', () => {
           type: 'string',
           description: 'A parameter',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject parameter without type', () => {
       expect(() =>
@@ -142,8 +142,8 @@ describe('CommandParameterSchema', () => {
           name: 'param',
           description: 'A parameter',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject parameter without description', () => {
       expect(() =>
@@ -151,28 +151,30 @@ describe('CommandParameterSchema', () => {
           name: 'param',
           type: 'string',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject parameter with invalid code length', () => {
+      // Empty string should be rejected
       expect(() =>
         CommandParameterSchema.parse({
           name: 'param',
           type: 'string',
           description: 'A parameter',
-          code: 'abc', // too short
+          code: '',
         })
-      ).toThrow(ZodError);
+      ).toThrow(ZodError)
 
+      // Too long (5+ chars) should be rejected
       expect(() =>
         CommandParameterSchema.parse({
           name: 'param',
           type: 'string',
           description: 'A parameter',
-          code: 'abcde', // too long
+          code: 'abcde',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject parameter with non-boolean required', () => {
       expect(() =>
@@ -182,20 +184,58 @@ describe('CommandParameterSchema', () => {
           description: 'A parameter',
           required: 'yes',
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
+    it('should accept code with 1-4 characters', () => {
+      // 1 character
+      let result = CommandParameterSchema.parse({
+        name: 'param',
+        type: 'string',
+        description: 'A parameter',
+        code: 'a',
+      })
+      expect(result.code).toBe('a')
+
+      // 2 characters
+      result = CommandParameterSchema.parse({
+        name: 'param',
+        type: 'string',
+        description: 'A parameter',
+        code: 'ab',
+      })
+      expect(result.code).toBe('ab')
+
+      // 3 characters
+      result = CommandParameterSchema.parse({
+        name: 'param',
+        type: 'string',
+        description: 'A parameter',
+        code: 'abc',
+      })
+      expect(result.code).toBe('abc')
+
+      // 4 characters
+      result = CommandParameterSchema.parse({
+        name: 'param',
+        type: 'string',
+        description: 'A parameter',
+        code: 'abcd',
+      })
+      expect(result.code).toBe('abcd')
+    })
+
     it('should accept empty string name', () => {
       const result = CommandParameterSchema.parse({
         name: '',
         type: 'string',
         description: 'A parameter',
-      });
+      })
 
-      expect(result.name).toBe('');
-    });
+      expect(result.name).toBe('')
+    })
 
     it('should accept null as default', () => {
       const result = CommandParameterSchema.parse({
@@ -204,10 +244,10 @@ describe('CommandParameterSchema', () => {
         description: 'Optional value',
         required: false,
         default: null,
-      });
+      })
 
-      expect(result.default).toBeNull();
-    });
+      expect(result.default).toBeNull()
+    })
 
     it('should accept undefined as default', () => {
       const result = CommandParameterSchema.parse({
@@ -216,12 +256,12 @@ describe('CommandParameterSchema', () => {
         description: 'Optional value',
         required: false,
         default: undefined,
-      });
+      })
 
-      expect(result.default).toBeUndefined();
-    });
-  });
-});
+      expect(result.default).toBeUndefined()
+    })
+  })
+})
 
 describe('CommandSchema', () => {
   describe('positive cases', () => {
@@ -230,15 +270,15 @@ describe('CommandSchema', () => {
         name: 'reloadCalendars',
         description: 'Reload all calendar file contents',
         scope: 'application',
-      });
+      })
 
       expect(result).toEqual({
         name: 'reloadCalendars',
         description: 'Reload all calendar file contents',
         scope: 'application',
         parameters: [], // default
-      });
-    });
+      })
+    })
 
     it('should accept resource-scoped command with single resource type', () => {
       const result = CommandSchema.parse({
@@ -246,10 +286,10 @@ describe('CommandSchema', () => {
         description: 'Show the event in the calendar window',
         scope: 'resource',
         resourceType: 'event',
-      });
+      })
 
-      expect(result.resourceType).toBe('event');
-    });
+      expect(result.resourceType).toBe('event')
+    })
 
     it('should accept resource-scoped command with multiple resource types', () => {
       const result = CommandSchema.parse({
@@ -257,10 +297,10 @@ describe('CommandSchema', () => {
         description: 'Duplicate the resource',
         scope: 'resource',
         resourceType: ['event', 'calendar'],
-      });
+      })
 
-      expect(result.resourceType).toEqual(['event', 'calendar']);
-    });
+      expect(result.resourceType).toEqual(['event', 'calendar'])
+    })
 
     it('should accept command with parameters', () => {
       const result = CommandSchema.parse({
@@ -274,11 +314,11 @@ describe('CommandSchema', () => {
             description: 'The view to switch to',
           },
         ],
-      });
+      })
 
-      expect(result.parameters).toHaveLength(1);
-      expect(result.parameters[0]?.name).toBe('to');
-    });
+      expect(result.parameters).toHaveLength(1)
+      expect(result.parameters[0]?.name).toBe('to')
+    })
 
     it('should accept command with return type', () => {
       const result = CommandSchema.parse({
@@ -286,10 +326,10 @@ describe('CommandSchema', () => {
         description: 'Get all calendars',
         scope: 'application',
         returns: 'Calendar[]',
-      });
+      })
 
-      expect(result.returns).toBe('Calendar[]');
-    });
+      expect(result.returns).toBe('Calendar[]')
+    })
 
     it('should accept command with code', () => {
       const result = CommandSchema.parse({
@@ -297,10 +337,10 @@ describe('CommandSchema', () => {
         description: 'Reload all calendar file contents',
         scope: 'application',
         code: 'rldc',
-      });
+      })
 
-      expect(result.code).toBe('rldc');
-    });
+      expect(result.code).toBe('rldc')
+    })
 
     it('should accept command with all fields', () => {
       const result = CommandSchema.parse({
@@ -322,7 +362,7 @@ describe('CommandSchema', () => {
         ],
         returns: 'Event',
         code: 'crev',
-      });
+      })
 
       expect(result).toEqual({
         name: 'createEvent',
@@ -345,19 +385,19 @@ describe('CommandSchema', () => {
         ],
         returns: 'Event',
         code: 'crev',
-      });
-    });
+      })
+    })
 
     it('should accept application-scoped command without resourceType', () => {
       const result = CommandSchema.parse({
         name: 'quit',
         description: 'Quit the application',
         scope: 'application',
-      });
+      })
 
-      expect(result.resourceType).toBeUndefined();
-    });
-  });
+      expect(result.resourceType).toBeUndefined()
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject command without name', () => {
@@ -366,8 +406,8 @@ describe('CommandSchema', () => {
           description: 'A command',
           scope: 'application',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command without description', () => {
       expect(() =>
@@ -375,8 +415,8 @@ describe('CommandSchema', () => {
           name: 'doSomething',
           scope: 'application',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command without scope', () => {
       expect(() =>
@@ -384,8 +424,8 @@ describe('CommandSchema', () => {
           name: 'doSomething',
           description: 'A command',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command with invalid scope', () => {
       expect(() =>
@@ -394,8 +434,8 @@ describe('CommandSchema', () => {
           description: 'A command',
           scope: 'global',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command with non-array parameters', () => {
       expect(() =>
@@ -405,8 +445,8 @@ describe('CommandSchema', () => {
           scope: 'application',
           parameters: 'not-an-array',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command with invalid parameter in array', () => {
       expect(() =>
@@ -419,41 +459,90 @@ describe('CommandSchema', () => {
             { name: 'param2' }, // missing type and description
           ],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject command with invalid code length', () => {
+      // Empty string should be rejected
       expect(() =>
         CommandSchema.parse({
           name: 'doSomething',
           description: 'A command',
           scope: 'application',
-          code: 'abc', // too short
+          code: '',
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+
+      // Too long (5+ chars) should be rejected
+      expect(() =>
+        CommandSchema.parse({
+          name: 'doSomething',
+          description: 'A command',
+          scope: 'application',
+          code: 'abcde',
+        })
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
+    it('should accept command with code 1-4 characters', () => {
+      // 1 character
+      let result = CommandSchema.parse({
+        name: 'doSomething',
+        description: 'A command',
+        scope: 'application',
+        code: 'a',
+      })
+      expect(result.code).toBe('a')
+
+      // 2 characters
+      result = CommandSchema.parse({
+        name: 'doSomething',
+        description: 'A command',
+        scope: 'application',
+        code: 'ab',
+      })
+      expect(result.code).toBe('ab')
+
+      // 3 characters
+      result = CommandSchema.parse({
+        name: 'doSomething',
+        description: 'A command',
+        scope: 'application',
+        code: 'abc',
+      })
+      expect(result.code).toBe('abc')
+
+      // 4 characters
+      result = CommandSchema.parse({
+        name: 'doSomething',
+        description: 'A command',
+        scope: 'application',
+        code: 'abcd',
+      })
+      expect(result.code).toBe('abcd')
+    })
+
     it('should accept empty string name', () => {
       const result = CommandSchema.parse({
         name: '',
         description: 'A command',
         scope: 'application',
-      });
+      })
 
-      expect(result.name).toBe('');
-    });
+      expect(result.name).toBe('')
+    })
 
     it('should accept empty string description', () => {
       const result = CommandSchema.parse({
         name: 'doSomething',
         description: '',
         scope: 'application',
-      });
+      })
 
-      expect(result.description).toBe('');
-    });
+      expect(result.description).toBe('')
+    })
 
     it('should accept empty parameters array', () => {
       const result = CommandSchema.parse({
@@ -461,10 +550,10 @@ describe('CommandSchema', () => {
         description: 'A command',
         scope: 'application',
         parameters: [],
-      });
+      })
 
-      expect(result.parameters).toEqual([]);
-    });
+      expect(result.parameters).toEqual([])
+    })
 
     it('should accept resource-scoped command with resourceType as empty array', () => {
       const result = CommandSchema.parse({
@@ -472,10 +561,10 @@ describe('CommandSchema', () => {
         description: 'A command',
         scope: 'resource',
         resourceType: [],
-      });
+      })
 
-      expect(result.resourceType).toEqual([]);
-    });
+      expect(result.resourceType).toEqual([])
+    })
 
     it('should handle undefined optional fields', () => {
       const result = CommandSchema.parse({
@@ -485,28 +574,28 @@ describe('CommandSchema', () => {
         resourceType: undefined,
         returns: undefined,
         code: undefined,
-      });
+      })
 
-      expect(result.resourceType).toBeUndefined();
-      expect(result.returns).toBeUndefined();
-      expect(result.code).toBeUndefined();
-    });
+      expect(result.resourceType).toBeUndefined()
+      expect(result.returns).toBeUndefined()
+      expect(result.code).toBeUndefined()
+    })
 
     it('should accept command with many parameters', () => {
       const params = Array.from({ length: 10 }, (_, i) => ({
         name: `param${String(i)}`,
         type: 'string',
         description: `Parameter ${String(i)}`,
-      }));
+      }))
 
       const result = CommandSchema.parse({
         name: 'complexCommand',
         description: 'A complex command',
         scope: 'application',
         parameters: params,
-      });
+      })
 
-      expect(result.parameters).toHaveLength(10);
-    });
-  });
-});
+      expect(result.parameters).toHaveLength(10)
+    })
+  })
+})

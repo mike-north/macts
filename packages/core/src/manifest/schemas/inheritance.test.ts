@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { InheritanceSchema } from './inheritance.js';
-import { ZodError } from 'zod';
+import { describe, it, expect } from 'vitest'
+import { InheritanceSchema } from './inheritance.js'
+import { ZodError } from 'zod'
 
 describe('InheritanceSchema', () => {
   describe('positive cases', () => {
@@ -10,7 +10,7 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
+      })
 
       expect(result).toEqual({
         discriminator: 'type',
@@ -18,8 +18,8 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
-    });
+      })
+    })
 
     it('should accept inheritance with abstract flag', () => {
       const result = InheritanceSchema.parse({
@@ -28,10 +28,10 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
+      })
 
-      expect(result.abstract).toBe(true);
-    });
+      expect(result.abstract).toBe(true)
+    })
 
     it('should accept inheritance with explicit false abstract', () => {
       const result = InheritanceSchema.parse({
@@ -40,10 +40,10 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
+      })
 
-      expect(result.abstract).toBe(false);
-    });
+      expect(result.abstract).toBe(false)
+    })
 
     it('should accept variant with description', () => {
       const result = InheritanceSchema.parse({
@@ -53,10 +53,10 @@ describe('InheritanceSchema', () => {
             description: 'A display alarm',
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.description).toBe('A display alarm');
-    });
+      expect(result.variants['display']?.description).toBe('A display alarm')
+    })
 
     it('should accept variant with properties', () => {
       const result = InheritanceSchema.parse({
@@ -68,12 +68,12 @@ describe('InheritanceSchema', () => {
             },
           },
         },
-      });
+      })
 
       expect(result.variants['display']?.properties).toEqual({
         message: { type: 'string' },
-      });
-    });
+      })
+    })
 
     it('should accept variant with both description and properties', () => {
       const result = InheritanceSchema.parse({
@@ -86,15 +86,15 @@ describe('InheritanceSchema', () => {
             },
           },
         },
-      });
+      })
 
       expect(result.variants['display']).toEqual({
         description: 'A display alarm',
         properties: {
           message: { type: 'string' },
         },
-      });
-    });
+      })
+    })
 
     it('should accept multiple variants', () => {
       const result = InheritanceSchema.parse({
@@ -110,13 +110,13 @@ describe('InheritanceSchema', () => {
             description: 'An email alarm',
           },
         },
-      });
+      })
 
-      expect(Object.keys(result.variants)).toHaveLength(3);
-      expect(result.variants['display']?.description).toBe('A display alarm');
-      expect(result.variants['sound']?.description).toBe('A sound alarm');
-      expect(result.variants['email']?.description).toBe('An email alarm');
-    });
+      expect(Object.keys(result.variants)).toHaveLength(3)
+      expect(result.variants['display']?.description).toBe('A display alarm')
+      expect(result.variants['sound']?.description).toBe('A sound alarm')
+      expect(result.variants['email']?.description).toBe('An email alarm')
+    })
 
     it('should accept complex variant properties', () => {
       const result = InheritanceSchema.parse({
@@ -130,14 +130,14 @@ describe('InheritanceSchema', () => {
             },
           },
         },
-      });
+      })
 
       expect(result.variants['sound']?.properties).toEqual({
         soundFile: { type: 'string' },
         volume: { type: 'number' },
         repeat: { type: 'boolean' },
-      });
-    });
+      })
+    })
 
     it('should accept nested property structures', () => {
       const result = InheritanceSchema.parse({
@@ -153,11 +153,11 @@ describe('InheritanceSchema', () => {
             },
           },
         },
-      });
+      })
 
-      expect(result.variants['complex']?.properties).toBeDefined();
-    });
-  });
+      expect(result.variants['complex']?.properties).toBeDefined()
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject inheritance without discriminator', () => {
@@ -167,16 +167,16 @@ describe('InheritanceSchema', () => {
             display: {},
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject inheritance without variants', () => {
       expect(() =>
         InheritanceSchema.parse({
           discriminator: 'type',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject inheritance with non-string discriminator', () => {
       expect(() =>
@@ -186,8 +186,8 @@ describe('InheritanceSchema', () => {
             display: {},
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject inheritance with non-boolean abstract', () => {
       expect(() =>
@@ -198,8 +198,8 @@ describe('InheritanceSchema', () => {
             display: {},
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject inheritance with non-object variants', () => {
       expect(() =>
@@ -207,8 +207,8 @@ describe('InheritanceSchema', () => {
           discriminator: 'type',
           variants: 'not-an-object',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject inheritance with array variants', () => {
       expect(() =>
@@ -216,8 +216,8 @@ describe('InheritanceSchema', () => {
           discriminator: 'type',
           variants: [{ display: {} }],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject variant with non-object value', () => {
       expect(() =>
@@ -227,8 +227,8 @@ describe('InheritanceSchema', () => {
             display: 'not-an-object',
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject variant with non-object properties', () => {
       expect(() =>
@@ -240,8 +240,8 @@ describe('InheritanceSchema', () => {
             },
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject variant with array properties', () => {
       expect(() =>
@@ -253,8 +253,8 @@ describe('InheritanceSchema', () => {
             },
           },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject variant with non-string description', () => {
       expect(() =>
@@ -266,9 +266,9 @@ describe('InheritanceSchema', () => {
             },
           },
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
     it('should accept empty string discriminator', () => {
@@ -277,19 +277,19 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
+      })
 
-      expect(result.discriminator).toBe('');
-    });
+      expect(result.discriminator).toBe('')
+    })
 
     it('should accept empty variants object', () => {
       const result = InheritanceSchema.parse({
         discriminator: 'type',
         variants: {},
-      });
+      })
 
-      expect(result.variants).toEqual({});
-    });
+      expect(result.variants).toEqual({})
+    })
 
     it('should accept variant with empty properties', () => {
       const result = InheritanceSchema.parse({
@@ -299,10 +299,10 @@ describe('InheritanceSchema', () => {
             properties: {},
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.properties).toEqual({});
-    });
+      expect(result.variants['display']?.properties).toEqual({})
+    })
 
     it('should accept variant with empty string description', () => {
       const result = InheritanceSchema.parse({
@@ -312,10 +312,10 @@ describe('InheritanceSchema', () => {
             description: '',
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.description).toBe('');
-    });
+      expect(result.variants['display']?.description).toBe('')
+    })
 
     it('should accept undefined optional fields in variant', () => {
       const result = InheritanceSchema.parse({
@@ -326,11 +326,11 @@ describe('InheritanceSchema', () => {
             properties: undefined,
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.description).toBeUndefined();
-      expect(result.variants['display']?.properties).toBeUndefined();
-    });
+      expect(result.variants['display']?.description).toBeUndefined()
+      expect(result.variants['display']?.properties).toBeUndefined()
+    })
 
     it('should accept variant with only description', () => {
       const result = InheritanceSchema.parse({
@@ -340,10 +340,10 @@ describe('InheritanceSchema', () => {
             description: 'Display only',
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.properties).toBeUndefined();
-    });
+      expect(result.variants['display']?.properties).toBeUndefined()
+    })
 
     it('should accept variant with only properties', () => {
       const result = InheritanceSchema.parse({
@@ -353,10 +353,10 @@ describe('InheritanceSchema', () => {
             properties: { msg: { type: 'string' } },
           },
         },
-      });
+      })
 
-      expect(result.variants['display']?.description).toBeUndefined();
-    });
+      expect(result.variants['display']?.description).toBeUndefined()
+    })
 
     it('should handle variant keys with special characters', () => {
       const result = InheritanceSchema.parse({
@@ -366,10 +366,10 @@ describe('InheritanceSchema', () => {
           sound_alarm: {},
           'email.alarm': {},
         },
-      });
+      })
 
-      expect(Object.keys(result.variants)).toHaveLength(3);
-    });
+      expect(Object.keys(result.variants)).toHaveLength(3)
+    })
 
     it('should accept single variant', () => {
       const result = InheritanceSchema.parse({
@@ -377,10 +377,10 @@ describe('InheritanceSchema', () => {
         variants: {
           only: {},
         },
-      });
+      })
 
-      expect(Object.keys(result.variants)).toHaveLength(1);
-    });
+      expect(Object.keys(result.variants)).toHaveLength(1)
+    })
 
     it('should handle extra properties by ignoring them', () => {
       const result = InheritanceSchema.parse({
@@ -390,7 +390,7 @@ describe('InheritanceSchema', () => {
           display: {},
         },
         extra: 'ignored',
-      });
+      })
 
       // Zod strips unknown properties by default
       expect(result).toEqual({
@@ -399,7 +399,7 @@ describe('InheritanceSchema', () => {
         variants: {
           display: {},
         },
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

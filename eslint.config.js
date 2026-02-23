@@ -1,6 +1,6 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import prettierConfig from 'eslint-config-prettier';
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import prettierConfig from 'eslint-config-prettier'
 
 export default tseslint.config(
   {
@@ -32,4 +32,4 @@ export default tseslint.config(
   },
   // Prettier must be last to disable formatting rules
   prettierConfig
-);
+)

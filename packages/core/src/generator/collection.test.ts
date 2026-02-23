@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { generateCollectionClass } from './collection.js';
-import { createGeneratorContext } from './context.js';
-import type { AppManifest } from '../manifest/index.js';
+import { describe, it, expect } from 'vitest'
+import { generateCollectionClass } from './collection.js'
+import { createGeneratorContext } from './context.js'
+import type { AppManifest } from '../manifest/index.js'
 
 const mockManifest: AppManifest = {
   version: '1.0',
@@ -22,62 +22,62 @@ const mockManifest: AppManifest = {
   hierarchy: { children: {} },
   relationships: [],
   commands: {},
-};
+}
 
 describe('generateCollectionClass', () => {
   const ctx = createGeneratorContext(mockManifest, {
     outDir: '/tmp/out',
     packageName: '@macts/sdk-test',
-  });
+  })
 
   it('should generate class with name', () => {
-    const resource = ctx.getResource('Calendar');
-    expect(resource).toBeDefined();
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    expect(resource).toBeDefined()
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.name).toBe('CalendarCollection');
-    expect(result.content).toContain('class CalendarCollection');
-  });
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.name).toBe('CalendarCollection')
+    expect(result.content).toContain('class CalendarCollection')
+  })
 
   it('should generate list method', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.content).toContain('async list()');
-    expect(result.content).toContain('CalendarInstance[]');
-  });
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.content).toContain('async list()')
+    expect(result.content).toContain('CalendarInstance[]')
+  })
 
   it('should generate get method', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.content).toContain('async get(id: string)');
-  });
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.content).toContain('async get(id: string)')
+  })
 
   it('should generate getByName method', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.content).toContain('async getByName(name: string)');
-  });
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.content).toContain('async getByName(name: string)')
+  })
 
   it('should generate create method', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.content).toContain('async create(input: CalendarCreateInput)');
-  });
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.content).toContain('async create(input: CalendarCreateInput)')
+  })
 
   it('should generate find method', () => {
-    const resource = ctx.getResource('Calendar');
-    if (!resource) return;
+    const resource = ctx.getResource('Calendar')
+    if (!resource) return
 
-    const result = generateCollectionClass(resource, ctx);
-    expect(result.content).toContain('async find(predicate:');
-  });
-});
+    const result = generateCollectionClass(resource, ctx)
+    expect(result.content).toContain('async find(predicate:')
+  })
+})

@@ -1,0 +1,164 @@
+version: '1.0'
+app:
+  bundleId: com.spotify.client
+  name: Spotify
+  displayName: Spotify
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Spotify Suite
+    code: spfy
+    description: Spotify specific classes.
+    resources:
+      - Track
+    enums:
+      - PlayerState
+    commands:
+      - nextTrack
+      - previousTrack
+      - playpause
+      - pause
+      - play
+      - playTrack
+  - name: Standard Suite
+    code: ????
+    description: Common classes and commands for most applications.
+resources:
+  Track:
+    name: Track
+    plural: Tracks
+    description: The currently playing track
+    code: cTrk
+    properties:
+      name:
+        access: r
+        type: string
+        description: The name of the track
+        code: pnam
+      artist:
+        access: r
+        type: string
+        description: The artist of the track
+        code: pArt
+      album:
+        access: r
+        type: string
+        description: The album of the track
+        code: pAlb
+      albumArtist:
+        access: r
+        type: string
+        description: The album artist of the track
+        code: pAlA
+      discNumber:
+        access: r
+        type: integer
+        description: The disc number of the track
+        code: pDsN
+      duration:
+        access: r
+        type: integer
+        description: The duration of the track in milliseconds
+        code: pDur
+      playedCount:
+        access: r
+        type: integer
+        description: Number of times this track has been played
+        code: pPlC
+      trackNumber:
+        access: r
+        type: integer
+        description: The track number
+        code: pTrN
+      spotifyUrl:
+        access: r
+        type: string
+        description: The Spotify URL for the track
+        code: pSpU
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the track
+        code: 'ID  '
+      artworkUrl:
+        access: r
+        type: string
+        description: The URL of the track artwork
+        code: pAru
+      artwork:
+        access: r
+        type: string
+        description: The track artwork
+        code: pArt
+      playerState:
+        access: r
+        type:
+          enum: PlayerState
+        description: The current player state
+        code: pPlS
+    identifiers:
+      - property: id
+        primary: true
+enums:
+  PlayerState:
+    name: PlayerState
+    code: ePlS
+    values:
+      - name: stopped
+        value: stopped
+        code: kPSS
+      - name: playing
+        value: playing
+        code: kPSP
+      - name: paused
+        value: paused
+        code: kPSp
+hierarchy:
+  children:
+    currentTrack:
+      resource: Track
+      access: r
+      description: The currently playing track
+commands:
+  nextTrack:
+    name: nextTrack
+    description: Skip to the next track.
+    scope: application
+    code: Next
+    parameters: []
+  previousTrack:
+    name: previousTrack
+    description: Skip to the previous track.
+    scope: application
+    code: Prev
+    parameters: []
+  playpause:
+    name: playpause
+    description: Toggle play/pause.
+    scope: application
+    code: PlPs
+    parameters: []
+  pause:
+    name: pause
+    description: Pause playback.
+    scope: application
+    code: Paus
+    parameters: []
+  play:
+    name: play
+    description: Resume playback.
+    scope: application
+    code: Play
+    parameters: []
+  playTrack:
+    name: playTrack
+    description: Start playback of a track in the given context.
+    scope: application
+    code: PCtx
+    parameters:
+      - name: inContext
+        type: string
+        description: the URI of the context to play in
+        required: false
+        code: cotx

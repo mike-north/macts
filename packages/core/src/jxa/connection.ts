@@ -1,15 +1,15 @@
-import { runJxa, runWithApp } from './executor.js';
+import { runJxa, runWithApp } from './executor.js'
 
 export interface AppConnectionOptions {
-  timeout?: number;
+  timeout?: number
 }
 
 export interface AppConnection {
-  bundleId: string;
-  name: string;
-  isRunning(): Promise<boolean>;
-  activate(): Promise<undefined>;
-  quit(): Promise<undefined>;
+  bundleId: string
+  name: string
+  isRunning(): Promise<boolean>
+  activate(): Promise<undefined>
+  quit(): Promise<undefined>
 }
 
 /**
@@ -19,8 +19,8 @@ export async function isAppRunning(bundleId: string): Promise<boolean> {
   const code = `
     var app = Application("${bundleId}");
     return app.running();
-  `;
-  return runJxa<boolean>(code);
+  `
+  return runJxa<boolean>(code)
 }
 
 /**
@@ -30,9 +30,9 @@ export async function activateApp(bundleId: string): Promise<undefined> {
   const code = `
     var app = Application("${bundleId}");
     app.activate();
-  `;
-  await runJxa<undefined>(code);
-  return undefined;
+  `
+  await runJxa<undefined>(code)
+  return undefined
 }
 
 /**
@@ -42,16 +42,16 @@ export async function quitApp(bundleId: string): Promise<undefined> {
   const code = `
     var app = Application("${bundleId}");
     app.quit();
-  `;
-  await runJxa<undefined>(code);
-  return undefined;
+  `
+  await runJxa<undefined>(code)
+  return undefined
 }
 
 /**
  * Get the display name of an application.
  */
 export async function getAppName(bundleId: string): Promise<string> {
-  return runWithApp<string>(bundleId, 'return app.name();');
+  return runWithApp<string>(bundleId, 'return app.name();')
 }
 
 /**
@@ -61,7 +61,7 @@ export async function connect(
   bundleId: string,
   _options: AppConnectionOptions = {}
 ): Promise<AppConnection> {
-  const name = await getAppName(bundleId);
+  const name = await getAppName(bundleId)
 
   return {
     bundleId,
@@ -69,5 +69,5 @@ export async function connect(
     isRunning: () => isAppRunning(bundleId),
     activate: () => activateApp(bundleId),
     quit: () => quitApp(bundleId),
-  };
+  }
 }

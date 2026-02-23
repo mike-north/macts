@@ -43,4 +43,4 @@ export type {
   DistributionModel,
   AppMetadata,
   ExtractionMetadata,
-} from '../manifest/schemas/index.js';
+} from '../manifest/schemas/index.js'

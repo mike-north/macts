@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { AppManifestSchema, type AppManifest } from './app.js';
+import { describe, it, expect } from 'vitest'
+import { AppManifestSchema, type AppManifest } from './app.js'
 
 describe('AppManifestSchema', () => {
   // Helper to create a minimal valid manifest
@@ -37,7 +37,7 @@ describe('AppManifestSchema', () => {
     },
     relationships: [],
     commands: {},
-  });
+  })
 
   // Helper to create a complete Calendar-like manifest
   const createCompleteManifest = (): AppManifest => ({
@@ -278,149 +278,149 @@ describe('AppManifestSchema', () => {
         },
       ],
     },
-  });
+  })
 
   describe('valid manifests', () => {
     it('should accept a minimal valid manifest', () => {
-      const manifest = createMinimalManifest();
-      const result = AppManifestSchema.safeParse(manifest);
+      const manifest = createMinimalManifest()
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.version).toBe('1.0');
-        expect(result.data.app.bundleId).toBe('com.example.test');
-        expect(result.data.resources['Document']).toBeDefined();
+        expect(result.data.version).toBe('1.0')
+        expect(result.data.app.bundleId).toBe('com.example.test')
+        expect(result.data.resources['Document']).toBeDefined()
       }
-    });
+    })
 
     it('should accept a complete Calendar-like manifest', () => {
-      const manifest = createCompleteManifest();
-      const result = AppManifestSchema.safeParse(manifest);
+      const manifest = createCompleteManifest()
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.app.bundleId).toBe('com.apple.iCal');
-        expect(result.data.suites).toHaveLength(1);
-        expect(Object.keys(result.data.resources)).toHaveLength(3);
-        expect(Object.keys(result.data.enums)).toHaveLength(2);
-        expect(Object.keys(result.data.commands)).toHaveLength(2);
-        expect(result.data.relationships).toHaveLength(1);
-        expect(result.data.extraction?.openQuestions).toHaveLength(1);
+        expect(result.data.app.bundleId).toBe('com.apple.iCal')
+        expect(result.data.suites).toHaveLength(1)
+        expect(Object.keys(result.data.resources)).toHaveLength(3)
+        expect(Object.keys(result.data.enums)).toHaveLength(2)
+        expect(Object.keys(result.data.commands)).toHaveLength(2)
+        expect(result.data.relationships).toHaveLength(1)
+        expect(result.data.extraction?.openQuestions).toHaveLength(1)
       }
-    });
+    })
 
     it('should apply defaults for optional fields', () => {
-      const manifest = createMinimalManifest();
-      const result = AppManifestSchema.safeParse(manifest);
+      const manifest = createMinimalManifest()
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(true)
       if (result.success) {
-        expect(result.data.suites).toEqual([]);
-        expect(result.data.enums).toEqual({});
-        expect(result.data.relationships).toEqual([]);
-        expect(result.data.commands).toEqual({});
-        expect(result.data.extraction).toBeUndefined();
+        expect(result.data.suites).toEqual([])
+        expect(result.data.enums).toEqual({})
+        expect(result.data.relationships).toEqual([])
+        expect(result.data.commands).toEqual({})
+        expect(result.data.extraction).toBeUndefined()
       }
-    });
+    })
 
     it('should preserve all provided fields', () => {
-      const manifest = createCompleteManifest();
-      const result = AppManifestSchema.safeParse(manifest);
+      const manifest = createCompleteManifest()
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(true)
       if (result.success) {
         // Check that all provided data is preserved
-        expect(result.data.app.displayName).toBe('Calendar');
-        expect(result.data.app.tccEntitlements).toEqual(['calendar', 'automation']);
-        expect(result.data.suites[0]?.name).toBe('Calendar Suite');
-        expect(result.data.resources['Event']?.properties['location']?.optional).toBe(true);
-        expect(result.data.extraction?.confidence?.overall).toBe(0.95);
+        expect(result.data.app.displayName).toBe('Calendar')
+        expect(result.data.app.tccEntitlements).toEqual(['calendar', 'automation'])
+        expect(result.data.suites[0]?.name).toBe('Calendar Suite')
+        expect(result.data.resources['Event']?.properties['location']?.optional).toBe(true)
+        expect(result.data.extraction?.confidence?.overall).toBe(0.95)
       }
-    });
-  });
+    })
+  })
 
   describe('required fields', () => {
     it('should reject manifest without version', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       // @ts-expect-error Testing runtime validation
-      delete manifest.version;
+      delete manifest.version
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('version');
+        expect(result.error.issues[0]?.path).toContain('version')
       }
-    });
+    })
 
     it('should reject manifest without app', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       // @ts-expect-error Testing runtime validation
-      delete manifest.app;
+      delete manifest.app
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('app');
+        expect(result.error.issues[0]?.path).toContain('app')
       }
-    });
+    })
 
     it('should reject manifest without resources', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       // @ts-expect-error Testing runtime validation
-      delete manifest.resources;
+      delete manifest.resources
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('resources');
+        expect(result.error.issues[0]?.path).toContain('resources')
       }
-    });
+    })
 
     it('should reject manifest without hierarchy', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       // @ts-expect-error Testing runtime validation
-      delete manifest.hierarchy;
+      delete manifest.hierarchy
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('hierarchy');
+        expect(result.error.issues[0]?.path).toContain('hierarchy')
       }
-    });
-  });
+    })
+  })
 
   describe('validation rules', () => {
     it('should reject invalid version', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       // @ts-expect-error Testing runtime validation
-      manifest.version = '2.0';
+      manifest.version = '2.0'
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('1.0');
+        expect(result.error.issues[0]?.message).toContain('1.0')
       }
-    });
+    })
 
     it('should reject empty resources object', () => {
-      const manifest = createMinimalManifest();
-      manifest.resources = {};
+      const manifest = createMinimalManifest()
+      manifest.resources = {}
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.error.issues[0]?.message).toMatch(/at least one resource/i);
+        expect(result.error.issues[0]?.message).toMatch(/at least one resource/i)
       }
-    });
+    })
 
     it('should accept multiple resources', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       manifest.resources['File'] = {
         name: 'File',
         plural: 'files',
@@ -432,15 +432,15 @@ describe('AppManifestSchema', () => {
             optional: false,
           },
         },
-      };
-
-      const result = AppManifestSchema.safeParse(manifest);
-
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(Object.keys(result.data.resources)).toHaveLength(2);
       }
-    });
+
+      const result = AppManifestSchema.safeParse(manifest)
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(Object.keys(result.data.resources)).toHaveLength(2)
+      }
+    })
 
     it('should validate nested schema structures', () => {
       // Create manifest with invalid property access mode directly
@@ -478,105 +478,105 @@ describe('AppManifestSchema', () => {
         },
         relationships: [],
         commands: {},
-      };
-
-      const result = AppManifestSchema.safeParse(manifest);
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('access');
       }
-    });
-  });
+
+      const result = AppManifestSchema.safeParse(manifest)
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0]?.path).toContain('access')
+      }
+    })
+  })
 
   describe('type inference', () => {
     it('should correctly infer AppManifest type', () => {
-      const manifest: AppManifest = createMinimalManifest();
+      const manifest: AppManifest = createMinimalManifest()
 
       // Type assertions to verify structure
-      expect(manifest.version).toBe('1.0');
-      expect(manifest.app.bundleId).toBe('com.example.test');
-      expect(manifest.resources['Document']).toBeDefined();
-      expect(manifest.hierarchy.children['documents']).toBeDefined();
-    });
+      expect(manifest.version).toBe('1.0')
+      expect(manifest.app.bundleId).toBe('com.example.test')
+      expect(manifest.resources['Document']).toBeDefined()
+      expect(manifest.hierarchy.children['documents']).toBeDefined()
+    })
 
     it('should allow optional extraction metadata', () => {
-      const manifest: AppManifest = createMinimalManifest();
+      const manifest: AppManifest = createMinimalManifest()
 
       // Should compile without extraction
-      expect(manifest.extraction).toBeUndefined();
+      expect(manifest.extraction).toBeUndefined()
 
       // Should compile with extraction
       manifest.extraction = {
         extractedAt: '2025-01-15T10:30:00Z',
         mactsVersion: '0.1.0',
         openQuestions: [],
-      };
-      expect(manifest.extraction.mactsVersion).toBe('0.1.0');
-    });
+      }
+      expect(manifest.extraction.mactsVersion).toBe('0.1.0')
+    })
 
     it('should correctly type nested structures', () => {
-      const manifest: AppManifest = createCompleteManifest();
+      const manifest: AppManifest = createCompleteManifest()
 
       // Access nested properties with full type safety
-      const eventResource = manifest.resources['Event'];
-      expect(eventResource?.name).toBe('Event');
+      const eventResource = manifest.resources['Event']
+      expect(eventResource?.name).toBe('Event')
 
-      const startDateProp = eventResource?.properties['startDate'];
-      expect(startDateProp?.type).toBe('date');
+      const startDateProp = eventResource?.properties['startDate']
+      expect(startDateProp?.type).toBe('date')
 
-      const createEventCmd = manifest.commands['createEvent'];
-      expect(createEventCmd?.scope).toBe('resource');
-    });
-  });
+      const createEventCmd = manifest.commands['createEvent']
+      expect(createEventCmd?.scope).toBe('resource')
+    })
+  })
 
   describe('edge cases', () => {
     it('should handle empty optional arrays', () => {
-      const manifest = createMinimalManifest();
-      manifest.suites = [];
-      manifest.relationships = [];
+      const manifest = createMinimalManifest()
+      manifest.suites = []
+      manifest.relationships = []
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
-    });
+      expect(result.success).toBe(true)
+    })
 
     it('should handle empty commands object', () => {
-      const manifest = createMinimalManifest();
-      manifest.commands = {};
+      const manifest = createMinimalManifest()
+      manifest.commands = {}
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
-    });
+      expect(result.success).toBe(true)
+    })
 
     it('should handle complex nested hierarchy', () => {
-      const manifest = createCompleteManifest();
+      const manifest = createCompleteManifest()
 
-      const result = AppManifestSchema.safeParse(manifest);
+      const result = AppManifestSchema.safeParse(manifest)
 
-      expect(result.success).toBe(true);
+      expect(result.success).toBe(true)
       if (result.success) {
-        const calendarsChild = result.data.hierarchy.children['calendars'];
-        expect(calendarsChild?.children?.['events']).toBeDefined();
-        expect(calendarsChild?.children?.['events']?.children?.['attendees']).toBeDefined();
+        const calendarsChild = result.data.hierarchy.children['calendars']
+        expect(calendarsChild?.children?.['events']).toBeDefined()
+        expect(calendarsChild?.children?.['events']?.children?.['attendees']).toBeDefined()
       }
-    });
+    })
 
     it('should validate extraction metadata when provided', () => {
-      const manifest = createMinimalManifest();
+      const manifest = createMinimalManifest()
       manifest.extraction = {
         extractedAt: 'invalid-date',
         mactsVersion: '0.1.0',
         openQuestions: [],
-      };
-
-      const result = AppManifestSchema.safeParse(manifest);
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.issues[0]?.path).toContain('extractedAt');
       }
-    });
-  });
-});
+
+      const result = AppManifestSchema.safeParse(manifest)
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0]?.path).toContain('extractedAt')
+      }
+    })
+  })
+})

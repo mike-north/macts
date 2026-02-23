@@ -1,0 +1,48 @@
+{
+  "name": "@macts/microsoft-edge-server",
+  "version": "0.0.0",
+  "description": "Server package for macOS MicrosoftEdge.app (API + MCP)",
+  "keywords": [
+    "macts-server"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/microsoft-edge-server.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp.d.ts",
+      "import": "./dist/mcp/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/microsoft-edge-server.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@macts/api": "workspace:*",
+    "@macts/core": "workspace:*",
+    "@macts/microsoft-edge": "workspace:*"
+  },
+  "peerDependencies": {
+    "@macts/mcp": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@macts/mcp": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "vitest": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * Schema for a single enum value.
@@ -11,9 +11,9 @@ export const EnumValueSchema = z.object({
   /** Human-readable description */
   description: z.string().optional(),
   /** AppleScript four-character code */
-  code: z.string().length(4).optional(),
-});
-export type EnumValue = z.infer<typeof EnumValueSchema>;
+  code: z.string().min(1).max(4).optional(),
+})
+export type EnumValue = z.infer<typeof EnumValueSchema>
 
 /**
  * Schema for an enumeration type.
@@ -24,8 +24,8 @@ export const EnumSchema = z.object({
   /** Human-readable description */
   description: z.string().optional(),
   /** AppleScript four-character code */
-  code: z.string().length(4).optional(),
+  code: z.string().min(1).max(4).optional(),
   /** Enum values */
   values: z.array(EnumValueSchema).min(1),
-});
-export type Enum = z.infer<typeof EnumSchema>;
+})
+export type Enum = z.infer<typeof EnumSchema>

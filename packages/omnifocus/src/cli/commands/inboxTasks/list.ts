@@ -1,0 +1,42 @@
+import { Command, Option } from 'clipanion';
+import { getClient } from '../../sdk.js';
+import { createFormatter } from '../../output/index.js';
+
+/**
+ * List inboxtasks.
+ */
+export class ListInboxTasksCommand extends Command {
+  static override paths = [["omnifocus", "inboxTasks", "list"]];
+
+  static override usage = Command.Usage({
+    description: 'List inboxtasks',
+  });
+
+  json = Option.Boolean('--json', { description: 'Output as JSON' });
+
+  async execute(): Promise<number> {
+    const formatter = createFormatter(this.json ?? false);
+
+    try {
+      const client = getClient();
+      const items = await client.inboxtasks.list();
+
+      const output = formatter.formatList(items.map(item => ({
+        id: item.id,
+        name: item.name,
+        note: item.note,
+        flagged: item.flagged,
+        deferDate: item.deferDate,
+        dueDate: item.dueDate,
+        creationDate: item.creationDate,
+      })));
+
+      this.context.stdout.write(output + '\n');
+      return 0;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.context.stderr.write(formatter.formatError(message) + '\n');
+      return 1;
+    }
+  }
+}

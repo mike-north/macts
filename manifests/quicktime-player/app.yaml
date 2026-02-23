@@ -1,0 +1,202 @@
+version: '1.0'
+app:
+  bundleId: com.apple.QuickTimePlayerX
+  name: QuickTime Player
+  displayName: QuickTime Player
+  tccEntitlements:
+    - automation
+  distributionModel: system
+suites:
+  - name: Internet Suite
+    code: gurl
+    description: Common URL related functionality
+    commands:
+      - openURL
+  - name: QuickTime Player Suite
+    code: qtpx
+    description: Classes and Commands for working with QuickTime Player
+    resources:
+      - Document
+    commands:
+      - play
+      - start
+      - pause
+      - resume
+      - stop
+      - stepBackward
+      - stepForward
+      - trim
+      - present
+      - newMovieRecording
+      - newAudioRecording
+      - newScreenRecording
+      - export
+      - showRemoteHud
+resources:
+  Document:
+    name: Document
+    plural: Documents
+    description: A QuickTime Player document
+    code: docu
+    properties:
+      name:
+        access: r
+        type: string
+        description: The document name
+        code: pnam
+      id:
+        access: r
+        type: string
+        description: The unique identifier of the document
+        code: 'ID  '
+      path:
+        access: r
+        type: string
+        description: The file path of the document
+        code: ppth
+      playing:
+        access: rw
+        type: boolean
+        description: Whether the document is currently playing
+        code: play
+      duration:
+        access: r
+        type: number
+        description: The duration of the document in seconds
+        code: dura
+      currentTime:
+        access: rw
+        type: number
+        description: The current playback time in seconds
+        code: time
+    identifiers:
+      - property: id
+        primary: true
+enums: {}
+hierarchy:
+  children:
+    documents:
+      resource: Document
+      access: rw
+      description: QuickTime Player documents
+commands:
+  openURL:
+    name: openURL
+    description: Open a URL.
+    scope: application
+    code: GURL
+    parameters: []
+  play:
+    name: play
+    description: Play the movie.
+    scope: application
+    code: play
+    parameters: []
+  start:
+    name: start
+    description: Start the movie recording.
+    scope: application
+    code: star
+    parameters: []
+  pause:
+    name: pause
+    description: Pause the recording.
+    scope: application
+    code: paus
+    parameters: []
+  resume:
+    name: resume
+    description: Resume the recording.
+    scope: application
+    code: resu
+    parameters: []
+  stop:
+    name: stop
+    description: Stop the movie or recording.
+    scope: application
+    code: stop
+    parameters: []
+  stepBackward:
+    name: stepBackward
+    description: Step the movie backward the specified number of steps (default is 1).
+    scope: application
+    code: stba
+    parameters:
+      - name: by
+        type: integer
+        description: number of steps
+        required: false
+        code: stpc
+  stepForward:
+    name: stepForward
+    description: Step the movie forward the specified number of steps (default is 1).
+    scope: application
+    code: stfo
+    parameters:
+      - name: by
+        type: integer
+        description: number of steps
+        required: false
+        code: stpc
+  trim:
+    name: trim
+    description: Trim the movie.
+    scope: application
+    code: trim
+    parameters:
+      - name: from
+        type: number
+        description: start time in seconds
+        required: true
+        code: trfm
+      - name: to
+        type: number
+        description: end time in seconds
+        required: true
+        code: trto
+  present:
+    name: present
+    description: Present the document full screen.
+    scope: application
+    code: pres
+    parameters: []
+  newMovieRecording:
+    name: newMovieRecording
+    description: Create a new movie recording document.
+    scope: application
+    code: navr
+    parameters: []
+  newAudioRecording:
+    name: newAudioRecording
+    description: Create a new audio recording document.
+    scope: application
+    code: nwar
+    parameters: []
+  newScreenRecording:
+    name: newScreenRecording
+    description: Create a new screen recording document.
+    scope: application
+    code: nscr
+    parameters: []
+  export:
+    name: export
+    description: Export a movie to another file
+    scope: application
+    code: expo
+    parameters:
+      - name: in
+        type: file
+        description: the destination file
+        required: true
+        code: kfil
+      - name: usingSettingsPreset
+        type: string
+        description: the name of the export settings preset to use
+        required: true
+        code: expp
+  showRemoteHud:
+    name: showRemoteHud
+    description: Show the document's Remote HUD
+    scope: application
+    code: rmot
+    parameters: []

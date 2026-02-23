@@ -7,6 +7,7 @@
 A complete Clipanion command that generates SDK packages from manifest files.
 
 **Features:**
+
 - Accepts manifest path as positional argument
 - Accepts `--out-dir` for output directory (required)
 - Accepts `--package-name` for npm package name (required)
@@ -19,6 +20,7 @@ A complete Clipanion command that generates SDK packages from manifest files.
 - Handles errors gracefully with detailed error messages
 
 **Example usage:**
+
 ```bash
 macts generate manifests/calendar/app.yaml --out-dir packages/sdk-calendar --package-name @macts/sdk-calendar
 macts generate manifests/calendar/app.yaml --out-dir packages/sdk-calendar --package-name @macts/sdk-calendar --version 1.0.0
@@ -27,6 +29,7 @@ macts generate manifests/calendar/app.yaml --out-dir packages/sdk-calendar --pac
 ### 2. CLI Entry Point (`/Users/mnorth/stripe/macts/packages/cli/src/bin.ts`)
 
 Updated the CLI entry point to:
+
 - Use Clipanion's CLI framework
 - Register the GenerateCommand
 - Register built-in Clipanion commands (Help and Version)
@@ -41,21 +44,25 @@ Updated to export the GenerateCommand for programmatic use.
 Created thorough test suite covering:
 
 **Positive test cases:**
+
 - Successful manifest loading and SDK generation
 - Passing version option to generator
 - Resolving relative paths to absolute paths
 
 **Negative test cases:**
+
 - Generation errors (when SDK generation produces errors)
 - Manifest load errors (invalid manifest files)
 - Write errors (permission denied, etc.)
 - Non-Error exceptions
 
 **Edge cases:**
+
 - Empty files array (no files to write)
 - Path resolution (relative to absolute)
 
 **Test coverage includes:**
+
 - Command parsing and option validation
 - Mock setup for core dependencies (`loadManifest`, `generateSdk`, `writeSdk`)
 - Output verification (stdout and stderr)
@@ -65,15 +72,18 @@ Created thorough test suite covering:
 ### 5. Core Package Updates
 
 **Fixed type issues in generator:**
+
 - Updated `propertyTypeToTs` in `/Users/mnorth/stripe/macts/packages/core/src/generator/types.ts` to accept `PropertyType | string | undefined` instead of just `PropertyType | undefined`. This fixes the issue where Command parameter types and return types are strings.
 - Updated `propertyTypeToZod` in `/Users/mnorth/stripe/macts/packages/core/src/generator/schemas.ts` to accept `PropertyType | string | undefined` for consistency.
 
 **Added package exports:**
+
 - Updated `/Users/mnorth/stripe/macts/packages/core/package.json` to export `./generator` subpath, allowing imports like `import { generateSdk } from '@macts/core/generator'`.
 
 ## Test Structure
 
 The test suite uses:
+
 - **Vitest** for test framework
 - **vi.mock()** for mocking core dependencies
 - **Mock streams** for stdout/stderr capture
@@ -81,6 +91,7 @@ The test suite uses:
 - **Grouped tests** using `describe` blocks for organization
 
 Test groups:
+
 1. **command parsing** - Validates command structure and options
 2. **execute** - Tests the main execution flow
 3. **edge cases** - Tests boundary conditions
@@ -88,17 +99,22 @@ Test groups:
 ## Implementation Decisions
 
 ### 1. Using Clipanion
+
 Clipanion was chosen because it was already specified in the CLI package dependencies and provides:
+
 - TypeScript-first API
 - Type-safe command definitions
 - Built-in help and version commands
 - Excellent error handling
 
 ### 2. Path Resolution
+
 All paths (manifest and output directory) are resolved to absolute paths using `resolve()` from `node:path`. This ensures consistent behavior regardless of the current working directory.
 
 ### 3. Error Handling
+
 The command distinguishes between three types of errors:
+
 1. **Generation errors** - Errors produced by the SDK generator (non-fatal, returned in result.errors)
 2. **Fatal errors** - Exceptions thrown during execution (manifest load failures, write failures)
 3. **Non-Error exceptions** - Handles cases where non-Error objects are thrown
@@ -106,7 +122,9 @@ The command distinguishes between three types of errors:
 All errors result in exit code 1 and detailed error messages written to stderr.
 
 ### 4. User Feedback
+
 The command provides clear progress messages:
+
 - "Loading manifest from..."
 - "Generating SDK for [app name]..."
 - "Writing N files to..."
@@ -114,7 +132,9 @@ The command provides clear progress messages:
 - Next steps (cd, pnpm install, pnpm build)
 
 ### 5. Type Safety
+
 The implementation maintains full type safety:
+
 - Uses typed imports from `@macts/core`
 - Properly types command options and parameters
 - Uses TypeScript's type narrowing for error handling
@@ -122,29 +142,33 @@ The implementation maintains full type safety:
 ## Dependencies
 
 ### Required Core APIs
+
 - `loadManifest(path: string): Promise<AppManifest>` - Loads and validates manifest
 - `generateSdk(manifest: AppManifest, options: GeneratorOptions): GenerateSdkResult` - Generates SDK files
 - `writeSdk(result: GenerateSdkResult, outDir: string): Promise<void>` - Writes files to disk
 
 ### Generator Options
+
 ```typescript
 interface GeneratorOptions {
-  outDir: string;
-  packageName: string;
-  version?: string;
-  format?: boolean;
-  sourceMaps?: boolean;
+  outDir: string
+  packageName: string
+  version?: string
+  format?: boolean
+  sourceMaps?: boolean
 }
 ```
 
 ## Files Created/Modified
 
 ### Created:
+
 - `/Users/mnorth/stripe/macts/packages/cli/src/commands/generate.ts` - Command implementation
 - `/Users/mnorth/stripe/macts/packages/cli/src/commands/generate.test.ts` - Comprehensive test suite
 - `/Users/mnorth/stripe/macts/packages/cli/IMPLEMENTATION_SUMMARY.md` - This file
 
 ### Modified:
+
 - `/Users/mnorth/stripe/macts/packages/cli/src/bin.ts` - Updated CLI entry point
 - `/Users/mnorth/stripe/macts/packages/cli/src/index.ts` - Added GenerateCommand export
 - `/Users/mnorth/stripe/macts/packages/core/package.json` - Added ./generator export
@@ -156,23 +180,27 @@ interface GeneratorOptions {
 To complete the implementation:
 
 1. **Install dependencies** (once network issues are resolved):
+
    ```bash
    pnpm install
    ```
 
 2. **Run tests**:
+
    ```bash
    cd packages/cli
    pnpm test
    ```
 
 3. **Build the CLI**:
+
    ```bash
    cd packages/cli
    pnpm build
    ```
 
 4. **Test the command manually**:
+
    ```bash
    # Create a test manifest
    # Run the command
@@ -189,6 +217,7 @@ To complete the implementation:
 ## Type Safety Notes
 
 All type casting was avoided. The implementation uses:
+
 - Proper TypeScript types throughout
 - No `as` casts
 - No `any` types

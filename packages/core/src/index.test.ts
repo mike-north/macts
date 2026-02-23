@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest'
 import {
   VERSION,
   AppManifestSchema,
@@ -6,24 +6,24 @@ import {
   type Resource,
   type Command,
   type Hierarchy,
-} from './index.js';
+} from './index.js'
 
 describe('@macts/core', () => {
   describe('VERSION', () => {
     it('should export VERSION constant', () => {
-      expect(VERSION).toBe('0.0.0');
-    });
+      expect(VERSION).toBe('0.0.0')
+    })
 
     it('should be a string', () => {
-      expect(typeof VERSION).toBe('string');
-    });
-  });
+      expect(typeof VERSION).toBe('string')
+    })
+  })
 
   describe('manifest exports', () => {
     it('should export AppManifestSchema', () => {
-      expect(AppManifestSchema).toBeDefined();
-      expect(typeof AppManifestSchema.parse).toBe('function');
-    });
+      expect(AppManifestSchema).toBeDefined()
+      expect(typeof AppManifestSchema.parse).toBe('function')
+    })
 
     it('should export manifest types', () => {
       // Type assertions to verify types are exported correctly
@@ -61,12 +61,12 @@ describe('@macts/core', () => {
         },
         relationships: [],
         commands: {},
-      };
+      }
 
       // Verify the schema can parse it
-      const result = AppManifestSchema.parse(manifest);
-      expect(result.version).toBe('1.0');
-    });
+      const result = AppManifestSchema.parse(manifest)
+      expect(result.version).toBe('1.0')
+    })
 
     it('should export resource type', () => {
       const resource: Resource = {
@@ -80,9 +80,9 @@ describe('@macts/core', () => {
             optional: false,
           },
         },
-      };
-      expect(resource.name).toBe('Test');
-    });
+      }
+      expect(resource.name).toBe('Test')
+    })
 
     it('should export command type', () => {
       const command: Command = {
@@ -90,9 +90,9 @@ describe('@macts/core', () => {
         description: 'A test command',
         scope: 'application',
         parameters: [],
-      };
-      expect(command.scope).toBe('application');
-    });
+      }
+      expect(command.scope).toBe('application')
+    })
 
     it('should export hierarchy type', () => {
       const hierarchy: Hierarchy = {
@@ -103,8 +103,8 @@ describe('@macts/core', () => {
             description: 'Items',
           },
         },
-      };
-      expect(hierarchy.children['items']?.resource).toBe('Item');
-    });
-  });
-});
+      }
+      expect(hierarchy.children['items']?.resource).toBe('Item')
+    })
+  })
+})

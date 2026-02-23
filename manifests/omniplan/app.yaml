@@ -1,0 +1,1052 @@
+version: '1.0'
+
+app:
+  bundleId: com.omnigroup.OmniPlan3.MacAppStore
+  name: OmniPlan
+  displayName: OmniPlan
+  tccEntitlements:
+    - automation
+  distributionModel: app-store
+
+suites:
+  - name: Standard Suite
+    code: core
+    description: Common classes and commands for all applications
+  - name: OmniPlan suite
+    code: OPLN
+    description: AppleScript commands and classes specific to OmniPlan
+    resources:
+      - Project
+      - Task
+      - Milestone
+      - Resource
+      - Assignment
+      - Dependency
+      - Violation
+      - Scenario
+      - Schedule
+      - Currency
+    commands:
+      - export
+      - assign
+      - depend
+      - baseline
+      - level
+      - lookup
+      - changeMark
+      - addWorkTime
+      - subtractWorkTime
+      - fix
+      - undo
+      - redo
+    enums:
+      - TaskType
+      - TaskStatus
+      - ResourceType
+      - DependencyType
+      - SchedulingGranularity
+
+resources:
+  Project:
+    name: Project
+    plural: Projects
+    description: An OmniPlan project
+    code: OPpj
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier for the project
+        code: 'ID  '
+      name:
+        access: r
+        type: string
+        description: The project's name
+        code: pnam
+      startingDate:
+        access: rw
+        type: date
+        description: The date on which work can begin
+        code: Opsd
+      endingDate:
+        access: r
+        type: date
+        description: The date on which work is complete
+        code: Oped
+      totalCost:
+        access: r
+        type: number
+        description: The cost of the entire project
+        code: OPtc
+      completed:
+        access: r
+        type: number
+        description: The percentage of the project which is complete (1.0 = 100%)
+        code: OPco
+      duration:
+        access: r
+        type: number
+        description: The total duration of the project in seconds
+        code: Otdu
+      effort:
+        access: r
+        type: number
+        description: The number of person-seconds required to complete the project
+        code: Otef
+
+  Task:
+    name: Task
+    plural: Tasks
+    description: A task within an OmniPlan project
+    code: Optk
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Internal identifier for this task
+        code: 'ID  '
+      name:
+        access: rw
+        type: string
+        description: The name of the task
+        code: pnam
+      startingDate:
+        access: rw
+        type: date
+        description: The date on which work begins
+        code: Opsd
+      endingDate:
+        access: rw
+        type: date
+        description: The date on which work ends
+        code: Oped
+      duration:
+        access: rw
+        type: number
+        description: The number of working seconds occupied by task
+        code: Otdu
+      effort:
+        access: rw
+        type: number
+        description: The number of person-seconds required to perform the task
+        code: Otef
+      completed:
+        access: rw
+        type: number
+        description: The percentage of the task which is complete (1.0 = 100%)
+        code: OPco
+      completedEffort:
+        access: rw
+        type: number
+        description: The person-seconds completed
+        code: Otce
+      remainingEffort:
+        access: r
+        type: number
+        description: The person-seconds remaining
+        code: Oter
+      priority:
+        access: rw
+        type: integer
+        description: Priority of this task
+        code: Otpr
+      taskStatus:
+        access: r
+        type:
+          enum: TaskStatus
+        description: The status of the current task
+        code: OPTs
+      taskType:
+        access: rw
+        type:
+          enum: TaskType
+        description: Whether this task is a standard task, milestone, group, or hammock
+        code: OPTT
+      staticCost:
+        access: rw
+        type: number
+        description: Cost for this task itself
+        code: OPSC
+      resourceCost:
+        access: r
+        type: number
+        description: Cost for paying resources assigned to this task
+        code: OPrc
+      totalCost:
+        access: r
+        type: number
+        description: Total cost for this task
+        code: OPtc
+      outlineDepth:
+        access: r
+        type: integer
+        description: The depth or level of this task in the project hierarchy
+        code: Odep
+      outlineNumber:
+        access: r
+        type: string
+        description: The hierarchical or WBS number of this task
+        code: Onum
+      startingConstraintDate:
+        access: rw
+        type: date
+        description: The earliest date this task may start
+        code: Otsa
+      endingConstraintDate:
+        access: rw
+        type: date
+        description: The latest date this task may end
+        code: Otfb
+      startingDateLocked:
+        access: rw
+        type: boolean
+        description: Whether the start date is locked or not
+        code: Otsl
+      endingDateLocked:
+        access: rw
+        type: boolean
+        description: Whether the end date is locked or not
+        code: Otel
+      note:
+        access: rw
+        type: string
+        description: Notes
+        code: Opnt
+
+  Milestone:
+    name: Milestone
+    plural: Milestones
+    description: A milestone (zero-duration marker task)
+    code: Opms
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Internal identifier for this milestone
+        code: 'ID  '
+      name:
+        access: rw
+        type: string
+        description: The name of the milestone
+        code: pnam
+      startingDate:
+        access: rw
+        type: date
+        description: The date of the milestone
+        code: Opsd
+      note:
+        access: rw
+        type: string
+        description: Notes
+        code: Opnt
+
+  Resource:
+    name: Resource
+    plural: Resources
+    description: A resource (person, equipment, or material)
+    code: Oprs
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      id:
+        access: r
+        type: integer
+        description: Internal identifier for this resource
+        code: 'ID  '
+      name:
+        access: rw
+        type: string
+        description: The name of the resource
+        code: pnam
+      resourceType:
+        access: rw
+        type:
+          enum: ResourceType
+        description: Type of the resource
+        code: Orty
+      number:
+        access: rw
+        type: number
+        description: The total number of units for this resource (1.0 = 100%)
+        code: Orna
+      emailAddress:
+        access: rw
+        type: string
+        description: Email address for this resource
+        code: Orem
+      costPerUse:
+        access: rw
+        type: number
+        description: The fixed cost per use of this resource
+        code: OPCu
+      costPerHour:
+        access: rw
+        type: number
+        description: The cost per hour of this resource
+        code: OPCh
+      efficiency:
+        access: rw
+        type: number
+        description: Resource efficiency (1.0 = 100%)
+        code: OPef
+      totalUses:
+        access: r
+        type: integer
+        description: Total number of uses of this resource
+        code: OPtu
+      totalSeconds:
+        access: r
+        type: number
+        description: Total seconds worked by this resource
+        code: OPth
+      totalCost:
+        access: r
+        type: number
+        description: Total cost of all assignments for this resource
+        code: OPtc
+      note:
+        access: rw
+        type: string
+        description: Notes
+        code: Opnt
+      outlineDepth:
+        access: r
+        type: integer
+        description: The depth or level of this resource in the hierarchy
+        code: Odep
+
+  Assignment:
+    name: Assignment
+    plural: Assignments
+    description: An assignment of a resource to a task
+    code: Opas
+    properties:
+      units:
+        access: rw
+        type: number
+        description: Units of the resource required for this task (1.0 = 100%)
+        code: Oaan
+
+  Dependency:
+    name: Dependency
+    plural: Dependencies
+    description: A dependency of one task upon another task
+    code: Opdp
+    properties:
+      dependencyType:
+        access: rw
+        type:
+          enum: DependencyType
+        description: Type of dependency
+        code: OPdk
+      leadTime:
+        access: rw
+        type: number
+        description: The number of seconds of lead time required between the tasks
+        code: OPlt
+      leadPercentage:
+        access: rw
+        type: number
+        description: The lead time, in percentage of the length of the prerequisite
+        code: OPlp
+
+  Violation:
+    name: Violation
+    plural: Violations
+    description: A scheduling conflict or issue
+    code: Opis
+    properties:
+      violationType:
+        access: r
+        type: string
+        description: The type of violation
+        code: OPty
+      shortDescription:
+        access: r
+        type: string
+        description: The short description of this violation
+        code: OPde
+      html:
+        access: r
+        type: string
+        description: The long description HTML for this violation
+        code: OPht
+
+  Scenario:
+    name: Scenario
+    plural: Scenarios
+    description: An alternative project plan
+    code: OPso
+    identifiers:
+      - property: id
+        primary: true
+    properties:
+      id:
+        access: r
+        type: string
+        description: The unique identifier for the scenario
+        code: 'ID  '
+      name:
+        access: rw
+        type: string
+        description: The name of the scenario
+        code: pnam
+      startingDate:
+        access: rw
+        type: date
+        description: The date on which work can begin
+        code: Opsd
+      endingDate:
+        access: r
+        type: date
+        description: The date on which work is complete
+        code: Oped
+      totalCost:
+        access: r
+        type: number
+        description: The cost of the entire project
+        code: OPtc
+      completed:
+        access: r
+        type: number
+        description: The percentage complete (1.0 = 100%)
+        code: OPco
+      duration:
+        access: r
+        type: number
+        description: The total duration in seconds
+        code: Otdu
+      effort:
+        access: r
+        type: number
+        description: The number of person-seconds required
+        code: Otef
+      violationCount:
+        access: r
+        type: integer
+        description: Number of violations in the scenario
+        code: Opec
+      schedulingGranularity:
+        access: rw
+        type:
+          enum: SchedulingGranularity
+        description: Scheduling granularity for this scenario
+        code: Opsg
+
+  Schedule:
+    name: Schedule
+    plural: Schedules
+    description: A schedule of working time
+    code: OPsc
+    properties: {}
+
+  Currency:
+    name: Currency
+    plural: Currencies
+    description: A locale based currency object
+    code: OPcu
+    properties:
+      code:
+        access: r
+        type: string
+        description: Locale code for this currency
+        code: OPcc
+      name:
+        access: r
+        type: string
+        description: Name for this currency
+        code: pnam
+      symbol:
+        access: r
+        type: string
+        description: Symbol for this currency
+        code: OPcs
+
+enums:
+  TaskType:
+    name: TaskType
+    description: Type of task
+    code: OPTT
+    values:
+      - name: standardTask
+        value: standardTask
+        description: A standard task
+        code: OPTS
+      - name: milestoneTask
+        value: milestoneTask
+        description: A milestone
+        code: OPTM
+      - name: groupTask
+        value: groupTask
+        description: A task which contains other tasks
+        code: OPTG
+      - name: hammockTask
+        value: hammockTask
+        description: A task whose length is defined by its dependencies
+        code: OPTH
+
+  TaskStatus:
+    name: TaskStatus
+    description: Status of a task
+    code: OPTs
+    values:
+      - name: ok
+        value: ok
+        description: None of the other statuses is true
+        code: OPTo
+      - name: closeToDueDate
+        value: closeToDueDate
+        description: Task is close to due date
+        code: OPTc
+      - name: dueNow
+        value: dueNow
+        description: Task is due today
+        code: OPTd
+      - name: pastDue
+        value: pastDue
+        description: Task is past due
+        code: OPTp
+      - name: finished
+        value: finished
+        description: Task is complete
+        code: OPTm
+
+  ResourceType:
+    name: ResourceType
+    description: Type of resource
+    code: OPRT
+    values:
+      - name: person
+        value: person
+        description: Resource person designation
+        code: OPRs
+      - name: equipment
+        value: equipment
+        description: Resource equipment designation
+        code: OPRe
+      - name: material
+        value: material
+        description: Resource material designation
+        code: OPRm
+      - name: resourceGroup
+        value: resourceGroup
+        description: Resource group designation
+        code: OPRg
+
+  DependencyType:
+    name: DependencyType
+    description: Type of dependency between tasks
+    code: OPdk
+    values:
+      - name: startstart
+        value: startstart
+        description: Start to start
+        code: ODss
+      - name: startfinish
+        value: startfinish
+        description: Start to finish
+        code: ODsf
+      - name: finishstart
+        value: finishstart
+        description: Finish to start
+        code: ODfs
+      - name: finishfinish
+        value: finishfinish
+        description: Finish to finish
+        code: ODff
+
+  SchedulingGranularity:
+    name: SchedulingGranularity
+    description: Granularity for task scheduling
+    code: OPSG
+    values:
+      - name: exactScheduling
+        value: exactScheduling
+        description: Schedule tasks exactly down to the second
+        code: OPS0
+      - name: hourlyScheduling
+        value: hourlyScheduling
+        description: All tasks start and end on hour boundaries
+        code: OPS1
+      - name: dailyScheduling
+        value: dailyScheduling
+        description: All tasks start at the beginning of a day and end at the end of a day
+        code: OPS2
+
+hierarchy:
+  children:
+    projects:
+      resource: Project
+      access: r
+      description: Projects in the document
+      children:
+        scenarios:
+          resource: Scenario
+          access: r
+          description: Scenarios within a project
+          children:
+            tasks:
+              resource: Task
+              access: rw
+              description: Tasks within a scenario
+              children:
+                tasks:
+                  resource: Task
+                  access: rw
+                  description: Subtasks within a task
+            milestones:
+              resource: Milestone
+              access: rw
+              description: Milestones within a scenario
+            resources:
+              resource: Resource
+              access: rw
+              description: Resources within a scenario
+            violations:
+              resource: Violation
+              access: r
+              description: Violations within a scenario
+        tasks:
+          resource: Task
+          access: rw
+          description: Tasks within a project
+          children:
+            tasks:
+              resource: Task
+              access: rw
+              description: Subtasks within a task
+            assignments:
+              resource: Assignment
+              access: r
+              description: Resource assignments for a task
+            dependencies:
+              resource: Dependency
+              access: r
+              description: Dependencies for a task
+        resources:
+          resource: Resource
+          access: rw
+          description: Resources within a project
+          children:
+            assignments:
+              resource: Assignment
+              access: r
+              description: Assignments for this resource
+
+commands:
+  listProjects:
+    name: list
+    description: List all projects
+    scope: resource
+    resourceType: Project
+    code: core
+    parameters: []
+    permission: omniplan:projects:list
+
+  getProject:
+    name: get
+    description: Get a project
+    scope: resource
+    resourceType: Project
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Project identifier
+        required: true
+    permission: omniplan:projects:get
+
+  listTasks:
+    name: list
+    description: List all tasks
+    scope: resource
+    resourceType: Task
+    code: core
+    parameters: []
+    permission: omniplan:tasks:list
+
+  getTask:
+    name: get
+    description: Get a task by ID
+    scope: resource
+    resourceType: Task
+    code: getd
+    parameters:
+      - name: id
+        type: integer
+        description: Task identifier
+        required: true
+    permission: omniplan:tasks:get
+
+  createTask:
+    name: create
+    description: Create a new task
+    scope: resource
+    resourceType: Task
+    code: crel
+    parameters:
+      - name: name
+        type: string
+        description: Task name
+        required: true
+      - name: startingDate
+        type: date
+        description: Start date
+        required: false
+      - name: duration
+        type: number
+        description: Duration in seconds
+        required: false
+    permission: omniplan:tasks:create
+
+  listMilestones:
+    name: list
+    description: List all milestones
+    scope: resource
+    resourceType: Milestone
+    code: core
+    parameters: []
+    permission: omniplan:milestones:list
+
+  getMilestone:
+    name: get
+    description: Get a milestone by ID
+    scope: resource
+    resourceType: Milestone
+    code: getd
+    parameters:
+      - name: id
+        type: integer
+        description: Milestone identifier
+        required: true
+    permission: omniplan:milestones:get
+
+  createMilestone:
+    name: create
+    description: Create a new milestone
+    scope: resource
+    resourceType: Milestone
+    code: crel
+    parameters:
+      - name: name
+        type: string
+        description: Milestone name
+        required: true
+      - name: startingDate
+        type: date
+        description: Milestone date
+        required: false
+    permission: omniplan:milestones:create
+
+  listResources:
+    name: list
+    description: List all resources
+    scope: resource
+    resourceType: Resource
+    code: core
+    parameters: []
+    permission: omniplan:resources:list
+
+  getResource:
+    name: get
+    description: Get a resource by ID
+    scope: resource
+    resourceType: Resource
+    code: getd
+    parameters:
+      - name: id
+        type: integer
+        description: Resource identifier
+        required: true
+    permission: omniplan:resources:get
+
+  createResource:
+    name: create
+    description: Create a new resource
+    scope: resource
+    resourceType: Resource
+    code: crel
+    parameters:
+      - name: name
+        type: string
+        description: Resource name
+        required: true
+      - name: resourceType
+        type: ResourceType
+        description: Resource type
+        required: false
+    permission: omniplan:resources:create
+
+  listAssignments:
+    name: list
+    description: List all assignments
+    scope: resource
+    resourceType: Assignment
+    code: core
+    parameters: []
+    permission: omniplan:assignments:list
+
+  listDependencies:
+    name: list
+    description: List all dependencies
+    scope: resource
+    resourceType: Dependency
+    code: core
+    parameters: []
+    permission: omniplan:dependencies:list
+
+  listViolations:
+    name: list
+    description: List all violations
+    scope: resource
+    resourceType: Violation
+    code: core
+    parameters: []
+    permission: omniplan:violations:list
+
+  listScenarios:
+    name: list
+    description: List all scenarios
+    scope: resource
+    resourceType: Scenario
+    code: core
+    parameters: []
+    permission: omniplan:scenarios:list
+
+  getScenario:
+    name: get
+    description: Get a scenario by ID
+    scope: resource
+    resourceType: Scenario
+    code: getd
+    parameters:
+      - name: id
+        type: string
+        description: Scenario identifier
+        required: true
+    permission: omniplan:scenarios:get
+
+  export:
+    name: export
+    description: Export a document
+    scope: application
+    code: xprt
+    parameters:
+      - name: to
+        type: string
+        description: Export file path
+        required: true
+    permission: omniplan:app:export
+
+  assign:
+    name: assign
+    description: Assign resources to tasks
+    scope: application
+    code: ASSN
+    parameters:
+      - name: resource
+        type: string
+        description: Resource to assign
+        required: true
+      - name: task
+        type: string
+        description: Task to assign to
+        required: true
+    permission: omniplan:app:assign
+
+  depend:
+    name: depend
+    description: Create a dependency between tasks
+    scope: application
+    code: SCHD
+    parameters:
+      - name: prerequisite
+        type: string
+        description: Prerequisite task
+        required: true
+      - name: dependent
+        type: string
+        description: Dependent task
+        required: true
+    permission: omniplan:app:depend
+
+  baseline:
+    name: baseline
+    description: Commit the current schedule as the baseline schedule
+    scope: application
+    code: BASE
+    parameters: []
+    permission: omniplan:app:baseline
+
+  level:
+    name: level
+    description: Level resources on project
+    scope: application
+    code: LEVL
+    parameters: []
+    permission: omniplan:app:level
+
+  lookup:
+    name: lookup
+    description: Look up a task via a custom data key
+    scope: application
+    code: LOOK
+    parameters:
+      - name: key
+        type: string
+        description: Custom data key
+        required: true
+    permission: omniplan:app:lookup
+
+  changeMark:
+    name: changeMark
+    description: Make a change tracking mark on project
+    scope: application
+    code: MARK
+    parameters: []
+    permission: omniplan:app:changeMark
+
+  addWorkTime:
+    name: addWorkTime
+    description: Add working hours to a schedule
+    scope: application
+    code: ADDS
+    parameters:
+      - name: schedule
+        type: string
+        description: Target schedule
+        required: true
+    permission: omniplan:app:addWorkTime
+
+  subtractWorkTime:
+    name: subtractWorkTime
+    description: Remove working hours from a schedule
+    scope: application
+    code: SUBS
+    parameters:
+      - name: schedule
+        type: string
+        description: Target schedule
+        required: true
+    permission: omniplan:app:subtractWorkTime
+
+  fix:
+    name: fix
+    description: Fix a violation
+    scope: resource
+    resourceType: Violation
+    code: 'FIX '
+    parameters: []
+    permission: omniplan:violations:fix
+
+  undo:
+    name: undo
+    description: Undo the last command
+    scope: application
+    code: UNDO
+    parameters: []
+    permission: omniplan:app:undo
+
+  redo:
+    name: redo
+    description: Redo the last undone command
+    scope: application
+    code: REDO
+    parameters: []
+    permission: omniplan:app:redo
+
+permissions:
+  projects:
+    read:
+      - omniplan:projects:list
+      - omniplan:projects:get
+
+  tasks:
+    read:
+      - omniplan:tasks:list
+      - omniplan:tasks:get
+    create:
+      - omniplan:tasks:create
+    write:
+      - omniplan:tasks:update
+    delete:
+      - omniplan:tasks:delete
+
+  milestones:
+    read:
+      - omniplan:milestones:list
+      - omniplan:milestones:get
+    create:
+      - omniplan:milestones:create
+    write:
+      - omniplan:milestones:update
+    delete:
+      - omniplan:milestones:delete
+
+  resources:
+    read:
+      - omniplan:resources:list
+      - omniplan:resources:get
+    create:
+      - omniplan:resources:create
+    write:
+      - omniplan:resources:update
+    delete:
+      - omniplan:resources:delete
+
+  assignments:
+    read:
+      - omniplan:assignments:list
+
+  dependencies:
+    read:
+      - omniplan:dependencies:list
+
+  violations:
+    read:
+      - omniplan:violations:list
+    write:
+      - omniplan:violations:fix
+
+  scenarios:
+    read:
+      - omniplan:scenarios:list
+      - omniplan:scenarios:get
+
+  app:
+    read:
+      - omniplan:app:export
+      - omniplan:app:assign
+      - omniplan:app:depend
+      - omniplan:app:baseline
+      - omniplan:app:level
+      - omniplan:app:lookup
+      - omniplan:app:changeMark
+      - omniplan:app:addWorkTime
+      - omniplan:app:subtractWorkTime
+      - omniplan:app:undo
+      - omniplan:app:redo
+
+extraction:
+  sourceFile: omniplan.sdef
+  confidence:
+    overall: 0.95
+    fields:
+      resources: 1.0
+      enums: 1.0
+      hierarchy: 0.95
+      commands: 0.95
+  openQuestions:
+    - question: Should we include the style and custom data classes?
+      context: These are documented in the SDEF but are more advanced features
+      relatedTo: Task, Resource

@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 /**
  * Property access mode - whether a property is read-only or read-write.
  */
-export const PropertyAccessSchema = z.enum(['r', 'rw']);
-export type PropertyAccess = z.infer<typeof PropertyAccessSchema>;
+export const PropertyAccessSchema = z.enum(['r', 'rw'])
+export type PropertyAccess = z.infer<typeof PropertyAccessSchema>
 
 /**
  * Primitive property types supported by AppleScript/JXA.
@@ -21,8 +21,8 @@ export const PrimitiveTypeSchema = z.enum([
   'point', // {x, y}
   'rect', // {x, y, width, height}
   'rgb', // {red, green, blue}
-]);
-export type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>;
+])
+export type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>
 
 /**
  * Property type - can be primitive, array, resource reference, or enum reference.
@@ -46,8 +46,8 @@ export const PropertyTypeSchema: z.ZodType<
       enum: z.string().min(1), // Reference to an enum type
     })
     .strict(),
-]);
-export type PropertyType = z.infer<typeof PropertyTypeSchema>;
+])
+export type PropertyType = z.infer<typeof PropertyTypeSchema>
 
 /**
  * Schema for a single property definition.
@@ -60,7 +60,7 @@ export const PropertySchema = z.object({
   /** Human-readable description */
   description: z.string().min(1),
   /** AppleScript four-character code */
-  code: z.string().length(4).optional(),
+  code: z.string().min(1).max(4).optional(),
   /** Default value */
   default: z.unknown().optional(),
   /** Whether this property is optional */
@@ -72,5 +72,5 @@ export const PropertySchema = z.object({
       since: z.string().optional(),
     })
     .optional(),
-});
-export type Property = z.infer<typeof PropertySchema>;
+})
+export type Property = z.infer<typeof PropertySchema>

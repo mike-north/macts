@@ -1,24 +1,26 @@
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
 
-const execAsync = promisify(exec);
+const execAsync = promisify(exec)
 
 export interface JxaExecutorOptions {
-  timeout?: number; // milliseconds
+  timeout?: number // milliseconds
+  /** Optional callback for stderr output. Defaults to console.warn if not provided. */
+  onStderr?: (msg: string) => void
 }
 
 export class JxaExecutionError extends Error {
-  public readonly code: string;
-  public readonly stderr: string;
+  public readonly code: string
+  public readonly stderr: string
 
   constructor(message: string, code: string, stderr: string, cause?: unknown) {
-    super(message);
-    this.name = 'JxaExecutionError';
-    this.code = code;
-    this.stderr = stderr;
+    super(message)
+    this.name = 'JxaExecutionError'
+    this.code = code
+    this.stderr = stderr
     // Set cause if provided (ES2022 feature)
     if (cause !== undefined) {
-      this.cause = cause;
+      this.cause = cause
     }
   }
 }
@@ -28,39 +30,43 @@ export class JxaExecutionError extends Error {
  * Uses osascript -l JavaScript under the hood.
  */
 export async function runJxa<T>(code: string, options: JxaExecutorOptions = {}): Promise<T> {
-  const { timeout = 30000 } = options;
+  const { timeout = 30000, onStderr } = options
 
   // Wrap code to JSON-stringify the result for parsing
   const wrappedCode = `
     ObjC.import('stdlib');
     var result = (function() { ${code} })();
     JSON.stringify(result);
-  `;
+  `
 
   try {
     const { stdout, stderr } = await execAsync(
       `osascript -l JavaScript -e ${escapeShellArg(wrappedCode)}`,
       { timeout }
-    );
+    )
 
     if (stderr) {
-      console.warn('JXA stderr:', stderr);
+      if (onStderr) {
+        onStderr(stderr)
+      } else {
+        console.warn('JXA stderr:', stderr)
+      }
     }
 
     // Parse JSON result
-    const trimmed = stdout.trim();
+    const trimmed = stdout.trim()
     if (!trimmed) {
-      return undefined as T;
+      return undefined as T
     }
-    return JSON.parse(trimmed) as T;
+    return JSON.parse(trimmed) as T
   } catch (error) {
-    const e = error as { code?: string; stderr?: string; message?: string };
+    const e = error as { code?: string; stderr?: string; message?: string }
     throw new JxaExecutionError(
       `JXA execution failed: ${e.message ?? 'Unknown error'}`,
       e.code ?? 'UNKNOWN',
       e.stderr ?? '',
       error
-    );
+    )
   }
 }
 
@@ -76,8 +82,8 @@ export async function runWithApp<T>(
     var app = Application("${bundleId}");
     app.includeStandardAdditions = true;
     return (function(app) { ${fn} })(app);
-  `;
-  return runJxa<T>(code, options);
+  `
+  return runJxa<T>(code, options)
 }
 
 /**
@@ -85,5 +91,5 @@ export async function runWithApp<T>(
  */
 function escapeShellArg(arg: string): string {
   // Use $'...' syntax for proper escaping
-  return "$'" + arg.replace(/'/g, "\\'").replace(/\n/g, '\\n') + "'";
+  return "$'" + arg.replace(/'/g, "\\'").replace(/\n/g, '\\n') + "'"
 }

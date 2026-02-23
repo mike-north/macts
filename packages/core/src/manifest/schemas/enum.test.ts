@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { EnumValueSchema, EnumSchema } from './enum.js';
-import { ZodError } from 'zod';
+import { describe, it, expect } from 'vitest'
+import { EnumValueSchema, EnumSchema } from './enum.js'
+import { ZodError } from 'zod'
 
 describe('EnumValueSchema', () => {
   describe('positive cases', () => {
@@ -8,54 +8,54 @@ describe('EnumValueSchema', () => {
       const result = EnumValueSchema.parse({
         name: 'Active',
         value: 'active',
-      });
+      })
 
       expect(result).toEqual({
         name: 'Active',
         value: 'active',
-      });
-    });
+      })
+    })
 
     it('should accept enum value with number value', () => {
       const result = EnumValueSchema.parse({
         name: 'High',
         value: 1,
-      });
+      })
 
       expect(result).toEqual({
         name: 'High',
         value: 1,
-      });
-    });
+      })
+    })
 
     it('should accept enum value with zero', () => {
       const result = EnumValueSchema.parse({
         name: 'None',
         value: 0,
-      });
+      })
 
-      expect(result.value).toBe(0);
-    });
+      expect(result.value).toBe(0)
+    })
 
     it('should accept enum value with description', () => {
       const result = EnumValueSchema.parse({
         name: 'Active',
         value: 'active',
         description: 'The item is active',
-      });
+      })
 
-      expect(result.description).toBe('The item is active');
-    });
+      expect(result.description).toBe('The item is active')
+    })
 
     it('should accept enum value with code', () => {
       const result = EnumValueSchema.parse({
         name: 'Active',
         value: 'active',
         code: 'Eact',
-      });
+      })
 
-      expect(result.code).toBe('Eact');
-    });
+      expect(result.code).toBe('Eact')
+    })
 
     it('should accept enum value with all optional fields', () => {
       const result = EnumValueSchema.parse({
@@ -63,16 +63,16 @@ describe('EnumValueSchema', () => {
         value: 'active',
         description: 'The item is active',
         code: 'Eact',
-      });
+      })
 
       expect(result).toEqual({
         name: 'Active',
         value: 'active',
         description: 'The item is active',
         code: 'Eact',
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject enum value without name', () => {
@@ -80,16 +80,16 @@ describe('EnumValueSchema', () => {
         EnumValueSchema.parse({
           value: 'active',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum value without value', () => {
       expect(() =>
         EnumValueSchema.parse({
           name: 'Active',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum value with boolean value', () => {
       expect(() =>
@@ -97,8 +97,8 @@ describe('EnumValueSchema', () => {
           name: 'Active',
           value: true,
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum value with object value', () => {
       expect(() =>
@@ -106,8 +106,8 @@ describe('EnumValueSchema', () => {
           name: 'Active',
           value: { status: 'active' },
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum value with array value', () => {
       expect(() =>
@@ -115,66 +115,102 @@ describe('EnumValueSchema', () => {
           name: 'Active',
           value: ['active'],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum value with invalid code length', () => {
+      // Empty string should be rejected
       expect(() =>
         EnumValueSchema.parse({
           name: 'Active',
           value: 'active',
-          code: 'abc', // too short
+          code: '',
         })
-      ).toThrow(ZodError);
+      ).toThrow(ZodError)
 
+      // Too long (5+ chars) should be rejected
       expect(() =>
         EnumValueSchema.parse({
           name: 'Active',
           value: 'active',
-          code: 'abcde', // too long
+          code: 'abcde',
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
+    it('should accept code with 1-4 characters', () => {
+      // 1 character
+      let result = EnumValueSchema.parse({
+        name: 'Active',
+        value: 'active',
+        code: 'a',
+      })
+      expect(result.code).toBe('a')
+
+      // 2 characters
+      result = EnumValueSchema.parse({
+        name: 'Active',
+        value: 'active',
+        code: 'ab',
+      })
+      expect(result.code).toBe('ab')
+
+      // 3 characters
+      result = EnumValueSchema.parse({
+        name: 'Active',
+        value: 'active',
+        code: 'abc',
+      })
+      expect(result.code).toBe('abc')
+
+      // 4 characters
+      result = EnumValueSchema.parse({
+        name: 'Active',
+        value: 'active',
+        code: 'abcd',
+      })
+      expect(result.code).toBe('abcd')
+    })
+
     it('should accept empty string name', () => {
       const result = EnumValueSchema.parse({
         name: '',
         value: 'active',
-      });
+      })
 
-      expect(result.name).toBe('');
-    });
+      expect(result.name).toBe('')
+    })
 
     it('should accept empty string value', () => {
       const result = EnumValueSchema.parse({
         name: 'Empty',
         value: '',
-      });
+      })
 
-      expect(result.value).toBe('');
-    });
+      expect(result.value).toBe('')
+    })
 
     it('should accept negative number value', () => {
       const result = EnumValueSchema.parse({
         name: 'Negative',
         value: -1,
-      });
+      })
 
-      expect(result.value).toBe(-1);
-    });
+      expect(result.value).toBe(-1)
+    })
 
     it('should accept floating point number value', () => {
       const result = EnumValueSchema.parse({
         name: 'Half',
         value: 0.5,
-      });
+      })
 
-      expect(result.value).toBe(0.5);
-    });
-  });
-});
+      expect(result.value).toBe(0.5)
+    })
+  })
+})
 
 describe('EnumSchema', () => {
   describe('positive cases', () => {
@@ -182,13 +218,13 @@ describe('EnumSchema', () => {
       const result = EnumSchema.parse({
         name: 'Status',
         values: [{ name: 'Active', value: 'active' }],
-      });
+      })
 
       expect(result).toEqual({
         name: 'Status',
         values: [{ name: 'Active', value: 'active' }],
-      });
-    });
+      })
+    })
 
     it('should accept enum with multiple values', () => {
       const result = EnumSchema.parse({
@@ -198,30 +234,30 @@ describe('EnumSchema', () => {
           { name: 'Inactive', value: 'inactive' },
           { name: 'Pending', value: 'pending' },
         ],
-      });
+      })
 
-      expect(result.values).toHaveLength(3);
-    });
+      expect(result.values).toHaveLength(3)
+    })
 
     it('should accept enum with description', () => {
       const result = EnumSchema.parse({
         name: 'Status',
         description: 'The status of an item',
         values: [{ name: 'Active', value: 'active' }],
-      });
+      })
 
-      expect(result.description).toBe('The status of an item');
-    });
+      expect(result.description).toBe('The status of an item')
+    })
 
     it('should accept enum with code', () => {
       const result = EnumSchema.parse({
         name: 'Status',
         code: 'enum',
         values: [{ name: 'Active', value: 'active' }],
-      });
+      })
 
-      expect(result.code).toBe('enum');
-    });
+      expect(result.code).toBe('enum')
+    })
 
     it('should accept enum with all optional fields', () => {
       const result = EnumSchema.parse({
@@ -236,7 +272,7 @@ describe('EnumSchema', () => {
             code: 'Eact',
           },
         ],
-      });
+      })
 
       expect(result).toEqual({
         name: 'Status',
@@ -250,8 +286,8 @@ describe('EnumSchema', () => {
             code: 'Eact',
           },
         ],
-      });
-    });
+      })
+    })
 
     it('should accept enum with mixed string and number values', () => {
       const result = EnumSchema.parse({
@@ -261,13 +297,13 @@ describe('EnumSchema', () => {
           { name: 'Low', value: 'low' },
           { name: 'High', value: 1 },
         ],
-      });
+      })
 
-      expect(result.values[0]?.value).toBe(0);
-      expect(result.values[1]?.value).toBe('low');
-      expect(result.values[2]?.value).toBe(1);
-    });
-  });
+      expect(result.values[0]?.value).toBe(0)
+      expect(result.values[1]?.value).toBe('low')
+      expect(result.values[2]?.value).toBe(1)
+    })
+  })
 
   describe('negative cases', () => {
     it('should reject enum without name', () => {
@@ -275,16 +311,16 @@ describe('EnumSchema', () => {
         EnumSchema.parse({
           values: [{ name: 'Active', value: 'active' }],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum without values', () => {
       expect(() =>
         EnumSchema.parse({
           name: 'Status',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum with empty values array', () => {
       expect(() =>
@@ -292,8 +328,8 @@ describe('EnumSchema', () => {
           name: 'Status',
           values: [],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum with non-string name', () => {
       expect(() =>
@@ -301,8 +337,8 @@ describe('EnumSchema', () => {
           name: 123,
           values: [{ name: 'Active', value: 'active' }],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum with non-array values', () => {
       expect(() =>
@@ -310,8 +346,8 @@ describe('EnumSchema', () => {
           name: 'Status',
           values: 'not-an-array',
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum with invalid value in array', () => {
       expect(() =>
@@ -322,46 +358,82 @@ describe('EnumSchema', () => {
             { name: 'Invalid' }, // missing value
           ],
         })
-      ).toThrow(ZodError);
-    });
+      ).toThrow(ZodError)
+    })
 
     it('should reject enum with invalid code length', () => {
+      // Empty string should be rejected
       expect(() =>
         EnumSchema.parse({
           name: 'Status',
-          code: 'abc', // too short
+          code: '',
           values: [{ name: 'Active', value: 'active' }],
         })
-      ).toThrow(ZodError);
+      ).toThrow(ZodError)
 
+      // Too long (5+ chars) should be rejected
       expect(() =>
         EnumSchema.parse({
           name: 'Status',
-          code: 'abcde', // too long
+          code: 'abcde',
           values: [{ name: 'Active', value: 'active' }],
         })
-      ).toThrow(ZodError);
-    });
-  });
+      ).toThrow(ZodError)
+    })
+  })
 
   describe('edge cases', () => {
+    it('should accept enum with code 1-4 characters', () => {
+      // 1 character
+      let result = EnumSchema.parse({
+        name: 'Status',
+        code: 'a',
+        values: [{ name: 'Active', value: 'active' }],
+      })
+      expect(result.code).toBe('a')
+
+      // 2 characters
+      result = EnumSchema.parse({
+        name: 'Status',
+        code: 'ab',
+        values: [{ name: 'Active', value: 'active' }],
+      })
+      expect(result.code).toBe('ab')
+
+      // 3 characters
+      result = EnumSchema.parse({
+        name: 'Status',
+        code: 'abc',
+        values: [{ name: 'Active', value: 'active' }],
+      })
+      expect(result.code).toBe('abc')
+
+      // 4 characters
+      result = EnumSchema.parse({
+        name: 'Status',
+        code: 'abcd',
+        values: [{ name: 'Active', value: 'active' }],
+      })
+      expect(result.code).toBe('abcd')
+    })
+
     it('should accept empty string name', () => {
       const result = EnumSchema.parse({
         name: '',
         values: [{ name: 'Active', value: 'active' }],
-      });
+      })
 
-      expect(result.name).toBe('');
-    });
+      expect(result.name).toBe('')
+    })
 
     it('should accept single value enum', () => {
       const result = EnumSchema.parse({
         name: 'Status',
         values: [{ name: 'OnlyValue', value: 'only' }],
-      });
+      })
 
-      expect(result.values).toHaveLength(1);
-    });
+      expect(result.values).toHaveLength(1)
+    })
 
     it('should accept undefined optional fields', () => {
       const result = EnumSchema.parse({
@@ -369,11 +441,11 @@ describe('EnumSchema', () => {
         description: undefined,
         code: undefined,
         values: [{ name: 'Active', value: 'active' }],
-      });
+      })
 
-      expect(result.description).toBeUndefined();
-      expect(result.code).toBeUndefined();
-    });
+      expect(result.description).toBeUndefined()
+      expect(result.code).toBeUndefined()
+    })
 
     it('should handle values with duplicate names', () => {
       // Zod does not enforce uniqueness, so this should pass
@@ -383,10 +455,10 @@ describe('EnumSchema', () => {
           { name: 'Active', value: 'active1' },
           { name: 'Active', value: 'active2' },
         ],
-      });
+      })
 
-      expect(result.values).toHaveLength(2);
-    });
+      expect(result.values).toHaveLength(2)
+    })
 
     it('should handle values with duplicate values', () => {
       // Zod does not enforce uniqueness, so this should pass
@@ -396,9 +468,9 @@ describe('EnumSchema', () => {
           { name: 'Active1', value: 'active' },
           { name: 'Active2', value: 'active' },
         ],
-      });
+      })
 
-      expect(result.values).toHaveLength(2);
-    });
-  });
-});
+      expect(result.values).toHaveLength(2)
+    })
+  })
+})
