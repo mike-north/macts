@@ -34,18 +34,9 @@ describe('getAppName', () => {
 })
 
 describe('activateApp', () => {
-  it('should throw for non-running app', async () => {
-    // Test that activate throws an error when app isn't running
-    // Calendar may not be running during test
-    const running = await isAppRunning('com.apple.iCal')
-
-    if (!running) {
-      await expect(activateApp('com.apple.iCal')).rejects.toThrow(JxaExecutionError)
-    } else {
-      // If Calendar is running, this test is satisfied either way
-      // (we just need to verify the function exists and can be called)
-      expect(typeof activateApp).toBe('function')
-    }
+  it('should throw for non-existent app', async () => {
+    // Use a bundle ID that will never exist on any system
+    await expect(activateApp('com.macts.nonexistent-test-app')).rejects.toThrow(JxaExecutionError)
   })
 })
 
