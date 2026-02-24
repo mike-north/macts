@@ -22,7 +22,6 @@ export class ShowEventCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.events.show();
 
       const output = formatter.formatSuccess('show completed successfully');

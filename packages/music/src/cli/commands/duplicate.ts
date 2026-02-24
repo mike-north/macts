@@ -19,8 +19,7 @@ export class DuplicateCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.duplicate(this.to as any);
+      await client.duplicate(this.to as unknown);
 
       const output = formatter.formatSuccess('duplicate completed successfully');
       this.context.stdout.write(output + '\n');

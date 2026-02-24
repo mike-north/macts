@@ -23,11 +23,6 @@ export class GetContainerCommand extends Command {
       const client = getClient();
       const item = await client.containers.get(this.containerId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Container not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

@@ -48,8 +48,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new ArcError(code, message);
     }
 
@@ -115,7 +115,7 @@ export class ArcClient {
    * Make a new object.
    */
   async make(_new: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.make', { 'new': _new, withProperties });
+    await this.#httpClient.rpc<undefined>('arc.app.make', { 'new': _new, withProperties });
   }
 
 
@@ -123,7 +123,7 @@ export class ArcClient {
    * Return the number of elements of a particular class within an object.
    */
   async count(each?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.count', { each });
+    await this.#httpClient.rpc<undefined>('arc.app.count', { each });
   }
 
 
@@ -131,7 +131,7 @@ export class ArcClient {
    * Close
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.close', {});
+    await this.#httpClient.rpc<undefined>('arc.app.close', {});
   }
 
 
@@ -139,7 +139,7 @@ export class ArcClient {
    * Select the tab.
    */
   async select(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.select', {});
+    await this.#httpClient.rpc<undefined>('arc.app.select', {});
   }
 
 
@@ -147,7 +147,7 @@ export class ArcClient {
    * Go Back (If Possible).
    */
   async goBack(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.goBack', {});
+    await this.#httpClient.rpc<undefined>('arc.app.goBack', {});
   }
 
 
@@ -155,7 +155,7 @@ export class ArcClient {
    * Go Forward (If Possible).
    */
   async goForward(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.goForward', {});
+    await this.#httpClient.rpc<undefined>('arc.app.goForward', {});
   }
 
 
@@ -163,7 +163,7 @@ export class ArcClient {
    * Reload a tab.
    */
   async reload(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.reload', {});
+    await this.#httpClient.rpc<undefined>('arc.app.reload', {});
   }
 
 
@@ -171,7 +171,7 @@ export class ArcClient {
    * Stop the current tab from loading.
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.stop', {});
+    await this.#httpClient.rpc<undefined>('arc.app.stop', {});
   }
 
 
@@ -179,7 +179,7 @@ export class ArcClient {
    * Execute a piece of javascript.
    */
   async execute(javascript: string): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.execute', { javascript });
+    await this.#httpClient.rpc<undefined>('arc.app.execute', { javascript });
   }
 
 
@@ -187,6 +187,6 @@ export class ArcClient {
    * Focus on a space.
    */
   async focus(): Promise<void> {
-    return this.#httpClient.rpc<void>('arc.app.focus', {});
+    await this.#httpClient.rpc<undefined>('arc.app.focus', {});
   }
 }

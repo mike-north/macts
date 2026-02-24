@@ -22,8 +22,7 @@ export class CompleteReminderCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.reminders.complete(this.id as any);
+      await client.reminders.complete(this.id as unknown);
 
       const output = formatter.formatSuccess('complete completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,8 +19,7 @@ export class SynchronizeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.synchronize(this.with as any);
+      await client.synchronize(this.with as unknown);
 
       const output = formatter.formatSuccess('synchronize completed successfully');
       this.context.stdout.write(output + '\n');

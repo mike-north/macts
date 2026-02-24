@@ -25,11 +25,6 @@ export class GetUrlCommand extends Command {
       const client = getClient();
       const item = await client.urls.get(this.urlId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Url not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

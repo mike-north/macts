@@ -26,8 +26,7 @@ export const appSearchTool: McpToolDefinition = {
   handler: async (args) => {
     const { query } = args as { query?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.search(query as any);
+    await client.search(query as unknown);
     return { success: true };
   },
 };
@@ -59,8 +58,7 @@ export const appActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { items, asType } = args as { items: unknown[]; asType?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.action(items as any, asType as any);
+    await client.action(items as unknown, asType as unknown);
     return { success: true };
   },
 };
@@ -87,8 +85,7 @@ export const appBrowseTool: McpToolDefinition = {
   handler: async (args) => {
     const { path } = args as { path: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.browse(path as any);
+    await client.browse(path as unknown);
     return { success: true };
   },
 };
@@ -124,8 +121,7 @@ export const appRunTriggerTool: McpToolDefinition = {
   handler: async (args) => {
     const { trigger, inWorkflow, withArgument } = args as { trigger: string; inWorkflow: string; withArgument?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.runTrigger(trigger as any, inWorkflow as any, withArgument as any);
+    await client.runTrigger(trigger as unknown, inWorkflow as unknown, withArgument as unknown);
     return { success: true };
   },
 };
@@ -152,8 +148,7 @@ export const appReloadWorkflowTool: McpToolDefinition = {
   handler: async (args) => {
     const { workflow } = args as { workflow: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.reloadWorkflow(workflow as any);
+    await client.reloadWorkflow(workflow as unknown);
     return { success: true };
   },
 };
@@ -188,8 +183,7 @@ export const appRevealWorkflowTool: McpToolDefinition = {
   handler: async (args) => {
     const { workflow, configuration, details } = args as { workflow: string; configuration?: boolean; details?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.revealWorkflow(workflow as any, configuration as any, details as any);
+    await client.revealWorkflow(workflow as unknown, configuration as unknown, details as unknown);
     return { success: true };
   },
 };
@@ -230,8 +224,7 @@ export const appSetConfigurationTool: McpToolDefinition = {
   handler: async (args) => {
     const { variable, toValue, inWorkflow, exportable } = args as { variable: string; toValue: string; inWorkflow: string; exportable?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.setConfiguration(variable as any, toValue as any, inWorkflow as any, exportable as any);
+    await client.setConfiguration(variable as unknown, toValue as unknown, inWorkflow as unknown, exportable as unknown);
     return { success: true };
   },
 };
@@ -263,8 +256,7 @@ export const appRemoveConfigurationTool: McpToolDefinition = {
   handler: async (args) => {
     const { variable, inWorkflow } = args as { variable: string; inWorkflow: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.removeConfiguration(variable as any, inWorkflow as any);
+    await client.removeConfiguration(variable as unknown, inWorkflow as unknown);
     return { success: true };
   },
 };
@@ -291,8 +283,7 @@ export const appSetThemeTool: McpToolDefinition = {
   handler: async (args) => {
     const { theme } = args as { theme: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.setTheme(theme as any);
+    await client.setTheme(theme as unknown);
     return { success: true };
   },
 };

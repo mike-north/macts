@@ -13,8 +13,7 @@ export interface Account {
 }
 
 // @public
-export interface AccountCreateInput {
-}
+export type AccountCreateInput = Record<string, never>;
 
 // @public
 export class AccountResourceClient {

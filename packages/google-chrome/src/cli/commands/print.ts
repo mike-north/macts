@@ -19,7 +19,6 @@ export class PrintCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.print();
 
       const output = formatter.formatSuccess('print completed successfully');

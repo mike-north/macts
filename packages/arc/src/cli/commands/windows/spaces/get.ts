@@ -24,11 +24,6 @@ export class GetSpaceCommand extends Command {
       const client = getClient();
       const item = await client.spaces.get(this.spaceId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Space not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         title: item.title,

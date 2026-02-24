@@ -29,8 +29,7 @@ export const appSendTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.send(to as any);
+    await client.send(to as unknown);
     return { success: true };
   },
 };

@@ -20,8 +20,7 @@ export class DoScriptCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.doScript(this.command as any, this.in as any);
+      await client.doScript(this.command as unknown, this.in as unknown);
 
       const output = formatter.formatSuccess('doScript completed successfully');
       this.context.stdout.write(output + '\n');

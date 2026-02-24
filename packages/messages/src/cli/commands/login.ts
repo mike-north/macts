@@ -19,7 +19,6 @@ export class LoginCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.login();
 
       const output = formatter.formatSuccess('login completed successfully');

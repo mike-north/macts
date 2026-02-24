@@ -19,7 +19,6 @@ export class ExistsCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.exists();
 
       const output = formatter.formatSuccess('exists completed successfully');

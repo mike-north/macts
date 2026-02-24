@@ -23,11 +23,6 @@ export class GetTrackCommand extends Command {
       const client = getClient();
       const item = await client.tracks.get(this.trackId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Track not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         artist: item.artist,

@@ -24,11 +24,6 @@ export class GetLineCommand extends Command {
       const client = getClient();
       const item = await client.lines.get(this.lineId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Line not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         lineType: item.lineType,

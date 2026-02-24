@@ -22,8 +22,7 @@ export class GoBackTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.goBack(this.tabId as any);
+      await client.tabs.goBack(this.tabId as unknown);
 
       const output = formatter.formatSuccess('goBack completed successfully');
       this.context.stdout.write(output + '\n');

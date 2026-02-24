@@ -19,7 +19,6 @@ export class FocusCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.focus();
 
       const output = formatter.formatSuccess('focus completed successfully');

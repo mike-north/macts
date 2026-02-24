@@ -19,7 +19,6 @@ export class NewMovieRecordingCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.newMovieRecording();
 
       const output = formatter.formatSuccess('newMovieRecording completed successfully');

@@ -19,8 +19,7 @@ export class StepForwardCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.stepForward(this.by as any);
+      await client.stepForward(this.by as unknown);
 
       const output = formatter.formatSuccess('stepForward completed successfully');
       this.context.stdout.write(output + '\n');

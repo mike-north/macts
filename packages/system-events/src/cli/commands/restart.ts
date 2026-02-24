@@ -19,8 +19,7 @@ export class RestartCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.restart(this.stateSavingPreference as any);
+      await client.restart(this.stateSavingPreference as unknown);
 
       const output = formatter.formatSuccess('restart completed successfully');
       this.context.stdout.write(output + '\n');

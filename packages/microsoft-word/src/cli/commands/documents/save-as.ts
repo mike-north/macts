@@ -23,8 +23,7 @@ export class SaveAsDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.documents.saveAs(this.fileName as any, this.fileFormat as any);
+      await client.documents.saveAs(this.fileName as unknown, this.fileFormat as unknown);
 
       const output = formatter.formatSuccess('saveAs completed successfully');
       this.context.stdout.write(output + '\n');

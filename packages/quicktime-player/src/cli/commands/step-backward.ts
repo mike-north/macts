@@ -19,8 +19,7 @@ export class StepBackwardCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.stepBackward(this.by as any);
+      await client.stepBackward(this.by as unknown);
 
       const output = formatter.formatSuccess('stepBackward completed successfully');
       this.context.stdout.write(output + '\n');

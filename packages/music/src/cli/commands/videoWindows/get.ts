@@ -23,11 +23,6 @@ export class GetVideoWindowCommand extends Command {
       const client = getClient();
       const item = await client.videowindows.get(this.videoWindowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('VideoWindow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

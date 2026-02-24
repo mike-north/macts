@@ -170,7 +170,7 @@ export const remindersCompleteTool: McpToolDefinition = {
     const { id } = args as { id: string };
     const client = getClient();
     await client.reminders.complete(id);
-    return { success: true, message: `Mark a reminder as complete ${id}` };
+    return { success: true };
   },
 };
 
@@ -197,7 +197,7 @@ export const remindersShowTool: McpToolDefinition = {
     const { id } = args as { id: string };
     const client = getClient();
     await client.reminders.show(id);
-    return { success: true, message: `Show the reminder in Reminders.app UI ${id}` };
+    return { success: true };
   },
 };
 

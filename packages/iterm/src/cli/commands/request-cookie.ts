@@ -19,8 +19,7 @@ export class RequestCookieCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.requestCookie(this.andKeyForAppNamed as any);
+      await client.requestCookie(this.andKeyForAppNamed as unknown);
 
       const output = formatter.formatSuccess('requestCookie completed successfully');
       this.context.stdout.write(output + '\n');

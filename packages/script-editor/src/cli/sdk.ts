@@ -21,7 +21,7 @@ export function getScriptEditorClient(): ScriptEditorClient {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions scripteditor:*:*'
+        'Create an API key with: macts api-key create --permissions script-editor:*:*'
     );
   }
 

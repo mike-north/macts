@@ -19,7 +19,6 @@ export class NewAudioRecordingCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.newAudioRecording();
 
       const output = formatter.formatSuccess('newAudioRecording completed successfully');

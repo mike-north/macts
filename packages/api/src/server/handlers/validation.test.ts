@@ -245,11 +245,12 @@ describe('buildSchemaRegistry', () => {
     const registry = buildSchemaRegistry(commands)
     const schema = registry.get('create')
     expect(schema).toBeDefined()
+    if (!schema) throw new Error('Schema not found')
 
-    const valid = schema!.safeParse({ title: 'Test', count: 5 })
+    const valid = schema.safeParse({ title: 'Test', count: 5 })
     expect(valid.success).toBe(true)
 
-    const invalid = schema!.safeParse({ title: 'Test', count: 'not-a-number' })
+    const invalid = schema.safeParse({ title: 'Test', count: 'not-a-number' })
     expect(invalid.success).toBe(false)
   })
 })

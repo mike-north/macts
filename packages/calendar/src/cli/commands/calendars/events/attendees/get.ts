@@ -25,11 +25,6 @@ export class GetAttendeeCommand extends Command {
       const client = getClient();
       const item = await client.attendees.get(this.attendeeId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Attendee not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         displayName: item.displayName,
         email: item.email,

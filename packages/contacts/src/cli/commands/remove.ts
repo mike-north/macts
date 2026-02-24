@@ -19,8 +19,7 @@ export class RemoveCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.remove(this.from as any);
+      await client.remove(this.from as unknown);
 
       const output = formatter.formatSuccess('remove completed successfully');
       this.context.stdout.write(output + '\n');

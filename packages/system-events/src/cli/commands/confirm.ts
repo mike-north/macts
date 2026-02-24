@@ -19,7 +19,6 @@ export class ConfirmCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.confirm();
 
       const output = formatter.formatSuccess('confirm completed successfully');

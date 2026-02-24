@@ -19,7 +19,6 @@ export class PresentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.present();
 
       const output = formatter.formatSuccess('present completed successfully');

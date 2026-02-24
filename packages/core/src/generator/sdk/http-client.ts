@@ -238,28 +238,39 @@ function generateTypesFile(manifest: AppManifest): string {
 
   // Generate resource types
   for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+    const props = Object.entries(resource.properties)
     lines.push(`/** ${resource.description} */`)
-    lines.push(`export interface ${resourceName} {`)
-    for (const [propName, prop] of Object.entries(resource.properties)) {
-      const tsType = propertyTypeToTs(prop.type)
-      const optional = prop.optional ? '?' : ''
-      lines.push(`  /** ${prop.description} */`)
-      lines.push(`  ${propName}${optional}: ${tsType};`)
+    if (props.length === 0) {
+      // Use Record<string, never> for resources with no properties
+      lines.push(`export type ${resourceName} = Record<string, never>;`)
+    } else {
+      lines.push(`export interface ${resourceName} {`)
+      for (const [propName, prop] of props) {
+        const tsType = propertyTypeToTs(prop.type)
+        const optional = prop.optional ? '?' : ''
+        lines.push(`  /** ${prop.description} */`)
+        lines.push(`  ${propName}${optional}: ${tsType};`)
+      }
+      lines.push('}')
     }
-    lines.push('}')
     lines.push('')
 
     // Generate create input type (writable properties only)
+    const writableProps = Object.entries(resource.properties).filter(([_, prop]) => prop.access === 'rw')
+
     lines.push(`/** Input for creating a ${resourceName} */`)
-    lines.push(`export interface ${resourceName}CreateInput {`)
-    for (const [propName, prop] of Object.entries(resource.properties)) {
-      if (prop.access === 'rw') {
+    if (writableProps.length === 0) {
+      // Use Record<string, never> for resources with no writable properties
+      lines.push(`export type ${resourceName}CreateInput = Record<string, never>;`)
+    } else {
+      lines.push(`export interface ${resourceName}CreateInput {`)
+      for (const [propName, prop] of writableProps) {
         const tsType = propertyTypeToTs(prop.type)
         lines.push(`  /** ${prop.description} */`)
         lines.push(`  ${propName}?: ${tsType};`)
       }
+      lines.push('}')
     }
-    lines.push('}')
     lines.push('')
 
     // Generate update input type
@@ -447,8 +458,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? \`HTTP \${response.status}\`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? \`HTTP \${String(response.status)}\`;
       throw new ${appName}Error(code, message);
     }
 
@@ -524,6 +535,8 @@ function generateAppCommandMethod(cmd: Command, appNameLower: string): string {
   })
 
   const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
+  const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
+  const needsAwait = returnType === 'void'
 
   const bodyProps = cmd.parameters
     .map((p) => {
@@ -533,12 +546,16 @@ function generateAppCommandMethod(cmd: Command, appNameLower: string): string {
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 
+  const rpcCall = needsAwait
+    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${cmd.name}', ${bodyArg});`
+    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${cmd.name}', ${bodyArg});`
+
   return `
   /**
    * ${cmd.description}
    */
   async ${safeIdentifier(cmd.name)}(${params.join(', ')}): Promise<${returnType}> {
-    return this.#httpClient.rpc<${returnType}>('${appNameLower}.app.${cmd.name}', ${bodyArg});
+    ${rpcCall}
   }`
 }
 
@@ -626,7 +643,7 @@ export class ${resourceName}ResourceClient {
    * Delete a ${nameLower}.
    */
   async delete(${primaryId ?? 'id'}: string): Promise<void> {
-    return this.#http.rpc<void>(\`\${this.#app}.\${this.#resource}.delete\`, { ${primaryId ?? 'id'} });
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.delete\`, { ${primaryId ?? 'id'} });
   }
 ${commandMethods}
 }
@@ -657,6 +674,8 @@ function generateResourceCommandMethod(
   })
 
   const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
+  const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
+  const needsAwait = returnType === 'void'
 
   const bodyProps = cmd.parameters
     .map((p) => {
@@ -666,13 +685,17 @@ function generateResourceCommandMethod(
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 
+  const rpcCall = needsAwait
+    ? `await this.#http.rpc<${rpcReturnType}>('${appNameLower}.${plural}.${cmd.name}', ${bodyArg});`
+    : `return this.#http.rpc<${rpcReturnType}>('${appNameLower}.${plural}.${cmd.name}', ${bodyArg});`
+
   return `
 
   /**
    * ${cmd.description}
    */
   async ${safeIdentifier(cmd.name)}(${params.join(', ')}): Promise<${returnType}> {
-    return this.#http.rpc<${returnType}>('${appNameLower}.${plural}.${cmd.name}', ${bodyArg});
+    ${rpcCall}
   }`
 }
 

@@ -23,11 +23,6 @@ export class GetSourceCommand extends Command {
       const client = getClient();
       const item = await client.sources.get(this.sourceId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Source not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         capacity: item.capacity,
         freeSpace: item.freeSpace,

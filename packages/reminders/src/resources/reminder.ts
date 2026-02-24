@@ -52,7 +52,7 @@ export class ReminderResourceClient {
    * Delete a reminder.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -64,7 +64,7 @@ export class ReminderResourceClient {
    * Mark a reminder as complete
    */
   async complete(id: string): Promise<void> {
-    return this.#http.rpc<void>('reminders.reminders.complete', { id });
+    await this.#http.rpc<undefined>('reminders.reminders.complete', { id });
   }
 
 
@@ -72,6 +72,6 @@ export class ReminderResourceClient {
    * Show the reminder in Reminders.app UI
    */
   async show(): Promise<void> {
-    return this.#http.rpc<void>('reminders.reminders.show', {});
+    await this.#http.rpc<undefined>('reminders.reminders.show', {});
   }
 }

@@ -20,8 +20,7 @@ export class TrimCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.trim(this.from as any, this.to as any);
+      await client.trim(this.from as unknown, this.to as unknown);
 
       const output = formatter.formatSuccess('trim completed successfully');
       this.context.stdout.write(output + '\n');

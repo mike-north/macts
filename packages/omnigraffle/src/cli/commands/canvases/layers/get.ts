@@ -24,11 +24,6 @@ export class GetLayerCommand extends Command {
       const client = getClient();
       const item = await client.layers.get(this.layerId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Layer not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         locked: item.locked,

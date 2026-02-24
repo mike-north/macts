@@ -22,8 +22,7 @@ export class UndoTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.undo(this.tabId as any);
+      await client.tabs.undo(this.tabId as unknown);
 
       const output = formatter.formatSuccess('undo completed successfully');
       this.context.stdout.write(output + '\n');

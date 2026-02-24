@@ -20,8 +20,7 @@ export class InsertTextCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.insertText(this.text as any, this.at as any);
+      await client.insertText(this.text as unknown, this.at as unknown);
 
       const output = formatter.formatSuccess('insertText completed successfully');
       this.context.stdout.write(output + '\n');

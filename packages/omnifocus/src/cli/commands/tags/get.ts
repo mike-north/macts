@@ -23,11 +23,6 @@ export class GetTagCommand extends Command {
       const client = getClient();
       const item = await client.tags.get(this.tagId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Tag not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

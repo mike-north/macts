@@ -24,11 +24,6 @@ export class GetGroupCommand extends Command {
       const client = getClient();
       const item = await client.groups.get(this.groupId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Group not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         rotation: item.rotation,

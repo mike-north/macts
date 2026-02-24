@@ -25,8 +25,7 @@ export interface Workflow {
 }
 
 /** Input for creating a Workflow */
-export interface WorkflowCreateInput {
-}
+export type WorkflowCreateInput = Record<string, never>;
 
 /** Input for updating a Workflow */
 export type WorkflowUpdateInput = Partial<WorkflowCreateInput>;
@@ -153,8 +152,7 @@ export interface RequiredResource {
 }
 
 /** Input for creating a RequiredResource */
-export interface RequiredResourceCreateInput {
-}
+export type RequiredResourceCreateInput = Record<string, never>;
 
 /** Input for updating a RequiredResource */
 export type RequiredResourceUpdateInput = Partial<RequiredResourceCreateInput>;

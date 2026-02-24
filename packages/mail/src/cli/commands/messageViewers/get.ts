@@ -23,11 +23,6 @@ export class GetMessageViewerCommand extends Command {
       const client = getClient();
       const item = await client.messageviewers.get(this.messageViewerId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MessageViewer not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         draftsMailbox: item.draftsMailbox,
         inbox: item.inbox,

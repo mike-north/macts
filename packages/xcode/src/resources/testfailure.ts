@@ -52,7 +52,7 @@ export class TestFailureResourceClient {
    * Delete a testfailure.
    */
   async delete(message: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { message });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { message });
   }
 
 }

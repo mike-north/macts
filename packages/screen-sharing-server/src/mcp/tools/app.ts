@@ -29,8 +29,7 @@ export const appGetURLTool: McpToolDefinition = {
   handler: async (args) => {
     const { url } = args as { url: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.getURL(url as any);
+    await client.getURL(url as unknown);
     return { success: true };
   },
 };

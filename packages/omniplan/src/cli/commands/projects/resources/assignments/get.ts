@@ -25,11 +25,6 @@ export class GetAssignmentCommand extends Command {
       const client = getClient();
       const item = await client.assignments.get(this.assignmentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Assignment not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         units: item.units,
       });

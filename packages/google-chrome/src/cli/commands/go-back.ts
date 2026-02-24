@@ -19,7 +19,6 @@ export class GoBackCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.goBack();
 
       const output = formatter.formatSuccess('goBack completed successfully');

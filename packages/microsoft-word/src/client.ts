@@ -58,8 +58,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new MicrosoftWordError(code, message);
     }
 
@@ -165,7 +165,7 @@ export class MicrosoftWordClient {
    * Undo the last action
    */
   async undo(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.undo', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.undo', {});
   }
 
 
@@ -173,7 +173,7 @@ export class MicrosoftWordClient {
    * Redo the last undone action
    */
   async redo(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.redo', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.redo', {});
   }
 
 
@@ -181,7 +181,7 @@ export class MicrosoftWordClient {
    * Copy the selected content to the clipboard
    */
   async copyObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.copyObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.copyObject', {});
   }
 
 
@@ -189,7 +189,7 @@ export class MicrosoftWordClient {
    * Cut the selected content to the clipboard
    */
   async cutObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.cutObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.cutObject', {});
   }
 
 
@@ -197,7 +197,7 @@ export class MicrosoftWordClient {
    * Paste content from the clipboard
    */
   async pasteObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.pasteObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.pasteObject', {});
   }
 
 
@@ -205,7 +205,7 @@ export class MicrosoftWordClient {
    * Select all content in the document
    */
   async selectAll(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.selectAll', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.selectAll', {});
   }
 
 
@@ -213,7 +213,7 @@ export class MicrosoftWordClient {
    * Find text in the document
    */
   async find(findText: string, matchCase?: boolean, matchWholeWord?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.find', { findText, matchCase, matchWholeWord });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.find', { findText, matchCase, matchWholeWord });
   }
 
 
@@ -221,7 +221,7 @@ export class MicrosoftWordClient {
    * Replace text in the document
    */
   async replace(findText: string, replaceWith: string, replaceAll?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.replace', { findText, replaceWith, replaceAll });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.replace', { findText, replaceWith, replaceAll });
   }
 
 
@@ -229,7 +229,7 @@ export class MicrosoftWordClient {
    * Insert text at the specified location
    */
   async insertText(text: string, at?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.insertText', { text, at });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.insertText', { text, at });
   }
 
 
@@ -237,6 +237,6 @@ export class MicrosoftWordClient {
    * Create a new document
    */
   async createNewDocument(attachedTemplate?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.createNewDocument', { attachedTemplate });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.createNewDocument', { attachedTemplate });
   }
 }

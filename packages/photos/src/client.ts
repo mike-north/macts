@@ -50,8 +50,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new PhotosError(code, message);
     }
 
@@ -125,7 +125,7 @@ export class PhotosClient {
    * Import files into the library
    */
   async _import(files: string, into?: string, skipCheckDuplicates?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.import', { files, into, skipCheckDuplicates });
+    await this.#httpClient.rpc<undefined>('photos.app.import', { files, into, skipCheckDuplicates });
   }
 
 
@@ -133,7 +133,7 @@ export class PhotosClient {
    * Export media items to the specified location as files
    */
   async _export(mediaItems: string, to: string, usingOriginals?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.export', { mediaItems, to, usingOriginals });
+    await this.#httpClient.rpc<undefined>('photos.app.export', { mediaItems, to, usingOriginals });
   }
 
 
@@ -141,7 +141,7 @@ export class PhotosClient {
    * Create a new album or folder
    */
   async make(_new: string, named?: string, at?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.make', { 'new': _new, named, at });
+    await this.#httpClient.rpc<undefined>('photos.app.make', { 'new': _new, named, at });
   }
 
 
@@ -149,7 +149,7 @@ export class PhotosClient {
    * Delete an album or folder
    */
   async _delete(target: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.delete', { target });
+    await this.#httpClient.rpc<undefined>('photos.app.delete', { target });
   }
 
 
@@ -157,7 +157,7 @@ export class PhotosClient {
    * Add media items to an album
    */
   async add(mediaItems: string, to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.add', { mediaItems, to });
+    await this.#httpClient.rpc<undefined>('photos.app.add', { mediaItems, to });
   }
 
 
@@ -165,7 +165,7 @@ export class PhotosClient {
    * Display an ad-hoc slide show from a list of media items
    */
   async startSlideshow(using: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.startSlideshow', { using });
+    await this.#httpClient.rpc<undefined>('photos.app.startSlideshow', { using });
   }
 
 
@@ -173,7 +173,7 @@ export class PhotosClient {
    * End the currently-playing slideshow
    */
   async stopSlideshow(): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.stopSlideshow', {});
+    await this.#httpClient.rpc<undefined>('photos.app.stopSlideshow', {});
   }
 
 
@@ -181,7 +181,7 @@ export class PhotosClient {
    * Skip to next slide in currently-playing slideshow
    */
   async nextSlide(): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.nextSlide', {});
+    await this.#httpClient.rpc<undefined>('photos.app.nextSlide', {});
   }
 
 
@@ -189,7 +189,7 @@ export class PhotosClient {
    * Skip to previous slide in currently-playing slideshow
    */
   async previousSlide(): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.previousSlide', {});
+    await this.#httpClient.rpc<undefined>('photos.app.previousSlide', {});
   }
 
 
@@ -197,7 +197,7 @@ export class PhotosClient {
    * Pause the currently-playing slideshow
    */
   async pauseSlideshow(): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.pauseSlideshow', {});
+    await this.#httpClient.rpc<undefined>('photos.app.pauseSlideshow', {});
   }
 
 
@@ -205,7 +205,7 @@ export class PhotosClient {
    * Resume the currently-playing slideshow
    */
   async resumeSlideshow(): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.resumeSlideshow', {});
+    await this.#httpClient.rpc<undefined>('photos.app.resumeSlideshow', {});
   }
 
 
@@ -213,7 +213,7 @@ export class PhotosClient {
    * Show the image at path in the application
    */
   async spotlight(target: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.spotlight', { target });
+    await this.#httpClient.rpc<undefined>('photos.app.spotlight', { target });
   }
 
 
@@ -221,6 +221,6 @@ export class PhotosClient {
    * Search for items matching the search string
    */
   async search(_for: string): Promise<void> {
-    return this.#httpClient.rpc<void>('photos.app.search', { 'for': _for });
+    await this.#httpClient.rpc<undefined>('photos.app.search', { 'for': _for });
   }
 }

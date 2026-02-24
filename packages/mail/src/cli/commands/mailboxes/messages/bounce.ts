@@ -22,7 +22,6 @@ export class BounceMessageCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.messages.bounce();
 
       const output = formatter.formatSuccess('bounce completed successfully');

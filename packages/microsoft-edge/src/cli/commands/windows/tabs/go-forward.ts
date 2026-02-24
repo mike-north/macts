@@ -22,8 +22,7 @@ export class GoForwardTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.goForward(this.tabId as any);
+      await client.tabs.goForward(this.tabId as unknown);
 
       const output = formatter.formatSuccess('goForward completed successfully');
       this.context.stdout.write(output + '\n');

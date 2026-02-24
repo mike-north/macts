@@ -1401,7 +1401,7 @@ export const musicApiPlugin = {
         },
         {
           "name": "mP3CD",
-          "value": 3,
+          "value": "mP3CD",
           "code": "kMCD"
         },
         {
@@ -1690,12 +1690,12 @@ export const musicApiPlugin = {
         },
         {
           "name": "m3U",
-          "value": 3,
+          "value": "m3U",
           "code": "kM3U"
         },
         {
           "name": "m3U8",
-          "value": 3,
+          "value": "m3U8",
           "code": "kM38"
         }
       ]

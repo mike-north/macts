@@ -24,11 +24,6 @@ export class GetChatCommand extends Command {
       const client = getClient();
       const item = await client.chats.get(this.chatId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Chat not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

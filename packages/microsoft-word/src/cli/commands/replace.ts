@@ -21,8 +21,7 @@ export class ReplaceCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.replace(this.findText as any, this.replaceWith as any, this.replaceAll as any);
+      await client.replace(this.findText as unknown, this.replaceWith as unknown, this.replaceAll as unknown);
 
       const output = formatter.formatSuccess('replace completed successfully');
       this.context.stdout.write(output + '\n');

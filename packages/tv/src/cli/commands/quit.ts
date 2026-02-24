@@ -19,7 +19,6 @@ export class QuitCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.quit();
 
       const output = formatter.formatSuccess('quit completed successfully');

@@ -23,7 +23,6 @@ export class RefreshFileTrackCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.filetracks.refresh();
 
       const output = formatter.formatSuccess('refresh completed successfully');

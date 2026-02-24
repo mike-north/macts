@@ -23,11 +23,6 @@ export class GetAccountCommand extends Command {
       const client = getClient();
       const item = await client.accounts.get(this.accountId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Account not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

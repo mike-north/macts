@@ -145,8 +145,7 @@ export interface Perspective {
 }
 
 // @public
-export interface PerspectiveCreateInput {
-}
+export type PerspectiveCreateInput = Record<string, never>;
 
 // @public
 export class PerspectiveResourceClient {

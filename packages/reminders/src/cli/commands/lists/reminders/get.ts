@@ -24,11 +24,6 @@ export class GetReminderCommand extends Command {
       const client = getClient();
       const item = await client.reminders.get(this.reminderId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Reminder not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

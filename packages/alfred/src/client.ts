@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new AlfredError(code, message);
     }
 
@@ -105,7 +105,7 @@ export class AlfredClient {
    * Show Alfred with the given text
    */
   async search(query?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.search', { query });
+    await this.#httpClient.rpc<undefined>('alfred.app.search', { query });
   }
 
 
@@ -113,7 +113,7 @@ export class AlfredClient {
    * Show Alfred actions for the given file
    */
   async action(items: string, asType?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.action', { items, asType });
+    await this.#httpClient.rpc<undefined>('alfred.app.action', { items, asType });
   }
 
 
@@ -121,7 +121,7 @@ export class AlfredClient {
    * Show Alfred file system navigation for given path
    */
   async browse(path: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.browse', { path });
+    await this.#httpClient.rpc<undefined>('alfred.app.browse', { path });
   }
 
 
@@ -129,7 +129,7 @@ export class AlfredClient {
    * Run Alfred workflow trigger
    */
   async runTrigger(trigger: string, inWorkflow: string, withArgument?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.runTrigger', { trigger, inWorkflow, withArgument });
+    await this.#httpClient.rpc<undefined>('alfred.app.runTrigger', { trigger, inWorkflow, withArgument });
   }
 
 
@@ -137,7 +137,7 @@ export class AlfredClient {
    * Reload Workflow with given UID (folder name) or Bundle ID
    */
   async reloadWorkflow(workflow: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.reloadWorkflow', { workflow });
+    await this.#httpClient.rpc<undefined>('alfred.app.reloadWorkflow', { workflow });
   }
 
 
@@ -145,7 +145,7 @@ export class AlfredClient {
    * Reveal Workflow with given UID (folder name) or Bundle ID
    */
   async revealWorkflow(workflow: string, configuration?: boolean, details?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.revealWorkflow', { workflow, configuration, details });
+    await this.#httpClient.rpc<undefined>('alfred.app.revealWorkflow', { workflow, configuration, details });
   }
 
 
@@ -153,7 +153,7 @@ export class AlfredClient {
    * Modify workflow configuration value, or set environment variable
    */
   async setConfiguration(variable: string, toValue: string, inWorkflow: string, exportable?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.setConfiguration', { variable, toValue, inWorkflow, exportable });
+    await this.#httpClient.rpc<undefined>('alfred.app.setConfiguration', { variable, toValue, inWorkflow, exportable });
   }
 
 
@@ -161,7 +161,7 @@ export class AlfredClient {
    * Revert workflow configuration value to default, or delete environment variable
    */
   async removeConfiguration(variable: string, inWorkflow: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.removeConfiguration', { variable, inWorkflow });
+    await this.#httpClient.rpc<undefined>('alfred.app.removeConfiguration', { variable, inWorkflow });
   }
 
 
@@ -169,6 +169,6 @@ export class AlfredClient {
    * Change theme in Alfred
    */
   async setTheme(theme: string): Promise<void> {
-    return this.#httpClient.rpc<void>('alfred.app.setTheme', { theme });
+    await this.#httpClient.rpc<undefined>('alfred.app.setTheme', { theme });
   }
 }

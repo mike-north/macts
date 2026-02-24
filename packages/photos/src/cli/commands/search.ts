@@ -19,8 +19,7 @@ export class SearchCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.search(this.for as any);
+      await client.search(this.for as unknown);
 
       const output = formatter.formatSuccess('search completed successfully');
       this.context.stdout.write(output + '\n');

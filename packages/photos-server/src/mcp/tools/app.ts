@@ -38,8 +38,7 @@ export const appImportTool: McpToolDefinition = {
   handler: async (args) => {
     const { files, into, skipCheckDuplicates } = args as { files: unknown[]; into?: string; skipCheckDuplicates?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._import(files as any, into as any, skipCheckDuplicates as any);
+    await client._import(files as unknown, into as unknown, skipCheckDuplicates as unknown);
     return { success: true };
   },
 };
@@ -76,8 +75,7 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { mediaItems, to, usingOriginals } = args as { mediaItems: unknown[]; to: string; usingOriginals?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._export(mediaItems as any, to as any, usingOriginals as any);
+    await client._export(mediaItems as unknown, to as unknown, usingOriginals as unknown);
     return { success: true };
   },
 };
@@ -112,8 +110,7 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, named, at } = args as { new: string; named?: string; at?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.make(_new as any, named as any, at as any);
+    await client.make(_new as unknown, named as unknown, at as unknown);
     return { success: true };
   },
 };
@@ -140,8 +137,7 @@ export const appDeleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { target } = args as { target: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._delete(target as any);
+    await client._delete(target as unknown);
     return { success: true };
   },
 };
@@ -174,8 +170,7 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { mediaItems, to } = args as { mediaItems: unknown[]; to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.add(mediaItems as any, to as any);
+    await client.add(mediaItems as unknown, to as unknown);
     return { success: true };
   },
 };
@@ -203,8 +198,7 @@ export const appStartSlideshowTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using: unknown[] };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.startSlideshow(using as any);
+    await client.startSlideshow(using as unknown);
     return { success: true };
   },
 };
@@ -321,8 +315,7 @@ export const appSpotlightTool: McpToolDefinition = {
   handler: async (args) => {
     const { target } = args as { target: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.spotlight(target as any);
+    await client.spotlight(target as unknown);
     return { success: true };
   },
 };
@@ -349,8 +342,7 @@ export const appSearchTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for } = args as { for: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.search(_for as any);
+    await client.search(_for as unknown);
     return { success: true };
   },
 };

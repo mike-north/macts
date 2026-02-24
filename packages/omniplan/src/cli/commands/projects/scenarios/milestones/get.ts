@@ -25,11 +25,6 @@ export class GetMilestoneCommand extends Command {
       const client = getClient();
       const item = await client.milestones.get(this.milestoneId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Milestone not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

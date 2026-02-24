@@ -21,8 +21,7 @@ export class ShowNoteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.notes.show(this.name as any);
+      await client.notes.show(this.name as unknown);
 
       const output = formatter.formatSuccess('show completed successfully');
       this.context.stdout.write(output + '\n');

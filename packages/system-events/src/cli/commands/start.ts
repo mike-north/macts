@@ -19,7 +19,6 @@ export class StartCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.start();
 
       const output = formatter.formatSuccess('start completed successfully');

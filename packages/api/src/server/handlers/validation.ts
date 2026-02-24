@@ -27,7 +27,7 @@ import type { Command } from '@macts/core'
  */
 export function buildCommandSchema(command: Command): z.ZodType {
   if (command.parameters.length === 0) {
-    return z.object({}).passthrough()
+    return z.object({}).loose()
   }
 
   const shape: Record<string, z.ZodType> = {}
@@ -44,7 +44,7 @@ export function buildCommandSchema(command: Command): z.ZodType {
         schema = z.boolean()
         break
       case 'date':
-        schema = z.string().datetime().or(z.string().date())
+        schema = z.iso.datetime().or(z.iso.date())
         break
       case 'string':
       default:
@@ -55,7 +55,7 @@ export function buildCommandSchema(command: Command): z.ZodType {
     shape[param.name] = param.required ? schema : schema.optional()
   }
 
-  return z.object(shape).passthrough()
+  return z.object(shape).loose()
 }
 
 /**

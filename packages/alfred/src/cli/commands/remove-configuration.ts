@@ -20,8 +20,7 @@ export class RemoveConfigurationCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.removeConfiguration(this.variable as any, this.inWorkflow as any);
+      await client.removeConfiguration(this.variable as unknown, this.inWorkflow as unknown);
 
       const output = formatter.formatSuccess('removeConfiguration completed successfully');
       this.context.stdout.write(output + '\n');

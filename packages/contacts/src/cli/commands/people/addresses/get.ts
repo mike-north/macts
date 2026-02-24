@@ -24,11 +24,6 @@ export class GetAddressCommand extends Command {
       const client = getClient();
       const item = await client.addresses.get(this.addressId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Address not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         city: item.city,
         formattedAddress: item.formattedAddress,

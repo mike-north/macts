@@ -23,11 +23,6 @@ export class GetWorkspaceDocumentCommand extends Command {
       const client = getClient();
       const item = await client.workspacedocuments.get(this.workspaceDocumentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('WorkspaceDocument not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         modified: item.modified,

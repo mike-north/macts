@@ -19,8 +19,7 @@ export class CreateTabWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.createTabWithDefaultProfile(this.command as any);
+      await client.createTabWithDefaultProfile(this.command as unknown);
 
       const output = formatter.formatSuccess('createTabWithDefaultProfile completed successfully');
       this.context.stdout.write(output + '\n');

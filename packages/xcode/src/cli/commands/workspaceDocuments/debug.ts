@@ -26,8 +26,7 @@ export class DebugWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.debug(this.workspaceName as any, this.scheme as any, this.runDestinationSpecifier as any, this.skipBuilding as any, this.commandLineArguments as any, this.environmentVariables as any);
+      await client.workspacedocuments.debug(this.workspaceName as unknown, this.scheme as unknown, this.runDestinationSpecifier as unknown, this.skipBuilding as unknown, this.commandLineArguments as unknown, this.environmentVariables as unknown);
 
       const output = formatter.formatSuccess('debug completed successfully');
       this.context.stdout.write(output + '\n');

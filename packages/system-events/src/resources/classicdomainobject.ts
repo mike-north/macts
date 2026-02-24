@@ -52,7 +52,7 @@ export class ClassicDomainObjectResourceClient {
    * Delete a classicdomainobject.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 }

@@ -24,11 +24,6 @@ export class GetAutomatorActionCommand extends Command {
       const client = getClient();
       const item = await client.automatoractions.get(this.automatorActionId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('AutomatorAction not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         bundleId: item.bundleId,

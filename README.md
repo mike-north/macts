@@ -1,14 +1,15 @@
 # macts
 
-TypeScript SDKs for macOS app automation - control Calendar.app and other native macOS applications from your code.
+TypeScript SDKs for macOS app automation -- control Calendar, Reminders, OmniFocus, Xcode, and 30+ other native macOS applications from your code.
 
 ## What is macts?
 
-macts (macOS Automation Control TypeScript SDKs) lets you programmatically interact with macOS applications like Calendar.app. It provides:
+macts (macOS Automation Control TypeScript SDKs) lets you programmatically interact with macOS applications. It provides:
 
-- **Type-safe APIs** - Full TypeScript support with autocomplete and type checking
-- **HTTP-based architecture** - A local API server handles JXA/AppleScript execution securely
-- **Multiple interfaces** - Use via SDK, CLI, or MCP (Model Context Protocol) for AI assistants
+- **Type-safe APIs** -- Full TypeScript support with autocomplete and type checking
+- **HTTP-based architecture** -- A local API server handles JXA/AppleScript execution securely
+- **Multiple interfaces** -- Use via SDK, CLI, or MCP (Model Context Protocol) for AI assistants
+- **Manifest-driven** -- App interfaces are defined in YAML manifests, with packages generated automatically
 
 ## Quick Start
 
@@ -32,16 +33,16 @@ This starts a local HTTP server (default: `http://localhost:8372`) that executes
 macts api-key create --name "my-app" --permissions "calendar:*"
 ```
 
-Save the generated API key - you'll need it to authenticate SDK requests.
+Save the generated API key -- you'll need it to authenticate SDK requests.
 
 ### 4. Use the SDK
 
 ```bash
-npm install @macts/sdk-calendar
+npm install @macts/calendar
 ```
 
 ```typescript
-import { CalendarClient } from '@macts/sdk-calendar'
+import { CalendarClient } from '@macts/calendar'
 
 const client = new CalendarClient({
   apiKey: process.env.MACTS_API_KEY!,
@@ -60,93 +61,136 @@ const event = await client.events.create({
 console.log('Created event:', event.uid)
 ```
 
-## Packages
+## Supported Applications
 
-| Package               | Description                          | Install                                    |
-| --------------------- | ------------------------------------ | ------------------------------------------ |
-| `@macts/cli`          | Command-line interface for macts     | `npm install -g @macts/cli`                |
-| `@macts/sdk-calendar` | TypeScript SDK for Calendar.app      | `npm install @macts/sdk-calendar`          |
-| `@macts/mcp-calendar` | MCP plugin for AI assistants         | `macts plugin install @macts/mcp-calendar` |
-| `@macts/api`          | HTTP API server (used internally)    | Bundled with CLI                           |
-| `@macts/core`         | Core types and generators (internal) | -                                          |
-| `@macts/mcp`          | MCP server framework (internal)      | -                                          |
+### macOS System Apps
+
+| App | Client Package | Server Package |
+|-----|---------------|----------------|
+| Calendar | `@macts/calendar` | `@macts/calendar-server` |
+| Contacts | `@macts/contacts` | `@macts/contacts-server` |
+| Finder | `@macts/finder` | `@macts/finder-server` |
+| Mail | `@macts/mail` | `@macts/mail-server` |
+| Messages | `@macts/messages` | `@macts/messages-server` |
+| Music | `@macts/music` | `@macts/music-server` |
+| Notes | `@macts/notes` | `@macts/notes-server` |
+| Photos | `@macts/photos` | `@macts/photos-server` |
+| Preview | `@macts/preview` | `@macts/preview-server` |
+| QuickTime Player | `@macts/quicktime-player` | `@macts/quicktime-player-server` |
+| Reminders | `@macts/reminders` | `@macts/reminders-server` |
+| Shortcuts | `@macts/shortcuts` | `@macts/shortcuts-server` |
+| TV | `@macts/tv` | `@macts/tv-server` |
+
+### macOS Utilities
+
+| App | Client Package | Server Package |
+|-----|---------------|----------------|
+| Automator | `@macts/automator` | `@macts/automator-server` |
+| Bluetooth File Exchange | `@macts/bluetooth-file-exchange` | `@macts/bluetooth-file-exchange-server` |
+| Console | `@macts/console` | `@macts/console-server` |
+| Screen Sharing | `@macts/screen-sharing` | `@macts/screen-sharing-server` |
+| Script Editor | `@macts/script-editor` | `@macts/script-editor-server` |
+| System Events | `@macts/system-events` | `@macts/system-events-server` |
+| System Information | `@macts/system-information` | `@macts/system-information-server` |
+| System Settings | `@macts/system-settings` | `@macts/system-settings-server` |
+| Terminal | `@macts/terminal` | `@macts/terminal-server` |
+| TextEdit | `@macts/textedit` | `@macts/textedit-server` |
+
+### Browsers
+
+| App | Client Package | Server Package |
+|-----|---------------|----------------|
+| Arc | `@macts/arc` | `@macts/arc-server` |
+| Google Chrome | `@macts/google-chrome` | `@macts/google-chrome-server` |
+| Microsoft Edge | `@macts/microsoft-edge` | `@macts/microsoft-edge-server` |
+| Safari | `@macts/safari` | `@macts/safari-server` |
+
+### Third-Party Apps
+
+| App | Client Package | Server Package |
+|-----|---------------|----------------|
+| Alfred 5 | `@macts/alfred` | `@macts/alfred-server` |
+| iTerm | `@macts/iterm` | `@macts/iterm-server` |
+| Microsoft Word | `@macts/microsoft-word` | `@macts/microsoft-word-server` |
+| OmniFocus | `@macts/omnifocus` | `@macts/omnifocus-server` |
+| OmniGraffle | `@macts/omnigraffle` | `@macts/omnigraffle-server` |
+| OmniPlan | `@macts/omniplan` | `@macts/omniplan-server` |
+| Spotify | `@macts/spotify` | `@macts/spotify-server` |
+| Xcode | `@macts/xcode` | `@macts/xcode-server` |
+
+### Infrastructure Packages
+
+| Package | Description |
+|---------|-------------|
+| `@macts/cli` | Command-line interface |
+| `@macts/api` | HTTP API server |
+| `@macts/core` | Manifest schemas, code generators, JXA bridge |
+| `@macts/mcp` | MCP server framework |
 
 ### Which package should I use?
 
-- **Building an app?** Use `@macts/sdk-calendar` for programmatic access
+- **Building an app?** Install the client package for your target app (e.g., `@macts/calendar`) for programmatic access
 - **Quick automation?** Use `@macts/cli` for command-line operations
-- **AI assistant integration?** Use `@macts/mcp-calendar` with Claude, Copilot, or other MCP-compatible tools
+- **AI assistant integration?** Install the server package (e.g., `@macts/calendar-server`) for MCP tools compatible with Claude, Copilot, or other MCP clients
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  YOUR CODE                                              │
-│                                                         │
-│  SDK (@macts/sdk-calendar)  ──► HTTP requests           │
-│  CLI (@macts/cli)           ──► HTTP requests           │
-│  MCP (@macts/mcp-calendar)  ──► HTTP requests           │
-└──────────────────────────────┬──────────────────────────┘
-                               │ HTTP + Bearer Token
-                               ▼
-┌─────────────────────────────────────────────────────────┐
-│  API SERVER (@macts/api)                                │
-│      ├── API key validation                             │
-│      ├── Permission checking                            │
-│      └── JXA execution                                  │
-└──────────────────────────────┬──────────────────────────┘
-                               │ osascript
-                               ▼
-                          Calendar.app
+┌───────────────────────────────────────────────────────┐
+│  YOUR CODE                                            │
+│                                                       │
+│  SDK  (@macts/calendar)         ──► HTTP requests     │
+│  CLI  (@macts/cli)              ──► HTTP requests     │
+│  MCP  (@macts/calendar-server)  ──► HTTP requests     │
+└────────────────────────┬──────────────────────────────┘
+                         │ HTTP + Bearer Token
+                         ▼
+┌───────────────────────────────────────────────────────┐
+│  API SERVER (@macts/api)                              │
+│      ├── API key validation                           │
+│      ├── Permission checking                          │
+│      └── JXA execution                                │
+└────────────────────────┬──────────────────────────────┘
+                         │ osascript
+                         ▼
+                   macOS Applications
 ```
 
 ## Requirements
 
-- **macOS** - macts uses JXA (JavaScript for Automation) which is macOS-only
-- **Node.js 20+** - Required for the API server and SDK
-- **Calendar.app** - Must be installed and have granted automation permissions
+- **macOS** -- macts uses JXA (JavaScript for Automation) which is macOS-only
+- **Node.js 20+** -- Required for the API server and SDK
+- **Target apps** -- Must be installed and have granted automation permissions
 
 ## Permissions
 
-macts uses a permission system to control what API keys can do:
+macts uses a three-tier permission system to control API key access. Permissions follow the format `app:resource:operation`:
 
 ```bash
-# Full calendar access
+# Full access to an app
 macts api-key create --name "full-access" --permissions "calendar:*"
 
 # Read-only access
-macts api-key create --name "read-only" --permissions "calendar:calendars:list,calendar:events:list"
+macts api-key create --name "read-only" --permissions "calendar:*:read"
 
 # Specific operations
 macts api-key create --name "events-only" --permissions "calendar:events:*"
+
+# Fine-grained
+macts api-key create --name "list-only" --permissions "calendar:events:list,calendar:calendars:list"
 ```
 
-## Development Status
-
-This project is under active development. The Calendar.app SDK is functional, with additional macOS applications planned.
-
-| Feature       | Status       |
-| ------------- | ------------ |
-| Calendar SDK  | ✅ Available |
-| Calendar CLI  | ✅ Available |
-| Calendar MCP  | ✅ Available |
-| Reminders SDK | 🚧 Planned   |
-| Contacts SDK  | 🚧 Planned   |
+See [manifests/README.md](manifests/README.md) for the full permissions model documentation.
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing, including how to add support for new macOS applications.
+
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/macts.git
+git clone https://github.com/mike-north/macts.git
 cd macts
-
-# Install dependencies
 pnpm install
-
-# Build all packages
 pnpm build
-
-# Run tests
 pnpm test
 ```
 

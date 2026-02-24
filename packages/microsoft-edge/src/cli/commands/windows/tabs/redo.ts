@@ -22,8 +22,7 @@ export class RedoTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.redo(this.tabId as any);
+      await client.tabs.redo(this.tabId as unknown);
 
       const output = formatter.formatSuccess('redo completed successfully');
       this.context.stdout.write(output + '\n');

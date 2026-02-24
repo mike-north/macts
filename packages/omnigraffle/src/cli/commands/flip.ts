@@ -20,8 +20,7 @@ export class FlipCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.flip(this.over as any);
+      await client.flip(this.over as unknown);
 
       const output = formatter.formatSuccess('flip completed successfully');
       this.context.stdout.write(output + '\n');

@@ -104,8 +104,7 @@ export interface Folder {
 }
 
 /** Input for creating a Folder */
-export interface FolderCreateInput {
-}
+export type FolderCreateInput = Record<string, never>;
 
 /** Input for updating a Folder */
 export type FolderUpdateInput = Partial<FolderCreateInput>;
@@ -117,8 +116,7 @@ export interface DesktopObject {
 }
 
 /** Input for creating a DesktopObject */
-export interface DesktopObjectCreateInput {
-}
+export type DesktopObjectCreateInput = Record<string, never>;
 
 /** Input for updating a DesktopObject */
 export type DesktopObjectUpdateInput = Partial<DesktopObjectCreateInput>;
@@ -218,8 +216,7 @@ export interface DocumentFile {
 }
 
 /** Input for creating a DocumentFile */
-export interface DocumentFileCreateInput {
-}
+export type DocumentFileCreateInput = Record<string, never>;
 
 /** Input for updating a DocumentFile */
 export type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>;
@@ -231,8 +228,7 @@ export interface InternetLocationFile {
 }
 
 /** Input for creating a InternetLocationFile */
-export interface InternetLocationFileCreateInput {
-}
+export type InternetLocationFileCreateInput = Record<string, never>;
 
 /** Input for updating a InternetLocationFile */
 export type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>;
@@ -244,8 +240,7 @@ export interface Clipping {
 }
 
 /** Input for creating a Clipping */
-export interface ClippingCreateInput {
-}
+export type ClippingCreateInput = Record<string, never>;
 
 /** Input for updating a Clipping */
 export type ClippingUpdateInput = Partial<ClippingCreateInput>;
@@ -257,8 +252,7 @@ export interface Package {
 }
 
 /** Input for creating a Package */
-export interface PackageCreateInput {
-}
+export type PackageCreateInput = Record<string, never>;
 
 /** Input for updating a Package */
 export type PackageUpdateInput = Partial<PackageCreateInput>;
@@ -311,8 +305,7 @@ export interface ClippingWindow {
 }
 
 /** Input for creating a ClippingWindow */
-export interface ClippingWindowCreateInput {
-}
+export type ClippingWindowCreateInput = Record<string, never>;
 
 /** Input for updating a ClippingWindow */
 export type ClippingWindowUpdateInput = Partial<ClippingWindowCreateInput>;

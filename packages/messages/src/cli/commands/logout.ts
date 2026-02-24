@@ -19,7 +19,6 @@ export class LogoutCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.logout();
 
       const output = formatter.formatSuccess('logout completed successfully');

@@ -20,8 +20,7 @@ export class ShouldEnableActionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.shouldEnableAction(this.with as any, this.for as any);
+      await client.shouldEnableAction(this.with as unknown, this.for as unknown);
 
       const output = formatter.formatSuccess('shouldEnableAction completed successfully');
       this.context.stdout.write(output + '\n');

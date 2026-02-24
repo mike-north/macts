@@ -19,8 +19,7 @@ export class DeleteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client._delete(this.target as any);
+      await client._delete(this.target as unknown);
 
       const output = formatter.formatSuccess('delete completed successfully');
       this.context.stdout.write(output + '\n');

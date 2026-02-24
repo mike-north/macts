@@ -14,8 +14,7 @@ export interface Device {
 }
 
 /** Input for creating a Device */
-export interface DeviceCreateInput {
-}
+export type DeviceCreateInput = Record<string, never>;
 
 /** Input for updating a Device */
 export type DeviceUpdateInput = Partial<DeviceCreateInput>;

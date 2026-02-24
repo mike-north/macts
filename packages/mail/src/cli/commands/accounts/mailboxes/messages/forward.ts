@@ -23,8 +23,7 @@ export class ForwardMessageCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.messages.forward(this.openingWindow as any);
+      await client.messages.forward(this.openingWindow as unknown);
 
       const output = formatter.formatSuccess('forward completed successfully');
       this.context.stdout.write(output + '\n');

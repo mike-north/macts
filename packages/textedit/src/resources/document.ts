@@ -52,7 +52,7 @@ export class DocumentResourceClient {
    * Delete a document.
    */
   async delete(name: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { name });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name });
   }
 
 

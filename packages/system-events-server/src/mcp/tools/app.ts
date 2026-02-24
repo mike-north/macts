@@ -155,8 +155,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.move(to as any);
+    await client.move(to as unknown);
     return { success: true };
   },
 };
@@ -216,8 +215,7 @@ export const appRestartTool: McpToolDefinition = {
   handler: async (args) => {
     const { stateSavingPreference } = args as { stateSavingPreference?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.restart(stateSavingPreference as any);
+    await client.restart(stateSavingPreference as unknown);
     return { success: true };
   },
 };
@@ -241,8 +239,7 @@ export const appShutDownTool: McpToolDefinition = {
   handler: async (args) => {
     const { stateSavingPreference } = args as { stateSavingPreference?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.shutDown(stateSavingPreference as any);
+    await client.shutDown(stateSavingPreference as unknown);
     return { success: true };
   },
 };
@@ -284,8 +281,7 @@ export const appKeyCodeTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.keyCode(using as any);
+    await client.keyCode(using as unknown);
     return { success: true };
   },
 };
@@ -309,8 +305,7 @@ export const appKeystrokeTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.keystroke(using as any);
+    await client.keystroke(using as unknown);
     return { success: true };
   },
 };
@@ -337,8 +332,7 @@ export const appAttachActionToTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.attachActionTo(using as any);
+    await client.attachActionTo(using as unknown);
     return { success: true };
   },
 };
@@ -445,8 +439,7 @@ export const appDoFolderActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { folderActionCode, withItemList, withWindowSize } = args as { folderActionCode: string; withItemList?: string; withWindowSize?: Record<string, unknown> };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.doFolderAction(folderActionCode as any, withItemList as any, withWindowSize as any);
+    await client.doFolderAction(folderActionCode as unknown, withItemList as unknown, withWindowSize as unknown);
     return { success: true };
   },
 };
@@ -474,8 +467,7 @@ export const appEditActionOfTool: McpToolDefinition = {
   handler: async (args) => {
     const { usingActionName, usingActionNumber } = args as { usingActionName?: string; usingActionNumber?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.editActionOf(usingActionName as any, usingActionNumber as any);
+    await client.editActionOf(usingActionName as unknown, usingActionNumber as unknown);
     return { success: true };
   },
 };
@@ -575,8 +567,7 @@ export const appRemoveActionFromTool: McpToolDefinition = {
   handler: async (args) => {
     const { usingActionName, usingActionNumber } = args as { usingActionName?: string; usingActionNumber?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.removeActionFrom(usingActionName as any, usingActionNumber as any);
+    await client.removeActionFrom(usingActionName as unknown, usingActionNumber as unknown);
     return { success: true };
   },
 };

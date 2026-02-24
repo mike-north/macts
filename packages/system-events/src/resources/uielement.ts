@@ -52,7 +52,7 @@ export class UIElementResourceClient {
    * Delete a uielement.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,7 +60,7 @@ export class UIElementResourceClient {
    * cause the target process to behave as if the UI element were clicked
    */
   async click(at?: string): Promise<void> {
-    return this.#http.rpc<void>('system-events.uielements.click', { at });
+    await this.#http.rpc<undefined>('system-events.uielements.click', { at });
   }
 
 
@@ -68,6 +68,6 @@ export class UIElementResourceClient {
    * set the selected property of the UI element
    */
   async select(): Promise<void> {
-    return this.#http.rpc<void>('system-events.uielements.select', {});
+    await this.#http.rpc<undefined>('system-events.uielements.select', {});
   }
 }

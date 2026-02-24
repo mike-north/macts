@@ -24,11 +24,6 @@ export class GetUserPlaylistCommand extends Command {
       const client = getClient();
       const item = await client.userplaylists.get(this.userPlaylistId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('UserPlaylist not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         shared: item.shared,

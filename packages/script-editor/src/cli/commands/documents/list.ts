@@ -6,7 +6,7 @@ import { createFormatter } from '../../output/index.js';
  * List documents.
  */
 export class ListDocumentsCommand extends Command {
-  static override paths = [["scripteditor", "documents", "list"]];
+  static override paths = [["script-editor", "documents", "list"]];
 
   static override usage = Command.Usage({
     description: 'List documents',

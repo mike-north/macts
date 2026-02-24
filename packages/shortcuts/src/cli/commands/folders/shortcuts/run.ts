@@ -23,8 +23,7 @@ export class RunShortcutCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.shortcuts.run(this.id as any, this.withInput as any);
+      await client.shortcuts.run(this.id as unknown, this.withInput as unknown);
 
       const output = formatter.formatSuccess('run completed successfully');
       this.context.stdout.write(output + '\n');

@@ -90,8 +90,7 @@ export interface Space {
 }
 
 /** Input for creating a Space */
-export interface SpaceCreateInput {
-}
+export type SpaceCreateInput = Record<string, never>;
 
 /** Input for updating a Space */
 export type SpaceUpdateInput = Partial<SpaceCreateInput>;

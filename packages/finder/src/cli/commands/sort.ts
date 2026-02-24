@@ -19,8 +19,7 @@ export class SortCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.sort(this.by as any);
+      await client.sort(this.by as unknown);
 
       const output = formatter.formatSuccess('sort completed successfully');
       this.context.stdout.write(output + '\n');

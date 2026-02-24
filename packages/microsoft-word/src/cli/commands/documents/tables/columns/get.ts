@@ -25,11 +25,6 @@ export class GetColumnCommand extends Command {
       const client = getClient();
       const item = await client.columns.get(this.columnId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Column not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         width: item.width,
         preferredWidth: item.preferredWidth,

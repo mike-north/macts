@@ -48,8 +48,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new TerminalError(code, message);
     }
 
@@ -115,6 +115,6 @@ export class TerminalClient {
    * Execute a shell command in a Terminal window or tab
    */
   async doScript(command: string, _in?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('terminal.app.doScript', { command, 'in': _in });
+    await this.#httpClient.rpc<undefined>('terminal.app.doScript', { command, 'in': _in });
   }
 }

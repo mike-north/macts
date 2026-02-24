@@ -23,11 +23,6 @@ export class GetBrowserWindowCommand extends Command {
       const client = getClient();
       const item = await client.browserwindows.get(this.browserWindowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BrowserWindow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         selection: item.selection,

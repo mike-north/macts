@@ -21,7 +21,7 @@ export const scriptEditorApiPlugin = {
   "version": "1.0",
   "app": {
     "bundleId": "com.apple.ScriptEditor2",
-    "name": "ScriptEditor",
+    "name": "Script Editor",
     "displayName": "Script Editor",
     "tccEntitlements": [
       "automation"
@@ -109,6 +109,7 @@ export const scriptEditorApiPlugin = {
       "scope": "resource",
       "resourceType": "Document",
       "parameters": [],
+      "code": "core",
       "permission": "scripteditor:documents:list"
     },
     "get": {
@@ -124,6 +125,7 @@ export const scriptEditorApiPlugin = {
           "required": true
         }
       ],
+      "code": "getd",
       "permission": "scripteditor:documents:get"
     },
     "create": {
@@ -139,6 +141,7 @@ export const scriptEditorApiPlugin = {
           "required": false
         }
       ],
+      "code": "crel",
       "permission": "scripteditor:documents:create"
     }
   },
@@ -152,6 +155,19 @@ export const scriptEditorApiPlugin = {
         "scripteditor:documents:create"
       ]
     }
+  },
+  "extraction": {
+    "sourceFile": "source.sdef",
+    "confidence": {
+      "overall": 0.9,
+      "fields": {
+        "resources": 0.95,
+        "enums": 1,
+        "hierarchy": 0.9,
+        "commands": 0.85
+      }
+    },
+    "openQuestions": []
   }
 } as AppManifest,
 } as const;

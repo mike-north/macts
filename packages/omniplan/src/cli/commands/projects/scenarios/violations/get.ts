@@ -25,11 +25,6 @@ export class GetViolationCommand extends Command {
       const client = getClient();
       const item = await client.violations.get(this.violationId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Violation not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         violationType: item.violationType,
         shortDescription: item.shortDescription,

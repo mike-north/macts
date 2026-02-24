@@ -21,7 +21,6 @@ export class AuthorizePaneCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.panes.authorize();
 
       const output = formatter.formatSuccess('authorize completed successfully');

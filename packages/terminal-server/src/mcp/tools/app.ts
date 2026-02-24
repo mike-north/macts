@@ -33,8 +33,7 @@ export const appDoScriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { command, in: _in } = args as { command: string; in?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.doScript(command as any, _in as any);
+    await client.doScript(command as unknown, _in as unknown);
     return { success: true };
   },
 };

@@ -19,7 +19,6 @@ export class RewindCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.rewind();
 
       const output = formatter.formatSuccess('rewind completed successfully');

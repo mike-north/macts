@@ -19,8 +19,7 @@ export class SplitHorizontallyWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.splitHorizontallyWithDefaultProfile(this.command as any);
+      await client.splitHorizontallyWithDefaultProfile(this.command as unknown);
 
       const output = formatter.formatSuccess('splitHorizontallyWithDefaultProfile completed successfully');
       this.context.stdout.write(output + '\n');

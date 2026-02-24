@@ -52,7 +52,7 @@ export class ShapeResourceClient {
    * Delete a shape.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 

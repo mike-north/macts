@@ -19,7 +19,6 @@ export class KeyDownCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.keyDown();
 
       const output = formatter.formatSuccess('keyDown completed successfully');

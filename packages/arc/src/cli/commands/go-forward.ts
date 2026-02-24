@@ -19,7 +19,6 @@ export class GoForwardCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.goForward();
 
       const output = formatter.formatSuccess('goForward completed successfully');

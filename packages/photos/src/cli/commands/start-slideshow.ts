@@ -19,8 +19,7 @@ export class StartSlideshowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.startSlideshow(this.using as any);
+      await client.startSlideshow(this.using as unknown);
 
       const output = formatter.formatSuccess('startSlideshow completed successfully');
       this.context.stdout.write(output + '\n');

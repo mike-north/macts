@@ -52,7 +52,7 @@ export class PaneResourceClient {
    * Delete a pane.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,7 +60,7 @@ export class PaneResourceClient {
    * Prompt for authorization for a settings pane. Deprecated: no longer does anything.
    */
   async authorize(): Promise<void> {
-    return this.#http.rpc<void>('system-settings.panes.authorize', {});
+    await this.#http.rpc<undefined>('system-settings.panes.authorize', {});
   }
 
 
@@ -68,6 +68,6 @@ export class PaneResourceClient {
    * Times and loads given settings pane and returns load time. Deprecated: no longer does anything.
    */
   async timedLoad(): Promise<void> {
-    return this.#http.rpc<void>('system-settings.panes.timedLoad', {});
+    await this.#http.rpc<undefined>('system-settings.panes.timedLoad', {});
   }
 }

@@ -57,8 +57,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new TVError(code, message);
     }
 
@@ -160,7 +160,7 @@ export class TVClient {
    * Close an object
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.close', {});
+    await this.#httpClient.rpc<undefined>('tv.app.close', {});
   }
 
 
@@ -168,7 +168,7 @@ export class TVClient {
    * Return the number of elements of a particular class within an object
    */
   async count(each: string): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.count', { each });
+    await this.#httpClient.rpc<undefined>('tv.app.count', { each });
   }
 
 
@@ -176,7 +176,7 @@ export class TVClient {
    * Delete an element from an object
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.delete', {});
+    await this.#httpClient.rpc<undefined>('tv.app.delete', {});
   }
 
 
@@ -184,7 +184,7 @@ export class TVClient {
    * Duplicate one or more object(s)
    */
   async duplicate(to?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.duplicate', { to });
+    await this.#httpClient.rpc<undefined>('tv.app.duplicate', { to });
   }
 
 
@@ -192,7 +192,7 @@ export class TVClient {
    * Verify if an object exists
    */
   async exists(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.exists', {});
+    await this.#httpClient.rpc<undefined>('tv.app.exists', {});
   }
 
 
@@ -200,7 +200,7 @@ export class TVClient {
    * Make a new element
    */
   async make(_new: string, at?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.make', { 'new': _new, at, withProperties });
+    await this.#httpClient.rpc<undefined>('tv.app.make', { 'new': _new, at, withProperties });
   }
 
 
@@ -208,7 +208,7 @@ export class TVClient {
    * Open the specified object(s)
    */
   async open(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.open', {});
+    await this.#httpClient.rpc<undefined>('tv.app.open', {});
   }
 
 
@@ -216,7 +216,7 @@ export class TVClient {
    * Run the application
    */
   async run(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.run', {});
+    await this.#httpClient.rpc<undefined>('tv.app.run', {});
   }
 
 
@@ -224,7 +224,7 @@ export class TVClient {
    * Quit the application
    */
   async quit(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.quit', {});
+    await this.#httpClient.rpc<undefined>('tv.app.quit', {});
   }
 
 
@@ -232,7 +232,7 @@ export class TVClient {
    * Save the specified object(s)
    */
   async save(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.save', {});
+    await this.#httpClient.rpc<undefined>('tv.app.save', {});
   }
 
 
@@ -240,7 +240,7 @@ export class TVClient {
    * add one or more files to a playlist
    */
   async add(to?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.add', { to });
+    await this.#httpClient.rpc<undefined>('tv.app.add', { to });
   }
 
 
@@ -248,7 +248,7 @@ export class TVClient {
    * reposition to beginning of current track or go to previous track if already at start of current track
    */
   async backTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.backTrack', {});
+    await this.#httpClient.rpc<undefined>('tv.app.backTrack', {});
   }
 
 
@@ -256,7 +256,7 @@ export class TVClient {
    * convert one or more files or tracks
    */
   async convert(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.convert', {});
+    await this.#httpClient.rpc<undefined>('tv.app.convert', {});
   }
 
 
@@ -264,7 +264,7 @@ export class TVClient {
    * download a cloud track or playlist
    */
   async download(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.download', {});
+    await this.#httpClient.rpc<undefined>('tv.app.download', {});
   }
 
 
@@ -272,7 +272,7 @@ export class TVClient {
    * skip forward in a playing track
    */
   async fastForward(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.fastForward', {});
+    await this.#httpClient.rpc<undefined>('tv.app.fastForward', {});
   }
 
 
@@ -280,7 +280,7 @@ export class TVClient {
    * advance to the next track in the current playlist
    */
   async nextTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.nextTrack', {});
+    await this.#httpClient.rpc<undefined>('tv.app.nextTrack', {});
   }
 
 
@@ -288,7 +288,7 @@ export class TVClient {
    * pause playback
    */
   async pause(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.pause', {});
+    await this.#httpClient.rpc<undefined>('tv.app.pause', {});
   }
 
 
@@ -296,7 +296,7 @@ export class TVClient {
    * play the current track or the specified track or file.
    */
   async play(once?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.play', { once });
+    await this.#httpClient.rpc<undefined>('tv.app.play', { once });
   }
 
 
@@ -304,7 +304,7 @@ export class TVClient {
    * toggle the playing/paused state of the current track
    */
   async playpause(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.playpause', {});
+    await this.#httpClient.rpc<undefined>('tv.app.playpause', {});
   }
 
 
@@ -312,7 +312,7 @@ export class TVClient {
    * return to the previous track in the current playlist
    */
   async previousTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.previousTrack', {});
+    await this.#httpClient.rpc<undefined>('tv.app.previousTrack', {});
   }
 
 
@@ -320,7 +320,7 @@ export class TVClient {
    * disable fast forward/rewind and resume playback, if playing.
    */
   async resume(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.resume', {});
+    await this.#httpClient.rpc<undefined>('tv.app.resume', {});
   }
 
 
@@ -328,7 +328,7 @@ export class TVClient {
    * reveal and select a track or playlist
    */
   async reveal(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.reveal', {});
+    await this.#httpClient.rpc<undefined>('tv.app.reveal', {});
   }
 
 
@@ -336,7 +336,7 @@ export class TVClient {
    * skip backwards in a playing track
    */
   async rewind(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.rewind', {});
+    await this.#httpClient.rpc<undefined>('tv.app.rewind', {});
   }
 
 
@@ -344,7 +344,7 @@ export class TVClient {
    * select the specified object(s)
    */
   async select(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.select', {});
+    await this.#httpClient.rpc<undefined>('tv.app.select', {});
   }
 
 
@@ -352,7 +352,7 @@ export class TVClient {
    * stop playback
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.stop', {});
+    await this.#httpClient.rpc<undefined>('tv.app.stop', {});
   }
 
 
@@ -360,6 +360,6 @@ export class TVClient {
    * Opens an iTunes Store or stream URL
    */
   async openLocation(): Promise<void> {
-    return this.#httpClient.rpc<void>('tv.app.openLocation', {});
+    await this.#httpClient.rpc<undefined>('tv.app.openLocation', {});
   }
 }

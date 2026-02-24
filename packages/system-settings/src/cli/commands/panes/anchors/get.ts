@@ -24,11 +24,6 @@ export class GetAnchorCommand extends Command {
       const client = getClient();
       const item = await client.anchors.get(this.anchorId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Anchor not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
       });

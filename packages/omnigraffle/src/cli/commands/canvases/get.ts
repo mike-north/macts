@@ -23,11 +23,6 @@ export class GetCanvasCommand extends Command {
       const client = getClient();
       const item = await client.canvases.get(this.canvasId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Canvas not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

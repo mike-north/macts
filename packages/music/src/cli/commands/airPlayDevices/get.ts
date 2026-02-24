@@ -23,11 +23,6 @@ export class GetAirPlayDeviceCommand extends Command {
       const client = getClient();
       const item = await client.airplaydevices.get(this.airPlayDeviceId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('AirPlayDevice not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         active: item.active,
         available: item.available,

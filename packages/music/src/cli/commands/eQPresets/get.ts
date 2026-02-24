@@ -23,11 +23,6 @@ export class GetEQPresetCommand extends Command {
       const client = getClient();
       const item = await client.eqpresets.get(this.eQPresetId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('EQPreset not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         band1: item.band1,
         band2: item.band2,

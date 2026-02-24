@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new ScreenSharingError(code, message);
     }
 
@@ -105,6 +105,6 @@ export class ScreenSharingClient {
    * Open a vnc URL
    */
   async getURL(url: string): Promise<void> {
-    return this.#httpClient.rpc<void>('screen-sharing.app.getURL', { url });
+    await this.#httpClient.rpc<undefined>('screen-sharing.app.getURL', { url });
   }
 }

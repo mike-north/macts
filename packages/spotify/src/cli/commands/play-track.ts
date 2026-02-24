@@ -19,8 +19,7 @@ export class PlayTrackCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.playTrack(this.inContext as any);
+      await client.playTrack(this.inContext as unknown);
 
       const output = formatter.formatSuccess('playTrack completed successfully');
       this.context.stdout.write(output + '\n');

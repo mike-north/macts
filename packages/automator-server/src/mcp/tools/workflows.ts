@@ -73,7 +73,7 @@ export const workflowsExecuteTool: McpToolDefinition = {
     const { workflow } = args as { workflow: string };
     const client = getClient();
     await client.workflows.execute(workflow);
-    return { success: true, message: `Execute a workflow ${workflow}` };
+    return { success: true };
   },
 };
 

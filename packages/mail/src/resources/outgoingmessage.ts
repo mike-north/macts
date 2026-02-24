@@ -52,7 +52,7 @@ export class OutgoingMessageResourceClient {
    * Delete a outgoingmessage.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,6 +60,6 @@ export class OutgoingMessageResourceClient {
    * Sends a message.
    */
   async send(): Promise<void> {
-    return this.#http.rpc<void>('mail.outgoingmessages.send', {});
+    await this.#http.rpc<undefined>('mail.outgoingmessages.send', {});
   }
 }

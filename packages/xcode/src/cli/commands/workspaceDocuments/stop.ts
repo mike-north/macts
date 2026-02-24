@@ -21,8 +21,7 @@ export class StopWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.stop(this.workspaceName as any);
+      await client.workspacedocuments.stop(this.workspaceName as unknown);
 
       const output = formatter.formatSuccess('stop completed successfully');
       this.context.stdout.write(output + '\n');

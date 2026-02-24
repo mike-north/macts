@@ -20,8 +20,7 @@ export class RemoveActionFromCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.removeActionFrom(this.usingActionName as any, this.usingActionNumber as any);
+      await client.removeActionFrom(this.usingActionName as unknown, this.usingActionNumber as unknown);
 
       const output = formatter.formatSuccess('removeActionFrom completed successfully');
       this.context.stdout.write(output + '\n');

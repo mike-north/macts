@@ -24,11 +24,6 @@ export class GetSchemeCommand extends Command {
       const client = getClient();
       const item = await client.schemes.get(this.schemeId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Scheme not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

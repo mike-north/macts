@@ -19,7 +19,6 @@ export class PasteSelectionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.pasteSelection();
 
       const output = formatter.formatSuccess('pasteSelection completed successfully');

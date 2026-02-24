@@ -47,8 +47,7 @@ export const appSwitchViewTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.switchView(to as any);
+    await client.switchView(to as unknown);
     return { success: true };
   },
 };
@@ -75,8 +74,7 @@ export const appViewCalendarTool: McpToolDefinition = {
   handler: async (args) => {
     const { at } = args as { at: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.viewCalendar(at as any);
+    await client.viewCalendar(at as unknown);
     return { success: true };
   },
 };

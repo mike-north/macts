@@ -23,11 +23,6 @@ export class GetWindowCommand extends Command {
       const client = getClient();
       const item = await client.windows.get(this.windowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Window not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         alternateIdentifier: item.alternateIdentifier,

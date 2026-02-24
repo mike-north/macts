@@ -22,8 +22,7 @@ export class CreateRangeDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.documents.createRange(this.start as any, this.end as any);
+      await client.documents.createRange(this.start as unknown, this.end as unknown);
 
       const output = formatter.formatSuccess('createRange completed successfully');
       this.context.stdout.write(output + '\n');

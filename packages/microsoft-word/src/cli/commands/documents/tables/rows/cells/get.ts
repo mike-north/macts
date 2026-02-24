@@ -26,11 +26,6 @@ export class GetCellCommand extends Command {
       const client = getClient();
       const item = await client.cells.get(this.cellId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Cell not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         content: item.content,
         width: item.width,

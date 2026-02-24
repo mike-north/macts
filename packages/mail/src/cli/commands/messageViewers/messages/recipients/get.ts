@@ -25,11 +25,6 @@ export class GetRecipientCommand extends Command {
       const client = getClient();
       const item = await client.recipients.get(this.recipientId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Recipient not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         address: item.address,
         name: item.name,

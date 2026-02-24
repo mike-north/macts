@@ -23,11 +23,6 @@ export class GetPaneCommand extends Command {
       const client = getClient();
       const item = await client.panes.get(this.paneId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Pane not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

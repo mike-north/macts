@@ -52,7 +52,7 @@ export class ActionResourceClient {
    * Delete a action.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,6 +60,6 @@ export class ActionResourceClient {
    * cause the target process to behave as if the action were applied to its UI element
    */
   async perform(): Promise<void> {
-    return this.#http.rpc<void>('system-events.actions.perform', {});
+    await this.#http.rpc<undefined>('system-events.actions.perform', {});
   }
 }

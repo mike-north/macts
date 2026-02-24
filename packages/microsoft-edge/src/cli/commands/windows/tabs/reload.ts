@@ -22,8 +22,7 @@ export class ReloadTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.reload(this.tabId as any);
+      await client.tabs.reload(this.tabId as unknown);
 
       const output = formatter.formatSuccess('reload completed successfully');
       this.context.stdout.write(output + '\n');

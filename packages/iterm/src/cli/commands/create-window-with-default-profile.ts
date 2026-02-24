@@ -19,8 +19,7 @@ export class CreateWindowWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.createWindowWithDefaultProfile(this.command as any);
+      await client.createWindowWithDefaultProfile(this.command as unknown);
 
       const output = formatter.formatSuccess('createWindowWithDefaultProfile completed successfully');
       this.context.stdout.write(output + '\n');

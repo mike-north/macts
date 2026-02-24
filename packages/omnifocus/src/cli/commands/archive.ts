@@ -20,8 +20,7 @@ export class ArchiveCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.archive(this.in as any, this.compression as any);
+      await client.archive(this.in as unknown, this.compression as unknown);
 
       const output = formatter.formatSuccess('archive completed successfully');
       this.context.stdout.write(output + '\n');

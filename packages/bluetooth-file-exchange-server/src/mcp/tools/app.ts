@@ -26,8 +26,7 @@ export const appBrowseTool: McpToolDefinition = {
   handler: async (args) => {
     const { device } = args as { device?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.browse(device as any);
+    await client.browse(device as unknown);
     return { success: true };
   },
 };
@@ -56,8 +55,7 @@ export const appSendTool: McpToolDefinition = {
   handler: async (args) => {
     const { file, toDevice } = args as { file?: unknown[]; toDevice?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.send(file as any, toDevice as any);
+    await client.send(file as unknown, toDevice as unknown);
     return { success: true };
   },
 };

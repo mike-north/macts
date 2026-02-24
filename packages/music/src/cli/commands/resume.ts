@@ -19,7 +19,6 @@ export class ResumeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.resume();
 
       const output = formatter.formatSuccess('resume completed successfully');

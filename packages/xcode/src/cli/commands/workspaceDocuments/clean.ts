@@ -21,8 +21,7 @@ export class CleanWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.clean(this.workspaceName as any);
+      await client.workspacedocuments.clean(this.workspaceName as unknown);
 
       const output = formatter.formatSuccess('clean completed successfully');
       this.context.stdout.write(output + '\n');

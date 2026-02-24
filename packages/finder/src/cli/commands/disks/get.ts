@@ -23,11 +23,6 @@ export class GetDiskCommand extends Command {
       const client = getClient();
       const item = await client.disks.get(this.diskId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Disk not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         capacity: item.capacity,

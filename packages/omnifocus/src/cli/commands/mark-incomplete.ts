@@ -19,8 +19,7 @@ export class MarkIncompleteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.markIncomplete(this.targets as any);
+      await client.markIncomplete(this.targets as unknown);
 
       const output = formatter.formatSuccess('markIncomplete completed successfully');
       this.context.stdout.write(output + '\n');

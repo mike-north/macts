@@ -19,7 +19,6 @@ export class RevealCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.reveal();
 
       const output = formatter.formatSuccess('reveal completed successfully');

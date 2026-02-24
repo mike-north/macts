@@ -25,11 +25,6 @@ export class GetDisplayAlarmCommand extends Command {
       const client = getClient();
       const item = await client.displayalarms.get(this.displayAlarmId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('DisplayAlarm not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         triggerInterval: item.triggerInterval,
         triggerDate: item.triggerDate,

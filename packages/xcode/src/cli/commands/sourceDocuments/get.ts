@@ -23,11 +23,6 @@ export class GetSourceDocumentCommand extends Command {
       const client = getClient();
       const item = await client.sourcedocuments.get(this.sourceDocumentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('SourceDocument not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         modified: item.modified,

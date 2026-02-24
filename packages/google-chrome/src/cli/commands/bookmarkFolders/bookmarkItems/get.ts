@@ -24,11 +24,6 @@ export class GetBookmarkItemCommand extends Command {
       const client = getClient();
       const item = await client.bookmarkitems.get(this.bookmarkItemId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BookmarkItem not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         title: item.title,

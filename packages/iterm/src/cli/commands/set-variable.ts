@@ -20,8 +20,7 @@ export class SetVariableCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.setVariable(this.named as any, this.to as any);
+      await client.setVariable(this.named as unknown, this.to as unknown);
 
       const output = formatter.formatSuccess('setVariable completed successfully');
       this.context.stdout.write(output + '\n');

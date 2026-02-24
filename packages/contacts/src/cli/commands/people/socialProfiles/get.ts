@@ -24,11 +24,6 @@ export class GetSocialProfileCommand extends Command {
       const client = getClient();
       const item = await client.socialprofiles.get(this.socialProfileId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('SocialProfile not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         serviceName: item.serviceName,

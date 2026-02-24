@@ -24,11 +24,6 @@ export class GetMSNHandleCommand extends Command {
       const client = getClient();
       const item = await client.msnhandles.get(this.mSNHandleId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MSNHandle not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

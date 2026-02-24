@@ -20,8 +20,7 @@ export class AddReadingListItemCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.addReadingListItem(this.andPreviewText as any, this.withTitle as any);
+      await client.addReadingListItem(this.andPreviewText as unknown, this.withTitle as unknown);
 
       const output = formatter.formatSuccess('addReadingListItem completed successfully');
       this.context.stdout.write(output + '\n');

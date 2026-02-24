@@ -302,11 +302,6 @@ ${parentOptions}
       const client = getClient();
       const item = await client.${resourceAccess}.get(this.${idParamName});
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('${resource.name} not found') + '\\n');
-        return 1;
-      }
-
       const output = formatter.format({
 ${generateListFieldMapping(resource)}
       });
@@ -352,8 +347,7 @@ export function generateAppCommand(
   const paramFlags = sortedParams.map((p) => generateParameterFlag(p, ctx)).join('\n')
 
   // Build positional method call arguments (matching SDK method signature order)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const methodArgs = sortedParams.map((p) => `this.${p.name} as any`).join(', ')
+  const methodArgs = sortedParams.map((p) => `this.${p.name} as unknown`).join(', ')
 
   // Use safe identifier for method name (e.g., 'delete' → '_delete', 'export' → '_export')
   const safeMethodName = safeIdentifier(cmd.name)
@@ -380,7 +374,6 @@ ${paramFlags}
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.${safeMethodName}(${methodArgs});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
@@ -455,7 +448,6 @@ ${paramFlags}
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd)});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
@@ -491,7 +483,7 @@ function generateResourceCommandArgs(cmd: ManifestCommand): string {
     return 0
   })
 
-  return sorted.map((p) => `this.${p.name} as any`).join(', ')
+  return sorted.map((p) => `this.${p.name} as unknown`).join(', ')
 }
 
 function generateParentOptions(parentParams: ParentParam[]): string {

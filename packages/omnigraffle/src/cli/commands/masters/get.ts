@@ -23,11 +23,6 @@ export class GetMasterCommand extends Command {
       const client = getClient();
       const item = await client.masters.get(this.masterId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Master not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

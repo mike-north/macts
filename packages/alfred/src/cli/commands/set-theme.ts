@@ -19,8 +19,7 @@ export class SetThemeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.setTheme(this.theme as any);
+      await client.setTheme(this.theme as unknown);
 
       const output = formatter.formatSuccess('setTheme completed successfully');
       this.context.stdout.write(output + '\n');

@@ -52,7 +52,7 @@ export class ApplicationResourceClient {
    * Delete a application.
    */
   async delete(name: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { name });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name });
   }
 
 }

@@ -23,11 +23,6 @@ export class GetRuleCommand extends Command {
       const client = getClient();
       const item = await client.rules.get(this.ruleId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Rule not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         colorMessage: item.colorMessage,
         deleteMessage: item.deleteMessage,

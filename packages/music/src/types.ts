@@ -21,7 +21,7 @@ export type ERpt = 'off' | 'one' | 'all';
 export type EShM = 'songs' | 'albums' | 'groupings';
 
 /** ESrc */
-export type ESrc = 'library' | 'audioCD' | '3' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
+export type ESrc = 'library' | 'audioCD' | 'mP3CD' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
 
 /** ESrA */
 export type ESrA = 'albums' | 'all' | 'artists' | 'composers' | 'displayed' | 'names';
@@ -42,7 +42,7 @@ export type EAPD = 'computer' | 'airPortExpress' | 'appleTV' | 'airPlayDevice' |
 export type EClS = 'unknown' | 'purchased' | 'matched' | 'uploaded' | 'ineligible' | 'removed' | 'error' | 'duplicate' | 'subscription' | 'prerelease' | 'noLongerAvailable' | 'notUploaded';
 
 /** EExF */
-export type EExF = 'plainText' | 'unicodeText' | 'xML' | '3' | '3';
+export type EExF = 'plainText' | 'unicodeText' | 'xML' | 'm3U' | 'm3U8';
 
 /** an AirPlay device */
 export interface AirPlayDevice {
@@ -154,8 +154,7 @@ export interface AudioCDTrack {
 }
 
 /** Input for creating a AudioCDTrack */
-export interface AudioCDTrackCreateInput {
-}
+export type AudioCDTrackCreateInput = Record<string, never>;
 
 /** Input for updating a AudioCDTrack */
 export type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>;
@@ -184,8 +183,7 @@ export interface Encoder {
 }
 
 /** Input for creating a Encoder */
-export interface EncoderCreateInput {
-}
+export type EncoderCreateInput = Record<string, never>;
 
 /** Input for updating a Encoder */
 export type EncoderUpdateInput = Partial<EncoderCreateInput>;
@@ -258,8 +256,7 @@ export interface EQWindow {
 }
 
 /** Input for creating a EQWindow */
-export interface EQWindowCreateInput {
-}
+export type EQWindowCreateInput = Record<string, never>;
 
 /** Input for updating a EQWindow */
 export type EQWindowUpdateInput = Partial<EQWindowCreateInput>;
@@ -286,8 +283,7 @@ export interface LibraryPlaylist {
 }
 
 /** Input for creating a LibraryPlaylist */
-export interface LibraryPlaylistCreateInput {
-}
+export type LibraryPlaylistCreateInput = Record<string, never>;
 
 /** Input for updating a LibraryPlaylist */
 export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>;
@@ -299,8 +295,7 @@ export interface MiniplayerWindow {
 }
 
 /** Input for creating a MiniplayerWindow */
-export interface MiniplayerWindowCreateInput {
-}
+export type MiniplayerWindowCreateInput = Record<string, never>;
 
 /** Input for updating a MiniplayerWindow */
 export type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>;
@@ -353,8 +348,7 @@ export interface PlaylistWindow {
 }
 
 /** Input for creating a PlaylistWindow */
-export interface PlaylistWindowCreateInput {
-}
+export type PlaylistWindowCreateInput = Record<string, never>;
 
 /** Input for updating a PlaylistWindow */
 export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
@@ -366,8 +360,7 @@ export interface RadioTunerPlaylist {
 }
 
 /** Input for creating a RadioTunerPlaylist */
-export interface RadioTunerPlaylistCreateInput {
-}
+export type RadioTunerPlaylistCreateInput = Record<string, never>;
 
 /** Input for updating a RadioTunerPlaylist */
 export type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>;
@@ -379,8 +372,7 @@ export interface SharedTrack {
 }
 
 /** Input for creating a SharedTrack */
-export interface SharedTrackCreateInput {
-}
+export type SharedTrackCreateInput = Record<string, never>;
 
 /** Input for updating a SharedTrack */
 export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
@@ -396,8 +388,7 @@ export interface Source {
 }
 
 /** Input for creating a Source */
-export interface SourceCreateInput {
-}
+export type SourceCreateInput = Record<string, never>;
 
 /** Input for updating a Source */
 export type SourceUpdateInput = Partial<SourceCreateInput>;
@@ -409,8 +400,7 @@ export interface SubscriptionPlaylist {
 }
 
 /** Input for creating a SubscriptionPlaylist */
-export interface SubscriptionPlaylistCreateInput {
-}
+export type SubscriptionPlaylistCreateInput = Record<string, never>;
 
 /** Input for updating a SubscriptionPlaylist */
 export type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>;
@@ -713,8 +703,7 @@ export interface VideoWindow {
 }
 
 /** Input for creating a VideoWindow */
-export interface VideoWindowCreateInput {
-}
+export type VideoWindowCreateInput = Record<string, never>;
 
 /** Input for updating a VideoWindow */
 export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;
@@ -726,8 +715,7 @@ export interface Visual {
 }
 
 /** Input for creating a Visual */
-export interface VisualCreateInput {
-}
+export type VisualCreateInput = Record<string, never>;
 
 /** Input for updating a Visual */
 export type VisualUpdateInput = Partial<VisualCreateInput>;

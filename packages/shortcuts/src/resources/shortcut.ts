@@ -52,7 +52,7 @@ export class ShortcutResourceClient {
    * Delete a shortcut.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -62,6 +62,6 @@ export class ShortcutResourceClient {
    * Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell 'Shortcuts Events' instead of 'Shortcuts'.
    */
   async run(id: string, withInput?: unknown): Promise<void> {
-    return this.#http.rpc<void>('shortcuts.shortcuts.run', { id, withInput });
+    await this.#http.rpc<undefined>('shortcuts.shortcuts.run', { id, withInput });
   }
 }

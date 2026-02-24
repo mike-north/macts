@@ -1,5 +1,5 @@
 /**
- * CLI plugin for ScriptEditor.
+ * CLI plugin for Script Editor.
  *
  * @packageDocumentation
  */

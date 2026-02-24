@@ -29,8 +29,7 @@ export const appCompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { text } = args as { text: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.complete(text as any);
+    await client.complete(text as unknown);
     return { success: true };
   },
 };
@@ -57,8 +56,7 @@ export const appMarkCompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.markComplete(targets as any);
+    await client.markComplete(targets as unknown);
     return { success: true };
   },
 };
@@ -85,8 +83,7 @@ export const appMarkIncompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.markIncomplete(targets as any);
+    await client.markIncomplete(targets as unknown);
     return { success: true };
   },
 };
@@ -113,8 +110,7 @@ export const appMarkDroppedTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.markDropped(targets as any);
+    await client.markDropped(targets as unknown);
     return { success: true };
   },
 };
@@ -146,8 +142,7 @@ export const appParseTasksIntoTool: McpToolDefinition = {
   handler: async (args) => {
     const { text, into } = args as { text: string; into: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.parseTasksInto(text as any, into as any);
+    await client.parseTasksInto(text as unknown, into as unknown);
     return { success: true };
   },
 };
@@ -178,8 +173,7 @@ export const appArchiveTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in, compression } = args as { in: string; compression?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.archive(_in as any, compression as any);
+    await client.archive(_in as unknown, compression as unknown);
     return { success: true };
   },
 };
@@ -242,8 +236,7 @@ export const appImportIntoTool: McpToolDefinition = {
   handler: async (args) => {
     const { file } = args as { file: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.importInto(file as any);
+    await client.importInto(file as unknown);
     return { success: true };
   },
 };

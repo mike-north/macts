@@ -52,7 +52,7 @@ export class BuildErrorResourceClient {
    * Delete a builderror.
    */
   async delete(message: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { message });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { message });
   }
 
 }

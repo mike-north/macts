@@ -19,8 +19,7 @@ export class VariableCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.variable(this.named as any);
+      await client.variable(this.named as unknown);
 
       const output = formatter.formatSuccess('variable completed successfully');
       this.context.stdout.write(output + '\n');

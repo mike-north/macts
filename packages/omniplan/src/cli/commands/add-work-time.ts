@@ -19,8 +19,7 @@ export class AddWorkTimeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.addWorkTime(this.schedule as any);
+      await client.addWorkTime(this.schedule as unknown);
 
       const output = formatter.formatSuccess('addWorkTime completed successfully');
       this.context.stdout.write(output + '\n');

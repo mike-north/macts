@@ -21,8 +21,7 @@ export class WriteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.write(this.contentsOfFile as any, this.text as any, this.newline as any);
+      await client.write(this.contentsOfFile as unknown, this.text as unknown, this.newline as unknown);
 
       const output = formatter.formatSuccess('write completed successfully');
       this.context.stdout.write(output + '\n');

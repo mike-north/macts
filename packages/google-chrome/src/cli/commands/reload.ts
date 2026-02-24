@@ -19,7 +19,6 @@ export class ReloadCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.reload();
 
       const output = formatter.formatSuccess('reload completed successfully');

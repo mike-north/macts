@@ -22,8 +22,7 @@ export class MakeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.make(this.new as any, this.at as any, this.to as any, this.withProperties as any);
+      await client.make(this.new as unknown, this.at as unknown, this.to as unknown, this.withProperties as unknown);
 
       const output = formatter.formatSuccess('make completed successfully');
       this.context.stdout.write(output + '\n');

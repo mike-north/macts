@@ -23,11 +23,6 @@ export class GetVisualCommand extends Command {
       const client = getClient();
       const item = await client.visuals.get(this.visualId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Visual not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

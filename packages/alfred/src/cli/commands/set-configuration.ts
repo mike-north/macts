@@ -22,8 +22,7 @@ export class SetConfigurationCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.setConfiguration(this.variable as any, this.toValue as any, this.inWorkflow as any, this.exportable as any);
+      await client.setConfiguration(this.variable as unknown, this.toValue as unknown, this.inWorkflow as unknown, this.exportable as unknown);
 
       const output = formatter.formatSuccess('setConfiguration completed successfully');
       this.context.stdout.write(output + '\n');

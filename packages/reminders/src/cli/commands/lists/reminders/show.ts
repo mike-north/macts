@@ -22,7 +22,6 @@ export class ShowReminderCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.reminders.show();
 
       const output = formatter.formatSuccess('show completed successfully');

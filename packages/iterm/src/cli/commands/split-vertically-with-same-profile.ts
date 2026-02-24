@@ -19,8 +19,7 @@ export class SplitVerticallyWithSameProfileCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.splitVerticallyWithSameProfile(this.command as any);
+      await client.splitVerticallyWithSameProfile(this.command as unknown);
 
       const output = formatter.formatSuccess('splitVerticallyWithSameProfile completed successfully');
       this.context.stdout.write(output + '\n');

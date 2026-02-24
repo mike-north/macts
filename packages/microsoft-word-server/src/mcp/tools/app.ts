@@ -145,8 +145,7 @@ export const appFindTool: McpToolDefinition = {
   handler: async (args) => {
     const { findText, matchCase, matchWholeWord } = args as { findText: string; matchCase?: boolean; matchWholeWord?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.find(findText as any, matchCase as any, matchWholeWord as any);
+    await client.find(findText as unknown, matchCase as unknown, matchWholeWord as unknown);
     return { success: true };
   },
 };
@@ -182,8 +181,7 @@ export const appReplaceTool: McpToolDefinition = {
   handler: async (args) => {
     const { findText, replaceWith, replaceAll } = args as { findText: string; replaceWith: string; replaceAll?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.replace(findText as any, replaceWith as any, replaceAll as any);
+    await client.replace(findText as unknown, replaceWith as unknown, replaceAll as unknown);
     return { success: true };
   },
 };
@@ -214,8 +212,7 @@ export const appInsertTextTool: McpToolDefinition = {
   handler: async (args) => {
     const { text, at } = args as { text: string; at?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.insertText(text as any, at as any);
+    await client.insertText(text as unknown, at as unknown);
     return { success: true };
   },
 };
@@ -239,8 +236,7 @@ export const appCreateNewDocumentTool: McpToolDefinition = {
   handler: async (args) => {
     const { attachedTemplate } = args as { attachedTemplate?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.createNewDocument(attachedTemplate as any);
+    await client.createNewDocument(attachedTemplate as unknown);
     return { success: true };
   },
 };

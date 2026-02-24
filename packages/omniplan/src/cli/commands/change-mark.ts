@@ -19,7 +19,6 @@ export class ChangeMarkCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.changeMark();
 
       const output = formatter.formatSuccess('changeMark completed successfully');

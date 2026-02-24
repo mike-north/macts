@@ -261,8 +261,7 @@ export interface Violation {
 }
 
 /** Input for creating a Violation */
-export interface ViolationCreateInput {
-}
+export type ViolationCreateInput = Record<string, never>;
 
 /** Input for updating a Violation */
 export type ViolationUpdateInput = Partial<ViolationCreateInput>;
@@ -305,12 +304,10 @@ export interface ScenarioCreateInput {
 export type ScenarioUpdateInput = Partial<ScenarioCreateInput>;
 
 /** A schedule of working time */
-export interface Schedule {
-}
+export type Schedule = Record<string, never>;
 
 /** Input for creating a Schedule */
-export interface ScheduleCreateInput {
-}
+export type ScheduleCreateInput = Record<string, never>;
 
 /** Input for updating a Schedule */
 export type ScheduleUpdateInput = Partial<ScheduleCreateInput>;
@@ -326,8 +323,7 @@ export interface Currency {
 }
 
 /** Input for creating a Currency */
-export interface CurrencyCreateInput {
-}
+export type CurrencyCreateInput = Record<string, never>;
 
 /** Input for updating a Currency */
 export type CurrencyUpdateInput = Partial<CurrencyCreateInput>;

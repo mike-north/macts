@@ -25,11 +25,6 @@ export class GetICQHandleCommand extends Command {
       const client = getClient();
       const item = await client.icqhandles.get(this.iCQHandleId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('ICQHandle not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

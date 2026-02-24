@@ -29,8 +29,7 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._export(to as any);
+    await client._export(to as unknown);
     return { success: true };
   },
 };
@@ -62,8 +61,7 @@ export const appAssignTool: McpToolDefinition = {
   handler: async (args) => {
     const { resource, task } = args as { resource: string; task: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.assign(resource as any, task as any);
+    await client.assign(resource as unknown, task as unknown);
     return { success: true };
   },
 };
@@ -95,8 +93,7 @@ export const appDependTool: McpToolDefinition = {
   handler: async (args) => {
     const { prerequisite, dependent } = args as { prerequisite: string; dependent: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.depend(prerequisite as any, dependent as any);
+    await client.depend(prerequisite as unknown, dependent as unknown);
     return { success: true };
   },
 };
@@ -159,8 +156,7 @@ export const appLookupTool: McpToolDefinition = {
   handler: async (args) => {
     const { key } = args as { key: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.lookup(key as any);
+    await client.lookup(key as unknown);
     return { success: true };
   },
 };
@@ -205,8 +201,7 @@ export const appAddWorkTimeTool: McpToolDefinition = {
   handler: async (args) => {
     const { schedule } = args as { schedule: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.addWorkTime(schedule as any);
+    await client.addWorkTime(schedule as unknown);
     return { success: true };
   },
 };
@@ -233,8 +228,7 @@ export const appSubtractWorkTimeTool: McpToolDefinition = {
   handler: async (args) => {
     const { schedule } = args as { schedule: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.subtractWorkTime(schedule as any);
+    await client.subtractWorkTime(schedule as unknown);
     return { success: true };
   },
 };

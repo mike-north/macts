@@ -23,11 +23,6 @@ export class GetShortcutCommand extends Command {
       const client = getClient();
       const item = await client.shortcuts.get(this.shortcutId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Shortcut not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         subtitle: item.subtitle,

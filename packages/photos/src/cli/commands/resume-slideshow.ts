@@ -19,7 +19,6 @@ export class ResumeSlideshowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.resumeSlideshow();
 
       const output = formatter.formatSuccess('resumeSlideshow completed successfully');

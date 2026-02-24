@@ -19,8 +19,7 @@ export class CountCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.count(this.each as any);
+      await client.count(this.each as unknown);
 
       const output = formatter.formatSuccess('count completed successfully');
       this.context.stdout.write(output + '\n');

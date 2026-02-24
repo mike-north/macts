@@ -23,11 +23,6 @@ export class GetMomentCommand extends Command {
       const client = getClient();
       const item = await client.moments.get(this.momentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Moment not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

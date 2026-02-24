@@ -24,11 +24,6 @@ export class GetSectionCommand extends Command {
       const client = getClient();
       const item = await client.sections.get(this.sectionId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Section not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         sectionIndex: item.sectionIndex,
         protectedForForms: item.protectedForForms,

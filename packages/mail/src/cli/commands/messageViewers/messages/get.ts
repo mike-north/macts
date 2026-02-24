@@ -24,11 +24,6 @@ export class GetMessageCommand extends Command {
       const client = getClient();
       const item = await client.messages.get(this.messageId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Message not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         allHeaders: item.allHeaders,

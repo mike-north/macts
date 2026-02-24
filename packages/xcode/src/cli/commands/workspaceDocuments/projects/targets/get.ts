@@ -25,11 +25,6 @@ export class GetTargetCommand extends Command {
       const client = getClient();
       const item = await client.targets.get(this.targetId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Target not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

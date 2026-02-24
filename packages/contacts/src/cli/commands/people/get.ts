@@ -23,11 +23,6 @@ export class GetPersonCommand extends Command {
       const client = getClient();
       const item = await client.people.get(this.personId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Person not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         nickname: item.nickname,
         organization: item.organization,

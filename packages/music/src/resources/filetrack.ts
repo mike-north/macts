@@ -52,7 +52,7 @@ export class FileTrackResourceClient {
    * Delete a filetrack.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,6 +60,6 @@ export class FileTrackResourceClient {
    * update file track information from the current information in the track’s file
    */
   async refresh(): Promise<void> {
-    return this.#http.rpc<void>('music.filetracks.refresh', {});
+    await this.#http.rpc<undefined>('music.filetracks.refresh', {});
   }
 }

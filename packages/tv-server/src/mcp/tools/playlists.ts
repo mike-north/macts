@@ -30,7 +30,7 @@ export const playlistsMoveTool: McpToolDefinition = {
     const { to } = args as { to: string };
     const client = getClient();
     await client.playlists.move(to);
-    return { success: true, message: `Move playlist(s) to a new location ${to}` };
+    return { success: true };
   },
 };
 
@@ -61,7 +61,7 @@ export const playlistsSearchTool: McpToolDefinition = {
     const { for: _for } = args as { for: string; only?: string };
     const client = getClient();
     await client.playlists.search(_for);
-    return { success: true, message: `search a playlist for tracks matching the search string. Identical to entering search text in the Search field. ${_for}` };
+    return { success: true };
   },
 };
 

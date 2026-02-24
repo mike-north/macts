@@ -24,11 +24,6 @@ export class GetResourceCommand extends Command {
       const client = getClient();
       const item = await client.resources.get(this.resourceId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Resource not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

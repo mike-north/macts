@@ -144,8 +144,7 @@ export interface AudioCDTrack {
 }
 
 // @public
-export interface AudioCDTrackCreateInput {
-}
+export type AudioCDTrackCreateInput = Record<string, never>;
 
 // @public
 export class AudioCDTrackResourceClient {
@@ -202,7 +201,7 @@ export type EAPD = 'computer' | 'airPortExpress' | 'appleTV' | 'airPlayDevice' |
 export type EClS = 'unknown' | 'purchased' | 'matched' | 'uploaded' | 'ineligible' | 'removed' | 'error' | 'duplicate' | 'subscription' | 'prerelease' | 'noLongerAvailable' | 'notUploaded';
 
 // @public
-export type EExF = 'plainText' | 'unicodeText' | 'xML' | '3' | '3';
+export type EExF = 'plainText' | 'unicodeText' | 'xML' | 'm3U' | 'm3U8';
 
 // @public
 export type EKnd = 'trackListing' | 'albumListing' | 'cdInsert';
@@ -216,8 +215,7 @@ export interface Encoder {
 }
 
 // @public
-export interface EncoderCreateInput {
-}
+export type EncoderCreateInput = Record<string, never>;
 
 // @public
 export class EncoderResourceClient {
@@ -312,8 +310,7 @@ export interface EQWindow {
 }
 
 // @public
-export interface EQWindowCreateInput {
-}
+export type EQWindowCreateInput = Record<string, never>;
 
 // @public
 export class EQWindowResourceClient {
@@ -349,7 +346,7 @@ export type ESpK = 'none' | 'folder' | 'genius' | 'library' | 'music' | 'purchas
 export type ESrA = 'albums' | 'all' | 'artists' | 'composers' | 'displayed' | 'names';
 
 // @public
-export type ESrc = 'library' | 'audioCD' | '3' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
+export type ESrc = 'library' | 'audioCD' | 'mP3CD' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
 
 // @public
 export interface FileTrack {
@@ -392,8 +389,7 @@ export interface LibraryPlaylist {
 }
 
 // @public
-export interface LibraryPlaylistCreateInput {
-}
+export type LibraryPlaylistCreateInput = Record<string, never>;
 
 // @public
 export class LibraryPlaylistResourceClient {
@@ -419,8 +415,7 @@ export interface MiniplayerWindow {
 }
 
 // @public
-export interface MiniplayerWindowCreateInput {
-}
+export type MiniplayerWindowCreateInput = Record<string, never>;
 
 // @public
 export class MiniplayerWindowResourceClient {
@@ -567,8 +562,7 @@ export interface PlaylistWindow {
 }
 
 // @public
-export interface PlaylistWindowCreateInput {
-}
+export type PlaylistWindowCreateInput = Record<string, never>;
 
 // @public
 export class PlaylistWindowResourceClient {
@@ -595,8 +589,7 @@ export interface RadioTunerPlaylist {
 }
 
 // @public
-export interface RadioTunerPlaylistCreateInput {
-}
+export type RadioTunerPlaylistCreateInput = Record<string, never>;
 
 // @public
 export class RadioTunerPlaylistResourceClient {
@@ -622,8 +615,7 @@ export interface SharedTrack {
 }
 
 // @public
-export interface SharedTrackCreateInput {
-}
+export type SharedTrackCreateInput = Record<string, never>;
 
 // @public
 export class SharedTrackResourceClient {
@@ -651,8 +643,7 @@ export interface Source {
 }
 
 // @public
-export interface SourceCreateInput {
-}
+export type SourceCreateInput = Record<string, never>;
 
 // @public
 export class SourceResourceClient {
@@ -680,8 +671,7 @@ export interface SubscriptionPlaylist {
 }
 
 // @public
-export interface SubscriptionPlaylistCreateInput {
-}
+export type SubscriptionPlaylistCreateInput = Record<string, never>;
 
 // @public
 export class SubscriptionPlaylistResourceClient {
@@ -985,8 +975,7 @@ export interface VideoWindow {
 }
 
 // @public
-export interface VideoWindowCreateInput {
-}
+export type VideoWindowCreateInput = Record<string, never>;
 
 // @public
 export class VideoWindowResourceClient {
@@ -1012,8 +1001,7 @@ export interface Visual {
 }
 
 // @public
-export interface VisualCreateInput {
-}
+export type VisualCreateInput = Record<string, never>;
 
 // @public
 export class VisualResourceClient {

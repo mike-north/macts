@@ -21,8 +21,7 @@ export class RevealWorkflowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.revealWorkflow(this.workflow as any, this.configuration as any, this.details as any);
+      await client.revealWorkflow(this.workflow as unknown, this.configuration as unknown, this.details as unknown);
 
       const output = formatter.formatSuccess('revealWorkflow completed successfully');
       this.context.stdout.write(output + '\n');

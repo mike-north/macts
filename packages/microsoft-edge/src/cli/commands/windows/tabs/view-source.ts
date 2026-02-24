@@ -22,8 +22,7 @@ export class ViewSourceTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.viewSource(this.tabId as any);
+      await client.tabs.viewSource(this.tabId as unknown);
 
       const output = formatter.formatSuccess('viewSource completed successfully');
       this.context.stdout.write(output + '\n');

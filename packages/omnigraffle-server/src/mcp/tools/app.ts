@@ -34,8 +34,7 @@ export const appConnectTool: McpToolDefinition = {
   handler: async (args) => {
     const { from, to } = args as { from: string; to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.connect(from as any, to as any);
+    await client.connect(from as unknown, to as unknown);
     return { success: true };
   },
 };
@@ -90,8 +89,7 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { as, scope, to } = args as { as: string; scope: string; to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._export(as as any, scope as any, to as any);
+    await client._export(as as unknown, scope as unknown, to as unknown);
     return { success: true };
   },
 };
@@ -118,8 +116,7 @@ export const appFlipTool: McpToolDefinition = {
   handler: async (args) => {
     const { over } = args as { over: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.flip(over as any);
+    await client.flip(over as unknown);
     return { success: true };
   },
 };
@@ -146,8 +143,7 @@ export const appSlideTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by: Record<string, unknown> };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.slide(by as any);
+    await client.slide(by as unknown);
     return { success: true };
   },
 };
@@ -171,8 +167,7 @@ export const appAssembleTool: McpToolDefinition = {
   handler: async (args) => {
     const { subgraph } = args as { subgraph?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.assemble(subgraph as any);
+    await client.assemble(subgraph as unknown);
     return { success: true };
   },
 };
@@ -217,8 +212,7 @@ export const appEvaluateJavascriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { script } = args as { script: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.evaluateJavascript(script as any);
+    await client.evaluateJavascript(script as unknown);
     return { success: true };
   },
 };

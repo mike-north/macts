@@ -30,8 +30,7 @@ export const appAddReadingListItemTool: McpToolDefinition = {
   handler: async (args) => {
     const { andPreviewText, withTitle } = args as { andPreviewText?: string; withTitle?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.addReadingListItem(andPreviewText as any, withTitle as any);
+    await client.addReadingListItem(andPreviewText as unknown, withTitle as unknown);
     return { success: true };
   },
 };
@@ -55,8 +54,7 @@ export const appDoJavaScriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in } = args as { in?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.doJavaScript(_in as any);
+    await client.doJavaScript(_in as unknown);
     return { success: true };
   },
 };
@@ -80,8 +78,7 @@ export const appEmailContentsTool: McpToolDefinition = {
   handler: async (args) => {
     const { of: _of } = args as { of?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.emailContents(_of as any);
+    await client.emailContents(_of as unknown);
     return { success: true };
   },
 };
@@ -112,8 +109,7 @@ export const appSearchTheWebTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for, in: _in } = args as { for: string; in?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.searchTheWeb(_for as any, _in as any);
+    await client.searchTheWeb(_for as unknown, _in as unknown);
     return { success: true };
   },
 };

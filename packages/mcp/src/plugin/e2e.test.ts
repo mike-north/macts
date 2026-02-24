@@ -21,7 +21,7 @@ function toolLiteral(
 /**
  * Build JS source for a valid MCP plugin with tools.
  */
-function validMcpPluginSource(name: string, description: string, tools: string = '[]'): string {
+function validMcpPluginSource(name: string, description: string, tools = '[]'): string {
   return `export const plugin = { name: '${name}', description: '${description}', tools: ${tools} };`
 }
 

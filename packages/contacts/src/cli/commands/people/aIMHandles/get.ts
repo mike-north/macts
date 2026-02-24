@@ -24,11 +24,6 @@ export class GetAIMHandleCommand extends Command {
       const client = getClient();
       const item = await client.aimhandles.get(this.aIMHandleId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('AIMHandle not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

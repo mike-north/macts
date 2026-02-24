@@ -19,7 +19,6 @@ export class SyncAllPlistToDiskCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.syncAllPlistToDisk();
 
       const output = formatter.formatSuccess('syncAllPlistToDisk completed successfully');

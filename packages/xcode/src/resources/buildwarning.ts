@@ -52,7 +52,7 @@ export class BuildWarningResourceClient {
    * Delete a buildwarning.
    */
   async delete(message: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { message });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { message });
   }
 
 }

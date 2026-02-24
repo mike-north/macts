@@ -47,8 +47,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new SafariError(code, message);
     }
 
@@ -110,7 +110,7 @@ export class SafariClient {
    * Add a new Reading List item with the given URL. Allows a custom title and preview text to be specified.
    */
   async addReadingListItem(andPreviewText?: string, withTitle?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.addReadingListItem', { andPreviewText, withTitle });
+    await this.#httpClient.rpc<undefined>('safari.app.addReadingListItem', { andPreviewText, withTitle });
   }
 
 
@@ -118,7 +118,7 @@ export class SafariClient {
    * Applies a string of JavaScript code to a document.
    */
   async doJavaScript(_in?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.doJavaScript', { 'in': _in });
+    await this.#httpClient.rpc<undefined>('safari.app.doJavaScript', { 'in': _in });
   }
 
 
@@ -126,7 +126,7 @@ export class SafariClient {
    * Emails the contents of a tab.
    */
   async emailContents(_of?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.emailContents', { 'of': _of });
+    await this.#httpClient.rpc<undefined>('safari.app.emailContents', { 'of': _of });
   }
 
 
@@ -134,7 +134,7 @@ export class SafariClient {
    * Searches the web using Safari's current search provider.
    */
   async searchTheWeb(_for: string, _in?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.searchTheWeb', { 'in': _in, 'for': _for });
+    await this.#httpClient.rpc<undefined>('safari.app.searchTheWeb', { 'in': _in, 'for': _for });
   }
 
 
@@ -142,7 +142,7 @@ export class SafariClient {
    * Shows Safari's bookmarks.
    */
   async showBookmarks(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.showBookmarks', {});
+    await this.#httpClient.rpc<undefined>('safari.app.showBookmarks', {});
   }
 
 
@@ -150,7 +150,7 @@ export class SafariClient {
    * Show Safari Extensions preferences.
    */
   async showExtensionsPreferences(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.showExtensionsPreferences', {});
+    await this.#httpClient.rpc<undefined>('safari.app.showExtensionsPreferences', {});
   }
 
 
@@ -158,7 +158,7 @@ export class SafariClient {
    * Dispatch a message to a Safari Extension.
    */
   async dispatchMessageToExtension(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.dispatchMessageToExtension', {});
+    await this.#httpClient.rpc<undefined>('safari.app.dispatchMessageToExtension', {});
   }
 
 
@@ -166,7 +166,7 @@ export class SafariClient {
    * Make sure that all in-memory structures are in-sync with their on-disk counterparts.
    */
   async syncAllPlistToDisk(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.syncAllPlistToDisk', {});
+    await this.#httpClient.rpc<undefined>('safari.app.syncAllPlistToDisk', {});
   }
 
 
@@ -174,7 +174,7 @@ export class SafariClient {
    * Show Safari's Privacy Report
    */
   async showPrivacyReport(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.showPrivacyReport', {});
+    await this.#httpClient.rpc<undefined>('safari.app.showPrivacyReport', {});
   }
 
 
@@ -182,6 +182,6 @@ export class SafariClient {
    * Show Safari Credit Card Settings.
    */
   async showCreditCardSettings(): Promise<void> {
-    return this.#httpClient.rpc<void>('safari.app.showCreditCardSettings', {});
+    await this.#httpClient.rpc<undefined>('safari.app.showCreditCardSettings', {});
   }
 }

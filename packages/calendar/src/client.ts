@@ -52,8 +52,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new CalendarError(code, message);
     }
 
@@ -135,7 +135,7 @@ export class CalendarClient {
    * Tell the application to reload all calendar files contents
    */
   async reloadCalendars(): Promise<void> {
-    return this.#httpClient.rpc<void>('calendar.app.reloadCalendars', {});
+    await this.#httpClient.rpc<undefined>('calendar.app.reloadCalendars', {});
   }
 
 
@@ -143,7 +143,7 @@ export class CalendarClient {
    * Show calendar on the given view
    */
   async switchView(to: ViewType): Promise<void> {
-    return this.#httpClient.rpc<void>('calendar.app.switchView', { to });
+    await this.#httpClient.rpc<undefined>('calendar.app.switchView', { to });
   }
 
 
@@ -151,6 +151,6 @@ export class CalendarClient {
    * Show calendar on the given date
    */
   async viewCalendar(at: Date): Promise<void> {
-    return this.#httpClient.rpc<void>('calendar.app.viewCalendar', { at });
+    await this.#httpClient.rpc<undefined>('calendar.app.viewCalendar', { at });
   }
 }

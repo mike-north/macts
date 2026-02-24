@@ -16,8 +16,7 @@ export interface Connection {
 }
 
 /** Input for creating a Connection */
-export interface ConnectionCreateInput {
-}
+export type ConnectionCreateInput = Record<string, never>;
 
 /** Input for updating a Connection */
 export type ConnectionUpdateInput = Partial<ConnectionCreateInput>;

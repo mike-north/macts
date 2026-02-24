@@ -328,8 +328,7 @@ export interface Perspective {
 }
 
 /** Input for creating a Perspective */
-export interface PerspectiveCreateInput {
-}
+export type PerspectiveCreateInput = Record<string, never>;
 
 /** Input for updating a Perspective */
 export type PerspectiveUpdateInput = Partial<PerspectiveCreateInput>;

@@ -26,11 +26,6 @@ export class GetHeaderCommand extends Command {
       const client = getClient();
       const item = await client.headers.get(this.headerId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Header not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         content: item.content,
         name: item.name,

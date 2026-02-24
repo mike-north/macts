@@ -22,8 +22,7 @@ export class SearchPlaylistCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.playlists.search(this.for as any, this.only as any);
+      await client.playlists.search(this.for as unknown, this.only as unknown);
 
       const output = formatter.formatSuccess('search completed successfully');
       this.context.stdout.write(output + '\n');

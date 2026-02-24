@@ -24,11 +24,6 @@ export class GetVariableCommand extends Command {
       const client = getClient();
       const item = await client.variables.get(this.variableId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Variable not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         value: item.value,

@@ -52,7 +52,7 @@ export class PlaylistResourceClient {
    * Delete a playlist.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,7 +60,7 @@ export class PlaylistResourceClient {
    * Move playlist(s) to a new location
    */
   async move(to: string): Promise<void> {
-    return this.#http.rpc<void>('music.playlists.move', { to });
+    await this.#http.rpc<undefined>('music.playlists.move', { to });
   }
 
 
@@ -68,6 +68,6 @@ export class PlaylistResourceClient {
    * search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
    */
   async search(_for: string, only?: string): Promise<void> {
-    return this.#http.rpc<void>('music.playlists.search', { 'for': _for, only });
+    await this.#http.rpc<undefined>('music.playlists.search', { 'for': _for, only });
   }
 }

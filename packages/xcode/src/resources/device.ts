@@ -52,7 +52,7 @@ export class DeviceResourceClient {
    * Delete a device.
    */
   async delete(deviceIdentifier: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { deviceIdentifier });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { deviceIdentifier });
   }
 
 }

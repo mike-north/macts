@@ -52,7 +52,7 @@ export class TabResourceClient {
    * Delete a tab.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -63,7 +63,7 @@ export class TabResourceClient {
    * Reload a tab
    */
   async reload(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.reload', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.reload', { tabId });
   }
 
 
@@ -71,7 +71,7 @@ export class TabResourceClient {
    * Go Back (If Possible)
    */
   async goBack(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.goBack', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.goBack', { tabId });
   }
 
 
@@ -79,7 +79,7 @@ export class TabResourceClient {
    * Go Forward (If Possible)
    */
   async goForward(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.goForward', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.goForward', { tabId });
   }
 
 
@@ -87,7 +87,7 @@ export class TabResourceClient {
    * Select all
    */
   async selectAll(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.selectAll', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.selectAll', { tabId });
   }
 
 
@@ -95,7 +95,7 @@ export class TabResourceClient {
    * Cut selected text (If Possible)
    */
   async cutSelection(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.cutSelection', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.cutSelection', { tabId });
   }
 
 
@@ -103,7 +103,7 @@ export class TabResourceClient {
    * Copy text
    */
   async copySelection(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.copySelection', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.copySelection', { tabId });
   }
 
 
@@ -111,7 +111,7 @@ export class TabResourceClient {
    * Paste text (If Possible)
    */
   async pasteSelection(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.pasteSelection', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.pasteSelection', { tabId });
   }
 
 
@@ -119,7 +119,7 @@ export class TabResourceClient {
    * Undo the last change
    */
   async undo(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.undo', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.undo', { tabId });
   }
 
 
@@ -127,7 +127,7 @@ export class TabResourceClient {
    * Redo the last change
    */
   async redo(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.redo', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.redo', { tabId });
   }
 
 
@@ -135,7 +135,7 @@ export class TabResourceClient {
    * Stop the current tab from loading
    */
   async stop(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.stop', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.stop', { tabId });
   }
 
 
@@ -143,7 +143,7 @@ export class TabResourceClient {
    * View the HTML source of the tab
    */
   async viewSource(tabId: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.viewSource', { tabId });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.viewSource', { tabId });
   }
 
 
@@ -151,6 +151,6 @@ export class TabResourceClient {
    * Execute a piece of javascript
    */
   async execute(tabId: string, javascript: string): Promise<void> {
-    return this.#http.rpc<void>('microsoft-edge.tabs.execute', { tabId, javascript });
+    await this.#http.rpc<undefined>('microsoft-edge.tabs.execute', { tabId, javascript });
   }
 }

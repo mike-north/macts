@@ -19,7 +19,6 @@ export class ActionPropertyCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.actionProperty();
 
       const output = formatter.formatSuccess('actionProperty completed successfully');

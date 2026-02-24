@@ -19,8 +19,7 @@ export class MarkDroppedCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.markDropped(this.targets as any);
+      await client.markDropped(this.targets as unknown);
 
       const output = formatter.formatSuccess('markDropped completed successfully');
       this.context.stdout.write(output + '\n');

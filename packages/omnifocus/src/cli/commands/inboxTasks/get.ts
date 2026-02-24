@@ -23,11 +23,6 @@ export class GetInboxTaskCommand extends Command {
       const client = getClient();
       const item = await client.inboxtasks.get(this.inboxTaskId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('InboxTask not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

@@ -48,8 +48,7 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, withProperties } = args as { to?: string; withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.duplicate(to as any, withProperties as any);
+    await client.duplicate(to as unknown, withProperties as unknown);
     return { success: true };
   },
 };
@@ -76,8 +75,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.move(to as any);
+    await client.move(to as unknown);
     return { success: true };
   },
 };
@@ -101,8 +99,7 @@ export const appCheckForNewMailTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for } = args as { for?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.checkForNewMail(_for as any);
+    await client.checkForNewMail(_for as unknown);
     return { success: true };
   },
 };
@@ -183,8 +180,7 @@ export const appImportMailMailboxTool: McpToolDefinition = {
   handler: async (args) => {
     const { at } = args as { at: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.importMailMailbox(at as any);
+    await client.importMailMailbox(at as unknown);
     return { success: true };
   },
 };
@@ -230,8 +226,7 @@ export const appPerformMailActionWithMessagesTool: McpToolDefinition = {
   handler: async (args) => {
     const { inMailboxes, forRule } = args as { inMailboxes?: string; forRule?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.performMailActionWithMessages(inMailboxes as any, forRule as any);
+    await client.performMailActionWithMessages(inMailboxes as unknown, forRule as unknown);
     return { success: true };
   },
 };
@@ -258,8 +253,7 @@ export const appSynchronizeTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with } = args as { with: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.synchronize(_with as any);
+    await client.synchronize(_with as unknown);
     return { success: true };
   },
 };

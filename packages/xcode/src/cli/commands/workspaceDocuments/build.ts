@@ -21,8 +21,7 @@ export class BuildWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.build(this.workspaceName as any);
+      await client.workspacedocuments.build(this.workspaceName as unknown);
 
       const output = formatter.formatSuccess('build completed successfully');
       this.context.stdout.write(output + '\n');

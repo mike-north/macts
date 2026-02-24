@@ -99,8 +99,7 @@ export interface LibraryPlaylist {
 }
 
 /** Input for creating a LibraryPlaylist */
-export interface LibraryPlaylistCreateInput {
-}
+export type LibraryPlaylistCreateInput = Record<string, never>;
 
 /** Input for updating a LibraryPlaylist */
 export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>;
@@ -149,8 +148,7 @@ export interface PlaylistWindow {
 }
 
 /** Input for creating a PlaylistWindow */
-export interface PlaylistWindowCreateInput {
-}
+export type PlaylistWindowCreateInput = Record<string, never>;
 
 /** Input for updating a PlaylistWindow */
 export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
@@ -162,8 +160,7 @@ export interface SharedTrack {
 }
 
 /** Input for creating a SharedTrack */
-export interface SharedTrackCreateInput {
-}
+export type SharedTrackCreateInput = Record<string, never>;
 
 /** Input for updating a SharedTrack */
 export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
@@ -181,8 +178,7 @@ export interface Source {
 }
 
 /** Input for creating a Source */
-export interface SourceCreateInput {
-}
+export type SourceCreateInput = Record<string, never>;
 
 /** Input for updating a Source */
 export type SourceUpdateInput = Partial<SourceCreateInput>;
@@ -415,8 +411,7 @@ export interface VideoWindow {
 }
 
 /** Input for creating a VideoWindow */
-export interface VideoWindowCreateInput {
-}
+export type VideoWindowCreateInput = Record<string, never>;
 
 /** Input for updating a VideoWindow */
 export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;

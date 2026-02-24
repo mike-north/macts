@@ -48,8 +48,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new iTermError(code, message);
     }
 
@@ -115,7 +115,7 @@ export class iTermClient {
    * Return the number of elements of a particular class within an object.
    */
   async count(each?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.count', { each });
+    await this.#httpClient.rpc<undefined>('iterm.app.count', { each });
   }
 
 
@@ -123,7 +123,7 @@ export class iTermClient {
    * Delete an object.
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.delete', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.delete', {});
   }
 
 
@@ -131,7 +131,7 @@ export class iTermClient {
    * Copy object(s) and put the copies at a new location.
    */
   async duplicate(to: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.duplicate', { to, withProperties });
+    await this.#httpClient.rpc<undefined>('iterm.app.duplicate', { to, withProperties });
   }
 
 
@@ -139,7 +139,7 @@ export class iTermClient {
    * Verify if an object exists.
    */
   async exists(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.exists', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.exists', {});
   }
 
 
@@ -147,7 +147,7 @@ export class iTermClient {
    * Make a new object.
    */
   async make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.make', { 'new': _new, at, withData, withProperties });
+    await this.#httpClient.rpc<undefined>('iterm.app.make', { 'new': _new, at, withData, withProperties });
   }
 
 
@@ -155,7 +155,7 @@ export class iTermClient {
    * Move object(s) to a new location.
    */
   async move(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.move', { to });
+    await this.#httpClient.rpc<undefined>('iterm.app.move', { to });
   }
 
 
@@ -163,7 +163,7 @@ export class iTermClient {
    * Close a document.
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.close', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.close', {});
   }
 
 
@@ -171,7 +171,7 @@ export class iTermClient {
    * Request a Python API cookie
    */
   async requestCookie(andKeyForAppNamed?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.requestCookie', { andKeyForAppNamed });
+    await this.#httpClient.rpc<undefined>('iterm.app.requestCookie', { andKeyForAppNamed });
   }
 
 
@@ -179,7 +179,7 @@ export class iTermClient {
    * Create a new tab
    */
   async createTab(withProfile: string, command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.createTab', { withProfile, command });
+    await this.#httpClient.rpc<undefined>('iterm.app.createTab', { withProfile, command });
   }
 
 
@@ -187,7 +187,7 @@ export class iTermClient {
    * Create a new tab with the default profile
    */
   async createTabWithDefaultProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.createTabWithDefaultProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.createTabWithDefaultProfile', { command });
   }
 
 
@@ -195,7 +195,7 @@ export class iTermClient {
    * Create a new window
    */
   async createWindowWithProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.createWindowWithProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.createWindowWithProfile', { command });
   }
 
 
@@ -203,7 +203,7 @@ export class iTermClient {
    * Create a hotkey window
    */
   async createHotkeyWindowWithProfile(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.createHotkeyWindowWithProfile', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.createHotkeyWindowWithProfile', {});
   }
 
 
@@ -211,7 +211,7 @@ export class iTermClient {
    * Launch API script by name
    */
   async launchAPIScriptNamed(_arguments?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.launchAPIScriptNamed', { 'arguments': _arguments });
+    await this.#httpClient.rpc<undefined>('iterm.app.launchAPIScriptNamed', { 'arguments': _arguments });
   }
 
 
@@ -219,7 +219,7 @@ export class iTermClient {
    * Invokes an expression, such as a registered function.
    */
   async invokeAPIExpression(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.invokeAPIExpression', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.invokeAPIExpression', {});
   }
 
 
@@ -227,7 +227,7 @@ export class iTermClient {
    * Create a new window with the default profile
    */
   async createWindowWithDefaultProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.createWindowWithDefaultProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.createWindowWithDefaultProfile', { command });
   }
 
 
@@ -235,7 +235,7 @@ export class iTermClient {
    * Send text as though it was typed.
    */
   async write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.write', { contentsOfFile, text, newline });
+    await this.#httpClient.rpc<undefined>('iterm.app.write', { contentsOfFile, text, newline });
   }
 
 
@@ -243,7 +243,7 @@ export class iTermClient {
    * Make receiver visible and selected.
    */
   async select(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.select', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.select', {});
   }
 
 
@@ -251,7 +251,7 @@ export class iTermClient {
    * Split a session vertically.
    */
   async splitVertically(withProfile: string, command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitVertically', { withProfile, command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitVertically', { withProfile, command });
   }
 
 
@@ -259,7 +259,7 @@ export class iTermClient {
    * Split a session vertically, using the default profile for the new session
    */
   async splitVerticallyWithDefaultProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitVerticallyWithDefaultProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitVerticallyWithDefaultProfile', { command });
   }
 
 
@@ -267,7 +267,7 @@ export class iTermClient {
    * Split a session vertically, using the original session's profile for the new session
    */
   async splitVerticallyWithSameProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitVerticallyWithSameProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitVerticallyWithSameProfile', { command });
   }
 
 
@@ -275,7 +275,7 @@ export class iTermClient {
    * Split a session horizontally.
    */
   async splitHorizontally(withProfile: string, command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitHorizontally', { withProfile, command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitHorizontally', { withProfile, command });
   }
 
 
@@ -283,7 +283,7 @@ export class iTermClient {
    * Split a session horizontally, using the default profile for the new session
    */
   async splitHorizontallyWithDefaultProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitHorizontallyWithDefaultProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitHorizontallyWithDefaultProfile', { command });
   }
 
 
@@ -291,7 +291,7 @@ export class iTermClient {
    * Split a session horizontally, using the original session's profile for the new session
    */
   async splitHorizontallyWithSameProfile(command?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.splitHorizontallyWithSameProfile', { command });
+    await this.#httpClient.rpc<undefined>('iterm.app.splitHorizontallyWithSameProfile', { command });
   }
 
 
@@ -299,7 +299,7 @@ export class iTermClient {
    * Returns the value of a session variable with the given name
    */
   async variable(named: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.variable', { named });
+    await this.#httpClient.rpc<undefined>('iterm.app.variable', { named });
   }
 
 
@@ -307,7 +307,7 @@ export class iTermClient {
    * Sets the value of a session variable
    */
   async setVariable(named: string, to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.setVariable', { named, to });
+    await this.#httpClient.rpc<undefined>('iterm.app.setVariable', { named, to });
   }
 
 
@@ -315,7 +315,7 @@ export class iTermClient {
    * Reveals a hotkey window. Only to be called on windows that are hotkey windows.
    */
   async revealHotkeyWindow(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.revealHotkeyWindow', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.revealHotkeyWindow', {});
   }
 
 
@@ -323,7 +323,7 @@ export class iTermClient {
    * Hides a hotkey window. Only to be called on windows that are hotkey windows.
    */
   async hideHotkeyWindow(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.hideHotkeyWindow', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.hideHotkeyWindow', {});
   }
 
 
@@ -331,6 +331,6 @@ export class iTermClient {
    * Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.
    */
   async toggleHotkeyWindow(): Promise<void> {
-    return this.#httpClient.rpc<void>('iterm.app.toggleHotkeyWindow', {});
+    await this.#httpClient.rpc<undefined>('iterm.app.toggleHotkeyWindow', {});
   }
 }

@@ -23,8 +23,7 @@ export class ExecuteTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.execute(this.tabId as any, this.javascript as any);
+      await client.tabs.execute(this.tabId as unknown, this.javascript as unknown);
 
       const output = formatter.formatSuccess('execute completed successfully');
       this.context.stdout.write(output + '\n');

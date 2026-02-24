@@ -19,8 +19,7 @@ export class CreateNewDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.createNewDocument(this.attachedTemplate as any);
+      await client.createNewDocument(this.attachedTemplate as unknown);
 
       const output = formatter.formatSuccess('createNewDocument completed successfully');
       this.context.stdout.write(output + '\n');

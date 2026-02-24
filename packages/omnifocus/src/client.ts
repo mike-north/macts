@@ -51,8 +51,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new OmniFocusError(code, message);
     }
 
@@ -130,7 +130,7 @@ export class OmniFocusClient {
    * Generate a list of completions given a string
    */
   async complete(text: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.complete', { text });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.complete', { text });
   }
 
 
@@ -138,7 +138,7 @@ export class OmniFocusClient {
    * Mark one or more projects or tasks complete
    */
   async markComplete(targets: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.markComplete', { targets });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.markComplete', { targets });
   }
 
 
@@ -146,7 +146,7 @@ export class OmniFocusClient {
    * Mark one or more projects or tasks incomplete
    */
   async markIncomplete(targets: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.markIncomplete', { targets });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.markIncomplete', { targets });
   }
 
 
@@ -154,7 +154,7 @@ export class OmniFocusClient {
    * Mark one or more projects or tasks as dropped
    */
   async markDropped(targets: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.markDropped', { targets });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.markDropped', { targets });
   }
 
 
@@ -162,7 +162,7 @@ export class OmniFocusClient {
    * Converts a textual representation of tasks into tasks
    */
   async parseTasksInto(text: string, into: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.parseTasksInto', { text, into });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.parseTasksInto', { text, into });
   }
 
 
@@ -170,7 +170,7 @@ export class OmniFocusClient {
    * Write a backup archive of the document
    */
   async archive(_in: string, compression?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.archive', { 'in': _in, compression });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.archive', { 'in': _in, compression });
   }
 
 
@@ -178,7 +178,7 @@ export class OmniFocusClient {
    * Hides completed tasks and processes any inbox items
    */
   async compact(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.compact', {});
+    await this.#httpClient.rpc<undefined>('omnifocus.app.compact', {});
   }
 
 
@@ -186,7 +186,7 @@ export class OmniFocusClient {
    * Synchronizes with the shared OmniFocus sync database
    */
   async synchronize(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.synchronize', {});
+    await this.#httpClient.rpc<undefined>('omnifocus.app.synchronize', {});
   }
 
 
@@ -194,7 +194,7 @@ export class OmniFocusClient {
    * Imports a file into an existing OmniFocus document
    */
   async importInto(file: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.importInto', { file });
+    await this.#httpClient.rpc<undefined>('omnifocus.app.importInto', { file });
   }
 
 
@@ -202,7 +202,7 @@ export class OmniFocusClient {
    * Undo the last command
    */
   async undo(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.undo', {});
+    await this.#httpClient.rpc<undefined>('omnifocus.app.undo', {});
   }
 
 
@@ -210,6 +210,6 @@ export class OmniFocusClient {
    * Redo the last undone command
    */
   async redo(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnifocus.app.redo', {});
+    await this.#httpClient.rpc<undefined>('omnifocus.app.redo', {});
   }
 }

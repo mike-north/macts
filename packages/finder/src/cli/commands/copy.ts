@@ -19,7 +19,6 @@ export class CopyCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.copy();
 
       const output = formatter.formatSuccess('copy completed successfully');

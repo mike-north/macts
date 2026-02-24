@@ -45,7 +45,7 @@ export const messagesForwardTool: McpToolDefinition = {
     const { openingWindow } = args as { openingWindow?: boolean };
     const client = getClient();
     await client.messages.forward(openingWindow);
-    return { success: true, message: `Creates a forwarded message. ${openingWindow}` };
+    return { success: true };
   },
 };
 
@@ -69,7 +69,7 @@ export const messagesRedirectTool: McpToolDefinition = {
     const { openingWindow } = args as { openingWindow?: boolean };
     const client = getClient();
     await client.messages.redirect(openingWindow);
-    return { success: true, message: `Creates a redirected message. ${openingWindow}` };
+    return { success: true };
   },
 };
 
@@ -97,7 +97,7 @@ export const messagesReplyTool: McpToolDefinition = {
     const { openingWindow } = args as { openingWindow?: boolean; replyToAll?: boolean };
     const client = getClient();
     await client.messages.reply(openingWindow);
-    return { success: true, message: `Creates a reply message. ${openingWindow}` };
+    return { success: true };
   },
 };
 

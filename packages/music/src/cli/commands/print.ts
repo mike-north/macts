@@ -22,8 +22,7 @@ export class PrintCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.print(this.printDialog as any, this.withProperties as any, this.kind as any, this.theme as any);
+      await client.print(this.printDialog as unknown, this.withProperties as unknown, this.kind as unknown, this.theme as unknown);
 
       const output = formatter.formatSuccess('print completed successfully');
       this.context.stdout.write(output + '\n');

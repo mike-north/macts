@@ -24,11 +24,6 @@ export class GetRadioTunerPlaylistCommand extends Command {
       const client = getClient();
       const item = await client.radiotunerplaylists.get(this.radioTunerPlaylistId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('RadioTunerPlaylist not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

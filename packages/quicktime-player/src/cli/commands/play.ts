@@ -19,7 +19,6 @@ export class PlayCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.play();
 
       const output = formatter.formatSuccess('play completed successfully');

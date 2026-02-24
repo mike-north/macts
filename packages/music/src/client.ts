@@ -67,8 +67,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new MusicError(code, message);
     }
 
@@ -210,7 +210,7 @@ export class MusicClient {
    * Print the specified object(s)
    */
   async print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.print', { printDialog, withProperties, kind, theme });
+    await this.#httpClient.rpc<undefined>('music.app.print', { printDialog, withProperties, kind, theme });
   }
 
 
@@ -218,7 +218,7 @@ export class MusicClient {
    * Close an object
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.close', {});
+    await this.#httpClient.rpc<undefined>('music.app.close', {});
   }
 
 
@@ -226,7 +226,7 @@ export class MusicClient {
    * Return the number of elements of a particular class within an object
    */
   async count(each: string): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.count', { each });
+    await this.#httpClient.rpc<undefined>('music.app.count', { each });
   }
 
 
@@ -234,7 +234,7 @@ export class MusicClient {
    * Delete an element from an object
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.delete', {});
+    await this.#httpClient.rpc<undefined>('music.app.delete', {});
   }
 
 
@@ -242,7 +242,7 @@ export class MusicClient {
    * Duplicate one or more object(s)
    */
   async duplicate(to?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.duplicate', { to });
+    await this.#httpClient.rpc<undefined>('music.app.duplicate', { to });
   }
 
 
@@ -250,7 +250,7 @@ export class MusicClient {
    * Verify if an object exists
    */
   async exists(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.exists', {});
+    await this.#httpClient.rpc<undefined>('music.app.exists', {});
   }
 
 
@@ -258,7 +258,7 @@ export class MusicClient {
    * Make a new element
    */
   async make(_new: string, at?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.make', { 'new': _new, at, withProperties });
+    await this.#httpClient.rpc<undefined>('music.app.make', { 'new': _new, at, withProperties });
   }
 
 
@@ -266,7 +266,7 @@ export class MusicClient {
    * Open the specified object(s)
    */
   async open(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.open', {});
+    await this.#httpClient.rpc<undefined>('music.app.open', {});
   }
 
 
@@ -274,7 +274,7 @@ export class MusicClient {
    * Run the application
    */
   async run(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.run', {});
+    await this.#httpClient.rpc<undefined>('music.app.run', {});
   }
 
 
@@ -282,7 +282,7 @@ export class MusicClient {
    * Quit the application
    */
   async quit(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.quit', {});
+    await this.#httpClient.rpc<undefined>('music.app.quit', {});
   }
 
 
@@ -290,7 +290,7 @@ export class MusicClient {
    * Save the specified object(s)
    */
   async save(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.save', {});
+    await this.#httpClient.rpc<undefined>('music.app.save', {});
   }
 
 
@@ -298,7 +298,7 @@ export class MusicClient {
    * add one or more files to a playlist
    */
   async add(to?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.add', { to });
+    await this.#httpClient.rpc<undefined>('music.app.add', { to });
   }
 
 
@@ -306,7 +306,7 @@ export class MusicClient {
    * reposition to beginning of current track or go to previous track if already at start of current track
    */
   async backTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.backTrack', {});
+    await this.#httpClient.rpc<undefined>('music.app.backTrack', {});
   }
 
 
@@ -314,7 +314,7 @@ export class MusicClient {
    * convert one or more files or tracks
    */
   async convert(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.convert', {});
+    await this.#httpClient.rpc<undefined>('music.app.convert', {});
   }
 
 
@@ -322,7 +322,7 @@ export class MusicClient {
    * download a cloud track or playlist
    */
   async download(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.download', {});
+    await this.#httpClient.rpc<undefined>('music.app.download', {});
   }
 
 
@@ -330,7 +330,7 @@ export class MusicClient {
    * export a source or playlist
    */
   async _export(as?: string, to?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.export', { as, to });
+    await this.#httpClient.rpc<undefined>('music.app.export', { as, to });
   }
 
 
@@ -338,7 +338,7 @@ export class MusicClient {
    * skip forward in a playing track
    */
   async fastForward(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.fastForward', {});
+    await this.#httpClient.rpc<undefined>('music.app.fastForward', {});
   }
 
 
@@ -346,7 +346,7 @@ export class MusicClient {
    * advance to the next track in the current playlist
    */
   async nextTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.nextTrack', {});
+    await this.#httpClient.rpc<undefined>('music.app.nextTrack', {});
   }
 
 
@@ -354,7 +354,7 @@ export class MusicClient {
    * pause playback
    */
   async pause(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.pause', {});
+    await this.#httpClient.rpc<undefined>('music.app.pause', {});
   }
 
 
@@ -362,7 +362,7 @@ export class MusicClient {
    * play the current track or the specified track or file.
    */
   async play(once?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.play', { once });
+    await this.#httpClient.rpc<undefined>('music.app.play', { once });
   }
 
 
@@ -370,7 +370,7 @@ export class MusicClient {
    * toggle the playing/paused state of the current track
    */
   async playpause(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.playpause', {});
+    await this.#httpClient.rpc<undefined>('music.app.playpause', {});
   }
 
 
@@ -378,7 +378,7 @@ export class MusicClient {
    * return to the previous track in the current playlist
    */
   async previousTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.previousTrack', {});
+    await this.#httpClient.rpc<undefined>('music.app.previousTrack', {});
   }
 
 
@@ -386,7 +386,7 @@ export class MusicClient {
    * disable fast forward/rewind and resume playback, if playing.
    */
   async resume(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.resume', {});
+    await this.#httpClient.rpc<undefined>('music.app.resume', {});
   }
 
 
@@ -394,7 +394,7 @@ export class MusicClient {
    * reveal and select a track or playlist
    */
   async reveal(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.reveal', {});
+    await this.#httpClient.rpc<undefined>('music.app.reveal', {});
   }
 
 
@@ -402,7 +402,7 @@ export class MusicClient {
    * skip backwards in a playing track
    */
   async rewind(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.rewind', {});
+    await this.#httpClient.rpc<undefined>('music.app.rewind', {});
   }
 
 
@@ -410,7 +410,7 @@ export class MusicClient {
    * select the specified object(s)
    */
   async select(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.select', {});
+    await this.#httpClient.rpc<undefined>('music.app.select', {});
   }
 
 
@@ -418,7 +418,7 @@ export class MusicClient {
    * stop playback
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.stop', {});
+    await this.#httpClient.rpc<undefined>('music.app.stop', {});
   }
 
 
@@ -426,6 +426,6 @@ export class MusicClient {
    * Opens an iTunes Store or audio stream URL
    */
   async openLocation(): Promise<void> {
-    return this.#httpClient.rpc<void>('music.app.openLocation', {});
+    await this.#httpClient.rpc<undefined>('music.app.openLocation', {});
   }
 }

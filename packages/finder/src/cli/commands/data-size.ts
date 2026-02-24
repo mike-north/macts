@@ -19,8 +19,7 @@ export class DataSizeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.dataSize(this.as as any);
+      await client.dataSize(this.as as unknown);
 
       const output = formatter.formatSuccess('dataSize completed successfully');
       this.context.stdout.write(output + '\n');

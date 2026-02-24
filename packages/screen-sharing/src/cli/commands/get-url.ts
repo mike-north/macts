@@ -19,8 +19,7 @@ export class GetURLCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.getURL(this.url as any);
+      await client.getURL(this.url as unknown);
 
       const output = formatter.formatSuccess('getURL completed successfully');
       this.context.stdout.write(output + '\n');

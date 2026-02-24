@@ -19,8 +19,7 @@ export class AttachActionToCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.attachActionTo(this.using as any);
+      await client.attachActionTo(this.using as unknown);
 
       const output = formatter.formatSuccess('attachActionTo completed successfully');
       this.context.stdout.write(output + '\n');

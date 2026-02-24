@@ -23,8 +23,7 @@ export class AttachWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.attach(this.workspaceName as any, this.toProcessIdentifier as any, this.suspended as any);
+      await client.workspacedocuments.attach(this.workspaceName as unknown, this.toProcessIdentifier as unknown, this.suspended as unknown);
 
       const output = formatter.formatSuccess('attach completed successfully');
       this.context.stdout.write(output + '\n');

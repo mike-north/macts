@@ -24,7 +24,7 @@ export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'r
 export type ViewerColumns = 'attachmentsColumn' | 'messageColor' | 'dateReceivedColumn' | 'dateSentColumn' | 'flagsColumn' | 'fromColumn' | 'mailboxColumn' | 'messageStatusColumn' | 'numberColumn' | 'sizeColumn' | 'subjectColumn' | 'toColumn' | 'dateLastSavedColumn';
 
 /** Authentication */
-export type Authentication = 'password' | 'apop' | '5' | 'ntlm' | '5' | 'external' | 'appleToken' | 'none';
+export type Authentication = 'password' | 'apop' | 'kerberos5' | 'ntlm' | 'md5' | 'external' | 'appleToken' | 'none';
 
 /** HighlightColors */
 export type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
@@ -590,8 +590,7 @@ export interface BccRecipient {
 }
 
 /** Input for creating a BccRecipient */
-export interface BccRecipientCreateInput {
-}
+export type BccRecipientCreateInput = Record<string, never>;
 
 /** Input for updating a BccRecipient */
 export type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>;
@@ -603,8 +602,7 @@ export interface CcRecipient {
 }
 
 /** Input for creating a CcRecipient */
-export interface CcRecipientCreateInput {
-}
+export type CcRecipientCreateInput = Record<string, never>;
 
 /** Input for updating a CcRecipient */
 export type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>;
@@ -616,8 +614,7 @@ export interface ToRecipient {
 }
 
 /** Input for creating a ToRecipient */
-export interface ToRecipientCreateInput {
-}
+export type ToRecipientCreateInput = Record<string, never>;
 
 /** Input for updating a ToRecipient */
 export type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>;
@@ -656,8 +653,7 @@ export interface MailAttachment {
 }
 
 /** Input for creating a MailAttachment */
-export interface MailAttachmentCreateInput {
-}
+export type MailAttachmentCreateInput = Record<string, never>;
 
 /** Input for updating a MailAttachment */
 export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>;

@@ -64,8 +64,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new MailError(code, message);
     }
 
@@ -195,7 +195,7 @@ export class MailClient {
    * Delete an object.
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.delete', {});
+    await this.#httpClient.rpc<undefined>('mail.app.delete', {});
   }
 
 
@@ -203,7 +203,7 @@ export class MailClient {
    * Copy an object.
    */
   async duplicate(to?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.duplicate', { to, withProperties });
+    await this.#httpClient.rpc<undefined>('mail.app.duplicate', { to, withProperties });
   }
 
 
@@ -211,7 +211,7 @@ export class MailClient {
    * Move an object to a new location.
    */
   async move(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.move', { to });
+    await this.#httpClient.rpc<undefined>('mail.app.move', { to });
   }
 
 
@@ -219,7 +219,7 @@ export class MailClient {
    * Triggers a check for email.
    */
   async checkForNewMail(_for?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.checkForNewMail', { 'for': _for });
+    await this.#httpClient.rpc<undefined>('mail.app.checkForNewMail', { 'for': _for });
   }
 
 
@@ -227,7 +227,7 @@ export class MailClient {
    * Command to get the full name out of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "John Doe"
    */
   async extractNameFrom(): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.extractNameFrom', {});
+    await this.#httpClient.rpc<undefined>('mail.app.extractNameFrom', {});
   }
 
 
@@ -235,7 +235,7 @@ export class MailClient {
    * Command to get just the email address of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "jdoe@example.com"
    */
   async extractAddressFrom(): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.extractAddressFrom', {});
+    await this.#httpClient.rpc<undefined>('mail.app.extractAddressFrom', {});
   }
 
 
@@ -243,7 +243,7 @@ export class MailClient {
    * Opens a mailto URL.
    */
   async getURL(): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.getURL', {});
+    await this.#httpClient.rpc<undefined>('mail.app.getURL', {});
   }
 
 
@@ -251,7 +251,7 @@ export class MailClient {
    * Imports a mailbox created by Mail.
    */
   async importMailMailbox(at: string): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.importMailMailbox', { at });
+    await this.#httpClient.rpc<undefined>('mail.app.importMailMailbox', { at });
   }
 
 
@@ -259,7 +259,7 @@ export class MailClient {
    * Opens a mailto URL.
    */
   async mailto(): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.mailto', {});
+    await this.#httpClient.rpc<undefined>('mail.app.mailto', {});
   }
 
 
@@ -267,7 +267,7 @@ export class MailClient {
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.
    */
   async performMailActionWithMessages(inMailboxes?: string, forRule?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.performMailActionWithMessages', { inMailboxes, forRule });
+    await this.#httpClient.rpc<undefined>('mail.app.performMailActionWithMessages', { inMailboxes, forRule });
   }
 
 
@@ -275,6 +275,6 @@ export class MailClient {
    * Command to trigger synchronizing of an IMAP account with the server.
    */
   async synchronize(_with: string): Promise<void> {
-    return this.#httpClient.rpc<void>('mail.app.synchronize', { 'with': _with });
+    await this.#httpClient.rpc<undefined>('mail.app.synchronize', { 'with': _with });
   }
 }

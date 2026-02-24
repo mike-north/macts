@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new QuickTimePlayerError(code, message);
     }
 
@@ -105,7 +105,7 @@ export class QuickTimePlayerClient {
    * Open a URL.
    */
   async openURL(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.openURL', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.openURL', {});
   }
 
 
@@ -113,7 +113,7 @@ export class QuickTimePlayerClient {
    * Play the movie.
    */
   async play(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.play', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.play', {});
   }
 
 
@@ -121,7 +121,7 @@ export class QuickTimePlayerClient {
    * Start the movie recording.
    */
   async start(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.start', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.start', {});
   }
 
 
@@ -129,7 +129,7 @@ export class QuickTimePlayerClient {
    * Pause the recording.
    */
   async pause(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.pause', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.pause', {});
   }
 
 
@@ -137,7 +137,7 @@ export class QuickTimePlayerClient {
    * Resume the recording.
    */
   async resume(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.resume', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.resume', {});
   }
 
 
@@ -145,7 +145,7 @@ export class QuickTimePlayerClient {
    * Stop the movie or recording.
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.stop', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stop', {});
   }
 
 
@@ -153,7 +153,7 @@ export class QuickTimePlayerClient {
    * Step the movie backward the specified number of steps (default is 1).
    */
   async stepBackward(by?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.stepBackward', { by });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepBackward', { by });
   }
 
 
@@ -161,7 +161,7 @@ export class QuickTimePlayerClient {
    * Step the movie forward the specified number of steps (default is 1).
    */
   async stepForward(by?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.stepForward', { by });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepForward', { by });
   }
 
 
@@ -169,7 +169,7 @@ export class QuickTimePlayerClient {
    * Trim the movie.
    */
   async trim(from: number, to: number): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.trim', { from, to });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.trim', { from, to });
   }
 
 
@@ -177,7 +177,7 @@ export class QuickTimePlayerClient {
    * Present the document full screen.
    */
   async present(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.present', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.present', {});
   }
 
 
@@ -185,7 +185,7 @@ export class QuickTimePlayerClient {
    * Create a new movie recording document.
    */
   async newMovieRecording(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.newMovieRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newMovieRecording', {});
   }
 
 
@@ -193,7 +193,7 @@ export class QuickTimePlayerClient {
    * Create a new audio recording document.
    */
   async newAudioRecording(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.newAudioRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newAudioRecording', {});
   }
 
 
@@ -201,7 +201,7 @@ export class QuickTimePlayerClient {
    * Create a new screen recording document.
    */
   async newScreenRecording(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.newScreenRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newScreenRecording', {});
   }
 
 
@@ -209,7 +209,7 @@ export class QuickTimePlayerClient {
    * Export a movie to another file
    */
   async _export(_in: string, usingSettingsPreset: string): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.export', { 'in': _in, usingSettingsPreset });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.export', { 'in': _in, usingSettingsPreset });
   }
 
 
@@ -217,6 +217,6 @@ export class QuickTimePlayerClient {
    * Show the document's Remote HUD
    */
   async showRemoteHud(): Promise<void> {
-    return this.#httpClient.rpc<void>('quicktime-player.app.showRemoteHud', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.showRemoteHud', {});
   }
 }

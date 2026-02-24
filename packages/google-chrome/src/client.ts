@@ -49,8 +49,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new GoogleChromeError(code, message);
     }
 
@@ -120,7 +120,7 @@ export class GoogleChromeClient {
    * Save an object.
    */
   async save(_in?: string, as?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.save', { 'in': _in, as });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.save', { 'in': _in, as });
   }
 
 
@@ -128,7 +128,7 @@ export class GoogleChromeClient {
    * Open a document.
    */
   async open(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.open', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.open', {});
   }
 
 
@@ -136,7 +136,7 @@ export class GoogleChromeClient {
    * Close a window.
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.close', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.close', {});
   }
 
 
@@ -144,7 +144,7 @@ export class GoogleChromeClient {
    * Quit the application.
    */
   async quit(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.quit', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.quit', {});
   }
 
 
@@ -152,7 +152,7 @@ export class GoogleChromeClient {
    * Return the number of elements of a particular class within an object.
    */
   async count(each?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.count', { each });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.count', { each });
   }
 
 
@@ -160,7 +160,7 @@ export class GoogleChromeClient {
    * Delete an object.
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.delete', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.delete', {});
   }
 
 
@@ -168,7 +168,7 @@ export class GoogleChromeClient {
    * Copy object(s) and put the copies at a new location.
    */
   async duplicate(to?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.duplicate', { to, withProperties });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.duplicate', { to, withProperties });
   }
 
 
@@ -176,7 +176,7 @@ export class GoogleChromeClient {
    * Verify if an object exists.
    */
   async exists(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.exists', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.exists', {});
   }
 
 
@@ -184,7 +184,7 @@ export class GoogleChromeClient {
    * Make a new object.
    */
   async make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.make', { 'new': _new, at, withData, withProperties });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.make', { 'new': _new, at, withData, withProperties });
   }
 
 
@@ -192,7 +192,7 @@ export class GoogleChromeClient {
    * Move object(s) to a new location.
    */
   async move(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.move', { to });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.move', { to });
   }
 
 
@@ -200,7 +200,7 @@ export class GoogleChromeClient {
    * Print an object.
    */
   async print(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.print', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.print', {});
   }
 
 
@@ -208,7 +208,7 @@ export class GoogleChromeClient {
    * Reload a tab.
    */
   async reload(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.reload', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.reload', {});
   }
 
 
@@ -216,7 +216,7 @@ export class GoogleChromeClient {
    * Go Back (If Possible).
    */
   async goBack(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.goBack', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.goBack', {});
   }
 
 
@@ -224,7 +224,7 @@ export class GoogleChromeClient {
    * Go Forward (If Possible).
    */
   async goForward(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.goForward', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.goForward', {});
   }
 
 
@@ -232,7 +232,7 @@ export class GoogleChromeClient {
    * Select all.
    */
   async selectAll(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.selectAll', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.selectAll', {});
   }
 
 
@@ -240,7 +240,7 @@ export class GoogleChromeClient {
    * Cut selected text (If Possible).
    */
   async cutSelection(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.cutSelection', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.cutSelection', {});
   }
 
 
@@ -248,7 +248,7 @@ export class GoogleChromeClient {
    * Copy text.
    */
   async copySelection(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.copySelection', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.copySelection', {});
   }
 
 
@@ -256,7 +256,7 @@ export class GoogleChromeClient {
    * Paste text (If Possible).
    */
   async pasteSelection(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.pasteSelection', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.pasteSelection', {});
   }
 
 
@@ -264,7 +264,7 @@ export class GoogleChromeClient {
    * Undo the last change.
    */
   async undo(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.undo', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.undo', {});
   }
 
 
@@ -272,7 +272,7 @@ export class GoogleChromeClient {
    * Redo the last change.
    */
   async redo(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.redo', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.redo', {});
   }
 
 
@@ -280,7 +280,7 @@ export class GoogleChromeClient {
    * Stop the current tab from loading.
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.stop', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.stop', {});
   }
 
 
@@ -288,7 +288,7 @@ export class GoogleChromeClient {
    * View the HTML source of the tab.
    */
   async viewSource(): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.viewSource', {});
+    await this.#httpClient.rpc<undefined>('google-chrome.app.viewSource', {});
   }
 
 
@@ -296,6 +296,6 @@ export class GoogleChromeClient {
    * Execute a piece of javascript.
    */
   async execute(javascript: string): Promise<void> {
-    return this.#httpClient.rpc<void>('google-chrome.app.execute', { javascript });
+    await this.#httpClient.rpc<undefined>('google-chrome.app.execute', { javascript });
   }
 }

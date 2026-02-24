@@ -20,8 +20,7 @@ export class ParseTasksIntoCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.parseTasksInto(this.text as any, this.into as any);
+      await client.parseTasksInto(this.text as unknown, this.into as unknown);
 
       const output = formatter.formatSuccess('parseTasksInto completed successfully');
       this.context.stdout.write(output + '\n');

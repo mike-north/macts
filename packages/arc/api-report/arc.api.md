@@ -51,8 +51,7 @@ export interface Space {
 }
 
 // @public
-export interface SpaceCreateInput {
-}
+export type SpaceCreateInput = Record<string, never>;
 
 // @public
 export class SpaceResourceClient {

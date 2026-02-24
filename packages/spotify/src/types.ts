@@ -39,8 +39,7 @@ export interface Track {
 }
 
 /** Input for creating a Track */
-export interface TrackCreateInput {
-}
+export type TrackCreateInput = Record<string, never>;
 
 /** Input for updating a Track */
 export type TrackUpdateInput = Partial<TrackCreateInput>;

@@ -19,7 +19,6 @@ export class PreviousTrackCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.previousTrack();
 
       const output = formatter.formatSuccess('previousTrack completed successfully');

@@ -25,11 +25,6 @@ export class GetEmailCommand extends Command {
       const client = getClient();
       const item = await client.emails.get(this.emailId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Email not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

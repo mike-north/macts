@@ -19,8 +19,7 @@ export class EvaluateJavascriptCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.evaluateJavascript(this.script as any);
+      await client.evaluateJavascript(this.script as unknown);
 
       const output = formatter.formatSuccess('evaluateJavascript completed successfully');
       this.context.stdout.write(output + '\n');

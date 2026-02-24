@@ -24,11 +24,6 @@ export class GetFieldCommand extends Command {
       const client = getClient();
       const item = await client.fields.get(this.fieldId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Field not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         fieldType: item.fieldType,
         fieldCode: item.fieldCode,

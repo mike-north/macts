@@ -12,8 +12,7 @@ export interface Application {
 }
 
 /** Input for creating a Application */
-export interface ApplicationCreateInput {
-}
+export type ApplicationCreateInput = Record<string, never>;
 
 /** Input for updating a Application */
 export type ApplicationUpdateInput = Partial<ApplicationCreateInput>;

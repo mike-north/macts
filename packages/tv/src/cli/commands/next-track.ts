@@ -19,7 +19,6 @@ export class NextTrackCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.nextTrack();
 
       const output = formatter.formatSuccess('nextTrack completed successfully');

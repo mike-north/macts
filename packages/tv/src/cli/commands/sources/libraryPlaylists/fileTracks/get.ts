@@ -25,11 +25,6 @@ export class GetFileTrackCommand extends Command {
       const client = getClient();
       const item = await client.filetracks.get(this.fileTrackId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('FileTrack not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         location: item.location,

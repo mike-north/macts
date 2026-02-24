@@ -19,7 +19,6 @@ export class SaveCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.save();
 
       const output = formatter.formatSuccess('save completed successfully');

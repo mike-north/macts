@@ -77,7 +77,7 @@ export const shortcutsRunTool: McpToolDefinition = {
     const { id } = args as { id: string; withInput?: string };
     const client = getClient();
     await client.shortcuts.run(id);
-    return { success: true, message: `Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell \'Shortcuts Events\' instead of \'Shortcuts\'. ${id}` };
+    return { success: true };
   },
 };
 

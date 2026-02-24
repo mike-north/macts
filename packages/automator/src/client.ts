@@ -50,8 +50,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new AutomatorError(code, message);
     }
 
@@ -125,7 +125,7 @@ export class AutomatorClient {
    * Add an Automator action or variable to a workflow
    */
   async add(object: unknown, to: unknown, atIndex?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('automator.app.add', { object, to, atIndex });
+    await this.#httpClient.rpc<undefined>('automator.app.add', { object, to, atIndex });
   }
 
 
@@ -133,6 +133,6 @@ export class AutomatorClient {
    * Remove an Automator action or variable from a workflow
    */
   async remove(object: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('automator.app.remove', { object });
+    await this.#httpClient.rpc<undefined>('automator.app.remove', { object });
   }
 }

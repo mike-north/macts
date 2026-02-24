@@ -166,7 +166,7 @@ export const eventsShowTool: McpToolDefinition = {
     const { uid } = args as { uid: string };
     const client = getClient();
     await client.events.show(uid);
-    return { success: true, message: `Show the event or to-do in the calendar window ${uid}` };
+    return { success: true };
   },
 };
 

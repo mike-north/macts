@@ -24,11 +24,6 @@ export class GetLibraryPlaylistCommand extends Command {
       const client = getClient();
       const item = await client.libraryplaylists.get(this.libraryPlaylistId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('LibraryPlaylist not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

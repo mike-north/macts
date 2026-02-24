@@ -22,8 +22,7 @@ export class PasteSelectionTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.pasteSelection(this.tabId as any);
+      await client.tabs.pasteSelection(this.tabId as unknown);
 
       const output = formatter.formatSuccess('pasteSelection completed successfully');
       this.context.stdout.write(output + '\n');

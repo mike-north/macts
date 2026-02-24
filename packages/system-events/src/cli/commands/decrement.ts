@@ -19,7 +19,6 @@ export class DecrementCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.decrement();
 
       const output = formatter.formatSuccess('decrement completed successfully');

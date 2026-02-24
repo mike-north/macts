@@ -52,7 +52,7 @@ export class MessageResourceClient {
    * Delete a message.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -60,7 +60,7 @@ export class MessageResourceClient {
    * Does nothing at all (deprecated)
    */
   async bounce(): Promise<void> {
-    return this.#http.rpc<void>('mail.messages.bounce', {});
+    await this.#http.rpc<undefined>('mail.messages.bounce', {});
   }
 
 
@@ -68,7 +68,7 @@ export class MessageResourceClient {
    * Creates a forwarded message.
    */
   async forward(openingWindow?: boolean): Promise<void> {
-    return this.#http.rpc<void>('mail.messages.forward', { openingWindow });
+    await this.#http.rpc<undefined>('mail.messages.forward', { openingWindow });
   }
 
 
@@ -76,7 +76,7 @@ export class MessageResourceClient {
    * Creates a redirected message.
    */
   async redirect(openingWindow?: boolean): Promise<void> {
-    return this.#http.rpc<void>('mail.messages.redirect', { openingWindow });
+    await this.#http.rpc<undefined>('mail.messages.redirect', { openingWindow });
   }
 
 
@@ -84,6 +84,6 @@ export class MessageResourceClient {
    * Creates a reply message.
    */
   async reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void> {
-    return this.#http.rpc<void>('mail.messages.reply', { openingWindow, replyToAll });
+    await this.#http.rpc<undefined>('mail.messages.reply', { openingWindow, replyToAll });
   }
 }

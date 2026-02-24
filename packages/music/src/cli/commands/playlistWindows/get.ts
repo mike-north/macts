@@ -23,11 +23,6 @@ export class GetPlaylistWindowCommand extends Command {
       const client = getClient();
       const item = await client.playlistwindows.get(this.playlistWindowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('PlaylistWindow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         selection: item.selection,
         view: item.view,

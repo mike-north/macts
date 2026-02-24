@@ -20,8 +20,7 @@ export class ExportCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client._export(this.in as any, this.usingSettingsPreset as any);
+      await client._export(this.in as unknown, this.usingSettingsPreset as unknown);
 
       const output = formatter.formatSuccess('export completed successfully');
       this.context.stdout.write(output + '\n');

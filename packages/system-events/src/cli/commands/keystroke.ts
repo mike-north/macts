@@ -19,8 +19,7 @@ export class KeystrokeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.keystroke(this.using as any);
+      await client.keystroke(this.using as unknown);
 
       const output = formatter.formatSuccess('keystroke completed successfully');
       this.context.stdout.write(output + '\n');

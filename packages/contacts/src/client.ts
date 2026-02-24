@@ -60,8 +60,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new ContactsError(code, message);
     }
 
@@ -175,7 +175,7 @@ export class ContactsClient {
    * Create a new object.
    */
   async make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.make', { 'new': _new, at, withData, withProperties });
+    await this.#httpClient.rpc<undefined>('contacts.app.make', { 'new': _new, at, withData, withProperties });
   }
 
 
@@ -183,7 +183,7 @@ export class ContactsClient {
    * Add a child object.
    */
   async add(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.add', { to });
+    await this.#httpClient.rpc<undefined>('contacts.app.add', { to });
   }
 
 
@@ -191,7 +191,7 @@ export class ContactsClient {
    * Remove a child object.
    */
   async remove(from: string): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.remove', { from });
+    await this.#httpClient.rpc<undefined>('contacts.app.remove', { from });
   }
 
 
@@ -199,7 +199,7 @@ export class ContactsClient {
    * Save all Contacts changes. Also see the unsaved property for the application class.
    */
   async save(): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.save', {});
+    await this.#httpClient.rpc<undefined>('contacts.app.save', {});
   }
 
 
@@ -207,7 +207,7 @@ export class ContactsClient {
    * RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)
    */
   async actionProperty(): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.actionProperty', {});
+    await this.#httpClient.rpc<undefined>('contacts.app.actionProperty', {});
   }
 
 
@@ -215,7 +215,7 @@ export class ContactsClient {
    * RollOver - Returns the title that will be placed in the menu for this roll over
    */
   async actionTitle(_with: unknown, _for: string): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.actionTitle', { 'with': _with, 'for': _for });
+    await this.#httpClient.rpc<undefined>('contacts.app.actionTitle', { 'with': _with, 'for': _for });
   }
 
 
@@ -223,7 +223,7 @@ export class ContactsClient {
    * RollOver - Performs the action on the given person and value
    */
   async performAction(_with: unknown, _for: string): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.performAction', { 'with': _with, 'for': _for });
+    await this.#httpClient.rpc<undefined>('contacts.app.performAction', { 'with': _with, 'for': _for });
   }
 
 
@@ -231,6 +231,6 @@ export class ContactsClient {
    * RollOver - Determines if the rollover action should be enabled for the given person and value
    */
   async shouldEnableAction(_with: unknown, _for: string): Promise<void> {
-    return this.#httpClient.rpc<void>('contacts.app.shouldEnableAction', { 'with': _with, 'for': _for });
+    await this.#httpClient.rpc<undefined>('contacts.app.shouldEnableAction', { 'with': _with, 'for': _for });
   }
 }

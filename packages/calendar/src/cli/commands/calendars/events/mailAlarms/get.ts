@@ -25,11 +25,6 @@ export class GetMailAlarmCommand extends Command {
       const client = getClient();
       const item = await client.mailalarms.get(this.mailAlarmId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MailAlarm not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         triggerInterval: item.triggerInterval,
         triggerDate: item.triggerDate,

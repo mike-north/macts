@@ -52,7 +52,7 @@ export class NoteResourceClient {
    * Delete a note.
    */
   async delete(name: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { name });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name });
   }
 
 
@@ -63,6 +63,6 @@ export class NoteResourceClient {
    * Show a note in the Notes app
    */
   async show(name: string): Promise<void> {
-    return this.#http.rpc<void>('notes.notes.show', { name });
+    await this.#http.rpc<undefined>('notes.notes.show', { name });
   }
 }

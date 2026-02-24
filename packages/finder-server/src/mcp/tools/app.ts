@@ -30,8 +30,7 @@ export const appOpenTool: McpToolDefinition = {
   handler: async (args) => {
     const { using, withProperties } = args as { using?: string; withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.open(using as any, withProperties as any);
+    await client.open(using as unknown, withProperties as unknown);
     return { success: true };
   },
 };
@@ -55,8 +54,7 @@ export const appPrintTool: McpToolDefinition = {
   handler: async (args) => {
     const { withProperties } = args as { withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.print(withProperties as any);
+    await client.print(withProperties as unknown);
     return { success: true };
   },
 };
@@ -137,8 +135,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.count(each as any);
+    await client.count(each as unknown);
     return { success: true };
   },
 };
@@ -162,8 +159,7 @@ export const appDataSizeTool: McpToolDefinition = {
   handler: async (args) => {
     const { as } = args as { as?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.dataSize(as as any);
+    await client.dataSize(as as unknown);
     return { success: true };
   },
 };
@@ -217,8 +213,7 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, replacing, routingSuppressed, exactCopy } = args as { to?: string; replacing?: boolean; routingSuppressed?: boolean; exactCopy?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.duplicate(to as any, replacing as any, routingSuppressed as any, exactCopy as any);
+    await client.duplicate(to as unknown, replacing as unknown, routingSuppressed as unknown, exactCopy as unknown);
     return { success: true };
   },
 };
@@ -276,8 +271,7 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, at, to, withProperties } = args as { new: string; at: string; to?: string; withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.make(_new as any, at as any, to as any, withProperties as any);
+    await client.make(_new as unknown, at as unknown, to as unknown, withProperties as unknown);
     return { success: true };
   },
 };
@@ -316,8 +310,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, replacing, positionedAt, routingSuppressed } = args as { to: string; replacing?: boolean; positionedAt?: string; routingSuppressed?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.move(to as any, replacing as any, positionedAt as any, routingSuppressed as any);
+    await client.move(to as unknown, replacing as unknown, positionedAt as unknown, routingSuppressed as unknown);
     return { success: true };
   },
 };
@@ -398,8 +391,7 @@ export const appSortTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.sort(by as any);
+    await client.sort(by as unknown);
     return { success: true };
   },
 };
@@ -423,8 +415,7 @@ export const appCleanUpTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.cleanUp(by as any);
+    await client.cleanUp(by as unknown);
     return { success: true };
   },
 };
@@ -466,8 +457,7 @@ export const appEmptyTool: McpToolDefinition = {
   handler: async (args) => {
     const { security } = args as { security?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.empty(security as any);
+    await client.empty(security as unknown);
     return { success: true };
   },
 };
@@ -531,8 +521,7 @@ export const appUpdateTool: McpToolDefinition = {
   handler: async (args) => {
     const { necessity, registeringApplications } = args as { necessity?: boolean; registeringApplications?: boolean };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.update(necessity as any, registeringApplications as any);
+    await client.update(necessity as unknown, registeringApplications as unknown);
     return { success: true };
   },
 };

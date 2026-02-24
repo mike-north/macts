@@ -20,8 +20,7 @@ export class UpdateCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.update(this.necessity as any, this.registeringApplications as any);
+      await client.update(this.necessity as unknown, this.registeringApplications as unknown);
 
       const output = formatter.formatSuccess('update completed successfully');
       this.context.stdout.write(output + '\n');

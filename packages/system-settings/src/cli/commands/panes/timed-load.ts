@@ -21,7 +21,6 @@ export class TimedLoadPaneCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.panes.timedLoad();
 
       const output = formatter.formatSuccess('timedLoad completed successfully');

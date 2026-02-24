@@ -19,7 +19,6 @@ export class SelectAllCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.selectAll();
 
       const output = formatter.formatSuccess('selectAll completed successfully');

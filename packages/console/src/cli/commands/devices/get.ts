@@ -23,11 +23,6 @@ export class GetDeviceCommand extends Command {
       const client = getClient();
       const item = await client.devices.get(this.deviceId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Device not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

@@ -52,7 +52,7 @@ export class TabResourceClient {
    * Delete a tab.
    */
   async delete(tty: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { tty });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { tty });
   }
 
 

@@ -41,8 +41,7 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, at, withData, withProperties } = args as { new: string; at?: string; withData?: string; withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.make(_new as any, at as any, withData as any, withProperties as any);
+    await client.make(_new as unknown, at as unknown, withData as unknown, withProperties as unknown);
     return { success: true };
   },
 };
@@ -69,8 +68,7 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.add(to as any);
+    await client.add(to as unknown);
     return { success: true };
   },
 };
@@ -97,8 +95,7 @@ export const appRemoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { from } = args as { from: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.remove(from as any);
+    await client.remove(from as unknown);
     return { success: true };
   },
 };
@@ -166,8 +163,7 @@ export const appActionTitleTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.actionTitle(_with as any, _for as any);
+    await client.actionTitle(_with as unknown, _for as unknown);
     return { success: true };
   },
 };
@@ -199,8 +195,7 @@ export const appPerformActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.performAction(_with as any, _for as any);
+    await client.performAction(_with as unknown, _for as unknown);
     return { success: true };
   },
 };
@@ -232,8 +227,7 @@ export const appShouldEnableActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.shouldEnableAction(_with as any, _for as any);
+    await client.shouldEnableAction(_with as unknown, _for as unknown);
     return { success: true };
   },
 };

@@ -22,8 +22,7 @@ export class MovePlaylistCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.playlists.move(this.to as any);
+      await client.playlists.move(this.to as unknown);
 
       const output = formatter.formatSuccess('move completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,7 +19,6 @@ export class EraseCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.erase();
 
       const output = formatter.formatSuccess('erase completed successfully');

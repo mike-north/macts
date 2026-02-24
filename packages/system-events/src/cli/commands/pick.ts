@@ -19,7 +19,6 @@ export class PickCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.pick();
 
       const output = formatter.formatSuccess('pick completed successfully');

@@ -24,11 +24,6 @@ export class GetInstantMessageCommand extends Command {
       const client = getClient();
       const item = await client.instantmessages.get(this.instantMessageId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('InstantMessage not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         serviceName: item.serviceName,
         serviceType: item.serviceType,

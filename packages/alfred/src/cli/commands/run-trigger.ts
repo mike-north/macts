@@ -21,8 +21,7 @@ export class RunTriggerCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.runTrigger(this.trigger as any, this.inWorkflow as any, this.withArgument as any);
+      await client.runTrigger(this.trigger as unknown, this.inWorkflow as unknown, this.withArgument as unknown);
 
       const output = formatter.formatSuccess('runTrigger completed successfully');
       this.context.stdout.write(output + '\n');

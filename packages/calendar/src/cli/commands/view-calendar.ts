@@ -19,8 +19,7 @@ export class ViewCalendarCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.viewCalendar(this.at as any);
+      await client.viewCalendar(this.at as unknown);
 
       const output = formatter.formatSuccess('viewCalendar completed successfully');
       this.context.stdout.write(output + '\n');

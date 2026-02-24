@@ -73,7 +73,7 @@ export const mediaitemsDuplicateTool: McpToolDefinition = {
     const { id } = args as { id: string };
     const client = getClient();
     await client.mediaitems.duplicate(id);
-    return { success: true, message: `Duplicate a media item ${id}` };
+    return { success: true };
   },
 };
 

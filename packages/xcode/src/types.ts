@@ -52,8 +52,7 @@ export interface FileDocument {
 }
 
 /** Input for creating a FileDocument */
-export interface FileDocumentCreateInput {
-}
+export type FileDocumentCreateInput = Record<string, never>;
 
 /** Input for updating a FileDocument */
 export type FileDocumentUpdateInput = Partial<FileDocumentCreateInput>;
@@ -137,8 +136,7 @@ export interface Project {
 }
 
 /** Input for creating a Project */
-export interface ProjectCreateInput {
-}
+export type ProjectCreateInput = Record<string, never>;
 
 /** Input for updating a Project */
 export type ProjectUpdateInput = Partial<ProjectCreateInput>;
@@ -171,8 +169,7 @@ export interface BuildConfiguration {
 }
 
 /** Input for creating a BuildConfiguration */
-export interface BuildConfigurationCreateInput {
-}
+export type BuildConfigurationCreateInput = Record<string, never>;
 
 /** Input for updating a BuildConfiguration */
 export type BuildConfigurationUpdateInput = Partial<BuildConfigurationCreateInput>;
@@ -224,8 +221,7 @@ export interface Scheme {
 }
 
 /** Input for creating a Scheme */
-export interface SchemeCreateInput {
-}
+export type SchemeCreateInput = Record<string, never>;
 
 /** Input for updating a Scheme */
 export type SchemeUpdateInput = Partial<SchemeCreateInput>;
@@ -245,8 +241,7 @@ export interface RunDestination {
 }
 
 /** Input for creating a RunDestination */
-export interface RunDestinationCreateInput {
-}
+export type RunDestinationCreateInput = Record<string, never>;
 
 /** Input for updating a RunDestination */
 export type RunDestinationUpdateInput = Partial<RunDestinationCreateInput>;
@@ -266,8 +261,7 @@ export interface Device {
 }
 
 /** Input for creating a Device */
-export interface DeviceCreateInput {
-}
+export type DeviceCreateInput = Record<string, never>;
 
 /** Input for updating a Device */
 export type DeviceUpdateInput = Partial<DeviceCreateInput>;

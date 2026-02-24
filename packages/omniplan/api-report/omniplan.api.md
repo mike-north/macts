@@ -42,8 +42,7 @@ export interface Currency {
 }
 
 // @public
-export interface CurrencyCreateInput {
-}
+export type CurrencyCreateInput = Record<string, never>;
 
 // @public
 export class CurrencyResourceClient {
@@ -337,12 +336,10 @@ export const ScenarioSchema: z.ZodObject<{
 export type ScenarioUpdateInput = Partial<ScenarioCreateInput>;
 
 // @public
-export interface Schedule {
-}
+export type Schedule = Record<string, never>;
 
 // @public
-export interface ScheduleCreateInput {
-}
+export type ScheduleCreateInput = Record<string, never>;
 
 // @public
 export class ScheduleResourceClient {
@@ -461,8 +458,7 @@ export interface Violation {
 }
 
 // @public
-export interface ViolationCreateInput {
-}
+export type ViolationCreateInput = Record<string, never>;
 
 // @public
 export class ViolationResourceClient {

@@ -23,11 +23,6 @@ export class GetWorkflowCommand extends Command {
       const client = getClient();
       const item = await client.workflows.get(this.workflowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Workflow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         currentAction: item.currentAction,

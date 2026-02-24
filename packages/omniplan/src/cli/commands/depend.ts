@@ -20,8 +20,7 @@ export class DependCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.depend(this.prerequisite as any, this.dependent as any);
+      await client.depend(this.prerequisite as unknown, this.dependent as unknown);
 
       const output = formatter.formatSuccess('depend completed successfully');
       this.context.stdout.write(output + '\n');

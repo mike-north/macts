@@ -25,11 +25,6 @@ export class GetURLTrackCommand extends Command {
       const client = getClient();
       const item = await client.urltracks.get(this.uRLTrackId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('URLTrack not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         address: item.address,

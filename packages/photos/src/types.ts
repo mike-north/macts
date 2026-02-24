@@ -120,8 +120,7 @@ export interface Moment {
 }
 
 /** Input for creating a Moment */
-export interface MomentCreateInput {
-}
+export type MomentCreateInput = Record<string, never>;
 
 /** Input for updating a Moment */
 export type MomentUpdateInput = Partial<MomentCreateInput>;

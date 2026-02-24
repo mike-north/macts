@@ -23,11 +23,6 @@ export class GetTextDocumentCommand extends Command {
       const client = getClient();
       const item = await client.textdocuments.get(this.textDocumentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('TextDocument not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         modified: item.modified,

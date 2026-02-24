@@ -19,8 +19,7 @@ export class ImportIntoCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.importInto(this.file as any);
+      await client.importInto(this.file as unknown);
 
       const output = formatter.formatSuccess('importInto completed successfully');
       this.context.stdout.write(output + '\n');

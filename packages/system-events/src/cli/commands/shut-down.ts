@@ -19,8 +19,7 @@ export class ShutDownCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.shutDown(this.stateSavingPreference as any);
+      await client.shutDown(this.stateSavingPreference as unknown);
 
       const output = formatter.formatSuccess('shutDown completed successfully');
       this.context.stdout.write(output + '\n');

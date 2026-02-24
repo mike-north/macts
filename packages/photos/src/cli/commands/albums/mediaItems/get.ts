@@ -24,11 +24,6 @@ export class GetMediaItemCommand extends Command {
       const client = getClient();
       const item = await client.mediaitems.get(this.mediaItemId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MediaItem not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

@@ -24,11 +24,6 @@ export class GetAudioCDPlaylistCommand extends Command {
       const client = getClient();
       const item = await client.audiocdplaylists.get(this.audioCDPlaylistId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('AudioCDPlaylist not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         artist: item.artist,
         compilation: item.compilation,

@@ -26,11 +26,6 @@ export class GetBccRecipientCommand extends Command {
       const client = getClient();
       const item = await client.bccrecipients.get(this.bccRecipientId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BccRecipient not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

@@ -125,19 +125,19 @@ function getDb(): Database.Database {
  */
 function migrateSchema(database: Database.Database): void {
   const currentVersion =
-    (database.pragma('user_version') as Array<{ user_version: number }>)[0]?.user_version ?? 0
+    (database.pragma('user_version') as { user_version: number }[])[0]?.user_version ?? 0
 
   if (currentVersion < 1) {
     // Migration 1: Add encrypted column if it doesn't exist
-    const columns = database.prepare("PRAGMA table_info('api_keys')").all() as Array<{
+    const columns = database.prepare("PRAGMA table_info('api_keys')").all() as {
       name: string
-    }>
+    }[]
     const hasEncrypted = columns.some((col) => col.name === 'encrypted')
     if (!hasEncrypted) {
       database.exec('ALTER TABLE api_keys ADD COLUMN encrypted INTEGER NOT NULL DEFAULT 0')
     }
 
-    database.pragma(`user_version = ${SCHEMA_VERSION}`)
+    database.pragma(`user_version = ${String(SCHEMA_VERSION)}`)
   }
 }
 

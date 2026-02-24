@@ -52,7 +52,7 @@ export class EventResourceClient {
    * Delete a event.
    */
   async delete(uid: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { uid });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { uid });
   }
 
 
@@ -63,6 +63,6 @@ export class EventResourceClient {
    * Show the event or to-do in the calendar window
    */
   async show(): Promise<void> {
-    return this.#http.rpc<void>('calendar.events.show', {});
+    await this.#http.rpc<undefined>('calendar.events.show', {});
   }
 }

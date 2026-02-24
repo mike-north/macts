@@ -14,8 +14,7 @@ export interface Attendee {
 }
 
 // @public
-export interface AttendeeCreateInput {
-}
+export type AttendeeCreateInput = Record<string, never>;
 
 // @public
 export class AttendeeResourceClient {

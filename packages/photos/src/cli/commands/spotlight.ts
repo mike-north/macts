@@ -19,8 +19,7 @@ export class SpotlightCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.spotlight(this.target as any);
+      await client.spotlight(this.target as unknown);
 
       const output = formatter.formatSuccess('spotlight completed successfully');
       this.context.stdout.write(output + '\n');

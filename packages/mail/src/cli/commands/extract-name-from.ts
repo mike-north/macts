@@ -19,7 +19,6 @@ export class ExtractNameFromCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.extractNameFrom();
 
       const output = formatter.formatSuccess('extractNameFrom completed successfully');

@@ -20,8 +20,7 @@ export class SplitVerticallyCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.splitVertically(this.withProfile as any, this.command as any);
+      await client.splitVertically(this.withProfile as unknown, this.command as unknown);
 
       const output = formatter.formatSuccess('splitVertically completed successfully');
       this.context.stdout.write(output + '\n');

@@ -24,11 +24,6 @@ export class GetEventCommand extends Command {
       const client = getClient();
       const item = await client.events.get(this.eventId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Event not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         summary: item.summary,
         description: item.description,

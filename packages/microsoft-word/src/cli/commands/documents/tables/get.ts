@@ -24,11 +24,6 @@ export class GetTableCommand extends Command {
       const client = getClient();
       const item = await client.tables.get(this.tableId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Table not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         rowCount: item.rowCount,
         columnCount: item.columnCount,

@@ -19,7 +19,6 @@ export class NextSlideCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.nextSlide();
 
       const output = formatter.formatSuccess('nextSlide completed successfully');

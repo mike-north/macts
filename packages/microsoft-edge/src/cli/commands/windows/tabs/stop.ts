@@ -22,8 +22,7 @@ export class StopTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.stop(this.tabId as any);
+      await client.tabs.stop(this.tabId as unknown);
 
       const output = formatter.formatSuccess('stop completed successfully');
       this.context.stdout.write(output + '\n');

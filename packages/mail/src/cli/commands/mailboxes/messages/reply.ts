@@ -23,8 +23,7 @@ export class ReplyMessageCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.messages.reply(this.openingWindow as any, this.replyToAll as any);
+      await client.messages.reply(this.openingWindow as unknown, this.replyToAll as unknown);
 
       const output = formatter.formatSuccess('reply completed successfully');
       this.context.stdout.write(output + '\n');

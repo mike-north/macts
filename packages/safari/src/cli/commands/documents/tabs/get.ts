@@ -24,11 +24,6 @@ export class GetTabCommand extends Command {
       const client = getClient();
       const item = await client.tabs.get(this.tabId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Tab not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

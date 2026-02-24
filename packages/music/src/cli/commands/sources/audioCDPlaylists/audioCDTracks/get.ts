@@ -25,11 +25,6 @@ export class GetAudioCDTrackCommand extends Command {
       const client = getClient();
       const item = await client.audiocdtracks.get(this.audioCDTrackId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('AudioCDTrack not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         location: item.location,
       });

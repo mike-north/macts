@@ -21,8 +21,7 @@ export class DuplicateMediaItemCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.mediaitems.duplicate(this.id as any);
+      await client.mediaitems.duplicate(this.id as unknown);
 
       const output = formatter.formatSuccess('duplicate completed successfully');
       this.context.stdout.write(output + '\n');

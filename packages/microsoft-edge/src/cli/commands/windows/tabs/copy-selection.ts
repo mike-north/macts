@@ -22,8 +22,7 @@ export class CopySelectionTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.copySelection(this.tabId as any);
+      await client.tabs.copySelection(this.tabId as unknown);
 
       const output = formatter.formatSuccess('copySelection completed successfully');
       this.context.stdout.write(output + '\n');

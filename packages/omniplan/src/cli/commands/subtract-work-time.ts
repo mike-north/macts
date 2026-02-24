@@ -19,8 +19,7 @@ export class SubtractWorkTimeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.subtractWorkTime(this.schedule as any);
+      await client.subtractWorkTime(this.schedule as unknown);
 
       const output = formatter.formatSuccess('subtractWorkTime completed successfully');
       this.context.stdout.write(output + '\n');

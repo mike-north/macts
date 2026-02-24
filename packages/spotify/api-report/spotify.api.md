@@ -59,8 +59,7 @@ export interface Track {
 }
 
 // @public
-export interface TrackCreateInput {
-}
+export type TrackCreateInput = Record<string, never>;
 
 // @public
 export class TrackResourceClient {

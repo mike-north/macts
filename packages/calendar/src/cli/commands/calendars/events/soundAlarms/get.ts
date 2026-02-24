@@ -25,11 +25,6 @@ export class GetSoundAlarmCommand extends Command {
       const client = getClient();
       const item = await client.soundalarms.get(this.soundAlarmId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('SoundAlarm not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         triggerInterval: item.triggerInterval,
         triggerDate: item.triggerDate,

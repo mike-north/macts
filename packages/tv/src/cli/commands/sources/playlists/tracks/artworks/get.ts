@@ -26,11 +26,6 @@ export class GetArtworkCommand extends Command {
       const client = getClient();
       const item = await client.artworks.get(this.artworkId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Artwork not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         data: item.data,

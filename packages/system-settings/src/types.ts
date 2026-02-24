@@ -14,8 +14,7 @@ export interface Pane {
 }
 
 /** Input for creating a Pane */
-export interface PaneCreateInput {
-}
+export type PaneCreateInput = Record<string, never>;
 
 /** Input for updating a Pane */
 export type PaneUpdateInput = Partial<PaneCreateInput>;
@@ -27,8 +26,7 @@ export interface Anchor {
 }
 
 /** Input for creating a Anchor */
-export interface AnchorCreateInput {
-}
+export type AnchorCreateInput = Record<string, never>;
 
 /** Input for updating a Anchor */
 export type AnchorUpdateInput = Partial<AnchorCreateInput>;

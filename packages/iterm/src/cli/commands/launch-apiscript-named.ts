@@ -19,8 +19,7 @@ export class LaunchAPIScriptNamedCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.launchAPIScriptNamed(this.arguments as any);
+      await client.launchAPIScriptNamed(this.arguments as unknown);
 
       const output = formatter.formatSuccess('launchAPIScriptNamed completed successfully');
       this.context.stdout.write(output + '\n');

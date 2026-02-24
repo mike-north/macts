@@ -14,8 +14,7 @@ export interface Account {
 }
 
 // @public
-export interface AccountCreateInput {
-}
+export type AccountCreateInput = Record<string, never>;
 
 // @public
 export class AccountResourceClient {
@@ -47,8 +46,7 @@ export interface Attachment {
 }
 
 // @public
-export interface AttachmentCreateInput {
-}
+export type AttachmentCreateInput = Record<string, never>;
 
 // @public
 export class AttachmentResourceClient {

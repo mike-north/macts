@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new BluetoothFileExchangeError(code, message);
     }
 
@@ -105,7 +105,7 @@ export class BluetoothFileExchangeClient {
    * Browse a device
    */
   async browse(device?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('bluetooth-file-exchange.app.browse', { device });
+    await this.#httpClient.rpc<undefined>('bluetooth-file-exchange.app.browse', { device });
   }
 
 
@@ -113,6 +113,6 @@ export class BluetoothFileExchangeClient {
    * Send a file to a bluetooth device
    */
   async send(file?: string, toDevice?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('bluetooth-file-exchange.app.send', { file, toDevice });
+    await this.#httpClient.rpc<undefined>('bluetooth-file-exchange.app.send', { file, toDevice });
   }
 }

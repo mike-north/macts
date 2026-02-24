@@ -19,7 +19,6 @@ export class RedoCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.redo();
 
       const output = formatter.formatSuccess('redo completed successfully');

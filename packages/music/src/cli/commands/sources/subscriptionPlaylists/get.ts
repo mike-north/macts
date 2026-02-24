@@ -24,11 +24,6 @@ export class GetSubscriptionPlaylistCommand extends Command {
       const client = getClient();
       const item = await client.subscriptionplaylists.get(this.subscriptionPlaylistId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('SubscriptionPlaylist not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

@@ -25,11 +25,6 @@ export class GetRowCommand extends Command {
       const client = getClient();
       const item = await client.rows.get(this.rowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Row not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         height: item.height,
         allowBreakAcrossPages: item.allowBreakAcrossPages,

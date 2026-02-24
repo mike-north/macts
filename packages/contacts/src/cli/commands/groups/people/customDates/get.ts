@@ -25,11 +25,6 @@ export class GetCustomDateCommand extends Command {
       const client = getClient();
       const item = await client.customdates.get(this.customDateId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('CustomDate not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

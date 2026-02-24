@@ -23,11 +23,6 @@ export class GetDocumentCommand extends Command {
       const client = getClient();
       const item = await client.documents.get(this.documentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Document not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         fullName: item.fullName,

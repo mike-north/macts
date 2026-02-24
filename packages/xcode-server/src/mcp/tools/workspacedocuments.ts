@@ -73,7 +73,7 @@ export const workspacedocumentsBuildTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string };
     const client = getClient();
     await client.workspacedocuments.build(workspaceName);
-    return { success: true, message: `Invoke the "build" scheme action ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -100,7 +100,7 @@ export const workspacedocumentsCleanTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string };
     const client = getClient();
     await client.workspacedocuments.clean(workspaceName);
-    return { success: true, message: `Invoke the "clean" scheme action ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -127,7 +127,7 @@ export const workspacedocumentsStopTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string };
     const client = getClient();
     await client.workspacedocuments.stop(workspaceName);
-    return { success: true, message: `Stop the active scheme action, if one is running ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -162,7 +162,7 @@ export const workspacedocumentsRunTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string; withCommandLineArguments?: string; withEnvironmentVariables?: string };
     const client = getClient();
     await client.workspacedocuments.run(workspaceName);
-    return { success: true, message: `Invoke the "run" scheme action ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -197,7 +197,7 @@ export const workspacedocumentsTestTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string; withCommandLineArguments?: string; withEnvironmentVariables?: string };
     const client = getClient();
     await client.workspacedocuments.test(workspaceName);
-    return { success: true, message: `Invoke the "test" scheme action ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -234,7 +234,7 @@ export const workspacedocumentsAttachTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string; toProcessIdentifier: number; suspended: boolean };
     const client = getClient();
     await client.workspacedocuments.attach(workspaceName);
-    return { success: true, message: `Start a new debugging session in the workspace ${workspaceName}` };
+    return { success: true };
   },
 };
 
@@ -281,7 +281,7 @@ export const workspacedocumentsDebugTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string; scheme?: string; runDestinationSpecifier?: string; skipBuilding?: boolean; commandLineArguments?: string; environmentVariables?: string };
     const client = getClient();
     await client.workspacedocuments.debug(workspaceName);
-    return { success: true, message: `Start a debugging session using the "run" or "run without building" scheme action ${workspaceName}` };
+    return { success: true };
   },
 };
 

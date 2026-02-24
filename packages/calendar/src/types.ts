@@ -118,8 +118,7 @@ export interface Attendee {
 }
 
 /** Input for creating a Attendee */
-export interface AttendeeCreateInput {
-}
+export type AttendeeCreateInput = Record<string, never>;
 
 /** Input for updating a Attendee */
 export type AttendeeUpdateInput = Partial<AttendeeCreateInput>;

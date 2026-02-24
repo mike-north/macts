@@ -19,7 +19,6 @@ export class CompactCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.compact();
 
       const output = formatter.formatSuccess('compact completed successfully');

@@ -232,8 +232,7 @@ export interface ClassicDomainObject {
 }
 
 /** Input for creating a ClassicDomainObject */
-export interface ClassicDomainObjectCreateInput {
-}
+export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 /** Input for updating a ClassicDomainObject */
 export type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>;
@@ -353,8 +352,7 @@ export interface Domain {
 }
 
 /** Input for creating a Domain */
-export interface DomainCreateInput {
-}
+export type DomainCreateInput = Record<string, never>;
 
 /** Input for updating a Domain */
 export type DomainUpdateInput = Partial<DomainCreateInput>;
@@ -403,8 +401,7 @@ export interface FilePackage {
 }
 
 /** Input for creating a FilePackage */
-export interface FilePackageCreateInput {
-}
+export type FilePackageCreateInput = Record<string, never>;
 
 /** Input for updating a FilePackage */
 export type FilePackageUpdateInput = Partial<FilePackageCreateInput>;
@@ -416,8 +413,7 @@ export interface Folder {
 }
 
 /** Input for creating a Folder */
-export interface FolderCreateInput {
-}
+export type FolderCreateInput = Record<string, never>;
 
 /** Input for updating a Folder */
 export type FolderUpdateInput = Partial<FolderCreateInput>;
@@ -429,8 +425,7 @@ export interface LocalDomainObject {
 }
 
 /** Input for creating a LocalDomainObject */
-export interface LocalDomainObjectCreateInput {
-}
+export type LocalDomainObjectCreateInput = Record<string, never>;
 
 /** Input for updating a LocalDomainObject */
 export type LocalDomainObjectUpdateInput = Partial<LocalDomainObjectCreateInput>;
@@ -442,8 +437,7 @@ export interface NetworkDomainObject {
 }
 
 /** Input for creating a NetworkDomainObject */
-export interface NetworkDomainObjectCreateInput {
-}
+export type NetworkDomainObjectCreateInput = Record<string, never>;
 
 /** Input for updating a NetworkDomainObject */
 export type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>;
@@ -455,8 +449,7 @@ export interface SystemDomainObject {
 }
 
 /** Input for creating a SystemDomainObject */
-export interface SystemDomainObjectCreateInput {
-}
+export type SystemDomainObjectCreateInput = Record<string, never>;
 
 /** Input for updating a SystemDomainObject */
 export type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>;
@@ -488,8 +481,7 @@ export interface UserDomainObject {
 }
 
 /** Input for creating a UserDomainObject */
-export interface UserDomainObjectCreateInput {
-}
+export type UserDomainObjectCreateInput = Record<string, never>;
 
 /** Input for updating a UserDomainObject */
 export type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>;
@@ -503,8 +495,7 @@ export interface Action {
 }
 
 /** Input for creating a Action */
-export interface ActionCreateInput {
-}
+export type ActionCreateInput = Record<string, never>;
 
 /** Input for updating a Action */
 export type ActionUpdateInput = Partial<ActionCreateInput>;
@@ -535,8 +526,7 @@ export interface Browser {
 }
 
 /** Input for creating a Browser */
-export interface BrowserCreateInput {
-}
+export type BrowserCreateInput = Record<string, never>;
 
 /** Input for updating a Browser */
 export type BrowserUpdateInput = Partial<BrowserCreateInput>;
@@ -548,8 +538,7 @@ export interface BusyIndicator {
 }
 
 /** Input for creating a BusyIndicator */
-export interface BusyIndicatorCreateInput {
-}
+export type BusyIndicatorCreateInput = Record<string, never>;
 
 /** Input for updating a BusyIndicator */
 export type BusyIndicatorUpdateInput = Partial<BusyIndicatorCreateInput>;
@@ -561,8 +550,7 @@ export interface Button {
 }
 
 /** Input for creating a Button */
-export interface ButtonCreateInput {
-}
+export type ButtonCreateInput = Record<string, never>;
 
 /** Input for updating a Button */
 export type ButtonUpdateInput = Partial<ButtonCreateInput>;
@@ -574,8 +562,7 @@ export interface Checkbox {
 }
 
 /** Input for creating a Checkbox */
-export interface CheckboxCreateInput {
-}
+export type CheckboxCreateInput = Record<string, never>;
 
 /** Input for updating a Checkbox */
 export type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
@@ -587,8 +574,7 @@ export interface ColorWell {
 }
 
 /** Input for creating a ColorWell */
-export interface ColorWellCreateInput {
-}
+export type ColorWellCreateInput = Record<string, never>;
 
 /** Input for updating a ColorWell */
 export type ColorWellUpdateInput = Partial<ColorWellCreateInput>;
@@ -600,8 +586,7 @@ export interface Column {
 }
 
 /** Input for creating a Column */
-export interface ColumnCreateInput {
-}
+export type ColumnCreateInput = Record<string, never>;
 
 /** Input for updating a Column */
 export type ColumnUpdateInput = Partial<ColumnCreateInput>;
@@ -613,8 +598,7 @@ export interface ComboBox {
 }
 
 /** Input for creating a ComboBox */
-export interface ComboBoxCreateInput {
-}
+export type ComboBoxCreateInput = Record<string, never>;
 
 /** Input for updating a ComboBox */
 export type ComboBoxUpdateInput = Partial<ComboBoxCreateInput>;
@@ -626,8 +610,7 @@ export interface Drawer {
 }
 
 /** Input for creating a Drawer */
-export interface DrawerCreateInput {
-}
+export type DrawerCreateInput = Record<string, never>;
 
 /** Input for updating a Drawer */
 export type DrawerUpdateInput = Partial<DrawerCreateInput>;
@@ -639,8 +622,7 @@ export interface Group {
 }
 
 /** Input for creating a Group */
-export interface GroupCreateInput {
-}
+export type GroupCreateInput = Record<string, never>;
 
 /** Input for updating a Group */
 export type GroupUpdateInput = Partial<GroupCreateInput>;
@@ -652,8 +634,7 @@ export interface GrowArea {
 }
 
 /** Input for creating a GrowArea */
-export interface GrowAreaCreateInput {
-}
+export type GrowAreaCreateInput = Record<string, never>;
 
 /** Input for updating a GrowArea */
 export type GrowAreaUpdateInput = Partial<GrowAreaCreateInput>;
@@ -665,8 +646,7 @@ export interface Image {
 }
 
 /** Input for creating a Image */
-export interface ImageCreateInput {
-}
+export type ImageCreateInput = Record<string, never>;
 
 /** Input for updating a Image */
 export type ImageUpdateInput = Partial<ImageCreateInput>;
@@ -678,8 +658,7 @@ export interface Incrementor {
 }
 
 /** Input for creating a Incrementor */
-export interface IncrementorCreateInput {
-}
+export type IncrementorCreateInput = Record<string, never>;
 
 /** Input for updating a Incrementor */
 export type IncrementorUpdateInput = Partial<IncrementorCreateInput>;
@@ -691,8 +670,7 @@ export interface List {
 }
 
 /** Input for creating a List */
-export interface ListCreateInput {
-}
+export type ListCreateInput = Record<string, never>;
 
 /** Input for updating a List */
 export type ListUpdateInput = Partial<ListCreateInput>;
@@ -704,8 +682,7 @@ export interface Menu {
 }
 
 /** Input for creating a Menu */
-export interface MenuCreateInput {
-}
+export type MenuCreateInput = Record<string, never>;
 
 /** Input for updating a Menu */
 export type MenuUpdateInput = Partial<MenuCreateInput>;
@@ -717,8 +694,7 @@ export interface MenuBar {
 }
 
 /** Input for creating a MenuBar */
-export interface MenuBarCreateInput {
-}
+export type MenuBarCreateInput = Record<string, never>;
 
 /** Input for updating a MenuBar */
 export type MenuBarUpdateInput = Partial<MenuBarCreateInput>;
@@ -730,8 +706,7 @@ export interface MenuBarItem {
 }
 
 /** Input for creating a MenuBarItem */
-export interface MenuBarItemCreateInput {
-}
+export type MenuBarItemCreateInput = Record<string, never>;
 
 /** Input for updating a MenuBarItem */
 export type MenuBarItemUpdateInput = Partial<MenuBarItemCreateInput>;
@@ -743,8 +718,7 @@ export interface MenuButton {
 }
 
 /** Input for creating a MenuButton */
-export interface MenuButtonCreateInput {
-}
+export type MenuButtonCreateInput = Record<string, never>;
 
 /** Input for updating a MenuButton */
 export type MenuButtonUpdateInput = Partial<MenuButtonCreateInput>;
@@ -756,8 +730,7 @@ export interface MenuItem {
 }
 
 /** Input for creating a MenuItem */
-export interface MenuItemCreateInput {
-}
+export type MenuItemCreateInput = Record<string, never>;
 
 /** Input for updating a MenuItem */
 export type MenuItemUpdateInput = Partial<MenuItemCreateInput>;
@@ -769,8 +742,7 @@ export interface Outline {
 }
 
 /** Input for creating a Outline */
-export interface OutlineCreateInput {
-}
+export type OutlineCreateInput = Record<string, never>;
 
 /** Input for updating a Outline */
 export type OutlineUpdateInput = Partial<OutlineCreateInput>;
@@ -782,8 +754,7 @@ export interface PopOver {
 }
 
 /** Input for creating a PopOver */
-export interface PopOverCreateInput {
-}
+export type PopOverCreateInput = Record<string, never>;
 
 /** Input for updating a PopOver */
 export type PopOverUpdateInput = Partial<PopOverCreateInput>;
@@ -795,8 +766,7 @@ export interface PopUpButton {
 }
 
 /** Input for creating a PopUpButton */
-export interface PopUpButtonCreateInput {
-}
+export type PopUpButtonCreateInput = Record<string, never>;
 
 /** Input for updating a PopUpButton */
 export type PopUpButtonUpdateInput = Partial<PopUpButtonCreateInput>;
@@ -861,8 +831,7 @@ export interface ProgressIndicator {
 }
 
 /** Input for creating a ProgressIndicator */
-export interface ProgressIndicatorCreateInput {
-}
+export type ProgressIndicatorCreateInput = Record<string, never>;
 
 /** Input for updating a ProgressIndicator */
 export type ProgressIndicatorUpdateInput = Partial<ProgressIndicatorCreateInput>;
@@ -874,8 +843,7 @@ export interface RadioButton {
 }
 
 /** Input for creating a RadioButton */
-export interface RadioButtonCreateInput {
-}
+export type RadioButtonCreateInput = Record<string, never>;
 
 /** Input for updating a RadioButton */
 export type RadioButtonUpdateInput = Partial<RadioButtonCreateInput>;
@@ -887,8 +855,7 @@ export interface RadioGroup {
 }
 
 /** Input for creating a RadioGroup */
-export interface RadioGroupCreateInput {
-}
+export type RadioGroupCreateInput = Record<string, never>;
 
 /** Input for updating a RadioGroup */
 export type RadioGroupUpdateInput = Partial<RadioGroupCreateInput>;
@@ -900,8 +867,7 @@ export interface RelevanceIndicator {
 }
 
 /** Input for creating a RelevanceIndicator */
-export interface RelevanceIndicatorCreateInput {
-}
+export type RelevanceIndicatorCreateInput = Record<string, never>;
 
 /** Input for updating a RelevanceIndicator */
 export type RelevanceIndicatorUpdateInput = Partial<RelevanceIndicatorCreateInput>;
@@ -913,8 +879,7 @@ export interface Row {
 }
 
 /** Input for creating a Row */
-export interface RowCreateInput {
-}
+export type RowCreateInput = Record<string, never>;
 
 /** Input for updating a Row */
 export type RowUpdateInput = Partial<RowCreateInput>;
@@ -926,8 +891,7 @@ export interface ScrollArea {
 }
 
 /** Input for creating a ScrollArea */
-export interface ScrollAreaCreateInput {
-}
+export type ScrollAreaCreateInput = Record<string, never>;
 
 /** Input for updating a ScrollArea */
 export type ScrollAreaUpdateInput = Partial<ScrollAreaCreateInput>;
@@ -939,8 +903,7 @@ export interface ScrollBar {
 }
 
 /** Input for creating a ScrollBar */
-export interface ScrollBarCreateInput {
-}
+export type ScrollBarCreateInput = Record<string, never>;
 
 /** Input for updating a ScrollBar */
 export type ScrollBarUpdateInput = Partial<ScrollBarCreateInput>;
@@ -952,8 +915,7 @@ export interface Sheet {
 }
 
 /** Input for creating a Sheet */
-export interface SheetCreateInput {
-}
+export type SheetCreateInput = Record<string, never>;
 
 /** Input for updating a Sheet */
 export type SheetUpdateInput = Partial<SheetCreateInput>;
@@ -965,8 +927,7 @@ export interface Slider {
 }
 
 /** Input for creating a Slider */
-export interface SliderCreateInput {
-}
+export type SliderCreateInput = Record<string, never>;
 
 /** Input for updating a Slider */
 export type SliderUpdateInput = Partial<SliderCreateInput>;
@@ -978,8 +939,7 @@ export interface Splitter {
 }
 
 /** Input for creating a Splitter */
-export interface SplitterCreateInput {
-}
+export type SplitterCreateInput = Record<string, never>;
 
 /** Input for updating a Splitter */
 export type SplitterUpdateInput = Partial<SplitterCreateInput>;
@@ -991,8 +951,7 @@ export interface SplitterGroup {
 }
 
 /** Input for creating a SplitterGroup */
-export interface SplitterGroupCreateInput {
-}
+export type SplitterGroupCreateInput = Record<string, never>;
 
 /** Input for updating a SplitterGroup */
 export type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>;
@@ -1004,8 +963,7 @@ export interface StaticText {
 }
 
 /** Input for creating a StaticText */
-export interface StaticTextCreateInput {
-}
+export type StaticTextCreateInput = Record<string, never>;
 
 /** Input for updating a StaticText */
 export type StaticTextUpdateInput = Partial<StaticTextCreateInput>;
@@ -1017,8 +975,7 @@ export interface TabGroup {
 }
 
 /** Input for creating a TabGroup */
-export interface TabGroupCreateInput {
-}
+export type TabGroupCreateInput = Record<string, never>;
 
 /** Input for updating a TabGroup */
 export type TabGroupUpdateInput = Partial<TabGroupCreateInput>;
@@ -1030,8 +987,7 @@ export interface Table {
 }
 
 /** Input for creating a Table */
-export interface TableCreateInput {
-}
+export type TableCreateInput = Record<string, never>;
 
 /** Input for updating a Table */
 export type TableUpdateInput = Partial<TableCreateInput>;
@@ -1043,8 +999,7 @@ export interface TextArea {
 }
 
 /** Input for creating a TextArea */
-export interface TextAreaCreateInput {
-}
+export type TextAreaCreateInput = Record<string, never>;
 
 /** Input for updating a TextArea */
 export type TextAreaUpdateInput = Partial<TextAreaCreateInput>;
@@ -1056,8 +1011,7 @@ export interface TextField {
 }
 
 /** Input for creating a TextField */
-export interface TextFieldCreateInput {
-}
+export type TextFieldCreateInput = Record<string, never>;
 
 /** Input for updating a TextField */
 export type TextFieldUpdateInput = Partial<TextFieldCreateInput>;
@@ -1069,8 +1023,7 @@ export interface Toolbar {
 }
 
 /** Input for creating a Toolbar */
-export interface ToolbarCreateInput {
-}
+export type ToolbarCreateInput = Record<string, never>;
 
 /** Input for updating a Toolbar */
 export type ToolbarUpdateInput = Partial<ToolbarCreateInput>;
@@ -1141,8 +1094,7 @@ export interface ValueIndicator {
 }
 
 /** Input for creating a ValueIndicator */
-export interface ValueIndicatorCreateInput {
-}
+export type ValueIndicatorCreateInput = Record<string, never>;
 
 /** Input for updating a ValueIndicator */
 export type ValueIndicatorUpdateInput = Partial<ValueIndicatorCreateInput>;
@@ -1246,8 +1198,7 @@ export interface ScriptingClass {
 }
 
 /** Input for creating a ScriptingClass */
-export interface ScriptingClassCreateInput {
-}
+export type ScriptingClassCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingClass */
 export type ScriptingClassUpdateInput = Partial<ScriptingClassCreateInput>;
@@ -1271,8 +1222,7 @@ export interface ScriptingCommand {
 }
 
 /** Input for creating a ScriptingCommand */
-export interface ScriptingCommandCreateInput {
-}
+export type ScriptingCommandCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingCommand */
 export type ScriptingCommandUpdateInput = Partial<ScriptingCommandCreateInput>;
@@ -1284,8 +1234,7 @@ export interface ScriptingDefinitionObject {
 }
 
 /** Input for creating a ScriptingDefinitionObject */
-export interface ScriptingDefinitionObjectCreateInput {
-}
+export type ScriptingDefinitionObjectCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingDefinitionObject */
 export type ScriptingDefinitionObjectUpdateInput = Partial<ScriptingDefinitionObjectCreateInput>;
@@ -1297,8 +1246,7 @@ export interface ScriptingElement {
 }
 
 /** Input for creating a ScriptingElement */
-export interface ScriptingElementCreateInput {
-}
+export type ScriptingElementCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingElement */
 export type ScriptingElementUpdateInput = Partial<ScriptingElementCreateInput>;
@@ -1314,8 +1262,7 @@ export interface ScriptingEnumeration {
 }
 
 /** Input for creating a ScriptingEnumeration */
-export interface ScriptingEnumerationCreateInput {
-}
+export type ScriptingEnumerationCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingEnumeration */
 export type ScriptingEnumerationUpdateInput = Partial<ScriptingEnumerationCreateInput>;
@@ -1333,8 +1280,7 @@ export interface ScriptingEnumerator {
 }
 
 /** Input for creating a ScriptingEnumerator */
-export interface ScriptingEnumeratorCreateInput {
-}
+export type ScriptingEnumeratorCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingEnumerator */
 export type ScriptingEnumeratorUpdateInput = Partial<ScriptingEnumeratorCreateInput>;
@@ -1356,8 +1302,7 @@ export interface ScriptingParameter {
 }
 
 /** Input for creating a ScriptingParameter */
-export interface ScriptingParameterCreateInput {
-}
+export type ScriptingParameterCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingParameter */
 export type ScriptingParameterUpdateInput = Partial<ScriptingParameterCreateInput>;
@@ -1383,8 +1328,7 @@ export interface ScriptingProperty {
 }
 
 /** Input for creating a ScriptingProperty */
-export interface ScriptingPropertyCreateInput {
-}
+export type ScriptingPropertyCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingProperty */
 export type ScriptingPropertyUpdateInput = Partial<ScriptingPropertyCreateInput>;
@@ -1402,8 +1346,7 @@ export interface ScriptingSuite {
 }
 
 /** Input for creating a ScriptingSuite */
-export interface ScriptingSuiteCreateInput {
-}
+export type ScriptingSuiteCreateInput = Record<string, never>;
 
 /** Input for updating a ScriptingSuite */
 export type ScriptingSuiteUpdateInput = Partial<ScriptingSuiteCreateInput>;

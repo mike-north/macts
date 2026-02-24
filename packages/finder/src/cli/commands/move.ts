@@ -22,8 +22,7 @@ export class MoveCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.move(this.to as any, this.replacing as any, this.positionedAt as any, this.routingSuppressed as any);
+      await client.move(this.to as unknown, this.replacing as unknown, this.positionedAt as unknown, this.routingSuppressed as unknown);
 
       const output = formatter.formatSuccess('move completed successfully');
       this.context.stdout.write(output + '\n');

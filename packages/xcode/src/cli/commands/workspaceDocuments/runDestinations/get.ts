@@ -24,11 +24,6 @@ export class GetRunDestinationCommand extends Command {
       const client = getClient();
       const item = await client.rundestinations.get(this.runDestinationId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('RunDestination not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         architecture: item.architecture,

@@ -19,8 +19,7 @@ export class ImportMailMailboxCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.importMailMailbox(this.at as any);
+      await client.importMailMailbox(this.at as unknown);
 
       const output = formatter.formatSuccess('importMailMailbox completed successfully');
       this.context.stdout.write(output + '\n');

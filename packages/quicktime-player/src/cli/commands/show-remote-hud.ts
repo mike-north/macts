@@ -19,7 +19,6 @@ export class ShowRemoteHudCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.showRemoteHud();
 
       const output = formatter.formatSuccess('showRemoteHud completed successfully');

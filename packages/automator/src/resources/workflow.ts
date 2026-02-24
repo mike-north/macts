@@ -52,7 +52,7 @@ export class WorkflowResourceClient {
    * Delete a workflow.
    */
   async delete(name: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { name });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name });
   }
 
 
@@ -62,6 +62,6 @@ export class WorkflowResourceClient {
    * Execute a workflow
    */
   async execute(workflow: unknown): Promise<void> {
-    return this.#http.rpc<void>('automator.workflows.execute', { workflow });
+    await this.#http.rpc<undefined>('automator.workflows.execute', { workflow });
   }
 }

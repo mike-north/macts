@@ -52,7 +52,7 @@ export class WorkspaceDocumentResourceClient {
    * Delete a workspacedocument.
    */
   async delete(name: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { name });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name });
   }
 
 
@@ -62,7 +62,7 @@ export class WorkspaceDocumentResourceClient {
    * Invoke the "build" scheme action
    */
   async build(workspaceName: string): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.build', { workspaceName });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.build', { workspaceName });
   }
 
 
@@ -70,7 +70,7 @@ export class WorkspaceDocumentResourceClient {
    * Invoke the "clean" scheme action
    */
   async clean(workspaceName: string): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.clean', { workspaceName });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.clean', { workspaceName });
   }
 
 
@@ -78,7 +78,7 @@ export class WorkspaceDocumentResourceClient {
    * Stop the active scheme action, if one is running
    */
   async stop(workspaceName: string): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.stop', { workspaceName });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.stop', { workspaceName });
   }
 
 
@@ -86,7 +86,7 @@ export class WorkspaceDocumentResourceClient {
    * Invoke the "run" scheme action
    */
   async run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.run', { workspaceName, withCommandLineArguments, withEnvironmentVariables });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.run', { workspaceName, withCommandLineArguments, withEnvironmentVariables });
   }
 
 
@@ -94,7 +94,7 @@ export class WorkspaceDocumentResourceClient {
    * Invoke the "test" scheme action
    */
   async test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.test', { workspaceName, withCommandLineArguments, withEnvironmentVariables });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.test', { workspaceName, withCommandLineArguments, withEnvironmentVariables });
   }
 
 
@@ -102,7 +102,7 @@ export class WorkspaceDocumentResourceClient {
    * Start a new debugging session in the workspace
    */
   async attach(workspaceName: string, toProcessIdentifier: number, suspended: boolean): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.attach', { workspaceName, toProcessIdentifier, suspended });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.attach', { workspaceName, toProcessIdentifier, suspended });
   }
 
 
@@ -110,6 +110,6 @@ export class WorkspaceDocumentResourceClient {
    * Start a debugging session using the "run" or "run without building" scheme action
    */
   async debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void> {
-    return this.#http.rpc<void>('xcode.workspacedocuments.debug', { workspaceName, scheme, runDestinationSpecifier, skipBuilding, commandLineArguments, environmentVariables });
+    await this.#http.rpc<undefined>('xcode.workspacedocuments.debug', { workspaceName, scheme, runDestinationSpecifier, skipBuilding, commandLineArguments, environmentVariables });
   }
 }

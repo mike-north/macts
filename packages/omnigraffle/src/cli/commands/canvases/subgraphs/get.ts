@@ -24,11 +24,6 @@ export class GetSubgraphCommand extends Command {
       const client = getClient();
       const item = await client.subgraphs.get(this.subgraphId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Subgraph not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         collapsed: item.collapsed,

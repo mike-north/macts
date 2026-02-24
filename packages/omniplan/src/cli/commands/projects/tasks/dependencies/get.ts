@@ -25,11 +25,6 @@ export class GetDependencyCommand extends Command {
       const client = getClient();
       const item = await client.dependencies.get(this.dependencyId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Dependency not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         dependencyType: item.dependencyType,
         leadTime: item.leadTime,

@@ -23,11 +23,6 @@ export class GetOutgoingMessageCommand extends Command {
       const client = getClient();
       const item = await client.outgoingmessages.get(this.outgoingMessageId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('OutgoingMessage not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         sender: item.sender,
         subject: item.subject,

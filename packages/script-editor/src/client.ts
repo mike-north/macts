@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new ScriptEditorError(code, message);
     }
 
@@ -91,7 +91,7 @@ export class ScriptEditorClient {
   constructor(options: ScriptEditorClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372';
     this.#httpClient = new HttpClient(baseUrl, options.apiKey);
-    this.documents = new DocumentResourceClient(this.#httpClient, 'scripteditor', 'documents');
+    this.documents = new DocumentResourceClient(this.#httpClient, 'script-editor', 'documents');
   }
 
   /**

@@ -25,11 +25,6 @@ export class GetSharedTrackCommand extends Command {
       const client = getClient();
       const item = await client.sharedtracks.get(this.sharedTrackId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('SharedTrack not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

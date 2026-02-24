@@ -61,8 +61,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new FinderError(code, message);
     }
 
@@ -180,7 +180,7 @@ export class FinderClient {
    * Open the specified object(s)
    */
   async open(using?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.open', { using, withProperties });
+    await this.#httpClient.rpc<undefined>('finder.app.open', { using, withProperties });
   }
 
 
@@ -188,7 +188,7 @@ export class FinderClient {
    * Print the specified object(s)
    */
   async print(withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.print', { withProperties });
+    await this.#httpClient.rpc<undefined>('finder.app.print', { withProperties });
   }
 
 
@@ -196,7 +196,7 @@ export class FinderClient {
    * Quit the Finder
    */
   async quit(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.quit', {});
+    await this.#httpClient.rpc<undefined>('finder.app.quit', {});
   }
 
 
@@ -204,7 +204,7 @@ export class FinderClient {
    * Activate the specified window (or the Finder)
    */
   async activate(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.activate', {});
+    await this.#httpClient.rpc<undefined>('finder.app.activate', {});
   }
 
 
@@ -212,7 +212,7 @@ export class FinderClient {
    * Close an object
    */
   async close(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.close', {});
+    await this.#httpClient.rpc<undefined>('finder.app.close', {});
   }
 
 
@@ -220,7 +220,7 @@ export class FinderClient {
    * Return the number of elements of a particular class within an object
    */
   async count(each: string): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.count', { each });
+    await this.#httpClient.rpc<undefined>('finder.app.count', { each });
   }
 
 
@@ -228,7 +228,7 @@ export class FinderClient {
    * Return the size in bytes of an object
    */
   async dataSize(as?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.dataSize', { as });
+    await this.#httpClient.rpc<undefined>('finder.app.dataSize', { as });
   }
 
 
@@ -236,7 +236,7 @@ export class FinderClient {
    * Move an item from its container to the trash
    */
   async _delete(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.delete', {});
+    await this.#httpClient.rpc<undefined>('finder.app.delete', {});
   }
 
 
@@ -244,7 +244,7 @@ export class FinderClient {
    * Duplicate one or more object(s)
    */
   async duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.duplicate', { to, replacing, routingSuppressed, exactCopy });
+    await this.#httpClient.rpc<undefined>('finder.app.duplicate', { to, replacing, routingSuppressed, exactCopy });
   }
 
 
@@ -252,7 +252,7 @@ export class FinderClient {
    * Verify if an object exists
    */
   async exists(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.exists', {});
+    await this.#httpClient.rpc<undefined>('finder.app.exists', {});
   }
 
 
@@ -260,7 +260,7 @@ export class FinderClient {
    * Make a new element
    */
   async make(_new: string, at: string, to?: string, withProperties?: unknown): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.make', { 'new': _new, at, to, withProperties });
+    await this.#httpClient.rpc<undefined>('finder.app.make', { 'new': _new, at, to, withProperties });
   }
 
 
@@ -268,7 +268,7 @@ export class FinderClient {
    * Move object(s) to a new location
    */
   async move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.move', { to, replacing, positionedAt, routingSuppressed });
+    await this.#httpClient.rpc<undefined>('finder.app.move', { to, replacing, positionedAt, routingSuppressed });
   }
 
 
@@ -276,7 +276,7 @@ export class FinderClient {
    * Select the specified object(s)
    */
   async select(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.select', {});
+    await this.#httpClient.rpc<undefined>('finder.app.select', {});
   }
 
 
@@ -284,7 +284,7 @@ export class FinderClient {
    * Private event to open a virtual location
    */
   async openVirtualLocation(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.openVirtualLocation', {});
+    await this.#httpClient.rpc<undefined>('finder.app.openVirtualLocation', {});
   }
 
 
@@ -292,7 +292,7 @@ export class FinderClient {
    * (NOT AVAILABLE YET) Copy the selected items to the clipboard (the Finder must be the front application)
    */
   async copy(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.copy', {});
+    await this.#httpClient.rpc<undefined>('finder.app.copy', {});
   }
 
 
@@ -300,7 +300,7 @@ export class FinderClient {
    * Return the specified object(s) in a sorted list
    */
   async sort(by: string): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.sort', { by });
+    await this.#httpClient.rpc<undefined>('finder.app.sort', { by });
   }
 
 
@@ -308,7 +308,7 @@ export class FinderClient {
    * Arrange items in window nicely (only applies to open windows in icon view that are not kept arranged)
    */
   async cleanUp(by?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.cleanUp', { by });
+    await this.#httpClient.rpc<undefined>('finder.app.cleanUp', { by });
   }
 
 
@@ -316,7 +316,7 @@ export class FinderClient {
    * Eject the specified disk(s)
    */
   async eject(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.eject', {});
+    await this.#httpClient.rpc<undefined>('finder.app.eject', {});
   }
 
 
@@ -324,7 +324,7 @@ export class FinderClient {
    * Empty the trash
    */
   async empty(security?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.empty', { security });
+    await this.#httpClient.rpc<undefined>('finder.app.empty', { security });
   }
 
 
@@ -332,7 +332,7 @@ export class FinderClient {
    * (NOT AVAILABLE) Erase the specified disk(s)
    */
   async erase(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.erase', {});
+    await this.#httpClient.rpc<undefined>('finder.app.erase', {});
   }
 
 
@@ -340,7 +340,7 @@ export class FinderClient {
    * Bring the specified object(s) into view
    */
   async reveal(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.reveal', {});
+    await this.#httpClient.rpc<undefined>('finder.app.reveal', {});
   }
 
 
@@ -348,7 +348,7 @@ export class FinderClient {
    * Update the display of the specified object(s) to match their on-disk representation
    */
   async update(necessity?: boolean, registeringApplications?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.update', { necessity, registeringApplications });
+    await this.#httpClient.rpc<undefined>('finder.app.update', { necessity, registeringApplications });
   }
 
 
@@ -356,7 +356,7 @@ export class FinderClient {
    * Restart the computer
    */
   async restart(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.restart', {});
+    await this.#httpClient.rpc<undefined>('finder.app.restart', {});
   }
 
 
@@ -364,7 +364,7 @@ export class FinderClient {
    * Shut Down the computer
    */
   async shutDown(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.shutDown', {});
+    await this.#httpClient.rpc<undefined>('finder.app.shutDown', {});
   }
 
 
@@ -372,6 +372,6 @@ export class FinderClient {
    * Put the computer to sleep
    */
   async sleep(): Promise<void> {
-    return this.#httpClient.rpc<void>('finder.app.sleep', {});
+    await this.#httpClient.rpc<undefined>('finder.app.sleep', {});
   }
 }

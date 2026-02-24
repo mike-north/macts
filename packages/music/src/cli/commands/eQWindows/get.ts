@@ -23,11 +23,6 @@ export class GetEQWindowCommand extends Command {
       const client = getClient();
       const item = await client.eqwindows.get(this.eQWindowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('EQWindow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

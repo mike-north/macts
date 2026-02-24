@@ -33,8 +33,7 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, withProperties } = args as { new: string; withProperties?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.make(_new as any, withProperties as any);
+    await client.make(_new as unknown, withProperties as unknown);
     return { success: true };
   },
 };
@@ -58,8 +57,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.count(each as any);
+    await client.count(each as unknown);
     return { success: true };
   },
 };
@@ -194,8 +192,7 @@ export const appExecuteTool: McpToolDefinition = {
   handler: async (args) => {
     const { javascript } = args as { javascript: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.execute(javascript as any);
+    await client.execute(javascript as unknown);
     return { success: true };
   },
 };

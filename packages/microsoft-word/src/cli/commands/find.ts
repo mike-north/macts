@@ -21,8 +21,7 @@ export class FindCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.find(this.findText as any, this.matchCase as any, this.matchWholeWord as any);
+      await client.find(this.findText as unknown, this.matchCase as unknown, this.matchWholeWord as unknown);
 
       const output = formatter.formatSuccess('find completed successfully');
       this.context.stdout.write(output + '\n');

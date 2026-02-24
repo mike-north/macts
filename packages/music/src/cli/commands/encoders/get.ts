@@ -23,11 +23,6 @@ export class GetEncoderCommand extends Command {
       const client = getClient();
       const item = await client.encoders.get(this.encoderId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Encoder not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         format: item.format,
       });

@@ -19,7 +19,6 @@ export class RevealHotkeyWindowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.revealHotkeyWindow();
 
       const output = formatter.formatSuccess('revealHotkeyWindow completed successfully');

@@ -19,8 +19,7 @@ export class SlideCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.slide(this.by as any);
+      await client.slide(this.by as unknown);
 
       const output = formatter.formatSuccess('slide completed successfully');
       this.context.stdout.write(output + '\n');

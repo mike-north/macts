@@ -48,8 +48,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new MessagesError(code, message);
     }
 
@@ -115,7 +115,7 @@ export class MessagesClient {
    * Sends a message to a participant or to a chat.
    */
   async send(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('messages.app.send', { to });
+    await this.#httpClient.rpc<undefined>('messages.app.send', { to });
   }
 
 
@@ -123,7 +123,7 @@ export class MessagesClient {
    * Login to all accounts.
    */
   async login(): Promise<void> {
-    return this.#httpClient.rpc<void>('messages.app.login', {});
+    await this.#httpClient.rpc<undefined>('messages.app.login', {});
   }
 
 
@@ -131,6 +131,6 @@ export class MessagesClient {
    * Logout of all accounts.
    */
   async logout(): Promise<void> {
-    return this.#httpClient.rpc<void>('messages.app.logout', {});
+    await this.#httpClient.rpc<undefined>('messages.app.logout', {});
   }
 }

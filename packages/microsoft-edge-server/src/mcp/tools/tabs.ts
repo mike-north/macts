@@ -112,7 +112,7 @@ export const tabsReloadTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.reload(tabId);
-    return { success: true, message: `Reload a tab ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -139,7 +139,7 @@ export const tabsGoBackTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.goBack(tabId);
-    return { success: true, message: `Go Back (If Possible) ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -166,7 +166,7 @@ export const tabsGoForwardTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.goForward(tabId);
-    return { success: true, message: `Go Forward (If Possible) ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -193,7 +193,7 @@ export const tabsSelectAllTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.selectAll(tabId);
-    return { success: true, message: `Select all ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -220,7 +220,7 @@ export const tabsCutSelectionTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.cutSelection(tabId);
-    return { success: true, message: `Cut selected text (If Possible) ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -247,7 +247,7 @@ export const tabsCopySelectionTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.copySelection(tabId);
-    return { success: true, message: `Copy text ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -274,7 +274,7 @@ export const tabsPasteSelectionTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.pasteSelection(tabId);
-    return { success: true, message: `Paste text (If Possible) ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -301,7 +301,7 @@ export const tabsUndoTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.undo(tabId);
-    return { success: true, message: `Undo the last change ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -328,7 +328,7 @@ export const tabsRedoTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.redo(tabId);
-    return { success: true, message: `Redo the last change ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -355,7 +355,7 @@ export const tabsStopTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.stop(tabId);
-    return { success: true, message: `Stop the current tab from loading ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -382,7 +382,7 @@ export const tabsViewSourceTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string };
     const client = getClient();
     await client.tabs.viewSource(tabId);
-    return { success: true, message: `View the HTML source of the tab ${tabId}` };
+    return { success: true };
   },
 };
 
@@ -414,7 +414,7 @@ export const tabsExecuteTool: McpToolDefinition = {
     const { tabId } = args as { tabId: string; javascript: string };
     const client = getClient();
     await client.tabs.execute(tabId);
-    return { success: true, message: `Execute a piece of javascript ${tabId}` };
+    return { success: true };
   },
 };
 

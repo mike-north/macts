@@ -21,8 +21,7 @@ export class AddCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.add(this.object as any, this.to as any, this.atIndex as any);
+      await client.add(this.object as unknown, this.to as unknown, this.atIndex as unknown);
 
       const output = formatter.formatSuccess('add completed successfully');
       this.context.stdout.write(output + '\n');

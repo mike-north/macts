@@ -19,7 +19,6 @@ export class OpenVirtualLocationCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.openVirtualLocation();
 
       const output = formatter.formatSuccess('openVirtualLocation completed successfully');

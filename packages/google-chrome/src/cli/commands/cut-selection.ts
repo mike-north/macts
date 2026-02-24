@@ -19,7 +19,6 @@ export class CutSelectionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.cutSelection();
 
       const output = formatter.formatSuccess('cutSelection completed successfully');

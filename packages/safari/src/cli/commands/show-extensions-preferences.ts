@@ -19,7 +19,6 @@ export class ShowExtensionsPreferencesCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.showExtensionsPreferences();
 
       const output = formatter.formatSuccess('showExtensionsPreferences completed successfully');

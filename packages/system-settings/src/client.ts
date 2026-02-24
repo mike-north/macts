@@ -47,8 +47,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new SystemSettingsError(code, message);
     }
 
@@ -110,6 +110,6 @@ export class SystemSettingsClient {
    * Reveals a settings pane or an anchor within a pane.
    */
   async reveal(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-settings.app.reveal', {});
+    await this.#httpClient.rpc<undefined>('system-settings.app.reveal', {});
   }
 }

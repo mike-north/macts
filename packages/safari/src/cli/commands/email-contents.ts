@@ -19,8 +19,7 @@ export class EmailContentsCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.emailContents(this.of as any);
+      await client.emailContents(this.of as unknown);
 
       const output = formatter.formatSuccess('emailContents completed successfully');
       this.context.stdout.write(output + '\n');

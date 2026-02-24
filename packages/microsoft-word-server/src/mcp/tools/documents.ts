@@ -100,7 +100,7 @@ export const documentsSaveAsTool: McpToolDefinition = {
     const { fileName } = args as { fileName: string; fileFormat?: string };
     const client = getClient();
     await client.documents.saveAs(fileName);
-    return { success: true, message: `Save the document with a new name or format ${fileName}` };
+    return { success: true };
   },
 };
 
@@ -124,7 +124,7 @@ export const documentsCloseTool: McpToolDefinition = {
     const { saving } = args as { saving?: boolean };
     const client = getClient();
     await client.documents.close(saving);
-    return { success: true, message: `Close the specified document ${saving}` };
+    return { success: true };
   },
 };
 
@@ -188,7 +188,7 @@ export const documentsCreateRangeTool: McpToolDefinition = {
     const { start } = args as { start?: number; end?: number };
     const client = getClient();
     await client.documents.createRange(start);
-    return { success: true, message: `Create a text range by character positions ${start}` };
+    return { success: true };
   },
 };
 

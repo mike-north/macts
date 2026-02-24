@@ -28,6 +28,7 @@ export class ApiKeyListCommand extends Command {
   })
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
+  // eslint-disable-next-line @typescript-eslint/require-await -- Clipanion requires async execute()
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 

@@ -19,8 +19,7 @@ export class EmptyCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.empty(this.security as any);
+      await client.empty(this.security as unknown);
 
       const output = formatter.formatSuccess('empty completed successfully');
       this.context.stdout.write(output + '\n');

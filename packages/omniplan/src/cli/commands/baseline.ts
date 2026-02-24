@@ -19,7 +19,6 @@ export class BaselineCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.baseline();
 
       const output = formatter.formatSuccess('baseline completed successfully');

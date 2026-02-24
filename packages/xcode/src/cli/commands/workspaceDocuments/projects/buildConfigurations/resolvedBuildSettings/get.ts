@@ -26,11 +26,6 @@ export class GetResolvedBuildSettingCommand extends Command {
       const client = getClient();
       const item = await client.resolvedbuildsettings.get(this.resolvedBuildSettingId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('ResolvedBuildSetting not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         value: item.value,

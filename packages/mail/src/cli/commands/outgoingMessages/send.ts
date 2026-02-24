@@ -21,7 +21,6 @@ export class SendOutgoingMessageCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.outgoingmessages.send();
 
       const output = formatter.formatSuccess('send completed successfully');

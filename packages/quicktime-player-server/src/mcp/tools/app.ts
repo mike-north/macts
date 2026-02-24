@@ -134,8 +134,7 @@ export const appStepBackwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.stepBackward(by as any);
+    await client.stepBackward(by as unknown);
     return { success: true };
   },
 };
@@ -159,8 +158,7 @@ export const appStepForwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.stepForward(by as any);
+    await client.stepForward(by as unknown);
     return { success: true };
   },
 };
@@ -192,8 +190,7 @@ export const appTrimTool: McpToolDefinition = {
   handler: async (args) => {
     const { from, to } = args as { from: number; to: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.trim(from as any, to as any);
+    await client.trim(from as unknown, to as unknown);
     return { success: true };
   },
 };
@@ -297,8 +294,7 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in, usingSettingsPreset } = args as { in: string; usingSettingsPreset: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client._export(_in as any, usingSettingsPreset as any);
+    await client._export(_in as unknown, usingSettingsPreset as unknown);
     return { success: true };
   },
 };

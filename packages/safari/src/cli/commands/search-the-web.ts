@@ -20,8 +20,7 @@ export class SearchTheWebCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.searchTheWeb(this.for as any, this.in as any);
+      await client.searchTheWeb(this.for as unknown, this.in as unknown);
 
       const output = formatter.formatSuccess('searchTheWeb completed successfully');
       this.context.stdout.write(output + '\n');

@@ -38,8 +38,7 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { object, to, atIndex } = args as { object: string; to: string; atIndex?: number };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.add(object as any, to as any, atIndex as any);
+    await client.add(object as unknown, to as unknown, atIndex as unknown);
     return { success: true };
   },
 };
@@ -66,8 +65,7 @@ export const appRemoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { object } = args as { object: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.remove(object as any);
+    await client.remove(object as unknown);
     return { success: true };
   },
 };

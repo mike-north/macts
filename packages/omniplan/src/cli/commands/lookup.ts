@@ -19,8 +19,7 @@ export class LookupCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.lookup(this.key as any);
+      await client.lookup(this.key as unknown);
 
       const output = formatter.formatSuccess('lookup completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,7 +19,6 @@ export class ConvertCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.convert();
 
       const output = formatter.formatSuccess('convert completed successfully');

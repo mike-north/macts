@@ -24,11 +24,6 @@ export class GetGraphicCommand extends Command {
       const client = getClient();
       const item = await client.graphics.get(this.graphicId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Graphic not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         origin: item.origin,

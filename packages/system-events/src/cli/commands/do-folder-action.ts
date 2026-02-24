@@ -21,8 +21,7 @@ export class DoFolderActionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.doFolderAction(this.folderActionCode as any, this.withItemList as any, this.withWindowSize as any);
+      await client.doFolderAction(this.folderActionCode as unknown, this.withItemList as unknown, this.withWindowSize as unknown);
 
       const output = formatter.formatSuccess('doFolderAction completed successfully');
       this.context.stdout.write(output + '\n');

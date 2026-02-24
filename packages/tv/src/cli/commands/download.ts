@@ -19,7 +19,6 @@ export class DownloadCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.download();
 
       const output = formatter.formatSuccess('download completed successfully');

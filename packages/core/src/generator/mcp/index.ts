@@ -102,10 +102,10 @@ function safeDestructure(names: string[]): { destructured: string; callArgs: str
 
   // Use renaming destructuring: { new: _new, for: _for }
   const destructured = names
-    .map((n, i) => (safeNames[i] !== n ? `${n}: ${safeNames[i]}` : n))
+    .map((n, i) => (safeNames[i] !== n ? `${n}: ${safeNames[i] ?? n}` : n))
     .join(', ')
   const callArgs = names
-    .map((n, i) => (safeNames[i] !== n ? `'${n}': ${safeNames[i]}` : n))
+    .map((n, i) => (safeNames[i] !== n ? `'${n}': ${safeNames[i] ?? n}` : n))
     .join(', ')
 
   return { destructured, callArgs }
@@ -240,7 +240,7 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
     const { ${destructuredId} } = args as ${argsType};
     const client = getClient();
     await client.${resourceName}.${safeIdentifier(tool.operationName)}(${safeIdProp});
-    return { success: true, message: \`${tool.description.replace(/'/g, "\\'")} \${${safeIdProp}}\` };
+    return { success: true };
   }`
     }
   }
@@ -281,13 +281,11 @@ function generateAppToolHandler(tool: GeneratedTool): string {
 
   // Pass arguments positionally to match SDK method signature.
   // Cast each arg to satisfy SDK's precise types (MCP infers from JSON Schema which is less specific).
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const positionalArgs = sortedProps.map((p) => `${safeIdentifier(p)} as any`).join(', ')
+  const positionalArgs = sortedProps.map((p) => `${safeIdentifier(p)} as unknown`).join(', ')
 
   return `async (args) => {
     const { ${destructured} } = args as ${argsType};
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await client.${methodName}(${positionalArgs});
     return { success: true };
   }`

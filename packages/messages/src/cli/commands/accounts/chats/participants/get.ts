@@ -25,11 +25,6 @@ export class GetParticipantCommand extends Command {
       const client = getClient();
       const item = await client.participants.get(this.participantId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Participant not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         account: item.account,

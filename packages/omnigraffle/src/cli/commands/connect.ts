@@ -20,8 +20,7 @@ export class ConnectCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.connect(this.from as any, this.to as any);
+      await client.connect(this.from as unknown, this.to as unknown);
 
       const output = formatter.formatSuccess('connect completed successfully');
       this.context.stdout.write(output + '\n');

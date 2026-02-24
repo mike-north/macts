@@ -24,11 +24,6 @@ export class GetRuleConditionCommand extends Command {
       const client = getClient();
       const item = await client.ruleconditions.get(this.ruleConditionId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('RuleCondition not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         expression: item.expression,
         header: item.header,

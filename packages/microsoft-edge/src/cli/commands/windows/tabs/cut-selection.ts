@@ -22,8 +22,7 @@ export class CutSelectionTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.cutSelection(this.tabId as any);
+      await client.tabs.cutSelection(this.tabId as unknown);
 
       const output = formatter.formatSuccess('cutSelection completed successfully');
       this.context.stdout.write(output + '\n');

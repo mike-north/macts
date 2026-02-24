@@ -51,9 +51,7 @@ export function createLogger(options?: pino.LoggerOptions): pino.Logger {
  * @returns The singleton Pino logger
  */
 export function getLogger(): pino.Logger {
-  if (!logger) {
-    logger = createLogger()
-  }
+  logger ??= createLogger()
   return logger
 }
 

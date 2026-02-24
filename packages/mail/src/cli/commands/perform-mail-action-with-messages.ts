@@ -20,8 +20,7 @@ export class PerformMailActionWithMessagesCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.performMailActionWithMessages(this.inMailboxes as any, this.forRule as any);
+      await client.performMailActionWithMessages(this.inMailboxes as unknown, this.forRule as unknown);
 
       const output = formatter.formatSuccess('performMailActionWithMessages completed successfully');
       this.context.stdout.write(output + '\n');

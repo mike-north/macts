@@ -6,7 +6,7 @@ import { createFormatter } from '../../output/index.js';
  * Get a document by ID.
  */
 export class GetDocumentCommand extends Command {
-  static override paths = [["scripteditor", "documents", "get"]];
+  static override paths = [["script-editor", "documents", "get"]];
 
   static override usage = Command.Usage({
     description: 'Get a document by ID',
@@ -22,11 +22,6 @@ export class GetDocumentCommand extends Command {
     try {
       const client = getClient();
       const item = await client.documents.get(this.documentId);
-
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Document not found') + '\n');
-        return 1;
-      }
 
       const output = formatter.format({
         name: item.name,

@@ -52,7 +52,7 @@ export class CalendarResourceClient {
    * Delete a calendar.
    */
   async delete(calendarIdentifier: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { calendarIdentifier });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { calendarIdentifier });
   }
 
 

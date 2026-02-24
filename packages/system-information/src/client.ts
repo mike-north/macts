@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new SystemInformationError(code, message);
     }
 
@@ -105,6 +105,6 @@ export class SystemInformationClient {
    * Send system information to AppleCare
    */
   async send(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-information.app.send', {});
+    await this.#httpClient.rpc<undefined>('system-information.app.send', {});
   }
 }

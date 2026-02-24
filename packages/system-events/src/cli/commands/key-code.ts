@@ -19,8 +19,7 @@ export class KeyCodeCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.keyCode(this.using as any);
+      await client.keyCode(this.using as unknown);
 
       const output = formatter.formatSuccess('keyCode completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,7 +19,6 @@ export class StopSlideshowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.stopSlideshow();
 
       const output = formatter.formatSuccess('stopSlideshow completed successfully');

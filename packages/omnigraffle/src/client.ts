@@ -56,8 +56,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new OmniGraffleError(code, message);
     }
 
@@ -155,7 +155,7 @@ export class OmniGraffleClient {
    * Draw a line between graphics
    */
   async connect(from: string, to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.connect', { from, to });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.connect', { from, to });
   }
 
 
@@ -163,7 +163,7 @@ export class OmniGraffleClient {
    * Layout graphics using the document's Layout Info
    */
   async layout(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.layout', {});
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.layout', {});
   }
 
 
@@ -171,7 +171,7 @@ export class OmniGraffleClient {
    * Export documents
    */
   async _export(as: string, scope: ExportAreaType, to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.export', { as, scope, to });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.export', { as, scope, to });
   }
 
 
@@ -179,7 +179,7 @@ export class OmniGraffleClient {
    * Flip graphics
    */
   async flip(over: Orientation): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.flip', { over });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.flip', { over });
   }
 
 
@@ -187,7 +187,7 @@ export class OmniGraffleClient {
    * Slide graphics by a vector amount
    */
   async slide(by: { x: number; y: number }): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.slide', { by });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.slide', { by });
   }
 
 
@@ -195,7 +195,7 @@ export class OmniGraffleClient {
    * Group graphics
    */
   async assemble(subgraph?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.assemble', { subgraph });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.assemble', { subgraph });
   }
 
 
@@ -203,7 +203,7 @@ export class OmniGraffleClient {
    * Change the number of pages to fit the current graphics
    */
   async pageAdjust(): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.pageAdjust', {});
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.pageAdjust', {});
   }
 
 
@@ -211,6 +211,6 @@ export class OmniGraffleClient {
    * Evaluate JavaScript and return the result
    */
   async evaluateJavascript(script: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omnigraffle.app.evaluateJavascript', { script });
+    await this.#httpClient.rpc<undefined>('omnigraffle.app.evaluateJavascript', { script });
   }
 }

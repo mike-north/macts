@@ -21,8 +21,7 @@ export class CloseDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.documents.close(this.saving as any);
+      await client.documents.close(this.saving as unknown);
 
       const output = formatter.formatSuccess('close completed successfully');
       this.context.stdout.write(output + '\n');

@@ -82,8 +82,7 @@ export interface Clipping {
 }
 
 // @public
-export interface ClippingCreateInput {
-}
+export type ClippingCreateInput = Record<string, never>;
 
 // @public
 export class ClippingResourceClient {
@@ -109,8 +108,7 @@ export interface ClippingWindow {
 }
 
 // @public
-export interface ClippingWindowCreateInput {
-}
+export type ClippingWindowCreateInput = Record<string, never>;
 
 // @public
 export class ClippingWindowResourceClient {
@@ -216,8 +214,7 @@ export interface DesktopObject {
 }
 
 // @public
-export interface DesktopObjectCreateInput {
-}
+export type DesktopObjectCreateInput = Record<string, never>;
 
 // @public
 export class DesktopObjectResourceClient {
@@ -287,8 +284,7 @@ export interface DocumentFile {
 }
 
 // @public
-export interface DocumentFileCreateInput {
-}
+export type DocumentFileCreateInput = Record<string, never>;
 
 // @public
 export class DocumentFileResourceClient {
@@ -477,8 +473,7 @@ export interface Folder {
 }
 
 // @public
-export interface FolderCreateInput {
-}
+export type FolderCreateInput = Record<string, never>;
 
 // @public
 export class FolderResourceClient {
@@ -510,8 +505,7 @@ export interface InternetLocationFile {
 }
 
 // @public
-export interface InternetLocationFileCreateInput {
-}
+export type InternetLocationFileCreateInput = Record<string, never>;
 
 // @public
 export class InternetLocationFileResourceClient {
@@ -589,8 +583,7 @@ export interface Package {
 }
 
 // @public
-export interface PackageCreateInput {
-}
+export type PackageCreateInput = Record<string, never>;
 
 // @public
 export class PackageResourceClient {

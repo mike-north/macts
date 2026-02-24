@@ -17,8 +17,7 @@ export interface Account {
 }
 
 /** Input for creating a Account */
-export interface AccountCreateInput {
-}
+export type AccountCreateInput = Record<string, never>;
 
 /** Input for updating a Account */
 export type AccountUpdateInput = Partial<AccountCreateInput>;

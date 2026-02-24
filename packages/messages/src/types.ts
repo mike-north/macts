@@ -36,8 +36,7 @@ export interface Participant {
 }
 
 /** Input for creating a Participant */
-export interface ParticipantCreateInput {
-}
+export type ParticipantCreateInput = Record<string, never>;
 
 /** Input for updating a Participant */
 export type ParticipantUpdateInput = Partial<ParticipantCreateInput>;
@@ -76,8 +75,7 @@ export interface Chat {
 }
 
 /** Input for creating a Chat */
-export interface ChatCreateInput {
-}
+export type ChatCreateInput = Record<string, never>;
 
 /** Input for updating a Chat */
 export type ChatUpdateInput = Partial<ChatCreateInput>;

@@ -19,7 +19,6 @@ export class ConnectCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.connect();
 
       const output = formatter.formatSuccess('connect completed successfully');

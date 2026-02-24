@@ -19,7 +19,6 @@ export class CancelCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.cancel();
 
       const output = formatter.formatSuccess('cancel completed successfully');

@@ -19,7 +19,6 @@ export class HideHotkeyWindowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.hideHotkeyWindow();
 
       const output = formatter.formatSuccess('hideHotkeyWindow completed successfully');

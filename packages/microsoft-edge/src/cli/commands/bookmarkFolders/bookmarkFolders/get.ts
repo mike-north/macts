@@ -24,11 +24,6 @@ export class GetBookmarkFolderCommand extends Command {
       const client = getClient();
       const item = await client.bookmarkfolders.get(this.bookmarkFolderId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BookmarkFolder not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         title: item.title,

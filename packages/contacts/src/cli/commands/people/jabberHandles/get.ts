@@ -24,11 +24,6 @@ export class GetJabberHandleCommand extends Command {
       const client = getClient();
       const item = await client.jabberhandles.get(this.jabberHandleId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('JabberHandle not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         label: item.label,

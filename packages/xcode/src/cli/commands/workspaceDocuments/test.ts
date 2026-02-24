@@ -23,8 +23,7 @@ export class TestWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.workspacedocuments.test(this.workspaceName as any, this.withCommandLineArguments as any, this.withEnvironmentVariables as any);
+      await client.workspacedocuments.test(this.workspaceName as unknown, this.withCommandLineArguments as unknown, this.withEnvironmentVariables as unknown);
 
       const output = formatter.formatSuccess('test completed successfully');
       this.context.stdout.write(output + '\n');

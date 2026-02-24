@@ -55,8 +55,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new OmniPlanError(code, message);
     }
 
@@ -150,7 +150,7 @@ export class OmniPlanClient {
    * Export a document
    */
   async _export(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.export', { to });
+    await this.#httpClient.rpc<undefined>('omniplan.app.export', { to });
   }
 
 
@@ -158,7 +158,7 @@ export class OmniPlanClient {
    * Assign resources to tasks
    */
   async assign(resource: string, task: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.assign', { resource, task });
+    await this.#httpClient.rpc<undefined>('omniplan.app.assign', { resource, task });
   }
 
 
@@ -166,7 +166,7 @@ export class OmniPlanClient {
    * Create a dependency between tasks
    */
   async depend(prerequisite: string, dependent: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.depend', { prerequisite, dependent });
+    await this.#httpClient.rpc<undefined>('omniplan.app.depend', { prerequisite, dependent });
   }
 
 
@@ -174,7 +174,7 @@ export class OmniPlanClient {
    * Commit the current schedule as the baseline schedule
    */
   async baseline(): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.baseline', {});
+    await this.#httpClient.rpc<undefined>('omniplan.app.baseline', {});
   }
 
 
@@ -182,7 +182,7 @@ export class OmniPlanClient {
    * Level resources on project
    */
   async level(): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.level', {});
+    await this.#httpClient.rpc<undefined>('omniplan.app.level', {});
   }
 
 
@@ -190,7 +190,7 @@ export class OmniPlanClient {
    * Look up a task via a custom data key
    */
   async lookup(key: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.lookup', { key });
+    await this.#httpClient.rpc<undefined>('omniplan.app.lookup', { key });
   }
 
 
@@ -198,7 +198,7 @@ export class OmniPlanClient {
    * Make a change tracking mark on project
    */
   async changeMark(): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.changeMark', {});
+    await this.#httpClient.rpc<undefined>('omniplan.app.changeMark', {});
   }
 
 
@@ -206,7 +206,7 @@ export class OmniPlanClient {
    * Add working hours to a schedule
    */
   async addWorkTime(schedule: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.addWorkTime', { schedule });
+    await this.#httpClient.rpc<undefined>('omniplan.app.addWorkTime', { schedule });
   }
 
 
@@ -214,7 +214,7 @@ export class OmniPlanClient {
    * Remove working hours from a schedule
    */
   async subtractWorkTime(schedule: string): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.subtractWorkTime', { schedule });
+    await this.#httpClient.rpc<undefined>('omniplan.app.subtractWorkTime', { schedule });
   }
 
 
@@ -222,7 +222,7 @@ export class OmniPlanClient {
    * Undo the last command
    */
   async undo(): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.undo', {});
+    await this.#httpClient.rpc<undefined>('omniplan.app.undo', {});
   }
 
 
@@ -230,6 +230,6 @@ export class OmniPlanClient {
    * Redo the last undone command
    */
   async redo(): Promise<void> {
-    return this.#httpClient.rpc<void>('omniplan.app.redo', {});
+    await this.#httpClient.rpc<undefined>('omniplan.app.redo', {});
   }
 }

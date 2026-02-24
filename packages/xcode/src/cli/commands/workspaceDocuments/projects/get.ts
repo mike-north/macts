@@ -24,11 +24,6 @@ export class GetProjectCommand extends Command {
       const client = getClient();
       const item = await client.projects.get(this.projectId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Project not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

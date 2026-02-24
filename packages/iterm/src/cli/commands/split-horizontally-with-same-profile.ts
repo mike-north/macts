@@ -19,8 +19,7 @@ export class SplitHorizontallyWithSameProfileCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.splitHorizontallyWithSameProfile(this.command as any);
+      await client.splitHorizontallyWithSameProfile(this.command as unknown);
 
       const output = formatter.formatSuccess('splitHorizontallyWithSameProfile completed successfully');
       this.context.stdout.write(output + '\n');

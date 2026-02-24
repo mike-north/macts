@@ -25,11 +25,6 @@ export class GetBuildConfigurationCommand extends Command {
       const client = getClient();
       const item = await client.buildconfigurations.get(this.buildConfigurationId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BuildConfiguration not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

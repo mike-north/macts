@@ -19,7 +19,6 @@ export class DispatchMessageToExtensionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.dispatchMessageToExtension();
 
       const output = formatter.formatSuccess('dispatchMessageToExtension completed successfully');

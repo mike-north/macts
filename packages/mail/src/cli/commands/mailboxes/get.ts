@@ -23,11 +23,6 @@ export class GetMailboxCommand extends Command {
       const client = getClient();
       const item = await client.mailboxes.get(this.mailboxId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Mailbox not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         unreadCount: item.unreadCount,

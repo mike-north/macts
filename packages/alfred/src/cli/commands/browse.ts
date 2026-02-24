@@ -19,8 +19,7 @@ export class BrowseCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.browse(this.browsePath as any);
+      await client.browse(this.browsePath as unknown);
 
       const output = formatter.formatSuccess('browse completed successfully');
       this.context.stdout.write(output + '\n');

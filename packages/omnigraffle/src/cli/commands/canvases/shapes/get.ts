@@ -24,11 +24,6 @@ export class GetShapeCommand extends Command {
       const client = getClient();
       const item = await client.shapes.get(this.shapeId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Shape not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

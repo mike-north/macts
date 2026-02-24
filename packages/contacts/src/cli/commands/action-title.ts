@@ -20,8 +20,7 @@ export class ActionTitleCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.actionTitle(this.with as any, this.for as any);
+      await client.actionTitle(this.with as unknown, this.for as unknown);
 
       const output = formatter.formatSuccess('actionTitle completed successfully');
       this.context.stdout.write(output + '\n');

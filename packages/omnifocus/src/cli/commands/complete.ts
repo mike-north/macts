@@ -19,8 +19,7 @@ export class CompleteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.complete(this.text as any);
+      await client.complete(this.text as unknown);
 
       const output = formatter.formatSuccess('complete completed successfully');
       this.context.stdout.write(output + '\n');

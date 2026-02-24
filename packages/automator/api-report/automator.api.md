@@ -123,8 +123,7 @@ export interface RequiredResource {
 }
 
 // @public
-export interface RequiredResourceCreateInput {
-}
+export type RequiredResourceCreateInput = Record<string, never>;
 
 // @public
 export class RequiredResourceResourceClient {
@@ -228,8 +227,7 @@ export interface Workflow {
 }
 
 // @public
-export interface WorkflowCreateInput {
-}
+export type WorkflowCreateInput = Record<string, never>;
 
 // @public
 export class WorkflowResourceClient {

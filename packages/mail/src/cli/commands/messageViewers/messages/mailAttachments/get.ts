@@ -25,11 +25,6 @@ export class GetMailAttachmentCommand extends Command {
       const client = getClient();
       const item = await client.mailattachments.get(this.mailAttachmentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MailAttachment not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         mIMEType: item.mIMEType,

@@ -27,7 +27,7 @@ export const uielementsClickTool: McpToolDefinition = {
     const { at } = args as { at?: string };
     const client = getClient();
     await client.uielements.click(at);
-    return { success: true, message: `cause the target process to behave as if the UI element were clicked ${at}` };
+    return { success: true };
   },
 };
 

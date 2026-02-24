@@ -26,11 +26,6 @@ export class GetBuildSettingCommand extends Command {
       const client = getClient();
       const item = await client.buildsettings.get(this.buildSettingId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('BuildSetting not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         value: item.value,

@@ -1,5 +1,5 @@
 /**
- * MCP plugin for macOS ScriptEditor.app.
+ * MCP plugin for macOS Script Editor.app.
  *
  * @packageDocumentation
  */

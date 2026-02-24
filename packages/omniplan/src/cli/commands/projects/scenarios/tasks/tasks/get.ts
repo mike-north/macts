@@ -26,11 +26,6 @@ export class GetTaskCommand extends Command {
       const client = getClient();
       const item = await client.tasks.get(this.taskId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Task not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
         name: item.name,

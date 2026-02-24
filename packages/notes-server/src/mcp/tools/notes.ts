@@ -99,7 +99,7 @@ export const notesShowTool: McpToolDefinition = {
     const { name } = args as { name: string };
     const client = getClient();
     await client.notes.show(name);
-    return { success: true, message: `Show a note in the Notes app ${name}` };
+    return { success: true };
   },
 };
 

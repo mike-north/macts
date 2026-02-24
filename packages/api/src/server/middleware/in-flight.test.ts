@@ -37,7 +37,7 @@ describe('createInFlightTracker', () => {
       let maxCount = 0
 
       // Use a deferred pattern to control request completion
-      const resolvers: Array<() => void> = []
+      const resolvers: (() => void)[] = []
 
       const app = new Hono()
       app.use('*', tracker.middleware())
@@ -117,7 +117,7 @@ describe('createInFlightTracker', () => {
 
       const app = new Hono()
       app.use('*', tracker.middleware())
-      app.use('*', async () => {
+      app.use('*', () => {
         throw new Error('middleware error')
       })
       app.get('/test', (c) => c.json({ ok: true }))
@@ -176,8 +176,8 @@ describe('createInFlightTracker', () => {
       // Drain should not have resolved yet
       expect(drained).toBe(false)
 
-      // Complete the request
-      resolveRequest!()
+      // Complete the request (resolveRequest is guaranteed to be set by the loop above)
+      resolveRequest()
       await requestPromise
 
       // Now drain should resolve
@@ -219,14 +219,14 @@ describe('createInFlightTracker', () => {
         /Drain timeout: 1 requests still in-flight after 50ms/
       )
 
-      // Clean up: resolve the stuck request
-      resolveRequest!()
+      // Clean up: resolve the stuck request (resolveRequest is guaranteed to be set by the loop above)
+      resolveRequest()
       await requestPromise
     })
 
     it('should include correct count in timeout error message', async () => {
       const tracker = createInFlightTracker()
-      const resolvers: Array<() => void> = []
+      const resolvers: (() => void)[] = []
 
       const app = new Hono()
       app.use('*', tracker.middleware())

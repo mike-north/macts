@@ -118,8 +118,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new SystemEventsError(code, message);
     }
 
@@ -465,7 +465,7 @@ export class SystemEventsClient {
    * Discard the results of a bounded update session with one or more files.
    */
   async abortTransaction(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.abortTransaction', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.abortTransaction', {});
   }
 
 
@@ -473,7 +473,7 @@ export class SystemEventsClient {
    * Begin a bounded update session with one or more files.
    */
   async beginTransaction(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.beginTransaction', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.beginTransaction', {});
   }
 
 
@@ -481,7 +481,7 @@ export class SystemEventsClient {
    * Apply the results of a bounded update session with one or more files.
    */
   async endTransaction(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.endTransaction', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.endTransaction', {});
   }
 
 
@@ -489,7 +489,7 @@ export class SystemEventsClient {
    * connect a configuration or service
    */
   async connect(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.connect', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.connect', {});
   }
 
 
@@ -497,7 +497,7 @@ export class SystemEventsClient {
    * disconnect a configuration or service
    */
   async disconnect(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.disconnect', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.disconnect', {});
   }
 
 
@@ -505,7 +505,7 @@ export class SystemEventsClient {
    * start the screen saver
    */
   async start(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.start', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.start', {});
   }
 
 
@@ -513,7 +513,7 @@ export class SystemEventsClient {
    * stop the screen saver
    */
   async stop(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.stop', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.stop', {});
   }
 
 
@@ -521,7 +521,7 @@ export class SystemEventsClient {
    * Move disk item(s) to a new location.
    */
   async move(to: string): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.move', { to });
+    await this.#httpClient.rpc<undefined>('system-events.app.move', { to });
   }
 
 
@@ -529,7 +529,7 @@ export class SystemEventsClient {
    * Open disk item(s) with the appropriate application.
    */
   async open(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.open', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.open', {});
   }
 
 
@@ -537,7 +537,7 @@ export class SystemEventsClient {
    * Log out the current user
    */
   async logOut(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.logOut', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.logOut', {});
   }
 
 
@@ -545,7 +545,7 @@ export class SystemEventsClient {
    * Restart the computer
    */
   async restart(stateSavingPreference?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.restart', { stateSavingPreference });
+    await this.#httpClient.rpc<undefined>('system-events.app.restart', { stateSavingPreference });
   }
 
 
@@ -553,7 +553,7 @@ export class SystemEventsClient {
    * Shut Down the computer
    */
   async shutDown(stateSavingPreference?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.shutDown', { stateSavingPreference });
+    await this.#httpClient.rpc<undefined>('system-events.app.shutDown', { stateSavingPreference });
   }
 
 
@@ -561,7 +561,7 @@ export class SystemEventsClient {
    * Put the computer to sleep
    */
   async sleep(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.sleep', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.sleep', {});
   }
 
 
@@ -569,7 +569,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if key codes were entered
    */
   async keyCode(using?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.keyCode', { using });
+    await this.#httpClient.rpc<undefined>('system-events.app.keyCode', { using });
   }
 
 
@@ -577,7 +577,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if keystrokes were entered
    */
   async keystroke(using?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.keystroke', { using });
+    await this.#httpClient.rpc<undefined>('system-events.app.keystroke', { using });
   }
 
 
@@ -585,7 +585,7 @@ export class SystemEventsClient {
    * Attach an action to a folder
    */
   async attachActionTo(using: string): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.attachActionTo', { using });
+    await this.#httpClient.rpc<undefined>('system-events.app.attachActionTo', { using });
   }
 
 
@@ -593,7 +593,7 @@ export class SystemEventsClient {
    * List the actions attached to a folder
    */
   async attachedScripts(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.attachedScripts', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.attachedScripts', {});
   }
 
 
@@ -601,7 +601,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if the UI element were cancelled
    */
   async cancel(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.cancel', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.cancel', {});
   }
 
 
@@ -609,7 +609,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if the UI element were confirmed
    */
   async confirm(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.confirm', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.confirm', {});
   }
 
 
@@ -617,7 +617,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if the UI element were decremented
    */
   async decrement(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.decrement', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.decrement', {});
   }
 
 
@@ -625,7 +625,7 @@ export class SystemEventsClient {
    * Send a folder action code to a folder action script
    */
   async doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: { x: number; y: number; width: number; height: number }): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.doFolderAction', { folderActionCode, withItemList, withWindowSize });
+    await this.#httpClient.rpc<undefined>('system-events.app.doFolderAction', { folderActionCode, withItemList, withWindowSize });
   }
 
 
@@ -633,7 +633,7 @@ export class SystemEventsClient {
    * Edit an action of a folder
    */
   async editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.editActionOf', { usingActionName, usingActionNumber });
+    await this.#httpClient.rpc<undefined>('system-events.app.editActionOf', { usingActionName, usingActionNumber });
   }
 
 
@@ -641,7 +641,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if the UI element were incremented
    */
   async increment(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.increment', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.increment', {});
   }
 
 
@@ -649,7 +649,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if keys were held down
    */
   async keyDown(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.keyDown', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.keyDown', {});
   }
 
 
@@ -657,7 +657,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if keys were released
    */
   async keyUp(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.keyUp', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.keyUp', {});
   }
 
 
@@ -665,7 +665,7 @@ export class SystemEventsClient {
    * cause the target process to behave as if the UI element were picked
    */
   async pick(): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.pick', {});
+    await this.#httpClient.rpc<undefined>('system-events.app.pick', {});
   }
 
 
@@ -673,6 +673,6 @@ export class SystemEventsClient {
    * Remove a folder action from a folder
    */
   async removeActionFrom(usingActionName?: string, usingActionNumber?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('system-events.app.removeActionFrom', { usingActionName, usingActionNumber });
+    await this.#httpClient.rpc<undefined>('system-events.app.removeActionFrom', { usingActionName, usingActionNumber });
   }
 }

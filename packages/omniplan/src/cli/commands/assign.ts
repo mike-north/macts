@@ -20,8 +20,7 @@ export class AssignCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.assign(this.resource as any, this.task as any);
+      await client.assign(this.resource as unknown, this.task as unknown);
 
       const output = formatter.formatSuccess('assign completed successfully');
       this.context.stdout.write(output + '\n');

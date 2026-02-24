@@ -23,11 +23,6 @@ export class GetMiniplayerWindowCommand extends Command {
       const client = getClient();
       const item = await client.miniplayerwindows.get(this.miniplayerWindowId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MiniplayerWindow not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

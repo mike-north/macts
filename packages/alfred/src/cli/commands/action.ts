@@ -20,8 +20,7 @@ export class ActionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.action(this.items as any, this.asType as any);
+      await client.action(this.items as unknown, this.asType as unknown);
 
       const output = formatter.formatSuccess('action completed successfully');
       this.context.stdout.write(output + '\n');

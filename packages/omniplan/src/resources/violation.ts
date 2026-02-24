@@ -52,7 +52,7 @@ export class ViolationResourceClient {
    * Delete a violation.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -61,6 +61,6 @@ export class ViolationResourceClient {
    * Fix a violation
    */
   async fix(): Promise<void> {
-    return this.#http.rpc<void>('omniplan.violations.fix', {});
+    await this.#http.rpc<undefined>('omniplan.violations.fix', {});
   }
 }

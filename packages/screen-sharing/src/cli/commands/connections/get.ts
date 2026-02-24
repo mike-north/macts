@@ -23,11 +23,6 @@ export class GetConnectionCommand extends Command {
       const client = getClient();
       const item = await client.connections.get(this.connectionId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Connection not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

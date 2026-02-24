@@ -20,8 +20,7 @@ export class OpenCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.open(this.using as any, this.withProperties as any);
+      await client.open(this.using as unknown, this.withProperties as unknown);
 
       const output = formatter.formatSuccess('open completed successfully');
       this.context.stdout.write(output + '\n');

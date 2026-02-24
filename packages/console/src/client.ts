@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new ConsoleError(code, message);
     }
 
@@ -105,6 +105,6 @@ export class ConsoleClient {
    * Select a device.
    */
   async selectDevice(): Promise<void> {
-    return this.#httpClient.rpc<void>('console.app.selectDevice', {});
+    await this.#httpClient.rpc<undefined>('console.app.selectDevice', {});
   }
 }

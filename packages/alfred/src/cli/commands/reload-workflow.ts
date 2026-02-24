@@ -19,8 +19,7 @@ export class ReloadWorkflowCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.reloadWorkflow(this.workflow as any);
+      await client.reloadWorkflow(this.workflow as unknown);
 
       const output = formatter.formatSuccess('reloadWorkflow completed successfully');
       this.context.stdout.write(output + '\n');

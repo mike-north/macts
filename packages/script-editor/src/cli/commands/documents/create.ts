@@ -6,7 +6,7 @@ import { createFormatter } from '../../output/index.js';
  * Create a new document.
  */
 export class CreateDocumentCommand extends Command {
-  static override paths = [["scripteditor", "documents", "create"]];
+  static override paths = [["script-editor", "documents", "create"]];
 
   static override usage = Command.Usage({
     description: 'Create a new document',

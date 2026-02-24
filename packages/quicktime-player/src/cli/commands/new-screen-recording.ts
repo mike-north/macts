@@ -19,7 +19,6 @@ export class NewScreenRecordingCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.newScreenRecording();
 
       const output = formatter.formatSuccess('newScreenRecording completed successfully');

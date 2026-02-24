@@ -22,8 +22,7 @@ export class SelectAllTabCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.tabs.selectAll(this.tabId as any);
+      await client.tabs.selectAll(this.tabId as unknown);
 
       const output = formatter.formatSuccess('selectAll completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,7 +19,6 @@ export class OpenLocationCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.openLocation();
 
       const output = formatter.formatSuccess('openLocation completed successfully');

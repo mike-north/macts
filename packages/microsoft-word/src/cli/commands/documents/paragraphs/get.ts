@@ -24,11 +24,6 @@ export class GetParagraphCommand extends Command {
       const client = getClient();
       const item = await client.paragraphs.get(this.paragraphId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Paragraph not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         alignment: item.alignment,
         firstLineIndent: item.firstLineIndent,

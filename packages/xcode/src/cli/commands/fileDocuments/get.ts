@@ -23,11 +23,6 @@ export class GetFileDocumentCommand extends Command {
       const client = getClient();
       const item = await client.filedocuments.get(this.fileDocumentId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('FileDocument not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         modified: item.modified,

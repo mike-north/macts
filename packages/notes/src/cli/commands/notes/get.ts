@@ -23,11 +23,6 @@ export class GetNoteCommand extends Command {
       const client = getClient();
       const item = await client.notes.get(this.noteId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Note not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         name: item.name,
         id: item.id,

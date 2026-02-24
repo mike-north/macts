@@ -116,8 +116,7 @@ export const appPlayTrackTool: McpToolDefinition = {
   handler: async (args) => {
     const { inContext } = args as { inContext?: string };
     const client = getClient();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    await client.playTrack(inContext as any);
+    await client.playTrack(inContext as unknown);
     return { success: true };
   },
 };

@@ -19,7 +19,6 @@ export class SleepCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.sleep();
 
       const output = formatter.formatSuccess('sleep completed successfully');

@@ -52,7 +52,7 @@ export class MediaItemResourceClient {
    * Delete a mediaitem.
    */
   async delete(id: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { id });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id });
   }
 
 
@@ -62,6 +62,6 @@ export class MediaItemResourceClient {
    * Duplicate a media item
    */
   async duplicate(id: string): Promise<void> {
-    return this.#http.rpc<void>('photos.mediaitems.duplicate', { id });
+    await this.#http.rpc<undefined>('photos.mediaitems.duplicate', { id });
   }
 }

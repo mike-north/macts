@@ -19,7 +19,6 @@ export class UndoCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.undo();
 
       const output = formatter.formatSuccess('undo completed successfully');

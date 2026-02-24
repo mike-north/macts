@@ -52,7 +52,7 @@ export class ParagraphResourceClient {
    * Delete a paragraph.
    */
   async delete(paragraphId: string): Promise<void> {
-    return this.#http.rpc<void>(`${this.#app}.${this.#resource}.delete`, { paragraphId });
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { paragraphId });
   }
 
 }

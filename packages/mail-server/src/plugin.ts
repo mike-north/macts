@@ -1406,7 +1406,7 @@ export const mailApiPlugin = {
         },
         {
           "name": "kerberos5",
-          "value": 5,
+          "value": "kerberos5",
           "description": "Kerberos V5 (GSSAPI)",
           "code": "axk5"
         },
@@ -1418,7 +1418,7 @@ export const mailApiPlugin = {
         },
         {
           "name": "md5",
-          "value": 5,
+          "value": "md5",
           "description": "CRAM-MD5",
           "code": "axmd"
         },

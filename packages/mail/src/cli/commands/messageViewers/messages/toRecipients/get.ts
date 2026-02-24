@@ -25,11 +25,6 @@ export class GetToRecipientCommand extends Command {
       const client = getClient();
       const item = await client.torecipients.get(this.toRecipientId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('ToRecipient not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         id: item.id,
       });

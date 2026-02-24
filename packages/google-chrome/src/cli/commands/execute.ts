@@ -19,8 +19,7 @@ export class ExecuteCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.execute(this.javascript as any);
+      await client.execute(this.javascript as unknown);
 
       const output = formatter.formatSuccess('execute completed successfully');
       this.context.stdout.write(output + '\n');

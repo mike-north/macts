@@ -19,7 +19,6 @@ export class LayoutCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.layout();
 
       const output = formatter.formatSuccess('layout completed successfully');

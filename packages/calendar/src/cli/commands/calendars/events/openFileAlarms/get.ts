@@ -25,11 +25,6 @@ export class GetOpenFileAlarmCommand extends Command {
       const client = getClient();
       const item = await client.openfilealarms.get(this.openFileAlarmId);
 
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('OpenFileAlarm not found') + '\n');
-        return 1;
-      }
-
       const output = formatter.format({
         triggerInterval: item.triggerInterval,
         triggerDate: item.triggerDate,

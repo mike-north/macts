@@ -23,7 +23,6 @@ export class FixViolationCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.violations.fix();
 
       const output = formatter.formatSuccess('fix completed successfully');

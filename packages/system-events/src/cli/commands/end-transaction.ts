@@ -19,7 +19,6 @@ export class EndTransactionCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.endTransaction();
 
       const output = formatter.formatSuccess('endTransaction completed successfully');

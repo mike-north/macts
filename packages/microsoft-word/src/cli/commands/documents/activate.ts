@@ -21,7 +21,6 @@ export class ActivateDocumentCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.documents.activate();
 
       const output = formatter.formatSuccess('activate completed successfully');

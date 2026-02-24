@@ -46,8 +46,8 @@ export class HttpClient {
 
     if (!response.ok) {
       const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
+      const code = error.error?.code ?? 'UNKNOWN_ERROR';
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
       throw new SpotifyError(code, message);
     }
 
@@ -105,7 +105,7 @@ export class SpotifyClient {
    * Skip to the next track.
    */
   async nextTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.nextTrack', {});
+    await this.#httpClient.rpc<undefined>('spotify.app.nextTrack', {});
   }
 
 
@@ -113,7 +113,7 @@ export class SpotifyClient {
    * Skip to the previous track.
    */
   async previousTrack(): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.previousTrack', {});
+    await this.#httpClient.rpc<undefined>('spotify.app.previousTrack', {});
   }
 
 
@@ -121,7 +121,7 @@ export class SpotifyClient {
    * Toggle play/pause.
    */
   async playpause(): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.playpause', {});
+    await this.#httpClient.rpc<undefined>('spotify.app.playpause', {});
   }
 
 
@@ -129,7 +129,7 @@ export class SpotifyClient {
    * Pause playback.
    */
   async pause(): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.pause', {});
+    await this.#httpClient.rpc<undefined>('spotify.app.pause', {});
   }
 
 
@@ -137,7 +137,7 @@ export class SpotifyClient {
    * Resume playback.
    */
   async play(): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.play', {});
+    await this.#httpClient.rpc<undefined>('spotify.app.play', {});
   }
 
 
@@ -145,6 +145,6 @@ export class SpotifyClient {
    * Start playback of a track in the given context.
    */
   async playTrack(inContext?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('spotify.app.playTrack', { inContext });
+    await this.#httpClient.rpc<undefined>('spotify.app.playTrack', { inContext });
   }
 }

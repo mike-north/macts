@@ -19,8 +19,7 @@ export class CleanUpCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.cleanUp(this.by as any);
+      await client.cleanUp(this.by as unknown);
 
       const output = formatter.formatSuccess('cleanUp completed successfully');
       this.context.stdout.write(output + '\n');

@@ -19,7 +19,6 @@ export class RunCommand extends Command {
 
     try {
       const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await client.run();
 
       const output = formatter.formatSuccess('run completed successfully');
