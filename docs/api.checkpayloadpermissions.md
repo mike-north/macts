@@ -9,10 +9,13 @@ Check multiple permissions against a validated payload.
 **Signature:**
 
 ```typescript
-declare function checkPayloadPermissions(payload: ApiKeyPayload, requiredPermissions: string[]): {
-    granted: boolean;
-    results: PermissionCheckResult[];
-};
+declare function checkPayloadPermissions(
+  payload: ApiKeyPayload,
+  requiredPermissions: string[]
+): {
+  granted: boolean
+  results: PermissionCheckResult[]
+}
 ```
 
 ## Parameters
@@ -21,48 +24,39 @@ declare function checkPayloadPermissions(payload: ApiKeyPayload, requiredPermiss
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 payload
 
-
 </td><td>
 
 [ApiKeyPayload](./core.apikeypayload.md)
 
-
 </td><td>
 
 Validated API key payload
-
 
 </td></tr>
 <tr><td>
 
 requiredPermissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Permissions to check
-
 
 </td></tr>
 </tbody></table>
@@ -72,4 +66,3 @@ Permissions to check
 { granted: boolean; results: [PermissionCheckResult](./core.permissioncheckresult.md)<!-- -->\[\]; }
 
 Object with overall granted status and individual results
-

@@ -9,5 +9,5 @@ SaveableFileFormat
 **Signature:**
 
 ```typescript
-type SaveableFileFormat = 'archive';
+type SaveableFileFormat = 'archive'
 ```

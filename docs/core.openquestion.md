@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
+type OpenQuestion = z.infer<typeof OpenQuestionSchema>
 ```
-**References:** [OpenQuestionSchema](./core.openquestionschema.md)
 
+**References:** [OpenQuestionSchema](./core.openquestionschema.md)

@@ -9,19 +9,18 @@ Preview client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class PreviewClient 
+declare class PreviewClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new PreviewClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./preview.previewclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PreviewClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,64 +57,51 @@ Constructs a new instance of the `PreviewClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [documents](./preview.previewclient.documents.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DocumentResourceClient](./preview.documentresourceclient.md)
 
-
 </td><td>
 
 A Preview document
-
 
 </td></tr>
 <tr><td>
 
 [http](./preview.previewclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./preview.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for a calendar event.
 **Signature:**
 
 ```typescript
-declare class EventResourceClient 
+declare class EventResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class EventResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.eventresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `EventResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,101 +46,79 @@ Constructs a new instance of the `EventResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.eventresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new event.
-
 
 </td></tr>
 <tr><td>
 
 [delete(uid)](./calendar.eventresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a event.
-
 
 </td></tr>
 <tr><td>
 
 [get(uid)](./calendar.eventresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a event by uid.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.eventresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all events.
-
 
 </td></tr>
 <tr><td>
 
 [show()](./calendar.eventresourceclient.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Show the event or to-do in the calendar window
-
 
 </td></tr>
 <tr><td>
 
 [update(uid, input)](./calendar.eventresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing event.
 
-
 </td></tr>
 </tbody></table>
-

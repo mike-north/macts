@@ -9,5 +9,5 @@ the name of the disk item
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

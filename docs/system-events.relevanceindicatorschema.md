@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-RelevanceIndicatorSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+RelevanceIndicatorSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

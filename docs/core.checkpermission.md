@@ -9,7 +9,7 @@ Check if any of the granted permissions cover the required permission. Convenien
 **Signature:**
 
 ```typescript
-declare function checkPermission(grantedPermissions: string[], requiredPermission: string): boolean;
+declare function checkPermission(grantedPermissions: string[], requiredPermission: string): boolean
 ```
 
 ## Parameters
@@ -18,48 +18,39 @@ declare function checkPermission(grantedPermissions: string[], requiredPermissio
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 grantedPermissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of fine-grained permissions
-
 
 </td></tr>
 <tr><td>
 
 requiredPermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The required permission
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +60,3 @@ The required permission
 boolean
 
 True if permission is granted
-

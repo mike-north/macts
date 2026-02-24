@@ -9,5 +9,5 @@ Four-character code for Apple Events
 **Signature:**
 
 ```typescript
-code: string;
+code: string
 ```

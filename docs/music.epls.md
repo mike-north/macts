@@ -9,5 +9,5 @@ EPlS
 **Signature:**
 
 ```typescript
-type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewinding';
+type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewinding'
 ```

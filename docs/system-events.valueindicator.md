@@ -9,7 +9,7 @@ A value indicator ( thumb or slider ) belonging to a scroll bar
 **Signature:**
 
 ```typescript
-interface ValueIndicator 
+interface ValueIndicator
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ValueIndicator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.valueindicator.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this value indicator
 
-
 </td></tr>
 </tbody></table>
-

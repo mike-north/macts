@@ -9,7 +9,7 @@ A generated MCP tool definition.
 **Signature:**
 
 ```typescript
-interface GeneratedTool 
+interface GeneratedTool
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface GeneratedTool
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [commandName](./core.generatedtool.commandname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Command name from manifest (e.g., "list")
-
 
 </td></tr>
 <tr><td>
 
 [description](./core.generatedtool.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Tool description
-
 
 </td></tr>
 <tr><td>
 
 [inputSchema](./core.generatedtool.inputschema.md)
 
-
 </td><td>
-
 
 </td><td>
 
 JsonSchema
 
-
 </td><td>
 
 JSON Schema for tool input parameters
-
 
 </td></tr>
 <tr><td>
 
 [isResourceOperation](./core.generatedtool.isresourceoperation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether this is a resource operation (true) or app command (false)
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.generatedtool.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
-Tool name (e.g., "macts\_\_calendar\_\_calendars\_list")
-
+Tool name (e.g., "macts\_\_calendar\_\_calendars_list")
 
 </td></tr>
 <tr><td>
 
 [operationName](./core.generatedtool.operationname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Operation name (e.g., "list")
-
 
 </td></tr>
 <tr><td>
 
 [resourceName](./core.generatedtool.resourcename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Resource name (e.g., "calendars")
-
 
 </td></tr>
 <tr><td>
 
 [resourceType?](./core.generatedtool.resourcetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Resource type name if this is a resource operation
 
-
 </td></tr>
 </tbody></table>
-

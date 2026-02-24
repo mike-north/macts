@@ -9,5 +9,5 @@ DynamicStyle
 **Signature:**
 
 ```typescript
-type DynamicStyle = 'auto' | 'dynamic' | 'light' | 'dark' | 'unknown';
+type DynamicStyle = 'auto' | 'dynamic' | 'light' | 'dark' | 'unknown'
 ```

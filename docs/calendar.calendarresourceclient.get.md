@@ -18,30 +18,24 @@ get(calendarIdentifier: string): Promise<Calendar>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 calendarIdentifier
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;[Calendar](./calendar.calendar.md)<!-- -->&gt;
-

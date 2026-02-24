@@ -9,7 +9,7 @@ Options for generating all HTTP packages.
 **Signature:**
 
 ```typescript
-interface GenerateAllOptions 
+interface GenerateAllOptions
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface GenerateAllOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiPackageName?](./core.generatealloptions.apipackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ API package name (defaults to @<!-- -->macts/api-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [appName](./core.generatealloptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 App name lower (e.g., "reminders") — used for directory names
-
 
 </td></tr>
 <tr><td>
 
 [cliPackageName?](./core.generatealloptions.clipackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ CLI package name (defaults to @<!-- -->macts/cli-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [mcpPackageName?](./core.generatealloptions.mcppackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ MCP package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [sdkPackageName?](./core.generatealloptions.sdkpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ SDK package name (defaults to @<!-- -->macts/sdk-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.generatealloptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Is the media a local volume (as opposed to a file server)?
 **Signature:**
 
 ```typescript
-localVolume: boolean;
+localVolume: boolean
 ```

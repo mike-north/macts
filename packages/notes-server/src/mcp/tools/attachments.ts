@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * List items
@@ -14,15 +14,15 @@ export const attachmentsListTool: McpToolDefinition = {
   name: 'macts__notes__attachments_list',
   description: 'List items',
   inputSchema: {
-    "type": "object",
-    "properties": {},
-    "additionalProperties": false
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
   },
   handler: async () => {
-    const client = getClient();
-    return client.attachments.list();
+    const client = getClient()
+    return client.attachments.list()
   },
-};
+}
 
 /**
  * Get an item by name
@@ -31,22 +31,19 @@ export const attachmentsGetTool: McpToolDefinition = {
   name: 'macts__notes__attachments_get',
   description: 'Get an item by name',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "name": {
-        "description": "Item name",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      name: {
+        description: 'Item name',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "name"
-    ]
+    additionalProperties: false,
+    required: ['name'],
   },
   handler: async (args) => {
-    const { name } = args as { name: string };
-    const client = getClient();
-    return client.attachments.get(name);
+    const { name } = args as { name: string }
+    const client = getClient()
+    return client.attachments.get(name)
   },
-};
-
+}

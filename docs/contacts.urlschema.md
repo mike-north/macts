@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-UrlSchema: z.ZodObject<{
-    id: z.ZodString;
-    label: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+UrlSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    label: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

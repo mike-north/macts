@@ -9,5 +9,5 @@ Input for creating a Attendee
 **Signature:**
 
 ```typescript
-interface AttendeeCreateInput 
+interface AttendeeCreateInput
 ```

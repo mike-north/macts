@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-result: T;
+result: T
 ```

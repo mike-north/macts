@@ -9,7 +9,7 @@ Result of generating all packages.
 **Signature:**
 
 ```typescript
-interface GenerateAllResult 
+interface GenerateAllResult
 ```
 
 ## Properties
@@ -18,107 +18,82 @@ interface GenerateAllResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [api](./core.generateallresult.api.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [cli](./core.generateallresult.cli.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [errors](./core.generateallresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [mcp](./core.generateallresult.mcp.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [sdk](./core.generateallresult.sdk.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

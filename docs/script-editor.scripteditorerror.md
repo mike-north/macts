@@ -9,8 +9,9 @@ Error class for ScriptEditor API errors.
 **Signature:**
 
 ```typescript
-declare class ScriptEditorError extends Error 
+declare class ScriptEditorError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -19,30 +20,24 @@ declare class ScriptEditorError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(code, message)](./script-editor.scripteditorerror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptEditorError` class
-
 
 </td></tr>
 </tbody></table>
@@ -53,41 +48,32 @@ Constructs a new instance of the `ScriptEditorError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./script-editor.scripteditorerror.code.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

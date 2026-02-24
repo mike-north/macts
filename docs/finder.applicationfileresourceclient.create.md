@@ -18,30 +18,24 @@ create(input: ApplicationFileCreateInput): Promise<ApplicationFile>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ApplicationFile](./finder.applicationfile.md)<!-- -->&gt;
-

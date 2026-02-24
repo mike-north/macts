@@ -9,5 +9,5 @@ Classes with multiple parents (ambiguous)
 **Signature:**
 
 ```typescript
-ambiguousClasses: Map<string, string[]>;
+ambiguousClasses: Map<string, string[]>
 ```

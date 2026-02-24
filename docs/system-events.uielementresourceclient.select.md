@@ -11,7 +11,7 @@ set the selected property of the UI element
 ```typescript
 select(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

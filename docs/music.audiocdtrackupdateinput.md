@@ -9,7 +9,7 @@ Input for updating a AudioCDTrack
 **Signature:**
 
 ```typescript
-type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>;
+type AudioCDTrackUpdateInput = Partial<AudioCDTrackCreateInput>
 ```
-**References:** [AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)
 
+**References:** [AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)

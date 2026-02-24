@@ -9,5 +9,5 @@ The Nickname of this person.
 **Signature:**
 
 ```typescript
-nickname: string;
+nickname: string
 ```

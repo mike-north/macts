@@ -9,7 +9,7 @@ A unit of data in Property List format
 **Signature:**
 
 ```typescript
-interface PropertyListItem 
+interface PropertyListItem
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface PropertyListItem
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [kind](./system-events.propertylistitem.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the kind of data stored in the property list item: boolean/data/date/list/number/record/string
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.propertylistitem.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the property list item ( if any )
-
 
 </td></tr>
 <tr><td>
 
 [text](./system-events.propertylistitem.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the text representation of the property list data
-
 
 </td></tr>
 <tr><td>
 
 [value](./system-events.propertylistitem.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the value of the property list item
 
-
 </td></tr>
 </tbody></table>
-

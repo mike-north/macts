@@ -9,7 +9,7 @@ the preferences for the current user's network
 **Signature:**
 
 ```typescript
-interface NetworkPreferencesObject 
+interface NetworkPreferencesObject
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface NetworkPreferencesObject
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentLocation](./system-events.networkpreferencesobject.currentlocation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Location](./system-events.location.md)
 
-
 </td><td>
 
 the current location
 
-
 </td></tr>
 </tbody></table>
-

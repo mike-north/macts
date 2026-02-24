@@ -10,9 +10,9 @@ Relationship cardinality.
 
 ```typescript
 CardinalitySchema: z.ZodEnum<{
-    "one-to-one": "one-to-one";
-    "one-to-many": "one-to-many";
-    "many-to-one": "many-to-one";
-    "many-to-many": "many-to-many";
+  'one-to-one': 'one-to-one'
+  'one-to-many': 'one-to-many'
+  'many-to-one': 'many-to-one'
+  'many-to-many': 'many-to-many'
 }>
 ```

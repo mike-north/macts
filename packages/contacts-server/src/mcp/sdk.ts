@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { ContactsClient, type ContactsClientOptions } from '@macts/contacts';
+import { ContactsClient, type ContactsClientOptions } from '@macts/contacts'
 
 /**
  * Get a ContactsClient instance.
@@ -16,32 +16,32 @@ import { ContactsClient, type ContactsClientOptions } from '@macts/contacts';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getContactsClient(): ContactsClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions contacts:*:*'
-    );
+    )
   }
 
   const options: ContactsClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new ContactsClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new ContactsClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: ContactsClient | null = null;
+let _client: ContactsClient | null = null
 
 /**
  * Get or create the singleton ContactsClient.
@@ -50,8 +50,8 @@ let _client: ContactsClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): ContactsClient {
-  _client ??= getContactsClient();
-  return _client;
+  _client ??= getContactsClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): ContactsClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

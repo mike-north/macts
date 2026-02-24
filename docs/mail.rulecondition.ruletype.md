@@ -9,5 +9,5 @@ Rule type
 **Signature:**
 
 ```typescript
-ruleType: string;
+ruleType: string
 ```

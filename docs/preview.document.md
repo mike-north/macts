@@ -9,7 +9,7 @@ A Preview document
 **Signature:**
 
 ```typescript
-interface Document 
+interface Document
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Document
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [modified](./preview.document.modified.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the document has been modified since last save
-
 
 </td></tr>
 <tr><td>
 
 [name](./preview.document.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the document
-
 
 </td></tr>
 <tr><td>
 
 [path?](./preview.document.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The file path of the document
 
-
 </td></tr>
 </tbody></table>
-

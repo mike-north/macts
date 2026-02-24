@@ -9,5 +9,27 @@ Edfm
 **Signature:**
 
 ```typescript
-type Edfm = 'macOSFormat' | 'macOSExtendedFormat' | 'uFSFormat' | 'nFSFormat' | 'audioFormat' | 'proDOSFormat' | 'mSDOSFormat' | 'nTFSFormat' | '9660' | 'highSierraFormat' | 'quickTakeFormat' | 'applePhotoFormat' | 'appleShareFormat' | 'uDFFormat' | 'webDAVFormat' | 'fTPFormat' | 'packetWrittenUDFFormat' | 'xsanFormat' | 'aPFSFormat' | 'exFATFormat' | 'sMBFormat' | 'unknownFormat';
+type Edfm =
+  | 'macOSFormat'
+  | 'macOSExtendedFormat'
+  | 'uFSFormat'
+  | 'nFSFormat'
+  | 'audioFormat'
+  | 'proDOSFormat'
+  | 'mSDOSFormat'
+  | 'nTFSFormat'
+  | '9660'
+  | 'highSierraFormat'
+  | 'quickTakeFormat'
+  | 'applePhotoFormat'
+  | 'appleShareFormat'
+  | 'uDFFormat'
+  | 'webDAVFormat'
+  | 'fTPFormat'
+  | 'packetWrittenUDFFormat'
+  | 'xsanFormat'
+  | 'aPFSFormat'
+  | 'exFATFormat'
+  | 'sMBFormat'
+  | 'unknownFormat'
 ```

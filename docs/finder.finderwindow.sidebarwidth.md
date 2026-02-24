@@ -9,5 +9,5 @@ the width of the sidebar for the container window
 **Signature:**
 
 ```typescript
-sidebarWidth: number;
+sidebarWidth: number
 ```

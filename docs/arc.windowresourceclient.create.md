@@ -18,30 +18,24 @@ create(input: WindowCreateInput): Promise<Window>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [WindowCreateInput](./arc.windowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Window](./arc.window.md)<!-- -->&gt;
-

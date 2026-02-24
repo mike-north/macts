@@ -9,7 +9,7 @@ Input for creating a AudioCDPlaylist
 **Signature:**
 
 ```typescript
-interface AudioCDPlaylistCreateInput 
+interface AudioCDPlaylistCreateInput
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface AudioCDPlaylistCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [artist?](./music.audiocdplaylistcreateinput.artist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the artist of the CD
-
 
 </td></tr>
 <tr><td>
 
 [compilation?](./music.audiocdplaylistcreateinput.compilation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this CD a compilation album?
-
 
 </td></tr>
 <tr><td>
 
 [composer?](./music.audiocdplaylistcreateinput.composer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the composer of the CD
-
 
 </td></tr>
 <tr><td>
 
 [discCount?](./music.audiocdplaylistcreateinput.disccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the total number of discs in this CD’s album
-
 
 </td></tr>
 <tr><td>
 
 [discNumber?](./music.audiocdplaylistcreateinput.discnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the index of this CD disc in the source album
-
 
 </td></tr>
 <tr><td>
 
 [genre?](./music.audiocdplaylistcreateinput.genre.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the genre of the CD
-
 
 </td></tr>
 <tr><td>
 
 [year?](./music.audiocdplaylistcreateinput.year.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the year the album was recorded/released
 
-
 </td></tr>
 </tbody></table>
-

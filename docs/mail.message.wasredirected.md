@@ -9,5 +9,5 @@ Indicates whether the message was redirected or not
 **Signature:**
 
 ```typescript
-wasRedirected: boolean;
+wasRedirected: boolean
 ```

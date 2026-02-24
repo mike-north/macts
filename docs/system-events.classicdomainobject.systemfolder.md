@@ -9,5 +9,5 @@ The System folder
 **Signature:**
 
 ```typescript
-systemFolder: Folder;
+systemFolder: Folder
 ```

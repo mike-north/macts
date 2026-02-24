@@ -9,7 +9,7 @@ Input for updating a Event
 **Signature:**
 
 ```typescript
-type EventUpdateInput = Partial<EventCreateInput>;
+type EventUpdateInput = Partial<EventCreateInput>
 ```
-**References:** [EventCreateInput](./calendar.eventcreateinput.md)
 
+**References:** [EventCreateInput](./calendar.eventcreateinput.md)

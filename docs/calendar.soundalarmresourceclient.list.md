@@ -11,7 +11,7 @@ List all soundalarms.
 ```typescript
 list(): Promise<SoundAlarm[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SoundAlarm](./calendar.soundalarm.md)<!-- -->\[\]&gt;
-

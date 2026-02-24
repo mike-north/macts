@@ -9,7 +9,7 @@ A terminal tab
 **Signature:**
 
 ```typescript
-interface Tab 
+interface Tab
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Tab
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentSession](./iterm.tab.currentsession.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Session](./iterm.session.md)
 
-
 </td><td>
 
 The current session in a tab
-
 
 </td></tr>
 <tr><td>
 
 [index](./iterm.tab.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Index of tab in parent tab view control
-
 
 </td></tr>
 <tr><td>
 
 [title](./iterm.tab.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The title property
 
-
 </td></tr>
 </tbody></table>
-

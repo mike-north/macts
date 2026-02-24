@@ -18,30 +18,24 @@ create(input: ComboBoxCreateInput): Promise<ComboBox>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ComboBoxCreateInput](./system-events.comboboxcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ComboBox](./system-events.combobox.md)<!-- -->&gt;
-

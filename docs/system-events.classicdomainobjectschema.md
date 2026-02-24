@@ -7,17 +7,20 @@
 **Signature:**
 
 ```typescript
-ClassicDomainObjectSchema: z.ZodObject<{
-    appleMenuFolder: z.ZodString;
-    controlPanelsFolder: z.ZodString;
-    controlStripModulesFolder: z.ZodString;
-    desktopFolder: z.ZodString;
-    extensionsFolder: z.ZodString;
-    fontsFolder: z.ZodString;
-    launcherItemsFolder: z.ZodString;
-    preferencesFolder: z.ZodString;
-    shutdownFolder: z.ZodString;
-    startupItemsFolder: z.ZodString;
-    systemFolder: z.ZodString;
-}, z.core.$strip>
+ClassicDomainObjectSchema: z.ZodObject<
+  {
+    appleMenuFolder: z.ZodString
+    controlPanelsFolder: z.ZodString
+    controlStripModulesFolder: z.ZodString
+    desktopFolder: z.ZodString
+    extensionsFolder: z.ZodString
+    fontsFolder: z.ZodString
+    launcherItemsFolder: z.ZodString
+    preferencesFolder: z.ZodString
+    shutdownFolder: z.ZodString
+    startupItemsFolder: z.ZodString
+    systemFolder: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ the list view options for the container window
 **Signature:**
 
 ```typescript
-listViewOptions: unknown;
+listViewOptions: unknown
 ```

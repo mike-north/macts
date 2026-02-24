@@ -9,5 +9,5 @@ Indicates whether the message is deleted or not
 **Signature:**
 
 ```typescript
-deletedStatus: boolean;
+deletedStatus: boolean
 ```

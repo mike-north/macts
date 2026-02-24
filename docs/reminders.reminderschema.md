@@ -7,18 +7,21 @@
 **Signature:**
 
 ```typescript
-ReminderSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    body: z.ZodString;
-    completed: z.ZodBoolean;
-    completionDate: z.ZodString;
-    dueDate: z.ZodString;
-    remindMeDate: z.ZodString;
-    priority: z.ZodNumber;
-    flagged: z.ZodBoolean;
-    creationDate: z.ZodString;
-    modificationDate: z.ZodString;
-    allDayDueDate: z.ZodString;
-}, z.core.$strip>
+ReminderSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    body: z.ZodString
+    completed: z.ZodBoolean
+    completionDate: z.ZodString
+    dueDate: z.ZodString
+    remindMeDate: z.ZodString
+    priority: z.ZodNumber
+    flagged: z.ZodBoolean
+    creationDate: z.ZodString
+    modificationDate: z.ZodString
+    allDayDueDate: z.ZodString
+  },
+  z.core.$strip
+>
 ```

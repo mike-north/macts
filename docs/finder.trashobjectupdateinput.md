@@ -9,7 +9,7 @@ Input for updating a TrashObject
 **Signature:**
 
 ```typescript
-type TrashObjectUpdateInput = Partial<TrashObjectCreateInput>;
+type TrashObjectUpdateInput = Partial<TrashObjectCreateInput>
 ```
-**References:** [TrashObjectCreateInput](./finder.trashobjectcreateinput.md)
 
+**References:** [TrashObjectCreateInput](./finder.trashobjectcreateinput.md)

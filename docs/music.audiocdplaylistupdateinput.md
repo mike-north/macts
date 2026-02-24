@@ -9,7 +9,7 @@ Input for updating a AudioCDPlaylist
 **Signature:**
 
 ```typescript
-type AudioCDPlaylistUpdateInput = Partial<AudioCDPlaylistCreateInput>;
+type AudioCDPlaylistUpdateInput = Partial<AudioCDPlaylistCreateInput>
 ```
-**References:** [AudioCDPlaylistCreateInput](./music.audiocdplaylistcreateinput.md)
 
+**References:** [AudioCDPlaylistCreateInput](./music.audiocdplaylistcreateinput.md)

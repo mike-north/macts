@@ -9,5 +9,5 @@ Type of element that can be contained (class name)
 **Signature:**
 
 ```typescript
-type: string;
+type: string
 ```

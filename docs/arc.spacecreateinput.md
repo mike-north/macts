@@ -9,5 +9,5 @@ Input for creating a Space
 **Signature:**
 
 ```typescript
-interface SpaceCreateInput 
+interface SpaceCreateInput
 ```

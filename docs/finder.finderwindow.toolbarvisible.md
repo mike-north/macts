@@ -9,5 +9,5 @@ Is the window's toolbar visible?
 **Signature:**
 
 ```typescript
-toolbarVisible: boolean;
+toolbarVisible: boolean
 ```

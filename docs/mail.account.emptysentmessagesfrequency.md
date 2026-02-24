@@ -9,5 +9,5 @@ Does nothing at all (deprecated)
 **Signature:**
 
 ```typescript
-emptySentMessagesFrequency: number;
+emptySentMessagesFrequency: number
 ```

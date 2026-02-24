@@ -9,7 +9,7 @@ Input for creating a AIMHandle
 **Signature:**
 
 ```typescript
-interface AIMHandleCreateInput 
+interface AIMHandleCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface AIMHandleCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.aimhandlecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.aimhandlecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The AIM handle value
 
-
 </td></tr>
 </tbody></table>
-

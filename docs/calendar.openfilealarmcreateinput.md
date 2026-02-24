@@ -9,7 +9,7 @@ Input for creating a OpenFileAlarm
 **Signature:**
 
 ```typescript
-interface OpenFileAlarmCreateInput 
+interface OpenFileAlarmCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface OpenFileAlarmCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [filepath?](./calendar.openfilealarmcreateinput.filepath.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The (POSIX) path to be opened by the alarm
-
 
 </td></tr>
 <tr><td>
 
 [triggerDate?](./calendar.openfilealarmcreateinput.triggerdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ An absolute alarm date
-
 
 </td></tr>
 <tr><td>
 
 [triggerInterval?](./calendar.openfilealarmcreateinput.triggerinterval.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The interval in minutes between the event and the alarm (positive for after, negative for before)
 
-
 </td></tr>
 </tbody></table>
-

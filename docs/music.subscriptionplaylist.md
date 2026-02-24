@@ -9,7 +9,7 @@ a subscription playlist from Apple Music
 **Signature:**
 
 ```typescript
-interface SubscriptionPlaylist 
+interface SubscriptionPlaylist
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface SubscriptionPlaylist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.subscriptionplaylist.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this playlist
 
-
 </td></tr>
 </tbody></table>
-

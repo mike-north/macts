@@ -5,54 +5,53 @@
  * @packageDocumentation
  */
 
-import { DocumentResourceClient } from './resources/document.js';
-
+import { DocumentResourceClient } from './resources/document.js'
 
 /**
  * Client configuration options.
  */
 export interface QuickTimePlayerClientOptions {
   /** API key for authentication */
-  apiKey: string;
+  apiKey: string
   /** Base URL for API server (default: http://localhost:8372) */
-  baseUrl?: string;
+  baseUrl?: string
 }
 
 /**
  * HTTP client wrapper for making authenticated requests.
  */
 export class HttpClient {
-  readonly #baseUrl: string;
-  readonly #apiKey: string;
+  readonly #baseUrl: string
+  readonly #apiKey: string
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl;
-    this.#apiKey = apiKey;
+    this.#baseUrl = baseUrl
+    this.#apiKey = apiKey
   }
 
   /**
    * Make an authenticated POST request to an RPC endpoint.
    */
   async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`;
+    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#apiKey}`,
+        Authorization: `Bearer ${this.#apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
+    })
 
     if (!response.ok) {
-      const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error.error?.message ?? `HTTP ${String(response.status)}`;
-      throw new QuickTimePlayerError(code, message);
+      const error = (await response.json()) as { error?: { code?: string; message?: string } }
+      const code = error.error?.code ?? 'UNKNOWN_ERROR'
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`
+      throw new QuickTimePlayerError(code, message)
     }
 
-    const result = await response.json() as { result: T };
-    return result.result;
+    const result = (await response.json()) as { result: T }
+    return result.result
   }
 }
 
@@ -60,12 +59,12 @@ export class HttpClient {
  * Error class for QuickTimePlayer API errors.
  */
 export class QuickTimePlayerError extends Error {
-  readonly code: string;
+  readonly code: string
 
   constructor(code: string, message: string) {
-    super(message);
-    this.name = 'QuickTimePlayerError';
-    this.code = code;
+    super(message)
+    this.name = 'QuickTimePlayerError'
+    this.code = code
   }
 }
 
@@ -83,140 +82,129 @@ export class QuickTimePlayerError extends Error {
  * ```
  */
 export class QuickTimePlayerClient {
-  readonly #httpClient: HttpClient;
+  readonly #httpClient: HttpClient
 
   /** A QuickTime Player document */
-  readonly documents: DocumentResourceClient;
+  readonly documents: DocumentResourceClient
 
   constructor(options: QuickTimePlayerClientOptions) {
-    const baseUrl = options.baseUrl ?? 'http://localhost:8372';
-    this.#httpClient = new HttpClient(baseUrl, options.apiKey);
-    this.documents = new DocumentResourceClient(this.#httpClient, 'quicktime-player', 'documents');
+    const baseUrl = options.baseUrl ?? 'http://localhost:8372'
+    this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.documents = new DocumentResourceClient(this.#httpClient, 'quicktime-player', 'documents')
   }
 
   /**
    * Get the HTTP client for making custom requests.
    */
   get http(): HttpClient {
-    return this.#httpClient;
+    return this.#httpClient
   }
 
   /**
    * Open a URL.
    */
   async openURL(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.openURL', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.openURL', {})
   }
-
 
   /**
    * Play the movie.
    */
   async play(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.play', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.play', {})
   }
-
 
   /**
    * Start the movie recording.
    */
   async start(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.start', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.start', {})
   }
-
 
   /**
    * Pause the recording.
    */
   async pause(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.pause', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.pause', {})
   }
-
 
   /**
    * Resume the recording.
    */
   async resume(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.resume', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.resume', {})
   }
-
 
   /**
    * Stop the movie or recording.
    */
   async stop(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.stop', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stop', {})
   }
-
 
   /**
    * Step the movie backward the specified number of steps (default is 1).
    */
   async stepBackward(by?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepBackward', { by });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepBackward', { by })
   }
-
 
   /**
    * Step the movie forward the specified number of steps (default is 1).
    */
   async stepForward(by?: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepForward', { by });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.stepForward', { by })
   }
-
 
   /**
    * Trim the movie.
    */
   async trim(from: number, to: number): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.trim', { from, to });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.trim', { from, to })
   }
-
 
   /**
    * Present the document full screen.
    */
   async present(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.present', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.present', {})
   }
-
 
   /**
    * Create a new movie recording document.
    */
   async newMovieRecording(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.newMovieRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newMovieRecording', {})
   }
-
 
   /**
    * Create a new audio recording document.
    */
   async newAudioRecording(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.newAudioRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newAudioRecording', {})
   }
-
 
   /**
    * Create a new screen recording document.
    */
   async newScreenRecording(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.newScreenRecording', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.newScreenRecording', {})
   }
-
 
   /**
    * Export a movie to another file
    */
   async _export(_in: string, usingSettingsPreset: string): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.export', { 'in': _in, usingSettingsPreset });
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.export', {
+      in: _in,
+      usingSettingsPreset,
+    })
   }
-
 
   /**
    * Show the document's Remote HUD
    */
   async showRemoteHud(): Promise<void> {
-    await this.#httpClient.rpc<undefined>('quicktime-player.app.showRemoteHud', {});
+    await this.#httpClient.rpc<undefined>('quicktime-player.app.showRemoteHud', {})
   }
 }

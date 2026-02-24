@@ -9,7 +9,7 @@ Input for updating a RelevanceIndicator
 **Signature:**
 
 ```typescript
-type RelevanceIndicatorUpdateInput = Partial<RelevanceIndicatorCreateInput>;
+type RelevanceIndicatorUpdateInput = Partial<RelevanceIndicatorCreateInput>
 ```
-**References:** [RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)
 
+**References:** [RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)

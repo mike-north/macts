@@ -1,27 +1,27 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../sdk.js';
-import { createFormatter } from '../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
  * Get a mediaitem by ID.
  */
 export class GetMediaItemCommand extends Command {
-  static override paths = [["photos", "mediaItems", "get"]];
+  static override paths = [['photos', 'mediaItems', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a mediaitem by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  mediaItemId = Option.String({ required: true });
+  mediaItemId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.mediaitems.get(this.mediaItemId);
+      const client = getClient()
+      const item = await client.mediaitems.get(this.mediaItemId)
 
       const output = formatter.format({
         id: item.id,
@@ -36,14 +36,14 @@ export class GetMediaItemCommand extends Command {
         favorite: item.favorite,
         keywords: item.keywords,
         size: item.size,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

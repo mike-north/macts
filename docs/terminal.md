@@ -10,77 +10,63 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [HttpClient](./terminal.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [SettingsSetResourceClient](./terminal.settingssetresourceclient.md)
 
-
 </td><td>
 
 Client for a terminal settings set (profile).
-
 
 </td></tr>
 <tr><td>
 
 [TabResourceClient](./terminal.tabresourceclient.md)
 
-
 </td><td>
 
 Client for a terminal tab.
-
 
 </td></tr>
 <tr><td>
 
 [TerminalClient](./terminal.terminalclient.md)
 
-
 </td><td>
 
 Terminal client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [TerminalError](./terminal.terminalerror.md)
 
-
 </td><td>
 
 Error class for Terminal API errors.
-
 
 </td></tr>
 <tr><td>
 
 [WindowResourceClient](./terminal.windowresourceclient.md)
 
-
 </td><td>
 
 Client for a terminal window.
-
 
 </td></tr>
 </tbody></table>
@@ -91,88 +77,72 @@ Client for a terminal window.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SettingsSet](./terminal.settingsset.md)
 
-
 </td><td>
 
 A Terminal settings set (profile)
-
 
 </td></tr>
 <tr><td>
 
 [SettingsSetCreateInput](./terminal.settingssetcreateinput.md)
 
-
 </td><td>
 
 Input for creating a SettingsSet
-
 
 </td></tr>
 <tr><td>
 
 [Tab](./terminal.tab.md)
 
-
 </td><td>
 
 A Terminal tab
-
 
 </td></tr>
 <tr><td>
 
 [TabCreateInput](./terminal.tabcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [TerminalClientOptions](./terminal.terminalclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Window](./terminal.window.md)
 
-
 </td><td>
 
 A Terminal window
-
 
 </td></tr>
 <tr><td>
 
 [WindowCreateInput](./terminal.windowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Window
-
 
 </td></tr>
 </tbody></table>
@@ -183,38 +153,30 @@ Input for creating a Window
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SettingsSetSchema](./terminal.settingssetschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TabSchema](./terminal.tabschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [WindowSchema](./terminal.windowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -225,45 +187,36 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SettingsSetUpdateInput](./terminal.settingssetupdateinput.md)
 
-
 </td><td>
 
 Input for updating a SettingsSet
-
 
 </td></tr>
 <tr><td>
 
 [TabUpdateInput](./terminal.tabupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [WindowUpdateInput](./terminal.windowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Window
 
-
 </td></tr>
 </tbody></table>
-

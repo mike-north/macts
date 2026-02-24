@@ -18,30 +18,24 @@ create(input: LibraryPlaylistCreateInput): Promise<LibraryPlaylist>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [LibraryPlaylistCreateInput](./tv.libraryplaylistcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[LibraryPlaylist](./tv.libraryplaylist.md)<!-- -->&gt;
-

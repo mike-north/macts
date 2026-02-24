@@ -9,5 +9,5 @@ the index of the movement in the work
 **Signature:**
 
 ```typescript
-movementNumber: number;
+movementNumber: number
 ```

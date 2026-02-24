@@ -9,5 +9,5 @@ The birth date of this person.
 **Signature:**
 
 ```typescript
-birthDate: string;
+birthDate: string
 ```

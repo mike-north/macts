@@ -11,7 +11,7 @@ List all anchors.
 ```typescript
 list(): Promise<Anchor[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Anchor](./system-settings.anchor.md)<!-- -->\[\]&gt;
-

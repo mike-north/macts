@@ -9,5 +9,5 @@ The container property
 **Signature:**
 
 ```typescript
-container: Mailbox;
+container: Mailbox
 ```

@@ -9,5 +9,5 @@ the URL for this track
 **Signature:**
 
 ```typescript
-address: string;
+address: string
 ```

@@ -9,5 +9,5 @@ Unique identifier for this source
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

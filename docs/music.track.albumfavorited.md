@@ -9,5 +9,5 @@ is the album for this track favorited?
 **Signature:**
 
 ```typescript
-albumFavorited: boolean;
+albumFavorited: boolean
 ```

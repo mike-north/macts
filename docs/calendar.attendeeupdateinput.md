@@ -9,7 +9,7 @@ Input for updating a Attendee
 **Signature:**
 
 ```typescript
-type AttendeeUpdateInput = Partial<AttendeeCreateInput>;
+type AttendeeUpdateInput = Partial<AttendeeCreateInput>
 ```
-**References:** [AttendeeCreateInput](./calendar.attendeecreateinput.md)
 
+**References:** [AttendeeCreateInput](./calendar.attendeecreateinput.md)

@@ -9,7 +9,7 @@ Input for updating a Location
 **Signature:**
 
 ```typescript
-type LocationUpdateInput = Partial<LocationCreateInput>;
+type LocationUpdateInput = Partial<LocationCreateInput>
 ```
-**References:** [LocationCreateInput](./system-events.locationcreateinput.md)
 
+**References:** [LocationCreateInput](./system-events.locationcreateinput.md)

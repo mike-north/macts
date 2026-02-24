@@ -9,5 +9,5 @@ Input for creating a MenuBar
 **Signature:**
 
 ```typescript
-interface MenuBarCreateInput 
+interface MenuBarCreateInput
 ```

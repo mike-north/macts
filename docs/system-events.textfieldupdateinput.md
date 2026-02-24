@@ -9,7 +9,7 @@ Input for updating a TextField
 **Signature:**
 
 ```typescript
-type TextFieldUpdateInput = Partial<TextFieldCreateInput>;
+type TextFieldUpdateInput = Partial<TextFieldCreateInput>
 ```
-**References:** [TextFieldCreateInput](./system-events.textfieldcreateinput.md)
 
+**References:** [TextFieldCreateInput](./system-events.textfieldcreateinput.md)

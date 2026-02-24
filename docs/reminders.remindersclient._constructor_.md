@@ -18,31 +18,24 @@ constructor(options: RemindersClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [RemindersClientOptions](./reminders.remindersclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

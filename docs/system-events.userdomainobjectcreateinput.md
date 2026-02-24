@@ -9,5 +9,5 @@ Input for creating a UserDomainObject
 **Signature:**
 
 ```typescript
-interface UserDomainObjectCreateInput 
+interface UserDomainObjectCreateInput
 ```

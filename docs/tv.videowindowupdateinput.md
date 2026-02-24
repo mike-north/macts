@@ -9,7 +9,7 @@ Input for updating a VideoWindow
 **Signature:**
 
 ```typescript
-type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;
+type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>
 ```
-**References:** [VideoWindowCreateInput](./tv.videowindowcreateinput.md)
 
+**References:** [VideoWindowCreateInput](./tv.videowindowcreateinput.md)

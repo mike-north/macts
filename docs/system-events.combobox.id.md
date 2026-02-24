@@ -9,5 +9,5 @@ Unique identifier for this combo box
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

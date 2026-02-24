@@ -11,7 +11,7 @@ List all popupbuttons.
 ```typescript
 list(): Promise<PopUpButton[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[PopUpButton](./system-events.popupbutton.md)<!-- -->\[\]&gt;
-

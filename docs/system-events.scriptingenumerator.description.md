@@ -9,5 +9,5 @@ The description of the enumerator
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

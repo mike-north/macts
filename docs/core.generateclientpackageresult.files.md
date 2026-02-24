@@ -10,7 +10,8 @@ Generated files with relative paths
 
 ```typescript
 files: {
-        path: string;
-        content: string;
-    }[];
+  path: string
+  content: string
+}
+;[]
 ```

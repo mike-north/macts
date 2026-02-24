@@ -9,7 +9,7 @@ Client for a checkbox belonging to a window.
 **Signature:**
 
 ```typescript
-declare class CheckboxResourceClient 
+declare class CheckboxResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class CheckboxResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.checkboxresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CheckboxResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `CheckboxResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.checkboxresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new checkbox.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.checkboxresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a checkbox.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.checkboxresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a checkbox by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.checkboxresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all checkboxes.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.checkboxresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing checkbox.
 
-
 </td></tr>
 </tbody></table>
-

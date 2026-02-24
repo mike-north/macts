@@ -9,5 +9,5 @@ Password for this account. Can be set, but not read via scripting
 **Signature:**
 
 ```typescript
-password: string;
+password: string
 ```

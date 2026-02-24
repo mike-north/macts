@@ -9,5 +9,5 @@ Input for creating a RadioTunerPlaylist
 **Signature:**
 
 ```typescript
-interface RadioTunerPlaylistCreateInput 
+interface RadioTunerPlaylistCreateInput
 ```

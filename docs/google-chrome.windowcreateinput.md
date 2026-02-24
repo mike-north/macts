@@ -9,7 +9,7 @@ Input for creating a Window
 **Signature:**
 
 ```typescript
-interface WindowCreateInput 
+interface WindowCreateInput
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface WindowCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [activeTabIndex?](./google-chrome.windowcreateinput.activetabindex.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The index of the active tab.
-
 
 </td></tr>
 <tr><td>
 
 [bounds?](./google-chrome.windowcreateinput.bounds.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 _(Optional)_ The bounding rectangle of the window.
-
 
 </td></tr>
 <tr><td>
 
 [givenName?](./google-chrome.windowcreateinput.givenname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The given name of the window.
-
 
 </td></tr>
 <tr><td>
 
 [index?](./google-chrome.windowcreateinput.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The index of the window, ordered front to back.
-
 
 </td></tr>
 <tr><td>
 
 [minimized?](./google-chrome.windowcreateinput.minimized.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently minimized.
-
 
 </td></tr>
 <tr><td>
 
 [mode?](./google-chrome.windowcreateinput.mode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./google-chrome.windowcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently visible.
-
 
 </td></tr>
 <tr><td>
 
 [zoomed?](./google-chrome.windowcreateinput.zoomed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently zoomed.
 
-
 </td></tr>
 </tbody></table>
-

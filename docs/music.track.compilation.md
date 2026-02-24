@@ -9,5 +9,5 @@ is this track from a compilation album?
 **Signature:**
 
 ```typescript
-compilation: boolean;
+compilation: boolean
 ```

@@ -9,10 +9,13 @@ Permission history entry - tracks when a command's permission changed. Used to p
 **Signature:**
 
 ```typescript
-PermissionHistoryEntrySchema: z.ZodObject<{
-    version: z.ZodString;
-    permission: z.ZodString;
-    changed: z.ZodString;
-    reason: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+PermissionHistoryEntrySchema: z.ZodObject<
+  {
+    version: z.ZodString
+    permission: z.ZodString
+    changed: z.ZodString
+    reason: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

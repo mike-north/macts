@@ -9,5 +9,5 @@ Appearances
 **Signature:**
 
 ```typescript
-type Appearances = 'blue' | 'graphite';
+type Appearances = 'blue' | 'graphite'
 ```

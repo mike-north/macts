@@ -9,5 +9,5 @@ The Applications folder
 **Signature:**
 
 ```typescript
-applicationsFolder: Folder;
+applicationsFolder: Folder
 ```

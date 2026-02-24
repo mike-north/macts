@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PathType = z.infer<typeof PathTypeSchema>;
+type PathType = z.infer<typeof PathTypeSchema>
 ```
-**References:** [PathTypeSchema](./core.pathtypeschema.md)
 
+**References:** [PathTypeSchema](./core.pathtypeschema.md)

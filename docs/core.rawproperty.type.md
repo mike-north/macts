@@ -9,5 +9,5 @@ Type of the property (e.g., "text", "integer", "rectangle")
 **Signature:**
 
 ```typescript
-type: string;
+type: string
 ```

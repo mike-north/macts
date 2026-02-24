@@ -9,7 +9,7 @@ A combo box belonging to a window
 **Signature:**
 
 ```typescript
-interface ComboBox 
+interface ComboBox
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ComboBox
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.combobox.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this combo box
 
-
 </td></tr>
 </tbody></table>
-

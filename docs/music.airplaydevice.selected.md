@@ -9,5 +9,5 @@ is the device currently selected?
 **Signature:**
 
 ```typescript
-selected: boolean;
+selected: boolean
 ```

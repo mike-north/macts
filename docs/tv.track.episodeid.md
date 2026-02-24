@@ -9,5 +9,5 @@ the episode ID of the track
 **Signature:**
 
 ```typescript
-episodeID: string;
+episodeID: string
 ```

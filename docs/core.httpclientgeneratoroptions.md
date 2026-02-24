@@ -9,7 +9,7 @@ Options for HTTP client SDK generation.
 **Signature:**
 
 ```typescript
-interface HttpClientGeneratorOptions 
+interface HttpClientGeneratorOptions
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface HttpClientGeneratorOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [defaultBaseUrl?](./core.httpclientgeneratoroptions.defaultbaseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Default API base URL
-
 
 </td></tr>
 <tr><td>
 
 [defaultPort?](./core.httpclientgeneratoroptions.defaultport.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Default port
-
 
 </td></tr>
 <tr><td>
 
 [packageName](./core.httpclientgeneratoroptions.packagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Package name (e.g., @<!-- -->macts/sdk-calendar)
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.httpclientgeneratoroptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

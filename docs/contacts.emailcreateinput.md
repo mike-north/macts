@@ -9,7 +9,7 @@ Input for creating a Email
 **Signature:**
 
 ```typescript
-interface EmailCreateInput 
+interface EmailCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface EmailCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.emailcreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this email
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.emailcreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The email address
 
-
 </td></tr>
 </tbody></table>
-

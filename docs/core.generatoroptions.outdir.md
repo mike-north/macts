@@ -9,5 +9,5 @@ Output directory for generated code
 **Signature:**
 
 ```typescript
-outDir: string;
+outDir: string
 ```

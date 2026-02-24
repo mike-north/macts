@@ -9,10 +9,13 @@ Schema for deprecation information.
 **Signature:**
 
 ```typescript
-DeprecationSchema: z.ZodObject<{
-    message: z.ZodString;
-    since: z.ZodOptional<z.ZodString>;
-    upstream: z.ZodDefault<z.ZodBoolean>;
-    replacement: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+DeprecationSchema: z.ZodObject<
+  {
+    message: z.ZodString
+    since: z.ZodOptional<z.ZodString>
+    upstream: z.ZodDefault<z.ZodBoolean>
+    replacement: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

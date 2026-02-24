@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { CalendarClient, type CalendarClientOptions } from '@macts/calendar';
+import { CalendarClient, type CalendarClientOptions } from '@macts/calendar'
 
 /**
  * Get a CalendarClient instance.
@@ -16,32 +16,32 @@ import { CalendarClient, type CalendarClientOptions } from '@macts/calendar';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getCalendarClient(): CalendarClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions calendar:*:*'
-    );
+    )
   }
 
   const options: CalendarClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new CalendarClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new CalendarClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: CalendarClient | null = null;
+let _client: CalendarClient | null = null
 
 /**
  * Get or create the singleton CalendarClient.
@@ -50,8 +50,8 @@ let _client: CalendarClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): CalendarClient {
-  _client ??= getCalendarClient();
-  return _client;
+  _client ??= getCalendarClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): CalendarClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

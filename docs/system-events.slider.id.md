@@ -9,5 +9,5 @@ Unique identifier for this slider
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

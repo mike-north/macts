@@ -11,11 +11,7 @@ import { discoverPlugins, loadPlugin } from './loader.js'
  *
  * Returns the project so callers can add more packages before calling `write()`.
  */
-function addCliPlugin(
-  pluginsProject: Project,
-  packageName: string,
-  entrySource: string
-): Project {
+function addCliPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
   dep.pkg = {
     ...dep.pkg,
@@ -239,7 +235,10 @@ describe('CLI plugin discovery e2e', () => {
       await pluginsProject.write()
 
       // Create a lockfile so cache can be written
-      writeFileSync(join(mactsHome, 'plugins', 'package-lock.json'), JSON.stringify({ lockfileVersion: 3 }))
+      writeFileSync(
+        join(mactsHome, 'plugins', 'package-lock.json'),
+        JSON.stringify({ lockfileVersion: 3 })
+      )
 
       // First discovery — slow path, writes cache
       const result1 = await discoverPlugins()
@@ -260,12 +259,18 @@ describe('CLI plugin discovery e2e', () => {
       await pluginsProject.write()
 
       // Create lockfile and discover (populates cache)
-      writeFileSync(join(mactsHome, 'plugins', 'package-lock.json'), JSON.stringify({ lockfileVersion: 3, v: 1 }))
+      writeFileSync(
+        join(mactsHome, 'plugins', 'package-lock.json'),
+        JSON.stringify({ lockfileVersion: 3, v: 1 })
+      )
       const result1 = await discoverPlugins()
       expect(result1.plugins).toHaveLength(1)
 
       // Change the lockfile content (simulating npm install changing it)
-      writeFileSync(join(mactsHome, 'plugins', 'package-lock.json'), JSON.stringify({ lockfileVersion: 3, v: 2 }))
+      writeFileSync(
+        join(mactsHome, 'plugins', 'package-lock.json'),
+        JSON.stringify({ lockfileVersion: 3, v: 2 })
+      )
 
       // Discovery should use slow path (cache hash mismatch)
       const result2 = await discoverPlugins()

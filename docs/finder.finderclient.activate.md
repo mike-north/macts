@@ -11,7 +11,7 @@ Activate the specified window (or the Finder)
 ```typescript
 activate(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

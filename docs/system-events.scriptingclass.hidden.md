@@ -9,5 +9,5 @@ Is the class hidden?
 **Signature:**
 
 ```typescript
-hidden: boolean;
+hidden: boolean
 ```

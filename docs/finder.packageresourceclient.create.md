@@ -18,30 +18,24 @@ create(input: PackageCreateInput): Promise<Package>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PackageCreateInput](./finder.packagecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Package](./finder.package.md)<!-- -->&gt;
-

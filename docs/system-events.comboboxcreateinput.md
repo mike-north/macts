@@ -9,5 +9,5 @@ Input for creating a ComboBox
 **Signature:**
 
 ```typescript
-interface ComboBoxCreateInput 
+interface ComboBoxCreateInput
 ```

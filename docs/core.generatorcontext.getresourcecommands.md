@@ -18,30 +18,24 @@ getResourceCommands(resourceName: string): Command[];
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 resourceName
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 [Command](./core.command.md)<!-- -->\[\]
-

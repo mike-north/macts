@@ -9,5 +9,5 @@ the maximum allowed width of this column
 **Signature:**
 
 ```typescript
-maximumWidth: number;
+maximumWidth: number
 ```

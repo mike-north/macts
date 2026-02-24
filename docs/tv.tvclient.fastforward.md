@@ -11,7 +11,7 @@ skip forward in a playing track
 ```typescript
 fastForward(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

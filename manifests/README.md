@@ -65,11 +65,11 @@ A manifest consists of several top-level sections. The authoritative schema is d
 ```yaml
 version: '1.0'
 app: { ... }
-suites: [ ... ]
+suites: [...]
 resources: { ... }
 enums: { ... }
 hierarchy: { ... }
-relationships: [ ... ]
+relationships: [...]
 commands: { ... }
 permissions: { ... }
 extraction: { ... }
@@ -143,16 +143,16 @@ app:
 
 #### Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `bundleId` | string | Yes | Bundle identifier (e.g., `com.apple.iCal`) |
-| `name` | string | Yes | Internal application name (e.g., `Calendar`) |
-| `displayName` | string | No | Display name shown to users |
-| `version` | string | No | Application version |
-| `minMacOSVersion` | string | No | Minimum macOS version required |
-| `icon` | string | No | Path to application icon |
-| `tccEntitlements` | array | No | Required TCC entitlements (see below) |
-| `distributionModel` | enum | No | Distribution model: `app-store`, `developer-id`, or `system` |
+| Field               | Type   | Required | Description                                                  |
+| ------------------- | ------ | -------- | ------------------------------------------------------------ |
+| `bundleId`          | string | Yes      | Bundle identifier (e.g., `com.apple.iCal`)                   |
+| `name`              | string | Yes      | Internal application name (e.g., `Calendar`)                 |
+| `displayName`       | string | No       | Display name shown to users                                  |
+| `version`           | string | No       | Application version                                          |
+| `minMacOSVersion`   | string | No       | Minimum macOS version required                               |
+| `icon`              | string | No       | Path to application icon                                     |
+| `tccEntitlements`   | array  | No       | Required TCC entitlements (see below)                        |
+| `distributionModel` | enum   | No       | Distribution model: `app-store`, `developer-id`, or `system` |
 
 #### TCC Entitlements
 
@@ -209,14 +209,14 @@ suites:
 
 #### Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Suite name |
-| `description` | string | No | Human-readable description |
-| `code` | string | No | AppleScript four-character code (legacy) |
-| `resources` | array | No | List of resource names in this suite |
-| `commands` | array | No | List of command names in this suite |
-| `enums` | array | No | List of enum names in this suite |
+| Field         | Type   | Required | Description                              |
+| ------------- | ------ | -------- | ---------------------------------------- |
+| `name`        | string | Yes      | Suite name                               |
+| `description` | string | No       | Human-readable description               |
+| `code`        | string | No       | AppleScript four-character code (legacy) |
+| `resources`   | array  | No       | List of resource names in this suite     |
+| `commands`    | array  | No       | List of command names in this suite      |
+| `enums`       | array  | No       | List of enum names in this suite         |
 
 Suites are primarily organizational and informational. They don't affect code generation directly but help document the structure of the original scripting dictionary.
 
@@ -238,27 +238,27 @@ resources:
     description: A calendar containing events
     code: wres
     properties: { ... }
-    identifiers: [ ... ]
+    identifiers: [...]
   Event:
     name: Event
     plural: Events
     description: A calendar event
     code: wrev
     properties: { ... }
-    identifiers: [ ... ]
+    identifiers: [...]
 ```
 
 #### Resource Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Resource name (singular, PascalCase) |
-| `plural` | string | Yes | Plural form for collections |
-| `description` | string | Yes | Human-readable description |
-| `code` | string | No | AppleScript four-character code |
-| `properties` | object | No | Property definitions (see [Properties](#properties)) |
-| `identifiers` | array | No | Identifier configuration (see [Identifiers](#identifiers)) |
-| `schema` | string | No | Reference to JSON Schema file for full data shape |
+| Field         | Type   | Required | Description                                                |
+| ------------- | ------ | -------- | ---------------------------------------------------------- |
+| `name`        | string | Yes      | Resource name (singular, PascalCase)                       |
+| `plural`      | string | Yes      | Plural form for collections                                |
+| `description` | string | Yes      | Human-readable description                                 |
+| `code`        | string | No       | AppleScript four-character code                            |
+| `properties`  | object | No       | Property definitions (see [Properties](#properties))       |
+| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers)) |
+| `schema`      | string | No       | Reference to JSON Schema file for full data shape          |
 
 #### Properties
 
@@ -291,15 +291,15 @@ properties:
 
 ##### Property Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `access` | enum | Yes | Access mode: `r` (read-only) or `rw` (read-write) |
-| `type` | type | No | Property type (defaults to `string` if omitted) |
-| `description` | string | Yes | Human-readable description |
-| `code` | string | No | AppleScript four-character code |
-| `default` | any | No | Default value |
-| `optional` | boolean | No | Whether property is optional (defaults to `false`) |
-| `deprecated` | object | No | Deprecation information |
+| Field         | Type    | Required | Description                                        |
+| ------------- | ------- | -------- | -------------------------------------------------- |
+| `access`      | enum    | Yes      | Access mode: `r` (read-only) or `rw` (read-write)  |
+| `type`        | type    | No       | Property type (defaults to `string` if omitted)    |
+| `description` | string  | Yes      | Human-readable description                         |
+| `code`        | string  | No       | AppleScript four-character code                    |
+| `default`     | any     | No       | Default value                                      |
+| `optional`    | boolean | No       | Whether property is optional (defaults to `false`) |
+| `deprecated`  | object  | No       | Deprecation information                            |
 
 ##### Property Types
 
@@ -377,10 +377,10 @@ identifiers:
     primary: false
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `property` | string | Yes | Name of the property used as identifier |
-| `primary` | boolean | No | Whether this is the primary identifier (defaults to `false`) |
+| Field      | Type    | Required | Description                                                  |
+| ---------- | ------- | -------- | ------------------------------------------------------------ |
+| `property` | string  | Yes      | Name of the property used as identifier                      |
+| `primary`  | boolean | No       | Whether this is the primary identifier (defaults to `false`) |
 
 The primary identifier is used for lookups and references. A resource should have exactly one primary identifier.
 
@@ -419,23 +419,23 @@ enums:
 
 #### Enum Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Enum name (PascalCase) |
-| `description` | string | No | Human-readable description |
-| `code` | string | No | AppleScript four-character code |
-| `values` | array | Yes | Enum values (at least one required) |
+| Field         | Type   | Required | Description                         |
+| ------------- | ------ | -------- | ----------------------------------- |
+| `name`        | string | Yes      | Enum name (PascalCase)              |
+| `description` | string | No       | Human-readable description          |
+| `code`        | string | No       | AppleScript four-character code     |
+| `values`      | array  | Yes      | Enum values (at least one required) |
 
 #### Enum Value Fields
 
 **Schema:** [`EnumValueSchema`](../packages/core/src/manifest/schemas/enum.ts)
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Value name (camelCase) |
-| `value` | string or number | Yes | Actual value |
-| `description` | string | No | Human-readable description |
-| `code` | string | No | AppleScript four-character code |
+| Field         | Type             | Required | Description                     |
+| ------------- | ---------------- | -------- | ------------------------------- |
+| `name`        | string           | Yes      | Value name (camelCase)          |
+| `value`       | string or number | Yes      | Actual value                    |
+| `description` | string           | No       | Human-readable description      |
+| `code`        | string           | No       | AppleScript four-character code |
 
 ---
 
@@ -484,12 +484,12 @@ Application
 
 **Schema:** [`HierarchyChildSchema`](../packages/core/src/manifest/schemas/hierarchy.ts)
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `resource` | string | Yes | Reference to a resource type |
-| `access` | enum | Yes | Access mode: `r` (read-only) or `rw` (can create/delete) |
-| `description` | string | No | Human-readable description of this relationship |
-| `children` | object | No | Nested children (recursive) |
+| Field         | Type   | Required | Description                                              |
+| ------------- | ------ | -------- | -------------------------------------------------------- |
+| `resource`    | string | Yes      | Reference to a resource type                             |
+| `access`      | enum   | Yes      | Access mode: `r` (read-only) or `rw` (can create/delete) |
+| `description` | string | No       | Human-readable description of this relationship          |
+| `children`    | object | No       | Nested children (recursive)                              |
 
 The `access` mode determines what operations are permitted:
 
@@ -516,14 +516,14 @@ relationships:
 
 #### Relationship Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Relationship name |
-| `from` | string | Yes | Source resource type |
-| `to` | string | Yes | Target resource type |
-| `cardinality` | enum | Yes | Relationship cardinality (see below) |
-| `property` | string | No | Property on source that holds the reference |
-| `description` | string | No | Human-readable description |
+| Field         | Type   | Required | Description                                 |
+| ------------- | ------ | -------- | ------------------------------------------- |
+| `name`        | string | Yes      | Relationship name                           |
+| `from`        | string | Yes      | Source resource type                        |
+| `to`          | string | Yes      | Target resource type                        |
+| `cardinality` | enum   | Yes      | Relationship cardinality (see below)        |
+| `property`    | string | No       | Property on source that holds the reference |
+| `description` | string | No       | Human-readable description                  |
 
 #### Cardinality Values
 
@@ -591,17 +591,17 @@ commands:
 
 #### Command Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Command name (camelCase) |
-| `description` | string | Yes | Human-readable description |
-| `scope` | enum | Yes | Command scope: `application` or `resource` |
-| `resourceType` | string or array | No | For resource-scoped commands, which resource type(s) can be targeted |
-| `parameters` | array | No | Input parameters |
-| `returns` | string | No | Return type (void if omitted) |
-| `code` | string | No | AppleScript four-character code |
-| `permission` | string | No | Fine-grained permission required (format: `app:resource:operation`) |
-| `permissionHistory` | array | No | History of permission changes for upgrade messages |
+| Field               | Type            | Required | Description                                                          |
+| ------------------- | --------------- | -------- | -------------------------------------------------------------------- |
+| `name`              | string          | Yes      | Command name (camelCase)                                             |
+| `description`       | string          | Yes      | Human-readable description                                           |
+| `scope`             | enum            | Yes      | Command scope: `application` or `resource`                           |
+| `resourceType`      | string or array | No       | For resource-scoped commands, which resource type(s) can be targeted |
+| `parameters`        | array           | No       | Input parameters                                                     |
+| `returns`           | string          | No       | Return type (void if omitted)                                        |
+| `code`              | string          | No       | AppleScript four-character code                                      |
+| `permission`        | string          | No       | Fine-grained permission required (format: `app:resource:operation`)  |
+| `permissionHistory` | array           | No       | History of permission changes for upgrade messages                   |
 
 #### Command Scope
 
@@ -624,7 +624,7 @@ parameters:
     type: rgb
     description: Calendar color
     required: false
-    default: {red: 0, green: 0, blue: 255}
+    default: { red: 0, green: 0, blue: 255 }
   - name: view
     type: ViewType
     description: View type
@@ -632,14 +632,14 @@ parameters:
     code: wre5
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Parameter name |
-| `type` | string or object | Yes | Parameter type (primitive string or reference object) |
-| `description` | string | Yes | Human-readable description |
-| `required` | boolean | No | Whether parameter is required (defaults to `true`) |
-| `default` | any | No | Default value if not required |
-| `code` | string | No | AppleScript four-character code |
+| Field         | Type             | Required | Description                                           |
+| ------------- | ---------------- | -------- | ----------------------------------------------------- |
+| `name`        | string           | Yes      | Parameter name                                        |
+| `type`        | string or object | Yes      | Parameter type (primitive string or reference object) |
+| `description` | string           | Yes      | Human-readable description                            |
+| `required`    | boolean          | No       | Whether parameter is required (defaults to `true`)    |
+| `default`     | any              | No       | Default value if not required                         |
+| `code`        | string           | No       | AppleScript four-character code                       |
 
 Parameter types follow the same rules as [property types](#property-types), supporting primitives, arrays, resource references, and enum references.
 
@@ -658,12 +658,12 @@ permissionHistory:
     reason: Split read permission into list and get for finer-grained access control
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `version` | string | Yes | Version when the permission changed |
-| `permission` | string | Yes | Previous permission string |
-| `changed` | string | Yes | ISO date when the change occurred |
-| `reason` | string | No | Human-readable reason for the change |
+| Field        | Type   | Required | Description                          |
+| ------------ | ------ | -------- | ------------------------------------ |
+| `version`    | string | Yes      | Version when the permission changed  |
+| `permission` | string | Yes      | Previous permission string           |
+| `changed`    | string | Yes      | ISO date when the change occurred    |
+| `reason`     | string | No       | Human-readable reason for the change |
 
 When a permission check fails, the system can detect if the user has the old permission and suggest regenerating their API key.
 
@@ -760,13 +760,13 @@ extraction:
 
 #### Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `extractedAt` | string | No | ISO 8601 timestamp of extraction |
-| `mactsVersion` | string | No | Version of macts used for extraction |
-| `sourceFile` | string | No | Source dictionary filename |
-| `confidence` | object | No | Confidence scores (see below) |
-| `openQuestions` | array | No | Questions for human review (see below) |
+| Field           | Type   | Required | Description                            |
+| --------------- | ------ | -------- | -------------------------------------- |
+| `extractedAt`   | string | No       | ISO 8601 timestamp of extraction       |
+| `mactsVersion`  | string | No       | Version of macts used for extraction   |
+| `sourceFile`    | string | No       | Source dictionary filename             |
+| `confidence`    | object | No       | Confidence scores (see below)          |
+| `openQuestions` | array  | No       | Questions for human review (see below) |
 
 #### Confidence Scores
 
@@ -781,10 +781,10 @@ confidence:
     hierarchy: 0.95
 ```
 
-| Field | Description |
-|-------|-------------|
+| Field     | Description                   |
+| --------- | ----------------------------- |
 | `overall` | Overall extraction confidence |
-| `fields` | Per-section confidence scores |
+| `fields`  | Per-section confidence scores |
 
 #### Open Questions
 
@@ -802,12 +802,12 @@ openQuestions:
     relatedTo: CalendarPriority
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `question` | string | Yes | The question being asked |
-| `context` | string | No | Context about where this question arose |
-| `suggestions` | array | No | Suggested answers to choose from |
-| `relatedTo` | string | No | Related resource/command/property name |
+| Field         | Type   | Required | Description                             |
+| ------------- | ------ | -------- | --------------------------------------- |
+| `question`    | string | Yes      | The question being asked                |
+| `context`     | string | No       | Context about where this question arose |
+| `suggestions` | array  | No       | Suggested answers to choose from        |
+| `relatedTo`   | string | No       | Related resource/command/property name  |
 
 ---
 
@@ -937,8 +937,8 @@ The permission matcher ([`../packages/core/src/permissions/matcher.ts`](../packa
 
 ```typescript
 function hasPermission(
-  grantedPermissions: string[],  // Fine-grained permissions from API key
-  requiredPermission: string,     // Fine-grained permission from command
+  grantedPermissions: string[], // Fine-grained permissions from API key
+  requiredPermission: string // Fine-grained permission from command
 ): PermissionCheckResult
 ```
 
@@ -952,14 +952,14 @@ function hasPermission(
 
 **Examples:**
 
-| Granted | Required | Match? |
-|---------|----------|--------|
-| `calendar:events:list` | `calendar:events:list` | Yes (direct) |
-| `calendar:*:read` | `calendar:events:list` | No (read is coarse, not fine) |
-| `calendar:events:*` | `calendar:events:list` | Yes (wildcard) |
-| `calendar:*:list` | `calendar:events:list` | Yes (wildcard) |
-| `calendar:*:*` | `calendar:events:list` | Yes (wildcard) |
-| `calendar:events:get` | `calendar:events:list` | No (different operations) |
+| Granted                | Required               | Match?                        |
+| ---------------------- | ---------------------- | ----------------------------- |
+| `calendar:events:list` | `calendar:events:list` | Yes (direct)                  |
+| `calendar:*:read`      | `calendar:events:list` | No (read is coarse, not fine) |
+| `calendar:events:*`    | `calendar:events:list` | Yes (wildcard)                |
+| `calendar:*:list`      | `calendar:events:list` | Yes (wildcard)                |
+| `calendar:*:*`         | `calendar:events:list` | Yes (wildcard)                |
+| `calendar:events:get`  | `calendar:events:list` | No (different operations)     |
 
 ### Permission Lifecycle
 

@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [HttpClient](./spotify.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [SpotifyClient](./spotify.spotifyclient.md)
 
-
 </td><td>
 
 Spotify client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [SpotifyError](./spotify.spotifyerror.md)
 
-
 </td><td>
 
 Error class for Spotify API errors.
-
 
 </td></tr>
 <tr><td>
 
 [TrackResourceClient](./spotify.trackresourceclient.md)
 
-
 </td><td>
 
 Client for the currently playing track.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ Client for the currently playing track.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SpotifyClientOptions](./spotify.spotifyclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Track](./spotify.track.md)
 
-
 </td><td>
 
 The currently playing track
-
 
 </td></tr>
 <tr><td>
 
 [TrackCreateInput](./spotify.trackcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Track
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Input for creating a Track
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [TrackSchema](./spotify.trackschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,34 +119,27 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [PlayerState](./spotify.playerstate.md)
 
-
 </td><td>
 
 PlayerState
-
 
 </td></tr>
 <tr><td>
 
 [TrackUpdateInput](./spotify.trackupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Track
 
-
 </td></tr>
 </tbody></table>
-

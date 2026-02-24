@@ -11,7 +11,7 @@ Show the reminder in Reminders.app UI
 ```typescript
 show(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

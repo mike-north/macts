@@ -11,7 +11,7 @@ Save the specified object(s)
 ```typescript
 save(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

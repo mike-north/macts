@@ -11,7 +11,7 @@ Show the event or to-do in the calendar window
 ```typescript
 show(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

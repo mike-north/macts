@@ -9,5 +9,5 @@ the size of the partition with which the process was launched
 **Signature:**
 
 ```typescript
-totalPartitionSize: number;
+totalPartitionSize: number
 ```

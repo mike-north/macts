@@ -9,5 +9,5 @@ Label for this date
 **Signature:**
 
 ```typescript
-label: string;
+label: string
 ```

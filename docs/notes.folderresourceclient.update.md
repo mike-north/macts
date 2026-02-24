@@ -18,44 +18,35 @@ update(name: string, input: FolderUpdateInput): Promise<Folder>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [FolderUpdateInput](./notes.folderupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[Folder](./notes.folder.md)<!-- -->&gt;
-

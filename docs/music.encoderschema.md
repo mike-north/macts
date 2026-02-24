@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-EncoderSchema: z.ZodObject<{
-    format: z.ZodString;
-}, z.core.$strip>
+EncoderSchema: z.ZodObject<
+  {
+    format: z.ZodString
+  },
+  z.core.$strip
+>
 ```

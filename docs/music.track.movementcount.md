@@ -9,5 +9,5 @@ the total number of movements in the work
 **Signature:**
 
 ```typescript
-movementCount: number;
+movementCount: number
 ```

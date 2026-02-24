@@ -9,7 +9,7 @@ Client for the local domain in the file system.
 **Signature:**
 
 ```typescript
-declare class LocalDomainObjectResourceClient 
+declare class LocalDomainObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class LocalDomainObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.localdomainobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `LocalDomainObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `LocalDomainObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.localdomainobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new localdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.localdomainobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a localdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.localdomainobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a localdomainobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.localdomainobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all localdomainobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.localdomainobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing localdomainobject.
 
-
 </td></tr>
 </tbody></table>
-

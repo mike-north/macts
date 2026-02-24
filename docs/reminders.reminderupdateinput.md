@@ -9,7 +9,7 @@ Input for updating a Reminder
 **Signature:**
 
 ```typescript
-type ReminderUpdateInput = Partial<ReminderCreateInput>;
+type ReminderUpdateInput = Partial<ReminderCreateInput>
 ```
-**References:** [ReminderCreateInput](./reminders.remindercreateinput.md)
 
+**References:** [ReminderCreateInput](./reminders.remindercreateinput.md)

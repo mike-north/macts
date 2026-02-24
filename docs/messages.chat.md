@@ -9,7 +9,7 @@ An SMS or iMessage chat.
 **Signature:**
 
 ```typescript
-interface Chat 
+interface Chat
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Chat
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [account](./messages.chat.account.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Account](./messages.account.md)
 
-
 </td><td>
 
 The account which is participating in this chat.
-
 
 </td></tr>
 <tr><td>
 
 [id](./messages.chat.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 A guid identifier for this chat.
-
 
 </td></tr>
 <tr><td>
 
 [name](./messages.chat.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The chat's name as it appears in the chat list.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Unique identifier for this domain
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

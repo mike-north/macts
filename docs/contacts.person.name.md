@@ -9,5 +9,5 @@ First/Last name of the person, uses the name display order preference setting in
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

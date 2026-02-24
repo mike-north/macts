@@ -18,30 +18,24 @@ create(input: ICQHandleCreateInput): Promise<ICQHandle>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ICQHandleCreateInput](./contacts.icqhandlecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ICQHandle](./contacts.icqhandle.md)<!-- -->&gt;
-

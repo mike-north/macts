@@ -9,5 +9,5 @@ Input for creating a NetworkDomainObject
 **Signature:**
 
 ```typescript
-interface NetworkDomainObjectCreateInput 
+interface NetworkDomainObjectCreateInput
 ```

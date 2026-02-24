@@ -9,5 +9,5 @@ Classes that are resources (have elements)
 **Signature:**
 
 ```typescript
-resources: Set<string>;
+resources: Set<string>
 ```

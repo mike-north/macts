@@ -9,7 +9,7 @@ A domain in the file system
 **Signature:**
 
 ```typescript
-interface Domain 
+interface Domain
 ```
 
 ## Properties
@@ -18,307 +18,242 @@ interface Domain
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [applicationsFolder](./system-events.domain.applicationsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Applications folder
-
 
 </td></tr>
 <tr><td>
 
 [applicationSupportFolder](./system-events.domain.applicationsupportfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Application Support folder
-
 
 </td></tr>
 <tr><td>
 
 [desktopPicturesFolder](./system-events.domain.desktoppicturesfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Desktop Pictures folder
-
 
 </td></tr>
 <tr><td>
 
 [folderActionScriptsFolder](./system-events.domain.folderactionscriptsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Folder Action Scripts folder
-
 
 </td></tr>
 <tr><td>
 
 [fontsFolder](./system-events.domain.fontsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Fonts folder
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.domain.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier of the domain
-
 
 </td></tr>
 <tr><td>
 
 [libraryFolder](./system-events.domain.libraryfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Library folder
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.domain.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the domain
-
 
 </td></tr>
 <tr><td>
 
 [preferencesFolder](./system-events.domain.preferencesfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Preferences folder
-
 
 </td></tr>
 <tr><td>
 
 [scriptingAdditionsFolder](./system-events.domain.scriptingadditionsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Scripting Additions folder
-
 
 </td></tr>
 <tr><td>
 
 [scriptsFolder](./system-events.domain.scriptsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Scripts folder
-
 
 </td></tr>
 <tr><td>
 
 [sharedDocumentsFolder](./system-events.domain.shareddocumentsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Shared Documents folder
-
 
 </td></tr>
 <tr><td>
 
 [speakableItemsFolder](./system-events.domain.speakableitemsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Speakable Items folder
-
 
 </td></tr>
 <tr><td>
 
 [utilitiesFolder](./system-events.domain.utilitiesfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Utilities folder
-
 
 </td></tr>
 <tr><td>
 
 [workflowsFolder](./system-events.domain.workflowsfolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Folder](./system-events.folder.md)
 
-
 </td><td>
 
 The Automator Workflows folder
 
-
 </td></tr>
 </tbody></table>
-

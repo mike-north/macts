@@ -11,7 +11,7 @@ End the span.
 ```typescript
 end(): void;
 ```
+
 **Returns:**
 
 void
-

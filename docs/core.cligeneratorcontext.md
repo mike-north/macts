@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface CliGeneratorContext 
+interface CliGeneratorContext
 ```
 
 ## Properties
@@ -16,55 +16,43 @@ interface CliGeneratorContext
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [manifest](./core.cligeneratorcontext.manifest.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [options](./core.cligeneratorcontext.options.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [CliGeneratorOptions](./core.cligeneratoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -75,111 +63,90 @@ Description
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [getAppClassName()](./core.cligeneratorcontext.getappclassname.md)
 
-
 </td><td>
 
 Get application class name (PascalCase)
-
 
 </td></tr>
 <tr><td>
 
 [getAppCommands()](./core.cligeneratorcontext.getappcommands.md)
 
-
 </td><td>
 
 Get application-level commands
-
 
 </td></tr>
 <tr><td>
 
 [getAppNameLower()](./core.cligeneratorcontext.getappnamelower.md)
 
-
 </td><td>
 
 Get application name (lowercase for CLI)
-
 
 </td></tr>
 <tr><td>
 
 [getEnum(name)](./core.cligeneratorcontext.getenum.md)
 
-
 </td><td>
 
 Get an enum by name
-
 
 </td></tr>
 <tr><td>
 
 [getEnums()](./core.cligeneratorcontext.getenums.md)
 
-
 </td><td>
 
 Get all enums
-
 
 </td></tr>
 <tr><td>
 
 [getHierarchyPaths()](./core.cligeneratorcontext.gethierarchypaths.md)
 
-
 </td><td>
 
 Get the hierarchy as a flat list of paths
-
 
 </td></tr>
 <tr><td>
 
 [getResource(name)](./core.cligeneratorcontext.getresource.md)
 
-
 </td><td>
 
 Get a resource by name
-
 
 </td></tr>
 <tr><td>
 
 [getResourceCommands(resourceName)](./core.cligeneratorcontext.getresourcecommands.md)
 
-
 </td><td>
 
 Get commands for a resource
-
 
 </td></tr>
 <tr><td>
 
 [getResources()](./core.cligeneratorcontext.getresources.md)
 
-
 </td><td>
 
 Get all resources
 
-
 </td></tr>
 </tbody></table>
-

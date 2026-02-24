@@ -9,5 +9,5 @@ The MSN handle value
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

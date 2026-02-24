@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-EmailSchema: z.ZodObject<{
-    id: z.ZodString;
-    label: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+EmailSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    label: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

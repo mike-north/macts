@@ -18,30 +18,24 @@ create(input: UrlCreateInput): Promise<Url>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [UrlCreateInput](./contacts.urlcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Url](./contacts.url.md)<!-- -->&gt;
-

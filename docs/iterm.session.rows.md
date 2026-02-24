@@ -9,5 +9,5 @@ The rows property
 **Signature:**
 
 ```typescript
-rows: number;
+rows: number
 ```

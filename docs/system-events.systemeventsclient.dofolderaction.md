@@ -23,62 +23,50 @@ doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 folderActionCode
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 withItemList
 
-
 </td><td>
 
 unknown
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 withWindowSize
 
-
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -86,4 +74,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

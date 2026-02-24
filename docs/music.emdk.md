@@ -9,5 +9,5 @@ EMdK
 **Signature:**
 
 ```typescript
-type EMdK = 'song' | 'musicVideo' | 'movie' | 'tVShow' | 'unknown';
+type EMdK = 'song' | 'musicVideo' | 'movie' | 'tVShow' | 'unknown'
 ```

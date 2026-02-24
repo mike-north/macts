@@ -11,7 +11,7 @@ List all menus.
 ```typescript
 list(): Promise<Menu[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Menu](./system-events.menu.md)<!-- -->\[\]&gt;
-

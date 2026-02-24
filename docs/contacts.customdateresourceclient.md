@@ -9,7 +9,7 @@ Client for arbitrary date associated with this person..
 **Signature:**
 
 ```typescript
-declare class CustomDateResourceClient 
+declare class CustomDateResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class CustomDateResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.customdateresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CustomDateResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `CustomDateResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.customdateresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new customdate.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.customdateresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a customdate.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.customdateresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a customdate by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.customdateresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all customdates.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.customdateresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing customdate.
 
-
 </td></tr>
 </tbody></table>
-

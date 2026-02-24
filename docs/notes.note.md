@@ -9,7 +9,7 @@ A note
 **Signature:**
 
 ```typescript
-interface Note 
+interface Note
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface Note
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [body](./notes.note.body.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The HTML content of the note body
-
 
 </td></tr>
 <tr><td>
 
 [creationDate](./notes.note.creationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The creation date of the note
-
 
 </td></tr>
 <tr><td>
 
 [id](./notes.note.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the note
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./notes.note.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The modification date of the note
-
 
 </td></tr>
 <tr><td>
 
 [name](./notes.note.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the note (first line)
-
 
 </td></tr>
 <tr><td>
 
 [passwordProtected](./notes.note.passwordprotected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the note is password protected
-
 
 </td></tr>
 <tr><td>
 
 [plaintext](./notes.note.plaintext.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The plaintext content of the note
-
 
 </td></tr>
 <tr><td>
 
 [shared](./notes.note.shared.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the note is shared
 
-
 </td></tr>
 </tbody></table>
-

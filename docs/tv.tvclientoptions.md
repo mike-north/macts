@@ -9,7 +9,7 @@ Client configuration options.
 **Signature:**
 
 ```typescript
-interface TVClientOptions 
+interface TVClientOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface TVClientOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKey](./tv.tvclientoptions.apikey.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 API key for authentication
-
 
 </td></tr>
 <tr><td>
 
 [baseUrl?](./tv.tvclientoptions.baseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Base URL for API server (default: http://localhost:8372)
 
-
 </td></tr>
 </tbody></table>
-

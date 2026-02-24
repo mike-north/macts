@@ -9,5 +9,5 @@ Is the property's value a list?
 **Signature:**
 
 ```typescript
-listed: boolean;
+listed: boolean
 ```

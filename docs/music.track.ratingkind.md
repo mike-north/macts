@@ -9,5 +9,5 @@ the rating kind of this track
 **Signature:**
 
 ```typescript
-ratingKind: string;
+ratingKind: string
 ```

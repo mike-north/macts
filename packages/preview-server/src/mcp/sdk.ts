@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { PreviewClient, type PreviewClientOptions } from '@macts/preview';
+import { PreviewClient, type PreviewClientOptions } from '@macts/preview'
 
 /**
  * Get a PreviewClient instance.
@@ -16,32 +16,32 @@ import { PreviewClient, type PreviewClientOptions } from '@macts/preview';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getPreviewClient(): PreviewClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions preview:*:*'
-    );
+    )
   }
 
   const options: PreviewClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new PreviewClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new PreviewClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: PreviewClient | null = null;
+let _client: PreviewClient | null = null
 
 /**
  * Get or create the singleton PreviewClient.
@@ -50,8 +50,8 @@ let _client: PreviewClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): PreviewClient {
-  _client ??= getPreviewClient();
-  return _client;
+  _client ??= getPreviewClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): PreviewClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

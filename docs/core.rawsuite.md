@@ -9,7 +9,7 @@ Raw suite - a logical grouping of related classes, commands, and enumerations. S
 **Signature:**
 
 ```typescript
-interface RawSuite 
+interface RawSuite
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface RawSuite
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [classes](./core.rawsuite.classes.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawClass](./core.rawclass.md)<!-- -->\[\]
 
-
 </td><td>
 
 Classes defined in this suite
-
 
 </td></tr>
 <tr><td>
 
 [code](./core.rawsuite.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events
-
 
 </td></tr>
 <tr><td>
 
 [commands](./core.rawsuite.commands.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawCommand](./core.rawcommand.md)<!-- -->\[\]
 
-
 </td><td>
 
 Commands defined in this suite
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawsuite.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [enumerations](./core.rawsuite.enumerations.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawEnumeration](./core.rawenumeration.md)<!-- -->\[\]
 
-
 </td><td>
 
 Enumerations defined in this suite
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawsuite.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Suite name
 
-
 </td></tr>
 </tbody></table>
-

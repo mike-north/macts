@@ -9,7 +9,7 @@ An event attendee
 **Signature:**
 
 ```typescript
-interface Attendee 
+interface Attendee
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Attendee
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [displayName](./calendar.attendee.displayname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The first and last name of the attendee
-
 
 </td></tr>
 <tr><td>
 
 [email](./calendar.attendee.email.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Email address of the attendee
-
 
 </td></tr>
 <tr><td>
 
 [participationStatus](./calendar.attendee.participationstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [ParticipationStatus](./calendar.participationstatus.md)
 
-
 </td><td>
 
 The invitation status for the attendee
 
-
 </td></tr>
 </tbody></table>
-

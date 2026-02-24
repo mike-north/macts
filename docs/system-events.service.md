@@ -9,7 +9,7 @@ A collection of settings for a network service
 **Signature:**
 
 ```typescript
-interface Service 
+interface Service
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface Service
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [active](./system-events.service.active.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the service active?
-
 
 </td></tr>
 <tr><td>
 
 [currentConfiguration](./system-events.service.currentconfiguration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Configuration](./system-events.configuration.md)
 
-
 </td><td>
 
 the currently selected configuration
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.service.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier for the service
-
 
 </td></tr>
 <tr><td>
 
 [interface](./system-events.service.interface.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Interface](./system-events.interface.md)
 
-
 </td><td>
 
 the interface the service is built on
-
 
 </td></tr>
 <tr><td>
 
 [kind](./system-events.service.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the type of service
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.service.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the service
 
-
 </td></tr>
 </tbody></table>
-

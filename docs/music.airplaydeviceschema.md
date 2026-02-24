@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-AirPlayDeviceSchema: z.ZodObject<{
-    active: z.ZodBoolean;
-    available: z.ZodBoolean;
-    kind: z.ZodString;
-    networkAddress: z.ZodString;
-    protected: z.ZodBoolean;
-    selected: z.ZodBoolean;
-    supportsAudio: z.ZodBoolean;
-    supportsVideo: z.ZodBoolean;
-    soundVolume: z.ZodNumber;
-}, z.core.$strip>
+AirPlayDeviceSchema: z.ZodObject<
+  {
+    active: z.ZodBoolean
+    available: z.ZodBoolean
+    kind: z.ZodString
+    networkAddress: z.ZodString
+    protected: z.ZodBoolean
+    selected: z.ZodBoolean
+    supportsAudio: z.ZodBoolean
+    supportsVideo: z.ZodBoolean
+    soundVolume: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

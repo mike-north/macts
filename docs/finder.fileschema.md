@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-FileSchema: z.ZodObject<{
-    fileType: z.ZodString;
-    creatorType: z.ZodString;
-    stationery: z.ZodBoolean;
-    productVersion: z.ZodString;
-    version: z.ZodString;
-}, z.core.$strip>
+FileSchema: z.ZodObject<
+  {
+    fileType: z.ZodString
+    creatorType: z.ZodString
+    stationery: z.ZodBoolean
+    productVersion: z.ZodString
+    version: z.ZodString
+  },
+  z.core.$strip
+>
 ```

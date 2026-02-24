@@ -9,5 +9,9 @@ Pple
 **Signature:**
 
 ```typescript
-type Pple = 'generalPreferencesPanel' | 'labelPreferencesPanel' | 'sidebarPreferencesPanel' | 'advancedPreferencesPanel';
+type Pple =
+  | 'generalPreferencesPanel'
+  | 'labelPreferencesPanel'
+  | 'sidebarPreferencesPanel'
+  | 'advancedPreferencesPanel'
 ```

@@ -11,7 +11,7 @@ Begin a bounded update session with one or more files.
 ```typescript
 beginTransaction(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ Client for the radio tuner playlist.
 **Signature:**
 
 ```typescript
-declare class RadioTunerPlaylistResourceClient 
+declare class RadioTunerPlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RadioTunerPlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.radiotunerplaylistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RadioTunerPlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RadioTunerPlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.radiotunerplaylistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new radiotunerplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.radiotunerplaylistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a radiotunerplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.radiotunerplaylistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a radiotunerplaylist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.radiotunerplaylistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all radiotunerplaylists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.radiotunerplaylistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing radiotunerplaylist.
 
-
 </td></tr>
 </tbody></table>
-

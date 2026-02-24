@@ -9,5 +9,5 @@ State, Province, or Region part of the address.
 **Signature:**
 
 ```typescript
-state: string;
+state: string
 ```

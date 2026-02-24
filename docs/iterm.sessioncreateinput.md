@@ -9,7 +9,7 @@ Input for creating a Session
 **Signature:**
 
 ```typescript
-interface SessionCreateInput 
+interface SessionCreateInput
 ```
 
 ## Properties
@@ -18,687 +18,542 @@ interface SessionCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [aNSIBlackColor?](./iterm.sessioncreateinput.ansiblackcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBlackColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBlueColor?](./iterm.sessioncreateinput.ansibluecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBlueColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightBlackColor?](./iterm.sessioncreateinput.ansibrightblackcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightBlackColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightBlueColor?](./iterm.sessioncreateinput.ansibrightbluecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightBlueColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightCyanColor?](./iterm.sessioncreateinput.ansibrightcyancolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightCyanColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightGreenColor?](./iterm.sessioncreateinput.ansibrightgreencolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightGreenColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightMagentaColor?](./iterm.sessioncreateinput.ansibrightmagentacolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightMagentaColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightRedColor?](./iterm.sessioncreateinput.ansibrightredcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightRedColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightWhiteColor?](./iterm.sessioncreateinput.ansibrightwhitecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightWhiteColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightYellowColor?](./iterm.sessioncreateinput.ansibrightyellowcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIBrightYellowColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSICyanColor?](./iterm.sessioncreateinput.ansicyancolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSICyanColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIGreenColor?](./iterm.sessioncreateinput.ansigreencolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIGreenColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIMagentaColor?](./iterm.sessioncreateinput.ansimagentacolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIMagentaColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIRedColor?](./iterm.sessioncreateinput.ansiredcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIRedColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIWhiteColor?](./iterm.sessioncreateinput.ansiwhitecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIWhiteColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIYellowColor?](./iterm.sessioncreateinput.ansiyellowcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The aNSIYellowColor property
-
 
 </td></tr>
 <tr><td>
 
 [answerbackString?](./iterm.sessioncreateinput.answerbackstring.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ ENQ Answerback string
-
 
 </td></tr>
 <tr><td>
 
 [backgroundColor?](./iterm.sessioncreateinput.backgroundcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The backgroundColor property
-
 
 </td></tr>
 <tr><td>
 
 [backgroundImage?](./iterm.sessioncreateinput.backgroundimage.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The backgroundImage property
-
 
 </td></tr>
 <tr><td>
 
 [boldColor?](./iterm.sessioncreateinput.boldcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The boldColor property
-
 
 </td></tr>
 <tr><td>
 
 [colorPreset?](./iterm.sessioncreateinput.colorpreset.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The colorPreset property
-
 
 </td></tr>
 <tr><td>
 
 [columns?](./iterm.sessioncreateinput.columns.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The columns property
-
 
 </td></tr>
 <tr><td>
 
 [contents?](./iterm.sessioncreateinput.contents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The currently visible contents of the session.
-
 
 </td></tr>
 <tr><td>
 
 [cursorColor?](./iterm.sessioncreateinput.cursorcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The cursorColor property
-
 
 </td></tr>
 <tr><td>
 
 [cursorTextColor?](./iterm.sessioncreateinput.cursortextcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The cursorTextColor property
-
 
 </td></tr>
 <tr><td>
 
 [foregroundColor?](./iterm.sessioncreateinput.foregroundcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The foregroundColor property
-
 
 </td></tr>
 <tr><td>
 
 [isAtShellPrompt?](./iterm.sessioncreateinput.isatshellprompt.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ The terminal is at the shell prompt. Requires shell integration.
-
 
 </td></tr>
 <tr><td>
 
 [isProcessing?](./iterm.sessioncreateinput.isprocessing.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ The session has received output recently.
-
 
 </td></tr>
 <tr><td>
 
 [name?](./iterm.sessioncreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name property
-
 
 </td></tr>
 <tr><td>
 
 [rows?](./iterm.sessioncreateinput.rows.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The rows property
-
 
 </td></tr>
 <tr><td>
 
 [selectedTextColor?](./iterm.sessioncreateinput.selectedtextcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The selectedTextColor property
-
 
 </td></tr>
 <tr><td>
 
 [selectionColor?](./iterm.sessioncreateinput.selectioncolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The selectionColor property
-
 
 </td></tr>
 <tr><td>
 
 [transparency?](./iterm.sessioncreateinput.transparency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The transparency property
-
 
 </td></tr>
 <tr><td>
 
 [underlineColor?](./iterm.sessioncreateinput.underlinecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The underlineColor property
-
 
 </td></tr>
 <tr><td>
 
 [useUnderlineColor?](./iterm.sessioncreateinput.useunderlinecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the use a dedicated color for underlining.
 
-
 </td></tr>
 </tbody></table>
-

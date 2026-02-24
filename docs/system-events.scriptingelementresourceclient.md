@@ -9,7 +9,7 @@ Client for an element within a class within a suite within a scripting definitio
 **Signature:**
 
 ```typescript
-declare class ScriptingElementResourceClient 
+declare class ScriptingElementResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingElementResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingelementresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingElementResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingElementResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingelementresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingelement.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingelementresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingelement.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingelementresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingelement by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingelementresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingelements.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingelementresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingelement.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Unique identifier for this color well
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

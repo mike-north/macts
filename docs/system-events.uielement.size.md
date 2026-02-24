@@ -9,5 +9,5 @@ the size of the UI element
 **Signature:**
 
 ```typescript
-size: string;
+size: string
 ```

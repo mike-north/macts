@@ -1,37 +1,44 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../sdk.js';
-import { createFormatter } from '../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 /**
  * Create a new automatoraction.
  */
 export class CreateAutomatorActionCommand extends Command {
-  static override paths = [["automator", "workflows", "actions", "create"]];
+  static override paths = [['automator', 'workflows', 'actions', 'create']]
 
   static override usage = Command.Usage({
     description: 'Create a new automatoraction',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' });
-  comment = Option.String('--comment', { required: true, description: "The comment for the name of the action" });
-  enabled = Option.Boolean('--enabled', { description: "Is the action enabled?" });
-  ignoresInput = Option.Boolean('--ignores-input', { description: "Shall the action ignore its input when it is run?" });
-  index = Option.String('--index', { required: true, description: "The index of the action" });
-  showActionWhenRun = Option.Boolean('--show-action-when-run', { description: "Shall the action show its user interface when it is run?" });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
+  comment = Option.String('--comment', {
+    required: true,
+    description: 'The comment for the name of the action',
+  })
+  enabled = Option.Boolean('--enabled', { description: 'Is the action enabled?' })
+  ignoresInput = Option.Boolean('--ignores-input', {
+    description: 'Shall the action ignore its input when it is run?',
+  })
+  index = Option.String('--index', { required: true, description: 'The index of the action' })
+  showActionWhenRun = Option.Boolean('--show-action-when-run', {
+    description: 'Shall the action show its user interface when it is run?',
+  })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
+      const client = getClient()
       const item = await client.automatoractions.create({
         comment: this.comment,
         enabled: this.enabled,
         ignoresInput: this.ignoresInput,
         index: this.index,
         showActionWhenRun: this.showActionWhenRun,
-      } as Record<string, unknown>);
+      } as Record<string, unknown>)
 
       const output = formatter.format({
         message: 'AutomatorAction created successfully',
@@ -58,14 +65,14 @@ export class CreateAutomatorActionCommand extends Command {
         warningAction: item.warningAction,
         warningLevel: item.warningLevel,
         warningMessage: item.warningMessage,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

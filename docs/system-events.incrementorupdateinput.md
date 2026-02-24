@@ -9,7 +9,7 @@ Input for updating a Incrementor
 **Signature:**
 
 ```typescript
-type IncrementorUpdateInput = Partial<IncrementorCreateInput>;
+type IncrementorUpdateInput = Partial<IncrementorCreateInput>
 ```
-**References:** [IncrementorCreateInput](./system-events.incrementorcreateinput.md)
 
+**References:** [IncrementorCreateInput](./system-events.incrementorcreateinput.md)

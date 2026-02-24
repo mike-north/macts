@@ -9,7 +9,7 @@ Input for creating a Header
 **Signature:**
 
 ```typescript
-interface HeaderCreateInput 
+interface HeaderCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface HeaderCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content?](./mail.headercreateinput.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Contents of the header
-
 
 </td></tr>
 <tr><td>
 
 [name?](./mail.headercreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Name of the header value
 
-
 </td></tr>
 </tbody></table>
-

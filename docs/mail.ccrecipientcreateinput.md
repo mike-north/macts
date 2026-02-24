@@ -9,5 +9,5 @@ Input for creating a CcRecipient
 **Signature:**
 
 ```typescript
-interface CcRecipientCreateInput 
+interface CcRecipientCreateInput
 ```

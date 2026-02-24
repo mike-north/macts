@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-command: Command;
+command: Command
 ```

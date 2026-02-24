@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-BccRecipientSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+BccRecipientSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

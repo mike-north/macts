@@ -9,5 +9,5 @@ The transparency property
 **Signature:**
 
 ```typescript
-transparency: number;
+transparency: number
 ```

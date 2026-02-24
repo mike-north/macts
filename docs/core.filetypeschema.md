@@ -9,8 +9,11 @@ File reference (POSIX path).
 **Signature:**
 
 ```typescript
-FileTypeSchema: z.ZodObject<{
-    path: z.ZodString;
-    exists: z.ZodOptional<z.ZodBoolean>;
-}, z.core.$strip>
+FileTypeSchema: z.ZodObject<
+  {
+    path: z.ZodString
+    exists: z.ZodOptional<z.ZodBoolean>
+  },
+  z.core.$strip
+>
 ```

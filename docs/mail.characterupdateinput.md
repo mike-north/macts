@@ -9,7 +9,7 @@ Input for updating a Character
 **Signature:**
 
 ```typescript
-type CharacterUpdateInput = Partial<CharacterCreateInput>;
+type CharacterUpdateInput = Partial<CharacterCreateInput>
 ```
-**References:** [CharacterCreateInput](./mail.charactercreateinput.md)
 
+**References:** [CharacterCreateInput](./mail.charactercreateinput.md)

@@ -9,5 +9,5 @@ EShM
 **Signature:**
 
 ```typescript
-type EShM = 'songs' | 'albums' | 'groupings';
+type EShM = 'songs' | 'albums' | 'groupings'
 ```

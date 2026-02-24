@@ -9,5 +9,5 @@ Input for creating a Package
 **Signature:**
 
 ```typescript
-interface PackageCreateInput 
+interface PackageCreateInput
 ```

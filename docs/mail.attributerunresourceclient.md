@@ -9,7 +9,7 @@ Client for this subdivides the text into chunks that all have the same attribute
 **Signature:**
 
 ```typescript
-declare class AttributeRunResourceClient 
+declare class AttributeRunResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AttributeRunResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.attributerunresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AttributeRunResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AttributeRunResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.attributerunresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new attributerun.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.attributerunresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a attributerun.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.attributerunresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a attributerun by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.attributerunresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all attributeruns.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.attributerunresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing attributerun.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ the current view for the container window
 **Signature:**
 
 ```typescript
-currentView: string;
+currentView: string
 ```

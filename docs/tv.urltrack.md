@@ -9,7 +9,7 @@ a track representing a network stream
 **Signature:**
 
 ```typescript
-interface URLTrack 
+interface URLTrack
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface URLTrack
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [address](./tv.urltrack.address.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the URL for this track
-
 
 </td></tr>
 <tr><td>
 
 [id](./tv.urltrack.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this track
 
-
 </td></tr>
 </tbody></table>
-

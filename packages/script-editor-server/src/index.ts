@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { scriptEditorApiPlugin as plugin, scriptEditorApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { scriptEditorApiPlugin as plugin, scriptEditorApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

@@ -9,7 +9,7 @@ A folder
 **Signature:**
 
 ```typescript
-interface Folder 
+interface Folder
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Folder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./finder.folder.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this folder
 
-
 </td></tr>
 </tbody></table>
-

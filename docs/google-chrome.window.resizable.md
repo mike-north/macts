@@ -9,5 +9,5 @@ Whether the window can be resized.
 **Signature:**
 
 ```typescript
-resizable: boolean;
+resizable: boolean
 ```

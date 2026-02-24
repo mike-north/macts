@@ -9,5 +9,5 @@ Input for creating a Incrementor
 **Signature:**
 
 ```typescript
-interface IncrementorCreateInput 
+interface IncrementorCreateInput
 ```

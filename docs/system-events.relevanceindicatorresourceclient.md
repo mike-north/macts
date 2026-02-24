@@ -9,7 +9,7 @@ Client for a relevance indicator belonging to a window.
 **Signature:**
 
 ```typescript
-declare class RelevanceIndicatorResourceClient 
+declare class RelevanceIndicatorResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RelevanceIndicatorResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.relevanceindicatorresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RelevanceIndicatorResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RelevanceIndicatorResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.relevanceindicatorresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new relevanceindicator.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.relevanceindicatorresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a relevanceindicator.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.relevanceindicatorresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a relevanceindicator by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.relevanceindicatorresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all relevanceindicators.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.relevanceindicatorresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing relevanceindicator.
 
-
 </td></tr>
 </tbody></table>
-

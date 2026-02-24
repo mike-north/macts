@@ -10,8 +10,8 @@ The cursorTextColor property
 
 ```typescript
 cursorTextColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

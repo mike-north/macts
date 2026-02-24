@@ -9,7 +9,7 @@ A mailbox that holds messages
 **Signature:**
 
 ```typescript
-interface Mailbox 
+interface Mailbox
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface Mailbox
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [account](./mail.mailbox.account.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Account](./mail.account.md)
 
-
 </td><td>
 
 The account property
-
 
 </td></tr>
 <tr><td>
 
 [container](./mail.mailbox.container.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Mailbox](./mail.mailbox.md)
 
-
 </td><td>
 
 The container property
-
 
 </td></tr>
 <tr><td>
 
 [name](./mail.mailbox.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of a mailbox
-
 
 </td></tr>
 <tr><td>
 
 [unreadCount](./mail.mailbox.unreadcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The number of unread messages in the mailbox
 
-
 </td></tr>
 </tbody></table>
-

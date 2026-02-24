@@ -11,7 +11,7 @@ List all bookmarkfolders.
 ```typescript
 list(): Promise<BookmarkFolder[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[BookmarkFolder](./google-chrome.bookmarkfolder.md)<!-- -->\[\]&gt;
-

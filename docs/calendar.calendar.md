@@ -9,7 +9,7 @@ A calendar containing events
 **Signature:**
 
 ```typescript
-interface Calendar 
+interface Calendar
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface Calendar
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [calendarIdentifier](./calendar.calendar.calendaridentifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 A unique calendar key
-
 
 </td></tr>
 <tr><td>
 
 [color](./calendar.calendar.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The calendar color
-
 
 </td></tr>
 <tr><td>
 
 [description](./calendar.calendar.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The calendar description
-
 
 </td></tr>
 <tr><td>
 
 [name](./calendar.calendar.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The calendar title
-
 
 </td></tr>
 <tr><td>
 
 [title](./calendar.calendar.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The calendar title (synonym for name)
-
 
 </td></tr>
 <tr><td>
 
 [writable](./calendar.calendar.writable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the calendar can be modified
 
-
 </td></tr>
 </tbody></table>
-

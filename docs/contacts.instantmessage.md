@@ -9,7 +9,7 @@ Address for instant messaging.
 **Signature:**
 
 ```typescript
-interface InstantMessage 
+interface InstantMessage
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface InstantMessage
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [serviceName](./contacts.instantmessage.servicename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The service name of this instant message address.
-
 
 </td></tr>
 <tr><td>
 
 [serviceType](./contacts.instantmessage.servicetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The service type of this instant message address.
-
 
 </td></tr>
 <tr><td>
 
 [userName](./contacts.instantmessage.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The user name of this instant message address.
 
-
 </td></tr>
 </tbody></table>
-

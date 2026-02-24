@@ -9,5 +9,5 @@ Unique identifier for the desktop
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

@@ -9,5 +9,5 @@ If rule matches, play this sound (specify name of sound or path to sound)
 **Signature:**
 
 ```typescript
-playSound: string;
+playSound: string
 ```

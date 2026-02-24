@@ -9,7 +9,7 @@ Input for updating a Visual
 **Signature:**
 
 ```typescript
-type VisualUpdateInput = Partial<VisualCreateInput>;
+type VisualUpdateInput = Partial<VisualCreateInput>
 ```
-**References:** [VisualCreateInput](./music.visualcreateinput.md)
 
+**References:** [VisualCreateInput](./music.visualcreateinput.md)

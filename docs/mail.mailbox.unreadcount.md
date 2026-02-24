@@ -9,5 +9,5 @@ The number of unread messages in the mailbox
 **Signature:**
 
 ```typescript
-unreadCount: number;
+unreadCount: number
 ```

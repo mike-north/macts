@@ -9,7 +9,7 @@ Input for updating a Toolbar
 **Signature:**
 
 ```typescript
-type ToolbarUpdateInput = Partial<ToolbarCreateInput>;
+type ToolbarUpdateInput = Partial<ToolbarCreateInput>
 ```
-**References:** [ToolbarCreateInput](./system-events.toolbarcreateinput.md)
 
+**References:** [ToolbarCreateInput](./system-events.toolbarcreateinput.md)

@@ -11,7 +11,7 @@ Private event to open a virtual location
 ```typescript
 openVirtualLocation(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,14 @@ HighlightColors
 **Signature:**
 
 ```typescript
-type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
+type HighlightColors =
+  | 'blue'
+  | 'gray'
+  | 'green'
+  | 'none'
+  | 'orange'
+  | 'other'
+  | 'purple'
+  | 'red'
+  | 'yellow'
 ```

@@ -9,5 +9,5 @@ Whether the window is the frontmost window
 **Signature:**
 
 ```typescript
-frontmost: boolean;
+frontmost: boolean
 ```

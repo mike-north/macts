@@ -9,7 +9,7 @@ Input for updating a OpenFileAlarm
 **Signature:**
 
 ```typescript
-type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>;
+type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>
 ```
-**References:** [OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)
 
+**References:** [OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)

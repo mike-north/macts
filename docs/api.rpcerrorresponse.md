@@ -9,7 +9,7 @@ RPC error response structure.
 **Signature:**
 
 ```typescript
-interface RpcErrorResponse 
+interface RpcErrorResponse
 ```
 
 ## Properties
@@ -18,39 +18,30 @@ interface RpcErrorResponse
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [error](./api.rpcerrorresponse.error.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { code: string; message: string; details?: unknown; }
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ List all tabs.
 ```typescript
 list(): Promise<Tab[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Tab](./safari.tab.md)<!-- -->\[\]&gt;
-

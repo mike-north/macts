@@ -9,7 +9,7 @@ Input for updating a Rule
 **Signature:**
 
 ```typescript
-type RuleUpdateInput = Partial<RuleCreateInput>;
+type RuleUpdateInput = Partial<RuleCreateInput>
 ```
-**References:** [RuleCreateInput](./mail.rulecreateinput.md)
 
+**References:** [RuleCreateInput](./mail.rulecreateinput.md)

@@ -9,7 +9,7 @@ Options for creating MCP generator context.
 **Signature:**
 
 ```typescript
-interface CreateMcpContextOptions 
+interface CreateMcpContextOptions
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface CreateMcpContextOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName](./core.createmcpcontextoptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Application name
-
 
 </td></tr>
 <tr><td>
 
 [manifest](./core.createmcpcontextoptions.manifest.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 App manifest
-
 
 </td></tr>
 <tr><td>
 
 [packageName?](./core.createmcpcontextoptions.packagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [sdkPackageName?](./core.createmcpcontextoptions.sdkpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ SDK package name (defaults to @<!-- -->macts/sdk-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.createmcpcontextoptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

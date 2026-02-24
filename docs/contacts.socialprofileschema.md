@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-SocialProfileSchema: z.ZodObject<{
-    id: z.ZodString;
-    serviceName: z.ZodString;
-    userName: z.ZodString;
-    userIdentifier: z.ZodString;
-    url: z.ZodString;
-}, z.core.$strip>
+SocialProfileSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    serviceName: z.ZodString
+    userName: z.ZodString
+    userIdentifier: z.ZodString
+    url: z.ZodString
+  },
+  z.core.$strip
+>
 ```

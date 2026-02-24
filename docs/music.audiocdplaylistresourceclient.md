@@ -9,7 +9,7 @@ Client for a playlist representing an audio cd.
 **Signature:**
 
 ```typescript
-declare class AudioCDPlaylistResourceClient 
+declare class AudioCDPlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AudioCDPlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.audiocdplaylistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AudioCDPlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AudioCDPlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.audiocdplaylistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new audiocdplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.audiocdplaylistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a audiocdplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.audiocdplaylistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a audiocdplaylist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.audiocdplaylistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all audiocdplaylists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.audiocdplaylistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing audiocdplaylist.
 
-
 </td></tr>
 </tbody></table>
-

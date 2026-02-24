@@ -9,7 +9,7 @@ A radio button group belonging to a window
 **Signature:**
 
 ```typescript
-interface RadioGroup 
+interface RadioGroup
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface RadioGroup
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.radiogroup.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this radio group
 
-
 </td></tr>
 </tbody></table>
-

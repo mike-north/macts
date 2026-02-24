@@ -9,7 +9,7 @@ Input for updating a SystemDomainObject
 **Signature:**
 
 ```typescript
-type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>;
+type SystemDomainObjectUpdateInput = Partial<SystemDomainObjectCreateInput>
 ```
-**References:** [SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)
 
+**References:** [SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)

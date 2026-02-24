@@ -18,30 +18,24 @@ create(input: UserDomainObjectCreateInput): Promise<UserDomainObject>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[UserDomainObject](./system-events.userdomainobject.md)<!-- -->&gt;
-

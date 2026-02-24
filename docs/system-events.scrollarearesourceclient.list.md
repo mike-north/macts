@@ -11,7 +11,7 @@ List all scrollareas.
 ```typescript
 list(): Promise<ScrollArea[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScrollArea](./system-events.scrollarea.md)<!-- -->\[\]&gt;
-

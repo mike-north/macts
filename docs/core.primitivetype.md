@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>;
+type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>
 ```
-**References:** [PrimitiveTypeSchema](./core.primitivetypeschema.md)
 
+**References:** [PrimitiveTypeSchema](./core.primitivetypeschema.md)

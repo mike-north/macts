@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-AttendeeSchema: z.ZodObject<{
-    displayName: z.ZodString;
-    email: z.ZodString;
-    participationStatus: z.ZodString;
-}, z.core.$strip>
+AttendeeSchema: z.ZodObject<
+  {
+    displayName: z.ZodString
+    email: z.ZodString
+    participationStatus: z.ZodString
+  },
+  z.core.$strip
+>
 ```

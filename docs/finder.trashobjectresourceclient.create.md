@@ -18,30 +18,24 @@ create(input: TrashObjectCreateInput): Promise<TrashObject>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TrashObjectCreateInput](./finder.trashobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[TrashObject](./finder.trashobject.md)<!-- -->&gt;
-

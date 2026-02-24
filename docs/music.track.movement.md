@@ -9,5 +9,5 @@ the movement name of the track
 **Signature:**
 
 ```typescript
-movement: string;
+movement: string
 ```

@@ -18,32 +18,26 @@ stepBackward(by?: number): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 by
 
-
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -51,4 +45,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

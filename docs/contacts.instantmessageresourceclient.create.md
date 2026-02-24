@@ -18,30 +18,24 @@ create(input: InstantMessageCreateInput): Promise<InstantMessage>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [InstantMessageCreateInput](./contacts.instantmessagecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[InstantMessage](./contacts.instantmessage.md)<!-- -->&gt;
-

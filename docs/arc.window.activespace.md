@@ -9,5 +9,5 @@ Returns the currently active space
 **Signature:**
 
 ```typescript
-activeSpace: Space;
+activeSpace: Space
 ```

@@ -9,5 +9,5 @@ the version of the application bundle referenced by the alias (visible at the bo
 **Signature:**
 
 ```typescript
-version: string;
+version: string
 ```

@@ -9,5 +9,5 @@ the artist of the CD
 **Signature:**
 
 ```typescript
-artist: string;
+artist: string
 ```

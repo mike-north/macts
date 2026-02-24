@@ -18,30 +18,24 @@ create(input: MSNHandleCreateInput): Promise<MSNHandle>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MSNHandleCreateInput](./contacts.msnhandlecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MSNHandle](./contacts.msnhandle.md)<!-- -->&gt;
-

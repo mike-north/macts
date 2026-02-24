@@ -11,7 +11,7 @@ List all connections.
 ```typescript
 list(): Promise<Connection[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Connection](./screen-sharing.connection.md)<!-- -->\[\]&gt;
-

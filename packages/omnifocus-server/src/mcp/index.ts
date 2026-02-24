@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match MCP plugin loader convention
-export { omnifocusPlugin as plugin, omnifocusPlugin } from './plugin.js';
-export type { McpPlugin, McpToolDefinition } from '@macts/mcp';
+export { omnifocusPlugin as plugin, omnifocusPlugin } from './plugin.js'
+export type { McpPlugin, McpToolDefinition } from '@macts/mcp'

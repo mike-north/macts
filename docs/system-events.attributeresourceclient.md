@@ -9,7 +9,7 @@ Client for an named data value associated with the ui element.
 **Signature:**
 
 ```typescript
-declare class AttributeResourceClient 
+declare class AttributeResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AttributeResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.attributeresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AttributeResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AttributeResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.attributeresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new attribute.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.attributeresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a attribute.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.attributeresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a attribute by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.attributeresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all attributes.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.attributeresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing attribute.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A person in the address book database.
 **Signature:**
 
 ```typescript
-interface Person 
+interface Person
 ```
 
 ## Properties
@@ -18,402 +18,317 @@ interface Person
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [birthDate](./contacts.person.birthdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The birth date of this person.
-
 
 </td></tr>
 <tr><td>
 
 [company](./contacts.person.company.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the current record a company or a person.
-
 
 </td></tr>
 <tr><td>
 
 [department](./contacts.person.department.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Department that this person works for.
-
 
 </td></tr>
 <tr><td>
 
 [firstName](./contacts.person.firstname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The First name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [homePage](./contacts.person.homepage.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The home page of this person.
-
 
 </td></tr>
 <tr><td>
 
 [image](./contacts.person.image.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Image for person.
-
 
 </td></tr>
 <tr><td>
 
 [jobTitle](./contacts.person.jobtitle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The job title of this person.
-
 
 </td></tr>
 <tr><td>
 
 [lastName](./contacts.person.lastname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Last name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [maidenName](./contacts.person.maidenname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Maiden name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [middleName](./contacts.person.middlename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Middle name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [name](./contacts.person.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 First/Last name of the person, uses the name display order preference setting in Contacts.
-
 
 </td></tr>
 <tr><td>
 
 [nickname](./contacts.person.nickname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Nickname of this person.
-
 
 </td></tr>
 <tr><td>
 
 [note](./contacts.person.note.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Notes for this person.
-
 
 </td></tr>
 <tr><td>
 
 [organization](./contacts.person.organization.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Organization that employs this person.
-
 
 </td></tr>
 <tr><td>
 
 [phoneticFirstName](./contacts.person.phoneticfirstname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The phonetic version of the First name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [phoneticLastName](./contacts.person.phoneticlastname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The phonetic version of the Last name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [phoneticMiddleName](./contacts.person.phoneticmiddlename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Phonetic version of the Middle name of this person.
-
 
 </td></tr>
 <tr><td>
 
 [suffix](./contacts.person.suffix.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Suffix of this person.
-
 
 </td></tr>
 <tr><td>
 
 [title](./contacts.person.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The title of this person.
-
 
 </td></tr>
 <tr><td>
 
 [vcard](./contacts.person.vcard.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Person information in vCard format, this always returns a card in version 3.0 format.
 
-
 </td></tr>
 </tbody></table>
-

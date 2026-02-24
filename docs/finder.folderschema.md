@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-FolderSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+FolderSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The session's profile name
 **Signature:**
 
 ```typescript
-profileName: string;
+profileName: string
 ```

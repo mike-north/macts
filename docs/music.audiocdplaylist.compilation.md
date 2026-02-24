@@ -9,5 +9,5 @@ is this CD a compilation album?
 **Signature:**
 
 ```typescript
-compilation: boolean;
+compilation: boolean
 ```

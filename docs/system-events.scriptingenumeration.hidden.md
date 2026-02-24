@@ -9,5 +9,5 @@ Is the enumeration hidden?
 **Signature:**
 
 ```typescript
-hidden: boolean;
+hidden: boolean
 ```

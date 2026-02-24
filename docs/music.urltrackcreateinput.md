@@ -9,7 +9,7 @@ Input for creating a URLTrack
 **Signature:**
 
 ```typescript
-interface URLTrackCreateInput 
+interface URLTrackCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface URLTrackCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [address?](./music.urltrackcreateinput.address.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the URL for this track
 
-
 </td></tr>
 </tbody></table>
-

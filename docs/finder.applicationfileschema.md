@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-ApplicationFileSchema: z.ZodObject<{
-    id: z.ZodString;
-    suggestedSize: z.ZodNumber;
-    minimumSize: z.ZodNumber;
-    preferredSize: z.ZodNumber;
-    acceptsHighLevelEvents: z.ZodBoolean;
-    hasScriptingTerminology: z.ZodBoolean;
-    opensInClassic: z.ZodBoolean;
-}, z.core.$strip>
+ApplicationFileSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    suggestedSize: z.ZodNumber
+    minimumSize: z.ZodNumber
+    preferredSize: z.ZodNumber
+    acceptsHighLevelEvents: z.ZodBoolean
+    hasScriptingTerminology: z.ZodBoolean
+    opensInClassic: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

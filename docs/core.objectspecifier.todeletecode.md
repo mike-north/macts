@@ -11,7 +11,7 @@ Generate JXA code to delete an object.
 ```typescript
 toDeleteCode(): string;
 ```
+
 **Returns:**
 
 string
-

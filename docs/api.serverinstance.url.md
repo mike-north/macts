@@ -9,5 +9,5 @@ Server URL after start
 **Signature:**
 
 ```typescript
-url: string | null;
+url: string | null
 ```

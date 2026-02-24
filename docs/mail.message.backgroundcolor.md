@@ -9,5 +9,5 @@ The background color of the message
 **Signature:**
 
 ```typescript
-backgroundColor: string;
+backgroundColor: string
 ```

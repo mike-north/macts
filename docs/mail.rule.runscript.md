@@ -9,5 +9,5 @@ If rule matches, run this compiled AppleScript file. Set to empty string to disa
 **Signature:**
 
 ```typescript
-runScript: string;
+runScript: string
 ```

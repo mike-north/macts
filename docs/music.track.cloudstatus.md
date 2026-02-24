@@ -9,5 +9,5 @@ the iCloud status of the track
 **Signature:**
 
 ```typescript
-cloudStatus: string;
+cloudStatus: string
 ```

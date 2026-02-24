@@ -18,30 +18,24 @@ create(input: DiskCreateInput): Promise<Disk>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DiskCreateInput](./finder.diskcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Disk](./finder.disk.md)<!-- -->&gt;
-

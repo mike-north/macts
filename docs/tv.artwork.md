@@ -9,7 +9,7 @@ a piece of art within a track or playlist
 **Signature:**
 
 ```typescript
-interface Artwork 
+interface Artwork
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface Artwork
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [data](./tv.artwork.data.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 data for this artwork, in the form of a picture
-
 
 </td></tr>
 <tr><td>
 
 [description](./tv.artwork.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 description of artwork as a string
-
 
 </td></tr>
 <tr><td>
 
 [downloaded](./tv.artwork.downloaded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 was this artwork downloaded by iTunes?
-
 
 </td></tr>
 <tr><td>
 
 [format](./tv.artwork.format.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the data format for this piece of artwork
-
 
 </td></tr>
 <tr><td>
 
 [id](./tv.artwork.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this artwork
-
 
 </td></tr>
 <tr><td>
 
 [kind](./tv.artwork.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 kind or purpose of this piece of artwork
-
 
 </td></tr>
 <tr><td>
 
 [rawData](./tv.artwork.rawdata.md)
 
-
 </td><td>
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 data for this artwork, in original format
 
-
 </td></tr>
 </tbody></table>
-

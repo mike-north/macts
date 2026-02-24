@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Resource = z.infer<typeof ResourceSchema>;
+type Resource = z.infer<typeof ResourceSchema>
 ```
-**References:** [ResourceSchema](./core.resourceschema.md)
 
+**References:** [ResourceSchema](./core.resourceschema.md)

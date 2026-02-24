@@ -9,7 +9,7 @@ Input for creating a Document
 **Signature:**
 
 ```typescript
-interface DocumentCreateInput 
+interface DocumentCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface DocumentCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentTime?](./quicktime-player.documentcreateinput.currenttime.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The current playback time in seconds
-
 
 </td></tr>
 <tr><td>
 
 [playing?](./quicktime-player.documentcreateinput.playing.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the document is currently playing
 
-
 </td></tr>
 </tbody></table>
-

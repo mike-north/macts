@@ -9,5 +9,5 @@ was this artwork downloaded by iTunes?
 **Signature:**
 
 ```typescript
-downloaded: boolean;
+downloaded: boolean
 ```

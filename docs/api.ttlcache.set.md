@@ -18,64 +18,52 @@ set(key: string, value: T, ttlMs?: number): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 key
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Cache key
-
 
 </td></tr>
 <tr><td>
 
 value
 
-
 </td><td>
 
 T
 
-
 </td><td>
 
 Value to cache
-
 
 </td></tr>
 <tr><td>
 
 ttlMs
 
-
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Optional TTL override in milliseconds
-
 
 </td></tr>
 </tbody></table>
@@ -83,4 +71,3 @@ _(Optional)_ Optional TTL override in milliseconds
 **Returns:**
 
 void
-

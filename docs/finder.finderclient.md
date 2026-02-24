@@ -9,19 +9,18 @@ Finder client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class FinderClient 
+declare class FinderClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new FinderClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./finder.finderclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `FinderClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,378 +57,306 @@ Constructs a new instance of the `FinderClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [aliasfiles](./finder.finderclient.aliasfiles.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AliasFileResourceClient](./finder.aliasfileresourceclient.md)
 
-
 </td><td>
 
 An alias file (created with “Make Alias”)
-
 
 </td></tr>
 <tr><td>
 
 [applicationfiles](./finder.finderclient.applicationfiles.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ApplicationFileResourceClient](./finder.applicationfileresourceclient.md)
 
-
 </td><td>
 
 An application's file on disk
-
 
 </td></tr>
 <tr><td>
 
 [clippings](./finder.finderclient.clippings.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ClippingResourceClient](./finder.clippingresourceclient.md)
 
-
 </td><td>
 
 A clipping
-
 
 </td></tr>
 <tr><td>
 
 [clippingwindows](./finder.finderclient.clippingwindows.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ClippingWindowResourceClient](./finder.clippingwindowresourceclient.md)
 
-
 </td><td>
 
 The window containing a clipping
-
 
 </td></tr>
 <tr><td>
 
 [columns](./finder.finderclient.columns.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ColumnResourceClient](./finder.columnresourceclient.md)
 
-
 </td><td>
 
 a column of a list view
-
 
 </td></tr>
 <tr><td>
 
 [containers](./finder.finderclient.containers.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ContainerResourceClient](./finder.containerresourceclient.md)
 
-
 </td><td>
 
 An item that contains other items
-
 
 </td></tr>
 <tr><td>
 
 [desktopobjects](./finder.finderclient.desktopobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DesktopObjectResourceClient](./finder.desktopobjectresourceclient.md)
 
-
 </td><td>
 
 Desktop-object is the class of the "desktop" object
-
 
 </td></tr>
 <tr><td>
 
 [disks](./finder.finderclient.disks.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DiskResourceClient](./finder.diskresourceclient.md)
 
-
 </td><td>
 
 A disk
-
 
 </td></tr>
 <tr><td>
 
 [documentfiles](./finder.finderclient.documentfiles.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DocumentFileResourceClient](./finder.documentfileresourceclient.md)
 
-
 </td><td>
 
 A document file
-
 
 </td></tr>
 <tr><td>
 
 [files](./finder.finderclient.files.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FileResourceClient](./finder.fileresourceclient.md)
 
-
 </td><td>
 
 A file
-
 
 </td></tr>
 <tr><td>
 
 [finderwindows](./finder.finderclient.finderwindows.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FinderWindowResourceClient](./finder.finderwindowresourceclient.md)
 
-
 </td><td>
 
 A file viewer window
-
 
 </td></tr>
 <tr><td>
 
 [folders](./finder.finderclient.folders.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FolderResourceClient](./finder.folderresourceclient.md)
 
-
 </td><td>
 
 A folder
-
 
 </td></tr>
 <tr><td>
 
 [http](./finder.finderclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./finder.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [internetlocationfiles](./finder.finderclient.internetlocationfiles.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [InternetLocationFileResourceClient](./finder.internetlocationfileresourceclient.md)
 
-
 </td><td>
 
 A file containing an internet location
-
 
 </td></tr>
 <tr><td>
 
 [listviewoptionss](./finder.finderclient.listviewoptionss.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ListViewOptionsResourceClient](./finder.listviewoptionsresourceclient.md)
 
-
 </td><td>
 
 the list view options
-
 
 </td></tr>
 <tr><td>
 
 [packages](./finder.finderclient.packages.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [PackageResourceClient](./finder.packageresourceclient.md)
 
-
 </td><td>
 
 A package
-
 
 </td></tr>
 <tr><td>
 
 [trashobjects](./finder.finderclient.trashobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TrashObjectResourceClient](./finder.trashobjectresourceclient.md)
 
-
 </td><td>
 
 Trash-object is the class of the “trash” object
-
 
 </td></tr>
 </tbody></table>
@@ -446,367 +367,288 @@ Trash-object is the class of the “trash” object
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [\_delete()](./finder.finderclient._delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Move an item from its container to the trash
-
 
 </td></tr>
 <tr><td>
 
 [activate()](./finder.finderclient.activate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Activate the specified window (or the Finder)
-
 
 </td></tr>
 <tr><td>
 
 [cleanUp(by)](./finder.finderclient.cleanup.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Arrange items in window nicely (only applies to open windows in icon view that are not kept arranged)
-
 
 </td></tr>
 <tr><td>
 
 [close()](./finder.finderclient.close.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Close an object
-
 
 </td></tr>
 <tr><td>
 
 [copy()](./finder.finderclient.copy.md)
 
-
 </td><td>
-
 
 </td><td>
 
 (NOT AVAILABLE YET) Copy the selected items to the clipboard (the Finder must be the front application)
-
 
 </td></tr>
 <tr><td>
 
 [count(each)](./finder.finderclient.count.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Return the number of elements of a particular class within an object
-
 
 </td></tr>
 <tr><td>
 
 [dataSize(as)](./finder.finderclient.datasize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Return the size in bytes of an object
-
 
 </td></tr>
 <tr><td>
 
 [duplicate(to, replacing, routingSuppressed, exactCopy)](./finder.finderclient.duplicate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Duplicate one or more object(s)
-
 
 </td></tr>
 <tr><td>
 
 [eject()](./finder.finderclient.eject.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Eject the specified disk(s)
-
 
 </td></tr>
 <tr><td>
 
 [empty(security)](./finder.finderclient.empty.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Empty the trash
-
 
 </td></tr>
 <tr><td>
 
 [erase()](./finder.finderclient.erase.md)
 
-
 </td><td>
-
 
 </td><td>
 
 (NOT AVAILABLE) Erase the specified disk(s)
-
 
 </td></tr>
 <tr><td>
 
 [exists()](./finder.finderclient.exists.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Verify if an object exists
-
 
 </td></tr>
 <tr><td>
 
 [make(\_new, at, to, withProperties)](./finder.finderclient.make.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Make a new element
-
 
 </td></tr>
 <tr><td>
 
 [move(to, replacing, positionedAt, routingSuppressed)](./finder.finderclient.move.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Move object(s) to a new location
-
 
 </td></tr>
 <tr><td>
 
 [open(using, withProperties)](./finder.finderclient.open.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Open the specified object(s)
-
 
 </td></tr>
 <tr><td>
 
 [openVirtualLocation()](./finder.finderclient.openvirtuallocation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Private event to open a virtual location
-
 
 </td></tr>
 <tr><td>
 
 [print(withProperties)](./finder.finderclient.print.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Print the specified object(s)
-
 
 </td></tr>
 <tr><td>
 
 [quit()](./finder.finderclient.quit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Quit the Finder
-
 
 </td></tr>
 <tr><td>
 
 [restart()](./finder.finderclient.restart.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Restart the computer
-
 
 </td></tr>
 <tr><td>
 
 [reveal()](./finder.finderclient.reveal.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Bring the specified object(s) into view
-
 
 </td></tr>
 <tr><td>
 
 [select()](./finder.finderclient.select.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Select the specified object(s)
-
 
 </td></tr>
 <tr><td>
 
 [shutDown()](./finder.finderclient.shutdown.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Shut Down the computer
-
 
 </td></tr>
 <tr><td>
 
 [sleep()](./finder.finderclient.sleep.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Put the computer to sleep
-
 
 </td></tr>
 <tr><td>
 
 [sort(by)](./finder.finderclient.sort.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Return the specified object(s) in a sorted list
-
 
 </td></tr>
 <tr><td>
 
 [update(necessity, registeringApplications)](./finder.finderclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update the display of the specified object(s) to match their on-disk representation
 
-
 </td></tr>
 </tbody></table>
-

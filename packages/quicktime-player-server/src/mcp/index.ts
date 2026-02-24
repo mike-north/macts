@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match MCP plugin loader convention
-export { quicktimePlayerPlugin as plugin, quicktimePlayerPlugin } from './plugin.js';
-export type { McpPlugin, McpToolDefinition } from '@macts/mcp';
+export { quicktimePlayerPlugin as plugin, quicktimePlayerPlugin } from './plugin.js'
+export type { McpPlugin, McpToolDefinition } from '@macts/mcp'

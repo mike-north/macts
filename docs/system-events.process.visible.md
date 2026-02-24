@@ -9,5 +9,5 @@ Is the process' layer visible?
 **Signature:**
 
 ```typescript
-visible: string;
+visible: string
 ```

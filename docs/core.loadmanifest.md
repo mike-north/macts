@@ -9,7 +9,7 @@ Load and validate a manifest from a YAML file.
 **Signature:**
 
 ```typescript
-declare function loadManifest(manifestPath: string): Promise<AppManifest>;
+declare function loadManifest(manifestPath: string): Promise<AppManifest>
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function loadManifest(manifestPath: string): Promise<AppManifest>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifestPath
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Path to the app.yaml manifest file
-
 
 </td></tr>
 </tbody></table>
@@ -57,4 +51,3 @@ Parsed and validated AppManifest
 ## Exceptions
 
 ManifestLoadError if loading or validation fails
-

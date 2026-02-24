@@ -9,5 +9,5 @@ File content
 **Signature:**
 
 ```typescript
-content: string;
+content: string
 ```

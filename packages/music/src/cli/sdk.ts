@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { MusicClient, type MusicClientOptions } from '../client.js';
+import { MusicClient, type MusicClientOptions } from '../client.js'
 
 /**
  * Get a MusicClient instance.
@@ -16,32 +16,32 @@ import { MusicClient, type MusicClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getMusicClient(): MusicClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions music:*:*'
-    );
+    )
   }
 
   const options: MusicClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new MusicClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new MusicClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: MusicClient | null = null;
+let _client: MusicClient | null = null
 
 /**
  * Get or create the singleton MusicClient.
@@ -50,8 +50,8 @@ let _client: MusicClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): MusicClient {
-  _client ??= getMusicClient();
-  return _client;
+  _client ??= getMusicClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): MusicClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

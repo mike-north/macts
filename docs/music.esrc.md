@@ -9,5 +9,5 @@ ESrc
 **Signature:**
 
 ```typescript
-type ESrc = 'library' | 'audioCD' | '3' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
+type ESrc = 'library' | 'audioCD' | '3' | 'radioTuner' | 'sharedLibrary' | 'iTunesStore' | 'unknown'
 ```

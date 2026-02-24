@@ -9,5 +9,5 @@ the date on which the disk item was created
 **Signature:**
 
 ```typescript
-creationDate: Date;
+creationDate: Date
 ```

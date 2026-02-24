@@ -9,5 +9,5 @@ can this preset be modified?
 **Signature:**
 
 ```typescript
-modifiable: boolean;
+modifiable: boolean
 ```

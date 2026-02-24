@@ -9,5 +9,5 @@ Is loading?
 **Signature:**
 
 ```typescript
-loading: boolean;
+loading: boolean
 ```

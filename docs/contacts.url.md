@@ -9,7 +9,7 @@ URLs for this person.
 **Signature:**
 
 ```typescript
-interface Url 
+interface Url
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Url
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.url.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this URL
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.url.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this URL
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.url.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The URL value
 
-
 </td></tr>
 </tbody></table>
-

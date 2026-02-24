@@ -9,5 +9,5 @@ List of messages currently being displayed in the viewer
 **Signature:**
 
 ```typescript
-visibleMessages: string;
+visibleMessages: string
 ```

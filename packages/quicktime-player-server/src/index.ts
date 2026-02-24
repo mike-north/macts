@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { quickTimePlayerApiPlugin as plugin, quickTimePlayerApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { quickTimePlayerApiPlugin as plugin, quickTimePlayerApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

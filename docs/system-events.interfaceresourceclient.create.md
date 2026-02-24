@@ -18,30 +18,24 @@ create(input: InterfaceCreateInput): Promise<Interface>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [InterfaceCreateInput](./system-events.interfacecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Interface](./system-events.interface.md)<!-- -->&gt;
-

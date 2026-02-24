@@ -9,5 +9,5 @@ Input for creating a SharedTrack
 **Signature:**
 
 ```typescript
-interface SharedTrackCreateInput 
+interface SharedTrackCreateInput
 ```

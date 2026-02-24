@@ -9,5 +9,5 @@ ERtK
 **Signature:**
 
 ```typescript
-type ERtK = 'user' | 'computed';
+type ERtK = 'user' | 'computed'
 ```

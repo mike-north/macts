@@ -9,5 +9,5 @@
 **Signature:**
 
 ```typescript
-expanded: boolean;
+expanded: boolean
 ```

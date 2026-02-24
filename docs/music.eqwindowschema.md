@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-EQWindowSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+EQWindowSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

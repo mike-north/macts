@@ -11,7 +11,7 @@ Dispatch a message to a Safari Extension.
 ```typescript
 dispatchMessageToExtension(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ Input for updating a Table
 **Signature:**
 
 ```typescript
-type TableUpdateInput = Partial<TableCreateInput>;
+type TableUpdateInput = Partial<TableCreateInput>
 ```
-**References:** [TableCreateInput](./system-events.tablecreateinput.md)
 
+**References:** [TableCreateInput](./system-events.tablecreateinput.md)

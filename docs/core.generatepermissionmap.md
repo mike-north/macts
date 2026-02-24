@@ -9,7 +9,10 @@ Generate a permission map from a manifest's permissions section.
 **Signature:**
 
 ```typescript
-declare function generatePermissionMap(appName: string, permissionsSection: PermissionsSection): PermissionMap;
+declare function generatePermissionMap(
+  appName: string,
+  permissionsSection: PermissionsSection
+): PermissionMap
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function generatePermissionMap(appName: string, permissionsSection: Perm
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 appName
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The application name (for permission string construction)
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 The permissions mapping from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ The permissions mapping from the manifest
 [PermissionMap](./core.permissionmap.md)
 
 Complete permission map
-

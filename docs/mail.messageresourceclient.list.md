@@ -11,7 +11,7 @@ List all messages.
 ```typescript
 list(): Promise<Message[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Message](./mail.message.md)<!-- -->\[\]&gt;
-

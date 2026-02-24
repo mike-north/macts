@@ -9,5 +9,5 @@ Metadata about the created key
 **Signature:**
 
 ```typescript
-metadata: _macts_core.ApiKeyMetadata;
+metadata: _macts_core.ApiKeyMetadata
 ```

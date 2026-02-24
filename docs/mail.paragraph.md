@@ -9,7 +9,7 @@ This subdivides the text into paragraphs.
 **Signature:**
 
 ```typescript
-interface Paragraph 
+interface Paragraph
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Paragraph
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color](./mail.paragraph.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font](./mail.paragraph.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size](./mail.paragraph.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

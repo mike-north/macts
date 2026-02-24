@@ -9,7 +9,7 @@ Client for a notes folder.
 **Signature:**
 
 ```typescript
-declare class FolderResourceClient 
+declare class FolderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class FolderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./notes.folderresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `FolderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `FolderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./notes.folderresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new folder.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./notes.folderresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a folder.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./notes.folderresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a folder by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./notes.folderresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all folders.
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./notes.folderresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing folder.
 
-
 </td></tr>
 </tbody></table>
-

@@ -10,6 +10,6 @@ The Hono app
 
 ```typescript
 app: Hono<{
-        Variables: AuthVariables;
-    }>;
+  Variables: AuthVariables
+}>
 ```

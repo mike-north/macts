@@ -11,7 +11,7 @@ List all busyindicators.
 ```typescript
 list(): Promise<BusyIndicator[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[BusyIndicator](./system-events.busyindicator.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ The user's Downloads folder
 **Signature:**
 
 ```typescript
-downloadsFolder: Folder;
+downloadsFolder: Folder
 ```

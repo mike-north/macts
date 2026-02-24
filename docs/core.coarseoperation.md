@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type CoarseOperation = (typeof COARSE_OPERATIONS)[number];
+type CoarseOperation = (typeof COARSE_OPERATIONS)[number]
 ```
-**References:** [COARSE\_OPERATIONS](./core.coarse_operations.md)
 
+**References:** [COARSE_OPERATIONS](./core.coarse_operations.md)

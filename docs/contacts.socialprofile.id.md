@@ -9,5 +9,5 @@ The persistent unique identifier for this profile.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

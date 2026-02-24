@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-GrowAreaSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+GrowAreaSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

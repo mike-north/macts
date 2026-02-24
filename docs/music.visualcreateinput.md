@@ -9,5 +9,5 @@ Input for creating a Visual
 **Signature:**
 
 ```typescript
-interface VisualCreateInput 
+interface VisualCreateInput
 ```

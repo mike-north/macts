@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-SpaceSchema: z.ZodObject<{
-    id: z.ZodString;
-    title: z.ZodString;
-}, z.core.$strip>
+SpaceSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    title: z.ZodString
+  },
+  z.core.$strip
+>
 ```

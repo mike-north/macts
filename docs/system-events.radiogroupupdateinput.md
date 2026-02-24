@@ -9,7 +9,7 @@ Input for updating a RadioGroup
 **Signature:**
 
 ```typescript
-type RadioGroupUpdateInput = Partial<RadioGroupCreateInput>;
+type RadioGroupUpdateInput = Partial<RadioGroupCreateInput>
 ```
-**References:** [RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)
 
+**References:** [RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)

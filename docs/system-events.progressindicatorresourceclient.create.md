@@ -18,30 +18,24 @@ create(input: ProgressIndicatorCreateInput): Promise<ProgressIndicator>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ProgressIndicator](./system-events.progressindicator.md)<!-- -->&gt;
-

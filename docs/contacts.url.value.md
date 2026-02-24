@@ -9,5 +9,5 @@ The URL value
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

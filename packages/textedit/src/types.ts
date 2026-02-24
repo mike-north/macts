@@ -3,30 +3,30 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A TextEdit document */
 export interface Document {
   /** The name of the document */
-  name: string;
+  name: string
   /** The file path of the document */
-  path?: string;
+  path?: string
   /** Whether the document has been modified since last save */
-  modified: boolean;
+  modified: boolean
   /** The text content of the document */
-  text: string;
+  text: string
 }
 
 /** Input for creating a Document */
 export interface DocumentCreateInput {
   /** The name of the document */
-  name?: string;
+  name?: string
   /** The text content of the document */
-  text?: string;
+  text?: string
 }
 
 /** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export type DocumentUpdateInput = Partial<DocumentCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -35,4 +35,4 @@ export const DocumentSchema = z.object({
   path: z.string().optional(),
   modified: z.boolean(),
   text: z.string(),
-});
+})

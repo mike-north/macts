@@ -7,14 +7,17 @@
 **Signature:**
 
 ```typescript
-NoteSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    body: z.ZodString;
-    plaintext: z.ZodString;
-    creationDate: z.ZodString;
-    modificationDate: z.ZodString;
-    shared: z.ZodBoolean;
-    passwordProtected: z.ZodBoolean;
-}, z.core.$strip>
+NoteSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    body: z.ZodString
+    plaintext: z.ZodString
+    creationDate: z.ZodString
+    modificationDate: z.ZodString
+    shared: z.ZodBoolean
+    passwordProtected: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

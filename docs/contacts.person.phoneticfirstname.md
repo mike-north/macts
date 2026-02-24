@@ -9,5 +9,5 @@ The phonetic version of the First name of this person.
 **Signature:**
 
 ```typescript
-phoneticFirstName: string;
+phoneticFirstName: string
 ```

@@ -9,7 +9,7 @@ Client for email address for a person..
 **Signature:**
 
 ```typescript
-declare class EmailResourceClient 
+declare class EmailResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class EmailResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.emailresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `EmailResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `EmailResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.emailresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new email.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.emailresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a email.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.emailresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a email by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.emailresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all emails.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.emailresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing email.
 
-
 </td></tr>
 </tbody></table>
-

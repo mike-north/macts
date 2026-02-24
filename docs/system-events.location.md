@@ -9,7 +9,7 @@ A set of services
 **Signature:**
 
 ```typescript
-interface Location 
+interface Location
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Location
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.location.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier for the location
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.location.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the location
 
-
 </td></tr>
 </tbody></table>
-

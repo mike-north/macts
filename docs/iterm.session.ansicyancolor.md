@@ -10,8 +10,8 @@ The aNSICyanColor property
 
 ```typescript
 aNSICyanColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

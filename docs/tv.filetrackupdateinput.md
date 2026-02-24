@@ -9,7 +9,7 @@ Input for updating a FileTrack
 **Signature:**
 
 ```typescript
-type FileTrackUpdateInput = Partial<FileTrackCreateInput>;
+type FileTrackUpdateInput = Partial<FileTrackCreateInput>
 ```
-**References:** [FileTrackCreateInput](./tv.filetrackcreateinput.md)
 
+**References:** [FileTrackCreateInput](./tv.filetrackcreateinput.md)

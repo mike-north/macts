@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * Select a device.
@@ -14,14 +14,13 @@ export const appSelectDeviceTool: McpToolDefinition = {
   name: 'macts__console__app_select_device',
   description: 'Select a device.',
   inputSchema: {
-    "type": "object",
-    "properties": {},
-    "additionalProperties": false
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
   },
   handler: async () => {
-    const client = getClient();
-    await client.selectDevice();
-    return { success: true };
+    const client = getClient()
+    await client.selectDevice()
+    return { success: true }
   },
-};
-
+}

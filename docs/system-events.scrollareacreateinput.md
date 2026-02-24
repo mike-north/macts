@@ -9,5 +9,5 @@ Input for creating a ScrollArea
 **Signature:**
 
 ```typescript
-interface ScrollAreaCreateInput 
+interface ScrollAreaCreateInput
 ```

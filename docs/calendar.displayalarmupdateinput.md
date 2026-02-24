@@ -9,7 +9,7 @@ Input for updating a DisplayAlarm
 **Signature:**
 
 ```typescript
-type DisplayAlarmUpdateInput = Partial<DisplayAlarmCreateInput>;
+type DisplayAlarmUpdateInput = Partial<DisplayAlarmCreateInput>
 ```
-**References:** [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
 
+**References:** [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)

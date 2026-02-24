@@ -7,12 +7,15 @@
 **Signature:**
 
 ```typescript
-ServiceSchema: z.ZodObject<{
-    active: z.ZodBoolean;
-    currentConfiguration: z.ZodString;
-    id: z.ZodString;
-    interface: z.ZodString;
-    kind: z.ZodNumber;
-    name: z.ZodString;
-}, z.core.$strip>
+ServiceSchema: z.ZodObject<
+  {
+    active: z.ZodBoolean
+    currentConfiguration: z.ZodString
+    id: z.ZodString
+    interface: z.ZodString
+    kind: z.ZodNumber
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

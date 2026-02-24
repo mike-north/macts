@@ -9,7 +9,7 @@ Input for updating a Tab
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>;
+type TabUpdateInput = Partial<TabCreateInput>
 ```
-**References:** [TabCreateInput](./terminal.tabcreateinput.md)
 
+**References:** [TabCreateInput](./terminal.tabcreateinput.md)

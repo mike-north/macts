@@ -9,5 +9,5 @@ Subject - unique key ID for revocation tracking
 **Signature:**
 
 ```typescript
-sub: string;
+sub: string
 ```

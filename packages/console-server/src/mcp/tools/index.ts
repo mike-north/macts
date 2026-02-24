@@ -4,11 +4,9 @@
  * @packageDocumentation
  */
 
-import { appSelectDeviceTool } from './app.js';
+import { appSelectDeviceTool } from './app.js'
 
 /**
  * All MCP tools.
  */
-export const allTools = [
-  appSelectDeviceTool,
-] as const;
+export const allTools = [appSelectDeviceTool] as const

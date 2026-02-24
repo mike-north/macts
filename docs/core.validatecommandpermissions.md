@@ -9,7 +9,10 @@ Validate that all command permissions are included in the permissions mapping.
 **Signature:**
 
 ```typescript
-declare function validateCommandPermissions(commandPermissions: Map<string, string>, permissionsSection: PermissionsSection): string[];
+declare function validateCommandPermissions(
+  commandPermissions: Map<string, string>,
+  permissionsSection: PermissionsSection
+): string[]
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function validateCommandPermissions(commandPermissions: Map<string, stri
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 commandPermissions
 
-
 </td><td>
 
 Map&lt;string, string&gt;
 
-
 </td><td>
 
 Map of command names to their permission strings
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 The permissions mapping from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ The permissions mapping from the manifest
 string\[\]
 
 Array of validation errors (empty if valid)
-

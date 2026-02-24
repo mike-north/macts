@@ -9,5 +9,5 @@ The index of the window, ordered front to back.
 **Signature:**
 
 ```typescript
-index: number;
+index: number
 ```

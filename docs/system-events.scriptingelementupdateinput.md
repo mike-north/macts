@@ -9,7 +9,7 @@ Input for updating a ScriptingElement
 **Signature:**
 
 ```typescript
-type ScriptingElementUpdateInput = Partial<ScriptingElementCreateInput>;
+type ScriptingElementUpdateInput = Partial<ScriptingElementCreateInput>
 ```
-**References:** [ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)
 
+**References:** [ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)

@@ -9,7 +9,7 @@ Fine-grained permission - one per command. Format: `app:resource:operation`
 **Signature:**
 
 ```typescript
-interface FinePermission 
+interface FinePermission
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface FinePermission
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [app](./core.finepermission.app.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [operation](./core.finepermission.operation.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [resource](./core.finepermission.resource.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [type](./core.finepermission.type.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 'fine'
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for a screen sharing connection.
 **Signature:**
 
 ```typescript
-declare class ConnectionResourceClient 
+declare class ConnectionResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ConnectionResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./screen-sharing.connectionresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ConnectionResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ConnectionResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./screen-sharing.connectionresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new connection.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./screen-sharing.connectionresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a connection.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./screen-sharing.connectionresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a connection by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./screen-sharing.connectionresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all connections.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./screen-sharing.connectionresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing connection.
 
-
 </td></tr>
 </tbody></table>
-

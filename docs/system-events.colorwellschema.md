@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ColorWellSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ColorWellSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

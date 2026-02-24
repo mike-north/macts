@@ -9,5 +9,5 @@ Input for creating a RadioButton
 **Signature:**
 
 ```typescript
-interface RadioButtonCreateInput 
+interface RadioButtonCreateInput
 ```

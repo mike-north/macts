@@ -9,7 +9,7 @@ Input for updating a Anchor
 **Signature:**
 
 ```typescript
-type AnchorUpdateInput = Partial<AnchorCreateInput>;
+type AnchorUpdateInput = Partial<AnchorCreateInput>
 ```
-**References:** [AnchorCreateInput](./system-settings.anchorcreateinput.md)
 
+**References:** [AnchorCreateInput](./system-settings.anchorcreateinput.md)

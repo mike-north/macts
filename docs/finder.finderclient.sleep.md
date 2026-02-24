@@ -11,7 +11,7 @@ Put the computer to sleep
 ```typescript
 sleep(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

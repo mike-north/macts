@@ -9,7 +9,7 @@ This subdivides the text into words.
 **Signature:**
 
 ```typescript
-interface Word 
+interface Word
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Word
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color](./mail.word.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font](./mail.word.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size](./mail.word.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

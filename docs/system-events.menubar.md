@@ -9,7 +9,7 @@ A menu bar belonging to a process
 **Signature:**
 
 ```typescript
-interface MenuBar 
+interface MenuBar
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface MenuBar
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.menubar.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this menu bar
 
-
 </td></tr>
 </tbody></table>
-

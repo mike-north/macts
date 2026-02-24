@@ -9,5 +9,5 @@ If the window is a hotkey window, this gives the name of the profile that create
 **Signature:**
 
 ```typescript
-hotkeyWindowProfile: string;
+hotkeyWindowProfile: string
 ```

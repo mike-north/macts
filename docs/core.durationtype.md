@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type DurationType = z.infer<typeof DurationTypeSchema>;
+type DurationType = z.infer<typeof DurationTypeSchema>
 ```
-**References:** [DurationTypeSchema](./core.durationtypeschema.md)
 
+**References:** [DurationTypeSchema](./core.durationtypeschema.md)

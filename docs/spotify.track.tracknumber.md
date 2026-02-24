@@ -9,5 +9,5 @@ The track number
 **Signature:**
 
 ```typescript
-trackNumber: number;
+trackNumber: number
 ```

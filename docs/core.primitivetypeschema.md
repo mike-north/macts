@@ -10,16 +10,16 @@ Primitive property types supported by AppleScript/JXA.
 
 ```typescript
 PrimitiveTypeSchema: z.ZodEnum<{
-    string: "string";
-    number: "number";
-    boolean: "boolean";
-    integer: "integer";
-    date: "date";
-    data: "data";
-    any: "any";
-    file: "file";
-    point: "point";
-    rect: "rect";
-    rgb: "rgb";
+  string: 'string'
+  number: 'number'
+  boolean: 'boolean'
+  integer: 'integer'
+  date: 'date'
+  data: 'data'
+  any: 'any'
+  file: 'file'
+  point: 'point'
+  rect: 'rect'
+  rgb: 'rgb'
 }>
 ```

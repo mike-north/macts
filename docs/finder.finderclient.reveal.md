@@ -11,7 +11,7 @@ Bring the specified object(s) into view
 ```typescript
 reveal(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

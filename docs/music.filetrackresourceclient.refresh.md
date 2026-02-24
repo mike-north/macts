@@ -11,7 +11,7 @@ update file track information from the current information in the track’s file
 ```typescript
 refresh(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

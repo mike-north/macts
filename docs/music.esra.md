@@ -9,5 +9,5 @@ ESrA
 **Signature:**
 
 ```typescript
-type ESrA = 'albums' | 'all' | 'artists' | 'composers' | 'displayed' | 'names';
+type ESrA = 'albums' | 'all' | 'artists' | 'composers' | 'displayed' | 'names'
 ```

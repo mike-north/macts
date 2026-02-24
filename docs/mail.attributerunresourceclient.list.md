@@ -11,7 +11,7 @@ List all attributeruns.
 ```typescript
 list(): Promise<AttributeRun[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[AttributeRun](./mail.attributerun.md)<!-- -->\[\]&gt;
-

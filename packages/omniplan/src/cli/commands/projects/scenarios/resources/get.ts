@@ -1,29 +1,29 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../../sdk.js';
-import { createFormatter } from '../../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../../sdk.js'
+import { createFormatter } from '../../../../output/index.js'
 
 /**
  * Get a resource by ID.
  */
 export class GetResourceCommand extends Command {
-  static override paths = [["omniplan", "projects", "scenarios", "resources", "get"]];
+  static override paths = [['omniplan', 'projects', 'scenarios', 'resources', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a resource by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  projectId = Option.String('--project-id', { required: true, description: 'Project ID' });
-  scenarioId = Option.String('--scenario-id', { required: true, description: 'Scenario ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  projectId = Option.String('--project-id', { required: true, description: 'Project ID' })
+  scenarioId = Option.String('--scenario-id', { required: true, description: 'Scenario ID' })
 
-  resourceId = Option.String({ required: true });
+  resourceId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.resources.get(this.resourceId);
+      const client = getClient()
+      const item = await client.resources.get(this.resourceId)
 
       const output = formatter.format({
         id: item.id,
@@ -39,14 +39,14 @@ export class GetResourceCommand extends Command {
         totalCost: item.totalCost,
         note: item.note,
         outlineDepth: item.outlineDepth,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

@@ -9,5 +9,5 @@ Classes that are value types (no elements)
 **Signature:**
 
 ```typescript
-valueTypes: Set<string>;
+valueTypes: Set<string>
 ```

@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ClippingWindowSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+ClippingWindowSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

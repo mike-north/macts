@@ -9,5 +9,5 @@ Is the focus on this UI element?
 **Signature:**
 
 ```typescript
-focused: string;
+focused: string
 ```

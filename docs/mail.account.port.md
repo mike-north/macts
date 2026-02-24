@@ -9,5 +9,5 @@ The port used to connect to an account
 **Signature:**
 
 ```typescript
-port: number;
+port: number
 ```

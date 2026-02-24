@@ -11,7 +11,7 @@ reveal and select a track or playlist
 ```typescript
 reveal(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ the show name of the track
 **Signature:**
 
 ```typescript
-show: string;
+show: string
 ```

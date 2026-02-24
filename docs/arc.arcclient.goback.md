@@ -11,7 +11,7 @@ Go Back (If Possible).
 ```typescript
 goBack(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

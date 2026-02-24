@@ -9,5 +9,5 @@ the name of the domain
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

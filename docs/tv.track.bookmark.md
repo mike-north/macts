@@ -9,5 +9,5 @@ the bookmark time of the track in seconds
 **Signature:**
 
 ```typescript
-bookmark: number;
+bookmark: number
 ```

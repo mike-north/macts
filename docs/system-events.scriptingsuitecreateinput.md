@@ -9,5 +9,5 @@ Input for creating a ScriptingSuite
 **Signature:**
 
 ```typescript
-interface ScriptingSuiteCreateInput 
+interface ScriptingSuiteCreateInput
 ```

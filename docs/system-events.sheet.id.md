@@ -9,5 +9,5 @@ Unique identifier for this sheet
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

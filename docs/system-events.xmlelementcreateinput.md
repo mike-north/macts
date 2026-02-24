@@ -9,7 +9,7 @@ Input for creating a XMLElement
 **Signature:**
 
 ```typescript
-interface XMLElementCreateInput 
+interface XMLElementCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface XMLElementCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [value?](./system-events.xmlelementcreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the value of the XML element
 
-
 </td></tr>
 </tbody></table>
-

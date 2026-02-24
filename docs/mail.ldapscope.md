@@ -9,5 +9,5 @@ LdapScope
 **Signature:**
 
 ```typescript
-type LdapScope = 'base' | 'oneLevel' | 'subtree';
+type LdapScope = 'base' | 'oneLevel' | 'subtree'
 ```

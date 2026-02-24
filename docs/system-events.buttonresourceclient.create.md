@@ -18,30 +18,24 @@ create(input: ButtonCreateInput): Promise<Button>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ButtonCreateInput](./system-events.buttoncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Button](./system-events.button.md)<!-- -->&gt;
-

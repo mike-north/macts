@@ -9,5 +9,5 @@ The Last name of this person.
 **Signature:**
 
 ```typescript
-lastName: string;
+lastName: string
 ```

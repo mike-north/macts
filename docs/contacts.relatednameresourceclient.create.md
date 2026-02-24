@@ -18,30 +18,24 @@ create(input: RelatedNameCreateInput): Promise<RelatedName>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RelatedNameCreateInput](./contacts.relatednamecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RelatedName](./contacts.relatedname.md)<!-- -->&gt;
-

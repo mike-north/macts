@@ -9,7 +9,7 @@ A scroll area belonging to a window
 **Signature:**
 
 ```typescript
-interface ScrollArea 
+interface ScrollArea
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ScrollArea
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.scrollarea.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this scroll area
 
-
 </td></tr>
 </tbody></table>
-

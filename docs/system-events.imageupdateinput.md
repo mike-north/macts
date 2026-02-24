@@ -9,7 +9,7 @@ Input for updating a Image
 **Signature:**
 
 ```typescript
-type ImageUpdateInput = Partial<ImageCreateInput>;
+type ImageUpdateInput = Partial<ImageCreateInput>
 ```
-**References:** [ImageCreateInput](./system-events.imagecreateinput.md)
 
+**References:** [ImageCreateInput](./system-events.imagecreateinput.md)

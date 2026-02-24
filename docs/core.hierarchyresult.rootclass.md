@@ -9,5 +9,5 @@ The root class (usually 'application')
 **Signature:**
 
 ```typescript
-rootClass: string | undefined;
+rootClass: string | undefined
 ```

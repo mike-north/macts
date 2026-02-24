@@ -9,5 +9,5 @@ Input for creating a Sheet
 **Signature:**
 
 ```typescript
-interface SheetCreateInput 
+interface SheetCreateInput
 ```

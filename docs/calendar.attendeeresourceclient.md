@@ -9,7 +9,7 @@ Client for an event attendee.
 **Signature:**
 
 ```typescript
-declare class AttendeeResourceClient 
+declare class AttendeeResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AttendeeResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.attendeeresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AttendeeResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AttendeeResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.attendeeresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new attendee.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./calendar.attendeeresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a attendee.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./calendar.attendeeresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a attendee by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.attendeeresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all attendees.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./calendar.attendeeresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing attendee.
 
-
 </td></tr>
 </tbody></table>
-

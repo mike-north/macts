@@ -11,7 +11,7 @@ List all documents.
 ```typescript
 list(): Promise<Document[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Document](./preview.document.md)<!-- -->\[\]&gt;
-

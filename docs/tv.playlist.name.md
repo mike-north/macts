@@ -9,5 +9,5 @@ the name of the playlist
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

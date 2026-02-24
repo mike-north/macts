@@ -9,5 +9,5 @@ The list of email addresses configured for an account
 **Signature:**
 
 ```typescript
-emailAddresses: string;
+emailAddresses: string
 ```

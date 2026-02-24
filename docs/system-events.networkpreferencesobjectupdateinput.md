@@ -9,7 +9,7 @@ Input for updating a NetworkPreferencesObject
 **Signature:**
 
 ```typescript
-type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>;
+type NetworkPreferencesObjectUpdateInput = Partial<NetworkPreferencesObjectCreateInput>
 ```
-**References:** [NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)
 
+**References:** [NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)

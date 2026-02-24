@@ -9,5 +9,5 @@ Is the window's path bar visible?
 **Signature:**
 
 ```typescript
-pathbarVisible: boolean;
+pathbarVisible: boolean
 ```

@@ -9,5 +9,8 @@ Permissions section - maps resources to their coarse→fine permission mappings.
 **Signature:**
 
 ```typescript
-PermissionsSectionSchema: z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>
+PermissionsSectionSchema: z.ZodRecord<
+  z.ZodString,
+  z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>
+>
 ```

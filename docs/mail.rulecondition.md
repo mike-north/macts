@@ -9,7 +9,7 @@ Class for conditions that can be attached to a single rule
 **Signature:**
 
 ```typescript
-interface RuleCondition 
+interface RuleCondition
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface RuleCondition
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [expression](./mail.rulecondition.expression.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Rule expression field
-
 
 </td></tr>
 <tr><td>
 
 [header](./mail.rulecondition.header.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Rule header key
-
 
 </td></tr>
 <tr><td>
 
 [qualifier](./mail.rulecondition.qualifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Rule qualifier
-
 
 </td></tr>
 <tr><td>
 
 [ruleType](./mail.rulecondition.ruletype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Rule type
 
-
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ Eject the specified disk(s)
 ```typescript
 eject(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

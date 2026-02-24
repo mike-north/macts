@@ -18,30 +18,24 @@ create(input: UIElementCreateInput): Promise<UIElement>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [UIElementCreateInput](./system-events.uielementcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[UIElement](./system-events.uielement.md)<!-- -->&gt;
-

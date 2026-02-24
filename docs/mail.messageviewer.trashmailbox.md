@@ -9,5 +9,5 @@ The top level Trash mailbox
 **Signature:**
 
 ```typescript
-trashMailbox: Mailbox;
+trashMailbox: Mailbox
 ```

@@ -9,19 +9,18 @@ Spotify client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class SpotifyClient 
+declare class SpotifyClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new SpotifyClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./spotify.spotifyclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SpotifyClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,63 +57,51 @@ Constructs a new instance of the `SpotifyClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [http](./spotify.spotifyclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./spotify.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [tracks](./spotify.spotifyclient.tracks.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TrackResourceClient](./spotify.trackresourceclient.md)
 
-
 </td><td>
 
 The currently playing track
-
 
 </td></tr>
 </tbody></table>
@@ -131,101 +112,79 @@ The currently playing track
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [nextTrack()](./spotify.spotifyclient.nexttrack.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Skip to the next track.
-
 
 </td></tr>
 <tr><td>
 
 [pause()](./spotify.spotifyclient.pause.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Pause playback.
-
 
 </td></tr>
 <tr><td>
 
 [play()](./spotify.spotifyclient.play.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Resume playback.
-
 
 </td></tr>
 <tr><td>
 
 [playpause()](./spotify.spotifyclient.playpause.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Toggle play/pause.
-
 
 </td></tr>
 <tr><td>
 
 [playTrack(inContext)](./spotify.spotifyclient.playtrack.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Start playback of a track in the given context.
-
 
 </td></tr>
 <tr><td>
 
 [previousTrack()](./spotify.spotifyclient.previoustrack.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Skip to the previous track.
 
-
 </td></tr>
 </tbody></table>
-

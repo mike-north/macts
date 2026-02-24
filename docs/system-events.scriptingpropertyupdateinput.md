@@ -9,7 +9,7 @@ Input for updating a ScriptingProperty
 **Signature:**
 
 ```typescript
-type ScriptingPropertyUpdateInput = Partial<ScriptingPropertyCreateInput>;
+type ScriptingPropertyUpdateInput = Partial<ScriptingPropertyCreateInput>
 ```
-**References:** [ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)
 
+**References:** [ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)

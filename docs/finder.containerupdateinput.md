@@ -9,7 +9,7 @@ Input for updating a Container
 **Signature:**
 
 ```typescript
-type ContainerUpdateInput = Partial<ContainerCreateInput>;
+type ContainerUpdateInput = Partial<ContainerCreateInput>
 ```
-**References:** [ContainerCreateInput](./finder.containercreateinput.md)
 
+**References:** [ContainerCreateInput](./finder.containercreateinput.md)

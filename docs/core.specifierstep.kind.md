@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-kind: 'app' | 'collection' | 'property';
+kind: 'app' | 'collection' | 'property'
 ```

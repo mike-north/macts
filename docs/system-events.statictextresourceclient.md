@@ -9,7 +9,7 @@ Client for a static text field belonging to a window.
 **Signature:**
 
 ```typescript
-declare class StaticTextResourceClient 
+declare class StaticTextResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class StaticTextResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.statictextresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `StaticTextResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `StaticTextResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.statictextresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new statictext.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.statictextresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a statictext.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.statictextresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a statictext by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.statictextresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all statictexts.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.statictextresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing statictext.
 
-
 </td></tr>
 </tbody></table>
-

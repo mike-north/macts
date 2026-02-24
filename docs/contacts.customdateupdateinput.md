@@ -9,7 +9,7 @@ Input for updating a CustomDate
 **Signature:**
 
 ```typescript
-type CustomDateUpdateInput = Partial<CustomDateCreateInput>;
+type CustomDateUpdateInput = Partial<CustomDateCreateInput>
 ```
-**References:** [CustomDateCreateInput](./contacts.customdatecreateinput.md)
 
+**References:** [CustomDateCreateInput](./contacts.customdatecreateinput.md)

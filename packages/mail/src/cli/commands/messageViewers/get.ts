@@ -1,27 +1,27 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../sdk.js';
-import { createFormatter } from '../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
  * Get a messageviewer by ID.
  */
 export class GetMessageViewerCommand extends Command {
-  static override paths = [["mail", "messageViewers", "get"]];
+  static override paths = [['mail', 'messageViewers', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a messageviewer by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  messageViewerId = Option.String({ required: true });
+  messageViewerId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.messageviewers.get(this.messageViewerId);
+      const client = getClient()
+      const item = await client.messageviewers.get(this.messageViewerId)
 
       const output = formatter.format({
         draftsMailbox: item.draftsMailbox,
@@ -39,14 +39,14 @@ export class GetMessageViewerCommand extends Command {
         visibleMessages: item.visibleMessages,
         selectedMessages: item.selectedMessages,
         selectedMailboxes: item.selectedMailboxes,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

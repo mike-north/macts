@@ -9,7 +9,7 @@ Input for updating a Mailbox
 **Signature:**
 
 ```typescript
-type MailboxUpdateInput = Partial<MailboxCreateInput>;
+type MailboxUpdateInput = Partial<MailboxCreateInput>
 ```
-**References:** [MailboxCreateInput](./mail.mailboxcreateinput.md)
 
+**References:** [MailboxCreateInput](./mail.mailboxcreateinput.md)

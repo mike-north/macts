@@ -9,7 +9,7 @@ A new email message
 **Signature:**
 
 ```typescript
-interface OutgoingMessage 
+interface OutgoingMessage
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface OutgoingMessage
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [htmlContent](./mail.outgoingmessage.htmlcontent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [id](./mail.outgoingmessage.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The unique identifier of the message
-
 
 </td></tr>
 <tr><td>
 
 [messageSignature](./mail.outgoingmessage.messagesignature.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The signature of the message
-
 
 </td></tr>
 <tr><td>
 
 [sender](./mail.outgoingmessage.sender.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The sender of the message
-
 
 </td></tr>
 <tr><td>
 
 [subject](./mail.outgoingmessage.subject.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The subject of the message
-
 
 </td></tr>
 <tr><td>
 
 [vcardPath](./mail.outgoingmessage.vcardpath.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [visible](./mail.outgoingmessage.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Controls whether the message window is shown on the screen. The default is false
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Input for creating a Account
 **Signature:**
 
 ```typescript
-interface AccountCreateInput 
+interface AccountCreateInput
 ```
 
 ## Properties
@@ -18,383 +18,302 @@ interface AccountCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [authentication?](./mail.accountcreateinput.authentication.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Preferred authentication scheme for account
-
 
 </td></tr>
 <tr><td>
 
 [deliveryAccount?](./mail.accountcreateinput.deliveryaccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The delivery account used when sending mail from this account
-
 
 </td></tr>
 <tr><td>
 
 [emailAddresses?](./mail.accountcreateinput.emailaddresses.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The list of email addresses configured for an account
-
 
 </td></tr>
 <tr><td>
 
 [emptyJunkMessagesFrequency?](./mail.accountcreateinput.emptyjunkmessagesfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete)
-
 
 </td></tr>
 <tr><td>
 
 [emptyJunkMessagesOnQuit?](./mail.accountcreateinput.emptyjunkmessagesonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Indicates whether the messages in the junk messages mailboxes will be deleted on quit
-
 
 </td></tr>
 <tr><td>
 
 [emptySentMessagesFrequency?](./mail.accountcreateinput.emptysentmessagesfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [emptySentMessagesOnQuit?](./mail.accountcreateinput.emptysentmessagesonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [emptyTrashFrequency?](./mail.accountcreateinput.emptytrashfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)
-
 
 </td></tr>
 <tr><td>
 
 [emptyTrashOnQuit?](./mail.accountcreateinput.emptytrashonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit
-
 
 </td></tr>
 <tr><td>
 
 [enabled?](./mail.accountcreateinput.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Indicates whether the account is enabled or not
-
 
 </td></tr>
 <tr><td>
 
 [fullName?](./mail.accountcreateinput.fullname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The users full name configured for an account
-
 
 </td></tr>
 <tr><td>
 
 [includeWhenGettingNewMail?](./mail.accountcreateinput.includewhengettingnewmail.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [moveDeletedMessagesToTrash?](./mail.accountcreateinput.movedeletedmessagestotrash.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Indicates whether messages that are deleted will be moved to the trash mailbox
-
 
 </td></tr>
 <tr><td>
 
 [name?](./mail.accountcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of an account
-
 
 </td></tr>
 <tr><td>
 
 [password?](./mail.accountcreateinput.password.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Password for this account. Can be set, but not read via scripting
-
 
 </td></tr>
 <tr><td>
 
 [port?](./mail.accountcreateinput.port.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The port used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [serverName?](./mail.accountcreateinput.servername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The host name used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [userName?](./mail.accountcreateinput.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The user name used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [usesSsl?](./mail.accountcreateinput.usesssl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Indicates whether SSL is enabled for this receiving account
 
-
 </td></tr>
 </tbody></table>
-

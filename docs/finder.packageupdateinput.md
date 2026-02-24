@@ -9,7 +9,7 @@ Input for updating a Package
 **Signature:**
 
 ```typescript
-type PackageUpdateInput = Partial<PackageCreateInput>;
+type PackageUpdateInput = Partial<PackageCreateInput>
 ```
-**References:** [PackageCreateInput](./finder.packagecreateinput.md)
 
+**References:** [PackageCreateInput](./finder.packagecreateinput.md)

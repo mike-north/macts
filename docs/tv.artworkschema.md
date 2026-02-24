@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-ArtworkSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    data: z.ZodString;
-    description: z.ZodString;
-    downloaded: z.ZodBoolean;
-    format: z.ZodString;
-    kind: z.ZodNumber;
-    rawData: z.ZodUnknown;
-}, z.core.$strip>
+ArtworkSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    data: z.ZodString
+    description: z.ZodString
+    downloaded: z.ZodBoolean
+    format: z.ZodString
+    kind: z.ZodNumber
+    rawData: z.ZodUnknown
+  },
+  z.core.$strip
+>
 ```

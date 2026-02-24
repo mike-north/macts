@@ -18,30 +18,24 @@ static app(bundleId: string): ObjectSpecifier;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 [ObjectSpecifier](./core.objectspecifier.md)
-

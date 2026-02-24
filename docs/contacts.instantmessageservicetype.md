@@ -9,5 +9,15 @@ InstantMessageServiceType
 **Signature:**
 
 ```typescript
-type InstantMessageServiceType = 'aIM' | 'facebook' | 'gaduGadu' | 'googleTalk' | 'iCQ' | 'jabber' | 'mSN' | 'qQ' | 'skype' | 'yahoo';
+type InstantMessageServiceType =
+  | 'aIM'
+  | 'facebook'
+  | 'gaduGadu'
+  | 'googleTalk'
+  | 'iCQ'
+  | 'jabber'
+  | 'mSN'
+  | 'qQ'
+  | 'skype'
+  | 'yahoo'
 ```

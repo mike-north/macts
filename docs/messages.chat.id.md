@@ -9,5 +9,5 @@ A guid identifier for this chat.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

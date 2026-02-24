@@ -9,5 +9,5 @@ Is the current record a company or a person.
 **Signature:**
 
 ```typescript
-company: boolean;
+company: boolean
 ```

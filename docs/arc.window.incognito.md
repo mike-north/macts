@@ -9,5 +9,5 @@ Whether the window is an incognito window.
 **Signature:**
 
 ```typescript
-incognito: boolean;
+incognito: boolean
 ```

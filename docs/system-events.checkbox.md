@@ -9,7 +9,7 @@ A checkbox belonging to a window
 **Signature:**
 
 ```typescript
-interface Checkbox 
+interface Checkbox
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Checkbox
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.checkbox.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this checkbox
 
-
 </td></tr>
 </tbody></table>
-

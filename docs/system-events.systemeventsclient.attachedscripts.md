@@ -11,7 +11,7 @@ List the actions attached to a folder
 ```typescript
 attachedScripts(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

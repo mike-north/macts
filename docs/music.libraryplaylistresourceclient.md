@@ -9,7 +9,7 @@ Client for the main library playlist.
 **Signature:**
 
 ```typescript
-declare class LibraryPlaylistResourceClient 
+declare class LibraryPlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class LibraryPlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.libraryplaylistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `LibraryPlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `LibraryPlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.libraryplaylistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new libraryplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.libraryplaylistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a libraryplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.libraryplaylistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a libraryplaylist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.libraryplaylistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all libraryplaylists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.libraryplaylistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing libraryplaylist.
 
-
 </td></tr>
 </tbody></table>
-

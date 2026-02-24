@@ -18,30 +18,24 @@ create(input: RowCreateInput): Promise<Row>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RowCreateInput](./system-events.rowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Row](./system-events.row.md)<!-- -->&gt;
-

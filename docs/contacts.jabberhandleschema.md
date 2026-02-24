@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-JabberHandleSchema: z.ZodObject<{
-    id: z.ZodString;
-    label: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+JabberHandleSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    label: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

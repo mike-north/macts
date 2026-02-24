@@ -11,7 +11,7 @@ List all drawers.
 ```typescript
 list(): Promise<Drawer[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Drawer](./system-events.drawer.md)<!-- -->\[\]&gt;
-

@@ -10,8 +10,8 @@ The aNSIBlackColor property
 
 ```typescript
 aNSIBlackColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

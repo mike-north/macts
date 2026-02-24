@@ -11,7 +11,7 @@ List all networkpreferencesobjects.
 ```typescript
 list(): Promise<NetworkPreferencesObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[NetworkPreferencesObject](./system-events.networkpreferencesobject.md)<!-- -->\[\]&gt;
-

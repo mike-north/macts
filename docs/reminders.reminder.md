@@ -9,7 +9,7 @@ A reminder item
 **Signature:**
 
 ```typescript
-interface Reminder 
+interface Reminder
 ```
 
 ## Properties
@@ -18,250 +18,197 @@ interface Reminder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [allDayDueDate](./reminders.reminder.alldayduedate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The all-day due date of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [body](./reminders.reminder.body.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The notes attached to the reminder
-
 
 </td></tr>
 <tr><td>
 
 [completed](./reminders.reminder.completed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the reminder is completed
-
 
 </td></tr>
 <tr><td>
 
 [completionDate](./reminders.reminder.completiondate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The completion date of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [creationDate](./reminders.reminder.creationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The creation date of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [dueDate](./reminders.reminder.duedate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The due date of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [flagged](./reminders.reminder.flagged.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the reminder is flagged
-
 
 </td></tr>
 <tr><td>
 
 [id](./reminders.reminder.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./reminders.reminder.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The modification date of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [name](./reminders.reminder.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the reminder
-
 
 </td></tr>
 <tr><td>
 
 [priority](./reminders.reminder.priority.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
-
 
 </td></tr>
 <tr><td>
 
 [remindMeDate](./reminders.reminder.remindmedate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The remind date of the reminder
 
-
 </td></tr>
 </tbody></table>
-

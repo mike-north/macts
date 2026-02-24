@@ -18,30 +18,24 @@ create(input: MenuItemCreateInput): Promise<MenuItem>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MenuItemCreateInput](./system-events.menuitemcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MenuItem](./system-events.menuitem.md)<!-- -->&gt;
-

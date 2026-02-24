@@ -9,8 +9,9 @@ Error thrown when permission expansion fails.
 **Signature:**
 
 ```typescript
-declare class PermissionExpansionError extends Error 
+declare class PermissionExpansionError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -19,30 +20,24 @@ declare class PermissionExpansionError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(permission, message)](./core.permissionexpansionerror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PermissionExpansionError` class
-
 
 </td></tr>
 </tbody></table>
@@ -53,41 +48,32 @@ Constructs a new instance of the `PermissionExpansionError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [permission](./core.permissionexpansionerror.permission.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

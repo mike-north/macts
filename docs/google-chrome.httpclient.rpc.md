@@ -18,46 +18,37 @@ rpc<T>(path: string, body?: object): Promise<T>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 path
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 body
 
-
 </td><td>
 
 object
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -65,4 +56,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;T&gt;
-

@@ -9,5 +9,5 @@ should tracks which refer to this preset be updated when the preset is renamed o
 **Signature:**
 
 ```typescript
-updateTracks: boolean;
+updateTracks: boolean
 ```

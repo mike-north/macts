@@ -9,5 +9,5 @@ the lyrics of the track
 **Signature:**
 
 ```typescript
-lyrics: string;
+lyrics: string
 ```

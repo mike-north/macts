@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Confidence = z.infer<typeof ConfidenceSchema>;
+type Confidence = z.infer<typeof ConfidenceSchema>
 ```
-**References:** [ConfidenceSchema](./core.confidenceschema.md)
 
+**References:** [ConfidenceSchema](./core.confidenceschema.md)

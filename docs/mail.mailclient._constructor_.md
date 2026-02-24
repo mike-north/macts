@@ -18,31 +18,24 @@ constructor(options: MailClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [MailClientOptions](./mail.mailclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

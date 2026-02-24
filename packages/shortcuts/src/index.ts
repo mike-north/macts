@@ -18,8 +18,8 @@
  * @packageDocumentation
  */
 
-export { ShortcutsClient, ShortcutsError, HttpClient } from './client.js';
-export type { ShortcutsClientOptions } from './client.js';
-export * from './types.js';
-export { ShortcutResourceClient } from './resources/shortcut.js';
-export { FolderResourceClient } from './resources/folder.js';
+export { ShortcutsClient, ShortcutsError, HttpClient } from './client.js'
+export type { ShortcutsClientOptions } from './client.js'
+export * from './types.js'
+export { ShortcutResourceClient } from './resources/shortcut.js'
+export { FolderResourceClient } from './resources/folder.js'

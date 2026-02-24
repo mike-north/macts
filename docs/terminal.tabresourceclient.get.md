@@ -18,30 +18,24 @@ get(tty: string): Promise<Tab>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 tty
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;[Tab](./terminal.tab.md)<!-- -->&gt;
-

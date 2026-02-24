@@ -11,7 +11,7 @@ List all scriptingproperties.
 ```typescript
 list(): Promise<ScriptingProperty[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingProperty](./system-events.scriptingproperty.md)<!-- -->\[\]&gt;
-

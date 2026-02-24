@@ -9,7 +9,7 @@ Options for creating an API key.
 **Signature:**
 
 ```typescript
-interface CreateApiKeyOptions 
+interface CreateApiKeyOptions
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface CreateApiKeyOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [expires?](./api.createapikeyoptions.expires.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date \| number \| string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Optional expiration. Can be a Date, Unix timestamp, or duration string (e.g., "30d", "1h").
-
 
 </td></tr>
 <tr><td>
 
 [name](./api.createapikeyoptions.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Human-readable name for the key
-
 
 </td></tr>
 <tr><td>
 
 [permissions](./api.createapikeyoptions.permissions.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Permissions to grant. Can include fine-grained, coarse, or wildcard permissions. Coarse and wildcard permissions are expanded at creation time.
 
-
 </td></tr>
 </tbody></table>
-

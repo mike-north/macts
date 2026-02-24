@@ -9,7 +9,7 @@ Input for creating a XMLData
 **Signature:**
 
 ```typescript
-interface XMLDataCreateInput 
+interface XMLDataCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface XMLDataCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name?](./system-events.xmldatacreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the XML data
-
 
 </td></tr>
 <tr><td>
 
 [text?](./system-events.xmldatacreateinput.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the text representation of the XML data
 
-
 </td></tr>
 </tbody></table>
-

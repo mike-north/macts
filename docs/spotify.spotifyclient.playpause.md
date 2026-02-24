@@ -11,7 +11,7 @@ Toggle play/pause.
 ```typescript
 playpause(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

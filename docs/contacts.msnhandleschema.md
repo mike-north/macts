@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-MSNHandleSchema: z.ZodObject<{
-    id: z.ZodString;
-    label: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+MSNHandleSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    label: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

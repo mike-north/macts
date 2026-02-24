@@ -9,5 +9,5 @@ Resource name (e.g., "calendars")
 **Signature:**
 
 ```typescript
-resourceName: string;
+resourceName: string
 ```

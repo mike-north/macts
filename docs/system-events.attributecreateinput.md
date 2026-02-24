@@ -9,7 +9,7 @@ Input for creating a Attribute
 **Signature:**
 
 ```typescript
-interface AttributeCreateInput 
+interface AttributeCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AttributeCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [value?](./system-events.attributecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the current value of the attribute
 
-
 </td></tr>
 </tbody></table>
-

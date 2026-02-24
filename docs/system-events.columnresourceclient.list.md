@@ -11,7 +11,7 @@ List all columns.
 ```typescript
 list(): Promise<Column[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Column](./system-events.column.md)<!-- -->\[\]&gt;
-

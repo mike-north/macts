@@ -9,8 +9,9 @@ Error class for Mail API errors.
 **Signature:**
 
 ```typescript
-declare class MailError extends Error 
+declare class MailError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -19,30 +20,24 @@ declare class MailError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(code, message)](./mail.mailerror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MailError` class
-
 
 </td></tr>
 </tbody></table>
@@ -53,41 +48,32 @@ Constructs a new instance of the `MailError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./mail.mailerror.code.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

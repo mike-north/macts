@@ -18,30 +18,24 @@ toJxa(value: T): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 value
 
-
 </td><td>
 
 T
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ T
 **Returns:**
 
 string
-

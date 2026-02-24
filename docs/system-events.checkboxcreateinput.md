@@ -9,5 +9,5 @@ Input for creating a Checkbox
 **Signature:**
 
 ```typescript
-interface CheckboxCreateInput 
+interface CheckboxCreateInput
 ```

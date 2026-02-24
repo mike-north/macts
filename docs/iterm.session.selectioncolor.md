@@ -10,8 +10,8 @@ The selectionColor property
 
 ```typescript
 selectionColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

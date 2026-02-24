@@ -9,7 +9,7 @@ Generate all schemas for a context.
 **Signature:**
 
 ```typescript
-declare function generateSchemas(ctx: GeneratorContext): GeneratedSchema[];
+declare function generateSchemas(ctx: GeneratorContext): GeneratedSchema[]
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function generateSchemas(ctx: GeneratorContext): GeneratedSchema[];
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ ctx
 **Returns:**
 
 [GeneratedSchema](./core.generatedschema.md)<!-- -->\[\]
-

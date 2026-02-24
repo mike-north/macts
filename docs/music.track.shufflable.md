@@ -9,5 +9,5 @@ is this track included when shuffling?
 **Signature:**
 
 ```typescript
-shufflable: boolean;
+shufflable: boolean
 ```

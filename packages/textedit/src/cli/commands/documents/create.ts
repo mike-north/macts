@@ -1,30 +1,33 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../sdk.js';
-import { createFormatter } from '../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
  * Create a new document.
  */
 export class CreateDocumentCommand extends Command {
-  static override paths = [["textedit", "documents", "create"]];
+  static override paths = [['textedit', 'documents', 'create']]
 
   static override usage = Command.Usage({
     description: 'Create a new document',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  name = Option.String('--name', { required: true, description: "The name of the document" });
-  text = Option.String('--text', { required: true, description: "The text content of the document" });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  name = Option.String('--name', { required: true, description: 'The name of the document' })
+  text = Option.String('--text', {
+    required: true,
+    description: 'The text content of the document',
+  })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
+      const client = getClient()
       const item = await client.documents.create({
         name: this.name,
         text: this.text,
-      } as Record<string, unknown>);
+      } as Record<string, unknown>)
 
       const output = formatter.format({
         message: 'Document created successfully',
@@ -32,14 +35,14 @@ export class CreateDocumentCommand extends Command {
         path: item.path,
         modified: item.modified,
         text: item.text,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

@@ -9,5 +9,5 @@ the URL of the disk item
 **Signature:**
 
 ```typescript
-uRL: string;
+uRL: string
 ```

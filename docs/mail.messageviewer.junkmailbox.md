@@ -9,5 +9,5 @@ The top level Junk mailbox
 **Signature:**
 
 ```typescript
-junkMailbox: Mailbox;
+junkMailbox: Mailbox
 ```

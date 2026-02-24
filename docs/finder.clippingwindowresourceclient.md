@@ -9,7 +9,7 @@ Client for the window containing a clipping.
 **Signature:**
 
 ```typescript
-declare class ClippingWindowResourceClient 
+declare class ClippingWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ClippingWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.clippingwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ClippingWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ClippingWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.clippingwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new clippingwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.clippingwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a clippingwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.clippingwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a clippingwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.clippingwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all clippingwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.clippingwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing clippingwindow.
 
-
 </td></tr>
 </tbody></table>
-

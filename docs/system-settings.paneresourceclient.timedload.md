@@ -11,7 +11,7 @@ Times and loads given settings pane and returns load time. Deprecated: no longer
 ```typescript
 timedLoad(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

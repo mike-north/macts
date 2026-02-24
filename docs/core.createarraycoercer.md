@@ -9,7 +9,7 @@ Create an array coercer from element coercer.
 **Signature:**
 
 ```typescript
-declare function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>;
+declare function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoer
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 elementCoercer
 
-
 </td><td>
 
 [TypeCoercer](./core.typecoercer.md)<!-- -->&lt;T&gt;
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ elementCoercer
 **Returns:**
 
 [TypeCoercer](./core.typecoercer.md)<!-- -->&lt;T\[\]&gt;
-

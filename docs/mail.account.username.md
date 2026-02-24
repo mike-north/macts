@@ -9,5 +9,5 @@ The user name used to connect to an account
 **Signature:**
 
 ```typescript
-userName: string;
+userName: string
 ```

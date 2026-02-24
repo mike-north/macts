@@ -11,7 +11,7 @@ Returns a no-op tracer by default. When an OpenTelemetry SDK is configured via [
 **Signature:**
 
 ```typescript
-declare function getTracer(_name?: string): Tracer;
+declare function getTracer(_name?: string): Tracer
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function getTracer(_name?: string): Tracer;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 \_name
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Tracer name (used as instrumentation scope name)
-
 
 </td></tr>
 </tbody></table>
@@ -58,21 +52,19 @@ A tracer instance
 
 ## Example
 
-
 ```typescript
-import { getTracer } from '@macts/api/telemetry';
+import { getTracer } from '@macts/api/telemetry'
 
-const tracer = getTracer('my-service');
-const span = tracer.startSpan('operation');
+const tracer = getTracer('my-service')
+const span = tracer.startSpan('operation')
 try {
   // ... do work
-  span.setStatus({ code: SpanStatusCode.OK });
+  span.setStatus({ code: SpanStatusCode.OK })
 } catch (err) {
-  span.recordException(err);
-  span.setStatus({ code: SpanStatusCode.ERROR, message: err.message });
-  throw err;
+  span.recordException(err)
+  span.setStatus({ code: SpanStatusCode.ERROR, message: err.message })
+  throw err
 } finally {
-  span.end();
+  span.end()
 }
 ```
-

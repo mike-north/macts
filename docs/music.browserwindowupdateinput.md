@@ -9,7 +9,7 @@ Input for updating a BrowserWindow
 **Signature:**
 
 ```typescript
-type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>;
+type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>
 ```
-**References:** [BrowserWindowCreateInput](./music.browserwindowcreateinput.md)
 
+**References:** [BrowserWindowCreateInput](./music.browserwindowcreateinput.md)

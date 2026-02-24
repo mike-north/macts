@@ -9,5 +9,5 @@ If rule matches, reply to message and prepend with this text. Set to empty strin
 **Signature:**
 
 ```typescript
-replyText: string;
+replyText: string
 ```

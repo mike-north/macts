@@ -9,5 +9,5 @@ The name of the parameter
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

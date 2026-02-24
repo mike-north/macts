@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-DocumentSchema: z.ZodObject<{
-    name: z.ZodString;
-    path: z.ZodOptional<z.ZodString>;
-    contents: z.ZodString;
-    language: z.ZodString;
-    modified: z.ZodBoolean;
-}, z.core.$strip>
+DocumentSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    path: z.ZodOptional<z.ZodString>
+    contents: z.ZodString
+    language: z.ZodString
+    modified: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

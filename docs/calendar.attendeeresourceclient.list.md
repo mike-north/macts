@@ -11,7 +11,7 @@ List all attendees.
 ```typescript
 list(): Promise<Attendee[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Attendee](./calendar.attendee.md)<!-- -->\[\]&gt;
-

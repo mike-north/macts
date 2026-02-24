@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-ParticipantSchema: z.ZodObject<{
-    id: z.ZodString;
-    account: z.ZodString;
-    name: z.ZodString;
-    handle: z.ZodString;
-    firstName: z.ZodString;
-    lastName: z.ZodString;
-    fullName: z.ZodString;
-}, z.core.$strip>
+ParticipantSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    account: z.ZodString
+    name: z.ZodString
+    handle: z.ZodString
+    firstName: z.ZodString
+    lastName: z.ZodString
+    fullName: z.ZodString
+  },
+  z.core.$strip
+>
 ```

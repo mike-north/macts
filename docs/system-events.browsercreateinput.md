@@ -9,5 +9,5 @@ Input for creating a Browser
 **Signature:**
 
 ```typescript
-interface BrowserCreateInput 
+interface BrowserCreateInput
 ```

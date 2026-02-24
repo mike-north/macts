@@ -9,7 +9,7 @@ Client for an email recipient in the bcc: field.
 **Signature:**
 
 ```typescript
-declare class BccRecipientResourceClient 
+declare class BccRecipientResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class BccRecipientResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.bccrecipientresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `BccRecipientResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `BccRecipientResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.bccrecipientresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new bccrecipient.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.bccrecipientresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a bccrecipient.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.bccrecipientresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a bccrecipient by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.bccrecipientresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all bccrecipients.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.bccrecipientresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing bccrecipient.
 
-
 </td></tr>
 </tbody></table>
-

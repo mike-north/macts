@@ -9,7 +9,7 @@ A color well belonging to a window
 **Signature:**
 
 ```typescript
-interface ColorWell 
+interface ColorWell
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ColorWell
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.colorwell.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this color well
 
-
 </td></tr>
 </tbody></table>
-

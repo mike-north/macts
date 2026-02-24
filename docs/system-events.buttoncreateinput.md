@@ -9,5 +9,5 @@ Input for creating a Button
 **Signature:**
 
 ```typescript
-interface ButtonCreateInput 
+interface ButtonCreateInput
 ```

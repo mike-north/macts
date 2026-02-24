@@ -9,5 +9,5 @@ The address that replies should be sent to
 **Signature:**
 
 ```typescript
-replyTo: string;
+replyTo: string
 ```

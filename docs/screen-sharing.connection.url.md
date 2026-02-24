@@ -9,5 +9,5 @@ The VNC URL of the connection
 **Signature:**
 
 ```typescript
-url: string;
+url: string
 ```

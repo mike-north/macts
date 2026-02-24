@@ -9,5 +9,5 @@ TypeOfAccount
 **Signature:**
 
 ```typescript
-type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown';
+type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown'
 ```

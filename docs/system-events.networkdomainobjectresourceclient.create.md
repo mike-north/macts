@@ -18,30 +18,24 @@ create(input: NetworkDomainObjectCreateInput): Promise<NetworkDomainObject>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[NetworkDomainObject](./system-events.networkdomainobject.md)<!-- -->&gt;
-

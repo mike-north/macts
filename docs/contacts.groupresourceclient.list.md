@@ -11,7 +11,7 @@ List all groups.
 ```typescript
 list(): Promise<Group[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Group](./contacts.group.md)<!-- -->\[\]&gt;
-

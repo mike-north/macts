@@ -11,7 +11,10 @@ The API plugin packages up the app manifest and metadata so the core API server 
 **Signature:**
 
 ```typescript
-declare function generateApiPlugin(manifest: AppManifest, options: ApiPluginGeneratorOptions): GenerateApiPluginResult;
+declare function generateApiPlugin(
+  manifest: AppManifest,
+  options: ApiPluginGeneratorOptions
+): GenerateApiPluginResult
 ```
 
 ## Parameters
@@ -20,48 +23,39 @@ declare function generateApiPlugin(manifest: AppManifest, options: ApiPluginGene
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [ApiPluginGeneratorOptions](./core.apiplugingeneratoroptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +65,3 @@ Generation options
 [GenerateApiPluginResult](./core.generateapipluginresult.md)
 
 Generated files and any errors
-

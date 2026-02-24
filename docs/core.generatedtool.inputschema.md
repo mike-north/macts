@@ -9,5 +9,5 @@ JSON Schema for tool input parameters
 **Signature:**
 
 ```typescript
-inputSchema: JsonSchema;
+inputSchema: JsonSchema
 ```

@@ -11,7 +11,7 @@ Converts RPC path format to permission string. Example: '/rpc/calendar.events.li
 **Signature:**
 
 ```typescript
-declare function rpcPathToPermission(path: string): string;
+declare function rpcPathToPermission(path: string): string
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function rpcPathToPermission(path: string): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 path
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 RPC path (e.g., '/rpc/calendar.events.list')
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ RPC path (e.g., '/rpc/calendar.events.list')
 string
 
 Permission string (e.g., 'calendar:events:list')
-

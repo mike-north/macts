@@ -9,5 +9,5 @@ The Phonetic version of the Middle name of this person.
 **Signature:**
 
 ```typescript
-phoneticMiddleName: string;
+phoneticMiddleName: string
 ```

@@ -9,5 +9,5 @@ Zip or postal code of the address.
 **Signature:**
 
 ```typescript
-zip: string;
+zip: string
 ```

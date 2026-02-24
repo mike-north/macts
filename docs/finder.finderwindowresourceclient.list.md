@@ -11,7 +11,7 @@ List all finderwindows.
 ```typescript
 list(): Promise<FinderWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[FinderWindow](./finder.finderwindow.md)<!-- -->\[\]&gt;
-

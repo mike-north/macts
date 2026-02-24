@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { SystemEventsClient, type SystemEventsClientOptions } from '../client.js';
+import { SystemEventsClient, type SystemEventsClientOptions } from '../client.js'
 
 /**
  * Get a SystemEventsClient instance.
@@ -16,32 +16,32 @@ import { SystemEventsClient, type SystemEventsClientOptions } from '../client.js
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getSystemEventsClient(): SystemEventsClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions system-events:*:*'
-    );
+    )
   }
 
   const options: SystemEventsClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new SystemEventsClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new SystemEventsClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: SystemEventsClient | null = null;
+let _client: SystemEventsClient | null = null
 
 /**
  * Get or create the singleton SystemEventsClient.
@@ -50,8 +50,8 @@ let _client: SystemEventsClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): SystemEventsClient {
-  _client ??= getSystemEventsClient();
-  return _client;
+  _client ??= getSystemEventsClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): SystemEventsClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

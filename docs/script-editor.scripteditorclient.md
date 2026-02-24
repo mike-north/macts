@@ -9,19 +9,18 @@ ScriptEditor client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class ScriptEditorClient 
+declare class ScriptEditorClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new ScriptEditorClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./script-editor.scripteditorclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptEditorClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,64 +57,51 @@ Constructs a new instance of the `ScriptEditorClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [documents](./script-editor.scripteditorclient.documents.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DocumentResourceClient](./script-editor.documentresourceclient.md)
 
-
 </td><td>
 
 A Script Editor document
-
 
 </td></tr>
 <tr><td>
 
 [http](./script-editor.scripteditorclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./script-editor.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
 
-
 </td></tr>
 </tbody></table>
-

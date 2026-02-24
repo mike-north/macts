@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { TVClient, type TVClientOptions } from '@macts/tv';
+import { TVClient, type TVClientOptions } from '@macts/tv'
 
 /**
  * Get a TVClient instance.
@@ -16,32 +16,32 @@ import { TVClient, type TVClientOptions } from '@macts/tv';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getTVClient(): TVClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions tv:*:*'
-    );
+    )
   }
 
   const options: TVClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new TVClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new TVClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: TVClient | null = null;
+let _client: TVClient | null = null
 
 /**
  * Get or create the singleton TVClient.
@@ -50,8 +50,8 @@ let _client: TVClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): TVClient {
-  _client ??= getTVClient();
-  return _client;
+  _client ??= getTVClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): TVClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

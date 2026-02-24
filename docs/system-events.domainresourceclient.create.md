@@ -18,30 +18,24 @@ create(input: DomainCreateInput): Promise<Domain>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DomainCreateInput](./system-events.domaincreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Domain](./system-events.domain.md)<!-- -->&gt;
-

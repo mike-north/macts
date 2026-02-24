@@ -9,7 +9,7 @@ Input for updating a Person
 **Signature:**
 
 ```typescript
-type PersonUpdateInput = Partial<PersonCreateInput>;
+type PersonUpdateInput = Partial<PersonCreateInput>
 ```
-**References:** [PersonCreateInput](./contacts.personcreateinput.md)
 
+**References:** [PersonCreateInput](./contacts.personcreateinput.md)

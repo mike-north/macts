@@ -9,7 +9,7 @@ Client configuration options.
 **Signature:**
 
 ```typescript
-interface TerminalClientOptions 
+interface TerminalClientOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface TerminalClientOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKey](./terminal.terminalclientoptions.apikey.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 API key for authentication
-
 
 </td></tr>
 <tr><td>
 
 [baseUrl?](./terminal.terminalclientoptions.baseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Base URL for API server (default: http://localhost:8372)
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ The size in points of the first character.
 **Signature:**
 
 ```typescript
-size: number;
+size: number
 ```

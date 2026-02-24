@@ -18,30 +18,24 @@ create(input: AnchorCreateInput): Promise<Anchor>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AnchorCreateInput](./system-settings.anchorcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Anchor](./system-settings.anchor.md)<!-- -->&gt;
-

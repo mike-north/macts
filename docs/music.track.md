@@ -9,7 +9,7 @@ playable audio source
 **Signature:**
 
 ```typescript
-interface Track 
+interface Track
 ```
 
 ## Properties
@@ -18,1352 +18,1067 @@ interface Track
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [album](./music.track.album.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the album name of the track
-
 
 </td></tr>
 <tr><td>
 
 [albumArtist](./music.track.albumartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the album artist of the track
-
 
 </td></tr>
 <tr><td>
 
 [albumDisliked](./music.track.albumdisliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the album for this track disliked?
-
 
 </td></tr>
 <tr><td>
 
 [albumFavorited](./music.track.albumfavorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the album for this track favorited?
-
 
 </td></tr>
 <tr><td>
 
 [albumRating](./music.track.albumrating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the rating of the album for this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [albumRatingKind](./music.track.albumratingkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the rating kind of the album rating for this track
-
 
 </td></tr>
 <tr><td>
 
 [artist](./music.track.artist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the artist/source of the track
-
 
 </td></tr>
 <tr><td>
 
 [bitRate](./music.track.bitrate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the bit rate of the track (in kbps)
-
 
 </td></tr>
 <tr><td>
 
 [bookmark](./music.track.bookmark.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the bookmark time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [bookmarkable](./music.track.bookmarkable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the playback position for this track remembered?
-
 
 </td></tr>
 <tr><td>
 
 [bpm](./music.track.bpm.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the tempo of this track in beats per minute
-
 
 </td></tr>
 <tr><td>
 
 [category](./music.track.category.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the category of the track
-
 
 </td></tr>
 <tr><td>
 
 [cloudStatus](./music.track.cloudstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the iCloud status of the track
-
 
 </td></tr>
 <tr><td>
 
 [comment](./music.track.comment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 freeform notes about the track
-
 
 </td></tr>
 <tr><td>
 
 [compilation](./music.track.compilation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track from a compilation album?
-
 
 </td></tr>
 <tr><td>
 
 [composer](./music.track.composer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the composer of the track
-
 
 </td></tr>
 <tr><td>
 
 [databaseID](./music.track.databaseid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.
-
 
 </td></tr>
 <tr><td>
 
 [dateAdded](./music.track.dateadded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date the track was added to the playlist
-
 
 </td></tr>
 <tr><td>
 
 [description](./music.track.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the description of the track
-
 
 </td></tr>
 <tr><td>
 
 [discCount](./music.track.disccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of discs in the source album
-
 
 </td></tr>
 <tr><td>
 
 [discNumber](./music.track.discnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of the disc containing this track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [disliked](./music.track.disliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track disliked?
-
 
 </td></tr>
 <tr><td>
 
 [downloaderAccount](./music.track.downloaderaccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the account of the person who downloaded this track
-
 
 </td></tr>
 <tr><td>
 
 [downloaderName](./music.track.downloadername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the person who downloaded this track
-
 
 </td></tr>
 <tr><td>
 
 [duration](./music.track.duration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the length of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [enabled](./music.track.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track checked for playback?
-
 
 </td></tr>
 <tr><td>
 
 [episodeID](./music.track.episodeid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the episode ID of the track
-
 
 </td></tr>
 <tr><td>
 
 [episodeNumber](./music.track.episodenumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the episode number of the track
-
 
 </td></tr>
 <tr><td>
 
 [eQ](./music.track.eq.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the EQ preset of the track
-
 
 </td></tr>
 <tr><td>
 
 [favorited](./music.track.favorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track favorited?
-
 
 </td></tr>
 <tr><td>
 
 [finish](./music.track.finish.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the stop time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [gapless](./music.track.gapless.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track from a gapless album?
-
 
 </td></tr>
 <tr><td>
 
 [genre](./music.track.genre.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the music/audio genre (category) of the track
-
 
 </td></tr>
 <tr><td>
 
 [grouping](./music.track.grouping.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the grouping (piece) of the track. Generally used to denote movements within a classical work.
-
 
 </td></tr>
 <tr><td>
 
 [kind](./music.track.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 a text description of the track
-
 
 </td></tr>
 <tr><td>
 
 [longDescription](./music.track.longdescription.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the long description of the track
-
 
 </td></tr>
 <tr><td>
 
 [lyrics](./music.track.lyrics.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the lyrics of the track
-
 
 </td></tr>
 <tr><td>
 
 [mediaKind](./music.track.mediakind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the media kind of the track
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./music.track.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the modification date of the content of this track
-
 
 </td></tr>
 <tr><td>
 
 [movement](./music.track.movement.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the movement name of the track
-
 
 </td></tr>
 <tr><td>
 
 [movementCount](./music.track.movementcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of movements in the work
-
 
 </td></tr>
 <tr><td>
 
 [movementNumber](./music.track.movementnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of the movement in the work
-
 
 </td></tr>
 <tr><td>
 
 [playedCount](./music.track.playedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 number of times this track has been played
-
 
 </td></tr>
 <tr><td>
 
 [playedDate](./music.track.playeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date and time this track was last played
-
 
 </td></tr>
 <tr><td>
 
 [purchaserAccount](./music.track.purchaseraccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the account of the person who purchased this track
-
 
 </td></tr>
 <tr><td>
 
 [purchaserName](./music.track.purchasername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the person who purchased this track
-
 
 </td></tr>
 <tr><td>
 
 [rating](./music.track.rating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the rating of this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [ratingKind](./music.track.ratingkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the rating kind of this track
-
 
 </td></tr>
 <tr><td>
 
 [releaseDate](./music.track.releasedate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the release date of this track
-
 
 </td></tr>
 <tr><td>
 
 [sampleRate](./music.track.samplerate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the sample rate of the track (in Hz)
-
 
 </td></tr>
 <tr><td>
 
 [seasonNumber](./music.track.seasonnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the season number of the track
-
 
 </td></tr>
 <tr><td>
 
 [show](./music.track.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the show name of the track
-
 
 </td></tr>
 <tr><td>
 
 [shufflable](./music.track.shufflable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track included when shuffling?
-
 
 </td></tr>
 <tr><td>
 
 [size](./music.track.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the size of the track (in bytes)
-
 
 </td></tr>
 <tr><td>
 
 [skippedCount](./music.track.skippedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 number of times this track has been skipped
-
 
 </td></tr>
 <tr><td>
 
 [skippedDate](./music.track.skippeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date and time this track was last skipped
-
 
 </td></tr>
 <tr><td>
 
 [sortAlbum](./music.track.sortalbum.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by album
-
 
 </td></tr>
 <tr><td>
 
 [sortAlbumArtist](./music.track.sortalbumartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by album artist
-
 
 </td></tr>
 <tr><td>
 
 [sortArtist](./music.track.sortartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by artist
-
 
 </td></tr>
 <tr><td>
 
 [sortComposer](./music.track.sortcomposer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by composer
-
 
 </td></tr>
 <tr><td>
 
 [sortName](./music.track.sortname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by name
-
 
 </td></tr>
 <tr><td>
 
 [sortShow](./music.track.sortshow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by show name
-
 
 </td></tr>
 <tr><td>
 
 [start](./music.track.start.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the start time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [time](./music.track.time.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the length of the track in MM:SS format
-
 
 </td></tr>
 <tr><td>
 
 [trackCount](./music.track.trackcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of tracks on the source album
-
 
 </td></tr>
 <tr><td>
 
 [trackNumber](./music.track.tracknumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of the track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [unplayed](./music.track.unplayed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track unplayed?
-
 
 </td></tr>
 <tr><td>
 
 [volumeAdjustment](./music.track.volumeadjustment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 relative volume adjustment of the track (-100% to 100%)
-
 
 </td></tr>
 <tr><td>
 
 [work](./music.track.work.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the work name of the track
-
 
 </td></tr>
 <tr><td>
 
 [year](./music.track.year.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the year the track was recorded/released
 
-
 </td></tr>
 </tbody></table>
-

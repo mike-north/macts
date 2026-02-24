@@ -9,5 +9,5 @@ If rule matches, mark message with the specified flag. Set to -1 to disable this
 **Signature:**
 
 ```typescript
-markFlagIndex: number;
+markFlagIndex: number
 ```

@@ -9,5 +9,5 @@ The unique identifier of the note
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

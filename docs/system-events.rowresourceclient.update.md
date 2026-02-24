@@ -18,44 +18,35 @@ update(id: string, input: RowUpdateInput): Promise<Row>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [RowUpdateInput](./system-events.rowupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[Row](./system-events.row.md)<!-- -->&gt;
-

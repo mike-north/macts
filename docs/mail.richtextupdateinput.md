@@ -9,7 +9,7 @@ Input for updating a RichText
 **Signature:**
 
 ```typescript
-type RichTextUpdateInput = Partial<RichTextCreateInput>;
+type RichTextUpdateInput = Partial<RichTextCreateInput>
 ```
-**References:** [RichTextCreateInput](./mail.richtextcreateinput.md)
 
+**References:** [RichTextCreateInput](./mail.richtextcreateinput.md)

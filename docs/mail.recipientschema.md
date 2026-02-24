@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-RecipientSchema: z.ZodObject<{
-    address: z.ZodString;
-    name: z.ZodString;
-}, z.core.$strip>
+RecipientSchema: z.ZodObject<
+  {
+    address: z.ZodString
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

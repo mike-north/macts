@@ -7,27 +7,30 @@
 **Signature:**
 
 ```typescript
-MessageSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    allHeaders: z.ZodString;
-    backgroundColor: z.ZodString;
-    mailbox: z.ZodString;
-    content: z.ZodString;
-    dateReceived: z.ZodString;
-    dateSent: z.ZodString;
-    deletedStatus: z.ZodBoolean;
-    flaggedStatus: z.ZodBoolean;
-    flagIndex: z.ZodNumber;
-    junkMailStatus: z.ZodBoolean;
-    readStatus: z.ZodBoolean;
-    messageId: z.ZodString;
-    source: z.ZodString;
-    replyTo: z.ZodString;
-    messageSize: z.ZodNumber;
-    sender: z.ZodString;
-    subject: z.ZodString;
-    wasForwarded: z.ZodBoolean;
-    wasRedirected: z.ZodBoolean;
-    wasRepliedTo: z.ZodBoolean;
-}, z.core.$strip>
+MessageSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    allHeaders: z.ZodString
+    backgroundColor: z.ZodString
+    mailbox: z.ZodString
+    content: z.ZodString
+    dateReceived: z.ZodString
+    dateSent: z.ZodString
+    deletedStatus: z.ZodBoolean
+    flaggedStatus: z.ZodBoolean
+    flagIndex: z.ZodNumber
+    junkMailStatus: z.ZodBoolean
+    readStatus: z.ZodBoolean
+    messageId: z.ZodString
+    source: z.ZodString
+    replyTo: z.ZodString
+    messageSize: z.ZodNumber
+    sender: z.ZodString
+    subject: z.ZodString
+    wasForwarded: z.ZodBoolean
+    wasRedirected: z.ZodBoolean
+    wasRepliedTo: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

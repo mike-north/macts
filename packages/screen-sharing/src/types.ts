@@ -3,23 +3,23 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A screen sharing connection */
 export interface Connection {
   /** The connection name */
-  name: string;
+  name: string
   /** The unique identifier of the connection */
-  id: string;
+  id: string
   /** The VNC URL of the connection */
-  url: string;
+  url: string
 }
 
 /** Input for creating a Connection */
-export type ConnectionCreateInput = Record<string, never>;
+export type ConnectionCreateInput = Record<string, never>
 
 /** Input for updating a Connection */
-export type ConnectionUpdateInput = Partial<ConnectionCreateInput>;
+export type ConnectionUpdateInput = Partial<ConnectionCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -27,4 +27,4 @@ export const ConnectionSchema = z.object({
   name: z.string(),
   id: z.string(),
   url: z.string(),
-});
+})

@@ -11,7 +11,7 @@ Generates Clipanion-based CLI plugins from macts manifests.
 **Signature:**
 
 ```typescript
-interface GenerateCliPluginResult 
+interface GenerateCliPluginResult
 ```
 
 ## Properties
@@ -20,56 +20,43 @@ interface GenerateCliPluginResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [errors](./core.generateclipluginresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generateclipluginresult.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

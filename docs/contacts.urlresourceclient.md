@@ -9,7 +9,7 @@ Client for urls for this person..
 **Signature:**
 
 ```typescript
-declare class UrlResourceClient 
+declare class UrlResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class UrlResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.urlresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `UrlResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `UrlResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.urlresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new url.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.urlresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a url.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.urlresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a url by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.urlresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all urls.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.urlresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing url.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ The unique message ID string
 **Signature:**
 
 ```typescript
-messageId: string;
+messageId: string
 ```

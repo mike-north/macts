@@ -9,8 +9,9 @@ Error class for Terminal API errors.
 **Signature:**
 
 ```typescript
-declare class TerminalError extends Error 
+declare class TerminalError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -19,30 +20,24 @@ declare class TerminalError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(code, message)](./terminal.terminalerror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TerminalError` class
-
 
 </td></tr>
 </tbody></table>
@@ -53,41 +48,32 @@ Constructs a new instance of the `TerminalError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./terminal.terminalerror.code.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

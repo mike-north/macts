@@ -11,7 +11,7 @@ List all buttons.
 ```typescript
 list(): Promise<Button[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Button](./system-events.button.md)<!-- -->\[\]&gt;
-

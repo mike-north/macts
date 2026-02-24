@@ -11,7 +11,7 @@ List all tabgroups.
 ```typescript
 list(): Promise<TabGroup[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[TabGroup](./system-events.tabgroup.md)<!-- -->\[\]&gt;
-

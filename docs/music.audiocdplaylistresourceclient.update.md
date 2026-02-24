@@ -18,44 +18,35 @@ update(id: string, input: AudioCDPlaylistUpdateInput): Promise<AudioCDPlaylist>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [AudioCDPlaylistUpdateInput](./music.audiocdplaylistupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[AudioCDPlaylist](./music.audiocdplaylist.md)<!-- -->&gt;
-

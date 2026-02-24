@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-ColumnSchema: z.ZodObject<{
-    index: z.ZodNumber;
-    name: z.ZodString;
-    sortDirection: z.ZodString;
-    width: z.ZodNumber;
-    minimumWidth: z.ZodNumber;
-    maximumWidth: z.ZodNumber;
-    visible: z.ZodBoolean;
-}, z.core.$strip>
+ColumnSchema: z.ZodObject<
+  {
+    index: z.ZodNumber
+    name: z.ZodString
+    sortDirection: z.ZodString
+    width: z.ZodNumber
+    minimumWidth: z.ZodNumber
+    maximumWidth: z.ZodNumber
+    visible: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

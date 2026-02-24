@@ -11,7 +11,10 @@ Combines an API plugin (at `src/`<!-- -->) and an MCP plugin (at `src/mcp/`<!-- 
 **Signature:**
 
 ```typescript
-declare function generateServerPackage(manifest: AppManifest, options: GenerateServerPackageOptions): GenerateServerPackageResult;
+declare function generateServerPackage(
+  manifest: AppManifest,
+  options: GenerateServerPackageOptions
+): GenerateServerPackageResult
 ```
 
 ## Parameters
@@ -20,48 +23,39 @@ declare function generateServerPackage(manifest: AppManifest, options: GenerateS
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GenerateServerPackageOptions](./core.generateserverpackageoptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +65,3 @@ Generation options
 [GenerateServerPackageResult](./core.generateserverpackageresult.md)
 
 Generated files and any errors
-

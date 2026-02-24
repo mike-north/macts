@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Command = z.infer<typeof CommandSchema>;
+type Command = z.infer<typeof CommandSchema>
 ```
-**References:** [CommandSchema](./core.commandschema.md)
 
+**References:** [CommandSchema](./core.commandschema.md)

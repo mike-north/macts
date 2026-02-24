@@ -18,30 +18,24 @@ create(input: ParticipantCreateInput): Promise<Participant>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ParticipantCreateInput](./messages.participantcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Participant](./messages.participant.md)<!-- -->&gt;
-

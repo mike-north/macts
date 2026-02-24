@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-BrowserWindowSchema: z.ZodObject<{
-    selection: z.ZodString;
-    view: z.ZodString;
-}, z.core.$strip>
+BrowserWindowSchema: z.ZodObject<
+  {
+    selection: z.ZodString
+    view: z.ZodString
+  },
+  z.core.$strip
+>
 ```

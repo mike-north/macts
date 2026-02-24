@@ -11,7 +11,7 @@ Open the specified object(s)
 ```typescript
 open(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

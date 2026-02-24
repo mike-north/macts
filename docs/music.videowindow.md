@@ -9,7 +9,7 @@ the video window
 **Signature:**
 
 ```typescript
-interface VideoWindow 
+interface VideoWindow
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface VideoWindow
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.videowindow.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this window
 
-
 </td></tr>
 </tbody></table>
-

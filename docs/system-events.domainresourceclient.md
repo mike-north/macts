@@ -9,7 +9,7 @@ Client for a domain in the file system.
 **Signature:**
 
 ```typescript
-declare class DomainResourceClient 
+declare class DomainResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DomainResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.domainresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DomainResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DomainResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.domainresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new domain.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.domainresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a domain.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.domainresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a domain by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.domainresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all domains.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.domainresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing domain.
 
-
 </td></tr>
 </tbody></table>
-

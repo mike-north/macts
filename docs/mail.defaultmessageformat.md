@@ -9,5 +9,5 @@ DefaultMessageFormat
 **Signature:**
 
 ```typescript
-type DefaultMessageFormat = 'plainFormat' | 'richFormat';
+type DefaultMessageFormat = 'plainFormat' | 'richFormat'
 ```

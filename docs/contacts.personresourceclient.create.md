@@ -18,30 +18,24 @@ create(input: PersonCreateInput): Promise<Person>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PersonCreateInput](./contacts.personcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Person](./contacts.person.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ Input for creating a GrowArea
 **Signature:**
 
 ```typescript
-interface GrowAreaCreateInput 
+interface GrowAreaCreateInput
 ```

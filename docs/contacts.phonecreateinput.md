@@ -9,7 +9,7 @@ Input for creating a Phone
 **Signature:**
 
 ```typescript
-interface PhoneCreateInput 
+interface PhoneCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface PhoneCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.phonecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this phone
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.phonecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The phone number
 
-
 </td></tr>
 </tbody></table>
-

@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import type { AppManifest } from '@macts/core';
+import type { AppManifest } from '@macts/core'
 
 /**
  * API plugin for iTerm.app.
@@ -18,1032 +18,1023 @@ export const iTermApiPlugin = {
   name: 'iterm',
   bundleId: 'com.googlecode.iterm2',
   manifest: {
-  "version": "1.0",
-  "app": {
-    "bundleId": "com.googlecode.iterm2",
-    "name": "iTerm",
-    "displayName": "iTerm",
-    "tccEntitlements": [
-      "automation"
+    version: '1.0',
+    app: {
+      bundleId: 'com.googlecode.iterm2',
+      name: 'iTerm',
+      displayName: 'iTerm',
+      tccEntitlements: ['automation'],
+      distributionModel: 'system',
+    },
+    suites: [
+      {
+        name: 'Standard Suite',
+        description: 'Common classes and commands for all applications.',
+        code: '????',
+        resources: ['Window'],
+        commands: ['count', 'delete', 'duplicate', 'exists', 'make', 'move'],
+        enums: ['SaveOptions'],
+      },
+      {
+        name: 'iTerm2 Suite',
+        description: 'Classes just for the iTerm2 application.',
+        code: 'Itrm',
+        resources: ['Tab', 'Session'],
+        commands: [
+          'close',
+          'requestCookie',
+          'createTab',
+          'createTabWithDefaultProfile',
+          'createWindowWithProfile',
+          'createHotkeyWindowWithProfile',
+          'launchAPIScriptNamed',
+          'invokeAPIExpression',
+          'createWindowWithDefaultProfile',
+          'write',
+          'select',
+          'splitVertically',
+          'splitVerticallyWithDefaultProfile',
+          'splitVerticallyWithSameProfile',
+          'splitHorizontally',
+          'splitHorizontallyWithDefaultProfile',
+          'splitHorizontallyWithSameProfile',
+          'variable',
+          'setVariable',
+          'revealHotkeyWindow',
+          'hideHotkeyWindow',
+          'toggleHotkeyWindow',
+        ],
+        enums: [],
+      },
     ],
-    "distributionModel": "system"
-  },
-  "suites": [
-    {
-      "name": "Standard Suite",
-      "description": "Common classes and commands for all applications.",
-      "code": "????",
-      "resources": [
-        "Window"
-      ],
-      "commands": [
-        "count",
-        "delete",
-        "duplicate",
-        "exists",
-        "make",
-        "move"
-      ],
-      "enums": [
-        "SaveOptions"
-      ]
-    },
-    {
-      "name": "iTerm2 Suite",
-      "description": "Classes just for the iTerm2 application.",
-      "code": "Itrm",
-      "resources": [
-        "Tab",
-        "Session"
-      ],
-      "commands": [
-        "close",
-        "requestCookie",
-        "createTab",
-        "createTabWithDefaultProfile",
-        "createWindowWithProfile",
-        "createHotkeyWindowWithProfile",
-        "launchAPIScriptNamed",
-        "invokeAPIExpression",
-        "createWindowWithDefaultProfile",
-        "write",
-        "select",
-        "splitVertically",
-        "splitVerticallyWithDefaultProfile",
-        "splitVerticallyWithSameProfile",
-        "splitHorizontally",
-        "splitHorizontallyWithDefaultProfile",
-        "splitHorizontallyWithSameProfile",
-        "variable",
-        "setVariable",
-        "revealHotkeyWindow",
-        "hideHotkeyWindow",
-        "toggleHotkeyWindow"
-      ],
-      "enums": []
-    }
-  ],
-  "resources": {
-    "Window": {
-      "name": "Window",
-      "plural": "Windows",
-      "description": "A window.",
-      "code": "cwin",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "integer",
-          "description": "The unique identifier of the session.",
-          "code": "ID  ",
-          "optional": false
-        },
-        "alternateIdentifier": {
-          "access": "r",
-          "type": "string",
-          "description": "The alternate unique identifier of the session.",
-          "code": "Twid",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The full title of the window.",
-          "code": "pnam",
-          "optional": false
-        },
-        "index": {
-          "access": "rw",
-          "type": "integer",
-          "description": "The index of the window, ordered front to back.",
-          "code": "pidx",
-          "optional": false
-        },
-        "bounds": {
-          "access": "rw",
-          "type": "rect",
-          "description": "The bounding rectangle of the window.",
-          "code": "pbnd",
-          "optional": false
-        },
-        "closeable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the window has a close box.",
-          "code": "hclb",
-          "optional": false
-        },
-        "miniaturizable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the window can be minimized.",
-          "code": "ismn",
-          "optional": false
-        },
-        "miniaturized": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is currently minimized.",
-          "code": "pmnd",
-          "optional": false
-        },
-        "resizable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the window can be resized.",
-          "code": "prsz",
-          "optional": false
-        },
-        "visible": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is currently visible.",
-          "code": "pvis",
-          "optional": false
-        },
-        "zoomable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the window can be zoomed.",
-          "code": "iszm",
-          "optional": false
-        },
-        "zoomed": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is currently zoomed.",
-          "code": "pzum",
-          "optional": false
-        },
-        "frontmost": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is currently the frontmost window.",
-          "code": "pisf",
-          "optional": false
-        },
-        "currentTab": {
-          "access": "rw",
-          "type": {
-            "resource": "tab"
+    resources: {
+      Window: {
+        name: 'Window',
+        plural: 'Windows',
+        description: 'A window.',
+        code: 'cwin',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'integer',
+            description: 'The unique identifier of the session.',
+            code: 'ID  ',
+            optional: false,
           },
-          "description": "The currently selected tab",
-          "code": "Crtb",
-          "optional": false
-        },
-        "currentSession": {
-          "access": "rw",
-          "type": {
-            "resource": "session"
+          alternateIdentifier: {
+            access: 'r',
+            type: 'string',
+            description: 'The alternate unique identifier of the session.',
+            code: 'Twid',
+            optional: false,
           },
-          "description": "The current session in a window",
-          "code": "Wcsn",
-          "optional": false
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The full title of the window.',
+            code: 'pnam',
+            optional: false,
+          },
+          index: {
+            access: 'rw',
+            type: 'integer',
+            description: 'The index of the window, ordered front to back.',
+            code: 'pidx',
+            optional: false,
+          },
+          bounds: {
+            access: 'rw',
+            type: 'rect',
+            description: 'The bounding rectangle of the window.',
+            code: 'pbnd',
+            optional: false,
+          },
+          closeable: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the window has a close box.',
+            code: 'hclb',
+            optional: false,
+          },
+          miniaturizable: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the window can be minimized.',
+            code: 'ismn',
+            optional: false,
+          },
+          miniaturized: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is currently minimized.',
+            code: 'pmnd',
+            optional: false,
+          },
+          resizable: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the window can be resized.',
+            code: 'prsz',
+            optional: false,
+          },
+          visible: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is currently visible.',
+            code: 'pvis',
+            optional: false,
+          },
+          zoomable: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the window can be zoomed.',
+            code: 'iszm',
+            optional: false,
+          },
+          zoomed: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is currently zoomed.',
+            code: 'pzum',
+            optional: false,
+          },
+          frontmost: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is currently the frontmost window.',
+            code: 'pisf',
+            optional: false,
+          },
+          currentTab: {
+            access: 'rw',
+            type: {
+              resource: 'tab',
+            },
+            description: 'The currently selected tab',
+            code: 'Crtb',
+            optional: false,
+          },
+          currentSession: {
+            access: 'rw',
+            type: {
+              resource: 'session',
+            },
+            description: 'The current session in a window',
+            code: 'Wcsn',
+            optional: false,
+          },
+          isHotkeyWindow: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is a hotkey window.',
+            code: 'ihkw',
+            optional: false,
+          },
+          hotkeyWindowProfile: {
+            access: 'rw',
+            type: 'string',
+            description:
+              'If the window is a hotkey window, this gives the name of the profile that created the window.',
+            code: 'hkwp',
+            optional: false,
+          },
+          position: {
+            access: 'rw',
+            type: 'point',
+            description:
+              'The position of the window, relative to the upper left corner of the screen.',
+            code: 'ppos',
+            optional: false,
+          },
+          origin: {
+            access: 'rw',
+            type: 'point',
+            description:
+              'The position of the window, relative to the lower left corner of the screen.',
+            code: 'pori',
+            optional: false,
+          },
+          size: {
+            access: 'rw',
+            type: 'point',
+            description: 'The width and height of the window',
+            code: 'psiz',
+            optional: false,
+          },
+          frame: {
+            access: 'rw',
+            type: 'rect',
+            description: 'The bounding rectangle, relative to the lower left corner of the screen.',
+            code: 'pfra',
+            optional: false,
+          },
         },
-        "isHotkeyWindow": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is a hotkey window.",
-          "code": "ihkw",
-          "optional": false
-        },
-        "hotkeyWindowProfile": {
-          "access": "rw",
-          "type": "string",
-          "description": "If the window is a hotkey window, this gives the name of the profile that created the window.",
-          "code": "hkwp",
-          "optional": false
-        },
-        "position": {
-          "access": "rw",
-          "type": "point",
-          "description": "The position of the window, relative to the upper left corner of the screen.",
-          "code": "ppos",
-          "optional": false
-        },
-        "origin": {
-          "access": "rw",
-          "type": "point",
-          "description": "The position of the window, relative to the lower left corner of the screen.",
-          "code": "pori",
-          "optional": false
-        },
-        "size": {
-          "access": "rw",
-          "type": "point",
-          "description": "The width and height of the window",
-          "code": "psiz",
-          "optional": false
-        },
-        "frame": {
-          "access": "rw",
-          "type": "rect",
-          "description": "The bounding rectangle, relative to the lower left corner of the screen.",
-          "code": "pfra",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "Tab": {
-      "name": "Tab",
-      "plural": "Tabs",
-      "description": "A terminal tab",
-      "code": "Trmt",
-      "properties": {
-        "currentSession": {
-          "access": "rw",
-          "type": {
-            "resource": "session"
+      Tab: {
+        name: 'Tab',
+        plural: 'Tabs',
+        description: 'A terminal tab',
+        code: 'Trmt',
+        properties: {
+          currentSession: {
+            access: 'rw',
+            type: {
+              resource: 'session',
+            },
+            description: 'The current session in a tab',
+            code: 'Wcsn',
+            optional: false,
           },
-          "description": "The current session in a tab",
-          "code": "Wcsn",
-          "optional": false
+          index: {
+            access: 'rw',
+            type: 'integer',
+            description: 'Index of tab in parent tab view control',
+            code: 'Indx',
+            optional: false,
+          },
+          title: {
+            access: 'rw',
+            type: 'string',
+            description: 'The title property',
+            code: 'titl',
+            optional: false,
+          },
         },
-        "index": {
-          "access": "rw",
-          "type": "integer",
-          "description": "Index of tab in parent tab view control",
-          "code": "Indx",
-          "optional": false
-        },
-        "title": {
-          "access": "rw",
-          "type": "string",
-          "description": "The title property",
-          "code": "titl",
-          "optional": false
-        }
-      }
-    },
-    "Session": {
-      "name": "Session",
-      "plural": "Sessions",
-      "description": "A terminal session",
-      "code": "Trms",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the session.",
-          "code": "ID  ",
-          "optional": false
-        },
-        "isProcessing": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "The session has received output recently.",
-          "code": "Prcs",
-          "optional": false
-        },
-        "isAtShellPrompt": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "The terminal is at the shell prompt. Requires shell integration.",
-          "code": "Iaps",
-          "optional": false
-        },
-        "columns": {
-          "access": "rw",
-          "type": "integer",
-          "description": "The columns property",
-          "code": "Cols",
-          "optional": false
-        },
-        "rows": {
-          "access": "rw",
-          "type": "integer",
-          "description": "The rows property",
-          "code": "Rows",
-          "optional": false
-        },
-        "tty": {
-          "access": "r",
-          "type": "string",
-          "description": "The tty property",
-          "code": "Stty",
-          "optional": false
-        },
-        "contents": {
-          "access": "rw",
-          "type": "string",
-          "description": "The currently visible contents of the session.",
-          "code": "Cntt",
-          "optional": false
-        },
-        "text": {
-          "access": "r",
-          "type": "string",
-          "description": "The currently visible contents of the session.",
-          "code": "pcnt",
-          "optional": false
-        },
-        "colorPreset": {
-          "access": "rw",
-          "type": "string",
-          "description": "The colorPreset property",
-          "code": "Copr",
-          "optional": false
-        },
-        "backgroundColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The backgroundColor property",
-          "code": "Co00",
-          "optional": false
-        },
-        "boldColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The boldColor property",
-          "code": "Co01",
-          "optional": false
-        },
-        "cursorColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The cursorColor property",
-          "code": "Co02",
-          "optional": false
-        },
-        "cursorTextColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The cursorTextColor property",
-          "code": "Co03",
-          "optional": false
-        },
-        "foregroundColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The foregroundColor property",
-          "code": "Co04",
-          "optional": false
-        },
-        "selectedTextColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The selectedTextColor property",
-          "code": "Co05",
-          "optional": false
-        },
-        "selectionColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The selectionColor property",
-          "code": "Co06",
-          "optional": false
-        },
-        "aNSIBlackColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBlackColor property",
-          "code": "Co07",
-          "optional": false
-        },
-        "aNSIRedColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIRedColor property",
-          "code": "Co08",
-          "optional": false
-        },
-        "aNSIGreenColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIGreenColor property",
-          "code": "Co09",
-          "optional": false
-        },
-        "aNSIYellowColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIYellowColor property",
-          "code": "Co10",
-          "optional": false
-        },
-        "aNSIBlueColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBlueColor property",
-          "code": "Co11",
-          "optional": false
-        },
-        "aNSIMagentaColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIMagentaColor property",
-          "code": "Co12",
-          "optional": false
-        },
-        "aNSICyanColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSICyanColor property",
-          "code": "Co13",
-          "optional": false
-        },
-        "aNSIWhiteColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIWhiteColor property",
-          "code": "Co14",
-          "optional": false
-        },
-        "aNSIBrightBlackColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightBlackColor property",
-          "code": "Co15",
-          "optional": false
-        },
-        "aNSIBrightRedColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightRedColor property",
-          "code": "Co16",
-          "optional": false
-        },
-        "aNSIBrightGreenColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightGreenColor property",
-          "code": "Co17",
-          "optional": false
-        },
-        "aNSIBrightYellowColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightYellowColor property",
-          "code": "Co18",
-          "optional": false
-        },
-        "aNSIBrightBlueColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightBlueColor property",
-          "code": "Co19",
-          "optional": false
-        },
-        "aNSIBrightMagentaColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightMagentaColor property",
-          "code": "Co20",
-          "optional": false
-        },
-        "aNSIBrightCyanColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightCyanColor property",
-          "code": "Co21",
-          "optional": false
-        },
-        "aNSIBrightWhiteColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The aNSIBrightWhiteColor property",
-          "code": "Co22",
-          "optional": false
-        },
-        "underlineColor": {
-          "access": "rw",
-          "type": "rgb",
-          "description": "The underlineColor property",
-          "code": "Co23",
-          "optional": false
-        },
-        "useUnderlineColor": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the use a dedicated color for underlining.",
-          "code": "Undl",
-          "optional": false
-        },
-        "backgroundImage": {
-          "access": "rw",
-          "type": "string",
-          "description": "The backgroundImage property",
-          "code": "Bgim",
-          "optional": false
-        },
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "The name property",
-          "code": "pnam",
-          "optional": false
-        },
-        "transparency": {
-          "access": "rw",
-          "type": "number",
-          "description": "The transparency property",
-          "code": "Trns",
-          "optional": false
-        },
-        "uniqueID": {
-          "access": "r",
-          "type": "string",
-          "description": "The uniqueID property",
-          "code": "Uniq",
-          "optional": false
-        },
-        "profileName": {
-          "access": "r",
-          "type": "string",
-          "description": "The session's profile name",
-          "code": "Pfnm",
-          "optional": false
-        },
-        "answerbackString": {
-          "access": "rw",
-          "type": "string",
-          "description": "ENQ Answerback string",
-          "code": "Answ",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    }
-  },
-  "enums": {
-    "SaveOptions": {
-      "name": "SaveOptions",
-      "code": "savo",
-      "values": [
-        {
-          "name": "Yes",
-          "value": "yes",
-          "description": "Save the file.",
-          "code": "yes "
+      Session: {
+        name: 'Session',
+        plural: 'Sessions',
+        description: 'A terminal session',
+        code: 'Trms',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the session.',
+            code: 'ID  ',
+            optional: false,
+          },
+          isProcessing: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'The session has received output recently.',
+            code: 'Prcs',
+            optional: false,
+          },
+          isAtShellPrompt: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'The terminal is at the shell prompt. Requires shell integration.',
+            code: 'Iaps',
+            optional: false,
+          },
+          columns: {
+            access: 'rw',
+            type: 'integer',
+            description: 'The columns property',
+            code: 'Cols',
+            optional: false,
+          },
+          rows: {
+            access: 'rw',
+            type: 'integer',
+            description: 'The rows property',
+            code: 'Rows',
+            optional: false,
+          },
+          tty: {
+            access: 'r',
+            type: 'string',
+            description: 'The tty property',
+            code: 'Stty',
+            optional: false,
+          },
+          contents: {
+            access: 'rw',
+            type: 'string',
+            description: 'The currently visible contents of the session.',
+            code: 'Cntt',
+            optional: false,
+          },
+          text: {
+            access: 'r',
+            type: 'string',
+            description: 'The currently visible contents of the session.',
+            code: 'pcnt',
+            optional: false,
+          },
+          colorPreset: {
+            access: 'rw',
+            type: 'string',
+            description: 'The colorPreset property',
+            code: 'Copr',
+            optional: false,
+          },
+          backgroundColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The backgroundColor property',
+            code: 'Co00',
+            optional: false,
+          },
+          boldColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The boldColor property',
+            code: 'Co01',
+            optional: false,
+          },
+          cursorColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The cursorColor property',
+            code: 'Co02',
+            optional: false,
+          },
+          cursorTextColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The cursorTextColor property',
+            code: 'Co03',
+            optional: false,
+          },
+          foregroundColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The foregroundColor property',
+            code: 'Co04',
+            optional: false,
+          },
+          selectedTextColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The selectedTextColor property',
+            code: 'Co05',
+            optional: false,
+          },
+          selectionColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The selectionColor property',
+            code: 'Co06',
+            optional: false,
+          },
+          aNSIBlackColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBlackColor property',
+            code: 'Co07',
+            optional: false,
+          },
+          aNSIRedColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIRedColor property',
+            code: 'Co08',
+            optional: false,
+          },
+          aNSIGreenColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIGreenColor property',
+            code: 'Co09',
+            optional: false,
+          },
+          aNSIYellowColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIYellowColor property',
+            code: 'Co10',
+            optional: false,
+          },
+          aNSIBlueColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBlueColor property',
+            code: 'Co11',
+            optional: false,
+          },
+          aNSIMagentaColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIMagentaColor property',
+            code: 'Co12',
+            optional: false,
+          },
+          aNSICyanColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSICyanColor property',
+            code: 'Co13',
+            optional: false,
+          },
+          aNSIWhiteColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIWhiteColor property',
+            code: 'Co14',
+            optional: false,
+          },
+          aNSIBrightBlackColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightBlackColor property',
+            code: 'Co15',
+            optional: false,
+          },
+          aNSIBrightRedColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightRedColor property',
+            code: 'Co16',
+            optional: false,
+          },
+          aNSIBrightGreenColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightGreenColor property',
+            code: 'Co17',
+            optional: false,
+          },
+          aNSIBrightYellowColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightYellowColor property',
+            code: 'Co18',
+            optional: false,
+          },
+          aNSIBrightBlueColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightBlueColor property',
+            code: 'Co19',
+            optional: false,
+          },
+          aNSIBrightMagentaColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightMagentaColor property',
+            code: 'Co20',
+            optional: false,
+          },
+          aNSIBrightCyanColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightCyanColor property',
+            code: 'Co21',
+            optional: false,
+          },
+          aNSIBrightWhiteColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The aNSIBrightWhiteColor property',
+            code: 'Co22',
+            optional: false,
+          },
+          underlineColor: {
+            access: 'rw',
+            type: 'rgb',
+            description: 'The underlineColor property',
+            code: 'Co23',
+            optional: false,
+          },
+          useUnderlineColor: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the use a dedicated color for underlining.',
+            code: 'Undl',
+            optional: false,
+          },
+          backgroundImage: {
+            access: 'rw',
+            type: 'string',
+            description: 'The backgroundImage property',
+            code: 'Bgim',
+            optional: false,
+          },
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'The name property',
+            code: 'pnam',
+            optional: false,
+          },
+          transparency: {
+            access: 'rw',
+            type: 'number',
+            description: 'The transparency property',
+            code: 'Trns',
+            optional: false,
+          },
+          uniqueID: {
+            access: 'r',
+            type: 'string',
+            description: 'The uniqueID property',
+            code: 'Uniq',
+            optional: false,
+          },
+          profileName: {
+            access: 'r',
+            type: 'string',
+            description: "The session's profile name",
+            code: 'Pfnm',
+            optional: false,
+          },
+          answerbackString: {
+            access: 'rw',
+            type: 'string',
+            description: 'ENQ Answerback string',
+            code: 'Answ',
+            optional: false,
+          },
         },
-        {
-          "name": "No",
-          "value": "no",
-          "description": "Do not save the file.",
-          "code": "no  "
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+    },
+    enums: {
+      SaveOptions: {
+        name: 'SaveOptions',
+        code: 'savo',
+        values: [
+          {
+            name: 'Yes',
+            value: 'yes',
+            description: 'Save the file.',
+            code: 'yes ',
+          },
+          {
+            name: 'No',
+            value: 'no',
+            description: 'Do not save the file.',
+            code: 'no  ',
+          },
+          {
+            name: 'Ask',
+            value: 'ask',
+            description: 'Ask the user whether or not to save the file.',
+            code: 'ask ',
+          },
+        ],
+      },
+    },
+    hierarchy: {
+      children: {
+        windows: {
+          resource: 'Window',
+          access: 'r',
+          description: 'A window.',
+          children: {
+            tabs: {
+              resource: 'Tab',
+              access: 'r',
+              description: 'A terminal tab',
+              children: {
+                sessions: {
+                  resource: 'Session',
+                  access: 'r',
+                  description: 'A terminal session',
+                },
+              },
+            },
+          },
         },
-        {
-          "name": "Ask",
-          "value": "ask",
-          "description": "Ask the user whether or not to save the file.",
-          "code": "ask "
-        }
-      ]
-    }
-  },
-  "hierarchy": {
-    "children": {
-      "windows": {
-        "resource": "Window",
-        "access": "r",
-        "description": "A window.",
-        "children": {
-          "tabs": {
-            "resource": "Tab",
-            "access": "r",
-            "description": "A terminal tab",
-            "children": {
-              "sessions": {
-                "resource": "Session",
-                "access": "r",
-                "description": "A terminal session"
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "relationships": [],
-  "commands": {
-    "count": {
-      "name": "count",
-      "description": "Return the number of elements of a particular class within an object.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "each",
-          "type": "string",
-          "description": "The class of objects to be counted.",
-          "required": false,
-          "code": "kocl"
-        }
-      ],
-      "code": "cnte"
+      },
     },
-    "delete": {
-      "name": "delete",
-      "description": "Delete an object.",
-      "scope": "application",
-      "parameters": [],
-      "code": "delo"
+    relationships: [],
+    commands: {
+      count: {
+        name: 'count',
+        description: 'Return the number of elements of a particular class within an object.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'each',
+            type: 'string',
+            description: 'The class of objects to be counted.',
+            required: false,
+            code: 'kocl',
+          },
+        ],
+        code: 'cnte',
+      },
+      delete: {
+        name: 'delete',
+        description: 'Delete an object.',
+        scope: 'application',
+        parameters: [],
+        code: 'delo',
+      },
+      duplicate: {
+        name: 'duplicate',
+        description: 'Copy object(s) and put the copies at a new location.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'to',
+            type: 'string',
+            description: 'The location for the new object(s).',
+            required: true,
+            code: 'insh',
+          },
+          {
+            name: 'withProperties',
+            type: 'any',
+            description: 'Properties to be set in the new duplicated object(s).',
+            required: false,
+            code: 'prdt',
+          },
+        ],
+        code: 'clon',
+      },
+      exists: {
+        name: 'exists',
+        description: 'Verify if an object exists.',
+        scope: 'application',
+        parameters: [],
+        code: 'doex',
+      },
+      make: {
+        name: 'make',
+        description: 'Make a new object.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'new',
+            type: 'string',
+            description: 'The class of the new object.',
+            required: true,
+            code: 'kocl',
+          },
+          {
+            name: 'at',
+            type: 'string',
+            description: 'The location at which to insert the object.',
+            required: false,
+            code: 'insh',
+          },
+          {
+            name: 'withData',
+            type: 'any',
+            description: 'The initial contents of the object.',
+            required: false,
+            code: 'data',
+          },
+          {
+            name: 'withProperties',
+            type: 'any',
+            description: 'The initial values for properties of the object.',
+            required: false,
+            code: 'prdt',
+          },
+        ],
+        code: 'crel',
+      },
+      move: {
+        name: 'move',
+        description: 'Move object(s) to a new location.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'to',
+            type: 'string',
+            description: 'The new location for the object(s).',
+            required: true,
+            code: 'insh',
+          },
+        ],
+        code: 'move',
+      },
+      close: {
+        name: 'close',
+        description: 'Close a document.',
+        scope: 'application',
+        parameters: [],
+        code: 'clos',
+      },
+      requestCookie: {
+        name: 'requestCookie',
+        description: 'Request a Python API cookie',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'andKeyForAppNamed',
+            type: 'string',
+            description: 'Name of script using the cookie. This is shown in the console.',
+            required: false,
+            code: 'Rcsn',
+          },
+        ],
+        code: 'rqck',
+      },
+      createTab: {
+        name: 'createTab',
+        description: 'Create a new tab',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'withProfile',
+            type: 'string',
+            description: 'The profile name',
+            required: true,
+            code: 'Ntwp',
+          },
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'ntwp',
+      },
+      createTabWithDefaultProfile: {
+        name: 'createTabWithDefaultProfile',
+        description: 'Create a new tab with the default profile',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'ntwn',
+      },
+      createWindowWithProfile: {
+        name: 'createWindowWithProfile',
+        description: 'Create a new window',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'nwwp',
+      },
+      createHotkeyWindowWithProfile: {
+        name: 'createHotkeyWindowWithProfile',
+        description: 'Create a hotkey window',
+        scope: 'application',
+        parameters: [],
+        code: 'nhwp',
+      },
+      launchAPIScriptNamed: {
+        name: 'launchAPIScriptNamed',
+        description: 'Launch API script by name',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'arguments',
+            type: 'string',
+            description: 'Arguments to pass to script',
+            required: false,
+            code: 'Asar',
+          },
+        ],
+        code: 'lasn',
+      },
+      invokeAPIExpression: {
+        name: 'invokeAPIExpression',
+        description: 'Invokes an expression, such as a registered function.',
+        scope: 'application',
+        parameters: [],
+        code: 'iaex',
+      },
+      createWindowWithDefaultProfile: {
+        name: 'createWindowWithDefaultProfile',
+        description: 'Create a new window with the default profile',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'nwwn',
+      },
+      write: {
+        name: 'write',
+        description: 'Send text as though it was typed.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'contentsOfFile',
+            type: 'file',
+            description: 'Filename to send the contents of',
+            required: false,
+            code: 'Cofl',
+          },
+          {
+            name: 'text',
+            type: 'string',
+            description: 'Text to send',
+            required: false,
+            code: 'Text',
+          },
+          {
+            name: 'newline',
+            type: 'boolean',
+            description: 'If newline should be added to end of text (default: yes)',
+            required: false,
+            code: 'Wtnl',
+          },
+        ],
+        code: 'sntx',
+      },
+      select: {
+        name: 'select',
+        description: 'Make receiver visible and selected.',
+        scope: 'application',
+        parameters: [],
+        code: 'slct',
+      },
+      splitVertically: {
+        name: 'splitVertically',
+        description: 'Split a session vertically.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'withProfile',
+            type: 'string',
+            description: 'Name of profile for new session.',
+            required: true,
+            code: 'Prfl',
+          },
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'splv',
+      },
+      splitVerticallyWithDefaultProfile: {
+        name: 'splitVerticallyWithDefaultProfile',
+        description: 'Split a session vertically, using the default profile for the new session',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'svdp',
+      },
+      splitVerticallyWithSameProfile: {
+        name: 'splitVerticallyWithSameProfile',
+        description:
+          "Split a session vertically, using the original session's profile for the new session",
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'svsp',
+      },
+      splitHorizontally: {
+        name: 'splitHorizontally',
+        description: 'Split a session horizontally.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'withProfile',
+            type: 'string',
+            description: 'Name of profile for new session.',
+            required: true,
+            code: 'Prfl',
+          },
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'splh',
+      },
+      splitHorizontallyWithDefaultProfile: {
+        name: 'splitHorizontallyWithDefaultProfile',
+        description: 'Split a session horizontally, using the default profile for the new session',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'shdp',
+      },
+      splitHorizontallyWithSameProfile: {
+        name: 'splitHorizontallyWithSameProfile',
+        description:
+          "Split a session horizontally, using the original session's profile for the new session",
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'Shell command to run',
+            required: false,
+            code: 'Nwcm',
+          },
+        ],
+        code: 'shsp',
+      },
+      variable: {
+        name: 'variable',
+        description: 'Returns the value of a session variable with the given name',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'named',
+            type: 'string',
+            description: 'Name of variable',
+            required: true,
+            code: 'Namd',
+          },
+        ],
+        code: 'varb',
+      },
+      setVariable: {
+        name: 'setVariable',
+        description: 'Sets the value of a session variable',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'named',
+            type: 'string',
+            description: 'Name of variable',
+            required: true,
+            code: 'Namd',
+          },
+          {
+            name: 'to',
+            type: 'string',
+            description: 'New value',
+            required: true,
+            code: 'Tovl',
+          },
+        ],
+        code: 'svar',
+      },
+      revealHotkeyWindow: {
+        name: 'revealHotkeyWindow',
+        description:
+          'Reveals a hotkey window. Only to be called on windows that are hotkey windows.',
+        scope: 'application',
+        parameters: [],
+        code: 'rhkw',
+      },
+      hideHotkeyWindow: {
+        name: 'hideHotkeyWindow',
+        description: 'Hides a hotkey window. Only to be called on windows that are hotkey windows.',
+        scope: 'application',
+        parameters: [],
+        code: 'hhkw',
+      },
+      toggleHotkeyWindow: {
+        name: 'toggleHotkeyWindow',
+        description:
+          'Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.',
+        scope: 'application',
+        parameters: [],
+        code: 'thkw',
+      },
     },
-    "duplicate": {
-      "name": "duplicate",
-      "description": "Copy object(s) and put the copies at a new location.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "to",
-          "type": "string",
-          "description": "The location for the new object(s).",
-          "required": true,
-          "code": "insh"
-        },
-        {
-          "name": "withProperties",
-          "type": "any",
-          "description": "Properties to be set in the new duplicated object(s).",
-          "required": false,
-          "code": "prdt"
-        }
-      ],
-      "code": "clon"
-    },
-    "exists": {
-      "name": "exists",
-      "description": "Verify if an object exists.",
-      "scope": "application",
-      "parameters": [],
-      "code": "doex"
-    },
-    "make": {
-      "name": "make",
-      "description": "Make a new object.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "new",
-          "type": "string",
-          "description": "The class of the new object.",
-          "required": true,
-          "code": "kocl"
-        },
-        {
-          "name": "at",
-          "type": "string",
-          "description": "The location at which to insert the object.",
-          "required": false,
-          "code": "insh"
-        },
-        {
-          "name": "withData",
-          "type": "any",
-          "description": "The initial contents of the object.",
-          "required": false,
-          "code": "data"
-        },
-        {
-          "name": "withProperties",
-          "type": "any",
-          "description": "The initial values for properties of the object.",
-          "required": false,
-          "code": "prdt"
-        }
-      ],
-      "code": "crel"
-    },
-    "move": {
-      "name": "move",
-      "description": "Move object(s) to a new location.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "to",
-          "type": "string",
-          "description": "The new location for the object(s).",
-          "required": true,
-          "code": "insh"
-        }
-      ],
-      "code": "move"
-    },
-    "close": {
-      "name": "close",
-      "description": "Close a document.",
-      "scope": "application",
-      "parameters": [],
-      "code": "clos"
-    },
-    "requestCookie": {
-      "name": "requestCookie",
-      "description": "Request a Python API cookie",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "andKeyForAppNamed",
-          "type": "string",
-          "description": "Name of script using the cookie. This is shown in the console.",
-          "required": false,
-          "code": "Rcsn"
-        }
-      ],
-      "code": "rqck"
-    },
-    "createTab": {
-      "name": "createTab",
-      "description": "Create a new tab",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "withProfile",
-          "type": "string",
-          "description": "The profile name",
-          "required": true,
-          "code": "Ntwp"
-        },
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "ntwp"
-    },
-    "createTabWithDefaultProfile": {
-      "name": "createTabWithDefaultProfile",
-      "description": "Create a new tab with the default profile",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "ntwn"
-    },
-    "createWindowWithProfile": {
-      "name": "createWindowWithProfile",
-      "description": "Create a new window",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "nwwp"
-    },
-    "createHotkeyWindowWithProfile": {
-      "name": "createHotkeyWindowWithProfile",
-      "description": "Create a hotkey window",
-      "scope": "application",
-      "parameters": [],
-      "code": "nhwp"
-    },
-    "launchAPIScriptNamed": {
-      "name": "launchAPIScriptNamed",
-      "description": "Launch API script by name",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "arguments",
-          "type": "string",
-          "description": "Arguments to pass to script",
-          "required": false,
-          "code": "Asar"
-        }
-      ],
-      "code": "lasn"
-    },
-    "invokeAPIExpression": {
-      "name": "invokeAPIExpression",
-      "description": "Invokes an expression, such as a registered function.",
-      "scope": "application",
-      "parameters": [],
-      "code": "iaex"
-    },
-    "createWindowWithDefaultProfile": {
-      "name": "createWindowWithDefaultProfile",
-      "description": "Create a new window with the default profile",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "nwwn"
-    },
-    "write": {
-      "name": "write",
-      "description": "Send text as though it was typed.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "contentsOfFile",
-          "type": "file",
-          "description": "Filename to send the contents of",
-          "required": false,
-          "code": "Cofl"
-        },
-        {
-          "name": "text",
-          "type": "string",
-          "description": "Text to send",
-          "required": false,
-          "code": "Text"
-        },
-        {
-          "name": "newline",
-          "type": "boolean",
-          "description": "If newline should be added to end of text (default: yes)",
-          "required": false,
-          "code": "Wtnl"
-        }
-      ],
-      "code": "sntx"
-    },
-    "select": {
-      "name": "select",
-      "description": "Make receiver visible and selected.",
-      "scope": "application",
-      "parameters": [],
-      "code": "slct"
-    },
-    "splitVertically": {
-      "name": "splitVertically",
-      "description": "Split a session vertically.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "withProfile",
-          "type": "string",
-          "description": "Name of profile for new session.",
-          "required": true,
-          "code": "Prfl"
-        },
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "splv"
-    },
-    "splitVerticallyWithDefaultProfile": {
-      "name": "splitVerticallyWithDefaultProfile",
-      "description": "Split a session vertically, using the default profile for the new session",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "svdp"
-    },
-    "splitVerticallyWithSameProfile": {
-      "name": "splitVerticallyWithSameProfile",
-      "description": "Split a session vertically, using the original session's profile for the new session",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "svsp"
-    },
-    "splitHorizontally": {
-      "name": "splitHorizontally",
-      "description": "Split a session horizontally.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "withProfile",
-          "type": "string",
-          "description": "Name of profile for new session.",
-          "required": true,
-          "code": "Prfl"
-        },
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "splh"
-    },
-    "splitHorizontallyWithDefaultProfile": {
-      "name": "splitHorizontallyWithDefaultProfile",
-      "description": "Split a session horizontally, using the default profile for the new session",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "shdp"
-    },
-    "splitHorizontallyWithSameProfile": {
-      "name": "splitHorizontallyWithSameProfile",
-      "description": "Split a session horizontally, using the original session's profile for the new session",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "Shell command to run",
-          "required": false,
-          "code": "Nwcm"
-        }
-      ],
-      "code": "shsp"
-    },
-    "variable": {
-      "name": "variable",
-      "description": "Returns the value of a session variable with the given name",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "named",
-          "type": "string",
-          "description": "Name of variable",
-          "required": true,
-          "code": "Namd"
-        }
-      ],
-      "code": "varb"
-    },
-    "setVariable": {
-      "name": "setVariable",
-      "description": "Sets the value of a session variable",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "named",
-          "type": "string",
-          "description": "Name of variable",
-          "required": true,
-          "code": "Namd"
-        },
-        {
-          "name": "to",
-          "type": "string",
-          "description": "New value",
-          "required": true,
-          "code": "Tovl"
-        }
-      ],
-      "code": "svar"
-    },
-    "revealHotkeyWindow": {
-      "name": "revealHotkeyWindow",
-      "description": "Reveals a hotkey window. Only to be called on windows that are hotkey windows.",
-      "scope": "application",
-      "parameters": [],
-      "code": "rhkw"
-    },
-    "hideHotkeyWindow": {
-      "name": "hideHotkeyWindow",
-      "description": "Hides a hotkey window. Only to be called on windows that are hotkey windows.",
-      "scope": "application",
-      "parameters": [],
-      "code": "hhkw"
-    },
-    "toggleHotkeyWindow": {
-      "name": "toggleHotkeyWindow",
-      "description": "Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.",
-      "scope": "application",
-      "parameters": [],
-      "code": "thkw"
-    }
-  }
-} as AppManifest,
-} as const;
+  } as AppManifest,
+} as const

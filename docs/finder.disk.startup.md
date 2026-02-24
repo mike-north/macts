@@ -9,5 +9,5 @@ Is this disk the boot disk?
 **Signature:**
 
 ```typescript
-startup: boolean;
+startup: boolean
 ```

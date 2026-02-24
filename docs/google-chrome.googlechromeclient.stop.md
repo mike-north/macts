@@ -11,7 +11,7 @@ Stop the current tab from loading.
 ```typescript
 stop(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

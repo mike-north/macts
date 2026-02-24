@@ -9,7 +9,7 @@ Client for a pop up button belonging to a window.
 **Signature:**
 
 ```typescript
-declare class PopUpButtonResourceClient 
+declare class PopUpButtonResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PopUpButtonResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.popupbuttonresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PopUpButtonResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PopUpButtonResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.popupbuttonresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new popupbutton.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.popupbuttonresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a popupbutton.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.popupbuttonresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a popupbutton by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.popupbuttonresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all popupbuttons.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.popupbuttonresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing popupbutton.
 
-
 </td></tr>
 </tbody></table>
-

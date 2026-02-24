@@ -18,30 +18,24 @@ create(input: MenuBarCreateInput): Promise<MenuBar>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MenuBarCreateInput](./system-events.menubarcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MenuBar](./system-events.menubar.md)<!-- -->&gt;
-

@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface GeneratedCollection 
+interface GeneratedCollection
 ```
 
 ## Properties
@@ -16,73 +16,56 @@ interface GeneratedCollection
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./core.generatedcollection.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [imports](./core.generatedcollection.imports.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.generatedcollection.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ List all localdomainobjects.
 ```typescript
 list(): Promise<LocalDomainObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[LocalDomainObject](./system-events.localdomainobject.md)<!-- -->\[\]&gt;
-

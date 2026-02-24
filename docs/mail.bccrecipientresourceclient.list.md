@@ -11,7 +11,7 @@ List all bccrecipients.
 ```typescript
 list(): Promise<BccRecipient[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[BccRecipient](./mail.bccrecipient.md)<!-- -->\[\]&gt;
-

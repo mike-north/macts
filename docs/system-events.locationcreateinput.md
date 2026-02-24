@@ -9,7 +9,7 @@ Input for creating a Location
 **Signature:**
 
 ```typescript
-interface LocationCreateInput 
+interface LocationCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface LocationCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name?](./system-events.locationcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the location
 
-
 </td></tr>
 </tbody></table>
-

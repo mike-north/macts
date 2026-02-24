@@ -9,7 +9,7 @@ A sheet displayed over a window
 **Signature:**
 
 ```typescript
-interface Sheet 
+interface Sheet
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Sheet
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.sheet.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this sheet
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Whether the tab is selected
 **Signature:**
 
 ```typescript
-selected: boolean;
+selected: boolean
 ```

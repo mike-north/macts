@@ -3,127 +3,127 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A media item, such as a photo or video */
 export interface MediaItem {
   /** The unique ID of the media item */
-  id: string;
+  id: string
   /** The name (title) of the media item */
-  name: string;
+  name: string
   /** A description of the media item */
-  description: string;
+  description: string
   /** The name of the file on disk */
-  filename: string;
+  filename: string
   /** The date of the media item */
-  date: Date;
+  date: Date
   /** The height of the media item in pixels */
-  height: number;
+  height: number
   /** The width of the media item in pixels */
-  width: number;
+  width: number
   /** The GPS altitude in meters */
-  altitude: number;
+  altitude: number
   /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
-  location: unknown;
+  location: unknown
   /** Whether the media item has been favorited */
-  favorite: boolean;
+  favorite: boolean
   /** A list of keywords to associate with a media item */
-  keywords: string[];
+  keywords: string[]
   /** The selected media item file size */
-  size: number;
+  size: number
 }
 
 /** Input for creating a MediaItem */
 export interface MediaItemCreateInput {
   /** The name (title) of the media item */
-  name?: string;
+  name?: string
   /** A description of the media item */
-  description?: string;
+  description?: string
   /** The date of the media item */
-  date?: Date;
+  date?: Date
   /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
-  location?: unknown;
+  location?: unknown
   /** Whether the media item has been favorited */
-  favorite?: boolean;
+  favorite?: boolean
   /** A list of keywords to associate with a media item */
-  keywords?: string[];
+  keywords?: string[]
   /** The selected media item file size */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a MediaItem */
-export type MediaItemUpdateInput = Partial<MediaItemCreateInput>;
+export type MediaItemUpdateInput = Partial<MediaItemCreateInput>
 
 /** Base class for collections that contains other items, such as albums and folders */
 export interface Container {
   /** The unique ID of this container */
-  id: string;
+  id: string
   /** The name of this container */
-  name: string;
+  name: string
   /** This container's parent folder, if any */
-  parent: Folder;
+  parent: Folder
 }
 
 /** Input for creating a Container */
 export interface ContainerCreateInput {
   /** The name of this container */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Container */
-export type ContainerUpdateInput = Partial<ContainerCreateInput>;
+export type ContainerUpdateInput = Partial<ContainerCreateInput>
 
 /** An album. A container that holds media items */
 export interface Album {
   /** The unique ID of this album */
-  id: string;
+  id: string
   /** The name of this album */
-  name: string;
+  name: string
   /** This album's parent folder, if any */
-  parent: Folder;
+  parent: Folder
 }
 
 /** Input for creating a Album */
 export interface AlbumCreateInput {
   /** The name of this album */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Album */
-export type AlbumUpdateInput = Partial<AlbumCreateInput>;
+export type AlbumUpdateInput = Partial<AlbumCreateInput>
 
 /** A folder. A container that holds albums and other folders, but not media items */
 export interface Folder {
   /** The unique ID of this folder */
-  id: string;
+  id: string
   /** The name of this folder */
-  name: string;
+  name: string
   /** This folder's parent folder, if any */
-  parent: Folder;
+  parent: Folder
 }
 
 /** Input for creating a Folder */
 export interface FolderCreateInput {
   /** The name of this folder */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = Partial<FolderCreateInput>
 
 /** A set of media items that represents a Moment */
 export interface Moment {
   /** The unique ID of the Moment */
-  id: string;
+  id: string
   /** The name of the Moment */
-  name: string;
+  name: string
 }
 
 /** Input for creating a Moment */
-export type MomentCreateInput = Record<string, never>;
+export type MomentCreateInput = Record<string, never>
 
 /** Input for updating a Moment */
-export type MomentUpdateInput = Partial<MomentCreateInput>;
+export type MomentUpdateInput = Partial<MomentCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -140,27 +140,27 @@ export const MediaItemSchema = z.object({
   favorite: z.boolean(),
   keywords: z.array(z.string()),
   size: z.number(),
-});
+})
 
 export const ContainerSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
-});
+})
 
 export const AlbumSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
-});
+})
 
 export const FolderSchema = z.object({
   id: z.string(),
   name: z.string(),
   parent: z.string(),
-});
+})
 
 export const MomentSchema = z.object({
   id: z.string(),
   name: z.string(),
-});
+})

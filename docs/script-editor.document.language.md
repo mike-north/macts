@@ -9,5 +9,5 @@ The scripting language (AppleScript or JavaScript)
 **Signature:**
 
 ```typescript
-language: string;
+language: string
 ```

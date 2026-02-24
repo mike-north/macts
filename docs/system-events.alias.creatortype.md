@@ -9,5 +9,5 @@ the OSType identifying the application that created the alias
 **Signature:**
 
 ```typescript
-creatorType: string;
+creatorType: string
 ```

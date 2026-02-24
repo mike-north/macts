@@ -9,5 +9,5 @@ Input for creating a DocumentFile
 **Signature:**
 
 ```typescript
-interface DocumentFileCreateInput 
+interface DocumentFileCreateInput
 ```

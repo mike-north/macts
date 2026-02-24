@@ -91,7 +91,14 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "type-check", "api-extractor", "api-extractor:ci"]
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "test",
+          "type-check",
+          "api-extractor",
+          "api-extractor:ci"
+        ]
       }
     }
   },

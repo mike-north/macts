@@ -18,30 +18,24 @@ get(id: string): Promise<Artwork>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;[Artwork](./tv.artwork.md)<!-- -->&gt;
-

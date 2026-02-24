@@ -9,5 +9,5 @@ does the device support audio playback?
 **Signature:**
 
 ```typescript
-supportsAudio: boolean;
+supportsAudio: boolean
 ```

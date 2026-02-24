@@ -9,7 +9,7 @@ a track residing in a shared library
 **Signature:**
 
 ```typescript
-interface SharedTrack 
+interface SharedTrack
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface SharedTrack
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.sharedtrack.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this track
 
-
 </td></tr>
 </tbody></table>
-

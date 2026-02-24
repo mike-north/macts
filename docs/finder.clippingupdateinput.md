@@ -9,7 +9,7 @@ Input for updating a Clipping
 **Signature:**
 
 ```typescript
-type ClippingUpdateInput = Partial<ClippingCreateInput>;
+type ClippingUpdateInput = Partial<ClippingCreateInput>
 ```
-**References:** [ClippingCreateInput](./finder.clippingcreateinput.md)
 
+**References:** [ClippingCreateInput](./finder.clippingcreateinput.md)

@@ -9,5 +9,5 @@ the server on which the disk resides, AFP volumes only
 **Signature:**
 
 ```typescript
-server: string;
+server: string
 ```

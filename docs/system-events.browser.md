@@ -9,7 +9,7 @@ A browser belonging to a window
 **Signature:**
 
 ```typescript
-interface Browser 
+interface Browser
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Browser
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.browser.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this browser
 
-
 </td></tr>
 </tbody></table>
-

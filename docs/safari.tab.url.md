@@ -9,5 +9,5 @@ The tab URL
 **Signature:**
 
 ```typescript
-url: string;
+url: string
 ```

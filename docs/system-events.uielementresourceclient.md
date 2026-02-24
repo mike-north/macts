@@ -9,7 +9,7 @@ Client for a piece of the user interface of a process.
 **Signature:**
 
 ```typescript
-declare class UIElementResourceClient 
+declare class UIElementResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class UIElementResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.uielementresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `UIElementResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,115 +46,90 @@ Constructs a new instance of the `UIElementResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [click(at)](./system-events.uielementresourceclient.click.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were clicked
-
 
 </td></tr>
 <tr><td>
 
 [create(input)](./system-events.uielementresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new uielement.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.uielementresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a uielement.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.uielementresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a uielement by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.uielementresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all uielements.
-
 
 </td></tr>
 <tr><td>
 
 [select()](./system-events.uielementresourceclient.select.md)
 
-
 </td><td>
-
 
 </td><td>
 
 set the selected property of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.uielementresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing uielement.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,8 +9,11 @@ Schema for extraction confidence scores. Values from 0.0 (no confidence) to 1.0 
 **Signature:**
 
 ```typescript
-ConfidenceSchema: z.ZodObject<{
-    overall: z.ZodNumber;
-    fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
-}, z.core.$strip>
+ConfidenceSchema: z.ZodObject<
+  {
+    overall: z.ZodNumber
+    fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>
+  },
+  z.core.$strip
+>
 ```

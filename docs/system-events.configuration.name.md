@@ -9,5 +9,5 @@ the name of the configuration
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

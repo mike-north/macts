@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type AppMetadata = z.infer<typeof AppMetadataSchema>;
+type AppMetadata = z.infer<typeof AppMetadataSchema>
 ```
-**References:** [AppMetadataSchema](./core.appmetadataschema.md)
 
+**References:** [AppMetadataSchema](./core.appmetadataschema.md)

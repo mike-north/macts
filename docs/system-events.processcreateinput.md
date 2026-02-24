@@ -9,7 +9,7 @@ Input for creating a Process
 **Signature:**
 
 ```typescript
-interface ProcessCreateInput 
+interface ProcessCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ProcessCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [frontmost?](./system-events.processcreateinput.frontmost.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Is the process the frontmost process
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./system-events.processcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Is the process' layer visible?
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,30 +18,24 @@ create(input: CustomDateCreateInput): Promise<CustomDate>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [CustomDateCreateInput](./contacts.customdatecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[CustomDate](./contacts.customdate.md)<!-- -->&gt;
-

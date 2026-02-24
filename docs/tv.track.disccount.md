@@ -9,5 +9,5 @@ the total number of discs in the source album
 **Signature:**
 
 ```typescript
-discCount: number;
+discCount: number
 ```

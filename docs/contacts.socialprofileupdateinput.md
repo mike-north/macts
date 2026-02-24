@@ -9,7 +9,7 @@ Input for updating a SocialProfile
 **Signature:**
 
 ```typescript
-type SocialProfileUpdateInput = Partial<SocialProfileCreateInput>;
+type SocialProfileUpdateInput = Partial<SocialProfileCreateInput>
 ```
-**References:** [SocialProfileCreateInput](./contacts.socialprofilecreateinput.md)
 
+**References:** [SocialProfileCreateInput](./contacts.socialprofilecreateinput.md)

@@ -9,5 +9,5 @@ Tool description
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

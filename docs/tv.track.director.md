@@ -9,5 +9,5 @@ the artist/source of the track
 **Signature:**
 
 ```typescript
-director: string;
+director: string
 ```

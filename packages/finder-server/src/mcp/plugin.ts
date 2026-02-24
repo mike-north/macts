@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Finder.app automation.
@@ -16,4 +16,4 @@ export const finderPlugin: McpPlugin = {
   name: 'finder',
   description: 'MCP plugin for macOS Finder.app automation',
   tools: allTools,
-};
+}

@@ -9,5 +9,5 @@ Does nothing at all (deprecated)
 **Signature:**
 
 ```typescript
-emptySentMessagesOnQuit: boolean;
+emptySentMessagesOnQuit: boolean
 ```

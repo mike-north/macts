@@ -9,7 +9,7 @@ Input for creating a AttributeRun
 **Signature:**
 
 ```typescript
-interface AttributeRunCreateInput 
+interface AttributeRunCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface AttributeRunCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color?](./mail.attributeruncreateinput.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font?](./mail.attributeruncreateinput.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size?](./mail.attributeruncreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

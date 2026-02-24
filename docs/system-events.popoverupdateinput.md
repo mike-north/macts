@@ -9,7 +9,7 @@ Input for updating a PopOver
 **Signature:**
 
 ```typescript
-type PopOverUpdateInput = Partial<PopOverCreateInput>;
+type PopOverUpdateInput = Partial<PopOverCreateInput>
 ```
-**References:** [PopOverCreateInput](./system-events.popovercreateinput.md)
 
+**References:** [PopOverCreateInput](./system-events.popovercreateinput.md)

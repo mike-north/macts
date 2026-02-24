@@ -11,7 +11,7 @@ List all packages.
 ```typescript
 list(): Promise<Package[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Package](./finder.package.md)<!-- -->\[\]&gt;
-

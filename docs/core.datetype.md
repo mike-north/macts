@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type DateType = z.infer<typeof DateTypeSchema>;
+type DateType = z.infer<typeof DateTypeSchema>
 ```
-**References:** [DateTypeSchema](./core.datetypeschema.md)
 
+**References:** [DateTypeSchema](./core.datetypeschema.md)

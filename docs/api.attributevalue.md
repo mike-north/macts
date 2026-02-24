@@ -9,5 +9,5 @@ Span attribute value types.
 **Signature:**
 
 ```typescript
-type AttributeValue = string | number | boolean;
+type AttributeValue = string | number | boolean
 ```

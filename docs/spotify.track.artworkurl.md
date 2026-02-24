@@ -9,5 +9,5 @@ The URL of the track artwork
 **Signature:**
 
 ```typescript
-artworkUrl: string;
+artworkUrl: string
 ```

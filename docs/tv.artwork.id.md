@@ -9,5 +9,5 @@ Unique identifier for this artwork
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

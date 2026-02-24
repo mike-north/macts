@@ -11,7 +11,7 @@ List all tabs.
 ```typescript
 list(): Promise<Tab[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Tab](./google-chrome.tab.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ The email address
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

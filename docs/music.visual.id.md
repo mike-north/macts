@@ -9,5 +9,5 @@ Unique identifier for this visual
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

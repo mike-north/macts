@@ -9,5 +9,5 @@ the type of service
 **Signature:**
 
 ```typescript
-kind: number;
+kind: number
 ```

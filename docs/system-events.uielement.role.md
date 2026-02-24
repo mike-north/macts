@@ -9,5 +9,5 @@ an encoded description of the UI element and its capabilities
 **Signature:**
 
 ```typescript
-role: string;
+role: string
 ```

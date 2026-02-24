@@ -9,7 +9,7 @@ Input for updating a AliasFile
 **Signature:**
 
 ```typescript
-type AliasFileUpdateInput = Partial<AliasFileCreateInput>;
+type AliasFileUpdateInput = Partial<AliasFileCreateInput>
 ```
-**References:** [AliasFileCreateInput](./finder.aliasfilecreateinput.md)
 
+**References:** [AliasFileCreateInput](./finder.aliasfilecreateinput.md)

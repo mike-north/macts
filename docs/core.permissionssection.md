@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PermissionsSection = z.infer<typeof PermissionsSectionSchema>;
+type PermissionsSection = z.infer<typeof PermissionsSectionSchema>
 ```
-**References:** [PermissionsSectionSchema](./core.permissionssectionschema.md)
 
+**References:** [PermissionsSectionSchema](./core.permissionssectionschema.md)

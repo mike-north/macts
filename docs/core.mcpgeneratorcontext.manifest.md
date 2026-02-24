@@ -9,5 +9,5 @@ App manifest
 **Signature:**
 
 ```typescript
-manifest: AppManifest;
+manifest: AppManifest
 ```

@@ -9,5 +9,5 @@ the modification date of the content of this track
 **Signature:**
 
 ```typescript
-modificationDate: Date;
+modificationDate: Date
 ```

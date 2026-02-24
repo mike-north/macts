@@ -9,7 +9,7 @@ A terminal session
 **Signature:**
 
 ```typescript
-interface Session 
+interface Session
 ```
 
 ## Properties
@@ -18,782 +18,617 @@ interface Session
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [aNSIBlackColor](./iterm.session.ansiblackcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBlackColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBlueColor](./iterm.session.ansibluecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBlueColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightBlackColor](./iterm.session.ansibrightblackcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightBlackColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightBlueColor](./iterm.session.ansibrightbluecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightBlueColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightCyanColor](./iterm.session.ansibrightcyancolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightCyanColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightGreenColor](./iterm.session.ansibrightgreencolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightGreenColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightMagentaColor](./iterm.session.ansibrightmagentacolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightMagentaColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightRedColor](./iterm.session.ansibrightredcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightRedColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightWhiteColor](./iterm.session.ansibrightwhitecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightWhiteColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIBrightYellowColor](./iterm.session.ansibrightyellowcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIBrightYellowColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSICyanColor](./iterm.session.ansicyancolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSICyanColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIGreenColor](./iterm.session.ansigreencolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIGreenColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIMagentaColor](./iterm.session.ansimagentacolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIMagentaColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIRedColor](./iterm.session.ansiredcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIRedColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIWhiteColor](./iterm.session.ansiwhitecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIWhiteColor property
-
 
 </td></tr>
 <tr><td>
 
 [aNSIYellowColor](./iterm.session.ansiyellowcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The aNSIYellowColor property
-
 
 </td></tr>
 <tr><td>
 
 [answerbackString](./iterm.session.answerbackstring.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 ENQ Answerback string
-
 
 </td></tr>
 <tr><td>
 
 [backgroundColor](./iterm.session.backgroundcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The backgroundColor property
-
 
 </td></tr>
 <tr><td>
 
 [backgroundImage](./iterm.session.backgroundimage.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The backgroundImage property
-
 
 </td></tr>
 <tr><td>
 
 [boldColor](./iterm.session.boldcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The boldColor property
-
 
 </td></tr>
 <tr><td>
 
 [colorPreset](./iterm.session.colorpreset.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The colorPreset property
-
 
 </td></tr>
 <tr><td>
 
 [columns](./iterm.session.columns.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The columns property
-
 
 </td></tr>
 <tr><td>
 
 [contents](./iterm.session.contents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The currently visible contents of the session.
-
 
 </td></tr>
 <tr><td>
 
 [cursorColor](./iterm.session.cursorcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The cursorColor property
-
 
 </td></tr>
 <tr><td>
 
 [cursorTextColor](./iterm.session.cursortextcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The cursorTextColor property
-
 
 </td></tr>
 <tr><td>
 
 [foregroundColor](./iterm.session.foregroundcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The foregroundColor property
-
 
 </td></tr>
 <tr><td>
 
 [id](./iterm.session.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the session.
-
 
 </td></tr>
 <tr><td>
 
 [isAtShellPrompt](./iterm.session.isatshellprompt.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 The terminal is at the shell prompt. Requires shell integration.
-
 
 </td></tr>
 <tr><td>
 
 [isProcessing](./iterm.session.isprocessing.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 The session has received output recently.
-
 
 </td></tr>
 <tr><td>
 
 [name](./iterm.session.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name property
-
 
 </td></tr>
 <tr><td>
 
 [profileName](./iterm.session.profilename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The session's profile name
-
 
 </td></tr>
 <tr><td>
 
 [rows](./iterm.session.rows.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The rows property
-
 
 </td></tr>
 <tr><td>
 
 [selectedTextColor](./iterm.session.selectedtextcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The selectedTextColor property
-
 
 </td></tr>
 <tr><td>
 
 [selectionColor](./iterm.session.selectioncolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The selectionColor property
-
 
 </td></tr>
 <tr><td>
 
 [text](./iterm.session.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The currently visible contents of the session.
-
 
 </td></tr>
 <tr><td>
 
 [transparency](./iterm.session.transparency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The transparency property
-
 
 </td></tr>
 <tr><td>
 
 [tty](./iterm.session.tty.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The tty property
-
 
 </td></tr>
 <tr><td>
 
 [underlineColor](./iterm.session.underlinecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The underlineColor property
-
 
 </td></tr>
 <tr><td>
 
 [uniqueID](./iterm.session.uniqueid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The uniqueID property
-
 
 </td></tr>
 <tr><td>
 
 [useUnderlineColor](./iterm.session.useunderlinecolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the use a dedicated color for underlining.
 
-
 </td></tr>
 </tbody></table>
-

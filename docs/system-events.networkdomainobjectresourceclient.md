@@ -9,7 +9,7 @@ Client for the network domain in the file system.
 **Signature:**
 
 ```typescript
-declare class NetworkDomainObjectResourceClient 
+declare class NetworkDomainObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class NetworkDomainObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.networkdomainobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `NetworkDomainObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `NetworkDomainObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.networkdomainobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new networkdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.networkdomainobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a networkdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.networkdomainobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a networkdomainobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.networkdomainobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all networkdomainobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.networkdomainobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing networkdomainobject.
 
-
 </td></tr>
 </tbody></table>
-

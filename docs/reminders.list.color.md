@@ -10,8 +10,8 @@ The color of the list
 
 ```typescript
 color: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

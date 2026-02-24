@@ -9,7 +9,7 @@ Client for this subdivides the text into paragraphs..
 **Signature:**
 
 ```typescript
-declare class ParagraphResourceClient 
+declare class ParagraphResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ParagraphResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.paragraphresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ParagraphResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ParagraphResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.paragraphresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new paragraph.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.paragraphresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a paragraph.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.paragraphresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a paragraph by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.paragraphresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all paragraphs.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.paragraphresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing paragraph.
 
-
 </td></tr>
 </tbody></table>
-

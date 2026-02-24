@@ -9,5 +9,13 @@ Elsv
 **Signature:**
 
 ```typescript
-type Elsv = 'nameColumn' | 'modificationDateColumn' | 'creationDateColumn' | 'sizeColumn' | 'kindColumn' | 'labelColumn' | 'versionColumn' | 'commentColumn';
+type Elsv =
+  | 'nameColumn'
+  | 'modificationDateColumn'
+  | 'creationDateColumn'
+  | 'sizeColumn'
+  | 'kindColumn'
+  | 'labelColumn'
+  | 'versionColumn'
+  | 'commentColumn'
 ```

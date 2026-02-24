@@ -9,5 +9,5 @@ Generated tools/index.ts content
 **Signature:**
 
 ```typescript
-toolsIndexContent: string;
+toolsIndexContent: string
 ```

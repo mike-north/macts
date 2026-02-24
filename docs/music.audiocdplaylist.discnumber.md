@@ -9,5 +9,5 @@ the index of this CD disc in the source album
 **Signature:**
 
 ```typescript
-discNumber: number;
+discNumber: number
 ```

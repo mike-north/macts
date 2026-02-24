@@ -9,5 +9,5 @@ Status of an attendee's response to an invitation
 **Signature:**
 
 ```typescript
-type ParticipationStatus = 'unknown' | 'accepted' | 'declined' | 'tentative';
+type ParticipationStatus = 'unknown' | 'accepted' | 'declined' | 'tentative'
 ```

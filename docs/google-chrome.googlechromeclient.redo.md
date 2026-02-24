@@ -11,7 +11,7 @@ Redo the last change.
 ```typescript
 redo(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -256,7 +256,9 @@ function generateTypesFile(manifest: AppManifest): string {
     lines.push('')
 
     // Generate create input type (writable properties only)
-    const writableProps = Object.entries(resource.properties).filter(([_, prop]) => prop.access === 'rw')
+    const writableProps = Object.entries(resource.properties).filter(
+      ([_, prop]) => prop.access === 'rw'
+    )
 
     lines.push(`/** Input for creating a ${resourceName} */`)
     if (writableProps.length === 0) {

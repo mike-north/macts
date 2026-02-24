@@ -9,5 +9,5 @@ Street part of the address, multiple lines separated by carriage returns.
 **Signature:**
 
 ```typescript
-street: string;
+street: string
 ```

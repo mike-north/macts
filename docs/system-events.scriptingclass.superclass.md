@@ -9,5 +9,5 @@ The class from which this class inherits
 **Signature:**
 
 ```typescript
-superclass: unknown;
+superclass: unknown
 ```

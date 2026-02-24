@@ -9,5 +9,5 @@ The signature of the message
 **Signature:**
 
 ```typescript
-messageSignature: string;
+messageSignature: string
 ```

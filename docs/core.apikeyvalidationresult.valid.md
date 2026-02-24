@@ -9,5 +9,5 @@ Whether the key is valid
 **Signature:**
 
 ```typescript
-valid: boolean;
+valid: boolean
 ```

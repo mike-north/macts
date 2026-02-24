@@ -9,5 +9,5 @@ If rule matches, redirect message to this address or multiple addresses, separat
 **Signature:**
 
 ```typescript
-redirectMessage: string;
+redirectMessage: string
 ```

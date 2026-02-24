@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-IncrementorSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+IncrementorSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ the value of the XML element
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

@@ -206,7 +206,9 @@ export function listInstalledPlugins(): InstalledPlugin[] {
     return Object.entries(pkg.dependencies)
       .filter(([pkgName]) => {
         const matched = PLUGIN_PACKAGE_PATTERN.exec(pkgName)?.[1]
-        return matched != null && !INFRASTRUCTURE_PACKAGES.has(matched) && !matched.endsWith('-server')
+        return (
+          matched != null && !INFRASTRUCTURE_PACKAGES.has(matched) && !matched.endsWith('-server')
+        )
       })
       .map(([packageName, version]) => ({ packageName, version }))
   } catch {

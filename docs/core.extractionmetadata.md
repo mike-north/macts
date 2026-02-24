@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type ExtractionMetadata = z.infer<typeof ExtractionMetadataSchema>;
+type ExtractionMetadata = z.infer<typeof ExtractionMetadataSchema>
 ```
-**References:** [ExtractionMetadataSchema](./core.extractionmetadataschema.md)
 
+**References:** [ExtractionMetadataSchema](./core.extractionmetadataschema.md)

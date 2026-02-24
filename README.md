@@ -65,67 +65,67 @@ console.log('Created event:', event.uid)
 
 ### macOS System Apps
 
-| App | Client Package | Server Package |
-|-----|---------------|----------------|
-| Calendar | `@macts/calendar` | `@macts/calendar-server` |
-| Contacts | `@macts/contacts` | `@macts/contacts-server` |
-| Finder | `@macts/finder` | `@macts/finder-server` |
-| Mail | `@macts/mail` | `@macts/mail-server` |
-| Messages | `@macts/messages` | `@macts/messages-server` |
-| Music | `@macts/music` | `@macts/music-server` |
-| Notes | `@macts/notes` | `@macts/notes-server` |
-| Photos | `@macts/photos` | `@macts/photos-server` |
-| Preview | `@macts/preview` | `@macts/preview-server` |
+| App              | Client Package            | Server Package                   |
+| ---------------- | ------------------------- | -------------------------------- |
+| Calendar         | `@macts/calendar`         | `@macts/calendar-server`         |
+| Contacts         | `@macts/contacts`         | `@macts/contacts-server`         |
+| Finder           | `@macts/finder`           | `@macts/finder-server`           |
+| Mail             | `@macts/mail`             | `@macts/mail-server`             |
+| Messages         | `@macts/messages`         | `@macts/messages-server`         |
+| Music            | `@macts/music`            | `@macts/music-server`            |
+| Notes            | `@macts/notes`            | `@macts/notes-server`            |
+| Photos           | `@macts/photos`           | `@macts/photos-server`           |
+| Preview          | `@macts/preview`          | `@macts/preview-server`          |
 | QuickTime Player | `@macts/quicktime-player` | `@macts/quicktime-player-server` |
-| Reminders | `@macts/reminders` | `@macts/reminders-server` |
-| Shortcuts | `@macts/shortcuts` | `@macts/shortcuts-server` |
-| TV | `@macts/tv` | `@macts/tv-server` |
+| Reminders        | `@macts/reminders`        | `@macts/reminders-server`        |
+| Shortcuts        | `@macts/shortcuts`        | `@macts/shortcuts-server`        |
+| TV               | `@macts/tv`               | `@macts/tv-server`               |
 
 ### macOS Utilities
 
-| App | Client Package | Server Package |
-|-----|---------------|----------------|
-| Automator | `@macts/automator` | `@macts/automator-server` |
+| App                     | Client Package                   | Server Package                          |
+| ----------------------- | -------------------------------- | --------------------------------------- |
+| Automator               | `@macts/automator`               | `@macts/automator-server`               |
 | Bluetooth File Exchange | `@macts/bluetooth-file-exchange` | `@macts/bluetooth-file-exchange-server` |
-| Console | `@macts/console` | `@macts/console-server` |
-| Screen Sharing | `@macts/screen-sharing` | `@macts/screen-sharing-server` |
-| Script Editor | `@macts/script-editor` | `@macts/script-editor-server` |
-| System Events | `@macts/system-events` | `@macts/system-events-server` |
-| System Information | `@macts/system-information` | `@macts/system-information-server` |
-| System Settings | `@macts/system-settings` | `@macts/system-settings-server` |
-| Terminal | `@macts/terminal` | `@macts/terminal-server` |
-| TextEdit | `@macts/textedit` | `@macts/textedit-server` |
+| Console                 | `@macts/console`                 | `@macts/console-server`                 |
+| Screen Sharing          | `@macts/screen-sharing`          | `@macts/screen-sharing-server`          |
+| Script Editor           | `@macts/script-editor`           | `@macts/script-editor-server`           |
+| System Events           | `@macts/system-events`           | `@macts/system-events-server`           |
+| System Information      | `@macts/system-information`      | `@macts/system-information-server`      |
+| System Settings         | `@macts/system-settings`         | `@macts/system-settings-server`         |
+| Terminal                | `@macts/terminal`                | `@macts/terminal-server`                |
+| TextEdit                | `@macts/textedit`                | `@macts/textedit-server`                |
 
 ### Browsers
 
-| App | Client Package | Server Package |
-|-----|---------------|----------------|
-| Arc | `@macts/arc` | `@macts/arc-server` |
-| Google Chrome | `@macts/google-chrome` | `@macts/google-chrome-server` |
+| App            | Client Package          | Server Package                 |
+| -------------- | ----------------------- | ------------------------------ |
+| Arc            | `@macts/arc`            | `@macts/arc-server`            |
+| Google Chrome  | `@macts/google-chrome`  | `@macts/google-chrome-server`  |
 | Microsoft Edge | `@macts/microsoft-edge` | `@macts/microsoft-edge-server` |
-| Safari | `@macts/safari` | `@macts/safari-server` |
+| Safari         | `@macts/safari`         | `@macts/safari-server`         |
 
 ### Third-Party Apps
 
-| App | Client Package | Server Package |
-|-----|---------------|----------------|
-| Alfred 5 | `@macts/alfred` | `@macts/alfred-server` |
-| iTerm | `@macts/iterm` | `@macts/iterm-server` |
+| App            | Client Package          | Server Package                 |
+| -------------- | ----------------------- | ------------------------------ |
+| Alfred 5       | `@macts/alfred`         | `@macts/alfred-server`         |
+| iTerm          | `@macts/iterm`          | `@macts/iterm-server`          |
 | Microsoft Word | `@macts/microsoft-word` | `@macts/microsoft-word-server` |
-| OmniFocus | `@macts/omnifocus` | `@macts/omnifocus-server` |
-| OmniGraffle | `@macts/omnigraffle` | `@macts/omnigraffle-server` |
-| OmniPlan | `@macts/omniplan` | `@macts/omniplan-server` |
-| Spotify | `@macts/spotify` | `@macts/spotify-server` |
-| Xcode | `@macts/xcode` | `@macts/xcode-server` |
+| OmniFocus      | `@macts/omnifocus`      | `@macts/omnifocus-server`      |
+| OmniGraffle    | `@macts/omnigraffle`    | `@macts/omnigraffle-server`    |
+| OmniPlan       | `@macts/omniplan`       | `@macts/omniplan-server`       |
+| Spotify        | `@macts/spotify`        | `@macts/spotify-server`        |
+| Xcode          | `@macts/xcode`          | `@macts/xcode-server`          |
 
 ### Infrastructure Packages
 
-| Package | Description |
-|---------|-------------|
-| `@macts/cli` | Command-line interface |
-| `@macts/api` | HTTP API server |
+| Package       | Description                                   |
+| ------------- | --------------------------------------------- |
+| `@macts/cli`  | Command-line interface                        |
+| `@macts/api`  | HTTP API server                               |
 | `@macts/core` | Manifest schemas, code generators, JXA bridge |
-| `@macts/mcp` | MCP server framework |
+| `@macts/mcp`  | MCP server framework                          |
 
 ### Which package should I use?
 

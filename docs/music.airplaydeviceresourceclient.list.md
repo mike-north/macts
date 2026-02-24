@@ -11,7 +11,7 @@ List all airplaydevices.
 ```typescript
 list(): Promise<AirPlayDevice[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[AirPlayDevice](./music.airplaydevice.md)<!-- -->\[\]&gt;
-

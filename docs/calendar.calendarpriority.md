@@ -9,5 +9,5 @@ Priority level for calendar items
 **Signature:**
 
 ```typescript
-type CalendarPriority = '0' | '9' | '5' | '1';
+type CalendarPriority = '0' | '9' | '5' | '1'
 ```

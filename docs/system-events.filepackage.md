@@ -9,7 +9,7 @@ A file package in the file system
 **Signature:**
 
 ```typescript
-interface FilePackage 
+interface FilePackage
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface FilePackage
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.filepackage.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this package
 
-
 </td></tr>
 </tbody></table>
-

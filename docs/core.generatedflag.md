@@ -9,7 +9,7 @@ Generated flag definition for a Clipanion command.
 **Signature:**
 
 ```typescript
-interface GeneratedFlag 
+interface GeneratedFlag
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface GeneratedFlag
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.generatedflag.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Clipanion option definition code
-
 
 </td></tr>
 <tr><td>
 
 [propertyName](./core.generatedflag.propertyname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Property name for the flag
 
-
 </td></tr>
 </tbody></table>
-

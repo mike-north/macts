@@ -9,5 +9,5 @@ Indicates whether SSL is enabled for this receiving account
 **Signature:**
 
 ```typescript
-usesSsl: boolean;
+usesSsl: boolean
 ```

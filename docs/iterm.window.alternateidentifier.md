@@ -9,5 +9,5 @@ The alternate unique identifier of the session.
 **Signature:**
 
 ```typescript
-alternateIdentifier: string;
+alternateIdentifier: string
 ```

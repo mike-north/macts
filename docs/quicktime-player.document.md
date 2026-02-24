@@ -9,7 +9,7 @@ A QuickTime Player document
 **Signature:**
 
 ```typescript
-interface Document 
+interface Document
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface Document
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentTime](./quicktime-player.document.currenttime.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The current playback time in seconds
-
 
 </td></tr>
 <tr><td>
 
 [duration](./quicktime-player.document.duration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The duration of the document in seconds
-
 
 </td></tr>
 <tr><td>
 
 [id](./quicktime-player.document.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the document
-
 
 </td></tr>
 <tr><td>
 
 [name](./quicktime-player.document.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The document name
-
 
 </td></tr>
 <tr><td>
 
 [path](./quicktime-player.document.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The file path of the document
-
 
 </td></tr>
 <tr><td>
 
 [playing](./quicktime-player.document.playing.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the document is currently playing
 
-
 </td></tr>
 </tbody></table>
-

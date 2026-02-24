@@ -9,7 +9,7 @@ Generate resource instance class code.
 **Signature:**
 
 ```typescript
-declare function generateResourceClass(resource: Resource, ctx: GeneratorContext): GeneratedClass;
+declare function generateResourceClass(resource: Resource, ctx: GeneratorContext): GeneratedClass
 ```
 
 ## Parameters
@@ -18,44 +18,35 @@ declare function generateResourceClass(resource: Resource, ctx: GeneratorContext
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 resource
 
-
 </td><td>
 
 [Resource](./core.resource.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ ctx
 **Returns:**
 
 [GeneratedClass](./core.generatedclass.md)
-

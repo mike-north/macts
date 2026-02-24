@@ -9,5 +9,5 @@ The first name from this participan's Contacts card, if available
 **Signature:**
 
 ```typescript
-firstName: string;
+firstName: string
 ```

@@ -9,5 +9,5 @@ Whether the title displays a custom title
 **Signature:**
 
 ```typescript
-titleDisplaysCustomTitle: boolean;
+titleDisplaysCustomTitle: boolean
 ```

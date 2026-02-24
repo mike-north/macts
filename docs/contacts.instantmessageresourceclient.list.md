@@ -11,7 +11,7 @@ List all instantmessages.
 ```typescript
 list(): Promise<InstantMessage[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[InstantMessage](./contacts.instantmessage.md)<!-- -->\[\]&gt;
-

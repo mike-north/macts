@@ -9,7 +9,7 @@ Client for a radio button belonging to a window.
 **Signature:**
 
 ```typescript
-declare class RadioButtonResourceClient 
+declare class RadioButtonResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RadioButtonResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.radiobuttonresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RadioButtonResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RadioButtonResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.radiobuttonresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new radiobutton.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.radiobuttonresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a radiobutton.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.radiobuttonresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a radiobutton by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.radiobuttonresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all radiobuttons.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.radiobuttonresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing radiobutton.
 
-
 </td></tr>
 </tbody></table>
-

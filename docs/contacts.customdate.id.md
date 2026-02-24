@@ -9,5 +9,5 @@ Unique identifier for this date
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

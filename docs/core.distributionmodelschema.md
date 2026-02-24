@@ -10,8 +10,8 @@ App distribution model.
 
 ```typescript
 DistributionModelSchema: z.ZodEnum<{
-    "app-store": "app-store";
-    "developer-id": "developer-id";
-    system: "system";
+  'app-store': 'app-store'
+  'developer-id': 'developer-id'
+  system: 'system'
 }>
 ```

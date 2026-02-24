@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface AppConnection 
+interface AppConnection
 ```
 
 ## Properties
@@ -16,55 +16,43 @@ interface AppConnection
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [bundleId](./core.appconnection.bundleid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.appconnection.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -75,39 +63,30 @@ string
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [activate()](./core.appconnection.activate.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [isRunning()](./core.appconnection.isrunning.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [quit()](./core.appconnection.quit.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

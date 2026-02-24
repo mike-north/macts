@@ -9,7 +9,10 @@ Update key metadata by ID.
 **Signature:**
 
 ```typescript
-declare function updateKeyMetadata(keyId: string, updates: Partial<ApiKeyMetadata>): ApiKeyMetadata | undefined;
+declare function updateKeyMetadata(
+  keyId: string,
+  updates: Partial<ApiKeyMetadata>
+): ApiKeyMetadata | undefined
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function updateKeyMetadata(keyId: string, updates: Partial<ApiKeyMetadat
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keyId
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Key ID to update
-
 
 </td></tr>
 <tr><td>
 
 updates
 
-
 </td><td>
 
 Partial&lt;[ApiKeyMetadata](./core.apikeymetadata.md)<!-- -->&gt;
 
-
 </td><td>
 
 Partial metadata to merge
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ Partial metadata to merge
 [ApiKeyMetadata](./core.apikeymetadata.md) \| undefined
 
 Updated metadata, or undefined if not found
-

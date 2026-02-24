@@ -9,7 +9,7 @@ Input for updating a GrowArea
 **Signature:**
 
 ```typescript
-type GrowAreaUpdateInput = Partial<GrowAreaCreateInput>;
+type GrowAreaUpdateInput = Partial<GrowAreaCreateInput>
 ```
-**References:** [GrowAreaCreateInput](./system-events.growareacreateinput.md)
 
+**References:** [GrowAreaCreateInput](./system-events.growareacreateinput.md)

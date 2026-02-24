@@ -7,25 +7,28 @@
 **Signature:**
 
 ```typescript
-ProcessSchema: z.ZodObject<{
-    acceptsHighLevelEvents: z.ZodBoolean;
-    acceptsRemoteEvents: z.ZodBoolean;
-    architecture: z.ZodString;
-    backgroundOnly: z.ZodBoolean;
-    bundleIdentifier: z.ZodString;
-    classic: z.ZodBoolean;
-    creatorType: z.ZodString;
-    displayedName: z.ZodString;
-    file: z.ZodString;
-    fileType: z.ZodString;
-    frontmost: z.ZodBoolean;
-    hasScriptingTerminology: z.ZodBoolean;
-    id: z.ZodNumber;
-    name: z.ZodString;
-    partitionSpaceUsed: z.ZodNumber;
-    shortName: z.ZodString;
-    totalPartitionSize: z.ZodNumber;
-    unixId: z.ZodNumber;
-    visible: z.ZodString;
-}, z.core.$strip>
+ProcessSchema: z.ZodObject<
+  {
+    acceptsHighLevelEvents: z.ZodBoolean
+    acceptsRemoteEvents: z.ZodBoolean
+    architecture: z.ZodString
+    backgroundOnly: z.ZodBoolean
+    bundleIdentifier: z.ZodString
+    classic: z.ZodBoolean
+    creatorType: z.ZodString
+    displayedName: z.ZodString
+    file: z.ZodString
+    fileType: z.ZodString
+    frontmost: z.ZodBoolean
+    hasScriptingTerminology: z.ZodBoolean
+    id: z.ZodNumber
+    name: z.ZodString
+    partitionSpaceUsed: z.ZodNumber
+    shortName: z.ZodString
+    totalPartitionSize: z.ZodNumber
+    unixId: z.ZodNumber
+    visible: z.ZodString
+  },
+  z.core.$strip
+>
 ```

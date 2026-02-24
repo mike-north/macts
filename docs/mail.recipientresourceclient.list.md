@@ -11,7 +11,7 @@ List all recipients.
 ```typescript
 list(): Promise<Recipient[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Recipient](./mail.recipient.md)<!-- -->\[\]&gt;
-

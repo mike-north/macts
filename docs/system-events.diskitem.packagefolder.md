@@ -9,5 +9,5 @@ Is the disk item a package?
 **Signature:**
 
 ```typescript
-packageFolder: boolean;
+packageFolder: boolean
 ```

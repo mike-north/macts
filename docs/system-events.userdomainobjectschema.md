@@ -7,17 +7,20 @@
 **Signature:**
 
 ```typescript
-UserDomainObjectSchema: z.ZodObject<{
-    desktopFolder: z.ZodString;
-    documentsFolder: z.ZodString;
-    downloadsFolder: z.ZodString;
-    favoritesFolder: z.ZodString;
-    homeFolder: z.ZodString;
-    moviesFolder: z.ZodString;
-    musicFolder: z.ZodString;
-    picturesFolder: z.ZodString;
-    publicFolder: z.ZodString;
-    sitesFolder: z.ZodString;
-    temporaryItemsFolder: z.ZodString;
-}, z.core.$strip>
+UserDomainObjectSchema: z.ZodObject<
+  {
+    desktopFolder: z.ZodString
+    documentsFolder: z.ZodString
+    downloadsFolder: z.ZodString
+    favoritesFolder: z.ZodString
+    homeFolder: z.ZodString
+    moviesFolder: z.ZodString
+    musicFolder: z.ZodString
+    picturesFolder: z.ZodString
+    publicFolder: z.ZodString
+    sitesFolder: z.ZodString
+    temporaryItemsFolder: z.ZodString
+  },
+  z.core.$strip
+>
 ```

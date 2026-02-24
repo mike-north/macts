@@ -9,5 +9,5 @@ the minimum allowed width of this column
 **Signature:**
 
 ```typescript
-minimumWidth: number;
+minimumWidth: number
 ```

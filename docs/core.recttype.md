@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type RectType = z.infer<typeof RectTypeSchema>;
+type RectType = z.infer<typeof RectTypeSchema>
 ```
-**References:** [RectTypeSchema](./core.recttypeschema.md)
 
+**References:** [RectTypeSchema](./core.recttypeschema.md)

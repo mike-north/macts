@@ -9,5 +9,5 @@ Output directory name (e.g., "calendar")
 **Signature:**
 
 ```typescript
-dir: string;
+dir: string
 ```

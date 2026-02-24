@@ -11,7 +11,7 @@ Middleware that tracks in-flight requests
 ```typescript
 middleware(): MiddlewareHandler;
 ```
+
 **Returns:**
 
 MiddlewareHandler
-

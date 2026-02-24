@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-SoundAlarmSchema: z.ZodObject<{
-    triggerInterval: z.ZodNumber;
-    triggerDate: z.ZodString;
-    soundName: z.ZodString;
-    soundFile: z.ZodString;
-}, z.core.$strip>
+SoundAlarmSchema: z.ZodObject<
+  {
+    triggerInterval: z.ZodNumber
+    triggerDate: z.ZodString
+    soundName: z.ZodString
+    soundFile: z.ZodString
+  },
+  z.core.$strip
+>
 ```

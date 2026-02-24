@@ -3,95 +3,95 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A Notes account */
 export interface Account {
   /** The name of the account */
-  name: string;
+  name: string
   /** The unique identifier of the account */
-  id: string;
+  id: string
   /** Whether the account has been upgraded */
-  upgraded: boolean;
+  upgraded: boolean
 }
 
 /** Input for creating a Account */
-export type AccountCreateInput = Record<string, never>;
+export type AccountCreateInput = Record<string, never>
 
 /** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = Partial<AccountCreateInput>
 
 /** A Notes folder */
 export interface Folder {
   /** The name of the folder */
-  name: string;
+  name: string
   /** The unique identifier of the folder */
-  id: string;
+  id: string
   /** The container of the folder */
-  container?: string;
+  container?: string
   /** Whether the folder is shared */
-  shared: boolean;
+  shared: boolean
 }
 
 /** Input for creating a Folder */
 export interface FolderCreateInput {
   /** The name of the folder */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Folder */
-export type FolderUpdateInput = Partial<FolderCreateInput>;
+export type FolderUpdateInput = Partial<FolderCreateInput>
 
 /** A note */
 export interface Note {
   /** The name of the note (first line) */
-  name: string;
+  name: string
   /** The unique identifier of the note */
-  id: string;
+  id: string
   /** The HTML content of the note body */
-  body: string;
+  body: string
   /** The plaintext content of the note */
-  plaintext: string;
+  plaintext: string
   /** The creation date of the note */
-  creationDate: string;
+  creationDate: string
   /** The modification date of the note */
-  modificationDate: string;
+  modificationDate: string
   /** Whether the note is shared */
-  shared: boolean;
+  shared: boolean
   /** Whether the note is password protected */
-  passwordProtected: boolean;
+  passwordProtected: boolean
 }
 
 /** Input for creating a Note */
 export interface NoteCreateInput {
   /** The name of the note (first line) */
-  name?: string;
+  name?: string
   /** The HTML content of the note body */
-  body?: string;
+  body?: string
 }
 
 /** Input for updating a Note */
-export type NoteUpdateInput = Partial<NoteCreateInput>;
+export type NoteUpdateInput = Partial<NoteCreateInput>
 
 /** A note attachment */
 export interface Attachment {
   /** The name of the attachment */
-  name: string;
+  name: string
   /** The unique identifier of the attachment */
-  id: string;
+  id: string
   /** The content identifier of the attachment */
-  contentIdentifier?: string;
+  contentIdentifier?: string
   /** The creation date of the attachment */
-  creationDate: string;
+  creationDate: string
   /** The modification date of the attachment */
-  modificationDate: string;
+  modificationDate: string
 }
 
 /** Input for creating a Attachment */
-export type AttachmentCreateInput = Record<string, never>;
+export type AttachmentCreateInput = Record<string, never>
 
 /** Input for updating a Attachment */
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>;
+export type AttachmentUpdateInput = Partial<AttachmentCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -99,14 +99,14 @@ export const AccountSchema = z.object({
   name: z.string(),
   id: z.string(),
   upgraded: z.boolean(),
-});
+})
 
 export const FolderSchema = z.object({
   name: z.string(),
   id: z.string(),
   container: z.string().optional(),
   shared: z.boolean(),
-});
+})
 
 export const NoteSchema = z.object({
   name: z.string(),
@@ -117,7 +117,7 @@ export const NoteSchema = z.object({
   modificationDate: z.string(),
   shared: z.boolean(),
   passwordProtected: z.boolean(),
-});
+})
 
 export const AttachmentSchema = z.object({
   name: z.string(),
@@ -125,4 +125,4 @@ export const AttachmentSchema = z.object({
   contentIdentifier: z.string().optional(),
   creationDate: z.string(),
   modificationDate: z.string(),
-});
+})

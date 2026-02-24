@@ -7,46 +7,64 @@
 **Signature:**
 
 ```typescript
-WindowSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    alternateIdentifier: z.ZodString;
-    name: z.ZodString;
-    index: z.ZodNumber;
-    bounds: z.ZodObject<{
-        x: z.ZodNumber;
-        y: z.ZodNumber;
-        width: z.ZodNumber;
-        height: z.ZodNumber;
-    }, z.core.$strip>;
-    closeable: z.ZodBoolean;
-    miniaturizable: z.ZodBoolean;
-    miniaturized: z.ZodBoolean;
-    resizable: z.ZodBoolean;
-    visible: z.ZodBoolean;
-    zoomable: z.ZodBoolean;
-    zoomed: z.ZodBoolean;
-    frontmost: z.ZodBoolean;
-    currentTab: z.ZodString;
-    currentSession: z.ZodString;
-    isHotkeyWindow: z.ZodBoolean;
-    hotkeyWindowProfile: z.ZodString;
-    position: z.ZodObject<{
-        x: z.ZodNumber;
-        y: z.ZodNumber;
-    }, z.core.$strip>;
-    origin: z.ZodObject<{
-        x: z.ZodNumber;
-        y: z.ZodNumber;
-    }, z.core.$strip>;
-    size: z.ZodObject<{
-        x: z.ZodNumber;
-        y: z.ZodNumber;
-    }, z.core.$strip>;
-    frame: z.ZodObject<{
-        x: z.ZodNumber;
-        y: z.ZodNumber;
-        width: z.ZodNumber;
-        height: z.ZodNumber;
-    }, z.core.$strip>;
-}, z.core.$strip>
+WindowSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    alternateIdentifier: z.ZodString
+    name: z.ZodString
+    index: z.ZodNumber
+    bounds: z.ZodObject<
+      {
+        x: z.ZodNumber
+        y: z.ZodNumber
+        width: z.ZodNumber
+        height: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    closeable: z.ZodBoolean
+    miniaturizable: z.ZodBoolean
+    miniaturized: z.ZodBoolean
+    resizable: z.ZodBoolean
+    visible: z.ZodBoolean
+    zoomable: z.ZodBoolean
+    zoomed: z.ZodBoolean
+    frontmost: z.ZodBoolean
+    currentTab: z.ZodString
+    currentSession: z.ZodString
+    isHotkeyWindow: z.ZodBoolean
+    hotkeyWindowProfile: z.ZodString
+    position: z.ZodObject<
+      {
+        x: z.ZodNumber
+        y: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    origin: z.ZodObject<
+      {
+        x: z.ZodNumber
+        y: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    size: z.ZodObject<
+      {
+        x: z.ZodNumber
+        y: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    frame: z.ZodObject<
+      {
+        x: z.ZodNumber
+        y: z.ZodNumber
+        width: z.ZodNumber
+        height: z.ZodNumber
+      },
+      z.core.$strip
+    >
+  },
+  z.core.$strip
+>
 ```

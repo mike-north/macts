@@ -9,5 +9,5 @@ Whether the reminder is flagged
 **Signature:**
 
 ```typescript
-flagged: boolean;
+flagged: boolean
 ```

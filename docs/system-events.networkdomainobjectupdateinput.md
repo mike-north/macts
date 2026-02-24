@@ -9,7 +9,7 @@ Input for updating a NetworkDomainObject
 **Signature:**
 
 ```typescript
-type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>;
+type NetworkDomainObjectUpdateInput = Partial<NetworkDomainObjectCreateInput>
 ```
-**References:** [NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)
 
+**References:** [NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)

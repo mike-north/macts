@@ -9,7 +9,7 @@ Input for updating a Sheet
 **Signature:**
 
 ```typescript
-type SheetUpdateInput = Partial<SheetCreateInput>;
+type SheetUpdateInput = Partial<SheetCreateInput>
 ```
-**References:** [SheetCreateInput](./system-events.sheetcreateinput.md)
 
+**References:** [SheetCreateInput](./system-events.sheetcreateinput.md)

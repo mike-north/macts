@@ -4,10 +4,10 @@
 
 ## GeneratedTool.name property
 
-Tool name (e.g., "macts\_\_calendar\_\_calendars\_list")
+Tool name (e.g., "macts\_\_calendar\_\_calendars_list")
 
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

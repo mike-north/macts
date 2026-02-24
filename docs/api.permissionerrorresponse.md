@@ -9,7 +9,7 @@ Error response structure for permission failures.
 **Signature:**
 
 ```typescript
-interface PermissionErrorResponse 
+interface PermissionErrorResponse
 ```
 
 ## Properties
@@ -18,39 +18,30 @@ interface PermissionErrorResponse
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [error](./api.permissionerrorresponse.error.md)
 
+</td><td>
 
 </td><td>
 
+{ code: 'PERMISSION_DENIED'; message: string; required: string; hint?: string; changelog?: { version: string; previousPermission: string; reason?: string; }; }
 
 </td><td>
-
-{ code: 'PERMISSION\_DENIED'; message: string; required: string; hint?: string; changelog?: { version: string; previousPermission: string; reason?: string; }; }
-
-
-</td><td>
-
 
 </td></tr>
 </tbody></table>
-

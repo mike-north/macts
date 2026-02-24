@@ -9,7 +9,7 @@ An image belonging to a static text field
 **Signature:**
 
 ```typescript
-interface Image 
+interface Image
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Image
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.image.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this image
 
-
 </td></tr>
 </tbody></table>
-

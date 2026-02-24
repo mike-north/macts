@@ -9,5 +9,5 @@ The all-day due date of the reminder
 **Signature:**
 
 ```typescript
-allDayDueDate: Date;
+allDayDueDate: Date
 ```

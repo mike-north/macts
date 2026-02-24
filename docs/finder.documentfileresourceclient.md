@@ -9,7 +9,7 @@ Client for a document file.
 **Signature:**
 
 ```typescript
-declare class DocumentFileResourceClient 
+declare class DocumentFileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DocumentFileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.documentfileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DocumentFileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DocumentFileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.documentfileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new documentfile.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.documentfileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a documentfile.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.documentfileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a documentfile by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.documentfileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all documentfiles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.documentfileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing documentfile.
 
-
 </td></tr>
 </tbody></table>
-

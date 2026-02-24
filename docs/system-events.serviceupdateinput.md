@@ -9,7 +9,7 @@ Input for updating a Service
 **Signature:**
 
 ```typescript
-type ServiceUpdateInput = Partial<ServiceCreateInput>;
+type ServiceUpdateInput = Partial<ServiceCreateInput>
 ```
-**References:** [ServiceCreateInput](./system-events.servicecreateinput.md)
 
+**References:** [ServiceCreateInput](./system-events.servicecreateinput.md)

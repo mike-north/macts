@@ -4,15 +4,11 @@
  * @packageDocumentation
  */
 
-import { documentsListTool } from './documents.js';
-import { documentsGetTool } from './documents.js';
-import { appSendTool } from './app.js';
+import { documentsListTool } from './documents.js'
+import { documentsGetTool } from './documents.js'
+import { appSendTool } from './app.js'
 
 /**
  * All MCP tools.
  */
-export const allTools = [
-  documentsListTool,
-  documentsGetTool,
-  appSendTool,
-] as const;
+export const allTools = [documentsListTool, documentsGetTool, appSendTool] as const

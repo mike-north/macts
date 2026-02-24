@@ -11,7 +11,7 @@ List all bookmarkitems.
 ```typescript
 list(): Promise<BookmarkItem[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[BookmarkItem](./google-chrome.bookmarkitem.md)<!-- -->\[\]&gt;
-

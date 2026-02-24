@@ -9,5 +9,5 @@ The user's Pictures folder
 **Signature:**
 
 ```typescript
-picturesFolder: Folder;
+picturesFolder: Folder
 ```

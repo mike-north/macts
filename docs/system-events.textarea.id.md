@@ -9,5 +9,5 @@ Unique identifier for this text area
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

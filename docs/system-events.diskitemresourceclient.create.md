@@ -18,30 +18,24 @@ create(input: DiskItemCreateInput): Promise<DiskItem>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DiskItemCreateInput](./system-events.diskitemcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[DiskItem](./system-events.diskitem.md)<!-- -->&gt;
-

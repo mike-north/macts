@@ -9,7 +9,7 @@ Input for updating a Group
 **Signature:**
 
 ```typescript
-type GroupUpdateInput = Partial<GroupCreateInput>;
+type GroupUpdateInput = Partial<GroupCreateInput>
 ```
-**References:** [GroupCreateInput](./system-events.groupcreateinput.md)
 
+**References:** [GroupCreateInput](./system-events.groupcreateinput.md)

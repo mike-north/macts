@@ -11,7 +11,7 @@ List all locations.
 ```typescript
 list(): Promise<Location[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Location](./system-events.location.md)<!-- -->\[\]&gt;
-

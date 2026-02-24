@@ -9,5 +9,5 @@ Input for creating a BusyIndicator
 **Signature:**
 
 ```typescript
-interface BusyIndicatorCreateInput 
+interface BusyIndicatorCreateInput
 ```

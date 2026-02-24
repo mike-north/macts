@@ -18,30 +18,24 @@ create(input: XMLElementCreateInput): Promise<XMLElement>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [XMLElementCreateInput](./system-events.xmlelementcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[XMLElement](./system-events.xmlelement.md)<!-- -->&gt;
-

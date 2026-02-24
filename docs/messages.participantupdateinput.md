@@ -9,7 +9,7 @@ Input for updating a Participant
 **Signature:**
 
 ```typescript
-type ParticipantUpdateInput = Partial<ParticipantCreateInput>;
+type ParticipantUpdateInput = Partial<ParticipantCreateInput>
 ```
-**References:** [ParticipantCreateInput](./messages.participantcreateinput.md)
 
+**References:** [ParticipantCreateInput](./messages.participantcreateinput.md)

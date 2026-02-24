@@ -9,5 +9,5 @@ Unique identifier for this splitter group
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

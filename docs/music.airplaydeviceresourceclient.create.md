@@ -18,30 +18,24 @@ create(input: AirPlayDeviceCreateInput): Promise<AirPlayDevice>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[AirPlayDevice](./music.airplaydevice.md)<!-- -->&gt;
-

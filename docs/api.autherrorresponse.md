@@ -9,7 +9,7 @@ Authentication error response structure.
 **Signature:**
 
 ```typescript
-interface AuthErrorResponse 
+interface AuthErrorResponse
 ```
 
 ## Properties
@@ -18,39 +18,30 @@ interface AuthErrorResponse
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [error](./api.autherrorresponse.error.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { code: [AuthErrorCode](./api.autherrorcode.md)<!-- -->; message: string; }
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

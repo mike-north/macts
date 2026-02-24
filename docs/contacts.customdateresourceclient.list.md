@@ -11,7 +11,7 @@ List all customdates.
 ```typescript
 list(): Promise<CustomDate[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[CustomDate](./contacts.customdate.md)<!-- -->\[\]&gt;
-

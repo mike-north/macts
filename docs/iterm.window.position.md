@@ -10,7 +10,7 @@ The position of the window, relative to the upper left corner of the screen.
 
 ```typescript
 position: {
-        x: number;
-        y: number;
-    };
+  x: number
+  y: number
+}
 ```

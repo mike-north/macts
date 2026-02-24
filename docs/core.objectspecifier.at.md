@@ -18,30 +18,24 @@ at(index: number): ObjectSpecifier;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 index
 
-
 </td><td>
 
 number
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ number
 **Returns:**
 
 [ObjectSpecifier](./core.objectspecifier.md)
-

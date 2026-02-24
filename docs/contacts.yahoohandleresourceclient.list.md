@@ -11,7 +11,7 @@ List all yahoohandles.
 ```typescript
 list(): Promise<YahooHandle[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[YahooHandle](./contacts.yahoohandle.md)<!-- -->\[\]&gt;
-

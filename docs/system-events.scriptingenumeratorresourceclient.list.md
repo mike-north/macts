@@ -11,7 +11,7 @@ List all scriptingenumerators.
 ```typescript
 list(): Promise<ScriptingEnumerator[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingEnumerator](./system-events.scriptingenumerator.md)<!-- -->\[\]&gt;
-

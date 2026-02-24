@@ -11,7 +11,7 @@ List all actions.
 ```typescript
 list(): Promise<Action[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Action](./system-events.action.md)<!-- -->\[\]&gt;
-

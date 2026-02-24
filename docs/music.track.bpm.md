@@ -9,5 +9,5 @@ the tempo of this track in beats per minute
 **Signature:**
 
 ```typescript
-bpm: number;
+bpm: number
 ```

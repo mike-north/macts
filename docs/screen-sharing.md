@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ConnectionResourceClient](./screen-sharing.connectionresourceclient.md)
 
-
 </td><td>
 
 Client for a screen sharing connection.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./screen-sharing.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [ScreenSharingClient](./screen-sharing.screensharingclient.md)
 
-
 </td><td>
 
 ScreenSharing client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [ScreenSharingError](./screen-sharing.screensharingerror.md)
 
-
 </td><td>
 
 Error class for ScreenSharing API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ Error class for ScreenSharing API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Connection](./screen-sharing.connection.md)
 
-
 </td><td>
 
 A screen sharing connection
-
 
 </td></tr>
 <tr><td>
 
 [ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
 
-
 </td><td>
 
 Input for creating a Connection
-
 
 </td></tr>
 <tr><td>
 
 [ScreenSharingClientOptions](./screen-sharing.screensharingclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ConnectionSchema](./screen-sharing.connectionschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,23 +119,18 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ConnectionUpdateInput](./screen-sharing.connectionupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Connection
 
-
 </td></tr>
 </tbody></table>
-

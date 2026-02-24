@@ -9,5 +9,5 @@ Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or
 **Signature:**
 
 ```typescript
-location: string;
+location: string
 ```

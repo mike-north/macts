@@ -9,5 +9,9 @@ MessageCachingPolicy
 **Signature:**
 
 ```typescript
-type MessageCachingPolicy = 'doNotKeepCopiesOfAnyMessages' | 'onlyMessagesIHaveRead' | 'allMessagesButOmitAttachments' | 'allMessagesAndTheirAttachments';
+type MessageCachingPolicy =
+  | 'doNotKeepCopiesOfAnyMessages'
+  | 'onlyMessagesIHaveRead'
+  | 'allMessagesButOmitAttachments'
+  | 'allMessagesAndTheirAttachments'
 ```

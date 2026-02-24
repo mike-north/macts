@@ -9,7 +9,7 @@ Input for creating a MSNHandle
 **Signature:**
 
 ```typescript
-interface MSNHandleCreateInput 
+interface MSNHandleCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface MSNHandleCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.msnhandlecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.msnhandlecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The MSN handle value
 
-
 </td></tr>
 </tbody></table>
-

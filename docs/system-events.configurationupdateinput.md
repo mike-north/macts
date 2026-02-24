@@ -9,7 +9,7 @@ Input for updating a Configuration
 **Signature:**
 
 ```typescript
-type ConfigurationUpdateInput = Partial<ConfigurationCreateInput>;
+type ConfigurationUpdateInput = Partial<ConfigurationCreateInput>
 ```
-**References:** [ConfigurationCreateInput](./system-events.configurationcreateinput.md)
 
+**References:** [ConfigurationCreateInput](./system-events.configurationcreateinput.md)

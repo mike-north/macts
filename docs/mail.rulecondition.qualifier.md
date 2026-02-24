@@ -9,5 +9,5 @@ Rule qualifier
 **Signature:**
 
 ```typescript
-qualifier: string;
+qualifier: string
 ```

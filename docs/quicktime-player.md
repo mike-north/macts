@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentResourceClient](./quicktime-player.documentresourceclient.md)
 
-
 </td><td>
 
 Client for a quicktime player document.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./quicktime-player.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [QuickTimePlayerClient](./quicktime-player.quicktimeplayerclient.md)
 
-
 </td><td>
 
 QuickTimePlayer client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [QuickTimePlayerError](./quicktime-player.quicktimeplayererror.md)
 
-
 </td><td>
 
 Error class for QuickTimePlayer API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ Error class for QuickTimePlayer API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Document](./quicktime-player.document.md)
 
-
 </td><td>
 
 A QuickTime Player document
-
 
 </td></tr>
 <tr><td>
 
 [DocumentCreateInput](./quicktime-player.documentcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Document
-
 
 </td></tr>
 <tr><td>
 
 [QuickTimePlayerClientOptions](./quicktime-player.quicktimeplayerclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentSchema](./quicktime-player.documentschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,23 +119,18 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentUpdateInput](./quicktime-player.documentupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Document
 
-
 </td></tr>
 </tbody></table>
-

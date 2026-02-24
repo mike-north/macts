@@ -11,7 +11,11 @@ Automatically handles span lifecycle: creates the span before execution, records
 **Signature:**
 
 ```typescript
-declare function withSpan<T>(name: string, fn: (span: Span) => Promise<T>, attributes?: Record<string, AttributeValue>): Promise<T>;
+declare function withSpan<T>(
+  name: string,
+  fn: (span: Span) => Promise<T>,
+  attributes?: Record<string, AttributeValue>
+): Promise<T>
 ```
 
 ## Parameters
@@ -20,64 +24,52 @@ declare function withSpan<T>(name: string, fn: (span: Span) => Promise<T>, attri
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Span name
-
 
 </td></tr>
 <tr><td>
 
 fn
 
-
 </td><td>
 
 (span: [Span](./api.span.md)<!-- -->) =&gt; Promise&lt;T&gt;
 
-
 </td><td>
 
 Async function to execute within the span
-
 
 </td></tr>
 <tr><td>
 
 attributes
 
-
 </td><td>
 
 Record&lt;string, [AttributeValue](./api.attributevalue.md)<!-- -->&gt;
 
-
 </td><td>
 
 _(Optional)_ Optional span attributes
-
 
 </td></tr>
 </tbody></table>
@@ -90,13 +82,11 @@ The result of the function
 
 ## Example
 
-
 ```typescript
-import { withSpan } from '@macts/api/telemetry';
+import { withSpan } from '@macts/api/telemetry'
 
 const result = await withSpan('db.query', async (span) => {
-  span.setAttribute('db.statement', 'SELECT ...');
-  return await db.query('SELECT ...');
-});
+  span.setAttribute('db.statement', 'SELECT ...')
+  return await db.query('SELECT ...')
+})
 ```
-

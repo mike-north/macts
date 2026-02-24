@@ -9,5 +9,5 @@ Can the attribute be set?
 **Signature:**
 
 ```typescript
-settable: boolean;
+settable: boolean
 ```

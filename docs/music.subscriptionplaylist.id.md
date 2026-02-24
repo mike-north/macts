@@ -9,5 +9,5 @@ Unique identifier for this playlist
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

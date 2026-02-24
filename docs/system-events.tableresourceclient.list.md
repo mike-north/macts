@@ -11,7 +11,7 @@ List all tables.
 ```typescript
 list(): Promise<Table[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Table](./system-events.table.md)<!-- -->\[\]&gt;
-

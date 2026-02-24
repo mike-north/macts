@@ -9,5 +9,5 @@ the name of the attribute
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

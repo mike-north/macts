@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-TabSchema: z.ZodObject<{
-    currentSession: z.ZodString;
-    index: z.ZodNumber;
-    title: z.ZodString;
-}, z.core.$strip>
+TabSchema: z.ZodObject<
+  {
+    currentSession: z.ZodString
+    index: z.ZodNumber
+    title: z.ZodString
+  },
+  z.core.$strip
+>
 ```

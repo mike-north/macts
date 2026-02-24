@@ -9,7 +9,7 @@ An enumeration within a suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingEnumeration 
+interface ScriptingEnumeration
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface ScriptingEnumeration
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [hidden](./system-events.scriptingenumeration.hidden.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the enumeration hidden?
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.scriptingenumeration.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the enumeration
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.scriptingenumeration.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the enumeration
 
-
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ select the specified object(s)
 ```typescript
 select(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

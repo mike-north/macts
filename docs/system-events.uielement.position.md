@@ -9,5 +9,5 @@ the position of the UI element
 **Signature:**
 
 ```typescript
-position: string;
+position: string
 ```

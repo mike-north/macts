@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match MCP plugin loader convention
-export { remindersPlugin as plugin, remindersPlugin } from './plugin.js';
-export type { McpPlugin, McpToolDefinition } from '@macts/mcp';
+export { remindersPlugin as plugin, remindersPlugin } from './plugin.js'
+export type { McpPlugin, McpToolDefinition } from '@macts/mcp'

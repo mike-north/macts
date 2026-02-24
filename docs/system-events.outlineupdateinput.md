@@ -9,7 +9,7 @@ Input for updating a Outline
 **Signature:**
 
 ```typescript
-type OutlineUpdateInput = Partial<OutlineCreateInput>;
+type OutlineUpdateInput = Partial<OutlineCreateInput>
 ```
-**References:** [OutlineCreateInput](./system-events.outlinecreateinput.md)
 
+**References:** [OutlineCreateInput](./system-events.outlinecreateinput.md)

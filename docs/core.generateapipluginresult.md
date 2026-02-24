@@ -9,7 +9,7 @@ Result of generating an API plugin.
 **Signature:**
 
 ```typescript
-interface GenerateApiPluginResult 
+interface GenerateApiPluginResult
 ```
 
 ## Properties
@@ -18,56 +18,43 @@ interface GenerateApiPluginResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [errors](./core.generateapipluginresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generateapipluginresult.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Priv
 **Signature:**
 
 ```typescript
-type Priv = 'readOnly' | 'readWrite' | 'writeOnly' | 'none';
+type Priv = 'readOnly' | 'readWrite' | 'writeOnly' | 'none'
 ```

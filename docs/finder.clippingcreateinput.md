@@ -9,5 +9,5 @@ Input for creating a Clipping
 **Signature:**
 
 ```typescript
-interface ClippingCreateInput 
+interface ClippingCreateInput
 ```

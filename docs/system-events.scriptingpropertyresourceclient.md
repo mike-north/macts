@@ -9,7 +9,7 @@ Client for a property within a class within a suite within a scripting definitio
 **Signature:**
 
 ```typescript
-declare class ScriptingPropertyResourceClient 
+declare class ScriptingPropertyResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingPropertyResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingpropertyresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingPropertyResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingPropertyResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingpropertyresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingproperty.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingpropertyresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingproperty.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingpropertyresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingproperty by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingpropertyresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingproperties.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingpropertyresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingproperty.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ The Spotify URL for the track
 **Signature:**
 
 ```typescript
-spotifyUrl: string;
+spotifyUrl: string
 ```

@@ -9,5 +9,5 @@ Indicates whether the rule has a move action
 **Signature:**
 
 ```typescript
-shouldMoveMessage: boolean;
+shouldMoveMessage: boolean
 ```

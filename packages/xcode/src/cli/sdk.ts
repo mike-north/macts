@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { XcodeClient, type XcodeClientOptions } from '../client.js';
+import { XcodeClient, type XcodeClientOptions } from '../client.js'
 
 /**
  * Get a XcodeClient instance.
@@ -16,32 +16,32 @@ import { XcodeClient, type XcodeClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getXcodeClient(): XcodeClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions xcode:*:*'
-    );
+    )
   }
 
   const options: XcodeClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new XcodeClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new XcodeClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: XcodeClient | null = null;
+let _client: XcodeClient | null = null
 
 /**
  * Get or create the singleton XcodeClient.
@@ -50,8 +50,8 @@ let _client: XcodeClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): XcodeClient {
-  _client ??= getXcodeClient();
-  return _client;
+  _client ??= getXcodeClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): XcodeClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

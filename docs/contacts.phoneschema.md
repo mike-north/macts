@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-PhoneSchema: z.ZodObject<{
-    id: z.ZodString;
-    label: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+PhoneSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    label: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

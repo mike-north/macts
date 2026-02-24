@@ -9,7 +9,7 @@ Input for updating a MenuItem
 **Signature:**
 
 ```typescript
-type MenuItemUpdateInput = Partial<MenuItemCreateInput>;
+type MenuItemUpdateInput = Partial<MenuItemCreateInput>
 ```
-**References:** [MenuItemCreateInput](./system-events.menuitemcreateinput.md)
 
+**References:** [MenuItemCreateInput](./system-events.menuitemcreateinput.md)

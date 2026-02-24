@@ -9,19 +9,18 @@ Calendar client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class CalendarClient 
+declare class CalendarClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new CalendarClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./calendar.calendarclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CalendarClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,189 +57,153 @@ Constructs a new instance of the `CalendarClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [attendees](./calendar.calendarclient.attendees.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AttendeeResourceClient](./calendar.attendeeresourceclient.md)
 
-
 </td><td>
 
 An event attendee
-
 
 </td></tr>
 <tr><td>
 
 [calendars](./calendar.calendarclient.calendars.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [CalendarResourceClient](./calendar.calendarresourceclient.md)
 
-
 </td><td>
 
 A calendar containing events
-
 
 </td></tr>
 <tr><td>
 
 [displayalarms](./calendar.calendarclient.displayalarms.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DisplayAlarmResourceClient](./calendar.displayalarmresourceclient.md)
 
-
 </td><td>
 
 A message/display alarm
-
 
 </td></tr>
 <tr><td>
 
 [events](./calendar.calendarclient.events.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [EventResourceClient](./calendar.eventresourceclient.md)
 
-
 </td><td>
 
 A calendar event
-
 
 </td></tr>
 <tr><td>
 
 [http](./calendar.calendarclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./calendar.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [mailalarms](./calendar.calendarclient.mailalarms.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MailAlarmResourceClient](./calendar.mailalarmresourceclient.md)
 
-
 </td><td>
 
 A mail/email alarm
-
 
 </td></tr>
 <tr><td>
 
 [openfilealarms](./calendar.calendarclient.openfilealarms.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [OpenFileAlarmResourceClient](./calendar.openfilealarmresourceclient.md)
 
-
 </td><td>
 
 An 'open file' alarm
-
 
 </td></tr>
 <tr><td>
 
 [soundalarms](./calendar.calendarclient.soundalarms.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SoundAlarmResourceClient](./calendar.soundalarmresourceclient.md)
 
-
 </td><td>
 
 A sound alarm
-
 
 </td></tr>
 </tbody></table>
@@ -257,59 +214,46 @@ A sound alarm
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [reloadCalendars()](./calendar.calendarclient.reloadcalendars.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Tell the application to reload all calendar files contents
-
 
 </td></tr>
 <tr><td>
 
 [switchView(to)](./calendar.calendarclient.switchview.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Show calendar on the given view
-
 
 </td></tr>
 <tr><td>
 
 [viewCalendar(at)](./calendar.calendarclient.viewcalendar.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Show calendar on the given date
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A slider belonging to a window
 **Signature:**
 
 ```typescript
-interface Slider 
+interface Slider
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Slider
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.slider.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this slider
 
-
 </td></tr>
 </tbody></table>
-

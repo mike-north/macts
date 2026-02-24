@@ -9,7 +9,7 @@ Minimal tracer interface compatible with OpenTelemetry Tracer.
 **Signature:**
 
 ```typescript
-interface Tracer 
+interface Tracer
 ```
 
 ## Methods
@@ -18,23 +18,18 @@ interface Tracer
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [startSpan(name, options)](./api.tracer.startspan.md)
 
-
 </td><td>
 
 Start a new span.
 
-
 </td></tr>
 </tbody></table>
-

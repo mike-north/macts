@@ -9,5 +9,5 @@ the size of the text displayed in the list view
 **Signature:**
 
 ```typescript
-textSize: number;
+textSize: number
 ```

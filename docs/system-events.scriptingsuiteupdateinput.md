@@ -9,7 +9,7 @@ Input for updating a ScriptingSuite
 **Signature:**
 
 ```typescript
-type ScriptingSuiteUpdateInput = Partial<ScriptingSuiteCreateInput>;
+type ScriptingSuiteUpdateInput = Partial<ScriptingSuiteCreateInput>
 ```
-**References:** [ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)
 
+**References:** [ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)

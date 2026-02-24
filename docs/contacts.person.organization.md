@@ -9,5 +9,5 @@ Organization that employs this person.
 **Signature:**
 
 ```typescript
-organization: string;
+organization: string
 ```

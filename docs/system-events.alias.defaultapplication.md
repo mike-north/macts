@@ -9,5 +9,5 @@ the application that will launch if the alias is opened
 **Signature:**
 
 ```typescript
-defaultApplication: string;
+defaultApplication: string
 ```

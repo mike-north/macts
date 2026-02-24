@@ -9,7 +9,7 @@ Client for an image belonging to a static text field.
 **Signature:**
 
 ```typescript
-declare class ImageResourceClient 
+declare class ImageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ImageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.imageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ImageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ImageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.imageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new image.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.imageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a image.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.imageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a image by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.imageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all images.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.imageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing image.
 
-
 </td></tr>
 </tbody></table>
-

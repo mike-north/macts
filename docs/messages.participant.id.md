@@ -9,5 +9,5 @@ The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

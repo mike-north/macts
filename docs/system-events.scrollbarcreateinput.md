@@ -9,5 +9,5 @@ Input for creating a ScrollBar
 **Signature:**
 
 ```typescript
-interface ScrollBarCreateInput 
+interface ScrollBarCreateInput
 ```

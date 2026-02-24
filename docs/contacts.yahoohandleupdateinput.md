@@ -9,7 +9,7 @@ Input for updating a YahooHandle
 **Signature:**
 
 ```typescript
-type YahooHandleUpdateInput = Partial<YahooHandleCreateInput>;
+type YahooHandleUpdateInput = Partial<YahooHandleCreateInput>
 ```
-**References:** [YahooHandleCreateInput](./contacts.yahoohandlecreateinput.md)
 
+**References:** [YahooHandleCreateInput](./contacts.yahoohandlecreateinput.md)

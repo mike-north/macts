@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-SystemDomainObjectSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+SystemDomainObjectSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

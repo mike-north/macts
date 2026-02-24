@@ -11,7 +11,7 @@ Handles three categories of types: - Primitive types (string, number, boolean, d
 **Signature:**
 
 ```typescript
-declare function propertyTypeToTs(type: PropertyType | undefined): string;
+declare function propertyTypeToTs(type: PropertyType | undefined): string
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function propertyTypeToTs(type: PropertyType | undefined): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 type
 
-
 </td><td>
 
 [PropertyType](./core.propertytype.md) \| undefined
 
-
 </td><td>
 
 The property type from the manifest, or undefined
-
 
 </td></tr>
 </tbody></table>
@@ -58,11 +52,9 @@ TypeScript type string representation
 
 ## Example
 
-
 ```typescript
-propertyTypeToTs('string')           // => 'string'
+propertyTypeToTs('string') // => 'string'
 propertyTypeToTs({ array: 'number' }) // => 'number[]'
 propertyTypeToTs({ resource: 'Event' }) // => 'Event'
-propertyTypeToTs('Calendar')         // => 'Calendar' (custom reference)
+propertyTypeToTs('Calendar') // => 'Calendar' (custom reference)
 ```
-

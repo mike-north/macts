@@ -9,7 +9,7 @@ Client for a header value for a message. e.g. to, subject, from..
 **Signature:**
 
 ```typescript
-declare class HeaderResourceClient 
+declare class HeaderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class HeaderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.headerresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `HeaderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `HeaderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.headerresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new header.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.headerresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a header.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.headerresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a header by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.headerresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all headers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.headerresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing header.
 
-
 </td></tr>
 </tbody></table>
-

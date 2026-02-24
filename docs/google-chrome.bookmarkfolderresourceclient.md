@@ -9,7 +9,7 @@ Client for a bookmarks folder that contains other bookmarks folder and bookmark 
 **Signature:**
 
 ```typescript
-declare class BookmarkFolderResourceClient 
+declare class BookmarkFolderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class BookmarkFolderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./google-chrome.bookmarkfolderresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `BookmarkFolderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `BookmarkFolderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./google-chrome.bookmarkfolderresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new bookmarkfolder.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./google-chrome.bookmarkfolderresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a bookmarkfolder.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./google-chrome.bookmarkfolderresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a bookmarkfolder by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./google-chrome.bookmarkfolderresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all bookmarkfolders.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./google-chrome.bookmarkfolderresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing bookmarkfolder.
 
-
 </td></tr>
 </tbody></table>
-

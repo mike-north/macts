@@ -9,7 +9,7 @@ A button belonging to a window or scroll bar
 **Signature:**
 
 ```typescript
-interface Button 
+interface Button
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Button
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.button.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this button
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A TextEdit document
 **Signature:**
 
 ```typescript
-interface Document 
+interface Document
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface Document
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [modified](./textedit.document.modified.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the document has been modified since last save
-
 
 </td></tr>
 <tr><td>
 
 [name](./textedit.document.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the document
-
 
 </td></tr>
 <tr><td>
 
 [path?](./textedit.document.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The file path of the document
-
 
 </td></tr>
 <tr><td>
 
 [text](./textedit.document.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The text content of the document
 
-
 </td></tr>
 </tbody></table>
-

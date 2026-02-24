@@ -9,7 +9,7 @@ Raw enumerator value - a single value in an enumeration.
 **Signature:**
 
 ```typescript
-interface RawEnumerator 
+interface RawEnumerator
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface RawEnumerator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.rawenumerator.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawenumerator.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawenumerator.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Enumerator name (e.g., "yes", "no", "ask")
 
-
 </td></tr>
 </tbody></table>
-

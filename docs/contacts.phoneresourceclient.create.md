@@ -18,30 +18,24 @@ create(input: PhoneCreateInput): Promise<Phone>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PhoneCreateInput](./contacts.phonecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Phone](./contacts.phone.md)<!-- -->&gt;
-

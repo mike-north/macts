@@ -9,7 +9,7 @@ Client for an email recipient in the cc: field.
 **Signature:**
 
 ```typescript
-declare class CcRecipientResourceClient 
+declare class CcRecipientResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class CcRecipientResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.ccrecipientresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CcRecipientResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `CcRecipientResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.ccrecipientresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new ccrecipient.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.ccrecipientresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a ccrecipient.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.ccrecipientresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a ccrecipient by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.ccrecipientresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all ccrecipients.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.ccrecipientresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing ccrecipient.
 
-
 </td></tr>
 </tbody></table>
-

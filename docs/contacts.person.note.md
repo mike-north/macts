@@ -9,5 +9,5 @@ Notes for this person.
 **Signature:**
 
 ```typescript
-note: string;
+note: string
 ```

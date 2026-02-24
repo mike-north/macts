@@ -9,5 +9,5 @@ Dpbh
 **Signature:**
 
 ```typescript
-type Dpbh = 'minimize' | 'off' | 'zoom';
+type Dpbh = 'minimize' | 'off' | 'zoom'
 ```

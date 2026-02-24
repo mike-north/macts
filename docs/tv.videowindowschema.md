@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-VideoWindowSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+VideoWindowSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

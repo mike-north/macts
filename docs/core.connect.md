@@ -9,7 +9,7 @@ Create a connection object for an application.
 **Signature:**
 
 ```typescript
-declare function connect(bundleId: string, _options?: AppConnectionOptions): Promise<AppConnection>;
+declare function connect(bundleId: string, _options?: AppConnectionOptions): Promise<AppConnection>
 ```
 
 ## Parameters
@@ -18,46 +18,37 @@ declare function connect(bundleId: string, _options?: AppConnectionOptions): Pro
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 \_options
 
-
 </td><td>
 
 [AppConnectionOptions](./core.appconnectionoptions.md)
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -65,4 +56,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;[AppConnection](./core.appconnection.md)<!-- -->&gt;
-

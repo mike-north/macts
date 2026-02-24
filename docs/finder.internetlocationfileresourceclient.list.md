@@ -11,7 +11,7 @@ List all internetlocationfiles.
 ```typescript
 list(): Promise<InternetLocationFile[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[InternetLocationFile](./finder.internetlocationfile.md)<!-- -->\[\]&gt;
-

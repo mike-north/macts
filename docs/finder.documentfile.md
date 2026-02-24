@@ -9,7 +9,7 @@ A document file
 **Signature:**
 
 ```typescript
-interface DocumentFile 
+interface DocumentFile
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface DocumentFile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./finder.documentfile.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this document
 
-
 </td></tr>
 </tbody></table>
-

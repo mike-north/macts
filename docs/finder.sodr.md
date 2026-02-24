@@ -9,5 +9,5 @@ Sodr
 **Signature:**
 
 ```typescript
-type Sodr = 'normal' | 'reversed';
+type Sodr = 'normal' | 'reversed'
 ```

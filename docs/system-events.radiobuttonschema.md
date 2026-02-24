@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-RadioButtonSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+RadioButtonSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

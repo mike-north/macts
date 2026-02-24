@@ -9,7 +9,7 @@ Input for updating a Checkbox
 **Signature:**
 
 ```typescript
-type CheckboxUpdateInput = Partial<CheckboxCreateInput>;
+type CheckboxUpdateInput = Partial<CheckboxCreateInput>
 ```
-**References:** [CheckboxCreateInput](./system-events.checkboxcreateinput.md)
 
+**References:** [CheckboxCreateInput](./system-events.checkboxcreateinput.md)

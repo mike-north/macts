@@ -11,7 +11,7 @@ List all scriptingelements.
 ```typescript
 list(): Promise<ScriptingElement[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingElement](./system-events.scriptingelement.md)<!-- -->\[\]&gt;
-

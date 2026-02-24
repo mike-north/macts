@@ -11,7 +11,7 @@ List all menubars.
 ```typescript
 list(): Promise<MenuBar[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MenuBar](./system-events.menubar.md)<!-- -->\[\]&gt;
-

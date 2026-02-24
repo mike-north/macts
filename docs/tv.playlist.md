@@ -9,7 +9,7 @@ a list of tracks/streams
 **Signature:**
 
 ```typescript
-interface Playlist 
+interface Playlist
 ```
 
 ## Properties
@@ -18,193 +18,152 @@ interface Playlist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./tv.playlist.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the description of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [duration](./tv.playlist.duration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total length of all tracks (in seconds)
-
 
 </td></tr>
 <tr><td>
 
 [id](./tv.playlist.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this playlist
-
 
 </td></tr>
 <tr><td>
 
 [name](./tv.playlist.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [parent](./tv.playlist.parent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Playlist](./tv.playlist.md)
 
-
 </td><td>
 
 folder which contains this playlist (if any)
-
 
 </td></tr>
 <tr><td>
 
 [size](./tv.playlist.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total size of all tracks (in bytes)
-
 
 </td></tr>
 <tr><td>
 
 [specialKind](./tv.playlist.specialkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 special playlist kind
-
 
 </td></tr>
 <tr><td>
 
 [time](./tv.playlist.time.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the length of all tracks in MM:SS format
-
 
 </td></tr>
 <tr><td>
 
 [visible](./tv.playlist.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this playlist visible in the Source list?
 
-
 </td></tr>
 </tbody></table>
-

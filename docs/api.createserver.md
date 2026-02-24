@@ -9,7 +9,7 @@ Create a macts API server for a single app.
 **Signature:**
 
 ```typescript
-declare function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
+declare function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance
 ```
 
 ## Parameters
@@ -18,48 +18,39 @@ declare function createServer(manifest: AppManifest, options?: ServerOptions): S
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 App manifest to serve
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [ServerOptions](./api.serveroptions.md)
 
-
 </td><td>
 
 _(Optional)_ Server configuration
-
 
 </td></tr>
 </tbody></table>
@@ -72,15 +63,13 @@ Hono app configured with routes
 
 ## Example
 
-
 ```typescript
-import { createServer, DEFAULT_PORT } from '@macts/api/server';
-import { loadManifest } from '@macts/core';
+import { createServer, DEFAULT_PORT } from '@macts/api/server'
+import { loadManifest } from '@macts/core'
 
-const manifest = await loadManifest('./calendar/app.yaml');
-const { app, start } = createServer(manifest, { port: DEFAULT_PORT });
+const manifest = await loadManifest('./calendar/app.yaml')
+const { app, start } = createServer(manifest, { port: DEFAULT_PORT })
 
-await start();
-console.log('Server running on http://localhost:8372');
+await start()
+console.log('Server running on http://localhost:8372')
 ```
-

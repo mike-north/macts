@@ -11,7 +11,7 @@ Verify if an object exists
 ```typescript
 exists(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

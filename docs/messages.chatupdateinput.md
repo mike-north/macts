@@ -9,7 +9,7 @@ Input for updating a Chat
 **Signature:**
 
 ```typescript
-type ChatUpdateInput = Partial<ChatCreateInput>;
+type ChatUpdateInput = Partial<ChatCreateInput>
 ```
-**References:** [ChatCreateInput](./messages.chatcreateinput.md)
 
+**References:** [ChatCreateInput](./messages.chatcreateinput.md)

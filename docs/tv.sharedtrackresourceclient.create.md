@@ -18,30 +18,24 @@ create(input: SharedTrackCreateInput): Promise<SharedTrack>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SharedTrackCreateInput](./tv.sharedtrackcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[SharedTrack](./tv.sharedtrack.md)<!-- -->&gt;
-

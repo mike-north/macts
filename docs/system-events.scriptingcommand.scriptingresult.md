@@ -9,5 +9,5 @@ The object or data returned by this command
 **Signature:**
 
 ```typescript
-scriptingResult: unknown;
+scriptingResult: unknown
 ```

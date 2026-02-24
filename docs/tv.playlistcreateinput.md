@@ -9,7 +9,7 @@ Input for creating a Playlist
 **Signature:**
 
 ```typescript
-interface PlaylistCreateInput 
+interface PlaylistCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface PlaylistCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description?](./tv.playlistcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the description of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [name?](./tv.playlistcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the playlist
 
-
 </td></tr>
 </tbody></table>
-

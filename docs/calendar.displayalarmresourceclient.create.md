@@ -18,30 +18,24 @@ create(input: DisplayAlarmCreateInput): Promise<DisplayAlarm>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[DisplayAlarm](./calendar.displayalarm.md)<!-- -->&gt;
-

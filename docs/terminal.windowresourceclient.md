@@ -9,7 +9,7 @@ Client for a terminal window.
 **Signature:**
 
 ```typescript
-declare class WindowResourceClient 
+declare class WindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class WindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./terminal.windowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `WindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `WindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./terminal.windowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new window.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./terminal.windowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a window.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./terminal.windowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a window by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./terminal.windowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all windows.
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./terminal.windowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing window.
 
-
 </td></tr>
 </tbody></table>
-

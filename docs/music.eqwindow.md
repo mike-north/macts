@@ -9,7 +9,7 @@ the equalizer window
 **Signature:**
 
 ```typescript
-interface EQWindow 
+interface EQWindow
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface EQWindow
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.eqwindow.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this window
 
-
 </td></tr>
 </tbody></table>
-

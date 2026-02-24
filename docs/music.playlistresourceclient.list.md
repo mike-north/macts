@@ -11,7 +11,7 @@ List all playlists.
 ```typescript
 list(): Promise<Playlist[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Playlist](./music.playlist.md)<!-- -->\[\]&gt;
-

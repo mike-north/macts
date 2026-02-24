@@ -9,5 +9,5 @@ Input for creating a ScriptingCommand
 **Signature:**
 
 ```typescript
-interface ScriptingCommandCreateInput 
+interface ScriptingCommandCreateInput
 ```

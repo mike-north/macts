@@ -9,5 +9,5 @@ The current URL
 **Signature:**
 
 ```typescript
-url: string;
+url: string
 ```

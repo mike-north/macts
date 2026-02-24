@@ -9,5 +9,5 @@ ENQ Answerback string
 **Signature:**
 
 ```typescript
-answerbackString: string;
+answerbackString: string
 ```

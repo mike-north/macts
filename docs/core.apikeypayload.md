@@ -9,7 +9,7 @@ API key payload structure.
 **Signature:**
 
 ```typescript
-interface ApiKeyPayload 
+interface ApiKeyPayload
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface ApiKeyPayload
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [exp?](./core.apikeypayload.exp.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Optional expiration timestamp (Unix seconds)
-
 
 </td></tr>
 <tr><td>
 
 [iat](./core.apikeypayload.iat.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Issued at timestamp (Unix seconds)
-
 
 </td></tr>
 <tr><td>
 
 [iss](./core.apikeypayload.iss.md)
 
-
 </td><td>
-
 
 </td><td>
 
 'macts'
 
-
 </td><td>
 
 Issuer - always 'macts'
-
 
 </td></tr>
 <tr><td>
 
 [name?](./core.apikeypayload.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable key name
-
 
 </td></tr>
 <tr><td>
 
 [permissions](./core.apikeypayload.permissions.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 List of fine-grained permissions granted
-
 
 </td></tr>
 <tr><td>
 
 [sub](./core.apikeypayload.sub.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Subject - unique key ID for revocation tracking
 
-
 </td></tr>
 </tbody></table>
-

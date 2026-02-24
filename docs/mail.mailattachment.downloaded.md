@@ -9,5 +9,5 @@ Indicates whether the attachment has been downloaded.
 **Signature:**
 
 ```typescript
-downloaded: boolean;
+downloaded: boolean
 ```

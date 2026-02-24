@@ -9,7 +9,7 @@ Input for creating a Document
 **Signature:**
 
 ```typescript
-interface DocumentCreateInput 
+interface DocumentCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface DocumentCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [contents?](./script-editor.documentcreateinput.contents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The source code of the script
-
 
 </td></tr>
 <tr><td>
 
 [language?](./script-editor.documentcreateinput.language.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The scripting language (AppleScript or JavaScript)
-
 
 </td></tr>
 <tr><td>
 
 [name?](./script-editor.documentcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the document
 
-
 </td></tr>
 </tbody></table>
-

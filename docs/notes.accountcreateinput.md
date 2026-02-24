@@ -9,5 +9,5 @@ Input for creating a Account
 **Signature:**
 
 ```typescript
-interface AccountCreateInput 
+interface AccountCreateInput
 ```

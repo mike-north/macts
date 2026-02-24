@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS QuickTime Player.app automation.
@@ -16,4 +16,4 @@ export const quicktimePlayerPlugin: McpPlugin = {
   name: 'quicktime-player',
   description: 'MCP plugin for macOS QuickTime Player.app automation',
   tools: allTools,
-};
+}

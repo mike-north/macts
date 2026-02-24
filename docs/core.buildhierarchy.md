@@ -11,7 +11,7 @@ This function analyzes element relationships to determine: - Which classes are r
 **Signature:**
 
 ```typescript
-declare function buildHierarchy(sdef: RawSdefData): HierarchyResult;
+declare function buildHierarchy(sdef: RawSdefData): HierarchyResult
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 sdef
 
-
 </td><td>
 
 [RawSdefData](./core.rawsdefdata.md)
 
-
 </td><td>
 
 Raw SDEF data
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ Raw SDEF data
 [HierarchyResult](./core.hierarchyresult.md)
 
 Hierarchy analysis result
-

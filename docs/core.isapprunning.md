@@ -9,7 +9,7 @@ Check if an application is currently running.
 **Signature:**
 
 ```typescript
-declare function isAppRunning(bundleId: string): Promise<boolean>;
+declare function isAppRunning(bundleId: string): Promise<boolean>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function isAppRunning(bundleId: string): Promise<boolean>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;boolean&gt;
-

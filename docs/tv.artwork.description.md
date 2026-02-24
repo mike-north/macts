@@ -9,5 +9,5 @@ description of artwork as a string
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

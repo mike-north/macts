@@ -9,5 +9,18 @@ Ipnl
 **Signature:**
 
 ```typescript
-type Ipnl = 'generalInformationPanel' | 'sharingPanel' | 'memoryPanel' | 'previewPanel' | 'applicationPanel' | 'languagesPanel' | 'pluginsPanel' | 'nameExtensionPanel' | 'commentsPanel' | 'contentIndexPanel' | 'burningPanel' | 'moreInfoPanel' | 'simpleHeaderPanel';
+type Ipnl =
+  | 'generalInformationPanel'
+  | 'sharingPanel'
+  | 'memoryPanel'
+  | 'previewPanel'
+  | 'applicationPanel'
+  | 'languagesPanel'
+  | 'pluginsPanel'
+  | 'nameExtensionPanel'
+  | 'commentsPanel'
+  | 'contentIndexPanel'
+  | 'burningPanel'
+  | 'moreInfoPanel'
+  | 'simpleHeaderPanel'
 ```

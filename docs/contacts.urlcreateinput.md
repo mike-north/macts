@@ -9,7 +9,7 @@ Input for creating a Url
 **Signature:**
 
 ```typescript
-interface UrlCreateInput 
+interface UrlCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface UrlCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.urlcreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this URL
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.urlcreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The URL value
 
-
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ List all radiogroups.
 ```typescript
 list(): Promise<RadioGroup[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RadioGroup](./system-events.radiogroup.md)<!-- -->\[\]&gt;
-

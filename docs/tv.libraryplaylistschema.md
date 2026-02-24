@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-LibraryPlaylistSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+LibraryPlaylistSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

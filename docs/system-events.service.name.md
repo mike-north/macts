@@ -9,5 +9,5 @@ the name of the service
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

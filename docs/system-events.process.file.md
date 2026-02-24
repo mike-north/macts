@@ -9,5 +9,5 @@ the file from which the process was launched
 **Signature:**
 
 ```typescript
-file: string;
+file: string
 ```

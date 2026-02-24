@@ -9,7 +9,7 @@ A relevance indicator belonging to a window
 **Signature:**
 
 ```typescript
-interface RelevanceIndicator 
+interface RelevanceIndicator
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface RelevanceIndicator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.relevanceindicator.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this relevance indicator
 
-
 </td></tr>
 </tbody></table>
-

@@ -11,9 +11,12 @@ Creates middleware that checks if the authenticated user has a specific permissi
 **Signature:**
 
 ```typescript
-declare function requirePermission(requiredPermission: string, options?: PermissionMiddlewareOptions): MiddlewareHandler<{
-    Variables: AuthVariables;
-}>;
+declare function requirePermission(
+  requiredPermission: string,
+  options?: PermissionMiddlewareOptions
+): MiddlewareHandler<{
+  Variables: AuthVariables
+}>
 ```
 
 ## Parameters
@@ -22,48 +25,39 @@ declare function requirePermission(requiredPermission: string, options?: Permiss
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 requiredPermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The permission string required (e.g., 'calendar:events:list')
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [PermissionMiddlewareOptions](./api.permissionmiddlewareoptions.md)
 
-
 </td><td>
 
 _(Optional)_ Optional configuration
-
 
 </td></tr>
 </tbody></table>
@@ -76,18 +70,16 @@ Middleware handler
 
 ## Example
 
-
 ```typescript
-import { Hono } from 'hono';
-import { authMiddleware } from './middleware/auth.js';
-import { requirePermission } from './middleware/permission.js';
+import { Hono } from 'hono'
+import { authMiddleware } from './middleware/auth.js'
+import { requirePermission } from './middleware/permission.js'
 
-const app = new Hono<{ Variables: AuthVariables }>();
+const app = new Hono<{ Variables: AuthVariables }>()
 
-app.use('/api/*', authMiddleware());
+app.use('/api/*', authMiddleware())
 
 app.post('/api/rpc/calendar.events.list', requirePermission('calendar:events:list'), (c) => {
   // Handle request - user has permission
-});
+})
 ```
-

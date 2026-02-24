@@ -9,5 +9,5 @@ The name of this account as defined in Account preferences description field
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

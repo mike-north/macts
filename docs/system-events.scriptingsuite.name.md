@@ -9,5 +9,5 @@ The name of the suite
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

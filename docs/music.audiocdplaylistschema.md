@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-AudioCDPlaylistSchema: z.ZodObject<{
-    artist: z.ZodString;
-    compilation: z.ZodBoolean;
-    composer: z.ZodString;
-    discCount: z.ZodNumber;
-    discNumber: z.ZodNumber;
-    genre: z.ZodString;
-    year: z.ZodNumber;
-}, z.core.$strip>
+AudioCDPlaylistSchema: z.ZodObject<
+  {
+    artist: z.ZodString
+    compilation: z.ZodBoolean
+    composer: z.ZodString
+    discCount: z.ZodNumber
+    discNumber: z.ZodNumber
+    genre: z.ZodString
+    year: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

@@ -11,7 +11,7 @@ List all growareas.
 ```typescript
 list(): Promise<GrowArea[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[GrowArea](./system-events.growarea.md)<!-- -->\[\]&gt;
-

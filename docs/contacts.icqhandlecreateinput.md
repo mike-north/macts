@@ -9,7 +9,7 @@ Input for creating a ICQHandle
 **Signature:**
 
 ```typescript
-interface ICQHandleCreateInput 
+interface ICQHandleCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ICQHandleCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.icqhandlecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.icqhandlecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The ICQ handle value
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ is the device currently being played to?
 **Signature:**
 
 ```typescript
-active: boolean;
+active: boolean
 ```

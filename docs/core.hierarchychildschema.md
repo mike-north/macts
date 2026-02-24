@@ -10,9 +10,9 @@ Schema for a child in the containment hierarchy.
 
 ```typescript
 HierarchyChildSchema: z.ZodType<{
-    resource: string;
-    access: 'r' | 'rw';
-    description?: string | undefined;
-    children?: Record<string, HierarchyChild> | undefined;
+  resource: string
+  access: 'r' | 'rw'
+  description?: string | undefined
+  children?: Record<string, HierarchyChild> | undefined
 }>
 ```

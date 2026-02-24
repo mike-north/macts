@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Relationship = z.infer<typeof RelationshipSchema>;
+type Relationship = z.infer<typeof RelationshipSchema>
 ```
-**References:** [RelationshipSchema](./core.relationshipschema.md)
 
+**References:** [RelationshipSchema](./core.relationshipschema.md)

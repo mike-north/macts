@@ -11,7 +11,7 @@ Discard the results of a bounded update session with one or more files.
 ```typescript
 abortTransaction(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

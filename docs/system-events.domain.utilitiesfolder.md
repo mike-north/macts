@@ -9,5 +9,5 @@ The Utilities folder
 **Signature:**
 
 ```typescript
-utilitiesFolder: Folder;
+utilitiesFolder: Folder
 ```

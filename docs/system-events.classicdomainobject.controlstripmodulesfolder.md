@@ -9,5 +9,5 @@ The Control Strip Modules folder
 **Signature:**
 
 ```typescript
-controlStripModulesFolder: Folder;
+controlStripModulesFolder: Folder
 ```

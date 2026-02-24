@@ -11,7 +11,7 @@ Get the steps for inspection.
 ```typescript
 getSteps(): readonly SpecifierStep[];
 ```
+
 **Returns:**
 
 readonly [SpecifierStep](./core.specifierstep.md)<!-- -->\[\]
-

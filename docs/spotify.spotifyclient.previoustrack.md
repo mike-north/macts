@@ -11,7 +11,7 @@ Skip to the previous track.
 ```typescript
 previousTrack(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

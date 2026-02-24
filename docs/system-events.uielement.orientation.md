@@ -9,5 +9,5 @@ the orientation of the UI element
 **Signature:**
 
 ```typescript
-orientation: string;
+orientation: string
 ```

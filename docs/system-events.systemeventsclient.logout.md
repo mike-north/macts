@@ -11,7 +11,7 @@ Log out the current user
 ```typescript
 logOut(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

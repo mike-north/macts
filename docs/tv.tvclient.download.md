@@ -11,7 +11,7 @@ download a cloud track or playlist
 ```typescript
 download(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

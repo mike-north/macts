@@ -9,7 +9,7 @@ User name for Microsoft Network (MSN) instant messaging.
 **Signature:**
 
 ```typescript
-interface MSNHandle 
+interface MSNHandle
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface MSNHandle
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.msnhandle.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this handle
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.msnhandle.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.msnhandle.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The MSN handle value
 
-
 </td></tr>
 </tbody></table>
-

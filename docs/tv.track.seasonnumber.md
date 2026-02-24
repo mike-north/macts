@@ -9,5 +9,5 @@ the season number of the track
 **Signature:**
 
 ```typescript
-seasonNumber: number;
+seasonNumber: number
 ```

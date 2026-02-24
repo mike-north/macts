@@ -9,7 +9,7 @@ Client for a sheet displayed over a window.
 **Signature:**
 
 ```typescript
-declare class SheetResourceClient 
+declare class SheetResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SheetResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.sheetresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SheetResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SheetResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.sheetresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new sheet.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.sheetresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a sheet.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.sheetresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a sheet by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.sheetresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all sheets.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.sheetresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing sheet.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Input for creating a MenuButton
 **Signature:**
 
 ```typescript
-interface MenuButtonCreateInput 
+interface MenuButtonCreateInput
 ```

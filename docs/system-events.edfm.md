@@ -9,5 +9,20 @@ Edfm
 **Signature:**
 
 ```typescript
-type Edfm = 'applePhotoFormat' | 'appleShareFormat' | 'audioFormat' | 'highSierraFormat' | '9660' | 'macOSExtendedFormat' | 'macOSFormat' | 'mSDOSFormat' | 'nFSFormat' | 'proDOSFormat' | 'quickTakeFormat' | 'uDFFormat' | 'uFSFormat' | 'unknownFormat' | 'webDAVFormat';
+type Edfm =
+  | 'applePhotoFormat'
+  | 'appleShareFormat'
+  | 'audioFormat'
+  | 'highSierraFormat'
+  | '9660'
+  | 'macOSExtendedFormat'
+  | 'macOSFormat'
+  | 'mSDOSFormat'
+  | 'nFSFormat'
+  | 'proDOSFormat'
+  | 'quickTakeFormat'
+  | 'uDFFormat'
+  | 'uFSFormat'
+  | 'unknownFormat'
+  | 'webDAVFormat'
 ```

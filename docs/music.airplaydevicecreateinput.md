@@ -9,7 +9,7 @@ Input for creating a AirPlayDevice
 **Signature:**
 
 ```typescript
-interface AirPlayDeviceCreateInput 
+interface AirPlayDeviceCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface AirPlayDeviceCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [selected?](./music.airplaydevicecreateinput.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is the device currently selected?
-
 
 </td></tr>
 <tr><td>
 
 [soundVolume?](./music.airplaydevicecreateinput.soundvolume.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the output volume for the device (0 = minimum, 100 = maximum)
 
-
 </td></tr>
 </tbody></table>
-

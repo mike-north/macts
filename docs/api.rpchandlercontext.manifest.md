@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-manifest: AppManifest;
+manifest: AppManifest
 ```

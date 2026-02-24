@@ -11,11 +11,11 @@ Creates a default logger on first call. Use [setLogger()](./api.setlogger.md) to
 **Signature:**
 
 ```typescript
-declare function getLogger(): pino.Logger;
+declare function getLogger(): pino.Logger
 ```
+
 **Returns:**
 
 pino.Logger
 
 The singleton Pino logger
-

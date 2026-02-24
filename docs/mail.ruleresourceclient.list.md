@@ -11,7 +11,7 @@ List all rules.
 ```typescript
 list(): Promise<Rule[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Rule](./mail.rule.md)<!-- -->\[\]&gt;
-

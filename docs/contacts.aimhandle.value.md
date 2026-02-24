@@ -9,5 +9,5 @@ The AIM handle value
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

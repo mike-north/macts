@@ -9,7 +9,7 @@ A property within a class within a suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingProperty 
+interface ScriptingProperty
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface ScriptingProperty
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [access](./system-events.scriptingproperty.access.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The type of access to this property
-
 
 </td></tr>
 <tr><td>
 
 [description](./system-events.scriptingproperty.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The description of the property
-
 
 </td></tr>
 <tr><td>
 
 [enumerated](./system-events.scriptingproperty.enumerated.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the property's value an enumerator?
-
 
 </td></tr>
 <tr><td>
 
 [hidden](./system-events.scriptingproperty.hidden.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the property hidden?
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.scriptingproperty.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the property
-
 
 </td></tr>
 <tr><td>
 
 [kind](./system-events.scriptingproperty.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The kind of object or data returned by this property
-
 
 </td></tr>
 <tr><td>
 
 [listed](./system-events.scriptingproperty.listed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the property's value a list?
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.scriptingproperty.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the property
 
-
 </td></tr>
 </tbody></table>
-

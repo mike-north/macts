@@ -9,5 +9,17 @@ EClS
 **Signature:**
 
 ```typescript
-type EClS = 'unknown' | 'purchased' | 'matched' | 'uploaded' | 'ineligible' | 'removed' | 'error' | 'duplicate' | 'subscription' | 'prerelease' | 'noLongerAvailable' | 'notUploaded';
+type EClS =
+  | 'unknown'
+  | 'purchased'
+  | 'matched'
+  | 'uploaded'
+  | 'ineligible'
+  | 'removed'
+  | 'error'
+  | 'duplicate'
+  | 'subscription'
+  | 'prerelease'
+  | 'noLongerAvailable'
+  | 'notUploaded'
 ```

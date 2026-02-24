@@ -9,7 +9,7 @@ Delete key metadata by ID.
 **Signature:**
 
 ```typescript
-declare function deleteKeyMetadata(keyId: string): boolean;
+declare function deleteKeyMetadata(keyId: string): boolean
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function deleteKeyMetadata(keyId: string): boolean;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keyId
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Key ID to delete
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Key ID to delete
 boolean
 
 True if key was found and deleted
-

@@ -10,88 +10,72 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountResourceClient](./notes.accountresourceclient.md)
 
-
 </td><td>
 
 Client for a notes account.
-
 
 </td></tr>
 <tr><td>
 
 [AttachmentResourceClient](./notes.attachmentresourceclient.md)
 
-
 </td><td>
 
 Client for a note attachment.
-
 
 </td></tr>
 <tr><td>
 
 [FolderResourceClient](./notes.folderresourceclient.md)
 
-
 </td><td>
 
 Client for a notes folder.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./notes.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [NoteResourceClient](./notes.noteresourceclient.md)
 
-
 </td><td>
 
 Client for a note.
-
 
 </td></tr>
 <tr><td>
 
 [NotesClient](./notes.notesclient.md)
 
-
 </td><td>
 
 Notes client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [NotesError](./notes.noteserror.md)
 
-
 </td><td>
 
 Error class for Notes API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -102,110 +86,90 @@ Error class for Notes API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Account](./notes.account.md)
 
-
 </td><td>
 
 A Notes account
-
 
 </td></tr>
 <tr><td>
 
 [AccountCreateInput](./notes.accountcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Account
-
 
 </td></tr>
 <tr><td>
 
 [Attachment](./notes.attachment.md)
 
-
 </td><td>
 
 A note attachment
-
 
 </td></tr>
 <tr><td>
 
 [AttachmentCreateInput](./notes.attachmentcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Attachment
-
 
 </td></tr>
 <tr><td>
 
 [Folder](./notes.folder.md)
 
-
 </td><td>
 
 A Notes folder
-
 
 </td></tr>
 <tr><td>
 
 [FolderCreateInput](./notes.foldercreateinput.md)
 
-
 </td><td>
 
 Input for creating a Folder
-
 
 </td></tr>
 <tr><td>
 
 [Note](./notes.note.md)
 
-
 </td><td>
 
 A note
-
 
 </td></tr>
 <tr><td>
 
 [NoteCreateInput](./notes.notecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Note
-
 
 </td></tr>
 <tr><td>
 
 [NotesClientOptions](./notes.notesclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -216,47 +180,37 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountSchema](./notes.accountschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [AttachmentSchema](./notes.attachmentschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FolderSchema](./notes.folderschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [NoteSchema](./notes.noteschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -267,56 +221,45 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountUpdateInput](./notes.accountupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Account
-
 
 </td></tr>
 <tr><td>
 
 [AttachmentUpdateInput](./notes.attachmentupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Attachment
-
 
 </td></tr>
 <tr><td>
 
 [FolderUpdateInput](./notes.folderupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Folder
-
 
 </td></tr>
 <tr><td>
 
 [NoteUpdateInput](./notes.noteupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Note
 
-
 </td></tr>
 </tbody></table>
-

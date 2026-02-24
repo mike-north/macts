@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { TextEditClient, type TextEditClientOptions } from '@macts/textedit';
+import { TextEditClient, type TextEditClientOptions } from '@macts/textedit'
 
 /**
  * Get a TextEditClient instance.
@@ -16,32 +16,32 @@ import { TextEditClient, type TextEditClientOptions } from '@macts/textedit';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getTextEditClient(): TextEditClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions textedit:*:*'
-    );
+    )
   }
 
   const options: TextEditClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new TextEditClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new TextEditClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: TextEditClient | null = null;
+let _client: TextEditClient | null = null
 
 /**
  * Get or create the singleton TextEditClient.
@@ -50,8 +50,8 @@ let _client: TextEditClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): TextEditClient {
-  _client ??= getTextEditClient();
-  return _client;
+  _client ??= getTextEditClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): TextEditClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

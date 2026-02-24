@@ -9,5 +9,5 @@ The description of the suite
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

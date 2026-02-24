@@ -9,7 +9,7 @@ Raw class from SDEF - represents an AppleScript object class.
 **Signature:**
 
 ```typescript
-interface RawClass 
+interface RawClass
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface RawClass
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.rawclass.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events (e.g., "docu")
-
 
 </td></tr>
 <tr><td>
 
 [deprecated?](./core.rawclass.deprecated.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether this class is deprecated
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawclass.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [elements](./core.rawclass.elements.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawElement](./core.rawelement.md)<!-- -->\[\]
 
-
 </td><td>
 
 Elements that can be contained by this class
-
 
 </td></tr>
 <tr><td>
 
 [inherits?](./core.rawclass.inherits.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Name of parent class for inheritance
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawclass.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Class name (e.g., "document", "window")
-
 
 </td></tr>
 <tr><td>
 
 [plural?](./core.rawclass.plural.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Plural form of the class name
-
 
 </td></tr>
 <tr><td>
 
 [properties](./core.rawclass.properties.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawProperty](./core.rawproperty.md)<!-- -->\[\]
 
-
 </td><td>
 
 Properties owned by this class
 
-
 </td></tr>
 </tbody></table>
-

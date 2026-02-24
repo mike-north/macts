@@ -9,7 +9,7 @@ Input for updating a RelatedName
 **Signature:**
 
 ```typescript
-type RelatedNameUpdateInput = Partial<RelatedNameCreateInput>;
+type RelatedNameUpdateInput = Partial<RelatedNameCreateInput>
 ```
-**References:** [RelatedNameCreateInput](./contacts.relatednamecreateinput.md)
 
+**References:** [RelatedNameCreateInput](./contacts.relatednamecreateinput.md)

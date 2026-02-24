@@ -18,44 +18,35 @@ update(id: string, input: XMLDataUpdateInput): Promise<XMLData>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [XMLDataUpdateInput](./system-events.xmldataupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[XMLData](./system-events.xmldata.md)<!-- -->&gt;
-

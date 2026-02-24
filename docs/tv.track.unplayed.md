@@ -9,5 +9,5 @@ is this track unplayed?
 **Signature:**
 
 ```typescript
-unplayed: boolean;
+unplayed: boolean
 ```

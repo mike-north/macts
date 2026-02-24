@@ -18,30 +18,24 @@ create(input: PaneCreateInput): Promise<Pane>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PaneCreateInput](./system-settings.panecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Pane](./system-settings.pane.md)<!-- -->&gt;
-

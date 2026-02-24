@@ -9,7 +9,7 @@ Client for a set of services.
 **Signature:**
 
 ```typescript
-declare class LocationResourceClient 
+declare class LocationResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class LocationResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.locationresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `LocationResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `LocationResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.locationresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new location.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.locationresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a location.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.locationresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a location by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.locationresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all locations.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.locationresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing location.
 
-
 </td></tr>
 </tbody></table>
-

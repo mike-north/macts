@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { textEditApiPlugin as plugin, textEditApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { textEditApiPlugin as plugin, textEditApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

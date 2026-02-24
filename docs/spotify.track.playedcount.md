@@ -9,5 +9,5 @@ Number of times this track has been played
 **Signature:**
 
 ```typescript
-playedCount: number;
+playedCount: number
 ```

@@ -7,12 +7,15 @@
 **Signature:**
 
 ```typescript
-DocumentSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    path: z.ZodString;
-    playing: z.ZodBoolean;
-    duration: z.ZodNumber;
-    currentTime: z.ZodNumber;
-}, z.core.$strip>
+DocumentSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    path: z.ZodString
+    playing: z.ZodBoolean
+    duration: z.ZodNumber
+    currentTime: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

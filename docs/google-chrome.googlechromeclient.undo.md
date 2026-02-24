@@ -11,7 +11,7 @@ Undo the last change.
 ```typescript
 undo(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

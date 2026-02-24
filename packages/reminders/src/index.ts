@@ -18,9 +18,9 @@
  * @packageDocumentation
  */
 
-export { RemindersClient, RemindersError, HttpClient } from './client.js';
-export type { RemindersClientOptions } from './client.js';
-export * from './types.js';
-export { AccountResourceClient } from './resources/account.js';
-export { ListResourceClient } from './resources/list.js';
-export { ReminderResourceClient } from './resources/reminder.js';
+export { RemindersClient, RemindersError, HttpClient } from './client.js'
+export type { RemindersClientOptions } from './client.js'
+export * from './types.js'
+export { AccountResourceClient } from './resources/account.js'
+export { ListResourceClient } from './resources/list.js'
+export { ReminderResourceClient } from './resources/reminder.js'

@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { safariApiPlugin as plugin, safariApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { safariApiPlugin as plugin, safariApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

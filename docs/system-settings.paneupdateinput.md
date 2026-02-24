@@ -9,7 +9,7 @@ Input for updating a Pane
 **Signature:**
 
 ```typescript
-type PaneUpdateInput = Partial<PaneCreateInput>;
+type PaneUpdateInput = Partial<PaneCreateInput>
 ```
-**References:** [PaneCreateInput](./system-settings.panecreateinput.md)
 
+**References:** [PaneCreateInput](./system-settings.panecreateinput.md)

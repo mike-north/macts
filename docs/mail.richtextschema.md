@@ -7,13 +7,19 @@
 **Signature:**
 
 ```typescript
-RichTextSchema: z.ZodObject<{
-    color: z.ZodObject<{
-        red: z.ZodNumber;
-        green: z.ZodNumber;
-        blue: z.ZodNumber;
-    }, z.core.$strip>;
-    font: z.ZodString;
-    size: z.ZodNumber;
-}, z.core.$strip>
+RichTextSchema: z.ZodObject<
+  {
+    color: z.ZodObject<
+      {
+        red: z.ZodNumber
+        green: z.ZodNumber
+        blue: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    font: z.ZodString
+    size: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The Yahoo handle value
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

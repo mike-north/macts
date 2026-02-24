@@ -18,30 +18,24 @@ create(input: VideoWindowCreateInput): Promise<VideoWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [VideoWindowCreateInput](./music.videowindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[VideoWindow](./music.videowindow.md)<!-- -->&gt;
-

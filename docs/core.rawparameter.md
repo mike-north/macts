@@ -9,7 +9,7 @@ Raw parameter for commands - represents a named parameter.
 **Signature:**
 
 ```typescript
-interface RawParameter 
+interface RawParameter
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface RawParameter
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.rawparameter.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawparameter.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawparameter.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Parameter name
-
 
 </td></tr>
 <tr><td>
 
 [optional?](./core.rawparameter.optional.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether this parameter is optional
-
 
 </td></tr>
 <tr><td>
 
 [type](./core.rawparameter.type.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Type of the parameter
 
-
 </td></tr>
 </tbody></table>
-

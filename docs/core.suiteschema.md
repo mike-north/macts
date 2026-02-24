@@ -9,12 +9,15 @@ Schema for suite organization from AppleScript dictionary.
 **Signature:**
 
 ```typescript
-SuiteSchema: z.ZodObject<{
-    name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    code: z.ZodOptional<z.ZodString>;
-    resources: z.ZodDefault<z.ZodArray<z.ZodString>>;
-    commands: z.ZodDefault<z.ZodArray<z.ZodString>>;
-    enums: z.ZodDefault<z.ZodArray<z.ZodString>>;
-}, z.core.$strip>
+SuiteSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    description: z.ZodOptional<z.ZodString>
+    code: z.ZodOptional<z.ZodString>
+    resources: z.ZodDefault<z.ZodArray<z.ZodString>>
+    commands: z.ZodDefault<z.ZodArray<z.ZodString>>
+    enums: z.ZodDefault<z.ZodArray<z.ZodString>>
+  },
+  z.core.$strip
+>
 ```

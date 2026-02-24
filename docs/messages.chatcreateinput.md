@@ -9,5 +9,5 @@ Input for creating a Chat
 **Signature:**
 
 ```typescript
-interface ChatCreateInput 
+interface ChatCreateInput
 ```

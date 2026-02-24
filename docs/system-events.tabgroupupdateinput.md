@@ -9,7 +9,7 @@ Input for updating a TabGroup
 **Signature:**
 
 ```typescript
-type TabGroupUpdateInput = Partial<TabGroupCreateInput>;
+type TabGroupUpdateInput = Partial<TabGroupCreateInput>
 ```
-**References:** [TabGroupCreateInput](./system-events.tabgroupcreateinput.md)
 
+**References:** [TabGroupCreateInput](./system-events.tabgroupcreateinput.md)

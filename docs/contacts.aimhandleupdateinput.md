@@ -9,7 +9,7 @@ Input for updating a AIMHandle
 **Signature:**
 
 ```typescript
-type AIMHandleUpdateInput = Partial<AIMHandleCreateInput>;
+type AIMHandleUpdateInput = Partial<AIMHandleCreateInput>
 ```
-**References:** [AIMHandleCreateInput](./contacts.aimhandlecreateinput.md)
 
+**References:** [AIMHandleCreateInput](./contacts.aimhandlecreateinput.md)

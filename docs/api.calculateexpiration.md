@@ -9,7 +9,7 @@ Calculate expiration timestamp from various input formats.
 **Signature:**
 
 ```typescript
-declare function calculateExpiration(expires: Date | number | string): number;
+declare function calculateExpiration(expires: Date | number | string): number
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function calculateExpiration(expires: Date | number | string): number;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 expires
 
-
 </td><td>
 
 Date \| number \| string
 
-
 </td><td>
 
 Expiration as Date, Unix timestamp (seconds), or duration string
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Expiration as Date, Unix timestamp (seconds), or duration string
 number
 
 Unix timestamp in seconds
-

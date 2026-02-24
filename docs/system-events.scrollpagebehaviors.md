@@ -9,5 +9,5 @@ ScrollPageBehaviors
 **Signature:**
 
 ```typescript
-type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
+type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage'
 ```

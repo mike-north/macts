@@ -11,7 +11,7 @@ List all openfilealarms.
 ```typescript
 list(): Promise<OpenFileAlarm[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[OpenFileAlarm](./calendar.openfilealarm.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ The size (in bytes) of a message
 **Signature:**
 
 ```typescript
-messageSize: number;
+messageSize: number
 ```

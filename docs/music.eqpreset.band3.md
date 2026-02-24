@@ -9,5 +9,5 @@ the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-band3: number;
+band3: number
 ```

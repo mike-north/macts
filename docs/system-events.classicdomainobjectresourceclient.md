@@ -9,7 +9,7 @@ Client for the classic domain in the file system.
 **Signature:**
 
 ```typescript
-declare class ClassicDomainObjectResourceClient 
+declare class ClassicDomainObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ClassicDomainObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.classicdomainobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ClassicDomainObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ClassicDomainObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.classicdomainobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new classicdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.classicdomainobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a classicdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.classicdomainobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a classicdomainobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.classicdomainobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all classicdomainobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.classicdomainobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing classicdomainobject.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A message/display alarm
 **Signature:**
 
 ```typescript
-interface DisplayAlarm 
+interface DisplayAlarm
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface DisplayAlarm
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [triggerDate](./calendar.displayalarm.triggerdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 An absolute alarm date
-
 
 </td></tr>
 <tr><td>
 
 [triggerInterval](./calendar.displayalarm.triggerinterval.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The interval in minutes between the event and the alarm (positive for after, negative for before)
 
-
 </td></tr>
 </tbody></table>
-

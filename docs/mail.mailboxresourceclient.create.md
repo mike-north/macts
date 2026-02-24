@@ -18,30 +18,24 @@ create(input: MailboxCreateInput): Promise<Mailbox>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MailboxCreateInput](./mail.mailboxcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Mailbox](./mail.mailbox.md)<!-- -->&gt;
-

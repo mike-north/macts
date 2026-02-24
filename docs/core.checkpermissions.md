@@ -9,10 +9,13 @@ Check multiple required permissions against granted permissions.
 **Signature:**
 
 ```typescript
-declare function checkPermissions(grantedPermissions: string[], requiredPermissions: string[]): {
-    granted: boolean;
-    results: PermissionCheckResult[];
-};
+declare function checkPermissions(
+  grantedPermissions: string[],
+  requiredPermissions: string[]
+): {
+  granted: boolean
+  results: PermissionCheckResult[]
+}
 ```
 
 ## Parameters
@@ -21,48 +24,39 @@ declare function checkPermissions(grantedPermissions: string[], requiredPermissi
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 grantedPermissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of fine-grained permissions
-
 
 </td></tr>
 <tr><td>
 
 requiredPermissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of required permissions
-
 
 </td></tr>
 </tbody></table>
@@ -72,4 +66,3 @@ Array of required permissions
 { granted: boolean; results: [PermissionCheckResult](./core.permissioncheckresult.md)<!-- -->\[\]; }
 
 Object with granted (all passed) and results for each
-

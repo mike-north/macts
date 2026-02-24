@@ -11,7 +11,7 @@ Reveals a settings pane or an anchor within a pane.
 ```typescript
 reveal(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

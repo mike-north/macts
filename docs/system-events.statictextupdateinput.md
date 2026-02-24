@@ -9,7 +9,7 @@ Input for updating a StaticText
 **Signature:**
 
 ```typescript
-type StaticTextUpdateInput = Partial<StaticTextCreateInput>;
+type StaticTextUpdateInput = Partial<StaticTextCreateInput>
 ```
-**References:** [StaticTextCreateInput](./system-events.statictextcreateinput.md)
 
+**References:** [StaticTextCreateInput](./system-events.statictextcreateinput.md)

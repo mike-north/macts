@@ -9,5 +9,5 @@ override string to use for the track when sorting by artist
 **Signature:**
 
 ```typescript
-sortDirector: string;
+sortDirector: string
 ```

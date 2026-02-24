@@ -9,7 +9,7 @@ Input for creating a Artwork
 **Signature:**
 
 ```typescript
-interface ArtworkCreateInput 
+interface ArtworkCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface ArtworkCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [data?](./tv.artworkcreateinput.data.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ data for this artwork, in the form of a picture
-
 
 </td></tr>
 <tr><td>
 
 [description?](./tv.artworkcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ description of artwork as a string
-
 
 </td></tr>
 <tr><td>
 
 [kind?](./tv.artworkcreateinput.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ kind or purpose of this piece of artwork
-
 
 </td></tr>
 <tr><td>
 
 [rawData?](./tv.artworkcreateinput.rawdata.md)
 
-
 </td><td>
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 _(Optional)_ data for this artwork, in original format
 
-
 </td></tr>
 </tbody></table>
-

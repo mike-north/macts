@@ -9,7 +9,7 @@ Client for a track on an audio cd.
 **Signature:**
 
 ```typescript
-declare class AudioCDTrackResourceClient 
+declare class AudioCDTrackResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AudioCDTrackResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.audiocdtrackresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AudioCDTrackResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AudioCDTrackResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.audiocdtrackresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new audiocdtrack.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.audiocdtrackresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a audiocdtrack.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.audiocdtrackresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a audiocdtrack by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.audiocdtrackresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all audiocdtracks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.audiocdtrackresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing audiocdtrack.
 
-
 </td></tr>
 </tbody></table>
-

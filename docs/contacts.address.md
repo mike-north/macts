@@ -9,7 +9,7 @@ Address for the given record.
 **Signature:**
 
 ```typescript
-interface Address 
+interface Address
 ```
 
 ## Properties
@@ -18,193 +18,152 @@ interface Address
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [city](./contacts.address.city.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 City part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [country](./contacts.address.country.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Country part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [countryCode](./contacts.address.countrycode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Country code part of the address (should be a two character iso country code).
-
 
 </td></tr>
 <tr><td>
 
 [formattedAddress](./contacts.address.formattedaddress.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 properly formatted string for this address.
-
 
 </td></tr>
 <tr><td>
 
 [id](./contacts.address.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 unique identifier for this address.
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.address.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label.
-
 
 </td></tr>
 <tr><td>
 
 [state](./contacts.address.state.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 State, Province, or Region part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [street](./contacts.address.street.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Street part of the address, multiple lines separated by carriage returns.
-
 
 </td></tr>
 <tr><td>
 
 [zip](./contacts.address.zip.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Zip or postal code of the address.
 
-
 </td></tr>
 </tbody></table>
-

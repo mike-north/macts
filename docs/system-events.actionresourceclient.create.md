@@ -18,30 +18,24 @@ create(input: ActionCreateInput): Promise<Action>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ActionCreateInput](./system-events.actioncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Action](./system-events.action.md)<!-- -->&gt;
-

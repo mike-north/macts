@@ -9,5 +9,5 @@ The name of the settings set
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

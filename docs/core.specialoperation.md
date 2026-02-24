@@ -9,5 +9,5 @@ Special coarse operations beyond standard CRUD. These are defined per-app in the
 **Signature:**
 
 ```typescript
-type SpecialOperation = string;
+type SpecialOperation = string
 ```

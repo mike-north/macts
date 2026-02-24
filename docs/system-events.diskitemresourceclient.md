@@ -9,7 +9,7 @@ Client for an item stored in the file system.
 **Signature:**
 
 ```typescript
-declare class DiskItemResourceClient 
+declare class DiskItemResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DiskItemResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.diskitemresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DiskItemResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DiskItemResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.diskitemresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new diskitem.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.diskitemresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a diskitem.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.diskitemresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a diskitem by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.diskitemresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all diskitems.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.diskitemresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing diskitem.
 
-
 </td></tr>
 </tbody></table>
-

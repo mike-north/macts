@@ -18,59 +18,46 @@ constructor(http: HttpClient, app: string, resource: string);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 http
 
-
 </td><td>
 
 [HttpClient](./system-events.httpclient.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 app
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 resource
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

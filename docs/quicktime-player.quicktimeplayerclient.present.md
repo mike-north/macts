@@ -11,7 +11,7 @@ Present the document full screen.
 ```typescript
 present(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

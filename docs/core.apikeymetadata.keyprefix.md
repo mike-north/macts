@@ -4,10 +4,10 @@
 
 ## ApiKeyMetadata.keyPrefix property
 
-Key prefix for identification (first 8 chars after macts\_sk\_)
+Key prefix for identification (first 8 chars after macts_sk\_)
 
 **Signature:**
 
 ```typescript
-keyPrefix: string;
+keyPrefix: string
 ```

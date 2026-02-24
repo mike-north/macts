@@ -9,5 +9,5 @@ Unique identifier for this folder
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

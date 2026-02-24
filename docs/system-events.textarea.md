@@ -9,7 +9,7 @@ A text area belonging to a window
 **Signature:**
 
 ```typescript
-interface TextArea 
+interface TextArea
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TextArea
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.textarea.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this text area
 
-
 </td></tr>
 </tbody></table>
-

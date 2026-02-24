@@ -9,7 +9,7 @@ Input for updating a MiniplayerWindow
 **Signature:**
 
 ```typescript
-type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>;
+type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>
 ```
-**References:** [MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)
 
+**References:** [MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)

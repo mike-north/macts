@@ -9,5 +9,5 @@ The phone number
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

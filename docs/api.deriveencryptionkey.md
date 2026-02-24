@@ -11,7 +11,7 @@ HKDF (HMAC-based Key Derivation Function) is used to derive a separate encryptio
 **Signature:**
 
 ```typescript
-declare function deriveEncryptionKey(signingSecret: string): Buffer;
+declare function deriveEncryptionKey(signingSecret: string): Buffer
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function deriveEncryptionKey(signingSecret: string): Buffer;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 signingSecret
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The signing secret to derive from
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ The signing secret to derive from
 Buffer
 
 32-byte derived key
-

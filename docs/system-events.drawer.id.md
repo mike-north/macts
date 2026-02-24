@@ -9,5 +9,5 @@ Unique identifier for this drawer
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

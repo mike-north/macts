@@ -9,7 +9,7 @@ Input for creating a Disk
 **Signature:**
 
 ```typescript
-interface DiskCreateInput 
+interface DiskCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface DiskCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ignorePrivileges?](./system-events.diskcreateinput.ignoreprivileges.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Ignore permissions on this disk?
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,11 @@ Create an API key with full access to a specific app.
 **Signature:**
 
 ```typescript
-declare function createFullAccessKey(appName: string, name: string, expires?: Date | number | string): Promise<CreateApiKeyResult>;
+declare function createFullAccessKey(
+  appName: string,
+  name: string,
+  expires?: Date | number | string
+): Promise<CreateApiKeyResult>
 ```
 
 ## Parameters
@@ -18,64 +22,52 @@ declare function createFullAccessKey(appName: string, name: string, expires?: Da
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 appName
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Application name
-
 
 </td></tr>
 <tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Human-readable key name
-
 
 </td></tr>
 <tr><td>
 
 expires
 
-
 </td><td>
 
 Date \| number \| string
 
-
 </td><td>
 
 _(Optional)_ Optional expiration
-
 
 </td></tr>
 </tbody></table>
@@ -85,4 +77,3 @@ _(Optional)_ Optional expiration
 Promise&lt;[CreateApiKeyResult](./api.createapikeyresult.md)<!-- -->&gt;
 
 Created key token and metadata
-

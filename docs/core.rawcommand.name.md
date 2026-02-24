@@ -9,5 +9,5 @@ Command name (e.g., "open", "save")
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

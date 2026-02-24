@@ -9,5 +9,5 @@ Indicates whether the message is flagged or not
 **Signature:**
 
 ```typescript
-flaggedStatus: boolean;
+flaggedStatus: boolean
 ```

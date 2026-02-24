@@ -1,27 +1,27 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../sdk.js';
-import { createFormatter } from '../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
  * Get a track by ID.
  */
 export class GetTrackCommand extends Command {
-  static override paths = [["spotify", "currentTrack", "get"]];
+  static override paths = [['spotify', 'currentTrack', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a track by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  trackId = Option.String({ required: true });
+  trackId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.tracks.get(this.trackId);
+      const client = getClient()
+      const item = await client.tracks.get(this.trackId)
 
       const output = formatter.format({
         name: item.name,
@@ -37,14 +37,14 @@ export class GetTrackCommand extends Command {
         artworkUrl: item.artworkUrl,
         artwork: item.artwork,
         playerState: item.playerState,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

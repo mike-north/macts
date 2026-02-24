@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-BookmarkFolderSchema: z.ZodObject<{
-    id: z.ZodString;
-    title: z.ZodString;
-    index: z.ZodNumber;
-}, z.core.$strip>
+BookmarkFolderSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    title: z.ZodString
+    index: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

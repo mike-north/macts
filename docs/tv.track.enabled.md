@@ -9,5 +9,5 @@ is this track checked for playback?
 **Signature:**
 
 ```typescript
-enabled: boolean;
+enabled: boolean
 ```

@@ -9,5 +9,5 @@ The number of columns
 **Signature:**
 
 ```typescript
-numberOfColumns: number;
+numberOfColumns: number
 ```

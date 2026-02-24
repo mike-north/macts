@@ -9,5 +9,5 @@ Operation name (e.g., "list")
 **Signature:**
 
 ```typescript
-operationName: string;
+operationName: string
 ```

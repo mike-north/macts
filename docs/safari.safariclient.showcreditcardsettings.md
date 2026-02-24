@@ -11,7 +11,7 @@ Show Safari Credit Card Settings.
 ```typescript
 showCreditCardSettings(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

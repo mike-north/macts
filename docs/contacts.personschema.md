@@ -7,26 +7,29 @@
 **Signature:**
 
 ```typescript
-PersonSchema: z.ZodObject<{
-    nickname: z.ZodString;
-    organization: z.ZodString;
-    maidenName: z.ZodString;
-    suffix: z.ZodString;
-    vcard: z.ZodString;
-    homePage: z.ZodString;
-    birthDate: z.ZodString;
-    phoneticLastName: z.ZodString;
-    title: z.ZodString;
-    phoneticMiddleName: z.ZodString;
-    department: z.ZodString;
-    image: z.ZodString;
-    name: z.ZodString;
-    note: z.ZodString;
-    company: z.ZodBoolean;
-    middleName: z.ZodString;
-    phoneticFirstName: z.ZodString;
-    jobTitle: z.ZodString;
-    lastName: z.ZodString;
-    firstName: z.ZodString;
-}, z.core.$strip>
+PersonSchema: z.ZodObject<
+  {
+    nickname: z.ZodString
+    organization: z.ZodString
+    maidenName: z.ZodString
+    suffix: z.ZodString
+    vcard: z.ZodString
+    homePage: z.ZodString
+    birthDate: z.ZodString
+    phoneticLastName: z.ZodString
+    title: z.ZodString
+    phoneticMiddleName: z.ZodString
+    department: z.ZodString
+    image: z.ZodString
+    name: z.ZodString
+    note: z.ZodString
+    company: z.ZodBoolean
+    middleName: z.ZodString
+    phoneticFirstName: z.ZodString
+    jobTitle: z.ZodString
+    lastName: z.ZodString
+    firstName: z.ZodString
+  },
+  z.core.$strip
+>
 ```

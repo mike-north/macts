@@ -18,30 +18,24 @@ create(input: SplitterCreateInput): Promise<Splitter>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SplitterCreateInput](./system-events.splittercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Splitter](./system-events.splitter.md)<!-- -->&gt;
-

@@ -9,7 +9,7 @@ Input for updating a List
 **Signature:**
 
 ```typescript
-type ListUpdateInput = Partial<ListCreateInput>;
+type ListUpdateInput = Partial<ListCreateInput>
 ```
-**References:** [ListCreateInput](./system-events.listcreateinput.md)
 
+**References:** [ListCreateInput](./system-events.listcreateinput.md)

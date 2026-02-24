@@ -9,5 +9,5 @@ FontSmoothingStyles
 **Signature:**
 
 ```typescript
-type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' | 'strong';
+type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' | 'strong'
 ```

@@ -9,5 +9,5 @@ is this a Smart Playlist?
 **Signature:**
 
 ```typescript
-smart: boolean;
+smart: boolean
 ```

@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { systemSettingsApiPlugin as plugin, systemSettingsApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { systemSettingsApiPlugin as plugin, systemSettingsApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

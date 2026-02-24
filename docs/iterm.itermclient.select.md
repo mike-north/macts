@@ -11,7 +11,7 @@ Make receiver visible and selected.
 ```typescript
 select(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -10,66 +10,54 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AnchorResourceClient](./system-settings.anchorresourceclient.md)
 
-
 </td><td>
 
 Client for an anchor within a settings pane..
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./system-settings.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [PaneResourceClient](./system-settings.paneresourceclient.md)
 
-
 </td><td>
 
 Client for a settings pane..
-
 
 </td></tr>
 <tr><td>
 
 [SystemSettingsClient](./system-settings.systemsettingsclient.md)
 
-
 </td><td>
 
 SystemSettings client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [SystemSettingsError](./system-settings.systemsettingserror.md)
 
-
 </td><td>
 
 Error class for SystemSettings API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -80,66 +68,54 @@ Error class for SystemSettings API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Anchor](./system-settings.anchor.md)
 
-
 </td><td>
 
 An anchor within a settings pane.
-
 
 </td></tr>
 <tr><td>
 
 [AnchorCreateInput](./system-settings.anchorcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Anchor
-
 
 </td></tr>
 <tr><td>
 
 [Pane](./system-settings.pane.md)
 
-
 </td><td>
 
 A settings pane.
-
 
 </td></tr>
 <tr><td>
 
 [PaneCreateInput](./system-settings.panecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Pane
-
 
 </td></tr>
 <tr><td>
 
 [SystemSettingsClientOptions](./system-settings.systemsettingsclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -150,29 +126,23 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AnchorSchema](./system-settings.anchorschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PaneSchema](./system-settings.paneschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -183,34 +153,27 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AnchorUpdateInput](./system-settings.anchorupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Anchor
-
 
 </td></tr>
 <tr><td>
 
 [PaneUpdateInput](./system-settings.paneupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Pane
 
-
 </td></tr>
 </tbody></table>
-

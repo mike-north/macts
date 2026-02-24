@@ -9,5 +9,5 @@ Input for creating a FilePackage
 **Signature:**
 
 ```typescript
-interface FilePackageCreateInput 
+interface FilePackageCreateInput
 ```

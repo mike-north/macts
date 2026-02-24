@@ -9,7 +9,7 @@ User name for ICQ instant messaging.
 **Signature:**
 
 ```typescript
-interface ICQHandle 
+interface ICQHandle
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface ICQHandle
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.icqhandle.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this handle
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.icqhandle.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.icqhandle.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The ICQ handle value
 
-
 </td></tr>
 </tbody></table>
-

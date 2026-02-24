@@ -11,7 +11,7 @@ List all aliases.
 ```typescript
 list(): Promise<Alias[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Alias](./system-events.alias.md)<!-- -->\[\]&gt;
-

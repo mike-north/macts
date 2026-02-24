@@ -9,7 +9,7 @@ Client for a menu belonging to a menu bar item.
 **Signature:**
 
 ```typescript
-declare class MenuResourceClient 
+declare class MenuResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MenuResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.menuresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MenuResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MenuResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.menuresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new menu.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.menuresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a menu.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.menuresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a menu by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.menuresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all menus.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.menuresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing menu.
 
-
 </td></tr>
 </tbody></table>
-

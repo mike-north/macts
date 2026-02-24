@@ -9,5 +9,5 @@ the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-band5: number;
+band5: number
 ```

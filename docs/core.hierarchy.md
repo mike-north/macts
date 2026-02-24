@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Hierarchy = z.infer<typeof HierarchySchema>;
+type Hierarchy = z.infer<typeof HierarchySchema>
 ```
-**References:** [HierarchySchema](./core.hierarchyschema.md)
 
+**References:** [HierarchySchema](./core.hierarchyschema.md)

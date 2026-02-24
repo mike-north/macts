@@ -9,7 +9,7 @@ Input for creating a Group
 **Signature:**
 
 ```typescript
-interface GroupCreateInput 
+interface GroupCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface GroupCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name?](./contacts.groupcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of this group.
 
-
 </td></tr>
 </tbody></table>
-

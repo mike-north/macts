@@ -9,7 +9,7 @@ A Mail account for receiving messages (POP/IMAP). To create a new receiving acco
 **Signature:**
 
 ```typescript
-interface Account 
+interface Account
 ```
 
 ## Properties
@@ -18,440 +18,347 @@ interface Account
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accountDirectory](./mail.account.accountdirectory.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The directory where the account stores things on disk
-
 
 </td></tr>
 <tr><td>
 
 [accountType](./mail.account.accounttype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The type of an account
-
 
 </td></tr>
 <tr><td>
 
 [authentication](./mail.account.authentication.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Preferred authentication scheme for account
-
 
 </td></tr>
 <tr><td>
 
 [deliveryAccount](./mail.account.deliveryaccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The delivery account used when sending mail from this account
-
 
 </td></tr>
 <tr><td>
 
 [emailAddresses](./mail.account.emailaddresses.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The list of email addresses configured for an account
-
 
 </td></tr>
 <tr><td>
 
 [emptyJunkMessagesFrequency](./mail.account.emptyjunkmessagesfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete)
-
 
 </td></tr>
 <tr><td>
 
 [emptyJunkMessagesOnQuit](./mail.account.emptyjunkmessagesonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the messages in the junk messages mailboxes will be deleted on quit
-
 
 </td></tr>
 <tr><td>
 
 [emptySentMessagesFrequency](./mail.account.emptysentmessagesfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [emptySentMessagesOnQuit](./mail.account.emptysentmessagesonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [emptyTrashFrequency](./mail.account.emptytrashfrequency.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)
-
 
 </td></tr>
 <tr><td>
 
 [emptyTrashOnQuit](./mail.account.emptytrashonquit.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit
-
 
 </td></tr>
 <tr><td>
 
 [enabled](./mail.account.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the account is enabled or not
-
 
 </td></tr>
 <tr><td>
 
 [fullName](./mail.account.fullname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The users full name configured for an account
-
 
 </td></tr>
 <tr><td>
 
 [id](./mail.account.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the account
-
 
 </td></tr>
 <tr><td>
 
 [includeWhenGettingNewMail](./mail.account.includewhengettingnewmail.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [moveDeletedMessagesToTrash](./mail.account.movedeletedmessagestotrash.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether messages that are deleted will be moved to the trash mailbox
-
 
 </td></tr>
 <tr><td>
 
 [name](./mail.account.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of an account
-
 
 </td></tr>
 <tr><td>
 
 [password](./mail.account.password.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Password for this account. Can be set, but not read via scripting
-
 
 </td></tr>
 <tr><td>
 
 [port](./mail.account.port.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The port used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [serverName](./mail.account.servername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The host name used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [userName](./mail.account.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The user name used to connect to an account
-
 
 </td></tr>
 <tr><td>
 
 [usesSsl](./mail.account.usesssl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether SSL is enabled for this receiving account
 
-
 </td></tr>
 </tbody></table>
-

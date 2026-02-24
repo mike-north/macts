@@ -9,19 +9,34 @@ Schema for extraction metadata.
 **Signature:**
 
 ```typescript
-ExtractionMetadataSchema: z.ZodObject<{
-    extractedAt: z.ZodOptional<z.ZodISODateTime>;
-    mactsVersion: z.ZodOptional<z.ZodString>;
-    sourceFile: z.ZodOptional<z.ZodString>;
-    confidence: z.ZodOptional<z.ZodObject<{
-        overall: z.ZodNumber;
-        fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
-    }, z.core.$strip>>;
-    openQuestions: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        question: z.ZodString;
-        context: z.ZodOptional<z.ZodString>;
-        suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>;
-        relatedTo: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>>;
-}, z.core.$strip>
+ExtractionMetadataSchema: z.ZodObject<
+  {
+    extractedAt: z.ZodOptional<z.ZodISODateTime>
+    mactsVersion: z.ZodOptional<z.ZodString>
+    sourceFile: z.ZodOptional<z.ZodString>
+    confidence: z.ZodOptional<
+      z.ZodObject<
+        {
+          overall: z.ZodNumber
+          fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>
+        },
+        z.core.$strip
+      >
+    >
+    openQuestions: z.ZodDefault<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            question: z.ZodString
+            context: z.ZodOptional<z.ZodString>
+            suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>
+            relatedTo: z.ZodOptional<z.ZodString>
+          },
+          z.core.$strip
+        >
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

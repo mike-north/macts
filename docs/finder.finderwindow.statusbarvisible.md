@@ -9,5 +9,5 @@ Is the window's status bar visible?
 **Signature:**
 
 ```typescript
-statusbarVisible: boolean;
+statusbarVisible: boolean
 ```

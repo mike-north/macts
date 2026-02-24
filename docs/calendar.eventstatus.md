@@ -9,5 +9,5 @@ Status of a calendar event
 **Signature:**
 
 ```typescript
-type EventStatus = 'cancelled' | 'confirmed' | 'none' | 'tentative';
+type EventStatus = 'cancelled' | 'confirmed' | 'none' | 'tentative'
 ```

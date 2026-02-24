@@ -9,5 +9,5 @@ the name of the UI Element, which identifies it within its container
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

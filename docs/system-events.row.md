@@ -9,7 +9,7 @@ A row belonging to a table
 **Signature:**
 
 ```typescript
-interface Row 
+interface Row
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Row
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.row.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this row
 
-
 </td></tr>
 </tbody></table>
-

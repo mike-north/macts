@@ -9,5 +9,5 @@ the name of the XML attribute
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

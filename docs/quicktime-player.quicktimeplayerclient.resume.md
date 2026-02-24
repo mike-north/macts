@@ -11,7 +11,7 @@ Resume the recording.
 ```typescript
 resume(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -18,30 +18,24 @@ create(input: MiniplayerWindowCreateInput): Promise<MiniplayerWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MiniplayerWindow](./music.miniplayerwindow.md)<!-- -->&gt;
-

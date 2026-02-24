@@ -11,7 +11,7 @@ Start the movie recording.
 ```typescript
 start(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

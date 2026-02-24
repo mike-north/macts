@@ -9,5 +9,5 @@ the data format for this piece of artwork
 **Signature:**
 
 ```typescript
-format: string;
+format: string
 ```

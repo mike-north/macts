@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Bluetooth File Exchange.app automation.
@@ -16,4 +16,4 @@ export const bluetoothFileExchangePlugin: McpPlugin = {
   name: 'bluetooth-file-exchange',
   description: 'MCP plugin for macOS Bluetooth File Exchange.app automation',
   tools: allTools,
-};
+}

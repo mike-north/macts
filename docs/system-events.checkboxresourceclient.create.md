@@ -18,30 +18,24 @@ create(input: CheckboxCreateInput): Promise<Checkbox>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [CheckboxCreateInput](./system-events.checkboxcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Checkbox](./system-events.checkbox.md)<!-- -->&gt;
-

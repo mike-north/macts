@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { MicrosoftEdgeClient, type MicrosoftEdgeClientOptions } from '../client.js';
+import { MicrosoftEdgeClient, type MicrosoftEdgeClientOptions } from '../client.js'
 
 /**
  * Get a MicrosoftEdgeClient instance.
@@ -16,32 +16,32 @@ import { MicrosoftEdgeClient, type MicrosoftEdgeClientOptions } from '../client.
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getMicrosoftEdgeClient(): MicrosoftEdgeClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions microsoft-edge:*:*'
-    );
+    )
   }
 
   const options: MicrosoftEdgeClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new MicrosoftEdgeClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new MicrosoftEdgeClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: MicrosoftEdgeClient | null = null;
+let _client: MicrosoftEdgeClient | null = null
 
 /**
  * Get or create the singleton MicrosoftEdgeClient.
@@ -50,8 +50,8 @@ let _client: MicrosoftEdgeClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): MicrosoftEdgeClient {
-  _client ??= getMicrosoftEdgeClient();
-  return _client;
+  _client ??= getMicrosoftEdgeClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): MicrosoftEdgeClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

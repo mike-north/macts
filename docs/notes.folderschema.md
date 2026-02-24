@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-FolderSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    container: z.ZodOptional<z.ZodString>;
-    shared: z.ZodBoolean;
-}, z.core.$strip>
+FolderSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    container: z.ZodOptional<z.ZodString>
+    shared: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

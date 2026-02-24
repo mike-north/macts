@@ -9,5 +9,5 @@ The name of the command
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

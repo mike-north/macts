@@ -9,5 +9,5 @@ Input for creating a Group
 **Signature:**
 
 ```typescript
-interface GroupCreateInput 
+interface GroupCreateInput
 ```

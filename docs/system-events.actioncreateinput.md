@@ -9,5 +9,5 @@ Input for creating a Action
 **Signature:**
 
 ```typescript
-interface ActionCreateInput 
+interface ActionCreateInput
 ```

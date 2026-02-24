@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-AddressSchema: z.ZodObject<{
-    city: z.ZodString;
-    formattedAddress: z.ZodString;
-    street: z.ZodString;
-    id: z.ZodString;
-    zip: z.ZodString;
-    country: z.ZodString;
-    label: z.ZodString;
-    countryCode: z.ZodString;
-    state: z.ZodString;
-}, z.core.$strip>
+AddressSchema: z.ZodObject<
+  {
+    city: z.ZodString
+    formattedAddress: z.ZodString
+    street: z.ZodString
+    id: z.ZodString
+    zip: z.ZodString
+    country: z.ZodString
+    label: z.ZodString
+    countryCode: z.ZodString
+    state: z.ZodString
+  },
+  z.core.$strip
+>
 ```

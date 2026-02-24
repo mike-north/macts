@@ -9,5 +9,5 @@ Input for creating a Table
 **Signature:**
 
 ```typescript
-interface TableCreateInput 
+interface TableCreateInput
 ```

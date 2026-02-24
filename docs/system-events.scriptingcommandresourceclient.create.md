@@ -18,30 +18,24 @@ create(input: ScriptingCommandCreateInput): Promise<ScriptingCommand>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingCommand](./system-events.scriptingcommand.md)<!-- -->&gt;
-

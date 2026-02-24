@@ -9,5 +9,5 @@ The calendar title (synonym for name)
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -11,7 +11,7 @@ reposition to beginning of current track or go to previous track if already at s
 ```typescript
 backTrack(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

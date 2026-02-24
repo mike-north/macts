@@ -10,77 +10,63 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountResourceClient](./reminders.accountresourceclient.md)
 
-
 </td><td>
 
 Client for an account in the reminders application.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./reminders.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [ListResourceClient](./reminders.listresourceclient.md)
 
-
 </td><td>
 
 Client for a list of reminders.
-
 
 </td></tr>
 <tr><td>
 
 [ReminderResourceClient](./reminders.reminderresourceclient.md)
 
-
 </td><td>
 
 Client for a reminder item.
-
 
 </td></tr>
 <tr><td>
 
 [RemindersClient](./reminders.remindersclient.md)
 
-
 </td><td>
 
 Reminders client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [RemindersError](./reminders.reminderserror.md)
 
-
 </td><td>
 
 Error class for Reminders API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -91,88 +77,72 @@ Error class for Reminders API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Account](./reminders.account.md)
 
-
 </td><td>
 
 An account in the Reminders application
-
 
 </td></tr>
 <tr><td>
 
 [AccountCreateInput](./reminders.accountcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Account
-
 
 </td></tr>
 <tr><td>
 
 [List](./reminders.list.md)
 
-
 </td><td>
 
 A list of reminders
-
 
 </td></tr>
 <tr><td>
 
 [ListCreateInput](./reminders.listcreateinput.md)
 
-
 </td><td>
 
 Input for creating a List
-
 
 </td></tr>
 <tr><td>
 
 [Reminder](./reminders.reminder.md)
 
-
 </td><td>
 
 A reminder item
-
 
 </td></tr>
 <tr><td>
 
 [ReminderCreateInput](./reminders.remindercreateinput.md)
 
-
 </td><td>
 
 Input for creating a Reminder
-
 
 </td></tr>
 <tr><td>
 
 [RemindersClientOptions](./reminders.remindersclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -183,38 +153,30 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountSchema](./reminders.accountschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ListSchema](./reminders.listschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ReminderSchema](./reminders.reminderschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -225,56 +187,45 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AccountUpdateInput](./reminders.accountupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Account
-
 
 </td></tr>
 <tr><td>
 
 [ListUpdateInput](./reminders.listupdateinput.md)
 
-
 </td><td>
 
 Input for updating a List
-
 
 </td></tr>
 <tr><td>
 
 [ReminderPriority](./reminders.reminderpriority.md)
 
-
 </td><td>
 
 Priority level for reminders
-
 
 </td></tr>
 <tr><td>
 
 [ReminderUpdateInput](./reminders.reminderupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Reminder
 
-
 </td></tr>
 </tbody></table>
-

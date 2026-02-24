@@ -9,7 +9,7 @@ A Notes folder
 **Signature:**
 
 ```typescript
-interface Folder 
+interface Folder
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface Folder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [container?](./notes.folder.container.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The container of the folder
-
 
 </td></tr>
 <tr><td>
 
 [id](./notes.folder.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the folder
-
 
 </td></tr>
 <tr><td>
 
 [name](./notes.folder.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the folder
-
 
 </td></tr>
 <tr><td>
 
 [shared](./notes.folder.shared.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the folder is shared
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Dhac
 **Signature:**
 
 ```typescript
-type Dhac = 'askWhatToDo' | 'ignore' | 'openApplication' | 'runAScript';
+type Dhac = 'askWhatToDo' | 'ignore' | 'openApplication' | 'runAScript'
 ```

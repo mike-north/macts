@@ -9,5 +9,5 @@ Unique identifier for this pop up button
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

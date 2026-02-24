@@ -9,5 +9,5 @@ Epos
 **Signature:**
 
 ```typescript
-type Epos = 'right' | 'bottom';
+type Epos = 'right' | 'bottom'
 ```

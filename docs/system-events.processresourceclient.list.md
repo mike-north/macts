@@ -11,7 +11,7 @@ List all processes.
 ```typescript
 list(): Promise<Process[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Process](./system-events.process.md)<!-- -->\[\]&gt;
-

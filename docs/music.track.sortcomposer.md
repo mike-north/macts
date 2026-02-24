@@ -9,5 +9,5 @@ override string to use for the track when sorting by composer
 **Signature:**
 
 ```typescript
-sortComposer: string;
+sortComposer: string
 ```

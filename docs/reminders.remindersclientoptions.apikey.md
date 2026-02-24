@@ -9,5 +9,5 @@ API key for authentication
 **Signature:**
 
 ```typescript
-apiKey: string;
+apiKey: string
 ```

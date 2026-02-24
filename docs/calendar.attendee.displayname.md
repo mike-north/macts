@@ -9,5 +9,5 @@ The first and last name of the attendee
 **Signature:**
 
 ```typescript
-displayName: string;
+displayName: string
 ```

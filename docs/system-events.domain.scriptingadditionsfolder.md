@@ -9,5 +9,5 @@ The Scripting Additions folder
 **Signature:**
 
 ```typescript
-scriptingAdditionsFolder: Folder;
+scriptingAdditionsFolder: Folder
 ```

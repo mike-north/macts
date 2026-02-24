@@ -9,7 +9,7 @@
 ```typescript
 isRunning(): Promise<boolean>;
 ```
+
 **Returns:**
 
 Promise&lt;boolean&gt;
-

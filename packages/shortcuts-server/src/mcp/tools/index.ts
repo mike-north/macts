@@ -4,11 +4,11 @@
  * @packageDocumentation
  */
 
-import { shortcutsListTool } from './shortcuts.js';
-import { shortcutsGetTool } from './shortcuts.js';
-import { shortcutsRunTool } from './shortcuts.js';
-import { foldersListTool } from './folders.js';
-import { foldersGetTool } from './folders.js';
+import { shortcutsListTool } from './shortcuts.js'
+import { shortcutsGetTool } from './shortcuts.js'
+import { shortcutsRunTool } from './shortcuts.js'
+import { foldersListTool } from './folders.js'
+import { foldersGetTool } from './folders.js'
 
 /**
  * All MCP tools.
@@ -19,4 +19,4 @@ export const allTools = [
   shortcutsRunTool,
   foldersListTool,
   foldersGetTool,
-] as const;
+] as const

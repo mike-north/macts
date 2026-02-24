@@ -9,5 +9,5 @@ SDK package name (e.g., @<!-- -->macts/sdk-calendar)
 **Signature:**
 
 ```typescript
-sdkPackageName: string;
+sdkPackageName: string
 ```

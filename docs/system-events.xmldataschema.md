@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-XMLDataSchema: z.ZodObject<{
-    id: z.ZodString;
-    name: z.ZodString;
-    text: z.ZodString;
-}, z.core.$strip>
+XMLDataSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    name: z.ZodString
+    text: z.ZodString
+  },
+  z.core.$strip
+>
 ```

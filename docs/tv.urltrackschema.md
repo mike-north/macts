@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-URLTrackSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    address: z.ZodString;
-}, z.core.$strip>
+URLTrackSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    address: z.ZodString
+  },
+  z.core.$strip
+>
 ```

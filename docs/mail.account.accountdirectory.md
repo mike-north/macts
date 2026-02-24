@@ -9,5 +9,5 @@ The directory where the account stores things on disk
 **Signature:**
 
 ```typescript
-accountDirectory: string;
+accountDirectory: string
 ```

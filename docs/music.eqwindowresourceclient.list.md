@@ -11,7 +11,7 @@ List all eqwindows.
 ```typescript
 list(): Promise<EQWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[EQWindow](./music.eqwindow.md)<!-- -->\[\]&gt;
-

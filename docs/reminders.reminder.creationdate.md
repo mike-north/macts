@@ -9,5 +9,5 @@ The creation date of the reminder
 **Signature:**
 
 ```typescript
-creationDate: Date;
+creationDate: Date
 ```

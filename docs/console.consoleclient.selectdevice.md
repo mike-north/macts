@@ -11,7 +11,7 @@ Select a device.
 ```typescript
 selectDevice(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

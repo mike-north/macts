@@ -9,7 +9,7 @@ Input for creating a Tab
 **Signature:**
 
 ```typescript
-interface TabCreateInput 
+interface TabCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface TabCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentSettings?](./terminal.tabcreateinput.currentsettings.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the current settings set
-
 
 </td></tr>
 <tr><td>
 
 [customTitle?](./terminal.tabcreateinput.customtitle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The custom title of the tab
-
 
 </td></tr>
 <tr><td>
 
 [selected?](./terminal.tabcreateinput.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the tab is selected
-
 
 </td></tr>
 <tr><td>
 
 [titleDisplaysCustomTitle?](./terminal.tabcreateinput.titledisplayscustomtitle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the title displays a custom title
 
-
 </td></tr>
 </tbody></table>
-

@@ -10,8 +10,8 @@ The aNSIMagentaColor property
 
 ```typescript
 aNSIMagentaColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

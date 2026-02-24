@@ -11,7 +11,7 @@ Opens an iTunes Store or stream URL
 ```typescript
 openLocation(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

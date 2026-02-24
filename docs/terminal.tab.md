@@ -9,7 +9,7 @@ A Terminal tab
 **Signature:**
 
 ```typescript
-interface Tab 
+interface Tab
 ```
 
 ## Properties
@@ -18,193 +18,152 @@ interface Tab
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [busy](./terminal.tab.busy.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the tab is busy running a process
-
 
 </td></tr>
 <tr><td>
 
 [contents](./terminal.tab.contents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The visible contents of the tab
-
 
 </td></tr>
 <tr><td>
 
 [currentSettings](./terminal.tab.currentsettings.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the current settings set
-
 
 </td></tr>
 <tr><td>
 
 [customTitle](./terminal.tab.customtitle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The custom title of the tab
-
 
 </td></tr>
 <tr><td>
 
 [history](./terminal.tab.history.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The complete history contents of the tab
-
 
 </td></tr>
 <tr><td>
 
 [processes](./terminal.tab.processes.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The currently running processes in the tab
-
 
 </td></tr>
 <tr><td>
 
 [selected](./terminal.tab.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the tab is selected
-
 
 </td></tr>
 <tr><td>
 
 [titleDisplaysCustomTitle](./terminal.tab.titledisplayscustomtitle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the title displays a custom title
-
 
 </td></tr>
 <tr><td>
 
 [tty](./terminal.tab.tty.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The tty device of the tab
 
-
 </td></tr>
 </tbody></table>
-

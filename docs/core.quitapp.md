@@ -9,7 +9,7 @@ Quit an application.
 **Signature:**
 
 ```typescript
-declare function quitApp(bundleId: string): Promise<undefined>;
+declare function quitApp(bundleId: string): Promise<undefined>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function quitApp(bundleId: string): Promise<undefined>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;undefined&gt;
-

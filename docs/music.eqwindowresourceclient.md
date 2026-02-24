@@ -9,7 +9,7 @@ Client for the equalizer window.
 **Signature:**
 
 ```typescript
-declare class EQWindowResourceClient 
+declare class EQWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class EQWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.eqwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `EQWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `EQWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.eqwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new eqwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.eqwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a eqwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.eqwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a eqwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.eqwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all eqwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.eqwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing eqwindow.
 
-
 </td></tr>
 </tbody></table>
-

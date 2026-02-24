@@ -18,30 +18,24 @@ create(input: ContainerCreateInput): Promise<Container>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ContainerCreateInput](./finder.containercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Container](./finder.container.md)<!-- -->&gt;
-

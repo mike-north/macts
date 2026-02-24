@@ -18,31 +18,24 @@ constructor(options: TextEditClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [TextEditClientOptions](./textedit.texteditclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

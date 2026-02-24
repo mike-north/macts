@@ -9,7 +9,7 @@ Input for creating a Tab
 **Signature:**
 
 ```typescript
-interface TabCreateInput 
+interface TabCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface TabCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentSession?](./iterm.tabcreateinput.currentsession.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Session](./iterm.session.md)
 
-
 </td><td>
 
 _(Optional)_ The current session in a tab
-
 
 </td></tr>
 <tr><td>
 
 [index?](./iterm.tabcreateinput.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ Index of tab in parent tab view control
-
 
 </td></tr>
 <tr><td>
 
 [title?](./iterm.tabcreateinput.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The title property
 
-
 </td></tr>
 </tbody></table>
-

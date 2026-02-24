@@ -9,5 +9,5 @@ The (POSIX) path to be opened by the alarm
 **Signature:**
 
 ```typescript
-filepath: string;
+filepath: string
 ```

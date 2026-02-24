@@ -11,7 +11,7 @@ List all urls.
 ```typescript
 list(): Promise<Url[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Url](./contacts.url.md)<!-- -->\[\]&gt;
-

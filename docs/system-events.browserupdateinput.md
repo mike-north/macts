@@ -9,7 +9,7 @@ Input for updating a Browser
 **Signature:**
 
 ```typescript
-type BrowserUpdateInput = Partial<BrowserCreateInput>;
+type BrowserUpdateInput = Partial<BrowserCreateInput>
 ```
-**References:** [BrowserCreateInput](./system-events.browsercreateinput.md)
 
+**References:** [BrowserCreateInput](./system-events.browsercreateinput.md)

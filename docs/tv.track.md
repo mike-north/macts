@@ -9,7 +9,7 @@ playable video source
 **Signature:**
 
 ```typescript
-interface Track 
+interface Track
 ```
 
 ## Properties
@@ -18,1010 +18,797 @@ interface Track
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [album](./tv.track.album.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the album name of the track
-
 
 </td></tr>
 <tr><td>
 
 [albumRating](./tv.track.albumrating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the rating of the album for this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [albumRatingKind](./tv.track.albumratingkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the rating kind of the album rating for this track
-
 
 </td></tr>
 <tr><td>
 
 [bitRate](./tv.track.bitrate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the bit rate of the track (in kbps)
-
 
 </td></tr>
 <tr><td>
 
 [bookmark](./tv.track.bookmark.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the bookmark time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [bookmarkable](./tv.track.bookmarkable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the playback position for this track remembered?
-
 
 </td></tr>
 <tr><td>
 
 [category](./tv.track.category.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the category of the track
-
 
 </td></tr>
 <tr><td>
 
 [comment](./tv.track.comment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 freeform notes about the track
-
 
 </td></tr>
 <tr><td>
 
 [databaseID](./tv.track.databaseid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.
-
 
 </td></tr>
 <tr><td>
 
 [dateAdded](./tv.track.dateadded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date the track was added to the playlist
-
 
 </td></tr>
 <tr><td>
 
 [description](./tv.track.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the description of the track
-
 
 </td></tr>
 <tr><td>
 
 [director](./tv.track.director.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the artist/source of the track
-
 
 </td></tr>
 <tr><td>
 
 [discCount](./tv.track.disccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of discs in the source album
-
 
 </td></tr>
 <tr><td>
 
 [discNumber](./tv.track.discnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of the disc containing this track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [downloaderAccount](./tv.track.downloaderaccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the account of the person who downloaded this track
-
 
 </td></tr>
 <tr><td>
 
 [downloaderName](./tv.track.downloadername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the person who downloaded this track
-
 
 </td></tr>
 <tr><td>
 
 [duration](./tv.track.duration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the length of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [enabled](./tv.track.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track checked for playback?
-
 
 </td></tr>
 <tr><td>
 
 [episodeID](./tv.track.episodeid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the episode ID of the track
-
 
 </td></tr>
 <tr><td>
 
 [episodeNumber](./tv.track.episodenumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the episode number of the track
-
 
 </td></tr>
 <tr><td>
 
 [finish](./tv.track.finish.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the stop time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [genre](./tv.track.genre.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the genre (category) of the track
-
 
 </td></tr>
 <tr><td>
 
 [grouping](./tv.track.grouping.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the grouping (piece) of the track. Generally used to denote movements within a classical work.
-
 
 </td></tr>
 <tr><td>
 
 [id](./tv.track.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this track
-
 
 </td></tr>
 <tr><td>
 
 [kind](./tv.track.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 a text description of the track
-
 
 </td></tr>
 <tr><td>
 
 [longDescription](./tv.track.longdescription.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the long description of the track
-
 
 </td></tr>
 <tr><td>
 
 [mediaKind](./tv.track.mediakind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the media kind of the track
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./tv.track.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the modification date of the content of this track
-
 
 </td></tr>
 <tr><td>
 
 [playedCount](./tv.track.playedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 number of times this track has been played
-
 
 </td></tr>
 <tr><td>
 
 [playedDate](./tv.track.playeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date and time this track was last played
-
 
 </td></tr>
 <tr><td>
 
 [purchaserAccount](./tv.track.purchaseraccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the account of the person who purchased this track
-
 
 </td></tr>
 <tr><td>
 
 [purchaserName](./tv.track.purchasername.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the person who purchased this track
-
 
 </td></tr>
 <tr><td>
 
 [rating](./tv.track.rating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the rating of this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [ratingKind](./tv.track.ratingkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the rating kind of this track
-
 
 </td></tr>
 <tr><td>
 
 [releaseDate](./tv.track.releasedate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the release date of this track
-
 
 </td></tr>
 <tr><td>
 
 [sampleRate](./tv.track.samplerate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the sample rate of the track (in Hz)
-
 
 </td></tr>
 <tr><td>
 
 [seasonNumber](./tv.track.seasonnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the season number of the track
-
 
 </td></tr>
 <tr><td>
 
 [show](./tv.track.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the show name of the track
-
 
 </td></tr>
 <tr><td>
 
 [size](./tv.track.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the size of the track (in bytes)
-
 
 </td></tr>
 <tr><td>
 
 [skippedCount](./tv.track.skippedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 number of times this track has been skipped
-
 
 </td></tr>
 <tr><td>
 
 [skippedDate](./tv.track.skippeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date and time this track was last skipped
-
 
 </td></tr>
 <tr><td>
 
 [sortAlbum](./tv.track.sortalbum.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by album
-
 
 </td></tr>
 <tr><td>
 
 [sortDirector](./tv.track.sortdirector.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by artist
-
 
 </td></tr>
 <tr><td>
 
 [sortName](./tv.track.sortname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by name
-
 
 </td></tr>
 <tr><td>
 
 [sortShow](./tv.track.sortshow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 override string to use for the track when sorting by show name
-
 
 </td></tr>
 <tr><td>
 
 [start](./tv.track.start.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the start time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [time](./tv.track.time.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the length of the track in MM:SS format
-
 
 </td></tr>
 <tr><td>
 
 [trackCount](./tv.track.trackcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of tracks on the source album
-
 
 </td></tr>
 <tr><td>
 
 [trackNumber](./tv.track.tracknumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of the track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [unplayed](./tv.track.unplayed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this track unplayed?
-
 
 </td></tr>
 <tr><td>
 
 [volumeAdjustment](./tv.track.volumeadjustment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 relative volume adjustment of the track (-100% to 100%)
-
 
 </td></tr>
 <tr><td>
 
 [year](./tv.track.year.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the year the track was recorded/released
 
-
 </td></tr>
 </tbody></table>
-

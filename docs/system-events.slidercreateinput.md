@@ -9,5 +9,5 @@ Input for creating a Slider
 **Signature:**
 
 ```typescript
-interface SliderCreateInput 
+interface SliderCreateInput
 ```

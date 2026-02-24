@@ -9,5 +9,5 @@ The plaintext content of the note
 **Signature:**
 
 ```typescript
-plaintext: string;
+plaintext: string
 ```

@@ -9,5 +9,5 @@ The session has received output recently.
 **Signature:**
 
 ```typescript
-isProcessing: boolean;
+isProcessing: boolean
 ```

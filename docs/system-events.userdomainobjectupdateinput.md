@@ -9,7 +9,7 @@ Input for updating a UserDomainObject
 **Signature:**
 
 ```typescript
-type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>;
+type UserDomainObjectUpdateInput = Partial<UserDomainObjectCreateInput>
 ```
-**References:** [UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)
 
+**References:** [UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)

@@ -9,5 +9,5 @@ Ecvw
 **Signature:**
 
 ```typescript
-type Ecvw = 'iconView' | 'listView' | 'columnView' | 'groupView' | 'flowView';
+type Ecvw = 'iconView' | 'listView' | 'columnView' | 'groupView' | 'flowView'
 ```

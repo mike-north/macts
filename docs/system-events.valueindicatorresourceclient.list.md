@@ -11,7 +11,7 @@ List all valueindicators.
 ```typescript
 list(): Promise<ValueIndicator[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ValueIndicator](./system-events.valueindicator.md)<!-- -->\[\]&gt;
-

@@ -9,7 +9,7 @@ Client for user name for jabber instant messaging..
 **Signature:**
 
 ```typescript
-declare class JabberHandleResourceClient 
+declare class JabberHandleResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class JabberHandleResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.jabberhandleresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `JabberHandleResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `JabberHandleResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.jabberhandleresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new jabberhandle.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.jabberhandleresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a jabberhandle.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.jabberhandleresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a jabberhandle by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.jabberhandleresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all jabberhandles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.jabberhandleresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing jabberhandle.
 
-
 </td></tr>
 </tbody></table>
-

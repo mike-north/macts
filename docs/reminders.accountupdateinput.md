@@ -9,7 +9,7 @@ Input for updating a Account
 **Signature:**
 
 ```typescript
-type AccountUpdateInput = Partial<AccountCreateInput>;
+type AccountUpdateInput = Partial<AccountCreateInput>
 ```
-**References:** [AccountCreateInput](./reminders.accountcreateinput.md)
 
+**References:** [AccountCreateInput](./reminders.accountcreateinput.md)

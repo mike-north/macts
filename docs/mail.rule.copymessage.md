@@ -9,5 +9,5 @@ If rule matches, copy to this mailbox
 **Signature:**
 
 ```typescript
-copyMessage: Mailbox;
+copyMessage: Mailbox
 ```

@@ -9,5 +9,5 @@ the work name of the track
 **Signature:**
 
 ```typescript
-work: string;
+work: string
 ```

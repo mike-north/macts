@@ -9,7 +9,7 @@ Input for updating a RadioTunerPlaylist
 **Signature:**
 
 ```typescript
-type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>;
+type RadioTunerPlaylistUpdateInput = Partial<RadioTunerPlaylistCreateInput>
 ```
-**References:** [RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)
 
+**References:** [RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)

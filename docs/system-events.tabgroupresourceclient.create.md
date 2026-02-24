@@ -18,30 +18,24 @@ create(input: TabGroupCreateInput): Promise<TabGroup>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TabGroupCreateInput](./system-events.tabgroupcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[TabGroup](./system-events.tabgroup.md)<!-- -->&gt;
-

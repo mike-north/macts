@@ -9,5 +9,5 @@ Unique identifier for this menu bar
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

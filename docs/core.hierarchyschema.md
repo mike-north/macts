@@ -9,17 +9,30 @@ Schema for the application-level hierarchy.
 **Signature:**
 
 ```typescript
-HierarchySchema: z.ZodObject<{
-    children: z.ZodRecord<z.ZodString, z.ZodType<{
-        resource: string;
-        access: "r" | "rw";
-        description?: string | undefined;
-        children?: Record<string, HierarchyChild> | undefined;
-    }, unknown, z.core.$ZodTypeInternals<{
-        resource: string;
-        access: "r" | "rw";
-        description?: string | undefined;
-        children?: Record<string, HierarchyChild> | undefined;
-    }, unknown>>>;
-}, z.core.$strip>
+HierarchySchema: z.ZodObject<
+  {
+    children: z.ZodRecord<
+      z.ZodString,
+      z.ZodType<
+        {
+          resource: string
+          access: 'r' | 'rw'
+          description?: string | undefined
+          children?: Record<string, HierarchyChild> | undefined
+        },
+        unknown,
+        z.core.$ZodTypeInternals<
+          {
+            resource: string
+            access: 'r' | 'rw'
+            description?: string | undefined
+            children?: Record<string, HierarchyChild> | undefined
+          },
+          unknown
+        >
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

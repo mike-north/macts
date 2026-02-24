@@ -9,5 +9,5 @@ Does the process accept remote events?
 **Signature:**
 
 ```typescript
-acceptsRemoteEvents: boolean;
+acceptsRemoteEvents: boolean
 ```

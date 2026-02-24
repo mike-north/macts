@@ -9,7 +9,7 @@ Get the display name of an application.
 **Signature:**
 
 ```typescript
-declare function getAppName(bundleId: string): Promise<string>;
+declare function getAppName(bundleId: string): Promise<string>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function getAppName(bundleId: string): Promise<string>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 Promise&lt;string&gt;
-

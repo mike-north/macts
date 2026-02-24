@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PointType = z.infer<typeof PointTypeSchema>;
+type PointType = z.infer<typeof PointTypeSchema>
 ```
-**References:** [PointTypeSchema](./core.pointtypeschema.md)
 
+**References:** [PointTypeSchema](./core.pointtypeschema.md)

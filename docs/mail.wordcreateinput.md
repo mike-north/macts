@@ -9,7 +9,7 @@ Input for creating a Word
 **Signature:**
 
 ```typescript
-interface WordCreateInput 
+interface WordCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface WordCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color?](./mail.wordcreateinput.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font?](./mail.wordcreateinput.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size?](./mail.wordcreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

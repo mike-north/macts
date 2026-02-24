@@ -9,7 +9,7 @@ Client for an 'open file' alarm.
 **Signature:**
 
 ```typescript
-declare class OpenFileAlarmResourceClient 
+declare class OpenFileAlarmResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class OpenFileAlarmResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.openfilealarmresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `OpenFileAlarmResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `OpenFileAlarmResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.openfilealarmresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new openfilealarm.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./calendar.openfilealarmresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a openfilealarm.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./calendar.openfilealarmresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a openfilealarm by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.openfilealarmresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all openfilealarms.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./calendar.openfilealarmresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing openfilealarm.
 
-
 </td></tr>
 </tbody></table>
-

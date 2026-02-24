@@ -9,5 +9,5 @@ The id of the settings pane.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

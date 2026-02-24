@@ -1,33 +1,33 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../sdk.js';
-import { createFormatter } from '../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../sdk.js'
+import { createFormatter } from '../output/index.js'
 
 /**
  * Open the specified object(s)
  */
 export class OpenCommand extends Command {
-  static override paths = [["music", "open"]];
+  static override paths = [['music', 'open']]
 
   static override usage = Command.Usage({
-    description: "Open the specified object(s)",
-  });
+    description: 'Open the specified object(s)',
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      await client.open();
+      const client = getClient()
+      await client.open()
 
-      const output = formatter.formatSuccess('open completed successfully');
-      this.context.stdout.write(output + '\n');
-      return 0;
+      const output = formatter.formatSuccess('open completed successfully')
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

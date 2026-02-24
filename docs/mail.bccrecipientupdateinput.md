@@ -9,7 +9,7 @@ Input for updating a BccRecipient
 **Signature:**
 
 ```typescript
-type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>;
+type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>
 ```
-**References:** [BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)
 
+**References:** [BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)

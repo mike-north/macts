@@ -9,5 +9,5 @@ The name of the track
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

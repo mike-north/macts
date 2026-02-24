@@ -11,7 +11,7 @@ List all menubuttons.
 ```typescript
 list(): Promise<MenuButton[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MenuButton](./system-events.menubutton.md)<!-- -->\[\]&gt;
-

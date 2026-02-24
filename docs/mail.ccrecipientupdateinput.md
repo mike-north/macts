@@ -9,7 +9,7 @@ Input for updating a CcRecipient
 **Signature:**
 
 ```typescript
-type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>;
+type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>
 ```
-**References:** [CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)
 
+**References:** [CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)

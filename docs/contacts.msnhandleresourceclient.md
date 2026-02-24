@@ -9,7 +9,7 @@ Client for user name for microsoft network (msn) instant messaging..
 **Signature:**
 
 ```typescript
-declare class MSNHandleResourceClient 
+declare class MSNHandleResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MSNHandleResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.msnhandleresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MSNHandleResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MSNHandleResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.msnhandleresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new msnhandle.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.msnhandleresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a msnhandle.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.msnhandleresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a msnhandle by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.msnhandleresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all msnhandles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.msnhandleresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing msnhandle.
 
-
 </td></tr>
 </tbody></table>
-

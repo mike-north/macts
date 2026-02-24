@@ -18,30 +18,24 @@ create(input: ScrollAreaCreateInput): Promise<ScrollArea>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScrollArea](./system-events.scrollarea.md)<!-- -->&gt;
-

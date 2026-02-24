@@ -18,30 +18,24 @@ create(input: RuleCreateInput): Promise<Rule>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RuleCreateInput](./mail.rulecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Rule](./mail.rule.md)<!-- -->&gt;
-

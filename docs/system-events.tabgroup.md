@@ -9,7 +9,7 @@ A tab group belonging to a window
 **Signature:**
 
 ```typescript
-interface TabGroup 
+interface TabGroup
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TabGroup
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.tabgroup.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this tab group
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,30 +18,24 @@ create(input: ScrollBarCreateInput): Promise<ScrollBar>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScrollBar](./system-events.scrollbar.md)<!-- -->&gt;
-

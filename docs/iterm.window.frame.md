@@ -10,9 +10,9 @@ The bounding rectangle, relative to the lower left corner of the screen.
 
 ```typescript
 frame: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
+  x: number
+  y: number
+  width: number
+  height: number
+}
 ```

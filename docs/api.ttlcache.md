@@ -9,7 +9,7 @@ A generic in-memory cache where each entry expires after a configurable TTL.
 **Signature:**
 
 ```typescript
-declare class TtlCache<T> 
+declare class TtlCache<T>
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TtlCache<T>
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(defaultTtlMs)](./api.ttlcache._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TtlCache` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,42 +46,34 @@ Constructs a new instance of the `TtlCache` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [size](./api.ttlcache.size.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Number of entries (may include expired entries until accessed).
-
 
 </td></tr>
 </tbody></table>
@@ -98,87 +84,68 @@ Number of entries (may include expired entries until accessed).
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [clear()](./api.ttlcache.clear.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Clear all entries.
-
 
 </td></tr>
 <tr><td>
 
 [delete(key)](./api.ttlcache.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a specific entry.
-
 
 </td></tr>
 <tr><td>
 
 [get(key)](./api.ttlcache.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a value from the cache. Returns undefined if the key doesn't exist or has expired.
-
 
 </td></tr>
 <tr><td>
 
 [has(key)](./api.ttlcache.has.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Check if a key exists and hasn't expired.
-
 
 </td></tr>
 <tr><td>
 
 [set(key, value, ttlMs)](./api.ttlcache.set.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Set a value in the cache.
 
-
 </td></tr>
 </tbody></table>
-

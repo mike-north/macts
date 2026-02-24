@@ -9,7 +9,7 @@
 ```typescript
 activate(): Promise<undefined>;
 ```
+
 **Returns:**
 
 Promise&lt;undefined&gt;
-

@@ -18,30 +18,24 @@ create(input: TextFieldCreateInput): Promise<TextField>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TextFieldCreateInput](./system-events.textfieldcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[TextField](./system-events.textfield.md)<!-- -->&gt;
-

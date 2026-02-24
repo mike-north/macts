@@ -9,7 +9,7 @@ Input for creating a Tab
 **Signature:**
 
 ```typescript
-interface TabCreateInput 
+interface TabCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TabCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [url?](./safari.tabcreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The tab URL
 
-
 </td></tr>
 </tbody></table>
-

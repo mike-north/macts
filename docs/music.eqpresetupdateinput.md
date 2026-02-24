@@ -9,7 +9,7 @@ Input for updating a EQPreset
 **Signature:**
 
 ```typescript
-type EQPresetUpdateInput = Partial<EQPresetCreateInput>;
+type EQPresetUpdateInput = Partial<EQPresetCreateInput>
 ```
-**References:** [EQPresetCreateInput](./music.eqpresetcreateinput.md)
 
+**References:** [EQPresetCreateInput](./music.eqpresetcreateinput.md)

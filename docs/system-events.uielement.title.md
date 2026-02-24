@@ -9,5 +9,5 @@ the title of the UI element as it appears on the screen
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -11,7 +11,7 @@ Get application-level commands
 ```typescript
 getAppCommands(): Command[];
 ```
+
 **Returns:**
 
 [Command](./core.command.md)<!-- -->\[\]
-

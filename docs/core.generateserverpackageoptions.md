@@ -9,7 +9,7 @@ Options for generating a server package.
 **Signature:**
 
 ```typescript
-interface GenerateServerPackageOptions 
+interface GenerateServerPackageOptions
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface GenerateServerPackageOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName](./core.generateserverpackageoptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 App name (e.g., 'calendar')
-
 
 </td></tr>
 <tr><td>
 
 [clientPackageName](./core.generateserverpackageoptions.clientpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Client package name (e.g., '<!-- -->@<!-- -->macts/calendar')
-
 
 </td></tr>
 <tr><td>
 
 [serverPackageName](./core.generateserverpackageoptions.serverpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Server package name (e.g., '<!-- -->@<!-- -->macts/calendar-server')
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.generateserverpackageoptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

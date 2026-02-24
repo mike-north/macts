@@ -11,7 +11,7 @@ List all classicdomainobjects.
 ```typescript
 list(): Promise<ClassicDomainObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ClassicDomainObject](./system-events.classicdomainobject.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ If rule matches, prepend this text to the forwarded message. Set to empty string
 **Signature:**
 
 ```typescript
-forwardText: string;
+forwardText: string
 ```

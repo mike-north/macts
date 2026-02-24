@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Photos.app automation.
@@ -16,4 +16,4 @@ export const photosPlugin: McpPlugin = {
   name: 'photos',
   description: 'MCP plugin for macOS Photos.app automation',
   tools: allTools,
-};
+}

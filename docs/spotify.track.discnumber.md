@@ -9,5 +9,5 @@ The disc number of the track
 **Signature:**
 
 ```typescript
-discNumber: number;
+discNumber: number
 ```

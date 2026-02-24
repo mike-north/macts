@@ -9,7 +9,7 @@ Input for updating a MenuButton
 **Signature:**
 
 ```typescript
-type MenuButtonUpdateInput = Partial<MenuButtonCreateInput>;
+type MenuButtonUpdateInput = Partial<MenuButtonCreateInput>
 ```
-**References:** [MenuButtonCreateInput](./system-events.menubuttoncreateinput.md)
 
+**References:** [MenuButtonCreateInput](./system-events.menubuttoncreateinput.md)

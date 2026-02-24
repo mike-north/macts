@@ -9,10 +9,13 @@ Rectangle with position and size.
 **Signature:**
 
 ```typescript
-RectTypeSchema: z.ZodObject<{
-    x: z.ZodNumber;
-    y: z.ZodNumber;
-    width: z.ZodNumber;
-    height: z.ZodNumber;
-}, z.core.$strip>
+RectTypeSchema: z.ZodObject<
+  {
+    x: z.ZodNumber
+    y: z.ZodNumber
+    width: z.ZodNumber
+    height: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

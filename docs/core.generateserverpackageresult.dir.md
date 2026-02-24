@@ -9,5 +9,5 @@ Directory name for the package (e.g., 'calendar-server')
 **Signature:**
 
 ```typescript
-dir: string;
+dir: string
 ```

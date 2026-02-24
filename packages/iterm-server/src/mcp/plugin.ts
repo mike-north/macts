@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS iTerm.app automation.
@@ -16,4 +16,4 @@ export const itermPlugin: McpPlugin = {
   name: 'iterm',
   description: 'MCP plugin for macOS iTerm.app automation',
   tools: allTools,
-};
+}

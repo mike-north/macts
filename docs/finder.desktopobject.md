@@ -9,7 +9,7 @@ Desktop-object is the class of the "desktop" object
 **Signature:**
 
 ```typescript
-interface DesktopObject 
+interface DesktopObject
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface DesktopObject
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./finder.desktopobject.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for the desktop
 
-
 </td></tr>
 </tbody></table>
-

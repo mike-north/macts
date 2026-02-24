@@ -9,7 +9,7 @@ Context for RPC handler execution.
 **Signature:**
 
 ```typescript
-interface RpcHandlerContext 
+interface RpcHandlerContext
 ```
 
 ## Properties
@@ -18,56 +18,43 @@ interface RpcHandlerContext
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [bundleId](./api.rpchandlercontext.bundleid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [manifest](./api.rpchandlercontext.manifest.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

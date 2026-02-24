@@ -11,7 +11,7 @@ List all libraryplaylists.
 ```typescript
 list(): Promise<LibraryPlaylist[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[LibraryPlaylist](./music.libraryplaylist.md)<!-- -->\[\]&gt;
-

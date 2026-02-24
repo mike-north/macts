@@ -18,80 +18,65 @@ print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: str
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 printDialog
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 withProperties
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 kind
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 theme
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -99,4 +84,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

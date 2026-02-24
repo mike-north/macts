@@ -9,5 +9,5 @@ the number of bytes currently used in the process' partition
 **Signature:**
 
 ```typescript
-partitionSpaceUsed: number;
+partitionSpaceUsed: number
 ```

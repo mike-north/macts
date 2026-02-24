@@ -9,5 +9,5 @@ Input for creating a List
 **Signature:**
 
 ```typescript
-interface ListCreateInput 
+interface ListCreateInput
 ```

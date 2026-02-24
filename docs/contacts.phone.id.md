@@ -9,5 +9,5 @@ Unique identifier for this phone
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

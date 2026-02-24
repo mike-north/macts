@@ -10,9 +10,9 @@ The bounding rectangle of the window.
 
 ```typescript
 bounds: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
+  x: number
+  y: number
+  width: number
+  height: number
+}
 ```

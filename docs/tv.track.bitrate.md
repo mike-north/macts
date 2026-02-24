@@ -9,5 +9,5 @@ the bit rate of the track (in kbps)
 **Signature:**
 
 ```typescript
-bitRate: number;
+bitRate: number
 ```

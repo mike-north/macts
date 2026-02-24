@@ -9,7 +9,7 @@ Client for class for conditions that can be attached to a single rule.
 **Signature:**
 
 ```typescript
-declare class RuleConditionResourceClient 
+declare class RuleConditionResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RuleConditionResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.ruleconditionresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RuleConditionResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RuleConditionResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.ruleconditionresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new rulecondition.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.ruleconditionresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a rulecondition.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.ruleconditionresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a rulecondition by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.ruleconditionresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all ruleconditions.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.ruleconditionresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing rulecondition.
 
-
 </td></tr>
 </tbody></table>
-

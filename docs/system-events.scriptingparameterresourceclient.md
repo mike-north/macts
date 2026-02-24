@@ -9,7 +9,7 @@ Client for a parameter within a command within a suite within a scripting defini
 **Signature:**
 
 ```typescript
-declare class ScriptingParameterResourceClient 
+declare class ScriptingParameterResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingParameterResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingparameterresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingParameterResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingParameterResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingparameterresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingparameter.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingparameterresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingparameter.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingparameterresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingparameter by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingparameterresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingparameters.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingparameterresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingparameter.
 
-
 </td></tr>
 </tbody></table>
-

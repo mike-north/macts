@@ -9,5 +9,5 @@ ESpK
 **Signature:**
 
 ```typescript
-type ESpK = 'none' | 'folder' | 'genius' | 'library' | 'music' | 'purchasedMusic';
+type ESpK = 'none' | 'folder' | 'genius' | 'library' | 'music' | 'purchasedMusic'
 ```

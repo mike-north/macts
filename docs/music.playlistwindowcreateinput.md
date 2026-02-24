@@ -9,5 +9,5 @@ Input for creating a PlaylistWindow
 **Signature:**
 
 ```typescript
-interface PlaylistWindowCreateInput 
+interface PlaylistWindowCreateInput
 ```

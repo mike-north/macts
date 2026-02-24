@@ -11,7 +11,7 @@ List all textareas.
 ```typescript
 list(): Promise<TextArea[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[TextArea](./system-events.textarea.md)<!-- -->\[\]&gt;
-

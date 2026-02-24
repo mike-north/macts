@@ -9,10 +9,13 @@ Schema for open questions from extraction.
 **Signature:**
 
 ```typescript
-OpenQuestionSchema: z.ZodObject<{
-    question: z.ZodString;
-    context: z.ZodOptional<z.ZodString>;
-    suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    relatedTo: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+OpenQuestionSchema: z.ZodObject<
+  {
+    question: z.ZodString
+    context: z.ZodOptional<z.ZodString>
+    suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>
+    relatedTo: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

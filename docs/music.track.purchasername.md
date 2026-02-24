@@ -9,5 +9,5 @@ the name of the person who purchased this track
 **Signature:**
 
 ```typescript
-purchaserName: string;
+purchaserName: string
 ```

@@ -18,31 +18,24 @@ constructor(options: TVClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [TVClientOptions](./tv.tvclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

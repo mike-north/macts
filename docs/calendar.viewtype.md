@@ -9,5 +9,5 @@ Calendar view type
 **Signature:**
 
 ```typescript
-type ViewType = 'dayView' | 'weekView' | 'monthView';
+type ViewType = 'dayView' | 'weekView' | 'monthView'
 ```

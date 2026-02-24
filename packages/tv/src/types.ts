@@ -3,418 +3,418 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** EPlS */
-export type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewinding';
+export type EPlS = 'stopped' | 'playing' | 'paused' | 'fastForwarding' | 'rewinding'
 
 /** ESrc */
-export type ESrc = 'library' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
+export type ESrc = 'library' | 'sharedLibrary' | 'iTunesStore' | 'unknown'
 
 /** ESrA */
-export type ESrA = 'albums' | 'all' | 'artists' | 'displayed' | 'names';
+export type ESrA = 'albums' | 'all' | 'artists' | 'displayed' | 'names'
 
 /** ESpK */
-export type ESpK = 'none' | 'folder' | 'library' | 'movies' | 'tVShows';
+export type ESpK = 'none' | 'folder' | 'library' | 'movies' | 'tVShows'
 
 /** EMdK */
-export type EMdK = 'homeVideo' | 'movie' | 'tVShow' | 'unknown';
+export type EMdK = 'homeVideo' | 'movie' | 'tVShow' | 'unknown'
 
 /** ERtK */
-export type ERtK = 'user' | 'computed';
+export type ERtK = 'user' | 'computed'
 
 /** a piece of art within a track or playlist */
 export interface Artwork {
   /** Unique identifier for this artwork */
-  id: number;
+  id: number
   /** data for this artwork, in the form of a picture */
-  data: string;
+  data: string
   /** description of artwork as a string */
-  description: string;
+  description: string
   /** was this artwork downloaded by iTunes? */
-  downloaded: boolean;
+  downloaded: boolean
   /** the data format for this piece of artwork */
-  format: string;
+  format: string
   /** kind or purpose of this piece of artwork */
-  kind: number;
+  kind: number
   /** data for this artwork, in original format */
-  rawData: unknown;
+  rawData: unknown
 }
 
 /** Input for creating a Artwork */
 export interface ArtworkCreateInput {
   /** data for this artwork, in the form of a picture */
-  data?: string;
+  data?: string
   /** description of artwork as a string */
-  description?: string;
+  description?: string
   /** kind or purpose of this piece of artwork */
-  kind?: number;
+  kind?: number
   /** data for this artwork, in original format */
-  rawData?: unknown;
+  rawData?: unknown
 }
 
 /** Input for updating a Artwork */
-export type ArtworkUpdateInput = Partial<ArtworkCreateInput>;
+export type ArtworkUpdateInput = Partial<ArtworkCreateInput>
 
 /** the main window */
 export interface BrowserWindow {
   /** Unique identifier for this window */
-  id: number;
+  id: number
   /** the selected tracks */
-  selection: string;
+  selection: string
   /** the playlist currently displayed in the window */
-  view: Playlist;
+  view: Playlist
 }
 
 /** Input for creating a BrowserWindow */
 export interface BrowserWindowCreateInput {
   /** the playlist currently displayed in the window */
-  view?: Playlist;
+  view?: Playlist
 }
 
 /** Input for updating a BrowserWindow */
-export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>;
+export type BrowserWindowUpdateInput = Partial<BrowserWindowCreateInput>
 
 /** a track representing a video file */
 export interface FileTrack {
   /** Unique identifier for this track */
-  id: number;
+  id: number
   /** the location of the file represented by this track */
-  location: string;
+  location: string
 }
 
 /** Input for creating a FileTrack */
 export interface FileTrackCreateInput {
   /** the location of the file represented by this track */
-  location?: string;
+  location?: string
 }
 
 /** Input for updating a FileTrack */
-export type FileTrackUpdateInput = Partial<FileTrackCreateInput>;
+export type FileTrackUpdateInput = Partial<FileTrackCreateInput>
 
 /** the main library playlist */
 export interface LibraryPlaylist {
   /** Unique identifier for this playlist */
-  id: number;
+  id: number
 }
 
 /** Input for creating a LibraryPlaylist */
-export type LibraryPlaylistCreateInput = Record<string, never>;
+export type LibraryPlaylistCreateInput = Record<string, never>
 
 /** Input for updating a LibraryPlaylist */
-export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>;
+export type LibraryPlaylistUpdateInput = Partial<LibraryPlaylistCreateInput>
 
 /** a list of tracks/streams */
 export interface Playlist {
   /** Unique identifier for this playlist */
-  id: number;
+  id: number
   /** the description of the playlist */
-  description: string;
+  description: string
   /** the total length of all tracks (in seconds) */
-  duration: number;
+  duration: number
   /** the name of the playlist */
-  name: string;
+  name: string
   /** folder which contains this playlist (if any) */
-  parent: Playlist;
+  parent: Playlist
   /** the total size of all tracks (in bytes) */
-  size: number;
+  size: number
   /** special playlist kind */
-  specialKind: string;
+  specialKind: string
   /** the length of all tracks in MM:SS format */
-  time: string;
+  time: string
   /** is this playlist visible in the Source list? */
-  visible: boolean;
+  visible: boolean
 }
 
 /** Input for creating a Playlist */
 export interface PlaylistCreateInput {
   /** the description of the playlist */
-  description?: string;
+  description?: string
   /** the name of the playlist */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Playlist */
-export type PlaylistUpdateInput = Partial<PlaylistCreateInput>;
+export type PlaylistUpdateInput = Partial<PlaylistCreateInput>
 
 /** a sub-window showing a single playlist */
 export interface PlaylistWindow {
   /** Unique identifier for this window */
-  id: number;
+  id: number
   /** the selected tracks */
-  selection: string;
+  selection: string
   /** the playlist displayed in the window */
-  view: Playlist;
+  view: Playlist
 }
 
 /** Input for creating a PlaylistWindow */
-export type PlaylistWindowCreateInput = Record<string, never>;
+export type PlaylistWindowCreateInput = Record<string, never>
 
 /** Input for updating a PlaylistWindow */
-export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
+export type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>
 
 /** a track residing in a shared library */
 export interface SharedTrack {
   /** Unique identifier for this track */
-  id: number;
+  id: number
 }
 
 /** Input for creating a SharedTrack */
-export type SharedTrackCreateInput = Record<string, never>;
+export type SharedTrackCreateInput = Record<string, never>
 
 /** Input for updating a SharedTrack */
-export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
+export type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>
 
 /** a media source (library, CD, device, etc.) */
 export interface Source {
   /** Unique identifier for this source */
-  id: number;
+  id: number
   /** the total size of the source if it has a fixed size */
-  capacity: number;
+  capacity: number
   /** the free space on the source if it has a fixed size */
-  freeSpace: number;
+  freeSpace: number
   /** The kind property */
-  kind: string;
+  kind: string
 }
 
 /** Input for creating a Source */
-export type SourceCreateInput = Record<string, never>;
+export type SourceCreateInput = Record<string, never>
 
 /** Input for updating a Source */
-export type SourceUpdateInput = Partial<SourceCreateInput>;
+export type SourceUpdateInput = Partial<SourceCreateInput>
 
 /** playable video source */
 export interface Track {
   /** Unique identifier for this track */
-  id: number;
+  id: number
   /** the album name of the track */
-  album: string;
+  album: string
   /** the rating of the album for this track (0 to 100) */
-  albumRating: number;
+  albumRating: number
   /** the rating kind of the album rating for this track */
-  albumRatingKind: string;
+  albumRatingKind: string
   /** the bit rate of the track (in kbps) */
-  bitRate: number;
+  bitRate: number
   /** the bookmark time of the track in seconds */
-  bookmark: number;
+  bookmark: number
   /** is the playback position for this track remembered? */
-  bookmarkable: boolean;
+  bookmarkable: boolean
   /** the category of the track */
-  category: string;
+  category: string
   /** freeform notes about the track */
-  comment: string;
+  comment: string
   /** the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data. */
-  databaseID: number;
+  databaseID: number
   /** the date the track was added to the playlist */
-  dateAdded: Date;
+  dateAdded: Date
   /** the description of the track */
-  description: string;
+  description: string
   /** the artist/source of the track */
-  director: string;
+  director: string
   /** the total number of discs in the source album */
-  discCount: number;
+  discCount: number
   /** the index of the disc containing this track on the source album */
-  discNumber: number;
+  discNumber: number
   /** the account of the person who downloaded this track */
-  downloaderAccount: string;
+  downloaderAccount: string
   /** the name of the person who downloaded this track */
-  downloaderName: string;
+  downloaderName: string
   /** the length of the track in seconds */
-  duration: number;
+  duration: number
   /** is this track checked for playback? */
-  enabled: boolean;
+  enabled: boolean
   /** the episode ID of the track */
-  episodeID: string;
+  episodeID: string
   /** the episode number of the track */
-  episodeNumber: number;
+  episodeNumber: number
   /** the stop time of the track in seconds */
-  finish: number;
+  finish: number
   /** the genre (category) of the track */
-  genre: string;
+  genre: string
   /** the grouping (piece) of the track. Generally used to denote movements within a classical work. */
-  grouping: string;
+  grouping: string
   /** a text description of the track */
-  kind: string;
+  kind: string
   /** the long description of the track */
-  longDescription: string;
+  longDescription: string
   /** the media kind of the track */
-  mediaKind: string;
+  mediaKind: string
   /** the modification date of the content of this track */
-  modificationDate: Date;
+  modificationDate: Date
   /** number of times this track has been played */
-  playedCount: number;
+  playedCount: number
   /** the date and time this track was last played */
-  playedDate: Date;
+  playedDate: Date
   /** the account of the person who purchased this track */
-  purchaserAccount: string;
+  purchaserAccount: string
   /** the name of the person who purchased this track */
-  purchaserName: string;
+  purchaserName: string
   /** the rating of this track (0 to 100) */
-  rating: number;
+  rating: number
   /** the rating kind of this track */
-  ratingKind: string;
+  ratingKind: string
   /** the release date of this track */
-  releaseDate: Date;
+  releaseDate: Date
   /** the sample rate of the track (in Hz) */
-  sampleRate: number;
+  sampleRate: number
   /** the season number of the track */
-  seasonNumber: number;
+  seasonNumber: number
   /** number of times this track has been skipped */
-  skippedCount: number;
+  skippedCount: number
   /** the date and time this track was last skipped */
-  skippedDate: Date;
+  skippedDate: Date
   /** the show name of the track */
-  show: string;
+  show: string
   /** override string to use for the track when sorting by album */
-  sortAlbum: string;
+  sortAlbum: string
   /** override string to use for the track when sorting by artist */
-  sortDirector: string;
+  sortDirector: string
   /** override string to use for the track when sorting by name */
-  sortName: string;
+  sortName: string
   /** override string to use for the track when sorting by show name */
-  sortShow: string;
+  sortShow: string
   /** the size of the track (in bytes) */
-  size: number;
+  size: number
   /** the start time of the track in seconds */
-  start: number;
+  start: number
   /** the length of the track in MM:SS format */
-  time: string;
+  time: string
   /** the total number of tracks on the source album */
-  trackCount: number;
+  trackCount: number
   /** the index of the track on the source album */
-  trackNumber: number;
+  trackNumber: number
   /** is this track unplayed? */
-  unplayed: boolean;
+  unplayed: boolean
   /** relative volume adjustment of the track (-100% to 100%) */
-  volumeAdjustment: number;
+  volumeAdjustment: number
   /** the year the track was recorded/released */
-  year: number;
+  year: number
 }
 
 /** Input for creating a Track */
 export interface TrackCreateInput {
   /** the album name of the track */
-  album?: string;
+  album?: string
   /** the rating of the album for this track (0 to 100) */
-  albumRating?: number;
+  albumRating?: number
   /** the bookmark time of the track in seconds */
-  bookmark?: number;
+  bookmark?: number
   /** is the playback position for this track remembered? */
-  bookmarkable?: boolean;
+  bookmarkable?: boolean
   /** the category of the track */
-  category?: string;
+  category?: string
   /** freeform notes about the track */
-  comment?: string;
+  comment?: string
   /** the description of the track */
-  description?: string;
+  description?: string
   /** the artist/source of the track */
-  director?: string;
+  director?: string
   /** the total number of discs in the source album */
-  discCount?: number;
+  discCount?: number
   /** the index of the disc containing this track on the source album */
-  discNumber?: number;
+  discNumber?: number
   /** is this track checked for playback? */
-  enabled?: boolean;
+  enabled?: boolean
   /** the episode ID of the track */
-  episodeID?: string;
+  episodeID?: string
   /** the episode number of the track */
-  episodeNumber?: number;
+  episodeNumber?: number
   /** the stop time of the track in seconds */
-  finish?: number;
+  finish?: number
   /** the genre (category) of the track */
-  genre?: string;
+  genre?: string
   /** the grouping (piece) of the track. Generally used to denote movements within a classical work. */
-  grouping?: string;
+  grouping?: string
   /** the long description of the track */
-  longDescription?: string;
+  longDescription?: string
   /** the media kind of the track */
-  mediaKind?: string;
+  mediaKind?: string
   /** number of times this track has been played */
-  playedCount?: number;
+  playedCount?: number
   /** the date and time this track was last played */
-  playedDate?: Date;
+  playedDate?: Date
   /** the rating of this track (0 to 100) */
-  rating?: number;
+  rating?: number
   /** the season number of the track */
-  seasonNumber?: number;
+  seasonNumber?: number
   /** number of times this track has been skipped */
-  skippedCount?: number;
+  skippedCount?: number
   /** the date and time this track was last skipped */
-  skippedDate?: Date;
+  skippedDate?: Date
   /** the show name of the track */
-  show?: string;
+  show?: string
   /** override string to use for the track when sorting by album */
-  sortAlbum?: string;
+  sortAlbum?: string
   /** override string to use for the track when sorting by artist */
-  sortDirector?: string;
+  sortDirector?: string
   /** override string to use for the track when sorting by name */
-  sortName?: string;
+  sortName?: string
   /** override string to use for the track when sorting by show name */
-  sortShow?: string;
+  sortShow?: string
   /** the start time of the track in seconds */
-  start?: number;
+  start?: number
   /** the total number of tracks on the source album */
-  trackCount?: number;
+  trackCount?: number
   /** the index of the track on the source album */
-  trackNumber?: number;
+  trackNumber?: number
   /** is this track unplayed? */
-  unplayed?: boolean;
+  unplayed?: boolean
   /** relative volume adjustment of the track (-100% to 100%) */
-  volumeAdjustment?: number;
+  volumeAdjustment?: number
   /** the year the track was recorded/released */
-  year?: number;
+  year?: number
 }
 
 /** Input for updating a Track */
-export type TrackUpdateInput = Partial<TrackCreateInput>;
+export type TrackUpdateInput = Partial<TrackCreateInput>
 
 /** a track representing a network stream */
 export interface URLTrack {
   /** Unique identifier for this track */
-  id: number;
+  id: number
   /** the URL for this track */
-  address: string;
+  address: string
 }
 
 /** Input for creating a URLTrack */
 export interface URLTrackCreateInput {
   /** the URL for this track */
-  address?: string;
+  address?: string
 }
 
 /** Input for updating a URLTrack */
-export type URLTrackUpdateInput = Partial<URLTrackCreateInput>;
+export type URLTrackUpdateInput = Partial<URLTrackCreateInput>
 
 /** custom playlists created by the user */
 export interface UserPlaylist {
   /** Unique identifier for this playlist */
-  id: number;
+  id: number
   /** is this playlist shared? */
-  shared: boolean;
+  shared: boolean
   /** is this a Smart Playlist? */
-  smart: boolean;
+  smart: boolean
 }
 
 /** Input for creating a UserPlaylist */
 export interface UserPlaylistCreateInput {
   /** is this playlist shared? */
-  shared?: boolean;
+  shared?: boolean
 }
 
 /** Input for updating a UserPlaylist */
-export type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>;
+export type UserPlaylistUpdateInput = Partial<UserPlaylistCreateInput>
 
 /** the video window */
 export interface VideoWindow {
   /** Unique identifier for this window */
-  id: number;
+  id: number
 }
 
 /** Input for creating a VideoWindow */
-export type VideoWindowCreateInput = Record<string, never>;
+export type VideoWindowCreateInput = Record<string, never>
 
 /** Input for updating a VideoWindow */
-export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>;
+export type VideoWindowUpdateInput = Partial<VideoWindowCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -426,22 +426,22 @@ export const ArtworkSchema = z.object({
   format: z.string(),
   kind: z.number(),
   rawData: z.unknown(),
-});
+})
 
 export const BrowserWindowSchema = z.object({
   id: z.number(),
   selection: z.string(),
   view: z.string(),
-});
+})
 
 export const FileTrackSchema = z.object({
   id: z.number(),
   location: z.string(),
-});
+})
 
 export const LibraryPlaylistSchema = z.object({
   id: z.number(),
-});
+})
 
 export const PlaylistSchema = z.object({
   id: z.number(),
@@ -453,24 +453,24 @@ export const PlaylistSchema = z.object({
   specialKind: z.string(),
   time: z.string(),
   visible: z.boolean(),
-});
+})
 
 export const PlaylistWindowSchema = z.object({
   id: z.number(),
   selection: z.string(),
   view: z.string(),
-});
+})
 
 export const SharedTrackSchema = z.object({
   id: z.number(),
-});
+})
 
 export const SourceSchema = z.object({
   id: z.number(),
   capacity: z.number(),
   freeSpace: z.number(),
   kind: z.string(),
-});
+})
 
 export const TrackSchema = z.object({
   id: z.number(),
@@ -525,19 +525,19 @@ export const TrackSchema = z.object({
   unplayed: z.boolean(),
   volumeAdjustment: z.number(),
   year: z.number(),
-});
+})
 
 export const URLTrackSchema = z.object({
   id: z.number(),
   address: z.string(),
-});
+})
 
 export const UserPlaylistSchema = z.object({
   id: z.number(),
   shared: z.boolean(),
   smart: z.boolean(),
-});
+})
 
 export const VideoWindowSchema = z.object({
   id: z.number(),
-});
+})

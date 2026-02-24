@@ -9,5 +9,11 @@ TransferStatus
 **Signature:**
 
 ```typescript
-type TransferStatus = 'preparing' | 'waiting' | 'transferring' | 'finalizing' | 'finished' | 'failed';
+type TransferStatus =
+  | 'preparing'
+  | 'waiting'
+  | 'transferring'
+  | 'finalizing'
+  | 'finished'
+  | 'failed'
 ```

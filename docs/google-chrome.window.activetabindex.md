@@ -9,5 +9,5 @@ The index of the active tab.
 **Signature:**
 
 ```typescript
-activeTabIndex: number;
+activeTabIndex: number
 ```

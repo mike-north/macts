@@ -9,5 +9,5 @@ The description of the command
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

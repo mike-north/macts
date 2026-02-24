@@ -9,5 +9,5 @@ The name of the font of the character.
 **Signature:**
 
 ```typescript
-font: string;
+font: string
 ```

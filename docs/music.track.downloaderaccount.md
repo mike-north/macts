@@ -9,5 +9,5 @@ the account of the person who downloaded this track
 **Signature:**
 
 ```typescript
-downloaderAccount: string;
+downloaderAccount: string
 ```

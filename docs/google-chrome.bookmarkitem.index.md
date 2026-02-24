@@ -9,5 +9,5 @@ Returns the index with respect to its parent bookmark folder.
 **Signature:**
 
 ```typescript
-index: number;
+index: number
 ```

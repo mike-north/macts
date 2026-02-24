@@ -9,5 +9,5 @@ the architecture in which the process is running
 **Signature:**
 
 ```typescript
-architecture: string;
+architecture: string
 ```

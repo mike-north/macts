@@ -9,5 +9,5 @@ Rule header key
 **Signature:**
 
 ```typescript
-header: string;
+header: string
 ```

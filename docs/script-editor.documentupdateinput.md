@@ -9,7 +9,7 @@ Input for updating a Document
 **Signature:**
 
 ```typescript
-type DocumentUpdateInput = Partial<DocumentCreateInput>;
+type DocumentUpdateInput = Partial<DocumentCreateInput>
 ```
-**References:** [DocumentCreateInput](./script-editor.documentcreateinput.md)
 
+**References:** [DocumentCreateInput](./script-editor.documentcreateinput.md)

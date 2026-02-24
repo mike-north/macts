@@ -9,5 +9,5 @@ Unique identifier for this URL
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

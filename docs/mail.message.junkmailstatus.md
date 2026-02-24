@@ -9,5 +9,5 @@ Indicates whether the message has been marked junk or evaluated to be junk by th
 **Signature:**
 
 ```typescript
-junkMailStatus: boolean;
+junkMailStatus: boolean
 ```

@@ -9,5 +9,5 @@ Unique identifier for this grow area
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

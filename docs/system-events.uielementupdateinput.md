@@ -9,7 +9,7 @@ Input for updating a UIElement
 **Signature:**
 
 ```typescript
-type UIElementUpdateInput = Partial<UIElementCreateInput>;
+type UIElementUpdateInput = Partial<UIElementCreateInput>
 ```
-**References:** [UIElementCreateInput](./system-events.uielementcreateinput.md)
 
+**References:** [UIElementCreateInput](./system-events.uielementcreateinput.md)

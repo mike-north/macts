@@ -9,5 +9,5 @@ Input for creating a Pane
 **Signature:**
 
 ```typescript
-interface PaneCreateInput 
+interface PaneCreateInput
 ```

@@ -9,7 +9,7 @@ a list of tracks/streams
 **Signature:**
 
 ```typescript
-interface Playlist 
+interface Playlist
 ```
 
 ## Properties
@@ -18,212 +18,167 @@ interface Playlist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./music.playlist.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the description of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [disliked](./music.playlist.disliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this playlist disliked?
-
 
 </td></tr>
 <tr><td>
 
 [duration](./music.playlist.duration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total length of all tracks (in seconds)
-
 
 </td></tr>
 <tr><td>
 
 [favorited](./music.playlist.favorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this playlist favorited?
-
 
 </td></tr>
 <tr><td>
 
 [name](./music.playlist.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [parent](./music.playlist.parent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Playlist](./music.playlist.md)
 
-
 </td><td>
 
 folder which contains this playlist (if any)
-
 
 </td></tr>
 <tr><td>
 
 [size](./music.playlist.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total size of all tracks (in bytes)
-
 
 </td></tr>
 <tr><td>
 
 [specialKind](./music.playlist.specialkind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 special playlist kind
-
 
 </td></tr>
 <tr><td>
 
 [time](./music.playlist.time.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the length of all tracks in MM:SS format
-
 
 </td></tr>
 <tr><td>
 
 [visible](./music.playlist.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this playlist visible in the Source list?
 
-
 </td></tr>
 </tbody></table>
-

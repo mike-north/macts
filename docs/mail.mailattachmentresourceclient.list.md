@@ -11,7 +11,7 @@ List all mailattachments.
 ```typescript
 list(): Promise<MailAttachment[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MailAttachment](./mail.mailattachment.md)<!-- -->\[\]&gt;
-

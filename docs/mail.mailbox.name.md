@@ -9,5 +9,5 @@ The name of a mailbox
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

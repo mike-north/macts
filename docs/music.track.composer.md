@@ -9,5 +9,5 @@ the composer of the track
 **Signature:**
 
 ```typescript
-composer: string;
+composer: string
 ```

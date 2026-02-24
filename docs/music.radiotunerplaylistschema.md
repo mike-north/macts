@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-RadioTunerPlaylistSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+RadioTunerPlaylistSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

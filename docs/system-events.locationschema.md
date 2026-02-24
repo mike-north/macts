@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-LocationSchema: z.ZodObject<{
-    id: z.ZodString;
-    name: z.ZodString;
-}, z.core.$strip>
+LocationSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The name used for display
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

@@ -9,7 +9,7 @@ Input for creating a JabberHandle
 **Signature:**
 
 ```typescript
-interface JabberHandleCreateInput 
+interface JabberHandleCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface JabberHandleCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.jabberhandlecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.jabberhandlecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The Jabber handle value
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Input for updating a ScriptingEnumeration
 **Signature:**
 
 ```typescript
-type ScriptingEnumerationUpdateInput = Partial<ScriptingEnumerationCreateInput>;
+type ScriptingEnumerationUpdateInput = Partial<ScriptingEnumerationCreateInput>
 ```
-**References:** [ScriptingEnumerationCreateInput](./system-events.scriptingenumerationcreateinput.md)
 
+**References:** [ScriptingEnumerationCreateInput](./system-events.scriptingenumerationcreateinput.md)

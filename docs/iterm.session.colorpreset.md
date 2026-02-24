@@ -9,5 +9,5 @@ The colorPreset property
 **Signature:**
 
 ```typescript
-colorPreset: string;
+colorPreset: string
 ```

@@ -18,78 +18,63 @@ move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?:
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 to
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 replacing
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 positionedAt
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 routingSuppressed
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -97,4 +82,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

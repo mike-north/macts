@@ -9,7 +9,7 @@ Extract the operation from a permission string.
 **Signature:**
 
 ```typescript
-declare function extractOperation(permission: string): string | undefined;
+declare function extractOperation(permission: string): string | undefined
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function extractOperation(permission: string): string | undefined;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission string
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Permission string
 string \| undefined
 
 Operation name or undefined if invalid
-

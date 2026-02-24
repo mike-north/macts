@@ -11,7 +11,7 @@ Paste text (If Possible).
 ```typescript
 pasteSelection(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ A header value for a message. E.g. To, Subject, From.
 **Signature:**
 
 ```typescript
-interface Header 
+interface Header
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Header
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./mail.header.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Contents of the header
-
 
 </td></tr>
 <tr><td>
 
 [name](./mail.header.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Name of the header value
 
-
 </td></tr>
 </tbody></table>
-

@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-WindowSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodNumber;
-    position: z.ZodString;
-    visible: z.ZodBoolean;
-    frontmost: z.ZodBoolean;
-}, z.core.$strip>
+WindowSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodNumber
+    position: z.ZodString
+    visible: z.ZodBoolean
+    frontmost: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

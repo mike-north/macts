@@ -9,5 +9,5 @@ The Library folder
 **Signature:**
 
 ```typescript
-libraryFolder: Folder;
+libraryFolder: Folder
 ```

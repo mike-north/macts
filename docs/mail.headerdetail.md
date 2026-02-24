@@ -9,5 +9,5 @@ HeaderDetail
 **Signature:**
 
 ```typescript
-type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders';
+type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders'
 ```

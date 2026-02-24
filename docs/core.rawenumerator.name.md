@@ -9,5 +9,5 @@ Enumerator name (e.g., "yes", "no", "ask")
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

@@ -9,5 +9,5 @@ The currently running processes in the tab
 **Signature:**
 
 ```typescript
-processes: string;
+processes: string
 ```

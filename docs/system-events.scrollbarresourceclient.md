@@ -9,7 +9,7 @@ Client for a scroll bar belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ScrollBarResourceClient 
+declare class ScrollBarResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScrollBarResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scrollbarresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScrollBarResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScrollBarResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scrollbarresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scrollbar.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scrollbarresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scrollbar.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scrollbarresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scrollbar by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scrollbarresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scrollbars.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scrollbarresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scrollbar.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ The notes attached to the reminder
 **Signature:**
 
 ```typescript
-body: string;
+body: string
 ```

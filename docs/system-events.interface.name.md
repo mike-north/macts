@@ -9,5 +9,5 @@ the name of the interface
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

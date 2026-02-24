@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-declare function createGeneratorContext(manifest: AppManifest, options: GeneratorOptions): GeneratorContext;
+declare function createGeneratorContext(
+  manifest: AppManifest,
+  options: GeneratorOptions
+): GeneratorContext
 ```
 
 ## Parameters
@@ -16,44 +19,35 @@ declare function createGeneratorContext(manifest: AppManifest, options: Generato
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GeneratorOptions](./core.generatoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -61,4 +55,3 @@ options
 **Returns:**
 
 [GeneratorContext](./core.generatorcontext.md)
-

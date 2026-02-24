@@ -11,7 +11,7 @@ List all scrollbars.
 ```typescript
 list(): Promise<ScrollBar[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScrollBar](./system-events.scrollbar.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ Indicates whether the rule has a copy action
 **Signature:**
 
 ```typescript
-shouldCopyMessage: boolean;
+shouldCopyMessage: boolean
 ```

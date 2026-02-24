@@ -9,5 +9,5 @@ the start time of the track in seconds
 **Signature:**
 
 ```typescript
-start: number;
+start: number
 ```

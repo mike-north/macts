@@ -9,7 +9,7 @@ A Group Record in the address book database
 **Signature:**
 
 ```typescript
-interface Group 
+interface Group
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Group
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name](./contacts.group.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of this group.
 
-
 </td></tr>
 </tbody></table>
-

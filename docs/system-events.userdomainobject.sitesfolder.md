@@ -9,5 +9,5 @@ The user's Sites folder
 **Signature:**
 
 ```typescript
-sitesFolder: Folder;
+sitesFolder: Folder
 ```

@@ -11,7 +11,7 @@ List all visuals.
 ```typescript
 list(): Promise<Visual[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Visual](./music.visual.md)<!-- -->\[\]&gt;
-

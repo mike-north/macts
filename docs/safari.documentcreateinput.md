@@ -9,7 +9,7 @@ Input for creating a Document
 **Signature:**
 
 ```typescript
-interface DocumentCreateInput 
+interface DocumentCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface DocumentCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [url?](./safari.documentcreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The current URL
 
-
 </td></tr>
 </tbody></table>
-

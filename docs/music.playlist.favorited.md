@@ -9,5 +9,5 @@ is this playlist favorited?
 **Signature:**
 
 ```typescript
-favorited: boolean;
+favorited: boolean
 ```

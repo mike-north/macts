@@ -9,7 +9,7 @@ Client for a outline belonging to a window.
 **Signature:**
 
 ```typescript
-declare class OutlineResourceClient 
+declare class OutlineResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class OutlineResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.outlineresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `OutlineResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `OutlineResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.outlineresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new outline.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.outlineresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a outline.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.outlineresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a outline by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.outlineresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all outlines.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.outlineresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing outline.
 
-
 </td></tr>
 </tbody></table>
-

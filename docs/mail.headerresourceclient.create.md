@@ -18,30 +18,24 @@ create(input: HeaderCreateInput): Promise<Header>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [HeaderCreateInput](./mail.headercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Header](./mail.header.md)<!-- -->&gt;
-

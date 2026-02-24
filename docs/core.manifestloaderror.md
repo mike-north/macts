@@ -9,8 +9,9 @@ Error thrown when manifest loading fails.
 **Signature:**
 
 ```typescript
-declare class ManifestLoadError extends Error 
+declare class ManifestLoadError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -19,30 +20,24 @@ declare class ManifestLoadError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(message, path, originalError)](./core.manifestloaderror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ManifestLoadError` class
-
 
 </td></tr>
 </tbody></table>
@@ -53,62 +48,49 @@ Constructs a new instance of the `ManifestLoadError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [originalError?](./core.manifestloaderror.originalerror.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 [path](./core.manifestloaderror.path.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

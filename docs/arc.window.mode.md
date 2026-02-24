@@ -9,5 +9,5 @@ Represents the mode of the window which can be 'normal' or 'incognito', can be s
 **Signature:**
 
 ```typescript
-mode: string;
+mode: string
 ```

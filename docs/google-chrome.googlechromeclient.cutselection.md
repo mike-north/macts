@@ -11,7 +11,7 @@ Cut selected text (If Possible).
 ```typescript
 cutSelection(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

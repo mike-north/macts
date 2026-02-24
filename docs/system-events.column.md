@@ -9,7 +9,7 @@ A column belonging to a table
 **Signature:**
 
 ```typescript
-interface Column 
+interface Column
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Column
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.column.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this column
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ The current player state
 **Signature:**
 
 ```typescript
-playerState: PlayerState;
+playerState: PlayerState
 ```

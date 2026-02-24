@@ -11,7 +11,7 @@ List all applicationfiles.
 ```typescript
 list(): Promise<ApplicationFile[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ApplicationFile](./finder.applicationfile.md)<!-- -->\[\]&gt;
-

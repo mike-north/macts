@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-GroupSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+GroupSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

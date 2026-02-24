@@ -11,7 +11,7 @@ return to the previous track in the current playlist
 ```typescript
 previousTrack(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

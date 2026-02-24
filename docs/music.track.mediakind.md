@@ -9,5 +9,5 @@ the media kind of the track
 **Signature:**
 
 ```typescript
-mediaKind: string;
+mediaKind: string
 ```

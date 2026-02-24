@@ -9,5 +9,5 @@ Input for creating a ToRecipient
 **Signature:**
 
 ```typescript
-interface ToRecipientCreateInput 
+interface ToRecipientCreateInput
 ```

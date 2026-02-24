@@ -11,7 +11,7 @@ cause the target process to behave as if the action were applied to its UI eleme
 ```typescript
 perform(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

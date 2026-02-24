@@ -9,5 +9,5 @@ The Unix process identifier of a process running in the native environment, or -
 **Signature:**
 
 ```typescript
-unixId: number;
+unixId: number
 ```

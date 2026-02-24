@@ -18,30 +18,24 @@ create(input: MailAttachmentCreateInput): Promise<MailAttachment>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MailAttachment](./mail.mailattachment.md)<!-- -->&gt;
-

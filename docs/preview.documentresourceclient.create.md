@@ -18,30 +18,24 @@ create(input: DocumentCreateInput): Promise<Document>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DocumentCreateInput](./preview.documentcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Document](./preview.document.md)<!-- -->&gt;
-

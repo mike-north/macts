@@ -9,5 +9,5 @@ the value of the property list item
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

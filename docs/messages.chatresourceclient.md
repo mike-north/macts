@@ -9,7 +9,7 @@ Client for an sms or imessage chat..
 **Signature:**
 
 ```typescript
-declare class ChatResourceClient 
+declare class ChatResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ChatResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./messages.chatresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ChatResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ChatResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./messages.chatresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new chat.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./messages.chatresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a chat.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./messages.chatresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a chat by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./messages.chatresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all chats.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./messages.chatresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing chat.
 
-
 </td></tr>
 </tbody></table>
-

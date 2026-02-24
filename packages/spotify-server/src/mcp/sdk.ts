@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { SpotifyClient, type SpotifyClientOptions } from '@macts/spotify';
+import { SpotifyClient, type SpotifyClientOptions } from '@macts/spotify'
 
 /**
  * Get a SpotifyClient instance.
@@ -16,32 +16,32 @@ import { SpotifyClient, type SpotifyClientOptions } from '@macts/spotify';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getSpotifyClient(): SpotifyClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions spotify:*:*'
-    );
+    )
   }
 
   const options: SpotifyClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new SpotifyClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new SpotifyClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: SpotifyClient | null = null;
+let _client: SpotifyClient | null = null
 
 /**
  * Get or create the singleton SpotifyClient.
@@ -50,8 +50,8 @@ let _client: SpotifyClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): SpotifyClient {
-  _client ??= getSpotifyClient();
-  return _client;
+  _client ??= getSpotifyClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): SpotifyClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

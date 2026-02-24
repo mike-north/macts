@@ -9,7 +9,10 @@ Expand a coarse permission to its constituent fine-grained permissions.
 **Signature:**
 
 ```typescript
-declare function expandCoarsePermission(permission: string, permissionsSection: PermissionsSection): string[];
+declare function expandCoarsePermission(
+  permission: string,
+  permissionsSection: PermissionsSection
+): string[]
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function expandCoarsePermission(permission: string, permissionsSection: 
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Coarse permission string (e.g., "calendar:events:read")
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 The permissions mapping from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -73,4 +67,3 @@ Array of fine-grained permission strings
 ## Exceptions
 
 PermissionExpansionError if the permission cannot be expanded
-

@@ -18,30 +18,24 @@ create(input: RadioButtonCreateInput): Promise<RadioButton>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RadioButton](./system-events.radiobutton.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ The HTML content of the note body
 **Signature:**
 
 ```typescript
-body: string;
+body: string
 ```

@@ -18,30 +18,24 @@ create(input: ServiceCreateInput): Promise<Service>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ServiceCreateInput](./system-events.servicecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Service](./system-events.service.md)<!-- -->&gt;
-

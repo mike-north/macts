@@ -9,7 +9,7 @@ Input for creating a Playlist
 **Signature:**
 
 ```typescript
-interface PlaylistCreateInput 
+interface PlaylistCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface PlaylistCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description?](./music.playlistcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the description of the playlist
-
 
 </td></tr>
 <tr><td>
 
 [disliked?](./music.playlistcreateinput.disliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this playlist disliked?
-
 
 </td></tr>
 <tr><td>
 
 [favorited?](./music.playlistcreateinput.favorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this playlist favorited?
-
 
 </td></tr>
 <tr><td>
 
 [name?](./music.playlistcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the playlist
 
-
 </td></tr>
 </tbody></table>
-

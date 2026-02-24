@@ -9,7 +9,7 @@ Client for a toolbar belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ToolbarResourceClient 
+declare class ToolbarResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ToolbarResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.toolbarresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ToolbarResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ToolbarResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.toolbarresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new toolbar.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.toolbarresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a toolbar.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.toolbarresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a toolbar by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.toolbarresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all toolbars.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.toolbarresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing toolbar.
 
-
 </td></tr>
 </tbody></table>
-

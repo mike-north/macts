@@ -3,34 +3,34 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A QuickTime Player document */
 export interface Document {
   /** The document name */
-  name: string;
+  name: string
   /** The unique identifier of the document */
-  id: string;
+  id: string
   /** The file path of the document */
-  path: string;
+  path: string
   /** Whether the document is currently playing */
-  playing: boolean;
+  playing: boolean
   /** The duration of the document in seconds */
-  duration: number;
+  duration: number
   /** The current playback time in seconds */
-  currentTime: number;
+  currentTime: number
 }
 
 /** Input for creating a Document */
 export interface DocumentCreateInput {
   /** Whether the document is currently playing */
-  playing?: boolean;
+  playing?: boolean
   /** The current playback time in seconds */
-  currentTime?: number;
+  currentTime?: number
 }
 
 /** Input for updating a Document */
-export type DocumentUpdateInput = Partial<DocumentCreateInput>;
+export type DocumentUpdateInput = Partial<DocumentCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -41,4 +41,4 @@ export const DocumentSchema = z.object({
   playing: z.boolean(),
   duration: z.number(),
   currentTime: z.number(),
-});
+})

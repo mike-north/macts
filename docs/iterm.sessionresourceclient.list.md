@@ -11,7 +11,7 @@ List all sessions.
 ```typescript
 list(): Promise<Session[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Session](./iterm.session.md)<!-- -->\[\]&gt;
-

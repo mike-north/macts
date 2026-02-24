@@ -9,5 +9,5 @@ the data format created by the encoder
 **Signature:**
 
 ```typescript
-format: string;
+format: string
 ```

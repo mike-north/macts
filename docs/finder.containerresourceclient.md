@@ -9,7 +9,7 @@ Client for an item that contains other items.
 **Signature:**
 
 ```typescript
-declare class ContainerResourceClient 
+declare class ContainerResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ContainerResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.containerresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ContainerResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ContainerResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.containerresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new container.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.containerresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a container.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.containerresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a container by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.containerresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all containers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.containerresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing container.
 
-
 </td></tr>
 </tbody></table>
-

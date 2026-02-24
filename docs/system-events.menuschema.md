@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-MenuSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+MenuSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

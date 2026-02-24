@@ -18,30 +18,24 @@ create(input: ToolbarCreateInput): Promise<Toolbar>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ToolbarCreateInput](./system-events.toolbarcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Toolbar](./system-events.toolbar.md)<!-- -->&gt;
-

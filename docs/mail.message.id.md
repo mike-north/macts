@@ -9,5 +9,5 @@ The unique identifier of the message.
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

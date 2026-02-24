@@ -9,5 +9,5 @@ Number of days before messages in the trash are permanently deleted (0 = delete 
 **Signature:**
 
 ```typescript
-emptyTrashFrequency: number;
+emptyTrashFrequency: number
 ```

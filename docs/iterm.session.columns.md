@@ -9,5 +9,5 @@ The columns property
 **Signature:**
 
 ```typescript
-columns: number;
+columns: number
 ```

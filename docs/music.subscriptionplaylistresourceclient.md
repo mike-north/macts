@@ -9,7 +9,7 @@ Client for a subscription playlist from apple music.
 **Signature:**
 
 ```typescript
-declare class SubscriptionPlaylistResourceClient 
+declare class SubscriptionPlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SubscriptionPlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.subscriptionplaylistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SubscriptionPlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SubscriptionPlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.subscriptionplaylistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new subscriptionplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.subscriptionplaylistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a subscriptionplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.subscriptionplaylistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a subscriptionplaylist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.subscriptionplaylistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all subscriptionplaylists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.subscriptionplaylistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing subscriptionplaylist.
 
-
 </td></tr>
 </tbody></table>
-

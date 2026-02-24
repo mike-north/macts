@@ -9,5 +9,5 @@ freeform notes about the track
 **Signature:**
 
 ```typescript
-comment: string;
+comment: string
 ```

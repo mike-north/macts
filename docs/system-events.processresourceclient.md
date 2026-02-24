@@ -9,7 +9,7 @@ Client for a process running on this computer.
 **Signature:**
 
 ```typescript
-declare class ProcessResourceClient 
+declare class ProcessResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ProcessResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.processresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ProcessResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ProcessResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.processresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new process.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.processresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a process.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.processresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a process by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.processresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all processes.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.processresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing process.
 
-
 </td></tr>
 </tbody></table>
-

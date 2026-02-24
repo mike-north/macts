@@ -9,7 +9,7 @@ Check if an operation is a standard coarse CRUD operation.
 **Signature:**
 
 ```typescript
-declare function isCoarseOperation(operation: string): operation is CoarseOperation;
+declare function isCoarseOperation(operation: string): operation is CoarseOperation
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function isCoarseOperation(operation: string): operation is CoarseOperat
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 operation
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ string
 **Returns:**
 
 operation is [CoarseOperation](./core.coarseoperation.md)
-

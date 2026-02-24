@@ -9,11 +9,11 @@ Generate a new cryptographically secure signing secret.
 **Signature:**
 
 ```typescript
-declare function generateSecret(): string;
+declare function generateSecret(): string
 ```
+
 **Returns:**
 
 string
 
 256-bit secret as base64 string
-

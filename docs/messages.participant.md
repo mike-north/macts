@@ -9,7 +9,7 @@ A participant for an account.
 **Signature:**
 
 ```typescript
-interface Participant 
+interface Participant
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface Participant
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [account](./messages.participant.account.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Account](./messages.account.md)
 
-
 </td><td>
 
 The account for this participant.
-
 
 </td></tr>
 <tr><td>
 
 [firstName](./messages.participant.firstname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The first name from this participan's Contacts card, if available
-
 
 </td></tr>
 <tr><td>
 
 [fullName](./messages.participant.fullname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The full name from this participant's Contacts card, if available
-
 
 </td></tr>
 <tr><td>
 
 [handle](./messages.participant.handle.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The participant's handle.
-
 
 </td></tr>
 <tr><td>
 
 [id](./messages.participant.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890
-
 
 </td></tr>
 <tr><td>
 
 [lastName](./messages.participant.lastname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The last name from this participant's Contacts card, if available
-
 
 </td></tr>
 <tr><td>
 
 [name](./messages.participant.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The participant's name as it appears in the participant list.
 
-
 </td></tr>
 </tbody></table>
-

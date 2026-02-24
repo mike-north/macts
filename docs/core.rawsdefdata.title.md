@@ -9,5 +9,5 @@ Title of the application/dictionary
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -9,7 +9,7 @@ Input for creating a BookmarkFolder
 **Signature:**
 
 ```typescript
-interface BookmarkFolderCreateInput 
+interface BookmarkFolderCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface BookmarkFolderCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [title?](./google-chrome.bookmarkfoldercreateinput.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The title of the folder.
 
-
 </td></tr>
 </tbody></table>
-

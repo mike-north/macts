@@ -9,7 +9,10 @@ Generate all HTTP packages (SDK, MCP, CLI, API) from a manifest.
 **Signature:**
 
 ```typescript
-declare function generateAllHttpPackages(manifest: AppManifest, options: GenerateAllOptions): GenerateAllResult;
+declare function generateAllHttpPackages(
+  manifest: AppManifest,
+  options: GenerateAllOptions
+): GenerateAllResult
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function generateAllHttpPackages(manifest: AppManifest, options: Generat
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GenerateAllOptions](./core.generatealloptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ Generation options
 [GenerateAllResult](./core.generateallresult.md)
 
 Generated files for all four packages
-

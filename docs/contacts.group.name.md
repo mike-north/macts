@@ -9,5 +9,5 @@ The name of this group.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

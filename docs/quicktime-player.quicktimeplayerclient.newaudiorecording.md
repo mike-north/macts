@@ -11,7 +11,7 @@ Create a new audio recording document.
 ```typescript
 newAudioRecording(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

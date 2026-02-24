@@ -7,19 +7,22 @@
 **Signature:**
 
 ```typescript
-EventSchema: z.ZodObject<{
-    summary: z.ZodString;
-    description: z.ZodString;
-    location: z.ZodString;
-    startDate: z.ZodString;
-    endDate: z.ZodString;
-    alldayEvent: z.ZodBoolean;
-    recurrence: z.ZodString;
-    status: z.ZodString;
-    sequence: z.ZodNumber;
-    stampDate: z.ZodString;
-    excludedDates: z.ZodArray<z.ZodString>;
-    uid: z.ZodString;
-    url: z.ZodString;
-}, z.core.$strip>
+EventSchema: z.ZodObject<
+  {
+    summary: z.ZodString
+    description: z.ZodString
+    location: z.ZodString
+    startDate: z.ZodString
+    endDate: z.ZodString
+    alldayEvent: z.ZodBoolean
+    recurrence: z.ZodString
+    status: z.ZodString
+    sequence: z.ZodNumber
+    stampDate: z.ZodString
+    excludedDates: z.ZodArray<z.ZodString>
+    uid: z.ZodString
+    url: z.ZodString
+  },
+  z.core.$strip
+>
 ```

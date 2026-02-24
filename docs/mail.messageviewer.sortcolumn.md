@@ -9,5 +9,5 @@ The column that is currently sorted in the viewer
 **Signature:**
 
 ```typescript
-sortColumn: string;
+sortColumn: string
 ```

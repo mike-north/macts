@@ -9,5 +9,5 @@ The calendar description
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

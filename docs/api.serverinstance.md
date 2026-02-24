@@ -9,7 +9,7 @@ Server instance with lifecycle methods.
 **Signature:**
 
 ```typescript
-interface ServerInstance 
+interface ServerInstance
 ```
 
 ## Properties
@@ -18,59 +18,47 @@ interface ServerInstance
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [app](./api.serverinstance.app.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Hono&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
 
-
 </td><td>
 
 The Hono app
-
 
 </td></tr>
 <tr><td>
 
 [url](./api.serverinstance.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| null
 
-
 </td><td>
 
 Server URL after start
-
 
 </td></tr>
 </tbody></table>
@@ -81,34 +69,27 @@ Server URL after start
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [start()](./api.serverinstance.start.md)
 
-
 </td><td>
 
 Start the server
-
 
 </td></tr>
 <tr><td>
 
 [stop()](./api.serverinstance.stop.md)
 
-
 </td><td>
 
 Stop the server
 
-
 </td></tr>
 </tbody></table>
-

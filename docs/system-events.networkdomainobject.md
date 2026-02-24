@@ -9,7 +9,7 @@ The network domain in the file system
 **Signature:**
 
 ```typescript
-interface NetworkDomainObject 
+interface NetworkDomainObject
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface NetworkDomainObject
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.networkdomainobject.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this domain
 
-
 </td></tr>
 </tbody></table>
-

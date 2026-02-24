@@ -11,7 +11,10 @@ Permissions are expanded at creation time: - Coarse permissions (calendar:events
 **Signature:**
 
 ```typescript
-declare function createApiKey(options: CreateApiKeyOptions, permissionsSection?: PermissionsSection): Promise<CreateApiKeyResult>;
+declare function createApiKey(
+  options: CreateApiKeyOptions,
+  permissionsSection?: PermissionsSection
+): Promise<CreateApiKeyResult>
 ```
 
 ## Parameters
@@ -20,48 +23,39 @@ declare function createApiKey(options: CreateApiKeyOptions, permissionsSection?:
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [CreateApiKeyOptions](./api.createapikeyoptions.md)
 
-
 </td><td>
 
 Key creation options
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 _(Optional)_ Permissions mapping from manifest (for expansion)
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +65,3 @@ _(Optional)_ Permissions mapping from manifest (for expansion)
 Promise&lt;[CreateApiKeyResult](./api.createapikeyresult.md)<!-- -->&gt;
 
 Created key token and metadata
-

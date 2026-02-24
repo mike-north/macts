@@ -9,5 +9,5 @@ the text representation of the property list data
 **Signature:**
 
 ```typescript
-text: string;
+text: string
 ```

@@ -9,5 +9,5 @@ The top level Out mailbox
 **Signature:**
 
 ```typescript
-outbox: Mailbox;
+outbox: Mailbox
 ```

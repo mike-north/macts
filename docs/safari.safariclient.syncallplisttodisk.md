@@ -11,7 +11,7 @@ Make sure that all in-memory structures are in-sync with their on-disk counterpa
 ```typescript
 syncAllPlistToDisk(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

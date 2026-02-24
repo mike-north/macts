@@ -18,30 +18,24 @@ create(input: ReminderCreateInput): Promise<Reminder>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ReminderCreateInput](./reminders.remindercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Reminder](./reminders.reminder.md)<!-- -->&gt;
-

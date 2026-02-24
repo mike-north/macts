@@ -11,7 +11,7 @@ Toggles the visibility of a hotkey window. Only to be called on windows that are
 ```typescript
 toggleHotkeyWindow(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ Is the property's value an enumerator?
 **Signature:**
 
 ```typescript
-enumerated: boolean;
+enumerated: boolean
 ```

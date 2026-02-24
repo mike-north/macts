@@ -9,7 +9,7 @@ Input for creating a Event
 **Signature:**
 
 ```typescript
-interface EventCreateInput 
+interface EventCreateInput
 ```
 
 ## Properties
@@ -18,231 +18,182 @@ interface EventCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [alldayEvent?](./calendar.eventcreateinput.alldayevent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ True if the event is an all-day event
-
 
 </td></tr>
 <tr><td>
 
 [description?](./calendar.eventcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The event notes
-
 
 </td></tr>
 <tr><td>
 
 [endDate?](./calendar.eventcreateinput.enddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ The event end date
-
 
 </td></tr>
 <tr><td>
 
 [excludedDates?](./calendar.eventcreateinput.excludeddates.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date\[\]
 
-
 </td><td>
 
 _(Optional)_ The exception dates for recurring events
-
 
 </td></tr>
 <tr><td>
 
 [location?](./calendar.eventcreateinput.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The event location
-
 
 </td></tr>
 <tr><td>
 
 [recurrence?](./calendar.eventcreateinput.recurrence.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The iCalendar (RFC 2445) string describing the event recurrence, if defined
-
 
 </td></tr>
 <tr><td>
 
 [stampDate?](./calendar.eventcreateinput.stampdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ The event modification date
-
 
 </td></tr>
 <tr><td>
 
 [startDate?](./calendar.eventcreateinput.startdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ The event start date
-
 
 </td></tr>
 <tr><td>
 
 [status?](./calendar.eventcreateinput.status.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [EventStatus](./calendar.eventstatus.md)
 
-
 </td><td>
 
 _(Optional)_ The event status
-
 
 </td></tr>
 <tr><td>
 
 [summary?](./calendar.eventcreateinput.summary.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The event summary/title
-
 
 </td></tr>
 <tr><td>
 
 [url?](./calendar.eventcreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The URL associated with the event
 
-
 </td></tr>
 </tbody></table>
-

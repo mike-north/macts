@@ -11,7 +11,7 @@ Select all.
 ```typescript
 selectAll(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

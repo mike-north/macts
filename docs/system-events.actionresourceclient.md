@@ -9,7 +9,7 @@ Client for an action that can be performed on the ui element.
 **Signature:**
 
 ```typescript
-declare class ActionResourceClient 
+declare class ActionResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ActionResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.actionresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ActionResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,101 +46,79 @@ Constructs a new instance of the `ActionResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.actionresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new action.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.actionresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a action.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.actionresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a action by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.actionresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all actions.
-
 
 </td></tr>
 <tr><td>
 
 [perform()](./system-events.actionresourceclient.perform.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the action were applied to its UI element
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.actionresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing action.
 
-
 </td></tr>
 </tbody></table>
-

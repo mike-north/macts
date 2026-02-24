@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-UserPlaylistSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    shared: z.ZodBoolean;
-    smart: z.ZodBoolean;
-}, z.core.$strip>
+UserPlaylistSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    shared: z.ZodBoolean
+    smart: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

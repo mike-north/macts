@@ -9,5 +9,5 @@ Enumeration name (e.g., "save options")
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

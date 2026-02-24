@@ -9,5 +9,5 @@ Rule expression field
 **Signature:**
 
 ```typescript
-expression: string;
+expression: string
 ```

@@ -9,5 +9,5 @@ The given name of the window.
 **Signature:**
 
 ```typescript
-givenName: string;
+givenName: string
 ```

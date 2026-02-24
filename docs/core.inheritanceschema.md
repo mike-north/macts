@@ -9,12 +9,21 @@ Schema for resource type inheritance/variants. Used for union types like Alarm (
 **Signature:**
 
 ```typescript
-InheritanceSchema: z.ZodObject<{
-    discriminator: z.ZodString;
-    abstract: z.ZodDefault<z.ZodBoolean>;
-    variants: z.ZodRecord<z.ZodString, z.ZodObject<{
-        properties: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodLazy<z.ZodAny>>>;
-        description: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>;
-}, z.core.$strip>
+InheritanceSchema: z.ZodObject<
+  {
+    discriminator: z.ZodString
+    abstract: z.ZodDefault<z.ZodBoolean>
+    variants: z.ZodRecord<
+      z.ZodString,
+      z.ZodObject<
+        {
+          properties: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodLazy<z.ZodAny>>>
+          description: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strip
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

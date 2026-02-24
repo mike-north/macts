@@ -9,5 +9,5 @@ Approximate size in bytes.
 **Signature:**
 
 ```typescript
-fileSize: number;
+fileSize: number
 ```

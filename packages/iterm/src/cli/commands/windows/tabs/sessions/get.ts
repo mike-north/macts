@@ -1,29 +1,29 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../../sdk.js';
-import { createFormatter } from '../../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../../sdk.js'
+import { createFormatter } from '../../../../output/index.js'
 
 /**
  * Get a session by ID.
  */
 export class GetSessionCommand extends Command {
-  static override paths = [["iterm", "windows", "tabs", "sessions", "get"]];
+  static override paths = [['iterm', 'windows', 'tabs', 'sessions', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a session by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  windowId = Option.String('--window-id', { required: true, description: 'Window ID' });
-  tabId = Option.String('--tab-id', { required: true, description: 'Tab ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
+  tabId = Option.String('--tab-id', { required: true, description: 'Tab ID' })
 
-  sessionId = Option.String({ required: true });
+  sessionId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.sessions.get(this.sessionId);
+      const client = getClient()
+      const item = await client.sessions.get(this.sessionId)
 
       const output = formatter.format({
         id: item.id,
@@ -66,14 +66,14 @@ export class GetSessionCommand extends Command {
         uniqueID: item.uniqueID,
         profileName: item.profileName,
         answerbackString: item.answerbackString,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

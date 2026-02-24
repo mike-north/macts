@@ -10,8 +10,8 @@ Create an RPC router for multiple manifests (multi-app support).
 
 ```typescript
 declare function createMultiAppRpcRouter(manifests: AppManifest[]): Hono<{
-    Variables: AuthVariables;
-}>;
+  Variables: AuthVariables
+}>
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function createMultiAppRpcRouter(manifests: AppManifest[]): Hono<{
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifests
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)<!-- -->\[\]
 
-
 </td><td>
 
 Array of app manifests
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ Array of app manifests
 Hono&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
 
 Combined Hono router
-

@@ -9,7 +9,7 @@ Enum value for JXA coercion (name and four-char code).
 **Signature:**
 
 ```typescript
-interface JxaEnumValue 
+interface JxaEnumValue
 ```
 
 ## Properties
@@ -18,56 +18,43 @@ interface JxaEnumValue
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.jxaenumvalue.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.jxaenumvalue.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

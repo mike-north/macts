@@ -18,30 +18,24 @@ create(input: GroupCreateInput): Promise<Group>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [GroupCreateInput](./system-events.groupcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Group](./system-events.group.md)<!-- -->&gt;
-

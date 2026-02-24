@@ -9,5 +9,5 @@ Whether the document has been modified since last save
 **Signature:**
 
 ```typescript
-modified: boolean;
+modified: boolean
 ```

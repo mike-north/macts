@@ -11,7 +11,7 @@ List all ruleconditions.
 ```typescript
 list(): Promise<RuleCondition[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RuleCondition](./mail.rulecondition.md)<!-- -->\[\]&gt;
-

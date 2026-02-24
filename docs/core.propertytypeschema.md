@@ -9,11 +9,16 @@ Property type - can be primitive, array, resource reference, or enum reference.
 **Signature:**
 
 ```typescript
-PropertyTypeSchema: z.ZodType<PrimitiveType | {
-    array: PropertyType;
-} | {
-    resource: string;
-} | {
-    enum: string;
-}>
+PropertyTypeSchema: z.ZodType<
+  | PrimitiveType
+  | {
+      array: PropertyType
+    }
+  | {
+      resource: string
+    }
+  | {
+      enum: string
+    }
+>
 ```

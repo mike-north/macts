@@ -9,5 +9,5 @@ is the playback position for this track remembered?
 **Signature:**
 
 ```typescript
-bookmarkable: boolean;
+bookmarkable: boolean
 ```

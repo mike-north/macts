@@ -9,5 +9,5 @@ special playlist kind
 **Signature:**
 
 ```typescript
-specialKind: string;
+specialKind: string
 ```

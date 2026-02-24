@@ -18,30 +18,24 @@ create(input: ScriptingPropertyCreateInput): Promise<ScriptingProperty>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingProperty](./system-events.scriptingproperty.md)<!-- -->&gt;
-

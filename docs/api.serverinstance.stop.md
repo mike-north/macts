@@ -11,7 +11,7 @@ Stop the server
 ```typescript
 stop(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

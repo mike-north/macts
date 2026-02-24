@@ -9,5 +9,5 @@ The users full name configured for an account
 **Signature:**
 
 ```typescript
-fullName: string;
+fullName: string
 ```

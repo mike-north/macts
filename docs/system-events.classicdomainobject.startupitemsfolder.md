@@ -9,5 +9,5 @@ The StartupItems folder
 **Signature:**
 
 ```typescript
-startupItemsFolder: Folder;
+startupItemsFolder: Folder
 ```

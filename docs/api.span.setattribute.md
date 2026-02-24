@@ -18,44 +18,35 @@ setAttribute(key: string, value: AttributeValue): this;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 key
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 value
 
-
 </td><td>
 
 [AttributeValue](./api.attributevalue.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ value
 **Returns:**
 
 this
-

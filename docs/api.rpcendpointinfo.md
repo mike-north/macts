@@ -9,7 +9,7 @@ Registered RPC endpoint info.
 **Signature:**
 
 ```typescript
-interface RpcEndpointInfo 
+interface RpcEndpointInfo
 ```
 
 ## Properties
@@ -18,92 +18,71 @@ interface RpcEndpointInfo
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [command](./api.rpcendpointinfo.command.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Command](./core.command.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [path](./api.rpcendpointinfo.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [permission](./api.rpcendpointinfo.permission.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [resource?](./api.rpcendpointinfo.resource.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Resource](./core.resource.md) \| undefined
 
-
 </td><td>
 
 _(Optional)_
 
-
 </td></tr>
 </tbody></table>
-

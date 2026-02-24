@@ -9,7 +9,7 @@ Input for updating a FilePackage
 **Signature:**
 
 ```typescript
-type FilePackageUpdateInput = Partial<FilePackageCreateInput>;
+type FilePackageUpdateInput = Partial<FilePackageCreateInput>
 ```
-**References:** [FilePackageCreateInput](./system-events.filepackagecreateinput.md)
 
+**References:** [FilePackageCreateInput](./system-events.filepackagecreateinput.md)

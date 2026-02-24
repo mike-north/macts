@@ -18,30 +18,24 @@ create(input: ProcessCreateInput): Promise<Process>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ProcessCreateInput](./system-events.processcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Process](./system-events.process.md)<!-- -->&gt;
-

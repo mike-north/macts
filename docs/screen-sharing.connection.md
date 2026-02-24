@@ -9,7 +9,7 @@ A screen sharing connection
 **Signature:**
 
 ```typescript
-interface Connection 
+interface Connection
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Connection
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./screen-sharing.connection.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the connection
-
 
 </td></tr>
 <tr><td>
 
 [name](./screen-sharing.connection.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The connection name
-
 
 </td></tr>
 <tr><td>
 
 [url](./screen-sharing.connection.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The VNC URL of the connection
 
-
 </td></tr>
 </tbody></table>
-

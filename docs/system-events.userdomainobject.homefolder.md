@@ -9,5 +9,5 @@ The user's Home folder
 **Signature:**
 
 ```typescript
-homeFolder: Folder;
+homeFolder: Folder
 ```

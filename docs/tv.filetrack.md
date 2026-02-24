@@ -9,7 +9,7 @@ a track representing a video file
 **Signature:**
 
 ```typescript
-interface FileTrack 
+interface FileTrack
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface FileTrack
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./tv.filetrack.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this track
-
 
 </td></tr>
 <tr><td>
 
 [location](./tv.filetrack.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the location of the file represented by this track
 
-
 </td></tr>
 </tbody></table>
-

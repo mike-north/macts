@@ -18,30 +18,24 @@ create(input: AttendeeCreateInput): Promise<Attendee>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AttendeeCreateInput](./calendar.attendeecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Attendee](./calendar.attendee.md)<!-- -->&gt;
-

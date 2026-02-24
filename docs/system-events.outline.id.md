@@ -9,5 +9,5 @@ Unique identifier for this outline
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

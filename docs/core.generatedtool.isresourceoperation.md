@@ -9,5 +9,5 @@ Whether this is a resource operation (true) or app command (false)
 **Signature:**
 
 ```typescript
-isResourceOperation: boolean;
+isResourceOperation: boolean
 ```

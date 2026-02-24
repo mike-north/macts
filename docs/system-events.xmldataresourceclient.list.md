@@ -11,7 +11,7 @@ List all xmldatas.
 ```typescript
 list(): Promise<XMLData[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[XMLData](./system-events.xmldata.md)<!-- -->\[\]&gt;
-

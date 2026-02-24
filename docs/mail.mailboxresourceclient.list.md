@@ -11,7 +11,7 @@ List all mailboxes.
 ```typescript
 list(): Promise<Mailbox[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Mailbox](./mail.mailbox.md)<!-- -->\[\]&gt;
-

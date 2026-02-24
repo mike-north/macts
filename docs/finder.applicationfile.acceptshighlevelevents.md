@@ -9,5 +9,5 @@ Is the application high-level event aware? (OBSOLETE: always returns true)
 **Signature:**
 
 ```typescript
-acceptsHighLevelEvents: boolean;
+acceptsHighLevelEvents: boolean
 ```

@@ -9,5 +9,5 @@ Human-readable name for the key
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

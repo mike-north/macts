@@ -3,46 +3,46 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** PlayerState */
-export type PlayerState = 'stopped' | 'playing' | 'paused';
+export type PlayerState = 'stopped' | 'playing' | 'paused'
 
 /** The currently playing track */
 export interface Track {
   /** The name of the track */
-  name: string;
+  name: string
   /** The artist of the track */
-  artist: string;
+  artist: string
   /** The album of the track */
-  album: string;
+  album: string
   /** The album artist of the track */
-  albumArtist: string;
+  albumArtist: string
   /** The disc number of the track */
-  discNumber: number;
+  discNumber: number
   /** The duration of the track in milliseconds */
-  duration: number;
+  duration: number
   /** Number of times this track has been played */
-  playedCount: number;
+  playedCount: number
   /** The track number */
-  trackNumber: number;
+  trackNumber: number
   /** The Spotify URL for the track */
-  spotifyUrl: string;
+  spotifyUrl: string
   /** The unique identifier of the track */
-  id: string;
+  id: string
   /** The URL of the track artwork */
-  artworkUrl: string;
+  artworkUrl: string
   /** The track artwork */
-  artwork: string;
+  artwork: string
   /** The current player state */
-  playerState: PlayerState;
+  playerState: PlayerState
 }
 
 /** Input for creating a Track */
-export type TrackCreateInput = Record<string, never>;
+export type TrackCreateInput = Record<string, never>
 
 /** Input for updating a Track */
-export type TrackUpdateInput = Partial<TrackCreateInput>;
+export type TrackUpdateInput = Partial<TrackCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -60,4 +60,4 @@ export const TrackSchema = z.object({
   artworkUrl: z.string(),
   artwork: z.string(),
   playerState: z.string(),
-});
+})

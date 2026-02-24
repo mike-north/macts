@@ -9,5 +9,5 @@ Class name (e.g., "document", "window")
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

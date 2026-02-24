@@ -8,10 +8,11 @@
 
 ```typescript
 cli: {
-        dir: string;
-        files: {
-            path: string;
-            content: string;
-        }[];
-    };
+  dir: string
+  files: {
+    path: string
+    content: string
+  }
+  ;[]
+}
 ```

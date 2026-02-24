@@ -9,7 +9,7 @@ Input for updating a Calendar
 **Signature:**
 
 ```typescript
-type CalendarUpdateInput = Partial<CalendarCreateInput>;
+type CalendarUpdateInput = Partial<CalendarCreateInput>
 ```
-**References:** [CalendarCreateInput](./calendar.calendarcreateinput.md)
 
+**References:** [CalendarCreateInput](./calendar.calendarcreateinput.md)

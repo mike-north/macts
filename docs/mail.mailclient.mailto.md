@@ -11,7 +11,7 @@ Opens a mailto URL.
 ```typescript
 mailto(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

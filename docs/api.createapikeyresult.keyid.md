@@ -9,5 +9,5 @@ Unique key ID for management/revocation
 **Signature:**
 
 ```typescript
-keyId: string;
+keyId: string
 ```

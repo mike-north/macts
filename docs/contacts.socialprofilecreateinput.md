@@ -9,7 +9,7 @@ Input for creating a SocialProfile
 **Signature:**
 
 ```typescript
-interface SocialProfileCreateInput 
+interface SocialProfileCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface SocialProfileCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [serviceName?](./contacts.socialprofilecreateinput.servicename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The service name of this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [url?](./contacts.socialprofilecreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The URL of this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [userIdentifier?](./contacts.socialprofilecreateinput.useridentifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ A service-specific identifier used with this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [userName?](./contacts.socialprofilecreateinput.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The username used with this social profile.
 
-
 </td></tr>
 </tbody></table>
-

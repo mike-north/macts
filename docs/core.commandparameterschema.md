@@ -9,12 +9,15 @@ Command parameter schema.
 **Signature:**
 
 ```typescript
-CommandParameterSchema: z.ZodObject<{
-    name: z.ZodString;
-    type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>;
-    description: z.ZodString;
-    required: z.ZodDefault<z.ZodBoolean>;
-    default: z.ZodOptional<z.ZodUnknown>;
-    code: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+CommandParameterSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>
+    description: z.ZodString
+    required: z.ZodDefault<z.ZodBoolean>
+    default: z.ZodOptional<z.ZodUnknown>
+    code: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

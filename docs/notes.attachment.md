@@ -9,7 +9,7 @@ A note attachment
 **Signature:**
 
 ```typescript
-interface Attachment 
+interface Attachment
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Attachment
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [contentIdentifier?](./notes.attachment.contentidentifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The content identifier of the attachment
-
 
 </td></tr>
 <tr><td>
 
 [creationDate](./notes.attachment.creationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The creation date of the attachment
-
 
 </td></tr>
 <tr><td>
 
 [id](./notes.attachment.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the attachment
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./notes.attachment.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The modification date of the attachment
-
 
 </td></tr>
 <tr><td>
 
 [name](./notes.attachment.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the attachment
 
-
 </td></tr>
 </tbody></table>
-

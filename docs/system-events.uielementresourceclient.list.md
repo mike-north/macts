@@ -11,7 +11,7 @@ List all uielements.
 ```typescript
 list(): Promise<UIElement[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[UIElement](./system-events.uielement.md)<!-- -->\[\]&gt;
-

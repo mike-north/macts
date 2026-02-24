@@ -9,7 +9,7 @@ An anchor within a settings pane.
 **Signature:**
 
 ```typescript
-interface Anchor 
+interface Anchor
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Anchor
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name](./system-settings.anchor.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the anchor.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Indicates whether messages that are deleted will be moved to the trash mailbox
 **Signature:**
 
 ```typescript
-moveDeletedMessagesToTrash: boolean;
+moveDeletedMessagesToTrash: boolean
 ```

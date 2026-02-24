@@ -9,7 +9,7 @@ Input for updating a Attribute
 **Signature:**
 
 ```typescript
-type AttributeUpdateInput = Partial<AttributeCreateInput>;
+type AttributeUpdateInput = Partial<AttributeCreateInput>
 ```
-**References:** [AttributeCreateInput](./system-events.attributecreateinput.md)
 
+**References:** [AttributeCreateInput](./system-events.attributecreateinput.md)

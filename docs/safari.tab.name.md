@@ -9,5 +9,5 @@ The tab name
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

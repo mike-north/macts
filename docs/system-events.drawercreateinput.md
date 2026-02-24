@@ -9,5 +9,5 @@ Input for creating a Drawer
 **Signature:**
 
 ```typescript
-interface DrawerCreateInput 
+interface DrawerCreateInput
 ```

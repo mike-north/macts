@@ -9,5 +9,5 @@ Does the process have a scripting terminology, i.e., can it be scripted?
 **Signature:**
 
 ```typescript
-hasScriptingTerminology: boolean;
+hasScriptingTerminology: boolean
 ```

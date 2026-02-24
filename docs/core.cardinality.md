@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Cardinality = z.infer<typeof CardinalitySchema>;
+type Cardinality = z.infer<typeof CardinalitySchema>
 ```
-**References:** [CardinalitySchema](./core.cardinalityschema.md)
 
+**References:** [CardinalitySchema](./core.cardinalityschema.md)

@@ -9,7 +9,7 @@ Client for a space.
 **Signature:**
 
 ```typescript
-declare class SpaceResourceClient 
+declare class SpaceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SpaceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./arc.spaceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SpaceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SpaceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./arc.spaceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new space.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./arc.spaceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a space.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./arc.spaceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a space by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./arc.spaceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all spaces.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./arc.spaceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing space.
 
-
 </td></tr>
 </tbody></table>
-

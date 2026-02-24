@@ -9,5 +9,5 @@ Input for creating a RadioGroup
 **Signature:**
 
 ```typescript
-interface RadioGroupCreateInput 
+interface RadioGroupCreateInput
 ```

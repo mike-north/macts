@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-RuleConditionSchema: z.ZodObject<{
-    expression: z.ZodString;
-    header: z.ZodString;
-    qualifier: z.ZodString;
-    ruleType: z.ZodString;
-}, z.core.$strip>
+RuleConditionSchema: z.ZodObject<
+  {
+    expression: z.ZodString
+    header: z.ZodString
+    qualifier: z.ZodString
+    ruleType: z.ZodString
+  },
+  z.core.$strip
+>
 ```

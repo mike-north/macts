@@ -9,7 +9,7 @@ Add key metadata to storage.
 **Signature:**
 
 ```typescript
-declare function addKeyMetadata(metadata: ApiKeyMetadata): void;
+declare function addKeyMetadata(metadata: ApiKeyMetadata): void
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function addKeyMetadata(metadata: ApiKeyMetadata): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 metadata
 
-
 </td><td>
 
 [ApiKeyMetadata](./core.apikeymetadata.md)
 
-
 </td><td>
 
 Key metadata to add
-
 
 </td></tr>
 </tbody></table>
@@ -51,4 +45,3 @@ Key metadata to add
 **Returns:**
 
 void
-

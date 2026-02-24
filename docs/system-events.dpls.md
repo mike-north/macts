@@ -9,5 +9,5 @@ Dpls
 **Signature:**
 
 ```typescript
-type Dpls = 'bottom' | 'left' | 'right';
+type Dpls = 'bottom' | 'left' | 'right'
 ```

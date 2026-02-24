@@ -9,5 +9,5 @@ Input for creating a Device
 **Signature:**
 
 ```typescript
-interface DeviceCreateInput 
+interface DeviceCreateInput
 ```

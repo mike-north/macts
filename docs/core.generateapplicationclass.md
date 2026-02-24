@@ -9,7 +9,7 @@ Generate the root application class.
 **Signature:**
 
 ```typescript
-declare function generateApplicationClass(ctx: GeneratorContext): GeneratedApplication;
+declare function generateApplicationClass(ctx: GeneratorContext): GeneratedApplication
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function generateApplicationClass(ctx: GeneratorContext): GeneratedAppli
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ ctx
 **Returns:**
 
 [GeneratedApplication](./core.generatedapplication.md)
-

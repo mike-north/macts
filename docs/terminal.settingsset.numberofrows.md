@@ -9,5 +9,5 @@ The number of rows
 **Signature:**
 
 ```typescript
-numberOfRows: number;
+numberOfRows: number
 ```

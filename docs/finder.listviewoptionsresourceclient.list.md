@@ -11,7 +11,7 @@ List all listviewoptionss.
 ```typescript
 list(): Promise<ListViewOptions[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ListViewOptions](./finder.listviewoptions.md)<!-- -->\[\]&gt;
-

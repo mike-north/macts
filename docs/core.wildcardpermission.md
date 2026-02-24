@@ -9,7 +9,7 @@ Wildcard permission - matches multiple permissions. Format: `app:*:operation` or
 **Signature:**
 
 ```typescript
-interface WildcardPermission 
+interface WildcardPermission
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface WildcardPermission
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [app](./core.wildcardpermission.app.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [operation](./core.wildcardpermission.operation.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [resource](./core.wildcardpermission.resource.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [type](./core.wildcardpermission.type.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 'wildcard'
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

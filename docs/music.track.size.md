@@ -9,5 +9,5 @@ the size of the track (in bytes)
 **Signature:**
 
 ```typescript
-size: number;
+size: number
 ```

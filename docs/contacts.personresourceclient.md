@@ -9,7 +9,7 @@ Client for a person in the address book database..
 **Signature:**
 
 ```typescript
-declare class PersonResourceClient 
+declare class PersonResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PersonResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.personresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PersonResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PersonResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.personresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new person.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.personresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a person.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.personresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a person by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.personresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all people.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.personresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing person.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Input for creating a Image
 **Signature:**
 
 ```typescript
-interface ImageCreateInput 
+interface ImageCreateInput
 ```

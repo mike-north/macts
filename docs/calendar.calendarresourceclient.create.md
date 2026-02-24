@@ -18,30 +18,24 @@ create(input: CalendarCreateInput): Promise<Calendar>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [CalendarCreateInput](./calendar.calendarcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Calendar](./calendar.calendar.md)<!-- -->&gt;
-

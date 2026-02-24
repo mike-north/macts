@@ -9,7 +9,7 @@ Client for custom playlists created by the user.
 **Signature:**
 
 ```typescript
-declare class UserPlaylistResourceClient 
+declare class UserPlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class UserPlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.userplaylistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `UserPlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `UserPlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.userplaylistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new userplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.userplaylistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a userplaylist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.userplaylistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a userplaylist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.userplaylistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all userplaylists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.userplaylistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing userplaylist.
 
-
 </td></tr>
 </tbody></table>
-

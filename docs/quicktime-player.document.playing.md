@@ -9,5 +9,5 @@ Whether the document is currently playing
 **Signature:**
 
 ```typescript
-playing: boolean;
+playing: boolean
 ```

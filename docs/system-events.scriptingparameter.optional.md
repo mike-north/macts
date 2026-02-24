@@ -9,5 +9,5 @@ Is the parameter optional?
 **Signature:**
 
 ```typescript
-optional: boolean;
+optional: boolean
 ```

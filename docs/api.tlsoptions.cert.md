@@ -9,5 +9,5 @@ Path to PEM-encoded certificate file
 **Signature:**
 
 ```typescript
-cert: string;
+cert: string
 ```

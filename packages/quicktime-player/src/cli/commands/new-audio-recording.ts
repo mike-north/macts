@@ -1,33 +1,33 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../sdk.js';
-import { createFormatter } from '../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../sdk.js'
+import { createFormatter } from '../output/index.js'
 
 /**
  * Create a new audio recording document.
  */
 export class NewAudioRecordingCommand extends Command {
-  static override paths = [["quicktime-player", "new-audio-recording"]];
+  static override paths = [['quicktime-player', 'new-audio-recording']]
 
   static override usage = Command.Usage({
-    description: "Create a new audio recording document.",
-  });
+    description: 'Create a new audio recording document.',
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      await client.newAudioRecording();
+      const client = getClient()
+      await client.newAudioRecording()
 
-      const output = formatter.formatSuccess('newAudioRecording completed successfully');
-      this.context.stdout.write(output + '\n');
-      return 0;
+      const output = formatter.formatSuccess('newAudioRecording completed successfully')
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

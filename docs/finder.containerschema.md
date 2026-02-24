@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-ContainerSchema: z.ZodObject<{
-    entireContents: z.ZodString;
-    expandable: z.ZodBoolean;
-    expanded: z.ZodBoolean;
-    completelyExpanded: z.ZodBoolean;
-    containerWindow: z.ZodString;
-}, z.core.$strip>
+ContainerSchema: z.ZodObject<
+  {
+    entireContents: z.ZodString
+    expandable: z.ZodBoolean
+    expanded: z.ZodBoolean
+    completelyExpanded: z.ZodBoolean
+    containerWindow: z.ZodString
+  },
+  z.core.$strip
+>
 ```

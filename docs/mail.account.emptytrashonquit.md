@@ -9,5 +9,5 @@ Indicates whether the messages in deleted messages mailboxes will be permanently
 **Signature:**
 
 ```typescript
-emptyTrashOnQuit: boolean;
+emptyTrashOnQuit: boolean
 ```

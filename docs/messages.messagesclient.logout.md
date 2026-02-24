@@ -11,7 +11,7 @@ Logout of all accounts.
 ```typescript
 logout(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ the rating of the album for this track (0 to 100)
 **Signature:**
 
 ```typescript
-albumRating: number;
+albumRating: number
 ```

@@ -9,7 +9,7 @@ User name for America Online (AOL) instant messaging.
 **Signature:**
 
 ```typescript
-interface AIMHandle 
+interface AIMHandle
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface AIMHandle
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.aimhandle.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this handle
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.aimhandle.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.aimhandle.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The AIM handle value
 
-
 </td></tr>
 </tbody></table>
-

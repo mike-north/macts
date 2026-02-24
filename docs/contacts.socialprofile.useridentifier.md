@@ -9,5 +9,5 @@ A service-specific identifier used with this social profile.
 **Signature:**
 
 ```typescript
-userIdentifier: string;
+userIdentifier: string
 ```

@@ -6,12 +6,12 @@
 
 Validate an API key token.
 
-Checks: 1. Token format (must start with macts\_sk\_) 2. JWT signature 3. Expiration (if set) 4. Revocation status
+Checks: 1. Token format (must start with macts_sk\_) 2. JWT signature 3. Expiration (if set) 4. Revocation status
 
 **Signature:**
 
 ```typescript
-declare function validateApiKey(token: string): Promise<ApiKeyValidationResult>;
+declare function validateApiKey(token: string): Promise<ApiKeyValidationResult>
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function validateApiKey(token: string): Promise<ApiKeyValidationResult>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 token
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The API key token to validate
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ The API key token to validate
 Promise&lt;[ApiKeyValidationResult](./core.apikeyvalidationresult.md)<!-- -->&gt;
 
 Validation result with payload if valid
-

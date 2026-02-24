@@ -9,7 +9,7 @@ Client for an application's file on disk.
 **Signature:**
 
 ```typescript
-declare class ApplicationFileResourceClient 
+declare class ApplicationFileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ApplicationFileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.applicationfileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ApplicationFileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ApplicationFileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.applicationfileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new applicationfile.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.applicationfileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a applicationfile.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.applicationfileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a applicationfile by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.applicationfileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all applicationfiles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.applicationfileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing applicationfile.
 
-
 </td></tr>
 </tbody></table>
-

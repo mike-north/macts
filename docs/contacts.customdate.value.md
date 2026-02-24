@@ -9,5 +9,5 @@ The date value
 **Signature:**
 
 ```typescript
-value: Date;
+value: Date
 ```

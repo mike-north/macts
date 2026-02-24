@@ -9,7 +9,7 @@ Client for a collection of settings for a network service.
 **Signature:**
 
 ```typescript
-declare class ServiceResourceClient 
+declare class ServiceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ServiceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.serviceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ServiceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ServiceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.serviceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new service.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.serviceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a service.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.serviceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a service by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.serviceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all services.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.serviceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing service.
 
-
 </td></tr>
 </tbody></table>
-

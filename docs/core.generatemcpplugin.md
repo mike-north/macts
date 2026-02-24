@@ -9,7 +9,7 @@ Generate an MCP plugin from a manifest.
 **Signature:**
 
 ```typescript
-declare function generateMcpPlugin(context: McpGeneratorContext): GeneratedMcpPlugin;
+declare function generateMcpPlugin(context: McpGeneratorContext): GeneratedMcpPlugin
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function generateMcpPlugin(context: McpGeneratorContext): GeneratedMcpPl
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 context
 
-
 </td><td>
 
 [McpGeneratorContext](./core.mcpgeneratorcontext.md)
 
-
 </td><td>
 
 MCP generator context
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ MCP generator context
 [GeneratedMcpPlugin](./core.generatedmcpplugin.md)
 
 Generated MCP plugin with all files
-

@@ -18,48 +18,39 @@ performMailActionWithMessages(inMailboxes?: string, forRule?: string): Promise<v
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 inMailboxes
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 forRule
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -67,4 +58,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ComboBoxSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ComboBoxSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

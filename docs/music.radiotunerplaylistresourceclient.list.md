@@ -11,7 +11,7 @@ List all radiotunerplaylists.
 ```typescript
 list(): Promise<RadioTunerPlaylist[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RadioTunerPlaylist](./music.radiotunerplaylist.md)<!-- -->\[\]&gt;
-

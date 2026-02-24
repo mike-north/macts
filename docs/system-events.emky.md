@@ -9,5 +9,5 @@ EMky
 **Signature:**
 
 ```typescript
-type EMky = 'command' | 'control' | 'option' | 'shift';
+type EMky = 'command' | 'control' | 'option' | 'shift'
 ```

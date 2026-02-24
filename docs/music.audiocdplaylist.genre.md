@@ -9,5 +9,5 @@ the genre of the CD
 **Signature:**
 
 ```typescript
-genre: string;
+genre: string
 ```

@@ -11,7 +11,7 @@ List all displayalarms.
 ```typescript
 list(): Promise<DisplayAlarm[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[DisplayAlarm](./calendar.displayalarm.md)<!-- -->\[\]&gt;
-

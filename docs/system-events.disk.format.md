@@ -9,5 +9,5 @@ the file system format of this disk
 **Signature:**
 
 ```typescript
-format: string;
+format: string
 ```

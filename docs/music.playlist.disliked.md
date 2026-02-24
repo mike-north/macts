@@ -9,5 +9,5 @@ is this playlist disliked?
 **Signature:**
 
 ```typescript
-disliked: boolean;
+disliked: boolean
 ```

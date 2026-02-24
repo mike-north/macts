@@ -11,7 +11,7 @@ List all sliders.
 ```typescript
 list(): Promise<Slider[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Slider](./system-events.slider.md)<!-- -->\[\]&gt;
-

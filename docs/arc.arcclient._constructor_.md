@@ -18,31 +18,24 @@ constructor(options: ArcClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [ArcClientOptions](./arc.arcclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Raw enumeration - represents a set of named constant values.
 **Signature:**
 
 ```typescript
-interface RawEnumeration 
+interface RawEnumeration
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface RawEnumeration
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.rawenumeration.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawenumeration.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawenumeration.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Enumeration name (e.g., "save options")
-
 
 </td></tr>
 <tr><td>
 
 [values](./core.rawenumeration.values.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawEnumerator](./core.rawenumerator.md)<!-- -->\[\]
 
-
 </td><td>
 
 Possible values for this enumeration
 
-
 </td></tr>
 </tbody></table>
-

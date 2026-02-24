@@ -9,7 +9,7 @@ Client for a file.
 **Signature:**
 
 ```typescript
-declare class FileResourceClient 
+declare class FileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class FileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.fileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `FileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `FileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.fileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new file.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.fileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a file.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.fileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a file by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.fileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all files.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.fileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing file.
 
-
 </td></tr>
 </tbody></table>
-

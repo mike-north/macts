@@ -9,7 +9,7 @@ Client for a grow area belonging to a window.
 **Signature:**
 
 ```typescript
-declare class GrowAreaResourceClient 
+declare class GrowAreaResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class GrowAreaResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.growarearesourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `GrowAreaResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `GrowAreaResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.growarearesourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new growarea.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.growarearesourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a growarea.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.growarearesourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a growarea by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.growarearesourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all growareas.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.growarearesourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing growarea.
 
-
 </td></tr>
 </tbody></table>
-

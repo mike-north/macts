@@ -9,7 +9,7 @@ A busy indicator belonging to a window
 **Signature:**
 
 ```typescript
-interface BusyIndicator 
+interface BusyIndicator
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface BusyIndicator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.busyindicator.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this busy indicator
 
-
 </td></tr>
 </tbody></table>
-

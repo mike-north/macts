@@ -9,5 +9,5 @@ QuotingColor
 **Signature:**
 
 ```typescript
-type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
+type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow'
 ```

@@ -18,30 +18,24 @@ create(input: InternetLocationFileCreateInput): Promise<InternetLocationFile>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[InternetLocationFile](./finder.internetlocationfile.md)<!-- -->&gt;
-

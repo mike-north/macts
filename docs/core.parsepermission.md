@@ -13,7 +13,7 @@ Note: The distinction between coarse and fine is contextual. The manifest's perm
 **Signature:**
 
 ```typescript
-declare function parsePermission(permission: string): ParsedPermission;
+declare function parsePermission(permission: string): ParsedPermission
 ```
 
 ## Parameters
@@ -22,32 +22,26 @@ declare function parsePermission(permission: string): ParsedPermission;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission string in format `app:resource:operation`
-
 
 </td></tr>
 </tbody></table>
@@ -61,4 +55,3 @@ Parsed permission object
 ## Exceptions
 
 PermissionParseError if the format is invalid
-

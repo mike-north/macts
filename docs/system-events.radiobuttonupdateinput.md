@@ -9,7 +9,7 @@ Input for updating a RadioButton
 **Signature:**
 
 ```typescript
-type RadioButtonUpdateInput = Partial<RadioButtonCreateInput>;
+type RadioButtonUpdateInput = Partial<RadioButtonCreateInput>
 ```
-**References:** [RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)
 
+**References:** [RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)

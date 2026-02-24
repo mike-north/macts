@@ -9,5 +9,5 @@ the release date of this track
 **Signature:**
 
 ```typescript
-releaseDate: Date;
+releaseDate: Date
 ```

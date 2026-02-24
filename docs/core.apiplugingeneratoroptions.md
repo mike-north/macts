@@ -9,7 +9,7 @@ Options for generating an API plugin.
 **Signature:**
 
 ```typescript
-interface ApiPluginGeneratorOptions 
+interface ApiPluginGeneratorOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ApiPluginGeneratorOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [packageName](./core.apiplugingeneratoroptions.packagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Package name (e.g., '<!-- -->@<!-- -->macts/api-calendar')
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.apiplugingeneratoroptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

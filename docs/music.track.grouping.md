@@ -9,5 +9,5 @@ the grouping (piece) of the track. Generally used to denote movements within a c
 **Signature:**
 
 ```typescript
-grouping: string;
+grouping: string
 ```

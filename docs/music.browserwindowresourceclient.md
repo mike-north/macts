@@ -9,7 +9,7 @@ Client for the main window.
 **Signature:**
 
 ```typescript
-declare class BrowserWindowResourceClient 
+declare class BrowserWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class BrowserWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.browserwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `BrowserWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `BrowserWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.browserwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new browserwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.browserwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a browserwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.browserwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a browserwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.browserwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all browserwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.browserwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing browserwindow.
 
-
 </td></tr>
 </tbody></table>
-

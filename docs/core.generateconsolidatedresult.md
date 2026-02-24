@@ -9,7 +9,7 @@ Result of generating consolidated packages.
 **Signature:**
 
 ```typescript
-interface GenerateConsolidatedResult 
+interface GenerateConsolidatedResult
 ```
 
 ## Properties
@@ -18,73 +18,56 @@ interface GenerateConsolidatedResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [client](./core.generateconsolidatedresult.client.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [errors](./core.generateconsolidatedresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [server](./core.generateconsolidatedresult.server.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { dir: string; files: { path: string; content: string; }\[\]; }
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

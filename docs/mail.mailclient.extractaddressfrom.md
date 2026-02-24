@@ -11,7 +11,7 @@ Command to get just the email address of a fully specified email address. E.g. C
 ```typescript
 extractAddressFrom(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ Controls whether the message window is shown on the screen. The default is false
 **Signature:**
 
 ```typescript
-visible: boolean;
+visible: boolean
 ```

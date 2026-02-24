@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-OpenFileAlarmSchema: z.ZodObject<{
-    triggerInterval: z.ZodNumber;
-    triggerDate: z.ZodString;
-    filepath: z.ZodString;
-}, z.core.$strip>
+OpenFileAlarmSchema: z.ZodObject<
+  {
+    triggerInterval: z.ZodNumber
+    triggerDate: z.ZodString
+    filepath: z.ZodString
+  },
+  z.core.$strip
+>
 ```

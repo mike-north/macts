@@ -9,5 +9,5 @@ Is the disk item visible?
 **Signature:**
 
 ```typescript
-visible: boolean;
+visible: boolean
 ```

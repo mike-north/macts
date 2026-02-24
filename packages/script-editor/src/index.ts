@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-export { ScriptEditorClient, ScriptEditorError, HttpClient } from './client.js';
-export type { ScriptEditorClientOptions } from './client.js';
-export * from './types.js';
-export { DocumentResourceClient } from './resources/document.js';
+export { ScriptEditorClient, ScriptEditorError, HttpClient } from './client.js'
+export type { ScriptEditorClientOptions } from './client.js'
+export * from './types.js'
+export { DocumentResourceClient } from './resources/document.js'

@@ -9,7 +9,7 @@ Result of creating an API key.
 **Signature:**
 
 ```typescript
-interface CreateApiKeyResult 
+interface CreateApiKeyResult
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface CreateApiKeyResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [keyId](./api.createapikeyresult.keyid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique key ID for management/revocation
-
 
 </td></tr>
 <tr><td>
 
 [metadata](./api.createapikeyresult.metadata.md)
 
+</td><td>
 
 </td><td>
 
-
-</td><td>
-
-[\_macts\_core.ApiKeyMetadata](./core.apikeymetadata.md)
-
+[\_macts_core.ApiKeyMetadata](./core.apikeymetadata.md)
 
 </td><td>
 
 Metadata about the created key
-
 
 </td></tr>
 <tr><td>
 
 [token](./api.createapikeyresult.token.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
-The signed API key token (prefixed with macts\_sk\_)
-
+The signed API key token (prefixed with macts_sk\_)
 
 </td></tr>
 </tbody></table>
-

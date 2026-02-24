@@ -9,7 +9,7 @@ Input for creating a Window
 **Signature:**
 
 ```typescript
-interface WindowCreateInput 
+interface WindowCreateInput
 ```
 
 ## Properties
@@ -18,288 +18,227 @@ interface WindowCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [bounds?](./iterm.windowcreateinput.bounds.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 _(Optional)_ The bounding rectangle of the window.
-
 
 </td></tr>
 <tr><td>
 
 [currentSession?](./iterm.windowcreateinput.currentsession.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Session](./iterm.session.md)
 
-
 </td><td>
 
 _(Optional)_ The current session in a window
-
 
 </td></tr>
 <tr><td>
 
 [currentTab?](./iterm.windowcreateinput.currenttab.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Tab](./iterm.tab.md)
 
-
 </td><td>
 
 _(Optional)_ The currently selected tab
-
 
 </td></tr>
 <tr><td>
 
 [frame?](./iterm.windowcreateinput.frame.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 _(Optional)_ The bounding rectangle, relative to the lower left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [frontmost?](./iterm.windowcreateinput.frontmost.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently the frontmost window.
-
 
 </td></tr>
 <tr><td>
 
 [hotkeyWindowProfile?](./iterm.windowcreateinput.hotkeywindowprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ If the window is a hotkey window, this gives the name of the profile that created the window.
-
 
 </td></tr>
 <tr><td>
 
 [index?](./iterm.windowcreateinput.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The index of the window, ordered front to back.
-
 
 </td></tr>
 <tr><td>
 
 [isHotkeyWindow?](./iterm.windowcreateinput.ishotkeywindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is a hotkey window.
-
 
 </td></tr>
 <tr><td>
 
 [miniaturized?](./iterm.windowcreateinput.miniaturized.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently minimized.
-
 
 </td></tr>
 <tr><td>
 
 [origin?](./iterm.windowcreateinput.origin.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 _(Optional)_ The position of the window, relative to the lower left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [position?](./iterm.windowcreateinput.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 _(Optional)_ The position of the window, relative to the upper left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [size?](./iterm.windowcreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 _(Optional)_ The width and height of the window
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./iterm.windowcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently visible.
-
 
 </td></tr>
 <tr><td>
 
 [zoomed?](./iterm.windowcreateinput.zoomed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently zoomed.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A parameter within a command within a suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingParameter 
+interface ScriptingParameter
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface ScriptingParameter
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./system-events.scriptingparameter.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The description of the parameter
-
 
 </td></tr>
 <tr><td>
 
 [hidden](./system-events.scriptingparameter.hidden.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the parameter hidden?
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.scriptingparameter.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the parameter
-
 
 </td></tr>
 <tr><td>
 
 [kind](./system-events.scriptingparameter.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The kind of object or data specified by this parameter
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.scriptingparameter.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the parameter
-
 
 </td></tr>
 <tr><td>
 
 [optional](./system-events.scriptingparameter.optional.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the parameter optional?
 
-
 </td></tr>
 </tbody></table>
-

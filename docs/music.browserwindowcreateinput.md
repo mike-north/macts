@@ -9,7 +9,7 @@ Input for creating a BrowserWindow
 **Signature:**
 
 ```typescript
-interface BrowserWindowCreateInput 
+interface BrowserWindowCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface BrowserWindowCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [view?](./music.browserwindowcreateinput.view.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Playlist](./music.playlist.md)
 
-
 </td><td>
 
 _(Optional)_ the playlist currently displayed in the window
 
-
 </td></tr>
 </tbody></table>
-

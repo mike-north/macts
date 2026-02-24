@@ -9,7 +9,7 @@ Client configuration options.
 **Signature:**
 
 ```typescript
-interface ConsoleClientOptions 
+interface ConsoleClientOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ConsoleClientOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKey](./console.consoleclientoptions.apikey.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 API key for authentication
-
 
 </td></tr>
 <tr><td>
 
 [baseUrl?](./console.consoleclientoptions.baseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Base URL for API server (default: http://localhost:8372)
 
-
 </td></tr>
 </tbody></table>
-

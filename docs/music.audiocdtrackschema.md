@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-AudioCDTrackSchema: z.ZodObject<{
-    location: z.ZodString;
-}, z.core.$strip>
+AudioCDTrackSchema: z.ZodObject<
+  {
+    location: z.ZodString
+  },
+  z.core.$strip
+>
 ```

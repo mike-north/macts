@@ -9,5 +9,5 @@ The completion date of the reminder
 **Signature:**
 
 ```typescript
-completionDate: Date;
+completionDate: Date
 ```

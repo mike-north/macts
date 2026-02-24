@@ -9,7 +9,7 @@ Telemetry configuration options.
 **Signature:**
 
 ```typescript
-interface TelemetryOptions 
+interface TelemetryOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface TelemetryOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [endpoint?](./api.telemetryoptions.endpoint.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ OTLP endpoint URL (default: 'http://localhost:4318')
-
 
 </td></tr>
 <tr><td>
 
 [serviceName?](./api.telemetryoptions.servicename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Service name for traces (default: 'macts-api')
 
-
 </td></tr>
 </tbody></table>
-

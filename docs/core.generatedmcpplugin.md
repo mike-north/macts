@@ -9,7 +9,7 @@ Result of MCP plugin generation.
 **Signature:**
 
 ```typescript
-interface GeneratedMcpPlugin 
+interface GeneratedMcpPlugin
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface GeneratedMcpPlugin
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [files](./core.generatedmcpplugin.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
 
 All generated files as path/content pairs
-
 
 </td></tr>
 <tr><td>
 
 [indexContent](./core.generatedmcpplugin.indexcontent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Generated index.ts content
-
 
 </td></tr>
 <tr><td>
 
 [packageJson](./core.generatedmcpplugin.packagejson.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Generated package.json content
-
 
 </td></tr>
 <tr><td>
 
 [pluginContent](./core.generatedmcpplugin.plugincontent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Generated plugin.ts content
-
 
 </td></tr>
 <tr><td>
 
 [pluginName](./core.generatedmcpplugin.pluginname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Plugin name (e.g., 'calendar')
-
 
 </td></tr>
 <tr><td>
 
 [toolFiles](./core.generatedmcpplugin.toolfiles.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [GeneratedToolFile](./core.generatedtoolfile.md)<!-- -->\[\]
 
-
 </td><td>
 
 Generated tool files
-
 
 </td></tr>
 <tr><td>
 
 [tools](./core.generatedmcpplugin.tools.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [GeneratedTool](./core.generatedtool.md)<!-- -->\[\]
 
-
 </td><td>
 
 All generated tools
-
 
 </td></tr>
 <tr><td>
 
 [toolsIndexContent](./core.generatedmcpplugin.toolsindexcontent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Generated tools/index.ts content
 
-
 </td></tr>
 </tbody></table>
-

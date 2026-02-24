@@ -9,5 +9,5 @@ Unique identifier for this radio button
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

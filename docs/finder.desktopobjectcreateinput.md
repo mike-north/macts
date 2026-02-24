@@ -9,5 +9,5 @@ Input for creating a DesktopObject
 **Signature:**
 
 ```typescript
-interface DesktopObjectCreateInput 
+interface DesktopObjectCreateInput
 ```

@@ -9,19 +9,18 @@ TextEdit client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class TextEditClient 
+declare class TextEditClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new TextEditClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./textedit.texteditclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TextEditClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,64 +57,51 @@ Constructs a new instance of the `TextEditClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [documents](./textedit.texteditclient.documents.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DocumentResourceClient](./textedit.documentresourceclient.md)
 
-
 </td><td>
 
 A TextEdit document
-
 
 </td></tr>
 <tr><td>
 
 [http](./textedit.texteditclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./textedit.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
 
-
 </td></tr>
 </tbody></table>
-

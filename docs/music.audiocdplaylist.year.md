@@ -9,5 +9,5 @@ the year the album was recorded/released
 **Signature:**
 
 ```typescript
-year: number;
+year: number
 ```

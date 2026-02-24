@@ -9,7 +9,7 @@ Client for a visual plug-in.
 **Signature:**
 
 ```typescript
-declare class VisualResourceClient 
+declare class VisualResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class VisualResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.visualresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `VisualResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `VisualResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.visualresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new visual.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.visualresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a visual.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.visualresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a visual by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.visualresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all visuals.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.visualresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing visual.
 
-
 </td></tr>
 </tbody></table>
-

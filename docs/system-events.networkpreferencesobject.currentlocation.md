@@ -9,5 +9,5 @@ the current location
 **Signature:**
 
 ```typescript
-currentLocation: Location;
+currentLocation: Location
 ```

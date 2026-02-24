@@ -9,5 +9,5 @@ Number of days before junk messages are deleted (0 = delete on quit, -1 = never 
 **Signature:**
 
 ```typescript
-emptyJunkMessagesFrequency: number;
+emptyJunkMessagesFrequency: number
 ```

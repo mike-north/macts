@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * List all bookmark items in a folder
@@ -14,25 +14,23 @@ export const bookmarkitemsListTool: McpToolDefinition = {
   name: 'macts__microsoft-edge__bookmarkitems_list',
   description: 'List all bookmark items in a folder',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "folderId": {
-        "description": "Bookmark folder identifier",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      folderId: {
+        description: 'Bookmark folder identifier',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "folderId"
-    ]
+    additionalProperties: false,
+    required: ['folderId'],
   },
   handler: async (args) => {
-    const { folderId } = args as { folderId: string };
-    void folderId;
-    const client = getClient();
-    return client.bookmarkitems.list();
+    const { folderId } = args as { folderId: string }
+    void folderId
+    const client = getClient()
+    return client.bookmarkitems.list()
   },
-};
+}
 
 /**
  * Get a bookmark item by ID
@@ -41,22 +39,19 @@ export const bookmarkitemsGetTool: McpToolDefinition = {
   name: 'macts__microsoft-edge__bookmarkitems_get',
   description: 'Get a bookmark item by ID',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "id": {
-        "description": "Bookmark item identifier",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      id: {
+        description: 'Bookmark item identifier',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "id"
-    ]
+    additionalProperties: false,
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string };
-    const client = getClient();
-    return client.bookmarkitems.get(id);
+    const { id } = args as { id: string }
+    const client = getClient()
+    return client.bookmarkitems.get(id)
   },
-};
-
+}

@@ -9,7 +9,7 @@ Input for creating a MessageViewer
 **Signature:**
 
 ```typescript
-interface MessageViewerCreateInput 
+interface MessageViewerCreateInput
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface MessageViewerCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [mailboxListVisible?](./mail.messageviewercreateinput.mailboxlistvisible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Controls whether the list of mailboxes is visible or not
-
 
 </td></tr>
 <tr><td>
 
 [previewPaneIsVisible?](./mail.messageviewercreateinput.previewpaneisvisible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Controls whether the preview pane of the message viewer window is visible or not
-
 
 </td></tr>
 <tr><td>
 
 [selectedMailboxes?](./mail.messageviewercreateinput.selectedmailboxes.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ List of mailboxes currently selected in the list of mailboxes
-
 
 </td></tr>
 <tr><td>
 
 [selectedMessages?](./mail.messageviewercreateinput.selectedmessages.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ List of messages currently selected
-
 
 </td></tr>
 <tr><td>
 
 [sortColumn?](./mail.messageviewercreateinput.sortcolumn.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The column that is currently sorted in the viewer
-
 
 </td></tr>
 <tr><td>
 
 [sortedAscending?](./mail.messageviewercreateinput.sortedascending.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the viewer is sorted ascending or not
-
 
 </td></tr>
 <tr><td>
 
 [visibleColumns?](./mail.messageviewercreateinput.visiblecolumns.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ List of columns that are visible. The subject column and the message status column will always be visible
-
 
 </td></tr>
 <tr><td>
 
 [visibleMessages?](./mail.messageviewercreateinput.visiblemessages.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ List of messages currently being displayed in the viewer
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A Notes account
 **Signature:**
 
 ```typescript
-interface Account 
+interface Account
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Account
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./notes.account.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the account
-
 
 </td></tr>
 <tr><td>
 
 [name](./notes.account.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the account
-
 
 </td></tr>
 <tr><td>
 
 [upgraded](./notes.account.upgraded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the account has been upgraded
 
-
 </td></tr>
 </tbody></table>
-

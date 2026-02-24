@@ -11,7 +11,7 @@ List all desktopobjects.
 ```typescript
 list(): Promise<DesktopObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[DesktopObject](./finder.desktopobject.md)<!-- -->\[\]&gt;
-

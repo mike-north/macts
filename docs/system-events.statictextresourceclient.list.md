@@ -11,7 +11,7 @@ List all statictexts.
 ```typescript
 list(): Promise<StaticText[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[StaticText](./system-events.statictext.md)<!-- -->\[\]&gt;
-

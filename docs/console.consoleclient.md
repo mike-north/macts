@@ -9,19 +9,18 @@ Console client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class ConsoleClient 
+declare class ConsoleClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new ConsoleClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./console.consoleclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ConsoleClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,63 +57,51 @@ Constructs a new instance of the `ConsoleClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [devices](./console.consoleclient.devices.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DeviceResourceClient](./console.deviceresourceclient.md)
 
-
 </td><td>
 
 A device in Console
-
 
 </td></tr>
 <tr><td>
 
 [http](./console.consoleclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./console.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 </tbody></table>
@@ -131,31 +112,24 @@ Get the HTTP client for making custom requests.
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [selectDevice()](./console.consoleclient.selectdevice.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Select a device.
 
-
 </td></tr>
 </tbody></table>
-

@@ -11,7 +11,7 @@ List all colorwells.
 ```typescript
 list(): Promise<ColorWell[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ColorWell](./system-events.colorwell.md)<!-- -->\[\]&gt;
-

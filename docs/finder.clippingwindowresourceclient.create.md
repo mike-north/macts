@@ -18,30 +18,24 @@ create(input: ClippingWindowCreateInput): Promise<ClippingWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ClippingWindow](./finder.clippingwindow.md)<!-- -->&gt;
-

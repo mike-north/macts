@@ -9,7 +9,7 @@ Client for a unit of data in xml format.
 **Signature:**
 
 ```typescript
-declare class XMLElementResourceClient 
+declare class XMLElementResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class XMLElementResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.xmlelementresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `XMLElementResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `XMLElementResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.xmlelementresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new xmlelement.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.xmlelementresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a xmlelement.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.xmlelementresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a xmlelement by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.xmlelementresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all xmlelements.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.xmlelementresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing xmlelement.
 
-
 </td></tr>
 </tbody></table>
-

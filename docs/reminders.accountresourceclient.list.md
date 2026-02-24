@@ -11,7 +11,7 @@ List all accounts.
 ```typescript
 list(): Promise<Account[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Account](./reminders.account.md)<!-- -->\[\]&gt;
-

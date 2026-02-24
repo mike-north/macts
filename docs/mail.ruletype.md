@@ -9,5 +9,24 @@ RuleType
 **Signature:**
 
 ```typescript
-type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMessage' | 'fromHeader' | 'headerKey' | 'messageContent' | 'messageIsJunkMail' | 'senderIsInMyContacts' | 'senderIsInMyPreviousRecipients' | 'senderIsMemberOfGroup' | 'senderIsNotInMyContacts' | 'senderIsNotInMyPreviousRecipients' | 'senderIsNotMemberOfGroup' | 'senderIsVIP' | 'subjectHeader' | 'toHeader' | 'toOrCcHeader' | 'attachmentType';
+type RuleType =
+  | 'account'
+  | 'anyRecipient'
+  | 'ccHeader'
+  | 'matchesEveryMessage'
+  | 'fromHeader'
+  | 'headerKey'
+  | 'messageContent'
+  | 'messageIsJunkMail'
+  | 'senderIsInMyContacts'
+  | 'senderIsInMyPreviousRecipients'
+  | 'senderIsMemberOfGroup'
+  | 'senderIsNotInMyContacts'
+  | 'senderIsNotInMyPreviousRecipients'
+  | 'senderIsNotMemberOfGroup'
+  | 'senderIsVIP'
+  | 'subjectHeader'
+  | 'toHeader'
+  | 'toOrCcHeader'
+  | 'attachmentType'
 ```

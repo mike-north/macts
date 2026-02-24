@@ -11,7 +11,7 @@ List all headers.
 ```typescript
 list(): Promise<Header[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Header](./mail.header.md)<!-- -->\[\]&gt;
-

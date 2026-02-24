@@ -9,5 +9,5 @@ The Apple Menu Items folder
 **Signature:**
 
 ```typescript
-appleMenuFolder: Folder;
+appleMenuFolder: Folder
 ```

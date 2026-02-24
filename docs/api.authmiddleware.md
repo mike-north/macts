@@ -12,26 +12,25 @@ Expects `Authorization: Bearer macts_sk_...` header. On success, sets `apiKeyPay
 
 ```typescript
 declare function authMiddleware(): MiddlewareHandler<{
-    Variables: AuthVariables;
-}>;
+  Variables: AuthVariables
+}>
 ```
+
 **Returns:**
 
 MiddlewareHandler&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
 
 ## Example
 
-
 ```typescript
-import { Hono } from 'hono';
-import { authMiddleware } from './middleware/auth.js';
+import { Hono } from 'hono'
+import { authMiddleware } from './middleware/auth.js'
 
-const app = new Hono<{ Variables: AuthVariables }>();
-app.use('/api/*', authMiddleware());
+const app = new Hono<{ Variables: AuthVariables }>()
+app.use('/api/*', authMiddleware())
 
 app.get('/api/protected', (c) => {
-  const payload = c.get('apiKeyPayload');
-  return c.json({ keyId: payload.sub });
-});
+  const payload = c.get('apiKeyPayload')
+  return c.json({ keyId: payload.sub })
+})
 ```
-

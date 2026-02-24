@@ -9,19 +9,18 @@ iTerm client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class iTermClient 
+declare class iTermClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new iTermClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./iterm.itermclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `iTermClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,105 +57,85 @@ Constructs a new instance of the `iTermClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [http](./iterm.itermclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./iterm.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [sessions](./iterm.itermclient.sessions.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SessionResourceClient](./iterm.sessionresourceclient.md)
 
-
 </td><td>
 
 A terminal session
-
 
 </td></tr>
 <tr><td>
 
 [tabs](./iterm.itermclient.tabs.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TabResourceClient](./iterm.tabresourceclient.md)
 
-
 </td><td>
 
 A terminal tab
-
 
 </td></tr>
 <tr><td>
 
 [windows](./iterm.itermclient.windows.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [WindowResourceClient](./iterm.windowresourceclient.md)
 
-
 </td><td>
 
 A window.
-
 
 </td></tr>
 </tbody></table>
@@ -173,409 +146,321 @@ A window.
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [\_delete()](./iterm.itermclient._delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete an object.
-
 
 </td></tr>
 <tr><td>
 
 [close()](./iterm.itermclient.close.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Close a document.
-
 
 </td></tr>
 <tr><td>
 
 [count(each)](./iterm.itermclient.count.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Return the number of elements of a particular class within an object.
-
 
 </td></tr>
 <tr><td>
 
 [createHotkeyWindowWithProfile()](./iterm.itermclient.createhotkeywindowwithprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a hotkey window
-
 
 </td></tr>
 <tr><td>
 
 [createTab(withProfile, command)](./iterm.itermclient.createtab.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new tab
-
 
 </td></tr>
 <tr><td>
 
 [createTabWithDefaultProfile(command)](./iterm.itermclient.createtabwithdefaultprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new tab with the default profile
-
 
 </td></tr>
 <tr><td>
 
 [createWindowWithDefaultProfile(command)](./iterm.itermclient.createwindowwithdefaultprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new window with the default profile
-
 
 </td></tr>
 <tr><td>
 
 [createWindowWithProfile(command)](./iterm.itermclient.createwindowwithprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new window
-
 
 </td></tr>
 <tr><td>
 
 [duplicate(to, withProperties)](./iterm.itermclient.duplicate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Copy object(s) and put the copies at a new location.
-
 
 </td></tr>
 <tr><td>
 
 [exists()](./iterm.itermclient.exists.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Verify if an object exists.
-
 
 </td></tr>
 <tr><td>
 
 [hideHotkeyWindow()](./iterm.itermclient.hidehotkeywindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Hides a hotkey window. Only to be called on windows that are hotkey windows.
-
 
 </td></tr>
 <tr><td>
 
 [invokeAPIExpression()](./iterm.itermclient.invokeapiexpression.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Invokes an expression, such as a registered function.
-
 
 </td></tr>
 <tr><td>
 
 [launchAPIScriptNamed(\_arguments)](./iterm.itermclient.launchapiscriptnamed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Launch API script by name
-
 
 </td></tr>
 <tr><td>
 
 [make(\_new, at, withData, withProperties)](./iterm.itermclient.make.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Make a new object.
-
 
 </td></tr>
 <tr><td>
 
 [move(to)](./iterm.itermclient.move.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Move object(s) to a new location.
-
 
 </td></tr>
 <tr><td>
 
 [requestCookie(andKeyForAppNamed)](./iterm.itermclient.requestcookie.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Request a Python API cookie
-
 
 </td></tr>
 <tr><td>
 
 [revealHotkeyWindow()](./iterm.itermclient.revealhotkeywindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Reveals a hotkey window. Only to be called on windows that are hotkey windows.
-
 
 </td></tr>
 <tr><td>
 
 [select()](./iterm.itermclient.select.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Make receiver visible and selected.
-
 
 </td></tr>
 <tr><td>
 
 [setVariable(named, to)](./iterm.itermclient.setvariable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Sets the value of a session variable
-
 
 </td></tr>
 <tr><td>
 
 [splitHorizontally(withProfile, command)](./iterm.itermclient.splithorizontally.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session horizontally.
-
 
 </td></tr>
 <tr><td>
 
 [splitHorizontallyWithDefaultProfile(command)](./iterm.itermclient.splithorizontallywithdefaultprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session horizontally, using the default profile for the new session
-
 
 </td></tr>
 <tr><td>
 
 [splitHorizontallyWithSameProfile(command)](./iterm.itermclient.splithorizontallywithsameprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session horizontally, using the original session's profile for the new session
-
 
 </td></tr>
 <tr><td>
 
 [splitVertically(withProfile, command)](./iterm.itermclient.splitvertically.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session vertically.
-
 
 </td></tr>
 <tr><td>
 
 [splitVerticallyWithDefaultProfile(command)](./iterm.itermclient.splitverticallywithdefaultprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session vertically, using the default profile for the new session
-
 
 </td></tr>
 <tr><td>
 
 [splitVerticallyWithSameProfile(command)](./iterm.itermclient.splitverticallywithsameprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Split a session vertically, using the original session's profile for the new session
-
 
 </td></tr>
 <tr><td>
 
 [toggleHotkeyWindow()](./iterm.itermclient.togglehotkeywindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.
-
 
 </td></tr>
 <tr><td>
 
 [variable(named)](./iterm.itermclient.variable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Returns the value of a session variable with the given name
-
 
 </td></tr>
 <tr><td>
 
 [write(contentsOfFile, text, newline)](./iterm.itermclient.write.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Send text as though it was typed.
 
-
 </td></tr>
 </tbody></table>
-

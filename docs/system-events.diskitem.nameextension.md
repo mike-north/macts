@@ -9,5 +9,5 @@ the extension portion of the name
 **Signature:**
 
 ```typescript
-nameExtension: string;
+nameExtension: string
 ```

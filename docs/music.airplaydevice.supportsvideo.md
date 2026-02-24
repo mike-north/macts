@@ -9,5 +9,5 @@ does the device support video playback?
 **Signature:**
 
 ```typescript
-supportsVideo: boolean;
+supportsVideo: boolean
 ```

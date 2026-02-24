@@ -9,7 +9,7 @@ Options for listing API keys.
 **Signature:**
 
 ```typescript
-interface ListApiKeysOptions 
+interface ListApiKeysOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ListApiKeysOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [includeRevoked?](./api.listapikeysoptions.includerevoked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Include revoked keys
-
 
 </td></tr>
 <tr><td>
 
 [namePattern?](./api.listapikeysoptions.namepattern.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Filter by name pattern
 
-
 </td></tr>
 </tbody></table>
-

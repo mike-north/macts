@@ -9,5 +9,5 @@ the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-band8: number;
+band8: number
 ```

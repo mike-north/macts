@@ -11,7 +11,7 @@ List all relatednames.
 ```typescript
 list(): Promise<RelatedName[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RelatedName](./contacts.relatedname.md)<!-- -->\[\]&gt;
-

@@ -10,121 +10,99 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AttendeeResourceClient](./calendar.attendeeresourceclient.md)
 
-
 </td><td>
 
 Client for an event attendee.
-
 
 </td></tr>
 <tr><td>
 
 [CalendarClient](./calendar.calendarclient.md)
 
-
 </td><td>
 
 Calendar client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [CalendarError](./calendar.calendarerror.md)
 
-
 </td><td>
 
 Error class for Calendar API errors.
-
 
 </td></tr>
 <tr><td>
 
 [CalendarResourceClient](./calendar.calendarresourceclient.md)
 
-
 </td><td>
 
 Client for a calendar containing events.
-
 
 </td></tr>
 <tr><td>
 
 [DisplayAlarmResourceClient](./calendar.displayalarmresourceclient.md)
 
-
 </td><td>
 
 Client for a message/display alarm.
-
 
 </td></tr>
 <tr><td>
 
 [EventResourceClient](./calendar.eventresourceclient.md)
 
-
 </td><td>
 
 Client for a calendar event.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./calendar.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [MailAlarmResourceClient](./calendar.mailalarmresourceclient.md)
 
-
 </td><td>
 
 Client for a mail/email alarm.
-
 
 </td></tr>
 <tr><td>
 
 [OpenFileAlarmResourceClient](./calendar.openfilealarmresourceclient.md)
 
-
 </td><td>
 
 Client for an 'open file' alarm.
-
 
 </td></tr>
 <tr><td>
 
 [SoundAlarmResourceClient](./calendar.soundalarmresourceclient.md)
 
-
 </td><td>
 
 Client for a sound alarm.
-
 
 </td></tr>
 </tbody></table>
@@ -135,176 +113,144 @@ Client for a sound alarm.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Attendee](./calendar.attendee.md)
 
-
 </td><td>
 
 An event attendee
-
 
 </td></tr>
 <tr><td>
 
 [AttendeeCreateInput](./calendar.attendeecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Attendee
-
 
 </td></tr>
 <tr><td>
 
 [Calendar](./calendar.calendar.md)
 
-
 </td><td>
 
 A calendar containing events
-
 
 </td></tr>
 <tr><td>
 
 [CalendarClientOptions](./calendar.calendarclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [CalendarCreateInput](./calendar.calendarcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Calendar
-
 
 </td></tr>
 <tr><td>
 
 [DisplayAlarm](./calendar.displayalarm.md)
 
-
 </td><td>
 
 A message/display alarm
-
 
 </td></tr>
 <tr><td>
 
 [DisplayAlarmCreateInput](./calendar.displayalarmcreateinput.md)
 
-
 </td><td>
 
 Input for creating a DisplayAlarm
 
-
 </td></tr>
 <tr><td>
 
-[Event\_2](./calendar.event_2.md)
-
+[Event_2](./calendar.event_2.md)
 
 </td><td>
 
 A calendar event
-
 
 </td></tr>
 <tr><td>
 
 [EventCreateInput](./calendar.eventcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Event
-
 
 </td></tr>
 <tr><td>
 
 [MailAlarm](./calendar.mailalarm.md)
 
-
 </td><td>
 
 A mail/email alarm
-
 
 </td></tr>
 <tr><td>
 
 [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
 
-
 </td><td>
 
 Input for creating a MailAlarm
-
 
 </td></tr>
 <tr><td>
 
 [OpenFileAlarm](./calendar.openfilealarm.md)
 
-
 </td><td>
 
 An 'open file' alarm
-
 
 </td></tr>
 <tr><td>
 
 [OpenFileAlarmCreateInput](./calendar.openfilealarmcreateinput.md)
 
-
 </td><td>
 
 Input for creating a OpenFileAlarm
-
 
 </td></tr>
 <tr><td>
 
 [SoundAlarm](./calendar.soundalarm.md)
 
-
 </td><td>
 
 A sound alarm
-
 
 </td></tr>
 <tr><td>
 
 [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
 
-
 </td><td>
 
 Input for creating a SoundAlarm
-
 
 </td></tr>
 </tbody></table>
@@ -315,74 +261,58 @@ Input for creating a SoundAlarm
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AttendeeSchema](./calendar.attendeeschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CalendarSchema](./calendar.calendarschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DisplayAlarmSchema](./calendar.displayalarmschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [EventSchema](./calendar.eventschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [MailAlarmSchema](./calendar.mailalarmschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [OpenFileAlarmSchema](./calendar.openfilealarmschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [SoundAlarmSchema](./calendar.soundalarmschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -393,133 +323,108 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AttendeeUpdateInput](./calendar.attendeeupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Attendee
-
 
 </td></tr>
 <tr><td>
 
 [CalendarPriority](./calendar.calendarpriority.md)
 
-
 </td><td>
 
 Priority level for calendar items
-
 
 </td></tr>
 <tr><td>
 
 [CalendarUpdateInput](./calendar.calendarupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Calendar
-
 
 </td></tr>
 <tr><td>
 
 [DisplayAlarmUpdateInput](./calendar.displayalarmupdateinput.md)
 
-
 </td><td>
 
 Input for updating a DisplayAlarm
-
 
 </td></tr>
 <tr><td>
 
 [EventStatus](./calendar.eventstatus.md)
 
-
 </td><td>
 
 Status of a calendar event
-
 
 </td></tr>
 <tr><td>
 
 [EventUpdateInput](./calendar.eventupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Event
-
 
 </td></tr>
 <tr><td>
 
 [MailAlarmUpdateInput](./calendar.mailalarmupdateinput.md)
 
-
 </td><td>
 
 Input for updating a MailAlarm
-
 
 </td></tr>
 <tr><td>
 
 [OpenFileAlarmUpdateInput](./calendar.openfilealarmupdateinput.md)
 
-
 </td><td>
 
 Input for updating a OpenFileAlarm
-
 
 </td></tr>
 <tr><td>
 
 [ParticipationStatus](./calendar.participationstatus.md)
 
-
 </td><td>
 
 Status of an attendee's response to an invitation
-
 
 </td></tr>
 <tr><td>
 
 [SoundAlarmUpdateInput](./calendar.soundalarmupdateinput.md)
 
-
 </td><td>
 
 Input for updating a SoundAlarm
-
 
 </td></tr>
 <tr><td>
 
 [ViewType](./calendar.viewtype.md)
 
-
 </td><td>
 
 Calendar view type
 
-
 </td></tr>
 </tbody></table>
-

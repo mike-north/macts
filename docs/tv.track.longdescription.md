@@ -9,5 +9,5 @@ the long description of the track
 **Signature:**
 
 ```typescript
-longDescription: string;
+longDescription: string
 ```

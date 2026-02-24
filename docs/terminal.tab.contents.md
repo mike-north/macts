@@ -9,5 +9,5 @@ The visible contents of the tab
 **Signature:**
 
 ```typescript
-contents: string;
+contents: string
 ```

@@ -9,7 +9,7 @@ Input for creating a Service
 **Signature:**
 
 ```typescript
-interface ServiceCreateInput 
+interface ServiceCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface ServiceCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentConfiguration?](./system-events.servicecreateinput.currentconfiguration.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Configuration](./system-events.configuration.md)
 
-
 </td><td>
 
 _(Optional)_ the currently selected configuration
-
 
 </td></tr>
 <tr><td>
 
 [name?](./system-events.servicecreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the service
 
-
 </td></tr>
 </tbody></table>
-

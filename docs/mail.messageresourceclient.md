@@ -9,7 +9,7 @@ Client for an email message.
 **Signature:**
 
 ```typescript
-declare class MessageResourceClient 
+declare class MessageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MessageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.messageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MessageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,143 +46,112 @@ Constructs a new instance of the `MessageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [bounce()](./mail.messageresourceclient.bounce.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [create(input)](./mail.messageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new message.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.messageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a message.
-
 
 </td></tr>
 <tr><td>
 
 [forward(openingWindow)](./mail.messageresourceclient.forward.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Creates a forwarded message.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.messageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a message by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.messageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all messages.
-
 
 </td></tr>
 <tr><td>
 
 [redirect(openingWindow)](./mail.messageresourceclient.redirect.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Creates a redirected message.
-
 
 </td></tr>
 <tr><td>
 
 [reply(openingWindow, replyToAll)](./mail.messageresourceclient.reply.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Creates a reply message.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.messageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing message.
 
-
 </td></tr>
 </tbody></table>
-

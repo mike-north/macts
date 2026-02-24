@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { AlfredClient, type AlfredClientOptions } from '@macts/alfred';
+import { AlfredClient, type AlfredClientOptions } from '@macts/alfred'
 
 /**
  * Get a AlfredClient instance.
@@ -16,32 +16,32 @@ import { AlfredClient, type AlfredClientOptions } from '@macts/alfred';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getAlfredClient(): AlfredClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions alfred:*:*'
-    );
+    )
   }
 
   const options: AlfredClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new AlfredClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new AlfredClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: AlfredClient | null = null;
+let _client: AlfredClient | null = null
 
 /**
  * Get or create the singleton AlfredClient.
@@ -50,8 +50,8 @@ let _client: AlfredClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): AlfredClient {
-  _client ??= getAlfredClient();
-  return _client;
+  _client ??= getAlfredClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): AlfredClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

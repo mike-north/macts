@@ -9,7 +9,7 @@ Input for updating a ValueIndicator
 **Signature:**
 
 ```typescript
-type ValueIndicatorUpdateInput = Partial<ValueIndicatorCreateInput>;
+type ValueIndicatorUpdateInput = Partial<ValueIndicatorCreateInput>
 ```
-**References:** [ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)
 
+**References:** [ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)

@@ -9,5 +9,5 @@ the equalizer preamp level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-preamp: number;
+preamp: number
 ```

@@ -9,5 +9,5 @@ The name of the note (first line)
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

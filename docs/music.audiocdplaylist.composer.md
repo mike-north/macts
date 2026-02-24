@@ -9,5 +9,5 @@ the composer of the CD
 **Signature:**
 
 ```typescript
-composer: string;
+composer: string
 ```

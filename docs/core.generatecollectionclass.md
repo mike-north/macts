@@ -9,7 +9,10 @@ Generate collection class code.
 **Signature:**
 
 ```typescript
-declare function generateCollectionClass(resource: Resource, _ctx: GeneratorContext): GeneratedCollection;
+declare function generateCollectionClass(
+  resource: Resource,
+  _ctx: GeneratorContext
+): GeneratedCollection
 ```
 
 ## Parameters
@@ -18,44 +21,35 @@ declare function generateCollectionClass(resource: Resource, _ctx: GeneratorCont
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 resource
 
-
 </td><td>
 
 [Resource](./core.resource.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 \_ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +57,3 @@ resource
 **Returns:**
 
 [GeneratedCollection](./core.generatedcollection.md)
-

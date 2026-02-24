@@ -9,5 +9,5 @@
 **Signature:**
 
 ```typescript
-clippingWindow: string;
+clippingWindow: string
 ```

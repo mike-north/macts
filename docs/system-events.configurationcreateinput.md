@@ -9,7 +9,7 @@ Input for creating a Configuration
 **Signature:**
 
 ```typescript
-interface ConfigurationCreateInput 
+interface ConfigurationCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ConfigurationCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accountName?](./system-events.configurationcreateinput.accountname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name used to authenticate
 
-
 </td></tr>
 </tbody></table>
-

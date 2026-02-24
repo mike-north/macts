@@ -10,7 +10,7 @@ Command scope - whether command operates on application or specific resource.
 
 ```typescript
 CommandScopeSchema: z.ZodEnum<{
-    resource: "resource";
-    application: "application";
+  resource: 'resource'
+  application: 'application'
 }>
 ```

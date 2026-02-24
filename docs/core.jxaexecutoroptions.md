@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface JxaExecutorOptions 
+interface JxaExecutorOptions
 ```
 
 ## Properties
@@ -16,60 +16,47 @@ interface JxaExecutorOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [onStderr?](./core.jxaexecutoroptions.onstderr.md)
 
-
 </td><td>
-
 
 </td><td>
 
 (msg: string) =&gt; void
 
-
 </td><td>
 
 _(Optional)_ Optional callback for stderr output. Defaults to console.warn if not provided.
-
 
 </td></tr>
 <tr><td>
 
 [timeout?](./core.jxaexecutoroptions.timeout.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_
 
-
 </td></tr>
 </tbody></table>
-

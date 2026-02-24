@@ -18,30 +18,24 @@ create(input: BusyIndicatorCreateInput): Promise<BusyIndicator>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[BusyIndicator](./system-events.busyindicator.md)<!-- -->&gt;
-

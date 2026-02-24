@@ -9,5 +9,5 @@ the short name of the file from which the process was launched
 **Signature:**
 
 ```typescript
-shortName: string;
+shortName: string
 ```

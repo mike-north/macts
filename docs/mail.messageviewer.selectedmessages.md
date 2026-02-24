@@ -9,5 +9,5 @@ List of messages currently selected
 **Signature:**
 
 ```typescript
-selectedMessages: string;
+selectedMessages: string
 ```
