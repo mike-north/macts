@@ -11,7 +11,7 @@ Reveals a hotkey window. Only to be called on windows that are hotkey windows.
 ```typescript
 revealHotkeyWindow(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

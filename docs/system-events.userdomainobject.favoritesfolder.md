@@ -9,5 +9,5 @@ The user's Favorites folder
 **Signature:**
 
 ```typescript
-favoritesFolder: Folder;
+favoritesFolder: Folder
 ```

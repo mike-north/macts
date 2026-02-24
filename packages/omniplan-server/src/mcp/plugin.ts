@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS OmniPlan.app automation.
@@ -16,4 +16,4 @@ export const omniplanPlugin: McpPlugin = {
   name: 'omniplan',
   description: 'MCP plugin for macOS OmniPlan.app automation',
   tools: allTools,
-};
+}

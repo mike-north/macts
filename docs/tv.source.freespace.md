@@ -9,5 +9,5 @@ the free space on the source if it has a fixed size
 **Signature:**
 
 ```typescript
-freeSpace: number;
+freeSpace: number
 ```

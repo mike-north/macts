@@ -9,5 +9,5 @@ Input for creating a SplitterGroup
 **Signature:**
 
 ```typescript
-interface SplitterGroupCreateInput 
+interface SplitterGroupCreateInput
 ```

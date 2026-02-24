@@ -9,7 +9,7 @@ An application's file on disk
 **Signature:**
 
 ```typescript
-interface ApplicationFile 
+interface ApplicationFile
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface ApplicationFile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [acceptsHighLevelEvents](./finder.applicationfile.acceptshighlevelevents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the application high-level event aware? (OBSOLETE: always returns true)
-
 
 </td></tr>
 <tr><td>
 
 [hasScriptingTerminology](./finder.applicationfile.hasscriptingterminology.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Does the process have a scripting terminology, i.e., can it be scripted?
-
 
 </td></tr>
 <tr><td>
 
 [id](./finder.applicationfile.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the bundle identifier or creator type of the application
-
 
 </td></tr>
 <tr><td>
 
 [minimumSize](./finder.applicationfile.minimumsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
-
 
 </td></tr>
 <tr><td>
 
 [opensInClassic](./finder.applicationfile.opensinclassic.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
-
 
 </td></tr>
 <tr><td>
 
 [preferredSize](./finder.applicationfile.preferredsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched
-
 
 </td></tr>
 <tr><td>
 
 [suggestedSize](./finder.applicationfile.suggestedsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 (AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched
 
-
 </td></tr>
 </tbody></table>
-

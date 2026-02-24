@@ -10,8 +10,8 @@ The underlineColor property
 
 ```typescript
 underlineColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

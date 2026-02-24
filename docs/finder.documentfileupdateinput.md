@@ -9,7 +9,7 @@ Input for updating a DocumentFile
 **Signature:**
 
 ```typescript
-type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>;
+type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>
 ```
-**References:** [DocumentFileCreateInput](./finder.documentfilecreateinput.md)
 
+**References:** [DocumentFileCreateInput](./finder.documentfilecreateinput.md)

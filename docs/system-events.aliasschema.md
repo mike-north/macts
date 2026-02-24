@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-AliasSchema: z.ZodObject<{
-    creatorType: z.ZodString;
-    defaultApplication: z.ZodString;
-    fileType: z.ZodString;
-    kind: z.ZodString;
-    productVersion: z.ZodString;
-    shortVersion: z.ZodString;
-    stationery: z.ZodBoolean;
-    typeIdentifier: z.ZodString;
-    version: z.ZodString;
-}, z.core.$strip>
+AliasSchema: z.ZodObject<
+  {
+    creatorType: z.ZodString
+    defaultApplication: z.ZodString
+    fileType: z.ZodString
+    kind: z.ZodString
+    productVersion: z.ZodString
+    shortVersion: z.ZodString
+    stationery: z.ZodBoolean
+    typeIdentifier: z.ZodString
+    version: z.ZodString
+  },
+  z.core.$strip
+>
 ```

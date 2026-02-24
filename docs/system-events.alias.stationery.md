@@ -9,5 +9,5 @@ Is the alias a stationery pad?
 **Signature:**
 
 ```typescript
-stationery: boolean;
+stationery: boolean
 ```

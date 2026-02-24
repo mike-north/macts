@@ -9,5 +9,5 @@ The title of the bookmark item.
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

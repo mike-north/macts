@@ -9,7 +9,7 @@ A menu item belonging to a menu
 **Signature:**
 
 ```typescript
-interface MenuItem 
+interface MenuItem
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface MenuItem
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.menuitem.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this menu item
 
-
 </td></tr>
 </tbody></table>
-

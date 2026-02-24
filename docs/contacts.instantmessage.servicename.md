@@ -9,5 +9,5 @@ The service name of this instant message address.
 **Signature:**
 
 ```typescript
-serviceName: string;
+serviceName: string
 ```

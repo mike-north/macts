@@ -9,5 +9,5 @@ The name of the settings pane.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

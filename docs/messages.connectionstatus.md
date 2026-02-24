@@ -9,5 +9,5 @@ ConnectionStatus
 **Signature:**
 
 ```typescript
-type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected';
+type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'disconnected'
 ```

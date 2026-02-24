@@ -9,7 +9,7 @@ Input for creating a UIElement
 **Signature:**
 
 ```typescript
-interface UIElementCreateInput 
+interface UIElementCreateInput
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface UIElementCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [focused?](./system-events.uielementcreateinput.focused.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Is the focus on this UI element?
-
 
 </td></tr>
 <tr><td>
 
 [position?](./system-events.uielementcreateinput.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the position of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [selected?](./system-events.uielementcreateinput.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Is the UI element selected?
-
 
 </td></tr>
 <tr><td>
 
 [size?](./system-events.uielementcreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the size of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [value?](./system-events.uielementcreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the current value of the UI element
 
-
 </td></tr>
 </tbody></table>
-

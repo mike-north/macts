@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type RgbType = z.infer<typeof RgbTypeSchema>;
+type RgbType = z.infer<typeof RgbTypeSchema>
 ```
-**References:** [RgbTypeSchema](./core.rgbtypeschema.md)
 
+**References:** [RgbTypeSchema](./core.rgbtypeschema.md)

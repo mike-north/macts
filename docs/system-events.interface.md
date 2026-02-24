@@ -9,7 +9,7 @@ A collection of settings for a network interface
 **Signature:**
 
 ```typescript
-interface Interface 
+interface Interface
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface Interface
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [automatic](./system-events.interface.automatic.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 configure the interface speed, duplex, and mtu automatically?
-
 
 </td></tr>
 <tr><td>
 
 [duplex](./system-events.interface.duplex.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the duplex setting half \| full \| full with flow control
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.interface.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier for the interface
-
 
 </td></tr>
 <tr><td>
 
 [kind](./system-events.interface.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the type of interface
-
 
 </td></tr>
 <tr><td>
 
 [mACAddress](./system-events.interface.macaddress.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the MAC address for the interface
-
 
 </td></tr>
 <tr><td>
 
 [mtu](./system-events.interface.mtu.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the packet size
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.interface.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the interface
-
 
 </td></tr>
 <tr><td>
 
 [speed](./system-events.interface.speed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 ethernet speed 10 \| 100 \| 1000
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ the width of this column
 **Signature:**
 
 ```typescript
-width: number;
+width: number
 ```

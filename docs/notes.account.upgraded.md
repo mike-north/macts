@@ -9,5 +9,5 @@ Whether the account has been upgraded
 **Signature:**
 
 ```typescript
-upgraded: boolean;
+upgraded: boolean
 ```

@@ -11,7 +11,7 @@ List all menubaritems.
 ```typescript
 list(): Promise<MenuBarItem[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MenuBarItem](./system-events.menubaritem.md)<!-- -->\[\]&gt;
-

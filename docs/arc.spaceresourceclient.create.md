@@ -18,30 +18,24 @@ create(input: SpaceCreateInput): Promise<Space>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SpaceCreateInput](./arc.spacecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Space](./arc.space.md)<!-- -->&gt;
-

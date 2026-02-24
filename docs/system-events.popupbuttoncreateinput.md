@@ -9,5 +9,5 @@ Input for creating a PopUpButton
 **Signature:**
 
 ```typescript
-interface PopUpButtonCreateInput 
+interface PopUpButtonCreateInput
 ```

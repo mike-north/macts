@@ -9,5 +9,5 @@ Unique identifier for this document
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

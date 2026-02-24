@@ -9,5 +9,5 @@ the file system path of the disk item
 **Signature:**
 
 ```typescript
-path: string;
+path: string
 ```

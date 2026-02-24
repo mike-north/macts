@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-DisplayAlarmSchema: z.ZodObject<{
-    triggerInterval: z.ZodNumber;
-    triggerDate: z.ZodString;
-}, z.core.$strip>
+DisplayAlarmSchema: z.ZodObject<
+  {
+    triggerInterval: z.ZodNumber
+    triggerDate: z.ZodString
+  },
+  z.core.$strip
+>
 ```

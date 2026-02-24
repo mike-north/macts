@@ -9,5 +9,5 @@ The document name
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

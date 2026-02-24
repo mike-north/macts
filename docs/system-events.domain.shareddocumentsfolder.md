@@ -9,5 +9,5 @@ The Shared Documents folder
 **Signature:**
 
 ```typescript
-sharedDocumentsFolder: Folder;
+sharedDocumentsFolder: Folder
 ```

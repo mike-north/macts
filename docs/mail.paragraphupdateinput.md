@@ -9,7 +9,7 @@ Input for updating a Paragraph
 **Signature:**
 
 ```typescript
-type ParagraphUpdateInput = Partial<ParagraphCreateInput>;
+type ParagraphUpdateInput = Partial<ParagraphCreateInput>
 ```
-**References:** [ParagraphCreateInput](./mail.paragraphcreateinput.md)
 
+**References:** [ParagraphCreateInput](./mail.paragraphcreateinput.md)

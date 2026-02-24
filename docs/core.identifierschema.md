@@ -9,8 +9,11 @@ Identifier configuration for a resource.
 **Signature:**
 
 ```typescript
-IdentifierSchema: z.ZodObject<{
-    property: z.ZodString;
-    primary: z.ZodDefault<z.ZodBoolean>;
-}, z.core.$strip>
+IdentifierSchema: z.ZodObject<
+  {
+    property: z.ZodString
+    primary: z.ZodDefault<z.ZodBoolean>
+  },
+  z.core.$strip
+>
 ```

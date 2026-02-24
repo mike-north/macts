@@ -9,5 +9,5 @@ The terminal is at the shell prompt. Requires shell integration.
 **Signature:**
 
 ```typescript
-isAtShellPrompt: boolean;
+isAtShellPrompt: boolean
 ```

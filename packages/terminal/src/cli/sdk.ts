@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { TerminalClient, type TerminalClientOptions } from '../client.js';
+import { TerminalClient, type TerminalClientOptions } from '../client.js'
 
 /**
  * Get a TerminalClient instance.
@@ -16,32 +16,32 @@ import { TerminalClient, type TerminalClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getTerminalClient(): TerminalClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions terminal:*:*'
-    );
+    )
   }
 
   const options: TerminalClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new TerminalClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new TerminalClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: TerminalClient | null = null;
+let _client: TerminalClient | null = null
 
 /**
  * Get or create the singleton TerminalClient.
@@ -50,8 +50,8 @@ let _client: TerminalClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): TerminalClient {
-  _client ??= getTerminalClient();
-  return _client;
+  _client ??= getTerminalClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): TerminalClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

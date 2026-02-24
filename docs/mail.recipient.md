@@ -9,7 +9,7 @@ An email recipient
 **Signature:**
 
 ```typescript
-interface Recipient 
+interface Recipient
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Recipient
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [address](./mail.recipient.address.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The recipients email address
-
 
 </td></tr>
 <tr><td>
 
 [name](./mail.recipient.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name used for display
 
-
 </td></tr>
 </tbody></table>
-

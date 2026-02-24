@@ -9,7 +9,7 @@ An alias file (created with “Make Alias”)
 **Signature:**
 
 ```typescript
-interface AliasFile 
+interface AliasFile
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AliasFile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [originalItem](./finder.aliasfile.originalitem.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the original item pointed to by the alias
 
-
 </td></tr>
 </tbody></table>
-

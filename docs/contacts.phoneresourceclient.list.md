@@ -11,7 +11,7 @@ List all phones.
 ```typescript
 list(): Promise<Phone[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Phone](./contacts.phone.md)<!-- -->\[\]&gt;
-

@@ -11,7 +11,7 @@ List all networkdomainobjects.
 ```typescript
 list(): Promise<NetworkDomainObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[NetworkDomainObject](./system-events.networkdomainobject.md)<!-- -->\[\]&gt;
-

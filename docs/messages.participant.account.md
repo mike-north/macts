@@ -9,5 +9,5 @@ The account for this participant.
 **Signature:**
 
 ```typescript
-account: Account;
+account: Account
 ```

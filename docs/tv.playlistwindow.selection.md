@@ -9,5 +9,5 @@ the selected tracks
 **Signature:**
 
 ```typescript
-selection: string;
+selection: string
 ```

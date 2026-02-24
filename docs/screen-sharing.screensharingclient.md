@@ -9,19 +9,18 @@ ScreenSharing client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class ScreenSharingClient 
+declare class ScreenSharingClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new ScreenSharingClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./screen-sharing.screensharingclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScreenSharingClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,63 +57,51 @@ Constructs a new instance of the `ScreenSharingClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [connections](./screen-sharing.screensharingclient.connections.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ConnectionResourceClient](./screen-sharing.connectionresourceclient.md)
 
-
 </td><td>
 
 A screen sharing connection
-
 
 </td></tr>
 <tr><td>
 
 [http](./screen-sharing.screensharingclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./screen-sharing.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 </tbody></table>
@@ -131,31 +112,24 @@ Get the HTTP client for making custom requests.
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [getURL()](./screen-sharing.screensharingclient.geturl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Open a vnc URL
 
-
 </td></tr>
 </tbody></table>
-

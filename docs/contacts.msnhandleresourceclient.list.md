@@ -11,7 +11,7 @@ List all msnhandles.
 ```typescript
 list(): Promise<MSNHandle[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MSNHandle](./contacts.msnhandle.md)<!-- -->\[\]&gt;
-

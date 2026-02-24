@@ -9,5 +9,5 @@ File path relative to src/commands
 **Signature:**
 
 ```typescript
-path: string;
+path: string
 ```

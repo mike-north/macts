@@ -9,5 +9,5 @@ The name of the account
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

@@ -9,5 +9,5 @@ Unique identifier for this incrementor
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

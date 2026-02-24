@@ -9,7 +9,7 @@ Client for an email recipient.
 **Signature:**
 
 ```typescript
-declare class RecipientResourceClient 
+declare class RecipientResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RecipientResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.recipientresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RecipientResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RecipientResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.recipientresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new recipient.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.recipientresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a recipient.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.recipientresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a recipient by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.recipientresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all recipients.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.recipientresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing recipient.
 
-
 </td></tr>
 </tbody></table>
-

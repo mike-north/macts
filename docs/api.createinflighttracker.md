@@ -11,8 +11,9 @@ Use this to implement graceful shutdown by waiting for all active requests to co
 **Signature:**
 
 ```typescript
-declare function createInFlightTracker(): InFlightTracker;
+declare function createInFlightTracker(): InFlightTracker
 ```
+
 **Returns:**
 
 [InFlightTracker](./api.inflighttracker.md)
@@ -21,12 +22,10 @@ An in-flight request tracker
 
 ## Example
 
-
 ```typescript
-const tracker = createInFlightTracker();
-app.use('*', tracker.middleware());
+const tracker = createInFlightTracker()
+app.use('*', tracker.middleware())
 
 // During shutdown:
-await tracker.waitForDrain(10_000);
+await tracker.waitForDrain(10_000)
 ```
-

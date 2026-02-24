@@ -11,7 +11,7 @@ Prompt for authorization for a settings pane. Deprecated: no longer does anythin
 ```typescript
 authorize(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

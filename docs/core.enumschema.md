@@ -9,15 +9,23 @@ Schema for an enumeration type.
 **Signature:**
 
 ```typescript
-EnumSchema: z.ZodObject<{
-    name: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    code: z.ZodOptional<z.ZodString>;
-    values: z.ZodArray<z.ZodObject<{
-        name: z.ZodString;
-        value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>;
-        description: z.ZodOptional<z.ZodString>;
-        code: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>;
-}, z.core.$strip>
+EnumSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    description: z.ZodOptional<z.ZodString>
+    code: z.ZodOptional<z.ZodString>
+    values: z.ZodArray<
+      z.ZodObject<
+        {
+          name: z.ZodString
+          value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>
+          description: z.ZodOptional<z.ZodString>
+          code: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strip
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The user name of this instant message address.
 **Signature:**
 
 ```typescript
-userName: string;
+userName: string
 ```

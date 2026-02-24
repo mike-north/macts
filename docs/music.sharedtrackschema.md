@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-SharedTrackSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+SharedTrackSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

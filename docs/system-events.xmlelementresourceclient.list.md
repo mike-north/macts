@@ -11,7 +11,7 @@ List all xmlelements.
 ```typescript
 list(): Promise<XMLElement[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[XMLElement](./system-events.xmlelement.md)<!-- -->\[\]&gt;
-

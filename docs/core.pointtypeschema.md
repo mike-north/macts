@@ -9,8 +9,11 @@ Point with x, y coordinates.
 **Signature:**
 
 ```typescript
-PointTypeSchema: z.ZodObject<{
-    x: z.ZodNumber;
-    y: z.ZodNumber;
-}, z.core.$strip>
+PointTypeSchema: z.ZodObject<
+  {
+    x: z.ZodNumber
+    y: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

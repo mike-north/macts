@@ -11,7 +11,7 @@ Quit the application
 ```typescript
 quit(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ an AirPlay device
 **Signature:**
 
 ```typescript
-interface AirPlayDevice 
+interface AirPlayDevice
 ```
 
 ## Properties
@@ -18,193 +18,152 @@ interface AirPlayDevice
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [active](./music.airplaydevice.active.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the device currently being played to?
-
 
 </td></tr>
 <tr><td>
 
 [available](./music.airplaydevice.available.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the device currently available?
-
 
 </td></tr>
 <tr><td>
 
 [kind](./music.airplaydevice.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the kind of the device
-
 
 </td></tr>
 <tr><td>
 
 [networkAddress](./music.airplaydevice.networkaddress.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the network (MAC) address of the device
-
 
 </td></tr>
 <tr><td>
 
 [protected](./music.airplaydevice.protected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the device password- or passcode-protected?
-
 
 </td></tr>
 <tr><td>
 
 [selected](./music.airplaydevice.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is the device currently selected?
-
 
 </td></tr>
 <tr><td>
 
 [soundVolume](./music.airplaydevice.soundvolume.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the output volume for the device (0 = minimum, 100 = maximum)
-
 
 </td></tr>
 <tr><td>
 
 [supportsAudio](./music.airplaydevice.supportsaudio.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 does the device support audio playback?
-
 
 </td></tr>
 <tr><td>
 
 [supportsVideo](./music.airplaydevice.supportsvideo.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 does the device support video playback?
 
-
 </td></tr>
 </tbody></table>
-

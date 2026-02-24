@@ -18,30 +18,24 @@ create(input: DiskCreateInput): Promise<Disk>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DiskCreateInput](./system-events.diskcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Disk](./system-events.disk.md)<!-- -->&gt;
-

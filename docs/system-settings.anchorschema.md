@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-AnchorSchema: z.ZodObject<{
-    name: z.ZodString;
-}, z.core.$strip>
+AnchorSchema: z.ZodObject<
+  {
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-band2: number;
+band2: number
 ```

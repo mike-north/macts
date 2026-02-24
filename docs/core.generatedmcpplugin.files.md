@@ -10,7 +10,8 @@ All generated files as path/content pairs
 
 ```typescript
 files: {
-        path: string;
-        content: string;
-    }[];
+  path: string
+  content: string
+}
+;[]
 ```

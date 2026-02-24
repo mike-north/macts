@@ -18,30 +18,24 @@ create(input: SystemDomainObjectCreateInput): Promise<SystemDomainObject>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[SystemDomainObject](./system-events.systemdomainobject.md)<!-- -->&gt;
-

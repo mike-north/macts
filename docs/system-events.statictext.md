@@ -9,7 +9,7 @@ A static text field belonging to a window
 **Signature:**
 
 ```typescript
-interface StaticText 
+interface StaticText
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface StaticText
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.statictext.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this static text
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ the current value of the UI element
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

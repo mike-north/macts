@@ -9,7 +9,7 @@ Client for represents an inline text attachment. this class is used mainly for m
 **Signature:**
 
 ```typescript
-declare class AttachmentResourceClient 
+declare class AttachmentResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AttachmentResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.attachmentresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AttachmentResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AttachmentResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.attachmentresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new attachment.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.attachmentresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a attachment.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.attachmentresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a attachment by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.attachmentresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all attachments.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.attachmentresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing attachment.
 
-
 </td></tr>
 </tbody></table>
-

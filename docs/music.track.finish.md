@@ -9,5 +9,5 @@ the stop time of the track in seconds
 **Signature:**
 
 ```typescript
-finish: number;
+finish: number
 ```

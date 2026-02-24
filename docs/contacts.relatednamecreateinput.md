@@ -9,7 +9,7 @@ Input for creating a RelatedName
 **Signature:**
 
 ```typescript
-interface RelatedNameCreateInput 
+interface RelatedNameCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface RelatedNameCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.relatednamecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this name
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.relatednamecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The related name value
 
-
 </td></tr>
 </tbody></table>
-

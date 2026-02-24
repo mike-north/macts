@@ -9,7 +9,7 @@ Input for updating a ScriptingCommand
 **Signature:**
 
 ```typescript
-type ScriptingCommandUpdateInput = Partial<ScriptingCommandCreateInput>;
+type ScriptingCommandUpdateInput = Partial<ScriptingCommandCreateInput>
 ```
-**References:** [ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)
 
+**References:** [ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)

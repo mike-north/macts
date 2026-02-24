@@ -11,7 +11,7 @@ Command to get the full name out of a fully specified email address. E.g. Callin
 ```typescript
 extractNameFrom(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

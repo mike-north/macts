@@ -69,7 +69,7 @@ function execFileAsync(command: string, args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     execFile(command, args, (error, stdout) => {
       if (error) {
-        reject(error)
+        reject(error instanceof Error ? error : new Error(JSON.stringify(error)))
       } else {
         resolve(stdout)
       }

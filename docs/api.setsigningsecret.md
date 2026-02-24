@@ -9,7 +9,7 @@ Set a custom signing secret.
 **Signature:**
 
 ```typescript
-declare function setSigningSecret(secret: string): Promise<void>;
+declare function setSigningSecret(secret: string): Promise<void>
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function setSigningSecret(secret: string): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 secret
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The secret to store
-
 
 </td></tr>
 </tbody></table>
@@ -51,4 +45,3 @@ The secret to store
 **Returns:**
 
 Promise&lt;void&gt;
-

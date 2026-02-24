@@ -9,5 +9,5 @@ Input for creating a Attachment
 **Signature:**
 
 ```typescript
-interface AttachmentCreateInput 
+interface AttachmentCreateInput
 ```

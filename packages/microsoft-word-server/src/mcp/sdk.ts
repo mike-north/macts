@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { MicrosoftWordClient, type MicrosoftWordClientOptions } from '@macts/microsoft-word';
+import { MicrosoftWordClient, type MicrosoftWordClientOptions } from '@macts/microsoft-word'
 
 /**
  * Get a MicrosoftWordClient instance.
@@ -16,32 +16,32 @@ import { MicrosoftWordClient, type MicrosoftWordClientOptions } from '@macts/mic
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getMicrosoftWordClient(): MicrosoftWordClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions microsoft-word:*:*'
-    );
+    )
   }
 
   const options: MicrosoftWordClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new MicrosoftWordClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new MicrosoftWordClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: MicrosoftWordClient | null = null;
+let _client: MicrosoftWordClient | null = null
 
 /**
  * Get or create the singleton MicrosoftWordClient.
@@ -50,8 +50,8 @@ let _client: MicrosoftWordClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): MicrosoftWordClient {
-  _client ??= getMicrosoftWordClient();
-  return _client;
+  _client ??= getMicrosoftWordClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): MicrosoftWordClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

@@ -11,7 +11,7 @@ Get application name (lowercase for CLI)
 ```typescript
 getAppNameLower(): string;
 ```
+
 **Returns:**
 
 string
-

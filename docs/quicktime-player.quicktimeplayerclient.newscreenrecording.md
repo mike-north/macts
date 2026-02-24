@@ -11,7 +11,7 @@ Create a new screen recording document.
 ```typescript
 newScreenRecording(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

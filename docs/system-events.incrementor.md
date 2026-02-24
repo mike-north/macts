@@ -9,7 +9,7 @@ A incrementor belonging to a window
 **Signature:**
 
 ```typescript
-interface Incrementor 
+interface Incrementor
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Incrementor
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.incrementor.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this incrementor
 
-
 </td></tr>
 </tbody></table>
-

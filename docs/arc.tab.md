@@ -9,7 +9,7 @@ A window's tab
 **Signature:**
 
 ```typescript
-interface Tab 
+interface Tab
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Tab
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./arc.tab.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the tab.
-
 
 </td></tr>
 <tr><td>
 
 [loading](./arc.tab.loading.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is loading?
-
 
 </td></tr>
 <tr><td>
 
 [location](./arc.tab.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
-
 
 </td></tr>
 <tr><td>
 
 [title](./arc.tab.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The full title of the tab.
-
 
 </td></tr>
 <tr><td>
 
 [uRL](./arc.tab.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The url of the tab.
 
-
 </td></tr>
 </tbody></table>
-

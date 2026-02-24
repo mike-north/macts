@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * List all actions in a workflow
@@ -14,25 +14,23 @@ export const automatoractionsListTool: McpToolDefinition = {
   name: 'macts__automator__automatoractions_list',
   description: 'List all actions in a workflow',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "workflowName": {
-        "description": "Workflow name",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      workflowName: {
+        description: 'Workflow name',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "workflowName"
-    ]
+    additionalProperties: false,
+    required: ['workflowName'],
   },
   handler: async (args) => {
-    const { workflowName } = args as { workflowName: string };
-    void workflowName;
-    const client = getClient();
-    return client.automatoractions.list();
+    const { workflowName } = args as { workflowName: string }
+    void workflowName
+    const client = getClient()
+    return client.automatoractions.list()
   },
-};
+}
 
 /**
  * Get an action by ID
@@ -41,22 +39,19 @@ export const automatoractionsGetTool: McpToolDefinition = {
   name: 'macts__automator__automatoractions_get',
   description: 'Get an action by ID',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "id": {
-        "description": "Action identifier",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      id: {
+        description: 'Action identifier',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "id"
-    ]
+    additionalProperties: false,
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string };
-    const client = getClient();
-    return client.automatoractions.get(id);
+    const { id } = args as { id: string }
+    const client = getClient()
+    return client.automatoractions.get(id)
   },
-};
-
+}

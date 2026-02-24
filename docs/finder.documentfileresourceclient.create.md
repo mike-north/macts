@@ -18,30 +18,24 @@ create(input: DocumentFileCreateInput): Promise<DocumentFile>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [DocumentFileCreateInput](./finder.documentfilecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[DocumentFile](./finder.documentfile.md)<!-- -->&gt;
-

@@ -9,7 +9,7 @@ Client for a note attachment.
 **Signature:**
 
 ```typescript
-declare class AttachmentResourceClient 
+declare class AttachmentResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AttachmentResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./notes.attachmentresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AttachmentResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AttachmentResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./notes.attachmentresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new attachment.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./notes.attachmentresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a attachment.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./notes.attachmentresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a attachment by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./notes.attachmentresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all attachments.
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./notes.attachmentresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing attachment.
 
-
 </td></tr>
 </tbody></table>
-

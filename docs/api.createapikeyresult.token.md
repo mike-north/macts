@@ -4,10 +4,10 @@
 
 ## CreateApiKeyResult.token property
 
-The signed API key token (prefixed with macts\_sk\_)
+The signed API key token (prefixed with macts_sk\_)
 
 **Signature:**
 
 ```typescript
-token: string;
+token: string
 ```

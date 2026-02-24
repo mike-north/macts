@@ -9,7 +9,7 @@ Create an MCP generator context.
 **Signature:**
 
 ```typescript
-declare function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext;
+declare function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function createMcpGeneratorContext(options: CreateMcpContextOptions): Mc
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [CreateMcpContextOptions](./core.createmcpcontextoptions.md)
 
-
 </td><td>
 
 Context creation options
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Context creation options
 [McpGeneratorContext](./core.mcpgeneratorcontext.md)
 
 MCP generator context
-

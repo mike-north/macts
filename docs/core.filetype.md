@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type FileType = z.infer<typeof FileTypeSchema>;
+type FileType = z.infer<typeof FileTypeSchema>
 ```
-**References:** [FileTypeSchema](./core.filetypeschema.md)
 
+**References:** [FileTypeSchema](./core.filetypeschema.md)

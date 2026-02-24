@@ -9,5 +9,5 @@ Input for creating a ScriptingElement
 **Signature:**
 
 ```typescript
-interface ScriptingElementCreateInput 
+interface ScriptingElementCreateInput
 ```

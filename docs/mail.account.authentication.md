@@ -9,5 +9,5 @@ Preferred authentication scheme for account
 **Signature:**
 
 ```typescript
-authentication: string;
+authentication: string
 ```

@@ -169,7 +169,7 @@ export const AttributeRunSchema: z.ZodObject<{
 export type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>;
 
 // @public
-export type Authentication = 'password' | 'apop' | '5' | 'ntlm' | '5' | 'external' | 'appleToken' | 'none';
+export type Authentication = 'password' | 'apop' | 'kerberos5' | 'ntlm' | 'md5' | 'external' | 'appleToken' | 'none';
 
 // @public
 export interface BccRecipient {
@@ -177,8 +177,7 @@ export interface BccRecipient {
 }
 
 // @public
-export interface BccRecipientCreateInput {
-}
+export type BccRecipientCreateInput = Record<string, never>;
 
 // @public
 export class BccRecipientResourceClient {
@@ -204,8 +203,7 @@ export interface CcRecipient {
 }
 
 // @public
-export interface CcRecipientCreateInput {
-}
+export type CcRecipientCreateInput = Record<string, never>;
 
 // @public
 export class CcRecipientResourceClient {
@@ -330,8 +328,7 @@ export interface MailAttachment {
 }
 
 // @public
-export interface MailAttachmentCreateInput {
-}
+export type MailAttachmentCreateInput = Record<string, never>;
 
 // @public
 export class MailAttachmentResourceClient {
@@ -891,8 +888,7 @@ export interface ToRecipient {
 }
 
 // @public
-export interface ToRecipientCreateInput {
-}
+export type ToRecipientCreateInput = Record<string, never>;
 
 // @public
 export class ToRecipientResourceClient {

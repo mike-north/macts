@@ -9,5 +9,5 @@ Input for creating a Toolbar
 **Signature:**
 
 ```typescript
-interface ToolbarCreateInput 
+interface ToolbarCreateInput
 ```

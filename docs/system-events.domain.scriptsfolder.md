@@ -9,5 +9,5 @@ The Scripts folder
 **Signature:**
 
 ```typescript
-scriptsFolder: Folder;
+scriptsFolder: Folder
 ```

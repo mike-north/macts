@@ -9,7 +9,7 @@ Client for a menu button belonging to a window.
 **Signature:**
 
 ```typescript
-declare class MenuButtonResourceClient 
+declare class MenuButtonResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MenuButtonResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.menubuttonresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MenuButtonResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MenuButtonResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.menubuttonresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new menubutton.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.menubuttonresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a menubutton.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.menubuttonresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a menubutton by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.menubuttonresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all menubuttons.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.menubuttonresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing menubutton.
 
-
 </td></tr>
 </tbody></table>
-

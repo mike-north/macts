@@ -9,5 +9,5 @@ Current version of the macts packages. All `@macts/*` packages use fixed version
 **Signature:**
 
 ```typescript
-VERSION = "0.0.0"
+VERSION = '0.0.0'
 ```

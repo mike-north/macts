@@ -11,7 +11,7 @@ Start the server
 ```typescript
 start(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

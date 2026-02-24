@@ -11,7 +11,7 @@ Focus on a space.
 ```typescript
 focus(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

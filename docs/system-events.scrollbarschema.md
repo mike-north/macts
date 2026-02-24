@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ScrollBarSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ScrollBarSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

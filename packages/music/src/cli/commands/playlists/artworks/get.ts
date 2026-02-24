@@ -1,33 +1,28 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../sdk.js';
-import { createFormatter } from '../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 /**
  * Get a artwork by ID.
  */
 export class GetArtworkCommand extends Command {
-  static override paths = [["music", "playlists", "artworks", "get"]];
+  static override paths = [['music', 'playlists', 'artworks', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a artwork by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  playlistId = Option.String('--playlist-id', { required: true, description: 'Playlist ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  playlistId = Option.String('--playlist-id', { required: true, description: 'Playlist ID' })
 
-  artworkId = Option.String({ required: true });
+  artworkId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.artworks.get(this.artworkId);
-
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Artwork not found') + '\n');
-        return 1;
-      }
+      const client = getClient()
+      const item = await client.artworks.get(this.artworkId)
 
       const output = formatter.format({
         data: item.data,
@@ -36,14 +31,14 @@ export class GetArtworkCommand extends Command {
         format: item.format,
         kind: item.kind,
         rawData: item.rawData,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

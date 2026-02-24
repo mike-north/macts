@@ -9,5 +9,5 @@ Controls whether the list of mailboxes is visible or not
 **Signature:**
 
 ```typescript
-mailboxListVisible: boolean;
+mailboxListVisible: boolean
 ```

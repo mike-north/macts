@@ -9,7 +9,7 @@ Context variables added by auth middleware.
 **Signature:**
 
 ```typescript
-interface AuthVariables 
+interface AuthVariables
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AuthVariables
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKeyPayload](./api.authvariables.apikeypayload.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [ApiKeyPayload](./core.apikeypayload.md)
 
-
 </td><td>
 
 The validated API key payload
 
-
 </td></tr>
 </tbody></table>
-

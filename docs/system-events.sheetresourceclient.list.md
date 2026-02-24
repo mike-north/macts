@@ -11,7 +11,7 @@ List all sheets.
 ```typescript
 list(): Promise<Sheet[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Sheet](./system-events.sheet.md)<!-- -->\[\]&gt;
-

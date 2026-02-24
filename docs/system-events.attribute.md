@@ -9,7 +9,7 @@ An named data value associated with the UI element
 **Signature:**
 
 ```typescript
-interface Attribute 
+interface Attribute
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Attribute
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name](./system-events.attribute.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the attribute
-
 
 </td></tr>
 <tr><td>
 
 [settable](./system-events.attribute.settable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Can the attribute be set?
-
 
 </td></tr>
 <tr><td>
 
 [value](./system-events.attribute.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the current value of the attribute
 
-
 </td></tr>
 </tbody></table>
-

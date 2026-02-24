@@ -9,7 +9,7 @@ the main window
 **Signature:**
 
 ```typescript
-interface BrowserWindow 
+interface BrowserWindow
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface BrowserWindow
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [selection](./music.browserwindow.selection.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the selected tracks
-
 
 </td></tr>
 <tr><td>
 
 [view](./music.browserwindow.view.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Playlist](./music.playlist.md)
 
-
 </td><td>
 
 the playlist currently displayed in the window
 
-
 </td></tr>
 </tbody></table>
-

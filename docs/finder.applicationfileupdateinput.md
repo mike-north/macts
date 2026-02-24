@@ -9,7 +9,7 @@ Input for updating a ApplicationFile
 **Signature:**
 
 ```typescript
-type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>;
+type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>
 ```
-**References:** [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
 
+**References:** [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)

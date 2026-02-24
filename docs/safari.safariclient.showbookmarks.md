@@ -11,7 +11,7 @@ Shows Safari's bookmarks.
 ```typescript
 showBookmarks(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -18,30 +18,24 @@ create(input: PopOverCreateInput): Promise<PopOver>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PopOverCreateInput](./system-events.popovercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[PopOver](./system-events.popover.md)<!-- -->&gt;
-

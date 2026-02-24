@@ -9,7 +9,7 @@ Generate Zod schema for an enum.
 **Signature:**
 
 ```typescript
-declare function generateEnumSchema(enumDef: Enum): GeneratedSchema;
+declare function generateEnumSchema(enumDef: Enum): GeneratedSchema
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function generateEnumSchema(enumDef: Enum): GeneratedSchema;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 enumDef
 
-
 </td><td>
 
 [Enum](./core.enum.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ enumDef
 **Returns:**
 
 [GeneratedSchema](./core.generatedschema.md)
-

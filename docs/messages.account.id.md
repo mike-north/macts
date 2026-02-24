@@ -9,5 +9,5 @@ A unique identifier for this account.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

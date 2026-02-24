@@ -3,275 +3,275 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** SaveOptions */
-export type SaveOptions = 'yes' | 'no' | 'ask';
+export type SaveOptions = 'yes' | 'no' | 'ask'
 
 /** A window. */
 export interface Window {
   /** The unique identifier of the session. */
-  id: number;
+  id: number
   /** The alternate unique identifier of the session. */
-  alternateIdentifier: string;
+  alternateIdentifier: string
   /** The full title of the window. */
-  name: string;
+  name: string
   /** The index of the window, ordered front to back. */
-  index: number;
+  index: number
   /** The bounding rectangle of the window. */
-  bounds: { x: number; y: number; width: number; height: number };
+  bounds: { x: number; y: number; width: number; height: number }
   /** Whether the window has a close box. */
-  closeable: boolean;
+  closeable: boolean
   /** Whether the window can be minimized. */
-  miniaturizable: boolean;
+  miniaturizable: boolean
   /** Whether the window is currently minimized. */
-  miniaturized: boolean;
+  miniaturized: boolean
   /** Whether the window can be resized. */
-  resizable: boolean;
+  resizable: boolean
   /** Whether the window is currently visible. */
-  visible: boolean;
+  visible: boolean
   /** Whether the window can be zoomed. */
-  zoomable: boolean;
+  zoomable: boolean
   /** Whether the window is currently zoomed. */
-  zoomed: boolean;
+  zoomed: boolean
   /** Whether the window is currently the frontmost window. */
-  frontmost: boolean;
+  frontmost: boolean
   /** The currently selected tab */
-  currentTab: Tab;
+  currentTab: Tab
   /** The current session in a window */
-  currentSession: Session;
+  currentSession: Session
   /** Whether the window is a hotkey window. */
-  isHotkeyWindow: boolean;
+  isHotkeyWindow: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
-  hotkeyWindowProfile: string;
+  hotkeyWindowProfile: string
   /** The position of the window, relative to the upper left corner of the screen. */
-  position: { x: number; y: number };
+  position: { x: number; y: number }
   /** The position of the window, relative to the lower left corner of the screen. */
-  origin: { x: number; y: number };
+  origin: { x: number; y: number }
   /** The width and height of the window */
-  size: { x: number; y: number };
+  size: { x: number; y: number }
   /** The bounding rectangle, relative to the lower left corner of the screen. */
-  frame: { x: number; y: number; width: number; height: number };
+  frame: { x: number; y: number; width: number; height: number }
 }
 
 /** Input for creating a Window */
 export interface WindowCreateInput {
   /** The index of the window, ordered front to back. */
-  index?: number;
+  index?: number
   /** The bounding rectangle of the window. */
-  bounds?: { x: number; y: number; width: number; height: number };
+  bounds?: { x: number; y: number; width: number; height: number }
   /** Whether the window is currently minimized. */
-  miniaturized?: boolean;
+  miniaturized?: boolean
   /** Whether the window is currently visible. */
-  visible?: boolean;
+  visible?: boolean
   /** Whether the window is currently zoomed. */
-  zoomed?: boolean;
+  zoomed?: boolean
   /** Whether the window is currently the frontmost window. */
-  frontmost?: boolean;
+  frontmost?: boolean
   /** The currently selected tab */
-  currentTab?: Tab;
+  currentTab?: Tab
   /** The current session in a window */
-  currentSession?: Session;
+  currentSession?: Session
   /** Whether the window is a hotkey window. */
-  isHotkeyWindow?: boolean;
+  isHotkeyWindow?: boolean
   /** If the window is a hotkey window, this gives the name of the profile that created the window. */
-  hotkeyWindowProfile?: string;
+  hotkeyWindowProfile?: string
   /** The position of the window, relative to the upper left corner of the screen. */
-  position?: { x: number; y: number };
+  position?: { x: number; y: number }
   /** The position of the window, relative to the lower left corner of the screen. */
-  origin?: { x: number; y: number };
+  origin?: { x: number; y: number }
   /** The width and height of the window */
-  size?: { x: number; y: number };
+  size?: { x: number; y: number }
   /** The bounding rectangle, relative to the lower left corner of the screen. */
-  frame?: { x: number; y: number; width: number; height: number };
+  frame?: { x: number; y: number; width: number; height: number }
 }
 
 /** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A terminal tab */
 export interface Tab {
   /** The current session in a tab */
-  currentSession: Session;
+  currentSession: Session
   /** Index of tab in parent tab view control */
-  index: number;
+  index: number
   /** The title property */
-  title: string;
+  title: string
 }
 
 /** Input for creating a Tab */
 export interface TabCreateInput {
   /** The current session in a tab */
-  currentSession?: Session;
+  currentSession?: Session
   /** Index of tab in parent tab view control */
-  index?: number;
+  index?: number
   /** The title property */
-  title?: string;
+  title?: string
 }
 
 /** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = Partial<TabCreateInput>
 
 /** A terminal session */
 export interface Session {
   /** The unique identifier of the session. */
-  id: string;
+  id: string
   /** The session has received output recently. */
-  isProcessing: boolean;
+  isProcessing: boolean
   /** The terminal is at the shell prompt. Requires shell integration. */
-  isAtShellPrompt: boolean;
+  isAtShellPrompt: boolean
   /** The columns property */
-  columns: number;
+  columns: number
   /** The rows property */
-  rows: number;
+  rows: number
   /** The tty property */
-  tty: string;
+  tty: string
   /** The currently visible contents of the session. */
-  contents: string;
+  contents: string
   /** The currently visible contents of the session. */
-  text: string;
+  text: string
   /** The colorPreset property */
-  colorPreset: string;
+  colorPreset: string
   /** The backgroundColor property */
-  backgroundColor: { r: number; g: number; b: number };
+  backgroundColor: { r: number; g: number; b: number }
   /** The boldColor property */
-  boldColor: { r: number; g: number; b: number };
+  boldColor: { r: number; g: number; b: number }
   /** The cursorColor property */
-  cursorColor: { r: number; g: number; b: number };
+  cursorColor: { r: number; g: number; b: number }
   /** The cursorTextColor property */
-  cursorTextColor: { r: number; g: number; b: number };
+  cursorTextColor: { r: number; g: number; b: number }
   /** The foregroundColor property */
-  foregroundColor: { r: number; g: number; b: number };
+  foregroundColor: { r: number; g: number; b: number }
   /** The selectedTextColor property */
-  selectedTextColor: { r: number; g: number; b: number };
+  selectedTextColor: { r: number; g: number; b: number }
   /** The selectionColor property */
-  selectionColor: { r: number; g: number; b: number };
+  selectionColor: { r: number; g: number; b: number }
   /** The aNSIBlackColor property */
-  aNSIBlackColor: { r: number; g: number; b: number };
+  aNSIBlackColor: { r: number; g: number; b: number }
   /** The aNSIRedColor property */
-  aNSIRedColor: { r: number; g: number; b: number };
+  aNSIRedColor: { r: number; g: number; b: number }
   /** The aNSIGreenColor property */
-  aNSIGreenColor: { r: number; g: number; b: number };
+  aNSIGreenColor: { r: number; g: number; b: number }
   /** The aNSIYellowColor property */
-  aNSIYellowColor: { r: number; g: number; b: number };
+  aNSIYellowColor: { r: number; g: number; b: number }
   /** The aNSIBlueColor property */
-  aNSIBlueColor: { r: number; g: number; b: number };
+  aNSIBlueColor: { r: number; g: number; b: number }
   /** The aNSIMagentaColor property */
-  aNSIMagentaColor: { r: number; g: number; b: number };
+  aNSIMagentaColor: { r: number; g: number; b: number }
   /** The aNSICyanColor property */
-  aNSICyanColor: { r: number; g: number; b: number };
+  aNSICyanColor: { r: number; g: number; b: number }
   /** The aNSIWhiteColor property */
-  aNSIWhiteColor: { r: number; g: number; b: number };
+  aNSIWhiteColor: { r: number; g: number; b: number }
   /** The aNSIBrightBlackColor property */
-  aNSIBrightBlackColor: { r: number; g: number; b: number };
+  aNSIBrightBlackColor: { r: number; g: number; b: number }
   /** The aNSIBrightRedColor property */
-  aNSIBrightRedColor: { r: number; g: number; b: number };
+  aNSIBrightRedColor: { r: number; g: number; b: number }
   /** The aNSIBrightGreenColor property */
-  aNSIBrightGreenColor: { r: number; g: number; b: number };
+  aNSIBrightGreenColor: { r: number; g: number; b: number }
   /** The aNSIBrightYellowColor property */
-  aNSIBrightYellowColor: { r: number; g: number; b: number };
+  aNSIBrightYellowColor: { r: number; g: number; b: number }
   /** The aNSIBrightBlueColor property */
-  aNSIBrightBlueColor: { r: number; g: number; b: number };
+  aNSIBrightBlueColor: { r: number; g: number; b: number }
   /** The aNSIBrightMagentaColor property */
-  aNSIBrightMagentaColor: { r: number; g: number; b: number };
+  aNSIBrightMagentaColor: { r: number; g: number; b: number }
   /** The aNSIBrightCyanColor property */
-  aNSIBrightCyanColor: { r: number; g: number; b: number };
+  aNSIBrightCyanColor: { r: number; g: number; b: number }
   /** The aNSIBrightWhiteColor property */
-  aNSIBrightWhiteColor: { r: number; g: number; b: number };
+  aNSIBrightWhiteColor: { r: number; g: number; b: number }
   /** The underlineColor property */
-  underlineColor: { r: number; g: number; b: number };
+  underlineColor: { r: number; g: number; b: number }
   /** Whether the use a dedicated color for underlining. */
-  useUnderlineColor: boolean;
+  useUnderlineColor: boolean
   /** The backgroundImage property */
-  backgroundImage: string;
+  backgroundImage: string
   /** The name property */
-  name: string;
+  name: string
   /** The transparency property */
-  transparency: number;
+  transparency: number
   /** The uniqueID property */
-  uniqueID: string;
+  uniqueID: string
   /** The session's profile name */
-  profileName: string;
+  profileName: string
   /** ENQ Answerback string */
-  answerbackString: string;
+  answerbackString: string
 }
 
 /** Input for creating a Session */
 export interface SessionCreateInput {
   /** The session has received output recently. */
-  isProcessing?: boolean;
+  isProcessing?: boolean
   /** The terminal is at the shell prompt. Requires shell integration. */
-  isAtShellPrompt?: boolean;
+  isAtShellPrompt?: boolean
   /** The columns property */
-  columns?: number;
+  columns?: number
   /** The rows property */
-  rows?: number;
+  rows?: number
   /** The currently visible contents of the session. */
-  contents?: string;
+  contents?: string
   /** The colorPreset property */
-  colorPreset?: string;
+  colorPreset?: string
   /** The backgroundColor property */
-  backgroundColor?: { r: number; g: number; b: number };
+  backgroundColor?: { r: number; g: number; b: number }
   /** The boldColor property */
-  boldColor?: { r: number; g: number; b: number };
+  boldColor?: { r: number; g: number; b: number }
   /** The cursorColor property */
-  cursorColor?: { r: number; g: number; b: number };
+  cursorColor?: { r: number; g: number; b: number }
   /** The cursorTextColor property */
-  cursorTextColor?: { r: number; g: number; b: number };
+  cursorTextColor?: { r: number; g: number; b: number }
   /** The foregroundColor property */
-  foregroundColor?: { r: number; g: number; b: number };
+  foregroundColor?: { r: number; g: number; b: number }
   /** The selectedTextColor property */
-  selectedTextColor?: { r: number; g: number; b: number };
+  selectedTextColor?: { r: number; g: number; b: number }
   /** The selectionColor property */
-  selectionColor?: { r: number; g: number; b: number };
+  selectionColor?: { r: number; g: number; b: number }
   /** The aNSIBlackColor property */
-  aNSIBlackColor?: { r: number; g: number; b: number };
+  aNSIBlackColor?: { r: number; g: number; b: number }
   /** The aNSIRedColor property */
-  aNSIRedColor?: { r: number; g: number; b: number };
+  aNSIRedColor?: { r: number; g: number; b: number }
   /** The aNSIGreenColor property */
-  aNSIGreenColor?: { r: number; g: number; b: number };
+  aNSIGreenColor?: { r: number; g: number; b: number }
   /** The aNSIYellowColor property */
-  aNSIYellowColor?: { r: number; g: number; b: number };
+  aNSIYellowColor?: { r: number; g: number; b: number }
   /** The aNSIBlueColor property */
-  aNSIBlueColor?: { r: number; g: number; b: number };
+  aNSIBlueColor?: { r: number; g: number; b: number }
   /** The aNSIMagentaColor property */
-  aNSIMagentaColor?: { r: number; g: number; b: number };
+  aNSIMagentaColor?: { r: number; g: number; b: number }
   /** The aNSICyanColor property */
-  aNSICyanColor?: { r: number; g: number; b: number };
+  aNSICyanColor?: { r: number; g: number; b: number }
   /** The aNSIWhiteColor property */
-  aNSIWhiteColor?: { r: number; g: number; b: number };
+  aNSIWhiteColor?: { r: number; g: number; b: number }
   /** The aNSIBrightBlackColor property */
-  aNSIBrightBlackColor?: { r: number; g: number; b: number };
+  aNSIBrightBlackColor?: { r: number; g: number; b: number }
   /** The aNSIBrightRedColor property */
-  aNSIBrightRedColor?: { r: number; g: number; b: number };
+  aNSIBrightRedColor?: { r: number; g: number; b: number }
   /** The aNSIBrightGreenColor property */
-  aNSIBrightGreenColor?: { r: number; g: number; b: number };
+  aNSIBrightGreenColor?: { r: number; g: number; b: number }
   /** The aNSIBrightYellowColor property */
-  aNSIBrightYellowColor?: { r: number; g: number; b: number };
+  aNSIBrightYellowColor?: { r: number; g: number; b: number }
   /** The aNSIBrightBlueColor property */
-  aNSIBrightBlueColor?: { r: number; g: number; b: number };
+  aNSIBrightBlueColor?: { r: number; g: number; b: number }
   /** The aNSIBrightMagentaColor property */
-  aNSIBrightMagentaColor?: { r: number; g: number; b: number };
+  aNSIBrightMagentaColor?: { r: number; g: number; b: number }
   /** The aNSIBrightCyanColor property */
-  aNSIBrightCyanColor?: { r: number; g: number; b: number };
+  aNSIBrightCyanColor?: { r: number; g: number; b: number }
   /** The aNSIBrightWhiteColor property */
-  aNSIBrightWhiteColor?: { r: number; g: number; b: number };
+  aNSIBrightWhiteColor?: { r: number; g: number; b: number }
   /** The underlineColor property */
-  underlineColor?: { r: number; g: number; b: number };
+  underlineColor?: { r: number; g: number; b: number }
   /** Whether the use a dedicated color for underlining. */
-  useUnderlineColor?: boolean;
+  useUnderlineColor?: boolean
   /** The backgroundImage property */
-  backgroundImage?: string;
+  backgroundImage?: string
   /** The name property */
-  name?: string;
+  name?: string
   /** The transparency property */
-  transparency?: number;
+  transparency?: number
   /** ENQ Answerback string */
-  answerbackString?: string;
+  answerbackString?: string
 }
 
 /** Input for updating a Session */
-export type SessionUpdateInput = Partial<SessionCreateInput>;
+export type SessionUpdateInput = Partial<SessionCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -297,13 +297,13 @@ export const WindowSchema = z.object({
   origin: z.object({ x: z.number(), y: z.number() }),
   size: z.object({ x: z.number(), y: z.number() }),
   frame: z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }),
-});
+})
 
 export const TabSchema = z.object({
   currentSession: z.string(),
   index: z.number(),
   title: z.string(),
-});
+})
 
 export const SessionSchema = z.object({
   id: z.string(),
@@ -346,4 +346,4 @@ export const SessionSchema = z.object({
   uniqueID: z.string(),
   profileName: z.string(),
   answerbackString: z.string(),
-});
+})

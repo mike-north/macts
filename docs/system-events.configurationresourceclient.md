@@ -9,7 +9,7 @@ Client for a collection of settings for configuring a connection.
 **Signature:**
 
 ```typescript
-declare class ConfigurationResourceClient 
+declare class ConfigurationResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ConfigurationResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.configurationresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ConfigurationResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ConfigurationResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.configurationresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new configuration.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.configurationresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a configuration.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.configurationresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a configuration by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.configurationresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all configurations.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.configurationresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing configuration.
 
-
 </td></tr>
 </tbody></table>
-

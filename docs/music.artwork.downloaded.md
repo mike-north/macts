@@ -9,5 +9,5 @@ was this artwork downloaded by Music?
 **Signature:**
 
 ```typescript
-downloaded: boolean;
+downloaded: boolean
 ```

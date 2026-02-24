@@ -9,7 +9,7 @@ Input for creating a UserPlaylist
 **Signature:**
 
 ```typescript
-interface UserPlaylistCreateInput 
+interface UserPlaylistCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface UserPlaylistCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [shared?](./tv.userplaylistcreateinput.shared.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this playlist shared?
 
-
 </td></tr>
 </tbody></table>
-

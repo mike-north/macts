@@ -9,7 +9,7 @@ Raw element from SDEF - represents a containment relationship. Elements define w
 **Signature:**
 
 ```typescript
-interface RawElement 
+interface RawElement
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface RawElement
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [access](./core.rawelement.access.md)
 
-
 </td><td>
-
 
 </td><td>
 
 'r' \| 'rw'
 
-
 </td><td>
 
 Access level: read-only or read-write
-
 
 </td></tr>
 <tr><td>
 
 [type](./core.rawelement.type.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Type of element that can be contained (class name)
 
-
 </td></tr>
 </tbody></table>
-

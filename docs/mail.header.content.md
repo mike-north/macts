@@ -9,5 +9,5 @@ Contents of the header
 **Signature:**
 
 ```typescript
-content: string;
+content: string
 ```

@@ -9,5 +9,5 @@ Indicates whether the message is read or not
 **Signature:**
 
 ```typescript
-readStatus: boolean;
+readStatus: boolean
 ```

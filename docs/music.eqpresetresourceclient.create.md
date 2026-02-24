@@ -18,30 +18,24 @@ create(input: EQPresetCreateInput): Promise<EQPreset>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [EQPresetCreateInput](./music.eqpresetcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[EQPreset](./music.eqpreset.md)<!-- -->&gt;
-

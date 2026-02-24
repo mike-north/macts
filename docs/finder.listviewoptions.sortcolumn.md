@@ -9,5 +9,5 @@ the column that the list view is sorted on
 **Signature:**
 
 ```typescript
-sortColumn: Column;
+sortColumn: Column
 ```

@@ -11,7 +11,7 @@ List all splittergroups.
 ```typescript
 list(): Promise<SplitterGroup[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SplitterGroup](./system-events.splittergroup.md)<!-- -->\[\]&gt;
-

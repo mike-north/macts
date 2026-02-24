@@ -9,7 +9,7 @@ Input for creating a InstantMessage
 **Signature:**
 
 ```typescript
-interface InstantMessageCreateInput 
+interface InstantMessageCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface InstantMessageCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [serviceType?](./contacts.instantmessagecreateinput.servicetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The service type of this instant message address.
-
 
 </td></tr>
 <tr><td>
 
 [userName?](./contacts.instantmessagecreateinput.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The user name of this instant message address.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Is the property hidden?
 **Signature:**
 
 ```typescript
-hidden: boolean;
+hidden: boolean
 ```

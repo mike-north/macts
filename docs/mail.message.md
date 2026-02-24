@@ -9,7 +9,7 @@ An email message
 **Signature:**
 
 ```typescript
-interface Message 
+interface Message
 ```
 
 ## Properties
@@ -18,421 +18,332 @@ interface Message
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [allHeaders](./mail.message.allheaders.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 All the headers of the message
-
 
 </td></tr>
 <tr><td>
 
 [backgroundColor](./mail.message.backgroundcolor.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The background color of the message
-
 
 </td></tr>
 <tr><td>
 
 [content](./mail.message.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 Contents of an email message
-
 
 </td></tr>
 <tr><td>
 
 [dateReceived](./mail.message.datereceived.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The date a message was received
-
 
 </td></tr>
 <tr><td>
 
 [dateSent](./mail.message.datesent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The date a message was sent
-
 
 </td></tr>
 <tr><td>
 
 [deletedStatus](./mail.message.deletedstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message is deleted or not
-
 
 </td></tr>
 <tr><td>
 
 [flaggedStatus](./mail.message.flaggedstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message is flagged or not
-
 
 </td></tr>
 <tr><td>
 
 [flagIndex](./mail.message.flagindex.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The flag on the message, or -1 if the message is not flagged
-
 
 </td></tr>
 <tr><td>
 
 [id](./mail.message.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The unique identifier of the message.
-
 
 </td></tr>
 <tr><td>
 
 [junkMailStatus](./mail.message.junkmailstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter.
-
 
 </td></tr>
 <tr><td>
 
 [mailbox](./mail.message.mailbox.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Mailbox](./mail.mailbox.md)
 
-
 </td><td>
 
 The mailbox in which this message is filed
-
 
 </td></tr>
 <tr><td>
 
 [messageId](./mail.message.messageid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique message ID string
-
 
 </td></tr>
 <tr><td>
 
 [messageSize](./mail.message.messagesize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size (in bytes) of a message
-
 
 </td></tr>
 <tr><td>
 
 [readStatus](./mail.message.readstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message is read or not
-
 
 </td></tr>
 <tr><td>
 
 [replyTo](./mail.message.replyto.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The address that replies should be sent to
-
 
 </td></tr>
 <tr><td>
 
 [sender](./mail.message.sender.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The sender of the message
-
 
 </td></tr>
 <tr><td>
 
 [source](./mail.message.source.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Raw source of the message
-
 
 </td></tr>
 <tr><td>
 
 [subject](./mail.message.subject.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The subject of the message
-
 
 </td></tr>
 <tr><td>
 
 [wasForwarded](./mail.message.wasforwarded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message was forwarded or not
-
 
 </td></tr>
 <tr><td>
 
 [wasRedirected](./mail.message.wasredirected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message was redirected or not
-
 
 </td></tr>
 <tr><td>
 
 [wasRepliedTo](./mail.message.wasrepliedto.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the message was replied to or not
 
-
 </td></tr>
 </tbody></table>
-

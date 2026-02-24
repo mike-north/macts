@@ -11,7 +11,7 @@ Show Safari Extensions preferences.
 ```typescript
 showExtensionsPreferences(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

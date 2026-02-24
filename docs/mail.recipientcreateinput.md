@@ -9,7 +9,7 @@ Input for creating a Recipient
 **Signature:**
 
 ```typescript
-interface RecipientCreateInput 
+interface RecipientCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface RecipientCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [address?](./mail.recipientcreateinput.address.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The recipients email address
-
 
 </td></tr>
 <tr><td>
 
 [name?](./mail.recipientcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name used for display
 
-
 </td></tr>
 </tbody></table>
-

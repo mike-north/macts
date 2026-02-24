@@ -9,5 +9,5 @@ ethernet speed 10 \| 100 \| 1000
 **Signature:**
 
 ```typescript
-speed: number;
+speed: number
 ```

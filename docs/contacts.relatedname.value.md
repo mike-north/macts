@@ -9,5 +9,5 @@ The related name value
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

@@ -9,5 +9,5 @@ MIME type of the attachment E.g. text/plain.
 **Signature:**
 
 ```typescript
-mIMEType: string;
+mIMEType: string
 ```

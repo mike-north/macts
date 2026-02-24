@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { notesApiPlugin as plugin, notesApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { notesApiPlugin as plugin, notesApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

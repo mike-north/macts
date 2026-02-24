@@ -9,5 +9,5 @@ Input for creating a Participant
 **Signature:**
 
 ```typescript
-interface ParticipantCreateInput 
+interface ParticipantCreateInput
 ```

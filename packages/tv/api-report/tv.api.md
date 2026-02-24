@@ -142,8 +142,7 @@ export interface LibraryPlaylist {
 }
 
 // @public
-export interface LibraryPlaylistCreateInput {
-}
+export type LibraryPlaylistCreateInput = Record<string, never>;
 
 // @public
 export class LibraryPlaylistResourceClient {
@@ -218,8 +217,7 @@ export interface PlaylistWindow {
 }
 
 // @public
-export interface PlaylistWindowCreateInput {
-}
+export type PlaylistWindowCreateInput = Record<string, never>;
 
 // @public
 export class PlaylistWindowResourceClient {
@@ -247,8 +245,7 @@ export interface SharedTrack {
 }
 
 // @public
-export interface SharedTrackCreateInput {
-}
+export type SharedTrackCreateInput = Record<string, never>;
 
 // @public
 export class SharedTrackResourceClient {
@@ -277,8 +274,7 @@ export interface Source {
 }
 
 // @public
-export interface SourceCreateInput {
-}
+export type SourceCreateInput = Record<string, never>;
 
 // @public
 export class SourceResourceClient {
@@ -590,8 +586,7 @@ export interface VideoWindow {
 }
 
 // @public
-export interface VideoWindowCreateInput {
-}
+export type VideoWindowCreateInput = Record<string, never>;
 
 // @public
 export class VideoWindowResourceClient {

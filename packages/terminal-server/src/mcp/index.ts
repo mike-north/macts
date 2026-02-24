@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match MCP plugin loader convention
-export { terminalPlugin as plugin, terminalPlugin } from './plugin.js';
-export type { McpPlugin, McpToolDefinition } from '@macts/mcp';
+export { terminalPlugin as plugin, terminalPlugin } from './plugin.js'
+export type { McpPlugin, McpToolDefinition } from '@macts/mcp'

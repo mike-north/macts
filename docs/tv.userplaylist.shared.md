@@ -9,5 +9,5 @@ is this playlist shared?
 **Signature:**
 
 ```typescript
-shared: boolean;
+shared: boolean
 ```

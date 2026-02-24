@@ -10,8 +10,8 @@ Create a Hono router with RPC endpoints from a manifest.
 
 ```typescript
 declare function createRpcRouter(manifest: AppManifest): Hono<{
-    Variables: AuthVariables;
-}>;
+  Variables: AuthVariables
+}>
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function createRpcRouter(manifest: AppManifest): Hono<{
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest containing commands
-
 
 </td></tr>
 </tbody></table>
@@ -58,15 +52,13 @@ Hono app with RPC routes
 
 ## Example
 
-
 ```typescript
-import { createRpcRouter } from './handlers/rpc.js';
-import { loadManifest } from '@macts/core';
+import { createRpcRouter } from './handlers/rpc.js'
+import { loadManifest } from '@macts/core'
 
-const manifest = await loadManifest('./calendar/app.yaml');
-const rpc = createRpcRouter(manifest);
+const manifest = await loadManifest('./calendar/app.yaml')
+const rpc = createRpcRouter(manifest)
 
 // Use as sub-router
-app.route('/api/v1', rpc);
+app.route('/api/v1', rpc)
 ```
-

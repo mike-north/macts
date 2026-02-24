@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface AppConnectionOptions 
+interface AppConnectionOptions
 ```
 
 ## Properties
@@ -16,41 +16,32 @@ interface AppConnectionOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [timeout?](./core.appconnectionoptions.timeout.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_
 
-
 </td></tr>
 </tbody></table>
-

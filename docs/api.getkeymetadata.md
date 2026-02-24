@@ -9,7 +9,7 @@ Get key metadata by ID.
 **Signature:**
 
 ```typescript
-declare function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
+declare function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keyId
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Key ID to find
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Key ID to find
 [ApiKeyMetadata](./core.apikeymetadata.md) \| undefined
 
 Key metadata, or undefined if not found
-

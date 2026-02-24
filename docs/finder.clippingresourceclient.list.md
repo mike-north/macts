@@ -11,7 +11,7 @@ List all clippings.
 ```typescript
 list(): Promise<Clipping[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Clipping](./finder.clipping.md)<!-- -->\[\]&gt;
-

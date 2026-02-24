@@ -11,7 +11,7 @@
 ```typescript
 copy(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ Input for creating a ScriptingDefinitionObject
 **Signature:**
 
 ```typescript
-interface ScriptingDefinitionObjectCreateInput 
+interface ScriptingDefinitionObjectCreateInput
 ```

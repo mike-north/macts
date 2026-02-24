@@ -9,7 +9,7 @@ Data in XML format
 **Signature:**
 
 ```typescript
-interface XMLData 
+interface XMLData
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface XMLData
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.xmldata.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier of the XML data
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.xmldata.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the XML data
-
 
 </td></tr>
 <tr><td>
 
 [text](./system-events.xmldata.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the text representation of the XML data
 
-
 </td></tr>
 </tbody></table>
-

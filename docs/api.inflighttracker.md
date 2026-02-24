@@ -9,7 +9,7 @@ In-flight request tracker for graceful shutdown.
 **Signature:**
 
 ```typescript
-interface InFlightTracker 
+interface InFlightTracker
 ```
 
 ## Properties
@@ -18,42 +18,34 @@ interface InFlightTracker
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [count](./api.inflighttracker.count.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Current number of in-flight requests
-
 
 </td></tr>
 </tbody></table>
@@ -64,34 +56,27 @@ Current number of in-flight requests
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [middleware()](./api.inflighttracker.middleware.md)
 
-
 </td><td>
 
 Middleware that tracks in-flight requests
-
 
 </td></tr>
 <tr><td>
 
 [waitForDrain(timeoutMs)](./api.inflighttracker.waitfordrain.md)
 
-
 </td><td>
 
 Wait for all in-flight requests to complete
 
-
 </td></tr>
 </tbody></table>
-

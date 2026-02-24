@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-BusyIndicatorSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+BusyIndicatorSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

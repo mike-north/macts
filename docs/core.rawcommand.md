@@ -9,7 +9,7 @@ Raw command from SDEF - represents an AppleScript command/verb.
 **Signature:**
 
 ```typescript
-interface RawCommand 
+interface RawCommand
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface RawCommand
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.rawcommand.code.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Four-character code for Apple Events (e.g., "aevtodoc")
-
 
 </td></tr>
 <tr><td>
 
 [description?](./core.rawcommand.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Human-readable description
-
 
 </td></tr>
 <tr><td>
 
 [directParameter?](./core.rawcommand.directparameter.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { type: string; description?: string; }
 
-
 </td><td>
 
 _(Optional)_ Direct parameter (the unnamed parameter after the command)
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.rawcommand.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Command name (e.g., "open", "save")
-
 
 </td></tr>
 <tr><td>
 
 [parameters](./core.rawcommand.parameters.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawParameter](./core.rawparameter.md)<!-- -->\[\]
 
-
 </td><td>
 
 Named parameters
-
 
 </td></tr>
 <tr><td>
 
 [result?](./core.rawcommand.result.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { type: string; description?: string; }
 
-
 </td><td>
 
 _(Optional)_ Return value specification
 
-
 </td></tr>
 </tbody></table>
-

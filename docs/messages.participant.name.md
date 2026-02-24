@@ -9,5 +9,5 @@ The participant's name as it appears in the participant list.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

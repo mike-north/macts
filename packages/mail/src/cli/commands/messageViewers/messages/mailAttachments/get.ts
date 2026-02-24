@@ -1,34 +1,32 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../../sdk.js';
-import { createFormatter } from '../../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../../sdk.js'
+import { createFormatter } from '../../../../output/index.js'
 
 /**
  * Get a mailattachment by ID.
  */
 export class GetMailAttachmentCommand extends Command {
-  static override paths = [["mail", "messageViewers", "messages", "mailAttachments", "get"]];
+  static override paths = [['mail', 'messageViewers', 'messages', 'mailAttachments', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a mailattachment by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  messageViewerId = Option.String('--message-viewer-id', { required: true, description: 'MessageViewer ID' });
-  messageId = Option.String('--message-id', { required: true, description: 'Message ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  messageViewerId = Option.String('--message-viewer-id', {
+    required: true,
+    description: 'MessageViewer ID',
+  })
+  messageId = Option.String('--message-id', { required: true, description: 'Message ID' })
 
-  mailAttachmentId = Option.String({ required: true });
+  mailAttachmentId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.mailattachments.get(this.mailAttachmentId);
-
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('MailAttachment not found') + '\n');
-        return 1;
-      }
+      const client = getClient()
+      const item = await client.mailattachments.get(this.mailAttachmentId)
 
       const output = formatter.format({
         name: item.name,
@@ -36,14 +34,14 @@ export class GetMailAttachmentCommand extends Command {
         fileSize: item.fileSize,
         downloaded: item.downloaded,
         id: item.id,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

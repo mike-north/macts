@@ -9,7 +9,7 @@ Client for a slider belonging to a window.
 **Signature:**
 
 ```typescript
-declare class SliderResourceClient 
+declare class SliderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SliderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.sliderresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SliderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SliderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.sliderresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new slider.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.sliderresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a slider.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.sliderresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a slider by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.sliderresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all sliders.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.sliderresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing slider.
 
-
 </td></tr>
 </tbody></table>
-

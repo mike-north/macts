@@ -9,5 +9,5 @@ override string to use for the track when sorting by show name
 **Signature:**
 
 ```typescript
-sortShow: string;
+sortShow: string
 ```

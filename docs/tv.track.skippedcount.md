@@ -9,5 +9,5 @@ number of times this track has been skipped
 **Signature:**
 
 ```typescript
-skippedCount: number;
+skippedCount: number
 ```

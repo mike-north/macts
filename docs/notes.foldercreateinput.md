@@ -9,7 +9,7 @@ Input for creating a Folder
 **Signature:**
 
 ```typescript
-interface FolderCreateInput 
+interface FolderCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface FolderCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name?](./notes.foldercreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the folder
 
-
 </td></tr>
 </tbody></table>
-

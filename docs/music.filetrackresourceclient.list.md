@@ -11,7 +11,7 @@ List all filetracks.
 ```typescript
 list(): Promise<FileTrack[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[FileTrack](./music.filetrack.md)<!-- -->\[\]&gt;
-

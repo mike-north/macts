@@ -9,7 +9,7 @@ Format a parsed permission back to a string.
 **Signature:**
 
 ```typescript
-declare function formatPermission(permission: ParsedPermission): string;
+declare function formatPermission(permission: ParsedPermission): string
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function formatPermission(permission: ParsedPermission): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 [ParsedPermission](./core.parsedpermission.md)
 
-
 </td><td>
 
 Parsed permission object
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Parsed permission object
 string
 
 Permission string
-

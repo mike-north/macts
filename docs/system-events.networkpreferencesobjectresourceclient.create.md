@@ -18,30 +18,24 @@ create(input: NetworkPreferencesObjectCreateInput): Promise<NetworkPreferencesOb
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [NetworkPreferencesObjectCreateInput](./system-events.networkpreferencesobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[NetworkPreferencesObject](./system-events.networkpreferencesobject.md)<!-- -->&gt;
-

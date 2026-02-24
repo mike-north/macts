@@ -10,8 +10,8 @@ The selectedTextColor property
 
 ```typescript
 selectedTextColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

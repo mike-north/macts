@@ -9,5 +9,5 @@ the container window for this folder
 **Signature:**
 
 ```typescript
-containerWindow: string;
+containerWindow: string
 ```

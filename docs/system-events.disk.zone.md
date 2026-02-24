@@ -9,5 +9,5 @@ the zone in which the disk's server resides, AFP volumes only
 **Signature:**
 
 ```typescript
-zone: string;
+zone: string
 ```

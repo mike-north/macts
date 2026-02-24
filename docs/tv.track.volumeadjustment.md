@@ -9,5 +9,5 @@ relative volume adjustment of the track (-100% to 100%)
 **Signature:**
 
 ```typescript
-volumeAdjustment: number;
+volumeAdjustment: number
 ```

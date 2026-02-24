@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Identifier = z.infer<typeof IdentifierSchema>;
+type Identifier = z.infer<typeof IdentifierSchema>
 ```
-**References:** [IdentifierSchema](./core.identifierschema.md)
 
+**References:** [IdentifierSchema](./core.identifierschema.md)

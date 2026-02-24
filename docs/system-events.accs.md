@@ -9,5 +9,5 @@ Accs
 **Signature:**
 
 ```typescript
-type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly';
+type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly'
 ```

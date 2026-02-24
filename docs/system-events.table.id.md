@@ -9,5 +9,5 @@ Unique identifier for this table
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

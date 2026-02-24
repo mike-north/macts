@@ -9,7 +9,7 @@ An enumerator within an enumeration within a suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingEnumerator 
+interface ScriptingEnumerator
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface ScriptingEnumerator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./system-events.scriptingenumerator.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The description of the enumerator
-
 
 </td></tr>
 <tr><td>
 
 [hidden](./system-events.scriptingenumerator.hidden.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the enumerator hidden?
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.scriptingenumerator.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the enumerator
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.scriptingenumerator.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the enumerator
 
-
 </td></tr>
 </tbody></table>
-

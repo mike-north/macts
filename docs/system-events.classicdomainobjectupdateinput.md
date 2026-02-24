@@ -9,7 +9,7 @@ Input for updating a ClassicDomainObject
 **Signature:**
 
 ```typescript
-type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>;
+type ClassicDomainObjectUpdateInput = Partial<ClassicDomainObjectCreateInput>
 ```
-**References:** [ClassicDomainObjectCreateInput](./system-events.classicdomainobjectcreateinput.md)
 
+**References:** [ClassicDomainObjectCreateInput](./system-events.classicdomainobjectcreateinput.md)

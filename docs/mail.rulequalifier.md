@@ -9,5 +9,13 @@ RuleQualifier
 **Signature:**
 
 ```typescript
-type RuleQualifier = 'beginsWithValue' | 'doesContainValue' | 'doesNotContainValue' | 'endsWithValue' | 'equalToValue' | 'lessThanValue' | 'greaterThanValue' | 'none';
+type RuleQualifier =
+  | 'beginsWithValue'
+  | 'doesContainValue'
+  | 'doesNotContainValue'
+  | 'endsWithValue'
+  | 'equalToValue'
+  | 'lessThanValue'
+  | 'greaterThanValue'
+  | 'none'
 ```

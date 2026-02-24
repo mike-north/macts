@@ -9,5 +9,5 @@ Is the parameter hidden?
 **Signature:**
 
 ```typescript
-hidden: boolean;
+hidden: boolean
 ```

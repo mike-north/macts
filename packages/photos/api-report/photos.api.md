@@ -172,8 +172,7 @@ export interface Moment {
 }
 
 // @public
-export interface MomentCreateInput {
-}
+export type MomentCreateInput = Record<string, never>;
 
 // @public
 export class MomentResourceClient {

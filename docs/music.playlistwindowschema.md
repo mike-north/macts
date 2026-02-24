@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-PlaylistWindowSchema: z.ZodObject<{
-    selection: z.ZodString;
-    view: z.ZodString;
-}, z.core.$strip>
+PlaylistWindowSchema: z.ZodObject<
+  {
+    selection: z.ZodString
+    view: z.ZodString
+  },
+  z.core.$strip
+>
 ```

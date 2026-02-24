@@ -9,5 +9,5 @@ the unique identifier of the XML data
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

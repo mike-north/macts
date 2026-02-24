@@ -9,7 +9,7 @@ Input for updating a ToRecipient
 **Signature:**
 
 ```typescript
-type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>;
+type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>
 ```
-**References:** [ToRecipientCreateInput](./mail.torecipientcreateinput.md)
 
+**References:** [ToRecipientCreateInput](./mail.torecipientcreateinput.md)

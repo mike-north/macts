@@ -5,66 +5,65 @@
  * @packageDocumentation
  */
 
-import { DocumentResourceClient } from './resources/document.js';
-import { ParagraphResourceClient } from './resources/paragraph.js';
-import { TextRangeResourceClient } from './resources/textrange.js';
-import { SelectionResourceClient } from './resources/selection.js';
-import { TableResourceClient } from './resources/table.js';
-import { RowResourceClient } from './resources/row.js';
-import { ColumnResourceClient } from './resources/column.js';
-import { CellResourceClient } from './resources/cell.js';
-import { FontResourceClient } from './resources/font.js';
-import { PageSetupResourceClient } from './resources/pagesetup.js';
-import { SectionResourceClient } from './resources/section.js';
-import { BookmarkResourceClient } from './resources/bookmark.js';
-import { FieldResourceClient } from './resources/field.js';
-
+import { DocumentResourceClient } from './resources/document.js'
+import { ParagraphResourceClient } from './resources/paragraph.js'
+import { TextRangeResourceClient } from './resources/textrange.js'
+import { SelectionResourceClient } from './resources/selection.js'
+import { TableResourceClient } from './resources/table.js'
+import { RowResourceClient } from './resources/row.js'
+import { ColumnResourceClient } from './resources/column.js'
+import { CellResourceClient } from './resources/cell.js'
+import { FontResourceClient } from './resources/font.js'
+import { PageSetupResourceClient } from './resources/pagesetup.js'
+import { SectionResourceClient } from './resources/section.js'
+import { BookmarkResourceClient } from './resources/bookmark.js'
+import { FieldResourceClient } from './resources/field.js'
 
 /**
  * Client configuration options.
  */
 export interface MicrosoftWordClientOptions {
   /** API key for authentication */
-  apiKey: string;
+  apiKey: string
   /** Base URL for API server (default: http://localhost:8372) */
-  baseUrl?: string;
+  baseUrl?: string
 }
 
 /**
  * HTTP client wrapper for making authenticated requests.
  */
 export class HttpClient {
-  readonly #baseUrl: string;
-  readonly #apiKey: string;
+  readonly #baseUrl: string
+  readonly #apiKey: string
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl;
-    this.#apiKey = apiKey;
+    this.#baseUrl = baseUrl
+    this.#apiKey = apiKey
   }
 
   /**
    * Make an authenticated POST request to an RPC endpoint.
    */
   async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`;
+    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#apiKey}`,
+        Authorization: `Bearer ${this.#apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
+    })
 
     if (!response.ok) {
-      const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
-      throw new MicrosoftWordError(code, message);
+      const error = (await response.json()) as { error?: { code?: string; message?: string } }
+      const code = error.error?.code ?? 'UNKNOWN_ERROR'
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`
+      throw new MicrosoftWordError(code, message)
     }
 
-    const result = await response.json() as { result: T };
-    return result.result;
+    const result = (await response.json()) as { result: T }
+    return result.result
   }
 }
 
@@ -72,12 +71,12 @@ export class HttpClient {
  * Error class for MicrosoftWord API errors.
  */
 export class MicrosoftWordError extends Error {
-  readonly code: string;
+  readonly code: string
 
   constructor(code: string, message: string) {
-    super(message);
-    this.name = 'MicrosoftWordError';
-    this.code = code;
+    super(message)
+    this.name = 'MicrosoftWordError'
+    this.code = code
   }
 }
 
@@ -95,148 +94,149 @@ export class MicrosoftWordError extends Error {
  * ```
  */
 export class MicrosoftWordClient {
-  readonly #httpClient: HttpClient;
+  readonly #httpClient: HttpClient
 
   /** A Microsoft Word document */
-  readonly documents: DocumentResourceClient;
+  readonly documents: DocumentResourceClient
 
   /** A single paragraph in a document */
-  readonly paragraphs: ParagraphResourceClient;
+  readonly paragraphs: ParagraphResourceClient
 
   /** A contiguous area in a document */
-  readonly textranges: TextRangeResourceClient;
+  readonly textranges: TextRangeResourceClient
 
   /** The current selection in a document */
-  readonly selections: SelectionResourceClient;
+  readonly selections: SelectionResourceClient
 
   /** A table in a document */
-  readonly tables: TableResourceClient;
+  readonly tables: TableResourceClient
 
   /** A row in a table */
-  readonly rows: RowResourceClient;
+  readonly rows: RowResourceClient
 
   /** A column in a table */
-  readonly columns: ColumnResourceClient;
+  readonly columns: ColumnResourceClient
 
   /** A cell in a table */
-  readonly cells: CellResourceClient;
+  readonly cells: CellResourceClient
 
   /** Font formatting properties */
-  readonly fonts: FontResourceClient;
+  readonly fonts: FontResourceClient
 
   /** Page setup properties for a document or section */
-  readonly pagesetups: PageSetupResourceClient;
+  readonly pagesetups: PageSetupResourceClient
 
   /** A section in a document */
-  readonly sections: SectionResourceClient;
+  readonly sections: SectionResourceClient
 
   /** A bookmark in a document */
-  readonly bookmarks: BookmarkResourceClient;
+  readonly bookmarks: BookmarkResourceClient
 
   /** A field in a document */
-  readonly fields: FieldResourceClient;
+  readonly fields: FieldResourceClient
 
   constructor(options: MicrosoftWordClientOptions) {
-    const baseUrl = options.baseUrl ?? 'http://localhost:8372';
-    this.#httpClient = new HttpClient(baseUrl, options.apiKey);
-    this.documents = new DocumentResourceClient(this.#httpClient, 'microsoft-word', 'documents');
-    this.paragraphs = new ParagraphResourceClient(this.#httpClient, 'microsoft-word', 'paragraphs');
-    this.textranges = new TextRangeResourceClient(this.#httpClient, 'microsoft-word', 'textranges');
-    this.selections = new SelectionResourceClient(this.#httpClient, 'microsoft-word', 'selections');
-    this.tables = new TableResourceClient(this.#httpClient, 'microsoft-word', 'tables');
-    this.rows = new RowResourceClient(this.#httpClient, 'microsoft-word', 'rows');
-    this.columns = new ColumnResourceClient(this.#httpClient, 'microsoft-word', 'columns');
-    this.cells = new CellResourceClient(this.#httpClient, 'microsoft-word', 'cells');
-    this.fonts = new FontResourceClient(this.#httpClient, 'microsoft-word', 'fonts');
-    this.pagesetups = new PageSetupResourceClient(this.#httpClient, 'microsoft-word', 'pagesetups');
-    this.sections = new SectionResourceClient(this.#httpClient, 'microsoft-word', 'sections');
-    this.bookmarks = new BookmarkResourceClient(this.#httpClient, 'microsoft-word', 'bookmarks');
-    this.fields = new FieldResourceClient(this.#httpClient, 'microsoft-word', 'fields');
+    const baseUrl = options.baseUrl ?? 'http://localhost:8372'
+    this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.documents = new DocumentResourceClient(this.#httpClient, 'microsoft-word', 'documents')
+    this.paragraphs = new ParagraphResourceClient(this.#httpClient, 'microsoft-word', 'paragraphs')
+    this.textranges = new TextRangeResourceClient(this.#httpClient, 'microsoft-word', 'textranges')
+    this.selections = new SelectionResourceClient(this.#httpClient, 'microsoft-word', 'selections')
+    this.tables = new TableResourceClient(this.#httpClient, 'microsoft-word', 'tables')
+    this.rows = new RowResourceClient(this.#httpClient, 'microsoft-word', 'rows')
+    this.columns = new ColumnResourceClient(this.#httpClient, 'microsoft-word', 'columns')
+    this.cells = new CellResourceClient(this.#httpClient, 'microsoft-word', 'cells')
+    this.fonts = new FontResourceClient(this.#httpClient, 'microsoft-word', 'fonts')
+    this.pagesetups = new PageSetupResourceClient(this.#httpClient, 'microsoft-word', 'pagesetups')
+    this.sections = new SectionResourceClient(this.#httpClient, 'microsoft-word', 'sections')
+    this.bookmarks = new BookmarkResourceClient(this.#httpClient, 'microsoft-word', 'bookmarks')
+    this.fields = new FieldResourceClient(this.#httpClient, 'microsoft-word', 'fields')
   }
 
   /**
    * Get the HTTP client for making custom requests.
    */
   get http(): HttpClient {
-    return this.#httpClient;
+    return this.#httpClient
   }
 
   /**
    * Undo the last action
    */
   async undo(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.undo', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.undo', {})
   }
-
 
   /**
    * Redo the last undone action
    */
   async redo(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.redo', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.redo', {})
   }
-
 
   /**
    * Copy the selected content to the clipboard
    */
   async copyObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.copyObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.copyObject', {})
   }
-
 
   /**
    * Cut the selected content to the clipboard
    */
   async cutObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.cutObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.cutObject', {})
   }
-
 
   /**
    * Paste content from the clipboard
    */
   async pasteObject(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.pasteObject', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.pasteObject', {})
   }
-
 
   /**
    * Select all content in the document
    */
   async selectAll(): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.selectAll', {});
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.selectAll', {})
   }
-
 
   /**
    * Find text in the document
    */
   async find(findText: string, matchCase?: boolean, matchWholeWord?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.find', { findText, matchCase, matchWholeWord });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.find', {
+      findText,
+      matchCase,
+      matchWholeWord,
+    })
   }
-
 
   /**
    * Replace text in the document
    */
   async replace(findText: string, replaceWith: string, replaceAll?: boolean): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.replace', { findText, replaceWith, replaceAll });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.replace', {
+      findText,
+      replaceWith,
+      replaceAll,
+    })
   }
-
 
   /**
    * Insert text at the specified location
    */
   async insertText(text: string, at?: number): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.insertText', { text, at });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.insertText', { text, at })
   }
-
 
   /**
    * Create a new document
    */
   async createNewDocument(attachedTemplate?: string): Promise<void> {
-    return this.#httpClient.rpc<void>('microsoft-word.app.createNewDocument', { attachedTemplate });
+    await this.#httpClient.rpc<undefined>('microsoft-word.app.createNewDocument', {
+      attachedTemplate,
+    })
   }
 }

@@ -18,30 +18,24 @@ create(input: PopUpButtonCreateInput): Promise<PopUpButton>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[PopUpButton](./system-events.popupbutton.md)<!-- -->&gt;
-

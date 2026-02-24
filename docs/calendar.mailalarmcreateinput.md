@@ -9,7 +9,7 @@ Input for creating a MailAlarm
 **Signature:**
 
 ```typescript
-interface MailAlarmCreateInput 
+interface MailAlarmCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface MailAlarmCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [triggerDate?](./calendar.mailalarmcreateinput.triggerdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ An absolute alarm date
-
 
 </td></tr>
 <tr><td>
 
 [triggerInterval?](./calendar.mailalarmcreateinput.triggerinterval.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The interval in minutes between the event and the alarm (positive for after, negative for before)
 
-
 </td></tr>
 </tbody></table>
-

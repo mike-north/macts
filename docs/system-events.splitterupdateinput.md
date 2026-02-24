@@ -9,7 +9,7 @@ Input for updating a Splitter
 **Signature:**
 
 ```typescript
-type SplitterUpdateInput = Partial<SplitterCreateInput>;
+type SplitterUpdateInput = Partial<SplitterCreateInput>
 ```
-**References:** [SplitterCreateInput](./system-events.splittercreateinput.md)
 
+**References:** [SplitterCreateInput](./system-events.splittercreateinput.md)

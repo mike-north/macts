@@ -9,5 +9,5 @@ what the action does
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

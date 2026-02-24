@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-cert: Buffer;
+cert: Buffer
 ```

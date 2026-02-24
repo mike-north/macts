@@ -9,7 +9,7 @@ A bookmarks folder that contains other bookmarks folder and bookmark items.
 **Signature:**
 
 ```typescript
-interface BookmarkFolder 
+interface BookmarkFolder
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface BookmarkFolder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./google-chrome.bookmarkfolder.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique ID of the bookmark folder.
-
 
 </td></tr>
 <tr><td>
 
 [index](./google-chrome.bookmarkfolder.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Returns the index with respect to its parent bookmark folder.
-
 
 </td></tr>
 <tr><td>
 
 [title](./google-chrome.bookmarkfolder.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The title of the folder.
 
-
 </td></tr>
 </tbody></table>
-

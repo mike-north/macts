@@ -7,19 +7,22 @@
 **Signature:**
 
 ```typescript
-EQPresetSchema: z.ZodObject<{
-    band1: z.ZodNumber;
-    band2: z.ZodNumber;
-    band3: z.ZodNumber;
-    band4: z.ZodNumber;
-    band5: z.ZodNumber;
-    band6: z.ZodNumber;
-    band7: z.ZodNumber;
-    band8: z.ZodNumber;
-    band9: z.ZodNumber;
-    band10: z.ZodNumber;
-    modifiable: z.ZodBoolean;
-    preamp: z.ZodNumber;
-    updateTracks: z.ZodBoolean;
-}, z.core.$strip>
+EQPresetSchema: z.ZodObject<
+  {
+    band1: z.ZodNumber
+    band2: z.ZodNumber
+    band3: z.ZodNumber
+    band4: z.ZodNumber
+    band5: z.ZodNumber
+    band6: z.ZodNumber
+    band7: z.ZodNumber
+    band8: z.ZodNumber
+    band9: z.ZodNumber
+    band10: z.ZodNumber
+    modifiable: z.ZodBoolean
+    preamp: z.ZodNumber
+    updateTracks: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

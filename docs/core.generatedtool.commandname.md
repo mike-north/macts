@@ -9,5 +9,5 @@ Command name from manifest (e.g., "list")
 **Signature:**
 
 ```typescript
-commandName: string;
+commandName: string
 ```

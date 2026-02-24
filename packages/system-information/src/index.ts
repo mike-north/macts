@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-export { SystemInformationClient, SystemInformationError, HttpClient } from './client.js';
-export type { SystemInformationClientOptions } from './client.js';
-export * from './types.js';
-export { DocumentResourceClient } from './resources/document.js';
+export { SystemInformationClient, SystemInformationError, HttpClient } from './client.js'
+export type { SystemInformationClientOptions } from './client.js'
+export * from './types.js'
+export { DocumentResourceClient } from './resources/document.js'

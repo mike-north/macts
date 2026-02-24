@@ -9,7 +9,7 @@ Input for updating a JabberHandle
 **Signature:**
 
 ```typescript
-type JabberHandleUpdateInput = Partial<JabberHandleCreateInput>;
+type JabberHandleUpdateInput = Partial<JabberHandleCreateInput>
 ```
-**References:** [JabberHandleCreateInput](./contacts.jabberhandlecreateinput.md)
 
+**References:** [JabberHandleCreateInput](./contacts.jabberhandlecreateinput.md)

@@ -9,5 +9,5 @@ The kind of alias, as shown in Finder
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

@@ -11,7 +11,7 @@ Restart the computer
 ```typescript
 restart(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

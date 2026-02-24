@@ -18,30 +18,24 @@ create(input: URLTrackCreateInput): Promise<URLTrack>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [URLTrackCreateInput](./tv.urltrackcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[URLTrack](./tv.urltrack.md)<!-- -->&gt;
-

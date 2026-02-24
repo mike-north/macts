@@ -9,7 +9,7 @@ A Safari document (window)
 **Signature:**
 
 ```typescript
-interface Document 
+interface Document
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Document
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./safari.document.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the document
-
 
 </td></tr>
 <tr><td>
 
 [name](./safari.document.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The document name
-
 
 </td></tr>
 <tr><td>
 
 [url](./safari.document.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The current URL
 
-
 </td></tr>
 </tbody></table>
-

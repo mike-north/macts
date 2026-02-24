@@ -101,7 +101,7 @@ describe('NoopTracer / NoopSpan', () => {
 
 describe('withSpan', () => {
   it('should execute the function and return its result', async () => {
-    const result = await withSpan('test-op', async (_span) => {
+    const result = await withSpan('test-op', (_span) => {
       return 42
     })
     expect(result).toBe(42)
@@ -109,7 +109,7 @@ describe('withSpan', () => {
 
   it('should pass a span to the function', async () => {
     let capturedSpan: Span | undefined
-    await withSpan('test-op', async (span) => {
+    await withSpan('test-op', (span) => {
       capturedSpan = span
       return null
     })
@@ -121,14 +121,14 @@ describe('withSpan', () => {
 
   it('should pass attributes to the span', async () => {
     // No-op tracer ignores attributes, but should not throw
-    const result = await withSpan('test-op', async (_span) => 'done', { 'custom.attr': 'value' })
+    const result = await withSpan('test-op', (_span) => 'done', { 'custom.attr': 'value' })
     expect(result).toBe('done')
   })
 
   it('should re-throw errors from the wrapped function', async () => {
     const error = new Error('test failure')
     await expect(
-      withSpan('failing-op', async () => {
+      withSpan('failing-op', () => {
         throw error
       })
     ).rejects.toThrow('test failure')
@@ -136,7 +136,7 @@ describe('withSpan', () => {
 
   it('should re-throw non-Error exceptions', async () => {
     await expect(
-      withSpan('failing-op', async () => {
+      withSpan('failing-op', () => {
         // eslint-disable-next-line @typescript-eslint/only-throw-error
         throw 'string error'
       })

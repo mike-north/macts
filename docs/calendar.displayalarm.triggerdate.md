@@ -9,5 +9,5 @@ An absolute alarm date
 **Signature:**
 
 ```typescript
-triggerDate: Date;
+triggerDate: Date
 ```

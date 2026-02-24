@@ -7,16 +7,22 @@
 **Signature:**
 
 ```typescript
-CalendarSchema: z.ZodObject<{
-    name: z.ZodString;
-    title: z.ZodString;
-    color: z.ZodObject<{
-        red: z.ZodNumber;
-        green: z.ZodNumber;
-        blue: z.ZodNumber;
-    }, z.core.$strip>;
-    calendarIdentifier: z.ZodString;
-    writable: z.ZodBoolean;
-    description: z.ZodString;
-}, z.core.$strip>
+CalendarSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    title: z.ZodString
+    color: z.ZodObject<
+      {
+        red: z.ZodNumber
+        green: z.ZodNumber
+        blue: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    calendarIdentifier: z.ZodString
+    writable: z.ZodBoolean
+    description: z.ZodString
+  },
+  z.core.$strip
+>
 ```

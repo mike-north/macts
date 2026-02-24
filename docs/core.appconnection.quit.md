@@ -9,7 +9,7 @@
 ```typescript
 quit(): Promise<undefined>;
 ```
+
 **Returns:**
 
 Promise&lt;undefined&gt;
-

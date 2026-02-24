@@ -9,5 +9,5 @@ Is the process the frontmost process
 **Signature:**
 
 ```typescript
-frontmost: boolean;
+frontmost: boolean
 ```

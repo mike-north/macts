@@ -9,5 +9,5 @@ PlayerState
 **Signature:**
 
 ```typescript
-type PlayerState = 'stopped' | 'playing' | 'paused';
+type PlayerState = 'stopped' | 'playing' | 'paused'
 ```

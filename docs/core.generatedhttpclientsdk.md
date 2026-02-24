@@ -9,7 +9,7 @@ Result of HTTP client SDK generation.
 **Signature:**
 
 ```typescript
-interface GeneratedHttpClientSdk 
+interface GeneratedHttpClientSdk
 ```
 
 ## Properties
@@ -18,56 +18,43 @@ interface GeneratedHttpClientSdk
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [errors](./core.generatedhttpclientsdk.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generatedhttpclientsdk.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

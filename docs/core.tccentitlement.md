@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type TccEntitlement = z.infer<typeof TccEntitlementSchema>;
+type TccEntitlement = z.infer<typeof TccEntitlementSchema>
 ```
-**References:** [TccEntitlementSchema](./core.tccentitlementschema.md)
 
+**References:** [TccEntitlementSchema](./core.tccentitlementschema.md)

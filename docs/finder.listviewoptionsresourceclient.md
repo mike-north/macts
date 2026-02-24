@@ -9,7 +9,7 @@ Client for the list view options.
 **Signature:**
 
 ```typescript
-declare class ListViewOptionsResourceClient 
+declare class ListViewOptionsResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ListViewOptionsResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.listviewoptionsresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ListViewOptionsResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ListViewOptionsResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.listviewoptionsresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new listviewoptions.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.listviewoptionsresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a listviewoptions.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.listviewoptionsresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a listviewoptions by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.listviewoptionsresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all listviewoptionss.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.listviewoptionsresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing listviewoptions.
 
-
 </td></tr>
 </tbody></table>
-

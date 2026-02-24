@@ -9,5 +9,5 @@ is this track disliked?
 **Signature:**
 
 ```typescript
-disliked: boolean;
+disliked: boolean
 ```

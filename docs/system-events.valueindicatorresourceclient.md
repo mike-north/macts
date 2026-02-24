@@ -9,7 +9,7 @@ Client for a value indicator ( thumb or slider ) belonging to a scroll bar.
 **Signature:**
 
 ```typescript
-declare class ValueIndicatorResourceClient 
+declare class ValueIndicatorResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ValueIndicatorResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.valueindicatorresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ValueIndicatorResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ValueIndicatorResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.valueindicatorresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new valueindicator.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.valueindicatorresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a valueindicator.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.valueindicatorresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a valueindicator by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.valueindicatorresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all valueindicators.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.valueindicatorresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing valueindicator.
 
-
 </td></tr>
 </tbody></table>
-

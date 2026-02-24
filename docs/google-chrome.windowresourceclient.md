@@ -9,7 +9,7 @@ Client for a window..
 **Signature:**
 
 ```typescript
-declare class WindowResourceClient 
+declare class WindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class WindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./google-chrome.windowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `WindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `WindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./google-chrome.windowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new window.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./google-chrome.windowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a window.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./google-chrome.windowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a window by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./google-chrome.windowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all windows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./google-chrome.windowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing window.
 
-
 </td></tr>
 </tbody></table>
-

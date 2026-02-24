@@ -9,7 +9,7 @@ Fluent builder for JXA object specifier chains. Generates code like: Application
 **Signature:**
 
 ```typescript
-declare class ObjectSpecifier 
+declare class ObjectSpecifier
 ```
 
 ## Methods
@@ -18,187 +18,147 @@ declare class ObjectSpecifier
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [app(bundleId)](./core.objectspecifier.app.md)
 
-
 </td><td>
 
 `static`
 
-
 </td><td>
 
 Start building from an application.
-
 
 </td></tr>
 <tr><td>
 
 [at(index)](./core.objectspecifier.at.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Select item by index (0-based in TypeScript, converted to 1-based for JXA).
-
 
 </td></tr>
 <tr><td>
 
 [byId(id)](./core.objectspecifier.byid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Select item by ID.
-
 
 </td></tr>
 <tr><td>
 
 [byName(name)](./core.objectspecifier.byname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Select item by name.
-
 
 </td></tr>
 <tr><td>
 
 [collection(name)](./core.objectspecifier.collection.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Access a collection (e.g., calendars, events).
-
 
 </td></tr>
 <tr><td>
 
 [getSteps()](./core.objectspecifier.getsteps.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get the steps for inspection.
-
 
 </td></tr>
 <tr><td>
 
 [property(name)](./core.objectspecifier.property.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Access a property.
-
 
 </td></tr>
 <tr><td>
 
 [toDeleteCode()](./core.objectspecifier.todeletecode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Generate JXA code to delete an object.
-
 
 </td></tr>
 <tr><td>
 
 [toGetCode()](./core.objectspecifier.togetcode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Generate JXA code to get the value.
-
 
 </td></tr>
 <tr><td>
 
 [toMakeCode(properties)](./core.objectspecifier.tomakecode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Generate JXA code to make a new object.
-
 
 </td></tr>
 <tr><td>
 
 [toSetCode(value)](./core.objectspecifier.tosetcode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Generate JXA code to set a value.
-
 
 </td></tr>
 <tr><td>
 
 [whose(predicate)](./core.objectspecifier.whose.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Filter collection with a predicate.
 
-
 </td></tr>
 </tbody></table>
-

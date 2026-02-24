@@ -11,7 +11,7 @@ List all scriptingsuites.
 ```typescript
 list(): Promise<ScriptingSuite[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingSuite](./system-events.scriptingsuite.md)<!-- -->\[\]&gt;
-

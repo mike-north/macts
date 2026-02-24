@@ -9,7 +9,7 @@ Generate TypeScript type alias for an enum as a string literal union.
 **Signature:**
 
 ```typescript
-declare function generateEnumType(enumDef: Enum): GeneratedType;
+declare function generateEnumType(enumDef: Enum): GeneratedType
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function generateEnumType(enumDef: Enum): GeneratedType;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 enumDef
 
-
 </td><td>
 
 [Enum](./core.enum.md)
 
-
 </td><td>
 
 The enum definition from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -56,10 +50,8 @@ Generated type with string literal union
 
 ## Example
 
-
 ```typescript
 // For an enum with values 'active' and 'inactive':
 // Generates:
 // export type Status = 'active' | 'inactive';
 ```
-

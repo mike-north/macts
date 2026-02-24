@@ -9,7 +9,7 @@ Input for updating a Drawer
 **Signature:**
 
 ```typescript
-type DrawerUpdateInput = Partial<DrawerCreateInput>;
+type DrawerUpdateInput = Partial<DrawerCreateInput>
 ```
-**References:** [DrawerCreateInput](./system-events.drawercreateinput.md)
 
+**References:** [DrawerCreateInput](./system-events.drawercreateinput.md)

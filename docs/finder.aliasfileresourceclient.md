@@ -9,7 +9,7 @@ Client for an alias file (created with “make alias”).
 **Signature:**
 
 ```typescript
-declare class AliasFileResourceClient 
+declare class AliasFileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AliasFileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.aliasfileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AliasFileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AliasFileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.aliasfileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new aliasfile.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.aliasfileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a aliasfile.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.aliasfileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a aliasfile by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.aliasfileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all aliasfiles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.aliasfileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing aliasfile.
 
-
 </td></tr>
 </tbody></table>
-

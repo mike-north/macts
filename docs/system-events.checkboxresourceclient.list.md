@@ -11,7 +11,7 @@ List all checkboxes.
 ```typescript
 list(): Promise<Checkbox[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Checkbox](./system-events.checkbox.md)<!-- -->\[\]&gt;
-

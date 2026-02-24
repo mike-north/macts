@@ -9,5 +9,5 @@ Plugin name (e.g., 'calendar')
 **Signature:**
 
 ```typescript
-pluginName: string;
+pluginName: string
 ```

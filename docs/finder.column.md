@@ -9,7 +9,7 @@ a column of a list view
 **Signature:**
 
 ```typescript
-interface Column 
+interface Column
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface Column
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [index](./finder.column.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index in the front-to-back ordering within its container
-
 
 </td></tr>
 <tr><td>
 
 [maximumWidth](./finder.column.maximumwidth.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the maximum allowed width of this column
-
 
 </td></tr>
 <tr><td>
 
 [minimumWidth](./finder.column.minimumwidth.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the minimum allowed width of this column
-
 
 </td></tr>
 <tr><td>
 
 [name](./finder.column.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the column name
-
 
 </td></tr>
 <tr><td>
 
 [sortDirection](./finder.column.sortdirection.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The direction in which the window is sorted
-
 
 </td></tr>
 <tr><td>
 
 [visible](./finder.column.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this column visible
-
 
 </td></tr>
 <tr><td>
 
 [width](./finder.column.width.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the width of this column
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,30 +18,24 @@ create(input: ScriptingElementCreateInput): Promise<ScriptingElement>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingElement](./system-events.scriptingelement.md)<!-- -->&gt;
-

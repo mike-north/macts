@@ -11,7 +11,11 @@ Use this when you've already validated the token and have the payload.
 **Signature:**
 
 ```typescript
-declare function checkPayloadPermission(payload: ApiKeyPayload, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): PermissionCheckResult;
+declare function checkPayloadPermission(
+  payload: ApiKeyPayload,
+  requiredPermission: string,
+  permissionHistory?: PermissionHistoryEntry[]
+): PermissionCheckResult
 ```
 
 ## Parameters
@@ -20,64 +24,52 @@ declare function checkPayloadPermission(payload: ApiKeyPayload, requiredPermissi
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 payload
 
-
 </td><td>
 
 [ApiKeyPayload](./core.apikeypayload.md)
 
-
 </td><td>
 
 Validated API key payload
-
 
 </td></tr>
 <tr><td>
 
 requiredPermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission to check
-
 
 </td></tr>
 <tr><td>
 
 permissionHistory
 
-
 </td><td>
 
 [PermissionHistoryEntry](./core.permissionhistoryentry.md)<!-- -->\[\]
 
-
 </td><td>
 
 _(Optional)_ Optional history for helpful error messages
-
 
 </td></tr>
 </tbody></table>
@@ -87,4 +79,3 @@ _(Optional)_ Optional history for helpful error messages
 [PermissionCheckResult](./core.permissioncheckresult.md)
 
 Permission check result
-

@@ -9,7 +9,7 @@ Generate a complete permission map from a manifest's permissions section. The ma
 **Signature:**
 
 ```typescript
-interface PermissionMap 
+interface PermissionMap
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface PermissionMap
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [allCoarse](./core.permissionmap.allcoarse.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Set&lt;string&gt;
 
-
 </td><td>
 
 All coarse permissions
-
 
 </td></tr>
 <tr><td>
 
 [allFine](./core.permissionmap.allfine.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Set&lt;string&gt;
 
-
 </td><td>
 
 All fine-grained permissions
-
 
 </td></tr>
 <tr><td>
 
 [coarseToFine](./core.permissionmap.coarsetofine.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Map&lt;string, string\[\]&gt;
 
-
 </td><td>
 
 Map of coarse permission to fine-grained permissions
-
 
 </td></tr>
 <tr><td>
 
 [fineToCoarse](./core.permissionmap.finetocoarse.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Map&lt;string, string&gt;
 
-
 </td><td>
 
 Map of fine-grained permission to its coarse category
 
-
 </td></tr>
 </tbody></table>
-

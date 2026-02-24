@@ -9,5 +9,5 @@ The Suffix of this person.
 **Signature:**
 
 ```typescript
-suffix: string;
+suffix: string
 ```

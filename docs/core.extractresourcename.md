@@ -9,7 +9,7 @@ Extract the resource name from a permission string.
 **Signature:**
 
 ```typescript
-declare function extractResourceName(permission: string): string | undefined;
+declare function extractResourceName(permission: string): string | undefined
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function extractResourceName(permission: string): string | undefined;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission string
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Permission string
 string \| undefined
 
 Resource name or undefined if invalid
-

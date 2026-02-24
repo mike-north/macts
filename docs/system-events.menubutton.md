@@ -9,7 +9,7 @@ A menu button belonging to a window
 **Signature:**
 
 ```typescript
-interface MenuButton 
+interface MenuButton
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface MenuButton
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.menubutton.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this menu button
 
-
 </td></tr>
 </tbody></table>
-

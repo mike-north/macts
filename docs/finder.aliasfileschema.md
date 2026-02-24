@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-AliasFileSchema: z.ZodObject<{
-    originalItem: z.ZodString;
-}, z.core.$strip>
+AliasFileSchema: z.ZodObject<
+  {
+    originalItem: z.ZodString
+  },
+  z.core.$strip
+>
 ```

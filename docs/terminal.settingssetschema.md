@@ -7,12 +7,15 @@
 **Signature:**
 
 ```typescript
-SettingsSetSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodNumber;
-    numberOfRows: z.ZodNumber;
-    numberOfColumns: z.ZodNumber;
-    fontName: z.ZodString;
-    fontSize: z.ZodNumber;
-}, z.core.$strip>
+SettingsSetSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodNumber
+    numberOfRows: z.ZodNumber
+    numberOfColumns: z.ZodNumber
+    fontName: z.ZodString
+    fontSize: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ Does the process run exclusively in the background?
 **Signature:**
 
 ```typescript
-backgroundOnly: boolean;
+backgroundOnly: boolean
 ```

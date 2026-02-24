@@ -18,30 +18,24 @@ create(input: RadioTunerPlaylistCreateInput): Promise<RadioTunerPlaylist>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RadioTunerPlaylist](./music.radiotunerplaylist.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ If rule matches, delete message
 **Signature:**
 
 ```typescript
-deleteMessage: boolean;
+deleteMessage: boolean
 ```

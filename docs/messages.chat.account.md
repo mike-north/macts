@@ -9,5 +9,5 @@ The account which is participating in this chat.
 **Signature:**
 
 ```typescript
-account: Account;
+account: Account
 ```

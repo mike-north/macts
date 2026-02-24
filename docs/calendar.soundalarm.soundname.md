@@ -9,5 +9,5 @@ The system sound name to be used for the alarm
 **Signature:**
 
 ```typescript
-soundName: string;
+soundName: string
 ```

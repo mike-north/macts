@@ -18,30 +18,24 @@ create(input: ChatCreateInput): Promise<Chat>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ChatCreateInput](./messages.chatcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Chat](./messages.chat.md)<!-- -->&gt;
-

@@ -18,30 +18,24 @@ create(input: TabCreateInput): Promise<Tab>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TabCreateInput](./safari.tabcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Tab](./safari.tab.md)<!-- -->&gt;
-

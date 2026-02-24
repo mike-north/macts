@@ -9,5 +9,5 @@ The HTML source of the web page currently loaded in the tab
 **Signature:**
 
 ```typescript
-source: string;
+source: string
 ```

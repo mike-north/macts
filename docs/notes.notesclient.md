@@ -9,19 +9,18 @@ Notes client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class NotesClient 
+declare class NotesClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new NotesClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./notes.notesclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `NotesClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,127 +57,102 @@ Constructs a new instance of the `NotesClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accounts](./notes.notesclient.accounts.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AccountResourceClient](./notes.accountresourceclient.md)
 
-
 </td><td>
 
 A Notes account
-
 
 </td></tr>
 <tr><td>
 
 [attachments](./notes.notesclient.attachments.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AttachmentResourceClient](./notes.attachmentresourceclient.md)
 
-
 </td><td>
 
 A note attachment
-
 
 </td></tr>
 <tr><td>
 
 [folders](./notes.notesclient.folders.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FolderResourceClient](./notes.folderresourceclient.md)
 
-
 </td><td>
 
 A Notes folder
-
 
 </td></tr>
 <tr><td>
 
 [http](./notes.notesclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./notes.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [notes](./notes.notesclient.notes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [NoteResourceClient](./notes.noteresourceclient.md)
 
-
 </td><td>
 
 A note
 
-
 </td></tr>
 </tbody></table>
-

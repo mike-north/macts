@@ -9,7 +9,7 @@ Input for creating a Calendar
 **Signature:**
 
 ```typescript
-interface CalendarCreateInput 
+interface CalendarCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface CalendarCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color?](./calendar.calendarcreateinput.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The calendar color
-
 
 </td></tr>
 <tr><td>
 
 [description?](./calendar.calendarcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The calendar description
-
 
 </td></tr>
 <tr><td>
 
 [name?](./calendar.calendarcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The calendar title
-
 
 </td></tr>
 <tr><td>
 
 [title?](./calendar.calendarcreateinput.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The calendar title (synonym for name)
 
-
 </td></tr>
 </tbody></table>
-

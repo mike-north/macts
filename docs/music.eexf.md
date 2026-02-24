@@ -9,5 +9,5 @@ EExF
 **Signature:**
 
 ```typescript
-type EExF = 'plainText' | 'unicodeText' | 'xML' | '3' | '3';
+type EExF = 'plainText' | 'unicodeText' | 'xML' | '3' | '3'
 ```

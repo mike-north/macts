@@ -9,5 +9,5 @@ Required permission that was checked
 **Signature:**
 
 ```typescript
-required: string;
+required: string
 ```

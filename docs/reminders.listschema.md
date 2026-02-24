@@ -7,14 +7,20 @@
 **Signature:**
 
 ```typescript
-ListSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    color: z.ZodObject<{
-        red: z.ZodNumber;
-        green: z.ZodNumber;
-        blue: z.ZodNumber;
-    }, z.core.$strip>;
-    emblem: z.ZodString;
-}, z.core.$strip>
+ListSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    color: z.ZodObject<
+      {
+        red: z.ZodNumber
+        green: z.ZodNumber
+        blue: z.ZodNumber
+      },
+      z.core.$strip
+    >
+    emblem: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The position of the window
 **Signature:**
 
 ```typescript
-position: string;
+position: string
 ```

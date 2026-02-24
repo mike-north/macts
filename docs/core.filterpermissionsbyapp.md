@@ -9,7 +9,7 @@ Filter a list of permissions to only those matching an app.
 **Signature:**
 
 ```typescript
-declare function filterPermissionsByApp(permissions: string[], app: string): string[];
+declare function filterPermissionsByApp(permissions: string[], app: string): string[]
 ```
 
 ## Parameters
@@ -18,48 +18,39 @@ declare function filterPermissionsByApp(permissions: string[], app: string): str
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of permission strings
-
 
 </td></tr>
 <tr><td>
 
 app
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 App name to filter by
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +60,3 @@ App name to filter by
 string\[\]
 
 Filtered permissions
-

@@ -9,5 +9,5 @@ The name of the property
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

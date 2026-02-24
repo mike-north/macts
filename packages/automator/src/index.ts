@@ -18,11 +18,11 @@
  * @packageDocumentation
  */
 
-export { AutomatorClient, AutomatorError, HttpClient } from './client.js';
-export type { AutomatorClientOptions } from './client.js';
-export * from './types.js';
-export { WorkflowResourceClient } from './resources/workflow.js';
-export { AutomatorActionResourceClient } from './resources/automatoraction.js';
-export { VariableResourceClient } from './resources/variable.js';
-export { SettingResourceClient } from './resources/setting.js';
-export { RequiredResourceResourceClient } from './resources/requiredresource.js';
+export { AutomatorClient, AutomatorError, HttpClient } from './client.js'
+export type { AutomatorClientOptions } from './client.js'
+export * from './types.js'
+export { WorkflowResourceClient } from './resources/workflow.js'
+export { AutomatorActionResourceClient } from './resources/automatoraction.js'
+export { VariableResourceClient } from './resources/variable.js'
+export { SettingResourceClient } from './resources/setting.js'
+export { RequiredResourceResourceClient } from './resources/requiredresource.js'

@@ -9,7 +9,7 @@ Group permissions by resource.
 **Signature:**
 
 ```typescript
-declare function groupPermissionsByResource(permissions: string[]): Map<string, string[]>;
+declare function groupPermissionsByResource(permissions: string[]): Map<string, string[]>
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function groupPermissionsByResource(permissions: string[]): Map<string, 
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of permission strings
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Array of permission strings
 Map&lt;string, string\[\]&gt;
 
 Map of resource name to permissions
-

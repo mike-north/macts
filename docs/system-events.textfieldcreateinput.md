@@ -9,5 +9,5 @@ Input for creating a TextField
 **Signature:**
 
 ```typescript
-interface TextFieldCreateInput 
+interface TextFieldCreateInput
 ```

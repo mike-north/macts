@@ -10,7 +10,7 @@ Property access mode - whether a property is read-only or read-write.
 
 ```typescript
 PropertyAccessSchema: z.ZodEnum<{
-    r: "r";
-    rw: "rw";
+  r: 'r'
+  rw: 'rw'
 }>
 ```

@@ -9,5 +9,5 @@ the description of the playlist
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

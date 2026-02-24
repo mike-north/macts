@@ -9,5 +9,5 @@ The title of the tab.
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -9,5 +9,5 @@ the short version of the application bundle referenced by the alias
 **Signature:**
 
 ```typescript
-shortVersion: string;
+shortVersion: string
 ```

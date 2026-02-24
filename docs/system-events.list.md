@@ -9,7 +9,7 @@ A list belonging to a window
 **Signature:**
 
 ```typescript
-interface List 
+interface List
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface List
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.list.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this list
 
-
 </td></tr>
 </tbody></table>
-

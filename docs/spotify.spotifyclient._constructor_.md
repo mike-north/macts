@@ -18,31 +18,24 @@ constructor(options: SpotifyClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [SpotifyClientOptions](./spotify.spotifyclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

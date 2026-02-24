@@ -9,7 +9,7 @@ Client for a column of a list view.
 **Signature:**
 
 ```typescript
-declare class ColumnResourceClient 
+declare class ColumnResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ColumnResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.columnresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ColumnResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ColumnResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.columnresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new column.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.columnresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a column.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.columnresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a column by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.columnresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all columns.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.columnresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing column.
 
-
 </td></tr>
 </tbody></table>
-

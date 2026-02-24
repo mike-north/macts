@@ -9,7 +9,7 @@ Convert a Zod schema to JSON Schema with definitions. Useful for complex schemas
 **Signature:**
 
 ```typescript
-declare function toJsonSchemaWithDefinitions(schema: z.ZodType, name: string): JsonSchema7Type;
+declare function toJsonSchemaWithDefinitions(schema: z.ZodType, name: string): JsonSchema7Type
 ```
 
 ## Parameters
@@ -18,48 +18,39 @@ declare function toJsonSchemaWithDefinitions(schema: z.ZodType, name: string): J
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 schema
 
-
 </td><td>
 
 z.ZodType
 
-
 </td><td>
 
 Zod schema to convert
-
 
 </td></tr>
 <tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Name for the schema in $defs
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +60,3 @@ Name for the schema in $defs
 JsonSchema7Type
 
 JSON Schema object with definitions
-

@@ -9,5 +9,5 @@ The Folder Action Scripts folder
 **Signature:**
 
 ```typescript
-folderActionScriptsFolder: Folder;
+folderActionScriptsFolder: Folder
 ```

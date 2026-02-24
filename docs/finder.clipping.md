@@ -9,7 +9,7 @@ A clipping
 **Signature:**
 
 ```typescript
-interface Clipping 
+interface Clipping
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Clipping
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [clippingWindow](./finder.clipping.clippingwindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 (NOT AVAILABLE YET) the clipping window for this clipping
 
-
 </td></tr>
 </tbody></table>
-

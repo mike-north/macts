@@ -9,5 +9,5 @@ the name of the process
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

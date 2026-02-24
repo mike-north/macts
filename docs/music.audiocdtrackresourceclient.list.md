@@ -11,7 +11,7 @@ List all audiocdtracks.
 ```typescript
 list(): Promise<AudioCDTrack[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[AudioCDTrack](./music.audiocdtrack.md)<!-- -->\[\]&gt;
-

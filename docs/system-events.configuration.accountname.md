@@ -9,5 +9,5 @@ the name used to authenticate
 **Signature:**
 
 ```typescript
-accountName: string;
+accountName: string
 ```

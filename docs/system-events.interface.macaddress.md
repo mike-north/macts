@@ -9,5 +9,5 @@ the MAC address for the interface
 **Signature:**
 
 ```typescript
-mACAddress: string;
+mACAddress: string
 ```

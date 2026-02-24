@@ -9,7 +9,7 @@ the main library playlist
 **Signature:**
 
 ```typescript
-interface LibraryPlaylist 
+interface LibraryPlaylist
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface LibraryPlaylist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.libraryplaylist.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this playlist
 
-
 </td></tr>
 </tbody></table>
-

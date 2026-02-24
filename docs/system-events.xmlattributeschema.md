@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-XMLAttributeSchema: z.ZodObject<{
-    name: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+XMLAttributeSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

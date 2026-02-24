@@ -1,7 +1,7 @@
 /**
- * CLI plugin for ScriptEditor.
+ * CLI plugin for Script Editor.
  *
  * @packageDocumentation
  */
 
-export { plugin } from './plugin.js';
+export { plugin } from './plugin.js'

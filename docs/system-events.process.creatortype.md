@@ -9,5 +9,5 @@ the OSType of the creator of the process (the signature)
 **Signature:**
 
 ```typescript
-creatorType: string;
+creatorType: string
 ```

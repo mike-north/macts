@@ -10,13 +10,13 @@ TCC (Transparency, Consent, and Control) entitlements.
 
 ```typescript
 TccEntitlementSchema: z.ZodEnum<{
-    calendar: "calendar";
-    contacts: "contacts";
-    reminders: "reminders";
-    photos: "photos";
-    music: "music";
-    files: "files";
-    accessibility: "accessibility";
-    automation: "automation";
+  calendar: 'calendar'
+  contacts: 'contacts'
+  reminders: 'reminders'
+  photos: 'photos'
+  music: 'music'
+  files: 'files'
+  accessibility: 'accessibility'
+  automation: 'automation'
 }>
 ```

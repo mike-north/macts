@@ -18,64 +18,52 @@ write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 contentsOfFile
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 text
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 newline
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -83,4 +71,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

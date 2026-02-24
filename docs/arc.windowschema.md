@@ -7,20 +7,23 @@
 **Signature:**
 
 ```typescript
-WindowSchema: z.ZodObject<{
-    id: z.ZodString;
-    name: z.ZodString;
-    index: z.ZodNumber;
-    closeable: z.ZodBoolean;
-    minimizable: z.ZodBoolean;
-    minimized: z.ZodBoolean;
-    resizable: z.ZodBoolean;
-    visible: z.ZodBoolean;
-    zoomable: z.ZodBoolean;
-    zoomed: z.ZodBoolean;
-    activeTab: z.ZodString;
-    activeSpace: z.ZodString;
-    incognito: z.ZodBoolean;
-    mode: z.ZodString;
-}, z.core.$strip>
+WindowSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    name: z.ZodString
+    index: z.ZodNumber
+    closeable: z.ZodBoolean
+    minimizable: z.ZodBoolean
+    minimized: z.ZodBoolean
+    resizable: z.ZodBoolean
+    visible: z.ZodBoolean
+    zoomable: z.ZodBoolean
+    zoomed: z.ZodBoolean
+    activeTab: z.ZodString
+    activeSpace: z.ZodString
+    incognito: z.ZodBoolean
+    mode: z.ZodString
+  },
+  z.core.$strip
+>
 ```

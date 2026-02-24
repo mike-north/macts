@@ -9,7 +9,7 @@ Input for updating a AttributeRun
 **Signature:**
 
 ```typescript
-type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>;
+type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>
 ```
-**References:** [AttributeRunCreateInput](./mail.attributeruncreateinput.md)
 
+**References:** [AttributeRunCreateInput](./mail.attributeruncreateinput.md)

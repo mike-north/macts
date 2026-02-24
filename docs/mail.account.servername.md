@@ -9,5 +9,5 @@ The host name used to connect to an account
 **Signature:**
 
 ```typescript
-serverName: string;
+serverName: string
 ```

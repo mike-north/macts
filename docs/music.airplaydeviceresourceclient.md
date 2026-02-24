@@ -9,7 +9,7 @@ Client for an airplay device.
 **Signature:**
 
 ```typescript
-declare class AirPlayDeviceResourceClient 
+declare class AirPlayDeviceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AirPlayDeviceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.airplaydeviceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AirPlayDeviceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AirPlayDeviceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.airplaydeviceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new airplaydevice.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.airplaydeviceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a airplaydevice.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.airplaydeviceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a airplaydevice by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.airplaydeviceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all airplaydevices.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.airplaydeviceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing airplaydevice.
 
-
 </td></tr>
 </tbody></table>
-

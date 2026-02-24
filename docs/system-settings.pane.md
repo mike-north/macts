@@ -9,7 +9,7 @@ A settings pane.
 **Signature:**
 
 ```typescript
-interface Pane 
+interface Pane
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Pane
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-settings.pane.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The id of the settings pane.
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-settings.pane.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the settings pane.
 
-
 </td></tr>
 </tbody></table>
-

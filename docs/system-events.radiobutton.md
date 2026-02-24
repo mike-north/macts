@@ -9,7 +9,7 @@ A radio button belonging to a window
 **Signature:**
 
 ```typescript
-interface RadioButton 
+interface RadioButton
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface RadioButton
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.radiobutton.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this radio button
 
-
 </td></tr>
 </tbody></table>
-

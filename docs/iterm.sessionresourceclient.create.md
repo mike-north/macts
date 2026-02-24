@@ -18,30 +18,24 @@ create(input: SessionCreateInput): Promise<Session>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SessionCreateInput](./iterm.sessioncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Session](./iterm.session.md)<!-- -->&gt;
-

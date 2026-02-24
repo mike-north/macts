@@ -9,5 +9,5 @@ Index of tab in parent tab view control
 **Signature:**
 
 ```typescript
-index: number;
+index: number
 ```

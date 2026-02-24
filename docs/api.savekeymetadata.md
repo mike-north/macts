@@ -11,7 +11,7 @@ Note: This is provided for API compatibility but is less efficient than individu
 **Signature:**
 
 ```typescript
-declare function saveKeyMetadata(keys: ApiKeyMetadata[]): void;
+declare function saveKeyMetadata(keys: ApiKeyMetadata[]): void
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function saveKeyMetadata(keys: ApiKeyMetadata[]): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keys
 
-
 </td><td>
 
 [ApiKeyMetadata](./core.apikeymetadata.md)<!-- -->\[\]
 
-
 </td><td>
 
 Array of key metadata to save
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Array of key metadata to save
 **Returns:**
 
 void
-

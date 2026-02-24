@@ -9,5 +9,5 @@ Can the media be ejected (floppies, CD's, and so on)?
 **Signature:**
 
 ```typescript
-ejectable: boolean;
+ejectable: boolean
 ```

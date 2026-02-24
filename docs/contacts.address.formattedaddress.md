@@ -9,5 +9,5 @@ properly formatted string for this address.
 **Signature:**
 
 ```typescript
-formattedAddress: string;
+formattedAddress: string
 ```

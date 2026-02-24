@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-AttachmentSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    contentIdentifier: z.ZodOptional<z.ZodString>;
-    creationDate: z.ZodString;
-    modificationDate: z.ZodString;
-}, z.core.$strip>
+AttachmentSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    contentIdentifier: z.ZodOptional<z.ZodString>
+    creationDate: z.ZodString
+    modificationDate: z.ZodString
+  },
+  z.core.$strip
+>
 ```

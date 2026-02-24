@@ -9,5 +9,5 @@ Ignore permissions on this disk?
 **Signature:**
 
 ```typescript
-ignorePrivileges: boolean;
+ignorePrivileges: boolean
 ```

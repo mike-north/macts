@@ -11,7 +11,7 @@ List all videowindows.
 ```typescript
 list(): Promise<VideoWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[VideoWindow](./tv.videowindow.md)<!-- -->\[\]&gt;
-

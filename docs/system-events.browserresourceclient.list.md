@@ -11,7 +11,7 @@ List all browsers.
 ```typescript
 list(): Promise<Browser[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Browser](./system-events.browser.md)<!-- -->\[\]&gt;
-

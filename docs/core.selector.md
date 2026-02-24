@@ -9,17 +9,21 @@ Selector types for narrowing collections.
 **Signature:**
 
 ```typescript
-type Selector = {
-    type: 'id';
-    value: string;
-} | {
-    type: 'name';
-    value: string;
-} | {
-    type: 'index';
-    value: number;
-} | {
-    type: 'whose';
-    predicate: Record<string, unknown>;
-};
+type Selector =
+  | {
+      type: 'id'
+      value: string
+    }
+  | {
+      type: 'name'
+      value: string
+    }
+  | {
+      type: 'index'
+      value: number
+    }
+  | {
+      type: 'whose'
+      predicate: Record<string, unknown>
+    }
 ```

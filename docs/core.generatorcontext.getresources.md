@@ -11,7 +11,7 @@ Get all resources
 ```typescript
 getResources(): Resource[];
 ```
+
 **Returns:**
 
 [Resource](./core.resource.md)<!-- -->\[\]
-

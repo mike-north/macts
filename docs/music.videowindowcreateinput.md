@@ -9,5 +9,5 @@ Input for creating a VideoWindow
 **Signature:**
 
 ```typescript
-interface VideoWindowCreateInput 
+interface VideoWindowCreateInput
 ```

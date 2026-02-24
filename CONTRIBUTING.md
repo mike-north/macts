@@ -177,6 +177,7 @@ node packages/cli/dist/bin.js generate manifests/{app-name}/app.yaml \
 ```
 
 This creates two directories:
+
 - `packages/{app-name}/` -- client SDK + CLI plugin
 - `packages/{app-name}-server/` -- API plugin + MCP tools
 

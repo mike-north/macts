@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-ScriptingEnumeratorSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    description: z.ZodString;
-    hidden: z.ZodBoolean;
-}, z.core.$strip>
+ScriptingEnumeratorSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    description: z.ZodString
+    hidden: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

@@ -9,5 +9,5 @@ The text of the web page currently loaded in the tab
 **Signature:**
 
 ```typescript
-text: string;
+text: string
 ```

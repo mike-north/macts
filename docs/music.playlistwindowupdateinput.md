@@ -9,7 +9,7 @@ Input for updating a PlaylistWindow
 **Signature:**
 
 ```typescript
-type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>;
+type PlaylistWindowUpdateInput = Partial<PlaylistWindowCreateInput>
 ```
-**References:** [PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)
 
+**References:** [PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)

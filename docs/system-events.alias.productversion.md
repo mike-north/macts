@@ -9,5 +9,5 @@ the version of the product (visible at the top of the "Get Info" window)
 **Signature:**
 
 ```typescript
-productVersion: string;
+productVersion: string
 ```

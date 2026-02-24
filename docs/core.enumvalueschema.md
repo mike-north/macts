@@ -9,10 +9,13 @@ Schema for a single enum value.
 **Signature:**
 
 ```typescript
-EnumValueSchema: z.ZodObject<{
-    name: z.ZodString;
-    value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>;
-    description: z.ZodOptional<z.ZodString>;
-    code: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+EnumValueSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>
+    description: z.ZodOptional<z.ZodString>
+    code: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

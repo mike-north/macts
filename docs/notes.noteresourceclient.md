@@ -9,7 +9,7 @@ Client for a note.
 **Signature:**
 
 ```typescript
-declare class NoteResourceClient 
+declare class NoteResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class NoteResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./notes.noteresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `NoteResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,101 +46,79 @@ Constructs a new instance of the `NoteResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./notes.noteresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new note.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./notes.noteresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a note.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./notes.noteresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a note by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./notes.noteresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all notes.
-
 
 </td></tr>
 <tr><td>
 
 [show(name)](./notes.noteresourceclient.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Show a note in the Notes app
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./notes.noteresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing note.
 
-
 </td></tr>
 </tbody></table>
-

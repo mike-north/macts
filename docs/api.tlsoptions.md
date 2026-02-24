@@ -9,7 +9,7 @@ TLS configuration options using file paths.
 **Signature:**
 
 ```typescript
-interface TlsOptions 
+interface TlsOptions
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface TlsOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ca?](./api.tlsoptions.ca.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Optional path to PEM-encoded CA certificate file
-
 
 </td></tr>
 <tr><td>
 
 [cert](./api.tlsoptions.cert.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Path to PEM-encoded certificate file
-
 
 </td></tr>
 <tr><td>
 
 [key](./api.tlsoptions.key.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Path to PEM-encoded private key file
 
-
 </td></tr>
 </tbody></table>
-

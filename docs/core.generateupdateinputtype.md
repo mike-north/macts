@@ -11,7 +11,7 @@ Creates an interface containing only writable properties, with all properties ma
 **Signature:**
 
 ```typescript
-declare function generateUpdateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType;
+declare function generateUpdateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType
 ```
 
 ## Parameters
@@ -20,48 +20,39 @@ declare function generateUpdateInputType(resource: Resource, _ctx: GeneratorCont
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 resource
 
-
 </td><td>
 
 [Resource](./core.resource.md)
 
-
 </td><td>
 
 The resource definition from the manifest
-
 
 </td></tr>
 <tr><td>
 
 \_ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
 
 Generator context (unused but maintained for API consistency)
-
 
 </td></tr>
 </tbody></table>
@@ -74,7 +65,6 @@ Generated type with update input interface
 
 ## Example
 
-
 ```typescript
 // For a Calendar resource with name (rw) and color (rw):
 // Generates:
@@ -83,4 +73,3 @@ Generated type with update input interface
 //   color?: string;
 // }
 ```
-

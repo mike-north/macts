@@ -9,5 +9,5 @@ Whether the folder is shared
 **Signature:**
 
 ```typescript
-shared: boolean;
+shared: boolean
 ```

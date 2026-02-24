@@ -9,5 +9,5 @@ Server package name (e.g., '<!-- -->@<!-- -->macts/calendar-server')
 **Signature:**
 
 ```typescript
-serverPackageName: string;
+serverPackageName: string
 ```

@@ -11,7 +11,7 @@ List all tracks.
 ```typescript
 list(): Promise<Track[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Track](./tv.track.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ The full title of the space.
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -18,30 +18,24 @@ create(input: MessageViewerCreateInput): Promise<MessageViewer>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MessageViewerCreateInput](./mail.messageviewercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MessageViewer](./mail.messageviewer.md)<!-- -->&gt;
-

@@ -9,7 +9,7 @@ Client for trash-object is the class of the “trash” object.
 **Signature:**
 
 ```typescript
-declare class TrashObjectResourceClient 
+declare class TrashObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TrashObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.trashobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TrashObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `TrashObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.trashobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new trashobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.trashobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a trashobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.trashobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a trashobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.trashobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all trashobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.trashobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing trashobject.
 
-
 </td></tr>
 </tbody></table>
-

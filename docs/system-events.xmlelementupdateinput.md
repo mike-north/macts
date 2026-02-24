@@ -9,7 +9,7 @@ Input for updating a XMLElement
 **Signature:**
 
 ```typescript
-type XMLElementUpdateInput = Partial<XMLElementCreateInput>;
+type XMLElementUpdateInput = Partial<XMLElementCreateInput>
 ```
-**References:** [XMLElementCreateInput](./system-events.xmlelementcreateinput.md)
 
+**References:** [XMLElementCreateInput](./system-events.xmlelementcreateinput.md)

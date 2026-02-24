@@ -11,7 +11,7 @@ List all radiobuttons.
 ```typescript
 list(): Promise<RadioButton[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RadioButton](./system-events.radiobutton.md)<!-- -->\[\]&gt;
-

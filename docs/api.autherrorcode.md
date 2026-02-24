@@ -9,5 +9,12 @@ Error codes for authentication failures.
 **Signature:**
 
 ```typescript
-type AuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+type AuthErrorCode =
+  | 'MISSING_AUTHORIZATION'
+  | 'INVALID_AUTH_SCHEME'
+  | 'INVALID_FORMAT'
+  | 'INVALID_SIGNATURE'
+  | 'EXPIRED'
+  | 'REVOKED'
+  | 'MALFORMED_PAYLOAD'
 ```

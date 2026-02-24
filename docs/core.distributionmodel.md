@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type DistributionModel = z.infer<typeof DistributionModelSchema>;
+type DistributionModel = z.infer<typeof DistributionModelSchema>
 ```
-**References:** [DistributionModelSchema](./core.distributionmodelschema.md)
 
+**References:** [DistributionModelSchema](./core.distributionmodelschema.md)

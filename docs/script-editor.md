@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentResourceClient](./script-editor.documentresourceclient.md)
 
-
 </td><td>
 
 Client for a script editor document.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./script-editor.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [ScriptEditorClient](./script-editor.scripteditorclient.md)
 
-
 </td><td>
 
 ScriptEditor client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [ScriptEditorError](./script-editor.scripteditorerror.md)
 
-
 </td><td>
 
 Error class for ScriptEditor API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ Error class for ScriptEditor API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Document](./script-editor.document.md)
 
-
 </td><td>
 
 A Script Editor document
-
 
 </td></tr>
 <tr><td>
 
 [DocumentCreateInput](./script-editor.documentcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Document
-
 
 </td></tr>
 <tr><td>
 
 [ScriptEditorClientOptions](./script-editor.scripteditorclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentSchema](./script-editor.documentschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,23 +119,18 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentUpdateInput](./script-editor.documentupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Document
 
-
 </td></tr>
 </tbody></table>
-

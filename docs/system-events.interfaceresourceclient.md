@@ -9,7 +9,7 @@ Client for a collection of settings for a network interface.
 **Signature:**
 
 ```typescript
-declare class InterfaceResourceClient 
+declare class InterfaceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class InterfaceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.interfaceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `InterfaceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `InterfaceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.interfaceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new interface.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.interfaceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a interface.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.interfaceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a interface by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.interfaceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all interfaces.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.interfaceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing interface.
 
-
 </td></tr>
 </tbody></table>
-

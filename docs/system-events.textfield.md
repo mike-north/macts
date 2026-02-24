@@ -9,7 +9,7 @@ A text field belonging to a window
 **Signature:**
 
 ```typescript
-interface TextField 
+interface TextField
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TextField
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.textfield.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this text field
 
-
 </td></tr>
 </tbody></table>
-

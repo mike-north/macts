@@ -9,5 +9,5 @@ Label for this phone
 **Signature:**
 
 ```typescript
-label: string;
+label: string
 ```

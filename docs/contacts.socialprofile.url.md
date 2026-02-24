@@ -9,5 +9,5 @@ The URL of this social profile.
 **Signature:**
 
 ```typescript
-url: string;
+url: string
 ```

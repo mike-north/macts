@@ -9,5 +9,5 @@ The text content of the document
 **Signature:**
 
 ```typescript
-text: string;
+text: string
 ```

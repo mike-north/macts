@@ -9,5 +9,5 @@ Image for person.
 **Signature:**
 
 ```typescript
-image: string;
+image: string
 ```

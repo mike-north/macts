@@ -11,7 +11,7 @@ Login to all accounts.
 ```typescript
 login(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

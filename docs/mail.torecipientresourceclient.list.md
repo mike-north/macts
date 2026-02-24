@@ -11,7 +11,7 @@ List all torecipients.
 ```typescript
 list(): Promise<ToRecipient[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ToRecipient](./mail.torecipient.md)<!-- -->\[\]&gt;
-

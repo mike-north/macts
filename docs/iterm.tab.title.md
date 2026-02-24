@@ -9,5 +9,5 @@ The title property
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

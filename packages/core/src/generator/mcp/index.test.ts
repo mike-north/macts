@@ -379,8 +379,9 @@ describe('generateMcpPlugin', () => {
 
     const sdkFile = result.files.find((f) => f.path === 'src/sdk.ts')
     expect(sdkFile).toBeDefined()
+    if (!sdkFile) throw new Error('SDK file not found')
 
-    const content = sdkFile!.content
+    const content = sdkFile.content
     expect(content).toContain(
       "import { TestAppClient, type TestAppClientOptions } from '@macts/sdk-testapp'"
     )
@@ -402,30 +403,35 @@ describe('generateMcpPlugin', () => {
     // tsconfig.json
     const tsconfig = result.files.find((f) => f.path === 'tsconfig.json')
     expect(tsconfig).toBeDefined()
-    const tsconfigParsed = JSON.parse(tsconfig!.content) as { extends: string }
+    if (!tsconfig) throw new Error('tsconfig.json not found')
+    const tsconfigParsed = JSON.parse(tsconfig.content) as { extends: string }
     expect(tsconfigParsed.extends).toBe('../../tsconfig.base.json')
 
     // tsup.config.ts
     const tsup = result.files.find((f) => f.path === 'tsup.config.ts')
     expect(tsup).toBeDefined()
-    expect(tsup!.content).toContain("entry: ['src/index.ts']")
-    expect(tsup!.content).toContain("format: ['esm']")
+    if (!tsup) throw new Error('tsup.config.ts not found')
+    expect(tsup.content).toContain("entry: ['src/index.ts']")
+    expect(tsup.content).toContain("format: ['esm']")
 
     // vitest.config.ts
     const vitest = result.files.find((f) => f.path === 'vitest.config.ts')
     expect(vitest).toBeDefined()
-    expect(vitest!.content).toContain("environment: 'node'")
+    if (!vitest) throw new Error('vitest.config.ts not found')
+    expect(vitest.content).toContain("environment: 'node'")
 
     // .gitignore
     const gitignore = result.files.find((f) => f.path === '.gitignore')
     expect(gitignore).toBeDefined()
-    expect(gitignore!.content).toContain('dist/')
-    expect(gitignore!.content).toContain('node_modules/')
+    if (!gitignore) throw new Error('.gitignore not found')
+    expect(gitignore.content).toContain('dist/')
+    expect(gitignore.content).toContain('node_modules/')
 
     // api-extractor.json
     const apiExtractor = result.files.find((f) => f.path === 'api-extractor.json')
     expect(apiExtractor).toBeDefined()
-    const apiExtractorParsed = JSON.parse(apiExtractor!.content) as {
+    if (!apiExtractor) throw new Error('api-extractor.json not found')
+    const apiExtractorParsed = JSON.parse(apiExtractor.content) as {
       $schema: string
       extends: string
     }
@@ -437,11 +443,13 @@ describe('generateMcpPlugin', () => {
     // .gitkeep files
     const apiReportGitkeep = result.files.find((f) => f.path === 'api-report/.gitkeep')
     expect(apiReportGitkeep).toBeDefined()
-    expect(apiReportGitkeep!.content).toBe('')
+    if (!apiReportGitkeep) throw new Error('api-report/.gitkeep not found')
+    expect(apiReportGitkeep.content).toBe('')
 
     const tempGitkeep = result.files.find((f) => f.path === 'temp/.gitkeep')
     expect(tempGitkeep).toBeDefined()
-    expect(tempGitkeep!.content).toBe('')
+    if (!tempGitkeep) throw new Error('temp/.gitkeep not found')
+    expect(tempGitkeep.content).toBe('')
   })
 
   it('should use default version 0.0.0 when no version specified', () => {
@@ -467,7 +475,9 @@ describe('generateMcpPlugin', () => {
 
     // SDK file should import from custom package
     const sdkFile = result.files.find((f) => f.path === 'src/sdk.ts')
-    expect(sdkFile!.content).toContain("from '@custom/sdk-testapp'")
+    expect(sdkFile).toBeDefined()
+    if (!sdkFile) throw new Error('SDK file not found')
+    expect(sdkFile.content).toContain("from '@custom/sdk-testapp'")
 
     // Package.json should depend on custom package
     const packageJson = JSON.parse(result.packageJson) as {

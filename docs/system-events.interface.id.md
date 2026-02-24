@@ -9,5 +9,5 @@ the unique identifier for the interface
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

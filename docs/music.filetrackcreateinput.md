@@ -9,7 +9,7 @@ Input for creating a FileTrack
 **Signature:**
 
 ```typescript
-interface FileTrackCreateInput 
+interface FileTrackCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface FileTrackCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [location?](./music.filetrackcreateinput.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the location of the file represented by this track
 
-
 </td></tr>
 </tbody></table>
-

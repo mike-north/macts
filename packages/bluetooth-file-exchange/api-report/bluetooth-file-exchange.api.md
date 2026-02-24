@@ -12,8 +12,7 @@ export interface Application {
 }
 
 // @public
-export interface ApplicationCreateInput {
-}
+export type ApplicationCreateInput = Record<string, never>;
 
 // @public
 export class ApplicationResourceClient {

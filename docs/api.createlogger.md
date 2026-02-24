@@ -6,12 +6,12 @@
 
 Create a new Pino logger instance.
 
-In development (NODE\_ENV !== 'production'), uses pino-pretty for human-readable output. In production, outputs structured JSON.
+In development (NODE_ENV !== 'production'), uses pino-pretty for human-readable output. In production, outputs structured JSON.
 
 **Signature:**
 
 ```typescript
-declare function createLogger(options?: pino.LoggerOptions): pino.Logger;
+declare function createLogger(options?: pino.LoggerOptions): pino.Logger
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 pino.LoggerOptions
 
-
 </td><td>
 
 _(Optional)_ Pino logger options to merge with defaults
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ _(Optional)_ Pino logger options to merge with defaults
 pino.Logger
 
 Configured Pino logger
-

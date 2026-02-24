@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Automator.app automation.
@@ -16,4 +16,4 @@ export const automatorPlugin: McpPlugin = {
   name: 'automator',
   description: 'MCP plugin for macOS Automator.app automation',
   tools: allTools,
-};
+}

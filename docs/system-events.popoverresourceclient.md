@@ -9,7 +9,7 @@ Client for a pop over belonging to a window.
 **Signature:**
 
 ```typescript
-declare class PopOverResourceClient 
+declare class PopOverResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PopOverResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.popoverresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PopOverResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PopOverResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.popoverresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new popover.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.popoverresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a popover.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.popoverresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a popover by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.popoverresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all popovers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.popoverresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing popover.
 
-
 </td></tr>
 </tbody></table>
-

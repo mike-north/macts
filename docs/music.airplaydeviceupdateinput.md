@@ -9,7 +9,7 @@ Input for updating a AirPlayDevice
 **Signature:**
 
 ```typescript
-type AirPlayDeviceUpdateInput = Partial<AirPlayDeviceCreateInput>;
+type AirPlayDeviceUpdateInput = Partial<AirPlayDeviceCreateInput>
 ```
-**References:** [AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)
 
+**References:** [AirPlayDeviceCreateInput](./music.airplaydevicecreateinput.md)

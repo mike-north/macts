@@ -9,7 +9,7 @@ Input for updating a FinderWindow
 **Signature:**
 
 ```typescript
-type FinderWindowUpdateInput = Partial<FinderWindowCreateInput>;
+type FinderWindowUpdateInput = Partial<FinderWindowCreateInput>
 ```
-**References:** [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
 
+**References:** [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)

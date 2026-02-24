@@ -11,7 +11,7 @@ List all scriptingparameters.
 ```typescript
 list(): Promise<ScriptingParameter[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingParameter](./system-events.scriptingparameter.md)<!-- -->\[\]&gt;
-

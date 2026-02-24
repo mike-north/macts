@@ -9,5 +9,5 @@ the folder or disk which has this disk item as an element
 **Signature:**
 
 ```typescript
-container: unknown;
+container: unknown
 ```

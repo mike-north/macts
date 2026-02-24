@@ -18,30 +18,24 @@ create(input: OutgoingMessageCreateInput): Promise<OutgoingMessage>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [OutgoingMessageCreateInput](./mail.outgoingmessagecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[OutgoingMessage](./mail.outgoingmessage.md)<!-- -->&gt;
-

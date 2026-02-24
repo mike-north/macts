@@ -9,5 +9,5 @@ the index of the track on the source album
 **Signature:**
 
 ```typescript
-trackNumber: number;
+trackNumber: number
 ```

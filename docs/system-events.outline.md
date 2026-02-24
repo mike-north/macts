@@ -9,7 +9,7 @@ A outline belonging to a window
 **Signature:**
 
 ```typescript
-interface Outline 
+interface Outline
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Outline
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.outline.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this outline
 
-
 </td></tr>
 </tbody></table>
-

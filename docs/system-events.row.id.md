@@ -9,5 +9,5 @@ Unique identifier for this row
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

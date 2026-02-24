@@ -11,7 +11,7 @@ List all richtext.
 ```typescript
 list(): Promise<RichText[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RichText](./mail.richtext.md)<!-- -->\[\]&gt;
-

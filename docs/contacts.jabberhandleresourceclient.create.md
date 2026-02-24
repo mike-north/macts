@@ -18,30 +18,24 @@ create(input: JabberHandleCreateInput): Promise<JabberHandle>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [JabberHandleCreateInput](./contacts.jabberhandlecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[JabberHandle](./contacts.jabberhandle.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ The modification date of the attachment
 **Signature:**
 
 ```typescript
-modificationDate: string;
+modificationDate: string
 ```

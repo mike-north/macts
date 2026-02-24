@@ -9,5 +9,5 @@ SaveOptions
 **Signature:**
 
 ```typescript
-type SaveOptions = 'yes' | 'no' | 'ask';
+type SaveOptions = 'yes' | 'no' | 'ask'
 ```

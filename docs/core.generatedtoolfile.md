@@ -9,7 +9,7 @@ Generated tool file content.
 **Signature:**
 
 ```typescript
-interface GeneratedToolFile 
+interface GeneratedToolFile
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface GeneratedToolFile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./core.generatedtoolfile.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 TypeScript source code
-
 
 </td></tr>
 <tr><td>
 
 [fileName](./core.generatedtoolfile.filename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 File path relative to tools/ directory (e.g., 'calendars.ts')
-
 
 </td></tr>
 <tr><td>
 
 [tools](./core.generatedtoolfile.tools.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [GeneratedTool](./core.generatedtool.md)<!-- -->\[\]
 
-
 </td><td>
 
 Tools exported from this file
 
-
 </td></tr>
 </tbody></table>
-

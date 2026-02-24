@@ -9,7 +9,7 @@ Client for equalizer preset configuration.
 **Signature:**
 
 ```typescript
-declare class EQPresetResourceClient 
+declare class EQPresetResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class EQPresetResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.eqpresetresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `EQPresetResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `EQPresetResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.eqpresetresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new eqpreset.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.eqpresetresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a eqpreset.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.eqpresetresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a eqpreset by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.eqpresetresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all eqpresets.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.eqpresetresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing eqpreset.
 
-
 </td></tr>
 </tbody></table>
-

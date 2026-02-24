@@ -9,7 +9,7 @@ Client for a color well belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ColorWellResourceClient 
+declare class ColorWellResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ColorWellResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.colorwellresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ColorWellResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ColorWellResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.colorwellresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new colorwell.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.colorwellresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a colorwell.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.colorwellresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a colorwell by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.colorwellresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all colorwells.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.colorwellresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing colorwell.
 
-
 </td></tr>
 </tbody></table>
-

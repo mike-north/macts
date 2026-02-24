@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-TabSchema: z.ZodObject<{
-    id: z.ZodString;
-    title: z.ZodString;
-    uRL: z.ZodString;
-    loading: z.ZodBoolean;
-    location: z.ZodString;
-}, z.core.$strip>
+TabSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    title: z.ZodString
+    uRL: z.ZodString
+    loading: z.ZodBoolean
+    location: z.ZodString
+  },
+  z.core.$strip
+>
 ```

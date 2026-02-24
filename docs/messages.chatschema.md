@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-ChatSchema: z.ZodObject<{
-    id: z.ZodString;
-    name: z.ZodString;
-    account: z.ZodString;
-}, z.core.$strip>
+ChatSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    name: z.ZodString
+    account: z.ZodString
+  },
+  z.core.$strip
+>
 ```

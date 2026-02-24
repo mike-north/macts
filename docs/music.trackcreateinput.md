@@ -9,7 +9,7 @@ Input for creating a Track
 **Signature:**
 
 ```typescript
-interface TrackCreateInput 
+interface TrackCreateInput
 ```
 
 ## Properties
@@ -18,1029 +18,812 @@ interface TrackCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [album?](./music.trackcreateinput.album.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the album name of the track
-
 
 </td></tr>
 <tr><td>
 
 [albumArtist?](./music.trackcreateinput.albumartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the album artist of the track
-
 
 </td></tr>
 <tr><td>
 
 [albumDisliked?](./music.trackcreateinput.albumdisliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is the album for this track disliked?
-
 
 </td></tr>
 <tr><td>
 
 [albumFavorited?](./music.trackcreateinput.albumfavorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is the album for this track favorited?
-
 
 </td></tr>
 <tr><td>
 
 [albumRating?](./music.trackcreateinput.albumrating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the rating of the album for this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [artist?](./music.trackcreateinput.artist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the artist/source of the track
-
 
 </td></tr>
 <tr><td>
 
 [bookmark?](./music.trackcreateinput.bookmark.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the bookmark time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [bookmarkable?](./music.trackcreateinput.bookmarkable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is the playback position for this track remembered?
-
 
 </td></tr>
 <tr><td>
 
 [bpm?](./music.trackcreateinput.bpm.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the tempo of this track in beats per minute
-
 
 </td></tr>
 <tr><td>
 
 [category?](./music.trackcreateinput.category.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the category of the track
-
 
 </td></tr>
 <tr><td>
 
 [comment?](./music.trackcreateinput.comment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ freeform notes about the track
-
 
 </td></tr>
 <tr><td>
 
 [compilation?](./music.trackcreateinput.compilation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track from a compilation album?
-
 
 </td></tr>
 <tr><td>
 
 [composer?](./music.trackcreateinput.composer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the composer of the track
-
 
 </td></tr>
 <tr><td>
 
 [description?](./music.trackcreateinput.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the description of the track
-
 
 </td></tr>
 <tr><td>
 
 [discCount?](./music.trackcreateinput.disccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the total number of discs in the source album
-
 
 </td></tr>
 <tr><td>
 
 [discNumber?](./music.trackcreateinput.discnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the index of the disc containing this track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [disliked?](./music.trackcreateinput.disliked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track disliked?
-
 
 </td></tr>
 <tr><td>
 
 [enabled?](./music.trackcreateinput.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track checked for playback?
-
 
 </td></tr>
 <tr><td>
 
 [episodeID?](./music.trackcreateinput.episodeid.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the episode ID of the track
-
 
 </td></tr>
 <tr><td>
 
 [episodeNumber?](./music.trackcreateinput.episodenumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the episode number of the track
-
 
 </td></tr>
 <tr><td>
 
 [eQ?](./music.trackcreateinput.eq.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the EQ preset of the track
-
 
 </td></tr>
 <tr><td>
 
 [favorited?](./music.trackcreateinput.favorited.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track favorited?
-
 
 </td></tr>
 <tr><td>
 
 [finish?](./music.trackcreateinput.finish.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the stop time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [gapless?](./music.trackcreateinput.gapless.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track from a gapless album?
-
 
 </td></tr>
 <tr><td>
 
 [genre?](./music.trackcreateinput.genre.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the music/audio genre (category) of the track
-
 
 </td></tr>
 <tr><td>
 
 [grouping?](./music.trackcreateinput.grouping.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the grouping (piece) of the track. Generally used to denote movements within a classical work.
-
 
 </td></tr>
 <tr><td>
 
 [longDescription?](./music.trackcreateinput.longdescription.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the long description of the track
-
 
 </td></tr>
 <tr><td>
 
 [lyrics?](./music.trackcreateinput.lyrics.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the lyrics of the track
-
 
 </td></tr>
 <tr><td>
 
 [mediaKind?](./music.trackcreateinput.mediakind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the media kind of the track
-
 
 </td></tr>
 <tr><td>
 
 [movement?](./music.trackcreateinput.movement.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the movement name of the track
-
 
 </td></tr>
 <tr><td>
 
 [movementCount?](./music.trackcreateinput.movementcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the total number of movements in the work
-
 
 </td></tr>
 <tr><td>
 
 [movementNumber?](./music.trackcreateinput.movementnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the index of the movement in the work
-
 
 </td></tr>
 <tr><td>
 
 [playedCount?](./music.trackcreateinput.playedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ number of times this track has been played
-
 
 </td></tr>
 <tr><td>
 
 [playedDate?](./music.trackcreateinput.playeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ the date and time this track was last played
-
 
 </td></tr>
 <tr><td>
 
 [rating?](./music.trackcreateinput.rating.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the rating of this track (0 to 100)
-
 
 </td></tr>
 <tr><td>
 
 [seasonNumber?](./music.trackcreateinput.seasonnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the season number of the track
-
 
 </td></tr>
 <tr><td>
 
 [show?](./music.trackcreateinput.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the show name of the track
-
 
 </td></tr>
 <tr><td>
 
 [shufflable?](./music.trackcreateinput.shufflable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track included when shuffling?
-
 
 </td></tr>
 <tr><td>
 
 [skippedCount?](./music.trackcreateinput.skippedcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ number of times this track has been skipped
-
 
 </td></tr>
 <tr><td>
 
 [skippedDate?](./music.trackcreateinput.skippeddate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ the date and time this track was last skipped
-
 
 </td></tr>
 <tr><td>
 
 [sortAlbum?](./music.trackcreateinput.sortalbum.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by album
-
 
 </td></tr>
 <tr><td>
 
 [sortAlbumArtist?](./music.trackcreateinput.sortalbumartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by album artist
-
 
 </td></tr>
 <tr><td>
 
 [sortArtist?](./music.trackcreateinput.sortartist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by artist
-
 
 </td></tr>
 <tr><td>
 
 [sortComposer?](./music.trackcreateinput.sortcomposer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by composer
-
 
 </td></tr>
 <tr><td>
 
 [sortName?](./music.trackcreateinput.sortname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by name
-
 
 </td></tr>
 <tr><td>
 
 [sortShow?](./music.trackcreateinput.sortshow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ override string to use for the track when sorting by show name
-
 
 </td></tr>
 <tr><td>
 
 [start?](./music.trackcreateinput.start.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the start time of the track in seconds
-
 
 </td></tr>
 <tr><td>
 
 [trackCount?](./music.trackcreateinput.trackcount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the total number of tracks on the source album
-
 
 </td></tr>
 <tr><td>
 
 [trackNumber?](./music.trackcreateinput.tracknumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the index of the track on the source album
-
 
 </td></tr>
 <tr><td>
 
 [unplayed?](./music.trackcreateinput.unplayed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ is this track unplayed?
-
 
 </td></tr>
 <tr><td>
 
 [volumeAdjustment?](./music.trackcreateinput.volumeadjustment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ relative volume adjustment of the track (-100% to 100%)
-
 
 </td></tr>
 <tr><td>
 
 [work?](./music.trackcreateinput.work.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the work name of the track
-
 
 </td></tr>
 <tr><td>
 
 [year?](./music.trackcreateinput.year.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the year the track was recorded/released
 
-
 </td></tr>
 </tbody></table>
-

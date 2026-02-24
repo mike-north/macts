@@ -9,7 +9,7 @@ Trash-object is the class of the “trash” object
 **Signature:**
 
 ```typescript
-interface TrashObject 
+interface TrashObject
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TrashObject
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [warnsBeforeEmptying](./finder.trashobject.warnsbeforeemptying.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Display a dialog when emptying the trash?
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,13 @@ Earr
 **Signature:**
 
 ```typescript
-type Earr = 'notArranged' | 'snapToGrid' | 'arrangedByName' | 'arrangedByModificationDate' | 'arrangedByCreationDate' | 'arrangedBySize' | 'arrangedByKind' | 'arrangedByLabel';
+type Earr =
+  | 'notArranged'
+  | 'snapToGrid'
+  | 'arrangedByName'
+  | 'arrangedByModificationDate'
+  | 'arrangedByCreationDate'
+  | 'arrangedBySize'
+  | 'arrangedByKind'
+  | 'arrangedByLabel'
 ```

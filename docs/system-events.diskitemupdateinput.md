@@ -9,7 +9,7 @@ Input for updating a DiskItem
 **Signature:**
 
 ```typescript
-type DiskItemUpdateInput = Partial<DiskItemCreateInput>;
+type DiskItemUpdateInput = Partial<DiskItemCreateInput>
 ```
-**References:** [DiskItemCreateInput](./system-events.diskitemcreateinput.md)
 
+**References:** [DiskItemCreateInput](./system-events.diskitemcreateinput.md)

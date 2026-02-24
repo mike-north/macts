@@ -7,28 +7,31 @@
 **Signature:**
 
 ```typescript
-AccountSchema: z.ZodObject<{
-    deliveryAccount: z.ZodString;
-    name: z.ZodString;
-    id: z.ZodString;
-    password: z.ZodString;
-    authentication: z.ZodString;
-    accountType: z.ZodString;
-    emailAddresses: z.ZodString;
-    fullName: z.ZodString;
-    emptyJunkMessagesFrequency: z.ZodNumber;
-    emptySentMessagesFrequency: z.ZodNumber;
-    emptyTrashFrequency: z.ZodNumber;
-    emptyJunkMessagesOnQuit: z.ZodBoolean;
-    emptySentMessagesOnQuit: z.ZodBoolean;
-    emptyTrashOnQuit: z.ZodBoolean;
-    enabled: z.ZodBoolean;
-    userName: z.ZodString;
-    accountDirectory: z.ZodString;
-    port: z.ZodNumber;
-    serverName: z.ZodString;
-    includeWhenGettingNewMail: z.ZodBoolean;
-    moveDeletedMessagesToTrash: z.ZodBoolean;
-    usesSsl: z.ZodBoolean;
-}, z.core.$strip>
+AccountSchema: z.ZodObject<
+  {
+    deliveryAccount: z.ZodString
+    name: z.ZodString
+    id: z.ZodString
+    password: z.ZodString
+    authentication: z.ZodString
+    accountType: z.ZodString
+    emailAddresses: z.ZodString
+    fullName: z.ZodString
+    emptyJunkMessagesFrequency: z.ZodNumber
+    emptySentMessagesFrequency: z.ZodNumber
+    emptyTrashFrequency: z.ZodNumber
+    emptyJunkMessagesOnQuit: z.ZodBoolean
+    emptySentMessagesOnQuit: z.ZodBoolean
+    emptyTrashOnQuit: z.ZodBoolean
+    enabled: z.ZodBoolean
+    userName: z.ZodString
+    accountDirectory: z.ZodString
+    port: z.ZodNumber
+    serverName: z.ZodString
+    includeWhenGettingNewMail: z.ZodBoolean
+    moveDeletedMessagesToTrash: z.ZodBoolean
+    usesSsl: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

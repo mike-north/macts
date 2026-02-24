@@ -9,5 +9,5 @@ ServiceType
 **Signature:**
 
 ```typescript
-type ServiceType = 'sMS' | 'iMessage' | 'rCS';
+type ServiceType = 'sMS' | 'iMessage' | 'rCS'
 ```

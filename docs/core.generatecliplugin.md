@@ -9,7 +9,10 @@ Generate a complete CLI plugin from a manifest.
 **Signature:**
 
 ```typescript
-declare function generateCliPlugin(manifest: AppManifest, options: CliGeneratorOptions): GenerateCliPluginResult;
+declare function generateCliPlugin(
+  manifest: AppManifest,
+  options: CliGeneratorOptions
+): GenerateCliPluginResult
 ```
 
 ## Parameters
@@ -18,44 +21,35 @@ declare function generateCliPlugin(manifest: AppManifest, options: CliGeneratorO
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [CliGeneratorOptions](./core.cligeneratoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +57,3 @@ options
 **Returns:**
 
 [GenerateCliPluginResult](./core.generateclipluginresult.md)
-

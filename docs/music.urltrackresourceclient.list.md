@@ -11,7 +11,7 @@ List all urltracks.
 ```typescript
 list(): Promise<URLTrack[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[URLTrack](./music.urltrack.md)<!-- -->\[\]&gt;
-

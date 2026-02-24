@@ -9,19 +9,18 @@ Messages client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class MessagesClient 
+declare class MessagesClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new MessagesClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./messages.messagesclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MessagesClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,105 +57,85 @@ Constructs a new instance of the `MessagesClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accounts](./messages.messagesclient.accounts.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AccountResourceClient](./messages.accountresourceclient.md)
 
-
 </td><td>
 
 An account that can be logged in to from this system
-
 
 </td></tr>
 <tr><td>
 
 [chats](./messages.messagesclient.chats.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ChatResourceClient](./messages.chatresourceclient.md)
 
-
 </td><td>
 
 An SMS or iMessage chat.
-
 
 </td></tr>
 <tr><td>
 
 [http](./messages.messagesclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./messages.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [participants](./messages.messagesclient.participants.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ParticipantResourceClient](./messages.participantresourceclient.md)
 
-
 </td><td>
 
 A participant for an account.
-
 
 </td></tr>
 </tbody></table>
@@ -173,59 +146,46 @@ A participant for an account.
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [login()](./messages.messagesclient.login.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Login to all accounts.
-
 
 </td></tr>
 <tr><td>
 
 [logout()](./messages.messagesclient.logout.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Logout of all accounts.
-
 
 </td></tr>
 <tr><td>
 
 [send(to)](./messages.messagesclient.send.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Sends a message to a participant or to a chat.
 
-
 </td></tr>
 </tbody></table>
-

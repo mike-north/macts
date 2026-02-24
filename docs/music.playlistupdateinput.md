@@ -9,7 +9,7 @@ Input for updating a Playlist
 **Signature:**
 
 ```typescript
-type PlaylistUpdateInput = Partial<PlaylistCreateInput>;
+type PlaylistUpdateInput = Partial<PlaylistCreateInput>
 ```
-**References:** [PlaylistCreateInput](./music.playlistcreateinput.md)
 
+**References:** [PlaylistCreateInput](./music.playlistcreateinput.md)

@@ -9,7 +9,7 @@ Input for updating a Tab
 **Signature:**
 
 ```typescript
-type TabUpdateInput = Partial<TabCreateInput>;
+type TabUpdateInput = Partial<TabCreateInput>
 ```
-**References:** [TabCreateInput](./safari.tabcreateinput.md)
 
+**References:** [TabCreateInput](./safari.tabcreateinput.md)

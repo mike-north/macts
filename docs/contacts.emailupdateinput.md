@@ -9,7 +9,7 @@ Input for updating a Email
 **Signature:**
 
 ```typescript
-type EmailUpdateInput = Partial<EmailCreateInput>;
+type EmailUpdateInput = Partial<EmailCreateInput>
 ```
-**References:** [EmailCreateInput](./contacts.emailcreateinput.md)
 
+**References:** [EmailCreateInput](./contacts.emailcreateinput.md)

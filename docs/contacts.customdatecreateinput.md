@@ -9,7 +9,7 @@ Input for creating a CustomDate
 **Signature:**
 
 ```typescript
-interface CustomDateCreateInput 
+interface CustomDateCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface CustomDateCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.customdatecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this date
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.customdatecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ The date value
 
-
 </td></tr>
 </tbody></table>
-

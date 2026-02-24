@@ -9,7 +9,7 @@ Input for updating a BusyIndicator
 **Signature:**
 
 ```typescript
-type BusyIndicatorUpdateInput = Partial<BusyIndicatorCreateInput>;
+type BusyIndicatorUpdateInput = Partial<BusyIndicatorCreateInput>
 ```
-**References:** [BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)
 
+**References:** [BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)

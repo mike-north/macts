@@ -18,30 +18,24 @@ create(input: MailAlarmCreateInput): Promise<MailAlarm>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[MailAlarm](./calendar.mailalarm.md)<!-- -->&gt;
-

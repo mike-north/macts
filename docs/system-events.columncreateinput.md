@@ -9,5 +9,5 @@ Input for creating a Column
 **Signature:**
 
 ```typescript
-interface ColumnCreateInput 
+interface ColumnCreateInput
 ```

@@ -9,5 +9,5 @@ Input for creating a AudioCDTrack
 **Signature:**
 
 ```typescript
-interface AudioCDTrackCreateInput 
+interface AudioCDTrackCreateInput
 ```

@@ -9,7 +9,7 @@ Client for a button belonging to a window or scroll bar.
 **Signature:**
 
 ```typescript
-declare class ButtonResourceClient 
+declare class ButtonResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ButtonResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.buttonresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ButtonResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ButtonResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.buttonresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new button.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.buttonresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a button.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.buttonresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a button by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.buttonresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all buttons.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.buttonresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing button.
 
-
 </td></tr>
 </tbody></table>
-

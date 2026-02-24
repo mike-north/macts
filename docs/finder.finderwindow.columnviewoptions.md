@@ -9,5 +9,5 @@ the column view options for the container window
 **Signature:**
 
 ```typescript
-columnViewOptions: unknown;
+columnViewOptions: unknown
 ```

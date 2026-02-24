@@ -9,5 +9,13 @@ EAPD
 **Signature:**
 
 ```typescript
-type EAPD = 'computer' | 'airPortExpress' | 'appleTV' | 'airPlayDevice' | 'bluetoothDevice' | 'homePod' | 'tV' | 'unknown';
+type EAPD =
+  | 'computer'
+  | 'airPortExpress'
+  | 'appleTV'
+  | 'airPlayDevice'
+  | 'bluetoothDevice'
+  | 'homePod'
+  | 'tV'
+  | 'unknown'
 ```

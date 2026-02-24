@@ -11,7 +11,7 @@ cause the target process to behave as if keys were held down
 ```typescript
 keyDown(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

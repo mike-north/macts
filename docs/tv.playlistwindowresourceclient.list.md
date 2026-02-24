@@ -11,7 +11,7 @@ List all playlistwindows.
 ```typescript
 list(): Promise<PlaylistWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[PlaylistWindow](./tv.playlistwindow.md)<!-- -->\[\]&gt;
-

@@ -11,7 +11,7 @@ Show Safari's Privacy Report
 ```typescript
 showPrivacyReport(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

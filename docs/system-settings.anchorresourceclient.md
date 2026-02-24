@@ -9,7 +9,7 @@ Client for an anchor within a settings pane..
 **Signature:**
 
 ```typescript
-declare class AnchorResourceClient 
+declare class AnchorResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AnchorResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-settings.anchorresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AnchorResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AnchorResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-settings.anchorresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new anchor.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-settings.anchorresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a anchor.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-settings.anchorresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a anchor by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-settings.anchorresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all anchors.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-settings.anchorresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing anchor.
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,30 +18,24 @@ create(input: AliasCreateInput): Promise<Alias>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AliasCreateInput](./system-events.aliascreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Alias](./system-events.alias.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ unique identifier for this address.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

@@ -9,7 +9,7 @@ Client for other names related to this person..
 **Signature:**
 
 ```typescript
-declare class RelatedNameResourceClient 
+declare class RelatedNameResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RelatedNameResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.relatednameresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RelatedNameResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RelatedNameResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.relatednameresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new relatedname.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.relatednameresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a relatedname.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.relatednameresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a relatedname by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.relatednameresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all relatednames.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.relatednameresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing relatedname.
 
-
 </td></tr>
 </tbody></table>
-

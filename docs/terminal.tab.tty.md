@@ -9,5 +9,5 @@ The tty device of the tab
 **Signature:**
 
 ```typescript
-tty: string;
+tty: string
 ```

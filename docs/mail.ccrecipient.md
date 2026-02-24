@@ -9,7 +9,7 @@ An email recipient in the Cc: field
 **Signature:**
 
 ```typescript
-interface CcRecipient 
+interface CcRecipient
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface CcRecipient
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./mail.ccrecipient.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this recipient
 
-
 </td></tr>
 </tbody></table>
-

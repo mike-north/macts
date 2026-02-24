@@ -9,7 +9,7 @@ Load manifest from a YAML string (for testing).
 **Signature:**
 
 ```typescript
-declare function parseManifestYaml(yamlContent: string): AppManifest;
+declare function parseManifestYaml(yamlContent: string): AppManifest
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function parseManifestYaml(yamlContent: string): AppManifest;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 yamlContent
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 YAML content as string
-
 
 </td></tr>
 </tbody></table>
@@ -57,4 +51,3 @@ Parsed and validated AppManifest
 ## Exceptions
 
 Error if parsing or validation fails
-

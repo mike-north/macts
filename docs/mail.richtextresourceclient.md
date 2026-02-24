@@ -9,7 +9,7 @@ Client for rich (styled) text.
 **Signature:**
 
 ```typescript
-declare class RichTextResourceClient 
+declare class RichTextResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RichTextResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.richtextresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RichTextResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RichTextResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.richtextresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new richtext.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.richtextresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a richtext.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.richtextresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a richtext by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.richtextresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all richtext.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.richtextresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing richtext.
 
-
 </td></tr>
 </tbody></table>
-

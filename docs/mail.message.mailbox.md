@@ -9,5 +9,5 @@ The mailbox in which this message is filed
 **Signature:**
 
 ```typescript
-mailbox: Mailbox;
+mailbox: Mailbox
 ```

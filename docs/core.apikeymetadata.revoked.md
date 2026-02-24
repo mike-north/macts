@@ -9,5 +9,5 @@ Whether the key has been revoked
 **Signature:**
 
 ```typescript
-revoked: boolean;
+revoked: boolean
 ```

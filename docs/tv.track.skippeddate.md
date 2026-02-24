@@ -9,5 +9,5 @@ the date and time this track was last skipped
 **Signature:**
 
 ```typescript
-skippedDate: Date;
+skippedDate: Date
 ```

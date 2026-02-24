@@ -7,8 +7,9 @@
 **Signature:**
 
 ```typescript
-declare class JxaExecutionError extends Error 
+declare class JxaExecutionError extends Error
 ```
+
 **Extends:** Error
 
 ## Constructors
@@ -17,30 +18,24 @@ declare class JxaExecutionError extends Error
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(message, code, stderr, cause)](./core.jxaexecutionerror._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `JxaExecutionError` class
-
 
 </td></tr>
 </tbody></table>
@@ -51,60 +46,47 @@ Constructs a new instance of the `JxaExecutionError` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [code](./core.jxaexecutionerror.code.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [stderr](./core.jxaexecutionerror.stderr.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

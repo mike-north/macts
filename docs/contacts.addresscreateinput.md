@@ -9,7 +9,7 @@ Input for creating a Address
 **Signature:**
 
 ```typescript
-interface AddressCreateInput 
+interface AddressCreateInput
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface AddressCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [city?](./contacts.addresscreateinput.city.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ City part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [country?](./contacts.addresscreateinput.country.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Country part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [countryCode?](./contacts.addresscreateinput.countrycode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Country code part of the address (should be a two character iso country code).
-
 
 </td></tr>
 <tr><td>
 
 [id?](./contacts.addresscreateinput.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ unique identifier for this address.
-
 
 </td></tr>
 <tr><td>
 
 [label?](./contacts.addresscreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label.
-
 
 </td></tr>
 <tr><td>
 
 [state?](./contacts.addresscreateinput.state.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ State, Province, or Region part of the address.
-
 
 </td></tr>
 <tr><td>
 
 [street?](./contacts.addresscreateinput.street.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Street part of the address, multiple lines separated by carriage returns.
-
 
 </td></tr>
 <tr><td>
 
 [zip?](./contacts.addresscreateinput.zip.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Zip or postal code of the address.
 
-
 </td></tr>
 </tbody></table>
-

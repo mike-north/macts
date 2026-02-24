@@ -11,7 +11,7 @@ Reload a tab.
 ```typescript
 reload(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

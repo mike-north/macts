@@ -9,5 +9,5 @@ The url visible to the user.
 **Signature:**
 
 ```typescript
-uRL: string;
+uRL: string
 ```

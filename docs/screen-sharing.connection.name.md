@@ -9,5 +9,5 @@ The connection name
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

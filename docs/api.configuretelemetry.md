@@ -13,7 +13,7 @@ Currently a no-op that logs a message indicating telemetry is not configured.
 **Signature:**
 
 ```typescript
-declare function configureTelemetry(_options?: TelemetryOptions): void;
+declare function configureTelemetry(_options?: TelemetryOptions): void
 ```
 
 ## Parameters
@@ -22,32 +22,26 @@ declare function configureTelemetry(_options?: TelemetryOptions): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 \_options
 
-
 </td><td>
 
 [TelemetryOptions](./api.telemetryoptions.md)
 
-
 </td><td>
 
 _(Optional)_ Telemetry configuration
-
 
 </td></tr>
 </tbody></table>
@@ -58,14 +52,12 @@ void
 
 ## Example
 
-
 ```typescript
-import { configureTelemetry } from '@macts/api/telemetry';
+import { configureTelemetry } from '@macts/api/telemetry'
 
 // When @opentelemetry/sdk-node is installed:
 await configureTelemetry({
   serviceName: 'macts-api',
   endpoint: 'http://localhost:4318',
-});
+})
 ```
-

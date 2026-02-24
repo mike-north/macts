@@ -18,30 +18,24 @@ create(input: ArtworkCreateInput): Promise<Artwork>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ArtworkCreateInput](./tv.artworkcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Artwork](./tv.artwork.md)<!-- -->&gt;
-

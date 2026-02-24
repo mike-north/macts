@@ -11,7 +11,7 @@ List all words.
 ```typescript
 list(): Promise<Word[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Word](./mail.word.md)<!-- -->\[\]&gt;
-

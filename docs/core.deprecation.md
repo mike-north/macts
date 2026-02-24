@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Deprecation = z.infer<typeof DeprecationSchema>;
+type Deprecation = z.infer<typeof DeprecationSchema>
 ```
-**References:** [DeprecationSchema](./core.deprecationschema.md)
 
+**References:** [DeprecationSchema](./core.deprecationschema.md)

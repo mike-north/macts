@@ -11,7 +11,7 @@ Show the document's Remote HUD
 ```typescript
 showRemoteHud(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

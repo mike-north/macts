@@ -11,7 +11,7 @@ List all subscriptionplaylists.
 ```typescript
 list(): Promise<SubscriptionPlaylist[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SubscriptionPlaylist](./music.subscriptionplaylist.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ Indicates whether the message was replied to or not
 **Signature:**
 
 ```typescript
-wasRepliedTo: boolean;
+wasRepliedTo: boolean
 ```

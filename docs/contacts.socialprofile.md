@@ -9,7 +9,7 @@ Profile for social networks.
 **Signature:**
 
 ```typescript
-interface SocialProfile 
+interface SocialProfile
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface SocialProfile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.socialprofile.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The persistent unique identifier for this profile.
-
 
 </td></tr>
 <tr><td>
 
 [serviceName](./contacts.socialprofile.servicename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The service name of this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [url](./contacts.socialprofile.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The URL of this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [userIdentifier](./contacts.socialprofile.useridentifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 A service-specific identifier used with this social profile.
-
 
 </td></tr>
 <tr><td>
 
 [userName](./contacts.socialprofile.username.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The username used with this social profile.
 
-
 </td></tr>
 </tbody></table>
-

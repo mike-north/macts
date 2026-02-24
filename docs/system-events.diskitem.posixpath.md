@@ -9,5 +9,5 @@ the POSIX file system path of the disk item
 **Signature:**
 
 ```typescript
-pOSIXPath: string;
+pOSIXPath: string
 ```

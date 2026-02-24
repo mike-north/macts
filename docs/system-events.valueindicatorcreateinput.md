@@ -9,5 +9,5 @@ Input for creating a ValueIndicator
 **Signature:**
 
 ```typescript
-interface ValueIndicatorCreateInput 
+interface ValueIndicatorCreateInput
 ```

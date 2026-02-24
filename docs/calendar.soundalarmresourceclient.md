@@ -9,7 +9,7 @@ Client for a sound alarm.
 **Signature:**
 
 ```typescript
-declare class SoundAlarmResourceClient 
+declare class SoundAlarmResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SoundAlarmResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.soundalarmresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SoundAlarmResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SoundAlarmResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.soundalarmresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new soundalarm.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./calendar.soundalarmresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a soundalarm.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./calendar.soundalarmresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a soundalarm by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.soundalarmresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all soundalarms.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./calendar.soundalarmresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing soundalarm.
 
-
 </td></tr>
 </tbody></table>
-

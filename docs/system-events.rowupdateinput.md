@@ -9,7 +9,7 @@ Input for updating a Row
 **Signature:**
 
 ```typescript
-type RowUpdateInput = Partial<RowCreateInput>;
+type RowUpdateInput = Partial<RowCreateInput>
 ```
-**References:** [RowCreateInput](./system-events.rowcreateinput.md)
 
+**References:** [RowCreateInput](./system-events.rowcreateinput.md)

@@ -9,5 +9,5 @@ the name of the EQ preset of the track
 **Signature:**
 
 ```typescript
-eQ: string;
+eQ: string
 ```

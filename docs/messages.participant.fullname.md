@@ -9,5 +9,5 @@ The full name from this participant's Contacts card, if available
 **Signature:**
 
 ```typescript
-fullName: string;
+fullName: string
 ```

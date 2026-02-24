@@ -18,46 +18,37 @@ search(_for: string, only?: string): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 \_for
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 only
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -65,4 +56,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

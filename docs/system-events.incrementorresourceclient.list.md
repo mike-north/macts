@@ -11,7 +11,7 @@ List all incrementors.
 ```typescript
 list(): Promise<Incrementor[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Incrementor](./system-events.incrementor.md)<!-- -->\[\]&gt;
-

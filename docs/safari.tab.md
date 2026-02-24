@@ -9,7 +9,7 @@ A Safari tab
 **Signature:**
 
 ```typescript
-interface Tab 
+interface Tab
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Tab
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./safari.tab.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the tab
-
 
 </td></tr>
 <tr><td>
 
 [name](./safari.tab.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The tab name
-
 
 </td></tr>
 <tr><td>
 
 [source](./safari.tab.source.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The HTML source of the web page currently loaded in the tab
-
 
 </td></tr>
 <tr><td>
 
 [text](./safari.tab.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The text of the web page currently loaded in the tab
-
 
 </td></tr>
 <tr><td>
 
 [url](./safari.tab.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The tab URL
 
-
 </td></tr>
 </tbody></table>
-

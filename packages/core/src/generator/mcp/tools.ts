@@ -165,7 +165,7 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
       if (isWritable) {
         properties[propName] = propertyToJsonSchema(prop)
         // Required properties (only for writable properties on create)
-        if (!prop.optional && command.name === 'create' && isWritable) {
+        if (!prop.optional && command.name === 'create') {
           // Check if property is in identifiers (read-only IDs are not required on create)
           const isIdentifier = resource.identifiers?.some((id) => id.property === propName)
           if (!isIdentifier) {

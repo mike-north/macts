@@ -9,5 +9,5 @@ The kind property
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

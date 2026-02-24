@@ -9,5 +9,5 @@ Unique identifier for this toolbar
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

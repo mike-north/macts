@@ -9,7 +9,7 @@ Client for a combo box belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ComboBoxResourceClient 
+declare class ComboBoxResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ComboBoxResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.comboboxresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ComboBoxResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ComboBoxResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.comboboxresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new combobox.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.comboboxresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a combobox.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.comboboxresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a combobox by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.comboboxresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all comboboxes.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.comboboxresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing combobox.
 
-
 </td></tr>
 </tbody></table>
-

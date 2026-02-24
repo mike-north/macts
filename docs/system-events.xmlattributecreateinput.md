@@ -9,7 +9,7 @@ Input for creating a XMLAttribute
 **Signature:**
 
 ```typescript
-interface XMLAttributeCreateInput 
+interface XMLAttributeCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface XMLAttributeCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [value?](./system-events.xmlattributecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the value of the XML attribute
 
-
 </td></tr>
 </tbody></table>
-

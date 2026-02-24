@@ -9,7 +9,7 @@ Client for a terminal session.
 **Signature:**
 
 ```typescript
-declare class SessionResourceClient 
+declare class SessionResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SessionResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./iterm.sessionresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SessionResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SessionResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./iterm.sessionresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new session.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./iterm.sessionresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a session.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./iterm.sessionresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a session by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./iterm.sessionresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all sessions.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./iterm.sessionresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing session.
 
-
 </td></tr>
 </tbody></table>
-

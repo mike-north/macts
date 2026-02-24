@@ -7,26 +7,29 @@
 **Signature:**
 
 ```typescript
-RuleSchema: z.ZodObject<{
-    colorMessage: z.ZodString;
-    deleteMessage: z.ZodBoolean;
-    forwardText: z.ZodString;
-    forwardMessage: z.ZodString;
-    markFlagged: z.ZodBoolean;
-    markFlagIndex: z.ZodNumber;
-    markRead: z.ZodBoolean;
-    playSound: z.ZodString;
-    redirectMessage: z.ZodString;
-    replyText: z.ZodString;
-    runScript: z.ZodString;
-    allConditionsMustBeMet: z.ZodBoolean;
-    copyMessage: z.ZodString;
-    moveMessage: z.ZodString;
-    highlightTextUsingColor: z.ZodBoolean;
-    enabled: z.ZodBoolean;
-    name: z.ZodString;
-    shouldCopyMessage: z.ZodBoolean;
-    shouldMoveMessage: z.ZodBoolean;
-    stopEvaluatingRules: z.ZodBoolean;
-}, z.core.$strip>
+RuleSchema: z.ZodObject<
+  {
+    colorMessage: z.ZodString
+    deleteMessage: z.ZodBoolean
+    forwardText: z.ZodString
+    forwardMessage: z.ZodString
+    markFlagged: z.ZodBoolean
+    markFlagIndex: z.ZodNumber
+    markRead: z.ZodBoolean
+    playSound: z.ZodString
+    redirectMessage: z.ZodString
+    replyText: z.ZodString
+    runScript: z.ZodString
+    allConditionsMustBeMet: z.ZodBoolean
+    copyMessage: z.ZodString
+    moveMessage: z.ZodString
+    highlightTextUsingColor: z.ZodBoolean
+    enabled: z.ZodBoolean
+    name: z.ZodString
+    shouldCopyMessage: z.ZodBoolean
+    shouldMoveMessage: z.ZodBoolean
+    stopEvaluatingRules: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

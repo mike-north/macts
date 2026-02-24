@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type CommandParameter = z.infer<typeof CommandParameterSchema>;
+type CommandParameter = z.infer<typeof CommandParameterSchema>
 ```
-**References:** [CommandParameterSchema](./core.commandparameterschema.md)
 
+**References:** [CommandParameterSchema](./core.commandparameterschema.md)

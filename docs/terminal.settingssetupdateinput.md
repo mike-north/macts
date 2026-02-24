@@ -9,7 +9,7 @@ Input for updating a SettingsSet
 **Signature:**
 
 ```typescript
-type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>;
+type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>
 ```
-**References:** [SettingsSetCreateInput](./terminal.settingssetcreateinput.md)
 
+**References:** [SettingsSetCreateInput](./terminal.settingssetcreateinput.md)

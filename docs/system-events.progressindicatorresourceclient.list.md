@@ -11,7 +11,7 @@ List all progressindicators.
 ```typescript
 list(): Promise<ProgressIndicator[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ProgressIndicator](./system-events.progressindicator.md)<!-- -->\[\]&gt;
-

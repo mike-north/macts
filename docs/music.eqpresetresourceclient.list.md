@@ -11,7 +11,7 @@ List all eqpresets.
 ```typescript
 list(): Promise<EQPreset[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[EQPreset](./music.eqpreset.md)<!-- -->\[\]&gt;
-

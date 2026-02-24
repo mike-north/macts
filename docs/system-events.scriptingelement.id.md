@@ -9,5 +9,5 @@ Unique identifier for this scripting element
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

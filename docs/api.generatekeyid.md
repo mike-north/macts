@@ -9,11 +9,11 @@ Generate a unique key ID.
 **Signature:**
 
 ```typescript
-declare function generateKeyId(): string;
+declare function generateKeyId(): string
 ```
+
 **Returns:**
 
 string
 
 Unique key ID prefixed with "key\_"
-

@@ -10,8 +10,8 @@ The boldColor property
 
 ```typescript
 boldColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

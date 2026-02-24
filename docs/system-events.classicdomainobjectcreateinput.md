@@ -9,5 +9,5 @@ Input for creating a ClassicDomainObject
 **Signature:**
 
 ```typescript
-interface ClassicDomainObjectCreateInput 
+interface ClassicDomainObjectCreateInput
 ```

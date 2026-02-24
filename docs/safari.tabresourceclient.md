@@ -9,7 +9,7 @@ Client for a safari tab.
 **Signature:**
 
 ```typescript
-declare class TabResourceClient 
+declare class TabResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TabResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./safari.tabresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TabResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `TabResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./safari.tabresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new tab.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./safari.tabresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a tab.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./safari.tabresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a tab by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./safari.tabresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all tabs.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./safari.tabresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing tab.
 
-
 </td></tr>
 </tbody></table>
-

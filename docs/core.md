@@ -10,64 +10,52 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [JxaExecutionError](./core.jxaexecutionerror.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ManifestLoadError](./core.manifestloaderror.md)
 
-
 </td><td>
 
 Error thrown when manifest loading fails.
-
 
 </td></tr>
 <tr><td>
 
 [ObjectSpecifier](./core.objectspecifier.md)
 
-
 </td><td>
 
 Fluent builder for JXA object specifier chains. Generates code like: Application('Calendar').calendars.byId('uid').events()
-
 
 </td></tr>
 <tr><td>
 
 [PermissionExpansionError](./core.permissionexpansionerror.md)
 
-
 </td><td>
 
 Error thrown when permission expansion fails.
-
 
 </td></tr>
 <tr><td>
 
 [PermissionParseError](./core.permissionparseerror.md)
 
-
 </td><td>
 
 Error thrown when a permission string is invalid.
-
 
 </td></tr>
 </tbody></table>
@@ -78,28 +66,23 @@ Error thrown when a permission string is invalid.
 
 Function
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [activateApp(bundleId)](./core.activateapp.md)
 
-
 </td><td>
 
 Activate (bring to foreground) an application.
-
 
 </td></tr>
 <tr><td>
 
 [buildHierarchy(sdef)](./core.buildhierarchy.md)
-
 
 </td><td>
 
@@ -107,219 +90,179 @@ Build a containment hierarchy from SDEF data.
 
 This function analyzes element relationships to determine: - Which classes are resources (have elements) vs value types (no elements) - The parent-child containment tree - The root class (typically 'application') - Classes with ambiguous placement (multiple parents)
 
-
 </td></tr>
 <tr><td>
 
 [checkPermission(grantedPermissions, requiredPermission)](./core.checkpermission.md)
 
-
 </td><td>
 
 Check if any of the granted permissions cover the required permission. Convenience wrapper for hasPermission that returns a boolean.
-
 
 </td></tr>
 <tr><td>
 
 [checkPermissions(grantedPermissions, requiredPermissions)](./core.checkpermissions.md)
 
-
 </td><td>
 
 Check multiple required permissions against granted permissions.
-
 
 </td></tr>
 <tr><td>
 
 [coarsePermission(app, resource, operation)](./core.coarsepermission.md)
 
-
 </td><td>
 
 Create a coarse permission string.
-
 
 </td></tr>
 <tr><td>
 
 [connect(bundleId, \_options)](./core.connect.md)
 
-
 </td><td>
 
 Create a connection object for an application.
-
 
 </td></tr>
 <tr><td>
 
 [createArrayCoercer(elementCoercer)](./core.createarraycoercer.md)
 
-
 </td><td>
 
 Create an array coercer from element coercer.
-
 
 </td></tr>
 <tr><td>
 
 [createEnumCoercer(values)](./core.createenumcoercer.md)
 
-
 </td><td>
 
 Create an enum coercer from enum definition.
-
 
 </td></tr>
 <tr><td>
 
 [createGeneratorContext(manifest, options)](./core.creategeneratorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [createMcpGeneratorContext(options)](./core.createmcpgeneratorcontext.md)
 
-
 </td><td>
 
 Create an MCP generator context.
-
 
 </td></tr>
 <tr><td>
 
 [describePermissions(permissions)](./core.describepermissions.md)
 
-
 </td><td>
 
 Get a human-readable description of what permissions grant.
-
 
 </td></tr>
 <tr><td>
 
 [expandCoarsePermission(permission, permissionsSection)](./core.expandcoarsepermission.md)
 
-
 </td><td>
 
 Expand a coarse permission to its constituent fine-grained permissions.
-
 
 </td></tr>
 <tr><td>
 
 [expandPermissions(permissions, permissionsSection)](./core.expandpermissions.md)
 
-
 </td><td>
 
 Expand multiple permissions, handling coarse and wildcard permissions.
-
 
 </td></tr>
 <tr><td>
 
 [extractAppName(permission)](./core.extractappname.md)
 
-
 </td><td>
 
 Extract the app name from a permission string.
-
 
 </td></tr>
 <tr><td>
 
 [extractOperation(permission)](./core.extractoperation.md)
 
-
 </td><td>
 
 Extract the operation from a permission string.
-
 
 </td></tr>
 <tr><td>
 
 [extractResourceName(permission)](./core.extractresourcename.md)
 
-
 </td><td>
 
 Extract the resource name from a permission string.
-
 
 </td></tr>
 <tr><td>
 
 [filterPermissionsByApp(permissions, app)](./core.filterpermissionsbyapp.md)
 
-
 </td><td>
 
 Filter a list of permissions to only those matching an app.
-
 
 </td></tr>
 <tr><td>
 
 [findCoarseCategory(finePermission, permissionsSection)](./core.findcoarsecategory.md)
 
-
 </td><td>
 
 Find the coarse category that contains a fine-grained permission.
-
 
 </td></tr>
 <tr><td>
 
 [finePermission(app, resource, operation)](./core.finepermission.md)
 
-
 </td><td>
 
 Create a fine-grained permission string.
-
 
 </td></tr>
 <tr><td>
 
 [formatPermission(permission)](./core.formatpermission.md)
 
-
 </td><td>
 
 Format a parsed permission back to a string.
-
 
 </td></tr>
 <tr><td>
 
 [generateAllHttpPackages(manifest, options)](./core.generateallhttppackages.md)
 
-
 </td><td>
 
 Generate all HTTP packages (SDK, MCP, CLI, API) from a manifest.
-
 
 </td></tr>
 <tr><td>
 
 [generateApiPlugin(manifest, options)](./core.generateapiplugin.md)
-
 
 </td><td>
 
@@ -327,23 +270,19 @@ Generate an API plugin from a manifest.
 
 The API plugin packages up the app manifest and metadata so the core API server can load it and auto-generate RPC endpoints.
 
-
 </td></tr>
 <tr><td>
 
 [generateApplicationClass(ctx)](./core.generateapplicationclass.md)
 
-
 </td><td>
 
 Generate the root application class.
-
 
 </td></tr>
 <tr><td>
 
 [generateClientPackage(manifest, options)](./core.generateclientpackage.md)
-
 
 </td><td>
 
@@ -351,34 +290,28 @@ Generate a consolidated client package from a manifest.
 
 Combines the HTTP client SDK and CLI plugin into a single package with: - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts) - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts) - Unified config files (package.json, tsconfig, tsup, api-extractor)
 
-
 </td></tr>
 <tr><td>
 
 [generateCliPlugin(manifest, options)](./core.generatecliplugin.md)
 
-
 </td><td>
 
 Generate a complete CLI plugin from a manifest.
-
 
 </td></tr>
 <tr><td>
 
 [generateCollectionClass(resource, \_ctx)](./core.generatecollectionclass.md)
 
-
 </td><td>
 
 Generate collection class code.
-
 
 </td></tr>
 <tr><td>
 
 [generateConsolidatedPackages(manifest, options)](./core.generateconsolidatedpackages.md)
-
 
 </td><td>
 
@@ -386,23 +319,19 @@ Generate consolidated packages (client + server) from a manifest.
 
 The client package combines SDK + CLI into `@macts/{app}`<!-- -->. The server package combines API + MCP into `@macts/{app}-server`<!-- -->.
 
-
 </td></tr>
 <tr><td>
 
 [generateCreateInputSchema(resource, \_ctx)](./core.generatecreateinputschema.md)
 
-
 </td><td>
 
 Generate Zod schema for resource create input.
-
 
 </td></tr>
 <tr><td>
 
 [generateCreateInputType(resource, \_ctx)](./core.generatecreateinputtype.md)
-
 
 </td><td>
 
@@ -410,67 +339,55 @@ Generate TypeScript interface for creating a resource.
 
 Creates an interface containing only writable properties. Properties are marked optional if they have a default value or are explicitly optional.
 
-
 </td></tr>
 <tr><td>
 
 [generateEnumSchema(enumDef)](./core.generateenumschema.md)
 
-
 </td><td>
 
 Generate Zod schema for an enum.
-
 
 </td></tr>
 <tr><td>
 
 [generateEnumType(enumDef)](./core.generateenumtype.md)
 
-
 </td><td>
 
 Generate TypeScript type alias for an enum as a string literal union.
-
 
 </td></tr>
 <tr><td>
 
 [generateHttpClientSdk(manifest, options)](./core.generatehttpclientsdk.md)
 
-
 </td><td>
 
 Generate HTTP client SDK from a manifest.
-
 
 </td></tr>
 <tr><td>
 
 [generateMcpPlugin(context)](./core.generatemcpplugin.md)
 
-
 </td><td>
 
 Generate an MCP plugin from a manifest.
-
 
 </td></tr>
 <tr><td>
 
 [generatePermissionMap(appName, permissionsSection)](./core.generatepermissionmap.md)
 
-
 </td><td>
 
 Generate a permission map from a manifest's permissions section.
-
 
 </td></tr>
 <tr><td>
 
 [generateReadType(resource, \_ctx)](./core.generatereadtype.md)
-
 
 </td><td>
 
@@ -478,56 +395,46 @@ Generate TypeScript interface for reading a resource.
 
 Creates an interface containing all properties from the resource definition, with read-only properties marked with the `readonly` modifier.
 
-
 </td></tr>
 <tr><td>
 
 [generateResourceClass(resource, ctx)](./core.generateresourceclass.md)
 
-
 </td><td>
 
 Generate resource instance class code.
-
 
 </td></tr>
 <tr><td>
 
 [generateResourceSchema(resource, \_ctx)](./core.generateresourceschema.md)
 
-
 </td><td>
 
 Generate Zod schema for a resource read type.
-
 
 </td></tr>
 <tr><td>
 
 [generateSchemas(ctx)](./core.generateschemas.md)
 
-
 </td><td>
 
 Generate all schemas for a context.
-
 
 </td></tr>
 <tr><td>
 
 [generateSdk(manifest, options)](./core.generatesdk.md)
 
-
 </td><td>
 
 Generate a complete SDK from a manifest.
-
 
 </td></tr>
 <tr><td>
 
 [generateServerPackage(manifest, options)](./core.generateserverpackage.md)
-
 
 </td><td>
 
@@ -535,12 +442,10 @@ Generate a consolidated server package from a manifest.
 
 Combines an API plugin (at `src/`<!-- -->) and an MCP plugin (at `src/mcp/`<!-- -->) into a single package with subpath exports for `.` (API) and `./mcp` (MCP).
 
-
 </td></tr>
 <tr><td>
 
 [generateTypes(ctx)](./core.generatetypes.md)
-
 
 </td><td>
 
@@ -548,23 +453,19 @@ Generate all TypeScript types for a generator context.
 
 Produces three types per resource (read, create input, update input) plus one type per enum. Types are generated in a consistent order: resources first (with their variants), then enums.
 
-
 </td></tr>
 <tr><td>
 
 [generateUpdateInputSchema(resource, \_ctx)](./core.generateupdateinputschema.md)
 
-
 </td><td>
 
 Generate Zod schema for resource update input (all optional).
-
 
 </td></tr>
 <tr><td>
 
 [generateUpdateInputType(resource, \_ctx)](./core.generateupdateinputtype.md)
-
 
 </td><td>
 
@@ -572,34 +473,28 @@ Generate TypeScript interface for updating a resource.
 
 Creates an interface containing only writable properties, with all properties marked as optional (partial update semantics).
 
-
 </td></tr>
 <tr><td>
 
 [getAppName(bundleId)](./core.getappname.md)
 
-
 </td><td>
 
 Get the display name of an application.
-
 
 </td></tr>
 <tr><td>
 
 [groupPermissionsByResource(permissions)](./core.grouppermissionsbyresource.md)
 
-
 </td><td>
 
 Group permissions by resource.
-
 
 </td></tr>
 <tr><td>
 
 [hasPermission(grantedPermissions, requiredPermission, permissionHistory)](./core.haspermission.md)
-
 
 </td><td>
 
@@ -607,78 +502,64 @@ Check if a set of granted permissions covers a required permission.
 
 Permissions are stored and matched as fine-grained only. Coarse permissions are expanded at key creation time, so validation only needs to compare fine-grained permissions.
 
-
 </td></tr>
 <tr><td>
 
 [isAppRunning(bundleId)](./core.isapprunning.md)
 
-
 </td><td>
 
 Check if an application is currently running.
-
 
 </td></tr>
 <tr><td>
 
 [isCoarseOperation(operation)](./core.iscoarseoperation.md)
 
-
 </td><td>
 
 Check if an operation is a standard coarse CRUD operation.
-
 
 </td></tr>
 <tr><td>
 
 [isValidPermission(permission)](./core.isvalidpermission.md)
 
-
 </td><td>
 
 Validate a permission string without parsing it.
-
 
 </td></tr>
 <tr><td>
 
 [loadManifest(manifestPath)](./core.loadmanifest.md)
 
-
 </td><td>
 
 Load and validate a manifest from a YAML file.
-
 
 </td></tr>
 <tr><td>
 
 [nullSafe(coercer)](./core.nullsafe.md)
 
-
 </td><td>
 
 Wrap a coercer to handle null/undefined values.
-
 
 </td></tr>
 <tr><td>
 
 [parseManifestYaml(yamlContent)](./core.parsemanifestyaml.md)
 
-
 </td><td>
 
 Load manifest from a YAML string (for testing).
-
 
 </td></tr>
 <tr><td>
 
 [parsePermission(permission)](./core.parsepermission.md)
-
 
 </td><td>
 
@@ -688,12 +569,10 @@ The parser determines permission type based on: 1. If resource or operation cont
 
 Note: The distinction between coarse and fine is contextual. The manifest's permissions section defines which operations are coarse for each resource. This parser makes a best-effort guess based on standard conventions.
 
-
 </td></tr>
 <tr><td>
 
 [propertyTypeToTs(type)](./core.propertytypetots.md)
-
 
 </td><td>
 
@@ -701,12 +580,10 @@ Convert manifest property type to TypeScript type string.
 
 Handles three categories of types: - Primitive types (string, number, boolean, date, etc.) - Complex types (arrays, resource references, enum references) - Custom type references (arbitrary strings referencing resources/enums)
 
-
 </td></tr>
 <tr><td>
 
 [propertyTypeToZod(type, optional)](./core.propertytypetozod.md)
-
 
 </td><td>
 
@@ -714,89 +591,73 @@ Convert manifest property type to Zod schema code.
 
 Handles three categories of types: - Primitive types (string, number, boolean, date, etc.) - Complex types (arrays, resource references, enum references) - Custom type references (arbitrary strings referencing resources/enums)
 
-
 </td></tr>
 <tr><td>
 
 [quitApp(bundleId)](./core.quitapp.md)
 
-
 </td><td>
 
 Quit an application.
-
 
 </td></tr>
 <tr><td>
 
 [runJxa(code, options)](./core.runjxa.md)
 
-
 </td><td>
 
 Execute raw JXA code and return the result. Uses osascript -l JavaScript under the hood.
-
 
 </td></tr>
 <tr><td>
 
 [runWithApp(bundleId, fn, options)](./core.runwithapp.md)
 
-
 </td><td>
 
 Execute JXA code in the context of an application.
-
 
 </td></tr>
 <tr><td>
 
 [toJsonSchema(schema, options)](./core.tojsonschema.md)
 
-
 </td><td>
 
 Convert a Zod schema to JSON Schema Draft 7.
-
 
 </td></tr>
 <tr><td>
 
 [toJsonSchemaWithDefinitions(schema, name)](./core.tojsonschemawithdefinitions.md)
 
-
 </td><td>
 
 Convert a Zod schema to JSON Schema with definitions. Useful for complex schemas with cross-references.
-
 
 </td></tr>
 <tr><td>
 
 [validateCommandPermissions(commandPermissions, permissionsSection)](./core.validatecommandpermissions.md)
 
-
 </td><td>
 
 Validate that all command permissions are included in the permissions mapping.
-
 
 </td></tr>
 <tr><td>
 
 [wildcardPermission(app, resource, operation)](./core.wildcardpermission.md)
 
-
 </td><td>
 
 Create a wildcard permission string.
-
 
 </td></tr>
 <tr><td>
 
 [writeFiles(files, outDir)](./core.writefiles.md)
-
 
 </td><td>
 
@@ -804,17 +665,14 @@ Write generated files to disk.
 
 Creates directories as needed and writes each file's content.
 
-
 </td></tr>
 <tr><td>
 
 [writeSdk(result, outDir)](./core.writesdk.md)
 
-
 </td><td>
 
 Write generated SDK to disk.
-
 
 </td></tr>
 </tbody></table>
@@ -825,185 +683,150 @@ Write generated SDK to disk.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ApiKeyMetadata](./core.apikeymetadata.md)
 
-
 </td><td>
 
 API key metadata stored separately from the key itself. Used for listing and management without exposing secrets.
-
 
 </td></tr>
 <tr><td>
 
 [ApiKeyPayload](./core.apikeypayload.md)
 
-
 </td><td>
 
 API key payload structure.
-
 
 </td></tr>
 <tr><td>
 
 [ApiKeyValidationResult](./core.apikeyvalidationresult.md)
 
-
 </td><td>
 
 Result of API key validation.
-
 
 </td></tr>
 <tr><td>
 
 [ApiPluginGeneratorOptions](./core.apiplugingeneratoroptions.md)
 
-
 </td><td>
 
 Options for generating an API plugin.
-
 
 </td></tr>
 <tr><td>
 
 [AppConnection](./core.appconnection.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [AppConnectionOptions](./core.appconnectionoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CliGeneratorContext](./core.cligeneratorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CliGeneratorOptions](./core.cligeneratoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CoarsePermission](./core.coarsepermission.md)
 
-
 </td><td>
 
 Coarse-grained permission - CRUD-style groups. Format: `app:resource:crud-operation`
-
 
 </td></tr>
 <tr><td>
 
 [CreateMcpContextOptions](./core.createmcpcontextoptions.md)
 
-
 </td><td>
 
 Options for creating MCP generator context.
-
 
 </td></tr>
 <tr><td>
 
 [FinePermission](./core.finepermission.md)
 
-
 </td><td>
 
 Fine-grained permission - one per command. Format: `app:resource:operation`
-
 
 </td></tr>
 <tr><td>
 
 [GenerateAllOptions](./core.generatealloptions.md)
 
-
 </td><td>
 
 Options for generating all HTTP packages.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateAllResult](./core.generateallresult.md)
 
-
 </td><td>
 
 Result of generating all packages.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateApiPluginResult](./core.generateapipluginresult.md)
 
-
 </td><td>
 
 Result of generating an API plugin.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateClientPackageOptions](./core.generateclientpackageoptions.md)
 
-
 </td><td>
 
 Options for client package generation.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateClientPackageResult](./core.generateclientpackageresult.md)
 
-
 </td><td>
 
 Result of client package generation.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateCliPluginResult](./core.generateclipluginresult.md)
-
 
 </td><td>
 
@@ -1011,406 +834,329 @@ CLI plugin generator.
 
 Generates Clipanion-based CLI plugins from macts manifests.
 
-
 </td></tr>
 <tr><td>
 
 [GenerateConsolidatedOptions](./core.generateconsolidatedoptions.md)
 
-
 </td><td>
 
 Options for generating consolidated packages (client + server).
-
 
 </td></tr>
 <tr><td>
 
 [GenerateConsolidatedResult](./core.generateconsolidatedresult.md)
 
-
 </td><td>
 
 Result of generating consolidated packages.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedApplication](./core.generatedapplication.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedClass](./core.generatedclass.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedCollection](./core.generatedcollection.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedCommand](./core.generatedcommand.md)
 
-
 </td><td>
 
 Generated command file.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedFlag](./core.generatedflag.md)
 
-
 </td><td>
 
 Generated flag definition for a Clipanion command.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedHttpClientSdk](./core.generatedhttpclientsdk.md)
 
-
 </td><td>
 
 Result of HTTP client SDK generation.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedMcpPlugin](./core.generatedmcpplugin.md)
 
-
 </td><td>
 
 Result of MCP plugin generation.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedSchema](./core.generatedschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedTool](./core.generatedtool.md)
 
-
 </td><td>
 
 A generated MCP tool definition.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedToolFile](./core.generatedtoolfile.md)
 
-
 </td><td>
 
 Generated tool file content.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratedType](./core.generatedtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GenerateSdkResult](./core.generatesdkresult.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GenerateServerPackageOptions](./core.generateserverpackageoptions.md)
 
-
 </td><td>
 
 Options for generating a server package.
-
 
 </td></tr>
 <tr><td>
 
 [GenerateServerPackageResult](./core.generateserverpackageresult.md)
 
-
 </td><td>
 
 Result of generating a server package.
-
 
 </td></tr>
 <tr><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [GeneratorOptions](./core.generatoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [HierarchyResult](./core.hierarchyresult.md)
 
-
 </td><td>
 
 Result of hierarchy analysis.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClientGeneratorOptions](./core.httpclientgeneratoroptions.md)
 
-
 </td><td>
 
 Options for HTTP client SDK generation.
-
 
 </td></tr>
 <tr><td>
 
 [JsonSchemaOptions](./core.jsonschemaoptions.md)
 
-
 </td><td>
 
 Options for JSON Schema generation.
-
 
 </td></tr>
 <tr><td>
 
 [JxaEnumValue](./core.jxaenumvalue.md)
 
-
 </td><td>
 
 Enum value for JXA coercion (name and four-char code).
-
 
 </td></tr>
 <tr><td>
 
 [JxaExecutorOptions](./core.jxaexecutoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [McpGeneratorContext](./core.mcpgeneratorcontext.md)
 
-
 </td><td>
 
 Context for MCP generator.
-
 
 </td></tr>
 <tr><td>
 
 [PermissionCheckResult](./core.permissioncheckresult.md)
 
-
 </td><td>
 
 Result of permission check.
-
 
 </td></tr>
 <tr><td>
 
 [PermissionMap](./core.permissionmap.md)
 
-
 </td><td>
 
 Generate a complete permission map from a manifest's permissions section. The map contains both directions: coarse→fine and fine→coarse.
-
 
 </td></tr>
 <tr><td>
 
 [RawClass](./core.rawclass.md)
 
-
 </td><td>
 
 Raw class from SDEF - represents an AppleScript object class.
-
 
 </td></tr>
 <tr><td>
 
 [RawCommand](./core.rawcommand.md)
 
-
 </td><td>
 
 Raw command from SDEF - represents an AppleScript command/verb.
-
 
 </td></tr>
 <tr><td>
 
 [RawElement](./core.rawelement.md)
 
-
 </td><td>
 
 Raw element from SDEF - represents a containment relationship. Elements define what types of objects can be contained by a class.
-
 
 </td></tr>
 <tr><td>
 
 [RawEnumeration](./core.rawenumeration.md)
 
-
 </td><td>
 
 Raw enumeration - represents a set of named constant values.
-
 
 </td></tr>
 <tr><td>
 
 [RawEnumerator](./core.rawenumerator.md)
 
-
 </td><td>
 
 Raw enumerator value - a single value in an enumeration.
-
 
 </td></tr>
 <tr><td>
 
 [RawParameter](./core.rawparameter.md)
 
-
 </td><td>
 
 Raw parameter for commands - represents a named parameter.
-
 
 </td></tr>
 <tr><td>
 
 [RawProperty](./core.rawproperty.md)
 
-
 </td><td>
 
 Raw property from SDEF - represents an attribute of a class.
-
 
 </td></tr>
 <tr><td>
 
 [RawSdefData](./core.rawsdefdata.md)
 
-
 </td><td>
 
 Complete parsed SDEF data - represents an entire scripting dictionary.
-
 
 </td></tr>
 <tr><td>
 
 [RawSuite](./core.rawsuite.md)
 
-
 </td><td>
 
 Raw suite - a logical grouping of related classes, commands, and enumerations. Suites organize terminology by functional area (e.g., "Standard Suite", "Text Suite").
-
 
 </td></tr>
 <tr><td>
 
 [SpecifierStep](./core.specifierstep.md)
 
-
 </td><td>
 
 A single step in an object specifier chain.
-
 
 </td></tr>
 <tr><td>
 
 [TypeCoercer](./core.typecoercer.md)
 
-
 </td><td>
 
 Type coercer interface - converts between TypeScript and JXA.
-
 
 </td></tr>
 <tr><td>
 
 [WildcardPermission](./core.wildcardpermission.md)
 
-
 </td><td>
 
 Wildcard permission - matches multiple permissions. Format: `app:*:operation` or `app:resource:*`
-
 
 </td></tr>
 </tbody></table>
@@ -1421,506 +1167,414 @@ Wildcard permission - matches multiple permissions. Format: `app:*:operation` or
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AppManifestSchema](./core.appmanifestschema.md)
 
-
 </td><td>
 
 Top-level manifest schema for a macOS application. This is the complete representation of an app's scriptable interface.
-
 
 </td></tr>
 <tr><td>
 
 [AppMetadataSchema](./core.appmetadataschema.md)
 
-
 </td><td>
 
 Schema for app-level metadata.
-
 
 </td></tr>
 <tr><td>
 
 [booleanCoercer](./core.booleancoercer.md)
 
-
 </td><td>
 
 Coerce booleans - JXA uses JavaScript booleans.
-
 
 </td></tr>
 <tr><td>
 
 [CardinalitySchema](./core.cardinalityschema.md)
 
-
 </td><td>
 
 Relationship cardinality.
 
-
 </td></tr>
 <tr><td>
 
-[COARSE\_OPERATIONS](./core.coarse_operations.md)
-
+[COARSE_OPERATIONS](./core.coarse_operations.md)
 
 </td><td>
 
 Standard CRUD operations for coarse permissions.
-
 
 </td></tr>
 <tr><td>
 
 [CoarseMappingSchema](./core.coarsemappingschema.md)
 
-
 </td><td>
 
 Coarse category to fine-grained permissions mapping. Maps operation names (read, create, write, delete, etc.) to arrays of fine-grained permission strings.
-
 
 </td></tr>
 <tr><td>
 
 [colorCoercer](./core.colorcoercer.md)
 
-
 </td><td>
 
 Coerce colors between hex strings and AppleScript RGB. AppleScript uses 16-bit color values (0-65535).
-
 
 </td></tr>
 <tr><td>
 
 [ColorTypeSchema](./core.colortypeschema.md)
 
-
 </td><td>
 
 Hex color string (\#RRGGBB format).
-
 
 </td></tr>
 <tr><td>
 
 [CommandParameterSchema](./core.commandparameterschema.md)
 
-
 </td><td>
 
 Command parameter schema.
-
 
 </td></tr>
 <tr><td>
 
 [CommandSchema](./core.commandschema.md)
 
-
 </td><td>
 
 Schema for a command definition.
-
 
 </td></tr>
 <tr><td>
 
 [CommandScopeSchema](./core.commandscopeschema.md)
 
-
 </td><td>
 
 Command scope - whether command operates on application or specific resource.
-
 
 </td></tr>
 <tr><td>
 
 [ConfidenceSchema](./core.confidenceschema.md)
 
-
 </td><td>
 
 Schema for extraction confidence scores. Values from 0.0 (no confidence) to 1.0 (fully confident).
-
 
 </td></tr>
 <tr><td>
 
 [dateCoercer](./core.datecoercer.md)
 
-
 </td><td>
 
 Coerce dates between TypeScript Date and JXA. JXA handles dates as JavaScript Date objects.
-
 
 </td></tr>
 <tr><td>
 
 [DateTypeSchema](./core.datetypeschema.md)
 
-
 </td><td>
 
 ISO 8601 date-time string or Date object. Used for dates throughout macts.
-
 
 </td></tr>
 <tr><td>
 
 [DeprecationSchema](./core.deprecationschema.md)
 
-
 </td><td>
 
 Schema for deprecation information.
-
 
 </td></tr>
 <tr><td>
 
 [DistributionModelSchema](./core.distributionmodelschema.md)
 
-
 </td><td>
 
 App distribution model.
-
 
 </td></tr>
 <tr><td>
 
 [DurationTypeSchema](./core.durationtypeschema.md)
 
-
 </td><td>
 
 ISO 8601 duration string. Examples: "PT1H" (1 hour), "P1D" (1 day), "PT30M" (30 minutes)
-
 
 </td></tr>
 <tr><td>
 
 [EnumSchema](./core.enumschema.md)
 
-
 </td><td>
 
 Schema for an enumeration type.
-
 
 </td></tr>
 <tr><td>
 
 [EnumValueSchema](./core.enumvalueschema.md)
 
-
 </td><td>
 
 Schema for a single enum value.
-
 
 </td></tr>
 <tr><td>
 
 [ExtractionMetadataSchema](./core.extractionmetadataschema.md)
 
-
 </td><td>
 
 Schema for extraction metadata.
-
 
 </td></tr>
 <tr><td>
 
 [FileTypeSchema](./core.filetypeschema.md)
 
-
 </td><td>
 
 File reference (POSIX path).
-
 
 </td></tr>
 <tr><td>
 
 [HexColorSchema](./core.hexcolorschema.md)
 
-
 </td><td>
 
 Hex color schema.
-
 
 </td></tr>
 <tr><td>
 
 [HierarchyChildSchema](./core.hierarchychildschema.md)
 
-
 </td><td>
 
 Schema for a child in the containment hierarchy.
-
 
 </td></tr>
 <tr><td>
 
 [HierarchySchema](./core.hierarchyschema.md)
 
-
 </td><td>
 
 Schema for the application-level hierarchy.
-
 
 </td></tr>
 <tr><td>
 
 [IdentifierSchema](./core.identifierschema.md)
 
-
 </td><td>
 
 Identifier configuration for a resource.
-
 
 </td></tr>
 <tr><td>
 
 [InheritanceSchema](./core.inheritanceschema.md)
 
-
 </td><td>
 
 Schema for resource type inheritance/variants. Used for union types like Alarm (DisplayAlarm \| SoundAlarm \| etc.)
-
 
 </td></tr>
 <tr><td>
 
 [numberCoercer](./core.numbercoercer.md)
 
-
 </td><td>
 
 Coerce numbers - straightforward conversion.
-
 
 </td></tr>
 <tr><td>
 
 [OpenQuestionSchema](./core.openquestionschema.md)
 
-
 </td><td>
 
 Schema for open questions from extraction.
-
 
 </td></tr>
 <tr><td>
 
 [pathCoercer](./core.pathcoercer.md)
 
-
 </td><td>
 
 Coerce paths between POSIX and AppleScript Path format.
-
 
 </td></tr>
 <tr><td>
 
 [PathTypeSchema](./core.pathtypeschema.md)
 
-
 </td><td>
 
 POSIX path string.
-
 
 </td></tr>
 <tr><td>
 
 [PermissionHistoryEntrySchema](./core.permissionhistoryentryschema.md)
 
-
 </td><td>
 
 Permission history entry - tracks when a command's permission changed. Used to provide helpful error messages when keys become invalid.
-
 
 </td></tr>
 <tr><td>
 
 [PermissionsSectionSchema](./core.permissionssectionschema.md)
 
-
 </td><td>
 
 Permissions section - maps resources to their coarse→fine permission mappings. This defines the relationship between coarse CRUD-style permissions and fine-grained per-command permissions.
-
 
 </td></tr>
 <tr><td>
 
 [PointTypeSchema](./core.pointtypeschema.md)
 
-
 </td><td>
 
 Point with x, y coordinates.
-
 
 </td></tr>
 <tr><td>
 
 [PrimitiveTypeSchema](./core.primitivetypeschema.md)
 
-
 </td><td>
 
 Primitive property types supported by AppleScript/JXA.
-
 
 </td></tr>
 <tr><td>
 
 [PropertyAccessSchema](./core.propertyaccessschema.md)
 
-
 </td><td>
 
 Property access mode - whether a property is read-only or read-write.
-
 
 </td></tr>
 <tr><td>
 
 [PropertySchema](./core.propertyschema.md)
 
-
 </td><td>
 
 Schema for a single property definition.
-
 
 </td></tr>
 <tr><td>
 
 [PropertyTypeSchema](./core.propertytypeschema.md)
 
-
 </td><td>
 
 Property type - can be primitive, array, resource reference, or enum reference.
-
 
 </td></tr>
 <tr><td>
 
 [RectTypeSchema](./core.recttypeschema.md)
 
-
 </td><td>
 
 Rectangle with position and size.
-
 
 </td></tr>
 <tr><td>
 
 [RelationshipSchema](./core.relationshipschema.md)
 
-
 </td><td>
 
 Schema for non-hierarchical relationships between resources.
-
 
 </td></tr>
 <tr><td>
 
 [ResourceSchema](./core.resourceschema.md)
 
-
 </td><td>
 
 Schema for a resource type definition.
-
 
 </td></tr>
 <tr><td>
 
 [RgbTypeSchema](./core.rgbtypeschema.md)
 
-
 </td><td>
 
 RGB color with 0-255 values.
-
 
 </td></tr>
 <tr><td>
 
 [stringCoercer](./core.stringcoercer.md)
 
-
 </td><td>
 
 Coerce strings with proper escaping for JXA.
-
 
 </td></tr>
 <tr><td>
 
 [SuiteSchema](./core.suiteschema.md)
 
-
 </td><td>
 
 Schema for suite organization from AppleScript dictionary.
-
 
 </td></tr>
 <tr><td>
 
 [TccEntitlementSchema](./core.tccentitlementschema.md)
 
-
 </td><td>
 
 TCC (Transparency, Consent, and Control) entitlements.
-
 
 </td></tr>
 <tr><td>
 
 [VERSION](./core.version.md)
 
-
 </td><td>
 
 Current version of the macts packages. All `@macts/*` packages use fixed versioning and stay in sync.
-
 
 </td></tr>
 </tbody></table>
@@ -1931,387 +1585,302 @@ Current version of the macts packages. All `@macts/*` packages use fixed version
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [AppMetadata](./core.appmetadata.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Cardinality](./core.cardinality.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CoarseMapping](./core.coarsemapping.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CoarseOperation](./core.coarseoperation.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ColorType](./core.colortype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Command](./core.command.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CommandParameter](./core.commandparameter.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [CommandScope](./core.commandscope.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Confidence](./core.confidence.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DateType](./core.datetype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Deprecation](./core.deprecation.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DistributionModel](./core.distributionmodel.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DurationType](./core.durationtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Enum](./core.enum.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [EnumValue](./core.enumvalue.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ExtractionMetadata](./core.extractionmetadata.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FileType](./core.filetype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [HexColor](./core.hexcolor.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Hierarchy](./core.hierarchy.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [HierarchyChild](./core.hierarchychild.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Identifier](./core.identifier.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Inheritance](./core.inheritance.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [OpenQuestion](./core.openquestion.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ParsedPermission](./core.parsedpermission.md)
 
-
 </td><td>
 
 Union type for all parsed permission types.
-
 
 </td></tr>
 <tr><td>
 
 [PathType](./core.pathtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PermissionHistoryEntry](./core.permissionhistoryentry.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PointType](./core.pointtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PrimitiveType](./core.primitivetype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Property](./core.property.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PropertyAccess](./core.propertyaccess.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PropertyType](./core.propertytype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [RectType](./core.recttype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Relationship](./core.relationship.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Resource](./core.resource.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [RgbType](./core.rgbtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [Selector](./core.selector.md)
 
-
 </td><td>
 
 Selector types for narrowing collections.
-
 
 </td></tr>
 <tr><td>
 
 [SpecialOperation](./core.specialoperation.md)
 
-
 </td><td>
 
 Special coarse operations beyond standard CRUD. These are defined per-app in the manifest.
-
 
 </td></tr>
 <tr><td>
 
 [Suite](./core.suite.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TccEntitlement](./core.tccentitlement.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

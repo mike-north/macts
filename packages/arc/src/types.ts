@@ -3,98 +3,97 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** An application's window */
 export interface Window {
   /** The unique identifier of the window. */
-  id: string;
+  id: string
   /** The full title of the window. */
-  name: string;
+  name: string
   /** The index of the window, ordered front to back. */
-  index: number;
+  index: number
   /** Whether the window has a close box. */
-  closeable: boolean;
+  closeable: boolean
   /** Whether the window can be minimized. */
-  minimizable: boolean;
+  minimizable: boolean
   /** Whether the window is currently minimized. */
-  minimized: boolean;
+  minimized: boolean
   /** Whether the window can be resized. */
-  resizable: boolean;
+  resizable: boolean
   /** Whether the window is currently visible. */
-  visible: boolean;
+  visible: boolean
   /** Whether the window can be zoomed. */
-  zoomable: boolean;
+  zoomable: boolean
   /** Whether the window is currently zoomed. */
-  zoomed: boolean;
+  zoomed: boolean
   /** Returns the currently selected tab */
-  activeTab: Tab;
+  activeTab: Tab
   /** Returns the currently active space */
-  activeSpace: Space;
+  activeSpace: Space
   /** Whether the window is an incognito window. */
-  incognito: boolean;
+  incognito: boolean
   /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode: string;
+  mode: string
 }
 
 /** Input for creating a Window */
 export interface WindowCreateInput {
   /** The index of the window, ordered front to back. */
-  index?: number;
+  index?: number
   /** Whether the window is currently minimized. */
-  minimized?: boolean;
+  minimized?: boolean
   /** Whether the window is currently visible. */
-  visible?: boolean;
+  visible?: boolean
   /** Whether the window is currently zoomed. */
-  zoomed?: boolean;
+  zoomed?: boolean
   /** Whether the window is an incognito window. */
-  incognito?: boolean;
+  incognito?: boolean
   /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
-  mode?: string;
+  mode?: string
 }
 
 /** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A window's tab */
 export interface Tab {
   /** The unique identifier of the tab. */
-  id: string;
+  id: string
   /** The full title of the tab. */
-  title: string;
+  title: string
   /** The url of the tab. */
-  uRL: string;
+  uRL: string
   /** Is loading? */
-  loading: boolean;
+  loading: boolean
   /** Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. */
-  location: string;
+  location: string
 }
 
 /** Input for creating a Tab */
 export interface TabCreateInput {
   /** The url of the tab. */
-  uRL?: string;
+  uRL?: string
   /** Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'. */
-  location?: string;
+  location?: string
 }
 
 /** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = Partial<TabCreateInput>
 
 /** A space */
 export interface Space {
   /** The unique identifier of the space. */
-  id: string;
+  id: string
   /** The full title of the space. */
-  title: string;
+  title: string
 }
 
 /** Input for creating a Space */
-export interface SpaceCreateInput {
-}
+export type SpaceCreateInput = Record<string, never>
 
 /** Input for updating a Space */
-export type SpaceUpdateInput = Partial<SpaceCreateInput>;
+export type SpaceUpdateInput = Partial<SpaceCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -113,7 +112,7 @@ export const WindowSchema = z.object({
   activeSpace: z.string(),
   incognito: z.boolean(),
   mode: z.string(),
-});
+})
 
 export const TabSchema = z.object({
   id: z.string(),
@@ -121,9 +120,9 @@ export const TabSchema = z.object({
   uRL: z.string(),
   loading: z.boolean(),
   location: z.string(),
-});
+})
 
 export const SpaceSchema = z.object({
   id: z.string(),
   title: z.string(),
-});
+})

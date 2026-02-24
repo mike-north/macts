@@ -9,7 +9,7 @@ Rich (styled) text
 **Signature:**
 
 ```typescript
-interface RichText 
+interface RichText
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface RichText
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color](./mail.richtext.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font](./mail.richtext.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size](./mail.richtext.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

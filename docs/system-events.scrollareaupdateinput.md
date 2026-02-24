@@ -9,7 +9,7 @@ Input for updating a ScrollArea
 **Signature:**
 
 ```typescript
-type ScrollAreaUpdateInput = Partial<ScrollAreaCreateInput>;
+type ScrollAreaUpdateInput = Partial<ScrollAreaCreateInput>
 ```
-**References:** [ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)
 
+**References:** [ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)

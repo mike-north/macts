@@ -9,5 +9,5 @@ the icon view options for the container window
 **Signature:**
 
 ```typescript
-iconViewOptions: unknown;
+iconViewOptions: unknown
 ```

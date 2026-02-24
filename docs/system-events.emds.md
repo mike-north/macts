@@ -9,5 +9,5 @@ EMds
 **Signature:**
 
 ```typescript
-type EMds = 'commandDown' | 'controlDown' | 'optionDown' | 'shiftDown';
+type EMds = 'commandDown' | 'controlDown' | 'optionDown' | 'shiftDown'
 ```

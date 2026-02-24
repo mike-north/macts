@@ -11,7 +11,7 @@ List all popovers.
 ```typescript
 list(): Promise<PopOver[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[PopOver](./system-events.popover.md)<!-- -->\[\]&gt;
-

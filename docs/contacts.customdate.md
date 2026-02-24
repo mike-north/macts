@@ -9,7 +9,7 @@ Arbitrary date associated with this person.
 **Signature:**
 
 ```typescript
-interface CustomDate 
+interface CustomDate
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface CustomDate
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.customdate.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this date
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.customdate.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this date
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.customdate.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 The date value
 
-
 </td></tr>
 </tbody></table>
-

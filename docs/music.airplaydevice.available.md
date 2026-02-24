@@ -9,5 +9,5 @@ is the device currently available?
 **Signature:**
 
 ```typescript
-available: boolean;
+available: boolean
 ```

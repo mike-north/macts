@@ -9,7 +9,7 @@ Client for an enumeration within a suite within a scripting definition.
 **Signature:**
 
 ```typescript
-declare class ScriptingEnumerationResourceClient 
+declare class ScriptingEnumerationResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingEnumerationResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingenumerationresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingEnumerationResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingEnumerationResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingenumerationresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingenumeration.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingenumerationresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingenumeration.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingenumerationresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingenumeration by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingenumerationresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingenumerations.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingenumerationresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingenumeration.
 
-
 </td></tr>
 </tbody></table>
-

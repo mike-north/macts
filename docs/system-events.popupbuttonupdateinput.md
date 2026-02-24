@@ -9,7 +9,7 @@ Input for updating a PopUpButton
 **Signature:**
 
 ```typescript
-type PopUpButtonUpdateInput = Partial<PopUpButtonCreateInput>;
+type PopUpButtonUpdateInput = Partial<PopUpButtonCreateInput>
 ```
-**References:** [PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)
 
+**References:** [PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)

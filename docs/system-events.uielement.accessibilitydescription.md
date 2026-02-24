@@ -9,5 +9,5 @@ a more complete description of the UI element and its capabilities
 **Signature:**
 
 ```typescript
-accessibilityDescription: string;
+accessibilityDescription: string
 ```

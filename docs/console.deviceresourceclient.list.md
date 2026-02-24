@@ -11,7 +11,7 @@ List all devices.
 ```typescript
 list(): Promise<Device[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Device](./console.device.md)<!-- -->\[\]&gt;
-

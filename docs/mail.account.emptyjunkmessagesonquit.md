@@ -9,5 +9,5 @@ Indicates whether the messages in the junk messages mailboxes will be deleted on
 **Signature:**
 
 ```typescript
-emptyJunkMessagesOnQuit: boolean;
+emptyJunkMessagesOnQuit: boolean
 ```

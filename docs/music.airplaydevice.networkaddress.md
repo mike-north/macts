@@ -9,5 +9,5 @@ the network (MAC) address of the device
 **Signature:**
 
 ```typescript
-networkAddress: string;
+networkAddress: string
 ```

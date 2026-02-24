@@ -9,7 +9,7 @@ Client for a terminal settings set (profile).
 **Signature:**
 
 ```typescript
-declare class SettingsSetResourceClient 
+declare class SettingsSetResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SettingsSetResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./terminal.settingssetresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SettingsSetResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SettingsSetResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./terminal.settingssetresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new settingsset.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./terminal.settingssetresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a settingsset.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./terminal.settingssetresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a settingsset by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./terminal.settingssetresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all settingssets.
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./terminal.settingssetresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing settingsset.
 
-
 </td></tr>
 </tbody></table>
-

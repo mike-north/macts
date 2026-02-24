@@ -9,5 +9,5 @@ The duration of the document in seconds
 **Signature:**
 
 ```typescript
-duration: number;
+duration: number
 ```

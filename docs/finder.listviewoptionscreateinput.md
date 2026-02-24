@@ -9,7 +9,7 @@ Input for creating a ListViewOptions
 **Signature:**
 
 ```typescript
-interface ListViewOptionsCreateInput 
+interface ListViewOptionsCreateInput
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface ListViewOptionsCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [calculatesFolderSizes?](./finder.listviewoptionscreateinput.calculatesfoldersizes.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Are folder sizes calculated and displayed in the window?
-
 
 </td></tr>
 <tr><td>
 
 [iconSize?](./finder.listviewoptionscreateinput.iconsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the size of icons displayed in the list view
-
 
 </td></tr>
 <tr><td>
 
 [showsIconPreview?](./finder.listviewoptionscreateinput.showsiconpreview.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ displays a preview of the item in list view
-
 
 </td></tr>
 <tr><td>
 
 [sortColumn?](./finder.listviewoptionscreateinput.sortcolumn.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Column](./finder.column.md)
 
-
 </td><td>
 
 _(Optional)_ the column that the list view is sorted on
-
 
 </td></tr>
 <tr><td>
 
 [textSize?](./finder.listviewoptionscreateinput.textsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the size of the text displayed in the list view
-
 
 </td></tr>
 <tr><td>
 
 [usesRelativeDates?](./finder.listviewoptionscreateinput.usesrelativedates.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Are relative dates (e.g., today, yesterday) shown in the list view?
 
-
 </td></tr>
 </tbody></table>
-

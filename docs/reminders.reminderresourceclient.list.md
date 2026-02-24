@@ -11,7 +11,7 @@ List all reminders.
 ```typescript
 list(): Promise<Reminder[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Reminder](./reminders.reminder.md)<!-- -->\[\]&gt;
-

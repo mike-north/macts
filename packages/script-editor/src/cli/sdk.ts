@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { ScriptEditorClient, type ScriptEditorClientOptions } from '../client.js';
+import { ScriptEditorClient, type ScriptEditorClientOptions } from '../client.js'
 
 /**
  * Get a ScriptEditorClient instance.
@@ -16,32 +16,32 @@ import { ScriptEditorClient, type ScriptEditorClientOptions } from '../client.js
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getScriptEditorClient(): ScriptEditorClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions scripteditor:*:*'
-    );
+        'Create an API key with: macts api-key create --permissions script-editor:*:*'
+    )
   }
 
   const options: ScriptEditorClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new ScriptEditorClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new ScriptEditorClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: ScriptEditorClient | null = null;
+let _client: ScriptEditorClient | null = null
 
 /**
  * Get or create the singleton ScriptEditorClient.
@@ -50,8 +50,8 @@ let _client: ScriptEditorClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): ScriptEditorClient {
-  _client ??= getScriptEditorClient();
-  return _client;
+  _client ??= getScriptEditorClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): ScriptEditorClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

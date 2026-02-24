@@ -9,7 +9,7 @@ An 'open file' alarm
 **Signature:**
 
 ```typescript
-interface OpenFileAlarm 
+interface OpenFileAlarm
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface OpenFileAlarm
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [filepath](./calendar.openfilealarm.filepath.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The (POSIX) path to be opened by the alarm
-
 
 </td></tr>
 <tr><td>
 
 [triggerDate](./calendar.openfilealarm.triggerdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 An absolute alarm date
-
 
 </td></tr>
 <tr><td>
 
 [triggerInterval](./calendar.openfilealarm.triggerinterval.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The interval in minutes between the event and the alarm (positive for after, negative for before)
 
-
 </td></tr>
 </tbody></table>
-

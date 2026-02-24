@@ -9,7 +9,7 @@ Type coercer interface - converts between TypeScript and JXA.
 **Signature:**
 
 ```typescript
-interface TypeCoercer<T> 
+interface TypeCoercer<T>
 ```
 
 ## Methods
@@ -18,34 +18,27 @@ interface TypeCoercer<T>
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [fromJxa(value)](./core.typecoercer.fromjxa.md)
 
-
 </td><td>
 
 Convert JXA result to TypeScript value
-
 
 </td></tr>
 <tr><td>
 
 [toJxa(value)](./core.typecoercer.tojxa.md)
 
-
 </td><td>
 
 Convert TypeScript value to JXA code string
 
-
 </td></tr>
 </tbody></table>
-

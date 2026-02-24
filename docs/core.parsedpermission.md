@@ -9,7 +9,7 @@ Union type for all parsed permission types.
 **Signature:**
 
 ```typescript
-type ParsedPermission = FinePermission | CoarsePermission | WildcardPermission;
+type ParsedPermission = FinePermission | CoarsePermission | WildcardPermission
 ```
-**References:** [FinePermission](./core.finepermission.md)<!-- -->, [CoarsePermission](./core.coarsepermission.md)<!-- -->, [WildcardPermission](./core.wildcardpermission.md)
 
+**References:** [FinePermission](./core.finepermission.md)<!-- -->, [CoarsePermission](./core.coarsepermission.md)<!-- -->, [WildcardPermission](./core.wildcardpermission.md)

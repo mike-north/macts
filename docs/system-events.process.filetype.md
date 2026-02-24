@@ -9,5 +9,5 @@ the OSType of the file type of the process
 **Signature:**
 
 ```typescript
-fileType: string;
+fileType: string
 ```

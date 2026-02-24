@@ -9,5 +9,5 @@ the sample rate of the track (in Hz)
 **Signature:**
 
 ```typescript
-sampleRate: number;
+sampleRate: number
 ```

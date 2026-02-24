@@ -9,7 +9,7 @@ Client for this subdivides the text into characters..
 **Signature:**
 
 ```typescript
-declare class CharacterResourceClient 
+declare class CharacterResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class CharacterResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.characterresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CharacterResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `CharacterResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.characterresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new character.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.characterresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a character.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.characterresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a character by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.characterresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all characters.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.characterresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing character.
 
-
 </td></tr>
 </tbody></table>
-

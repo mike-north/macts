@@ -9,7 +9,7 @@ Input for creating a Window
 **Signature:**
 
 ```typescript
-interface WindowCreateInput 
+interface WindowCreateInput
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface WindowCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [incognito?](./arc.windowcreateinput.incognito.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is an incognito window.
-
 
 </td></tr>
 <tr><td>
 
 [index?](./arc.windowcreateinput.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The index of the window, ordered front to back.
-
 
 </td></tr>
 <tr><td>
 
 [minimized?](./arc.windowcreateinput.minimized.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently minimized.
-
 
 </td></tr>
 <tr><td>
 
 [mode?](./arc.windowcreateinput.mode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./arc.windowcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently visible.
-
 
 </td></tr>
 <tr><td>
 
 [zoomed?](./arc.windowcreateinput.zoomed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is currently zoomed.
 
-
 </td></tr>
 </tbody></table>
-

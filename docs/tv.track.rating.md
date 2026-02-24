@@ -9,5 +9,5 @@ the rating of this track (0 to 100)
 **Signature:**
 
 ```typescript
-rating: number;
+rating: number
 ```

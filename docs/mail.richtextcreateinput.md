@@ -9,7 +9,7 @@ Input for creating a RichText
 **Signature:**
 
 ```typescript
-interface RichTextCreateInput 
+interface RichTextCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface RichTextCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color?](./mail.richtextcreateinput.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The color of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [font?](./mail.richtextcreateinput.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the font of the first character.
-
 
 </td></tr>
 <tr><td>
 
 [size?](./mail.richtextcreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The size in points of the first character.
 
-
 </td></tr>
 </tbody></table>
-

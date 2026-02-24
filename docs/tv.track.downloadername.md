@@ -9,5 +9,5 @@ the name of the person who downloaded this track
 **Signature:**
 
 ```typescript
-downloaderName: string;
+downloaderName: string
 ```

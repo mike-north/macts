@@ -9,5 +9,5 @@ the total number of bytes (free or used) on the disk
 **Signature:**
 
 ```typescript
-capacity: number;
+capacity: number
 ```

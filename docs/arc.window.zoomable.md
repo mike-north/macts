@@ -9,5 +9,5 @@ Whether the window can be zoomed.
 **Signature:**
 
 ```typescript
-zoomable: boolean;
+zoomable: boolean
 ```

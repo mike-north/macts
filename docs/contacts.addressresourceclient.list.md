@@ -11,7 +11,7 @@ List all addresses.
 ```typescript
 list(): Promise<Address[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Address](./contacts.address.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ The sender of the message
 **Signature:**
 
 ```typescript
-sender: string;
+sender: string
 ```

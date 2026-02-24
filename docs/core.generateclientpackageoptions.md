@@ -9,7 +9,7 @@ Options for client package generation.
 **Signature:**
 
 ```typescript
-interface GenerateClientPackageOptions 
+interface GenerateClientPackageOptions
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface GenerateClientPackageOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName](./core.generateclientpackageoptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 App name (e.g., "calendar")
-
 
 </td></tr>
 <tr><td>
 
 [clientPackageName](./core.generateclientpackageoptions.clientpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Client package name (e.g., "<!-- -->@<!-- -->macts/calendar")
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.generateclientpackageoptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

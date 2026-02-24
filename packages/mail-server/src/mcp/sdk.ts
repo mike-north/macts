@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { MailClient, type MailClientOptions } from '@macts/mail';
+import { MailClient, type MailClientOptions } from '@macts/mail'
 
 /**
  * Get a MailClient instance.
@@ -16,32 +16,32 @@ import { MailClient, type MailClientOptions } from '@macts/mail';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getMailClient(): MailClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions mail:*:*'
-    );
+    )
   }
 
   const options: MailClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new MailClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new MailClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: MailClient | null = null;
+let _client: MailClient | null = null
 
 /**
  * Get or create the singleton MailClient.
@@ -50,8 +50,8 @@ let _client: MailClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): MailClient {
-  _client ??= getMailClient();
-  return _client;
+  _client ??= getMailClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): MailClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

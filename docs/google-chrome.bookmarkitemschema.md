@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-BookmarkItemSchema: z.ZodObject<{
-    id: z.ZodString;
-    title: z.ZodString;
-    uRL: z.ZodString;
-    index: z.ZodNumber;
-}, z.core.$strip>
+BookmarkItemSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    title: z.ZodString
+    uRL: z.ZodString
+    index: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

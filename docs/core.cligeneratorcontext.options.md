@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-options: CliGeneratorOptions;
+options: CliGeneratorOptions
 ```

@@ -9,5 +9,5 @@ Input for creating a LocalDomainObject
 **Signature:**
 
 ```typescript
-interface LocalDomainObjectCreateInput 
+interface LocalDomainObjectCreateInput
 ```

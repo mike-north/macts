@@ -9,5 +9,5 @@ RPC request body structure.
 **Signature:**
 
 ```typescript
-type RpcRequest = Record<string, unknown>;
+type RpcRequest = Record<string, unknown>
 ```

@@ -9,5 +9,5 @@
 **Signature:**
 
 ```typescript
-suggestedSize: number;
+suggestedSize: number
 ```

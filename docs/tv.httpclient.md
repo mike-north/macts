@@ -9,7 +9,7 @@ HTTP client wrapper for making authenticated requests.
 **Signature:**
 
 ```typescript
-declare class HttpClient 
+declare class HttpClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class HttpClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(baseUrl, apiKey)](./tv.httpclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `HttpClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,31 +46,24 @@ Constructs a new instance of the `HttpClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [rpc(path, body)](./tv.httpclient.rpc.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Make an authenticated POST request to an RPC endpoint.
 
-
 </td></tr>
 </tbody></table>
-

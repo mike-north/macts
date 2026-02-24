@@ -11,7 +11,7 @@ List all clippingwindows.
 ```typescript
 list(): Promise<ClippingWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ClippingWindow](./finder.clippingwindow.md)<!-- -->\[\]&gt;
-

@@ -9,7 +9,7 @@ a visual plug-in
 **Signature:**
 
 ```typescript
-interface Visual 
+interface Visual
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Visual
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.visual.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this visual
 
-
 </td></tr>
 </tbody></table>
-

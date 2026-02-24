@@ -11,7 +11,7 @@ Handles three categories of types: - Primitive types (string, number, boolean, d
 **Signature:**
 
 ```typescript
-declare function propertyTypeToZod(type: PropertyType | undefined, optional: boolean): string;
+declare function propertyTypeToZod(type: PropertyType | undefined, optional: boolean): string
 ```
 
 ## Parameters
@@ -20,48 +20,39 @@ declare function propertyTypeToZod(type: PropertyType | undefined, optional: boo
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 type
 
-
 </td><td>
 
 [PropertyType](./core.propertytype.md) \| undefined
 
-
 </td><td>
 
 The property type from the manifest, or undefined
-
 
 </td></tr>
 <tr><td>
 
 optional
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether to wrap the schema in .optional()
-
 
 </td></tr>
 </tbody></table>
@@ -74,10 +65,8 @@ Zod schema code string
 
 ## Example
 
-
 ```typescript
-propertyTypeToZod('string', false)           // => 'z.string()'
+propertyTypeToZod('string', false) // => 'z.string()'
 propertyTypeToZod({ array: 'number' }, false) // => 'z.array(z.number())'
 propertyTypeToZod({ enum: 'Priority' }, true) // => 'PrioritySchema.optional()'
 ```
-

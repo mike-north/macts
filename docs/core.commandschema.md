@@ -9,30 +9,47 @@ Schema for a command definition.
 **Signature:**
 
 ```typescript
-CommandSchema: z.ZodObject<{
-    name: z.ZodString;
-    description: z.ZodString;
+CommandSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    description: z.ZodString
     scope: z.ZodEnum<{
-        resource: "resource";
-        application: "application";
-    }>;
-    resourceType: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
-    parameters: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        name: z.ZodString;
-        type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>;
-        description: z.ZodString;
-        required: z.ZodDefault<z.ZodBoolean>;
-        default: z.ZodOptional<z.ZodUnknown>;
-        code: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>>;
-    returns: z.ZodOptional<z.ZodString>;
-    code: z.ZodOptional<z.ZodString>;
-    permission: z.ZodOptional<z.ZodString>;
-    permissionHistory: z.ZodOptional<z.ZodArray<z.ZodObject<{
-        version: z.ZodString;
-        permission: z.ZodString;
-        changed: z.ZodString;
-        reason: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>>;
-}, z.core.$strip>
+      resource: 'resource'
+      application: 'application'
+    }>
+    resourceType: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>
+    parameters: z.ZodDefault<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            name: z.ZodString
+            type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>
+            description: z.ZodString
+            required: z.ZodDefault<z.ZodBoolean>
+            default: z.ZodOptional<z.ZodUnknown>
+            code: z.ZodOptional<z.ZodString>
+          },
+          z.core.$strip
+        >
+      >
+    >
+    returns: z.ZodOptional<z.ZodString>
+    code: z.ZodOptional<z.ZodString>
+    permission: z.ZodOptional<z.ZodString>
+    permissionHistory: z.ZodOptional<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            version: z.ZodString
+            permission: z.ZodString
+            changed: z.ZodString
+            reason: z.ZodOptional<z.ZodString>
+          },
+          z.core.$strip
+        >
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

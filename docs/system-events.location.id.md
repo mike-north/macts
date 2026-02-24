@@ -9,5 +9,5 @@ the unique identifier for the location
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

@@ -18,30 +18,24 @@ create(input: SoundAlarmCreateInput): Promise<SoundAlarm>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[SoundAlarm](./calendar.soundalarm.md)<!-- -->&gt;
-

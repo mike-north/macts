@@ -9,7 +9,7 @@ Client for the currently playing track.
 **Signature:**
 
 ```typescript
-declare class TrackResourceClient 
+declare class TrackResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TrackResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./spotify.trackresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TrackResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `TrackResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./spotify.trackresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new track.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./spotify.trackresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a track.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./spotify.trackresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a track by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./spotify.trackresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all tracks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./spotify.trackresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing track.
 
-
 </td></tr>
 </tbody></table>
-

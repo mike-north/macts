@@ -9,7 +9,7 @@ Input for updating a Phone
 **Signature:**
 
 ```typescript
-type PhoneUpdateInput = Partial<PhoneCreateInput>;
+type PhoneUpdateInput = Partial<PhoneCreateInput>
 ```
-**References:** [PhoneCreateInput](./contacts.phonecreateinput.md)
 
+**References:** [PhoneCreateInput](./contacts.phonecreateinput.md)

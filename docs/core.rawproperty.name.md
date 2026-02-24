@@ -9,5 +9,5 @@ Property name (e.g., "name", "bounds")
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

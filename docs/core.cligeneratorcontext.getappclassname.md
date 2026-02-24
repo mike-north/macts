@@ -11,7 +11,7 @@ Get application class name (PascalCase)
 ```typescript
 getAppClassName(): string;
 ```
+
 **Returns:**
 
 string
-

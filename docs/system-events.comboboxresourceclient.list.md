@@ -11,7 +11,7 @@ List all comboboxes.
 ```typescript
 list(): Promise<ComboBox[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ComboBox](./system-events.combobox.md)<!-- -->\[\]&gt;
-

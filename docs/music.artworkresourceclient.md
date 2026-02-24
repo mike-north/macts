@@ -9,7 +9,7 @@ Client for a piece of art within a track or playlist.
 **Signature:**
 
 ```typescript
-declare class ArtworkResourceClient 
+declare class ArtworkResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ArtworkResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.artworkresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ArtworkResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ArtworkResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.artworkresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new artwork.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.artworkresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a artwork.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.artworkresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a artwork by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.artworkresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all artworks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.artworkresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing artwork.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Input for creating a DiskItem
 **Signature:**
 
 ```typescript
-interface DiskItemCreateInput 
+interface DiskItemCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface DiskItemCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [modificationDate?](./system-events.diskitemcreateinput.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 _(Optional)_ the date on which the disk item was last modified
-
 
 </td></tr>
 <tr><td>
 
 [name?](./system-events.diskitemcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the name of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./system-events.diskitemcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Is the disk item visible?
 
-
 </td></tr>
 </tbody></table>
-

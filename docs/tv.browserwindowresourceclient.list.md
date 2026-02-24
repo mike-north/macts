@@ -11,7 +11,7 @@ List all browserwindows.
 ```typescript
 list(): Promise<BrowserWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[BrowserWindow](./tv.browserwindow.md)<!-- -->\[\]&gt;
-

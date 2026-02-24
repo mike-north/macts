@@ -9,5 +9,5 @@ Is the service active?
 **Signature:**
 
 ```typescript
-active: boolean;
+active: boolean
 ```

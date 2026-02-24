@@ -9,7 +9,12 @@ Create a read-only API key for a specific app.
 **Signature:**
 
 ```typescript
-declare function createReadOnlyKey(appName: string, name: string, permissionsSection: PermissionsSection, expires?: Date | number | string): Promise<CreateApiKeyResult>;
+declare function createReadOnlyKey(
+  appName: string,
+  name: string,
+  permissionsSection: PermissionsSection,
+  expires?: Date | number | string
+): Promise<CreateApiKeyResult>
 ```
 
 ## Parameters
@@ -18,80 +23,65 @@ declare function createReadOnlyKey(appName: string, name: string, permissionsSec
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 appName
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Application name
-
 
 </td></tr>
 <tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Human-readable key name
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 Permissions mapping for expansion
-
 
 </td></tr>
 <tr><td>
 
 expires
 
-
 </td><td>
 
 Date \| number \| string
 
-
 </td><td>
 
 _(Optional)_ Optional expiration
-
 
 </td></tr>
 </tbody></table>
@@ -101,4 +91,3 @@ _(Optional)_ Optional expiration
 Promise&lt;[CreateApiKeyResult](./api.createapikeyresult.md)<!-- -->&gt;
 
 Created key token and metadata
-

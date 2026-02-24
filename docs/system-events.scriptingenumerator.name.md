@@ -9,5 +9,5 @@ The name of the enumerator
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

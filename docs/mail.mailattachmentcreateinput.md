@@ -9,5 +9,5 @@ Input for creating a MailAttachment
 **Signature:**
 
 ```typescript
-interface MailAttachmentCreateInput 
+interface MailAttachmentCreateInput
 ```

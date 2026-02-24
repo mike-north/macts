@@ -11,7 +11,7 @@ Apply the results of a bounded update session with one or more files.
 ```typescript
 endTransaction(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

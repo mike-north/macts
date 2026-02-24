@@ -9,5 +9,5 @@ the minimum value that the UI element can take on
 **Signature:**
 
 ```typescript
-minimumValue: string;
+minimumValue: string
 ```

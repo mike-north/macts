@@ -9,7 +9,7 @@ Client for a message/display alarm.
 **Signature:**
 
 ```typescript
-declare class DisplayAlarmResourceClient 
+declare class DisplayAlarmResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DisplayAlarmResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.displayalarmresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DisplayAlarmResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DisplayAlarmResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.displayalarmresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new displayalarm.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./calendar.displayalarmresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a displayalarm.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./calendar.displayalarmresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a displayalarm by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.displayalarmresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all displayalarms.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./calendar.displayalarmresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing displayalarm.
 
-
 </td></tr>
 </tbody></table>
-

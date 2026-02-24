@@ -9,7 +9,7 @@ Result of permission check.
 **Signature:**
 
 ```typescript
-interface PermissionCheckResult 
+interface PermissionCheckResult
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface PermissionCheckResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [changelog?](./core.permissioncheckresult.changelog.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { version: string; previousPermission: string; reason?: string; }
 
-
 </td><td>
 
 _(Optional)_ Permission change info if the requirement changed
-
 
 </td></tr>
 <tr><td>
 
 [granted](./core.permissioncheckresult.granted.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether permission is granted
-
 
 </td></tr>
 <tr><td>
 
 [hint?](./core.permissioncheckresult.hint.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Hint for upgrading if denied
-
 
 </td></tr>
 <tr><td>
 
 [matchedBy?](./core.permissioncheckresult.matchedby.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Matching permission from the key (if granted)
-
 
 </td></tr>
 <tr><td>
 
 [required](./core.permissioncheckresult.required.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Required permission that was checked
 
-
 </td></tr>
 </tbody></table>
-

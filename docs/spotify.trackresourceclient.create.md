@@ -18,30 +18,24 @@ create(input: TrackCreateInput): Promise<Track>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TrackCreateInput](./spotify.trackcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Track](./spotify.track.md)<!-- -->&gt;
-

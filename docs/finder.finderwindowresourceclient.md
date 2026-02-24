@@ -9,7 +9,7 @@ Client for a file viewer window.
 **Signature:**
 
 ```typescript
-declare class FinderWindowResourceClient 
+declare class FinderWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class FinderWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.finderwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `FinderWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `FinderWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.finderwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new finderwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.finderwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a finderwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.finderwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a finderwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.finderwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all finderwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.finderwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing finderwindow.
 
-
 </td></tr>
 </tbody></table>
-

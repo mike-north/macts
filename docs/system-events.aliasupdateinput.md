@@ -9,7 +9,7 @@ Input for updating a Alias
 **Signature:**
 
 ```typescript
-type AliasUpdateInput = Partial<AliasCreateInput>;
+type AliasUpdateInput = Partial<AliasCreateInput>
 ```
-**References:** [AliasCreateInput](./system-events.aliascreateinput.md)
 
+**References:** [AliasCreateInput](./system-events.aliascreateinput.md)

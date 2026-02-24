@@ -9,5 +9,5 @@ Display a dialog when emptying the trash?
 **Signature:**
 
 ```typescript
-warnsBeforeEmptying: boolean;
+warnsBeforeEmptying: boolean
 ```

@@ -9,7 +9,7 @@ Input for updating a ProgressIndicator
 **Signature:**
 
 ```typescript
-type ProgressIndicatorUpdateInput = Partial<ProgressIndicatorCreateInput>;
+type ProgressIndicatorUpdateInput = Partial<ProgressIndicatorCreateInput>
 ```
-**References:** [ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)
 
+**References:** [ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)

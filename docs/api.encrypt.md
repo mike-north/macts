@@ -11,7 +11,7 @@ Output format: base64(IV \|\| authTag \|\| ciphertext) - IV: 12 bytes (randomly 
 **Signature:**
 
 ```typescript
-declare function encrypt(plaintext: string, key: Buffer): string;
+declare function encrypt(plaintext: string, key: Buffer): string
 ```
 
 ## Parameters
@@ -20,48 +20,39 @@ declare function encrypt(plaintext: string, key: Buffer): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 plaintext
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The string to encrypt
-
 
 </td></tr>
 <tr><td>
 
 key
 
-
 </td><td>
 
 Buffer
 
-
 </td><td>
 
 32-byte encryption key (from deriveEncryptionKey)
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +62,3 @@ Buffer
 string
 
 Base64-encoded encrypted payload
-

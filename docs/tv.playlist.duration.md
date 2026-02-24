@@ -9,5 +9,5 @@ the total length of all tracks (in seconds)
 **Signature:**
 
 ```typescript
-duration: number;
+duration: number
 ```

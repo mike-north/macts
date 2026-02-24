@@ -9,7 +9,7 @@ Client for this subdivides the text into words..
 **Signature:**
 
 ```typescript
-declare class WordResourceClient 
+declare class WordResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class WordResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.wordresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `WordResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `WordResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.wordresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new word.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.wordresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a word.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.wordresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a word by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.wordresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all words.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.wordresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing word.
 
-
 </td></tr>
 </tbody></table>
-

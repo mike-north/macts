@@ -9,7 +9,7 @@ Client for a splitter belonging to a window.
 **Signature:**
 
 ```typescript
-declare class SplitterResourceClient 
+declare class SplitterResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SplitterResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.splitterresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SplitterResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SplitterResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.splitterresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new splitter.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.splitterresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a splitter.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.splitterresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a splitter by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.splitterresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all splitters.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.splitterresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing splitter.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for an email recipient in the to: field.
 **Signature:**
 
 ```typescript
-declare class ToRecipientResourceClient 
+declare class ToRecipientResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ToRecipientResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.torecipientresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ToRecipientResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ToRecipientResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.torecipientresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new torecipient.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.torecipientresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a torecipient.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.torecipientresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a torecipient by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.torecipientresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all torecipients.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.torecipientresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing torecipient.
 
-
 </td></tr>
 </tbody></table>
-

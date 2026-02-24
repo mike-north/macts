@@ -9,7 +9,7 @@ Input for updating a InstantMessage
 **Signature:**
 
 ```typescript
-type InstantMessageUpdateInput = Partial<InstantMessageCreateInput>;
+type InstantMessageUpdateInput = Partial<InstantMessageCreateInput>
 ```
-**References:** [InstantMessageCreateInput](./contacts.instantmessagecreateinput.md)
 
+**References:** [InstantMessageCreateInput](./contacts.instantmessagecreateinput.md)

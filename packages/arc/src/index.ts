@@ -18,9 +18,9 @@
  * @packageDocumentation
  */
 
-export { ArcClient, ArcError, HttpClient } from './client.js';
-export type { ArcClientOptions } from './client.js';
-export * from './types.js';
-export { WindowResourceClient } from './resources/window.js';
-export { TabResourceClient } from './resources/tab.js';
-export { SpaceResourceClient } from './resources/space.js';
+export { ArcClient, ArcError, HttpClient } from './client.js'
+export type { ArcClientOptions } from './client.js'
+export * from './types.js'
+export { WindowResourceClient } from './resources/window.js'
+export { TabResourceClient } from './resources/tab.js'
+export { SpaceResourceClient } from './resources/space.js'

@@ -11,7 +11,7 @@ Hides a hotkey window. Only to be called on windows that are hotkey windows.
 ```typescript
 hideHotkeyWindow(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -18,30 +18,24 @@ create(input: FinderWindowCreateInput): Promise<FinderWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[FinderWindow](./finder.finderwindow.md)<!-- -->&gt;
-

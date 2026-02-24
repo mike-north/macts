@@ -9,5 +9,5 @@ The chat's name as it appears in the chat list.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

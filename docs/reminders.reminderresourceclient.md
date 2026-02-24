@@ -9,7 +9,7 @@ Client for a reminder item.
 **Signature:**
 
 ```typescript
-declare class ReminderResourceClient 
+declare class ReminderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ReminderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./reminders.reminderresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ReminderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,115 +46,90 @@ Constructs a new instance of the `ReminderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [complete(id)](./reminders.reminderresourceclient.complete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Mark a reminder as complete
-
 
 </td></tr>
 <tr><td>
 
 [create(input)](./reminders.reminderresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new reminder.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./reminders.reminderresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a reminder.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./reminders.reminderresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a reminder by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./reminders.reminderresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all reminders.
-
 
 </td></tr>
 <tr><td>
 
 [show()](./reminders.reminderresourceclient.show.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Show the reminder in Reminders.app UI
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./reminders.reminderresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing reminder.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ the entire contents of the container, including the contents of its children
 **Signature:**
 
 ```typescript
-entireContents: string;
+entireContents: string
 ```

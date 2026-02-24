@@ -9,5 +9,5 @@ The Control Panels folder
 **Signature:**
 
 ```typescript
-controlPanelsFolder: Folder;
+controlPanelsFolder: Folder
 ```

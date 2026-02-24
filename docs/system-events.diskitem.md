@@ -9,7 +9,7 @@ An item stored in the file system
 **Signature:**
 
 ```typescript
-interface DiskItem 
+interface DiskItem
 ```
 
 ## Properties
@@ -18,326 +18,257 @@ interface DiskItem
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [busyStatus](./system-events.diskitem.busystatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the disk item busy?
-
 
 </td></tr>
 <tr><td>
 
 [container](./system-events.diskitem.container.md)
 
-
 </td><td>
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 the folder or disk which has this disk item as an element
-
 
 </td></tr>
 <tr><td>
 
 [creationDate](./system-events.diskitem.creationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date on which the disk item was created
-
 
 </td></tr>
 <tr><td>
 
 [displayedName](./system-events.diskitem.displayedname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the disk item as displayed in the User Interface
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.diskitem.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique ID of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [modificationDate](./system-events.diskitem.modificationdate.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 the date on which the disk item was last modified
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.diskitem.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [nameExtension](./system-events.diskitem.nameextension.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the extension portion of the name
-
 
 </td></tr>
 <tr><td>
 
 [packageFolder](./system-events.diskitem.packagefolder.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the disk item a package?
-
 
 </td></tr>
 <tr><td>
 
 [path](./system-events.diskitem.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the file system path of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [physicalSize](./system-events.diskitem.physicalsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the actual space used by the disk item on disk
-
 
 </td></tr>
 <tr><td>
 
 [pOSIXPath](./system-events.diskitem.posixpath.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the POSIX file system path of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [size](./system-events.diskitem.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the logical size of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [uRL](./system-events.diskitem.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the URL of the disk item
-
 
 </td></tr>
 <tr><td>
 
 [visible](./system-events.diskitem.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the disk item visible?
-
 
 </td></tr>
 <tr><td>
 
 [volume](./system-events.diskitem.volume.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the volume on which the disk item resides
 
-
 </td></tr>
 </tbody></table>
-

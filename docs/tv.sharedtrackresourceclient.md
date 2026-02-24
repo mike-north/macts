@@ -9,7 +9,7 @@ Client for a track residing in a shared library.
 **Signature:**
 
 ```typescript
-declare class SharedTrackResourceClient 
+declare class SharedTrackResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SharedTrackResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./tv.sharedtrackresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SharedTrackResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SharedTrackResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./tv.sharedtrackresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new sharedtrack.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./tv.sharedtrackresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a sharedtrack.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./tv.sharedtrackresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a sharedtrack by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./tv.sharedtrackresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all sharedtracks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./tv.sharedtrackresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing sharedtrack.
 
-
 </td></tr>
 </tbody></table>
-

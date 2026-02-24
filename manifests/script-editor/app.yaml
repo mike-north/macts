@@ -1,7 +1,7 @@
 version: '1.0'
 app:
   bundleId: com.apple.ScriptEditor2
-  name: ScriptEditor
+  name: Script Editor
   displayName: Script Editor
   tccEntitlements:
     - automation

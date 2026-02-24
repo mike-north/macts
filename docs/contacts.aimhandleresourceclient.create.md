@@ -18,30 +18,24 @@ create(input: AIMHandleCreateInput): Promise<AIMHandle>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AIMHandleCreateInput](./contacts.aimhandlecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[AIMHandle](./contacts.aimhandle.md)<!-- -->&gt;
-

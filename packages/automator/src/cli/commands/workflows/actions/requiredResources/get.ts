@@ -1,48 +1,46 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../../sdk.js';
-import { createFormatter } from '../../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../../sdk.js'
+import { createFormatter } from '../../../../output/index.js'
 
 /**
  * Get a requiredresource by ID.
  */
 export class GetRequiredResourceCommand extends Command {
-  static override paths = [["automator", "workflows", "actions", "requiredResources", "get"]];
+  static override paths = [['automator', 'workflows', 'actions', 'requiredResources', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a requiredresource by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' });
-  automatorActionId = Option.String('--automator-action-id', { required: true, description: 'AutomatorAction ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
+  automatorActionId = Option.String('--automator-action-id', {
+    required: true,
+    description: 'AutomatorAction ID',
+  })
 
-  requiredResourceId = Option.String({ required: true });
+  requiredResourceId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.requiredresources.get(this.requiredResourceId);
-
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('RequiredResource not found') + '\n');
-        return 1;
-      }
+      const client = getClient()
+      const item = await client.requiredresources.get(this.requiredResourceId)
 
       const output = formatter.format({
         kind: item.kind,
         name: item.name,
         resource: item.resource,
         version: item.version,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

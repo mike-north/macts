@@ -9,7 +9,7 @@ Client for address for the given record..
 **Signature:**
 
 ```typescript
-declare class AddressResourceClient 
+declare class AddressResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AddressResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.addressresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AddressResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AddressResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.addressresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new address.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.addressresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a address.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.addressresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a address by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.addressresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all addresses.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.addressresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing address.
 
-
 </td></tr>
 </tbody></table>
-

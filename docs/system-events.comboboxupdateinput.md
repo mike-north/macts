@@ -9,7 +9,7 @@ Input for updating a ComboBox
 **Signature:**
 
 ```typescript
-type ComboBoxUpdateInput = Partial<ComboBoxCreateInput>;
+type ComboBoxUpdateInput = Partial<ComboBoxCreateInput>
 ```
-**References:** [ComboBoxCreateInput](./system-events.comboboxcreateinput.md)
 
+**References:** [ComboBoxCreateInput](./system-events.comboboxcreateinput.md)

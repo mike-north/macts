@@ -18,30 +18,24 @@ viewCalendar(at: Date): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 at
 
-
 </td><td>
 
 Date
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ Date
 **Returns:**
 
 Promise&lt;void&gt;
-

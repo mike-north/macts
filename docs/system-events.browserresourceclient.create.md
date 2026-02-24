@@ -18,30 +18,24 @@ create(input: BrowserCreateInput): Promise<Browser>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [BrowserCreateInput](./system-events.browsercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Browser](./system-events.browser.md)<!-- -->&gt;
-

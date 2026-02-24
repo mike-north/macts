@@ -9,155 +9,310 @@ Top-level manifest schema for a macOS application. This is the complete represen
 **Signature:**
 
 ```typescript
-AppManifestSchema: z.ZodObject<{
-    version: z.ZodLiteral<"1.0">;
-    app: z.ZodObject<{
-        bundleId: z.ZodString;
-        name: z.ZodString;
-        displayName: z.ZodOptional<z.ZodString>;
-        version: z.ZodOptional<z.ZodString>;
-        minMacOSVersion: z.ZodOptional<z.ZodString>;
-        icon: z.ZodOptional<z.ZodString>;
-        tccEntitlements: z.ZodDefault<z.ZodArray<z.ZodEnum<{
-            calendar: "calendar";
-            contacts: "contacts";
-            reminders: "reminders";
-            photos: "photos";
-            music: "music";
-            files: "files";
-            accessibility: "accessibility";
-            automation: "automation";
-        }>>>;
-        distributionModel: z.ZodOptional<z.ZodEnum<{
-            "app-store": "app-store";
-            "developer-id": "developer-id";
-            system: "system";
-        }>>;
-    }, z.core.$strip>;
-    suites: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        name: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
-        code: z.ZodOptional<z.ZodString>;
-        resources: z.ZodDefault<z.ZodArray<z.ZodString>>;
-        commands: z.ZodDefault<z.ZodArray<z.ZodString>>;
-        enums: z.ZodDefault<z.ZodArray<z.ZodString>>;
-    }, z.core.$strip>>>;
-    resources: z.ZodRecord<z.ZodString, z.ZodObject<{
-        name: z.ZodString;
-        plural: z.ZodString;
-        description: z.ZodString;
-        schema: z.ZodOptional<z.ZodString>;
-        code: z.ZodOptional<z.ZodString>;
-        properties: z.ZodPipe<z.ZodTransform<{}, unknown>, z.ZodRecord<z.ZodString, z.ZodObject<{
-            access: z.ZodEnum<{
-                r: "r";
-                rw: "rw";
-            }>;
-            type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
-                array: PropertyType;
-            } | {
-                resource: string;
-            } | {
-                enum: string;
-            }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
-                array: PropertyType;
-            } | {
-                resource: string;
-            } | {
-                enum: string;
-            }, unknown>>>;
-            description: z.ZodString;
-            code: z.ZodOptional<z.ZodString>;
-            default: z.ZodOptional<z.ZodUnknown>;
-            optional: z.ZodDefault<z.ZodBoolean>;
-            deprecated: z.ZodOptional<z.ZodObject<{
-                message: z.ZodString;
-                since: z.ZodOptional<z.ZodString>;
-            }, z.core.$strip>>;
-        }, z.core.$strip>>>;
-        identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
-            property: z.ZodString;
-            primary: z.ZodDefault<z.ZodBoolean>;
-        }, z.core.$strip>>>;
-    }, z.core.$strip>>;
-    enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
-        name: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
-        code: z.ZodOptional<z.ZodString>;
-        values: z.ZodArray<z.ZodObject<{
-            name: z.ZodString;
-            value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>;
-            description: z.ZodOptional<z.ZodString>;
-            code: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>;
-    }, z.core.$strip>>>;
-    hierarchy: z.ZodObject<{
-        children: z.ZodRecord<z.ZodString, z.ZodType<{
-            resource: string;
-            access: "r" | "rw";
-            description?: string | undefined;
-            children?: Record<string, HierarchyChild> | undefined;
-        }, unknown, z.core.$ZodTypeInternals<{
-            resource: string;
-            access: "r" | "rw";
-            description?: string | undefined;
-            children?: Record<string, HierarchyChild> | undefined;
-        }, unknown>>>;
-    }, z.core.$strip>;
-    relationships: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        name: z.ZodString;
-        from: z.ZodString;
-        to: z.ZodString;
-        cardinality: z.ZodEnum<{
-            "one-to-one": "one-to-one";
-            "one-to-many": "one-to-many";
-            "many-to-one": "many-to-one";
-            "many-to-many": "many-to-many";
-        }>;
-        property: z.ZodOptional<z.ZodString>;
-        description: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>>;
-    commands: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
-        name: z.ZodString;
-        description: z.ZodString;
-        scope: z.ZodEnum<{
-            resource: "resource";
-            application: "application";
-        }>;
-        resourceType: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
-        parameters: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            name: z.ZodString;
-            type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>;
-            description: z.ZodString;
-            required: z.ZodDefault<z.ZodBoolean>;
-            default: z.ZodOptional<z.ZodUnknown>;
-            code: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>>;
-        returns: z.ZodOptional<z.ZodString>;
-        code: z.ZodOptional<z.ZodString>;
-        permission: z.ZodOptional<z.ZodString>;
-        permissionHistory: z.ZodOptional<z.ZodArray<z.ZodObject<{
-            version: z.ZodString;
-            permission: z.ZodString;
-            changed: z.ZodString;
-            reason: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>>;
-    }, z.core.$strip>>>;
-    permissions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>>;
-    extraction: z.ZodOptional<z.ZodObject<{
-        extractedAt: z.ZodOptional<z.ZodISODateTime>;
-        mactsVersion: z.ZodOptional<z.ZodString>;
-        sourceFile: z.ZodOptional<z.ZodString>;
-        confidence: z.ZodOptional<z.ZodObject<{
-            overall: z.ZodNumber;
-            fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
-        }, z.core.$strip>>;
-        openQuestions: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            question: z.ZodString;
-            context: z.ZodOptional<z.ZodString>;
-            suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>;
-            relatedTo: z.ZodOptional<z.ZodString>;
-        }, z.core.$strip>>>;
-    }, z.core.$strip>>;
-}, z.core.$strip>
+AppManifestSchema: z.ZodObject<
+  {
+    version: z.ZodLiteral<'1.0'>
+    app: z.ZodObject<
+      {
+        bundleId: z.ZodString
+        name: z.ZodString
+        displayName: z.ZodOptional<z.ZodString>
+        version: z.ZodOptional<z.ZodString>
+        minMacOSVersion: z.ZodOptional<z.ZodString>
+        icon: z.ZodOptional<z.ZodString>
+        tccEntitlements: z.ZodDefault<
+          z.ZodArray<
+            z.ZodEnum<{
+              calendar: 'calendar'
+              contacts: 'contacts'
+              reminders: 'reminders'
+              photos: 'photos'
+              music: 'music'
+              files: 'files'
+              accessibility: 'accessibility'
+              automation: 'automation'
+            }>
+          >
+        >
+        distributionModel: z.ZodOptional<
+          z.ZodEnum<{
+            'app-store': 'app-store'
+            'developer-id': 'developer-id'
+            system: 'system'
+          }>
+        >
+      },
+      z.core.$strip
+    >
+    suites: z.ZodDefault<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            name: z.ZodString
+            description: z.ZodOptional<z.ZodString>
+            code: z.ZodOptional<z.ZodString>
+            resources: z.ZodDefault<z.ZodArray<z.ZodString>>
+            commands: z.ZodDefault<z.ZodArray<z.ZodString>>
+            enums: z.ZodDefault<z.ZodArray<z.ZodString>>
+          },
+          z.core.$strip
+        >
+      >
+    >
+    resources: z.ZodRecord<
+      z.ZodString,
+      z.ZodObject<
+        {
+          name: z.ZodString
+          plural: z.ZodString
+          description: z.ZodString
+          schema: z.ZodOptional<z.ZodString>
+          code: z.ZodOptional<z.ZodString>
+          properties: z.ZodPipe<
+            z.ZodTransform<{}, unknown>,
+            z.ZodRecord<
+              z.ZodString,
+              z.ZodObject<
+                {
+                  access: z.ZodEnum<{
+                    r: 'r'
+                    rw: 'rw'
+                  }>
+                  type: z.ZodOptional<
+                    z.ZodType<
+                      | 'string'
+                      | 'number'
+                      | 'boolean'
+                      | 'integer'
+                      | 'date'
+                      | 'data'
+                      | 'any'
+                      | 'file'
+                      | 'point'
+                      | 'rect'
+                      | 'rgb'
+                      | {
+                          array: PropertyType
+                        }
+                      | {
+                          resource: string
+                        }
+                      | {
+                          enum: string
+                        },
+                      unknown,
+                      z.core.$ZodTypeInternals<
+                        | 'string'
+                        | 'number'
+                        | 'boolean'
+                        | 'integer'
+                        | 'date'
+                        | 'data'
+                        | 'any'
+                        | 'file'
+                        | 'point'
+                        | 'rect'
+                        | 'rgb'
+                        | {
+                            array: PropertyType
+                          }
+                        | {
+                            resource: string
+                          }
+                        | {
+                            enum: string
+                          },
+                        unknown
+                      >
+                    >
+                  >
+                  description: z.ZodString
+                  code: z.ZodOptional<z.ZodString>
+                  default: z.ZodOptional<z.ZodUnknown>
+                  optional: z.ZodDefault<z.ZodBoolean>
+                  deprecated: z.ZodOptional<
+                    z.ZodObject<
+                      {
+                        message: z.ZodString
+                        since: z.ZodOptional<z.ZodString>
+                      },
+                      z.core.$strip
+                    >
+                  >
+                },
+                z.core.$strip
+              >
+            >
+          >
+          identifiers: z.ZodOptional<
+            z.ZodArray<
+              z.ZodObject<
+                {
+                  property: z.ZodString
+                  primary: z.ZodDefault<z.ZodBoolean>
+                },
+                z.core.$strip
+              >
+            >
+          >
+        },
+        z.core.$strip
+      >
+    >
+    enums: z.ZodDefault<
+      z.ZodRecord<
+        z.ZodString,
+        z.ZodObject<
+          {
+            name: z.ZodString
+            description: z.ZodOptional<z.ZodString>
+            code: z.ZodOptional<z.ZodString>
+            values: z.ZodArray<
+              z.ZodObject<
+                {
+                  name: z.ZodString
+                  value: z.ZodUnion<readonly [z.ZodString, z.ZodNumber]>
+                  description: z.ZodOptional<z.ZodString>
+                  code: z.ZodOptional<z.ZodString>
+                },
+                z.core.$strip
+              >
+            >
+          },
+          z.core.$strip
+        >
+      >
+    >
+    hierarchy: z.ZodObject<
+      {
+        children: z.ZodRecord<
+          z.ZodString,
+          z.ZodType<
+            {
+              resource: string
+              access: 'r' | 'rw'
+              description?: string | undefined
+              children?: Record<string, HierarchyChild> | undefined
+            },
+            unknown,
+            z.core.$ZodTypeInternals<
+              {
+                resource: string
+                access: 'r' | 'rw'
+                description?: string | undefined
+                children?: Record<string, HierarchyChild> | undefined
+              },
+              unknown
+            >
+          >
+        >
+      },
+      z.core.$strip
+    >
+    relationships: z.ZodDefault<
+      z.ZodArray<
+        z.ZodObject<
+          {
+            name: z.ZodString
+            from: z.ZodString
+            to: z.ZodString
+            cardinality: z.ZodEnum<{
+              'one-to-one': 'one-to-one'
+              'one-to-many': 'one-to-many'
+              'many-to-one': 'many-to-one'
+              'many-to-many': 'many-to-many'
+            }>
+            property: z.ZodOptional<z.ZodString>
+            description: z.ZodOptional<z.ZodString>
+          },
+          z.core.$strip
+        >
+      >
+    >
+    commands: z.ZodDefault<
+      z.ZodRecord<
+        z.ZodString,
+        z.ZodObject<
+          {
+            name: z.ZodString
+            description: z.ZodString
+            scope: z.ZodEnum<{
+              resource: 'resource'
+              application: 'application'
+            }>
+            resourceType: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>
+            parameters: z.ZodDefault<
+              z.ZodArray<
+                z.ZodObject<
+                  {
+                    name: z.ZodString
+                    type: z.ZodUnion<readonly [z.ZodString, z.ZodRecord<z.ZodString, z.ZodString>]>
+                    description: z.ZodString
+                    required: z.ZodDefault<z.ZodBoolean>
+                    default: z.ZodOptional<z.ZodUnknown>
+                    code: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >
+              >
+            >
+            returns: z.ZodOptional<z.ZodString>
+            code: z.ZodOptional<z.ZodString>
+            permission: z.ZodOptional<z.ZodString>
+            permissionHistory: z.ZodOptional<
+              z.ZodArray<
+                z.ZodObject<
+                  {
+                    version: z.ZodString
+                    permission: z.ZodString
+                    changed: z.ZodString
+                    reason: z.ZodOptional<z.ZodString>
+                  },
+                  z.core.$strip
+                >
+              >
+            >
+          },
+          z.core.$strip
+        >
+      >
+    >
+    permissions: z.ZodOptional<
+      z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>
+    >
+    extraction: z.ZodOptional<
+      z.ZodObject<
+        {
+          extractedAt: z.ZodOptional<z.ZodISODateTime>
+          mactsVersion: z.ZodOptional<z.ZodString>
+          sourceFile: z.ZodOptional<z.ZodString>
+          confidence: z.ZodOptional<
+            z.ZodObject<
+              {
+                overall: z.ZodNumber
+                fields: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>
+              },
+              z.core.$strip
+            >
+          >
+          openQuestions: z.ZodDefault<
+            z.ZodArray<
+              z.ZodObject<
+                {
+                  question: z.ZodString
+                  context: z.ZodOptional<z.ZodString>
+                  suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>
+                  relatedTo: z.ZodOptional<z.ZodString>
+                },
+                z.core.$strip
+              >
+            >
+          >
+        },
+        z.core.$strip
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

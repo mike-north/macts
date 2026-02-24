@@ -1,33 +1,28 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../sdk.js';
-import { createFormatter } from '../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 /**
  * Get a project by ID.
  */
 export class GetProjectCommand extends Command {
-  static override paths = [["omnifocus", "folders", "projects", "get"]];
+  static override paths = [['omnifocus', 'folders', 'projects', 'get']]
 
   static override usage = Command.Usage({
     description: 'Get a project by ID',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' })
 
-  projectId = Option.String({ required: true });
+  projectId = Option.String({ required: true })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      const item = await client.projects.get(this.projectId);
-
-      if (!item) {
-        this.context.stderr.write(formatter.formatError('Project not found') + '\n');
-        return 1;
-      }
+      const client = getClient()
+      const item = await client.projects.get(this.projectId)
 
       const output = formatter.format({
         id: item.id,
@@ -61,14 +56,14 @@ export class GetProjectCommand extends Command {
         numberOfTasks: item.numberOfTasks,
         numberOfAvailableTasks: item.numberOfAvailableTasks,
         numberOfCompletedTasks: item.numberOfCompletedTasks,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

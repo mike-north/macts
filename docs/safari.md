@@ -10,66 +10,54 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentResourceClient](./safari.documentresourceclient.md)
 
-
 </td><td>
 
 Client for a safari document (window).
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./safari.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [SafariClient](./safari.safariclient.md)
 
-
 </td><td>
 
 Safari client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [SafariError](./safari.safarierror.md)
 
-
 </td><td>
 
 Error class for Safari API errors.
-
 
 </td></tr>
 <tr><td>
 
 [TabResourceClient](./safari.tabresourceclient.md)
 
-
 </td><td>
 
 Client for a safari tab.
-
 
 </td></tr>
 </tbody></table>
@@ -80,66 +68,54 @@ Client for a safari tab.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Document](./safari.document.md)
 
-
 </td><td>
 
 A Safari document (window)
-
 
 </td></tr>
 <tr><td>
 
 [DocumentCreateInput](./safari.documentcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Document
-
 
 </td></tr>
 <tr><td>
 
 [SafariClientOptions](./safari.safariclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Tab](./safari.tab.md)
 
-
 </td><td>
 
 A Safari tab
-
 
 </td></tr>
 <tr><td>
 
 [TabCreateInput](./safari.tabcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Tab
-
 
 </td></tr>
 </tbody></table>
@@ -150,29 +126,23 @@ Input for creating a Tab
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentSchema](./safari.documentschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TabSchema](./safari.tabschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -183,34 +153,27 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentUpdateInput](./safari.documentupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Document
-
 
 </td></tr>
 <tr><td>
 
 [TabUpdateInput](./safari.tabupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Tab
 
-
 </td></tr>
 </tbody></table>
-

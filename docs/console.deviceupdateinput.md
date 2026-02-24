@@ -9,7 +9,7 @@ Input for updating a Device
 **Signature:**
 
 ```typescript
-type DeviceUpdateInput = Partial<DeviceCreateInput>;
+type DeviceUpdateInput = Partial<DeviceCreateInput>
 ```
-**References:** [DeviceCreateInput](./console.devicecreateinput.md)
 
+**References:** [DeviceCreateInput](./console.devicecreateinput.md)

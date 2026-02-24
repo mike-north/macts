@@ -56,8 +56,7 @@ export interface BuildConfiguration {
 }
 
 // @public
-export interface BuildConfigurationCreateInput {
-}
+export type BuildConfigurationCreateInput = Record<string, never>;
 
 // @public
 export class BuildConfigurationResourceClient {
@@ -205,8 +204,7 @@ export interface Device {
 }
 
 // @public
-export interface DeviceCreateInput {
-}
+export type DeviceCreateInput = Record<string, never>;
 
 // @public
 export class DeviceResourceClient {
@@ -239,8 +237,7 @@ export interface FileDocument {
 }
 
 // @public
-export interface FileDocumentCreateInput {
-}
+export type FileDocumentCreateInput = Record<string, never>;
 
 // @public
 export class FileDocumentResourceClient {
@@ -276,8 +273,7 @@ export interface Project {
 }
 
 // @public
-export interface ProjectCreateInput {
-}
+export type ProjectCreateInput = Record<string, never>;
 
 // @public
 export class ProjectResourceClient {
@@ -339,8 +335,7 @@ export interface RunDestination {
 }
 
 // @public
-export interface RunDestinationCreateInput {
-}
+export type RunDestinationCreateInput = Record<string, never>;
 
 // @public
 export class RunDestinationResourceClient {
@@ -412,8 +407,7 @@ export type SchemeActionResultStatus = 'notYetStarted' | 'running' | 'cancelled'
 export type SchemeActionResultUpdateInput = Partial<SchemeActionResultCreateInput>;
 
 // @public
-export interface SchemeCreateInput {
-}
+export type SchemeCreateInput = Record<string, never>;
 
 // @public
 export class SchemeResourceClient {

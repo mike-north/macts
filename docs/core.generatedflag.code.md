@@ -9,5 +9,5 @@ Clipanion option definition code
 **Signature:**
 
 ```typescript
-code: string;
+code: string
 ```

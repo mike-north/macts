@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type HexColor = z.infer<typeof HexColorSchema>;
+type HexColor = z.infer<typeof HexColorSchema>
 ```
-**References:** [HexColorSchema](./core.hexcolorschema.md)
 
+**References:** [HexColorSchema](./core.hexcolorschema.md)

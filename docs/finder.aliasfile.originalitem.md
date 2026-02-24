@@ -9,5 +9,5 @@ the original item pointed to by the alias
 **Signature:**
 
 ```typescript
-originalItem: string;
+originalItem: string
 ```

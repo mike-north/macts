@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-HeaderSchema: z.ZodObject<{
-    content: z.ZodString;
-    name: z.ZodString;
-}, z.core.$strip>
+HeaderSchema: z.ZodObject<
+  {
+    content: z.ZodString
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -18,30 +18,24 @@ create(input: ConfigurationCreateInput): Promise<Configuration>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ConfigurationCreateInput](./system-events.configurationcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Configuration](./system-events.configuration.md)<!-- -->&gt;
-

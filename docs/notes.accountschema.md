@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-AccountSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    upgraded: z.ZodBoolean;
-}, z.core.$strip>
+AccountSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    upgraded: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

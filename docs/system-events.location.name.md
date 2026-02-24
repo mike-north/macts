@@ -9,5 +9,5 @@ the name of the location
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

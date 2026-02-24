@@ -9,5 +9,5 @@ Is the account enabled?
 **Signature:**
 
 ```typescript
-enabled: boolean;
+enabled: boolean
 ```

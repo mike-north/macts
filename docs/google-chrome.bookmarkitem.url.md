@@ -9,5 +9,5 @@ The URL of the bookmark.
 **Signature:**
 
 ```typescript
-uRL: string;
+uRL: string
 ```

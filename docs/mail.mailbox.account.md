@@ -9,5 +9,5 @@ The account property
 **Signature:**
 
 ```typescript
-account: Account;
+account: Account
 ```

@@ -9,5 +9,5 @@ the name of the property list item ( if any )
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

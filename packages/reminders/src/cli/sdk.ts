@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { RemindersClient, type RemindersClientOptions } from '../client.js';
+import { RemindersClient, type RemindersClientOptions } from '../client.js'
 
 /**
  * Get a RemindersClient instance.
@@ -16,32 +16,32 @@ import { RemindersClient, type RemindersClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getRemindersClient(): RemindersClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions reminders:*:*'
-    );
+    )
   }
 
   const options: RemindersClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new RemindersClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new RemindersClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: RemindersClient | null = null;
+let _client: RemindersClient | null = null
 
 /**
  * Get or create the singleton RemindersClient.
@@ -50,8 +50,8 @@ let _client: RemindersClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): RemindersClient {
-  _client ??= getRemindersClient();
-  return _client;
+  _client ??= getRemindersClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): RemindersClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

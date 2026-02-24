@@ -11,7 +11,7 @@ List all scriptingcommands.
 ```typescript
 list(): Promise<ScriptingCommand[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingCommand](./system-events.scriptingcommand.md)<!-- -->\[\]&gt;
-

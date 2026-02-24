@@ -9,7 +9,7 @@ Input for updating a BookmarkFolder
 **Signature:**
 
 ```typescript
-type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>;
+type BookmarkFolderUpdateInput = Partial<BookmarkFolderCreateInput>
 ```
-**References:** [BookmarkFolderCreateInput](./google-chrome.bookmarkfoldercreateinput.md)
 
+**References:** [BookmarkFolderCreateInput](./google-chrome.bookmarkfoldercreateinput.md)

@@ -9,5 +9,5 @@ Input for creating a InternetLocationFile
 **Signature:**
 
 ```typescript
-interface InternetLocationFileCreateInput 
+interface InternetLocationFileCreateInput
 ```

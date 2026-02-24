@@ -20,46 +20,37 @@ startSpan(name: string, options?: {
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 name
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 { attributes?: Record&lt;string, [AttributeValue](./api.attributevalue.md)<!-- -->&gt;; }
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -67,4 +58,3 @@ _(Optional)_
 **Returns:**
 
 [Span](./api.span.md)
-

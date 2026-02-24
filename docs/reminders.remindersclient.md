@@ -9,19 +9,18 @@ Reminders client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class RemindersClient 
+declare class RemindersClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new RemindersClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./reminders.remindersclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RemindersClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,106 +57,85 @@ Constructs a new instance of the `RemindersClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accounts](./reminders.remindersclient.accounts.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AccountResourceClient](./reminders.accountresourceclient.md)
 
-
 </td><td>
 
 An account in the Reminders application
-
 
 </td></tr>
 <tr><td>
 
 [http](./reminders.remindersclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./reminders.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [lists](./reminders.remindersclient.lists.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ListResourceClient](./reminders.listresourceclient.md)
 
-
 </td><td>
 
 A list of reminders
-
 
 </td></tr>
 <tr><td>
 
 [reminders](./reminders.remindersclient.reminders.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ReminderResourceClient](./reminders.reminderresourceclient.md)
 
-
 </td><td>
 
 A reminder item
 
-
 </td></tr>
 </tbody></table>
-

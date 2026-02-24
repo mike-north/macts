@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * List all schemes in a workspace
@@ -14,25 +14,23 @@ export const schemesListTool: McpToolDefinition = {
   name: 'macts__xcode__schemes_list',
   description: 'List all schemes in a workspace',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "workspaceName": {
-        "description": "Workspace document name",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      workspaceName: {
+        description: 'Workspace document name',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "workspaceName"
-    ]
+    additionalProperties: false,
+    required: ['workspaceName'],
   },
   handler: async (args) => {
-    const { workspaceName } = args as { workspaceName: string };
-    void workspaceName;
-    const client = getClient();
-    return client.schemes.list();
+    const { workspaceName } = args as { workspaceName: string }
+    void workspaceName
+    const client = getClient()
+    return client.schemes.list()
   },
-};
+}
 
 /**
  * Get a scheme by ID
@@ -41,22 +39,19 @@ export const schemesGetTool: McpToolDefinition = {
   name: 'macts__xcode__schemes_get',
   description: 'Get a scheme by ID',
   inputSchema: {
-    "type": "object",
-    "properties": {
-      "id": {
-        "description": "Scheme identifier",
-        "type": "string"
-      }
+    type: 'object',
+    properties: {
+      id: {
+        description: 'Scheme identifier',
+        type: 'string',
+      },
     },
-    "additionalProperties": false,
-    "required": [
-      "id"
-    ]
+    additionalProperties: false,
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string };
-    const client = getClient();
-    return client.schemes.get(id);
+    const { id } = args as { id: string }
+    const client = getClient()
+    return client.schemes.get(id)
   },
-};
-
+}

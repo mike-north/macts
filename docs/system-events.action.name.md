@@ -9,5 +9,5 @@ the name of the action
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

@@ -11,7 +11,7 @@ List all notes.
 ```typescript
 list(): Promise<Note[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Note](./notes.note.md)<!-- -->\[\]&gt;
-

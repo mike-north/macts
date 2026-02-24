@@ -9,7 +9,7 @@ Replace the singleton logger instance.
 **Signature:**
 
 ```typescript
-declare function setLogger(newLogger: pino.Logger): void;
+declare function setLogger(newLogger: pino.Logger): void
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function setLogger(newLogger: pino.Logger): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 newLogger
 
-
 </td><td>
 
 pino.Logger
 
-
 </td><td>
 
 The Pino logger to use as the singleton
-
 
 </td></tr>
 </tbody></table>
@@ -51,4 +45,3 @@ The Pino logger to use as the singleton
 **Returns:**
 
 void
-

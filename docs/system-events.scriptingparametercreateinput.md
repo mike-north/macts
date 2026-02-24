@@ -9,5 +9,5 @@ Input for creating a ScriptingParameter
 **Signature:**
 
 ```typescript
-interface ScriptingParameterCreateInput 
+interface ScriptingParameterCreateInput
 ```

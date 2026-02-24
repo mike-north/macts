@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface GeneratorContext 
+interface GeneratorContext
 ```
 
 ## Properties
@@ -16,55 +16,43 @@ interface GeneratorContext
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [manifest](./core.generatorcontext.manifest.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [options](./core.generatorcontext.options.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [GeneratorOptions](./core.generatoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -75,78 +63,63 @@ Description
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [getAppCommands()](./core.generatorcontext.getappcommands.md)
 
-
 </td><td>
 
 Get application-level commands
-
 
 </td></tr>
 <tr><td>
 
 [getEnum(name)](./core.generatorcontext.getenum.md)
 
-
 </td><td>
 
 Get an enum by name
-
 
 </td></tr>
 <tr><td>
 
 [getEnums()](./core.generatorcontext.getenums.md)
 
-
 </td><td>
 
 Get all enums
-
 
 </td></tr>
 <tr><td>
 
 [getResource(name)](./core.generatorcontext.getresource.md)
 
-
 </td><td>
 
 Get a resource by name
-
 
 </td></tr>
 <tr><td>
 
 [getResourceCommands(resourceName)](./core.generatorcontext.getresourcecommands.md)
 
-
 </td><td>
 
 Get commands for a resource
-
 
 </td></tr>
 <tr><td>
 
 [getResources()](./core.generatorcontext.getresources.md)
 
-
 </td><td>
 
 Get all resources
 
-
 </td></tr>
 </tbody></table>
-

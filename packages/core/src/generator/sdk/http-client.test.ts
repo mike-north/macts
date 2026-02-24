@@ -109,7 +109,7 @@ describe('generateHttpClientSdk', () => {
 
     // Check app-level command method
     expect(content).toContain('async refresh()')
-    expect(content).toContain("this.#httpClient.rpc<void>('testapp.app.refresh'")
+    expect(content).toContain("await this.#httpClient.rpc<undefined>('testapp.app.refresh'")
 
     // Check error class
     expect(content).toContain('export class TestAppError extends Error')

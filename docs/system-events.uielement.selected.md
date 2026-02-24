@@ -9,5 +9,5 @@ Is the UI element selected?
 **Signature:**
 
 ```typescript
-selected: string;
+selected: string
 ```

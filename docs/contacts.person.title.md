@@ -9,5 +9,5 @@ The title of this person.
 **Signature:**
 
 ```typescript
-title: string;
+title: string
 ```

@@ -11,7 +11,7 @@ List all windows.
 ```typescript
 list(): Promise<Window[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Window](./terminal.window.md)<!-- -->\[\]&gt;
-

@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PropertyType = z.infer<typeof PropertyTypeSchema>;
+type PropertyType = z.infer<typeof PropertyTypeSchema>
 ```
-**References:** [PropertyTypeSchema](./core.propertytypeschema.md)
 
+**References:** [PropertyTypeSchema](./core.propertytypeschema.md)

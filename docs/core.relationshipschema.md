@@ -9,17 +9,20 @@ Schema for non-hierarchical relationships between resources.
 **Signature:**
 
 ```typescript
-RelationshipSchema: z.ZodObject<{
-    name: z.ZodString;
-    from: z.ZodString;
-    to: z.ZodString;
+RelationshipSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    from: z.ZodString
+    to: z.ZodString
     cardinality: z.ZodEnum<{
-        "one-to-one": "one-to-one";
-        "one-to-many": "one-to-many";
-        "many-to-one": "many-to-one";
-        "many-to-many": "many-to-many";
-    }>;
-    property: z.ZodOptional<z.ZodString>;
-    description: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>
+      'one-to-one': 'one-to-one'
+      'one-to-many': 'one-to-many'
+      'many-to-one': 'many-to-one'
+      'many-to-many': 'many-to-many'
+    }>
+    property: z.ZodOptional<z.ZodString>
+    description: z.ZodOptional<z.ZodString>
+  },
+  z.core.$strip
+>
 ```

@@ -9,7 +9,7 @@ Input for updating a OutgoingMessage
 **Signature:**
 
 ```typescript
-type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>;
+type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>
 ```
-**References:** [OutgoingMessageCreateInput](./mail.outgoingmessagecreateinput.md)
 
+**References:** [OutgoingMessageCreateInput](./mail.outgoingmessagecreateinput.md)

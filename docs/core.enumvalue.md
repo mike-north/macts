@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type EnumValue = z.infer<typeof EnumValueSchema>;
+type EnumValue = z.infer<typeof EnumValueSchema>
 ```
-**References:** [EnumValueSchema](./core.enumvalueschema.md)
 
+**References:** [EnumValueSchema](./core.enumvalueschema.md)

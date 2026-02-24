@@ -9,7 +9,7 @@ a media source (library, CD, device, etc.)
 **Signature:**
 
 ```typescript
-interface Source 
+interface Source
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface Source
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [capacity](./tv.source.capacity.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total size of the source if it has a fixed size
-
 
 </td></tr>
 <tr><td>
 
 [freeSpace](./tv.source.freespace.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the free space on the source if it has a fixed size
-
 
 </td></tr>
 <tr><td>
 
 [id](./tv.source.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this source
-
 
 </td></tr>
 <tr><td>
 
 [kind](./tv.source.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The kind property
 
-
 </td></tr>
 </tbody></table>
-

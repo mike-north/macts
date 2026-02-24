@@ -9,5 +9,5 @@ The currently visible contents of the session.
 **Signature:**
 
 ```typescript
-contents: string;
+contents: string
 ```

@@ -9,5 +9,5 @@ data for this artwork, in original format
 **Signature:**
 
 ```typescript
-rawData: unknown;
+rawData: unknown
 ```

@@ -9,7 +9,7 @@ Input for updating a Header
 **Signature:**
 
 ```typescript
-type HeaderUpdateInput = Partial<HeaderCreateInput>;
+type HeaderUpdateInput = Partial<HeaderCreateInput>
 ```
-**References:** [HeaderCreateInput](./mail.headercreateinput.md)
 
+**References:** [HeaderCreateInput](./mail.headercreateinput.md)

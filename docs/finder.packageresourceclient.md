@@ -9,7 +9,7 @@ Client for a package.
 **Signature:**
 
 ```typescript
-declare class PackageResourceClient 
+declare class PackageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PackageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.packageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PackageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PackageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.packageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new package.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.packageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a package.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.packageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a package by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.packageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all packages.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.packageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing package.
 
-
 </td></tr>
 </tbody></table>
-

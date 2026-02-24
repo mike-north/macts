@@ -9,5 +9,5 @@ The invitation status for the attendee
 **Signature:**
 
 ```typescript
-participationStatus: ParticipationStatus;
+participationStatus: ParticipationStatus
 ```

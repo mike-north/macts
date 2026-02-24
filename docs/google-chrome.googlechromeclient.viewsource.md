@@ -11,7 +11,7 @@ View the HTML source of the tab.
 ```typescript
 viewSource(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

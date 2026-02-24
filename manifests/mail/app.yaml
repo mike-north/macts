@@ -984,7 +984,7 @@ enums:
         description: APOP
         code: aapo
       - name: kerberos5
-        value: 5
+        value: kerberos5
         description: Kerberos V5 (GSSAPI)
         code: axk5
       - name: ntlm
@@ -992,7 +992,7 @@ enums:
         description: NTLM
         code: axnt
       - name: md5
-        value: 5
+        value: md5
         description: CRAM-MD5
         code: axmd
       - name: external

@@ -11,7 +11,7 @@ List all chats.
 ```typescript
 list(): Promise<Chat[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Chat](./messages.chat.md)<!-- -->\[\]&gt;
-

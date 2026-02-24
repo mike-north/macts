@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-NetworkPreferencesObjectSchema: z.ZodObject<{
-    currentLocation: z.ZodString;
-}, z.core.$strip>
+NetworkPreferencesObjectSchema: z.ZodObject<
+  {
+    currentLocation: z.ZodString
+  },
+  z.core.$strip
+>
 ```

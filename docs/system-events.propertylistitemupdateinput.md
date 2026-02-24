@@ -9,7 +9,7 @@ Input for updating a PropertyListItem
 **Signature:**
 
 ```typescript
-type PropertyListItemUpdateInput = Partial<PropertyListItemCreateInput>;
+type PropertyListItemUpdateInput = Partial<PropertyListItemCreateInput>
 ```
-**References:** [PropertyListItemCreateInput](./system-events.propertylistitemcreateinput.md)
 
+**References:** [PropertyListItemCreateInput](./system-events.propertylistitemcreateinput.md)

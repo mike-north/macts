@@ -9,7 +9,7 @@ Input for updating a Action
 **Signature:**
 
 ```typescript
-type ActionUpdateInput = Partial<ActionCreateInput>;
+type ActionUpdateInput = Partial<ActionCreateInput>
 ```
-**References:** [ActionCreateInput](./system-events.actioncreateinput.md)
 
+**References:** [ActionCreateInput](./system-events.actioncreateinput.md)

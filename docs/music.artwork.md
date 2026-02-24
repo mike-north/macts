@@ -9,7 +9,7 @@ a piece of art within a track or playlist
 **Signature:**
 
 ```typescript
-interface Artwork 
+interface Artwork
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface Artwork
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [data](./music.artwork.data.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 data for this artwork, in the form of a picture
-
 
 </td></tr>
 <tr><td>
 
 [description](./music.artwork.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 description of artwork as a string
-
 
 </td></tr>
 <tr><td>
 
 [downloaded](./music.artwork.downloaded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 was this artwork downloaded by Music?
-
 
 </td></tr>
 <tr><td>
 
 [format](./music.artwork.format.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the data format for this piece of artwork
-
 
 </td></tr>
 <tr><td>
 
 [kind](./music.artwork.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 kind or purpose of this piece of artwork
-
 
 </td></tr>
 <tr><td>
 
 [rawData](./music.artwork.rawdata.md)
 
-
 </td><td>
-
 
 </td><td>
 
 unknown
 
-
 </td><td>
 
 data for this artwork, in original format
 
-
 </td></tr>
 </tbody></table>
-

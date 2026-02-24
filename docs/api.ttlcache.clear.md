@@ -11,7 +11,7 @@ Clear all entries.
 ```typescript
 clear(): void;
 ```
+
 **Returns:**
 
 void
-

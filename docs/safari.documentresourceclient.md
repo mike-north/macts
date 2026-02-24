@@ -9,7 +9,7 @@ Client for a safari document (window).
 **Signature:**
 
 ```typescript
-declare class DocumentResourceClient 
+declare class DocumentResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DocumentResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./safari.documentresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DocumentResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DocumentResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./safari.documentresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new document.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./safari.documentresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a document.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./safari.documentresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a document by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./safari.documentresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all documents.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./safari.documentresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing document.
 
-
 </td></tr>
 </tbody></table>
-

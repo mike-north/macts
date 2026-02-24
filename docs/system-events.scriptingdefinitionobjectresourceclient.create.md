@@ -18,30 +18,24 @@ create(input: ScriptingDefinitionObjectCreateInput): Promise<ScriptingDefinition
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingDefinitionObject](./system-events.scriptingdefinitionobject.md)<!-- -->&gt;
-

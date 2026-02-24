@@ -9,5 +9,5 @@ Input for creating a TextArea
 **Signature:**
 
 ```typescript
-interface TextAreaCreateInput 
+interface TextAreaCreateInput
 ```

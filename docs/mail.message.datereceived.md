@@ -9,5 +9,5 @@ The date a message was received
 **Signature:**
 
 ```typescript
-dateReceived: Date;
+dateReceived: Date
 ```

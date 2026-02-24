@@ -9,5 +9,5 @@ the kind of data stored in the property list item: boolean/data/date/list/number
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

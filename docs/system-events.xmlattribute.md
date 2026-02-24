@@ -9,7 +9,7 @@ A named value associated with a unit of data in XML format
 **Signature:**
 
 ```typescript
-interface XMLAttribute 
+interface XMLAttribute
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface XMLAttribute
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name](./system-events.xmlattribute.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the XML attribute
-
 
 </td></tr>
 <tr><td>
 
 [value](./system-events.xmlattribute.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the value of the XML attribute
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Indicates whether all conditions must be met for rule to execute
 **Signature:**
 
 ```typescript
-allConditionsMustBeMet: boolean;
+allConditionsMustBeMet: boolean
 ```

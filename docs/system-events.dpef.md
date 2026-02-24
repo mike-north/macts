@@ -9,5 +9,5 @@ Dpef
 **Signature:**
 
 ```typescript
-type Dpef = 'genie' | 'scale';
+type Dpef = 'genie' | 'scale'
 ```

@@ -9,7 +9,7 @@ Input for creating a NetworkPreferencesObject
 **Signature:**
 
 ```typescript
-interface NetworkPreferencesObjectCreateInput 
+interface NetworkPreferencesObjectCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface NetworkPreferencesObjectCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [currentLocation?](./system-events.networkpreferencesobjectcreateinput.currentlocation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Location](./system-events.location.md)
 
-
 </td><td>
 
 _(Optional)_ the current location
 
-
 </td></tr>
 </tbody></table>
-

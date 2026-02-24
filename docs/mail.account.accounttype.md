@@ -9,5 +9,5 @@ The type of an account
 **Signature:**
 
 ```typescript
-accountType: string;
+accountType: string
 ```

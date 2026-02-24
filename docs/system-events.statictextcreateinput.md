@@ -9,5 +9,5 @@ Input for creating a StaticText
 **Signature:**
 
 ```typescript
-interface StaticTextCreateInput 
+interface StaticTextCreateInput
 ```

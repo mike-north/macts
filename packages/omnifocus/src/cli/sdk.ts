@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { OmniFocusClient, type OmniFocusClientOptions } from '../client.js';
+import { OmniFocusClient, type OmniFocusClientOptions } from '../client.js'
 
 /**
  * Get a OmniFocusClient instance.
@@ -16,32 +16,32 @@ import { OmniFocusClient, type OmniFocusClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getOmniFocusClient(): OmniFocusClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions omnifocus:*:*'
-    );
+    )
   }
 
   const options: OmniFocusClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new OmniFocusClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new OmniFocusClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: OmniFocusClient | null = null;
+let _client: OmniFocusClient | null = null
 
 /**
  * Get or create the singleton OmniFocusClient.
@@ -50,8 +50,8 @@ let _client: OmniFocusClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): OmniFocusClient {
-  _client ??= getOmniFocusClient();
-  return _client;
+  _client ??= getOmniFocusClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): OmniFocusClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

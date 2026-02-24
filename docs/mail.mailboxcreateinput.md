@@ -9,7 +9,7 @@ Input for creating a Mailbox
 **Signature:**
 
 ```typescript
-interface MailboxCreateInput 
+interface MailboxCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface MailboxCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [name?](./mail.mailboxcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of a mailbox
 
-
 </td></tr>
 </tbody></table>
-

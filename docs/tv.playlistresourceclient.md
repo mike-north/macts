@@ -9,7 +9,7 @@ Client for a list of tracks/streams.
 **Signature:**
 
 ```typescript
-declare class PlaylistResourceClient 
+declare class PlaylistResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PlaylistResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./tv.playlistresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PlaylistResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,115 +46,90 @@ Constructs a new instance of the `PlaylistResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./tv.playlistresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new playlist.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./tv.playlistresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a playlist.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./tv.playlistresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a playlist by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./tv.playlistresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all playlists.
-
 
 </td></tr>
 <tr><td>
 
 [move(to)](./tv.playlistresourceclient.move.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Move playlist(s) to a new location
-
 
 </td></tr>
 <tr><td>
 
 [search(\_for, only)](./tv.playlistresourceclient.search.md)
 
-
 </td><td>
-
 
 </td><td>
 
 search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./tv.playlistresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing playlist.
 
-
 </td></tr>
 </tbody></table>
-

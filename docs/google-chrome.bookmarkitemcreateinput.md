@@ -9,7 +9,7 @@ Input for creating a BookmarkItem
 **Signature:**
 
 ```typescript
-interface BookmarkItemCreateInput 
+interface BookmarkItemCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface BookmarkItemCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [title?](./google-chrome.bookmarkitemcreateinput.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The title of the bookmark item.
-
 
 </td></tr>
 <tr><td>
 
 [uRL?](./google-chrome.bookmarkitemcreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The URL of the bookmark.
 
-
 </td></tr>
 </tbody></table>
-

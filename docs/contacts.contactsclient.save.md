@@ -11,7 +11,7 @@ Save all Contacts changes. Also see the unsaved property for the application cla
 ```typescript
 save(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

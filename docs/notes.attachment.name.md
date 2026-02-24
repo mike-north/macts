@@ -9,5 +9,5 @@ The name of the attachment
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

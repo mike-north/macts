@@ -9,5 +9,5 @@ The unique identifier of the session.
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

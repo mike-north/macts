@@ -11,7 +11,7 @@ List all trashobjects.
 ```typescript
 list(): Promise<TrashObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[TrashObject](./finder.trashobject.md)<!-- -->\[\]&gt;
-

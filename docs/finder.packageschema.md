@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-PackageSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>
+PackageSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

@@ -18,30 +18,24 @@ create(input: ScriptingEnumeratorCreateInput): Promise<ScriptingEnumerator>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingEnumeratorCreateInput](./system-events.scriptingenumeratorcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingEnumerator](./system-events.scriptingenumerator.md)<!-- -->&gt;
-

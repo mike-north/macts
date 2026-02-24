@@ -9,5 +9,5 @@ File path relative to tools/ directory (e.g., 'calendars.ts')
 **Signature:**
 
 ```typescript
-fileName: string;
+fileName: string
 ```

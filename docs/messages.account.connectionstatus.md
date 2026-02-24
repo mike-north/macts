@@ -9,5 +9,5 @@ The connection status for this account.
 **Signature:**
 
 ```typescript
-connectionStatus: string;
+connectionStatus: string
 ```

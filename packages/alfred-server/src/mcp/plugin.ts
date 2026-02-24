@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Alfred.app automation.
@@ -16,4 +16,4 @@ export const alfredPlugin: McpPlugin = {
   name: 'alfred',
   description: 'MCP plugin for macOS Alfred.app automation',
   tools: allTools,
-};
+}

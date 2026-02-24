@@ -9,5 +9,5 @@ EKnd
 **Signature:**
 
 ```typescript
-type EKnd = 'trackListing' | 'albumListing' | 'cdInsert';
+type EKnd = 'trackListing' | 'albumListing' | 'cdInsert'
 ```

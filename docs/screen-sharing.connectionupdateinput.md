@@ -9,7 +9,7 @@ Input for updating a Connection
 **Signature:**
 
 ```typescript
-type ConnectionUpdateInput = Partial<ConnectionCreateInput>;
+type ConnectionUpdateInput = Partial<ConnectionCreateInput>
 ```
-**References:** [ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
 
+**References:** [ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)

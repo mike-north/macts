@@ -9,7 +9,7 @@ Input for updating a Button
 **Signature:**
 
 ```typescript
-type ButtonUpdateInput = Partial<ButtonCreateInput>;
+type ButtonUpdateInput = Partial<ButtonCreateInput>
 ```
-**References:** [ButtonCreateInput](./system-events.buttoncreateinput.md)
 
+**References:** [ButtonCreateInput](./system-events.buttoncreateinput.md)

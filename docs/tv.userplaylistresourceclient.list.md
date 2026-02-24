@@ -11,7 +11,7 @@ List all userplaylists.
 ```typescript
 list(): Promise<UserPlaylist[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[UserPlaylist](./tv.userplaylist.md)<!-- -->\[\]&gt;
-

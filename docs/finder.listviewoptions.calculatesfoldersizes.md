@@ -9,5 +9,5 @@ Are folder sizes calculated and displayed in the window?
 **Signature:**
 
 ```typescript
-calculatesFolderSizes: boolean;
+calculatesFolderSizes: boolean
 ```

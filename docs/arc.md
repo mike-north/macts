@@ -10,77 +10,63 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ArcClient](./arc.arcclient.md)
 
-
 </td><td>
 
 Arc client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [ArcError](./arc.arcerror.md)
 
-
 </td><td>
 
 Error class for Arc API errors.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./arc.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [SpaceResourceClient](./arc.spaceresourceclient.md)
 
-
 </td><td>
 
 Client for a space.
-
 
 </td></tr>
 <tr><td>
 
 [TabResourceClient](./arc.tabresourceclient.md)
 
-
 </td><td>
 
 Client for a window's tab.
-
 
 </td></tr>
 <tr><td>
 
 [WindowResourceClient](./arc.windowresourceclient.md)
 
-
 </td><td>
 
 Client for an application's window.
-
 
 </td></tr>
 </tbody></table>
@@ -91,88 +77,72 @@ Client for an application's window.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ArcClientOptions](./arc.arcclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Space](./arc.space.md)
 
-
 </td><td>
 
 A space
-
 
 </td></tr>
 <tr><td>
 
 [SpaceCreateInput](./arc.spacecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Space
-
 
 </td></tr>
 <tr><td>
 
 [Tab](./arc.tab.md)
 
-
 </td><td>
 
 A window's tab
-
 
 </td></tr>
 <tr><td>
 
 [TabCreateInput](./arc.tabcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [Window](./arc.window.md)
 
-
 </td><td>
 
 An application's window
-
 
 </td></tr>
 <tr><td>
 
 [WindowCreateInput](./arc.windowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Window
-
 
 </td></tr>
 </tbody></table>
@@ -183,38 +153,30 @@ Input for creating a Window
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SpaceSchema](./arc.spaceschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TabSchema](./arc.tabschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [WindowSchema](./arc.windowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -225,45 +187,36 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SpaceUpdateInput](./arc.spaceupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Space
-
 
 </td></tr>
 <tr><td>
 
 [TabUpdateInput](./arc.tabupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [WindowUpdateInput](./arc.windowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Window
 
-
 </td></tr>
 </tbody></table>
-

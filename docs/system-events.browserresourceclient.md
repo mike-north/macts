@@ -9,7 +9,7 @@ Client for a browser belonging to a window.
 **Signature:**
 
 ```typescript
-declare class BrowserResourceClient 
+declare class BrowserResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class BrowserResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.browserresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `BrowserResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `BrowserResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.browserresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new browser.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.browserresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a browser.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.browserresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a browser by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.browserresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all browsers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.browserresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing browser.
 
-
 </td></tr>
 </tbody></table>
-

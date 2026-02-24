@@ -9,7 +9,7 @@ Input for creating a Character
 **Signature:**
 
 ```typescript
-interface CharacterCreateInput 
+interface CharacterCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface CharacterCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color?](./mail.charactercreateinput.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 _(Optional)_ The color of the character.
-
 
 </td></tr>
 <tr><td>
 
 [font?](./mail.charactercreateinput.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the font of the character.
-
 
 </td></tr>
 <tr><td>
 
 [size?](./mail.charactercreateinput.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The size in points of the character.
 
-
 </td></tr>
 </tbody></table>
-

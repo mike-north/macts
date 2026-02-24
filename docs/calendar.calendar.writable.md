@@ -9,5 +9,5 @@ Whether the calendar can be modified
 **Signature:**
 
 ```typescript
-writable: boolean;
+writable: boolean
 ```

@@ -11,7 +11,7 @@ Invokes an expression, such as a registered function.
 ```typescript
 invokeAPIExpression(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ The interval in minutes between the event and the alarm (positive for after, neg
 **Signature:**
 
 ```typescript
-triggerInterval: number;
+triggerInterval: number
 ```

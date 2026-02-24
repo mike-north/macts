@@ -11,7 +11,7 @@ List all scriptingclasses.
 ```typescript
 list(): Promise<ScriptingClass[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingClass](./system-events.scriptingclass.md)<!-- -->\[\]&gt;
-

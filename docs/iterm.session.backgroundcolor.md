@@ -10,8 +10,8 @@ The backgroundColor property
 
 ```typescript
 backgroundColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

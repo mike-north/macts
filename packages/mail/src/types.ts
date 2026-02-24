@@ -3,664 +3,721 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** SaveableFileFormat */
-export type SaveableFileFormat = 'nativeFormat';
+export type SaveableFileFormat = 'nativeFormat'
 
 /** DefaultMessageFormat */
-export type DefaultMessageFormat = 'plainFormat' | 'richFormat';
+export type DefaultMessageFormat = 'plainFormat' | 'richFormat'
 
 /** HeaderDetail */
-export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders';
+export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders'
 
 /** LdapScope */
-export type LdapScope = 'base' | 'oneLevel' | 'subtree';
+export type LdapScope = 'base' | 'oneLevel' | 'subtree'
 
 /** QuotingColor */
-export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
+export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'red' | 'yellow'
 
 /** ViewerColumns */
-export type ViewerColumns = 'attachmentsColumn' | 'messageColor' | 'dateReceivedColumn' | 'dateSentColumn' | 'flagsColumn' | 'fromColumn' | 'mailboxColumn' | 'messageStatusColumn' | 'numberColumn' | 'sizeColumn' | 'subjectColumn' | 'toColumn' | 'dateLastSavedColumn';
+export type ViewerColumns =
+  | 'attachmentsColumn'
+  | 'messageColor'
+  | 'dateReceivedColumn'
+  | 'dateSentColumn'
+  | 'flagsColumn'
+  | 'fromColumn'
+  | 'mailboxColumn'
+  | 'messageStatusColumn'
+  | 'numberColumn'
+  | 'sizeColumn'
+  | 'subjectColumn'
+  | 'toColumn'
+  | 'dateLastSavedColumn'
 
 /** Authentication */
-export type Authentication = 'password' | 'apop' | '5' | 'ntlm' | '5' | 'external' | 'appleToken' | 'none';
+export type Authentication =
+  | 'password'
+  | 'apop'
+  | 'kerberos5'
+  | 'ntlm'
+  | 'md5'
+  | 'external'
+  | 'appleToken'
+  | 'none'
 
 /** HighlightColors */
-export type HighlightColors = 'blue' | 'gray' | 'green' | 'none' | 'orange' | 'other' | 'purple' | 'red' | 'yellow';
+export type HighlightColors =
+  | 'blue'
+  | 'gray'
+  | 'green'
+  | 'none'
+  | 'orange'
+  | 'other'
+  | 'purple'
+  | 'red'
+  | 'yellow'
 
 /** MessageCachingPolicy */
-export type MessageCachingPolicy = 'doNotKeepCopiesOfAnyMessages' | 'onlyMessagesIHaveRead' | 'allMessagesButOmitAttachments' | 'allMessagesAndTheirAttachments';
+export type MessageCachingPolicy =
+  | 'doNotKeepCopiesOfAnyMessages'
+  | 'onlyMessagesIHaveRead'
+  | 'allMessagesButOmitAttachments'
+  | 'allMessagesAndTheirAttachments'
 
 /** RuleQualifier */
-export type RuleQualifier = 'beginsWithValue' | 'doesContainValue' | 'doesNotContainValue' | 'endsWithValue' | 'equalToValue' | 'lessThanValue' | 'greaterThanValue' | 'none';
+export type RuleQualifier =
+  | 'beginsWithValue'
+  | 'doesContainValue'
+  | 'doesNotContainValue'
+  | 'endsWithValue'
+  | 'equalToValue'
+  | 'lessThanValue'
+  | 'greaterThanValue'
+  | 'none'
 
 /** RuleType */
-export type RuleType = 'account' | 'anyRecipient' | 'ccHeader' | 'matchesEveryMessage' | 'fromHeader' | 'headerKey' | 'messageContent' | 'messageIsJunkMail' | 'senderIsInMyContacts' | 'senderIsInMyPreviousRecipients' | 'senderIsMemberOfGroup' | 'senderIsNotInMyContacts' | 'senderIsNotInMyPreviousRecipients' | 'senderIsNotMemberOfGroup' | 'senderIsVIP' | 'subjectHeader' | 'toHeader' | 'toOrCcHeader' | 'attachmentType';
+export type RuleType =
+  | 'account'
+  | 'anyRecipient'
+  | 'ccHeader'
+  | 'matchesEveryMessage'
+  | 'fromHeader'
+  | 'headerKey'
+  | 'messageContent'
+  | 'messageIsJunkMail'
+  | 'senderIsInMyContacts'
+  | 'senderIsInMyPreviousRecipients'
+  | 'senderIsMemberOfGroup'
+  | 'senderIsNotInMyContacts'
+  | 'senderIsNotInMyPreviousRecipients'
+  | 'senderIsNotMemberOfGroup'
+  | 'senderIsVIP'
+  | 'subjectHeader'
+  | 'toHeader'
+  | 'toOrCcHeader'
+  | 'attachmentType'
 
 /** TypeOfAccount */
-export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown';
+export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown'
 
 /** Rich (styled) text */
 export interface RichText {
   /** The color of the first character. */
-  color: { r: number; g: number; b: number };
+  color: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font: string;
+  font: string
   /** The size in points of the first character. */
-  size: number;
+  size: number
 }
 
 /** Input for creating a RichText */
 export interface RichTextCreateInput {
   /** The color of the first character. */
-  color?: { r: number; g: number; b: number };
+  color?: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font?: string;
+  font?: string
   /** The size in points of the first character. */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a RichText */
-export type RichTextUpdateInput = Partial<RichTextCreateInput>;
+export type RichTextUpdateInput = Partial<RichTextCreateInput>
 
 /** Represents an inline text attachment. This class is used mainly for make commands. */
 export interface Attachment {
   /** The file for the attachment */
-  fileName: string;
+  fileName: string
 }
 
 /** Input for creating a Attachment */
 export interface AttachmentCreateInput {
   /** The file for the attachment */
-  fileName?: string;
+  fileName?: string
 }
 
 /** Input for updating a Attachment */
-export type AttachmentUpdateInput = Partial<AttachmentCreateInput>;
+export type AttachmentUpdateInput = Partial<AttachmentCreateInput>
 
 /** This subdivides the text into paragraphs. */
 export interface Paragraph {
   /** The color of the first character. */
-  color: { r: number; g: number; b: number };
+  color: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font: string;
+  font: string
   /** The size in points of the first character. */
-  size: number;
+  size: number
 }
 
 /** Input for creating a Paragraph */
 export interface ParagraphCreateInput {
   /** The color of the first character. */
-  color?: { r: number; g: number; b: number };
+  color?: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font?: string;
+  font?: string
   /** The size in points of the first character. */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a Paragraph */
-export type ParagraphUpdateInput = Partial<ParagraphCreateInput>;
+export type ParagraphUpdateInput = Partial<ParagraphCreateInput>
 
 /** This subdivides the text into words. */
 export interface Word {
   /** The color of the first character. */
-  color: { r: number; g: number; b: number };
+  color: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font: string;
+  font: string
   /** The size in points of the first character. */
-  size: number;
+  size: number
 }
 
 /** Input for creating a Word */
 export interface WordCreateInput {
   /** The color of the first character. */
-  color?: { r: number; g: number; b: number };
+  color?: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font?: string;
+  font?: string
   /** The size in points of the first character. */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a Word */
-export type WordUpdateInput = Partial<WordCreateInput>;
+export type WordUpdateInput = Partial<WordCreateInput>
 
 /** This subdivides the text into characters. */
 export interface Character {
   /** The color of the character. */
-  color: { r: number; g: number; b: number };
+  color: { r: number; g: number; b: number }
   /** The name of the font of the character. */
-  font: string;
+  font: string
   /** The size in points of the character. */
-  size: number;
+  size: number
 }
 
 /** Input for creating a Character */
 export interface CharacterCreateInput {
   /** The color of the character. */
-  color?: { r: number; g: number; b: number };
+  color?: { r: number; g: number; b: number }
   /** The name of the font of the character. */
-  font?: string;
+  font?: string
   /** The size in points of the character. */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a Character */
-export type CharacterUpdateInput = Partial<CharacterCreateInput>;
+export type CharacterUpdateInput = Partial<CharacterCreateInput>
 
 /** This subdivides the text into chunks that all have the same attributes. */
 export interface AttributeRun {
   /** The color of the first character. */
-  color: { r: number; g: number; b: number };
+  color: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font: string;
+  font: string
   /** The size in points of the first character. */
-  size: number;
+  size: number
 }
 
 /** Input for creating a AttributeRun */
 export interface AttributeRunCreateInput {
   /** The color of the first character. */
-  color?: { r: number; g: number; b: number };
+  color?: { r: number; g: number; b: number }
   /** The name of the font of the first character. */
-  font?: string;
+  font?: string
   /** The size in points of the first character. */
-  size?: number;
+  size?: number
 }
 
 /** Input for updating a AttributeRun */
-export type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>;
+export type AttributeRunUpdateInput = Partial<AttributeRunCreateInput>
 
 /** A new email message */
 export interface OutgoingMessage {
   /** The sender of the message */
-  sender: string;
+  sender: string
   /** The subject of the message */
-  subject: string;
+  subject: string
   /** Controls whether the message window is shown on the screen. The default is false */
-  visible: boolean;
+  visible: boolean
   /** The signature of the message */
-  messageSignature: string;
+  messageSignature: string
   /** The unique identifier of the message */
-  id: number;
+  id: number
   /** Does nothing at all (deprecated) */
-  htmlContent: string;
+  htmlContent: string
   /** Does nothing at all (deprecated) */
-  vcardPath: string;
+  vcardPath: string
 }
 
 /** Input for creating a OutgoingMessage */
 export interface OutgoingMessageCreateInput {
   /** The sender of the message */
-  sender?: string;
+  sender?: string
   /** The subject of the message */
-  subject?: string;
+  subject?: string
   /** Controls whether the message window is shown on the screen. The default is false */
-  visible?: boolean;
+  visible?: boolean
   /** The signature of the message */
-  messageSignature?: string;
+  messageSignature?: string
   /** Does nothing at all (deprecated) */
-  htmlContent?: string;
+  htmlContent?: string
   /** Does nothing at all (deprecated) */
-  vcardPath?: string;
+  vcardPath?: string
 }
 
 /** Input for updating a OutgoingMessage */
-export type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>;
+export type OutgoingMessageUpdateInput = Partial<OutgoingMessageCreateInput>
 
 /** Represents the object responsible for managing a viewer window */
 export interface MessageViewer {
   /** The top level Drafts mailbox */
-  draftsMailbox: Mailbox;
+  draftsMailbox: Mailbox
   /** The top level In mailbox */
-  inbox: Mailbox;
+  inbox: Mailbox
   /** The top level Junk mailbox */
-  junkMailbox: Mailbox;
+  junkMailbox: Mailbox
   /** The top level Out mailbox */
-  outbox: Mailbox;
+  outbox: Mailbox
   /** The top level Sent mailbox */
-  sentMailbox: Mailbox;
+  sentMailbox: Mailbox
   /** The top level Trash mailbox */
-  trashMailbox: Mailbox;
+  trashMailbox: Mailbox
   /** The column that is currently sorted in the viewer */
-  sortColumn: string;
+  sortColumn: string
   /** Whether the viewer is sorted ascending or not */
-  sortedAscending: boolean;
+  sortedAscending: boolean
   /** Controls whether the list of mailboxes is visible or not */
-  mailboxListVisible: boolean;
+  mailboxListVisible: boolean
   /** Controls whether the preview pane of the message viewer window is visible or not */
-  previewPaneIsVisible: boolean;
+  previewPaneIsVisible: boolean
   /** List of columns that are visible. The subject column and the message status column will always be visible */
-  visibleColumns: string;
+  visibleColumns: string
   /** The unique identifier of the message viewer */
-  id: number;
+  id: number
   /** List of messages currently being displayed in the viewer */
-  visibleMessages: string;
+  visibleMessages: string
   /** List of messages currently selected */
-  selectedMessages: string;
+  selectedMessages: string
   /** List of mailboxes currently selected in the list of mailboxes */
-  selectedMailboxes: string;
+  selectedMailboxes: string
 }
 
 /** Input for creating a MessageViewer */
 export interface MessageViewerCreateInput {
   /** The column that is currently sorted in the viewer */
-  sortColumn?: string;
+  sortColumn?: string
   /** Whether the viewer is sorted ascending or not */
-  sortedAscending?: boolean;
+  sortedAscending?: boolean
   /** Controls whether the list of mailboxes is visible or not */
-  mailboxListVisible?: boolean;
+  mailboxListVisible?: boolean
   /** Controls whether the preview pane of the message viewer window is visible or not */
-  previewPaneIsVisible?: boolean;
+  previewPaneIsVisible?: boolean
   /** List of columns that are visible. The subject column and the message status column will always be visible */
-  visibleColumns?: string;
+  visibleColumns?: string
   /** List of messages currently being displayed in the viewer */
-  visibleMessages?: string;
+  visibleMessages?: string
   /** List of messages currently selected */
-  selectedMessages?: string;
+  selectedMessages?: string
   /** List of mailboxes currently selected in the list of mailboxes */
-  selectedMailboxes?: string;
+  selectedMailboxes?: string
 }
 
 /** Input for updating a MessageViewer */
-export type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>;
+export type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>
 
 /** An email message */
 export interface Message {
   /** The unique identifier of the message. */
-  id: number;
+  id: number
   /** All the headers of the message */
-  allHeaders: string;
+  allHeaders: string
   /** The background color of the message */
-  backgroundColor: string;
+  backgroundColor: string
   /** The mailbox in which this message is filed */
-  mailbox: Mailbox;
+  mailbox: Mailbox
   /** Contents of an email message */
-  content: unknown;
+  content: unknown
   /** The date a message was received */
-  dateReceived: Date;
+  dateReceived: Date
   /** The date a message was sent */
-  dateSent: Date;
+  dateSent: Date
   /** Indicates whether the message is deleted or not */
-  deletedStatus: boolean;
+  deletedStatus: boolean
   /** Indicates whether the message is flagged or not */
-  flaggedStatus: boolean;
+  flaggedStatus: boolean
   /** The flag on the message, or -1 if the message is not flagged */
-  flagIndex: number;
+  flagIndex: number
   /** Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. */
-  junkMailStatus: boolean;
+  junkMailStatus: boolean
   /** Indicates whether the message is read or not */
-  readStatus: boolean;
+  readStatus: boolean
   /** The unique message ID string */
-  messageId: string;
+  messageId: string
   /** Raw source of the message */
-  source: string;
+  source: string
   /** The address that replies should be sent to */
-  replyTo: string;
+  replyTo: string
   /** The size (in bytes) of a message */
-  messageSize: number;
+  messageSize: number
   /** The sender of the message */
-  sender: string;
+  sender: string
   /** The subject of the message */
-  subject: string;
+  subject: string
   /** Indicates whether the message was forwarded or not */
-  wasForwarded: boolean;
+  wasForwarded: boolean
   /** Indicates whether the message was redirected or not */
-  wasRedirected: boolean;
+  wasRedirected: boolean
   /** Indicates whether the message was replied to or not */
-  wasRepliedTo: boolean;
+  wasRepliedTo: boolean
 }
 
 /** Input for creating a Message */
 export interface MessageCreateInput {
   /** The background color of the message */
-  backgroundColor?: string;
+  backgroundColor?: string
   /** The mailbox in which this message is filed */
-  mailbox?: Mailbox;
+  mailbox?: Mailbox
   /** Indicates whether the message is deleted or not */
-  deletedStatus?: boolean;
+  deletedStatus?: boolean
   /** Indicates whether the message is flagged or not */
-  flaggedStatus?: boolean;
+  flaggedStatus?: boolean
   /** The flag on the message, or -1 if the message is not flagged */
-  flagIndex?: number;
+  flagIndex?: number
   /** Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter. */
-  junkMailStatus?: boolean;
+  junkMailStatus?: boolean
   /** Indicates whether the message is read or not */
-  readStatus?: boolean;
+  readStatus?: boolean
 }
 
 /** Input for updating a Message */
-export type MessageUpdateInput = Partial<MessageCreateInput>;
+export type MessageUpdateInput = Partial<MessageCreateInput>
 
 /** A Mail account for receiving messages (POP/IMAP). To create a new receiving account, use the 'pop account', 'imap account', and 'iCloud account' objects */
 export interface Account {
   /** The delivery account used when sending mail from this account */
-  deliveryAccount: string;
+  deliveryAccount: string
   /** The name of an account */
-  name: string;
+  name: string
   /** The unique identifier of the account */
-  id: string;
+  id: string
   /** Password for this account. Can be set, but not read via scripting */
-  password: string;
+  password: string
   /** Preferred authentication scheme for account */
-  authentication: string;
+  authentication: string
   /** The type of an account */
-  accountType: string;
+  accountType: string
   /** The list of email addresses configured for an account */
-  emailAddresses: string;
+  emailAddresses: string
   /** The users full name configured for an account */
-  fullName: string;
+  fullName: string
   /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
-  emptyJunkMessagesFrequency: number;
+  emptyJunkMessagesFrequency: number
   /** Does nothing at all (deprecated) */
-  emptySentMessagesFrequency: number;
+  emptySentMessagesFrequency: number
   /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) */
-  emptyTrashFrequency: number;
+  emptyTrashFrequency: number
   /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
-  emptyJunkMessagesOnQuit: boolean;
+  emptyJunkMessagesOnQuit: boolean
   /** Does nothing at all (deprecated) */
-  emptySentMessagesOnQuit: boolean;
+  emptySentMessagesOnQuit: boolean
   /** Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit */
-  emptyTrashOnQuit: boolean;
+  emptyTrashOnQuit: boolean
   /** Indicates whether the account is enabled or not */
-  enabled: boolean;
+  enabled: boolean
   /** The user name used to connect to an account */
-  userName: string;
+  userName: string
   /** The directory where the account stores things on disk */
-  accountDirectory: string;
+  accountDirectory: string
   /** The port used to connect to an account */
-  port: number;
+  port: number
   /** The host name used to connect to an account */
-  serverName: string;
+  serverName: string
   /** Does nothing at all (deprecated) */
-  includeWhenGettingNewMail: boolean;
+  includeWhenGettingNewMail: boolean
   /** Indicates whether messages that are deleted will be moved to the trash mailbox */
-  moveDeletedMessagesToTrash: boolean;
+  moveDeletedMessagesToTrash: boolean
   /** Indicates whether SSL is enabled for this receiving account */
-  usesSsl: boolean;
+  usesSsl: boolean
 }
 
 /** Input for creating a Account */
 export interface AccountCreateInput {
   /** The delivery account used when sending mail from this account */
-  deliveryAccount?: string;
+  deliveryAccount?: string
   /** The name of an account */
-  name?: string;
+  name?: string
   /** Password for this account. Can be set, but not read via scripting */
-  password?: string;
+  password?: string
   /** Preferred authentication scheme for account */
-  authentication?: string;
+  authentication?: string
   /** The list of email addresses configured for an account */
-  emailAddresses?: string;
+  emailAddresses?: string
   /** The users full name configured for an account */
-  fullName?: string;
+  fullName?: string
   /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
-  emptyJunkMessagesFrequency?: number;
+  emptyJunkMessagesFrequency?: number
   /** Does nothing at all (deprecated) */
-  emptySentMessagesFrequency?: number;
+  emptySentMessagesFrequency?: number
   /** Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete) */
-  emptyTrashFrequency?: number;
+  emptyTrashFrequency?: number
   /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
-  emptyJunkMessagesOnQuit?: boolean;
+  emptyJunkMessagesOnQuit?: boolean
   /** Does nothing at all (deprecated) */
-  emptySentMessagesOnQuit?: boolean;
+  emptySentMessagesOnQuit?: boolean
   /** Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit */
-  emptyTrashOnQuit?: boolean;
+  emptyTrashOnQuit?: boolean
   /** Indicates whether the account is enabled or not */
-  enabled?: boolean;
+  enabled?: boolean
   /** The user name used to connect to an account */
-  userName?: string;
+  userName?: string
   /** The port used to connect to an account */
-  port?: number;
+  port?: number
   /** The host name used to connect to an account */
-  serverName?: string;
+  serverName?: string
   /** Does nothing at all (deprecated) */
-  includeWhenGettingNewMail?: boolean;
+  includeWhenGettingNewMail?: boolean
   /** Indicates whether messages that are deleted will be moved to the trash mailbox */
-  moveDeletedMessagesToTrash?: boolean;
+  moveDeletedMessagesToTrash?: boolean
   /** Indicates whether SSL is enabled for this receiving account */
-  usesSsl?: boolean;
+  usesSsl?: boolean
 }
 
 /** Input for updating a Account */
-export type AccountUpdateInput = Partial<AccountCreateInput>;
+export type AccountUpdateInput = Partial<AccountCreateInput>
 
 /** A mailbox that holds messages */
 export interface Mailbox {
   /** The name of a mailbox */
-  name: string;
+  name: string
   /** The number of unread messages in the mailbox */
-  unreadCount: number;
+  unreadCount: number
   /** The account property */
-  account: Account;
+  account: Account
   /** The container property */
-  container: Mailbox;
+  container: Mailbox
 }
 
 /** Input for creating a Mailbox */
 export interface MailboxCreateInput {
   /** The name of a mailbox */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Mailbox */
-export type MailboxUpdateInput = Partial<MailboxCreateInput>;
+export type MailboxUpdateInput = Partial<MailboxCreateInput>
 
 /** Class for message rules */
 export interface Rule {
   /** If rule matches, apply this color */
-  colorMessage: string;
+  colorMessage: string
   /** If rule matches, delete message */
-  deleteMessage: boolean;
+  deleteMessage: boolean
   /** If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text */
-  forwardText: string;
+  forwardText: string
   /** If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action */
-  forwardMessage: string;
+  forwardMessage: string
   /** If rule matches, mark message as flagged */
-  markFlagged: boolean;
+  markFlagged: boolean
   /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
-  markFlagIndex: number;
+  markFlagIndex: number
   /** If rule matches, mark message as read */
-  markRead: boolean;
+  markRead: boolean
   /** If rule matches, play this sound (specify name of sound or path to sound) */
-  playSound: string;
+  playSound: string
   /** If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action */
-  redirectMessage: string;
+  redirectMessage: string
   /** If rule matches, reply to message and prepend with this text. Set to empty string to disable this action */
-  replyText: string;
+  replyText: string
   /** If rule matches, run this compiled AppleScript file. Set to empty string to disable this action */
-  runScript: string;
+  runScript: string
   /** Indicates whether all conditions must be met for rule to execute */
-  allConditionsMustBeMet: boolean;
+  allConditionsMustBeMet: boolean
   /** If rule matches, copy to this mailbox */
-  copyMessage: Mailbox;
+  copyMessage: Mailbox
   /** If rule matches, move to this mailbox */
-  moveMessage: Mailbox;
+  moveMessage: Mailbox
   /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
-  highlightTextUsingColor: boolean;
+  highlightTextUsingColor: boolean
   /** Indicates whether the rule is enabled */
-  enabled: boolean;
+  enabled: boolean
   /** Name of rule */
-  name: string;
+  name: string
   /** Indicates whether the rule has a copy action */
-  shouldCopyMessage: boolean;
+  shouldCopyMessage: boolean
   /** Indicates whether the rule has a move action */
-  shouldMoveMessage: boolean;
+  shouldMoveMessage: boolean
   /** If rule matches, stop rule evaluation for this message */
-  stopEvaluatingRules: boolean;
+  stopEvaluatingRules: boolean
 }
 
 /** Input for creating a Rule */
 export interface RuleCreateInput {
   /** If rule matches, apply this color */
-  colorMessage?: string;
+  colorMessage?: string
   /** If rule matches, delete message */
-  deleteMessage?: boolean;
+  deleteMessage?: boolean
   /** If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text */
-  forwardText?: string;
+  forwardText?: string
   /** If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action */
-  forwardMessage?: string;
+  forwardMessage?: string
   /** If rule matches, mark message as flagged */
-  markFlagged?: boolean;
+  markFlagged?: boolean
   /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
-  markFlagIndex?: number;
+  markFlagIndex?: number
   /** If rule matches, mark message as read */
-  markRead?: boolean;
+  markRead?: boolean
   /** If rule matches, play this sound (specify name of sound or path to sound) */
-  playSound?: string;
+  playSound?: string
   /** If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action */
-  redirectMessage?: string;
+  redirectMessage?: string
   /** If rule matches, reply to message and prepend with this text. Set to empty string to disable this action */
-  replyText?: string;
+  replyText?: string
   /** If rule matches, run this compiled AppleScript file. Set to empty string to disable this action */
-  runScript?: string;
+  runScript?: string
   /** Indicates whether all conditions must be met for rule to execute */
-  allConditionsMustBeMet?: boolean;
+  allConditionsMustBeMet?: boolean
   /** If rule matches, copy to this mailbox */
-  copyMessage?: Mailbox;
+  copyMessage?: Mailbox
   /** If rule matches, move to this mailbox */
-  moveMessage?: Mailbox;
+  moveMessage?: Mailbox
   /** Indicates whether the color will be used to highlight the text or background of a message in the message list */
-  highlightTextUsingColor?: boolean;
+  highlightTextUsingColor?: boolean
   /** Indicates whether the rule is enabled */
-  enabled?: boolean;
+  enabled?: boolean
   /** Name of rule */
-  name?: string;
+  name?: string
   /** Indicates whether the rule has a copy action */
-  shouldCopyMessage?: boolean;
+  shouldCopyMessage?: boolean
   /** Indicates whether the rule has a move action */
-  shouldMoveMessage?: boolean;
+  shouldMoveMessage?: boolean
   /** If rule matches, stop rule evaluation for this message */
-  stopEvaluatingRules?: boolean;
+  stopEvaluatingRules?: boolean
 }
 
 /** Input for updating a Rule */
-export type RuleUpdateInput = Partial<RuleCreateInput>;
+export type RuleUpdateInput = Partial<RuleCreateInput>
 
 /** Class for conditions that can be attached to a single rule */
 export interface RuleCondition {
   /** Rule expression field */
-  expression: string;
+  expression: string
   /** Rule header key */
-  header: string;
+  header: string
   /** Rule qualifier */
-  qualifier: string;
+  qualifier: string
   /** Rule type */
-  ruleType: string;
+  ruleType: string
 }
 
 /** Input for creating a RuleCondition */
 export interface RuleConditionCreateInput {
   /** Rule expression field */
-  expression?: string;
+  expression?: string
   /** Rule header key */
-  header?: string;
+  header?: string
   /** Rule qualifier */
-  qualifier?: string;
+  qualifier?: string
   /** Rule type */
-  ruleType?: string;
+  ruleType?: string
 }
 
 /** Input for updating a RuleCondition */
-export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>;
+export type RuleConditionUpdateInput = Partial<RuleConditionCreateInput>
 
 /** An email recipient */
 export interface Recipient {
   /** The recipients email address */
-  address: string;
+  address: string
   /** The name used for display */
-  name: string;
+  name: string
 }
 
 /** Input for creating a Recipient */
 export interface RecipientCreateInput {
   /** The recipients email address */
-  address?: string;
+  address?: string
   /** The name used for display */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Recipient */
-export type RecipientUpdateInput = Partial<RecipientCreateInput>;
+export type RecipientUpdateInput = Partial<RecipientCreateInput>
 
 /** An email recipient in the Bcc: field */
 export interface BccRecipient {
   /** Unique identifier for this recipient */
-  id: string;
+  id: string
 }
 
 /** Input for creating a BccRecipient */
-export interface BccRecipientCreateInput {
-}
+export type BccRecipientCreateInput = Record<string, never>
 
 /** Input for updating a BccRecipient */
-export type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>;
+export type BccRecipientUpdateInput = Partial<BccRecipientCreateInput>
 
 /** An email recipient in the Cc: field */
 export interface CcRecipient {
   /** Unique identifier for this recipient */
-  id: string;
+  id: string
 }
 
 /** Input for creating a CcRecipient */
-export interface CcRecipientCreateInput {
-}
+export type CcRecipientCreateInput = Record<string, never>
 
 /** Input for updating a CcRecipient */
-export type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>;
+export type CcRecipientUpdateInput = Partial<CcRecipientCreateInput>
 
 /** An email recipient in the To: field */
 export interface ToRecipient {
   /** Unique identifier for this recipient */
-  id: string;
+  id: string
 }
 
 /** Input for creating a ToRecipient */
-export interface ToRecipientCreateInput {
-}
+export type ToRecipientCreateInput = Record<string, never>
 
 /** Input for updating a ToRecipient */
-export type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>;
+export type ToRecipientUpdateInput = Partial<ToRecipientCreateInput>
 
 /** A header value for a message. E.g. To, Subject, From. */
 export interface Header {
   /** Contents of the header */
-  content: string;
+  content: string
   /** Name of the header value */
-  name: string;
+  name: string
 }
 
 /** Input for creating a Header */
 export interface HeaderCreateInput {
   /** Contents of the header */
-  content?: string;
+  content?: string
   /** Name of the header value */
-  name?: string;
+  name?: string
 }
 
 /** Input for updating a Header */
-export type HeaderUpdateInput = Partial<HeaderCreateInput>;
+export type HeaderUpdateInput = Partial<HeaderCreateInput>
 
 /** A file attached to a received message. */
 export interface MailAttachment {
   /** Name of the attachment */
-  name: string;
+  name: string
   /** MIME type of the attachment E.g. text/plain. */
-  mIMEType: string;
+  mIMEType: string
   /** Approximate size in bytes. */
-  fileSize: number;
+  fileSize: number
   /** Indicates whether the attachment has been downloaded. */
-  downloaded: boolean;
+  downloaded: boolean
   /** The unique identifier of the attachment. */
-  id: string;
+  id: string
 }
 
 /** Input for creating a MailAttachment */
-export interface MailAttachmentCreateInput {
-}
+export type MailAttachmentCreateInput = Record<string, never>
 
 /** Input for updating a MailAttachment */
-export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>;
+export type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -668,35 +725,35 @@ export const RichTextSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
-});
+})
 
 export const AttachmentSchema = z.object({
   fileName: z.string(),
-});
+})
 
 export const ParagraphSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
-});
+})
 
 export const WordSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
-});
+})
 
 export const CharacterSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
-});
+})
 
 export const AttributeRunSchema = z.object({
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
   font: z.string(),
   size: z.number(),
-});
+})
 
 export const OutgoingMessageSchema = z.object({
   sender: z.string(),
@@ -706,7 +763,7 @@ export const OutgoingMessageSchema = z.object({
   id: z.number(),
   htmlContent: z.string(),
   vcardPath: z.string(),
-});
+})
 
 export const MessageViewerSchema = z.object({
   draftsMailbox: z.string(),
@@ -724,7 +781,7 @@ export const MessageViewerSchema = z.object({
   visibleMessages: z.string(),
   selectedMessages: z.string(),
   selectedMailboxes: z.string(),
-});
+})
 
 export const MessageSchema = z.object({
   id: z.number(),
@@ -748,7 +805,7 @@ export const MessageSchema = z.object({
   wasForwarded: z.boolean(),
   wasRedirected: z.boolean(),
   wasRepliedTo: z.boolean(),
-});
+})
 
 export const AccountSchema = z.object({
   deliveryAccount: z.string(),
@@ -773,14 +830,14 @@ export const AccountSchema = z.object({
   includeWhenGettingNewMail: z.boolean(),
   moveDeletedMessagesToTrash: z.boolean(),
   usesSsl: z.boolean(),
-});
+})
 
 export const MailboxSchema = z.object({
   name: z.string(),
   unreadCount: z.number(),
   account: z.string(),
   container: z.string(),
-});
+})
 
 export const RuleSchema = z.object({
   colorMessage: z.string(),
@@ -803,36 +860,36 @@ export const RuleSchema = z.object({
   shouldCopyMessage: z.boolean(),
   shouldMoveMessage: z.boolean(),
   stopEvaluatingRules: z.boolean(),
-});
+})
 
 export const RuleConditionSchema = z.object({
   expression: z.string(),
   header: z.string(),
   qualifier: z.string(),
   ruleType: z.string(),
-});
+})
 
 export const RecipientSchema = z.object({
   address: z.string(),
   name: z.string(),
-});
+})
 
 export const BccRecipientSchema = z.object({
   id: z.string(),
-});
+})
 
 export const CcRecipientSchema = z.object({
   id: z.string(),
-});
+})
 
 export const ToRecipientSchema = z.object({
   id: z.string(),
-});
+})
 
 export const HeaderSchema = z.object({
   content: z.string(),
   name: z.string(),
-});
+})
 
 export const MailAttachmentSchema = z.object({
   name: z.string(),
@@ -840,4 +897,4 @@ export const MailAttachmentSchema = z.object({
   fileSize: z.number(),
   downloaded: z.boolean(),
   id: z.string(),
-});
+})

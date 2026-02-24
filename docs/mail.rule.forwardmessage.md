@@ -9,5 +9,5 @@ If rule matches, forward message to this address, or multiple addresses, separat
 **Signature:**
 
 ```typescript
-forwardMessage: string;
+forwardMessage: string
 ```

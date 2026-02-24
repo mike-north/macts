@@ -9,5 +9,5 @@ the total size of the source if it has a fixed size
 **Signature:**
 
 ```typescript
-capacity: number;
+capacity: number
 ```

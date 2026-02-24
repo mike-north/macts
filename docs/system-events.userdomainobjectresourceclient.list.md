@@ -11,7 +11,7 @@ List all userdomainobjects.
 ```typescript
 list(): Promise<UserDomainObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[UserDomainObject](./system-events.userdomainobject.md)<!-- -->\[\]&gt;
-

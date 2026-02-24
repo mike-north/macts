@@ -9,5 +9,5 @@ the unique identifier for the service
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

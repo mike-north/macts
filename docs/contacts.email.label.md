@@ -9,5 +9,5 @@ Label for this email
 **Signature:**
 
 ```typescript
-label: string;
+label: string
 ```

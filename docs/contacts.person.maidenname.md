@@ -9,5 +9,5 @@ The Maiden name of this person.
 **Signature:**
 
 ```typescript
-maidenName: string;
+maidenName: string
 ```

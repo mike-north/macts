@@ -50,8 +50,7 @@ export interface Chat {
 }
 
 // @public
-export interface ChatCreateInput {
-}
+export type ChatCreateInput = Record<string, never>;
 
 // @public
 export class ChatResourceClient {
@@ -122,8 +121,7 @@ export interface Participant {
 }
 
 // @public
-export interface ParticipantCreateInput {
-}
+export type ParticipantCreateInput = Record<string, never>;
 
 // @public
 export class ParticipantResourceClient {

@@ -9,7 +9,7 @@ Minimal span interface compatible with OpenTelemetry Span.
 **Signature:**
 
 ```typescript
-interface Span 
+interface Span
 ```
 
 ## Methods
@@ -18,56 +18,45 @@ interface Span
 
 Method
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [end()](./api.span.end.md)
 
-
 </td><td>
 
 End the span.
-
 
 </td></tr>
 <tr><td>
 
 [recordException(exception)](./api.span.recordexception.md)
 
-
 </td><td>
 
 Record an exception on the span.
-
 
 </td></tr>
 <tr><td>
 
 [setAttribute(key, value)](./api.span.setattribute.md)
 
-
 </td><td>
 
 Set an attribute on the span.
-
 
 </td></tr>
 <tr><td>
 
 [setStatus(status)](./api.span.setstatus.md)
 
-
 </td><td>
 
 Set the span status.
 
-
 </td></tr>
 </tbody></table>
-

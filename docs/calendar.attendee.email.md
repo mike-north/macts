@@ -9,5 +9,5 @@ Email address of the attendee
 **Signature:**
 
 ```typescript
-email: string;
+email: string
 ```

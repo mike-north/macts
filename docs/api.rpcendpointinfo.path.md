@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-path: string;
+path: string
 ```

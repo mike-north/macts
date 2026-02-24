@@ -9,5 +9,5 @@ Unique identifier for this pop over
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

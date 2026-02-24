@@ -9,7 +9,7 @@ A Terminal window
 **Signature:**
 
 ```typescript
-interface Window 
+interface Window
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Window
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [frontmost](./terminal.window.frontmost.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is the frontmost window
-
 
 </td></tr>
 <tr><td>
 
 [id](./terminal.window.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The unique identifier of the window
-
 
 </td></tr>
 <tr><td>
 
 [name](./terminal.window.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The title of the window
-
 
 </td></tr>
 <tr><td>
 
 [position](./terminal.window.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The position of the window
-
 
 </td></tr>
 <tr><td>
 
 [visible](./terminal.window.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is visible
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for address for instant messaging..
 **Signature:**
 
 ```typescript
-declare class InstantMessageResourceClient 
+declare class InstantMessageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class InstantMessageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.instantmessageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `InstantMessageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `InstantMessageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.instantmessageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new instantmessage.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.instantmessageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a instantmessage.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.instantmessageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a instantmessage by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.instantmessageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all instantmessages.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.instantmessageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing instantmessage.
 
-
 </td></tr>
 </tbody></table>
-

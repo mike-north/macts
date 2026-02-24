@@ -11,7 +11,7 @@ List all attributes.
 ```typescript
 list(): Promise<Attribute[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Attribute](./system-events.attribute.md)<!-- -->\[\]&gt;
-

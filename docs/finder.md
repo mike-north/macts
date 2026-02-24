@@ -10,220 +10,180 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AliasFileResourceClient](./finder.aliasfileresourceclient.md)
 
-
 </td><td>
 
 Client for an alias file (created with “make alias”).
-
 
 </td></tr>
 <tr><td>
 
 [ApplicationFileResourceClient](./finder.applicationfileresourceclient.md)
 
-
 </td><td>
 
 Client for an application's file on disk.
-
 
 </td></tr>
 <tr><td>
 
 [ClippingResourceClient](./finder.clippingresourceclient.md)
 
-
 </td><td>
 
 Client for a clipping.
-
 
 </td></tr>
 <tr><td>
 
 [ClippingWindowResourceClient](./finder.clippingwindowresourceclient.md)
 
-
 </td><td>
 
 Client for the window containing a clipping.
-
 
 </td></tr>
 <tr><td>
 
 [ColumnResourceClient](./finder.columnresourceclient.md)
 
-
 </td><td>
 
 Client for a column of a list view.
-
 
 </td></tr>
 <tr><td>
 
 [ContainerResourceClient](./finder.containerresourceclient.md)
 
-
 </td><td>
 
 Client for an item that contains other items.
-
 
 </td></tr>
 <tr><td>
 
 [DesktopObjectResourceClient](./finder.desktopobjectresourceclient.md)
 
-
 </td><td>
 
 Client for desktop-object is the class of the "desktop" object.
-
 
 </td></tr>
 <tr><td>
 
 [DiskResourceClient](./finder.diskresourceclient.md)
 
-
 </td><td>
 
 Client for a disk.
-
 
 </td></tr>
 <tr><td>
 
 [DocumentFileResourceClient](./finder.documentfileresourceclient.md)
 
-
 </td><td>
 
 Client for a document file.
-
 
 </td></tr>
 <tr><td>
 
 [FileResourceClient](./finder.fileresourceclient.md)
 
-
 </td><td>
 
 Client for a file.
-
 
 </td></tr>
 <tr><td>
 
 [FinderClient](./finder.finderclient.md)
 
-
 </td><td>
 
 Finder client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [FinderError](./finder.findererror.md)
 
-
 </td><td>
 
 Error class for Finder API errors.
-
 
 </td></tr>
 <tr><td>
 
 [FinderWindowResourceClient](./finder.finderwindowresourceclient.md)
 
-
 </td><td>
 
 Client for a file viewer window.
-
 
 </td></tr>
 <tr><td>
 
 [FolderResourceClient](./finder.folderresourceclient.md)
 
-
 </td><td>
 
 Client for a folder.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./finder.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [InternetLocationFileResourceClient](./finder.internetlocationfileresourceclient.md)
 
-
 </td><td>
 
 Client for a file containing an internet location.
-
 
 </td></tr>
 <tr><td>
 
 [ListViewOptionsResourceClient](./finder.listviewoptionsresourceclient.md)
 
-
 </td><td>
 
 Client for the list view options.
-
 
 </td></tr>
 <tr><td>
 
 [PackageResourceClient](./finder.packageresourceclient.md)
 
-
 </td><td>
 
 Client for a package.
-
 
 </td></tr>
 <tr><td>
 
 [TrashObjectResourceClient](./finder.trashobjectresourceclient.md)
 
-
 </td><td>
 
 Client for trash-object is the class of the “trash” object.
-
 
 </td></tr>
 </tbody></table>
@@ -234,374 +194,306 @@ Client for trash-object is the class of the “trash” object.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AliasFile](./finder.aliasfile.md)
 
-
 </td><td>
 
 An alias file (created with “Make Alias”)
-
 
 </td></tr>
 <tr><td>
 
 [AliasFileCreateInput](./finder.aliasfilecreateinput.md)
 
-
 </td><td>
 
 Input for creating a AliasFile
-
 
 </td></tr>
 <tr><td>
 
 [ApplicationFile](./finder.applicationfile.md)
 
-
 </td><td>
 
 An application's file on disk
-
 
 </td></tr>
 <tr><td>
 
 [ApplicationFileCreateInput](./finder.applicationfilecreateinput.md)
 
-
 </td><td>
 
 Input for creating a ApplicationFile
-
 
 </td></tr>
 <tr><td>
 
 [Clipping](./finder.clipping.md)
 
-
 </td><td>
 
 A clipping
-
 
 </td></tr>
 <tr><td>
 
 [ClippingCreateInput](./finder.clippingcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Clipping
-
 
 </td></tr>
 <tr><td>
 
 [ClippingWindow](./finder.clippingwindow.md)
 
-
 </td><td>
 
 The window containing a clipping
-
 
 </td></tr>
 <tr><td>
 
 [ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a ClippingWindow
-
 
 </td></tr>
 <tr><td>
 
 [Column](./finder.column.md)
 
-
 </td><td>
 
 a column of a list view
-
 
 </td></tr>
 <tr><td>
 
 [ColumnCreateInput](./finder.columncreateinput.md)
 
-
 </td><td>
 
 Input for creating a Column
-
 
 </td></tr>
 <tr><td>
 
 [Container](./finder.container.md)
 
-
 </td><td>
 
 An item that contains other items
-
 
 </td></tr>
 <tr><td>
 
 [ContainerCreateInput](./finder.containercreateinput.md)
 
-
 </td><td>
 
 Input for creating a Container
-
 
 </td></tr>
 <tr><td>
 
 [DesktopObject](./finder.desktopobject.md)
 
-
 </td><td>
 
 Desktop-object is the class of the "desktop" object
-
 
 </td></tr>
 <tr><td>
 
 [DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
 
-
 </td><td>
 
 Input for creating a DesktopObject
-
 
 </td></tr>
 <tr><td>
 
 [Disk](./finder.disk.md)
 
-
 </td><td>
 
 A disk
-
 
 </td></tr>
 <tr><td>
 
 [DiskCreateInput](./finder.diskcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Disk
-
 
 </td></tr>
 <tr><td>
 
 [DocumentFile](./finder.documentfile.md)
 
-
 </td><td>
 
 A document file
-
 
 </td></tr>
 <tr><td>
 
 [DocumentFileCreateInput](./finder.documentfilecreateinput.md)
 
-
 </td><td>
 
 Input for creating a DocumentFile
 
-
 </td></tr>
 <tr><td>
 
-[File\_2](./finder.file_2.md)
-
+[File_2](./finder.file_2.md)
 
 </td><td>
 
 A file
-
 
 </td></tr>
 <tr><td>
 
 [FileCreateInput](./finder.filecreateinput.md)
 
-
 </td><td>
 
 Input for creating a File
-
 
 </td></tr>
 <tr><td>
 
 [FinderClientOptions](./finder.finderclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [FinderWindow](./finder.finderwindow.md)
 
-
 </td><td>
 
 A file viewer window
-
 
 </td></tr>
 <tr><td>
 
 [FinderWindowCreateInput](./finder.finderwindowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a FinderWindow
-
 
 </td></tr>
 <tr><td>
 
 [Folder](./finder.folder.md)
 
-
 </td><td>
 
 A folder
-
 
 </td></tr>
 <tr><td>
 
 [FolderCreateInput](./finder.foldercreateinput.md)
 
-
 </td><td>
 
 Input for creating a Folder
-
 
 </td></tr>
 <tr><td>
 
 [InternetLocationFile](./finder.internetlocationfile.md)
 
-
 </td><td>
 
 A file containing an internet location
-
 
 </td></tr>
 <tr><td>
 
 [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
 
-
 </td><td>
 
 Input for creating a InternetLocationFile
-
 
 </td></tr>
 <tr><td>
 
 [ListViewOptions](./finder.listviewoptions.md)
 
-
 </td><td>
 
 the list view options
-
 
 </td></tr>
 <tr><td>
 
 [ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)
 
-
 </td><td>
 
 Input for creating a ListViewOptions
-
 
 </td></tr>
 <tr><td>
 
 [Package](./finder.package.md)
 
-
 </td><td>
 
 A package
-
 
 </td></tr>
 <tr><td>
 
 [PackageCreateInput](./finder.packagecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Package
-
 
 </td></tr>
 <tr><td>
 
 [TrashObject](./finder.trashobject.md)
 
-
 </td><td>
 
 Trash-object is the class of the “trash” object
-
 
 </td></tr>
 <tr><td>
 
 [TrashObjectCreateInput](./finder.trashobjectcreateinput.md)
 
-
 </td><td>
 
 Input for creating a TrashObject
-
 
 </td></tr>
 </tbody></table>
@@ -612,155 +504,121 @@ Input for creating a TrashObject
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AliasFileSchema](./finder.aliasfileschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ApplicationFileSchema](./finder.applicationfileschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ClippingSchema](./finder.clippingschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ClippingWindowSchema](./finder.clippingwindowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ColumnSchema](./finder.columnschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ContainerSchema](./finder.containerschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DesktopObjectSchema](./finder.desktopobjectschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DiskSchema](./finder.diskschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [DocumentFileSchema](./finder.documentfileschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FileSchema](./finder.fileschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FinderWindowSchema](./finder.finderwindowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FolderSchema](./finder.folderschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [InternetLocationFileSchema](./finder.internetlocationfileschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [ListViewOptionsSchema](./finder.listviewoptionsschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PackageSchema](./finder.packageschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TrashObjectSchema](./finder.trashobjectschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -771,320 +629,261 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [AliasFileUpdateInput](./finder.aliasfileupdateinput.md)
 
-
 </td><td>
 
 Input for updating a AliasFile
-
 
 </td></tr>
 <tr><td>
 
 [ApplicationFileUpdateInput](./finder.applicationfileupdateinput.md)
 
-
 </td><td>
 
 Input for updating a ApplicationFile
-
 
 </td></tr>
 <tr><td>
 
 [ClippingUpdateInput](./finder.clippingupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Clipping
-
 
 </td></tr>
 <tr><td>
 
 [ClippingWindowUpdateInput](./finder.clippingwindowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a ClippingWindow
-
 
 </td></tr>
 <tr><td>
 
 [ColumnUpdateInput](./finder.columnupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Column
-
 
 </td></tr>
 <tr><td>
 
 [ContainerUpdateInput](./finder.containerupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Container
-
 
 </td></tr>
 <tr><td>
 
 [DesktopObjectUpdateInput](./finder.desktopobjectupdateinput.md)
 
-
 </td><td>
 
 Input for updating a DesktopObject
-
 
 </td></tr>
 <tr><td>
 
 [DiskUpdateInput](./finder.diskupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Disk
-
 
 </td></tr>
 <tr><td>
 
 [DocumentFileUpdateInput](./finder.documentfileupdateinput.md)
 
-
 </td><td>
 
 Input for updating a DocumentFile
-
 
 </td></tr>
 <tr><td>
 
 [Earr](./finder.earr.md)
 
-
 </td><td>
 
 Earr
-
 
 </td></tr>
 <tr><td>
 
 [Ecvw](./finder.ecvw.md)
 
-
 </td><td>
 
 Ecvw
-
 
 </td></tr>
 <tr><td>
 
 [Edfm](./finder.edfm.md)
 
-
 </td><td>
 
 Edfm
-
 
 </td></tr>
 <tr><td>
 
 [Elsv](./finder.elsv.md)
 
-
 </td><td>
 
 Elsv
-
 
 </td></tr>
 <tr><td>
 
 [Epos](./finder.epos.md)
 
-
 </td><td>
 
 Epos
-
 
 </td></tr>
 <tr><td>
 
 [FileUpdateInput](./finder.fileupdateinput.md)
 
-
 </td><td>
 
 Input for updating a File
-
 
 </td></tr>
 <tr><td>
 
 [FinderWindowUpdateInput](./finder.finderwindowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a FinderWindow
-
 
 </td></tr>
 <tr><td>
 
 [FolderUpdateInput](./finder.folderupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Folder
-
 
 </td></tr>
 <tr><td>
 
 [InternetLocationFileUpdateInput](./finder.internetlocationfileupdateinput.md)
 
-
 </td><td>
 
 Input for updating a InternetLocationFile
-
 
 </td></tr>
 <tr><td>
 
 [Ipnl](./finder.ipnl.md)
 
-
 </td><td>
 
 Ipnl
-
 
 </td></tr>
 <tr><td>
 
 [Isiz](./finder.isiz.md)
 
-
 </td><td>
 
 Isiz
-
 
 </td></tr>
 <tr><td>
 
 [ListViewOptionsUpdateInput](./finder.listviewoptionsupdateinput.md)
 
-
 </td><td>
 
 Input for updating a ListViewOptions
-
 
 </td></tr>
 <tr><td>
 
 [Lvic](./finder.lvic.md)
 
-
 </td><td>
 
 Lvic
-
 
 </td></tr>
 <tr><td>
 
 [PackageUpdateInput](./finder.packageupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Package
-
 
 </td></tr>
 <tr><td>
 
 [Pple](./finder.pple.md)
 
-
 </td><td>
 
 Pple
-
 
 </td></tr>
 <tr><td>
 
 [Priv](./finder.priv.md)
 
-
 </td><td>
 
 Priv
-
 
 </td></tr>
 <tr><td>
 
 [Sodr](./finder.sodr.md)
 
-
 </td><td>
 
 Sodr
-
 
 </td></tr>
 <tr><td>
 
 [Sort](./finder.sort.md)
 
-
 </td><td>
 
 Sort
-
 
 </td></tr>
 <tr><td>
 
 [TrashObjectUpdateInput](./finder.trashobjectupdateinput.md)
 
-
 </td><td>
 
 Input for updating a TrashObject
 
-
 </td></tr>
 </tbody></table>
-

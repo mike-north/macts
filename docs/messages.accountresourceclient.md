@@ -9,7 +9,7 @@ Client for an account that can be logged in to from this system.
 **Signature:**
 
 ```typescript
-declare class AccountResourceClient 
+declare class AccountResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AccountResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./messages.accountresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AccountResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AccountResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./messages.accountresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new account.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./messages.accountresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a account.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./messages.accountresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a account by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./messages.accountresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all accounts.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./messages.accountresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing account.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Are relative dates (e.g., today, yesterday) shown in the list view?
 **Signature:**
 
 ```typescript
-usesRelativeDates: boolean;
+usesRelativeDates: boolean
 ```

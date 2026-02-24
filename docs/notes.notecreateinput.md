@@ -9,7 +9,7 @@ Input for creating a Note
 **Signature:**
 
 ```typescript
-interface NoteCreateInput 
+interface NoteCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface NoteCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [body?](./notes.notecreateinput.body.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The HTML content of the note body
-
 
 </td></tr>
 <tr><td>
 
 [name?](./notes.notecreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the note (first line)
 
-
 </td></tr>
 </tbody></table>
-

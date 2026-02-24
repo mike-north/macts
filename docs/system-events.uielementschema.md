@@ -7,25 +7,28 @@
 **Signature:**
 
 ```typescript
-UIElementSchema: z.ZodObject<{
-    accessibilityDescription: z.ZodString;
-    class: z.ZodString;
-    description: z.ZodString;
-    enabled: z.ZodString;
-    entireContents: z.ZodString;
-    focused: z.ZodString;
-    help: z.ZodString;
-    maximumValue: z.ZodString;
-    minimumValue: z.ZodString;
-    name: z.ZodString;
-    orientation: z.ZodString;
-    position: z.ZodString;
-    role: z.ZodString;
-    roleDescription: z.ZodString;
-    selected: z.ZodString;
-    size: z.ZodString;
-    subrole: z.ZodString;
-    title: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+UIElementSchema: z.ZodObject<
+  {
+    accessibilityDescription: z.ZodString
+    class: z.ZodString
+    description: z.ZodString
+    enabled: z.ZodString
+    entireContents: z.ZodString
+    focused: z.ZodString
+    help: z.ZodString
+    maximumValue: z.ZodString
+    minimumValue: z.ZodString
+    name: z.ZodString
+    orientation: z.ZodString
+    position: z.ZodString
+    role: z.ZodString
+    roleDescription: z.ZodString
+    selected: z.ZodString
+    size: z.ZodString
+    subrole: z.ZodString
+    title: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

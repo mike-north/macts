@@ -9,7 +9,7 @@ Client for a file package in the file system.
 **Signature:**
 
 ```typescript
-declare class FilePackageResourceClient 
+declare class FilePackageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class FilePackageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.filepackageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `FilePackageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `FilePackageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.filepackageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new filepackage.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.filepackageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a filepackage.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.filepackageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a filepackage by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.filepackageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all filepackages.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.filepackageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing filepackage.
 
-
 </td></tr>
 </tbody></table>
-

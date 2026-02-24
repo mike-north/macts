@@ -9,5 +9,5 @@ Input for creating a ProgressIndicator
 **Signature:**
 
 ```typescript
-interface ProgressIndicatorCreateInput 
+interface ProgressIndicatorCreateInput
 ```

@@ -9,5 +9,5 @@ Input for creating a Splitter
 **Signature:**
 
 ```typescript
-interface SplitterCreateInput 
+interface SplitterCreateInput
 ```

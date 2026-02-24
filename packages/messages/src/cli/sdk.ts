@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { MessagesClient, type MessagesClientOptions } from '../client.js';
+import { MessagesClient, type MessagesClientOptions } from '../client.js'
 
 /**
  * Get a MessagesClient instance.
@@ -16,32 +16,32 @@ import { MessagesClient, type MessagesClientOptions } from '../client.js';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getMessagesClient(): MessagesClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions messages:*:*'
-    );
+    )
   }
 
   const options: MessagesClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new MessagesClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new MessagesClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: MessagesClient | null = null;
+let _client: MessagesClient | null = null
 
 /**
  * Get or create the singleton MessagesClient.
@@ -50,8 +50,8 @@ let _client: MessagesClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): MessagesClient {
-  _client ??= getMessagesClient();
-  return _client;
+  _client ??= getMessagesClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): MessagesClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

@@ -9,9 +9,12 @@ RGB color with 0-255 values.
 **Signature:**
 
 ```typescript
-RgbTypeSchema: z.ZodObject<{
-    r: z.ZodNumber;
-    g: z.ZodNumber;
-    b: z.ZodNumber;
-}, z.core.$strip>
+RgbTypeSchema: z.ZodObject<
+  {
+    r: z.ZodNumber
+    g: z.ZodNumber
+    b: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

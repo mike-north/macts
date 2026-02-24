@@ -18,30 +18,24 @@ create(input: RelevanceIndicatorCreateInput): Promise<RelevanceIndicator>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RelevanceIndicator](./system-events.relevanceindicator.md)<!-- -->&gt;
-

@@ -9,5 +9,5 @@ Is the disk item busy?
 **Signature:**
 
 ```typescript
-busyStatus: boolean;
+busyStatus: boolean
 ```

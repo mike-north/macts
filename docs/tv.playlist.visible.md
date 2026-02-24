@@ -9,5 +9,5 @@ is this playlist visible in the Source list?
 **Signature:**
 
 ```typescript
-visible: boolean;
+visible: boolean
 ```

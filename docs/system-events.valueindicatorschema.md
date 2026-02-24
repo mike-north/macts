@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ValueIndicatorSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ValueIndicatorSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -18,31 +18,24 @@ constructor(options: QuickTimePlayerClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [QuickTimePlayerClientOptions](./quicktime-player.quicktimeplayerclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

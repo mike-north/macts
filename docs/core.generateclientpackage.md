@@ -11,7 +11,10 @@ Combines the HTTP client SDK and CLI plugin into a single package with: - SDK so
 **Signature:**
 
 ```typescript
-declare function generateClientPackage(manifest: AppManifest, options: GenerateClientPackageOptions): GenerateClientPackageResult;
+declare function generateClientPackage(
+  manifest: AppManifest,
+  options: GenerateClientPackageOptions
+): GenerateClientPackageResult
 ```
 
 ## Parameters
@@ -20,48 +23,39 @@ declare function generateClientPackage(manifest: AppManifest, options: GenerateC
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GenerateClientPackageOptions](./core.generateclientpackageoptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +65,3 @@ Generation options
 [GenerateClientPackageResult](./core.generateclientpackageresult.md)
 
 Generated files for the consolidated package
-

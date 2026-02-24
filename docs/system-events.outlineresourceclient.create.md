@@ -18,30 +18,24 @@ create(input: OutlineCreateInput): Promise<Outline>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [OutlineCreateInput](./system-events.outlinecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Outline](./system-events.outline.md)<!-- -->&gt;
-

@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-PlaylistSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    description: z.ZodString;
-    duration: z.ZodNumber;
-    name: z.ZodString;
-    parent: z.ZodString;
-    size: z.ZodNumber;
-    specialKind: z.ZodString;
-    time: z.ZodString;
-    visible: z.ZodBoolean;
-}, z.core.$strip>
+PlaylistSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    description: z.ZodString
+    duration: z.ZodNumber
+    name: z.ZodString
+    parent: z.ZodString
+    size: z.ZodNumber
+    specialKind: z.ZodString
+    time: z.ZodString
+    visible: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

@@ -9,7 +9,7 @@ Input for creating a Tab
 **Signature:**
 
 ```typescript
-interface TabCreateInput 
+interface TabCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface TabCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [location?](./arc.tabcreateinput.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
-
 
 </td></tr>
 <tr><td>
 
 [uRL?](./arc.tabcreateinput.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The url of the tab.
 
-
 </td></tr>
 </tbody></table>
-

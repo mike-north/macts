@@ -9,7 +9,7 @@ Phone number for a person.
 **Signature:**
 
 ```typescript
-interface Phone 
+interface Phone
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Phone
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.phone.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this phone
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.phone.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this phone
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.phone.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The phone number
 
-
 </td></tr>
 </tbody></table>
-

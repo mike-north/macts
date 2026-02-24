@@ -9,5 +9,5 @@ the output volume for the device (0 = minimum, 100 = maximum)
 **Signature:**
 
 ```typescript
-soundVolume: number;
+soundVolume: number
 ```

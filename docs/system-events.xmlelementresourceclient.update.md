@@ -18,44 +18,35 @@ update(id: string, input: XMLElementUpdateInput): Promise<XMLElement>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [XMLElementUpdateInput](./system-events.xmlelementupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[XMLElement](./system-events.xmlelement.md)<!-- -->&gt;
-

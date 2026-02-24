@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { arcApiPlugin as plugin, arcApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { arcApiPlugin as plugin, arcApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

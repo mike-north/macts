@@ -9,7 +9,7 @@ A grow area belonging to a window
 **Signature:**
 
 ```typescript
-interface GrowArea 
+interface GrowArea
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface GrowArea
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.growarea.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this grow area
 
-
 </td></tr>
 </tbody></table>
-

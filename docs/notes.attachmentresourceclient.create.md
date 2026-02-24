@@ -18,30 +18,24 @@ create(input: AttachmentCreateInput): Promise<Attachment>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AttachmentCreateInput](./notes.attachmentcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Attachment](./notes.attachment.md)<!-- -->&gt;
-

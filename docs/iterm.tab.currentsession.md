@@ -9,5 +9,5 @@ The current session in a tab
 **Signature:**
 
 ```typescript
-currentSession: Session;
+currentSession: Session
 ```

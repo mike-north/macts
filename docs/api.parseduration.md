@@ -9,7 +9,7 @@ Parse a duration string into milliseconds.
 **Signature:**
 
 ```typescript
-declare function parseDuration(duration: string): number;
+declare function parseDuration(duration: string): number
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function parseDuration(duration: string): number;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 duration
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Duration string (e.g., "30d", "1h")
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Duration string (e.g., "30d", "1h")
 number
 
 Duration in milliseconds
-

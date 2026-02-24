@@ -9,5 +9,5 @@ The validated API key payload
 **Signature:**
 
 ```typescript
-apiKeyPayload: ApiKeyPayload;
+apiKeyPayload: ApiKeyPayload
 ```

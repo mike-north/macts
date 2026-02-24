@@ -9,5 +9,5 @@ Input for creating a SystemDomainObject
 **Signature:**
 
 ```typescript
-interface SystemDomainObjectCreateInput 
+interface SystemDomainObjectCreateInput
 ```

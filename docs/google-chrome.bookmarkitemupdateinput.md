@@ -9,7 +9,7 @@ Input for updating a BookmarkItem
 **Signature:**
 
 ```typescript
-type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>;
+type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>
 ```
-**References:** [BookmarkItemCreateInput](./google-chrome.bookmarkitemcreateinput.md)
 
+**References:** [BookmarkItemCreateInput](./google-chrome.bookmarkitemcreateinput.md)

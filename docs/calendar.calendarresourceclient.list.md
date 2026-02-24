@@ -11,7 +11,7 @@ List all calendars.
 ```typescript
 list(): Promise<Calendar[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Calendar](./calendar.calendar.md)<!-- -->\[\]&gt;
-

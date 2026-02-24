@@ -9,7 +9,7 @@ Input for updating a Note
 **Signature:**
 
 ```typescript
-type NoteUpdateInput = Partial<NoteCreateInput>;
+type NoteUpdateInput = Partial<NoteCreateInput>
 ```
-**References:** [NoteCreateInput](./notes.notecreateinput.md)
 
+**References:** [NoteCreateInput](./notes.notecreateinput.md)

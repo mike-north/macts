@@ -9,7 +9,7 @@ the radio tuner playlist
 **Signature:**
 
 ```typescript
-interface RadioTunerPlaylist 
+interface RadioTunerPlaylist
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface RadioTunerPlaylist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.radiotunerplaylist.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this playlist
 
-
 </td></tr>
 </tbody></table>
-

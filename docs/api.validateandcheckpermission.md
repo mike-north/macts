@@ -9,9 +9,15 @@ Validate a token and check if it has a required permission.
 **Signature:**
 
 ```typescript
-declare function validateAndCheckPermission(token: string, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): Promise<PermissionCheckResult & {
-    validationError?: string;
-}>;
+declare function validateAndCheckPermission(
+  token: string,
+  requiredPermission: string,
+  permissionHistory?: PermissionHistoryEntry[]
+): Promise<
+  PermissionCheckResult & {
+    validationError?: string
+  }
+>
 ```
 
 ## Parameters
@@ -20,64 +26,52 @@ declare function validateAndCheckPermission(token: string, requiredPermission: s
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 token
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 API key token
-
 
 </td></tr>
 <tr><td>
 
 requiredPermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission to check
-
 
 </td></tr>
 <tr><td>
 
 permissionHistory
 
-
 </td><td>
 
 [PermissionHistoryEntry](./core.permissionhistoryentry.md)<!-- -->\[\]
 
-
 </td><td>
 
 _(Optional)_ Optional history for helpful error messages
-
 
 </td></tr>
 </tbody></table>
@@ -87,4 +81,3 @@ _(Optional)_ Optional history for helpful error messages
 Promise&lt;[PermissionCheckResult](./core.permissioncheckresult.md) &amp; { validationError?: string; }&gt;
 
 Permission check result
-

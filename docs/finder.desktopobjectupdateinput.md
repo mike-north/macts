@@ -9,7 +9,7 @@ Input for updating a DesktopObject
 **Signature:**
 
 ```typescript
-type DesktopObjectUpdateInput = Partial<DesktopObjectCreateInput>;
+type DesktopObjectUpdateInput = Partial<DesktopObjectCreateInput>
 ```
-**References:** [DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
 
+**References:** [DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)

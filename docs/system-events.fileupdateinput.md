@@ -9,7 +9,7 @@ Input for updating a File
 **Signature:**
 
 ```typescript
-type FileUpdateInput = Partial<FileCreateInput>;
+type FileUpdateInput = Partial<FileCreateInput>
 ```
-**References:** [FileCreateInput](./system-events.filecreateinput.md)
 
+**References:** [FileCreateInput](./system-events.filecreateinput.md)

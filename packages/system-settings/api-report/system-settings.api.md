@@ -12,8 +12,7 @@ export interface Anchor {
 }
 
 // @public
-export interface AnchorCreateInput {
-}
+export type AnchorCreateInput = Record<string, never>;
 
 // @public
 export class AnchorResourceClient {
@@ -46,8 +45,7 @@ export interface Pane {
 }
 
 // @public
-export interface PaneCreateInput {
-}
+export type PaneCreateInput = Record<string, never>;
 
 // @public
 export class PaneResourceClient {

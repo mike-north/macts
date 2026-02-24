@@ -9,5 +9,5 @@ Unique identifier for this recipient
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

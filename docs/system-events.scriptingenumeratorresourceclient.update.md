@@ -18,44 +18,35 @@ update(id: string, input: ScriptingEnumeratorUpdateInput): Promise<ScriptingEnum
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingEnumeratorUpdateInput](./system-events.scriptingenumeratorupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingEnumerator](./system-events.scriptingenumerator.md)<!-- -->&gt;
-

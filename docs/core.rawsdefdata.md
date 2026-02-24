@@ -9,7 +9,7 @@ Complete parsed SDEF data - represents an entire scripting dictionary.
 **Signature:**
 
 ```typescript
-interface RawSdefData 
+interface RawSdefData
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface RawSdefData
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [suites](./core.rawsdefdata.suites.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [RawSuite](./core.rawsuite.md)<!-- -->\[\]
 
-
 </td><td>
 
 Suites containing the terminology
-
 
 </td></tr>
 <tr><td>
 
 [title](./core.rawsdefdata.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Title of the application/dictionary
 
-
 </td></tr>
 </tbody></table>
-

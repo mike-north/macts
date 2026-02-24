@@ -18,48 +18,39 @@ update(necessity?: boolean, registeringApplications?: boolean): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 necessity
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 registeringApplications
 
-
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -67,4 +58,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;void&gt;
-

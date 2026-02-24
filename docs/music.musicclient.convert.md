@@ -11,7 +11,7 @@ convert one or more files or tracks
 ```typescript
 convert(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

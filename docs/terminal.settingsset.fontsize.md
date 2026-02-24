@@ -9,5 +9,5 @@ The size of the font
 **Signature:**
 
 ```typescript
-fontSize: number;
+fontSize: number
 ```

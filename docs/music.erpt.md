@@ -9,5 +9,5 @@ ERpt
 **Signature:**
 
 ```typescript
-type ERpt = 'off' | 'one' | 'all';
+type ERpt = 'off' | 'one' | 'all'
 ```

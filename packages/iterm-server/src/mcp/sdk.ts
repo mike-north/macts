@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { iTermClient, type iTermClientOptions } from '@macts/iterm';
+import { iTermClient, type iTermClientOptions } from '@macts/iterm'
 
 /**
  * Get a iTermClient instance.
@@ -16,32 +16,32 @@ import { iTermClient, type iTermClientOptions } from '@macts/iterm';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getiTermClient(): iTermClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions iterm:*:*'
-    );
+    )
   }
 
   const options: iTermClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new iTermClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new iTermClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: iTermClient | null = null;
+let _client: iTermClient | null = null
 
 /**
  * Get or create the singleton iTermClient.
@@ -50,8 +50,8 @@ let _client: iTermClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): iTermClient {
-  _client ??= getiTermClient();
-  return _client;
+  _client ??= getiTermClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): iTermClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ProgressIndicatorSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ProgressIndicatorSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

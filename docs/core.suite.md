@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Suite = z.infer<typeof SuiteSchema>;
+type Suite = z.infer<typeof SuiteSchema>
 ```
-**References:** [SuiteSchema](./core.suiteschema.md)
 
+**References:** [SuiteSchema](./core.suiteschema.md)

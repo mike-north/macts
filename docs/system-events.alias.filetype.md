@@ -9,5 +9,5 @@ the OSType identifying the type of data contained in the alias
 **Signature:**
 
 ```typescript
-fileType: string;
+fileType: string
 ```

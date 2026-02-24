@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentResourceClient](./textedit.documentresourceclient.md)
 
-
 </td><td>
 
 Client for a textedit document.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./textedit.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [TextEditClient](./textedit.texteditclient.md)
 
-
 </td><td>
 
 TextEdit client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [TextEditError](./textedit.textediterror.md)
 
-
 </td><td>
 
 Error class for TextEdit API errors.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ Error class for TextEdit API errors.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Document](./textedit.document.md)
 
-
 </td><td>
 
 A TextEdit document
-
 
 </td></tr>
 <tr><td>
 
 [DocumentCreateInput](./textedit.documentcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Document
-
 
 </td></tr>
 <tr><td>
 
 [TextEditClientOptions](./textedit.texteditclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Client configuration options.
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentSchema](./textedit.documentschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,23 +119,18 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DocumentUpdateInput](./textedit.documentupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Document
 
-
 </td></tr>
 </tbody></table>
-

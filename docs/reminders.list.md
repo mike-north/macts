@@ -9,7 +9,7 @@ A list of reminders
 **Signature:**
 
 ```typescript
-interface List 
+interface List
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface List
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color](./reminders.list.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The color of the list
-
 
 </td></tr>
 <tr><td>
 
 [emblem](./reminders.list.emblem.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The emblem icon name of the list
-
 
 </td></tr>
 <tr><td>
 
 [id](./reminders.list.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the list
-
 
 </td></tr>
 <tr><td>
 
 [name](./reminders.list.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the list
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Create an enum coercer from enum definition.
 **Signature:**
 
 ```typescript
-declare function createEnumCoercer(values: JxaEnumValue[]): TypeCoercer<string>;
+declare function createEnumCoercer(values: JxaEnumValue[]): TypeCoercer<string>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function createEnumCoercer(values: JxaEnumValue[]): TypeCoercer<string>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 values
 
-
 </td><td>
 
 [JxaEnumValue](./core.jxaenumvalue.md)<!-- -->\[\]
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ values
 **Returns:**
 
 [TypeCoercer](./core.typecoercer.md)<!-- -->&lt;string&gt;
-

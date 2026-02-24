@@ -11,10 +11,13 @@ Creates directories as needed and writes each file's content.
 **Signature:**
 
 ```typescript
-declare function writeFiles(files: {
-    path: string;
-    content: string;
-}[], outDir: string): Promise<void>;
+declare function writeFiles(
+  files: {
+    path: string
+    content: string
+  }[],
+  outDir: string
+): Promise<void>
 ```
 
 ## Parameters
@@ -23,48 +26,39 @@ declare function writeFiles(files: {
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 files
 
-
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
 
 Array of path/content pairs
-
 
 </td></tr>
 <tr><td>
 
 outDir
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Base output directory
-
 
 </td></tr>
 </tbody></table>
@@ -72,4 +66,3 @@ Base output directory
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ Input for creating a ColorWell
 **Signature:**
 
 ```typescript
-interface ColorWellCreateInput 
+interface ColorWellCreateInput
 ```

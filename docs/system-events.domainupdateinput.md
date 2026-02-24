@@ -9,7 +9,7 @@ Input for updating a Domain
 **Signature:**
 
 ```typescript
-type DomainUpdateInput = Partial<DomainCreateInput>;
+type DomainUpdateInput = Partial<DomainCreateInput>
 ```
-**References:** [DomainCreateInput](./system-events.domaincreateinput.md)
 
+**References:** [DomainCreateInput](./system-events.domaincreateinput.md)

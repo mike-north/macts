@@ -9,7 +9,7 @@ A unit of data in XML format
 **Signature:**
 
 ```typescript
-interface XMLElement 
+interface XMLElement
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface XMLElement
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.xmlelement.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the unique identifier of the XML element
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.xmlelement.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the XML element
-
 
 </td></tr>
 <tr><td>
 
 [value](./system-events.xmlelement.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the value of the XML element
 
-
 </td></tr>
 </tbody></table>
-

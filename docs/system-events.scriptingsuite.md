@@ -9,7 +9,7 @@ A suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingSuite 
+interface ScriptingSuite
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface ScriptingSuite
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./system-events.scriptingsuite.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The description of the suite
-
 
 </td></tr>
 <tr><td>
 
 [hidden](./system-events.scriptingsuite.hidden.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the suite hidden?
-
 
 </td></tr>
 <tr><td>
 
 [id](./system-events.scriptingsuite.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the suite
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.scriptingsuite.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the suite
 
-
 </td></tr>
 </tbody></table>
-

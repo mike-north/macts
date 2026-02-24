@@ -9,7 +9,7 @@ Input for updating a MailAttachment
 **Signature:**
 
 ```typescript
-type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>;
+type MailAttachmentUpdateInput = Partial<MailAttachmentCreateInput>
 ```
-**References:** [MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)
 
+**References:** [MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)

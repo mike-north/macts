@@ -9,5 +9,5 @@ Unique identifier for this track
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

@@ -9,7 +9,7 @@ Input for updating a TextArea
 **Signature:**
 
 ```typescript
-type TextAreaUpdateInput = Partial<TextAreaCreateInput>;
+type TextAreaUpdateInput = Partial<TextAreaCreateInput>
 ```
-**References:** [TextAreaCreateInput](./system-events.textareacreateinput.md)
 
+**References:** [TextAreaCreateInput](./system-events.textareacreateinput.md)

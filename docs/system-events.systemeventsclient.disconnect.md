@@ -11,7 +11,7 @@ disconnect a configuration or service
 ```typescript
 disconnect(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

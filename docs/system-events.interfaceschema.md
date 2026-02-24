@@ -7,14 +7,17 @@
 **Signature:**
 
 ```typescript
-InterfaceSchema: z.ZodObject<{
-    automatic: z.ZodBoolean;
-    duplex: z.ZodString;
-    id: z.ZodString;
-    kind: z.ZodString;
-    mACAddress: z.ZodString;
-    mtu: z.ZodNumber;
-    name: z.ZodString;
-    speed: z.ZodNumber;
-}, z.core.$strip>
+InterfaceSchema: z.ZodObject<
+  {
+    automatic: z.ZodBoolean
+    duplex: z.ZodString
+    id: z.ZodString
+    kind: z.ZodString
+    mACAddress: z.ZodString
+    mtu: z.ZodNumber
+    name: z.ZodString
+    speed: z.ZodNumber
+  },
+  z.core.$strip
+>
 ```

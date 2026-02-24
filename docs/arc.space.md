@@ -9,7 +9,7 @@ A space
 **Signature:**
 
 ```typescript
-interface Space 
+interface Space
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Space
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./arc.space.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the space.
-
 
 </td></tr>
 <tr><td>
 
 [title](./arc.space.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The full title of the space.
 
-
 </td></tr>
 </tbody></table>
-

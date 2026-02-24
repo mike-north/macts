@@ -9,7 +9,7 @@ Write generated SDK to disk.
 **Signature:**
 
 ```typescript
-declare function writeSdk(result: GenerateSdkResult, outDir: string): Promise<void>;
+declare function writeSdk(result: GenerateSdkResult, outDir: string): Promise<void>
 ```
 
 ## Parameters
@@ -18,44 +18,35 @@ declare function writeSdk(result: GenerateSdkResult, outDir: string): Promise<vo
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 result
 
-
 </td><td>
 
 [GenerateSdkResult](./core.generatesdkresult.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 outDir
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ string
 **Returns:**
 
 Promise&lt;void&gt;
-

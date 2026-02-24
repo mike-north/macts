@@ -11,7 +11,7 @@ List all interfaces.
 ```typescript
 list(): Promise<Interface[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Interface](./system-events.interface.md)<!-- -->\[\]&gt;
-

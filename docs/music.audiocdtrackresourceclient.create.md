@@ -18,30 +18,24 @@ create(input: AudioCDTrackCreateInput): Promise<AudioCDTrack>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[AudioCDTrack](./music.audiocdtrack.md)<!-- -->&gt;
-

@@ -11,7 +11,7 @@ List all rows.
 ```typescript
 list(): Promise<Row[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Row](./system-events.row.md)<!-- -->\[\]&gt;
-

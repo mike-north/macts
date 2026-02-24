@@ -9,7 +9,7 @@ Client for a list belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ListResourceClient 
+declare class ListResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ListResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.listresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ListResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ListResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.listresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new list.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.listresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a list.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.listresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a list by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.listresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all lists.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.listresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing list.
 
-
 </td></tr>
 </tbody></table>
-

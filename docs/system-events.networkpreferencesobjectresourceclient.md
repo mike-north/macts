@@ -9,7 +9,7 @@ Client for the preferences for the current user's network.
 **Signature:**
 
 ```typescript
-declare class NetworkPreferencesObjectResourceClient 
+declare class NetworkPreferencesObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class NetworkPreferencesObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.networkpreferencesobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `NetworkPreferencesObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `NetworkPreferencesObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.networkpreferencesobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new networkpreferencesobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.networkpreferencesobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a networkpreferencesobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.networkpreferencesobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a networkpreferencesobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.networkpreferencesobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all networkpreferencesobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.networkpreferencesobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing networkpreferencesobject.
 
-
 </td></tr>
 </tbody></table>
-

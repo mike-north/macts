@@ -11,7 +11,11 @@ Permissions are stored and matched as fine-grained only. Coarse permissions are 
 **Signature:**
 
 ```typescript
-declare function hasPermission(grantedPermissions: string[], requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): PermissionCheckResult;
+declare function hasPermission(
+  grantedPermissions: string[],
+  requiredPermission: string,
+  permissionHistory?: PermissionHistoryEntry[]
+): PermissionCheckResult
 ```
 
 ## Parameters
@@ -20,64 +24,52 @@ declare function hasPermission(grantedPermissions: string[], requiredPermission:
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 grantedPermissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of fine-grained permissions the key has
-
 
 </td></tr>
 <tr><td>
 
 requiredPermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 The fine-grained permission needed for an operation
-
 
 </td></tr>
 <tr><td>
 
 permissionHistory
 
-
 </td><td>
 
 [PermissionHistoryEntry](./core.permissionhistoryentry.md)<!-- -->\[\]
 
-
 </td><td>
 
 _(Optional)_ Optional history for helpful error messages
-
 
 </td></tr>
 </tbody></table>
@@ -87,4 +79,3 @@ _(Optional)_ Optional history for helpful error messages
 [PermissionCheckResult](./core.permissioncheckresult.md)
 
 Result indicating if permission is granted and why
-

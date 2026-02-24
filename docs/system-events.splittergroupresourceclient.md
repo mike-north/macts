@@ -9,7 +9,7 @@ Client for a splitter group belonging to a window.
 **Signature:**
 
 ```typescript
-declare class SplitterGroupResourceClient 
+declare class SplitterGroupResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SplitterGroupResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.splittergroupresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SplitterGroupResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SplitterGroupResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.splittergroupresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new splittergroup.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.splittergroupresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a splittergroup.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.splittergroupresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a splittergroup by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.splittergroupresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all splittergroups.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.splittergroupresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing splittergroup.
 
-
 </td></tr>
 </tbody></table>
-

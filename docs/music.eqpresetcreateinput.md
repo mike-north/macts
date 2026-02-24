@@ -9,7 +9,7 @@ Input for creating a EQPreset
 **Signature:**
 
 ```typescript
-interface EQPresetCreateInput 
+interface EQPresetCreateInput
 ```
 
 ## Properties
@@ -18,250 +18,197 @@ interface EQPresetCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [band1?](./music.eqpresetcreateinput.band1.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band10?](./music.eqpresetcreateinput.band10.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band2?](./music.eqpresetcreateinput.band2.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band3?](./music.eqpresetcreateinput.band3.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band4?](./music.eqpresetcreateinput.band4.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band5?](./music.eqpresetcreateinput.band5.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band6?](./music.eqpresetcreateinput.band6.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 1 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band7?](./music.eqpresetcreateinput.band7.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 2 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band8?](./music.eqpresetcreateinput.band8.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band9?](./music.eqpresetcreateinput.band9.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer 8 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [preamp?](./music.eqpresetcreateinput.preamp.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ the equalizer preamp level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [updateTracks?](./music.eqpresetcreateinput.updatetracks.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ should tracks which refer to this preset be updated when the preset is renamed or deleted?
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Generated package.json content
 **Signature:**
 
 ```typescript
-packageJson: string;
+packageJson: string
 ```

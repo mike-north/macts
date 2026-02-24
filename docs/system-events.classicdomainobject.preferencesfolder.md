@@ -9,5 +9,5 @@ The Classic Preferences folder
 **Signature:**
 
 ```typescript
-preferencesFolder: Folder;
+preferencesFolder: Folder
 ```

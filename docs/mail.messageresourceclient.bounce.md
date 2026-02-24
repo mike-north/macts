@@ -11,7 +11,7 @@ Does nothing at all (deprecated)
 ```typescript
 bounce(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

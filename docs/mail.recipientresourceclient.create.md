@@ -18,30 +18,24 @@ create(input: RecipientCreateInput): Promise<Recipient>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RecipientCreateInput](./mail.recipientcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Recipient](./mail.recipient.md)<!-- -->&gt;
-

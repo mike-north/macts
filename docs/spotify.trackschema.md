@@ -7,19 +7,22 @@
 **Signature:**
 
 ```typescript
-TrackSchema: z.ZodObject<{
-    name: z.ZodString;
-    artist: z.ZodString;
-    album: z.ZodString;
-    albumArtist: z.ZodString;
-    discNumber: z.ZodNumber;
-    duration: z.ZodNumber;
-    playedCount: z.ZodNumber;
-    trackNumber: z.ZodNumber;
-    spotifyUrl: z.ZodString;
-    id: z.ZodString;
-    artworkUrl: z.ZodString;
-    artwork: z.ZodString;
-    playerState: z.ZodString;
-}, z.core.$strip>
+TrackSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    artist: z.ZodString
+    album: z.ZodString
+    albumArtist: z.ZodString
+    discNumber: z.ZodNumber
+    duration: z.ZodNumber
+    playedCount: z.ZodNumber
+    trackNumber: z.ZodNumber
+    spotifyUrl: z.ZodString
+    id: z.ZodString
+    artworkUrl: z.ZodString
+    artwork: z.ZodString
+    playerState: z.ZodString
+  },
+  z.core.$strip
+>
 ```

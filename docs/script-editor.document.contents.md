@@ -9,5 +9,5 @@ The source code of the script
 **Signature:**
 
 ```typescript
-contents: string;
+contents: string
 ```

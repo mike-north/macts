@@ -9,5 +9,5 @@ The Application Support folder
 **Signature:**
 
 ```typescript
-applicationSupportFolder: Folder;
+applicationSupportFolder: Folder
 ```

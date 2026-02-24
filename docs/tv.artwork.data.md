@@ -9,5 +9,5 @@ data for this artwork, in the form of a picture
 **Signature:**
 
 ```typescript
-data: string;
+data: string
 ```

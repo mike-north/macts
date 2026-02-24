@@ -9,7 +9,7 @@ Input for updating a Slider
 **Signature:**
 
 ```typescript
-type SliderUpdateInput = Partial<SliderCreateInput>;
+type SliderUpdateInput = Partial<SliderCreateInput>
 ```
-**References:** [SliderCreateInput](./system-events.slidercreateinput.md)
 
+**References:** [SliderCreateInput](./system-events.slidercreateinput.md)

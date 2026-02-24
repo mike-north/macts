@@ -18,30 +18,24 @@ switchView(to: ViewType): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 to
 
-
 </td><td>
 
 [ViewType](./calendar.viewtype.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ to
 **Returns:**
 
 Promise&lt;void&gt;
-

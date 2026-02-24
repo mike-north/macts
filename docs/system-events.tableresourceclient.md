@@ -9,7 +9,7 @@ Client for a table belonging to a window.
 **Signature:**
 
 ```typescript
-declare class TableResourceClient 
+declare class TableResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TableResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.tableresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TableResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `TableResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.tableresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new table.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.tableresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a table.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.tableresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a table by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.tableresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all tables.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.tableresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing table.
 
-
 </td></tr>
 </tbody></table>
-

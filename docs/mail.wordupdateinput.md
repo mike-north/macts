@@ -9,7 +9,7 @@ Input for updating a Word
 **Signature:**
 
 ```typescript
-type WordUpdateInput = Partial<WordCreateInput>;
+type WordUpdateInput = Partial<WordCreateInput>
 ```
-**References:** [WordCreateInput](./mail.wordcreateinput.md)
 
+**References:** [WordCreateInput](./mail.wordcreateinput.md)

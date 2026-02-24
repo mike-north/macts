@@ -9,7 +9,7 @@ Client for a media source (library, cd, device, etc.).
 **Signature:**
 
 ```typescript
-declare class SourceResourceClient 
+declare class SourceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SourceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./tv.sourceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SourceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SourceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./tv.sourceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new source.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./tv.sourceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a source.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./tv.sourceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a source by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./tv.sourceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all sources.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./tv.sourceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing source.
 
-
 </td></tr>
 </tbody></table>
-

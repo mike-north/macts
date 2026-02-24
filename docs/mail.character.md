@@ -9,7 +9,7 @@ This subdivides the text into characters.
 **Signature:**
 
 ```typescript
-interface Character 
+interface Character
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Character
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [color](./mail.character.color.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { r: number; g: number; b: number; }
 
-
 </td><td>
 
 The color of the character.
-
 
 </td></tr>
 <tr><td>
 
 [font](./mail.character.font.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the font of the character.
-
 
 </td></tr>
 <tr><td>
 
 [size](./mail.character.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size in points of the character.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Does nothing at all (deprecated)
 **Signature:**
 
 ```typescript
-vcardPath: string;
+vcardPath: string
 ```

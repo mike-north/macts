@@ -11,7 +11,7 @@ start the screen saver
 ```typescript
 start(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

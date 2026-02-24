@@ -9,5 +9,5 @@ Indicates whether the rule is enabled
 **Signature:**
 
 ```typescript
-enabled: boolean;
+enabled: boolean
 ```

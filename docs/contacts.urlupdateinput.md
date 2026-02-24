@@ -9,7 +9,7 @@ Input for updating a Url
 **Signature:**
 
 ```typescript
-type UrlUpdateInput = Partial<UrlCreateInput>;
+type UrlUpdateInput = Partial<UrlCreateInput>
 ```
-**References:** [UrlCreateInput](./contacts.urlcreateinput.md)
 
+**References:** [UrlCreateInput](./contacts.urlcreateinput.md)

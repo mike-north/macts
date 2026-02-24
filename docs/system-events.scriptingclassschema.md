@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-ScriptingClassSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    description: z.ZodString;
-    hidden: z.ZodBoolean;
-    pluralName: z.ZodString;
-    suiteName: z.ZodString;
-    superclass: z.ZodString;
-}, z.core.$strip>
+ScriptingClassSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    description: z.ZodString
+    hidden: z.ZodBoolean
+    pluralName: z.ZodString
+    suiteName: z.ZodString
+    superclass: z.ZodString
+  },
+  z.core.$strip
+>
 ```

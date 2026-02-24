@@ -9,5 +9,5 @@
 **Signature:**
 
 ```typescript
-opensInClassic: boolean;
+opensInClassic: boolean
 ```

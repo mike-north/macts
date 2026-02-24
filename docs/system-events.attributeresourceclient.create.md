@@ -18,30 +18,24 @@ create(input: AttributeCreateInput): Promise<Attribute>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [AttributeCreateInput](./system-events.attributecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Attribute](./system-events.attribute.md)<!-- -->&gt;
-

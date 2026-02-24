@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-CheckboxSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+CheckboxSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

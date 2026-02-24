@@ -9,5 +9,5 @@ the account of the person who purchased this track
 **Signature:**
 
 ```typescript
-purchaserAccount: string;
+purchaserAccount: string
 ```

@@ -9,7 +9,7 @@ Input for updating a MSNHandle
 **Signature:**
 
 ```typescript
-type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>;
+type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>
 ```
-**References:** [MSNHandleCreateInput](./contacts.msnhandlecreateinput.md)
 
+**References:** [MSNHandleCreateInput](./contacts.msnhandlecreateinput.md)

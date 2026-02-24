@@ -9,7 +9,7 @@ Span status code type.
 **Signature:**
 
 ```typescript
-type SpanStatusCodeValue = (typeof SpanStatusCode)[keyof typeof SpanStatusCode];
+type SpanStatusCodeValue = (typeof SpanStatusCode)[keyof typeof SpanStatusCode]
 ```
-**References:** [SpanStatusCode](./api.spanstatuscode.md)
 
+**References:** [SpanStatusCode](./api.spanstatuscode.md)

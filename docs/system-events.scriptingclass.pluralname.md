@@ -9,5 +9,5 @@ The plural name of the class
 **Signature:**
 
 ```typescript
-pluralName: string;
+pluralName: string
 ```

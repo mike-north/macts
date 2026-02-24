@@ -18,30 +18,24 @@ create(input: ScriptingSuiteCreateInput): Promise<ScriptingSuite>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ScriptingSuite](./system-events.scriptingsuite.md)<!-- -->&gt;
-

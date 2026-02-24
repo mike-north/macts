@@ -112,10 +112,7 @@ export function generateClientPackage(
       if (relativePath === 'sdk.ts') {
         files.push({
           path: newPath,
-          content: file.content.replace(
-            `from '${syntheticSdkPackageName}'`,
-            `from '../client.js'`
-          ),
+          content: file.content.replace(`from '${syntheticSdkPackageName}'`, `from '../client.js'`),
         })
       } else {
         files.push({ path: newPath, content: file.content })
@@ -269,4 +266,3 @@ function generateApiExtractorConfig(): string {
     2
   )
 }
-

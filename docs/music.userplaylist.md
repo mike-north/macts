@@ -9,7 +9,7 @@ custom playlists created by the user
 **Signature:**
 
 ```typescript
-interface UserPlaylist 
+interface UserPlaylist
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface UserPlaylist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [genius](./music.userplaylist.genius.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this a Genius Playlist?
-
 
 </td></tr>
 <tr><td>
 
 [shared](./music.userplaylist.shared.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this playlist shared?
-
 
 </td></tr>
 <tr><td>
 
 [smart](./music.userplaylist.smart.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this a Smart Playlist?
 
-
 </td></tr>
 </tbody></table>
-

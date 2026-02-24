@@ -9,5 +9,5 @@ The full title of the window.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

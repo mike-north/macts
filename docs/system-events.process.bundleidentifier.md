@@ -9,5 +9,5 @@ the bundle identifier of the process' application file
 **Signature:**
 
 ```typescript
-bundleIdentifier: string;
+bundleIdentifier: string
 ```

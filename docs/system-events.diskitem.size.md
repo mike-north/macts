@@ -9,5 +9,5 @@ the logical size of the disk item
 **Signature:**
 
 ```typescript
-size: number;
+size: number
 ```

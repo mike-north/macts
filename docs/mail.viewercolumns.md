@@ -9,5 +9,18 @@ ViewerColumns
 **Signature:**
 
 ```typescript
-type ViewerColumns = 'attachmentsColumn' | 'messageColor' | 'dateReceivedColumn' | 'dateSentColumn' | 'flagsColumn' | 'fromColumn' | 'mailboxColumn' | 'messageStatusColumn' | 'numberColumn' | 'sizeColumn' | 'subjectColumn' | 'toColumn' | 'dateLastSavedColumn';
+type ViewerColumns =
+  | 'attachmentsColumn'
+  | 'messageColor'
+  | 'dateReceivedColumn'
+  | 'dateSentColumn'
+  | 'flagsColumn'
+  | 'fromColumn'
+  | 'mailboxColumn'
+  | 'messageStatusColumn'
+  | 'numberColumn'
+  | 'sizeColumn'
+  | 'subjectColumn'
+  | 'toColumn'
+  | 'dateLastSavedColumn'
 ```

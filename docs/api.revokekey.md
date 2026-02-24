@@ -9,7 +9,7 @@ Revoke a key by ID.
 **Signature:**
 
 ```typescript
-declare function revokeKey(keyId: string): boolean;
+declare function revokeKey(keyId: string): boolean
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function revokeKey(keyId: string): boolean;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keyId
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Key ID to revoke
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Key ID to revoke
 boolean
 
 True if key was found and revoked
-

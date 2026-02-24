@@ -9,7 +9,7 @@ Input for updating a SubscriptionPlaylist
 **Signature:**
 
 ```typescript
-type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>;
+type SubscriptionPlaylistUpdateInput = Partial<SubscriptionPlaylistCreateInput>
 ```
-**References:** [SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)
 
+**References:** [SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)

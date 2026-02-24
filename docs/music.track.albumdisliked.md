@@ -9,5 +9,5 @@ is the album for this track disliked?
 **Signature:**
 
 ```typescript
-albumDisliked: boolean;
+albumDisliked: boolean
 ```

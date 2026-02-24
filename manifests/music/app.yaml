@@ -1010,7 +1010,7 @@ enums:
         value: audioCD
         code: kACD
       - name: mP3CD
-        value: 3
+        value: mP3CD
         code: kMCD
       - name: radioTuner
         value: radioTuner
@@ -1191,10 +1191,10 @@ enums:
         value: xML
         code: kXML
       - name: m3U
-        value: 3
+        value: m3U
         code: kM3U
       - name: m3U8
-        value: 3
+        value: m3U8
         code: kM38
 hierarchy:
   children:

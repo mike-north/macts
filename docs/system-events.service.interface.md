@@ -9,5 +9,5 @@ the interface the service is built on
 **Signature:**
 
 ```typescript
-interface: Interface;
+interface: Interface
 ```

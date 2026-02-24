@@ -9,7 +9,7 @@ Generated command file.
 **Signature:**
 
 ```typescript
-interface GeneratedCommand 
+interface GeneratedCommand
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface GeneratedCommand
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./core.generatedcommand.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 File content
-
 
 </td></tr>
 <tr><td>
 
 [path](./core.generatedcommand.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 File path relative to src/commands
 
-
 </td></tr>
 </tbody></table>
-

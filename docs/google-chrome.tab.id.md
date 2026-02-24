@@ -9,5 +9,5 @@ Unique ID of the tab.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

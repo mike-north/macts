@@ -11,7 +11,7 @@ Play the movie.
 ```typescript
 play(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

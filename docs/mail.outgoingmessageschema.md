@@ -7,13 +7,16 @@
 **Signature:**
 
 ```typescript
-OutgoingMessageSchema: z.ZodObject<{
-    sender: z.ZodString;
-    subject: z.ZodString;
-    visible: z.ZodBoolean;
-    messageSignature: z.ZodString;
-    id: z.ZodNumber;
-    htmlContent: z.ZodString;
-    vcardPath: z.ZodString;
-}, z.core.$strip>
+OutgoingMessageSchema: z.ZodObject<
+  {
+    sender: z.ZodString
+    subject: z.ZodString
+    visible: z.ZodBoolean
+    messageSignature: z.ZodString
+    id: z.ZodNumber
+    htmlContent: z.ZodString
+    vcardPath: z.ZodString
+  },
+  z.core.$strip
+>
 ```

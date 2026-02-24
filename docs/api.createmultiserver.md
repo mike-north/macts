@@ -9,7 +9,10 @@ Create a macts API server for multiple apps.
 **Signature:**
 
 ```typescript
-declare function createMultiServer(manifests: AppManifest[], options?: ServerOptions): ServerInstance;
+declare function createMultiServer(
+  manifests: AppManifest[],
+  options?: ServerOptions
+): ServerInstance
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function createMultiServer(manifests: AppManifest[], options?: ServerOpt
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifests
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)<!-- -->\[\]
 
-
 </td><td>
 
 Array of app manifests
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [ServerOptions](./api.serveroptions.md)
 
-
 </td><td>
 
 _(Optional)_ Server configuration
-
 
 </td></tr>
 </tbody></table>
@@ -72,15 +66,13 @@ Hono app configured with routes for all apps
 
 ## Example
 
-
 ```typescript
-import { createMultiServer } from '@macts/api/server';
-import { loadManifest } from '@macts/core';
+import { createMultiServer } from '@macts/api/server'
+import { loadManifest } from '@macts/core'
 
-const calendar = await loadManifest('./calendar/app.yaml');
-const reminders = await loadManifest('./reminders/app.yaml');
-const { app, start } = createMultiServer([calendar, reminders]);
+const calendar = await loadManifest('./calendar/app.yaml')
+const reminders = await loadManifest('./reminders/app.yaml')
+const { app, start } = createMultiServer([calendar, reminders])
 
-await start();
+await start()
 ```
-

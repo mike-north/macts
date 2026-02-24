@@ -11,7 +11,7 @@ Delete an object.
 ```typescript
 _delete(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

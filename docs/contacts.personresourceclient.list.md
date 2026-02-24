@@ -11,7 +11,7 @@ List all people.
 ```typescript
 list(): Promise<Person[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Person](./contacts.person.md)<!-- -->\[\]&gt;
-

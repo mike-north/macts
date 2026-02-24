@@ -9,7 +9,7 @@ A tab.
 **Signature:**
 
 ```typescript
-interface Tab 
+interface Tab
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface Tab
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./google-chrome.tab.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique ID of the tab.
-
 
 </td></tr>
 <tr><td>
 
 [loading](./google-chrome.tab.loading.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is loading?
-
 
 </td></tr>
 <tr><td>
 
 [title](./google-chrome.tab.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The title of the tab.
-
 
 </td></tr>
 <tr><td>
 
 [uRL](./google-chrome.tab.url.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The url visible to the user.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for a disk.
 **Signature:**
 
 ```typescript
-declare class DiskResourceClient 
+declare class DiskResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DiskResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.diskresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DiskResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DiskResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.diskresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new disk.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.diskresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a disk.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.diskresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a disk by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.diskresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all disks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.diskresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing disk.
 
-
 </td></tr>
 </tbody></table>
-

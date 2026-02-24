@@ -9,5 +9,5 @@ Input for creating a Encoder
 **Signature:**
 
 ```typescript
-interface EncoderCreateInput 
+interface EncoderCreateInput
 ```

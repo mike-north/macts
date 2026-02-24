@@ -9,5 +9,5 @@ The Middle name of this person.
 **Signature:**
 
 ```typescript
-middleName: string;
+middleName: string
 ```

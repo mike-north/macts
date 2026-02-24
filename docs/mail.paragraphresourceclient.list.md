@@ -11,7 +11,7 @@ List all paragraphs.
 ```typescript
 list(): Promise<Paragraph[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Paragraph](./mail.paragraph.md)<!-- -->\[\]&gt;
-

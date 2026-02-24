@@ -9,5 +9,5 @@ Country part of the address.
 **Signature:**
 
 ```typescript
-country: string;
+country: string
 ```

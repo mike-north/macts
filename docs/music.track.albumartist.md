@@ -9,5 +9,5 @@ the album artist of the track
 **Signature:**
 
 ```typescript
-albumArtist: string;
+albumArtist: string
 ```

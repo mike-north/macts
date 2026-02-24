@@ -9,7 +9,7 @@ Input for updating a ScrollBar
 **Signature:**
 
 ```typescript
-type ScrollBarUpdateInput = Partial<ScrollBarCreateInput>;
+type ScrollBarUpdateInput = Partial<ScrollBarCreateInput>
 ```
-**References:** [ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)
 
+**References:** [ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)

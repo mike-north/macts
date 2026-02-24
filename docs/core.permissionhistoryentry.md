@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PermissionHistoryEntry = z.infer<typeof PermissionHistoryEntrySchema>;
+type PermissionHistoryEntry = z.infer<typeof PermissionHistoryEntrySchema>
 ```
-**References:** [PermissionHistoryEntrySchema](./core.permissionhistoryentryschema.md)
 
+**References:** [PermissionHistoryEntrySchema](./core.permissionhistoryentryschema.md)

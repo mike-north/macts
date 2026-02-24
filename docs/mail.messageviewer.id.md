@@ -9,5 +9,5 @@ The unique identifier of the message viewer
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

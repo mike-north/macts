@@ -9,7 +9,7 @@ Input for creating a Alias
 **Signature:**
 
 ```typescript
-interface AliasCreateInput 
+interface AliasCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface AliasCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [creatorType?](./system-events.aliascreateinput.creatortype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the OSType identifying the application that created the alias
-
 
 </td></tr>
 <tr><td>
 
 [defaultApplication?](./system-events.aliascreateinput.defaultapplication.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the application that will launch if the alias is opened
-
 
 </td></tr>
 <tr><td>
 
 [fileType?](./system-events.aliascreateinput.filetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the OSType identifying the type of data contained in the alias
-
 
 </td></tr>
 <tr><td>
 
 [stationery?](./system-events.aliascreateinput.stationery.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Is the alias a stationery pad?
 
-
 </td></tr>
 </tbody></table>
-

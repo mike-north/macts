@@ -9,5 +9,5 @@ The name of the reminder
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

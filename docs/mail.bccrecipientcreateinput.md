@@ -9,5 +9,5 @@ Input for creating a BccRecipient
 **Signature:**
 
 ```typescript
-interface BccRecipientCreateInput 
+interface BccRecipientCreateInput
 ```

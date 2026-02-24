@@ -9,7 +9,7 @@ Client for a radio button group belonging to a window.
 **Signature:**
 
 ```typescript
-declare class RadioGroupResourceClient 
+declare class RadioGroupResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RadioGroupResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.radiogroupresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RadioGroupResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RadioGroupResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.radiogroupresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new radiogroup.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.radiogroupresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a radiogroup.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.radiogroupresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a radiogroup by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.radiogroupresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all radiogroups.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.radiogroupresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing radiogroup.
 
-
 </td></tr>
 </tbody></table>
-

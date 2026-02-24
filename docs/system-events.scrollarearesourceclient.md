@@ -9,7 +9,7 @@ Client for a scroll area belonging to a window.
 **Signature:**
 
 ```typescript
-declare class ScrollAreaResourceClient 
+declare class ScrollAreaResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScrollAreaResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scrollarearesourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScrollAreaResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScrollAreaResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scrollarearesourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scrollarea.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scrollarearesourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scrollarea.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scrollarearesourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scrollarea by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scrollarearesourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scrollareas.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scrollarearesourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scrollarea.
 
-
 </td></tr>
 </tbody></table>
-

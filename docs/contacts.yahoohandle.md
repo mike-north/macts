@@ -9,7 +9,7 @@ User name for Yahoo instant messaging.
 **Signature:**
 
 ```typescript
-interface YahooHandle 
+interface YahooHandle
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface YahooHandle
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.yahoohandle.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this handle
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.yahoohandle.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.yahoohandle.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Yahoo handle value
 
-
 </td></tr>
 </tbody></table>
-

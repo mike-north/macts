@@ -9,7 +9,7 @@ Input for creating a File
 **Signature:**
 
 ```typescript
-interface FileCreateInput 
+interface FileCreateInput
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface FileCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [creatorType?](./finder.filecreateinput.creatortype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the OSType identifying the application that created the item
-
 
 </td></tr>
 <tr><td>
 
 [fileType?](./finder.filecreateinput.filetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the OSType identifying the type of data contained in the item
-
 
 </td></tr>
 <tr><td>
 
 [stationery?](./finder.filecreateinput.stationery.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Is the file a stationery pad?
 
-
 </td></tr>
 </tbody></table>
-

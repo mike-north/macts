@@ -9,5 +9,5 @@ If rule matches, mark message as read
 **Signature:**
 
 ```typescript
-markRead: boolean;
+markRead: boolean
 ```

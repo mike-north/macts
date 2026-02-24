@@ -9,5 +9,5 @@ The current playback time in seconds
 **Signature:**
 
 ```typescript
-currentTime: number;
+currentTime: number
 ```

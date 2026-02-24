@@ -9,5 +9,5 @@ the unique id for this disk (unchanged while disk remains connected and Finder r
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

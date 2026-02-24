@@ -10,176 +10,144 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ArtworkResourceClient](./tv.artworkresourceclient.md)
 
-
 </td><td>
 
 Client for a piece of art within a track or playlist.
-
 
 </td></tr>
 <tr><td>
 
 [BrowserWindowResourceClient](./tv.browserwindowresourceclient.md)
 
-
 </td><td>
 
 Client for the main window.
-
 
 </td></tr>
 <tr><td>
 
 [FileTrackResourceClient](./tv.filetrackresourceclient.md)
 
-
 </td><td>
 
 Client for a track representing a video file.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./tv.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [LibraryPlaylistResourceClient](./tv.libraryplaylistresourceclient.md)
 
-
 </td><td>
 
 Client for the main library playlist.
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistResourceClient](./tv.playlistresourceclient.md)
 
-
 </td><td>
 
 Client for a list of tracks/streams.
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistWindowResourceClient](./tv.playlistwindowresourceclient.md)
 
-
 </td><td>
 
 Client for a sub-window showing a single playlist.
-
 
 </td></tr>
 <tr><td>
 
 [SharedTrackResourceClient](./tv.sharedtrackresourceclient.md)
 
-
 </td><td>
 
 Client for a track residing in a shared library.
-
 
 </td></tr>
 <tr><td>
 
 [SourceResourceClient](./tv.sourceresourceclient.md)
 
-
 </td><td>
 
 Client for a media source (library, cd, device, etc.).
-
 
 </td></tr>
 <tr><td>
 
 [TrackResourceClient](./tv.trackresourceclient.md)
 
-
 </td><td>
 
 Client for playable video source.
-
 
 </td></tr>
 <tr><td>
 
 [TVClient](./tv.tvclient.md)
 
-
 </td><td>
 
 TV client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [TVError](./tv.tverror.md)
 
-
 </td><td>
 
 Error class for TV API errors.
-
 
 </td></tr>
 <tr><td>
 
 [URLTrackResourceClient](./tv.urltrackresourceclient.md)
 
-
 </td><td>
 
 Client for a track representing a network stream.
-
 
 </td></tr>
 <tr><td>
 
 [UserPlaylistResourceClient](./tv.userplaylistresourceclient.md)
 
-
 </td><td>
 
 Client for custom playlists created by the user.
-
 
 </td></tr>
 <tr><td>
 
 [VideoWindowResourceClient](./tv.videowindowresourceclient.md)
 
-
 </td><td>
 
 Client for the video window.
-
 
 </td></tr>
 </tbody></table>
@@ -190,286 +158,234 @@ Client for the video window.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [Artwork](./tv.artwork.md)
 
-
 </td><td>
 
 a piece of art within a track or playlist
-
 
 </td></tr>
 <tr><td>
 
 [ArtworkCreateInput](./tv.artworkcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Artwork
-
 
 </td></tr>
 <tr><td>
 
 [BrowserWindow](./tv.browserwindow.md)
 
-
 </td><td>
 
 the main window
-
 
 </td></tr>
 <tr><td>
 
 [BrowserWindowCreateInput](./tv.browserwindowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a BrowserWindow
-
 
 </td></tr>
 <tr><td>
 
 [FileTrack](./tv.filetrack.md)
 
-
 </td><td>
 
 a track representing a video file
-
 
 </td></tr>
 <tr><td>
 
 [FileTrackCreateInput](./tv.filetrackcreateinput.md)
 
-
 </td><td>
 
 Input for creating a FileTrack
-
 
 </td></tr>
 <tr><td>
 
 [LibraryPlaylist](./tv.libraryplaylist.md)
 
-
 </td><td>
 
 the main library playlist
-
 
 </td></tr>
 <tr><td>
 
 [LibraryPlaylistCreateInput](./tv.libraryplaylistcreateinput.md)
 
-
 </td><td>
 
 Input for creating a LibraryPlaylist
-
 
 </td></tr>
 <tr><td>
 
 [Playlist](./tv.playlist.md)
 
-
 </td><td>
 
 a list of tracks/streams
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistCreateInput](./tv.playlistcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Playlist
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistWindow](./tv.playlistwindow.md)
 
-
 </td><td>
 
 a sub-window showing a single playlist
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistWindowCreateInput](./tv.playlistwindowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a PlaylistWindow
-
 
 </td></tr>
 <tr><td>
 
 [SharedTrack](./tv.sharedtrack.md)
 
-
 </td><td>
 
 a track residing in a shared library
-
 
 </td></tr>
 <tr><td>
 
 [SharedTrackCreateInput](./tv.sharedtrackcreateinput.md)
 
-
 </td><td>
 
 Input for creating a SharedTrack
-
 
 </td></tr>
 <tr><td>
 
 [Source](./tv.source.md)
 
-
 </td><td>
 
 a media source (library, CD, device, etc.)
-
 
 </td></tr>
 <tr><td>
 
 [SourceCreateInput](./tv.sourcecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Source
-
 
 </td></tr>
 <tr><td>
 
 [Track](./tv.track.md)
 
-
 </td><td>
 
 playable video source
-
 
 </td></tr>
 <tr><td>
 
 [TrackCreateInput](./tv.trackcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Track
-
 
 </td></tr>
 <tr><td>
 
 [TVClientOptions](./tv.tvclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [URLTrack](./tv.urltrack.md)
 
-
 </td><td>
 
 a track representing a network stream
-
 
 </td></tr>
 <tr><td>
 
 [URLTrackCreateInput](./tv.urltrackcreateinput.md)
 
-
 </td><td>
 
 Input for creating a URLTrack
-
 
 </td></tr>
 <tr><td>
 
 [UserPlaylist](./tv.userplaylist.md)
 
-
 </td><td>
 
 custom playlists created by the user
-
 
 </td></tr>
 <tr><td>
 
 [UserPlaylistCreateInput](./tv.userplaylistcreateinput.md)
 
-
 </td><td>
 
 Input for creating a UserPlaylist
-
 
 </td></tr>
 <tr><td>
 
 [VideoWindow](./tv.videowindow.md)
 
-
 </td><td>
 
 the video window
-
 
 </td></tr>
 <tr><td>
 
 [VideoWindowCreateInput](./tv.videowindowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a VideoWindow
-
 
 </td></tr>
 </tbody></table>
@@ -480,119 +396,93 @@ Input for creating a VideoWindow
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ArtworkSchema](./tv.artworkschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [BrowserWindowSchema](./tv.browserwindowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [FileTrackSchema](./tv.filetrackschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [LibraryPlaylistSchema](./tv.libraryplaylistschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistSchema](./tv.playlistschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistWindowSchema](./tv.playlistwindowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [SharedTrackSchema](./tv.sharedtrackschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [SourceSchema](./tv.sourceschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TrackSchema](./tv.trackschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [URLTrackSchema](./tv.urltrackschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [UserPlaylistSchema](./tv.userplaylistschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [VideoWindowSchema](./tv.videowindowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -603,210 +493,171 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ArtworkUpdateInput](./tv.artworkupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Artwork
-
 
 </td></tr>
 <tr><td>
 
 [BrowserWindowUpdateInput](./tv.browserwindowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a BrowserWindow
-
 
 </td></tr>
 <tr><td>
 
 [EMdK](./tv.emdk.md)
 
-
 </td><td>
 
 EMdK
-
 
 </td></tr>
 <tr><td>
 
 [EPlS](./tv.epls.md)
 
-
 </td><td>
 
 EPlS
-
 
 </td></tr>
 <tr><td>
 
 [ERtK](./tv.ertk.md)
 
-
 </td><td>
 
 ERtK
-
 
 </td></tr>
 <tr><td>
 
 [ESpK](./tv.espk.md)
 
-
 </td><td>
 
 ESpK
-
 
 </td></tr>
 <tr><td>
 
 [ESrA](./tv.esra.md)
 
-
 </td><td>
 
 ESrA
-
 
 </td></tr>
 <tr><td>
 
 [ESrc](./tv.esrc.md)
 
-
 </td><td>
 
 ESrc
-
 
 </td></tr>
 <tr><td>
 
 [FileTrackUpdateInput](./tv.filetrackupdateinput.md)
 
-
 </td><td>
 
 Input for updating a FileTrack
-
 
 </td></tr>
 <tr><td>
 
 [LibraryPlaylistUpdateInput](./tv.libraryplaylistupdateinput.md)
 
-
 </td><td>
 
 Input for updating a LibraryPlaylist
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistUpdateInput](./tv.playlistupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Playlist
-
 
 </td></tr>
 <tr><td>
 
 [PlaylistWindowUpdateInput](./tv.playlistwindowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a PlaylistWindow
-
 
 </td></tr>
 <tr><td>
 
 [SharedTrackUpdateInput](./tv.sharedtrackupdateinput.md)
 
-
 </td><td>
 
 Input for updating a SharedTrack
-
 
 </td></tr>
 <tr><td>
 
 [SourceUpdateInput](./tv.sourceupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Source
-
 
 </td></tr>
 <tr><td>
 
 [TrackUpdateInput](./tv.trackupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Track
-
 
 </td></tr>
 <tr><td>
 
 [URLTrackUpdateInput](./tv.urltrackupdateinput.md)
 
-
 </td><td>
 
 Input for updating a URLTrack
-
 
 </td></tr>
 <tr><td>
 
 [UserPlaylistUpdateInput](./tv.userplaylistupdateinput.md)
 
-
 </td><td>
 
 Input for updating a UserPlaylist
-
 
 </td></tr>
 <tr><td>
 
 [VideoWindowUpdateInput](./tv.videowindowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a VideoWindow
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,30 +18,24 @@ create(input: ParagraphCreateInput): Promise<Paragraph>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ParagraphCreateInput](./mail.paragraphcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Paragraph](./mail.paragraph.md)<!-- -->&gt;
-

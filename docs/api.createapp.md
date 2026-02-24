@@ -11,9 +11,12 @@ Useful for testing or custom server setups.
 **Signature:**
 
 ```typescript
-declare function createApp(manifests: AppManifest[], options?: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'>): Hono<{
-    Variables: AuthVariables;
-}>;
+declare function createApp(
+  manifests: AppManifest[],
+  options?: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'>
+): Hono<{
+  Variables: AuthVariables
+}>
 ```
 
 ## Parameters
@@ -22,48 +25,39 @@ declare function createApp(manifests: AppManifest[], options?: Pick<ServerOption
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifests
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)<!-- -->\[\]
 
-
 </td><td>
 
 Array of app manifests
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 Pick&lt;[ServerOptions](./api.serveroptions.md)<!-- -->, 'cors' \| 'logging' \| 'prettyJson'&gt;
 
-
 </td><td>
 
 _(Optional)_ Server configuration (only middleware options used)
-
 
 </td></tr>
 </tbody></table>
@@ -73,4 +67,3 @@ _(Optional)_ Server configuration (only middleware options used)
 Hono&lt;{ Variables: [AuthVariables](./api.authvariables.md)<!-- -->; }&gt;
 
 Configured Hono app
-

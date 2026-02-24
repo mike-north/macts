@@ -9,5 +9,5 @@ is this a Genius Playlist?
 **Signature:**
 
 ```typescript
-genius: boolean;
+genius: boolean
 ```

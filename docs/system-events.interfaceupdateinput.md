@@ -9,7 +9,7 @@ Input for updating a Interface
 **Signature:**
 
 ```typescript
-type InterfaceUpdateInput = Partial<InterfaceCreateInput>;
+type InterfaceUpdateInput = Partial<InterfaceCreateInput>
 ```
-**References:** [InterfaceCreateInput](./system-events.interfacecreateinput.md)
 
+**References:** [InterfaceCreateInput](./system-events.interfacecreateinput.md)

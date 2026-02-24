@@ -9,7 +9,7 @@ Input for updating a Source
 **Signature:**
 
 ```typescript
-type SourceUpdateInput = Partial<SourceCreateInput>;
+type SourceUpdateInput = Partial<SourceCreateInput>
 ```
-**References:** [SourceCreateInput](./music.sourcecreateinput.md)
 
+**References:** [SourceCreateInput](./music.sourcecreateinput.md)

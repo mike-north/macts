@@ -9,5 +9,5 @@ Input for creating a SubscriptionPlaylist
 **Signature:**
 
 ```typescript
-interface SubscriptionPlaylistCreateInput 
+interface SubscriptionPlaylistCreateInput
 ```

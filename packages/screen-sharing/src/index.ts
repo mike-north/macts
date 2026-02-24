@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-export { ScreenSharingClient, ScreenSharingError, HttpClient } from './client.js';
-export type { ScreenSharingClientOptions } from './client.js';
-export * from './types.js';
-export { ConnectionResourceClient } from './resources/connection.js';
+export { ScreenSharingClient, ScreenSharingError, HttpClient } from './client.js'
+export type { ScreenSharingClientOptions } from './client.js'
+export * from './types.js'
+export { ConnectionResourceClient } from './resources/connection.js'

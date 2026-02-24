@@ -9,5 +9,5 @@ Whether the viewer is sorted ascending or not
 **Signature:**
 
 ```typescript
-sortedAscending: boolean;
+sortedAscending: boolean
 ```

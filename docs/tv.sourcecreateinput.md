@@ -9,5 +9,5 @@ Input for creating a Source
 **Signature:**
 
 ```typescript
-interface SourceCreateInput 
+interface SourceCreateInput
 ```

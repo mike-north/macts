@@ -9,5 +9,5 @@ Enum
 **Signature:**
 
 ```typescript
-type Enum = 'standard' | 'detailed';
+type Enum = 'standard' | 'detailed'
 ```

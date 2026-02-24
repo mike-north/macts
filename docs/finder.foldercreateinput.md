@@ -9,5 +9,5 @@ Input for creating a Folder
 **Signature:**
 
 ```typescript
-interface FolderCreateInput 
+interface FolderCreateInput
 ```

@@ -18,30 +18,24 @@ create(input: UserPlaylistCreateInput): Promise<UserPlaylist>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [UserPlaylistCreateInput](./music.userplaylistcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[UserPlaylist](./music.userplaylist.md)<!-- -->&gt;
-

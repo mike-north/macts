@@ -9,5 +9,5 @@ Input for creating a EQWindow
 **Signature:**
 
 ```typescript
-interface EQWindowCreateInput 
+interface EQWindowCreateInput
 ```

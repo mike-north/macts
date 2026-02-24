@@ -9,5 +9,5 @@ Access level: read-only or read-write
 **Signature:**
 
 ```typescript
-access: 'r' | 'rw';
+access: 'r' | 'rw'
 ```

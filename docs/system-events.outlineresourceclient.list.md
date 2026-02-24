@@ -11,7 +11,7 @@ List all outlines.
 ```typescript
 list(): Promise<Outline[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Outline](./system-events.outline.md)<!-- -->\[\]&gt;
-

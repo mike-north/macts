@@ -11,7 +11,7 @@ List all mailalarms.
 ```typescript
 list(): Promise<MailAlarm[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MailAlarm](./calendar.mailalarm.md)<!-- -->\[\]&gt;
-

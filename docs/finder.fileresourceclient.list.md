@@ -11,7 +11,7 @@ List all files.
 ```typescript
 list(): Promise<File[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[File](./finder.file_2.md)<!-- -->\[\]&gt;
-

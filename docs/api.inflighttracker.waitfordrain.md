@@ -18,30 +18,24 @@ waitForDrain(timeoutMs: number): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 timeoutMs
 
-
 </td><td>
 
 number
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ number
 **Returns:**
 
 Promise&lt;void&gt;
-

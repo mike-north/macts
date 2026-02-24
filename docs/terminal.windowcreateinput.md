@@ -9,7 +9,7 @@ Input for creating a Window
 **Signature:**
 
 ```typescript
-interface WindowCreateInput 
+interface WindowCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface WindowCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [position?](./terminal.windowcreateinput.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The position of the window
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./terminal.windowcreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Whether the window is visible
 
-
 </td></tr>
 </tbody></table>
-

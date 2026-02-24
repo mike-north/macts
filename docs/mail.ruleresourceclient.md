@@ -9,7 +9,7 @@ Client for class for message rules.
 **Signature:**
 
 ```typescript
-declare class RuleResourceClient 
+declare class RuleResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RuleResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.ruleresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RuleResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RuleResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.ruleresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new rule.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.ruleresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a rule.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.ruleresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a rule by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.ruleresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all rules.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.ruleresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing rule.
 
-
 </td></tr>
 </tbody></table>
-

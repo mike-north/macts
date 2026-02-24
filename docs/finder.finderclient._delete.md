@@ -11,7 +11,7 @@ Move an item from its container to the trash
 ```typescript
 _delete(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -11,7 +11,7 @@ Get the hierarchy as a flat list of paths
 ```typescript
 getHierarchyPaths(): HierarchyPath[];
 ```
+
 **Returns:**
 
 HierarchyPath\[\]
-

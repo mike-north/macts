@@ -18,30 +18,24 @@ create(input: FolderCreateInput): Promise<Folder>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [FolderCreateInput](./finder.foldercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Folder](./finder.folder.md)<!-- -->&gt;
-

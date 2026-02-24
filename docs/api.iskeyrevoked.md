@@ -11,7 +11,7 @@ This is an optimized query that only checks revocation status.
 **Signature:**
 
 ```typescript
-declare function isKeyRevoked(keyId: string): boolean;
+declare function isKeyRevoked(keyId: string): boolean
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function isKeyRevoked(keyId: string): boolean;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 keyId
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Key ID to check
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ Key ID to check
 boolean
 
 True if the key exists and is revoked
-

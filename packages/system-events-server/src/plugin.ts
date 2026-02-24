@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import type { AppManifest } from '@macts/core';
+import type { AppManifest } from '@macts/core'
 
 /**
  * API plugin for SystemEvents.app.
@@ -18,3604 +18,3556 @@ export const systemEventsApiPlugin = {
   name: 'systemevents',
   bundleId: 'com.apple.systemevents',
   manifest: {
-  "version": "1.0",
-  "app": {
-    "bundleId": "com.apple.systemevents",
-    "name": "System Events",
-    "displayName": "System Events",
-    "tccEntitlements": [
-      "automation"
+    version: '1.0',
+    app: {
+      bundleId: 'com.apple.systemevents',
+      name: 'System Events',
+      displayName: 'System Events',
+      tccEntitlements: ['automation'],
+      distributionModel: 'system',
+    },
+    suites: [
+      {
+        name: 'System Events Suite',
+        description: 'Terms and Events for controlling the System Events application',
+        code: 'sevs',
+        resources: [],
+        commands: ['abortTransaction', 'beginTransaction', 'endTransaction'],
+        enums: ['SaveableFileFormat'],
+      },
+      {
+        name: 'Accounts Suite',
+        description: 'Terms and Events for controlling the users account settings',
+        code: 'acco',
+        resources: [],
+        commands: [],
+        enums: [],
+      },
+      {
+        name: 'Appearance Suite',
+        description: 'Terms for controlling Appearance preferences',
+        code: 'appz',
+        resources: [],
+        commands: [],
+        enums: ['ScrollPageBehaviors', 'FontSmoothingStyles', 'Appearances', 'HighlightColors'],
+      },
+      {
+        name: 'CD and DVD Preferences Suite',
+        description: 'Terms and Events for controlling the actions when inserting CDs and DVDs',
+        code: 'dhas',
+        resources: [],
+        commands: [],
+        enums: ['Dhac'],
+      },
+      {
+        name: 'Desktop Suite',
+        description: 'Terms and Events for controlling the desktop picture settings.',
+        code: 'dskp',
+        resources: [],
+        commands: [],
+        enums: ['DynamicStyle'],
+      },
+      {
+        name: 'Dock Preferences Suite',
+        description: 'Terms and Events for controlling the dock preferences',
+        code: 'dpas',
+        resources: [],
+        commands: [],
+        enums: ['Dpls', 'Dpef', 'Dpbh'],
+      },
+      {
+        name: 'Login Items Suite',
+        description: 'Terms and Events for controlling the Login Items application',
+        code: 'logi',
+        resources: [],
+        commands: [],
+        enums: [],
+      },
+      {
+        name: 'Network Preferences Suite',
+        description: 'Terms and Commands for manipulating and viewing network settings',
+        code: 'netz',
+        resources: [
+          'Configuration',
+          'Interface',
+          'Location',
+          'NetworkPreferencesObject',
+          'Service',
+        ],
+        commands: ['connect', 'disconnect'],
+        enums: [],
+      },
+      {
+        name: 'Screen Saver Suite',
+        description: 'Terms and Events for controlling screen saver settings.',
+        code: 'scsv',
+        resources: [],
+        commands: ['start', 'stop'],
+        enums: [],
+      },
+      {
+        name: 'Security Suite',
+        description: 'Terms for controlling Security preferences',
+        code: 'secu',
+        resources: [],
+        commands: [],
+        enums: [],
+      },
+      {
+        name: 'Disk-Folder-File Suite',
+        description: 'Terms and Events for controlling Disks, Folders, and Files',
+        code: 'cdis',
+        resources: [
+          'Alias',
+          'ClassicDomainObject',
+          'Disk',
+          'DiskItem',
+          'Domain',
+          'File',
+          'FilePackage',
+          'Folder',
+          'LocalDomainObject',
+          'NetworkDomainObject',
+          'SystemDomainObject',
+          'UserDomainObject',
+        ],
+        commands: ['delete', 'move', 'open'],
+        enums: ['Edfm'],
+      },
+      {
+        name: 'Power Suite',
+        description: 'Terms and Events for controlling System power',
+        code: 'powr',
+        resources: [],
+        commands: ['logOut', 'restart', 'shutDown', 'sleep'],
+        enums: [],
+      },
+      {
+        name: 'Processes Suite',
+        description: 'Terms and Events for controlling Processes',
+        code: 'prcs',
+        resources: [
+          'Action',
+          'Attribute',
+          'Browser',
+          'BusyIndicator',
+          'Button',
+          'Checkbox',
+          'ColorWell',
+          'Column',
+          'ComboBox',
+          'Drawer',
+          'Group',
+          'GrowArea',
+          'Image',
+          'Incrementor',
+          'List',
+          'Menu',
+          'MenuBar',
+          'MenuBarItem',
+          'MenuButton',
+          'MenuItem',
+          'Outline',
+          'PopOver',
+          'PopUpButton',
+          'Process',
+          'ProgressIndicator',
+          'RadioButton',
+          'RadioGroup',
+          'RelevanceIndicator',
+          'Row',
+          'ScrollArea',
+          'ScrollBar',
+          'Sheet',
+          'Slider',
+          'Splitter',
+          'SplitterGroup',
+          'StaticText',
+          'TabGroup',
+          'Table',
+          'TextArea',
+          'TextField',
+          'Toolbar',
+          'UIElement',
+          'ValueIndicator',
+        ],
+        commands: ['click', 'keyCode', 'keystroke', 'perform', 'select'],
+        enums: ['EMds', 'EMky'],
+      },
+      {
+        name: 'Property List Suite',
+        description: 'Terms and Events for accessing the content of Property List files',
+        code: 'pliz',
+        resources: ['PropertyListItem'],
+        commands: [],
+        enums: [],
+      },
+      {
+        name: 'XML Suite',
+        description: 'Terms and Events for accessing the content of XML files',
+        code: 'xmlz',
+        resources: ['XMLAttribute', 'XMLData', 'XMLElement'],
+        commands: [],
+        enums: [],
+      },
+      {
+        name: 'Type Definitions',
+        description: 'Records used in scripting System Events',
+        code: 'tpdf',
+        resources: [],
+        commands: [],
+        enums: ['Enum'],
+      },
+      {
+        name: 'Hidden Suite',
+        description: 'Hidden Terms and Events for controlling the System Events application',
+        code: 'tpnm',
+        resources: [],
+        commands: [
+          'attachActionTo',
+          'attachedScripts',
+          'cancel',
+          'confirm',
+          'decrement',
+          'doFolderAction',
+          'editActionOf',
+          'increment',
+          'keyDown',
+          'keyUp',
+          'pick',
+          'removeActionFrom',
+        ],
+        enums: ['Actn'],
+      },
+      {
+        name: 'Scripting Definition Suite',
+        description: 'Terms and Events for examining the System Events scripting definition',
+        code: 'sdef',
+        resources: [
+          'ScriptingClass',
+          'ScriptingCommand',
+          'ScriptingDefinitionObject',
+          'ScriptingElement',
+          'ScriptingEnumeration',
+          'ScriptingEnumerator',
+          'ScriptingParameter',
+          'ScriptingProperty',
+          'ScriptingSuite',
+        ],
+        commands: [],
+        enums: ['Accs'],
+      },
     ],
-    "distributionModel": "system"
-  },
-  "suites": [
-    {
-      "name": "System Events Suite",
-      "description": "Terms and Events for controlling the System Events application",
-      "code": "sevs",
-      "resources": [],
-      "commands": [
-        "abortTransaction",
-        "beginTransaction",
-        "endTransaction"
-      ],
-      "enums": [
-        "SaveableFileFormat"
-      ]
-    },
-    {
-      "name": "Accounts Suite",
-      "description": "Terms and Events for controlling the users account settings",
-      "code": "acco",
-      "resources": [],
-      "commands": [],
-      "enums": []
-    },
-    {
-      "name": "Appearance Suite",
-      "description": "Terms for controlling Appearance preferences",
-      "code": "appz",
-      "resources": [],
-      "commands": [],
-      "enums": [
-        "ScrollPageBehaviors",
-        "FontSmoothingStyles",
-        "Appearances",
-        "HighlightColors"
-      ]
-    },
-    {
-      "name": "CD and DVD Preferences Suite",
-      "description": "Terms and Events for controlling the actions when inserting CDs and DVDs",
-      "code": "dhas",
-      "resources": [],
-      "commands": [],
-      "enums": [
-        "Dhac"
-      ]
-    },
-    {
-      "name": "Desktop Suite",
-      "description": "Terms and Events for controlling the desktop picture settings.",
-      "code": "dskp",
-      "resources": [],
-      "commands": [],
-      "enums": [
-        "DynamicStyle"
-      ]
-    },
-    {
-      "name": "Dock Preferences Suite",
-      "description": "Terms and Events for controlling the dock preferences",
-      "code": "dpas",
-      "resources": [],
-      "commands": [],
-      "enums": [
-        "Dpls",
-        "Dpef",
-        "Dpbh"
-      ]
-    },
-    {
-      "name": "Login Items Suite",
-      "description": "Terms and Events for controlling the Login Items application",
-      "code": "logi",
-      "resources": [],
-      "commands": [],
-      "enums": []
-    },
-    {
-      "name": "Network Preferences Suite",
-      "description": "Terms and Commands for manipulating and viewing network settings",
-      "code": "netz",
-      "resources": [
-        "Configuration",
-        "Interface",
-        "Location",
-        "NetworkPreferencesObject",
-        "Service"
-      ],
-      "commands": [
-        "connect",
-        "disconnect"
-      ],
-      "enums": []
-    },
-    {
-      "name": "Screen Saver Suite",
-      "description": "Terms and Events for controlling screen saver settings.",
-      "code": "scsv",
-      "resources": [],
-      "commands": [
-        "start",
-        "stop"
-      ],
-      "enums": []
-    },
-    {
-      "name": "Security Suite",
-      "description": "Terms for controlling Security preferences",
-      "code": "secu",
-      "resources": [],
-      "commands": [],
-      "enums": []
-    },
-    {
-      "name": "Disk-Folder-File Suite",
-      "description": "Terms and Events for controlling Disks, Folders, and Files",
-      "code": "cdis",
-      "resources": [
-        "Alias",
-        "ClassicDomainObject",
-        "Disk",
-        "DiskItem",
-        "Domain",
-        "File",
-        "FilePackage",
-        "Folder",
-        "LocalDomainObject",
-        "NetworkDomainObject",
-        "SystemDomainObject",
-        "UserDomainObject"
-      ],
-      "commands": [
-        "delete",
-        "move",
-        "open"
-      ],
-      "enums": [
-        "Edfm"
-      ]
-    },
-    {
-      "name": "Power Suite",
-      "description": "Terms and Events for controlling System power",
-      "code": "powr",
-      "resources": [],
-      "commands": [
-        "logOut",
-        "restart",
-        "shutDown",
-        "sleep"
-      ],
-      "enums": []
-    },
-    {
-      "name": "Processes Suite",
-      "description": "Terms and Events for controlling Processes",
-      "code": "prcs",
-      "resources": [
-        "Action",
-        "Attribute",
-        "Browser",
-        "BusyIndicator",
-        "Button",
-        "Checkbox",
-        "ColorWell",
-        "Column",
-        "ComboBox",
-        "Drawer",
-        "Group",
-        "GrowArea",
-        "Image",
-        "Incrementor",
-        "List",
-        "Menu",
-        "MenuBar",
-        "MenuBarItem",
-        "MenuButton",
-        "MenuItem",
-        "Outline",
-        "PopOver",
-        "PopUpButton",
-        "Process",
-        "ProgressIndicator",
-        "RadioButton",
-        "RadioGroup",
-        "RelevanceIndicator",
-        "Row",
-        "ScrollArea",
-        "ScrollBar",
-        "Sheet",
-        "Slider",
-        "Splitter",
-        "SplitterGroup",
-        "StaticText",
-        "TabGroup",
-        "Table",
-        "TextArea",
-        "TextField",
-        "Toolbar",
-        "UIElement",
-        "ValueIndicator"
-      ],
-      "commands": [
-        "click",
-        "keyCode",
-        "keystroke",
-        "perform",
-        "select"
-      ],
-      "enums": [
-        "EMds",
-        "EMky"
-      ]
-    },
-    {
-      "name": "Property List Suite",
-      "description": "Terms and Events for accessing the content of Property List files",
-      "code": "pliz",
-      "resources": [
-        "PropertyListItem"
-      ],
-      "commands": [],
-      "enums": []
-    },
-    {
-      "name": "XML Suite",
-      "description": "Terms and Events for accessing the content of XML files",
-      "code": "xmlz",
-      "resources": [
-        "XMLAttribute",
-        "XMLData",
-        "XMLElement"
-      ],
-      "commands": [],
-      "enums": []
-    },
-    {
-      "name": "Type Definitions",
-      "description": "Records used in scripting System Events",
-      "code": "tpdf",
-      "resources": [],
-      "commands": [],
-      "enums": [
-        "Enum"
-      ]
-    },
-    {
-      "name": "Hidden Suite",
-      "description": "Hidden Terms and Events for controlling the System Events application",
-      "code": "tpnm",
-      "resources": [],
-      "commands": [
-        "attachActionTo",
-        "attachedScripts",
-        "cancel",
-        "confirm",
-        "decrement",
-        "doFolderAction",
-        "editActionOf",
-        "increment",
-        "keyDown",
-        "keyUp",
-        "pick",
-        "removeActionFrom"
-      ],
-      "enums": [
-        "Actn"
-      ]
-    },
-    {
-      "name": "Scripting Definition Suite",
-      "description": "Terms and Events for examining the System Events scripting definition",
-      "code": "sdef",
-      "resources": [
-        "ScriptingClass",
-        "ScriptingCommand",
-        "ScriptingDefinitionObject",
-        "ScriptingElement",
-        "ScriptingEnumeration",
-        "ScriptingEnumerator",
-        "ScriptingParameter",
-        "ScriptingProperty",
-        "ScriptingSuite"
-      ],
-      "commands": [],
-      "enums": [
-        "Accs"
-      ]
-    }
-  ],
-  "resources": {
-    "Configuration": {
-      "name": "Configuration",
-      "plural": "Configurations",
-      "description": "A collection of settings for configuring a connection",
-      "code": "conF",
-      "properties": {
-        "accountName": {
-          "access": "rw",
-          "type": "string",
-          "description": "the name used to authenticate",
-          "code": "user",
-          "optional": false
+    resources: {
+      Configuration: {
+        name: 'Configuration',
+        plural: 'Configurations',
+        description: 'A collection of settings for configuring a connection',
+        code: 'conF',
+        properties: {
+          accountName: {
+            access: 'rw',
+            type: 'string',
+            description: 'the name used to authenticate',
+            code: 'user',
+            optional: false,
+          },
+          connected: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the configuration connected?',
+            code: 'conn',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier for the configuration',
+            code: 'ID  ',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the configuration',
+            code: 'pnam',
+            optional: false,
+          },
         },
-        "connected": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the configuration connected?",
-          "code": "conn",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier for the configuration",
-          "code": "ID  ",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the configuration",
-          "code": "pnam",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "Interface": {
-      "name": "Interface",
-      "plural": "Interfaces",
-      "description": "A collection of settings for a network interface",
-      "code": "intf",
-      "properties": {
-        "automatic": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "configure the interface speed, duplex, and mtu automatically?",
-          "code": "auto",
-          "optional": false
+      Interface: {
+        name: 'Interface',
+        plural: 'Interfaces',
+        description: 'A collection of settings for a network interface',
+        code: 'intf',
+        properties: {
+          automatic: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'configure the interface speed, duplex, and mtu automatically?',
+            code: 'auto',
+            optional: false,
+          },
+          duplex: {
+            access: 'rw',
+            type: 'string',
+            description: 'the duplex setting  half | full | full with flow control',
+            code: 'dupl',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier for the interface',
+            code: 'ID  ',
+            optional: false,
+          },
+          kind: {
+            access: 'r',
+            type: 'string',
+            description: 'the type of interface',
+            code: 'kind',
+            optional: false,
+          },
+          mACAddress: {
+            access: 'r',
+            type: 'string',
+            description: 'the MAC address for the interface',
+            code: 'maca',
+            optional: false,
+          },
+          mtu: {
+            access: 'rw',
+            type: 'integer',
+            description: 'the packet size',
+            code: 'mtu',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the interface',
+            code: 'pnam',
+            optional: false,
+          },
+          speed: {
+            access: 'rw',
+            type: 'integer',
+            description: 'ethernet speed 10 | 100 | 1000',
+            code: 'sped',
+            optional: false,
+          },
         },
-        "duplex": {
-          "access": "rw",
-          "type": "string",
-          "description": "the duplex setting  half | full | full with flow control",
-          "code": "dupl",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier for the interface",
-          "code": "ID  ",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "the type of interface",
-          "code": "kind",
-          "optional": false
-        },
-        "mACAddress": {
-          "access": "r",
-          "type": "string",
-          "description": "the MAC address for the interface",
-          "code": "maca",
-          "optional": false
-        },
-        "mtu": {
-          "access": "rw",
-          "type": "integer",
-          "description": "the packet size",
-          "code": "mtu",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the interface",
-          "code": "pnam",
-          "optional": false
-        },
-        "speed": {
-          "access": "rw",
-          "type": "integer",
-          "description": "ethernet speed 10 | 100 | 1000",
-          "code": "sped",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "Location": {
-      "name": "Location",
-      "plural": "Locations",
-      "description": "A set of services",
-      "code": "loca",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier for the location",
-          "code": "ID  ",
-          "optional": false
+      Location: {
+        name: 'Location',
+        plural: 'Locations',
+        description: 'A set of services',
+        code: 'loca',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier for the location',
+            code: 'ID  ',
+            optional: false,
+          },
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'the name of the location',
+            code: 'pnam',
+            optional: false,
+          },
         },
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "the name of the location",
-          "code": "pnam",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "NetworkPreferencesObject": {
-      "name": "NetworkPreferencesObject",
-      "plural": "NetworkPreferencesObjects",
-      "description": "the preferences for the current user's network",
-      "code": "neto",
-      "properties": {
-        "currentLocation": {
-          "access": "rw",
-          "type": {
-            "resource": "location"
+      NetworkPreferencesObject: {
+        name: 'NetworkPreferencesObject',
+        plural: 'NetworkPreferencesObjects',
+        description: "the preferences for the current user's network",
+        code: 'neto',
+        properties: {
+          currentLocation: {
+            access: 'rw',
+            type: {
+              resource: 'location',
+            },
+            description: 'the current location',
+            code: 'locc',
+            optional: false,
           },
-          "description": "the current location",
-          "code": "locc",
-          "optional": false
-        }
-      }
-    },
-    "Service": {
-      "name": "Service",
-      "plural": "Services",
-      "description": "A collection of settings for a network service",
-      "code": "svce",
-      "properties": {
-        "active": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the service active?",
-          "code": "acti",
-          "optional": false
         },
-        "currentConfiguration": {
-          "access": "rw",
-          "type": {
-            "resource": "configuration"
-          },
-          "description": "the currently selected configuration",
-          "code": "cnfg",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier for the service",
-          "code": "ID  ",
-          "optional": false
-        },
-        "interface": {
-          "access": "r",
-          "type": {
-            "resource": "interface"
-          },
-          "description": "the interface the service is built on",
-          "code": "intf",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "integer",
-          "description": "the type of service",
-          "code": "kind",
-          "optional": false
-        },
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "the name of the service",
-          "code": "pnam",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "Alias": {
-      "name": "Alias",
-      "plural": "Aliases",
-      "description": "An alias in the file system",
-      "code": "alis",
-      "properties": {
-        "creatorType": {
-          "access": "rw",
-          "type": "string",
-          "description": "the OSType identifying the application that created the alias",
-          "code": "fcrt",
-          "optional": false
-        },
-        "defaultApplication": {
-          "access": "rw",
-          "type": "string",
-          "description": "the application that will launch if the alias is opened",
-          "code": "asda",
-          "optional": false
-        },
-        "fileType": {
-          "access": "rw",
-          "type": "string",
-          "description": "the OSType identifying the type of data contained in the alias",
-          "code": "asty",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "The kind of alias, as shown in Finder",
-          "code": "kind",
-          "optional": false
-        },
-        "productVersion": {
-          "access": "r",
-          "type": "string",
-          "description": "the version of the product (visible at the top of the \"Get Info\" window)",
-          "code": "ver2",
-          "optional": false
-        },
-        "shortVersion": {
-          "access": "r",
-          "type": "string",
-          "description": "the short version of the application bundle referenced by the alias",
-          "code": "assv",
-          "optional": false
-        },
-        "stationery": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Is the alias a stationery pad?",
-          "code": "pspd",
-          "optional": false
-        },
-        "typeIdentifier": {
-          "access": "r",
-          "type": "string",
-          "description": "The type identifier of the alias",
-          "code": "utid",
-          "optional": false
-        },
-        "version": {
-          "access": "r",
-          "type": "string",
-          "description": "the version of the application bundle referenced by the alias (visible at the bottom of the \"Get Info\" window)",
-          "code": "vers",
-          "optional": false
-        }
-      }
-    },
-    "ClassicDomainObject": {
-      "name": "ClassicDomainObject",
-      "plural": "ClassicDomainObjects",
-      "description": "The Classic domain in the file system",
-      "code": "domc",
-      "properties": {
-        "appleMenuFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+      Service: {
+        name: 'Service',
+        plural: 'Services',
+        description: 'A collection of settings for a network service',
+        code: 'svce',
+        properties: {
+          active: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the service active?',
+            code: 'acti',
+            optional: false,
           },
-          "description": "The Apple Menu Items folder",
-          "code": "amnu",
-          "optional": false
-        },
-        "controlPanelsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          currentConfiguration: {
+            access: 'rw',
+            type: {
+              resource: 'configuration',
+            },
+            description: 'the currently selected configuration',
+            code: 'cnfg',
+            optional: false,
           },
-          "description": "The Control Panels folder",
-          "code": "ctrl",
-          "optional": false
-        },
-        "controlStripModulesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier for the service',
+            code: 'ID  ',
+            optional: false,
           },
-          "description": "The Control Strip Modules folder",
-          "code": "sdev",
-          "optional": false
-        },
-        "desktopFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          interface: {
+            access: 'r',
+            type: {
+              resource: 'interface',
+            },
+            description: 'the interface the service is built on',
+            code: 'intf',
+            optional: false,
           },
-          "description": "The Classic Desktop folder",
-          "code": "desk",
-          "optional": false
-        },
-        "extensionsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          kind: {
+            access: 'r',
+            type: 'integer',
+            description: 'the type of service',
+            code: 'kind',
+            optional: false,
           },
-          "description": "The Extensions folder",
-          "code": "extz",
-          "optional": false
-        },
-        "fontsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'the name of the service',
+            code: 'pnam',
+            optional: false,
           },
-          "description": "The Fonts folder",
-          "code": "font",
-          "optional": false
         },
-        "launcherItemsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
           },
-          "description": "The Launcher Items folder",
-          "code": "laun",
-          "optional": false
-        },
-        "preferencesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Classic Preferences folder",
-          "code": "pref",
-          "optional": false
-        },
-        "shutdownFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Shutdown Items folder",
-          "code": "shdf",
-          "optional": false
-        },
-        "startupItemsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The StartupItems folder",
-          "code": "empz",
-          "optional": false
-        },
-        "systemFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The System folder",
-          "code": "macs",
-          "optional": false
-        }
-      }
-    },
-    "Disk": {
-      "name": "Disk",
-      "plural": "Disks",
-      "description": "A disk in the file system",
-      "code": "cdis",
-      "properties": {
-        "capacity": {
-          "access": "r",
-          "type": "number",
-          "description": "the total number of bytes (free or used) on the disk",
-          "code": "capa",
-          "optional": false
-        },
-        "ejectable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Can the media be ejected (floppies, CD's, and so on)?",
-          "code": "isej",
-          "optional": false
-        },
-        "format": {
-          "access": "r",
-          "type": "string",
-          "description": "the file system format of this disk",
-          "code": "dfmt",
-          "optional": false
-        },
-        "freeSpace": {
-          "access": "r",
-          "type": "number",
-          "description": "the number of free bytes left on the disk",
-          "code": "frsp",
-          "optional": false
-        },
-        "ignorePrivileges": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Ignore permissions on this disk?",
-          "code": "igpr",
-          "optional": false
-        },
-        "localVolume": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the media a local volume (as opposed to a file server)?",
-          "code": "isrv",
-          "optional": false
-        },
-        "server": {
-          "access": "r",
-          "type": "string",
-          "description": "the server on which the disk resides, AFP volumes only",
-          "code": "srvr",
-          "optional": false
-        },
-        "startup": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is this disk the boot disk?",
-          "code": "istd",
-          "optional": false
-        },
-        "zone": {
-          "access": "r",
-          "type": "string",
-          "description": "the zone in which the disk's server resides, AFP volumes only",
-          "code": "zone",
-          "optional": false
-        }
-      }
-    },
-    "DiskItem": {
-      "name": "DiskItem",
-      "plural": "DiskItems",
-      "description": "An item stored in the file system",
-      "code": "ditm",
-      "properties": {
-        "busyStatus": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the disk item busy?",
-          "code": "busy",
-          "optional": false
-        },
-        "container": {
-          "access": "r",
-          "type": {
-            "resource": "disk item"
-          },
-          "description": "the folder or disk which has this disk item as an element",
-          "code": "ctnr",
-          "optional": false
-        },
-        "creationDate": {
-          "access": "r",
-          "type": "date",
-          "description": "the date on which the disk item was created",
-          "code": "ascd",
-          "optional": false
-        },
-        "displayedName": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the disk item as displayed in the User Interface",
-          "code": "dnam",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique ID of the disk item",
-          "code": "ID  ",
-          "optional": false
-        },
-        "modificationDate": {
-          "access": "rw",
-          "type": "date",
-          "description": "the date on which the disk item was last modified",
-          "code": "asmo",
-          "optional": false
-        },
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "the name of the disk item",
-          "code": "pnam",
-          "optional": false
-        },
-        "nameExtension": {
-          "access": "r",
-          "type": "string",
-          "description": "the extension portion of the name",
-          "code": "extn",
-          "optional": false
-        },
-        "packageFolder": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the disk item a package?",
-          "code": "pkgf",
-          "optional": false
-        },
-        "path": {
-          "access": "r",
-          "type": "string",
-          "description": "the file system path of the disk item",
-          "code": "ppth",
-          "optional": false
-        },
-        "physicalSize": {
-          "access": "r",
-          "type": "integer",
-          "description": "the actual space used by the disk item on disk",
-          "code": "phys",
-          "optional": false
-        },
-        "pOSIXPath": {
-          "access": "r",
-          "type": "string",
-          "description": "the POSIX file system path of the disk item",
-          "code": "posx",
-          "optional": false
-        },
-        "size": {
-          "access": "r",
-          "type": "integer",
-          "description": "the logical size of the disk item",
-          "code": "ptsz",
-          "optional": false
-        },
-        "uRL": {
-          "access": "r",
-          "type": "string",
-          "description": "the URL of the disk item",
-          "code": "url",
-          "optional": false
-        },
-        "visible": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Is the disk item visible?",
-          "code": "pvis",
-          "optional": false
-        },
-        "volume": {
-          "access": "r",
-          "type": "string",
-          "description": "the volume on which the disk item resides",
-          "code": "volu",
-          "optional": false
-        }
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "Domain": {
-      "name": "Domain",
-      "plural": "Domains",
-      "description": "A domain in the file system",
-      "code": "doma",
-      "properties": {
-        "applicationSupportFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+      Alias: {
+        name: 'Alias',
+        plural: 'Aliases',
+        description: 'An alias in the file system',
+        code: 'alis',
+        properties: {
+          creatorType: {
+            access: 'rw',
+            type: 'string',
+            description: 'the OSType identifying the application that created the alias',
+            code: 'fcrt',
+            optional: false,
           },
-          "description": "The Application Support folder",
-          "code": "asup",
-          "optional": false
-        },
-        "applicationsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          defaultApplication: {
+            access: 'rw',
+            type: 'string',
+            description: 'the application that will launch if the alias is opened',
+            code: 'asda',
+            optional: false,
           },
-          "description": "The Applications folder",
-          "code": "apps",
-          "optional": false
-        },
-        "desktopPicturesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          fileType: {
+            access: 'rw',
+            type: 'string',
+            description: 'the OSType identifying the type of data contained in the alias',
+            code: 'asty',
+            optional: false,
           },
-          "description": "The Desktop Pictures folder",
-          "code": "dtp$",
-          "optional": false
-        },
-        "folderActionScriptsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          kind: {
+            access: 'r',
+            type: 'string',
+            description: 'The kind of alias, as shown in Finder',
+            code: 'kind',
+            optional: false,
           },
-          "description": "The Folder Action Scripts folder",
-          "code": "fasf",
-          "optional": false
-        },
-        "fontsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          productVersion: {
+            access: 'r',
+            type: 'string',
+            description: 'the version of the product (visible at the top of the "Get Info" window)',
+            code: 'ver2',
+            optional: false,
           },
-          "description": "The Fonts folder",
-          "code": "font",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier of the domain",
-          "code": "ID  ",
-          "optional": false
-        },
-        "libraryFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          shortVersion: {
+            access: 'r',
+            type: 'string',
+            description: 'the short version of the application bundle referenced by the alias',
+            code: 'assv',
+            optional: false,
           },
-          "description": "The Library folder",
-          "code": "dlib",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the domain",
-          "code": "pnam",
-          "optional": false
-        },
-        "preferencesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          stationery: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Is the alias a stationery pad?',
+            code: 'pspd',
+            optional: false,
           },
-          "description": "The Preferences folder",
-          "code": "pref",
-          "optional": false
-        },
-        "scriptingAdditionsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          typeIdentifier: {
+            access: 'r',
+            type: 'string',
+            description: 'The type identifier of the alias',
+            code: 'utid',
+            optional: false,
           },
-          "description": "The Scripting Additions folder",
-          "code": "$scr",
-          "optional": false
-        },
-        "scriptsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          version: {
+            access: 'r',
+            type: 'string',
+            description:
+              'the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window)',
+            code: 'vers',
+            optional: false,
           },
-          "description": "The Scripts folder",
-          "code": "scr$",
-          "optional": false
         },
-        "sharedDocumentsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Shared Documents folder",
-          "code": "sdat",
-          "optional": false
-        },
-        "speakableItemsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Speakable Items folder",
-          "code": "spki",
-          "optional": false
-        },
-        "utilitiesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Utilities folder",
-          "code": "uti$",
-          "optional": false
-        },
-        "workflowsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
-          },
-          "description": "The Automator Workflows folder",
-          "code": "flow",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "File": {
-      "name": "File",
-      "plural": "Files",
-      "description": "A file in the file system",
-      "code": "file",
-      "properties": {
-        "creatorType": {
-          "access": "rw",
-          "type": "string",
-          "description": "the OSType identifying the application that created the file",
-          "code": "fcrt",
-          "optional": false
-        },
-        "defaultApplication": {
-          "access": "rw",
-          "type": "string",
-          "description": "the application that will launch if the file is opened",
-          "code": "asda",
-          "optional": false
-        },
-        "fileType": {
-          "access": "rw",
-          "type": "string",
-          "description": "the OSType identifying the type of data contained in the file",
-          "code": "asty",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "The kind of file, as shown in Finder",
-          "code": "kind",
-          "optional": false
-        },
-        "productVersion": {
-          "access": "r",
-          "type": "string",
-          "description": "the version of the product (visible at the top of the \"Get Info\" window)",
-          "code": "ver2",
-          "optional": false
-        },
-        "shortVersion": {
-          "access": "r",
-          "type": "string",
-          "description": "the short version of the file",
-          "code": "assv",
-          "optional": false
-        },
-        "stationery": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Is the file a stationery pad?",
-          "code": "pspd",
-          "optional": false
-        },
-        "typeIdentifier": {
-          "access": "r",
-          "type": "string",
-          "description": "The type identifier of the file",
-          "code": "utid",
-          "optional": false
-        },
-        "version": {
-          "access": "r",
-          "type": "string",
-          "description": "the version of the file (visible at the bottom of the \"Get Info\" window)",
-          "code": "vers",
-          "optional": false
-        }
-      }
-    },
-    "FilePackage": {
-      "name": "FilePackage",
-      "plural": "FilePackages",
-      "description": "A file package in the file system",
-      "code": "cpkg",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this package",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Folder": {
-      "name": "Folder",
-      "plural": "Folders",
-      "description": "A folder in the file system",
-      "code": "cfol",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this folder",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "LocalDomainObject": {
-      "name": "LocalDomainObject",
-      "plural": "LocalDomainObjects",
-      "description": "The local domain in the file system",
-      "code": "doml",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this domain",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "NetworkDomainObject": {
-      "name": "NetworkDomainObject",
-      "plural": "NetworkDomainObjects",
-      "description": "The network domain in the file system",
-      "code": "domn",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this domain",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "SystemDomainObject": {
-      "name": "SystemDomainObject",
-      "plural": "SystemDomainObjects",
-      "description": "The system domain in the file system",
-      "code": "doms",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this domain",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "UserDomainObject": {
-      "name": "UserDomainObject",
-      "plural": "UserDomainObjects",
-      "description": "The user domain in the file system",
-      "code": "domu",
-      "properties": {
-        "desktopFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+      ClassicDomainObject: {
+        name: 'ClassicDomainObject',
+        plural: 'ClassicDomainObjects',
+        description: 'The Classic domain in the file system',
+        code: 'domc',
+        properties: {
+          appleMenuFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Apple Menu Items folder',
+            code: 'amnu',
+            optional: false,
           },
-          "description": "The user's Desktop folder",
-          "code": "desk",
-          "optional": false
-        },
-        "documentsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          controlPanelsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Control Panels folder',
+            code: 'ctrl',
+            optional: false,
           },
-          "description": "The user's Documents folder",
-          "code": "docs",
-          "optional": false
-        },
-        "downloadsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          controlStripModulesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Control Strip Modules folder',
+            code: 'sdev',
+            optional: false,
           },
-          "description": "The user's Downloads folder",
-          "code": "down",
-          "optional": false
-        },
-        "favoritesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          desktopFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Classic Desktop folder',
+            code: 'desk',
+            optional: false,
           },
-          "description": "The user's Favorites folder",
-          "code": "favs",
-          "optional": false
-        },
-        "homeFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          extensionsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Extensions folder',
+            code: 'extz',
+            optional: false,
           },
-          "description": "The user's Home folder",
-          "code": "cusr",
-          "optional": false
-        },
-        "moviesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          fontsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Fonts folder',
+            code: 'font',
+            optional: false,
           },
-          "description": "The user's Movies folder",
-          "code": "mdoc",
-          "optional": false
-        },
-        "musicFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          launcherItemsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Launcher Items folder',
+            code: 'laun',
+            optional: false,
           },
-          "description": "The user's Music folder",
-          "code": "%doc",
-          "optional": false
-        },
-        "picturesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          preferencesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Classic Preferences folder',
+            code: 'pref',
+            optional: false,
           },
-          "description": "The user's Pictures folder",
-          "code": "pdoc",
-          "optional": false
-        },
-        "publicFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          shutdownFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Shutdown Items folder',
+            code: 'shdf',
+            optional: false,
           },
-          "description": "The user's Public folder",
-          "code": "pubb",
-          "optional": false
-        },
-        "sitesFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          startupItemsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The StartupItems folder',
+            code: 'empz',
+            optional: false,
           },
-          "description": "The user's Sites folder",
-          "code": "site",
-          "optional": false
-        },
-        "temporaryItemsFolder": {
-          "access": "r",
-          "type": {
-            "resource": "Folder"
+          systemFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The System folder',
+            code: 'macs',
+            optional: false,
           },
-          "description": "The Temporary Items folder",
-          "code": "temp",
-          "optional": false
-        }
-      }
-    },
-    "Action": {
-      "name": "Action",
-      "plural": "Actions",
-      "description": "An action that can be performed on the UI element",
-      "code": "actT",
-      "properties": {
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "what the action does",
-          "code": "desc",
-          "optional": false
         },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the action",
-          "code": "pnam",
-          "optional": false
-        }
-      }
-    },
-    "Attribute": {
-      "name": "Attribute",
-      "plural": "Attributes",
-      "description": "An named data value associated with the UI element",
-      "code": "attr",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the attribute",
-          "code": "pnam",
-          "optional": false
-        },
-        "settable": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Can the attribute be set?",
-          "code": "stbl",
-          "optional": false
-        },
-        "value": {
-          "access": "rw",
-          "type": "string",
-          "description": "the current value of the attribute",
-          "code": "valL",
-          "optional": false
-        }
-      }
-    },
-    "Browser": {
-      "name": "Browser",
-      "plural": "Browsers",
-      "description": "A browser belonging to a window",
-      "code": "broW",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this browser",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "BusyIndicator": {
-      "name": "BusyIndicator",
-      "plural": "BusyIndicators",
-      "description": "A busy indicator belonging to a window",
-      "code": "busi",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this busy indicator",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Button": {
-      "name": "Button",
-      "plural": "Buttons",
-      "description": "A button belonging to a window or scroll bar",
-      "code": "butT",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this button",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Checkbox": {
-      "name": "Checkbox",
-      "plural": "Checkboxes",
-      "description": "A checkbox belonging to a window",
-      "code": "chbx",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this checkbox",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ColorWell": {
-      "name": "ColorWell",
-      "plural": "ColorWells",
-      "description": "A color well belonging to a window",
-      "code": "colW",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this color well",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Column": {
-      "name": "Column",
-      "plural": "Columns",
-      "description": "A column belonging to a table",
-      "code": "ccol",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this column",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ComboBox": {
-      "name": "ComboBox",
-      "plural": "ComboBoxes",
-      "description": "A combo box belonging to a window",
-      "code": "comB",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this combo box",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Drawer": {
-      "name": "Drawer",
-      "plural": "Drawers",
-      "description": "A drawer that may be extended from a window",
-      "code": "draA",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this drawer",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Group": {
-      "name": "Group",
-      "plural": "Groups",
-      "description": "A group belonging to a window",
-      "code": "sgrp",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this group",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "GrowArea": {
-      "name": "GrowArea",
-      "plural": "GrowAreas",
-      "description": "A grow area belonging to a window",
-      "code": "grow",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this grow area",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Image": {
-      "name": "Image",
-      "plural": "Images",
-      "description": "An image belonging to a static text field",
-      "code": "imaA",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this image",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Incrementor": {
-      "name": "Incrementor",
-      "plural": "Incrementors",
-      "description": "A incrementor belonging to a window",
-      "code": "incr",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this incrementor",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "List": {
-      "name": "List",
-      "plural": "Lists",
-      "description": "A list belonging to a window",
-      "code": "list",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this list",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Menu": {
-      "name": "Menu",
-      "plural": "Menus",
-      "description": "A menu belonging to a menu bar item",
-      "code": "menE",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this menu",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "MenuBar": {
-      "name": "MenuBar",
-      "plural": "MenuBars",
-      "description": "A menu bar belonging to a process",
-      "code": "mbar",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this menu bar",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "MenuBarItem": {
-      "name": "MenuBarItem",
-      "plural": "MenuBarItems",
-      "description": "A menu bar item belonging to a menu bar",
-      "code": "mbri",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this menu bar item",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "MenuButton": {
-      "name": "MenuButton",
-      "plural": "MenuButtons",
-      "description": "A menu button belonging to a window",
-      "code": "menB",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this menu button",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "MenuItem": {
-      "name": "MenuItem",
-      "plural": "MenuItems",
-      "description": "A menu item belonging to a menu",
-      "code": "menI",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this menu item",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Outline": {
-      "name": "Outline",
-      "plural": "Outlines",
-      "description": "A outline belonging to a window",
-      "code": "outl",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this outline",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "PopOver": {
-      "name": "PopOver",
-      "plural": "PopOvers",
-      "description": "A pop over belonging to a window",
-      "code": "popv",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this pop over",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "PopUpButton": {
-      "name": "PopUpButton",
-      "plural": "PopUpButtons",
-      "description": "A pop up button belonging to a window",
-      "code": "popB",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this pop up button",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Process": {
-      "name": "Process",
-      "plural": "Processes",
-      "description": "A process running on this computer",
-      "code": "prcs",
-      "properties": {
-        "acceptsHighLevelEvents": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the process high-level event aware (accepts open application, open document, print document, and quit)?",
-          "code": "isab",
-          "optional": false
-        },
-        "acceptsRemoteEvents": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Does the process accept remote events?",
-          "code": "revt",
-          "optional": false
-        },
-        "architecture": {
-          "access": "r",
-          "type": "string",
-          "description": "the architecture in which the process is running",
-          "code": "arch",
-          "optional": false
-        },
-        "backgroundOnly": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Does the process run exclusively in the background?",
-          "code": "bkgo",
-          "optional": false
-        },
-        "bundleIdentifier": {
-          "access": "r",
-          "type": "string",
-          "description": "the bundle identifier of the process' application file",
-          "code": "bnid",
-          "optional": false
-        },
-        "classic": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the process running in the Classic environment?",
-          "code": "clsc",
-          "optional": false
-        },
-        "creatorType": {
-          "access": "r",
-          "type": "string",
-          "description": "the OSType of the creator of the process (the signature)",
-          "code": "fcrt",
-          "optional": false
-        },
-        "displayedName": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the file from which the process was launched, as displayed in the User Interface",
-          "code": "dnam",
-          "optional": false
-        },
-        "file": {
-          "access": "r",
-          "type": "string",
-          "description": "the file from which the process was launched",
-          "code": "file",
-          "optional": false
-        },
-        "fileType": {
-          "access": "r",
-          "type": "string",
-          "description": "the OSType of the file type of the process",
-          "code": "asty",
-          "optional": false
-        },
-        "frontmost": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Is the process the frontmost process",
-          "code": "pisf",
-          "optional": false
-        },
-        "hasScriptingTerminology": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Does the process have a scripting terminology, i.e., can it be scripted?",
-          "code": "hscr",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "integer",
-          "description": "The unique identifier of the process",
-          "code": "ID  ",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the process",
-          "code": "pnam",
-          "optional": false
-        },
-        "partitionSpaceUsed": {
-          "access": "r",
-          "type": "integer",
-          "description": "the number of bytes currently used in the process' partition",
-          "code": "pusd",
-          "optional": false
-        },
-        "shortName": {
-          "access": "r",
-          "type": "string",
-          "description": "the short name of the file from which the process was launched",
-          "code": "cfbn",
-          "optional": false
-        },
-        "totalPartitionSize": {
-          "access": "r",
-          "type": "integer",
-          "description": "the size of the partition with which the process was launched",
-          "code": "appt",
-          "optional": false
-        },
-        "unixId": {
-          "access": "r",
-          "type": "integer",
-          "description": "The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment",
-          "code": "idux",
-          "optional": false
-        },
-        "visible": {
-          "access": "rw",
-          "type": "string",
-          "description": "Is the process' layer visible?",
-          "code": "pvis",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ProgressIndicator": {
-      "name": "ProgressIndicator",
-      "plural": "ProgressIndicators",
-      "description": "A progress indicator belonging to a window",
-      "code": "proI",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this progress indicator",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "RadioButton": {
-      "name": "RadioButton",
-      "plural": "RadioButtons",
-      "description": "A radio button belonging to a window",
-      "code": "radB",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this radio button",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "RadioGroup": {
-      "name": "RadioGroup",
-      "plural": "RadioGroups",
-      "description": "A radio button group belonging to a window",
-      "code": "rgrp",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this radio group",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "RelevanceIndicator": {
-      "name": "RelevanceIndicator",
-      "plural": "RelevanceIndicators",
-      "description": "A relevance indicator belonging to a window",
-      "code": "reli",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this relevance indicator",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Row": {
-      "name": "Row",
-      "plural": "Rows",
-      "description": "A row belonging to a table",
-      "code": "crow",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this row",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ScrollArea": {
-      "name": "ScrollArea",
-      "plural": "ScrollAreas",
-      "description": "A scroll area belonging to a window",
-      "code": "scra",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this scroll area",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ScrollBar": {
-      "name": "ScrollBar",
-      "plural": "ScrollBars",
-      "description": "A scroll bar belonging to a window",
-      "code": "scrb",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this scroll bar",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Sheet": {
-      "name": "Sheet",
-      "plural": "Sheets",
-      "description": "A sheet displayed over a window",
-      "code": "sheE",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this sheet",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Slider": {
-      "name": "Slider",
-      "plural": "Sliders",
-      "description": "A slider belonging to a window",
-      "code": "sliI",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this slider",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Splitter": {
-      "name": "Splitter",
-      "plural": "Splitters",
-      "description": "A splitter belonging to a window",
-      "code": "splr",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this splitter",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "SplitterGroup": {
-      "name": "SplitterGroup",
-      "plural": "SplitterGroups",
-      "description": "A splitter group belonging to a window",
-      "code": "splg",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this splitter group",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "StaticText": {
-      "name": "StaticText",
-      "plural": "StaticTexts",
-      "description": "A static text field belonging to a window",
-      "code": "sttx",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this static text",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "TabGroup": {
-      "name": "TabGroup",
-      "plural": "TabGroups",
-      "description": "A tab group belonging to a window",
-      "code": "tabg",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this tab group",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Table": {
-      "name": "Table",
-      "plural": "Tables",
-      "description": "A table belonging to a window",
-      "code": "tabB",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this table",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "TextArea": {
-      "name": "TextArea",
-      "plural": "TextAreas",
-      "description": "A text area belonging to a window",
-      "code": "txta",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this text area",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "TextField": {
-      "name": "TextField",
-      "plural": "TextFields",
-      "description": "A text field belonging to a window",
-      "code": "txtf",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this text field",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "Toolbar": {
-      "name": "Toolbar",
-      "plural": "Toolbars",
-      "description": "A toolbar belonging to a window",
-      "code": "tbar",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this toolbar",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "UIElement": {
-      "name": "UIElement",
-      "plural": "UIElements",
-      "description": "A piece of the user interface of a process",
-      "code": "uiel",
-      "properties": {
-        "accessibilityDescription": {
-          "access": "r",
-          "type": "string",
-          "description": "a more complete description of the UI element and its capabilities",
-          "code": "axds",
-          "optional": false
-        },
-        "class": {
-          "access": "r",
-          "type": "string",
-          "description": "the class of the UI Element, which identifies it function",
-          "code": "pcls",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "the accessibility description, if available; otherwise, the role description",
-          "code": "desc",
-          "optional": false
-        },
-        "enabled": {
-          "access": "r",
-          "type": "string",
-          "description": "Is the UI element enabled? ( Does it accept clicks? )",
-          "code": "enaB",
-          "optional": false
-        },
-        "entireContents": {
-          "access": "r",
-          "type": "string",
-          "description": "a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree",
-          "code": "ects",
-          "optional": false
-        },
-        "focused": {
-          "access": "rw",
-          "type": "string",
-          "description": "Is the focus on this UI element?",
-          "code": "focu",
-          "optional": false
-        },
-        "help": {
-          "access": "r",
-          "type": "string",
-          "description": "an elaborate description of the UI element and its capabilities",
-          "code": "help",
-          "optional": false
-        },
-        "maximumValue": {
-          "access": "r",
-          "type": "string",
-          "description": "the maximum value that the UI element can take on",
-          "code": "maxV",
-          "optional": false
-        },
-        "minimumValue": {
-          "access": "r",
-          "type": "string",
-          "description": "the minimum value that the UI element can take on",
-          "code": "minW",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the UI Element, which identifies it within its container",
-          "code": "pnam",
-          "optional": false
-        },
-        "orientation": {
-          "access": "r",
-          "type": "string",
-          "description": "the orientation of the UI element",
-          "code": "orie",
-          "optional": false
-        },
-        "position": {
-          "access": "rw",
-          "type": "string",
-          "description": "the position of the UI element",
-          "code": "posn",
-          "optional": false
-        },
-        "role": {
-          "access": "r",
-          "type": "string",
-          "description": "an encoded description of the UI element and its capabilities",
-          "code": "role",
-          "optional": false
-        },
-        "roleDescription": {
-          "access": "r",
-          "type": "string",
-          "description": "a more complete description of the UI element's role",
-          "code": "rold",
-          "optional": false
-        },
-        "selected": {
-          "access": "rw",
-          "type": "string",
-          "description": "Is the UI element selected?",
-          "code": "selE",
-          "optional": false
-        },
-        "size": {
-          "access": "rw",
-          "type": "string",
-          "description": "the size of the UI element",
-          "code": "ptsz",
-          "optional": false
-        },
-        "subrole": {
-          "access": "r",
-          "type": "string",
-          "description": "an encoded description of the UI element and its capabilities",
-          "code": "sbrl",
-          "optional": false
-        },
-        "title": {
-          "access": "r",
-          "type": "string",
-          "description": "the title of the UI element as it appears on the screen",
-          "code": "titl",
-          "optional": false
-        },
-        "value": {
-          "access": "rw",
-          "type": "string",
-          "description": "the current value of the UI element",
-          "code": "valL",
-          "optional": false
-        }
-      }
-    },
-    "ValueIndicator": {
-      "name": "ValueIndicator",
-      "plural": "ValueIndicators",
-      "description": "A value indicator ( thumb or slider ) belonging to a scroll bar",
-      "code": "vali",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this value indicator",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "PropertyListItem": {
-      "name": "PropertyListItem",
-      "plural": "PropertyListItems",
-      "description": "A unit of data in Property List format",
-      "code": "plii",
-      "properties": {
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "the kind of data stored in the property list item: boolean/data/date/list/number/record/string",
-          "code": "kind",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the property list item ( if any )",
-          "code": "pnam",
-          "optional": false
-        },
-        "text": {
-          "access": "rw",
-          "type": "string",
-          "description": "the text representation of the property list data",
-          "code": "ctxt",
-          "optional": false
-        },
-        "value": {
-          "access": "rw",
-          "type": "string",
-          "description": "the value of the property list item",
-          "code": "valL",
-          "optional": false
-        }
-      }
-    },
-    "XMLAttribute": {
-      "name": "XMLAttribute",
-      "plural": "XMLAttributes",
-      "description": "A named value associated with a unit of data in XML format",
-      "code": "xmla",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the XML attribute",
-          "code": "pnam",
-          "optional": false
-        },
-        "value": {
-          "access": "rw",
-          "type": "string",
-          "description": "the value of the XML attribute",
-          "code": "valL",
-          "optional": false
-        }
-      }
-    },
-    "XMLData": {
-      "name": "XMLData",
-      "plural": "XMLDatas",
-      "description": "Data in XML format",
-      "code": "xmld",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier of the XML data",
-          "code": "ID  ",
-          "optional": false
-        },
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "the name of the XML data",
-          "code": "pnam",
-          "optional": false
-        },
-        "text": {
-          "access": "rw",
-          "type": "string",
-          "description": "the text representation of the XML data",
-          "code": "ctxt",
-          "optional": false
-        }
-      },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "XMLElement": {
-      "name": "XMLElement",
-      "plural": "XMLElements",
-      "description": "A unit of data in XML format",
-      "code": "xmle",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "the unique identifier of the XML element",
-          "code": "ID  ",
-          "optional": false
-        },
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "the name of the XML element",
-          "code": "pnam",
-          "optional": false
-        },
-        "value": {
-          "access": "rw",
-          "type": "string",
-          "description": "the value of the XML element",
-          "code": "valL",
-          "optional": false
-        }
-      },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingClass": {
-      "name": "ScriptingClass",
-      "plural": "ScriptingClasses",
-      "description": "A class within a suite within a scripting definition",
-      "code": "sdcl",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the class",
-          "code": "pnam",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the class",
-          "code": "ID  ",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the class",
-          "code": "desc",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the class hidden?",
-          "code": "hidn",
-          "optional": false
-        },
-        "pluralName": {
-          "access": "r",
-          "type": "string",
-          "description": "The plural name of the class",
-          "code": "plnm",
-          "optional": false
-        },
-        "suiteName": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the suite to which this class belongs",
-          "code": "stnm",
-          "optional": false
-        },
-        "superclass": {
-          "access": "r",
-          "type": {
-            "resource": "scripting class"
+      Disk: {
+        name: 'Disk',
+        plural: 'Disks',
+        description: 'A disk in the file system',
+        code: 'cdis',
+        properties: {
+          capacity: {
+            access: 'r',
+            type: 'number',
+            description: 'the total number of bytes (free or used) on the disk',
+            code: 'capa',
+            optional: false,
           },
-          "description": "The class from which this class inherits",
-          "code": "supe",
-          "optional": false
-        }
-      },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingCommand": {
-      "name": "ScriptingCommand",
-      "plural": "ScriptingCommands",
-      "description": "A command within a suite within a scripting definition",
-      "code": "sdcm",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the command",
-          "code": "pnam",
-          "optional": false
-        },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the command",
-          "code": "ID  ",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the command",
-          "code": "desc",
-          "optional": false
-        },
-        "directParameter": {
-          "access": "r",
-          "type": {
-            "resource": "scripting parameter"
+          ejectable: {
+            access: 'r',
+            type: 'boolean',
+            description: "Can the media be ejected (floppies, CD's, and so on)?",
+            code: 'isej',
+            optional: false,
           },
-          "description": "The direct parameter of the command",
-          "code": "sddp",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the command hidden?",
-          "code": "hidn",
-          "optional": false
-        },
-        "scriptingResult": {
-          "access": "r",
-          "type": {
-            "resource": "scripting result object"
+          format: {
+            access: 'r',
+            type: 'string',
+            description: 'the file system format of this disk',
+            code: 'dfmt',
+            optional: false,
           },
-          "description": "The object or data returned by this command",
-          "code": "sdrs",
-          "optional": false
+          freeSpace: {
+            access: 'r',
+            type: 'number',
+            description: 'the number of free bytes left on the disk',
+            code: 'frsp',
+            optional: false,
+          },
+          ignorePrivileges: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Ignore permissions on this disk?',
+            code: 'igpr',
+            optional: false,
+          },
+          localVolume: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the media a local volume (as opposed to a file server)?',
+            code: 'isrv',
+            optional: false,
+          },
+          server: {
+            access: 'r',
+            type: 'string',
+            description: 'the server on which the disk resides, AFP volumes only',
+            code: 'srvr',
+            optional: false,
+          },
+          startup: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is this disk the boot disk?',
+            code: 'istd',
+            optional: false,
+          },
+          zone: {
+            access: 'r',
+            type: 'string',
+            description: "the zone in which the disk's server resides, AFP volumes only",
+            code: 'zone',
+            optional: false,
+          },
         },
-        "suiteName": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the suite to which this command belongs",
-          "code": "stnm",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingDefinitionObject": {
-      "name": "ScriptingDefinitionObject",
-      "plural": "ScriptingDefinitionObjects",
-      "description": "The scripting definition of the System Events applicaation",
-      "code": "sdeo",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this scripting definition object",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ScriptingElement": {
-      "name": "ScriptingElement",
-      "plural": "ScriptingElements",
-      "description": "An element within a class within a suite within a scripting definition",
-      "code": "sdel",
-      "properties": {
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "Unique identifier for this scripting element",
-          "code": "ID  ",
-          "optional": false
-        }
-      }
-    },
-    "ScriptingEnumeration": {
-      "name": "ScriptingEnumeration",
-      "plural": "ScriptingEnumerations",
-      "description": "An enumeration within a suite within a scripting definition",
-      "code": "sden",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the enumeration",
-          "code": "pnam",
-          "optional": false
+      DiskItem: {
+        name: 'DiskItem',
+        plural: 'DiskItems',
+        description: 'An item stored in the file system',
+        code: 'ditm',
+        properties: {
+          busyStatus: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the disk item busy?',
+            code: 'busy',
+            optional: false,
+          },
+          container: {
+            access: 'r',
+            type: {
+              resource: 'disk item',
+            },
+            description: 'the folder or disk which has this disk item as an element',
+            code: 'ctnr',
+            optional: false,
+          },
+          creationDate: {
+            access: 'r',
+            type: 'date',
+            description: 'the date on which the disk item was created',
+            code: 'ascd',
+            optional: false,
+          },
+          displayedName: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the disk item as displayed in the User Interface',
+            code: 'dnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique ID of the disk item',
+            code: 'ID  ',
+            optional: false,
+          },
+          modificationDate: {
+            access: 'rw',
+            type: 'date',
+            description: 'the date on which the disk item was last modified',
+            code: 'asmo',
+            optional: false,
+          },
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'the name of the disk item',
+            code: 'pnam',
+            optional: false,
+          },
+          nameExtension: {
+            access: 'r',
+            type: 'string',
+            description: 'the extension portion of the name',
+            code: 'extn',
+            optional: false,
+          },
+          packageFolder: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the disk item a package?',
+            code: 'pkgf',
+            optional: false,
+          },
+          path: {
+            access: 'r',
+            type: 'string',
+            description: 'the file system path of the disk item',
+            code: 'ppth',
+            optional: false,
+          },
+          physicalSize: {
+            access: 'r',
+            type: 'integer',
+            description: 'the actual space used by the disk item on disk',
+            code: 'phys',
+            optional: false,
+          },
+          pOSIXPath: {
+            access: 'r',
+            type: 'string',
+            description: 'the POSIX file system path of the disk item',
+            code: 'posx',
+            optional: false,
+          },
+          size: {
+            access: 'r',
+            type: 'integer',
+            description: 'the logical size of the disk item',
+            code: 'ptsz',
+            optional: false,
+          },
+          uRL: {
+            access: 'r',
+            type: 'string',
+            description: 'the URL of the disk item',
+            code: 'url',
+            optional: false,
+          },
+          visible: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Is the disk item visible?',
+            code: 'pvis',
+            optional: false,
+          },
+          volume: {
+            access: 'r',
+            type: 'string',
+            description: 'the volume on which the disk item resides',
+            code: 'volu',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the enumeration",
-          "code": "ID  ",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the enumeration hidden?",
-          "code": "hidn",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingEnumerator": {
-      "name": "ScriptingEnumerator",
-      "plural": "ScriptingEnumerators",
-      "description": "An enumerator within an enumeration within a suite within a scripting definition",
-      "code": "sder",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the enumerator",
-          "code": "pnam",
-          "optional": false
+      Domain: {
+        name: 'Domain',
+        plural: 'Domains',
+        description: 'A domain in the file system',
+        code: 'doma',
+        properties: {
+          applicationSupportFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Application Support folder',
+            code: 'asup',
+            optional: false,
+          },
+          applicationsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Applications folder',
+            code: 'apps',
+            optional: false,
+          },
+          desktopPicturesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Desktop Pictures folder',
+            code: 'dtp$',
+            optional: false,
+          },
+          folderActionScriptsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Folder Action Scripts folder',
+            code: 'fasf',
+            optional: false,
+          },
+          fontsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Fonts folder',
+            code: 'font',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier of the domain',
+            code: 'ID  ',
+            optional: false,
+          },
+          libraryFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Library folder',
+            code: 'dlib',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the domain',
+            code: 'pnam',
+            optional: false,
+          },
+          preferencesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Preferences folder',
+            code: 'pref',
+            optional: false,
+          },
+          scriptingAdditionsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Scripting Additions folder',
+            code: '$scr',
+            optional: false,
+          },
+          scriptsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Scripts folder',
+            code: 'scr$',
+            optional: false,
+          },
+          sharedDocumentsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Shared Documents folder',
+            code: 'sdat',
+            optional: false,
+          },
+          speakableItemsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Speakable Items folder',
+            code: 'spki',
+            optional: false,
+          },
+          utilitiesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Utilities folder',
+            code: 'uti$',
+            optional: false,
+          },
+          workflowsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Automator Workflows folder',
+            code: 'flow',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the enumerator",
-          "code": "ID  ",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the enumerator",
-          "code": "desc",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the enumerator hidden?",
-          "code": "hidn",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingParameter": {
-      "name": "ScriptingParameter",
-      "plural": "ScriptingParameters",
-      "description": "A parameter within a command within a suite within a scripting definition",
-      "code": "sdpa",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the parameter",
-          "code": "pnam",
-          "optional": false
+      File: {
+        name: 'File',
+        plural: 'Files',
+        description: 'A file in the file system',
+        code: 'file',
+        properties: {
+          creatorType: {
+            access: 'rw',
+            type: 'string',
+            description: 'the OSType identifying the application that created the file',
+            code: 'fcrt',
+            optional: false,
+          },
+          defaultApplication: {
+            access: 'rw',
+            type: 'string',
+            description: 'the application that will launch if the file is opened',
+            code: 'asda',
+            optional: false,
+          },
+          fileType: {
+            access: 'rw',
+            type: 'string',
+            description: 'the OSType identifying the type of data contained in the file',
+            code: 'asty',
+            optional: false,
+          },
+          kind: {
+            access: 'r',
+            type: 'string',
+            description: 'The kind of file, as shown in Finder',
+            code: 'kind',
+            optional: false,
+          },
+          productVersion: {
+            access: 'r',
+            type: 'string',
+            description: 'the version of the product (visible at the top of the "Get Info" window)',
+            code: 'ver2',
+            optional: false,
+          },
+          shortVersion: {
+            access: 'r',
+            type: 'string',
+            description: 'the short version of the file',
+            code: 'assv',
+            optional: false,
+          },
+          stationery: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Is the file a stationery pad?',
+            code: 'pspd',
+            optional: false,
+          },
+          typeIdentifier: {
+            access: 'r',
+            type: 'string',
+            description: 'The type identifier of the file',
+            code: 'utid',
+            optional: false,
+          },
+          version: {
+            access: 'r',
+            type: 'string',
+            description: 'the version of the file (visible at the bottom of the "Get Info" window)',
+            code: 'vers',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the parameter",
-          "code": "ID  ",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the parameter",
-          "code": "desc",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the parameter hidden?",
-          "code": "hidn",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "The kind of object or data specified by this parameter",
-          "code": "kind",
-          "optional": false
-        },
-        "optional": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the parameter optional?",
-          "code": "optl",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingProperty": {
-      "name": "ScriptingProperty",
-      "plural": "ScriptingProperties",
-      "description": "A property within a class within a suite within a scripting definition",
-      "code": "sdpr",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the property",
-          "code": "pnam",
-          "optional": false
+      FilePackage: {
+        name: 'FilePackage',
+        plural: 'FilePackages',
+        description: 'A file package in the file system',
+        code: 'cpkg',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this package',
+            code: 'ID  ',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the property",
-          "code": "ID  ",
-          "optional": false
-        },
-        "access": {
-          "access": "r",
-          "type": "string",
-          "description": "The type of access to this property",
-          "code": "accs",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the property",
-          "code": "desc",
-          "optional": false
-        },
-        "enumerated": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the property's value an enumerator?",
-          "code": "enmd",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the property hidden?",
-          "code": "hidn",
-          "optional": false
-        },
-        "kind": {
-          "access": "r",
-          "type": "string",
-          "description": "The kind of object or data returned by this property",
-          "code": "kind",
-          "optional": false
-        },
-        "listed": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the property's value a list?",
-          "code": "lstd",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    },
-    "ScriptingSuite": {
-      "name": "ScriptingSuite",
-      "plural": "ScriptingSuites",
-      "description": "A suite within a scripting definition",
-      "code": "sdst",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The name of the suite",
-          "code": "pnam",
-          "optional": false
+      Folder: {
+        name: 'Folder',
+        plural: 'Folders',
+        description: 'A folder in the file system',
+        code: 'cfol',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this folder',
+            code: 'ID  ',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "string",
-          "description": "The unique identifier of the suite",
-          "code": "ID  ",
-          "optional": false
-        },
-        "description": {
-          "access": "r",
-          "type": "string",
-          "description": "The description of the suite",
-          "code": "desc",
-          "optional": false
-        },
-        "hidden": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Is the suite hidden?",
-          "code": "hidn",
-          "optional": false
-        }
       },
-      "identifiers": [
-        {
-          "property": "id",
-          "primary": true
-        }
-      ]
-    }
-  },
-  "enums": {
-    "SaveableFileFormat": {
-      "name": "SaveableFileFormat",
-      "code": "savf",
-      "values": [
-        {
-          "name": "text",
-          "value": "text",
-          "description": "Text File Format",
-          "code": "ctxt"
-        }
-      ]
+      LocalDomainObject: {
+        name: 'LocalDomainObject',
+        plural: 'LocalDomainObjects',
+        description: 'The local domain in the file system',
+        code: 'doml',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this domain',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      NetworkDomainObject: {
+        name: 'NetworkDomainObject',
+        plural: 'NetworkDomainObjects',
+        description: 'The network domain in the file system',
+        code: 'domn',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this domain',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      SystemDomainObject: {
+        name: 'SystemDomainObject',
+        plural: 'SystemDomainObjects',
+        description: 'The system domain in the file system',
+        code: 'doms',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this domain',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      UserDomainObject: {
+        name: 'UserDomainObject',
+        plural: 'UserDomainObjects',
+        description: 'The user domain in the file system',
+        code: 'domu',
+        properties: {
+          desktopFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Desktop folder",
+            code: 'desk',
+            optional: false,
+          },
+          documentsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Documents folder",
+            code: 'docs',
+            optional: false,
+          },
+          downloadsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Downloads folder",
+            code: 'down',
+            optional: false,
+          },
+          favoritesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Favorites folder",
+            code: 'favs',
+            optional: false,
+          },
+          homeFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Home folder",
+            code: 'cusr',
+            optional: false,
+          },
+          moviesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Movies folder",
+            code: 'mdoc',
+            optional: false,
+          },
+          musicFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Music folder",
+            code: '%doc',
+            optional: false,
+          },
+          picturesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Pictures folder",
+            code: 'pdoc',
+            optional: false,
+          },
+          publicFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Public folder",
+            code: 'pubb',
+            optional: false,
+          },
+          sitesFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: "The user's Sites folder",
+            code: 'site',
+            optional: false,
+          },
+          temporaryItemsFolder: {
+            access: 'r',
+            type: {
+              resource: 'Folder',
+            },
+            description: 'The Temporary Items folder',
+            code: 'temp',
+            optional: false,
+          },
+        },
+      },
+      Action: {
+        name: 'Action',
+        plural: 'Actions',
+        description: 'An action that can be performed on the UI element',
+        code: 'actT',
+        properties: {
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'what the action does',
+            code: 'desc',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the action',
+            code: 'pnam',
+            optional: false,
+          },
+        },
+      },
+      Attribute: {
+        name: 'Attribute',
+        plural: 'Attributes',
+        description: 'An named data value associated with the UI element',
+        code: 'attr',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the attribute',
+            code: 'pnam',
+            optional: false,
+          },
+          settable: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Can the attribute be set?',
+            code: 'stbl',
+            optional: false,
+          },
+          value: {
+            access: 'rw',
+            type: 'string',
+            description: 'the current value of the attribute',
+            code: 'valL',
+            optional: false,
+          },
+        },
+      },
+      Browser: {
+        name: 'Browser',
+        plural: 'Browsers',
+        description: 'A browser belonging to a window',
+        code: 'broW',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this browser',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      BusyIndicator: {
+        name: 'BusyIndicator',
+        plural: 'BusyIndicators',
+        description: 'A busy indicator belonging to a window',
+        code: 'busi',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this busy indicator',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Button: {
+        name: 'Button',
+        plural: 'Buttons',
+        description: 'A button belonging to a window or scroll bar',
+        code: 'butT',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this button',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Checkbox: {
+        name: 'Checkbox',
+        plural: 'Checkboxes',
+        description: 'A checkbox belonging to a window',
+        code: 'chbx',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this checkbox',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ColorWell: {
+        name: 'ColorWell',
+        plural: 'ColorWells',
+        description: 'A color well belonging to a window',
+        code: 'colW',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this color well',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Column: {
+        name: 'Column',
+        plural: 'Columns',
+        description: 'A column belonging to a table',
+        code: 'ccol',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this column',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ComboBox: {
+        name: 'ComboBox',
+        plural: 'ComboBoxes',
+        description: 'A combo box belonging to a window',
+        code: 'comB',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this combo box',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Drawer: {
+        name: 'Drawer',
+        plural: 'Drawers',
+        description: 'A drawer that may be extended from a window',
+        code: 'draA',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this drawer',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Group: {
+        name: 'Group',
+        plural: 'Groups',
+        description: 'A group belonging to a window',
+        code: 'sgrp',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this group',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      GrowArea: {
+        name: 'GrowArea',
+        plural: 'GrowAreas',
+        description: 'A grow area belonging to a window',
+        code: 'grow',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this grow area',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Image: {
+        name: 'Image',
+        plural: 'Images',
+        description: 'An image belonging to a static text field',
+        code: 'imaA',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this image',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Incrementor: {
+        name: 'Incrementor',
+        plural: 'Incrementors',
+        description: 'A incrementor belonging to a window',
+        code: 'incr',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this incrementor',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      List: {
+        name: 'List',
+        plural: 'Lists',
+        description: 'A list belonging to a window',
+        code: 'list',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this list',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Menu: {
+        name: 'Menu',
+        plural: 'Menus',
+        description: 'A menu belonging to a menu bar item',
+        code: 'menE',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this menu',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      MenuBar: {
+        name: 'MenuBar',
+        plural: 'MenuBars',
+        description: 'A menu bar belonging to a process',
+        code: 'mbar',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this menu bar',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      MenuBarItem: {
+        name: 'MenuBarItem',
+        plural: 'MenuBarItems',
+        description: 'A menu bar item belonging to a menu bar',
+        code: 'mbri',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this menu bar item',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      MenuButton: {
+        name: 'MenuButton',
+        plural: 'MenuButtons',
+        description: 'A menu button belonging to a window',
+        code: 'menB',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this menu button',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      MenuItem: {
+        name: 'MenuItem',
+        plural: 'MenuItems',
+        description: 'A menu item belonging to a menu',
+        code: 'menI',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this menu item',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Outline: {
+        name: 'Outline',
+        plural: 'Outlines',
+        description: 'A outline belonging to a window',
+        code: 'outl',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this outline',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      PopOver: {
+        name: 'PopOver',
+        plural: 'PopOvers',
+        description: 'A pop over belonging to a window',
+        code: 'popv',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this pop over',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      PopUpButton: {
+        name: 'PopUpButton',
+        plural: 'PopUpButtons',
+        description: 'A pop up button belonging to a window',
+        code: 'popB',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this pop up button',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Process: {
+        name: 'Process',
+        plural: 'Processes',
+        description: 'A process running on this computer',
+        code: 'prcs',
+        properties: {
+          acceptsHighLevelEvents: {
+            access: 'r',
+            type: 'boolean',
+            description:
+              'Is the process high-level event aware (accepts open application, open document, print document, and quit)?',
+            code: 'isab',
+            optional: false,
+          },
+          acceptsRemoteEvents: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Does the process accept remote events?',
+            code: 'revt',
+            optional: false,
+          },
+          architecture: {
+            access: 'r',
+            type: 'string',
+            description: 'the architecture in which the process is running',
+            code: 'arch',
+            optional: false,
+          },
+          backgroundOnly: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Does the process run exclusively in the background?',
+            code: 'bkgo',
+            optional: false,
+          },
+          bundleIdentifier: {
+            access: 'r',
+            type: 'string',
+            description: "the bundle identifier of the process' application file",
+            code: 'bnid',
+            optional: false,
+          },
+          classic: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the process running in the Classic environment?',
+            code: 'clsc',
+            optional: false,
+          },
+          creatorType: {
+            access: 'r',
+            type: 'string',
+            description: 'the OSType of the creator of the process (the signature)',
+            code: 'fcrt',
+            optional: false,
+          },
+          displayedName: {
+            access: 'r',
+            type: 'string',
+            description:
+              'the name of the file from which the process was launched, as displayed in the User Interface',
+            code: 'dnam',
+            optional: false,
+          },
+          file: {
+            access: 'r',
+            type: 'string',
+            description: 'the file from which the process was launched',
+            code: 'file',
+            optional: false,
+          },
+          fileType: {
+            access: 'r',
+            type: 'string',
+            description: 'the OSType of the file type of the process',
+            code: 'asty',
+            optional: false,
+          },
+          frontmost: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Is the process the frontmost process',
+            code: 'pisf',
+            optional: false,
+          },
+          hasScriptingTerminology: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Does the process have a scripting terminology, i.e., can it be scripted?',
+            code: 'hscr',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'integer',
+            description: 'The unique identifier of the process',
+            code: 'ID  ',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the process',
+            code: 'pnam',
+            optional: false,
+          },
+          partitionSpaceUsed: {
+            access: 'r',
+            type: 'integer',
+            description: "the number of bytes currently used in the process' partition",
+            code: 'pusd',
+            optional: false,
+          },
+          shortName: {
+            access: 'r',
+            type: 'string',
+            description: 'the short name of the file from which the process was launched',
+            code: 'cfbn',
+            optional: false,
+          },
+          totalPartitionSize: {
+            access: 'r',
+            type: 'integer',
+            description: 'the size of the partition with which the process was launched',
+            code: 'appt',
+            optional: false,
+          },
+          unixId: {
+            access: 'r',
+            type: 'integer',
+            description:
+              'The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment',
+            code: 'idux',
+            optional: false,
+          },
+          visible: {
+            access: 'rw',
+            type: 'string',
+            description: "Is the process' layer visible?",
+            code: 'pvis',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ProgressIndicator: {
+        name: 'ProgressIndicator',
+        plural: 'ProgressIndicators',
+        description: 'A progress indicator belonging to a window',
+        code: 'proI',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this progress indicator',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      RadioButton: {
+        name: 'RadioButton',
+        plural: 'RadioButtons',
+        description: 'A radio button belonging to a window',
+        code: 'radB',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this radio button',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      RadioGroup: {
+        name: 'RadioGroup',
+        plural: 'RadioGroups',
+        description: 'A radio button group belonging to a window',
+        code: 'rgrp',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this radio group',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      RelevanceIndicator: {
+        name: 'RelevanceIndicator',
+        plural: 'RelevanceIndicators',
+        description: 'A relevance indicator belonging to a window',
+        code: 'reli',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this relevance indicator',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Row: {
+        name: 'Row',
+        plural: 'Rows',
+        description: 'A row belonging to a table',
+        code: 'crow',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this row',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ScrollArea: {
+        name: 'ScrollArea',
+        plural: 'ScrollAreas',
+        description: 'A scroll area belonging to a window',
+        code: 'scra',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this scroll area',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ScrollBar: {
+        name: 'ScrollBar',
+        plural: 'ScrollBars',
+        description: 'A scroll bar belonging to a window',
+        code: 'scrb',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this scroll bar',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Sheet: {
+        name: 'Sheet',
+        plural: 'Sheets',
+        description: 'A sheet displayed over a window',
+        code: 'sheE',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this sheet',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Slider: {
+        name: 'Slider',
+        plural: 'Sliders',
+        description: 'A slider belonging to a window',
+        code: 'sliI',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this slider',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Splitter: {
+        name: 'Splitter',
+        plural: 'Splitters',
+        description: 'A splitter belonging to a window',
+        code: 'splr',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this splitter',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      SplitterGroup: {
+        name: 'SplitterGroup',
+        plural: 'SplitterGroups',
+        description: 'A splitter group belonging to a window',
+        code: 'splg',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this splitter group',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      StaticText: {
+        name: 'StaticText',
+        plural: 'StaticTexts',
+        description: 'A static text field belonging to a window',
+        code: 'sttx',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this static text',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      TabGroup: {
+        name: 'TabGroup',
+        plural: 'TabGroups',
+        description: 'A tab group belonging to a window',
+        code: 'tabg',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this tab group',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Table: {
+        name: 'Table',
+        plural: 'Tables',
+        description: 'A table belonging to a window',
+        code: 'tabB',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this table',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      TextArea: {
+        name: 'TextArea',
+        plural: 'TextAreas',
+        description: 'A text area belonging to a window',
+        code: 'txta',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this text area',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      TextField: {
+        name: 'TextField',
+        plural: 'TextFields',
+        description: 'A text field belonging to a window',
+        code: 'txtf',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this text field',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      Toolbar: {
+        name: 'Toolbar',
+        plural: 'Toolbars',
+        description: 'A toolbar belonging to a window',
+        code: 'tbar',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this toolbar',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      UIElement: {
+        name: 'UIElement',
+        plural: 'UIElements',
+        description: 'A piece of the user interface of a process',
+        code: 'uiel',
+        properties: {
+          accessibilityDescription: {
+            access: 'r',
+            type: 'string',
+            description: 'a more complete description of the UI element and its capabilities',
+            code: 'axds',
+            optional: false,
+          },
+          class: {
+            access: 'r',
+            type: 'string',
+            description: 'the class of the UI Element, which identifies it function',
+            code: 'pcls',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description:
+              'the accessibility description, if available; otherwise, the role description',
+            code: 'desc',
+            optional: false,
+          },
+          enabled: {
+            access: 'r',
+            type: 'string',
+            description: 'Is the UI element enabled? ( Does it accept clicks? )',
+            code: 'enaB',
+            optional: false,
+          },
+          entireContents: {
+            access: 'r',
+            type: 'string',
+            description:
+              'a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree',
+            code: 'ects',
+            optional: false,
+          },
+          focused: {
+            access: 'rw',
+            type: 'string',
+            description: 'Is the focus on this UI element?',
+            code: 'focu',
+            optional: false,
+          },
+          help: {
+            access: 'r',
+            type: 'string',
+            description: 'an elaborate description of the UI element and its capabilities',
+            code: 'help',
+            optional: false,
+          },
+          maximumValue: {
+            access: 'r',
+            type: 'string',
+            description: 'the maximum value that the UI element can take on',
+            code: 'maxV',
+            optional: false,
+          },
+          minimumValue: {
+            access: 'r',
+            type: 'string',
+            description: 'the minimum value that the UI element can take on',
+            code: 'minW',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the UI Element, which identifies it within its container',
+            code: 'pnam',
+            optional: false,
+          },
+          orientation: {
+            access: 'r',
+            type: 'string',
+            description: 'the orientation of the UI element',
+            code: 'orie',
+            optional: false,
+          },
+          position: {
+            access: 'rw',
+            type: 'string',
+            description: 'the position of the UI element',
+            code: 'posn',
+            optional: false,
+          },
+          role: {
+            access: 'r',
+            type: 'string',
+            description: 'an encoded description of the UI element and its capabilities',
+            code: 'role',
+            optional: false,
+          },
+          roleDescription: {
+            access: 'r',
+            type: 'string',
+            description: "a more complete description of the UI element's role",
+            code: 'rold',
+            optional: false,
+          },
+          selected: {
+            access: 'rw',
+            type: 'string',
+            description: 'Is the UI element selected?',
+            code: 'selE',
+            optional: false,
+          },
+          size: {
+            access: 'rw',
+            type: 'string',
+            description: 'the size of the UI element',
+            code: 'ptsz',
+            optional: false,
+          },
+          subrole: {
+            access: 'r',
+            type: 'string',
+            description: 'an encoded description of the UI element and its capabilities',
+            code: 'sbrl',
+            optional: false,
+          },
+          title: {
+            access: 'r',
+            type: 'string',
+            description: 'the title of the UI element as it appears on the screen',
+            code: 'titl',
+            optional: false,
+          },
+          value: {
+            access: 'rw',
+            type: 'string',
+            description: 'the current value of the UI element',
+            code: 'valL',
+            optional: false,
+          },
+        },
+      },
+      ValueIndicator: {
+        name: 'ValueIndicator',
+        plural: 'ValueIndicators',
+        description: 'A value indicator ( thumb or slider ) belonging to a scroll bar',
+        code: 'vali',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this value indicator',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      PropertyListItem: {
+        name: 'PropertyListItem',
+        plural: 'PropertyListItems',
+        description: 'A unit of data in Property List format',
+        code: 'plii',
+        properties: {
+          kind: {
+            access: 'r',
+            type: 'string',
+            description:
+              'the kind of data stored in the property list item: boolean/data/date/list/number/record/string',
+            code: 'kind',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the property list item ( if any )',
+            code: 'pnam',
+            optional: false,
+          },
+          text: {
+            access: 'rw',
+            type: 'string',
+            description: 'the text representation of the property list data',
+            code: 'ctxt',
+            optional: false,
+          },
+          value: {
+            access: 'rw',
+            type: 'string',
+            description: 'the value of the property list item',
+            code: 'valL',
+            optional: false,
+          },
+        },
+      },
+      XMLAttribute: {
+        name: 'XMLAttribute',
+        plural: 'XMLAttributes',
+        description: 'A named value associated with a unit of data in XML format',
+        code: 'xmla',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the XML attribute',
+            code: 'pnam',
+            optional: false,
+          },
+          value: {
+            access: 'rw',
+            type: 'string',
+            description: 'the value of the XML attribute',
+            code: 'valL',
+            optional: false,
+          },
+        },
+      },
+      XMLData: {
+        name: 'XMLData',
+        plural: 'XMLDatas',
+        description: 'Data in XML format',
+        code: 'xmld',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier of the XML data',
+            code: 'ID  ',
+            optional: false,
+          },
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'the name of the XML data',
+            code: 'pnam',
+            optional: false,
+          },
+          text: {
+            access: 'rw',
+            type: 'string',
+            description: 'the text representation of the XML data',
+            code: 'ctxt',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      XMLElement: {
+        name: 'XMLElement',
+        plural: 'XMLElements',
+        description: 'A unit of data in XML format',
+        code: 'xmle',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'the unique identifier of the XML element',
+            code: 'ID  ',
+            optional: false,
+          },
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'the name of the XML element',
+            code: 'pnam',
+            optional: false,
+          },
+          value: {
+            access: 'rw',
+            type: 'string',
+            description: 'the value of the XML element',
+            code: 'valL',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingClass: {
+        name: 'ScriptingClass',
+        plural: 'ScriptingClasses',
+        description: 'A class within a suite within a scripting definition',
+        code: 'sdcl',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the class',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the class',
+            code: 'ID  ',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the class',
+            code: 'desc',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the class hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+          pluralName: {
+            access: 'r',
+            type: 'string',
+            description: 'The plural name of the class',
+            code: 'plnm',
+            optional: false,
+          },
+          suiteName: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the suite to which this class belongs',
+            code: 'stnm',
+            optional: false,
+          },
+          superclass: {
+            access: 'r',
+            type: {
+              resource: 'scripting class',
+            },
+            description: 'The class from which this class inherits',
+            code: 'supe',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingCommand: {
+        name: 'ScriptingCommand',
+        plural: 'ScriptingCommands',
+        description: 'A command within a suite within a scripting definition',
+        code: 'sdcm',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the command',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the command',
+            code: 'ID  ',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the command',
+            code: 'desc',
+            optional: false,
+          },
+          directParameter: {
+            access: 'r',
+            type: {
+              resource: 'scripting parameter',
+            },
+            description: 'The direct parameter of the command',
+            code: 'sddp',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the command hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+          scriptingResult: {
+            access: 'r',
+            type: {
+              resource: 'scripting result object',
+            },
+            description: 'The object or data returned by this command',
+            code: 'sdrs',
+            optional: false,
+          },
+          suiteName: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the suite to which this command belongs',
+            code: 'stnm',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingDefinitionObject: {
+        name: 'ScriptingDefinitionObject',
+        plural: 'ScriptingDefinitionObjects',
+        description: 'The scripting definition of the System Events applicaation',
+        code: 'sdeo',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this scripting definition object',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ScriptingElement: {
+        name: 'ScriptingElement',
+        plural: 'ScriptingElements',
+        description: 'An element within a class within a suite within a scripting definition',
+        code: 'sdel',
+        properties: {
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'Unique identifier for this scripting element',
+            code: 'ID  ',
+            optional: false,
+          },
+        },
+      },
+      ScriptingEnumeration: {
+        name: 'ScriptingEnumeration',
+        plural: 'ScriptingEnumerations',
+        description: 'An enumeration within a suite within a scripting definition',
+        code: 'sden',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the enumeration',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the enumeration',
+            code: 'ID  ',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the enumeration hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingEnumerator: {
+        name: 'ScriptingEnumerator',
+        plural: 'ScriptingEnumerators',
+        description:
+          'An enumerator within an enumeration within a suite within a scripting definition',
+        code: 'sder',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the enumerator',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the enumerator',
+            code: 'ID  ',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the enumerator',
+            code: 'desc',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the enumerator hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingParameter: {
+        name: 'ScriptingParameter',
+        plural: 'ScriptingParameters',
+        description: 'A parameter within a command within a suite within a scripting definition',
+        code: 'sdpa',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the parameter',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the parameter',
+            code: 'ID  ',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the parameter',
+            code: 'desc',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the parameter hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+          kind: {
+            access: 'r',
+            type: 'string',
+            description: 'The kind of object or data specified by this parameter',
+            code: 'kind',
+            optional: false,
+          },
+          optional: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the parameter optional?',
+            code: 'optl',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingProperty: {
+        name: 'ScriptingProperty',
+        plural: 'ScriptingProperties',
+        description: 'A property within a class within a suite within a scripting definition',
+        code: 'sdpr',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the property',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the property',
+            code: 'ID  ',
+            optional: false,
+          },
+          access: {
+            access: 'r',
+            type: 'string',
+            description: 'The type of access to this property',
+            code: 'accs',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the property',
+            code: 'desc',
+            optional: false,
+          },
+          enumerated: {
+            access: 'r',
+            type: 'boolean',
+            description: "Is the property's value an enumerator?",
+            code: 'enmd',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the property hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+          kind: {
+            access: 'r',
+            type: 'string',
+            description: 'The kind of object or data returned by this property',
+            code: 'kind',
+            optional: false,
+          },
+          listed: {
+            access: 'r',
+            type: 'boolean',
+            description: "Is the property's value a list?",
+            code: 'lstd',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
+      ScriptingSuite: {
+        name: 'ScriptingSuite',
+        plural: 'ScriptingSuites',
+        description: 'A suite within a scripting definition',
+        code: 'sdst',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The name of the suite',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'string',
+            description: 'The unique identifier of the suite',
+            code: 'ID  ',
+            optional: false,
+          },
+          description: {
+            access: 'r',
+            type: 'string',
+            description: 'The description of the suite',
+            code: 'desc',
+            optional: false,
+          },
+          hidden: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Is the suite hidden?',
+            code: 'hidn',
+            optional: false,
+          },
+        },
+        identifiers: [
+          {
+            property: 'id',
+            primary: true,
+          },
+        ],
+      },
     },
-    "ScrollPageBehaviors": {
-      "name": "ScrollPageBehaviors",
-      "code": "sclb",
-      "values": [
-        {
-          "name": "jumpToHere",
-          "value": "jumpToHere",
-          "description": "jump to here",
-          "code": "tohr"
-        },
-        {
-          "name": "jumpToNextPage",
-          "value": "jumpToNextPage",
-          "description": "jump to next page",
-          "code": "nxpg"
-        }
-      ]
+    enums: {
+      SaveableFileFormat: {
+        name: 'SaveableFileFormat',
+        code: 'savf',
+        values: [
+          {
+            name: 'text',
+            value: 'text',
+            description: 'Text File Format',
+            code: 'ctxt',
+          },
+        ],
+      },
+      ScrollPageBehaviors: {
+        name: 'ScrollPageBehaviors',
+        code: 'sclb',
+        values: [
+          {
+            name: 'jumpToHere',
+            value: 'jumpToHere',
+            description: 'jump to here',
+            code: 'tohr',
+          },
+          {
+            name: 'jumpToNextPage',
+            value: 'jumpToNextPage',
+            description: 'jump to next page',
+            code: 'nxpg',
+          },
+        ],
+      },
+      FontSmoothingStyles: {
+        name: 'FontSmoothingStyles',
+        code: 'ftss',
+        values: [
+          {
+            name: 'automatic',
+            value: 'automatic',
+            description: 'automatic',
+            code: 'autm',
+          },
+          {
+            name: 'light',
+            value: 'light',
+            description: 'light',
+            code: 'lite',
+          },
+          {
+            name: 'medium',
+            value: 'medium',
+            description: 'medium',
+            code: 'medi',
+          },
+          {
+            name: 'standard',
+            value: 'standard',
+            description: 'standard',
+            code: 'stnd',
+          },
+          {
+            name: 'strong',
+            value: 'strong',
+            description: 'strong',
+            code: 'strg',
+          },
+        ],
+      },
+      Appearances: {
+        name: 'Appearances',
+        code: 'appe',
+        values: [
+          {
+            name: 'blue',
+            value: 'blue',
+            description: 'blue',
+            code: 'blue',
+          },
+          {
+            name: 'graphite',
+            value: 'graphite',
+            description: 'graphite',
+            code: 'grft',
+          },
+        ],
+      },
+      HighlightColors: {
+        name: 'HighlightColors',
+        code: 'hico',
+        values: [
+          {
+            name: 'blue',
+            value: 'blue',
+            description: 'blue',
+            code: 'blue',
+          },
+          {
+            name: 'gold',
+            value: 'gold',
+            description: 'gold',
+            code: 'gold',
+          },
+          {
+            name: 'graphite',
+            value: 'graphite',
+            description: 'graphite',
+            code: 'grft',
+          },
+          {
+            name: 'green',
+            value: 'green',
+            description: 'green',
+            code: 'gren',
+          },
+          {
+            name: 'orange',
+            value: 'orange',
+            description: 'orange',
+            code: 'orng',
+          },
+          {
+            name: 'purple',
+            value: 'purple',
+            description: 'purple',
+            code: 'prpl',
+          },
+          {
+            name: 'red',
+            value: 'red',
+            description: 'red',
+            code: 'red',
+          },
+          {
+            name: 'silver',
+            value: 'silver',
+            description: 'silver',
+            code: 'slvr',
+          },
+        ],
+      },
+      Dhac: {
+        name: 'Dhac',
+        code: 'dhac',
+        values: [
+          {
+            name: 'askWhatToDo',
+            value: 'askWhatToDo',
+            description: 'ask what to do',
+            code: 'dhas',
+          },
+          {
+            name: 'ignore',
+            value: 'ignore',
+            description: 'ignore',
+            code: 'dhig',
+          },
+          {
+            name: 'openApplication',
+            value: 'openApplication',
+            description: 'open application',
+            code: 'dhap',
+          },
+          {
+            name: 'runAScript',
+            value: 'runAScript',
+            description: 'run a script',
+            code: 'dhrs',
+          },
+        ],
+      },
+      DynamicStyle: {
+        name: 'DynamicStyle',
+        code: 'dyst',
+        values: [
+          {
+            name: 'auto',
+            value: 'auto',
+            description: 'automatic (if supported, follows light/dark appearance)',
+            code: 'atmt',
+          },
+          {
+            name: 'dynamic',
+            value: 'dynamic',
+            description:
+              'dynamic (if supported, updates desktop picture based on time and/or location)',
+            code: 'dynm',
+          },
+          {
+            name: 'light',
+            value: 'light',
+            description: 'light',
+            code: 'lite',
+          },
+          {
+            name: 'dark',
+            value: 'dark',
+            description: 'dark',
+            code: 'dark',
+          },
+          {
+            name: 'unknown',
+            value: 'unknown',
+            description: 'unknown value',
+            code: 'unk?',
+          },
+        ],
+      },
+      Dpls: {
+        name: 'Dpls',
+        code: 'dpls',
+        values: [
+          {
+            name: 'bottom',
+            value: 'bottom',
+            description: 'bottom',
+            code: 'bott',
+          },
+          {
+            name: 'left',
+            value: 'left',
+            description: 'left',
+            code: 'left',
+          },
+          {
+            name: 'right',
+            value: 'right',
+            description: 'right',
+            code: 'righ',
+          },
+        ],
+      },
+      Dpef: {
+        name: 'Dpef',
+        code: 'dpef',
+        values: [
+          {
+            name: 'genie',
+            value: 'genie',
+            description: 'genie',
+            code: 'geni',
+          },
+          {
+            name: 'scale',
+            value: 'scale',
+            description: 'scale',
+            code: 'scal',
+          },
+        ],
+      },
+      Dpbh: {
+        name: 'Dpbh',
+        code: 'dpbh',
+        values: [
+          {
+            name: 'minimize',
+            value: 'minimize',
+            description: 'minimize',
+            code: 'ddmi',
+          },
+          {
+            name: 'off',
+            value: 'off',
+            description: 'off',
+            code: 'ddof',
+          },
+          {
+            name: 'zoom',
+            value: 'zoom',
+            description: 'zoom',
+            code: 'ddzo',
+          },
+        ],
+      },
+      Edfm: {
+        name: 'Edfm',
+        code: 'edfm',
+        values: [
+          {
+            name: 'applePhotoFormat',
+            value: 'applePhotoFormat',
+            description: 'Apple Photo format',
+            code: 'dfph',
+          },
+          {
+            name: 'appleShareFormat',
+            value: 'appleShareFormat',
+            description: 'AppleShare format',
+            code: 'dfas',
+          },
+          {
+            name: 'audioFormat',
+            value: 'audioFormat',
+            description: 'audio format',
+            code: 'dfau',
+          },
+          {
+            name: 'highSierraFormat',
+            value: 'highSierraFormat',
+            description: 'High Sierra format',
+            code: 'dfhs',
+          },
+          {
+            name: 'iSO9660Format',
+            value: 9660,
+            description: 'ISO 9660 format',
+            code: 'df96',
+          },
+          {
+            name: 'macOSExtendedFormat',
+            value: 'macOSExtendedFormat',
+            description: 'Mac OS Extended format',
+            code: 'dfh+',
+          },
+          {
+            name: 'macOSFormat',
+            value: 'macOSFormat',
+            description: 'Mac OS format',
+            code: 'dfhf',
+          },
+          {
+            name: 'mSDOSFormat',
+            value: 'mSDOSFormat',
+            description: 'MSDOS format',
+            code: 'dfms',
+          },
+          {
+            name: 'nFSFormat',
+            value: 'nFSFormat',
+            description: 'NFS format',
+            code: 'dfnf',
+          },
+          {
+            name: 'proDOSFormat',
+            value: 'proDOSFormat',
+            description: 'ProDOS format',
+            code: 'dfpr',
+          },
+          {
+            name: 'quickTakeFormat',
+            value: 'quickTakeFormat',
+            description: 'QuickTake format',
+            code: 'dfqt',
+          },
+          {
+            name: 'uDFFormat',
+            value: 'uDFFormat',
+            description: 'UDF format',
+            code: 'dfud',
+          },
+          {
+            name: 'uFSFormat',
+            value: 'uFSFormat',
+            description: 'UFS format',
+            code: 'dfuf',
+          },
+          {
+            name: 'unknownFormat',
+            value: 'unknownFormat',
+            description: 'unknown format',
+            code: 'df$$',
+          },
+          {
+            name: 'webDAVFormat',
+            value: 'webDAVFormat',
+            description: 'WebDAV format',
+            code: 'dfwd',
+          },
+        ],
+      },
+      EMds: {
+        name: 'EMds',
+        code: 'eMds',
+        values: [
+          {
+            name: 'commandDown',
+            value: 'commandDown',
+            description: 'command down',
+            code: 'Kcmd',
+          },
+          {
+            name: 'controlDown',
+            value: 'controlDown',
+            description: 'control down',
+            code: 'Kctl',
+          },
+          {
+            name: 'optionDown',
+            value: 'optionDown',
+            description: 'option down',
+            code: 'Kopt',
+          },
+          {
+            name: 'shiftDown',
+            value: 'shiftDown',
+            description: 'shift down',
+            code: 'Ksft',
+          },
+        ],
+      },
+      EMky: {
+        name: 'EMky',
+        code: 'eMky',
+        values: [
+          {
+            name: 'command',
+            value: 'command',
+            description: 'command',
+            code: 'eCmd',
+          },
+          {
+            name: 'control',
+            value: 'control',
+            description: 'control',
+            code: 'eCnt',
+          },
+          {
+            name: 'option',
+            value: 'option',
+            description: 'option',
+            code: 'eOpt',
+          },
+          {
+            name: 'shift',
+            value: 'shift',
+            description: 'shift',
+            code: 'eSft',
+          },
+        ],
+      },
+      Enum: {
+        name: 'Enum',
+        code: 'enum',
+        values: [
+          {
+            name: 'standard',
+            value: 'standard',
+            description: 'Standard PostScript error handling',
+            code: 'lwst',
+          },
+          {
+            name: 'detailed',
+            value: 'detailed',
+            description: 'print a detailed report of PostScript errors',
+            code: 'lwdt',
+          },
+        ],
+      },
+      Actn: {
+        name: 'Actn',
+        code: 'actn',
+        values: [
+          {
+            name: 'itemsAdded',
+            value: 'itemsAdded',
+            description: 'items added',
+            code: 'fget',
+          },
+          {
+            name: 'itemsRemoved',
+            value: 'itemsRemoved',
+            description: 'items removed',
+            code: 'flos',
+          },
+          {
+            name: 'windowClosed',
+            value: 'windowClosed',
+            description: 'window closed',
+            code: 'fclo',
+          },
+          {
+            name: 'windowMoved',
+            value: 'windowMoved',
+            description: 'window moved',
+            code: 'fsiz',
+          },
+          {
+            name: 'windowOpened',
+            value: 'windowOpened',
+            description: 'window opened',
+            code: 'fopn',
+          },
+        ],
+      },
+      Accs: {
+        name: 'Accs',
+        code: 'accs',
+        values: [
+          {
+            name: 'none',
+            value: 'none',
+            description: 'none',
+            code: 'none',
+          },
+          {
+            name: 'readOnly',
+            value: 'readOnly',
+            description: 'read only',
+            code: 'read',
+          },
+          {
+            name: 'readWrite',
+            value: 'readWrite',
+            description: 'read write',
+            code: 'rdwr',
+          },
+          {
+            name: 'writeOnly',
+            value: 'writeOnly',
+            description: 'write only',
+            code: 'writ',
+          },
+        ],
+      },
     },
-    "FontSmoothingStyles": {
-      "name": "FontSmoothingStyles",
-      "code": "ftss",
-      "values": [
-        {
-          "name": "automatic",
-          "value": "automatic",
-          "description": "automatic",
-          "code": "autm"
-        },
-        {
-          "name": "light",
-          "value": "light",
-          "description": "light",
-          "code": "lite"
-        },
-        {
-          "name": "medium",
-          "value": "medium",
-          "description": "medium",
-          "code": "medi"
-        },
-        {
-          "name": "standard",
-          "value": "standard",
-          "description": "standard",
-          "code": "stnd"
-        },
-        {
-          "name": "strong",
-          "value": "strong",
-          "description": "strong",
-          "code": "strg"
-        }
-      ]
+    hierarchy: {
+      children: {},
     },
-    "Appearances": {
-      "name": "Appearances",
-      "code": "appe",
-      "values": [
-        {
-          "name": "blue",
-          "value": "blue",
-          "description": "blue",
-          "code": "blue"
-        },
-        {
-          "name": "graphite",
-          "value": "graphite",
-          "description": "graphite",
-          "code": "grft"
-        }
-      ]
+    relationships: [],
+    commands: {
+      abortTransaction: {
+        name: 'abortTransaction',
+        description: 'Discard the results of a bounded update session with one or more files.',
+        scope: 'application',
+        parameters: [],
+        code: 'ttrm',
+      },
+      beginTransaction: {
+        name: 'beginTransaction',
+        description: 'Begin a bounded update session with one or more files.',
+        scope: 'application',
+        parameters: [],
+        code: 'begi',
+      },
+      endTransaction: {
+        name: 'endTransaction',
+        description: 'Apply the results of a bounded update session with one or more files.',
+        scope: 'application',
+        parameters: [],
+        code: 'endt',
+      },
+      connect: {
+        name: 'connect',
+        description: 'connect a configuration or service',
+        scope: 'application',
+        parameters: [],
+        code: 'conn',
+      },
+      disconnect: {
+        name: 'disconnect',
+        description: 'disconnect a configuration or service',
+        scope: 'application',
+        parameters: [],
+        code: 'dcon',
+      },
+      start: {
+        name: 'start',
+        description: 'start the screen saver',
+        scope: 'application',
+        parameters: [],
+        code: 'strt',
+      },
+      stop: {
+        name: 'stop',
+        description: 'stop the screen saver',
+        scope: 'application',
+        parameters: [],
+        code: 'stop',
+      },
+      delete: {
+        name: 'delete',
+        description: 'Delete disk item(s).',
+        scope: 'resource',
+        resourceType: 'DiskItem',
+        parameters: [],
+        code: 'delo',
+      },
+      move: {
+        name: 'move',
+        description: 'Move disk item(s) to a new location.',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'to',
+            type: 'string',
+            description: 'The new location for the disk item(s).',
+            required: true,
+            code: 'insh',
+          },
+        ],
+        code: 'move',
+      },
+      open: {
+        name: 'open',
+        description: 'Open disk item(s) with the appropriate application.',
+        scope: 'application',
+        parameters: [],
+        code: 'odoc',
+      },
+      logOut: {
+        name: 'logOut',
+        description: 'Log out the current user',
+        scope: 'application',
+        parameters: [],
+        code: 'logo',
+      },
+      restart: {
+        name: 'restart',
+        description: 'Restart the computer',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'stateSavingPreference',
+            type: 'boolean',
+            description: 'Is the user defined state saving preference followed?',
+            required: false,
+            code: 'stsv',
+          },
+        ],
+        code: 'rest',
+      },
+      shutDown: {
+        name: 'shutDown',
+        description: 'Shut Down the computer',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'stateSavingPreference',
+            type: 'boolean',
+            description: 'Is the user defined state saving preference followed?',
+            required: false,
+            code: 'stsv',
+          },
+        ],
+        code: 'shut',
+      },
+      sleep: {
+        name: 'sleep',
+        description: 'Put the computer to sleep',
+        scope: 'application',
+        parameters: [],
+        code: 'slep',
+      },
+      click: {
+        name: 'click',
+        description: 'cause the target process to behave as if the UI element were clicked',
+        scope: 'resource',
+        resourceType: 'UIElement',
+        parameters: [
+          {
+            name: 'at',
+            type: 'string',
+            description:
+              'when sent to a "process" object, the { x, y } location at which to click, in global coordinates',
+            required: false,
+            code: 'insh',
+          },
+        ],
+        code: 'clic',
+      },
+      keyCode: {
+        name: 'keyCode',
+        description: 'cause the target process to behave as if key codes were entered',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'using',
+            type: 'string',
+            description: 'modifiers with which the key codes are to be entered',
+            required: false,
+            code: 'faal',
+          },
+        ],
+        code: 'kcod',
+      },
+      keystroke: {
+        name: 'keystroke',
+        description: 'cause the target process to behave as if keystrokes were entered',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'using',
+            type: 'string',
+            description: 'modifiers with which the keystrokes are to be entered',
+            required: false,
+            code: 'faal',
+          },
+        ],
+        code: 'kprs',
+      },
+      perform: {
+        name: 'perform',
+        description:
+          'cause the target process to behave as if the action were applied to its UI element',
+        scope: 'resource',
+        resourceType: 'Action',
+        parameters: [],
+        code: 'perf',
+      },
+      select: {
+        name: 'select',
+        description: 'set the selected property of the UI element',
+        scope: 'resource',
+        resourceType: 'UIElement',
+        parameters: [],
+        code: 'slct',
+      },
+      attachActionTo: {
+        name: 'attachActionTo',
+        description: 'Attach an action to a folder',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'using',
+            type: 'string',
+            description: 'a file containing the script to attach',
+            required: true,
+            code: 'faal',
+          },
+        ],
+        code: 'atfa',
+      },
+      attachedScripts: {
+        name: 'attachedScripts',
+        description: 'List the actions attached to a folder',
+        scope: 'application',
+        parameters: [],
+        code: 'lact',
+      },
+      cancel: {
+        name: 'cancel',
+        description: 'cause the target process to behave as if the UI element were cancelled',
+        scope: 'application',
+        parameters: [],
+        code: 'cncl',
+      },
+      confirm: {
+        name: 'confirm',
+        description: 'cause the target process to behave as if the UI element were confirmed',
+        scope: 'application',
+        parameters: [],
+        code: 'cnfm',
+      },
+      decrement: {
+        name: 'decrement',
+        description: 'cause the target process to behave as if the UI element were decremented',
+        scope: 'application',
+        parameters: [],
+        code: 'decr',
+      },
+      doFolderAction: {
+        name: 'doFolderAction',
+        description: 'Send a folder action code to a folder action script',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'folderActionCode',
+            type: 'string',
+            description: 'the folder action message to process',
+            required: true,
+            code: 'actn',
+          },
+          {
+            name: 'withItemList',
+            type: 'any',
+            description: 'a list of items for the folder action message to process',
+            required: false,
+            code: 'flst',
+          },
+          {
+            name: 'withWindowSize',
+            type: 'rect',
+            description: 'the new window size for the folder action message to process',
+            required: false,
+            code: 'fnsz',
+          },
+        ],
+        code: 'fola',
+      },
+      editActionOf: {
+        name: 'editActionOf',
+        description: 'Edit an action of a folder',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'usingActionName',
+            type: 'string',
+            description: '...or the name of the action to edit',
+            required: false,
+            code: 'snam',
+          },
+          {
+            name: 'usingActionNumber',
+            type: 'integer',
+            description: 'the index number of the action to edit...',
+            required: false,
+            code: 'indx',
+          },
+        ],
+        code: 'edfa',
+      },
+      increment: {
+        name: 'increment',
+        description: 'cause the target process to behave as if the UI element were incremented',
+        scope: 'application',
+        parameters: [],
+        code: 'incE',
+      },
+      keyDown: {
+        name: 'keyDown',
+        description: 'cause the target process to behave as if keys were held down',
+        scope: 'application',
+        parameters: [],
+        code: 'keyF',
+      },
+      keyUp: {
+        name: 'keyUp',
+        description: 'cause the target process to behave as if keys were released',
+        scope: 'application',
+        parameters: [],
+        code: 'keyU',
+      },
+      pick: {
+        name: 'pick',
+        description: 'cause the target process to behave as if the UI element were picked',
+        scope: 'application',
+        parameters: [],
+        code: 'pick',
+      },
+      removeActionFrom: {
+        name: 'removeActionFrom',
+        description: 'Remove a folder action from a folder',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'usingActionName',
+            type: 'string',
+            description: '...or the name of the action to remove',
+            required: false,
+            code: 'snam',
+          },
+          {
+            name: 'usingActionNumber',
+            type: 'integer',
+            description: 'the index number of the action to remove...',
+            required: false,
+            code: 'indx',
+          },
+        ],
+        code: 'rmfa',
+      },
     },
-    "HighlightColors": {
-      "name": "HighlightColors",
-      "code": "hico",
-      "values": [
-        {
-          "name": "blue",
-          "value": "blue",
-          "description": "blue",
-          "code": "blue"
-        },
-        {
-          "name": "gold",
-          "value": "gold",
-          "description": "gold",
-          "code": "gold"
-        },
-        {
-          "name": "graphite",
-          "value": "graphite",
-          "description": "graphite",
-          "code": "grft"
-        },
-        {
-          "name": "green",
-          "value": "green",
-          "description": "green",
-          "code": "gren"
-        },
-        {
-          "name": "orange",
-          "value": "orange",
-          "description": "orange",
-          "code": "orng"
-        },
-        {
-          "name": "purple",
-          "value": "purple",
-          "description": "purple",
-          "code": "prpl"
-        },
-        {
-          "name": "red",
-          "value": "red",
-          "description": "red",
-          "code": "red"
-        },
-        {
-          "name": "silver",
-          "value": "silver",
-          "description": "silver",
-          "code": "slvr"
-        }
-      ]
-    },
-    "Dhac": {
-      "name": "Dhac",
-      "code": "dhac",
-      "values": [
-        {
-          "name": "askWhatToDo",
-          "value": "askWhatToDo",
-          "description": "ask what to do",
-          "code": "dhas"
-        },
-        {
-          "name": "ignore",
-          "value": "ignore",
-          "description": "ignore",
-          "code": "dhig"
-        },
-        {
-          "name": "openApplication",
-          "value": "openApplication",
-          "description": "open application",
-          "code": "dhap"
-        },
-        {
-          "name": "runAScript",
-          "value": "runAScript",
-          "description": "run a script",
-          "code": "dhrs"
-        }
-      ]
-    },
-    "DynamicStyle": {
-      "name": "DynamicStyle",
-      "code": "dyst",
-      "values": [
-        {
-          "name": "auto",
-          "value": "auto",
-          "description": "automatic (if supported, follows light/dark appearance)",
-          "code": "atmt"
-        },
-        {
-          "name": "dynamic",
-          "value": "dynamic",
-          "description": "dynamic (if supported, updates desktop picture based on time and/or location)",
-          "code": "dynm"
-        },
-        {
-          "name": "light",
-          "value": "light",
-          "description": "light",
-          "code": "lite"
-        },
-        {
-          "name": "dark",
-          "value": "dark",
-          "description": "dark",
-          "code": "dark"
-        },
-        {
-          "name": "unknown",
-          "value": "unknown",
-          "description": "unknown value",
-          "code": "unk?"
-        }
-      ]
-    },
-    "Dpls": {
-      "name": "Dpls",
-      "code": "dpls",
-      "values": [
-        {
-          "name": "bottom",
-          "value": "bottom",
-          "description": "bottom",
-          "code": "bott"
-        },
-        {
-          "name": "left",
-          "value": "left",
-          "description": "left",
-          "code": "left"
-        },
-        {
-          "name": "right",
-          "value": "right",
-          "description": "right",
-          "code": "righ"
-        }
-      ]
-    },
-    "Dpef": {
-      "name": "Dpef",
-      "code": "dpef",
-      "values": [
-        {
-          "name": "genie",
-          "value": "genie",
-          "description": "genie",
-          "code": "geni"
-        },
-        {
-          "name": "scale",
-          "value": "scale",
-          "description": "scale",
-          "code": "scal"
-        }
-      ]
-    },
-    "Dpbh": {
-      "name": "Dpbh",
-      "code": "dpbh",
-      "values": [
-        {
-          "name": "minimize",
-          "value": "minimize",
-          "description": "minimize",
-          "code": "ddmi"
-        },
-        {
-          "name": "off",
-          "value": "off",
-          "description": "off",
-          "code": "ddof"
-        },
-        {
-          "name": "zoom",
-          "value": "zoom",
-          "description": "zoom",
-          "code": "ddzo"
-        }
-      ]
-    },
-    "Edfm": {
-      "name": "Edfm",
-      "code": "edfm",
-      "values": [
-        {
-          "name": "applePhotoFormat",
-          "value": "applePhotoFormat",
-          "description": "Apple Photo format",
-          "code": "dfph"
-        },
-        {
-          "name": "appleShareFormat",
-          "value": "appleShareFormat",
-          "description": "AppleShare format",
-          "code": "dfas"
-        },
-        {
-          "name": "audioFormat",
-          "value": "audioFormat",
-          "description": "audio format",
-          "code": "dfau"
-        },
-        {
-          "name": "highSierraFormat",
-          "value": "highSierraFormat",
-          "description": "High Sierra format",
-          "code": "dfhs"
-        },
-        {
-          "name": "iSO9660Format",
-          "value": 9660,
-          "description": "ISO 9660 format",
-          "code": "df96"
-        },
-        {
-          "name": "macOSExtendedFormat",
-          "value": "macOSExtendedFormat",
-          "description": "Mac OS Extended format",
-          "code": "dfh+"
-        },
-        {
-          "name": "macOSFormat",
-          "value": "macOSFormat",
-          "description": "Mac OS format",
-          "code": "dfhf"
-        },
-        {
-          "name": "mSDOSFormat",
-          "value": "mSDOSFormat",
-          "description": "MSDOS format",
-          "code": "dfms"
-        },
-        {
-          "name": "nFSFormat",
-          "value": "nFSFormat",
-          "description": "NFS format",
-          "code": "dfnf"
-        },
-        {
-          "name": "proDOSFormat",
-          "value": "proDOSFormat",
-          "description": "ProDOS format",
-          "code": "dfpr"
-        },
-        {
-          "name": "quickTakeFormat",
-          "value": "quickTakeFormat",
-          "description": "QuickTake format",
-          "code": "dfqt"
-        },
-        {
-          "name": "uDFFormat",
-          "value": "uDFFormat",
-          "description": "UDF format",
-          "code": "dfud"
-        },
-        {
-          "name": "uFSFormat",
-          "value": "uFSFormat",
-          "description": "UFS format",
-          "code": "dfuf"
-        },
-        {
-          "name": "unknownFormat",
-          "value": "unknownFormat",
-          "description": "unknown format",
-          "code": "df$$"
-        },
-        {
-          "name": "webDAVFormat",
-          "value": "webDAVFormat",
-          "description": "WebDAV format",
-          "code": "dfwd"
-        }
-      ]
-    },
-    "EMds": {
-      "name": "EMds",
-      "code": "eMds",
-      "values": [
-        {
-          "name": "commandDown",
-          "value": "commandDown",
-          "description": "command down",
-          "code": "Kcmd"
-        },
-        {
-          "name": "controlDown",
-          "value": "controlDown",
-          "description": "control down",
-          "code": "Kctl"
-        },
-        {
-          "name": "optionDown",
-          "value": "optionDown",
-          "description": "option down",
-          "code": "Kopt"
-        },
-        {
-          "name": "shiftDown",
-          "value": "shiftDown",
-          "description": "shift down",
-          "code": "Ksft"
-        }
-      ]
-    },
-    "EMky": {
-      "name": "EMky",
-      "code": "eMky",
-      "values": [
-        {
-          "name": "command",
-          "value": "command",
-          "description": "command",
-          "code": "eCmd"
-        },
-        {
-          "name": "control",
-          "value": "control",
-          "description": "control",
-          "code": "eCnt"
-        },
-        {
-          "name": "option",
-          "value": "option",
-          "description": "option",
-          "code": "eOpt"
-        },
-        {
-          "name": "shift",
-          "value": "shift",
-          "description": "shift",
-          "code": "eSft"
-        }
-      ]
-    },
-    "Enum": {
-      "name": "Enum",
-      "code": "enum",
-      "values": [
-        {
-          "name": "standard",
-          "value": "standard",
-          "description": "Standard PostScript error handling",
-          "code": "lwst"
-        },
-        {
-          "name": "detailed",
-          "value": "detailed",
-          "description": "print a detailed report of PostScript errors",
-          "code": "lwdt"
-        }
-      ]
-    },
-    "Actn": {
-      "name": "Actn",
-      "code": "actn",
-      "values": [
-        {
-          "name": "itemsAdded",
-          "value": "itemsAdded",
-          "description": "items added",
-          "code": "fget"
-        },
-        {
-          "name": "itemsRemoved",
-          "value": "itemsRemoved",
-          "description": "items removed",
-          "code": "flos"
-        },
-        {
-          "name": "windowClosed",
-          "value": "windowClosed",
-          "description": "window closed",
-          "code": "fclo"
-        },
-        {
-          "name": "windowMoved",
-          "value": "windowMoved",
-          "description": "window moved",
-          "code": "fsiz"
-        },
-        {
-          "name": "windowOpened",
-          "value": "windowOpened",
-          "description": "window opened",
-          "code": "fopn"
-        }
-      ]
-    },
-    "Accs": {
-      "name": "Accs",
-      "code": "accs",
-      "values": [
-        {
-          "name": "none",
-          "value": "none",
-          "description": "none",
-          "code": "none"
-        },
-        {
-          "name": "readOnly",
-          "value": "readOnly",
-          "description": "read only",
-          "code": "read"
-        },
-        {
-          "name": "readWrite",
-          "value": "readWrite",
-          "description": "read write",
-          "code": "rdwr"
-        },
-        {
-          "name": "writeOnly",
-          "value": "writeOnly",
-          "description": "write only",
-          "code": "writ"
-        }
-      ]
-    }
-  },
-  "hierarchy": {
-    "children": {}
-  },
-  "relationships": [],
-  "commands": {
-    "abortTransaction": {
-      "name": "abortTransaction",
-      "description": "Discard the results of a bounded update session with one or more files.",
-      "scope": "application",
-      "parameters": [],
-      "code": "ttrm"
-    },
-    "beginTransaction": {
-      "name": "beginTransaction",
-      "description": "Begin a bounded update session with one or more files.",
-      "scope": "application",
-      "parameters": [],
-      "code": "begi"
-    },
-    "endTransaction": {
-      "name": "endTransaction",
-      "description": "Apply the results of a bounded update session with one or more files.",
-      "scope": "application",
-      "parameters": [],
-      "code": "endt"
-    },
-    "connect": {
-      "name": "connect",
-      "description": "connect a configuration or service",
-      "scope": "application",
-      "parameters": [],
-      "code": "conn"
-    },
-    "disconnect": {
-      "name": "disconnect",
-      "description": "disconnect a configuration or service",
-      "scope": "application",
-      "parameters": [],
-      "code": "dcon"
-    },
-    "start": {
-      "name": "start",
-      "description": "start the screen saver",
-      "scope": "application",
-      "parameters": [],
-      "code": "strt"
-    },
-    "stop": {
-      "name": "stop",
-      "description": "stop the screen saver",
-      "scope": "application",
-      "parameters": [],
-      "code": "stop"
-    },
-    "delete": {
-      "name": "delete",
-      "description": "Delete disk item(s).",
-      "scope": "resource",
-      "resourceType": "DiskItem",
-      "parameters": [],
-      "code": "delo"
-    },
-    "move": {
-      "name": "move",
-      "description": "Move disk item(s) to a new location.",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "to",
-          "type": "string",
-          "description": "The new location for the disk item(s).",
-          "required": true,
-          "code": "insh"
-        }
-      ],
-      "code": "move"
-    },
-    "open": {
-      "name": "open",
-      "description": "Open disk item(s) with the appropriate application.",
-      "scope": "application",
-      "parameters": [],
-      "code": "odoc"
-    },
-    "logOut": {
-      "name": "logOut",
-      "description": "Log out the current user",
-      "scope": "application",
-      "parameters": [],
-      "code": "logo"
-    },
-    "restart": {
-      "name": "restart",
-      "description": "Restart the computer",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "stateSavingPreference",
-          "type": "boolean",
-          "description": "Is the user defined state saving preference followed?",
-          "required": false,
-          "code": "stsv"
-        }
-      ],
-      "code": "rest"
-    },
-    "shutDown": {
-      "name": "shutDown",
-      "description": "Shut Down the computer",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "stateSavingPreference",
-          "type": "boolean",
-          "description": "Is the user defined state saving preference followed?",
-          "required": false,
-          "code": "stsv"
-        }
-      ],
-      "code": "shut"
-    },
-    "sleep": {
-      "name": "sleep",
-      "description": "Put the computer to sleep",
-      "scope": "application",
-      "parameters": [],
-      "code": "slep"
-    },
-    "click": {
-      "name": "click",
-      "description": "cause the target process to behave as if the UI element were clicked",
-      "scope": "resource",
-      "resourceType": "UIElement",
-      "parameters": [
-        {
-          "name": "at",
-          "type": "string",
-          "description": "when sent to a \"process\" object, the { x, y } location at which to click, in global coordinates",
-          "required": false,
-          "code": "insh"
-        }
-      ],
-      "code": "clic"
-    },
-    "keyCode": {
-      "name": "keyCode",
-      "description": "cause the target process to behave as if key codes were entered",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "using",
-          "type": "string",
-          "description": "modifiers with which the key codes are to be entered",
-          "required": false,
-          "code": "faal"
-        }
-      ],
-      "code": "kcod"
-    },
-    "keystroke": {
-      "name": "keystroke",
-      "description": "cause the target process to behave as if keystrokes were entered",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "using",
-          "type": "string",
-          "description": "modifiers with which the keystrokes are to be entered",
-          "required": false,
-          "code": "faal"
-        }
-      ],
-      "code": "kprs"
-    },
-    "perform": {
-      "name": "perform",
-      "description": "cause the target process to behave as if the action were applied to its UI element",
-      "scope": "resource",
-      "resourceType": "Action",
-      "parameters": [],
-      "code": "perf"
-    },
-    "select": {
-      "name": "select",
-      "description": "set the selected property of the UI element",
-      "scope": "resource",
-      "resourceType": "UIElement",
-      "parameters": [],
-      "code": "slct"
-    },
-    "attachActionTo": {
-      "name": "attachActionTo",
-      "description": "Attach an action to a folder",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "using",
-          "type": "string",
-          "description": "a file containing the script to attach",
-          "required": true,
-          "code": "faal"
-        }
-      ],
-      "code": "atfa"
-    },
-    "attachedScripts": {
-      "name": "attachedScripts",
-      "description": "List the actions attached to a folder",
-      "scope": "application",
-      "parameters": [],
-      "code": "lact"
-    },
-    "cancel": {
-      "name": "cancel",
-      "description": "cause the target process to behave as if the UI element were cancelled",
-      "scope": "application",
-      "parameters": [],
-      "code": "cncl"
-    },
-    "confirm": {
-      "name": "confirm",
-      "description": "cause the target process to behave as if the UI element were confirmed",
-      "scope": "application",
-      "parameters": [],
-      "code": "cnfm"
-    },
-    "decrement": {
-      "name": "decrement",
-      "description": "cause the target process to behave as if the UI element were decremented",
-      "scope": "application",
-      "parameters": [],
-      "code": "decr"
-    },
-    "doFolderAction": {
-      "name": "doFolderAction",
-      "description": "Send a folder action code to a folder action script",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "folderActionCode",
-          "type": "string",
-          "description": "the folder action message to process",
-          "required": true,
-          "code": "actn"
-        },
-        {
-          "name": "withItemList",
-          "type": "any",
-          "description": "a list of items for the folder action message to process",
-          "required": false,
-          "code": "flst"
-        },
-        {
-          "name": "withWindowSize",
-          "type": "rect",
-          "description": "the new window size for the folder action message to process",
-          "required": false,
-          "code": "fnsz"
-        }
-      ],
-      "code": "fola"
-    },
-    "editActionOf": {
-      "name": "editActionOf",
-      "description": "Edit an action of a folder",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "usingActionName",
-          "type": "string",
-          "description": "...or the name of the action to edit",
-          "required": false,
-          "code": "snam"
-        },
-        {
-          "name": "usingActionNumber",
-          "type": "integer",
-          "description": "the index number of the action to edit...",
-          "required": false,
-          "code": "indx"
-        }
-      ],
-      "code": "edfa"
-    },
-    "increment": {
-      "name": "increment",
-      "description": "cause the target process to behave as if the UI element were incremented",
-      "scope": "application",
-      "parameters": [],
-      "code": "incE"
-    },
-    "keyDown": {
-      "name": "keyDown",
-      "description": "cause the target process to behave as if keys were held down",
-      "scope": "application",
-      "parameters": [],
-      "code": "keyF"
-    },
-    "keyUp": {
-      "name": "keyUp",
-      "description": "cause the target process to behave as if keys were released",
-      "scope": "application",
-      "parameters": [],
-      "code": "keyU"
-    },
-    "pick": {
-      "name": "pick",
-      "description": "cause the target process to behave as if the UI element were picked",
-      "scope": "application",
-      "parameters": [],
-      "code": "pick"
-    },
-    "removeActionFrom": {
-      "name": "removeActionFrom",
-      "description": "Remove a folder action from a folder",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "usingActionName",
-          "type": "string",
-          "description": "...or the name of the action to remove",
-          "required": false,
-          "code": "snam"
-        },
-        {
-          "name": "usingActionNumber",
-          "type": "integer",
-          "description": "the index number of the action to remove...",
-          "required": false,
-          "code": "indx"
-        }
-      ],
-      "code": "rmfa"
-    }
-  }
-} as AppManifest,
-} as const;
+  } as AppManifest,
+} as const

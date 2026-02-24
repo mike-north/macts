@@ -11,7 +11,7 @@ List all scriptingdefinitionobjects.
 ```typescript
 list(): Promise<ScriptingDefinitionObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ScriptingDefinitionObject](./system-events.scriptingdefinitionobject.md)<!-- -->\[\]&gt;
-

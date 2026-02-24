@@ -9,5 +9,5 @@ The name of the class
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

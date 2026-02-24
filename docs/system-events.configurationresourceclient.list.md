@@ -11,7 +11,7 @@ List all configurations.
 ```typescript
 list(): Promise<Configuration[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Configuration](./system-events.configuration.md)<!-- -->\[\]&gt;
-

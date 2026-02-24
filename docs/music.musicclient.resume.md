@@ -11,7 +11,7 @@ disable fast forward/rewind and resume playback, if playing.
 ```typescript
 resume(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

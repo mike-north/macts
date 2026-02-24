@@ -11,7 +11,7 @@ Pause the recording.
 ```typescript
 pause(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

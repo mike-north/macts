@@ -9,5 +9,5 @@ Path to PEM-encoded private key file
 **Signature:**
 
 ```typescript
-key: string;
+key: string
 ```

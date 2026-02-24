@@ -9,5 +9,5 @@ Application name
 **Signature:**
 
 ```typescript
-appName: string;
+appName: string
 ```

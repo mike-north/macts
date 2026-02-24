@@ -9,5 +9,5 @@ Country code part of the address (should be a two character iso country code).
 **Signature:**
 
 ```typescript
-countryCode: string;
+countryCode: string
 ```

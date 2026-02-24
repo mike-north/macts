@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type CommandScope = z.infer<typeof CommandScopeSchema>;
+type CommandScope = z.infer<typeof CommandScopeSchema>
 ```
-**References:** [CommandScopeSchema](./core.commandscopeschema.md)
 
+**References:** [CommandScopeSchema](./core.commandscopeschema.md)

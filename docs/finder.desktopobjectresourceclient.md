@@ -9,7 +9,7 @@ Client for desktop-object is the class of the "desktop" object.
 **Signature:**
 
 ```typescript
-declare class DesktopObjectResourceClient 
+declare class DesktopObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DesktopObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.desktopobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DesktopObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DesktopObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.desktopobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new desktopobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.desktopobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a desktopobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.desktopobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a desktopobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.desktopobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all desktopobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.desktopobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing desktopobject.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ the date the track was added to the playlist
 **Signature:**
 
 ```typescript
-dateAdded: Date;
+dateAdded: Date
 ```

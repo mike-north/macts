@@ -18,30 +18,24 @@ create(input: ClippingCreateInput): Promise<Clipping>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ClippingCreateInput](./finder.clippingcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Clipping](./finder.clipping.md)<!-- -->&gt;
-

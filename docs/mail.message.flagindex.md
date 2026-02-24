@@ -9,5 +9,5 @@ The flag on the message, or -1 if the message is not flagged
 **Signature:**
 
 ```typescript
-flagIndex: number;
+flagIndex: number
 ```

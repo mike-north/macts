@@ -9,5 +9,5 @@ Input for creating a ClippingWindow
 **Signature:**
 
 ```typescript
-interface ClippingWindowCreateInput 
+interface ClippingWindowCreateInput
 ```

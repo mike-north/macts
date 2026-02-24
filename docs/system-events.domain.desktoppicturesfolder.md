@@ -9,5 +9,5 @@ The Desktop Pictures folder
 **Signature:**
 
 ```typescript
-desktopPicturesFolder: Folder;
+desktopPicturesFolder: Folder
 ```

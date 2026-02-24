@@ -9,5 +9,5 @@ the column name
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

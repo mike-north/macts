@@ -9,5 +9,5 @@ The creation date of the note
 **Signature:**
 
 ```typescript
-creationDate: string;
+creationDate: string
 ```

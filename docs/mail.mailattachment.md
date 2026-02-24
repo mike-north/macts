@@ -9,7 +9,7 @@ A file attached to a received message.
 **Signature:**
 
 ```typescript
-interface MailAttachment 
+interface MailAttachment
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface MailAttachment
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [downloaded](./mail.mailattachment.downloaded.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Indicates whether the attachment has been downloaded.
-
 
 </td></tr>
 <tr><td>
 
 [fileSize](./mail.mailattachment.filesize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Approximate size in bytes.
-
 
 </td></tr>
 <tr><td>
 
 [id](./mail.mailattachment.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the attachment.
-
 
 </td></tr>
 <tr><td>
 
 [mIMEType](./mail.mailattachment.mimetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 MIME type of the attachment E.g. text/plain.
-
 
 </td></tr>
 <tr><td>
 
 [name](./mail.mailattachment.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Name of the attachment
 
-
 </td></tr>
 </tbody></table>
-

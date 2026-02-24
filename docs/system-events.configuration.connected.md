@@ -9,5 +9,5 @@ Is the configuration connected?
 **Signature:**
 
 ```typescript
-connected: boolean;
+connected: boolean
 ```

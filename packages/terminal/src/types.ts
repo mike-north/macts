@@ -3,102 +3,102 @@
  * Auto-generated - do not edit.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /** A Terminal window */
 export interface Window {
   /** The title of the window */
-  name: string;
+  name: string
   /** The unique identifier of the window */
-  id: number;
+  id: number
   /** The position of the window */
-  position: string;
+  position: string
   /** Whether the window is visible */
-  visible: boolean;
+  visible: boolean
   /** Whether the window is the frontmost window */
-  frontmost: boolean;
+  frontmost: boolean
 }
 
 /** Input for creating a Window */
 export interface WindowCreateInput {
   /** The position of the window */
-  position?: string;
+  position?: string
   /** Whether the window is visible */
-  visible?: boolean;
+  visible?: boolean
 }
 
 /** Input for updating a Window */
-export type WindowUpdateInput = Partial<WindowCreateInput>;
+export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A Terminal tab */
 export interface Tab {
   /** The visible contents of the tab */
-  contents: string;
+  contents: string
   /** The complete history contents of the tab */
-  history: string;
+  history: string
   /** Whether the tab is busy running a process */
-  busy: boolean;
+  busy: boolean
   /** The currently running processes in the tab */
-  processes: string;
+  processes: string
   /** Whether the tab is selected */
-  selected: boolean;
+  selected: boolean
   /** Whether the title displays a custom title */
-  titleDisplaysCustomTitle: boolean;
+  titleDisplaysCustomTitle: boolean
   /** The custom title of the tab */
-  customTitle: string;
+  customTitle: string
   /** The tty device of the tab */
-  tty: string;
+  tty: string
   /** The name of the current settings set */
-  currentSettings: string;
+  currentSettings: string
 }
 
 /** Input for creating a Tab */
 export interface TabCreateInput {
   /** Whether the tab is selected */
-  selected?: boolean;
+  selected?: boolean
   /** Whether the title displays a custom title */
-  titleDisplaysCustomTitle?: boolean;
+  titleDisplaysCustomTitle?: boolean
   /** The custom title of the tab */
-  customTitle?: string;
+  customTitle?: string
   /** The name of the current settings set */
-  currentSettings?: string;
+  currentSettings?: string
 }
 
 /** Input for updating a Tab */
-export type TabUpdateInput = Partial<TabCreateInput>;
+export type TabUpdateInput = Partial<TabCreateInput>
 
 /** A Terminal settings set (profile) */
 export interface SettingsSet {
   /** The name of the settings set */
-  name: string;
+  name: string
   /** The unique identifier of the settings set */
-  id: number;
+  id: number
   /** The number of rows */
-  numberOfRows: number;
+  numberOfRows: number
   /** The number of columns */
-  numberOfColumns: number;
+  numberOfColumns: number
   /** The name of the font */
-  fontName: string;
+  fontName: string
   /** The size of the font */
-  fontSize: number;
+  fontSize: number
 }
 
 /** Input for creating a SettingsSet */
 export interface SettingsSetCreateInput {
   /** The name of the settings set */
-  name?: string;
+  name?: string
   /** The number of rows */
-  numberOfRows?: number;
+  numberOfRows?: number
   /** The number of columns */
-  numberOfColumns?: number;
+  numberOfColumns?: number
   /** The name of the font */
-  fontName?: string;
+  fontName?: string
   /** The size of the font */
-  fontSize?: number;
+  fontSize?: number
 }
 
 /** Input for updating a SettingsSet */
-export type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>;
+export type SettingsSetUpdateInput = Partial<SettingsSetCreateInput>
 
 // Zod schemas for runtime validation
 
@@ -108,7 +108,7 @@ export const WindowSchema = z.object({
   position: z.string(),
   visible: z.boolean(),
   frontmost: z.boolean(),
-});
+})
 
 export const TabSchema = z.object({
   contents: z.string(),
@@ -120,7 +120,7 @@ export const TabSchema = z.object({
   customTitle: z.string(),
   tty: z.string(),
   currentSettings: z.string(),
-});
+})
 
 export const SettingsSetSchema = z.object({
   name: z.string(),
@@ -129,4 +129,4 @@ export const SettingsSetSchema = z.object({
   numberOfColumns: z.number(),
   fontName: z.string(),
   fontSize: z.number(),
-});
+})

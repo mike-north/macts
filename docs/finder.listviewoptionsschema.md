@@ -7,12 +7,15 @@
 **Signature:**
 
 ```typescript
-ListViewOptionsSchema: z.ZodObject<{
-    calculatesFolderSizes: z.ZodBoolean;
-    showsIconPreview: z.ZodBoolean;
-    iconSize: z.ZodString;
-    textSize: z.ZodNumber;
-    sortColumn: z.ZodString;
-    usesRelativeDates: z.ZodBoolean;
-}, z.core.$strip>
+ListViewOptionsSchema: z.ZodObject<
+  {
+    calculatesFolderSizes: z.ZodBoolean
+    showsIconPreview: z.ZodBoolean
+    iconSize: z.ZodString
+    textSize: z.ZodNumber
+    sortColumn: z.ZodString
+    usesRelativeDates: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

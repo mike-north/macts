@@ -9,5 +9,5 @@ Property name for the flag
 **Signature:**
 
 ```typescript
-propertyName: string;
+propertyName: string
 ```

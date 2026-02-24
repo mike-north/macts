@@ -9,5 +9,5 @@ The service name of this social profile.
 **Signature:**
 
 ```typescript
-serviceName: string;
+serviceName: string
 ```

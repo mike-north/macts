@@ -9,5 +9,5 @@ The name of the list
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

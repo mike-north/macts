@@ -9,7 +9,7 @@ Input for creating a PropertyListItem
 **Signature:**
 
 ```typescript
-interface PropertyListItemCreateInput 
+interface PropertyListItemCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface PropertyListItemCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [text?](./system-events.propertylistitemcreateinput.text.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the text representation of the property list data
-
 
 </td></tr>
 <tr><td>
 
 [value?](./system-events.propertylistitemcreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the value of the property list item
 
-
 </td></tr>
 </tbody></table>
-

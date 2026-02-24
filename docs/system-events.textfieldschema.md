@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-TextFieldSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+TextFieldSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

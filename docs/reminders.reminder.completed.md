@@ -9,5 +9,5 @@ Whether the reminder is completed
 **Signature:**
 
 ```typescript
-completed: boolean;
+completed: boolean
 ```

@@ -9,5 +9,5 @@ The type identifier of the alias
 **Signature:**
 
 ```typescript
-typeIdentifier: string;
+typeIdentifier: string
 ```

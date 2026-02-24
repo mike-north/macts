@@ -11,7 +11,7 @@ Print an object.
 ```typescript
 print(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

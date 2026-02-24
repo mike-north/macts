@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-TrashObjectSchema: z.ZodObject<{
-    warnsBeforeEmptying: z.ZodBoolean;
-}, z.core.$strip>
+TrashObjectSchema: z.ZodObject<
+  {
+    warnsBeforeEmptying: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

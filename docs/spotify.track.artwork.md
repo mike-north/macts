@@ -9,5 +9,5 @@ The track artwork
 **Signature:**
 
 ```typescript
-artwork: string;
+artwork: string
 ```

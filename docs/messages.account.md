@@ -9,7 +9,7 @@ An account that can be logged in to from this system
 **Signature:**
 
 ```typescript
-interface Account 
+interface Account
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Account
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [connectionStatus](./messages.account.connectionstatus.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The connection status for this account.
-
 
 </td></tr>
 <tr><td>
 
 [description](./messages.account.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of this account as defined in Account preferences description field
-
 
 </td></tr>
 <tr><td>
 
 [enabled](./messages.account.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Is the account enabled?
-
 
 </td></tr>
 <tr><td>
 
 [id](./messages.account.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 A unique identifier for this account.
-
 
 </td></tr>
 <tr><td>
 
 [serviceType](./messages.account.servicetype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The type of service for this account
 
-
 </td></tr>
 </tbody></table>
-

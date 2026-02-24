@@ -9,7 +9,7 @@ Client for a clipping.
 **Signature:**
 
 ```typescript
-declare class ClippingResourceClient 
+declare class ClippingResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ClippingResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.clippingresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ClippingResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ClippingResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.clippingresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new clipping.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.clippingresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a clipping.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.clippingresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a clipping by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.clippingresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all clippings.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.clippingresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing clipping.
 
-
 </td></tr>
 </tbody></table>
-

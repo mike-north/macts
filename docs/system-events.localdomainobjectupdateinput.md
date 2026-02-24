@@ -9,7 +9,7 @@ Input for updating a LocalDomainObject
 **Signature:**
 
 ```typescript
-type LocalDomainObjectUpdateInput = Partial<LocalDomainObjectCreateInput>;
+type LocalDomainObjectUpdateInput = Partial<LocalDomainObjectCreateInput>
 ```
-**References:** [LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)
 
+**References:** [LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)

@@ -18,30 +18,24 @@ create(input: XMLDataCreateInput): Promise<XMLData>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [XMLDataCreateInput](./system-events.xmldatacreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[XMLData](./system-events.xmldata.md)<!-- -->&gt;
-

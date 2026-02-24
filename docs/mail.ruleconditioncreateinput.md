@@ -9,7 +9,7 @@ Input for creating a RuleCondition
 **Signature:**
 
 ```typescript
-interface RuleConditionCreateInput 
+interface RuleConditionCreateInput
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface RuleConditionCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [expression?](./mail.ruleconditioncreateinput.expression.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Rule expression field
-
 
 </td></tr>
 <tr><td>
 
 [header?](./mail.ruleconditioncreateinput.header.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Rule header key
-
 
 </td></tr>
 <tr><td>
 
 [qualifier?](./mail.ruleconditioncreateinput.qualifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Rule qualifier
-
 
 </td></tr>
 <tr><td>
 
 [ruleType?](./mail.ruleconditioncreateinput.ruletype.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Rule type
 
-
 </td></tr>
 </tbody></table>
-

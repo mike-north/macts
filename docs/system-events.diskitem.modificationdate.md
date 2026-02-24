@@ -9,5 +9,5 @@ the date on which the disk item was last modified
 **Signature:**
 
 ```typescript
-modificationDate: Date;
+modificationDate: Date
 ```

@@ -9,5 +9,5 @@ The Classic Desktop folder
 **Signature:**
 
 ```typescript
-desktopFolder: Folder;
+desktopFolder: Folder
 ```

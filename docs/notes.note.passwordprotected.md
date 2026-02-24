@@ -9,5 +9,5 @@ Whether the note is password protected
 **Signature:**
 
 ```typescript
-passwordProtected: boolean;
+passwordProtected: boolean
 ```

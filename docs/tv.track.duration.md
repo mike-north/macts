@@ -9,5 +9,5 @@ the length of the track in seconds
 **Signature:**
 
 ```typescript
-duration: number;
+duration: number
 ```

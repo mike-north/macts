@@ -9,5 +9,5 @@ the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
 **Signature:**
 
 ```typescript
-band1: number;
+band1: number
 ```

@@ -9,7 +9,7 @@ Input for creating a OutgoingMessage
 **Signature:**
 
 ```typescript
-interface OutgoingMessageCreateInput 
+interface OutgoingMessageCreateInput
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface OutgoingMessageCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [htmlContent?](./mail.outgoingmessagecreateinput.htmlcontent.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [messageSignature?](./mail.outgoingmessagecreateinput.messagesignature.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The signature of the message
-
 
 </td></tr>
 <tr><td>
 
 [sender?](./mail.outgoingmessagecreateinput.sender.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The sender of the message
-
 
 </td></tr>
 <tr><td>
 
 [subject?](./mail.outgoingmessagecreateinput.subject.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The subject of the message
-
 
 </td></tr>
 <tr><td>
 
 [vcardPath?](./mail.outgoingmessagecreateinput.vcardpath.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Does nothing at all (deprecated)
-
 
 </td></tr>
 <tr><td>
 
 [visible?](./mail.outgoingmessagecreateinput.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Controls whether the message window is shown on the screen. The default is false
 
-
 </td></tr>
 </tbody></table>
-

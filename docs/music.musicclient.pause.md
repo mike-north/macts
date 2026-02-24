@@ -11,7 +11,7 @@ pause playback
 ```typescript
 pause(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

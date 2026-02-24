@@ -9,5 +9,5 @@ Controls whether the preview pane of the message viewer window is visible or not
 **Signature:**
 
 ```typescript
-previewPaneIsVisible: boolean;
+previewPaneIsVisible: boolean
 ```

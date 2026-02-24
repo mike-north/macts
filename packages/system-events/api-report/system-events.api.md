@@ -16,8 +16,7 @@ export interface Action {
 }
 
 // @public
-export interface ActionCreateInput {
-}
+export type ActionCreateInput = Record<string, never>;
 
 // @public
 export class ActionResourceClient {
@@ -130,8 +129,7 @@ export interface Browser {
 }
 
 // @public
-export interface BrowserCreateInput {
-}
+export type BrowserCreateInput = Record<string, never>;
 
 // @public
 export class BrowserResourceClient {
@@ -157,8 +155,7 @@ export interface BusyIndicator {
 }
 
 // @public
-export interface BusyIndicatorCreateInput {
-}
+export type BusyIndicatorCreateInput = Record<string, never>;
 
 // @public
 export class BusyIndicatorResourceClient {
@@ -184,8 +181,7 @@ export interface Button {
 }
 
 // @public
-export interface ButtonCreateInput {
-}
+export type ButtonCreateInput = Record<string, never>;
 
 // @public
 export class ButtonResourceClient {
@@ -211,8 +207,7 @@ export interface Checkbox {
 }
 
 // @public
-export interface CheckboxCreateInput {
-}
+export type CheckboxCreateInput = Record<string, never>;
 
 // @public
 export class CheckboxResourceClient {
@@ -248,8 +243,7 @@ export interface ClassicDomainObject {
 }
 
 // @public
-export interface ClassicDomainObjectCreateInput {
-}
+export type ClassicDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export class ClassicDomainObjectResourceClient {
@@ -285,8 +279,7 @@ export interface ColorWell {
 }
 
 // @public
-export interface ColorWellCreateInput {
-}
+export type ColorWellCreateInput = Record<string, never>;
 
 // @public
 export class ColorWellResourceClient {
@@ -312,8 +305,7 @@ export interface Column {
 }
 
 // @public
-export interface ColumnCreateInput {
-}
+export type ColumnCreateInput = Record<string, never>;
 
 // @public
 export class ColumnResourceClient {
@@ -339,8 +331,7 @@ export interface ComboBox {
 }
 
 // @public
-export interface ComboBoxCreateInput {
-}
+export type ComboBoxCreateInput = Record<string, never>;
 
 // @public
 export class ComboBoxResourceClient {
@@ -521,8 +512,7 @@ export interface Domain {
 }
 
 // @public
-export interface DomainCreateInput {
-}
+export type DomainCreateInput = Record<string, never>;
 
 // @public
 export class DomainResourceClient {
@@ -571,8 +561,7 @@ export interface Drawer {
 }
 
 // @public
-export interface DrawerCreateInput {
-}
+export type DrawerCreateInput = Record<string, never>;
 
 // @public
 export class DrawerResourceClient {
@@ -635,8 +624,7 @@ export interface FilePackage {
 }
 
 // @public
-export interface FilePackageCreateInput {
-}
+export type FilePackageCreateInput = Record<string, never>;
 
 // @public
 export class FilePackageResourceClient {
@@ -688,8 +676,7 @@ export interface Folder {
 }
 
 // @public
-export interface FolderCreateInput {
-}
+export type FolderCreateInput = Record<string, never>;
 
 // @public
 export class FolderResourceClient {
@@ -718,8 +705,7 @@ export interface Group {
 }
 
 // @public
-export interface GroupCreateInput {
-}
+export type GroupCreateInput = Record<string, never>;
 
 // @public
 export class GroupResourceClient {
@@ -745,8 +731,7 @@ export interface GrowArea {
 }
 
 // @public
-export interface GrowAreaCreateInput {
-}
+export type GrowAreaCreateInput = Record<string, never>;
 
 // @public
 export class GrowAreaResourceClient {
@@ -781,8 +766,7 @@ export interface Image {
 }
 
 // @public
-export interface ImageCreateInput {
-}
+export type ImageCreateInput = Record<string, never>;
 
 // @public
 export class ImageResourceClient {
@@ -808,8 +792,7 @@ export interface Incrementor {
 }
 
 // @public
-export interface IncrementorCreateInput {
-}
+export type IncrementorCreateInput = Record<string, never>;
 
 // @public
 export class IncrementorResourceClient {
@@ -880,8 +863,7 @@ export interface List {
 }
 
 // @public
-export interface ListCreateInput {
-}
+export type ListCreateInput = Record<string, never>;
 
 // @public
 export class ListResourceClient {
@@ -907,8 +889,7 @@ export interface LocalDomainObject {
 }
 
 // @public
-export interface LocalDomainObjectCreateInput {
-}
+export type LocalDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export class LocalDomainObjectResourceClient {
@@ -969,8 +950,7 @@ export interface MenuBar {
 }
 
 // @public
-export interface MenuBarCreateInput {
-}
+export type MenuBarCreateInput = Record<string, never>;
 
 // @public
 export interface MenuBarItem {
@@ -978,8 +958,7 @@ export interface MenuBarItem {
 }
 
 // @public
-export interface MenuBarItemCreateInput {
-}
+export type MenuBarItemCreateInput = Record<string, never>;
 
 // @public
 export class MenuBarItemResourceClient {
@@ -1023,8 +1002,7 @@ export interface MenuButton {
 }
 
 // @public
-export interface MenuButtonCreateInput {
-}
+export type MenuButtonCreateInput = Record<string, never>;
 
 // @public
 export class MenuButtonResourceClient {
@@ -1045,8 +1023,7 @@ export const MenuButtonSchema: z.ZodObject<{
 export type MenuButtonUpdateInput = Partial<MenuButtonCreateInput>;
 
 // @public
-export interface MenuCreateInput {
-}
+export type MenuCreateInput = Record<string, never>;
 
 // @public
 export interface MenuItem {
@@ -1054,8 +1031,7 @@ export interface MenuItem {
 }
 
 // @public
-export interface MenuItemCreateInput {
-}
+export type MenuItemCreateInput = Record<string, never>;
 
 // @public
 export class MenuItemResourceClient {
@@ -1099,8 +1075,7 @@ export interface NetworkDomainObject {
 }
 
 // @public
-export interface NetworkDomainObjectCreateInput {
-}
+export type NetworkDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export class NetworkDomainObjectResourceClient {
@@ -1154,8 +1129,7 @@ export interface Outline {
 }
 
 // @public
-export interface OutlineCreateInput {
-}
+export type OutlineCreateInput = Record<string, never>;
 
 // @public
 export class OutlineResourceClient {
@@ -1181,8 +1155,7 @@ export interface PopOver {
 }
 
 // @public
-export interface PopOverCreateInput {
-}
+export type PopOverCreateInput = Record<string, never>;
 
 // @public
 export class PopOverResourceClient {
@@ -1208,8 +1181,7 @@ export interface PopUpButton {
 }
 
 // @public
-export interface PopUpButtonCreateInput {
-}
+export type PopUpButtonCreateInput = Record<string, never>;
 
 // @public
 export class PopUpButtonResourceClient {
@@ -1300,8 +1272,7 @@ export interface ProgressIndicator {
 }
 
 // @public
-export interface ProgressIndicatorCreateInput {
-}
+export type ProgressIndicatorCreateInput = Record<string, never>;
 
 // @public
 export class ProgressIndicatorResourceClient {
@@ -1362,8 +1333,7 @@ export interface RadioButton {
 }
 
 // @public
-export interface RadioButtonCreateInput {
-}
+export type RadioButtonCreateInput = Record<string, never>;
 
 // @public
 export class RadioButtonResourceClient {
@@ -1389,8 +1359,7 @@ export interface RadioGroup {
 }
 
 // @public
-export interface RadioGroupCreateInput {
-}
+export type RadioGroupCreateInput = Record<string, never>;
 
 // @public
 export class RadioGroupResourceClient {
@@ -1416,8 +1385,7 @@ export interface RelevanceIndicator {
 }
 
 // @public
-export interface RelevanceIndicatorCreateInput {
-}
+export type RelevanceIndicatorCreateInput = Record<string, never>;
 
 // @public
 export class RelevanceIndicatorResourceClient {
@@ -1443,8 +1411,7 @@ export interface Row {
 }
 
 // @public
-export interface RowCreateInput {
-}
+export type RowCreateInput = Record<string, never>;
 
 // @public
 export class RowResourceClient {
@@ -1479,8 +1446,7 @@ export interface ScriptingClass {
 }
 
 // @public
-export interface ScriptingClassCreateInput {
-}
+export type ScriptingClassCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingClassResourceClient {
@@ -1518,8 +1484,7 @@ export interface ScriptingCommand {
 }
 
 // @public
-export interface ScriptingCommandCreateInput {
-}
+export type ScriptingCommandCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingCommandResourceClient {
@@ -1551,8 +1516,7 @@ export interface ScriptingDefinitionObject {
 }
 
 // @public
-export interface ScriptingDefinitionObjectCreateInput {
-}
+export type ScriptingDefinitionObjectCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingDefinitionObjectResourceClient {
@@ -1578,8 +1542,7 @@ export interface ScriptingElement {
 }
 
 // @public
-export interface ScriptingElementCreateInput {
-}
+export type ScriptingElementCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingElementResourceClient {
@@ -1607,8 +1570,7 @@ export interface ScriptingEnumeration {
 }
 
 // @public
-export interface ScriptingEnumerationCreateInput {
-}
+export type ScriptingEnumerationCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingEnumerationResourceClient {
@@ -1639,8 +1601,7 @@ export interface ScriptingEnumerator {
 }
 
 // @public
-export interface ScriptingEnumeratorCreateInput {
-}
+export type ScriptingEnumeratorCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingEnumeratorResourceClient {
@@ -1674,8 +1635,7 @@ export interface ScriptingParameter {
 }
 
 // @public
-export interface ScriptingParameterCreateInput {
-}
+export type ScriptingParameterCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingParameterResourceClient {
@@ -1713,8 +1673,7 @@ export interface ScriptingProperty {
 }
 
 // @public
-export interface ScriptingPropertyCreateInput {
-}
+export type ScriptingPropertyCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingPropertyResourceClient {
@@ -1750,8 +1709,7 @@ export interface ScriptingSuite {
 }
 
 // @public
-export interface ScriptingSuiteCreateInput {
-}
+export type ScriptingSuiteCreateInput = Record<string, never>;
 
 // @public
 export class ScriptingSuiteResourceClient {
@@ -1780,8 +1738,7 @@ export interface ScrollArea {
 }
 
 // @public
-export interface ScrollAreaCreateInput {
-}
+export type ScrollAreaCreateInput = Record<string, never>;
 
 // @public
 export class ScrollAreaResourceClient {
@@ -1807,8 +1764,7 @@ export interface ScrollBar {
 }
 
 // @public
-export interface ScrollBarCreateInput {
-}
+export type ScrollBarCreateInput = Record<string, never>;
 
 // @public
 export class ScrollBarResourceClient {
@@ -1876,8 +1832,7 @@ export interface Sheet {
 }
 
 // @public
-export interface SheetCreateInput {
-}
+export type SheetCreateInput = Record<string, never>;
 
 // @public
 export class SheetResourceClient {
@@ -1903,8 +1858,7 @@ export interface Slider {
 }
 
 // @public
-export interface SliderCreateInput {
-}
+export type SliderCreateInput = Record<string, never>;
 
 // @public
 export class SliderResourceClient {
@@ -1930,8 +1884,7 @@ export interface Splitter {
 }
 
 // @public
-export interface SplitterCreateInput {
-}
+export type SplitterCreateInput = Record<string, never>;
 
 // @public
 export interface SplitterGroup {
@@ -1939,8 +1892,7 @@ export interface SplitterGroup {
 }
 
 // @public
-export interface SplitterGroupCreateInput {
-}
+export type SplitterGroupCreateInput = Record<string, never>;
 
 // @public
 export class SplitterGroupResourceClient {
@@ -1984,8 +1936,7 @@ export interface StaticText {
 }
 
 // @public
-export interface StaticTextCreateInput {
-}
+export type StaticTextCreateInput = Record<string, never>;
 
 // @public
 export class StaticTextResourceClient {
@@ -2011,8 +1962,7 @@ export interface SystemDomainObject {
 }
 
 // @public
-export interface SystemDomainObjectCreateInput {
-}
+export type SystemDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export class SystemDomainObjectResourceClient {
@@ -2162,8 +2112,7 @@ export interface TabGroup {
 }
 
 // @public
-export interface TabGroupCreateInput {
-}
+export type TabGroupCreateInput = Record<string, never>;
 
 // @public
 export class TabGroupResourceClient {
@@ -2189,8 +2138,7 @@ export interface Table {
 }
 
 // @public
-export interface TableCreateInput {
-}
+export type TableCreateInput = Record<string, never>;
 
 // @public
 export class TableResourceClient {
@@ -2216,8 +2164,7 @@ export interface TextArea {
 }
 
 // @public
-export interface TextAreaCreateInput {
-}
+export type TextAreaCreateInput = Record<string, never>;
 
 // @public
 export class TextAreaResourceClient {
@@ -2243,8 +2190,7 @@ export interface TextField {
 }
 
 // @public
-export interface TextFieldCreateInput {
-}
+export type TextFieldCreateInput = Record<string, never>;
 
 // @public
 export class TextFieldResourceClient {
@@ -2270,8 +2216,7 @@ export interface Toolbar {
 }
 
 // @public
-export interface ToolbarCreateInput {
-}
+export type ToolbarCreateInput = Record<string, never>;
 
 // @public
 export class ToolbarResourceClient {
@@ -2377,8 +2322,7 @@ export interface UserDomainObject {
 }
 
 // @public
-export interface UserDomainObjectCreateInput {
-}
+export type UserDomainObjectCreateInput = Record<string, never>;
 
 // @public
 export class UserDomainObjectResourceClient {
@@ -2414,8 +2358,7 @@ export interface ValueIndicator {
 }
 
 // @public
-export interface ValueIndicatorCreateInput {
-}
+export type ValueIndicatorCreateInput = Record<string, never>;
 
 // @public
 export class ValueIndicatorResourceClient {

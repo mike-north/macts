@@ -9,7 +9,7 @@ Client for data in xml format.
 **Signature:**
 
 ```typescript
-declare class XMLDataResourceClient 
+declare class XMLDataResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class XMLDataResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.xmldataresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `XMLDataResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `XMLDataResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.xmldataresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new xmldata.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.xmldataresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a xmldata.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.xmldataresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a xmldata by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.xmldataresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all xmldatas.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.xmldataresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing xmldata.
 
-
 </td></tr>
 </tbody></table>
-

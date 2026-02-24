@@ -11,7 +11,7 @@ List all participants.
 ```typescript
 list(): Promise<Participant[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Participant](./messages.participant.md)<!-- -->\[\]&gt;
-

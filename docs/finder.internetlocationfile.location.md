@@ -9,5 +9,5 @@ the internet location
 **Signature:**
 
 ```typescript
-location: string;
+location: string
 ```

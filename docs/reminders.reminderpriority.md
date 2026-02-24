@@ -9,5 +9,5 @@ Priority level for reminders
 **Signature:**
 
 ```typescript
-type ReminderPriority = '0' | '9' | '5' | '1';
+type ReminderPriority = '0' | '9' | '5' | '1'
 ```

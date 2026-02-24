@@ -9,5 +9,5 @@ the actual space used by the disk item on disk
 **Signature:**
 
 ```typescript
-physicalSize: number;
+physicalSize: number
 ```

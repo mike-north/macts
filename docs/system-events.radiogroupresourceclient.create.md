@@ -18,30 +18,24 @@ create(input: RadioGroupCreateInput): Promise<RadioGroup>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RadioGroup](./system-events.radiogroup.md)<!-- -->&gt;
-

@@ -9,7 +9,7 @@ Input for updating a Folder
 **Signature:**
 
 ```typescript
-type FolderUpdateInput = Partial<FolderCreateInput>;
+type FolderUpdateInput = Partial<FolderCreateInput>
 ```
-**References:** [FolderCreateInput](./system-events.foldercreateinput.md)
 
+**References:** [FolderCreateInput](./system-events.foldercreateinput.md)

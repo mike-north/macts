@@ -9,5 +9,5 @@ Unique identifier for this window
 **Signature:**
 
 ```typescript
-id: number;
+id: number
 ```

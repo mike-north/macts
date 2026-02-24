@@ -9,5 +9,5 @@ Input for creating a MiniplayerWindow
 **Signature:**
 
 ```typescript
-interface MiniplayerWindowCreateInput 
+interface MiniplayerWindowCreateInput
 ```

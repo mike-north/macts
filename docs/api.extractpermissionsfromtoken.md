@@ -11,7 +11,7 @@ Useful for debugging and inspection. Does NOT verify signature.
 **Signature:**
 
 ```typescript
-declare function extractPermissionsFromToken(token: string): string[] | undefined;
+declare function extractPermissionsFromToken(token: string): string[] | undefined
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function extractPermissionsFromToken(token: string): string[] | undefine
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 token
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 API key token
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ API key token
 string\[\] \| undefined
 
 Permissions array or undefined if token is malformed
-

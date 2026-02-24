@@ -9,5 +9,5 @@ a list of every UI element contained in this UI element and its child UI element
 **Signature:**
 
 ```typescript
-entireContents: string;
+entireContents: string
 ```

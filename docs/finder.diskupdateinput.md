@@ -9,7 +9,7 @@ Input for updating a Disk
 **Signature:**
 
 ```typescript
-type DiskUpdateInput = Partial<DiskCreateInput>;
+type DiskUpdateInput = Partial<DiskCreateInput>
 ```
-**References:** [DiskCreateInput](./finder.diskcreateinput.md)
 
+**References:** [DiskCreateInput](./finder.diskcreateinput.md)

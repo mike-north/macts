@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-bundleId: string;
+bundleId: string
 ```

@@ -11,7 +11,7 @@ Create a hotkey window
 ```typescript
 createHotkeyWindowWithProfile(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

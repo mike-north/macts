@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-AccountSchema: z.ZodObject<{
-    id: z.ZodString;
-    description: z.ZodString;
-    enabled: z.ZodBoolean;
-    connectionStatus: z.ZodString;
-    serviceType: z.ZodString;
-}, z.core.$strip>
+AccountSchema: z.ZodObject<
+  {
+    id: z.ZodString
+    description: z.ZodString
+    enabled: z.ZodBoolean
+    connectionStatus: z.ZodString
+    serviceType: z.ZodString
+  },
+  z.core.$strip
+>
 ```

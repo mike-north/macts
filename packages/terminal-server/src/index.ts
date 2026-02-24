@@ -5,5 +5,5 @@
  */
 
 // Export as 'plugin' to match API plugin loader convention
-export { terminalApiPlugin as plugin, terminalApiPlugin } from './plugin.js';
-export type { AppManifest } from '@macts/core';
+export { terminalApiPlugin as plugin, terminalApiPlugin } from './plugin.js'
+export type { AppManifest } from '@macts/core'

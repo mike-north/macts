@@ -11,7 +11,7 @@ List all aimhandles.
 ```typescript
 list(): Promise<AIMHandle[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[AIMHandle](./contacts.aimhandle.md)<!-- -->\[\]&gt;
-

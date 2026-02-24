@@ -9,7 +9,7 @@ Client configuration options.
 **Signature:**
 
 ```typescript
-interface SafariClientOptions 
+interface SafariClientOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface SafariClientOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKey](./safari.safariclientoptions.apikey.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 API key for authentication
-
 
 </td></tr>
 <tr><td>
 
 [baseUrl?](./safari.safariclientoptions.baseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Base URL for API server (default: http://localhost:8372)
 
-
 </td></tr>
 </tbody></table>
-

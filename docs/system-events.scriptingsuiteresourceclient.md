@@ -9,7 +9,7 @@ Client for a suite within a scripting definition.
 **Signature:**
 
 ```typescript
-declare class ScriptingSuiteResourceClient 
+declare class ScriptingSuiteResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingSuiteResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingsuiteresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingSuiteResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingSuiteResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingsuiteresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingsuite.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingsuiteresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingsuite.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingsuiteresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingsuite by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingsuiteresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingsuites.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingsuiteresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingsuite.
 
-
 </td></tr>
 </tbody></table>
-

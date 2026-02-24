@@ -9,7 +9,7 @@ Client for a new email message.
 **Signature:**
 
 ```typescript
-declare class OutgoingMessageResourceClient 
+declare class OutgoingMessageResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class OutgoingMessageResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.outgoingmessageresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `OutgoingMessageResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,101 +46,79 @@ Constructs a new instance of the `OutgoingMessageResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.outgoingmessageresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new outgoingmessage.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.outgoingmessageresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a outgoingmessage.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.outgoingmessageresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a outgoingmessage by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.outgoingmessageresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all outgoingmessages.
-
 
 </td></tr>
 <tr><td>
 
 [send()](./mail.outgoingmessageresourceclient.send.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Sends a message.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.outgoingmessageresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing outgoingmessage.
 
-
 </td></tr>
 </tbody></table>
-

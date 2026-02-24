@@ -1,36 +1,44 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../sdk.js';
-import { createFormatter } from '../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../sdk.js'
+import { createFormatter } from '../output/index.js'
 
 /**
  * Make a new element
  */
 export class MakeCommand extends Command {
-  static override paths = [["music", "make"]];
+  static override paths = [['music', 'make']]
 
   static override usage = Command.Usage({
-    description: "Make a new element",
-  });
+    description: 'Make a new element',
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  new = Option.String('--new', { required: true, description: "the class of the new element. Keyword 'new' is optional in AppleScript" });
-  at = Option.String('--at', { required: false, description: "the location at which to insert the element" });
-  withProperties = Option.String('--with-properties', { required: false, description: "the initial values for the properties of the element" });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  new = Option.String('--new', {
+    required: true,
+    description: "the class of the new element. Keyword 'new' is optional in AppleScript",
+  })
+  at = Option.String('--at', {
+    required: false,
+    description: 'the location at which to insert the element',
+  })
+  withProperties = Option.String('--with-properties', {
+    required: false,
+    description: 'the initial values for the properties of the element',
+  })
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      await client.make(this.new as any, this.at as any, this.withProperties as any);
+      const client = getClient()
+      await client.make(this.new as unknown, this.at as unknown, this.withProperties as unknown)
 
-      const output = formatter.formatSuccess('make completed successfully');
-      this.context.stdout.write(output + '\n');
-      return 0;
+      const output = formatter.formatSuccess('make completed successfully')
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

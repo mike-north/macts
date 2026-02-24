@@ -9,5 +9,5 @@ Input for creating a Domain
 **Signature:**
 
 ```typescript
-interface DomainCreateInput 
+interface DomainCreateInput
 ```

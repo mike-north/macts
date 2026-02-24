@@ -9,7 +9,7 @@ Input for updating a SoundAlarm
 **Signature:**
 
 ```typescript
-type SoundAlarmUpdateInput = Partial<SoundAlarmCreateInput>;
+type SoundAlarmUpdateInput = Partial<SoundAlarmCreateInput>
 ```
-**References:** [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)
 
+**References:** [SoundAlarmCreateInput](./calendar.soundalarmcreateinput.md)

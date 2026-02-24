@@ -11,7 +11,7 @@ List all miniplayerwindows.
 ```typescript
 list(): Promise<MiniplayerWindow[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MiniplayerWindow](./music.miniplayerwindow.md)<!-- -->\[\]&gt;
-

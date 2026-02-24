@@ -9,7 +9,7 @@ A group belonging to a window
 **Signature:**
 
 ```typescript
-interface Group 
+interface Group
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Group
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.group.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this group
 
-
 </td></tr>
 </tbody></table>
-

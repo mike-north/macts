@@ -6,16 +6,16 @@
 
 Get the signing secret, generating one if it doesn't exist.
 
-Priority: 1. Environment variable MACTS\_API\_KEY\_SECRET 2. File at \~/.macts/secrets/api-key-secret 3. Generate new secret and store in file
+Priority: 1. Environment variable MACTS_API_KEY_SECRET 2. File at \~/.macts/secrets/api-key-secret 3. Generate new secret and store in file
 
 **Signature:**
 
 ```typescript
-declare function getSigningSecret(): Promise<string>;
+declare function getSigningSecret(): Promise<string>
 ```
+
 **Returns:**
 
 Promise&lt;string&gt;
 
 The signing secret
-

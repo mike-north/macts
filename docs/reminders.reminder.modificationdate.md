@@ -9,5 +9,5 @@ The modification date of the reminder
 **Signature:**
 
 ```typescript
-modificationDate: Date;
+modificationDate: Date
 ```

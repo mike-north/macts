@@ -9,5 +9,5 @@ the current value of the attribute
 **Signature:**
 
 ```typescript
-value: string;
+value: string
 ```

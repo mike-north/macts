@@ -9,5 +9,5 @@ The due date of the reminder
 **Signature:**
 
 ```typescript
-dueDate: Date;
+dueDate: Date
 ```

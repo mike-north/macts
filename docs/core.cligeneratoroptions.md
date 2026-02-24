@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface CliGeneratorOptions 
+interface CliGeneratorOptions
 ```
 
 ## Properties
@@ -16,79 +16,62 @@ interface CliGeneratorOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [packageName](./core.cligeneratoroptions.packagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Package name (e.g., @<!-- -->macts/cli-calendar)
-
 
 </td></tr>
 <tr><td>
 
 [sdkPackageName](./core.cligeneratoroptions.sdkpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 SDK package name (e.g., @<!-- -->macts/sdk-calendar)
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.cligeneratoroptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

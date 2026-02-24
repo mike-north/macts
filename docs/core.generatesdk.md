@@ -9,7 +9,7 @@ Generate a complete SDK from a manifest.
 **Signature:**
 
 ```typescript
-declare function generateSdk(manifest: AppManifest, options: GeneratorOptions): GenerateSdkResult;
+declare function generateSdk(manifest: AppManifest, options: GeneratorOptions): GenerateSdkResult
 ```
 
 ## Parameters
@@ -18,44 +18,35 @@ declare function generateSdk(manifest: AppManifest, options: GeneratorOptions): 
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GeneratorOptions](./core.generatoroptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ options
 **Returns:**
 
 [GenerateSdkResult](./core.generatesdkresult.md)
-

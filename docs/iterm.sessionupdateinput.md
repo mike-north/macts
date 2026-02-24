@@ -9,7 +9,7 @@ Input for updating a Session
 **Signature:**
 
 ```typescript
-type SessionUpdateInput = Partial<SessionCreateInput>;
+type SessionUpdateInput = Partial<SessionCreateInput>
 ```
-**References:** [SessionCreateInput](./iterm.sessioncreateinput.md)
 
+**References:** [SessionCreateInput](./iterm.sessioncreateinput.md)

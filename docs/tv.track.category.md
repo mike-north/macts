@@ -9,5 +9,5 @@ the category of the track
 **Signature:**
 
 ```typescript
-category: string;
+category: string
 ```

@@ -11,7 +11,7 @@ Create a new movie recording document.
 ```typescript
 newMovieRecording(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -7,8 +7,11 @@
 **Signature:**
 
 ```typescript
-FileTrackSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    location: z.ZodString;
-}, z.core.$strip>
+FileTrackSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    location: z.ZodString
+  },
+  z.core.$strip
+>
 ```

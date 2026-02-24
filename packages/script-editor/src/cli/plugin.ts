@@ -1,17 +1,13 @@
-import type { CliPlugin } from '@macts/cli';
-import { ListDocumentsCommand } from './commands/documents/list.js';
-import { CreateDocumentCommand } from './commands/documents/create.js';
-import { GetDocumentCommand } from './commands/documents/get.js';
+import type { CliPlugin } from '@macts/cli'
+import { ListDocumentsCommand } from './commands/documents/list.js'
+import { CreateDocumentCommand } from './commands/documents/create.js'
+import { GetDocumentCommand } from './commands/documents/get.js'
 
 /**
- * CLI plugin for ScriptEditor.
+ * CLI plugin for Script Editor.
  */
 export const plugin: CliPlugin = {
-  name: 'scripteditor',
-  description: 'Commands for ScriptEditor',
-  commands: [
-    ListDocumentsCommand,
-    CreateDocumentCommand,
-    GetDocumentCommand,
-  ],
-};
+  name: 'script-editor',
+  description: 'Commands for Script Editor',
+  commands: [ListDocumentsCommand, CreateDocumentCommand, GetDocumentCommand],
+}

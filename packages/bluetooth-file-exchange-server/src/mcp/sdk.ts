@@ -4,7 +4,10 @@
  * @packageDocumentation
  */
 
-import { BluetoothFileExchangeClient, type BluetoothFileExchangeClientOptions } from '@macts/bluetooth-file-exchange';
+import {
+  BluetoothFileExchangeClient,
+  type BluetoothFileExchangeClientOptions,
+} from '@macts/bluetooth-file-exchange'
 
 /**
  * Get a BluetoothFileExchangeClient instance.
@@ -16,32 +19,32 @@ import { BluetoothFileExchangeClient, type BluetoothFileExchangeClientOptions } 
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getBluetoothFileExchangeClient(): BluetoothFileExchangeClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions bluetooth-file-exchange:*:*'
-    );
+    )
   }
 
   const options: BluetoothFileExchangeClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new BluetoothFileExchangeClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new BluetoothFileExchangeClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: BluetoothFileExchangeClient | null = null;
+let _client: BluetoothFileExchangeClient | null = null
 
 /**
  * Get or create the singleton BluetoothFileExchangeClient.
@@ -50,8 +53,8 @@ let _client: BluetoothFileExchangeClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): BluetoothFileExchangeClient {
-  _client ??= getBluetoothFileExchangeClient();
-  return _client;
+  _client ??= getBluetoothFileExchangeClient()
+  return _client
 }
 
 /**
@@ -59,5 +62,5 @@ export function getClient(): BluetoothFileExchangeClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

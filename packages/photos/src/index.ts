@@ -18,11 +18,11 @@
  * @packageDocumentation
  */
 
-export { PhotosClient, PhotosError, HttpClient } from './client.js';
-export type { PhotosClientOptions } from './client.js';
-export * from './types.js';
-export { MediaItemResourceClient } from './resources/mediaitem.js';
-export { ContainerResourceClient } from './resources/container.js';
-export { AlbumResourceClient } from './resources/album.js';
-export { FolderResourceClient } from './resources/folder.js';
-export { MomentResourceClient } from './resources/moment.js';
+export { PhotosClient, PhotosError, HttpClient } from './client.js'
+export type { PhotosClientOptions } from './client.js'
+export * from './types.js'
+export { MediaItemResourceClient } from './resources/mediaitem.js'
+export { ContainerResourceClient } from './resources/container.js'
+export { AlbumResourceClient } from './resources/album.js'
+export { FolderResourceClient } from './resources/folder.js'
+export { MomentResourceClient } from './resources/moment.js'

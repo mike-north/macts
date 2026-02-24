@@ -11,7 +11,7 @@ List all propertylistitems.
 ```typescript
 list(): Promise<PropertyListItem[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[PropertyListItem](./system-events.propertylistitem.md)<!-- -->\[\]&gt;
-

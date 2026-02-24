@@ -11,7 +11,7 @@ List all services.
 ```typescript
 list(): Promise<Service[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Service](./system-events.service.md)<!-- -->\[\]&gt;
-

@@ -11,7 +11,7 @@ Quit the Finder
 ```typescript
 quit(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

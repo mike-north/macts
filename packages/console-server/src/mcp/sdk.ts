@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { ConsoleClient, type ConsoleClientOptions } from '@macts/console';
+import { ConsoleClient, type ConsoleClientOptions } from '@macts/console'
 
 /**
  * Get a ConsoleClient instance.
@@ -16,32 +16,32 @@ import { ConsoleClient, type ConsoleClientOptions } from '@macts/console';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getConsoleClient(): ConsoleClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions console:*:*'
-    );
+    )
   }
 
   const options: ConsoleClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new ConsoleClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new ConsoleClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: ConsoleClient | null = null;
+let _client: ConsoleClient | null = null
 
 /**
  * Get or create the singleton ConsoleClient.
@@ -50,8 +50,8 @@ let _client: ConsoleClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): ConsoleClient {
-  _client ??= getConsoleClient();
-  return _client;
+  _client ??= getConsoleClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): ConsoleClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

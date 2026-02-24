@@ -11,7 +11,7 @@ List all emails.
 ```typescript
 list(): Promise<Email[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Email](./contacts.email.md)<!-- -->\[\]&gt;
-

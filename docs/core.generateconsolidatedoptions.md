@@ -9,7 +9,7 @@ Options for generating consolidated packages (client + server).
 **Signature:**
 
 ```typescript
-interface GenerateConsolidatedOptions 
+interface GenerateConsolidatedOptions
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface GenerateConsolidatedOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName](./core.generateconsolidatedoptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 App name lower (e.g., "reminders") — used for directory names
-
 
 </td></tr>
 <tr><td>
 
 [clientPackageName?](./core.generateconsolidatedoptions.clientpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Client package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
-
 
 </td></tr>
 <tr><td>
 
 [serverPackageName?](./core.generateconsolidatedoptions.serverpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Server package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->-server)
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.generateconsolidatedoptions.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

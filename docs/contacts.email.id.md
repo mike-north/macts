@@ -9,5 +9,5 @@ Unique identifier for this email
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

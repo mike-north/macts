@@ -9,7 +9,10 @@ Find the coarse category that contains a fine-grained permission.
 **Signature:**
 
 ```typescript
-declare function findCoarseCategory(finePermission: string, permissionsSection: PermissionsSection): string | undefined;
+declare function findCoarseCategory(
+  finePermission: string,
+  permissionsSection: PermissionsSection
+): string | undefined
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function findCoarseCategory(finePermission: string, permissionsSection: 
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 finePermission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Fine-grained permission string
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 The permissions mapping from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ The permissions mapping from the manifest
 string \| undefined
 
 Coarse permission string, or undefined if not found
-

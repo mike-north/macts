@@ -9,5 +9,5 @@ The top level Drafts mailbox
 **Signature:**
 
 ```typescript
-draftsMailbox: Mailbox;
+draftsMailbox: Mailbox
 ```

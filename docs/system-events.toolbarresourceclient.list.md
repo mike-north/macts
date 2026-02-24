@@ -11,7 +11,7 @@ List all toolbars.
 ```typescript
 list(): Promise<Toolbar[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Toolbar](./system-events.toolbar.md)<!-- -->\[\]&gt;
-

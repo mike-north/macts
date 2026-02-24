@@ -9,7 +9,7 @@ Client for the miniplayer window.
 **Signature:**
 
 ```typescript
-declare class MiniplayerWindowResourceClient 
+declare class MiniplayerWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MiniplayerWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.miniplayerwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MiniplayerWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MiniplayerWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.miniplayerwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new miniplayerwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.miniplayerwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a miniplayerwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.miniplayerwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a miniplayerwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.miniplayerwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all miniplayerwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.miniplayerwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing miniplayerwindow.
 
-
 </td></tr>
 </tbody></table>
-

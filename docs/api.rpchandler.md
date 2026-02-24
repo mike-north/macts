@@ -9,7 +9,7 @@ RPC handler function type.
 **Signature:**
 
 ```typescript
-type RpcHandler = (args: RpcRequest, ctx: RpcHandlerContext) => Promise<unknown>;
+type RpcHandler = (args: RpcRequest, ctx: RpcHandlerContext) => Promise<unknown>
 ```
-**References:** [RpcRequest](./api.rpcrequest.md)<!-- -->, [RpcHandlerContext](./api.rpchandlercontext.md)
 
+**References:** [RpcRequest](./api.rpcrequest.md)<!-- -->, [RpcHandlerContext](./api.rpchandlercontext.md)

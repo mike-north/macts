@@ -9,5 +9,5 @@ Label.
 **Signature:**
 
 ```typescript
-label: string;
+label: string
 ```

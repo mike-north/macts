@@ -9,7 +9,7 @@ Client for user name for america online (aol) instant messaging..
 **Signature:**
 
 ```typescript
-declare class AIMHandleResourceClient 
+declare class AIMHandleResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AIMHandleResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.aimhandleresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AIMHandleResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AIMHandleResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.aimhandleresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new aimhandle.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.aimhandleresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a aimhandle.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.aimhandleresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a aimhandle by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.aimhandleresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all aimhandles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.aimhandleresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing aimhandle.
 
-
 </td></tr>
 </tbody></table>
-

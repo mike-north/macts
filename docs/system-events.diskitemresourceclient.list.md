@@ -11,7 +11,7 @@ List all diskitems.
 ```typescript
 list(): Promise<DiskItem[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[DiskItem](./system-events.diskitem.md)<!-- -->\[\]&gt;
-

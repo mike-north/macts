@@ -9,5 +9,5 @@ Input for creating a ScriptingProperty
 **Signature:**
 
 ```typescript
-interface ScriptingPropertyCreateInput 
+interface ScriptingPropertyCreateInput
 ```

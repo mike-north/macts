@@ -9,5 +9,5 @@ Department that this person works for.
 **Signature:**
 
 ```typescript
-department: string;
+department: string
 ```

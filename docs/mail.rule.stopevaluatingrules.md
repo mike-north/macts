@@ -9,5 +9,5 @@ If rule matches, stop rule evaluation for this message
 **Signature:**
 
 ```typescript
-stopEvaluatingRules: boolean;
+stopEvaluatingRules: boolean
 ```

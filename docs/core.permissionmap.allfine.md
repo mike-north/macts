@@ -9,5 +9,5 @@ All fine-grained permissions
 **Signature:**
 
 ```typescript
-allFine: Set<string>;
+allFine: Set<string>
 ```

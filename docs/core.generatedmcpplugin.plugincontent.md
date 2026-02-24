@@ -9,5 +9,5 @@ Generated plugin.ts content
 **Signature:**
 
 ```typescript
-pluginContent: string;
+pluginContent: string
 ```

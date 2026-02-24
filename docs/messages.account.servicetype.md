@@ -9,5 +9,5 @@ The type of service for this account
 **Signature:**
 
 ```typescript
-serviceType: string;
+serviceType: string
 ```

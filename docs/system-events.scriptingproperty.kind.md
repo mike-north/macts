@@ -9,5 +9,5 @@ The kind of object or data returned by this property
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

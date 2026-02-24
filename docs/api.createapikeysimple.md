@@ -11,7 +11,7 @@ Use this when you don't have access to the manifest or when permissions are alre
 **Signature:**
 
 ```typescript
-declare function createApiKeySimple(options: CreateApiKeyOptions): Promise<CreateApiKeyResult>;
+declare function createApiKeySimple(options: CreateApiKeyOptions): Promise<CreateApiKeyResult>
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function createApiKeySimple(options: CreateApiKeyOptions): Promise<Creat
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [CreateApiKeyOptions](./api.createapikeyoptions.md)
 
-
 </td><td>
 
 Key creation options
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ Key creation options
 Promise&lt;[CreateApiKeyResult](./api.createapikeyresult.md)<!-- -->&gt;
 
 Created key token and metadata
-

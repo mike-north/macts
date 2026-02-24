@@ -9,7 +9,7 @@ Decrypt an AES-256-GCM encrypted payload.
 **Signature:**
 
 ```typescript
-declare function decrypt(ciphertext: string, key: Buffer): string;
+declare function decrypt(ciphertext: string, key: Buffer): string
 ```
 
 ## Parameters
@@ -18,48 +18,39 @@ declare function decrypt(ciphertext: string, key: Buffer): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 ciphertext
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Base64-encoded encrypted payload (from encrypt)
-
 
 </td></tr>
 <tr><td>
 
 key
 
-
 </td><td>
 
 Buffer
 
-
 </td><td>
 
 32-byte encryption key (same key used for encryption)
-
 
 </td></tr>
 </tbody></table>
@@ -73,4 +64,3 @@ Decrypted plaintext string
 ## Exceptions
 
 Error if the key is wrong, data is corrupted, or format is invalid
-

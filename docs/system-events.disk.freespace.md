@@ -9,5 +9,5 @@ the number of free bytes left on the disk
 **Signature:**
 
 ```typescript
-freeSpace: number;
+freeSpace: number
 ```

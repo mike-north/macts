@@ -9,5 +9,5 @@ Creation timestamp
 **Signature:**
 
 ```typescript
-createdAt: Date;
+createdAt: Date
 ```

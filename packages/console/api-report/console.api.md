@@ -34,8 +34,7 @@ export interface Device {
 }
 
 // @public
-export interface DeviceCreateInput {
-}
+export type DeviceCreateInput = Record<string, never>;
 
 // @public
 export class DeviceResourceClient {

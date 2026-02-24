@@ -9,7 +9,7 @@ converts a track to a specific file format
 **Signature:**
 
 ```typescript
-interface Encoder 
+interface Encoder
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Encoder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [format](./music.encoder.format.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the data format created by the encoder
 
-
 </td></tr>
 </tbody></table>
-

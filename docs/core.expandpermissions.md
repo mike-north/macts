@@ -9,7 +9,10 @@ Expand multiple permissions, handling coarse and wildcard permissions.
 **Signature:**
 
 ```typescript
-declare function expandPermissions(permissions: string[], permissionsSection: PermissionsSection): string[];
+declare function expandPermissions(
+  permissions: string[],
+  permissionsSection: PermissionsSection
+): string[]
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function expandPermissions(permissions: string[], permissionsSection: Pe
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of permission strings (fine, coarse, or wildcard)
-
 
 </td></tr>
 <tr><td>
 
 permissionsSection
 
-
 </td><td>
 
 [PermissionsSection](./core.permissionssection.md)
 
-
 </td><td>
 
 The permissions mapping from the manifest
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ The permissions mapping from the manifest
 string\[\]
 
 Array of unique fine-grained permission strings
-

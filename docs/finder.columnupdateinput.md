@@ -9,7 +9,7 @@ Input for updating a Column
 **Signature:**
 
 ```typescript
-type ColumnUpdateInput = Partial<ColumnCreateInput>;
+type ColumnUpdateInput = Partial<ColumnCreateInput>
 ```
-**References:** [ColumnCreateInput](./finder.columncreateinput.md)
 
+**References:** [ColumnCreateInput](./finder.columncreateinput.md)

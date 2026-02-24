@@ -9,7 +9,7 @@ Input for updating a Process
 **Signature:**
 
 ```typescript
-type ProcessUpdateInput = Partial<ProcessCreateInput>;
+type ProcessUpdateInput = Partial<ProcessCreateInput>
 ```
-**References:** [ProcessCreateInput](./system-events.processcreateinput.md)
 
+**References:** [ProcessCreateInput](./system-events.processcreateinput.md)

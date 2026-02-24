@@ -9,7 +9,7 @@ Get the key ID from a token without validation.
 **Signature:**
 
 ```typescript
-declare function extractKeyIdFromToken(token: string): string | undefined;
+declare function extractKeyIdFromToken(token: string): string | undefined
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function extractKeyIdFromToken(token: string): string | undefined;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 token
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 API key token
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ API key token
 string \| undefined
 
 Key ID or undefined if token is malformed
-

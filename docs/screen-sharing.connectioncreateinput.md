@@ -9,5 +9,5 @@ Input for creating a Connection
 **Signature:**
 
 ```typescript
-interface ConnectionCreateInput 
+interface ConnectionCreateInput
 ```

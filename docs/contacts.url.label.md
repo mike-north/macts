@@ -9,5 +9,5 @@ Label for this URL
 **Signature:**
 
 ```typescript
-label: string;
+label: string
 ```

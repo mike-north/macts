@@ -9,5 +9,5 @@ the total number of tracks on the source album
 **Signature:**
 
 ```typescript
-trackCount: number;
+trackCount: number
 ```

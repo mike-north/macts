@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-ConfigurationSchema: z.ZodObject<{
-    accountName: z.ZodString;
-    connected: z.ZodBoolean;
-    id: z.ZodString;
-    name: z.ZodString;
-}, z.core.$strip>
+ConfigurationSchema: z.ZodObject<
+  {
+    accountName: z.ZodString
+    connected: z.ZodBoolean
+    id: z.ZodString
+    name: z.ZodString
+  },
+  z.core.$strip
+>
 ```

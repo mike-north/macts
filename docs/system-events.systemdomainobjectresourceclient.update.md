@@ -18,44 +18,35 @@ update(id: string, input: SystemDomainObjectUpdateInput): Promise<SystemDomainOb
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 id
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 input
 
-
 </td><td>
 
 [SystemDomainObjectUpdateInput](./system-events.systemdomainobjectupdateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ input
 **Returns:**
 
 Promise&lt;[SystemDomainObject](./system-events.systemdomainobject.md)<!-- -->&gt;
-

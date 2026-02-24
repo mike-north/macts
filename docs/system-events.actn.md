@@ -9,5 +9,5 @@ Actn
 **Signature:**
 
 ```typescript
-type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved' | 'windowOpened';
+type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved' | 'windowOpened'
 ```

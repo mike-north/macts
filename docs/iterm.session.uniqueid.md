@@ -9,5 +9,5 @@ The uniqueID property
 **Signature:**
 
 ```typescript
-uniqueID: string;
+uniqueID: string
 ```

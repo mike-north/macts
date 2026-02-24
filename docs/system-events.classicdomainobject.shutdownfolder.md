@@ -9,5 +9,5 @@ The Shutdown Items folder
 **Signature:**
 
 ```typescript
-shutdownFolder: Folder;
+shutdownFolder: Folder
 ```

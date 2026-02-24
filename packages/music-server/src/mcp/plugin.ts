@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Music.app automation.
@@ -16,4 +16,4 @@ export const musicPlugin: McpPlugin = {
   name: 'music',
   description: 'MCP plugin for macOS Music.app automation',
   tools: allTools,
-};
+}

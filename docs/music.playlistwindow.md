@@ -9,7 +9,7 @@ a sub-window showing a single playlist
 **Signature:**
 
 ```typescript
-interface PlaylistWindow 
+interface PlaylistWindow
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface PlaylistWindow
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [selection](./music.playlistwindow.selection.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the selected tracks
-
 
 </td></tr>
 <tr><td>
 
 [view](./music.playlistwindow.view.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Playlist](./music.playlist.md)
 
-
 </td><td>
 
 the playlist displayed in the window
 
-
 </td></tr>
 </tbody></table>
-

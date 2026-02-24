@@ -9,5 +9,5 @@ the location of the file represented by this track
 **Signature:**
 
 ```typescript
-location: string;
+location: string
 ```

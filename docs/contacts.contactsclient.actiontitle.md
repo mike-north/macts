@@ -18,44 +18,35 @@ actionTitle(_with: unknown, _for: string): Promise<void>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 \_with
 
-
 </td><td>
 
 unknown
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 \_for
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +54,3 @@ string
 **Returns:**
 
 Promise&lt;void&gt;
-

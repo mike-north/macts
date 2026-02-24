@@ -11,7 +11,7 @@ List all outgoingmessages.
 ```typescript
 list(): Promise<OutgoingMessage[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[OutgoingMessage](./mail.outgoingmessage.md)<!-- -->\[\]&gt;
-

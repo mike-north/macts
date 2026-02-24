@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface GenerateSdkResult 
+interface GenerateSdkResult
 ```
 
 ## Properties
@@ -16,56 +16,43 @@ interface GenerateSdkResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [errors](./core.generatesdkresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generatesdkresult.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

@@ -268,8 +268,9 @@ describe('generateServerPackage', () => {
 
     const pkgFile = result.files.find((f) => f.path === 'package.json')
     expect(pkgFile).toBeDefined()
+    if (!pkgFile) throw new Error('package.json not found')
 
-    const pkg = JSON.parse(pkgFile!.content) as {
+    const pkg = JSON.parse(pkgFile.content) as {
       name: string
       version: string
       type: string
@@ -313,7 +314,8 @@ describe('generateServerPackage', () => {
     })
 
     const pkgFile = result.files.find((f) => f.path === 'package.json')
-    const pkg = JSON.parse(pkgFile!.content) as { version: string }
+    if (!pkgFile) throw new Error('package.json not found')
+    const pkg = JSON.parse(pkgFile.content) as { version: string }
     expect(pkg.version).toBe('0.0.0')
   })
 
@@ -356,7 +358,8 @@ describe('generateServerPackage', () => {
     })
 
     const pkgFile = result.files.find((f) => f.path === 'package.json')
-    const pkg = JSON.parse(pkgFile!.content) as { scripts: Record<string, string> }
+    if (!pkgFile) throw new Error('package.json not found')
+    const pkg = JSON.parse(pkgFile.content) as { scripts: Record<string, string> }
 
     expect(pkg.scripts['api-extractor']).toBeUndefined()
     expect(pkg.scripts['api-extractor:ci']).toBeUndefined()
@@ -419,7 +422,8 @@ describe('generateServerPackage', () => {
 
     // Package name should be correct
     const pkgFile = result.files.find((f) => f.path === 'package.json')
-    const pkg = JSON.parse(pkgFile!.content) as {
+    if (!pkgFile) throw new Error('package.json not found')
+    const pkg = JSON.parse(pkgFile.content) as {
       name: string
       dependencies: Record<string, string>
     }

@@ -5,54 +5,53 @@
  * @packageDocumentation
  */
 
-import { DocumentResourceClient } from './resources/document.js';
-
+import { DocumentResourceClient } from './resources/document.js'
 
 /**
  * Client configuration options.
  */
 export interface ScriptEditorClientOptions {
   /** API key for authentication */
-  apiKey: string;
+  apiKey: string
   /** Base URL for API server (default: http://localhost:8372) */
-  baseUrl?: string;
+  baseUrl?: string
 }
 
 /**
  * HTTP client wrapper for making authenticated requests.
  */
 export class HttpClient {
-  readonly #baseUrl: string;
-  readonly #apiKey: string;
+  readonly #baseUrl: string
+  readonly #apiKey: string
 
   constructor(baseUrl: string, apiKey: string) {
-    this.#baseUrl = baseUrl;
-    this.#apiKey = apiKey;
+    this.#baseUrl = baseUrl
+    this.#apiKey = apiKey
   }
 
   /**
    * Make an authenticated POST request to an RPC endpoint.
    */
   async rpc<T>(path: string, body: object = {}): Promise<T> {
-    const url = `${this.#baseUrl}/api/v1/rpc/${path}`;
+    const url = `${this.#baseUrl}/api/v1/rpc/${path}`
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#apiKey}`,
+        Authorization: `Bearer ${this.#apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
+    })
 
     if (!response.ok) {
-      const error = await response.json() as { error?: { code?: string; message?: string } };
-      const code = error?.error?.code ?? 'UNKNOWN_ERROR';
-      const message = error?.error?.message ?? `HTTP ${response.status}`;
-      throw new ScriptEditorError(code, message);
+      const error = (await response.json()) as { error?: { code?: string; message?: string } }
+      const code = error.error?.code ?? 'UNKNOWN_ERROR'
+      const message = error.error?.message ?? `HTTP ${String(response.status)}`
+      throw new ScriptEditorError(code, message)
     }
 
-    const result = await response.json() as { result: T };
-    return result.result;
+    const result = (await response.json()) as { result: T }
+    return result.result
   }
 }
 
@@ -60,12 +59,12 @@ export class HttpClient {
  * Error class for ScriptEditor API errors.
  */
 export class ScriptEditorError extends Error {
-  readonly code: string;
+  readonly code: string
 
   constructor(code: string, message: string) {
-    super(message);
-    this.name = 'ScriptEditorError';
-    this.code = code;
+    super(message)
+    this.name = 'ScriptEditorError'
+    this.code = code
   }
 }
 
@@ -83,22 +82,21 @@ export class ScriptEditorError extends Error {
  * ```
  */
 export class ScriptEditorClient {
-  readonly #httpClient: HttpClient;
+  readonly #httpClient: HttpClient
 
   /** A Script Editor document */
-  readonly documents: DocumentResourceClient;
+  readonly documents: DocumentResourceClient
 
   constructor(options: ScriptEditorClientOptions) {
-    const baseUrl = options.baseUrl ?? 'http://localhost:8372';
-    this.#httpClient = new HttpClient(baseUrl, options.apiKey);
-    this.documents = new DocumentResourceClient(this.#httpClient, 'scripteditor', 'documents');
+    const baseUrl = options.baseUrl ?? 'http://localhost:8372'
+    this.#httpClient = new HttpClient(baseUrl, options.apiKey)
+    this.documents = new DocumentResourceClient(this.#httpClient, 'script-editor', 'documents')
   }
 
   /**
    * Get the HTTP client for making custom requests.
    */
   get http(): HttpClient {
-    return this.#httpClient;
+    return this.#httpClient
   }
-
 }

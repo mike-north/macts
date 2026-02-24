@@ -9,5 +9,5 @@ SaveableFileFormat
 **Signature:**
 
 ```typescript
-type SaveableFileFormat = 'nativeFormat';
+type SaveableFileFormat = 'nativeFormat'
 ```

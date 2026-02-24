@@ -11,7 +11,7 @@ List all messageviewers.
 ```typescript
 list(): Promise<MessageViewer[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[MessageViewer](./mail.messageviewer.md)<!-- -->\[\]&gt;
-

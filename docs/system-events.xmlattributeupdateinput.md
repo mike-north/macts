@@ -9,7 +9,7 @@ Input for updating a XMLAttribute
 **Signature:**
 
 ```typescript
-type XMLAttributeUpdateInput = Partial<XMLAttributeCreateInput>;
+type XMLAttributeUpdateInput = Partial<XMLAttributeCreateInput>
 ```
-**References:** [XMLAttributeCreateInput](./system-events.xmlattributecreateinput.md)
 
+**References:** [XMLAttributeCreateInput](./system-events.xmlattributecreateinput.md)

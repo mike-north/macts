@@ -9,5 +9,5 @@ The emblem icon name of the list
 **Signature:**
 
 ```typescript
-emblem: string;
+emblem: string
 ```

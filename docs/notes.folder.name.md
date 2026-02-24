@@ -9,5 +9,5 @@ The name of the folder
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

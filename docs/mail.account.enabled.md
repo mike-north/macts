@@ -9,5 +9,5 @@ Indicates whether the account is enabled or not
 **Signature:**
 
 ```typescript
-enabled: boolean;
+enabled: boolean
 ```

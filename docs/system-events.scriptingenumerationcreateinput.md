@@ -9,5 +9,5 @@ Input for creating a ScriptingEnumeration
 **Signature:**
 
 ```typescript
-interface ScriptingEnumerationCreateInput 
+interface ScriptingEnumerationCreateInput
 ```

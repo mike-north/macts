@@ -9,7 +9,10 @@ Generate HTTP client SDK from a manifest.
 **Signature:**
 
 ```typescript
-declare function generateHttpClientSdk(manifest: AppManifest, options: HttpClientGeneratorOptions): GeneratedHttpClientSdk;
+declare function generateHttpClientSdk(
+  manifest: AppManifest,
+  options: HttpClientGeneratorOptions
+): GeneratedHttpClientSdk
 ```
 
 ## Parameters
@@ -18,48 +21,39 @@ declare function generateHttpClientSdk(manifest: AppManifest, options: HttpClien
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [HttpClientGeneratorOptions](./core.httpclientgeneratoroptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -69,4 +63,3 @@ Generation options
 [GeneratedHttpClientSdk](./core.generatedhttpclientsdk.md)
 
 Generated SDK files
-

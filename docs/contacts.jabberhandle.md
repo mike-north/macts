@@ -9,7 +9,7 @@ User name for Jabber instant messaging.
 **Signature:**
 
 ```typescript
-interface JabberHandle 
+interface JabberHandle
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface JabberHandle
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.jabberhandle.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this handle
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.jabberhandle.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.jabberhandle.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The Jabber handle value
 
-
 </td></tr>
 </tbody></table>
-

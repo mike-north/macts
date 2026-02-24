@@ -9,5 +9,5 @@ the common, unique ID for this track. If two tracks in different playlists have 
 **Signature:**
 
 ```typescript
-databaseID: number;
+databaseID: number
 ```

@@ -9,5 +9,5 @@ Does this disk do file system journaling?
 **Signature:**
 
 ```typescript
-journalingEnabled: boolean;
+journalingEnabled: boolean
 ```

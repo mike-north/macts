@@ -9,7 +9,7 @@ Input for creating a AliasFile
 **Signature:**
 
 ```typescript
-interface AliasFileCreateInput 
+interface AliasFileCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AliasFileCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [originalItem?](./finder.aliasfilecreateinput.originalitem.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ the original item pointed to by the alias
 
-
 </td></tr>
 </tbody></table>
-

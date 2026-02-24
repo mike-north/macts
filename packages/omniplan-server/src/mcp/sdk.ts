@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { OmniPlanClient, type OmniPlanClientOptions } from '@macts/omniplan';
+import { OmniPlanClient, type OmniPlanClientOptions } from '@macts/omniplan'
 
 /**
  * Get a OmniPlanClient instance.
@@ -16,32 +16,32 @@ import { OmniPlanClient, type OmniPlanClientOptions } from '@macts/omniplan';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getOmniPlanClient(): OmniPlanClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions omniplan:*:*'
-    );
+    )
   }
 
   const options: OmniPlanClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new OmniPlanClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new OmniPlanClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: OmniPlanClient | null = null;
+let _client: OmniPlanClient | null = null
 
 /**
  * Get or create the singleton OmniPlanClient.
@@ -50,8 +50,8 @@ let _client: OmniPlanClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): OmniPlanClient {
-  _client ??= getOmniPlanClient();
-  return _client;
+  _client ??= getOmniPlanClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): OmniPlanClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

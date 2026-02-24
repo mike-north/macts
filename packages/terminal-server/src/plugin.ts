@@ -6,7 +6,7 @@
  * @packageDocumentation
  */
 
-import type { AppManifest } from '@macts/core';
+import type { AppManifest } from '@macts/core'
 
 /**
  * API plugin for Terminal.app.
@@ -18,304 +18,278 @@ export const terminalApiPlugin = {
   name: 'terminal',
   bundleId: 'com.apple.Terminal',
   manifest: {
-  "version": "1.0",
-  "app": {
-    "bundleId": "com.apple.Terminal",
-    "name": "Terminal",
-    "displayName": "Terminal",
-    "tccEntitlements": [
-      "automation"
+    version: '1.0',
+    app: {
+      bundleId: 'com.apple.Terminal',
+      name: 'Terminal',
+      displayName: 'Terminal',
+      tccEntitlements: ['automation'],
+      distributionModel: 'system',
+    },
+    suites: [
+      {
+        name: 'Terminal Suite',
+        description: 'Terminal application classes',
+        code: 'trmx',
+        resources: ['Window', 'Tab', 'SettingsSet'],
+        commands: ['doScript'],
+        enums: [],
+      },
     ],
-    "distributionModel": "system"
-  },
-  "suites": [
-    {
-      "name": "Terminal Suite",
-      "description": "Terminal application classes",
-      "code": "trmx",
-      "resources": [
-        "Window",
-        "Tab",
-        "SettingsSet"
-      ],
-      "commands": [
-        "doScript"
-      ],
-      "enums": []
-    }
-  ],
-  "resources": {
-    "Window": {
-      "name": "Window",
-      "plural": "Windows",
-      "description": "A Terminal window",
-      "code": "cwin",
-      "properties": {
-        "name": {
-          "access": "r",
-          "type": "string",
-          "description": "The title of the window",
-          "code": "pnam",
-          "optional": false
+    resources: {
+      Window: {
+        name: 'Window',
+        plural: 'Windows',
+        description: 'A Terminal window',
+        code: 'cwin',
+        properties: {
+          name: {
+            access: 'r',
+            type: 'string',
+            description: 'The title of the window',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'number',
+            description: 'The unique identifier of the window',
+            code: 'ID  ',
+            optional: false,
+          },
+          position: {
+            access: 'rw',
+            type: 'string',
+            description: 'The position of the window',
+            code: 'posn',
+            optional: false,
+          },
+          visible: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the window is visible',
+            code: 'pvis',
+            optional: false,
+          },
+          frontmost: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the window is the frontmost window',
+            code: 'pisf',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "number",
-          "description": "The unique identifier of the window",
-          "code": "ID  ",
-          "optional": false
-        },
-        "position": {
-          "access": "rw",
-          "type": "string",
-          "description": "The position of the window",
-          "code": "posn",
-          "optional": false
-        },
-        "visible": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the window is visible",
-          "code": "pvis",
-          "optional": false
-        },
-        "frontmost": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the window is the frontmost window",
-          "code": "pisf",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'name',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "name",
-          "primary": true
-        }
-      ]
-    },
-    "Tab": {
-      "name": "Tab",
-      "plural": "Tabs",
-      "description": "A Terminal tab",
-      "code": "ttab",
-      "properties": {
-        "contents": {
-          "access": "r",
-          "type": "string",
-          "description": "The visible contents of the tab",
-          "code": "pcnt",
-          "optional": false
+      Tab: {
+        name: 'Tab',
+        plural: 'Tabs',
+        description: 'A Terminal tab',
+        code: 'ttab',
+        properties: {
+          contents: {
+            access: 'r',
+            type: 'string',
+            description: 'The visible contents of the tab',
+            code: 'pcnt',
+            optional: false,
+          },
+          history: {
+            access: 'r',
+            type: 'string',
+            description: 'The complete history contents of the tab',
+            code: 'hist',
+            optional: false,
+          },
+          busy: {
+            access: 'r',
+            type: 'boolean',
+            description: 'Whether the tab is busy running a process',
+            code: 'busy',
+            optional: false,
+          },
+          processes: {
+            access: 'r',
+            type: 'string',
+            description: 'The currently running processes in the tab',
+            code: 'prcs',
+            optional: false,
+          },
+          selected: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the tab is selected',
+            code: 'tbsl',
+            optional: false,
+          },
+          titleDisplaysCustomTitle: {
+            access: 'rw',
+            type: 'boolean',
+            description: 'Whether the title displays a custom title',
+            code: 'tdct',
+            optional: false,
+          },
+          customTitle: {
+            access: 'rw',
+            type: 'string',
+            description: 'The custom title of the tab',
+            code: 'titl',
+            optional: false,
+          },
+          tty: {
+            access: 'r',
+            type: 'string',
+            description: 'The tty device of the tab',
+            code: 'ttty',
+            optional: false,
+          },
+          currentSettings: {
+            access: 'rw',
+            type: 'string',
+            description: 'The name of the current settings set',
+            code: 'tcst',
+            optional: false,
+          },
         },
-        "history": {
-          "access": "r",
-          "type": "string",
-          "description": "The complete history contents of the tab",
-          "code": "hist",
-          "optional": false
-        },
-        "busy": {
-          "access": "r",
-          "type": "boolean",
-          "description": "Whether the tab is busy running a process",
-          "code": "busy",
-          "optional": false
-        },
-        "processes": {
-          "access": "r",
-          "type": "string",
-          "description": "The currently running processes in the tab",
-          "code": "prcs",
-          "optional": false
-        },
-        "selected": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the tab is selected",
-          "code": "tbsl",
-          "optional": false
-        },
-        "titleDisplaysCustomTitle": {
-          "access": "rw",
-          "type": "boolean",
-          "description": "Whether the title displays a custom title",
-          "code": "tdct",
-          "optional": false
-        },
-        "customTitle": {
-          "access": "rw",
-          "type": "string",
-          "description": "The custom title of the tab",
-          "code": "titl",
-          "optional": false
-        },
-        "tty": {
-          "access": "r",
-          "type": "string",
-          "description": "The tty device of the tab",
-          "code": "ttty",
-          "optional": false
-        },
-        "currentSettings": {
-          "access": "rw",
-          "type": "string",
-          "description": "The name of the current settings set",
-          "code": "tcst",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'tty',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "tty",
-          "primary": true
-        }
-      ]
-    },
-    "SettingsSet": {
-      "name": "SettingsSet",
-      "plural": "SettingsSets",
-      "description": "A Terminal settings set (profile)",
-      "code": "tprf",
-      "properties": {
-        "name": {
-          "access": "rw",
-          "type": "string",
-          "description": "The name of the settings set",
-          "code": "pnam",
-          "optional": false
+      SettingsSet: {
+        name: 'SettingsSet',
+        plural: 'SettingsSets',
+        description: 'A Terminal settings set (profile)',
+        code: 'tprf',
+        properties: {
+          name: {
+            access: 'rw',
+            type: 'string',
+            description: 'The name of the settings set',
+            code: 'pnam',
+            optional: false,
+          },
+          id: {
+            access: 'r',
+            type: 'number',
+            description: 'The unique identifier of the settings set',
+            code: 'ID  ',
+            optional: false,
+          },
+          numberOfRows: {
+            access: 'rw',
+            type: 'number',
+            description: 'The number of rows',
+            code: 'crow',
+            optional: false,
+          },
+          numberOfColumns: {
+            access: 'rw',
+            type: 'number',
+            description: 'The number of columns',
+            code: 'ccol',
+            optional: false,
+          },
+          fontName: {
+            access: 'rw',
+            type: 'string',
+            description: 'The name of the font',
+            code: 'font',
+            optional: false,
+          },
+          fontSize: {
+            access: 'rw',
+            type: 'number',
+            description: 'The size of the font',
+            code: 'ptsz',
+            optional: false,
+          },
         },
-        "id": {
-          "access": "r",
-          "type": "number",
-          "description": "The unique identifier of the settings set",
-          "code": "ID  ",
-          "optional": false
-        },
-        "numberOfRows": {
-          "access": "rw",
-          "type": "number",
-          "description": "The number of rows",
-          "code": "crow",
-          "optional": false
-        },
-        "numberOfColumns": {
-          "access": "rw",
-          "type": "number",
-          "description": "The number of columns",
-          "code": "ccol",
-          "optional": false
-        },
-        "fontName": {
-          "access": "rw",
-          "type": "string",
-          "description": "The name of the font",
-          "code": "font",
-          "optional": false
-        },
-        "fontSize": {
-          "access": "rw",
-          "type": "number",
-          "description": "The size of the font",
-          "code": "ptsz",
-          "optional": false
-        }
+        identifiers: [
+          {
+            property: 'name',
+            primary: true,
+          },
+        ],
       },
-      "identifiers": [
-        {
-          "property": "name",
-          "primary": true
-        }
-      ]
-    }
-  },
-  "enums": {},
-  "hierarchy": {
-    "children": {
-      "windows": {
-        "resource": "Window",
-        "access": "r",
-        "description": "Terminal windows"
-      },
-      "settingsSets": {
-        "resource": "SettingsSet",
-        "access": "rw",
-        "description": "Terminal settings sets (profiles)"
-      }
-    }
-  },
-  "relationships": [],
-  "commands": {
-    "list": {
-      "name": "list",
-      "description": "List items",
-      "scope": "resource",
-      "resourceType": [
-        "Window",
-        "Tab",
-        "SettingsSet"
-      ],
-      "parameters": []
     },
-    "get": {
-      "name": "get",
-      "description": "Get an item by identifier",
-      "scope": "resource",
-      "resourceType": [
-        "Window",
-        "Tab",
-        "SettingsSet"
-      ],
-      "parameters": [
-        {
-          "name": "name",
-          "type": "string",
-          "description": "Item identifier",
-          "required": true
-        }
-      ]
-    },
-    "doScript": {
-      "name": "doScript",
-      "description": "Execute a shell command in a Terminal window or tab",
-      "scope": "application",
-      "parameters": [
-        {
-          "name": "command",
-          "type": "string",
-          "description": "The command to execute",
-          "required": true
+    enums: {},
+    hierarchy: {
+      children: {
+        windows: {
+          resource: 'Window',
+          access: 'r',
+          description: 'Terminal windows',
         },
-        {
-          "name": "in",
-          "type": "string",
-          "description": "The window or tab to run the command in",
-          "required": false
-        }
-      ],
-      "code": "dosc"
-    }
-  },
-  "permissions": {
-    "windows": {
-      "read": [
-        "terminal:windows:list",
-        "terminal:windows:get"
-      ]
+        settingsSets: {
+          resource: 'SettingsSet',
+          access: 'rw',
+          description: 'Terminal settings sets (profiles)',
+        },
+      },
     },
-    "settingsSets": {
-      "read": [
-        "terminal:settingssets:list",
-        "terminal:settingssets:get"
-      ],
-      "write": [
-        "terminal:settingssets:update"
-      ]
+    relationships: [],
+    commands: {
+      list: {
+        name: 'list',
+        description: 'List items',
+        scope: 'resource',
+        resourceType: ['Window', 'Tab', 'SettingsSet'],
+        parameters: [],
+      },
+      get: {
+        name: 'get',
+        description: 'Get an item by identifier',
+        scope: 'resource',
+        resourceType: ['Window', 'Tab', 'SettingsSet'],
+        parameters: [
+          {
+            name: 'name',
+            type: 'string',
+            description: 'Item identifier',
+            required: true,
+          },
+        ],
+      },
+      doScript: {
+        name: 'doScript',
+        description: 'Execute a shell command in a Terminal window or tab',
+        scope: 'application',
+        parameters: [
+          {
+            name: 'command',
+            type: 'string',
+            description: 'The command to execute',
+            required: true,
+          },
+          {
+            name: 'in',
+            type: 'string',
+            description: 'The window or tab to run the command in',
+            required: false,
+          },
+        ],
+        code: 'dosc',
+      },
     },
-    "commands": {
-      "execute": [
-        "terminal:commands:doScript"
-      ]
-    }
-  }
-} as AppManifest,
-} as const;
+    permissions: {
+      windows: {
+        read: ['terminal:windows:list', 'terminal:windows:get'],
+      },
+      settingsSets: {
+        read: ['terminal:settingssets:list', 'terminal:settingssets:get'],
+        write: ['terminal:settingssets:update'],
+      },
+      commands: {
+        execute: ['terminal:commands:doScript'],
+      },
+    },
+  } as AppManifest,
+} as const

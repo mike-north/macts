@@ -9,5 +9,5 @@ The kind of object or data specified by this parameter
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

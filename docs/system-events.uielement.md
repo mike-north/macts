@@ -9,7 +9,7 @@ A piece of the user interface of a process
 **Signature:**
 
 ```typescript
-interface UIElement 
+interface UIElement
 ```
 
 ## Properties
@@ -18,383 +18,302 @@ interface UIElement
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [accessibilityDescription](./system-events.uielement.accessibilitydescription.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 a more complete description of the UI element and its capabilities
-
 
 </td></tr>
 <tr><td>
 
 [class](./system-events.uielement.class.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the class of the UI Element, which identifies it function
-
 
 </td></tr>
 <tr><td>
 
 [description](./system-events.uielement.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the accessibility description, if available; otherwise, the role description
-
 
 </td></tr>
 <tr><td>
 
 [enabled](./system-events.uielement.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Is the UI element enabled? ( Does it accept clicks? )
-
 
 </td></tr>
 <tr><td>
 
 [entireContents](./system-events.uielement.entirecontents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree
-
 
 </td></tr>
 <tr><td>
 
 [focused](./system-events.uielement.focused.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Is the focus on this UI element?
-
 
 </td></tr>
 <tr><td>
 
 [help](./system-events.uielement.help.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 an elaborate description of the UI element and its capabilities
-
 
 </td></tr>
 <tr><td>
 
 [maximumValue](./system-events.uielement.maximumvalue.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the maximum value that the UI element can take on
-
 
 </td></tr>
 <tr><td>
 
 [minimumValue](./system-events.uielement.minimumvalue.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the minimum value that the UI element can take on
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.uielement.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the UI Element, which identifies it within its container
-
 
 </td></tr>
 <tr><td>
 
 [orientation](./system-events.uielement.orientation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the orientation of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [position](./system-events.uielement.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the position of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [role](./system-events.uielement.role.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 an encoded description of the UI element and its capabilities
-
 
 </td></tr>
 <tr><td>
 
 [roleDescription](./system-events.uielement.roledescription.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 a more complete description of the UI element's role
-
 
 </td></tr>
 <tr><td>
 
 [selected](./system-events.uielement.selected.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Is the UI element selected?
-
 
 </td></tr>
 <tr><td>
 
 [size](./system-events.uielement.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the size of the UI element
-
 
 </td></tr>
 <tr><td>
 
 [subrole](./system-events.uielement.subrole.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 an encoded description of the UI element and its capabilities
-
 
 </td></tr>
 <tr><td>
 
 [title](./system-events.uielement.title.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the title of the UI element as it appears on the screen
-
 
 </td></tr>
 <tr><td>
 
 [value](./system-events.uielement.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the current value of the UI element
 
-
 </td></tr>
 </tbody></table>
-

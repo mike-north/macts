@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-InstantMessageSchema: z.ZodObject<{
-    serviceName: z.ZodString;
-    serviceType: z.ZodString;
-    userName: z.ZodString;
-}, z.core.$strip>
+InstantMessageSchema: z.ZodObject<
+  {
+    serviceName: z.ZodString
+    serviceType: z.ZodString
+    userName: z.ZodString
+  },
+  z.core.$strip
+>
 ```

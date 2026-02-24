@@ -10,55 +10,45 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ConsoleClient](./console.consoleclient.md)
 
-
 </td><td>
 
 Console client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [ConsoleError](./console.consoleerror.md)
 
-
 </td><td>
 
 Error class for Console API errors.
-
 
 </td></tr>
 <tr><td>
 
 [DeviceResourceClient](./console.deviceresourceclient.md)
 
-
 </td><td>
 
 Client for a device in console.
-
 
 </td></tr>
 <tr><td>
 
 [HttpClient](./console.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 </tbody></table>
@@ -69,44 +59,36 @@ HTTP client wrapper for making authenticated requests.
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ConsoleClientOptions](./console.consoleclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Device](./console.device.md)
 
-
 </td><td>
 
 A device in Console
-
 
 </td></tr>
 <tr><td>
 
 [DeviceCreateInput](./console.devicecreateinput.md)
 
-
 </td><td>
 
 Input for creating a Device
-
 
 </td></tr>
 </tbody></table>
@@ -117,20 +99,16 @@ Input for creating a Device
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DeviceSchema](./console.deviceschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -141,23 +119,18 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [DeviceUpdateInput](./console.deviceupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Device
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,13 +18,13 @@
  * @packageDocumentation
  */
 
-export { CalendarClient, CalendarError, HttpClient } from './client.js';
-export type { CalendarClientOptions } from './client.js';
-export * from './types.js';
-export { CalendarResourceClient } from './resources/calendar.js';
-export { EventResourceClient } from './resources/event.js';
-export { AttendeeResourceClient } from './resources/attendee.js';
-export { DisplayAlarmResourceClient } from './resources/displayalarm.js';
-export { MailAlarmResourceClient } from './resources/mailalarm.js';
-export { SoundAlarmResourceClient } from './resources/soundalarm.js';
-export { OpenFileAlarmResourceClient } from './resources/openfilealarm.js';
+export { CalendarClient, CalendarError, HttpClient } from './client.js'
+export type { CalendarClientOptions } from './client.js'
+export * from './types.js'
+export { CalendarResourceClient } from './resources/calendar.js'
+export { EventResourceClient } from './resources/event.js'
+export { AttendeeResourceClient } from './resources/attendee.js'
+export { DisplayAlarmResourceClient } from './resources/displayalarm.js'
+export { MailAlarmResourceClient } from './resources/mailalarm.js'
+export { SoundAlarmResourceClient } from './resources/soundalarm.js'
+export { OpenFileAlarmResourceClient } from './resources/openfilealarm.js'

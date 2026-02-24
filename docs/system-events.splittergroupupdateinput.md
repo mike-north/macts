@@ -9,7 +9,7 @@ Input for updating a SplitterGroup
 **Signature:**
 
 ```typescript
-type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>;
+type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>
 ```
-**References:** [SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)
 
+**References:** [SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)

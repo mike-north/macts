@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-RadioGroupSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+RadioGroupSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

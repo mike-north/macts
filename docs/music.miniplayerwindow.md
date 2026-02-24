@@ -9,7 +9,7 @@ the miniplayer window
 **Signature:**
 
 ```typescript
-interface MiniplayerWindow 
+interface MiniplayerWindow
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface MiniplayerWindow
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./music.miniplayerwindow.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this window
 
-
 </td></tr>
 </tbody></table>
-

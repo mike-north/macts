@@ -18,30 +18,24 @@ create(input: StaticTextCreateInput): Promise<StaticText>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [StaticTextCreateInput](./system-events.statictextcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[StaticText](./system-events.statictext.md)<!-- -->&gt;
-

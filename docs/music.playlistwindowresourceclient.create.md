@@ -18,30 +18,24 @@ create(input: PlaylistWindowCreateInput): Promise<PlaylistWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[PlaylistWindow](./music.playlistwindow.md)<!-- -->&gt;
-

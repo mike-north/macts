@@ -9,7 +9,7 @@ Input for updating a MailAlarm
 **Signature:**
 
 ```typescript
-type MailAlarmUpdateInput = Partial<MailAlarmCreateInput>;
+type MailAlarmUpdateInput = Partial<MailAlarmCreateInput>
 ```
-**References:** [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)
 
+**References:** [MailAlarmCreateInput](./calendar.mailalarmcreateinput.md)

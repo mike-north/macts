@@ -11,7 +11,7 @@ Shut Down the computer
 ```typescript
 shutDown(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

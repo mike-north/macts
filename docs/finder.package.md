@@ -9,7 +9,7 @@ A package
 **Signature:**
 
 ```typescript
-interface Package 
+interface Package
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Package
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./finder.package.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 Unique identifier for this package
 
-
 </td></tr>
 </tbody></table>
-

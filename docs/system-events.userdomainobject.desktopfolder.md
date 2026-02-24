@@ -9,5 +9,5 @@ The user's Desktop folder
 **Signature:**
 
 ```typescript
-desktopFolder: Folder;
+desktopFolder: Folder
 ```

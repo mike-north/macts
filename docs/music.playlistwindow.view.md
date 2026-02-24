@@ -9,5 +9,5 @@ the playlist displayed in the window
 **Signature:**
 
 ```typescript
-view: Playlist;
+view: Playlist
 ```

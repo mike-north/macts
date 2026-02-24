@@ -9,7 +9,7 @@ A single step in an object specifier chain.
 **Signature:**
 
 ```typescript
-interface SpecifierStep 
+interface SpecifierStep
 ```
 
 ## Properties
@@ -18,75 +18,58 @@ interface SpecifierStep
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [kind](./core.specifierstep.kind.md)
 
-
 </td><td>
-
 
 </td><td>
 
 'app' \| 'collection' \| 'property'
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.specifierstep.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [selector?](./core.specifierstep.selector.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Selector](./core.selector.md)
 
-
 </td><td>
 
 _(Optional)_
 
-
 </td></tr>
 </tbody></table>
-

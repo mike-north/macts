@@ -9,5 +9,5 @@ the maximum value that the UI element can take on
 **Signature:**
 
 ```typescript
-maximumValue: string;
+maximumValue: string
 ```

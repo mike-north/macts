@@ -9,5 +9,5 @@ the packet size
 **Signature:**
 
 ```typescript
-mtu: number;
+mtu: number
 ```

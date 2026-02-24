@@ -9,7 +9,7 @@ Client for the video window.
 **Signature:**
 
 ```typescript
-declare class VideoWindowResourceClient 
+declare class VideoWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class VideoWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.videowindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `VideoWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `VideoWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.videowindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new videowindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.videowindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a videowindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.videowindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a videowindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.videowindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all videowindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.videowindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing videowindow.
 
-
 </td></tr>
 </tbody></table>
-

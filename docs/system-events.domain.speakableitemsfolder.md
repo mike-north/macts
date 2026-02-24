@@ -9,5 +9,5 @@ The Speakable Items folder
 **Signature:**
 
 ```typescript
-speakableItemsFolder: Folder;
+speakableItemsFolder: Folder
 ```

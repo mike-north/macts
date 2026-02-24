@@ -9,7 +9,7 @@ A Terminal settings set (profile)
 **Signature:**
 
 ```typescript
-interface SettingsSet 
+interface SettingsSet
 ```
 
 ## Properties
@@ -18,136 +18,107 @@ interface SettingsSet
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [fontName](./terminal.settingsset.fontname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the font
-
 
 </td></tr>
 <tr><td>
 
 [fontSize](./terminal.settingsset.fontsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The size of the font
-
 
 </td></tr>
 <tr><td>
 
 [id](./terminal.settingsset.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The unique identifier of the settings set
-
 
 </td></tr>
 <tr><td>
 
 [name](./terminal.settingsset.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the settings set
-
 
 </td></tr>
 <tr><td>
 
 [numberOfColumns](./terminal.settingsset.numberofcolumns.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The number of columns
-
 
 </td></tr>
 <tr><td>
 
 [numberOfRows](./terminal.settingsset.numberofrows.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The number of rows
 
-
 </td></tr>
 </tbody></table>
-

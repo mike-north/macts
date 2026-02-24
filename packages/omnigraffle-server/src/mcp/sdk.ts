@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { OmniGraffleClient, type OmniGraffleClientOptions } from '@macts/omnigraffle';
+import { OmniGraffleClient, type OmniGraffleClientOptions } from '@macts/omnigraffle'
 
 /**
  * Get a OmniGraffleClient instance.
@@ -16,32 +16,32 @@ import { OmniGraffleClient, type OmniGraffleClientOptions } from '@macts/omnigra
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getOmniGraffleClient(): OmniGraffleClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions omnigraffle:*:*'
-    );
+    )
   }
 
   const options: OmniGraffleClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new OmniGraffleClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new OmniGraffleClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: OmniGraffleClient | null = null;
+let _client: OmniGraffleClient | null = null
 
 /**
  * Get or create the singleton OmniGraffleClient.
@@ -50,8 +50,8 @@ let _client: OmniGraffleClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): OmniGraffleClient {
-  _client ??= getOmniGraffleClient();
-  return _client;
+  _client ??= getOmniGraffleClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): OmniGraffleClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

@@ -9,5 +9,5 @@ The subject of the message
 **Signature:**
 
 ```typescript
-subject: string;
+subject: string
 ```

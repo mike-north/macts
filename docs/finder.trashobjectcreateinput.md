@@ -9,7 +9,7 @@ Input for creating a TrashObject
 **Signature:**
 
 ```typescript
-interface TrashObjectCreateInput 
+interface TrashObjectCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface TrashObjectCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [warnsBeforeEmptying?](./finder.trashobjectcreateinput.warnsbeforeemptying.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Display a dialog when emptying the trash?
 
-
 </td></tr>
 </tbody></table>
-

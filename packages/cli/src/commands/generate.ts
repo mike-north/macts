@@ -8,8 +8,6 @@ import {
   writeFiles,
 } from '@macts/core'
 
-type GenerateTarget = 'all' | 'client' | 'server'
-
 /**
  * Command to generate packages from manifests.
  *
@@ -77,7 +75,7 @@ export class GenerateCommand extends Command {
     try {
       const manifestPath = resolve(this.manifestPath)
       const outDir = resolve(this.outDir)
-      const target = (this.target ?? 'all') as GenerateTarget
+      const target = this.target
 
       this.context.stdout.write(`Loading manifest from ${manifestPath}...\n`)
       const manifest = await loadManifest(manifestPath)
@@ -88,15 +86,15 @@ export class GenerateCommand extends Command {
       )
 
       if (target === 'client') {
-        return this.generateClient(manifest, appName, outDir)
+        return await this.generateClient(manifest, appName, outDir)
       }
 
       if (target === 'server') {
-        return this.generateServer(manifest, appName, outDir)
+        return await this.generateServer(manifest, appName, outDir)
       }
 
       // Default: generate all packages
-      return this.generateAll(manifest, appName, outDir)
+      return await this.generateAll(manifest, appName, outDir)
     } catch (error) {
       if (error instanceof Error) {
         this.context.stderr.write(`Error: ${error.message}\n`)

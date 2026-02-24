@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface GeneratedType 
+interface GeneratedType
 ```
 
 ## Properties
@@ -16,73 +16,56 @@ interface GeneratedType
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./core.generatedtype.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [imports](./core.generatedtype.imports.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.generatedtype.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

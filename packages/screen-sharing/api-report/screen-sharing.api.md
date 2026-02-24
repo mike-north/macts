@@ -14,8 +14,7 @@ export interface Connection {
 }
 
 // @public
-export interface ConnectionCreateInput {
-}
+export type ConnectionCreateInput = Record<string, never>;
 
 // @public
 export class ConnectionResourceClient {

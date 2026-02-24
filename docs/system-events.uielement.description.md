@@ -9,5 +9,5 @@ the accessibility description, if available; otherwise, the role description
 **Signature:**
 
 ```typescript
-description: string;
+description: string
 ```

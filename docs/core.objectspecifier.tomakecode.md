@@ -18,30 +18,24 @@ toMakeCode(properties: Record<string, unknown>): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 properties
 
-
 </td><td>
 
 Record&lt;string, unknown&gt;
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ Record&lt;string, unknown&gt;
 **Returns:**
 
 string
-

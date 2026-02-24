@@ -9,7 +9,7 @@ Input for updating a ICQHandle
 **Signature:**
 
 ```typescript
-type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>;
+type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>
 ```
-**References:** [ICQHandleCreateInput](./contacts.icqhandlecreateinput.md)
 
+**References:** [ICQHandleCreateInput](./contacts.icqhandlecreateinput.md)

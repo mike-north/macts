@@ -9,5 +9,5 @@ the name of the disk item as displayed in the User Interface
 **Signature:**
 
 ```typescript
-displayedName: string;
+displayedName: string
 ```

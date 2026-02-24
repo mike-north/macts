@@ -9,5 +9,5 @@ Client package name (e.g., '<!-- -->@<!-- -->macts/calendar')
 **Signature:**
 
 ```typescript
-clientPackageName: string;
+clientPackageName: string
 ```

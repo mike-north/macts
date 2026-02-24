@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type AppManifest = z.infer<typeof AppManifestSchema>;
+type AppManifest = z.infer<typeof AppManifestSchema>
 ```
-**References:** [AppManifestSchema](./core.appmanifestschema.md)
 
+**References:** [AppManifestSchema](./core.appmanifestschema.md)

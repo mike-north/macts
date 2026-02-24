@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-SourceSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    capacity: z.ZodNumber;
-    freeSpace: z.ZodNumber;
-    kind: z.ZodString;
-}, z.core.$strip>
+SourceSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    capacity: z.ZodNumber
+    freeSpace: z.ZodNumber
+    kind: z.ZodString
+  },
+  z.core.$strip
+>
 ```

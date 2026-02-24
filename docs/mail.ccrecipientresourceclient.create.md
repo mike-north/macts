@@ -18,30 +18,24 @@ create(input: CcRecipientCreateInput): Promise<CcRecipient>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[CcRecipient](./mail.ccrecipient.md)<!-- -->&gt;
-

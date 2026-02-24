@@ -9,7 +9,7 @@ Result of hierarchy analysis.
 **Signature:**
 
 ```typescript
-interface HierarchyResult 
+interface HierarchyResult
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface HierarchyResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ambiguousClasses](./core.hierarchyresult.ambiguousclasses.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Map&lt;string, string\[\]&gt;
 
-
 </td><td>
 
 Classes with multiple parents (ambiguous)
-
 
 </td></tr>
 <tr><td>
 
 [hierarchy](./core.hierarchyresult.hierarchy.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Hierarchy](./core.hierarchy.md)
 
-
 </td><td>
 
 The containment hierarchy tree
-
 
 </td></tr>
 <tr><td>
 
 [resources](./core.hierarchyresult.resources.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Set&lt;string&gt;
 
-
 </td><td>
 
 Classes that are resources (have elements)
-
 
 </td></tr>
 <tr><td>
 
 [rootClass](./core.hierarchyresult.rootclass.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 The root class (usually 'application')
-
 
 </td></tr>
 <tr><td>
 
 [valueTypes](./core.hierarchyresult.valuetypes.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Set&lt;string&gt;
 
-
 </td><td>
 
 Classes that are value types (no elements)
 
-
 </td></tr>
 </tbody></table>
-

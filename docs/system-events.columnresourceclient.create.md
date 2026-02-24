@@ -18,30 +18,24 @@ create(input: ColumnCreateInput): Promise<Column>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ColumnCreateInput](./system-events.columncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Column](./system-events.column.md)<!-- -->&gt;
-

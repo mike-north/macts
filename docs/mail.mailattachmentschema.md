@@ -7,11 +7,14 @@
 **Signature:**
 
 ```typescript
-MailAttachmentSchema: z.ZodObject<{
-    name: z.ZodString;
-    mIMEType: z.ZodString;
-    fileSize: z.ZodNumber;
-    downloaded: z.ZodBoolean;
-    id: z.ZodString;
-}, z.core.$strip>
+MailAttachmentSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    mIMEType: z.ZodString
+    fileSize: z.ZodNumber
+    downloaded: z.ZodBoolean
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

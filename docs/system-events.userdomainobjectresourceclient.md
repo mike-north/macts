@@ -9,7 +9,7 @@ Client for the user domain in the file system.
 **Signature:**
 
 ```typescript
-declare class UserDomainObjectResourceClient 
+declare class UserDomainObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class UserDomainObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.userdomainobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `UserDomainObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `UserDomainObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.userdomainobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new userdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.userdomainobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a userdomainobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.userdomainobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a userdomainobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.userdomainobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all userdomainobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.userdomainobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing userdomainobject.
 
-
 </td></tr>
 </tbody></table>
-

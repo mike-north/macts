@@ -11,7 +11,7 @@ List all xmlattributes.
 ```typescript
 list(): Promise<XMLAttribute[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[XMLAttribute](./system-events.xmlattribute.md)<!-- -->\[\]&gt;
-

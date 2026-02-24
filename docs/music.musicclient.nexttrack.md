@@ -11,7 +11,7 @@ advance to the next track in the current playlist
 ```typescript
 nextTrack(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

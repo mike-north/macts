@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Messages.app automation.
@@ -16,4 +16,4 @@ export const messagesPlugin: McpPlugin = {
   name: 'messages',
   description: 'MCP plugin for macOS Messages.app automation',
   tools: allTools,
-};
+}

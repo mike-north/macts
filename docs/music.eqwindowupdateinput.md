@@ -9,7 +9,7 @@ Input for updating a EQWindow
 **Signature:**
 
 ```typescript
-type EQWindowUpdateInput = Partial<EQWindowCreateInput>;
+type EQWindowUpdateInput = Partial<EQWindowCreateInput>
 ```
-**References:** [EQWindowCreateInput](./music.eqwindowcreateinput.md)
 
+**References:** [EQWindowCreateInput](./music.eqwindowcreateinput.md)

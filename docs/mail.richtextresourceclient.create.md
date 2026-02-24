@@ -18,30 +18,24 @@ create(input: RichTextCreateInput): Promise<RichText>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [RichTextCreateInput](./mail.richtextcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[RichText](./mail.richtext.md)<!-- -->&gt;
-

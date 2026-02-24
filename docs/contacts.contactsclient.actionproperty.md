@@ -11,7 +11,7 @@ RollOver - Which property this roll over is associated with (Properties can be o
 ```typescript
 actionProperty(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

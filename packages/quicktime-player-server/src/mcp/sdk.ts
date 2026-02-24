@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { QuickTimePlayerClient, type QuickTimePlayerClientOptions } from '@macts/quicktime-player';
+import { QuickTimePlayerClient, type QuickTimePlayerClientOptions } from '@macts/quicktime-player'
 
 /**
  * Get a QuickTimePlayerClient instance.
@@ -16,32 +16,32 @@ import { QuickTimePlayerClient, type QuickTimePlayerClientOptions } from '@macts
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getQuickTimePlayerClient(): QuickTimePlayerClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions quicktime-player:*:*'
-    );
+    )
   }
 
   const options: QuickTimePlayerClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new QuickTimePlayerClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new QuickTimePlayerClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: QuickTimePlayerClient | null = null;
+let _client: QuickTimePlayerClient | null = null
 
 /**
  * Get or create the singleton QuickTimePlayerClient.
@@ -50,8 +50,8 @@ let _client: QuickTimePlayerClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): QuickTimePlayerClient {
-  _client ??= getQuickTimePlayerClient();
-  return _client;
+  _client ??= getQuickTimePlayerClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): QuickTimePlayerClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

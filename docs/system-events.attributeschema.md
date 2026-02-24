@@ -7,9 +7,12 @@
 **Signature:**
 
 ```typescript
-AttributeSchema: z.ZodObject<{
-    name: z.ZodString;
-    settable: z.ZodBoolean;
-    value: z.ZodString;
-}, z.core.$strip>
+AttributeSchema: z.ZodObject<
+  {
+    name: z.ZodString
+    settable: z.ZodBoolean
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

@@ -9,7 +9,7 @@ A Script Editor document
 **Signature:**
 
 ```typescript
-interface Document 
+interface Document
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface Document
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [contents](./script-editor.document.contents.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The source code of the script
-
 
 </td></tr>
 <tr><td>
 
 [language](./script-editor.document.language.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The scripting language (AppleScript or JavaScript)
-
 
 </td></tr>
 <tr><td>
 
 [modified](./script-editor.document.modified.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the document has been modified since last save
-
 
 </td></tr>
 <tr><td>
 
 [name](./script-editor.document.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The name of the document
-
 
 </td></tr>
 <tr><td>
 
 [path?](./script-editor.document.path.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The file path of the document
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,5 +9,5 @@ Input for creating a Outline
 **Signature:**
 
 ```typescript
-interface OutlineCreateInput 
+interface OutlineCreateInput
 ```

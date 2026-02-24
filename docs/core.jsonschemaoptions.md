@@ -9,7 +9,7 @@ Options for JSON Schema generation.
 **Signature:**
 
 ```typescript
-interface JsonSchemaOptions 
+interface JsonSchemaOptions
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface JsonSchemaOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName?](./core.jsonschemaoptions.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ App name for $id generation
-
 
 </td></tr>
 <tr><td>
 
 [id?](./core.jsonschemaoptions.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Full custom $id override
-
 
 </td></tr>
 <tr><td>
 
 [schemaName?](./core.jsonschemaoptions.schemaname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Schema name (e.g., 'resource', 'command')
 
-
 </td></tr>
 </tbody></table>
-

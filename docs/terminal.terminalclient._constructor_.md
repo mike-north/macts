@@ -18,31 +18,24 @@ constructor(options: TerminalClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [TerminalClientOptions](./terminal.terminalclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

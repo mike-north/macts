@@ -9,5 +9,5 @@ The user's Movies folder
 **Signature:**
 
 ```typescript
-moviesFolder: Folder;
+moviesFolder: Folder
 ```

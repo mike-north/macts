@@ -11,7 +11,7 @@ List all relevanceindicators.
 ```typescript
 list(): Promise<RelevanceIndicator[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[RelevanceIndicator](./system-events.relevanceindicator.md)<!-- -->\[\]&gt;
-

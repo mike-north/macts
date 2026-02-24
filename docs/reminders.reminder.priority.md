@@ -9,5 +9,5 @@ The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
 **Signature:**
 
 ```typescript
-priority: number;
+priority: number
 ```

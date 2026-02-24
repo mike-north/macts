@@ -9,5 +9,5 @@ The Extensions folder
 **Signature:**
 
 ```typescript
-extensionsFolder: Folder;
+extensionsFolder: Folder
 ```

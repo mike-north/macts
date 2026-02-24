@@ -9,5 +9,5 @@ Isiz
 **Signature:**
 
 ```typescript
-type Isiz = 'mini' | 'small' | 'large';
+type Isiz = 'mini' | 'small' | 'large'
 ```

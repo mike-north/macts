@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type PropertyAccess = z.infer<typeof PropertyAccessSchema>;
+type PropertyAccess = z.infer<typeof PropertyAccessSchema>
 ```
-**References:** [PropertyAccessSchema](./core.propertyaccessschema.md)
 
+**References:** [PropertyAccessSchema](./core.propertyaccessschema.md)

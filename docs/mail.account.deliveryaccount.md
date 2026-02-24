@@ -9,5 +9,5 @@ The delivery account used when sending mail from this account
 **Signature:**
 
 ```typescript
-deliveryAccount: string;
+deliveryAccount: string
 ```

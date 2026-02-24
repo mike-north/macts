@@ -18,30 +18,24 @@ create(input: BookmarkItemCreateInput): Promise<BookmarkItem>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [BookmarkItemCreateInput](./google-chrome.bookmarkitemcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[BookmarkItem](./google-chrome.bookmarkitem.md)<!-- -->&gt;
-

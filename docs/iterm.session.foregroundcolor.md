@@ -10,8 +10,8 @@ The foregroundColor property
 
 ```typescript
 foregroundColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

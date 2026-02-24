@@ -18,9 +18,9 @@
  * @packageDocumentation
  */
 
-export { iTermClient, iTermError, HttpClient } from './client.js';
-export type { iTermClientOptions } from './client.js';
-export * from './types.js';
-export { WindowResourceClient } from './resources/window.js';
-export { TabResourceClient } from './resources/tab.js';
-export { SessionResourceClient } from './resources/session.js';
+export { iTermClient, iTermError, HttpClient } from './client.js'
+export type { iTermClientOptions } from './client.js'
+export * from './types.js'
+export { WindowResourceClient } from './resources/window.js'
+export { TabResourceClient } from './resources/tab.js'
+export { SessionResourceClient } from './resources/session.js'

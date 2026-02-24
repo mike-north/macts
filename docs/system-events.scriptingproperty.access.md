@@ -9,5 +9,5 @@ The type of access to this property
 **Signature:**
 
 ```typescript
-access: string;
+access: string
 ```

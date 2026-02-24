@@ -9,5 +9,5 @@ The username used with this social profile.
 **Signature:**
 
 ```typescript
-userName: string;
+userName: string
 ```

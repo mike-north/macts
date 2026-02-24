@@ -11,7 +11,7 @@ toggle the playing/paused state of the current track
 ```typescript
 playpause(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

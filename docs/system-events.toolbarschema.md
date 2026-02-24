@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-ToolbarSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+ToolbarSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

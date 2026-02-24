@@ -9,7 +9,7 @@ Client for a group belonging to a window.
 **Signature:**
 
 ```typescript
-declare class GroupResourceClient 
+declare class GroupResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class GroupResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.groupresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `GroupResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `GroupResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.groupresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new group.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.groupresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a group.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.groupresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a group by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.groupresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all groups.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.groupresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing group.
 
-
 </td></tr>
 </tbody></table>
-

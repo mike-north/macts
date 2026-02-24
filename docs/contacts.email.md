@@ -9,7 +9,7 @@ Email address for a person.
 **Signature:**
 
 ```typescript
-interface Email 
+interface Email
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface Email
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.email.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this email
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.email.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this email
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.email.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The email address
 
-
 </td></tr>
 </tbody></table>
-

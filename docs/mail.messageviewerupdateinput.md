@@ -9,7 +9,7 @@ Input for updating a MessageViewer
 **Signature:**
 
 ```typescript
-type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>;
+type MessageViewerUpdateInput = Partial<MessageViewerCreateInput>
 ```
-**References:** [MessageViewerCreateInput](./mail.messageviewercreateinput.md)
 
+**References:** [MessageViewerCreateInput](./mail.messageviewercreateinput.md)

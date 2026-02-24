@@ -9,7 +9,7 @@ Client for a mail/email alarm.
 **Signature:**
 
 ```typescript
-declare class MailAlarmResourceClient 
+declare class MailAlarmResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MailAlarmResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.mailalarmresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MailAlarmResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MailAlarmResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.mailalarmresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new mailalarm.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./calendar.mailalarmresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a mailalarm.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./calendar.mailalarmresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a mailalarm by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.mailalarmresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all mailalarms.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./calendar.mailalarmresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing mailalarm.
 
-
 </td></tr>
 </tbody></table>
-

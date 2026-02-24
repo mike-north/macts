@@ -9,5 +9,5 @@ the duplex setting half \| full \| full with flow control
 **Signature:**
 
 ```typescript
-duplex: string;
+duplex: string
 ```

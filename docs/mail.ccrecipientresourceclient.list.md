@@ -11,7 +11,7 @@ List all ccrecipients.
 ```typescript
 list(): Promise<CcRecipient[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[CcRecipient](./mail.ccrecipient.md)<!-- -->\[\]&gt;
-

@@ -9,7 +9,7 @@ a playlist representing an audio CD
 **Signature:**
 
 ```typescript
-interface AudioCDPlaylist 
+interface AudioCDPlaylist
 ```
 
 ## Properties
@@ -18,155 +18,122 @@ interface AudioCDPlaylist
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [artist](./music.audiocdplaylist.artist.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the artist of the CD
-
 
 </td></tr>
 <tr><td>
 
 [compilation](./music.audiocdplaylist.compilation.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 is this CD a compilation album?
-
 
 </td></tr>
 <tr><td>
 
 [composer](./music.audiocdplaylist.composer.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the composer of the CD
-
 
 </td></tr>
 <tr><td>
 
 [discCount](./music.audiocdplaylist.disccount.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the total number of discs in this CD’s album
-
 
 </td></tr>
 <tr><td>
 
 [discNumber](./music.audiocdplaylist.discnumber.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the index of this CD disc in the source album
-
 
 </td></tr>
 <tr><td>
 
 [genre](./music.audiocdplaylist.genre.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the genre of the CD
-
 
 </td></tr>
 <tr><td>
 
 [year](./music.audiocdplaylist.year.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the year the album was recorded/released
 
-
 </td></tr>
 </tbody></table>
-

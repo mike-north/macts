@@ -11,7 +11,7 @@ List all systemdomainobjects.
 ```typescript
 list(): Promise<SystemDomainObject[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SystemDomainObject](./system-events.systemdomainobject.md)<!-- -->\[\]&gt;
-

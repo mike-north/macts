@@ -4,13 +4,10 @@
  * @packageDocumentation
  */
 
-import { appBrowseTool } from './app.js';
-import { appSendTool } from './app.js';
+import { appBrowseTool } from './app.js'
+import { appSendTool } from './app.js'
 
 /**
  * All MCP tools.
  */
-export const allTools = [
-  appBrowseTool,
-  appSendTool,
-] as const;
+export const allTools = [appBrowseTool, appSendTool] as const

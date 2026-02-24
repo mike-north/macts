@@ -9,5 +9,5 @@ the date and time this track was last played
 **Signature:**
 
 ```typescript
-playedDate: Date;
+playedDate: Date
 ```

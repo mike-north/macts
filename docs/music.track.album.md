@@ -9,5 +9,5 @@ the album name of the track
 **Signature:**
 
 ```typescript
-album: string;
+album: string
 ```

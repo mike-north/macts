@@ -9,5 +9,5 @@ configure the interface speed, duplex, and mtu automatically?
 **Signature:**
 
 ```typescript
-automatic: boolean;
+automatic: boolean
 ```

@@ -9,7 +9,7 @@ Get a human-readable description of what permissions grant.
 **Signature:**
 
 ```typescript
-declare function describePermissions(permissions: string[]): string;
+declare function describePermissions(permissions: string[]): string
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function describePermissions(permissions: string[]): string;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permissions
 
-
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Array of permission strings
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Array of permission strings
 string
 
 Human-readable description
-

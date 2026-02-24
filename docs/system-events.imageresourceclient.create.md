@@ -18,30 +18,24 @@ create(input: ImageCreateInput): Promise<Image>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ImageCreateInput](./system-events.imagecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Image](./system-events.image.md)<!-- -->&gt;
-

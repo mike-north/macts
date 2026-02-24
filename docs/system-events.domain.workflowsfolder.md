@@ -9,5 +9,5 @@ The Automator Workflows folder
 **Signature:**
 
 ```typescript
-workflowsFolder: Folder;
+workflowsFolder: Folder
 ```

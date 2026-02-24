@@ -9,7 +9,7 @@ Result of generating a server package.
 **Signature:**
 
 ```typescript
-interface GenerateServerPackageResult 
+interface GenerateServerPackageResult
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface GenerateServerPackageResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [dir](./core.generateserverpackageresult.dir.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Directory name for the package (e.g., 'calendar-server')
-
 
 </td></tr>
 <tr><td>
 
 [errors](./core.generateserverpackageresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Any errors encountered during generation
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generateserverpackageresult.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
 
 All generated files as path/content pairs
 
-
 </td></tr>
 </tbody></table>
-

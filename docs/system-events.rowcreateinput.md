@@ -9,5 +9,5 @@ Input for creating a Row
 **Signature:**
 
 ```typescript
-interface RowCreateInput 
+interface RowCreateInput
 ```

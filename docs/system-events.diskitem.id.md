@@ -9,5 +9,5 @@ the unique ID of the disk item
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

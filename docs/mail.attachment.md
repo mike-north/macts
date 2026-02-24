@@ -9,7 +9,7 @@ Represents an inline text attachment. This class is used mainly for make command
 **Signature:**
 
 ```typescript
-interface Attachment 
+interface Attachment
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Attachment
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [fileName](./mail.attachment.filename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The file for the attachment
 
-
 </td></tr>
 </tbody></table>
-

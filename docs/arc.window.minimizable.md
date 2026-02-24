@@ -9,5 +9,5 @@ Whether the window can be minimized.
 **Signature:**
 
 ```typescript
-minimizable: boolean;
+minimizable: boolean
 ```

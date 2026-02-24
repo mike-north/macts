@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-interface GeneratedApplication 
+interface GeneratedApplication
 ```
 
 ## Properties
@@ -16,73 +16,56 @@ interface GeneratedApplication
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [content](./core.generatedapplication.content.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [imports](./core.generatedapplication.imports.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [name](./core.generatedapplication.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

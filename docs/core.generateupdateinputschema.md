@@ -9,7 +9,10 @@ Generate Zod schema for resource update input (all optional).
 **Signature:**
 
 ```typescript
-declare function generateUpdateInputSchema(resource: Resource, _ctx: GeneratorContext): GeneratedSchema;
+declare function generateUpdateInputSchema(
+  resource: Resource,
+  _ctx: GeneratorContext
+): GeneratedSchema
 ```
 
 ## Parameters
@@ -18,44 +21,35 @@ declare function generateUpdateInputSchema(resource: Resource, _ctx: GeneratorCo
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 resource
 
-
 </td><td>
 
 [Resource](./core.resource.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 \_ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -63,4 +57,3 @@ resource
 **Returns:**
 
 [GeneratedSchema](./core.generatedschema.md)
-

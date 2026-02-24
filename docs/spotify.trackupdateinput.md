@@ -9,7 +9,7 @@ Input for updating a Track
 **Signature:**
 
 ```typescript
-type TrackUpdateInput = Partial<TrackCreateInput>;
+type TrackUpdateInput = Partial<TrackCreateInput>
 ```
-**References:** [TrackCreateInput](./spotify.trackcreateinput.md)
 
+**References:** [TrackCreateInput](./spotify.trackcreateinput.md)

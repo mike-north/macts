@@ -18,30 +18,24 @@ create(input: PropertyListItemCreateInput): Promise<PropertyListItem>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [PropertyListItemCreateInput](./system-events.propertylistitemcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[PropertyListItem](./system-events.propertylistitem.md)<!-- -->&gt;
-

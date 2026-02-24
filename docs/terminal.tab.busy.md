@@ -9,5 +9,5 @@ Whether the tab is busy running a process
 **Signature:**
 
 ```typescript
-busy: boolean;
+busy: boolean
 ```

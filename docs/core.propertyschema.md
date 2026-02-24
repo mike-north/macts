@@ -9,31 +9,74 @@ Schema for a single property definition.
 **Signature:**
 
 ```typescript
-PropertySchema: z.ZodObject<{
+PropertySchema: z.ZodObject<
+  {
     access: z.ZodEnum<{
-        r: "r";
-        rw: "rw";
-    }>;
-    type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
-        array: PropertyType;
-    } | {
-        resource: string;
-    } | {
-        enum: string;
-    }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
-        array: PropertyType;
-    } | {
-        resource: string;
-    } | {
-        enum: string;
-    }, unknown>>>;
-    description: z.ZodString;
-    code: z.ZodOptional<z.ZodString>;
-    default: z.ZodOptional<z.ZodUnknown>;
-    optional: z.ZodDefault<z.ZodBoolean>;
-    deprecated: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-        since: z.ZodOptional<z.ZodString>;
-    }, z.core.$strip>>;
-}, z.core.$strip>
+      r: 'r'
+      rw: 'rw'
+    }>
+    type: z.ZodOptional<
+      z.ZodType<
+        | 'string'
+        | 'number'
+        | 'boolean'
+        | 'integer'
+        | 'date'
+        | 'data'
+        | 'any'
+        | 'file'
+        | 'point'
+        | 'rect'
+        | 'rgb'
+        | {
+            array: PropertyType
+          }
+        | {
+            resource: string
+          }
+        | {
+            enum: string
+          },
+        unknown,
+        z.core.$ZodTypeInternals<
+          | 'string'
+          | 'number'
+          | 'boolean'
+          | 'integer'
+          | 'date'
+          | 'data'
+          | 'any'
+          | 'file'
+          | 'point'
+          | 'rect'
+          | 'rgb'
+          | {
+              array: PropertyType
+            }
+          | {
+              resource: string
+            }
+          | {
+              enum: string
+            },
+          unknown
+        >
+      >
+    >
+    description: z.ZodString
+    code: z.ZodOptional<z.ZodString>
+    default: z.ZodOptional<z.ZodUnknown>
+    optional: z.ZodDefault<z.ZodBoolean>
+    deprecated: z.ZodOptional<
+      z.ZodObject<
+        {
+          message: z.ZodString
+          since: z.ZodOptional<z.ZodString>
+        },
+        z.core.$strip
+      >
+    >
+  },
+  z.core.$strip
+>
 ```

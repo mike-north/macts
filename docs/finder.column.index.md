@@ -9,5 +9,5 @@ the index in the front-to-back ordering within its container
 **Signature:**
 
 ```typescript
-index: number;
+index: number
 ```

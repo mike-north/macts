@@ -9,5 +9,5 @@ The complete history contents of the tab
 **Signature:**
 
 ```typescript
-history: string;
+history: string
 ```

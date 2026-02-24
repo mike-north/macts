@@ -9,7 +9,7 @@ Input for creating a Attachment
 **Signature:**
 
 ```typescript
-interface AttachmentCreateInput 
+interface AttachmentCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AttachmentCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [fileName?](./mail.attachmentcreateinput.filename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The file for the attachment
 
-
 </td></tr>
 </tbody></table>
-

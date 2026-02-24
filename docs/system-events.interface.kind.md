@@ -9,5 +9,5 @@ the type of interface
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

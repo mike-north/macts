@@ -9,5 +9,5 @@ The backgroundImage property
 **Signature:**
 
 ```typescript
-backgroundImage: string;
+backgroundImage: string
 ```

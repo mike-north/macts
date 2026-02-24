@@ -9,7 +9,7 @@ Input for creating a SettingsSet
 **Signature:**
 
 ```typescript
-interface SettingsSetCreateInput 
+interface SettingsSetCreateInput
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface SettingsSetCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [fontName?](./terminal.settingssetcreateinput.fontname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the font
-
 
 </td></tr>
 <tr><td>
 
 [fontSize?](./terminal.settingssetcreateinput.fontsize.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The size of the font
-
 
 </td></tr>
 <tr><td>
 
 [name?](./terminal.settingssetcreateinput.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The name of the settings set
-
 
 </td></tr>
 <tr><td>
 
 [numberOfColumns?](./terminal.settingssetcreateinput.numberofcolumns.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The number of columns
-
 
 </td></tr>
 <tr><td>
 
 [numberOfRows?](./terminal.settingssetcreateinput.numberofrows.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 _(Optional)_ The number of rows
 
-
 </td></tr>
 </tbody></table>
-

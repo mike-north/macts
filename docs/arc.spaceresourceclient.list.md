@@ -11,7 +11,7 @@ List all spaces.
 ```typescript
 list(): Promise<Space[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Space](./arc.space.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ Whether the window is visible
 **Signature:**
 
 ```typescript
-visible: boolean;
+visible: boolean
 ```

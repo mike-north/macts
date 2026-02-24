@@ -9,5 +9,5 @@ Unique ID of the bookmark folder.
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

@@ -9,5 +9,5 @@ All the headers of the message
 **Signature:**
 
 ```typescript
-allHeaders: string;
+allHeaders: string
 ```

@@ -9,5 +9,5 @@ City part of the address.
 **Signature:**
 
 ```typescript
-city: string;
+city: string
 ```

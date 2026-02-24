@@ -18,30 +18,24 @@ create(input: LocationCreateInput): Promise<Location>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [LocationCreateInput](./system-events.locationcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Location](./system-events.location.md)<!-- -->&gt;
-

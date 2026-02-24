@@ -1,42 +1,81 @@
-import { Command, Option } from 'clipanion';
-import * as t from 'typanion';
-import { getClient } from '../../sdk.js';
-import { createFormatter } from '../../output/index.js';
+import { Command, Option } from 'clipanion'
+import * as t from 'typanion'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
  * Create a new project.
  */
 export class CreateProjectCommand extends Command {
-  static override paths = [["omnifocus", "projects", "create"]];
+  static override paths = [['omnifocus', 'projects', 'create']]
 
   static override usage = Command.Usage({
     description: 'Create a new project',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  name = Option.String('--name', { required: true, description: "The name of the project" });
-  note = Option.String('--note', { required: true, description: "The note of the project" });
-  status = Option.String('--status', { required: true, description: "The status of the project", validator: t.isEnum(["active", "onHold", "done", "dropped"]) });
-  flagged = Option.Boolean('--flagged', { description: "True if flagged" });
-  deferDate = Option.String('--defer-date', { required: true, description: "When the project should become available for action" });
-  plannedDate = Option.String('--planned-date', { required: true, description: "The date at which work for this project is intended" });
-  dueDate = Option.String('--due-date', { required: true, description: "When the project must be finished" });
-  completionDate = Option.String('--completion-date', { required: true, description: "The project's date of completion" });
-  droppedDate = Option.String('--dropped-date', { required: true, description: "The date the project was dropped" });
-  creationDate = Option.String('--creation-date', { required: true, description: "When the project was created" });
-  lastReviewDate = Option.String('--last-review-date', { required: true, description: "When the project was last reviewed" });
-  nextReviewDate = Option.String('--next-review-date', { required: true, description: "When the project should next be reviewed" });
-  estimatedMinutes = Option.String('--estimated-minutes', { required: true, description: "The estimated time, in whole minutes, that this project will take to finish" });
-  sequential = Option.Boolean('--sequential', { description: "If true, any children are sequentially dependent" });
-  completedByChildren = Option.Boolean('--completed-by-children', { description: "If true, complete when children are completed" });
-  singletonActionHolder = Option.Boolean('--singleton-action-holder', { description: "True if the project contains singleton actions" });
-  defaultSingletonActionHolder = Option.Boolean('--default-singleton-action-holder', { description: "True if the project is the default holder of singleton actions" });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  name = Option.String('--name', { required: true, description: 'The name of the project' })
+  note = Option.String('--note', { required: true, description: 'The note of the project' })
+  status = Option.String('--status', {
+    required: true,
+    description: 'The status of the project',
+    validator: t.isEnum(['active', 'onHold', 'done', 'dropped']),
+  })
+  flagged = Option.Boolean('--flagged', { description: 'True if flagged' })
+  deferDate = Option.String('--defer-date', {
+    required: true,
+    description: 'When the project should become available for action',
+  })
+  plannedDate = Option.String('--planned-date', {
+    required: true,
+    description: 'The date at which work for this project is intended',
+  })
+  dueDate = Option.String('--due-date', {
+    required: true,
+    description: 'When the project must be finished',
+  })
+  completionDate = Option.String('--completion-date', {
+    required: true,
+    description: "The project's date of completion",
+  })
+  droppedDate = Option.String('--dropped-date', {
+    required: true,
+    description: 'The date the project was dropped',
+  })
+  creationDate = Option.String('--creation-date', {
+    required: true,
+    description: 'When the project was created',
+  })
+  lastReviewDate = Option.String('--last-review-date', {
+    required: true,
+    description: 'When the project was last reviewed',
+  })
+  nextReviewDate = Option.String('--next-review-date', {
+    required: true,
+    description: 'When the project should next be reviewed',
+  })
+  estimatedMinutes = Option.String('--estimated-minutes', {
+    required: true,
+    description: 'The estimated time, in whole minutes, that this project will take to finish',
+  })
+  sequential = Option.Boolean('--sequential', {
+    description: 'If true, any children are sequentially dependent',
+  })
+  completedByChildren = Option.Boolean('--completed-by-children', {
+    description: 'If true, complete when children are completed',
+  })
+  singletonActionHolder = Option.Boolean('--singleton-action-holder', {
+    description: 'True if the project contains singleton actions',
+  })
+  defaultSingletonActionHolder = Option.Boolean('--default-singleton-action-holder', {
+    description: 'True if the project is the default holder of singleton actions',
+  })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
+      const client = getClient()
       const item = await client.projects.create({
         name: this.name,
         note: this.note,
@@ -55,7 +94,7 @@ export class CreateProjectCommand extends Command {
         completedByChildren: this.completedByChildren,
         singletonActionHolder: this.singletonActionHolder,
         defaultSingletonActionHolder: this.defaultSingletonActionHolder,
-      } as Record<string, unknown>);
+      } as Record<string, unknown>)
 
       const output = formatter.format({
         message: 'Project created successfully',
@@ -90,14 +129,14 @@ export class CreateProjectCommand extends Command {
         numberOfTasks: item.numberOfTasks,
         numberOfAvailableTasks: item.numberOfAvailableTasks,
         numberOfCompletedTasks: item.numberOfCompletedTasks,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

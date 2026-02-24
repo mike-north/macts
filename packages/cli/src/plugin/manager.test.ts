@@ -88,56 +88,56 @@ describe('installPlugin', () => {
     vi.clearAllMocks()
   })
 
-  it('should reject invalid package names (non-scoped)', async () => {
+  it('should reject invalid package names (non-scoped)', () => {
     const result = installPlugin('calendar')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject invalid package names (wrong scope)', async () => {
+  it('should reject invalid package names (wrong scope)', () => {
     const result = installPlugin('@other/calendar')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject invalid package names (empty)', async () => {
+  it('should reject invalid package names (empty)', () => {
     const result = installPlugin('')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject infrastructure packages (core)', async () => {
+  it('should reject infrastructure packages (core)', () => {
     const result = installPlugin('@macts/core')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject infrastructure packages (api)', async () => {
+  it('should reject infrastructure packages (api)', () => {
     const result = installPlugin('@macts/api')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject infrastructure packages (cli)', async () => {
+  it('should reject infrastructure packages (cli)', () => {
     const result = installPlugin('@macts/cli')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject infrastructure packages (mcp)', async () => {
+  it('should reject infrastructure packages (mcp)', () => {
     const result = installPlugin('@macts/mcp')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject server packages', async () => {
+  it('should reject server packages', () => {
     const result = installPlugin('@macts/calendar-server')
 
     expect(result.success).toBe(false)
@@ -349,21 +349,21 @@ describe('uninstallPlugin', () => {
     vi.clearAllMocks()
   })
 
-  it('should reject invalid package names', async () => {
+  it('should reject invalid package names', () => {
     const result = uninstallPlugin('invalid-package')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject infrastructure packages', async () => {
+  it('should reject infrastructure packages', () => {
     const result = uninstallPlugin('@macts/core')
 
     expect(result.success).toBe(false)
     expect(result.message).toContain('Invalid plugin package name')
   })
 
-  it('should reject server packages', async () => {
+  it('should reject server packages', () => {
     const result = uninstallPlugin('@macts/calendar-server')
 
     expect(result.success).toBe(false)

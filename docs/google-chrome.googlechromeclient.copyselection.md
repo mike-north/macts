@@ -11,7 +11,7 @@ Copy text.
 ```typescript
 copySelection(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

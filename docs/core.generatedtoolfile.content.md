@@ -9,5 +9,5 @@ TypeScript source code
 **Signature:**
 
 ```typescript
-content: string;
+content: string
 ```

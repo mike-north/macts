@@ -9,5 +9,5 @@ Issued at timestamp (Unix seconds)
 **Signature:**
 
 ```typescript
-iat: number;
+iat: number
 ```

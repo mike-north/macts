@@ -11,7 +11,7 @@ Close an object
 ```typescript
 close(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

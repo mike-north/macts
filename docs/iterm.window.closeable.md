@@ -9,5 +9,5 @@ Whether the window has a close box.
 **Signature:**
 
 ```typescript
-closeable: boolean;
+closeable: boolean
 ```

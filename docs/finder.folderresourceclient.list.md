@@ -11,7 +11,7 @@ List all folders.
 ```typescript
 list(): Promise<Folder[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Folder](./finder.folder.md)<!-- -->\[\]&gt;
-

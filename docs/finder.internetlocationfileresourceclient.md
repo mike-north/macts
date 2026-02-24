@@ -9,7 +9,7 @@ Client for a file containing an internet location.
 **Signature:**
 
 ```typescript
-declare class InternetLocationFileResourceClient 
+declare class InternetLocationFileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class InternetLocationFileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./finder.internetlocationfileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `InternetLocationFileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `InternetLocationFileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./finder.internetlocationfileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new internetlocationfile.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./finder.internetlocationfileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a internetlocationfile.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./finder.internetlocationfileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a internetlocationfile by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./finder.internetlocationfileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all internetlocationfiles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./finder.internetlocationfileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing internetlocationfile.
 
-
 </td></tr>
 </tbody></table>
-

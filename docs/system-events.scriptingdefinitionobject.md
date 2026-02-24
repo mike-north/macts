@@ -9,7 +9,7 @@ The scripting definition of the System Events applicaation
 **Signature:**
 
 ```typescript
-interface ScriptingDefinitionObject 
+interface ScriptingDefinitionObject
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ScriptingDefinitionObject
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.scriptingdefinitionobject.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this scripting definition object
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ A device in Console
 **Signature:**
 
 ```typescript
-interface Device 
+interface Device
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Device
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./console.device.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The unique identifier of the device
-
 
 </td></tr>
 <tr><td>
 
 [name](./console.device.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The device name
 
-
 </td></tr>
 </tbody></table>
-

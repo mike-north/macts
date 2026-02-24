@@ -11,7 +11,7 @@ List all aliasfiles.
 ```typescript
 list(): Promise<AliasFile[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[AliasFile](./finder.aliasfile.md)<!-- -->\[\]&gt;
-

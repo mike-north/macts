@@ -9,5 +9,5 @@ All coarse permissions
 **Signature:**
 
 ```typescript
-allCoarse: Set<string>;
+allCoarse: Set<string>
 ```

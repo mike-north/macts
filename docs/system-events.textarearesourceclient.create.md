@@ -18,30 +18,24 @@ create(input: TextAreaCreateInput): Promise<TextArea>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [TextAreaCreateInput](./system-events.textareacreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[TextArea](./system-events.textarea.md)<!-- -->&gt;
-

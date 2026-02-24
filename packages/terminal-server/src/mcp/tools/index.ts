@@ -4,13 +4,13 @@
  * @packageDocumentation
  */
 
-import { windowsListTool } from './windows.js';
-import { windowsGetTool } from './windows.js';
-import { tabsListTool } from './tabs.js';
-import { tabsGetTool } from './tabs.js';
-import { settingssetsListTool } from './settingssets.js';
-import { settingssetsGetTool } from './settingssets.js';
-import { appDoScriptTool } from './app.js';
+import { windowsListTool } from './windows.js'
+import { windowsGetTool } from './windows.js'
+import { tabsListTool } from './tabs.js'
+import { tabsGetTool } from './tabs.js'
+import { settingssetsListTool } from './settingssets.js'
+import { settingssetsGetTool } from './settingssets.js'
+import { appDoScriptTool } from './app.js'
 
 /**
  * All MCP tools.
@@ -23,4 +23,4 @@ export const allTools = [
   settingssetsListTool,
   settingssetsGetTool,
   appDoScriptTool,
-] as const;
+] as const

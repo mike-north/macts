@@ -9,5 +9,5 @@ Is the process running in the Classic environment?
 **Signature:**
 
 ```typescript
-classic: boolean;
+classic: boolean
 ```

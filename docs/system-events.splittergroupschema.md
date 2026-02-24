@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-SplitterGroupSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+SplitterGroupSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

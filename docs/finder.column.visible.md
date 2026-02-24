@@ -9,5 +9,5 @@ is this column visible
 **Signature:**
 
 ```typescript
-visible: boolean;
+visible: boolean
 ```

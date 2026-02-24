@@ -9,7 +9,7 @@ Options for the permission middleware.
 **Signature:**
 
 ```typescript
-interface PermissionMiddlewareOptions 
+interface PermissionMiddlewareOptions
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface PermissionMiddlewareOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [permissionHistory?](./api.permissionmiddlewareoptions.permissionhistory.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [PermissionHistoryEntry](./core.permissionhistoryentry.md)<!-- -->\[\]
 
-
 </td><td>
 
 _(Optional)_ History entries for helpful error messages
 
-
 </td></tr>
 </tbody></table>
-

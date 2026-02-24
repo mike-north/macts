@@ -11,7 +11,7 @@ Go Forward (If Possible).
 ```typescript
 goForward(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

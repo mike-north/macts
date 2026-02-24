@@ -9,5 +9,5 @@ the length of the track in MM:SS format
 **Signature:**
 
 ```typescript
-time: string;
+time: string
 ```

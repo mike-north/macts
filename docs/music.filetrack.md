@@ -9,7 +9,7 @@ a track representing an audio file (MP3, AIFF, etc.)
 **Signature:**
 
 ```typescript
-interface FileTrack 
+interface FileTrack
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface FileTrack
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [location](./music.filetrack.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the location of the file represented by this track
 
-
 </td></tr>
 </tbody></table>
-

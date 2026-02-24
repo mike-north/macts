@@ -11,7 +11,7 @@ Get all enums
 ```typescript
 getEnums(): Enum[];
 ```
+
 **Returns:**
 
 [Enum](./core.enum.md)<!-- -->\[\]
-

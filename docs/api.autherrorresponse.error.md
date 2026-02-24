@@ -8,7 +8,7 @@
 
 ```typescript
 error: {
-        code: AuthErrorCode;
-        message: string;
-    };
+  code: AuthErrorCode
+  message: string
+}
 ```

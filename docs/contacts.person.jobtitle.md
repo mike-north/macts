@@ -9,5 +9,5 @@ The job title of this person.
 **Signature:**
 
 ```typescript
-jobTitle: string;
+jobTitle: string
 ```

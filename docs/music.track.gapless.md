@@ -9,5 +9,5 @@ is this track from a gapless album?
 **Signature:**
 
 ```typescript
-gapless: boolean;
+gapless: boolean
 ```

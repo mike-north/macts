@@ -9,5 +9,5 @@ Contents of an email message
 **Signature:**
 
 ```typescript
-content: unknown;
+content: unknown
 ```

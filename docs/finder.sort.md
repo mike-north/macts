@@ -9,5 +9,13 @@ Sort
 **Signature:**
 
 ```typescript
-type Sort = 'name' | 'modificationDate' | 'creationDate' | 'size' | 'kind' | 'labelIndex' | 'comment' | 'version';
+type Sort =
+  | 'name'
+  | 'modificationDate'
+  | 'creationDate'
+  | 'size'
+  | 'kind'
+  | 'labelIndex'
+  | 'comment'
+  | 'version'
 ```

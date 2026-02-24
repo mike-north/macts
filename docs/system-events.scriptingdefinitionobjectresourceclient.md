@@ -9,7 +9,7 @@ Client for the scripting definition of the system events applicaation.
 **Signature:**
 
 ```typescript
-declare class ScriptingDefinitionObjectResourceClient 
+declare class ScriptingDefinitionObjectResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ScriptingDefinitionObjectResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.scriptingdefinitionobjectresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ScriptingDefinitionObjectResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ScriptingDefinitionObjectResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.scriptingdefinitionobjectresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new scriptingdefinitionobject.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.scriptingdefinitionobjectresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a scriptingdefinitionobject.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.scriptingdefinitionobjectresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a scriptingdefinitionobject by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.scriptingdefinitionobjectresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all scriptingdefinitionobjects.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.scriptingdefinitionobjectresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing scriptingdefinitionobject.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Validate a permission string without parsing it.
 **Signature:**
 
 ```typescript
-declare function isValidPermission(permission: string): boolean;
+declare function isValidPermission(permission: string): boolean
 ```
 
 ## Parameters
@@ -18,32 +18,26 @@ declare function isValidPermission(permission: string): boolean;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 permission
 
-
 </td><td>
 
 string
 
-
 </td><td>
 
 Permission string to validate
-
 
 </td></tr>
 </tbody></table>
@@ -53,4 +47,3 @@ Permission string to validate
 boolean
 
 True if valid, false otherwise
-

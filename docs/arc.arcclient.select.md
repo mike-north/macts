@@ -11,7 +11,7 @@ Select the tab.
 ```typescript
 select(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

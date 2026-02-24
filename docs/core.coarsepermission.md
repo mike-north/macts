@@ -9,7 +9,7 @@ Coarse-grained permission - CRUD-style groups. Format: `app:resource:crud-operat
 **Signature:**
 
 ```typescript
-interface CoarsePermission 
+interface CoarsePermission
 ```
 
 ## Properties
@@ -18,98 +18,77 @@ interface CoarsePermission
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [app](./core.coarsepermission.app.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [operation](./core.coarsepermission.operation.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [CoarseOperation](./core.coarseoperation.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [resource](./core.coarsepermission.resource.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [type](./core.coarsepermission.type.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 'coarse'
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

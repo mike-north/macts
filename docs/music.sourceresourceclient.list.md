@@ -11,7 +11,7 @@ List all sources.
 ```typescript
 list(): Promise<Source[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Source](./music.source.md)<!-- -->\[\]&gt;
-

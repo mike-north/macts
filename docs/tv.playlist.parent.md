@@ -9,5 +9,5 @@ folder which contains this playlist (if any)
 **Signature:**
 
 ```typescript
-parent: Playlist;
+parent: Playlist
 ```

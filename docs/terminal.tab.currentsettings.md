@@ -9,5 +9,5 @@ The name of the current settings set
 **Signature:**
 
 ```typescript
-currentSettings: string;
+currentSettings: string
 ```

@@ -9,7 +9,7 @@ Client for a mailbox that holds messages.
 **Signature:**
 
 ```typescript
-declare class MailboxResourceClient 
+declare class MailboxResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MailboxResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.mailboxresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MailboxResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MailboxResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.mailboxresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new mailbox.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.mailboxresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a mailbox.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.mailboxresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a mailbox by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.mailboxresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all mailboxes.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.mailboxresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing mailbox.
 
-
 </td></tr>
 </tbody></table>
-

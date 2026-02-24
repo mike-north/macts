@@ -11,7 +11,7 @@ Stop the movie or recording.
 ```typescript
 stop(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

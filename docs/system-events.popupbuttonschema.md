@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-PopUpButtonSchema: z.ZodObject<{
-    id: z.ZodString;
-}, z.core.$strip>
+PopUpButtonSchema: z.ZodObject<
+  {
+    id: z.ZodString
+  },
+  z.core.$strip
+>
 ```

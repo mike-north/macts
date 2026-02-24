@@ -9,5 +9,5 @@ Input for creating a Track
 **Signature:**
 
 ```typescript
-interface TrackCreateInput 
+interface TrackCreateInput
 ```

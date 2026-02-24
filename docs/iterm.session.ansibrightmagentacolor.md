@@ -10,8 +10,8 @@ The aNSIBrightMagentaColor property
 
 ```typescript
 aNSIBrightMagentaColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

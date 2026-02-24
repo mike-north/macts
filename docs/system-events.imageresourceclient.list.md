@@ -11,7 +11,7 @@ List all images.
 ```typescript
 list(): Promise<Image[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Image](./system-events.image.md)<!-- -->\[\]&gt;
-

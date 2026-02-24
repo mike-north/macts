@@ -9,5 +9,5 @@ Returns the currently selected tab
 **Signature:**
 
 ```typescript
-activeTab: Tab;
+activeTab: Tab
 ```

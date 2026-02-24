@@ -11,7 +11,7 @@ connect a configuration or service
 ```typescript
 connect(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

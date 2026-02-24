@@ -10,77 +10,63 @@
 
 Class
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [HttpClient](./iterm.httpclient.md)
 
-
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
 
 </td></tr>
 <tr><td>
 
 [iTermClient](./iterm.itermclient.md)
 
-
 </td><td>
 
 iTerm client for HTTP-based macOS automation.
-
 
 </td></tr>
 <tr><td>
 
 [iTermError](./iterm.itermerror.md)
 
-
 </td><td>
 
 Error class for iTerm API errors.
-
 
 </td></tr>
 <tr><td>
 
 [SessionResourceClient](./iterm.sessionresourceclient.md)
 
-
 </td><td>
 
 Client for a terminal session.
-
 
 </td></tr>
 <tr><td>
 
 [TabResourceClient](./iterm.tabresourceclient.md)
 
-
 </td><td>
 
 Client for a terminal tab.
-
 
 </td></tr>
 <tr><td>
 
 [WindowResourceClient](./iterm.windowresourceclient.md)
 
-
 </td><td>
 
 Client for a window..
-
 
 </td></tr>
 </tbody></table>
@@ -91,88 +77,72 @@ Client for a window..
 
 Interface
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [iTermClientOptions](./iterm.itermclientoptions.md)
 
-
 </td><td>
 
 Client configuration options.
-
 
 </td></tr>
 <tr><td>
 
 [Session](./iterm.session.md)
 
-
 </td><td>
 
 A terminal session
-
 
 </td></tr>
 <tr><td>
 
 [SessionCreateInput](./iterm.sessioncreateinput.md)
 
-
 </td><td>
 
 Input for creating a Session
-
 
 </td></tr>
 <tr><td>
 
 [Tab](./iterm.tab.md)
 
-
 </td><td>
 
 A terminal tab
-
 
 </td></tr>
 <tr><td>
 
 [TabCreateInput](./iterm.tabcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [Window](./iterm.window.md)
 
-
 </td><td>
 
 A window.
-
 
 </td></tr>
 <tr><td>
 
 [WindowCreateInput](./iterm.windowcreateinput.md)
 
-
 </td><td>
 
 Input for creating a Window
-
 
 </td></tr>
 </tbody></table>
@@ -183,38 +153,30 @@ Input for creating a Window
 
 Variable
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SessionSchema](./iterm.sessionschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [TabSchema](./iterm.tabschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [WindowSchema](./iterm.windowschema.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -225,56 +187,45 @@ Description
 
 Type Alias
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [SaveOptions](./iterm.saveoptions.md)
 
-
 </td><td>
 
 SaveOptions
-
 
 </td></tr>
 <tr><td>
 
 [SessionUpdateInput](./iterm.sessionupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Session
-
 
 </td></tr>
 <tr><td>
 
 [TabUpdateInput](./iterm.tabupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Tab
-
 
 </td></tr>
 <tr><td>
 
 [WindowUpdateInput](./iterm.windowupdateinput.md)
 
-
 </td><td>
 
 Input for updating a Window
 
-
 </td></tr>
 </tbody></table>
-

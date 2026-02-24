@@ -9,5 +9,5 @@ kind or purpose of this piece of artwork
 **Signature:**
 
 ```typescript
-kind: number;
+kind: number
 ```

@@ -18,30 +18,24 @@ recordException(exception: Error | string): void;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 exception
 
-
 </td><td>
 
 Error \| string
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ Error \| string
 **Returns:**
 
 void
-

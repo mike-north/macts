@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-TabSchema: z.ZodObject<{
-    contents: z.ZodString;
-    history: z.ZodString;
-    busy: z.ZodBoolean;
-    processes: z.ZodString;
-    selected: z.ZodBoolean;
-    titleDisplaysCustomTitle: z.ZodBoolean;
-    customTitle: z.ZodString;
-    tty: z.ZodString;
-    currentSettings: z.ZodString;
-}, z.core.$strip>
+TabSchema: z.ZodObject<
+  {
+    contents: z.ZodString
+    history: z.ZodString
+    busy: z.ZodBoolean
+    processes: z.ZodString
+    selected: z.ZodBoolean
+    titleDisplaysCustomTitle: z.ZodBoolean
+    customTitle: z.ZodString
+    tty: z.ZodString
+    currentSettings: z.ZodString
+  },
+  z.core.$strip
+>
 ```

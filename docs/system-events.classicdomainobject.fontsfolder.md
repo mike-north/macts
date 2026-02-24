@@ -9,5 +9,5 @@ The Fonts folder
 **Signature:**
 
 ```typescript
-fontsFolder: Folder;
+fontsFolder: Folder
 ```

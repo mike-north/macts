@@ -9,5 +9,5 @@ the container at which this file viewer is targeted
 **Signature:**
 
 ```typescript
-target: string;
+target: string
 ```

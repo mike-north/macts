@@ -9,5 +9,5 @@ Indicates whether the color will be used to highlight the text or background of 
 **Signature:**
 
 ```typescript
-highlightTextUsingColor: boolean;
+highlightTextUsingColor: boolean
 ```

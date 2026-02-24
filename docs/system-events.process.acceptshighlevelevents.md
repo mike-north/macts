@@ -9,5 +9,5 @@ Is the process high-level event aware (accepts open application, open document, 
 **Signature:**
 
 ```typescript
-acceptsHighLevelEvents: boolean;
+acceptsHighLevelEvents: boolean
 ```

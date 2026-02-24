@@ -9,5 +9,5 @@ Whether the window is currently minimized.
 **Signature:**
 
 ```typescript
-minimized: boolean;
+minimized: boolean
 ```

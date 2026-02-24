@@ -11,7 +11,7 @@ skip backwards in a playing track
 ```typescript
 rewind(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ Client for a row belonging to a table.
 **Signature:**
 
 ```typescript
-declare class RowResourceClient 
+declare class RowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class RowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.rowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `RowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `RowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.rowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new row.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.rowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a row.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.rowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a row by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.rowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all rows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.rowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing row.
 
-
 </td></tr>
 </tbody></table>
-

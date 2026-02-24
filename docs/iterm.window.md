@@ -9,7 +9,7 @@ A window.
 **Signature:**
 
 ```typescript
-interface Window 
+interface Window
 ```
 
 ## Properties
@@ -18,421 +18,332 @@ interface Window
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [alternateIdentifier](./iterm.window.alternateidentifier.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The alternate unique identifier of the session.
-
 
 </td></tr>
 <tr><td>
 
 [bounds](./iterm.window.bounds.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 The bounding rectangle of the window.
-
 
 </td></tr>
 <tr><td>
 
 [closeable](./iterm.window.closeable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window has a close box.
-
 
 </td></tr>
 <tr><td>
 
 [currentSession](./iterm.window.currentsession.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Session](./iterm.session.md)
 
-
 </td><td>
 
 The current session in a window
-
 
 </td></tr>
 <tr><td>
 
 [currentTab](./iterm.window.currenttab.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [Tab](./iterm.tab.md)
 
-
 </td><td>
 
 The currently selected tab
-
 
 </td></tr>
 <tr><td>
 
 [frame](./iterm.window.frame.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; width: number; height: number; }
 
-
 </td><td>
 
 The bounding rectangle, relative to the lower left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [frontmost](./iterm.window.frontmost.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is currently the frontmost window.
-
 
 </td></tr>
 <tr><td>
 
 [hotkeyWindowProfile](./iterm.window.hotkeywindowprofile.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 If the window is a hotkey window, this gives the name of the profile that created the window.
-
 
 </td></tr>
 <tr><td>
 
 [id](./iterm.window.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The unique identifier of the session.
-
 
 </td></tr>
 <tr><td>
 
 [index](./iterm.window.index.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 The index of the window, ordered front to back.
-
 
 </td></tr>
 <tr><td>
 
 [isHotkeyWindow](./iterm.window.ishotkeywindow.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is a hotkey window.
-
 
 </td></tr>
 <tr><td>
 
 [miniaturizable](./iterm.window.miniaturizable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window can be minimized.
-
 
 </td></tr>
 <tr><td>
 
 [miniaturized](./iterm.window.miniaturized.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is currently minimized.
-
 
 </td></tr>
 <tr><td>
 
 [name](./iterm.window.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The full title of the window.
-
 
 </td></tr>
 <tr><td>
 
 [origin](./iterm.window.origin.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 The position of the window, relative to the lower left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [position](./iterm.window.position.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 The position of the window, relative to the upper left corner of the screen.
-
 
 </td></tr>
 <tr><td>
 
 [resizable](./iterm.window.resizable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window can be resized.
-
 
 </td></tr>
 <tr><td>
 
 [size](./iterm.window.size.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { x: number; y: number; }
 
-
 </td><td>
 
 The width and height of the window
-
 
 </td></tr>
 <tr><td>
 
 [visible](./iterm.window.visible.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is currently visible.
-
 
 </td></tr>
 <tr><td>
 
 [zoomable](./iterm.window.zoomable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window can be zoomed.
-
 
 </td></tr>
 <tr><td>
 
 [zoomed](./iterm.window.zoomed.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the window is currently zoomed.
 
-
 </td></tr>
 </tbody></table>
-

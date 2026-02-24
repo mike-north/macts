@@ -9,5 +9,5 @@ The name of the suite to which this command belongs
 **Signature:**
 
 ```typescript
-suiteName: string;
+suiteName: string
 ```

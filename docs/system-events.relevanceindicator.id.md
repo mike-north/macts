@@ -9,5 +9,5 @@ Unique identifier for this relevance indicator
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

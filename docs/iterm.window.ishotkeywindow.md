@@ -9,5 +9,5 @@ Whether the window is a hotkey window.
 **Signature:**
 
 ```typescript
-isHotkeyWindow: boolean;
+isHotkeyWindow: boolean
 ```

@@ -9,7 +9,7 @@ Context for MCP generator.
 **Signature:**
 
 ```typescript
-interface McpGeneratorContext 
+interface McpGeneratorContext
 ```
 
 ## Properties
@@ -18,117 +18,92 @@ interface McpGeneratorContext
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [appName](./core.mcpgeneratorcontext.appname.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Application name (e.g., 'calendar')
-
 
 </td></tr>
 <tr><td>
 
 [manifest](./core.mcpgeneratorcontext.manifest.md)
 
-
 </td><td>
-
 
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 App manifest
-
 
 </td></tr>
 <tr><td>
 
 [packageName](./core.mcpgeneratorcontext.packagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Package name (e.g., '<!-- -->@<!-- -->macts/mcp-calendar')
-
 
 </td></tr>
 <tr><td>
 
 [sdkPackageName](./core.mcpgeneratorcontext.sdkpackagename.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 SDK package name (e.g., '<!-- -->@<!-- -->macts/sdk-calendar')
-
 
 </td></tr>
 <tr><td>
 
 [version?](./core.mcpgeneratorcontext.version.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string \| undefined
 
-
 </td><td>
 
 _(Optional)_ Package version
 
-
 </td></tr>
 </tbody></table>
-

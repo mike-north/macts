@@ -9,19 +9,18 @@ SystemSettings client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class SystemSettingsClient 
+declare class SystemSettingsClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new SystemSettingsClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./system-settings.systemsettingsclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SystemSettingsClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,84 +57,68 @@ Constructs a new instance of the `SystemSettingsClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [anchors](./system-settings.systemsettingsclient.anchors.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AnchorResourceClient](./system-settings.anchorresourceclient.md)
 
-
 </td><td>
 
 An anchor within a settings pane.
-
 
 </td></tr>
 <tr><td>
 
 [http](./system-settings.systemsettingsclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./system-settings.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [panes](./system-settings.systemsettingsclient.panes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [PaneResourceClient](./system-settings.paneresourceclient.md)
 
-
 </td><td>
 
 A settings pane.
-
 
 </td></tr>
 </tbody></table>
@@ -152,31 +129,24 @@ A settings pane.
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [reveal()](./system-settings.systemsettingsclient.reveal.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Reveals a settings pane or an anchor within a pane.
 
-
 </td></tr>
 </tbody></table>
-

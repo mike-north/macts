@@ -9,5 +9,5 @@ The phonetic version of the Last name of this person.
 **Signature:**
 
 ```typescript
-phoneticLastName: string;
+phoneticLastName: string
 ```

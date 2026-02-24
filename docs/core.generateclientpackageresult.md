@@ -9,7 +9,7 @@ Result of client package generation.
 **Signature:**
 
 ```typescript
-interface GenerateClientPackageResult 
+interface GenerateClientPackageResult
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface GenerateClientPackageResult
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [dir](./core.generateclientpackageresult.dir.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Output directory name (e.g., "calendar")
-
 
 </td></tr>
 <tr><td>
 
 [errors](./core.generateclientpackageresult.errors.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Any errors encountered during generation
-
 
 </td></tr>
 <tr><td>
 
 [files](./core.generateclientpackageresult.files.md)
 
-
 </td><td>
-
 
 </td><td>
 
 { path: string; content: string; }\[\]
 
-
 </td><td>
 
 Generated files with relative paths
 
-
 </td></tr>
 </tbody></table>
-

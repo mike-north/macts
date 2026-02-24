@@ -9,7 +9,7 @@ Input for updating a Space
 **Signature:**
 
 ```typescript
-type SpaceUpdateInput = Partial<SpaceCreateInput>;
+type SpaceUpdateInput = Partial<SpaceCreateInput>
 ```
-**References:** [SpaceCreateInput](./arc.spacecreateinput.md)
 
+**References:** [SpaceCreateInput](./arc.spacecreateinput.md)

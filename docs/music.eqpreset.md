@@ -9,7 +9,7 @@ equalizer preset configuration
 **Signature:**
 
 ```typescript
-interface EQPreset 
+interface EQPreset
 ```
 
 ## Properties
@@ -18,269 +18,212 @@ interface EQPreset
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [band1](./music.eqpreset.band1.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 32 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band10](./music.eqpreset.band10.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 16 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band2](./music.eqpreset.band2.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 64 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band3](./music.eqpreset.band3.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 125 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band4](./music.eqpreset.band4.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 250 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band5](./music.eqpreset.band5.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 500 Hz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band6](./music.eqpreset.band6.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 1 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band7](./music.eqpreset.band7.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 2 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band8](./music.eqpreset.band8.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 4 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [band9](./music.eqpreset.band9.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer 8 kHz band level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [modifiable](./music.eqpreset.modifiable.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 can this preset be modified?
-
 
 </td></tr>
 <tr><td>
 
 [preamp](./music.eqpreset.preamp.md)
 
-
 </td><td>
-
 
 </td><td>
 
 number
 
-
 </td><td>
 
 the equalizer preamp level (-12.0 dB to +12.0 dB)
-
 
 </td></tr>
 <tr><td>
 
 [updateTracks](./music.eqpreset.updatetracks.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 should tracks which refer to this preset be updated when the preset is renamed or deleted?
 
-
 </td></tr>
 </tbody></table>
-

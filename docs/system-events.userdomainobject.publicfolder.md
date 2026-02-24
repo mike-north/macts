@@ -9,5 +9,5 @@ The user's Public folder
 **Signature:**
 
 ```typescript
-publicFolder: Folder;
+publicFolder: Folder
 ```

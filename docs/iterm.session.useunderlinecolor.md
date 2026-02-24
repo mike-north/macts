@@ -9,5 +9,5 @@ Whether the use a dedicated color for underlining.
 **Signature:**
 
 ```typescript
-useUnderlineColor: boolean;
+useUnderlineColor: boolean
 ```

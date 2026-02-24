@@ -9,5 +9,5 @@ the music/audio genre (category) of the track
 **Signature:**
 
 ```typescript
-genre: string;
+genre: string
 ```

@@ -11,7 +11,7 @@ Open disk item(s) with the appropriate application.
 ```typescript
 open(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

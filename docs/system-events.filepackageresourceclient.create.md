@@ -18,30 +18,24 @@ create(input: FilePackageCreateInput): Promise<FilePackage>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [FilePackageCreateInput](./system-events.filepackagecreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[FilePackage](./system-events.filepackage.md)<!-- -->&gt;
-

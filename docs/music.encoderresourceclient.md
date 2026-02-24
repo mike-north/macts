@@ -9,7 +9,7 @@ Client for converts a track to a specific file format.
 **Signature:**
 
 ```typescript
-declare class EncoderResourceClient 
+declare class EncoderResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class EncoderResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.encoderresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `EncoderResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `EncoderResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.encoderresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new encoder.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.encoderresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a encoder.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.encoderresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a encoder by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.encoderresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all encoders.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.encoderresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing encoder.
 
-
 </td></tr>
 </tbody></table>
-

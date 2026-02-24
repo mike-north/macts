@@ -11,7 +11,7 @@ Produces three types per resource (read, create input, update input) plus one ty
 **Signature:**
 
 ```typescript
-declare function generateTypes(ctx: GeneratorContext): GeneratedType[];
+declare function generateTypes(ctx: GeneratorContext): GeneratedType[]
 ```
 
 ## Parameters
@@ -20,32 +20,26 @@ declare function generateTypes(ctx: GeneratorContext): GeneratedType[];
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 ctx
 
-
 </td><td>
 
 [GeneratorContext](./core.generatorcontext.md)
 
-
 </td><td>
 
 Generator context containing the manifest and options
-
 
 </td></tr>
 </tbody></table>
@@ -55,4 +49,3 @@ Generator context containing the manifest and options
 [GeneratedType](./core.generatedtype.md)<!-- -->\[\]
 
 Array of generated types
-

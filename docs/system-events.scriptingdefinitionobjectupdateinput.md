@@ -9,7 +9,7 @@ Input for updating a ScriptingDefinitionObject
 **Signature:**
 
 ```typescript
-type ScriptingDefinitionObjectUpdateInput = Partial<ScriptingDefinitionObjectCreateInput>;
+type ScriptingDefinitionObjectUpdateInput = Partial<ScriptingDefinitionObjectCreateInput>
 ```
-**References:** [ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)
 
+**References:** [ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)

@@ -9,5 +9,5 @@ List of mailboxes currently selected in the list of mailboxes
 **Signature:**
 
 ```typescript
-selectedMailboxes: string;
+selectedMailboxes: string
 ```

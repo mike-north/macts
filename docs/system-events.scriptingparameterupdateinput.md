@@ -9,7 +9,7 @@ Input for updating a ScriptingParameter
 **Signature:**
 
 ```typescript
-type ScriptingParameterUpdateInput = Partial<ScriptingParameterCreateInput>;
+type ScriptingParameterUpdateInput = Partial<ScriptingParameterCreateInput>
 ```
-**References:** [ScriptingParameterCreateInput](./system-events.scriptingparametercreateinput.md)
 
+**References:** [ScriptingParameterCreateInput](./system-events.scriptingparametercreateinput.md)

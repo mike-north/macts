@@ -9,5 +9,5 @@ The direction in which the window is sorted
 **Signature:**
 
 ```typescript
-sortDirection: string;
+sortDirection: string
 ```

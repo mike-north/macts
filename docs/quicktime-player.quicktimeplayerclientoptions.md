@@ -9,7 +9,7 @@ Client configuration options.
 **Signature:**
 
 ```typescript
-interface QuickTimePlayerClientOptions 
+interface QuickTimePlayerClientOptions
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface QuickTimePlayerClientOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [apiKey](./quicktime-player.quicktimeplayerclientoptions.apikey.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 API key for authentication
-
 
 </td></tr>
 <tr><td>
 
 [baseUrl?](./quicktime-player.quicktimeplayerclientoptions.baseurl.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Base URL for API server (default: http://localhost:8372)
 
-
 </td></tr>
 </tbody></table>
-

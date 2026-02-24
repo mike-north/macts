@@ -9,7 +9,7 @@ An email recipient in the To: field
 **Signature:**
 
 ```typescript
-interface ToRecipient 
+interface ToRecipient
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ToRecipient
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./mail.torecipient.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this recipient
 
-
 </td></tr>
 </tbody></table>
-

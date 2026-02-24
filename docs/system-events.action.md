@@ -9,7 +9,7 @@ An action that can be performed on the UI element
 **Signature:**
 
 ```typescript
-interface Action 
+interface Action
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface Action
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [description](./system-events.action.description.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 what the action does
-
 
 </td></tr>
 <tr><td>
 
 [name](./system-events.action.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the name of the action
 
-
 </td></tr>
 </tbody></table>
-

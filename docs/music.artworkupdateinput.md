@@ -9,7 +9,7 @@ Input for updating a Artwork
 **Signature:**
 
 ```typescript
-type ArtworkUpdateInput = Partial<ArtworkCreateInput>;
+type ArtworkUpdateInput = Partial<ArtworkCreateInput>
 ```
-**References:** [ArtworkCreateInput](./music.artworkcreateinput.md)
 
+**References:** [ArtworkCreateInput](./music.artworkcreateinput.md)

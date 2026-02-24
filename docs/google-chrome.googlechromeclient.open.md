@@ -11,7 +11,7 @@ Open a document.
 ```typescript
 open(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

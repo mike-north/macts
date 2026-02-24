@@ -9,7 +9,7 @@ Client for an item consists of an url and the title of a bookmark.
 **Signature:**
 
 ```typescript
-declare class BookmarkItemResourceClient 
+declare class BookmarkItemResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class BookmarkItemResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./google-chrome.bookmarkitemresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `BookmarkItemResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `BookmarkItemResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./google-chrome.bookmarkitemresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new bookmarkitem.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./google-chrome.bookmarkitemresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a bookmarkitem.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./google-chrome.bookmarkitemresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a bookmarkitem by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./google-chrome.bookmarkitemresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all bookmarkitems.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./google-chrome.bookmarkitemresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing bookmarkitem.
 
-
 </td></tr>
 </tbody></table>
-

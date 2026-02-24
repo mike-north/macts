@@ -9,7 +9,7 @@ Client for a unit of data in property list format.
 **Signature:**
 
 ```typescript
-declare class PropertyListItemResourceClient 
+declare class PropertyListItemResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PropertyListItemResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.propertylistitemresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PropertyListItemResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PropertyListItemResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.propertylistitemresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new propertylistitem.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.propertylistitemresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a propertylistitem.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.propertylistitemresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a propertylistitem by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.propertylistitemresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all propertylistitems.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.propertylistitemresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing propertylistitem.
 
-
 </td></tr>
 </tbody></table>
-

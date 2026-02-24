@@ -9,7 +9,7 @@ Loaded TLS certificate and key buffers ready for use with HTTPS server.
 **Signature:**
 
 ```typescript
-interface LoadedTlsOptions 
+interface LoadedTlsOptions
 ```
 
 ## Properties
@@ -18,75 +18,58 @@ interface LoadedTlsOptions
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [ca?](./api.loadedtlsoptions.ca.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Buffer
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 <tr><td>
 
 [cert](./api.loadedtlsoptions.cert.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Buffer
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 [key](./api.loadedtlsoptions.key.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Buffer
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

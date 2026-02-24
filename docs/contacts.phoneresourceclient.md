@@ -9,7 +9,7 @@ Client for phone number for a person..
 **Signature:**
 
 ```typescript
-declare class PhoneResourceClient 
+declare class PhoneResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PhoneResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.phoneresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PhoneResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PhoneResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.phoneresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new phone.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.phoneresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a phone.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.phoneresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a phone by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.phoneresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all phones.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.phoneresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing phone.
 
-
 </td></tr>
 </tbody></table>
-

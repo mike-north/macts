@@ -9,7 +9,7 @@ API key metadata stored separately from the key itself. Used for listing and man
 **Signature:**
 
 ```typescript
-interface ApiKeyMetadata 
+interface ApiKeyMetadata
 ```
 
 ## Properties
@@ -18,174 +18,137 @@ interface ApiKeyMetadata
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [createdAt](./core.apikeymetadata.createdat.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date
 
-
 </td><td>
 
 Creation timestamp
-
 
 </td></tr>
 <tr><td>
 
 [expiresAt?](./core.apikeymetadata.expiresat.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Date \| undefined
 
-
 </td><td>
 
 _(Optional)_ Expiration timestamp (undefined if no expiration)
-
 
 </td></tr>
 <tr><td>
 
 [id](./core.apikeymetadata.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique key ID
-
 
 </td></tr>
 <tr><td>
 
 [keyPrefix](./core.apikeymetadata.keyprefix.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
-Key prefix for identification (first 8 chars after macts\_sk\_)
-
+Key prefix for identification (first 8 chars after macts_sk\_)
 
 </td></tr>
 <tr><td>
 
 [name](./core.apikeymetadata.name.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Human-readable name
-
 
 </td></tr>
 <tr><td>
 
 [originalPermissions](./core.apikeymetadata.originalpermissions.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Original permissions as requested (before expansion)
-
 
 </td></tr>
 <tr><td>
 
 [permissions](./core.apikeymetadata.permissions.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string\[\]
 
-
 </td><td>
 
 Permissions granted (may include coarse that were expanded)
-
 
 </td></tr>
 <tr><td>
 
 [revoked](./core.apikeymetadata.revoked.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 Whether the key has been revoked
 
-
 </td></tr>
 </tbody></table>
-

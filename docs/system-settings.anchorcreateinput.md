@@ -9,5 +9,5 @@ Input for creating a Anchor
 **Signature:**
 
 ```typescript
-interface AnchorCreateInput 
+interface AnchorCreateInput
 ```

@@ -18,30 +18,24 @@ create(input: SheetCreateInput): Promise<Sheet>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SheetCreateInput](./system-events.sheetcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Sheet](./system-events.sheet.md)<!-- -->&gt;
-

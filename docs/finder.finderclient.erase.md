@@ -11,7 +11,7 @@
 ```typescript
 erase(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ Client for a sub-window showing a single playlist.
 **Signature:**
 
 ```typescript
-declare class PlaylistWindowResourceClient 
+declare class PlaylistWindowResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class PlaylistWindowResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.playlistwindowresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `PlaylistWindowResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `PlaylistWindowResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.playlistwindowresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new playlistwindow.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.playlistwindowresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a playlistwindow.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.playlistwindowresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a playlistwindow by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.playlistwindowresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all playlistwindows.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.playlistwindowresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing playlistwindow.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ Client for user name for icq instant messaging..
 **Signature:**
 
 ```typescript
-declare class ICQHandleResourceClient 
+declare class ICQHandleResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class ICQHandleResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.icqhandleresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `ICQHandleResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `ICQHandleResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.icqhandleresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new icqhandle.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.icqhandleresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a icqhandle.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.icqhandleresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a icqhandle by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.icqhandleresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all icqhandles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.icqhandleresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing icqhandle.
 
-
 </td></tr>
 </tbody></table>
-

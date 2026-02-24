@@ -11,7 +11,7 @@ Sends a message.
 ```typescript
 send(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

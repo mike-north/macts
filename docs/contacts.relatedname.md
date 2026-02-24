@@ -9,7 +9,7 @@ Other names related to this person.
 **Signature:**
 
 ```typescript
-interface RelatedName 
+interface RelatedName
 ```
 
 ## Properties
@@ -18,79 +18,62 @@ interface RelatedName
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./contacts.relatedname.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this name
-
 
 </td></tr>
 <tr><td>
 
 [label](./contacts.relatedname.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Label for this name
-
 
 </td></tr>
 <tr><td>
 
 [value](./contacts.relatedname.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 The related name value
 
-
 </td></tr>
 </tbody></table>
-

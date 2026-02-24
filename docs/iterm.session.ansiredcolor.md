@@ -10,8 +10,8 @@ The aNSIRedColor property
 
 ```typescript
 aNSIRedColor: {
-        r: number;
-        g: number;
-        b: number;
-    };
+  r: number
+  g: number
+  b: number
+}
 ```

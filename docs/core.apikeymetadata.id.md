@@ -9,5 +9,5 @@ Unique key ID
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

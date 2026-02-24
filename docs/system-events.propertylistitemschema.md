@@ -7,10 +7,13 @@
 **Signature:**
 
 ```typescript
-PropertyListItemSchema: z.ZodObject<{
-    kind: z.ZodString;
-    name: z.ZodString;
-    text: z.ZodString;
-    value: z.ZodString;
-}, z.core.$strip>
+PropertyListItemSchema: z.ZodObject<
+  {
+    kind: z.ZodString
+    name: z.ZodString
+    text: z.ZodString
+    value: z.ZodString
+  },
+  z.core.$strip
+>
 ```

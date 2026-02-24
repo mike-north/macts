@@ -21,30 +21,24 @@ setStatus(status: {
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 status
 
-
 </td><td>
 
 { code: [SpanStatusCodeValue](./api.spanstatuscodevalue.md)<!-- -->; message?: string; }
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -52,4 +46,3 @@ status
 **Returns:**
 
 this
-

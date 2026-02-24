@@ -9,5 +9,5 @@ the year the track was recorded/released
 **Signature:**
 
 ```typescript
-year: number;
+year: number
 ```

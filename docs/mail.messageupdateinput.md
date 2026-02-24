@@ -9,7 +9,7 @@ Input for updating a Message
 **Signature:**
 
 ```typescript
-type MessageUpdateInput = Partial<MessageCreateInput>;
+type MessageUpdateInput = Partial<MessageCreateInput>
 ```
-**References:** [MessageCreateInput](./mail.messagecreateinput.md)
 
+**References:** [MessageCreateInput](./mail.messagecreateinput.md)

@@ -9,7 +9,7 @@ Client for a tab group belonging to a window.
 **Signature:**
 
 ```typescript
-declare class TabGroupResourceClient 
+declare class TabGroupResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class TabGroupResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.tabgroupresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `TabGroupResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `TabGroupResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.tabgroupresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new tabgroup.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.tabgroupresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a tabgroup.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.tabgroupresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a tabgroup by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.tabgroupresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all tabgroups.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.tabgroupresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing tabgroup.
 
-
 </td></tr>
 </tbody></table>
-

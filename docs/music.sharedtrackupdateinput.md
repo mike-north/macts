@@ -9,7 +9,7 @@ Input for updating a SharedTrack
 **Signature:**
 
 ```typescript
-type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>;
+type SharedTrackUpdateInput = Partial<SharedTrackCreateInput>
 ```
-**References:** [SharedTrackCreateInput](./music.sharedtrackcreateinput.md)
 
+**References:** [SharedTrackCreateInput](./music.sharedtrackcreateinput.md)

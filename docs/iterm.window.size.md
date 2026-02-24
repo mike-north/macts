@@ -10,7 +10,7 @@ The width and height of the window
 
 ```typescript
 size: {
-        x: number;
-        y: number;
-    };
+  x: number
+  y: number
+}
 ```

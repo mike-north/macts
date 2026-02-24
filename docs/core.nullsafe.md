@@ -9,7 +9,7 @@ Wrap a coercer to handle null/undefined values.
 **Signature:**
 
 ```typescript
-declare function nullSafe<T>(coercer: TypeCoercer<T>): TypeCoercer<T | null | undefined>;
+declare function nullSafe<T>(coercer: TypeCoercer<T>): TypeCoercer<T | null | undefined>
 ```
 
 ## Parameters
@@ -18,30 +18,24 @@ declare function nullSafe<T>(coercer: TypeCoercer<T>): TypeCoercer<T | null | un
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 coercer
 
-
 </td><td>
 
 [TypeCoercer](./core.typecoercer.md)<!-- -->&lt;T&gt;
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ coercer
 **Returns:**
 
 [TypeCoercer](./core.typecoercer.md)<!-- -->&lt;T \| null \| undefined&gt;
-

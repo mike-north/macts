@@ -11,7 +11,7 @@ List all panes.
 ```typescript
 list(): Promise<Pane[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Pane](./system-settings.pane.md)<!-- -->\[\]&gt;
-

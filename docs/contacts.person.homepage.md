@@ -9,5 +9,5 @@ The home page of this person.
 **Signature:**
 
 ```typescript
-homePage: string;
+homePage: string
 ```

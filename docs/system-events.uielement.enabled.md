@@ -9,5 +9,5 @@ Is the UI element enabled? ( Does it accept clicks? )
 **Signature:**
 
 ```typescript
-enabled: string;
+enabled: string
 ```

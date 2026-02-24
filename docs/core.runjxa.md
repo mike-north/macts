@@ -9,7 +9,7 @@ Execute raw JXA code and return the result. Uses osascript -l JavaScript under t
 **Signature:**
 
 ```typescript
-declare function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>;
+declare function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>
 ```
 
 ## Parameters
@@ -18,46 +18,37 @@ declare function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 code
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [JxaExecutorOptions](./core.jxaexecutoroptions.md)
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -65,4 +56,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;T&gt;
-

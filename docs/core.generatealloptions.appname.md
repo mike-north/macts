@@ -9,5 +9,5 @@ App name lower (e.g., "reminders") — used for directory names
 **Signature:**
 
 ```typescript
-appName: string;
+appName: string
 ```

@@ -9,5 +9,5 @@ Indicates whether the message was forwarded or not
 **Signature:**
 
 ```typescript
-wasForwarded: boolean;
+wasForwarded: boolean
 ```

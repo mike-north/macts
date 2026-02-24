@@ -9,5 +9,5 @@ The Temporary Items folder
 **Signature:**
 
 ```typescript
-temporaryItemsFolder: Folder;
+temporaryItemsFolder: Folder
 ```

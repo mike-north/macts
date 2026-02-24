@@ -9,7 +9,7 @@ Input for updating a InternetLocationFile
 **Signature:**
 
 ```typescript
-type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>;
+type InternetLocationFileUpdateInput = Partial<InternetLocationFileCreateInput>
 ```
-**References:** [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
 
+**References:** [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)

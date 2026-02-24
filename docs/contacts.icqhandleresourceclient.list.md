@@ -11,7 +11,7 @@ List all icqhandles.
 ```typescript
 list(): Promise<ICQHandle[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[ICQHandle](./contacts.icqhandle.md)<!-- -->\[\]&gt;
-

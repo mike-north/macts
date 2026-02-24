@@ -18,30 +18,24 @@ create(input: SliderCreateInput): Promise<Slider>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SliderCreateInput](./system-events.slidercreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Slider](./system-events.slider.md)<!-- -->&gt;
-

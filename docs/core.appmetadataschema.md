@@ -9,27 +9,36 @@ Schema for app-level metadata.
 **Signature:**
 
 ```typescript
-AppMetadataSchema: z.ZodObject<{
-    bundleId: z.ZodString;
-    name: z.ZodString;
-    displayName: z.ZodOptional<z.ZodString>;
-    version: z.ZodOptional<z.ZodString>;
-    minMacOSVersion: z.ZodOptional<z.ZodString>;
-    icon: z.ZodOptional<z.ZodString>;
-    tccEntitlements: z.ZodDefault<z.ZodArray<z.ZodEnum<{
-        calendar: "calendar";
-        contacts: "contacts";
-        reminders: "reminders";
-        photos: "photos";
-        music: "music";
-        files: "files";
-        accessibility: "accessibility";
-        automation: "automation";
-    }>>>;
-    distributionModel: z.ZodOptional<z.ZodEnum<{
-        "app-store": "app-store";
-        "developer-id": "developer-id";
-        system: "system";
-    }>>;
-}, z.core.$strip>
+AppMetadataSchema: z.ZodObject<
+  {
+    bundleId: z.ZodString
+    name: z.ZodString
+    displayName: z.ZodOptional<z.ZodString>
+    version: z.ZodOptional<z.ZodString>
+    minMacOSVersion: z.ZodOptional<z.ZodString>
+    icon: z.ZodOptional<z.ZodString>
+    tccEntitlements: z.ZodDefault<
+      z.ZodArray<
+        z.ZodEnum<{
+          calendar: 'calendar'
+          contacts: 'contacts'
+          reminders: 'reminders'
+          photos: 'photos'
+          music: 'music'
+          files: 'files'
+          accessibility: 'accessibility'
+          automation: 'automation'
+        }>
+      >
+    >
+    distributionModel: z.ZodOptional<
+      z.ZodEnum<{
+        'app-store': 'app-store'
+        'developer-id': 'developer-id'
+        system: 'system'
+      }>
+    >
+  },
+  z.core.$strip
+>
 ```

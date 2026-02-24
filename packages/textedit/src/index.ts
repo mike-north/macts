@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-export { TextEditClient, TextEditError, HttpClient } from './client.js';
-export type { TextEditClientOptions } from './client.js';
-export * from './types.js';
-export { DocumentResourceClient } from './resources/document.js';
+export { TextEditClient, TextEditError, HttpClient } from './client.js'
+export type { TextEditClientOptions } from './client.js'
+export * from './types.js'
+export { DocumentResourceClient } from './resources/document.js'

@@ -9,5 +9,5 @@ Whether the note is shared
 **Signature:**
 
 ```typescript
-shared: boolean;
+shared: boolean
 ```

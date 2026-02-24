@@ -11,7 +11,7 @@ List all artworks.
 ```typescript
 list(): Promise<Artwork[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Artwork](./music.artwork.md)<!-- -->\[\]&gt;
-

@@ -9,5 +9,5 @@ Input for creating a TabGroup
 **Signature:**
 
 ```typescript
-interface TabGroupCreateInput 
+interface TabGroupCreateInput
 ```

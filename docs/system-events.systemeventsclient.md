@@ -9,19 +9,18 @@ SystemEvents client for HTTP-based macOS automation.
 **Signature:**
 
 ```typescript
-declare class SystemEventsClient 
+declare class SystemEventsClient
 ```
 
 ## Example
 
-
 ```typescript
 const client = new SystemEventsClient({
   apiKey: process.env.MACTS_API_KEY!,
-});
+})
 
 // List calendars
-const calendars = await client.calendars.list();
+const calendars = await client.calendars.list()
 ```
 
 ## Constructors
@@ -30,30 +29,24 @@ const calendars = await client.calendars.list();
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(options)](./system-events.systemeventsclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SystemEventsClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -64,1575 +57,1275 @@ Constructs a new instance of the `SystemEventsClient` class
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [actions](./system-events.systemeventsclient.actions.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ActionResourceClient](./system-events.actionresourceclient.md)
 
-
 </td><td>
 
 An action that can be performed on the UI element
-
 
 </td></tr>
 <tr><td>
 
 [aliases](./system-events.systemeventsclient.aliases.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AliasResourceClient](./system-events.aliasresourceclient.md)
 
-
 </td><td>
 
 An alias in the file system
-
 
 </td></tr>
 <tr><td>
 
 [attributes](./system-events.systemeventsclient.attributes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [AttributeResourceClient](./system-events.attributeresourceclient.md)
 
-
 </td><td>
 
 An named data value associated with the UI element
-
 
 </td></tr>
 <tr><td>
 
 [browsers](./system-events.systemeventsclient.browsers.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [BrowserResourceClient](./system-events.browserresourceclient.md)
 
-
 </td><td>
 
 A browser belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [busyindicators](./system-events.systemeventsclient.busyindicators.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [BusyIndicatorResourceClient](./system-events.busyindicatorresourceclient.md)
 
-
 </td><td>
 
 A busy indicator belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [buttons](./system-events.systemeventsclient.buttons.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ButtonResourceClient](./system-events.buttonresourceclient.md)
 
-
 </td><td>
 
 A button belonging to a window or scroll bar
-
 
 </td></tr>
 <tr><td>
 
 [checkboxes](./system-events.systemeventsclient.checkboxes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [CheckboxResourceClient](./system-events.checkboxresourceclient.md)
 
-
 </td><td>
 
 A checkbox belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [classicdomainobjects](./system-events.systemeventsclient.classicdomainobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ClassicDomainObjectResourceClient](./system-events.classicdomainobjectresourceclient.md)
 
-
 </td><td>
 
 The Classic domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [colorwells](./system-events.systemeventsclient.colorwells.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ColorWellResourceClient](./system-events.colorwellresourceclient.md)
 
-
 </td><td>
 
 A color well belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [columns](./system-events.systemeventsclient.columns.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ColumnResourceClient](./system-events.columnresourceclient.md)
 
-
 </td><td>
 
 A column belonging to a table
-
 
 </td></tr>
 <tr><td>
 
 [comboboxes](./system-events.systemeventsclient.comboboxes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ComboBoxResourceClient](./system-events.comboboxresourceclient.md)
 
-
 </td><td>
 
 A combo box belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [configurations](./system-events.systemeventsclient.configurations.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ConfigurationResourceClient](./system-events.configurationresourceclient.md)
 
-
 </td><td>
 
 A collection of settings for configuring a connection
-
 
 </td></tr>
 <tr><td>
 
 [diskitems](./system-events.systemeventsclient.diskitems.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DiskItemResourceClient](./system-events.diskitemresourceclient.md)
 
-
 </td><td>
 
 An item stored in the file system
-
 
 </td></tr>
 <tr><td>
 
 [disks](./system-events.systemeventsclient.disks.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DiskResourceClient](./system-events.diskresourceclient.md)
 
-
 </td><td>
 
 A disk in the file system
-
 
 </td></tr>
 <tr><td>
 
 [domains](./system-events.systemeventsclient.domains.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DomainResourceClient](./system-events.domainresourceclient.md)
 
-
 </td><td>
 
 A domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [drawers](./system-events.systemeventsclient.drawers.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [DrawerResourceClient](./system-events.drawerresourceclient.md)
 
-
 </td><td>
 
 A drawer that may be extended from a window
-
 
 </td></tr>
 <tr><td>
 
 [filepackages](./system-events.systemeventsclient.filepackages.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FilePackageResourceClient](./system-events.filepackageresourceclient.md)
 
-
 </td><td>
 
 A file package in the file system
-
 
 </td></tr>
 <tr><td>
 
 [files](./system-events.systemeventsclient.files.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FileResourceClient](./system-events.fileresourceclient.md)
 
-
 </td><td>
 
 A file in the file system
-
 
 </td></tr>
 <tr><td>
 
 [folders](./system-events.systemeventsclient.folders.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [FolderResourceClient](./system-events.folderresourceclient.md)
 
-
 </td><td>
 
 A folder in the file system
-
 
 </td></tr>
 <tr><td>
 
 [groups](./system-events.systemeventsclient.groups.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [GroupResourceClient](./system-events.groupresourceclient.md)
 
-
 </td><td>
 
 A group belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [growareas](./system-events.systemeventsclient.growareas.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [GrowAreaResourceClient](./system-events.growarearesourceclient.md)
 
-
 </td><td>
 
 A grow area belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [http](./system-events.systemeventsclient.http.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [HttpClient](./system-events.httpclient.md)
 
-
 </td><td>
 
 Get the HTTP client for making custom requests.
-
 
 </td></tr>
 <tr><td>
 
 [images](./system-events.systemeventsclient.images.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ImageResourceClient](./system-events.imageresourceclient.md)
 
-
 </td><td>
 
 An image belonging to a static text field
-
 
 </td></tr>
 <tr><td>
 
 [incrementors](./system-events.systemeventsclient.incrementors.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [IncrementorResourceClient](./system-events.incrementorresourceclient.md)
 
-
 </td><td>
 
 A incrementor belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [interfaces](./system-events.systemeventsclient.interfaces.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [InterfaceResourceClient](./system-events.interfaceresourceclient.md)
 
-
 </td><td>
 
 A collection of settings for a network interface
-
 
 </td></tr>
 <tr><td>
 
 [lists](./system-events.systemeventsclient.lists.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ListResourceClient](./system-events.listresourceclient.md)
 
-
 </td><td>
 
 A list belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [localdomainobjects](./system-events.systemeventsclient.localdomainobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [LocalDomainObjectResourceClient](./system-events.localdomainobjectresourceclient.md)
 
-
 </td><td>
 
 The local domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [locations](./system-events.systemeventsclient.locations.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [LocationResourceClient](./system-events.locationresourceclient.md)
 
-
 </td><td>
 
 A set of services
-
 
 </td></tr>
 <tr><td>
 
 [menubaritems](./system-events.systemeventsclient.menubaritems.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MenuBarItemResourceClient](./system-events.menubaritemresourceclient.md)
 
-
 </td><td>
 
 A menu bar item belonging to a menu bar
-
 
 </td></tr>
 <tr><td>
 
 [menubars](./system-events.systemeventsclient.menubars.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MenuBarResourceClient](./system-events.menubarresourceclient.md)
 
-
 </td><td>
 
 A menu bar belonging to a process
-
 
 </td></tr>
 <tr><td>
 
 [menubuttons](./system-events.systemeventsclient.menubuttons.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MenuButtonResourceClient](./system-events.menubuttonresourceclient.md)
 
-
 </td><td>
 
 A menu button belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [menuitems](./system-events.systemeventsclient.menuitems.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MenuItemResourceClient](./system-events.menuitemresourceclient.md)
 
-
 </td><td>
 
 A menu item belonging to a menu
-
 
 </td></tr>
 <tr><td>
 
 [menus](./system-events.systemeventsclient.menus.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [MenuResourceClient](./system-events.menuresourceclient.md)
 
-
 </td><td>
 
 A menu belonging to a menu bar item
-
 
 </td></tr>
 <tr><td>
 
 [networkdomainobjects](./system-events.systemeventsclient.networkdomainobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [NetworkDomainObjectResourceClient](./system-events.networkdomainobjectresourceclient.md)
 
-
 </td><td>
 
 The network domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [networkpreferencesobjects](./system-events.systemeventsclient.networkpreferencesobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [NetworkPreferencesObjectResourceClient](./system-events.networkpreferencesobjectresourceclient.md)
 
-
 </td><td>
 
 the preferences for the current user's network
-
 
 </td></tr>
 <tr><td>
 
 [outlines](./system-events.systemeventsclient.outlines.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [OutlineResourceClient](./system-events.outlineresourceclient.md)
 
-
 </td><td>
 
 A outline belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [popovers](./system-events.systemeventsclient.popovers.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [PopOverResourceClient](./system-events.popoverresourceclient.md)
 
-
 </td><td>
 
 A pop over belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [popupbuttons](./system-events.systemeventsclient.popupbuttons.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [PopUpButtonResourceClient](./system-events.popupbuttonresourceclient.md)
 
-
 </td><td>
 
 A pop up button belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [processes](./system-events.systemeventsclient.processes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ProcessResourceClient](./system-events.processresourceclient.md)
 
-
 </td><td>
 
 A process running on this computer
-
 
 </td></tr>
 <tr><td>
 
 [progressindicators](./system-events.systemeventsclient.progressindicators.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ProgressIndicatorResourceClient](./system-events.progressindicatorresourceclient.md)
 
-
 </td><td>
 
 A progress indicator belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [propertylistitems](./system-events.systemeventsclient.propertylistitems.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [PropertyListItemResourceClient](./system-events.propertylistitemresourceclient.md)
 
-
 </td><td>
 
 A unit of data in Property List format
-
 
 </td></tr>
 <tr><td>
 
 [radiobuttons](./system-events.systemeventsclient.radiobuttons.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [RadioButtonResourceClient](./system-events.radiobuttonresourceclient.md)
 
-
 </td><td>
 
 A radio button belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [radiogroups](./system-events.systemeventsclient.radiogroups.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [RadioGroupResourceClient](./system-events.radiogroupresourceclient.md)
 
-
 </td><td>
 
 A radio button group belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [relevanceindicators](./system-events.systemeventsclient.relevanceindicators.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [RelevanceIndicatorResourceClient](./system-events.relevanceindicatorresourceclient.md)
 
-
 </td><td>
 
 A relevance indicator belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [rows](./system-events.systemeventsclient.rows.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [RowResourceClient](./system-events.rowresourceclient.md)
 
-
 </td><td>
 
 A row belonging to a table
-
 
 </td></tr>
 <tr><td>
 
 [scriptingclasses](./system-events.systemeventsclient.scriptingclasses.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingClassResourceClient](./system-events.scriptingclassresourceclient.md)
 
-
 </td><td>
 
 A class within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingcommands](./system-events.systemeventsclient.scriptingcommands.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingCommandResourceClient](./system-events.scriptingcommandresourceclient.md)
 
-
 </td><td>
 
 A command within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingdefinitionobjects](./system-events.systemeventsclient.scriptingdefinitionobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingDefinitionObjectResourceClient](./system-events.scriptingdefinitionobjectresourceclient.md)
 
-
 </td><td>
 
 The scripting definition of the System Events applicaation
-
 
 </td></tr>
 <tr><td>
 
 [scriptingelements](./system-events.systemeventsclient.scriptingelements.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingElementResourceClient](./system-events.scriptingelementresourceclient.md)
 
-
 </td><td>
 
 An element within a class within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingenumerations](./system-events.systemeventsclient.scriptingenumerations.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingEnumerationResourceClient](./system-events.scriptingenumerationresourceclient.md)
 
-
 </td><td>
 
 An enumeration within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingenumerators](./system-events.systemeventsclient.scriptingenumerators.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingEnumeratorResourceClient](./system-events.scriptingenumeratorresourceclient.md)
 
-
 </td><td>
 
 An enumerator within an enumeration within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingparameters](./system-events.systemeventsclient.scriptingparameters.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingParameterResourceClient](./system-events.scriptingparameterresourceclient.md)
 
-
 </td><td>
 
 A parameter within a command within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingproperties](./system-events.systemeventsclient.scriptingproperties.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingPropertyResourceClient](./system-events.scriptingpropertyresourceclient.md)
 
-
 </td><td>
 
 A property within a class within a suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scriptingsuites](./system-events.systemeventsclient.scriptingsuites.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScriptingSuiteResourceClient](./system-events.scriptingsuiteresourceclient.md)
 
-
 </td><td>
 
 A suite within a scripting definition
-
 
 </td></tr>
 <tr><td>
 
 [scrollareas](./system-events.systemeventsclient.scrollareas.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScrollAreaResourceClient](./system-events.scrollarearesourceclient.md)
 
-
 </td><td>
 
 A scroll area belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [scrollbars](./system-events.systemeventsclient.scrollbars.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ScrollBarResourceClient](./system-events.scrollbarresourceclient.md)
 
-
 </td><td>
 
 A scroll bar belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [services](./system-events.systemeventsclient.services.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ServiceResourceClient](./system-events.serviceresourceclient.md)
 
-
 </td><td>
 
 A collection of settings for a network service
-
 
 </td></tr>
 <tr><td>
 
 [sheets](./system-events.systemeventsclient.sheets.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SheetResourceClient](./system-events.sheetresourceclient.md)
 
-
 </td><td>
 
 A sheet displayed over a window
-
 
 </td></tr>
 <tr><td>
 
 [sliders](./system-events.systemeventsclient.sliders.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SliderResourceClient](./system-events.sliderresourceclient.md)
 
-
 </td><td>
 
 A slider belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [splittergroups](./system-events.systemeventsclient.splittergroups.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SplitterGroupResourceClient](./system-events.splittergroupresourceclient.md)
 
-
 </td><td>
 
 A splitter group belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [splitters](./system-events.systemeventsclient.splitters.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SplitterResourceClient](./system-events.splitterresourceclient.md)
 
-
 </td><td>
 
 A splitter belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [statictexts](./system-events.systemeventsclient.statictexts.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [StaticTextResourceClient](./system-events.statictextresourceclient.md)
 
-
 </td><td>
 
 A static text field belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [systemdomainobjects](./system-events.systemeventsclient.systemdomainobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [SystemDomainObjectResourceClient](./system-events.systemdomainobjectresourceclient.md)
 
-
 </td><td>
 
 The system domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [tabgroups](./system-events.systemeventsclient.tabgroups.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TabGroupResourceClient](./system-events.tabgroupresourceclient.md)
 
-
 </td><td>
 
 A tab group belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [tables](./system-events.systemeventsclient.tables.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TableResourceClient](./system-events.tableresourceclient.md)
 
-
 </td><td>
 
 A table belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [textareas](./system-events.systemeventsclient.textareas.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TextAreaResourceClient](./system-events.textarearesourceclient.md)
 
-
 </td><td>
 
 A text area belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [textfields](./system-events.systemeventsclient.textfields.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [TextFieldResourceClient](./system-events.textfieldresourceclient.md)
 
-
 </td><td>
 
 A text field belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [toolbars](./system-events.systemeventsclient.toolbars.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ToolbarResourceClient](./system-events.toolbarresourceclient.md)
 
-
 </td><td>
 
 A toolbar belonging to a window
-
 
 </td></tr>
 <tr><td>
 
 [uielements](./system-events.systemeventsclient.uielements.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [UIElementResourceClient](./system-events.uielementresourceclient.md)
 
-
 </td><td>
 
 A piece of the user interface of a process
-
 
 </td></tr>
 <tr><td>
 
 [userdomainobjects](./system-events.systemeventsclient.userdomainobjects.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [UserDomainObjectResourceClient](./system-events.userdomainobjectresourceclient.md)
 
-
 </td><td>
 
 The user domain in the file system
-
 
 </td></tr>
 <tr><td>
 
 [valueindicators](./system-events.systemeventsclient.valueindicators.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [ValueIndicatorResourceClient](./system-events.valueindicatorresourceclient.md)
 
-
 </td><td>
 
 A value indicator ( thumb or slider ) belonging to a scroll bar
-
 
 </td></tr>
 <tr><td>
 
 [xmlattributes](./system-events.systemeventsclient.xmlattributes.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [XMLAttributeResourceClient](./system-events.xmlattributeresourceclient.md)
 
-
 </td><td>
 
 A named value associated with a unit of data in XML format
-
 
 </td></tr>
 <tr><td>
 
 [xmldatas](./system-events.systemeventsclient.xmldatas.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [XMLDataResourceClient](./system-events.xmldataresourceclient.md)
 
-
 </td><td>
 
 Data in XML format
-
 
 </td></tr>
 <tr><td>
 
 [xmlelements](./system-events.systemeventsclient.xmlelements.md)
 
-
 </td><td>
 
 `readonly`
-
 
 </td><td>
 
 [XMLElementResourceClient](./system-events.xmlelementresourceclient.md)
 
-
 </td><td>
 
 A unit of data in XML format
-
 
 </td></tr>
 </tbody></table>
@@ -1643,395 +1336,310 @@ A unit of data in XML format
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [abortTransaction()](./system-events.systemeventsclient.aborttransaction.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Discard the results of a bounded update session with one or more files.
-
 
 </td></tr>
 <tr><td>
 
 [attachActionTo(using)](./system-events.systemeventsclient.attachactionto.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Attach an action to a folder
-
 
 </td></tr>
 <tr><td>
 
 [attachedScripts()](./system-events.systemeventsclient.attachedscripts.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List the actions attached to a folder
-
 
 </td></tr>
 <tr><td>
 
 [beginTransaction()](./system-events.systemeventsclient.begintransaction.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Begin a bounded update session with one or more files.
-
 
 </td></tr>
 <tr><td>
 
 [cancel()](./system-events.systemeventsclient.cancel.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were cancelled
-
 
 </td></tr>
 <tr><td>
 
 [confirm()](./system-events.systemeventsclient.confirm.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were confirmed
-
 
 </td></tr>
 <tr><td>
 
 [connect()](./system-events.systemeventsclient.connect.md)
 
-
 </td><td>
-
 
 </td><td>
 
 connect a configuration or service
-
 
 </td></tr>
 <tr><td>
 
 [decrement()](./system-events.systemeventsclient.decrement.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were decremented
-
 
 </td></tr>
 <tr><td>
 
 [disconnect()](./system-events.systemeventsclient.disconnect.md)
 
-
 </td><td>
-
 
 </td><td>
 
 disconnect a configuration or service
-
 
 </td></tr>
 <tr><td>
 
 [doFolderAction(folderActionCode, withItemList, withWindowSize)](./system-events.systemeventsclient.dofolderaction.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Send a folder action code to a folder action script
-
 
 </td></tr>
 <tr><td>
 
 [editActionOf(usingActionName, usingActionNumber)](./system-events.systemeventsclient.editactionof.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Edit an action of a folder
-
 
 </td></tr>
 <tr><td>
 
 [endTransaction()](./system-events.systemeventsclient.endtransaction.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Apply the results of a bounded update session with one or more files.
-
 
 </td></tr>
 <tr><td>
 
 [increment()](./system-events.systemeventsclient.increment.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were incremented
-
 
 </td></tr>
 <tr><td>
 
 [keyCode(using)](./system-events.systemeventsclient.keycode.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if key codes were entered
-
 
 </td></tr>
 <tr><td>
 
 [keyDown()](./system-events.systemeventsclient.keydown.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if keys were held down
-
 
 </td></tr>
 <tr><td>
 
 [keystroke(using)](./system-events.systemeventsclient.keystroke.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if keystrokes were entered
-
 
 </td></tr>
 <tr><td>
 
 [keyUp()](./system-events.systemeventsclient.keyup.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if keys were released
-
 
 </td></tr>
 <tr><td>
 
 [logOut()](./system-events.systemeventsclient.logout.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Log out the current user
-
 
 </td></tr>
 <tr><td>
 
 [move(to)](./system-events.systemeventsclient.move.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Move disk item(s) to a new location.
-
 
 </td></tr>
 <tr><td>
 
 [open()](./system-events.systemeventsclient.open.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Open disk item(s) with the appropriate application.
-
 
 </td></tr>
 <tr><td>
 
 [pick()](./system-events.systemeventsclient.pick.md)
 
-
 </td><td>
-
 
 </td><td>
 
 cause the target process to behave as if the UI element were picked
-
 
 </td></tr>
 <tr><td>
 
 [removeActionFrom(usingActionName, usingActionNumber)](./system-events.systemeventsclient.removeactionfrom.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Remove a folder action from a folder
-
 
 </td></tr>
 <tr><td>
 
 [restart(stateSavingPreference)](./system-events.systemeventsclient.restart.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Restart the computer
-
 
 </td></tr>
 <tr><td>
 
 [shutDown(stateSavingPreference)](./system-events.systemeventsclient.shutdown.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Shut Down the computer
-
 
 </td></tr>
 <tr><td>
 
 [sleep()](./system-events.systemeventsclient.sleep.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Put the computer to sleep
-
 
 </td></tr>
 <tr><td>
 
 [start()](./system-events.systemeventsclient.start.md)
 
-
 </td><td>
-
 
 </td><td>
 
 start the screen saver
-
 
 </td></tr>
 <tr><td>
 
 [stop()](./system-events.systemeventsclient.stop.md)
 
-
 </td><td>
-
 
 </td><td>
 
 stop the screen saver
 
-
 </td></tr>
 </tbody></table>
-

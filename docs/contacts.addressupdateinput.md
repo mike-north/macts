@@ -9,7 +9,7 @@ Input for updating a Address
 **Signature:**
 
 ```typescript
-type AddressUpdateInput = Partial<AddressCreateInput>;
+type AddressUpdateInput = Partial<AddressCreateInput>
 ```
-**References:** [AddressCreateInput](./contacts.addresscreateinput.md)
 
+**References:** [AddressCreateInput](./contacts.addresscreateinput.md)

@@ -9,7 +9,7 @@ An element within a class within a suite within a scripting definition
 **Signature:**
 
 ```typescript
-interface ScriptingElement 
+interface ScriptingElement
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ScriptingElement
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.scriptingelement.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this scripting element
 
-
 </td></tr>
 </tbody></table>
-

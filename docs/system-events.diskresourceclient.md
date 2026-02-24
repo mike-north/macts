@@ -9,7 +9,7 @@ Client for a disk in the file system.
 **Signature:**
 
 ```typescript
-declare class DiskResourceClient 
+declare class DiskResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DiskResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.diskresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DiskResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DiskResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.diskresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new disk.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.diskresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a disk.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.diskresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a disk by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.diskresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all disks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.diskresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing disk.
 
-
 </td></tr>
 </tbody></table>
-

@@ -9,7 +9,7 @@ An email recipient in the Bcc: field
 **Signature:**
 
 ```typescript
-interface BccRecipient 
+interface BccRecipient
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface BccRecipient
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./mail.bccrecipient.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this recipient
 
-
 </td></tr>
 </tbody></table>
-

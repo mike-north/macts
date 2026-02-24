@@ -9,5 +9,5 @@ The name of the anchor.
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

@@ -11,7 +11,7 @@ List all groups.
 ```typescript
 list(): Promise<Group[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Group](./system-events.group.md)<!-- -->\[\]&gt;
-

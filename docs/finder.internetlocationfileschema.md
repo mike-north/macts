@@ -7,7 +7,10 @@
 **Signature:**
 
 ```typescript
-InternetLocationFileSchema: z.ZodObject<{
-    location: z.ZodString;
-}, z.core.$strip>
+InternetLocationFileSchema: z.ZodObject<
+  {
+    location: z.ZodString
+  },
+  z.core.$strip
+>
 ```

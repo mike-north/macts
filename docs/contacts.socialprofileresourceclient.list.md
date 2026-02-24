@@ -11,7 +11,7 @@ List all socialprofiles.
 ```typescript
 list(): Promise<SocialProfile[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SocialProfile](./contacts.socialprofile.md)<!-- -->\[\]&gt;
-

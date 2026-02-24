@@ -9,7 +9,7 @@ Client for a device in console.
 **Signature:**
 
 ```typescript
-declare class DeviceResourceClient 
+declare class DeviceResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DeviceResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./console.deviceresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DeviceResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DeviceResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./console.deviceresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new device.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./console.deviceresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a device.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./console.deviceresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a device by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./console.deviceresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all devices.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./console.deviceresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing device.
 
-
 </td></tr>
 </tbody></table>
-

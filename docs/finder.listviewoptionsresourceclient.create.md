@@ -18,30 +18,24 @@ create(input: ListViewOptionsCreateInput): Promise<ListViewOptions>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[ListViewOptions](./finder.listviewoptions.md)<!-- -->&gt;
-

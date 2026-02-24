@@ -9,5 +9,5 @@ the rating kind of the album rating for this track
 **Signature:**
 
 ```typescript
-albumRatingKind: string;
+albumRatingKind: string
 ```

@@ -9,7 +9,7 @@ Client for a calendar containing events.
 **Signature:**
 
 ```typescript
-declare class CalendarResourceClient 
+declare class CalendarResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class CalendarResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./calendar.calendarresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `CalendarResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `CalendarResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./calendar.calendarresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new calendar.
-
 
 </td></tr>
 <tr><td>
 
 [delete(calendarIdentifier)](./calendar.calendarresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a calendar.
-
 
 </td></tr>
 <tr><td>
 
 [get(calendarIdentifier)](./calendar.calendarresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a calendar by calendarIdentifier.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./calendar.calendarresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all calendars.
-
 
 </td></tr>
 <tr><td>
 
 [update(calendarIdentifier, input)](./calendar.calendarresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing calendar.
 
-
 </td></tr>
 </tbody></table>
-

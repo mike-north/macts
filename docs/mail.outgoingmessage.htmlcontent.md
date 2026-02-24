@@ -9,5 +9,5 @@ Does nothing at all (deprecated)
 **Signature:**
 
 ```typescript
-htmlContent: string;
+htmlContent: string
 ```

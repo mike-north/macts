@@ -9,5 +9,5 @@ Person information in vCard format, this always returns a card in version 3.0 fo
 **Signature:**
 
 ```typescript
-vcard: string;
+vcard: string
 ```

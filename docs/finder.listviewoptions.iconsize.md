@@ -9,5 +9,5 @@ the size of icons displayed in the list view
 **Signature:**
 
 ```typescript
-iconSize: string;
+iconSize: string
 ```

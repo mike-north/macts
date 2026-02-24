@@ -9,7 +9,7 @@ Input for creating a Account
 **Signature:**
 
 ```typescript
-interface AccountCreateInput 
+interface AccountCreateInput
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface AccountCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [enabled?](./messages.accountcreateinput.enabled.md)
 
-
 </td><td>
-
 
 </td><td>
 
 boolean
 
-
 </td><td>
 
 _(Optional)_ Is the account enabled?
 
-
 </td></tr>
 </tbody></table>
-

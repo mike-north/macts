@@ -9,5 +9,5 @@ Whether permission is granted
 **Signature:**
 
 ```typescript
-granted: boolean;
+granted: boolean
 ```

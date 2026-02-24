@@ -9,5 +9,5 @@ Input for creating a RelevanceIndicator
 **Signature:**
 
 ```typescript
-interface RelevanceIndicatorCreateInput 
+interface RelevanceIndicatorCreateInput
 ```

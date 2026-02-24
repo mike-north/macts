@@ -11,7 +11,7 @@ List all jabberhandles.
 ```typescript
 list(): Promise<JabberHandle[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[JabberHandle](./contacts.jabberhandle.md)<!-- -->\[\]&gt;
-

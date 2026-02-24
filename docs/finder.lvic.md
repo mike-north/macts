@@ -9,5 +9,5 @@ Lvic
 **Signature:**
 
 ```typescript
-type Lvic = 'smallIcon' | 'largeIcon';
+type Lvic = 'smallIcon' | 'largeIcon'
 ```

@@ -9,7 +9,7 @@ A pop over belonging to a window
 **Signature:**
 
 ```typescript
-interface PopOver 
+interface PopOver
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface PopOver
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.popover.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this pop over
 
-
 </td></tr>
 </tbody></table>
-

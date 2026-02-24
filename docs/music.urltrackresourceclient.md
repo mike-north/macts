@@ -9,7 +9,7 @@ Client for a track representing a network stream.
 **Signature:**
 
 ```typescript
-declare class URLTrackResourceClient 
+declare class URLTrackResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class URLTrackResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./music.urltrackresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `URLTrackResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `URLTrackResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./music.urltrackresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new urltrack.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./music.urltrackresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a urltrack.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./music.urltrackresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a urltrack by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./music.urltrackresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all urltracks.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./music.urltrackresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing urltrack.
 
-
 </td></tr>
 </tbody></table>
-

@@ -18,31 +18,24 @@ constructor(options: MessagesClientOptions);
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 options
 
-
 </td><td>
 
 [MessagesClientOptions](./messages.messagesclientoptions.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

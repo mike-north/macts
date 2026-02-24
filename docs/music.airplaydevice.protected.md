@@ -9,5 +9,5 @@ is the device password- or passcode-protected?
 **Signature:**
 
 ```typescript
-protected: boolean;
+protected: boolean
 ```

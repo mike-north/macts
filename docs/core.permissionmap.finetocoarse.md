@@ -9,5 +9,5 @@ Map of fine-grained permission to its coarse category
 **Signature:**
 
 ```typescript
-fineToCoarse: Map<string, string>;
+fineToCoarse: Map<string, string>
 ```

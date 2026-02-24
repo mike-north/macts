@@ -9,5 +9,5 @@ Issuer - always 'macts'
 **Signature:**
 
 ```typescript
-iss: 'macts';
+iss: 'macts'
 ```

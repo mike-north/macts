@@ -9,5 +9,5 @@ displays a preview of the item in list view
 **Signature:**
 
 ```typescript
-showsIconPreview: boolean;
+showsIconPreview: boolean
 ```

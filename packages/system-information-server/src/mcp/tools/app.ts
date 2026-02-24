@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
-import { getClient } from '../sdk.js';
+import type { McpToolDefinition } from '@macts/mcp'
+import { getClient } from '../sdk.js'
 
 /**
  * Send system information to AppleCare
@@ -14,14 +14,13 @@ export const appSendTool: McpToolDefinition = {
   name: 'macts__system-information__app_send',
   description: 'Send system information to AppleCare',
   inputSchema: {
-    "type": "object",
-    "properties": {},
-    "additionalProperties": false
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
   },
   handler: async () => {
-    const client = getClient();
-    await client.send();
-    return { success: true };
+    const client = getClient()
+    await client.send()
+    return { success: true }
   },
-};
-
+}

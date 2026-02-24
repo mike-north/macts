@@ -11,7 +11,7 @@ cause the target process to behave as if the UI element were incremented
 ```typescript
 increment(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

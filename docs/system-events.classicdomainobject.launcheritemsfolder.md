@@ -9,5 +9,5 @@ The Launcher Items folder
 **Signature:**
 
 ```typescript
-launcherItemsFolder: Folder;
+launcherItemsFolder: Folder
 ```

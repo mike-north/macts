@@ -9,7 +9,7 @@ Client for profile for social networks..
 **Signature:**
 
 ```typescript
-declare class SocialProfileResourceClient 
+declare class SocialProfileResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class SocialProfileResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./contacts.socialprofileresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `SocialProfileResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `SocialProfileResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./contacts.socialprofileresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new socialprofile.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./contacts.socialprofileresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a socialprofile.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./contacts.socialprofileresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a socialprofile by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./contacts.socialprofileresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all socialprofiles.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./contacts.socialprofileresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing socialprofile.
 
-
 </td></tr>
 </tbody></table>
-

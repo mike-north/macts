@@ -9,5 +9,5 @@ Direction
 **Signature:**
 
 ```typescript
-type Direction = 'incoming' | 'outgoing';
+type Direction = 'incoming' | 'outgoing'
 ```

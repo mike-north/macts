@@ -18,30 +18,24 @@ create(input: ConnectionCreateInput): Promise<Connection>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[Connection](./screen-sharing.connection.md)<!-- -->&gt;
-

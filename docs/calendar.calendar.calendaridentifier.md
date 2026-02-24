@@ -9,5 +9,5 @@ A unique calendar key
 **Signature:**
 
 ```typescript
-calendarIdentifier: string;
+calendarIdentifier: string
 ```

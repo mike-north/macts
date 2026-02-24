@@ -9,7 +9,7 @@ Client for represents the object responsible for managing a viewer window.
 **Signature:**
 
 ```typescript
-declare class MessageViewerResourceClient 
+declare class MessageViewerResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class MessageViewerResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./mail.messageviewerresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `MessageViewerResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `MessageViewerResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./mail.messageviewerresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new messageviewer.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./mail.messageviewerresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a messageviewer.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./mail.messageviewerresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a messageviewer by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./mail.messageviewerresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all messageviewers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./mail.messageviewerresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing messageviewer.
 
-
 </td></tr>
 </tbody></table>
-

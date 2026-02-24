@@ -9,7 +9,7 @@ A splitter belonging to a window
 **Signature:**
 
 ```typescript
-interface Splitter 
+interface Splitter
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Splitter
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.splitter.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this splitter
 
-
 </td></tr>
 </tbody></table>
-

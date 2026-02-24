@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
-import { allTools } from './tools/index.js';
+import type { McpPlugin } from '@macts/mcp'
+import { allTools } from './tools/index.js'
 
 /**
  * MCP plugin for macOS Preview.app automation.
@@ -16,4 +16,4 @@ export const previewPlugin: McpPlugin = {
   name: 'preview',
   description: 'MCP plugin for macOS Preview.app automation',
   tools: allTools,
-};
+}

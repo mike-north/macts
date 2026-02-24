@@ -11,7 +11,7 @@ List all sharedtracks.
 ```typescript
 list(): Promise<SharedTrack[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SharedTrack](./tv.sharedtrack.md)<!-- -->\[\]&gt;
-

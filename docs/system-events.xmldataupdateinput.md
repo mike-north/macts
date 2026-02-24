@@ -9,7 +9,7 @@ Input for updating a XMLData
 **Signature:**
 
 ```typescript
-type XMLDataUpdateInput = Partial<XMLDataCreateInput>;
+type XMLDataUpdateInput = Partial<XMLDataCreateInput>
 ```
-**References:** [XMLDataCreateInput](./system-events.xmldatacreateinput.md)
 
+**References:** [XMLDataCreateInput](./system-events.xmldatacreateinput.md)

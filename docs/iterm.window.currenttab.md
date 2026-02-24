@@ -9,5 +9,5 @@ The currently selected tab
 **Signature:**
 
 ```typescript
-currentTab: Tab;
+currentTab: Tab
 ```

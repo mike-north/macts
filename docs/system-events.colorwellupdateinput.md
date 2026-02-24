@@ -9,7 +9,7 @@ Input for updating a ColorWell
 **Signature:**
 
 ```typescript
-type ColorWellUpdateInput = Partial<ColorWellCreateInput>;
+type ColorWellUpdateInput = Partial<ColorWellCreateInput>
 ```
-**References:** [ColorWellCreateInput](./system-events.colorwellcreateinput.md)
 
+**References:** [ColorWellCreateInput](./system-events.colorwellcreateinput.md)

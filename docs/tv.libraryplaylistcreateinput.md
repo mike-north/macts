@@ -9,5 +9,5 @@ Input for creating a LibraryPlaylist
 **Signature:**
 
 ```typescript
-interface LibraryPlaylistCreateInput 
+interface LibraryPlaylistCreateInput
 ```

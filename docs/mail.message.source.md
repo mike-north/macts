@@ -9,5 +9,5 @@ Raw source of the message
 **Signature:**
 
 ```typescript
-source: string;
+source: string
 ```

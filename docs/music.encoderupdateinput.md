@@ -9,7 +9,7 @@ Input for updating a Encoder
 **Signature:**
 
 ```typescript
-type EncoderUpdateInput = Partial<EncoderCreateInput>;
+type EncoderUpdateInput = Partial<EncoderCreateInput>
 ```
-**References:** [EncoderCreateInput](./music.encodercreateinput.md)
 
+**References:** [EncoderCreateInput](./music.encodercreateinput.md)

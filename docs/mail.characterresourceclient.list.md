@@ -11,7 +11,7 @@ List all characters.
 ```typescript
 list(): Promise<Character[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Character](./mail.character.md)<!-- -->\[\]&gt;
-

@@ -9,7 +9,7 @@ Client for an alias in the file system.
 **Signature:**
 
 ```typescript
-declare class AliasResourceClient 
+declare class AliasResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AliasResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.aliasresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AliasResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AliasResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.aliasresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new alias.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.aliasresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a alias.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.aliasresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a alias by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.aliasresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all aliases.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.aliasresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing alias.
 
-
 </td></tr>
 </tbody></table>
-

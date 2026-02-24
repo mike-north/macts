@@ -11,7 +11,7 @@ Close a document.
 ```typescript
 close(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,5 +9,5 @@ The containment hierarchy tree
 **Signature:**
 
 ```typescript
-hierarchy: Hierarchy;
+hierarchy: Hierarchy
 ```

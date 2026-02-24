@@ -9,8 +9,11 @@ Execute JXA code in the context of an application.
 **Signature:**
 
 ```typescript
-declare function runWithApp<T>(bundleId: string, fn: string, // Function body as string
-options?: JxaExecutorOptions): Promise<T>;
+declare function runWithApp<T>(
+  bundleId: string,
+  fn: string, // Function body as string
+  options?: JxaExecutorOptions
+): Promise<T>
 ```
 
 ## Parameters
@@ -19,60 +22,48 @@ options?: JxaExecutorOptions): Promise<T>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 bundleId
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 fn
 
-
 </td><td>
 
 string
 
-
 </td><td>
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [JxaExecutorOptions](./core.jxaexecutoroptions.md)
 
-
 </td><td>
 
 _(Optional)_
-
 
 </td></tr>
 </tbody></table>
@@ -80,4 +71,3 @@ _(Optional)_
 **Returns:**
 
 Promise&lt;T&gt;
-

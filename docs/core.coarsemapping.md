@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type CoarseMapping = z.infer<typeof CoarseMappingSchema>;
+type CoarseMapping = z.infer<typeof CoarseMappingSchema>
 ```
-**References:** [CoarseMappingSchema](./core.coarsemappingschema.md)
 
+**References:** [CoarseMappingSchema](./core.coarsemappingschema.md)

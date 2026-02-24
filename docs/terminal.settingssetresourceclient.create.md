@@ -18,30 +18,24 @@ create(input: SettingsSetCreateInput): Promise<SettingsSet>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [SettingsSetCreateInput](./terminal.settingssetcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[SettingsSet](./terminal.settingsset.md)<!-- -->&gt;
-

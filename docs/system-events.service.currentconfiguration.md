@@ -9,5 +9,5 @@ the currently selected configuration
 **Signature:**
 
 ```typescript
-currentConfiguration: Configuration;
+currentConfiguration: Configuration
 ```

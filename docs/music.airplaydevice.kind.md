@@ -9,5 +9,5 @@ the kind of the device
 **Signature:**
 
 ```typescript
-kind: string;
+kind: string
 ```

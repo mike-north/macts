@@ -9,5 +9,5 @@ List of columns that are visible. The subject column and the message status colu
 **Signature:**
 
 ```typescript
-visibleColumns: string;
+visibleColumns: string
 ```

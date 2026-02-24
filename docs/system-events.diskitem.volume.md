@@ -9,5 +9,5 @@ the volume on which the disk item resides
 **Signature:**
 
 ```typescript
-volume: string;
+volume: string
 ```

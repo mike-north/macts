@@ -7,21 +7,24 @@
 **Signature:**
 
 ```typescript
-DomainSchema: z.ZodObject<{
-    applicationSupportFolder: z.ZodString;
-    applicationsFolder: z.ZodString;
-    desktopPicturesFolder: z.ZodString;
-    folderActionScriptsFolder: z.ZodString;
-    fontsFolder: z.ZodString;
-    id: z.ZodString;
-    libraryFolder: z.ZodString;
-    name: z.ZodString;
-    preferencesFolder: z.ZodString;
-    scriptingAdditionsFolder: z.ZodString;
-    scriptsFolder: z.ZodString;
-    sharedDocumentsFolder: z.ZodString;
-    speakableItemsFolder: z.ZodString;
-    utilitiesFolder: z.ZodString;
-    workflowsFolder: z.ZodString;
-}, z.core.$strip>
+DomainSchema: z.ZodObject<
+  {
+    applicationSupportFolder: z.ZodString
+    applicationsFolder: z.ZodString
+    desktopPicturesFolder: z.ZodString
+    folderActionScriptsFolder: z.ZodString
+    fontsFolder: z.ZodString
+    id: z.ZodString
+    libraryFolder: z.ZodString
+    name: z.ZodString
+    preferencesFolder: z.ZodString
+    scriptingAdditionsFolder: z.ZodString
+    scriptsFolder: z.ZodString
+    sharedDocumentsFolder: z.ZodString
+    speakableItemsFolder: z.ZodString
+    utilitiesFolder: z.ZodString
+    workflowsFolder: z.ZodString
+  },
+  z.core.$strip
+>
 ```

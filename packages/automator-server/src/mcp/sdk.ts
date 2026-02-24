@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { AutomatorClient, type AutomatorClientOptions } from '@macts/automator';
+import { AutomatorClient, type AutomatorClientOptions } from '@macts/automator'
 
 /**
  * Get a AutomatorClient instance.
@@ -16,32 +16,32 @@ import { AutomatorClient, type AutomatorClientOptions } from '@macts/automator';
  * @throws Error if MACTS_API_KEY is not set
  */
 export function getAutomatorClient(): AutomatorClient {
-  const apiKey = process.env['MACTS_API_KEY'];
+  const apiKey = process.env['MACTS_API_KEY']
 
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
         'Create an API key with: macts api-key create --permissions automator:*:*'
-    );
+    )
   }
 
   const options: AutomatorClientOptions = {
     apiKey,
-  };
-
-  const baseUrl = process.env['MACTS_API_URL'];
-  if (baseUrl) {
-    options.baseUrl = baseUrl;
   }
 
-  return new AutomatorClient(options);
+  const baseUrl = process.env['MACTS_API_URL']
+  if (baseUrl) {
+    options.baseUrl = baseUrl
+  }
+
+  return new AutomatorClient(options)
 }
 
 /**
  * Singleton client instance.
  * Lazily initialized on first use.
  */
-let _client: AutomatorClient | null = null;
+let _client: AutomatorClient | null = null
 
 /**
  * Get or create the singleton AutomatorClient.
@@ -50,8 +50,8 @@ let _client: AutomatorClient | null = null;
  * avoids creating multiple HTTP connections.
  */
 export function getClient(): AutomatorClient {
-  _client ??= getAutomatorClient();
-  return _client;
+  _client ??= getAutomatorClient()
+  return _client
 }
 
 /**
@@ -59,5 +59,5 @@ export function getClient(): AutomatorClient {
  * Useful for testing.
  */
 export function resetClient(): void {
-  _client = null;
+  _client = null
 }

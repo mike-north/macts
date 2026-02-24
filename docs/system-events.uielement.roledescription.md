@@ -9,5 +9,5 @@ a more complete description of the UI element's role
 **Signature:**
 
 ```typescript
-roleDescription: string;
+roleDescription: string
 ```

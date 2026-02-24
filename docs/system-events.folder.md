@@ -9,7 +9,7 @@ A folder in the file system
 **Signature:**
 
 ```typescript
-interface Folder 
+interface Folder
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface Folder
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.folder.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this folder
 
-
 </td></tr>
 </tbody></table>
-

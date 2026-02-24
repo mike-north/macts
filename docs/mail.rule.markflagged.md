@@ -9,5 +9,5 @@ If rule matches, mark message as flagged
 **Signature:**
 
 ```typescript
-markFlagged: boolean;
+markFlagged: boolean
 ```

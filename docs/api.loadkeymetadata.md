@@ -9,11 +9,11 @@ Load all key metadata from storage.
 **Signature:**
 
 ```typescript
-declare function loadKeyMetadata(): ApiKeyMetadata[];
+declare function loadKeyMetadata(): ApiKeyMetadata[]
 ```
+
 **Returns:**
 
 [ApiKeyMetadata](./core.apikeymetadata.md)<!-- -->\[\]
 
 Array of key metadata
-

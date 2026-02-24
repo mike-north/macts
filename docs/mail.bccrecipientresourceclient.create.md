@@ -18,30 +18,24 @@ create(input: BccRecipientCreateInput): Promise<BccRecipient>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[BccRecipient](./mail.bccrecipient.md)<!-- -->&gt;
-

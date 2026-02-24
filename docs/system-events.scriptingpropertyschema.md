@@ -7,14 +7,17 @@
 **Signature:**
 
 ```typescript
-ScriptingPropertySchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    access: z.ZodString;
-    description: z.ZodString;
-    enumerated: z.ZodBoolean;
-    hidden: z.ZodBoolean;
-    kind: z.ZodString;
-    listed: z.ZodBoolean;
-}, z.core.$strip>
+ScriptingPropertySchema: z.ZodObject<
+  {
+    name: z.ZodString
+    id: z.ZodString
+    access: z.ZodString
+    description: z.ZodString
+    enumerated: z.ZodBoolean
+    hidden: z.ZodBoolean
+    kind: z.ZodString
+    listed: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

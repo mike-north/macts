@@ -11,7 +11,7 @@ Open a URL.
 ```typescript
 openURL(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

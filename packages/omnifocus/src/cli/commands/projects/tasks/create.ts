@@ -1,37 +1,62 @@
-import { Command, Option } from 'clipanion';
-import { getClient } from '../../../sdk.js';
-import { createFormatter } from '../../../output/index.js';
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
 
 /**
  * Create a new task.
  */
 export class CreateTaskCommand extends Command {
-  static override paths = [["omnifocus", "projects", "tasks", "create"]];
+  static override paths = [['omnifocus', 'projects', 'tasks', 'create']]
 
   static override usage = Command.Usage({
     description: 'Create a new task',
-  });
+  })
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' });
-  projectId = Option.String('--project-id', { required: true, description: 'Project ID' });
-  name = Option.String('--name', { required: true, description: "The name of the task" });
-  note = Option.String('--note', { required: true, description: "The note of the task" });
-  flagged = Option.Boolean('--flagged', { description: "True if flagged" });
-  deferDate = Option.String('--defer-date', { required: true, description: "When the task should become available for action" });
-  plannedDate = Option.String('--planned-date', { required: true, description: "The date at which work for this task is intended" });
-  dueDate = Option.String('--due-date', { required: true, description: "When the task must be finished" });
-  completionDate = Option.String('--completion-date', { required: true, description: "The task's date of completion" });
-  droppedDate = Option.String('--dropped-date', { required: true, description: "The date the task was dropped" });
-  creationDate = Option.String('--creation-date', { required: true, description: "When the task was created" });
-  estimatedMinutes = Option.String('--estimated-minutes', { required: true, description: "The estimated time, in whole minutes, that this task will take to finish" });
-  sequential = Option.Boolean('--sequential', { description: "If true, any children are sequentially dependent" });
-  completedByChildren = Option.Boolean('--completed-by-children', { description: "If true, complete when children are completed" });
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  projectId = Option.String('--project-id', { required: true, description: 'Project ID' })
+  name = Option.String('--name', { required: true, description: 'The name of the task' })
+  note = Option.String('--note', { required: true, description: 'The note of the task' })
+  flagged = Option.Boolean('--flagged', { description: 'True if flagged' })
+  deferDate = Option.String('--defer-date', {
+    required: true,
+    description: 'When the task should become available for action',
+  })
+  plannedDate = Option.String('--planned-date', {
+    required: true,
+    description: 'The date at which work for this task is intended',
+  })
+  dueDate = Option.String('--due-date', {
+    required: true,
+    description: 'When the task must be finished',
+  })
+  completionDate = Option.String('--completion-date', {
+    required: true,
+    description: "The task's date of completion",
+  })
+  droppedDate = Option.String('--dropped-date', {
+    required: true,
+    description: 'The date the task was dropped',
+  })
+  creationDate = Option.String('--creation-date', {
+    required: true,
+    description: 'When the task was created',
+  })
+  estimatedMinutes = Option.String('--estimated-minutes', {
+    required: true,
+    description: 'The estimated time, in whole minutes, that this task will take to finish',
+  })
+  sequential = Option.Boolean('--sequential', {
+    description: 'If true, any children are sequentially dependent',
+  })
+  completedByChildren = Option.Boolean('--completed-by-children', {
+    description: 'If true, complete when children are completed',
+  })
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false);
+    const formatter = createFormatter(this.json ?? false)
 
     try {
-      const client = getClient();
+      const client = getClient()
       const item = await client.tasks.create({
         name: this.name,
         note: this.note,
@@ -45,7 +70,7 @@ export class CreateTaskCommand extends Command {
         estimatedMinutes: this.estimatedMinutes,
         sequential: this.sequential,
         completedByChildren: this.completedByChildren,
-      } as Record<string, unknown>);
+      } as Record<string, unknown>)
 
       const output = formatter.format({
         message: 'Task created successfully',
@@ -76,14 +101,14 @@ export class CreateTaskCommand extends Command {
         numberOfTasks: item.numberOfTasks,
         numberOfAvailableTasks: item.numberOfAvailableTasks,
         numberOfCompletedTasks: item.numberOfCompletedTasks,
-      });
+      })
 
-      this.context.stdout.write(output + '\n');
-      return 0;
+      this.context.stdout.write(output + '\n')
+      return 0
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      this.context.stderr.write(formatter.formatError(message) + '\n');
-      return 1;
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
     }
   }
 }

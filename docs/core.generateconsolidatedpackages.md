@@ -11,7 +11,10 @@ The client package combines SDK + CLI into `@macts/{app}`<!-- -->. The server pa
 **Signature:**
 
 ```typescript
-declare function generateConsolidatedPackages(manifest: AppManifest, options: GenerateConsolidatedOptions): GenerateConsolidatedResult;
+declare function generateConsolidatedPackages(
+  manifest: AppManifest,
+  options: GenerateConsolidatedOptions
+): GenerateConsolidatedResult
 ```
 
 ## Parameters
@@ -20,48 +23,39 @@ declare function generateConsolidatedPackages(manifest: AppManifest, options: Ge
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 manifest
 
-
 </td><td>
 
 [AppManifest](./core.appmanifest.md)
 
-
 </td><td>
 
 The app manifest
-
 
 </td></tr>
 <tr><td>
 
 options
 
-
 </td><td>
 
 [GenerateConsolidatedOptions](./core.generateconsolidatedoptions.md)
 
-
 </td><td>
 
 Generation options
-
 
 </td></tr>
 </tbody></table>
@@ -71,4 +65,3 @@ Generation options
 [GenerateConsolidatedResult](./core.generateconsolidatedresult.md)
 
 Generated files for both packages
-

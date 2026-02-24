@@ -9,5 +9,5 @@ Package name (e.g., '<!-- -->@<!-- -->macts/api-calendar')
 **Signature:**
 
 ```typescript
-packageName: string;
+packageName: string
 ```

@@ -7,15 +7,18 @@
 **Signature:**
 
 ```typescript
-DiskSchema: z.ZodObject<{
-    id: z.ZodNumber;
-    capacity: z.ZodNumber;
-    freeSpace: z.ZodNumber;
-    ejectable: z.ZodBoolean;
-    localVolume: z.ZodBoolean;
-    startup: z.ZodBoolean;
-    format: z.ZodString;
-    journalingEnabled: z.ZodBoolean;
-    ignorePrivileges: z.ZodBoolean;
-}, z.core.$strip>
+DiskSchema: z.ZodObject<
+  {
+    id: z.ZodNumber
+    capacity: z.ZodNumber
+    freeSpace: z.ZodNumber
+    ejectable: z.ZodBoolean
+    localVolume: z.ZodBoolean
+    startup: z.ZodBoolean
+    format: z.ZodString
+    journalingEnabled: z.ZodBoolean
+    ignorePrivileges: z.ZodBoolean
+  },
+  z.core.$strip
+>
 ```

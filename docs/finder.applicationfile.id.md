@@ -9,5 +9,5 @@ the bundle identifier or creator type of the application
 **Signature:**
 
 ```typescript
-id: string;
+id: string
 ```

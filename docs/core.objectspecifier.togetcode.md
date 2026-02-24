@@ -11,7 +11,7 @@ Generate JXA code to get the value.
 ```typescript
 toGetCode(): string;
 ```
+
 **Returns:**
 
 string
-

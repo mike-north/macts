@@ -11,7 +11,7 @@ List all settingssets.
 ```typescript
 list(): Promise<SettingsSet[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[SettingsSet](./terminal.settingsset.md)<!-- -->\[\]&gt;
-

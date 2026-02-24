@@ -9,5 +9,5 @@ If rule matches, move to this mailbox
 **Signature:**
 
 ```typescript
-moveMessage: Mailbox;
+moveMessage: Mailbox
 ```

@@ -11,7 +11,7 @@ List all events.
 ```typescript
 list(): Promise<Event[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Event](./calendar.event_2.md)<!-- -->\[\]&gt;
-

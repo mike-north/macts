@@ -11,7 +11,7 @@ List all domains.
 ```typescript
 list(): Promise<Domain[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Domain](./system-events.domain.md)<!-- -->\[\]&gt;
-

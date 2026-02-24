@@ -9,7 +9,7 @@ Client for a notes account.
 **Signature:**
 
 ```typescript
-declare class AccountResourceClient 
+declare class AccountResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class AccountResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./notes.accountresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `AccountResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `AccountResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./notes.accountresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new account.
-
 
 </td></tr>
 <tr><td>
 
 [delete(name)](./notes.accountresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a account.
-
 
 </td></tr>
 <tr><td>
 
 [get(name)](./notes.accountresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a account by name.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./notes.accountresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all accounts.
-
 
 </td></tr>
 <tr><td>
 
 [update(name, input)](./notes.accountresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing account.
 
-
 </td></tr>
 </tbody></table>
-

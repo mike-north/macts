@@ -9,5 +9,5 @@ If rule matches, apply this color
 **Signature:**
 
 ```typescript
-colorMessage: string;
+colorMessage: string
 ```

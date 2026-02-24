@@ -9,7 +9,7 @@ A file containing an internet location
 **Signature:**
 
 ```typescript
-interface InternetLocationFile 
+interface InternetLocationFile
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface InternetLocationFile
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [location](./finder.internetlocationfile.location.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 the internet location
 
-
 </td></tr>
 </tbody></table>
-

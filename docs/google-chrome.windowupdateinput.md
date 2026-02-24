@@ -9,7 +9,7 @@ Input for updating a Window
 **Signature:**
 
 ```typescript
-type WindowUpdateInput = Partial<WindowCreateInput>;
+type WindowUpdateInput = Partial<WindowCreateInput>
 ```
-**References:** [WindowCreateInput](./google-chrome.windowcreateinput.md)
 
+**References:** [WindowCreateInput](./google-chrome.windowcreateinput.md)

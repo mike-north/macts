@@ -9,7 +9,7 @@ A progress indicator belonging to a window
 **Signature:**
 
 ```typescript
-interface ProgressIndicator 
+interface ProgressIndicator
 ```
 
 ## Properties
@@ -18,41 +18,32 @@ interface ProgressIndicator
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [id](./system-events.progressindicator.id.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 Unique identifier for this progress indicator
 
-
 </td></tr>
 </tbody></table>
-

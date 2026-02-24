@@ -18,30 +18,24 @@ create(input: BrowserWindowCreateInput): Promise<BrowserWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [BrowserWindowCreateInput](./music.browserwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[BrowserWindow](./music.browserwindow.md)<!-- -->&gt;
-

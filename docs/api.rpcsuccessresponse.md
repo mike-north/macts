@@ -9,7 +9,7 @@ RPC success response structure.
 **Signature:**
 
 ```typescript
-interface RpcSuccessResponse<T = unknown> 
+interface RpcSuccessResponse<T = unknown>
 ```
 
 ## Properties
@@ -18,39 +18,30 @@ interface RpcSuccessResponse<T = unknown>
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [result](./api.rpcsuccessresponse.result.md)
 
-
 </td><td>
-
 
 </td><td>
 
 T
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
-

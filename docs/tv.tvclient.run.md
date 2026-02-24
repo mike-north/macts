@@ -11,7 +11,7 @@ Run the application
 ```typescript
 run(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

@@ -9,7 +9,7 @@ Input for creating a YahooHandle
 **Signature:**
 
 ```typescript
-interface YahooHandleCreateInput 
+interface YahooHandleCreateInput
 ```
 
 ## Properties
@@ -18,60 +18,47 @@ interface YahooHandleCreateInput
 
 Property
 
-
 </th><th>
 
 Modifiers
-
 
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [label?](./contacts.yahoohandlecreateinput.label.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ Label for this handle
-
 
 </td></tr>
 <tr><td>
 
 [value?](./contacts.yahoohandlecreateinput.value.md)
 
-
 </td><td>
-
 
 </td><td>
 
 string
 
-
 </td><td>
 
 _(Optional)_ The Yahoo handle value
 
-
 </td></tr>
 </tbody></table>
-

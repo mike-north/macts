@@ -9,5 +9,5 @@ Duration string format for expiration. Examples: "30d", "1h", "2w", "6m"
 **Signature:**
 
 ```typescript
-type DurationString = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'}`;
+type DurationString = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'}`
 ```

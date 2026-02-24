@@ -9,7 +9,7 @@ Client for a drawer that may be extended from a window.
 **Signature:**
 
 ```typescript
-declare class DrawerResourceClient 
+declare class DrawerResourceClient
 ```
 
 ## Constructors
@@ -18,30 +18,24 @@ declare class DrawerResourceClient
 
 Constructor
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [(constructor)(http, app, resource)](./system-events.drawerresourceclient._constructor_.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Constructs a new instance of the `DrawerResourceClient` class
-
 
 </td></tr>
 </tbody></table>
@@ -52,87 +46,68 @@ Constructs a new instance of the `DrawerResourceClient` class
 
 Method
 
-
 </th><th>
 
 Modifiers
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [create(input)](./system-events.drawerresourceclient.create.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Create a new drawer.
-
 
 </td></tr>
 <tr><td>
 
 [delete(id)](./system-events.drawerresourceclient.delete.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Delete a drawer.
-
 
 </td></tr>
 <tr><td>
 
 [get(id)](./system-events.drawerresourceclient.get.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Get a drawer by id.
-
 
 </td></tr>
 <tr><td>
 
 [list()](./system-events.drawerresourceclient.list.md)
 
-
 </td><td>
-
 
 </td><td>
 
 List all drawers.
-
 
 </td></tr>
 <tr><td>
 
 [update(id, input)](./system-events.drawerresourceclient.update.md)
 
-
 </td><td>
-
 
 </td><td>
 
 Update an existing drawer.
 
-
 </td></tr>
 </tbody></table>
-

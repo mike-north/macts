@@ -9,7 +9,7 @@ Input for updating a ListViewOptions
 **Signature:**
 
 ```typescript
-type ListViewOptionsUpdateInput = Partial<ListViewOptionsCreateInput>;
+type ListViewOptionsUpdateInput = Partial<ListViewOptionsCreateInput>
 ```
-**References:** [ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)
 
+**References:** [ListViewOptionsCreateInput](./finder.listviewoptionscreateinput.md)

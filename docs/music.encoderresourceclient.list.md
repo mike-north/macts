@@ -11,7 +11,7 @@ List all encoders.
 ```typescript
 list(): Promise<Encoder[]>;
 ```
+
 **Returns:**
 
 Promise&lt;[Encoder](./music.encoder.md)<!-- -->\[\]&gt;
-

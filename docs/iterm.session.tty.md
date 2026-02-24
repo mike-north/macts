@@ -9,5 +9,5 @@ The tty property
 **Signature:**
 
 ```typescript
-tty: string;
+tty: string
 ```

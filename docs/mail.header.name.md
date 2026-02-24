@@ -9,5 +9,5 @@ Name of the header value
 **Signature:**
 
 ```typescript
-name: string;
+name: string
 ```

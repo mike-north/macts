@@ -11,7 +11,7 @@ Tell the application to reload all calendar files contents
 ```typescript
 reloadCalendars(): Promise<void>;
 ```
+
 **Returns:**
 
 Promise&lt;void&gt;
-

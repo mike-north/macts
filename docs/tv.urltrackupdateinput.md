@@ -9,7 +9,7 @@ Input for updating a URLTrack
 **Signature:**
 
 ```typescript
-type URLTrackUpdateInput = Partial<URLTrackCreateInput>;
+type URLTrackUpdateInput = Partial<URLTrackCreateInput>
 ```
-**References:** [URLTrackCreateInput](./tv.urltrackcreateinput.md)
 
+**References:** [URLTrackCreateInput](./tv.urltrackcreateinput.md)

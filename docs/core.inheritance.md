@@ -7,7 +7,7 @@
 **Signature:**
 
 ```typescript
-type Inheritance = z.infer<typeof InheritanceSchema>;
+type Inheritance = z.infer<typeof InheritanceSchema>
 ```
-**References:** [InheritanceSchema](./core.inheritanceschema.md)
 
+**References:** [InheritanceSchema](./core.inheritanceschema.md)

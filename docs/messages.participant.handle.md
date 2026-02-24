@@ -9,5 +9,5 @@ The participant's handle.
 **Signature:**
 
 ```typescript
-handle: string;
+handle: string
 ```

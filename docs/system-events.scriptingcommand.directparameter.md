@@ -9,5 +9,5 @@ The direct parameter of the command
 **Signature:**
 
 ```typescript
-directParameter: unknown;
+directParameter: unknown
 ```

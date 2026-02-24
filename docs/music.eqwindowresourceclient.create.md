@@ -18,30 +18,24 @@ create(input: EQWindowCreateInput): Promise<EQWindow>;
 
 Parameter
 
-
 </th><th>
 
 Type
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 input
 
-
 </td><td>
 
 [EQWindowCreateInput](./music.eqwindowcreateinput.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>
@@ -49,4 +43,3 @@ input
 **Returns:**
 
 Promise&lt;[EQWindow](./music.eqwindow.md)<!-- -->&gt;
-

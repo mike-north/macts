@@ -9,5 +9,5 @@ The (POSIX) path to the sound file to be used for the alarm
 **Signature:**
 
 ```typescript
-soundFile: string;
+soundFile: string
 ```
