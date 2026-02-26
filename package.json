@@ -8,6 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "clean": "nx reset && rm -rf packages/*/dist packages/*/temp packages/*/*.tsbuildinfo .nx/cache",
     "build": "nx run-many -t build",
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",

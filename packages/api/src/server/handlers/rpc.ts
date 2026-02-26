@@ -358,13 +358,14 @@ async function executeResourceCommand(
       return result;
     `
   } else if (command.name === 'get') {
-    // Get by ID: app.calendars.byId(id)
+    // Get by ID: app.calendars.byId(calendarIdentifier)
+    const idParam = command.parameters.find((p) => p.required)?.name ?? 'id'
     const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
 
     code = `
       ${paramAssignments}
       // Get ${resource?.name ?? 'item'} by ID
-      var item = app.${resourcePlural}.byId(id);
+      var item = app.${resourcePlural}.byId(${idParam});
       var obj = {};
       ${propNames.map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`).join('\n      ')}
       return obj;
@@ -397,6 +398,16 @@ async function executeResourceCommand(
         return item.properties();
       `
     }
+  } else if (command.name === 'delete') {
+    // Delete: app.calendars.byId(id).delete()
+    const idParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+
+    code = `
+      ${paramAssignments}
+      // Delete ${resource?.name ?? 'item'} by ID
+      app.${resourcePlural}.byId(${idParam}).delete();
+      return undefined;
+    `
   } else {
     // Generic command execution
     const paramObj = command.parameters

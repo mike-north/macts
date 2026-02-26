@@ -410,7 +410,7 @@ commands:
     resourceType: Calendar
     code: getd
     parameters:
-      - name: id
+      - name: calendarIdentifier
         type: string
         description: Calendar identifier
         required: true
@@ -454,7 +454,7 @@ commands:
     resourceType: Event
     code: getd
     parameters:
-      - name: id
+      - name: uid
         type: string
         description: Event identifier
         required: true
@@ -496,6 +496,32 @@ commands:
         description: Whether this is an all-day event
         required: false
     permission: calendar:events:create
+
+  deleteCalendar:
+    name: delete
+    description: Delete a calendar
+    scope: resource
+    resourceType: Calendar
+    code: dele
+    parameters:
+      - name: calendarIdentifier
+        type: string
+        description: Calendar identifier
+        required: true
+    permission: calendar:calendars:delete
+
+  deleteEvent:
+    name: delete
+    description: Delete an event
+    scope: resource
+    resourceType: Event
+    code: dele
+    parameters:
+      - name: uid
+        type: string
+        description: Event identifier
+        required: true
+    permission: calendar:events:delete
 
   reloadCalendars:
     name: reloadCalendars

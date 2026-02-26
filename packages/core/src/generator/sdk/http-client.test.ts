@@ -275,6 +275,68 @@ describe('generateHttpClientSdk', () => {
     expect(content).toContain("export { ItemResourceClient } from './resources/item.js'")
   })
 
+  it('uses non-id primary identifier for get/delete/update methods', () => {
+    const calendarManifest: AppManifest = {
+      version: '1.0',
+      app: {
+        name: 'Calendar',
+        bundleId: 'com.apple.iCal',
+        tccEntitlements: ['automation'],
+      },
+      resources: {
+        Calendar: {
+          name: 'Calendar',
+          plural: 'Calendars',
+          description: 'A calendar',
+          properties: {
+            name: { access: 'rw', type: 'string', description: 'Name', optional: false },
+            calendarIdentifier: {
+              access: 'r',
+              type: 'string',
+              description: 'Unique ID',
+              optional: false,
+            },
+          },
+          identifiers: [{ property: 'calendarIdentifier', primary: true }],
+        },
+      },
+      enums: {},
+      hierarchy: {
+        children: {
+          calendars: { resource: 'Calendar', access: 'rw' },
+        },
+      },
+      commands: {},
+      suites: [],
+      relationships: [],
+    }
+
+    const result = generateHttpClientSdk(calendarManifest, {
+      packageName: '@macts/calendar',
+    })
+
+    const resourceFile = findFile(result.files, 'src/resources/calendar.ts')
+    const content = resourceFile.content
+
+    // Should use calendarIdentifier, not id
+    expect(content).toContain(
+      'async get(calendarIdentifier: string): Promise<Calendar>'
+    )
+    expect(content).toContain(
+      'async delete(calendarIdentifier: string): Promise<void>'
+    )
+    expect(content).toContain(
+      'async update(calendarIdentifier: string, input: CalendarUpdateInput): Promise<Calendar>'
+    )
+
+    // RPC calls should pass calendarIdentifier
+    expect(content).toContain('{ calendarIdentifier }')
+
+    // Should NOT use 'id' as the parameter name
+    expect(content).not.toContain('async get(id: string)')
+    expect(content).not.toContain('async delete(id: string)')
+  })
+
   it('uses custom base URL and port', () => {
     const result = generateHttpClientSdk(testManifest, {
       packageName: '@macts/sdk-testapp',

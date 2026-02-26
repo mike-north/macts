@@ -1,52 +1,37 @@
-import { Command, Option } from 'clipanion'
-import * as t from 'typanion'
-import { getClient } from '../../../sdk.js'
-import { createFormatter } from '../../../output/index.js'
+import { Command, Option } from 'clipanion';
+import * as t from 'typanion';
+import { getClient } from '../../../sdk.js';
+import { createFormatter } from '../../../output/index.js';
 
 /**
  * Create a new event.
  */
 export class CreateEventCommand extends Command {
-  static override paths = [['calendar', 'calendars', 'events', 'create']]
+  static override paths = [["calendar", "calendars", "events", "create"]];
 
   static override usage = Command.Usage({
     description: 'Create a new event',
-  })
+  });
 
-  json = Option.Boolean('--json', { description: 'Output as JSON' })
-  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
-  summary = Option.String('--summary', { required: true, description: 'The event summary/title' })
-  description = Option.String('--description', { required: true, description: 'The event notes' })
-  location = Option.String('--location', { required: true, description: 'The event location' })
-  startDate = Option.String('--start-date', { required: true, description: 'The event start date' })
-  endDate = Option.String('--end-date', { required: true, description: 'The event end date' })
-  alldayEvent = Option.Boolean('--allday-event', {
-    description: 'True if the event is an all-day event',
-  })
-  recurrence = Option.String('--recurrence', {
-    required: true,
-    description: 'The iCalendar (RFC 2445) string describing the event recurrence, if defined',
-  })
-  status = Option.String('--status', {
-    required: true,
-    description: 'The event status',
-    validator: t.isEnum(['cancelled', 'confirmed', 'none', 'tentative']),
-  })
-  stampDate = Option.String('--stamp-date', {
-    required: true,
-    description: 'The event modification date',
-  })
-  excludedDates = Option.String('--excluded-dates', {
-    required: true,
-    description: 'The exception dates for recurring events',
-  })
-  url = Option.String('--url', { required: true, description: 'The URL associated with the event' })
+  json = Option.Boolean('--json', { description: 'Output as JSON' });
+  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' });
+  summary = Option.String('--summary', { required: true, description: "The event summary/title" });
+  description = Option.String('--description', { required: true, description: "The event notes" });
+  location = Option.String('--location', { required: true, description: "The event location" });
+  startDate = Option.String('--start-date', { required: true, description: "The event start date" });
+  endDate = Option.String('--end-date', { required: true, description: "The event end date" });
+  alldayEvent = Option.Boolean('--allday-event', { description: "True if the event is an all-day event" });
+  recurrence = Option.String('--recurrence', { required: true, description: "The iCalendar (RFC 2445) string describing the event recurrence, if defined" });
+  status = Option.String('--status', { required: true, description: "The event status", validator: t.isEnum(["cancelled", "confirmed", "none", "tentative"]) });
+  stampDate = Option.String('--stamp-date', { required: true, description: "The event modification date" });
+  excludedDates = Option.String('--excluded-dates', { required: true, description: "The exception dates for recurring events" });
+  url = Option.String('--url', { required: true, description: "The URL associated with the event" });
 
   async execute(): Promise<number> {
-    const formatter = createFormatter(this.json ?? false)
+    const formatter = createFormatter(this.json ?? false);
 
     try {
-      const client = getClient()
+      const client = getClient();
       const item = await client.events.create({
         summary: this.summary,
         description: this.description,
@@ -59,7 +44,7 @@ export class CreateEventCommand extends Command {
         stampDate: this.stampDate,
         excludedDates: this.excludedDates,
         url: this.url,
-      } as Record<string, unknown>)
+      } as Record<string, unknown>);
 
       const output = formatter.format({
         message: 'Event created successfully',
@@ -76,14 +61,14 @@ export class CreateEventCommand extends Command {
         excludedDates: item.excludedDates,
         uid: item.uid,
         url: item.url,
-      })
+      });
 
-      this.context.stdout.write(output + '\n')
-      return 0
+      this.context.stdout.write(output + '\n');
+      return 0;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      this.context.stderr.write(formatter.formatError(message) + '\n')
-      return 1
+      const message = error instanceof Error ? error.message : String(error);
+      this.context.stderr.write(formatter.formatError(message) + '\n');
+      return 1;
     }
   }
 }
