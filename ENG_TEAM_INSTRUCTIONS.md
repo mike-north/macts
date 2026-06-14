@@ -21,9 +21,15 @@ governability at the same time.
 
 ## 2. How work reaches you
 
-- Work is dispatched as **GitHub issues**. Each issue states scope, acceptance
-  criteria, dependencies, and whether it is **greenlit** or **backlog**. Only
-  start greenlit issues.
+- Work is dispatched as **GitHub issues**.
+- **Triage rule (hard):** only start issues labeled **`greenlit`**. An issue
+  labeled **`backlog`**, or carrying no `greenlit` label at all (e.g. a bare
+  `bug`/`enhancement`), is **not ready** — do not start it, even if no greenlit
+  work remains. Promotion to `greenlit` is the PM's decision, not engineering's;
+  if you believe something should be promoted, say so in the issue and wait.
+- Among greenlit issues, take any labeled **`priority:next`** first; otherwise
+  oldest-first. Skip issues already labeled `in progress` / `in review` /
+  `blocked` (those are claimed or held).
 - If an issue is ambiguous, under-specified, or you discover it conflicts with
   another in-flight issue, **stop and ask in the issue thread** before building.
   Do not guess at product intent.
