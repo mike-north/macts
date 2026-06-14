@@ -1,0 +1,40 @@
+{
+  "name": "@macts-bench/efficiency",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Efficiency benchmark harness: structured macts automation vs. raw computer-use",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "macts-bench": "./dist/bin/bench.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "bench": "tsx src/bin/bench.ts",
+    "lint": "eslint src test",
+    "test": "vitest run",
+    "test:local": "vitest run --dir test/local",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "tsup": "catalog:",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
