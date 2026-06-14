@@ -194,6 +194,12 @@ running macts API server, and no model credentials, so the harness cannot produc
 real token/round-trip/reliability numbers. The committed harness deliberately
 reports failures-pending-live-environment rather than fabricated figures.
 
+**Scope of this PR:** this change delivers the benchmark harness only. Recording
+real baseline numbers requires a live Mac run with the target apps and API
+credentials, and is tracked as a follow-up — this PR and its associated issue
+should not be considered complete until that live run is performed and its
+findings are recorded here.
+
 What the harness already encodes as the structural hypothesis to be confirmed by
 a live run:
 
@@ -212,7 +218,3 @@ a live run:
 These are hypotheses the harness exists to **measure**, not claims. Run the live
 benchmark to fill in the numbers, and record the finding (including any task where
 macts does **not** yet win — that is a product signal, not a failure).
-
-```
-
-```
