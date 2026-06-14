@@ -30,7 +30,7 @@ import { LiveEnvironmentError } from './environment.js'
 import { UsageMeter } from './agent.js'
 import type { TurnUsage } from './agent.js'
 import type { LiveConfig } from './environment.js'
-import type { RunContext, RunMetrics, Runner, TaskDefinition } from '../types.js'
+import type { RunContext, RunMetrics, RunOutcome, Runner, TaskDefinition } from '../types.js'
 
 /**
  * The result of executing a task's composed capability script against the live
@@ -87,7 +87,7 @@ export class MactsRunner implements Runner {
     this.#deps = deps
   }
 
-  async run(context: RunContext): Promise<RunMetrics> {
+  async run(context: RunContext): Promise<RunOutcome> {
     const deps = this.#deps
     if (!deps) {
       throw new LiveEnvironmentError(
@@ -102,7 +102,7 @@ export class MactsRunner implements Runner {
    * The single-turn composition: one planning turn, then one composed execution
    * of N typed operations. Factored out so it is independently testable.
    */
-  async #compose(deps: MactsRunnerDeps, context: RunContext): Promise<RunMetrics> {
+  async #compose(deps: MactsRunnerDeps, context: RunContext): Promise<RunOutcome> {
     const start = Date.now()
     const meter = new UsageMeter()
 
@@ -114,32 +114,40 @@ export class MactsRunner implements Runner {
     const script = deps.scripts.get(context.task.id)
     if (!script) {
       return {
-        totalTokens: meter.totalTokens,
-        turns: meter.turns,
-        wallClockMs: Math.max(0, Date.now() - start),
-        success: false,
-        retries: 0,
+        metrics: {
+          totalTokens: meter.totalTokens,
+          turns: meter.turns,
+          wallClockMs: Math.max(0, Date.now() - start),
+          success: false,
+          retries: 0,
+        },
+        failureReason: `No composed script registered for task "${context.task.id}"`,
       }
     }
 
     let retries = 0
     let success = false
+    let lastReason: string | undefined
     for (;;) {
       const result = await script(deps.config, context.task)
       if (result.success) {
         success = true
         break
       }
+      lastReason = result.reason
       if (retries >= context.maxRetries) break
       retries += 1
     }
 
-    return {
+    const metrics: RunMetrics = {
       totalTokens: meter.totalTokens,
       turns: meter.turns,
       wallClockMs: Math.max(0, Date.now() - start),
       success,
       retries,
     }
+    if (success) return { metrics }
+    if (lastReason !== undefined) return { metrics, failureReason: lastReason }
+    return { metrics }
   }
 }

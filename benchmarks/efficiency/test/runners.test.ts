@@ -93,7 +93,7 @@ describe('RawComputerUseRunner', () => {
     }
 
     const runner = new RawComputerUseRunner({ driver, screen, maxTurns: 40 })
-    const metrics = await runner.run(context())
+    const { metrics } = await runner.run(context())
 
     expect(metrics.success).toBe(true)
     expect(metrics.turns).toBe(2) // two model round-trips
@@ -115,7 +115,7 @@ describe('RawComputerUseRunner', () => {
       perform: () => Promise.resolve(),
     }
     const runner = new RawComputerUseRunner({ driver, screen, maxTurns: 3 })
-    const metrics = await runner.run(context())
+    const { metrics } = await runner.run(context())
 
     expect(metrics.success).toBe(false)
     expect(metrics.turns).toBe(3) // capped
@@ -141,7 +141,7 @@ describe('MactsRunner', () => {
       planningUsage,
     })
 
-    const metrics = await runner.run(context())
+    const { metrics } = await runner.run(context())
 
     expect(metrics.success).toBe(true)
     expect(metrics.turns).toBe(1) // ONE round-trip, regardless of op count
@@ -156,10 +156,12 @@ describe('MactsRunner', () => {
       scripts: new Map(),
       planningUsage,
     })
-    const metrics = await runner.run(context())
+    const { metrics, failureReason } = await runner.run(context())
     expect(metrics.success).toBe(false)
     expect(metrics.retries).toBe(0)
     expect(metrics.turns).toBe(1) // the planning turn still counts
+    // The runner surfaces a diagnostic rather than a generic harness message.
+    expect(failureReason).toContain('t1')
   })
 
   // The composed script may fail transiently; the runner retries to the bound.
@@ -174,11 +176,13 @@ describe('MactsRunner', () => {
       scripts: new Map([['t1', script]]),
       planningUsage,
     })
-    const metrics = await runner.run(context(2))
+    const { metrics, failureReason } = await runner.run(context(2))
 
     expect(metrics.success).toBe(false)
     expect(metrics.retries).toBe(2)
     expect(attempts).toBe(3) // initial + 2 retries
+    // The last script reason is propagated so the report is actionable.
+    expect(failureReason).toBe('event not found')
   })
 
   it('succeeds on a retry after a transient failure', async () => {
@@ -192,10 +196,11 @@ describe('MactsRunner', () => {
       scripts: new Map([['t1', script]]),
       planningUsage,
     })
-    const metrics = await runner.run(context(2))
+    const { metrics, failureReason } = await runner.run(context(2))
 
     expect(metrics.success).toBe(true)
     expect(metrics.retries).toBe(1)
     expect(attempts).toBe(2)
+    expect(failureReason).toBeUndefined()
   })
 })

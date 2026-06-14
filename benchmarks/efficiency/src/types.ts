@@ -123,6 +123,21 @@ export interface RunContext {
 }
 
 /**
+ * The return value of {@link Runner.run}: measured metrics plus an optional
+ * per-task failure reason that runners can supply on a non-throwing failure.
+ *
+ * @remarks
+ * Separating the failure reason from {@link RunMetrics} keeps the metrics
+ * schema clean (purely numeric) while letting runners surface diagnostic
+ * messages (e.g. a composed-script error) that make reports more actionable.
+ */
+export interface RunOutcome {
+  readonly metrics: RunMetrics
+  /** Present only when `metrics.success` is `false`. */
+  readonly failureReason?: string
+}
+
+/**
  * A pluggable execution path. Implementations measure their own token/turn cost
  * and report it; the harness only orchestrates and scores.
  *
@@ -136,12 +151,12 @@ export interface Runner {
   /** Which path this runner represents — labels the captured metrics. */
   readonly kind: RunnerKind
   /**
-   * Execute the task and return measured metrics. Implementations should
-   * resolve (not reject) on task failure, recording `success: false` and a
-   * `failureReason`; a thrown error is treated by the harness as an
-   * infrastructure failure (see {@link runTask}).
+   * Execute the task and return a {@link RunOutcome}. Implementations should
+   * resolve (not reject) on task failure, returning `metrics.success: false`
+   * and an optional `failureReason` for diagnostics. A thrown error is treated
+   * by the harness as an infrastructure failure (see {@link runTask}).
    */
-  run(context: RunContext): Promise<RunMetrics>
+  run(context: RunContext): Promise<RunOutcome>
 }
 
 /**

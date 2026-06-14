@@ -11,11 +11,16 @@
  * @packageDocumentation
  */
 
-import type { RunContext, RunMetrics, Runner, RunnerKind } from '../types.js'
+import type { RunContext, RunMetrics, RunOutcome, Runner, RunnerKind } from '../types.js'
 
 /** A scripted outcome for one task id: either metrics to return or an error to throw. */
 export type ScriptedOutcome =
-  | { readonly kind: 'metrics'; readonly metrics: RunMetrics }
+  | {
+      readonly kind: 'metrics'
+      readonly metrics: RunMetrics
+      /** Optional failure reason to include in the returned {@link RunOutcome}. */
+      readonly failureReason?: string
+    }
   | { readonly kind: 'throw'; readonly error: Error }
 
 /**
@@ -30,7 +35,7 @@ export class ScriptedRunner implements Runner {
     this.#outcomes = outcomes
   }
 
-  run(context: RunContext): Promise<RunMetrics> {
+  run(context: RunContext): Promise<RunOutcome> {
     const outcome = this.#outcomes.get(context.task.id)
     if (!outcome) {
       return Promise.reject(
@@ -40,6 +45,10 @@ export class ScriptedRunner implements Runner {
     if (outcome.kind === 'throw') {
       return Promise.reject(outcome.error)
     }
-    return Promise.resolve(outcome.metrics)
+    const runOutcome: RunOutcome =
+      outcome.failureReason !== undefined
+        ? { metrics: outcome.metrics, failureReason: outcome.failureReason }
+        : { metrics: outcome.metrics }
+    return Promise.resolve(runOutcome)
   }
 }

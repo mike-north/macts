@@ -18,7 +18,7 @@
 import { LiveEnvironmentError } from './environment.js'
 import { UsageMeter } from './agent.js'
 import type { ModelDriver } from './agent.js'
-import type { RunContext, RunMetrics, Runner } from '../types.js'
+import type { RunContext, RunOutcome, Runner } from '../types.js'
 
 /**
  * Captures the screen and performs pixel-level input. The real implementation
@@ -59,7 +59,7 @@ export class RawComputerUseRunner implements Runner {
     this.#deps = deps
   }
 
-  async run(context: RunContext): Promise<RunMetrics> {
+  async run(context: RunContext): Promise<RunOutcome> {
     const deps = this.#deps
     if (!deps) {
       throw new LiveEnvironmentError(
@@ -71,7 +71,7 @@ export class RawComputerUseRunner implements Runner {
   }
 
   /** The screenshot → act loop, factored out so it is independently testable. */
-  async #drive(deps: RawComputerUseDeps, context: RunContext): Promise<RunMetrics> {
+  async #drive(deps: RawComputerUseDeps, context: RunContext): Promise<RunOutcome> {
     const start = Date.now()
     const meter = new UsageMeter()
     let retries = 0
@@ -99,11 +99,13 @@ export class RawComputerUseRunner implements Runner {
     }
 
     return {
-      totalTokens: meter.totalTokens,
-      turns: meter.turns,
-      wallClockMs: Math.max(0, Date.now() - start),
-      success,
-      retries,
+      metrics: {
+        totalTokens: meter.totalTokens,
+        turns: meter.turns,
+        wallClockMs: Math.max(0, Date.now() - start),
+        success,
+        retries,
+      },
     }
   }
 }

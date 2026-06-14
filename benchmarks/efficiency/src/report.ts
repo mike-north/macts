@@ -117,6 +117,14 @@ function renderHeadline(comparison: Comparison | null): string {
   return `${tokenPart}; ${turnPart}; ${reliabilityPart}. A ratio above 1x means the structured macts path is cheaper.`
 }
 
+/**
+ * Sanitize a string for safe interpolation into a markdown table cell.
+ * Pipes break the cell boundary; newlines break the row. Both are escaped.
+ */
+function tableCell(value: string): string {
+  return value.replace(/\|/g, '\\|').replace(/\r?\n|\r/g, ' ')
+}
+
 /** Render one markdown row per (task, runner) result. */
 function renderPerTaskTable(results: readonly TaskResult[]): string {
   const header = md`
@@ -127,8 +135,10 @@ function renderPerTaskTable(results: readonly TaskResult[]): string {
   const rows = results.map((r) => {
     const m = r.metrics
     const success = m.success ? 'yes' : 'no'
-    const failure = r.failureReason ?? ''
-    return `| ${r.taskId} | ${r.runner} | ${success} | ${String(m.totalTokens)} | ${String(
+    const failure = r.failureReason !== undefined ? tableCell(r.failureReason) : ''
+    const taskId = tableCell(r.taskId)
+    const runner = tableCell(r.runner)
+    return `| ${taskId} | ${runner} | ${success} | ${String(m.totalTokens)} | ${String(
       m.turns
     )} | ${String(m.retries)} | ${String(m.wallClockMs)} | ${failure} |`
   })

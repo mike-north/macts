@@ -10,7 +10,7 @@
  */
 
 import { buildReport } from './report.js'
-import type { BenchmarkReport, Runner, TaskDefinition, TaskResult } from './types.js'
+import type { BenchmarkReport, RunOutcome, Runner, TaskDefinition, TaskResult } from './types.js'
 
 /** Default retry bound passed to runners for transient failures. */
 export const DEFAULT_MAX_RETRIES = 2
@@ -59,14 +59,17 @@ export async function runTask(
 ): Promise<TaskResult> {
   const start = clock()
   try {
-    const metrics = await runner.run({ task, maxRetries })
+    const outcome: RunOutcome = await runner.run({ task, maxRetries })
     const result: TaskResult = {
       taskId: task.id,
       runner: runner.kind,
-      metrics,
+      metrics: outcome.metrics,
     }
-    if (!metrics.success && metrics.retries >= 0) {
-      return { ...result, failureReason: 'Runner reported task failure' }
+    if (!outcome.metrics.success) {
+      return {
+        ...result,
+        failureReason: outcome.failureReason ?? 'Runner reported task failure',
+      }
     }
     return result
   } catch (error) {

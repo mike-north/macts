@@ -143,6 +143,32 @@ describe('renderMarkdown', () => {
     expect(md()).toContain('clicked the wrong file')
   })
 
+  // Negative: failureReason containing `|` and a newline must not break the
+  // markdown table. Derived by hand: `|` → `\|`, newlines → space.
+  it('escapes pipes and normalises newlines in failureReason so the table cell stays intact', () => {
+    const badReason: TaskResult[] = [
+      {
+        taskId: 'create-calendar-event',
+        runner: 'macts',
+        metrics: {
+          totalTokens: 400,
+          turns: 1,
+          wallClockMs: 800,
+          success: false,
+          retries: 0,
+        },
+        // A failure reason with both a pipe and a newline.
+        failureReason: 'error: not found | details:\nsecond line',
+      },
+    ]
+    const out = renderMarkdown(buildReport(badReason, GENERATED_AT))
+    // Pipe is escaped, newline is replaced with a space — the table is unbroken.
+    expect(out).toContain('error: not found \\| details: second line')
+    // No unescaped pipe-followed-by-space that would split the cell.
+    const perTaskLines = out.split('\n').filter((l) => l.startsWith('| create-calendar'))
+    expect(perTaskLines).toHaveLength(1)
+  })
+
   // Edge: a null comparison renders an explanatory headline, not a crash.
   it('renders an explanatory headline when comparison is null', () => {
     const onlyMacts: TaskResult[] = [

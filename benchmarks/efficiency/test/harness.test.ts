@@ -47,7 +47,7 @@ function fakeClock(values: number[]): () => number {
 }
 
 describe('runTask', () => {
-  it('records a runner-reported failure with a reason', async () => {
+  it('uses the generic fallback when a runner reports failure without a reason', async () => {
     const runner = new ScriptedRunner(
       'macts',
       new Map([['t1', ok({ success: false, retries: 1 })]])
@@ -55,6 +55,33 @@ describe('runTask', () => {
     const out = await runTask(runner, task('t1'), 2, () => 0)
     expect(out.metrics.success).toBe(false)
     expect(out.failureReason).toBe('Runner reported task failure')
+  })
+
+  it('propagates the runner-supplied failureReason to the TaskResult', async () => {
+    const failedMetrics: RunMetrics = {
+      totalTokens: 100,
+      turns: 1,
+      wallClockMs: 10,
+      success: false,
+      retries: 0,
+    }
+    const runner = new ScriptedRunner(
+      'macts',
+      new Map([
+        [
+          't1',
+          {
+            kind: 'metrics' as const,
+            metrics: failedMetrics,
+            failureReason: 'calendar permission denied',
+          },
+        ],
+      ])
+    )
+    const out = await runTask(runner, task('t1'), 2, () => 0)
+    expect(out.metrics.success).toBe(false)
+    // The runner-supplied reason takes precedence over the generic fallback.
+    expect(out.failureReason).toBe('calendar permission denied')
   })
 
   // Negative / core robustness: a thrown error becomes a recorded failure.
