@@ -48,11 +48,13 @@ This starts a local HTTP server at `http://localhost:8372` that routes calls to 
 ### 3. Create a scoped API key
 
 ```bash
-# Read-only access to calendar events
-macts api-key create --name "assistant" --permission "calendar:events:read"
+# Grant exactly what the example below needs (list calendars, create events)
+macts api-key create --name "assistant" \
+  --permission "calendar:calendars:list" \
+  --permission "calendar:events:create"
 
-# Read-only access across all calendar resources
-macts api-key create --name "scheduler" --permission "calendar:*:read"
+# …or grant every calendar operation with a wildcard
+macts api-key create --name "scheduler" --permission "calendar:*:*"
 ```
 
 Save the generated token — you need it to authenticate SDK requests.
@@ -86,12 +88,12 @@ const event = await client.events.create({
 **MCP tools (for AI assistants):**
 
 ```bash
-macts plugin install @macts/cli-calendar   # install the calendar MCP plugin
-macts mcp start                            # start the MCP daemon in the background
+macts mcp start    # start the local MCP daemon
 ```
 
-Point Claude Desktop or another MCP client at the local MCP server to give it access to the
-calendar tools. Plugins are installed into `~/.macts/plugins/` (override with `MACTS_HOME`).
+macts exposes each app's capabilities as MCP tools through its server package (e.g.
+`@macts/calendar-server`). Start the MCP daemon and point Claude Desktop or another MCP client at
+the local MCP server to give it access to the calendar tools.
 
 ## AI Agent Use Cases
 
@@ -242,8 +244,11 @@ Every API key is granted a set of explicit capability scopes:
 # Grant only what is needed
 macts api-key create --name "assistant" --permission "calendar:events:create"
 
-# Read-only access to all calendar resources
-macts api-key create --name "reader" --permission "calendar:*:read"
+# Read-only access (list/get/show are the read-type operations)
+macts api-key create --name "reader" \
+  --permission "calendar:calendars:list" \
+  --permission "calendar:events:list" \
+  --permission "calendar:events:get"
 
 # Multiple apps, fine-grained (repeat --permission for each scope)
 macts api-key create --name "scheduler" \
@@ -263,9 +268,10 @@ machine unless an app capability itself (such as Mail's send operation) involves
 ### Narrow defaults, explicit escalation
 
 API keys are granted only the permissions listed at creation time. Wildcards (`*`) are matched at
-request time, so a key with `calendar:*:read` will match any current or future `read` operation on
-any calendar resource. Pass `--manifest` to pre-expand wildcards to only the capabilities present
-in the manifest at key-creation time. Keys can be revoked at any time:
+request time, so a key with `calendar:*:*` matches every current or future operation on any
+calendar resource (the fine-grained operations are `list`, `get`, `show`, `create`, and `delete`).
+Pass `--manifest` to pre-expand a wildcard into only the explicit capabilities present in the
+manifest at key-creation time. Keys can be revoked at any time:
 
 ```bash
 macts api-key revoke <key-id>
