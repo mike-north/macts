@@ -47,5 +47,15 @@ export {
   applyGovernance,
 } from './governance.js'
 
+// Shared discovery decision logic (limit validation, governance-aware
+// search/inspect outcomes) used by both the CLI and MCP discovery surfaces.
+export {
+  type DiscoverySearchOutcome,
+  type InspectOutcome,
+  resolveDiscoveryLimit,
+  summarizeDiscoverySearch,
+  inspectCapability,
+} from './discovery.js'
+
 // Registry loading from a manifests directory
 export { loadManifestsFromDir, loadCapabilityRegistry } from './loader.js'

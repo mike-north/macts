@@ -279,7 +279,6 @@ export interface Capability {
     readonly appBundleId: string;
     readonly cliSnippet: string;
     readonly description: string;
-    // Warning: (ae-forgotten-export) The symbol "JsonSchema" needs to be exported by the entry point index.d.ts
     readonly inputSchema: JsonSchema;
     readonly keywords: readonly string[];
     readonly mcpToolName: string;
@@ -516,6 +515,17 @@ export function deriveCapabilities(manifest: AppManifest): Capability[];
 
 // @public
 export function describePermissions(permissions: string[]): string;
+
+// @public
+export type DiscoverySearchOutcome = {
+    readonly kind: 'matches';
+    readonly governed: readonly GovernedCapability[];
+} | {
+    readonly kind: 'no-match';
+} | {
+    readonly kind: 'governance-blocked';
+    readonly deniedCount: number;
+};
 
 // @public (undocumented)
 export type DistributionModel = z.infer<typeof DistributionModelSchema>;
@@ -1080,6 +1090,21 @@ export const InheritanceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function inspectCapability(registry: CapabilityRegistry, name: string, filter?: GovernanceFilter): InspectOutcome;
+
+// @public
+export type InspectOutcome = {
+    readonly kind: 'found';
+    readonly capability: Capability;
+    readonly decision: GovernanceDecision;
+} | {
+    readonly kind: 'not-found';
+} | {
+    readonly kind: 'denied';
+    readonly reason: string | undefined;
+};
+
+// @public
 export function isAppRunning(bundleId: string): Promise<boolean>;
 
 // @public
@@ -1090,6 +1115,26 @@ export function isRiskClass(value: unknown): value is RiskClass;
 
 // @public
 export function isValidPermission(permission: string): boolean;
+
+// @public
+export interface JsonSchema {
+    // (undocumented)
+    readonly [key: string]: unknown;
+    // (undocumented)
+    readonly additionalProperties?: boolean;
+    // (undocumented)
+    readonly description?: string;
+    // (undocumented)
+    readonly enum?: readonly unknown[];
+    // (undocumented)
+    readonly items?: JsonSchema;
+    // (undocumented)
+    readonly properties?: Record<string, JsonSchema>;
+    // (undocumented)
+    readonly required?: readonly string[];
+    // (undocumented)
+    readonly type?: string;
+}
 
 // @public
 export interface JsonSchemaOptions {
@@ -1466,6 +1511,9 @@ export const RelationshipSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 
+// @public
+export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
+
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;
 
@@ -1608,6 +1656,9 @@ export const SuiteSchema: z.ZodObject<{
     commands: z.ZodDefault<z.ZodArray<z.ZodString>>;
     enums: z.ZodDefault<z.ZodArray<z.ZodString>>;
 }, z.core.$strip>;
+
+// @public
+export function summarizeDiscoverySearch(ranked: readonly CapabilitySearchResult[], filter?: GovernanceFilter): DiscoverySearchOutcome;
 
 // @public (undocumented)
 export type TccEntitlement = z.infer<typeof TccEntitlementSchema>;

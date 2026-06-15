@@ -43,6 +43,21 @@ describe('loadManifestsFromDir / loadCapabilityRegistry', () => {
     expect(manifests.some((m) => m.app.name === 'Notebook')).toBe(true)
   })
 
+  it('skips a missing manifest via the structured ENOENT code, not message text', async () => {
+    // Regression: missing-manifest detection must key on the structured
+    // `err.code === 'ENOENT'`, not `message.includes('ENOENT')`. A directory
+    // with no app.yaml must be skipped silently, while a real validation
+    // failure (the `broken` app) is reported as an error whose message is a
+    // schema-validation message — NOT an ENOENT string.
+    const { errors } = await loadManifestsFromDir(dir)
+    // The empty directory is skipped: it appears in neither manifests nor errors.
+    expect(errors.some((e) => e.app === 'empty-app')).toBe(false)
+    // The reported error for `broken` is a validation failure, not ENOENT.
+    const brokenError = errors.find((e) => e.app === 'broken')
+    expect(brokenError).toBeDefined()
+    expect(brokenError?.message).not.toContain('ENOENT')
+  })
+
   it('builds a registry whose capabilities come from the loaded manifests', async () => {
     const { registry } = await loadCapabilityRegistry(dir)
     expect(registry.get('notebook.notes.create')?.risk).toBe('write')

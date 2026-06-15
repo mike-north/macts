@@ -7,7 +7,7 @@
 import { readdir } from 'node:fs/promises'
 import type { Dirent } from 'node:fs'
 import { join } from 'node:path'
-import { loadManifest } from '../manifest/loader.js'
+import { loadManifest, ManifestLoadError } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/index.js'
 import { buildCapabilityRegistry } from './registry.js'
 import type { CapabilityRegistry } from './types.js'
@@ -16,6 +16,30 @@ import type { CapabilityRegistry } from './types.js'
  * Standard manifest filename within each app's manifest directory.
  */
 const MANIFEST_FILENAME = 'app.yaml'
+
+/**
+ * Does the error structurally indicate a missing file (`ENOENT`)?
+ *
+ * `loadManifest` wraps the underlying `fs` error in a {@link ManifestLoadError}
+ * with the original error as its `cause`/`originalError`, so the structured
+ * `code` lives on the wrapped error. Checking `code === 'ENOENT'` is robust
+ * across Node versions/platforms, unlike matching the message text.
+ *
+ * @param error - The thrown error to inspect
+ * @returns True if the error (or its underlying cause) is an `ENOENT`
+ */
+function isMissingFileError(error: unknown): boolean {
+  const hasEnoentCode = (value: unknown): boolean =>
+    typeof value === 'object' &&
+    value !== null &&
+    'code' in value &&
+    (value as { code?: unknown }).code === 'ENOENT'
+
+  if (error instanceof ManifestLoadError) {
+    return hasEnoentCode(error.originalError)
+  }
+  return hasEnoentCode(error)
+}
 
 /**
  * Load every manifest under a manifests root directory.
@@ -56,11 +80,13 @@ export async function loadManifestsFromDir(manifestsDir: string): Promise<{
       manifests.push(await loadManifest(manifestPath))
     } catch (error) {
       // Skip subdirectories that simply have no manifest; only report real
-      // load/validation failures of an existing manifest file.
-      const message = error instanceof Error ? error.message : String(error)
-      if (message.includes('ENOENT')) {
+      // load/validation failures of an existing manifest file. Detect the
+      // missing-file case via the structured `ENOENT` error code rather than a
+      // substring of the message, which varies across Node versions/platforms.
+      if (isMissingFileError(error)) {
         continue
       }
+      const message = error instanceof Error ? error.message : String(error)
       errors.push({ app, message })
     }
   }

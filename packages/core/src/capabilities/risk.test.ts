@@ -63,7 +63,10 @@ describe('classifyRiskFromOperation', () => {
     ['email', 'send'],
     ['share', 'send'],
     ['invite', 'send'],
+    // `forward` as the leading verb is a genuine outbound transmission
+    // (e.g. Mail's `forward` / `forwardMessage` forwards an email outward).
     ['forward', 'send'],
+    ['forwardMessage', 'send'],
     // execute: arbitrary code/scripts
     ['doScript', 'execute'],
     ['doJavaScript', 'execute'],
@@ -106,6 +109,56 @@ describe('classifyRiskFromOperation', () => {
   it('returns the safe default for an empty / symbol-only operation name', () => {
     expect(classifyRiskFromOperation('')).toBe(DEFAULT_RISK)
     expect(classifyRiskFromOperation('---')).toBe(DEFAULT_RISK)
+  })
+})
+
+describe('classifyRiskFromOperation — navigation verbs are not outbound `send`', () => {
+  // Regression for PR #29: a naive substring match treated any operation
+  // containing "forward" as `send`, misclassifying navigation verbs. `forward`
+  // is meaningful as a leading verb (Mail forwards an email) but as a *direction
+  // word* inside a navigation verb it must not imply outbound transmission.
+  // `forward` is not a read/write/etc. token, so these fall to the safe default
+  // (DEFAULT_RISK = 'execute') rather than being mis-gated as exfiltration.
+  const navigationCases: readonly (readonly [operation: string, expected: RiskClass])[] = [
+    ['goForward', DEFAULT_RISK], // Arc / Chrome / Edge tab navigation
+    ['stepForward', DEFAULT_RISK], // QuickTime Player frame navigation
+    ['go-forward', DEFAULT_RISK], // separator-style spelling
+    ['GoForward', DEFAULT_RISK], // PascalCase spelling
+  ]
+
+  it.each(navigationCases)('classifies %s as %s (NOT send)', (operation, expected) => {
+    expect(classifyRiskFromOperation(operation)).toBe(expected)
+    expect(classifyRiskFromOperation(operation)).not.toBe('send')
+  })
+})
+
+describe('classifyRiskFromOperation — predicate-style queries classify as read', () => {
+  // Regression for PR #29: predicate-prefixed operations are boolean *queries*
+  // (they observe state), so they must classify as `read`, not be mis-gated as
+  // `system-change` (via tokens like `enable`/`disable`) or `delete`/`write`.
+  const predicateCases: readonly (readonly [operation: string, expected: RiskClass])[] = [
+    ['shouldEnableAction', 'read'], // Contacts — boolean query, contains `enable`
+    ['canDelete', 'read'], // contains the `delete` token
+    ['isRunning', 'read'],
+    ['hasUpdate', 'read'], // contains the `update` write token
+    ['willSend', 'read'], // contains the `send` token
+    ['needsReload', 'read'], // contains the `reload` system-change token
+  ]
+
+  it.each(predicateCases)('classifies %s as read', (operation, expected) => {
+    expect(classifyRiskFromOperation(operation)).toBe(expected)
+  })
+
+  it('does not treat a non-predicate leading token as a predicate (cancel ≠ can)', () => {
+    // `cancel` shares the prefix `can` but tokenizes to a single token `cancel`,
+    // which is not the predicate `can`. It must not be forced to `read`.
+    expect(classifyRiskFromOperation('cancel')).not.toBe('read')
+  })
+
+  it('still classifies genuine enable/disable lifecycle ops as system-change', () => {
+    // The predicate guard must not weaken real `enableX` / `disableX` ops.
+    expect(classifyRiskFromOperation('enableExtension')).toBe('system-change')
+    expect(classifyRiskFromOperation('disableNotifications')).toBe('system-change')
   })
 })
 
