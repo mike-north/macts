@@ -98,7 +98,7 @@ pnpm --filter @macts-bench/efficiency bench --out ./benchmark-results --max-retr
 ```
 
 This writes `report.json` (schema v1) and `report.md` to the output directory
-(default `./benchmark-results`, gitignored).
+(default `./benchmark-results`, gitignored via `benchmarks/efficiency/.gitignore`).
 
 ### Without a live environment (e.g. CI, a dev box)
 
@@ -196,9 +196,8 @@ reports failures-pending-live-environment rather than fabricated figures.
 
 **Scope of this PR:** this change delivers the benchmark harness only. Recording
 real baseline numbers requires a live Mac run with the target apps and API
-credentials, and is tracked as a follow-up — this PR and its associated issue
-should not be considered complete until that live run is performed and its
-findings are recorded here.
+credentials; that live run is tracked separately in issue #28. When that run is
+complete, the findings should be recorded here.
 
 What the harness already encodes as the structural hypothesis to be confirmed by
 a live run:
