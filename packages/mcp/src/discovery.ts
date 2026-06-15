@@ -16,7 +16,9 @@
 
 import {
   searchCapabilities,
-  applyGovernance,
+  resolveDiscoveryLimit,
+  summarizeDiscoverySearch,
+  inspectCapability,
   ALLOW_ALL_GOVERNANCE,
   type CapabilityRegistry,
   type GovernanceFilter,
@@ -94,18 +96,33 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefin
     handler: (args: unknown): Promise<unknown> => {
       const { intent, capability, limit } = (args ?? {}) as DiscoveryArgs
 
-      // Inspect mode: exact capability name.
+      // Inspect mode: exact capability name. Apply the active governance filter
+      // so a denied capability is never leaked through inspection while it is
+      // hidden from search results.
       if (typeof capability === 'string' && capability.length > 0) {
-        const found = registry.get(capability)
-        if (!found) {
+        const outcome = inspectCapability(registry, capability, governance)
+        if (outcome.kind === 'not-found') {
           return Promise.resolve({
             found: false,
             capability,
             message: `Unknown capability "${capability}". Search by intent to discover available capabilities.`,
           })
         }
+        if (outcome.kind === 'denied') {
+          // Withhold the descriptor; report a structured not-available result.
+          return Promise.resolve({
+            found: false,
+            available: false,
+            capability,
+            governance: 'denied',
+            ...(outcome.reason !== undefined ? { reason: outcome.reason } : {}),
+            message: `Capability "${capability}" is denied by the active governance policy.`,
+          })
+        }
+        const found = outcome.capability
         return Promise.resolve({
           found: true,
+          governance: outcome.decision.disposition,
           capability: {
             name: found.name,
             app: found.app,
@@ -128,17 +145,12 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefin
         })
       }
 
-      const max =
-        typeof limit === 'number' && Number.isFinite(limit) && limit > 0
-          ? Math.floor(limit)
-          : DEFAULT_DISCOVERY_LIMIT
+      const max = resolveDiscoveryLimit(limit, DEFAULT_DISCOVERY_LIMIT)
       const ranked = searchCapabilities(registry, intent, { limit: max })
-      const governed = applyGovernance(
-        ranked.map((r) => r.capability),
-        governance
-      )
+      const outcome = summarizeDiscoverySearch(ranked, governance)
 
-      if (governed.length === 0) {
+      // Genuine no-match: suggest generating a new capability.
+      if (outcome.kind === 'no-match') {
         return Promise.resolve({
           intent,
           results: [],
@@ -148,9 +160,21 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefin
         })
       }
 
+      // Matches existed but governance denied them all — distinct from no-match.
+      // Do NOT suggest generating a new capability here.
+      if (outcome.kind === 'governance-blocked') {
+        return Promise.resolve({
+          intent,
+          results: [],
+          governance: 'denied',
+          deniedCount: outcome.deniedCount,
+          message: `${String(outcome.deniedCount)} matching ${outcome.deniedCount === 1 ? 'capability is' : 'capabilities are'} denied by the active governance policy. Request approval rather than generating a new capability.`,
+        })
+      }
+
       return Promise.resolve({
         intent,
-        results: governed.map(({ capability: cap, decision }) => ({
+        results: outcome.governed.map(({ capability: cap, decision }) => ({
           name: cap.name,
           app: cap.app,
           risk: cap.risk,

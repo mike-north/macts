@@ -82,6 +82,50 @@ describe('macts capabilities (UAT)', () => {
     expect(stdout).toContain('call: macts calendar calendars list')
   })
 
+  it('search caps results at a valid --limit', async () => {
+    const { stdout, code } = await runCli([
+      'capabilities',
+      'search',
+      'calendar',
+      '--limit',
+      '1',
+      '--json',
+    ])
+    expect(code).toBe(0)
+    const parsed = JSON.parse(stdout) as { data: { results: unknown[] } }
+    expect(parsed.data.results).toHaveLength(1)
+  })
+
+  it('search falls back to the default for an invalid --limit (foo → not empty)', async () => {
+    // Regression: an invalid --limit must not reach slice(0, NaN) and silently
+    // return zero results; it falls back to the default limit instead.
+    const { stdout, code } = await runCli([
+      'capabilities',
+      'search',
+      'create calendar event',
+      '--limit',
+      'foo',
+      '--json',
+    ])
+    expect(code).toBe(0)
+    const parsed = JSON.parse(stdout) as { data: { results: unknown[] } }
+    expect(parsed.data.results.length).toBeGreaterThan(0)
+  })
+
+  it('search rejects a non-positive --limit, falling back to the default', async () => {
+    const { stdout, code } = await runCli([
+      'capabilities',
+      'search',
+      'create calendar event',
+      '--limit',
+      '0',
+      '--json',
+    ])
+    expect(code).toBe(0)
+    const parsed = JSON.parse(stdout) as { data: { results: unknown[] } }
+    expect(parsed.data.results.length).toBeGreaterThan(0)
+  })
+
   it('search with no match suggests generating a new capability (not UI fallback)', async () => {
     const { stdout, code } = await runCli(['capabilities', 'search', 'zzzznomatch qqqq', '--json'])
     expect(code).toBe(0)

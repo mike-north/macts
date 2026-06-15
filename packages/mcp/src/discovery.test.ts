@@ -117,6 +117,73 @@ describe('createDiscoveryTool', () => {
     expect(result.results.some((r) => r.name === 'notebook.notes.list')).toBe(true)
   })
 
+  it('distinguishes governance-blocked from no-match (does NOT suggest generation)', async () => {
+    // All matches are denied by policy. This must NOT be reported as a no-match
+    // (which would suggest generating a new capability); it is a distinct
+    // governance-denied result.
+    const denyAll: GovernanceFilter = {
+      evaluate: () => ({ disposition: 'deny', reason: 'policy X denies all' }),
+    }
+    const tool = createDiscoveryTool({ registry, governance: denyAll })
+    const result = (await tool.handler({ intent: 'note' })) as {
+      results: unknown[]
+      nextMove?: string
+      governance?: string
+      deniedCount?: number
+    }
+    expect(result.results).toEqual([])
+    expect(result.governance).toBe('denied')
+    expect(result.deniedCount).toBeGreaterThan(0)
+    // Critically: no "generate a new capability" hint in the blocked case.
+    expect(result.nextMove).toBeUndefined()
+  })
+
+  it('inspect-by-name respects governance: a denied capability is not leaked', async () => {
+    // Regression: inspect must apply the same `deny` that hides a capability
+    // from search, returning a structured not-available result instead of the
+    // full descriptor.
+    const denyDeletes: GovernanceFilter = {
+      evaluate: (cap) =>
+        cap.risk === 'delete'
+          ? { disposition: 'deny', reason: 'deletes require approval' }
+          : { disposition: 'allow' },
+    }
+    const tool = createDiscoveryTool({ registry, governance: denyDeletes })
+    const result = (await tool.handler({ capability: 'notebook.notes.delete' })) as {
+      found: boolean
+      available?: boolean
+      governance?: string
+      reason?: string
+      capability?: unknown
+    }
+    expect(result.found).toBe(false)
+    expect(result.available).toBe(false)
+    expect(result.governance).toBe('denied')
+    expect(result.reason).toBe('deletes require approval')
+    // Only the name is echoed back for identification; the full descriptor
+    // (risk, permission, inputSchema, …) must NOT be leaked.
+    expect(typeof result.capability).toBe('string')
+    expect(result.capability).toBe('notebook.notes.delete')
+    expect(JSON.stringify(result)).not.toContain('inputSchema')
+    expect(JSON.stringify(result)).not.toContain('"risk"')
+  })
+
+  it('inspect-by-name surfaces governance disposition for an allowed capability', async () => {
+    const result = await discover({ capability: 'notebook.notes.list' })
+    expect(result['found']).toBe(true)
+    expect(result['governance']).toBe('allow')
+  })
+
+  it('falls back to the default limit for an invalid limit (NaN/0/negative)', async () => {
+    // An invalid limit must not silently empty the results via slice(0, NaN).
+    for (const bad of [Number.NaN, 0, -5, 2.5]) {
+      const result = (await discover({ intent: 'note', limit: bad })) as {
+        results: unknown[]
+      }
+      expect(result.results.length).toBeGreaterThan(0)
+    }
+  })
+
   it('never leaks automation-mechanism terminology in results', async () => {
     const result = await discover({ intent: 'list notes' })
     expect(JSON.stringify(result)).not.toMatch(/applescript|jxa|osascript/i)

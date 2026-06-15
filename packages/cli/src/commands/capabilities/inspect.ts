@@ -1,4 +1,5 @@
 import { Command, Option } from 'clipanion'
+import { inspectCapability, ALLOW_ALL_GOVERNANCE } from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import { loadRegistry } from './registry.js'
 
@@ -36,9 +37,11 @@ export class CapabilitiesInspectCommand extends Command {
 
     try {
       const { registry } = await loadRegistry(this.manifestsDir)
-      const capability = registry.get(this.capability)
+      // Route inspection through the same governance seam as search, so a
+      // capability denied by the active policy cannot be retrieved by name.
+      const outcome = inspectCapability(registry, this.capability, ALLOW_ALL_GOVERNANCE)
 
-      if (!capability) {
+      if (outcome.kind === 'not-found') {
         this.context.stderr.write(
           formatter.formatError(
             `Unknown capability: ${this.capability}. Run \`macts capabilities search <intent>\` to discover available capabilities.`
@@ -46,6 +49,18 @@ export class CapabilitiesInspectCommand extends Command {
         )
         return 1
       }
+
+      if (outcome.kind === 'denied') {
+        // Do not leak the descriptor; surface a structured not-available result.
+        const reason = outcome.reason ?? 'denied by the active governance policy'
+        this.context.stderr.write(
+          formatter.formatError(`Capability "${this.capability}" is not available: ${reason}.`) +
+            '\n'
+        )
+        return 1
+      }
+
+      const { capability } = outcome
 
       if (this.json) {
         this.context.stdout.write(

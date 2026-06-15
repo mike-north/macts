@@ -1,7 +1,15 @@
 import { Command, Option } from 'clipanion'
-import { searchCapabilities, applyGovernance, ALLOW_ALL_GOVERNANCE } from '@macts/core'
+import {
+  searchCapabilities,
+  resolveDiscoveryLimit,
+  summarizeDiscoverySearch,
+  ALLOW_ALL_GOVERNANCE,
+} from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import { loadRegistry } from './registry.js'
+
+/** Default number of search results when `--limit` is absent or invalid. */
+const DEFAULT_SEARCH_LIMIT = 10
 
 /**
  * Search for capabilities matching an intent.
@@ -43,18 +51,27 @@ export class CapabilitiesSearchCommand extends Command {
 
     try {
       const { registry } = await loadRegistry(this.manifestsDir)
-      const limit = this.limit ? Number.parseInt(this.limit, 10) : 10
+      // Validate `--limit`: a non-positive-integer value (e.g. `--limit foo`)
+      // would otherwise reach `slice(0, NaN)` and silently empty the results.
+      const limit = resolveDiscoveryLimit(this.limit, DEFAULT_SEARCH_LIMIT)
       const ranked = searchCapabilities(registry, this.intent, { limit })
 
       // Apply the active governance filter (no-op pass-through by default).
       // The governance workstream will supply a real policy here.
-      const matches = ranked.map((r) => r.capability)
-      const governed = applyGovernance(matches, ALLOW_ALL_GOVERNANCE)
+      const outcome = summarizeDiscoverySearch(ranked, ALLOW_ALL_GOVERNANCE)
       const scoreByName = new Map(ranked.map((r) => [r.capability.name, r.score]))
 
-      if (governed.length === 0) {
+      // Distinguish "nothing matched" (suggest generating a capability) from
+      // "matches existed but governance denied them all" (do NOT suggest
+      // generation — a different policy could surface them).
+      if (outcome.kind === 'no-match') {
         return this.reportNoMatch(formatter)
       }
+      if (outcome.kind === 'governance-blocked') {
+        return this.reportGovernanceBlocked(formatter, outcome.deniedCount)
+      }
+
+      const governed = outcome.governed
 
       if (this.json) {
         this.context.stdout.write(
@@ -110,6 +127,36 @@ export class CapabilitiesSearchCommand extends Command {
     } else {
       this.context.stdout.write(`\nNo capability matches "${this.intent}".\n\n`)
       this.context.stdout.write(`Next move: ${suggestion}\n`)
+    }
+    return 0
+  }
+
+  /**
+   * Report the governance-blocked case: capabilities matched the intent but the
+   * active policy denied every one of them. Unlike the no-match case, the next
+   * move is to seek approval for the existing capabilities — never to generate a
+   * new one, which would not change the policy outcome.
+   */
+  private reportGovernanceBlocked(
+    formatter: ReturnType<typeof createFormatter>,
+    deniedCount: number
+  ): number {
+    const message = `${String(deniedCount)} matching ${deniedCount === 1 ? 'capability is' : 'capabilities are'} denied by the active governance policy.`
+    if (this.json) {
+      this.context.stdout.write(
+        formatter.format({
+          intent: this.intent,
+          results: [],
+          governance: 'denied',
+          deniedCount,
+          message,
+        }) + '\n'
+      )
+    } else {
+      this.context.stdout.write(`\n${message}\n`)
+      this.context.stdout.write(
+        `\nThese capabilities exist but are blocked by policy. Request approval rather than generating a new capability.\n`
+      )
     }
     return 0
   }
