@@ -94,5 +94,8 @@ export {
   type GenerateServerPackageResult,
 } from './server/index.js'
 
+// Capability metadata module generator (per-app machine-readable risk metadata)
+export { generateCapabilitiesModule } from './capabilities/index.js'
+
 // File writer
 export { writeFiles } from './write.js'
