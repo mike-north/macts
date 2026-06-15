@@ -16,7 +16,7 @@ import { getPluginsCacheFile, getPluginsLockfile } from './paths.js'
  * Cached plugin entry.
  */
 export interface CachedPlugin {
-  /** Package name (e.g., "@macts/cli-calendar") */
+  /** Package name (e.g., "@macts/calendar") */
   readonly packageName: string
   /** Plugin name (e.g., "calendar") */
   readonly name: string

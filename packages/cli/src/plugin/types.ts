@@ -4,7 +4,7 @@ import type { CommandClass } from 'clipanion'
  * CLI plugin interface.
  *
  * A plugin provides commands for a specific application SDK.
- * Plugins are dynamically discovered from `@macts/cli-*` packages.
+ * Plugins are dynamically discovered from `@macts/<app>` packages.
  */
 export interface CliPlugin {
   /** Plugin name (e.g., 'calendar') */

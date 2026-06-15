@@ -62,8 +62,8 @@ export function getMactsHome(): string {
  * // ├── package.json
  * // ├── package-lock.json
  * // ├── node_modules/
- * // │   ├── @macts/cli-calendar/
- * // │   └── @macts/cli-other/
+ * // │   ├── @macts/calendar/         (CLI plugin)
+ * // │   └── @macts/calendar-server/  (MCP server plugin)
  * // └── .plugins-cache.json
  * ```
  */

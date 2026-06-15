@@ -13,11 +13,16 @@ export class PluginInstallCommand extends Command {
     details: `
       Installs a macts CLI plugin from npm into ~/.macts/plugins/.
 
-      Plugins must be scoped under @macts/cli-* for security.
+      CLI plugins are published as @macts/<app> packages (SDK + CLI commands).
+      To install an app's MCP server plugin instead (so the MCP daemon exposes
+      its tools), use \`macts mcp install <app>\`.
+
+      The install location can be overridden with the MACTS_HOME environment
+      variable (defaults to ~/.macts).
     `,
     examples: [
-      ['Install the calendar plugin', '$0 plugin install @macts/cli-calendar'],
-      ['Install a specific version', '$0 plugin install @macts/cli-calendar@1.0.0'],
+      ['Install the calendar plugin', '$0 plugin install @macts/calendar'],
+      ['Install a specific version', '$0 plugin install @macts/calendar@1.0.0'],
     ],
   })
 
@@ -27,7 +32,7 @@ export class PluginInstallCommand extends Command {
   execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
-    // Parse package name and version (handle scoped packages like @macts/cli-calendar@1.0.0)
+    // Parse package name and version (handle scoped packages like @macts/calendar@1.0.0)
     // Find the last @ that's not at position 0 (scope prefix)
     const lastAtIndex = this.packageName.lastIndexOf('@')
     const [name, version] =

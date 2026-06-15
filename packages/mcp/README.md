@@ -10,13 +10,16 @@ The [Model Context Protocol (MCP)](https://modelcontextprotocol.io) is an open p
 
 This package is typically used through the `macts` CLI, which handles plugin installation and server startup.
 
-Install an MCP plugin:
+Install an app's MCP server plugin:
 
 ```bash
-macts plugin install @macts/mcp-calendar
+macts mcp install calendar
 ```
 
-Plugins are installed to `~/.macts/plugins/` and automatically discovered when the server starts.
+This installs the `@macts/calendar-server` package into `~/.macts/plugins/`
+(override the location with the `MACTS_HOME` environment variable). Installed
+plugins are discovered automatically when the server starts; restart the daemon
+(`macts mcp start`) after installing so it exposes the new tools.
 
 ## Quick Start
 
@@ -96,7 +99,10 @@ After restarting Claude Desktop, the macts tools will be available to Claude.
 
 ## Creating a Plugin
 
-MCP plugins follow a simple structure. Create a package named `@macts/mcp-<app>`:
+MCP plugins follow a simple structure. They are published as `@macts/<app>-server`
+packages that expose an MCP plugin via the `./mcp` export. In practice these
+packages are generated from an app manifest (see `@macts/core`), but a minimal
+hand-written plugin looks like:
 
 ```typescript
 import type { McpPlugin, McpToolDefinition } from '@macts/mcp'
@@ -232,9 +238,9 @@ export const plugin: McpPlugin = {
 
 ### Plugin Package Requirements
 
-1. **Package name**: Must match `@macts/mcp-*` pattern for security
-2. **Export**: Must export a `plugin` object of type `McpPlugin`
-3. **Installation**: Must be installed via `macts plugin install`
+1. **Package name**: Must match `@macts/<app>-server` pattern for security
+2. **Export**: Must expose the `plugin` object via the `./mcp` subpath export
+3. **Installation**: Must be installed via `macts mcp install <app>`
 4. **Keywords**: Add `"macts-mcp-plugin"` to `package.json` keywords for discovery
 
 ### Tool Naming Convention
@@ -370,7 +376,7 @@ Load a single MCP plugin by package name.
 ```typescript
 import { loadMcpPlugin } from '@macts/mcp'
 
-const result = await loadMcpPlugin('@macts/mcp-calendar')
+const result = await loadMcpPlugin('@macts/calendar-server')
 if (result.success) {
   console.log(`Loaded: ${result.plugin.name}`)
 } else {
@@ -380,7 +386,7 @@ if (result.success) {
 
 **Parameters:**
 
-- `packageName`: npm package name (e.g., `@macts/mcp-calendar`)
+- `packageName`: npm package name (e.g., `@macts/calendar-server`)
 
 **Returns:** Result object with either `plugin` or `error`
 
@@ -412,7 +418,7 @@ import { writeMcpPluginCache, type CachedPlugin } from '@macts/mcp'
 
 const plugins: CachedPlugin[] = [
   {
-    packageName: '@macts/mcp-calendar',
+    packageName: '@macts/calendar-server',
     name: 'calendar',
     description: 'Calendar.app automation',
   },
@@ -576,7 +582,7 @@ interface JsonSchema {
    ```
 
 2. **Check plugin package name:**
-   - Must match pattern `@macts/mcp-*`
+   - Must match pattern `@macts/<app>-server`
    - Must have `macts-mcp-plugin` keyword in package.json
 
 3. **Test plugin loading:**
@@ -592,8 +598,8 @@ interface JsonSchema {
 
 **Solutions:**
 
-- Reinstall plugin: `macts plugin install @macts/mcp-calendar --force`
-- Clear plugin cache: `rm ~/.macts/.mcp-plugin-cache`
+- Reinstall plugin: `macts mcp uninstall calendar && macts mcp install calendar`
+- Clear plugin cache: `rm ~/.macts/plugins/.mcp-plugins-cache.json`
 - Check plugin exports: Plugin must export a `plugin` object
 
 ### Tools Not Working
@@ -720,7 +726,7 @@ curl http://localhost:3000/health
 
 ## Plugin Security
 
-For security, the MCP server only loads plugins matching the pattern `@macts/mcp-*`. This ensures that:
+For security, the MCP server only loads plugins matching the pattern `@macts/<app>-server`. This ensures that:
 
 1. Plugins are explicitly scoped under the `@macts` organization
 2. Plugin names follow a consistent convention
@@ -734,7 +740,7 @@ Invalid MCP plugin package name: my-plugin
 
 ## Related Packages
 
-- **[@macts/mcp-calendar](../mcp-calendar/)** - MCP plugin for Calendar.app automation
+- **[@macts/calendar-server](../calendar-server/)** - MCP server plugin for Calendar.app automation
 - **[@macts/core](../core/)** - Core macOS automation framework
 - **[@macts/cli](../cli/)** - Command-line interface for macts
 

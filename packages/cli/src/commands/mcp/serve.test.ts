@@ -50,7 +50,7 @@ describe('McpServeCommand', () => {
       plugins: [mockPlugin],
       errors: [
         {
-          packageName: '@macts/mcp-broken',
+          packageName: '@macts/broken-server',
           message: 'Failed to load',
         },
       ],
@@ -74,7 +74,7 @@ describe('McpServeCommand', () => {
       setTimeout(resolve, 100)
     })
 
-    expect(getStderr()).toContain('Warning: Failed to load plugin @macts/mcp-broken')
+    expect(getStderr()).toContain('Warning: Failed to load plugin @macts/broken-server')
     expect(getStderr()).toContain('Failed to load')
 
     // Clean up - resolve the blocking promise

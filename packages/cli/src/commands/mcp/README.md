@@ -1,8 +1,91 @@
 # MCP Daemon Management Commands
 
-This directory contains CLI commands for managing the MCP daemon server.
+This directory contains CLI commands for managing the MCP daemon server and the
+MCP server plugins it exposes.
+
+## Happy Path
+
+```bash
+# 1. Install an app's MCP server plugin (@macts/<app>-server) into ~/.macts/plugins/
+macts mcp install calendar
+
+# 2. (Re)start the daemon so it discovers and exposes the new tools
+macts mcp start
+
+# 3. Point your MCP client at the daemon — the app's tools are now available
+```
+
+The install location is `~/.macts/plugins/` (override with the `MACTS_HOME`
+environment variable). The daemon discovers every installed
+`@macts/<app>-server` package there automatically.
 
 ## Commands
+
+### `macts mcp install`
+
+Install an app's MCP server plugin so the daemon exposes its tools.
+
+**Arguments:**
+
+- `<app>` - App name (e.g. `calendar`) or full package name
+  (e.g. `@macts/calendar-server`). An optional version suffix is supported
+  (e.g. `calendar@1.0.0`).
+
+**Options:**
+
+- `--json` - Output result as JSON
+
+**Usage:**
+
+```bash
+# Install by app name
+macts mcp install calendar
+
+# Install by full package name
+macts mcp install @macts/calendar-server
+
+# Install a specific version
+macts mcp install calendar@1.0.0
+```
+
+**Behavior:**
+
+- Resolves the app name to the `@macts/<app>-server` package
+- Installs into `~/.macts/plugins/` via `npm install --ignore-scripts`
+- Invalidates the plugin cache so discovery picks up the change
+- Returns exit code 0 on success, 1 on failure (invalid name, npm error)
+
+> After installing, restart the daemon (`macts mcp start`) so it exposes the new
+> tools.
+
+### `macts mcp uninstall`
+
+Remove an app's MCP server plugin.
+
+**Arguments:**
+
+- `<app>` - App name or full `@macts/<app>-server` package name
+
+**Usage:**
+
+```bash
+macts mcp uninstall calendar
+```
+
+### `macts mcp list`
+
+List installed MCP server plugins (the `@macts/<app>-server` packages the daemon
+discovers).
+
+**Options:**
+
+- `--json` - Output as JSON
+
+**Usage:**
+
+```bash
+macts mcp list
+```
 
 ### `macts mcp serve`
 
@@ -168,7 +251,7 @@ macts mcp diagnose
   "plugins": {
     "totalFound": 3,
     "totalErrors": 0,
-    "plugins": [{ "packageName": "@macts/mcp-calendar", "version": "1.0.0", "tools": 5 }],
+    "plugins": [{ "packageName": "@macts/calendar-server", "version": "1.0.0", "tools": 5 }],
     "errors": []
   },
   "recommendations": []
