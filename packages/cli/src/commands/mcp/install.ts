@@ -56,10 +56,17 @@ export class McpInstallCommand extends Command {
     const result = installMcpServerPlugin(app, version)
 
     if (result.success) {
-      this.context.stdout.write(formatter.formatSuccess(result.message) + '\n')
-      this.context.stdout.write(
-        formatter.formatSuccess('Restart the daemon to expose new tools: macts mcp start') + '\n'
-      )
+      if (this.json ?? false) {
+        // In JSON mode emit a single object so stdout is one parseable JSON value.
+        this.context.stdout.write(
+          JSON.stringify({ success: true, message: result.message }, null, 2) + '\n'
+        )
+      } else {
+        this.context.stdout.write(formatter.formatSuccess(result.message) + '\n')
+        this.context.stdout.write(
+          formatter.formatSuccess('Restart the daemon to expose new tools: macts mcp start') + '\n'
+        )
+      }
       return Promise.resolve(0)
     } else {
       this.context.stderr.write(formatter.formatError(result.message) + '\n')

@@ -696,9 +696,10 @@ describe('resolveMcpServerPackageName', () => {
   })
 
   it('should reject a bare app name that already ends in -server', () => {
-    // Avoid producing @macts/calendar-server-server from "calendar-server" being
-    // treated as a bare app slug. The -server form is handled by the qualified branch.
-    expect(resolveMcpServerPackageName('calendar')).toBe('@macts/calendar-server')
+    // Passing "calendar-server" as a bare slug would produce the nonsense package
+    // "@macts/calendar-server-server". The resolver must return null so callers
+    // know to either treat it as a fully-qualified name or reject it outright.
+    expect(resolveMcpServerPackageName('calendar-server')).toBeNull()
   })
 
   it('should reject a wrong-scope server package', () => {

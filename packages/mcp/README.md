@@ -241,7 +241,7 @@ export const plugin: McpPlugin = {
 1. **Package name**: Must match `@macts/<app>-server` pattern for security
 2. **Export**: Must expose the `plugin` object via the `./mcp` subpath export
 3. **Installation**: Must be installed via `macts mcp install <app>`
-4. **Keywords**: Add `"macts-mcp-plugin"` to `package.json` keywords for discovery
+4. **Keywords**: Add `"macts-mcp-plugin"` to `package.json` keywords for npm searchability (discovery is done by scanning installed `@macts/*-server` packages in `~/.macts/plugins/`)
 
 ### Tool Naming Convention
 

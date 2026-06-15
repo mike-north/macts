@@ -110,6 +110,23 @@ describe('McpInstallCommand', () => {
     expect(exitCode).toBe(1)
     expect(getStderr()).toContain('Invalid MCP server plugin')
   })
+
+  it('emits exactly one parseable JSON object on stdout when --json is passed', async () => {
+    // Regression: without the fix, two separate JSON objects were written to stdout,
+    // breaking any consumer that calls JSON.parse() on the output.
+    const { stdout, stderr, getStdout } = createMockStreams()
+    vi.mocked(installMcpServerPlugin).mockReturnValue({
+      success: true,
+      message: 'Installed @macts/calendar-server',
+    })
+
+    const exitCode = await cli.run(['mcp', 'install', 'calendar', '--json'], { stdout, stderr })
+
+    expect(exitCode).toBe(0)
+    // JSON.parse throws if the string is not a single valid JSON value.
+    const parsed = JSON.parse(getStdout()) as unknown
+    expect(parsed).toEqual({ success: true, message: 'Installed @macts/calendar-server' })
+  })
 })
 
 describe('McpUninstallCommand', () => {
