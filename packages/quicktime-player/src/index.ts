@@ -22,3 +22,5 @@ export { QuickTimePlayerClient, QuickTimePlayerError, HttpClient } from './clien
 export type { QuickTimePlayerClientOptions } from './client.js'
 export * from './types.js'
 export { DocumentResourceClient } from './resources/document.js'
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

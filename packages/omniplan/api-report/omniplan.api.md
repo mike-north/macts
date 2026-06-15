@@ -35,6 +35,25 @@ export const AssignmentSchema: z.ZodObject<{
 export type AssignmentUpdateInput = Partial<AssignmentCreateInput>;
 
 // @public
+export const capabilities: readonly CapabilityMetadata[];
+
+// @public
+export interface CapabilityMetadata {
+    readonly app: string;
+    readonly appBundleId: string;
+    readonly description: string;
+    readonly inputSchema: Record<string, unknown>;
+    readonly name: string;
+    readonly operation: string;
+    readonly permission: string | null;
+    readonly resource: string;
+    readonly risk: CapabilityRisk;
+}
+
+// @public
+export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
+
+// @public
 export interface Currency {
     code: string;
     name: string;

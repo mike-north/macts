@@ -94,3 +94,5 @@ export { ScriptingEnumeratorResourceClient } from './resources/scriptingenumerat
 export { ScriptingParameterResourceClient } from './resources/scriptingparameter.js'
 export { ScriptingPropertyResourceClient } from './resources/scriptingproperty.js'
 export { ScriptingSuiteResourceClient } from './resources/scriptingsuite.js'
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

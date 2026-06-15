@@ -74,6 +74,25 @@ export const BookmarkItemSchema: z.ZodObject<{
 export type BookmarkItemUpdateInput = Partial<BookmarkItemCreateInput>;
 
 // @public
+export const capabilities: readonly CapabilityMetadata[];
+
+// @public
+export interface CapabilityMetadata {
+    readonly app: string;
+    readonly appBundleId: string;
+    readonly description: string;
+    readonly inputSchema: Record<string, unknown>;
+    readonly name: string;
+    readonly operation: string;
+    readonly permission: string | null;
+    readonly resource: string;
+    readonly risk: CapabilityRisk;
+}
+
+// @public
+export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
+
+// @public
 export class GoogleChromeClient {
     constructor(options: GoogleChromeClientOptions);
     readonly bookmarkfolders: BookmarkFolderResourceClient;

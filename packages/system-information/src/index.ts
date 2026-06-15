@@ -22,3 +22,5 @@ export { SystemInformationClient, SystemInformationError, HttpClient } from './c
 export type { SystemInformationClientOptions } from './client.js'
 export * from './types.js'
 export { DocumentResourceClient } from './resources/document.js'
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'
