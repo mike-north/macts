@@ -76,6 +76,7 @@ const client = new CalendarClient({
 
 // List all calendars
 const calendars = await client.calendars.list()
+console.log(calendars)
 
 // Create an event
 const event = await client.events.create({
@@ -83,6 +84,7 @@ const event = await client.events.create({
   startDate: new Date('2026-02-17T10:00:00'),
   endDate: new Date('2026-02-17T11:00:00'),
 })
+console.log(event.uid)
 ```
 
 **MCP tools (for AI assistants):**
@@ -93,7 +95,8 @@ plugins directory (`~/.macts/plugins`, override with `MACTS_HOME`):
 
 ```bash
 # Install an app's server package into the plugins directory…
-npm install --prefix ~/.macts/plugins @macts/calendar-server
+# (--ignore-scripts mirrors the built-in installer and avoids running package lifecycle scripts)
+npm install --ignore-scripts --prefix ~/.macts/plugins @macts/calendar-server
 # …then start the daemon and point Claude Desktop (or another MCP client) at it.
 macts mcp start
 ```
@@ -255,13 +258,14 @@ macts api-key create --name "assistant" --permission "calendar:events:create"
 macts api-key create --name "reader" \
   --permission "calendar:calendars:list" \
   --permission "calendar:events:list" \
-  --permission "calendar:events:get"
+  --permission "calendar:events:get" \
+  --permission "calendar:events:show"
 
 # Multiple apps, fine-grained (repeat --permission for each scope)
 macts api-key create --name "scheduler" \
   --permission "calendar:events:list" \
   --permission "calendar:events:create" \
-  --permission "reminders:tasks:list"
+  --permission "reminders:reminders:list"
 ```
 
 This is the difference between "let the AI control my computer" and "let the AI create Calendar
