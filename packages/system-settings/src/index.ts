@@ -22,6 +22,5 @@ export { SystemSettingsClient, SystemSettingsError, HttpClient } from './client.
 export type { SystemSettingsClientOptions } from './client.js'
 export * from './types.js'
 export { PaneResourceClient } from './resources/pane.js'
-export { AnchorResourceClient } from './resources/anchor.js'
 export { capabilities } from './capabilities.js'
 export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Shortcut, ShortcutCreateInput, ShortcutUpdateInput } from '../types.js'
+import type { Shortcut } from '../types.js'
 
 /**
  * Client for a shortcut in the shortcuts application.
@@ -35,30 +35,9 @@ export class ShortcutResourceClient {
   }
 
   /**
-   * Create a new shortcut.
-   */
-  async create(input: ShortcutCreateInput): Promise<Shortcut> {
-    return this.#http.rpc<Shortcut>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing shortcut.
-   */
-  async update(id: string, input: ShortcutUpdateInput): Promise<Shortcut> {
-    return this.#http.rpc<Shortcut>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a shortcut.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
-  }
-
-  /**
    * Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell 'Shortcuts Events' instead of 'Shortcuts'.
    */
   async run(id: string, withInput?: unknown): Promise<void> {
-    await this.#http.rpc<undefined>('shortcuts.shortcuts.run', { id, withInput })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.run`, { id, withInput })
   }
 }

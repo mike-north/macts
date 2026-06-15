@@ -6,10 +6,8 @@
  */
 
 import { MediaItemResourceClient } from './resources/mediaitem.js'
-import { ContainerResourceClient } from './resources/container.js'
 import { AlbumResourceClient } from './resources/album.js'
 import { FolderResourceClient } from './resources/folder.js'
-import { MomentResourceClient } from './resources/moment.js'
 
 /**
  * Client configuration options.
@@ -91,26 +89,18 @@ export class PhotosClient {
   /** A media item, such as a photo or video */
   readonly mediaitems: MediaItemResourceClient
 
-  /** Base class for collections that contains other items, such as albums and folders */
-  readonly containers: ContainerResourceClient
-
   /** An album. A container that holds media items */
   readonly albums: AlbumResourceClient
 
   /** A folder. A container that holds albums and other folders, but not media items */
   readonly folders: FolderResourceClient
 
-  /** A set of media items that represents a Moment */
-  readonly moments: MomentResourceClient
-
   constructor(options: PhotosClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.mediaitems = new MediaItemResourceClient(this.#httpClient, 'photos', 'mediaitems')
-    this.containers = new ContainerResourceClient(this.#httpClient, 'photos', 'containers')
     this.albums = new AlbumResourceClient(this.#httpClient, 'photos', 'albums')
     this.folders = new FolderResourceClient(this.#httpClient, 'photos', 'folders')
-    this.moments = new MomentResourceClient(this.#httpClient, 'photos', 'moments')
   }
 
   /**

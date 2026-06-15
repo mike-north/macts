@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Milestone, MilestoneCreateInput, MilestoneUpdateInput } from '../types.js'
+import type { Milestone, MilestoneCreateInput } from '../types.js'
 
 /**
  * Client for a milestone (zero-duration marker task).
@@ -24,34 +24,20 @@ export class MilestoneResourceClient {
    * List all milestones.
    */
   async list(): Promise<Milestone[]> {
-    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.listMilestones`)
   }
 
   /**
    * Get a milestone by id.
    */
   async get(id: string): Promise<Milestone> {
-    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.get`, { id })
+    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.getMilestone`, { id })
   }
 
   /**
    * Create a new milestone.
    */
   async create(input: MilestoneCreateInput): Promise<Milestone> {
-    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing milestone.
-   */
-  async update(id: string, input: MilestoneUpdateInput): Promise<Milestone> {
-    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a milestone.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.createMilestone`, input)
   }
 }

@@ -1,7 +1,6 @@
 ---
-'@macts/sdk-reminders': minor
-'@macts/mcp-reminders': minor
-'@macts/cli-reminders': minor
+'@macts/reminders': minor
+'@macts/reminders-server': minor
 ---
 
 Add Reminders.app support with SDK, MCP, and CLI packages

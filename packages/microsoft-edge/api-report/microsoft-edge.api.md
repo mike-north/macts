@@ -21,11 +21,8 @@ export interface BookmarkFolderCreateInput {
 // @public
 export class BookmarkFolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: BookmarkFolderCreateInput): Promise<BookmarkFolder>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<BookmarkFolder>;
     list(): Promise<BookmarkFolder[]>;
-    update(id: string, input: BookmarkFolderUpdateInput): Promise<BookmarkFolder>;
 }
 
 // @public (undocumented)
@@ -55,11 +52,8 @@ export interface BookmarkItemCreateInput {
 // @public
 export class BookmarkItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: BookmarkItemCreateInput): Promise<BookmarkItem>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<BookmarkItem>;
     list(): Promise<BookmarkItem[]>;
-    update(id: string, input: BookmarkItemUpdateInput): Promise<BookmarkItem>;
 }
 
 // @public (undocumented)
@@ -132,6 +126,7 @@ export interface Tab {
 // @public
 export interface TabCreateInput {
     uRL?: string;
+    windowId: string;
 }
 
 // @public
@@ -140,7 +135,6 @@ export class TabResourceClient {
     copySelection(tabId: string): Promise<void>;
     create(input: TabCreateInput): Promise<Tab>;
     cutSelection(tabId: string): Promise<void>;
-    delete(id: string): Promise<void>;
     execute(tabId: string, javascript: string): Promise<void>;
     get(id: string): Promise<Tab>;
     goBack(tabId: string): Promise<void>;
@@ -152,7 +146,6 @@ export class TabResourceClient {
     selectAll(tabId: string): Promise<void>;
     stop(tabId: string): Promise<void>;
     undo(tabId: string): Promise<void>;
-    update(id: string, input: TabUpdateInput): Promise<Tab>;
     viewSource(tabId: string): Promise<void>;
 }
 
@@ -212,10 +205,8 @@ export interface WindowCreateInput {
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: WindowCreateInput): Promise<Window>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Window>;
     list(): Promise<Window[]>;
-    update(id: string, input: WindowUpdateInput): Promise<Window>;
 }
 
 // @public (undocumented)

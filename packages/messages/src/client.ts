@@ -5,10 +5,6 @@
  * @packageDocumentation
  */
 
-import { ParticipantResourceClient } from './resources/participant.js'
-import { AccountResourceClient } from './resources/account.js'
-import { ChatResourceClient } from './resources/chat.js'
-
 /**
  * Client configuration options.
  */
@@ -86,21 +82,9 @@ export class MessagesError extends Error {
 export class MessagesClient {
   readonly #httpClient: HttpClient
 
-  /** A participant for an account. */
-  readonly participants: ParticipantResourceClient
-
-  /** An account that can be logged in to from this system */
-  readonly accounts: AccountResourceClient
-
-  /** An SMS or iMessage chat. */
-  readonly chats: ChatResourceClient
-
   constructor(options: MessagesClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.participants = new ParticipantResourceClient(this.#httpClient, 'messages', 'participants')
-    this.accounts = new AccountResourceClient(this.#httpClient, 'messages', 'accounts')
-    this.chats = new ChatResourceClient(this.#httpClient, 'messages', 'chats')
   }
 
   /**

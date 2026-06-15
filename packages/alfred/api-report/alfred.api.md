@@ -10,7 +10,6 @@ import { z } from 'zod';
 export class AlfredClient {
     constructor(options: AlfredClientOptions);
     action(items: string, asType?: string): Promise<void>;
-    readonly applications: ApplicationResourceClient;
     browse(path: string): Promise<void>;
     get http(): HttpClient;
     reloadWorkflow(workflow: string): Promise<void>;
@@ -42,16 +41,6 @@ export interface Application {
 
 // @public
 export type ApplicationCreateInput = Record<string, never>;
-
-// @public
-export class ApplicationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ApplicationCreateInput): Promise<Application>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<Application>;
-    list(): Promise<Application[]>;
-    update(name: string, input: ApplicationUpdateInput): Promise<Application>;
-}
 
 // @public (undocumented)
 export const ApplicationSchema: z.ZodObject<{

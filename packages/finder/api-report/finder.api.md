@@ -16,16 +16,6 @@ export interface AliasFileCreateInput {
     originalItem?: string;
 }
 
-// @public
-export class AliasFileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AliasFileCreateInput): Promise<AliasFile>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AliasFile>;
-    list(): Promise<AliasFile[]>;
-    update(id: string, input: AliasFileUpdateInput): Promise<AliasFile>;
-}
-
 // @public (undocumented)
 export const AliasFileSchema: z.ZodObject<{
     originalItem: z.ZodString;
@@ -50,16 +40,6 @@ export interface ApplicationFileCreateInput {
     minimumSize?: number;
     opensInClassic?: boolean;
     preferredSize?: number;
-}
-
-// @public
-export class ApplicationFileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ApplicationFileCreateInput): Promise<ApplicationFile>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ApplicationFile>;
-    list(): Promise<ApplicationFile[]>;
-    update(id: string, input: ApplicationFileUpdateInput): Promise<ApplicationFile>;
 }
 
 // @public (undocumented)
@@ -103,16 +83,6 @@ export interface Clipping {
 // @public
 export type ClippingCreateInput = Record<string, never>;
 
-// @public
-export class ClippingResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ClippingCreateInput): Promise<Clipping>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Clipping>;
-    list(): Promise<Clipping[]>;
-    update(id: string, input: ClippingUpdateInput): Promise<Clipping>;
-}
-
 // @public (undocumented)
 export const ClippingSchema: z.ZodObject<{
     clippingWindow: z.ZodString;
@@ -128,16 +98,6 @@ export interface ClippingWindow {
 
 // @public
 export type ClippingWindowCreateInput = Record<string, never>;
-
-// @public
-export class ClippingWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ClippingWindowCreateInput): Promise<ClippingWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ClippingWindow>;
-    list(): Promise<ClippingWindow[]>;
-    update(id: string, input: ClippingWindowUpdateInput): Promise<ClippingWindow>;
-}
 
 // @public (undocumented)
 export const ClippingWindowSchema: z.ZodObject<{
@@ -164,16 +124,6 @@ export interface ColumnCreateInput {
     sortDirection?: string;
     visible?: boolean;
     width?: number;
-}
-
-// @public
-export class ColumnResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ColumnCreateInput): Promise<Column>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Column>;
-    list(): Promise<Column[]>;
-    update(id: string, input: ColumnUpdateInput): Promise<Column>;
 }
 
 // @public (undocumented)
@@ -205,16 +155,6 @@ export interface ContainerCreateInput {
     expanded?: boolean;
 }
 
-// @public
-export class ContainerResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ContainerCreateInput): Promise<Container>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Container>;
-    list(): Promise<Container[]>;
-    update(id: string, input: ContainerUpdateInput): Promise<Container>;
-}
-
 // @public (undocumented)
 export const ContainerSchema: z.ZodObject<{
     entireContents: z.ZodString;
@@ -234,16 +174,6 @@ export interface DesktopObject {
 
 // @public
 export type DesktopObjectCreateInput = Record<string, never>;
-
-// @public
-export class DesktopObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DesktopObjectCreateInput): Promise<DesktopObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<DesktopObject>;
-    list(): Promise<DesktopObject[]>;
-    update(id: string, input: DesktopObjectUpdateInput): Promise<DesktopObject>;
-}
 
 // @public (undocumented)
 export const DesktopObjectSchema: z.ZodObject<{
@@ -271,16 +201,6 @@ export interface DiskCreateInput {
     ignorePrivileges?: boolean;
 }
 
-// @public
-export class DiskResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DiskCreateInput): Promise<Disk>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Disk>;
-    list(): Promise<Disk[]>;
-    update(id: string, input: DiskUpdateInput): Promise<Disk>;
-}
-
 // @public (undocumented)
 export const DiskSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -304,16 +224,6 @@ export interface DocumentFile {
 
 // @public
 export type DocumentFileCreateInput = Record<string, never>;
-
-// @public
-export class DocumentFileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DocumentFileCreateInput): Promise<DocumentFile>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<DocumentFile>;
-    list(): Promise<DocumentFile[]>;
-    update(id: string, input: DocumentFileUpdateInput): Promise<DocumentFile>;
-}
 
 // @public (undocumented)
 export const DocumentFileSchema: z.ZodObject<{
@@ -355,16 +265,6 @@ export interface FileCreateInput {
     stationery?: boolean;
 }
 
-// @public
-export class FileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FileCreateInput): Promise<File_2>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<File_2>;
-    list(): Promise<File_2[]>;
-    update(id: string, input: FileUpdateInput): Promise<File_2>;
-}
-
 // @public (undocumented)
 export const FileSchema: z.ZodObject<{
     fileType: z.ZodString;
@@ -381,37 +281,22 @@ export type FileUpdateInput = Partial<FileCreateInput>;
 export class FinderClient {
     constructor(options: FinderClientOptions);
     activate(): Promise<void>;
-    readonly aliasfiles: AliasFileResourceClient;
-    readonly applicationfiles: ApplicationFileResourceClient;
     cleanUp(by?: string): Promise<void>;
-    readonly clippings: ClippingResourceClient;
-    readonly clippingwindows: ClippingWindowResourceClient;
     close(): Promise<void>;
-    readonly columns: ColumnResourceClient;
-    readonly containers: ContainerResourceClient;
     copy(): Promise<void>;
     count(each: string): Promise<void>;
     dataSize(as?: string): Promise<void>;
     _delete(): Promise<void>;
-    readonly desktopobjects: DesktopObjectResourceClient;
-    readonly disks: DiskResourceClient;
-    readonly documentfiles: DocumentFileResourceClient;
     duplicate(to?: string, replacing?: boolean, routingSuppressed?: boolean, exactCopy?: boolean): Promise<void>;
     eject(): Promise<void>;
     empty(security?: boolean): Promise<void>;
     erase(): Promise<void>;
     exists(): Promise<void>;
-    readonly files: FileResourceClient;
-    readonly finderwindows: FinderWindowResourceClient;
-    readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    readonly internetlocationfiles: InternetLocationFileResourceClient;
-    readonly listviewoptionss: ListViewOptionsResourceClient;
     make(_new: string, at: string, to?: string, withProperties?: unknown): Promise<void>;
     move(to: string, replacing?: boolean, positionedAt?: string, routingSuppressed?: boolean): Promise<void>;
     open(using?: string, withProperties?: unknown): Promise<void>;
     openVirtualLocation(): Promise<void>;
-    readonly packages: PackageResourceClient;
     print(withProperties?: unknown): Promise<void>;
     quit(): Promise<void>;
     restart(): Promise<void>;
@@ -420,7 +305,6 @@ export class FinderClient {
     shutDown(): Promise<void>;
     sleep(): Promise<void>;
     sort(by: string): Promise<void>;
-    readonly trashobjects: TrashObjectResourceClient;
     update(necessity?: boolean, registeringApplications?: boolean): Promise<void>;
 }
 
@@ -460,16 +344,6 @@ export interface FinderWindowCreateInput {
     toolbarVisible?: boolean;
 }
 
-// @public
-export class FinderWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FinderWindowCreateInput): Promise<FinderWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<FinderWindow>;
-    list(): Promise<FinderWindow[]>;
-    update(id: string, input: FinderWindowUpdateInput): Promise<FinderWindow>;
-}
-
 // @public (undocumented)
 export const FinderWindowSchema: z.ZodObject<{
     target: z.ZodString;
@@ -494,16 +368,6 @@ export interface Folder {
 // @public
 export type FolderCreateInput = Record<string, never>;
 
-// @public
-export class FolderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
-    update(id: string, input: FolderUpdateInput): Promise<Folder>;
-}
-
 // @public (undocumented)
 export const FolderSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -525,16 +389,6 @@ export interface InternetLocationFile {
 
 // @public
 export type InternetLocationFileCreateInput = Record<string, never>;
-
-// @public
-export class InternetLocationFileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: InternetLocationFileCreateInput): Promise<InternetLocationFile>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<InternetLocationFile>;
-    list(): Promise<InternetLocationFile[]>;
-    update(id: string, input: InternetLocationFileUpdateInput): Promise<InternetLocationFile>;
-}
 
 // @public (undocumented)
 export const InternetLocationFileSchema: z.ZodObject<{
@@ -570,16 +424,6 @@ export interface ListViewOptionsCreateInput {
     usesRelativeDates?: boolean;
 }
 
-// @public
-export class ListViewOptionsResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ListViewOptionsCreateInput): Promise<ListViewOptions>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ListViewOptions>;
-    list(): Promise<ListViewOptions[]>;
-    update(id: string, input: ListViewOptionsUpdateInput): Promise<ListViewOptions>;
-}
-
 // @public (undocumented)
 export const ListViewOptionsSchema: z.ZodObject<{
     calculatesFolderSizes: z.ZodBoolean;
@@ -603,16 +447,6 @@ export interface Package {
 
 // @public
 export type PackageCreateInput = Record<string, never>;
-
-// @public
-export class PackageResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PackageCreateInput): Promise<Package>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Package>;
-    list(): Promise<Package[]>;
-    update(id: string, input: PackageUpdateInput): Promise<Package>;
-}
 
 // @public (undocumented)
 export const PackageSchema: z.ZodObject<{
@@ -642,16 +476,6 @@ export interface TrashObject {
 // @public
 export interface TrashObjectCreateInput {
     warnsBeforeEmptying?: boolean;
-}
-
-// @public
-export class TrashObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TrashObjectCreateInput): Promise<TrashObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<TrashObject>;
-    list(): Promise<TrashObject[]>;
-    update(id: string, input: TrashObjectUpdateInput): Promise<TrashObject>;
 }
 
 // @public (undocumented)

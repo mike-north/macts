@@ -4,11 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type {
-  BookmarkFolder,
-  BookmarkFolderCreateInput,
-  BookmarkFolderUpdateInput,
-} from '../types.js'
+import type { BookmarkFolder } from '../types.js'
 
 /**
  * Client for a bookmarks folder that contains other bookmarks folder and bookmark items..
@@ -28,34 +24,15 @@ export class BookmarkFolderResourceClient {
    * List all bookmarkfolders.
    */
   async list(): Promise<BookmarkFolder[]> {
-    return this.#http.rpc<BookmarkFolder[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<BookmarkFolder[]>(`${this.#app}.${this.#resource}.listBookmarkFolders`)
   }
 
   /**
    * Get a bookmarkfolder by id.
    */
   async get(id: string): Promise<BookmarkFolder> {
-    return this.#http.rpc<BookmarkFolder>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new bookmarkfolder.
-   */
-  async create(input: BookmarkFolderCreateInput): Promise<BookmarkFolder> {
-    return this.#http.rpc<BookmarkFolder>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing bookmarkfolder.
-   */
-  async update(id: string, input: BookmarkFolderUpdateInput): Promise<BookmarkFolder> {
-    return this.#http.rpc<BookmarkFolder>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a bookmarkfolder.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<BookmarkFolder>(`${this.#app}.${this.#resource}.getBookmarkFolder`, {
+      id,
+    })
   }
 }

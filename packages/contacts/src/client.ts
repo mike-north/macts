@@ -5,22 +5,6 @@
  * @packageDocumentation
  */
 
-import { AddressResourceClient } from './resources/address.js'
-import { AIMHandleResourceClient } from './resources/aimhandle.js'
-import { CustomDateResourceClient } from './resources/customdate.js'
-import { EmailResourceClient } from './resources/email.js'
-import { GroupResourceClient } from './resources/group.js'
-import { ICQHandleResourceClient } from './resources/icqhandle.js'
-import { InstantMessageResourceClient } from './resources/instantmessage.js'
-import { JabberHandleResourceClient } from './resources/jabberhandle.js'
-import { MSNHandleResourceClient } from './resources/msnhandle.js'
-import { PersonResourceClient } from './resources/person.js'
-import { PhoneResourceClient } from './resources/phone.js'
-import { RelatedNameResourceClient } from './resources/relatedname.js'
-import { SocialProfileResourceClient } from './resources/socialprofile.js'
-import { UrlResourceClient } from './resources/url.js'
-import { YahooHandleResourceClient } from './resources/yahoohandle.js'
-
 /**
  * Client configuration options.
  */
@@ -98,81 +82,9 @@ export class ContactsError extends Error {
 export class ContactsClient {
   readonly #httpClient: HttpClient
 
-  /** Address for the given record. */
-  readonly addresses: AddressResourceClient
-
-  /** User name for America Online (AOL) instant messaging. */
-  readonly aimhandles: AIMHandleResourceClient
-
-  /** Arbitrary date associated with this person. */
-  readonly customdates: CustomDateResourceClient
-
-  /** Email address for a person. */
-  readonly emails: EmailResourceClient
-
-  /** A Group Record in the address book database */
-  readonly groups: GroupResourceClient
-
-  /** User name for ICQ instant messaging. */
-  readonly icqhandles: ICQHandleResourceClient
-
-  /** Address for instant messaging. */
-  readonly instantmessages: InstantMessageResourceClient
-
-  /** User name for Jabber instant messaging. */
-  readonly jabberhandles: JabberHandleResourceClient
-
-  /** User name for Microsoft Network (MSN) instant messaging. */
-  readonly msnhandles: MSNHandleResourceClient
-
-  /** A person in the address book database. */
-  readonly people: PersonResourceClient
-
-  /** Phone number for a person. */
-  readonly phones: PhoneResourceClient
-
-  /** Other names related to this person. */
-  readonly relatednames: RelatedNameResourceClient
-
-  /** Profile for social networks. */
-  readonly socialprofiles: SocialProfileResourceClient
-
-  /** URLs for this person. */
-  readonly urls: UrlResourceClient
-
-  /** User name for Yahoo instant messaging. */
-  readonly yahoohandles: YahooHandleResourceClient
-
   constructor(options: ContactsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.addresses = new AddressResourceClient(this.#httpClient, 'contacts', 'addresses')
-    this.aimhandles = new AIMHandleResourceClient(this.#httpClient, 'contacts', 'aimhandles')
-    this.customdates = new CustomDateResourceClient(this.#httpClient, 'contacts', 'customdates')
-    this.emails = new EmailResourceClient(this.#httpClient, 'contacts', 'emails')
-    this.groups = new GroupResourceClient(this.#httpClient, 'contacts', 'groups')
-    this.icqhandles = new ICQHandleResourceClient(this.#httpClient, 'contacts', 'icqhandles')
-    this.instantmessages = new InstantMessageResourceClient(
-      this.#httpClient,
-      'contacts',
-      'instantmessages'
-    )
-    this.jabberhandles = new JabberHandleResourceClient(
-      this.#httpClient,
-      'contacts',
-      'jabberhandles'
-    )
-    this.msnhandles = new MSNHandleResourceClient(this.#httpClient, 'contacts', 'msnhandles')
-    this.people = new PersonResourceClient(this.#httpClient, 'contacts', 'people')
-    this.phones = new PhoneResourceClient(this.#httpClient, 'contacts', 'phones')
-    this.relatednames = new RelatedNameResourceClient(this.#httpClient, 'contacts', 'relatednames')
-    this.socialprofiles = new SocialProfileResourceClient(
-      this.#httpClient,
-      'contacts',
-      'socialprofiles'
-    )
-    this.urls = new UrlResourceClient(this.#httpClient, 'contacts', 'urls')
-    this.yahoohandles = new YahooHandleResourceClient(this.#httpClient, 'contacts', 'yahoohandles')
   }
 
   /**

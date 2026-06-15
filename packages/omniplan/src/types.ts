@@ -99,13 +99,13 @@ export interface Task {
 
 /** Input for creating a Task */
 export interface TaskCreateInput {
-  /** The name of the task */
-  name?: string
-  /** The date on which work begins */
+  /** Task name */
+  name: string
+  /** Start date */
   startingDate?: Date
   /** The date on which work ends */
   endingDate?: Date
-  /** The number of working seconds occupied by task */
+  /** Duration in seconds */
   duration?: number
   /** The number of person-seconds required to perform the task */
   effort?: number
@@ -148,9 +148,9 @@ export interface Milestone {
 
 /** Input for creating a Milestone */
 export interface MilestoneCreateInput {
-  /** The name of the milestone */
-  name?: string
-  /** The date of the milestone */
+  /** Milestone name */
+  name: string
+  /** Milestone date */
   startingDate?: Date
   /** Notes */
   note?: string
@@ -191,9 +191,9 @@ export interface Resource {
 
 /** Input for creating a Resource */
 export interface ResourceCreateInput {
-  /** The name of the resource */
-  name?: string
-  /** Type of the resource */
+  /** Resource name */
+  name: string
+  /** Resource type */
   resourceType?: ResourceType
   /** The total number of units for this resource (1.0 = 100%) */
   number?: number

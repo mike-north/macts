@@ -36,9 +36,9 @@ export interface List {
 
 /** Input for creating a List */
 export interface ListCreateInput {
-  /** The name of the list */
-  name?: string
-  /** The color of the list */
+  /** List name */
+  name: string
+  /** List color */
   color?: { r: number; g: number; b: number }
   /** The emblem icon name of the list */
   emblem?: string
@@ -77,22 +77,24 @@ export interface Reminder {
 
 /** Input for creating a Reminder */
 export interface ReminderCreateInput {
-  /** The name of the reminder */
-  name?: string
-  /** The notes attached to the reminder */
+  /** Reminder name */
+  name: string
+  /** Reminder notes */
   body?: string
   /** Whether the reminder is completed */
   completed?: boolean
-  /** The due date of the reminder */
+  /** Due date */
   dueDate?: Date
-  /** The remind date of the reminder */
+  /** Remind me date */
   remindMeDate?: Date
-  /** The priority of the reminder (0=none, 1=high, 5=medium, 9=low) */
+  /** Priority (0=none, 1=high, 5=medium, 9=low) */
   priority?: number
-  /** Whether the reminder is flagged */
+  /** Whether to flag the reminder */
   flagged?: boolean
   /** The all-day due date of the reminder */
   allDayDueDate?: Date
+  /** List identifier for the reminder */
+  listId: string
 }
 
 /** Input for updating a Reminder */

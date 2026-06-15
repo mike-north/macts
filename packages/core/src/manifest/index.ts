@@ -15,3 +15,7 @@ export * from './loader.js'
 
 // JSON Schema generation utilities
 export * from './json-schema.js'
+
+// Canonical RPC route derivation (single source of truth shared by the
+// client SDK generator and the server router)
+export * from './route.js'

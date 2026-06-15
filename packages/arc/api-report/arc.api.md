@@ -19,10 +19,7 @@ export class ArcClient {
     make(_new: string, withProperties?: unknown): Promise<void>;
     reload(): Promise<void>;
     select(): Promise<void>;
-    readonly spaces: SpaceResourceClient;
     stop(): Promise<void>;
-    readonly tabs: TabResourceClient;
-    readonly windows: WindowResourceClient;
 }
 
 // @public
@@ -72,16 +69,6 @@ export interface Space {
 // @public
 export type SpaceCreateInput = Record<string, never>;
 
-// @public
-export class SpaceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SpaceCreateInput): Promise<Space>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Space>;
-    list(): Promise<Space[]>;
-    update(id: string, input: SpaceUpdateInput): Promise<Space>;
-}
-
 // @public (undocumented)
 export const SpaceSchema: z.ZodObject<{
     id: z.ZodString;
@@ -104,16 +91,6 @@ export interface Tab {
 export interface TabCreateInput {
     location?: string;
     uRL?: string;
-}
-
-// @public
-export class TabResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabCreateInput): Promise<Tab>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Tab>;
-    list(): Promise<Tab[]>;
-    update(id: string, input: TabUpdateInput): Promise<Tab>;
 }
 
 // @public (undocumented)
@@ -154,16 +131,6 @@ export interface WindowCreateInput {
     mode?: string;
     visible?: boolean;
     zoomed?: boolean;
-}
-
-// @public
-export class WindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: WindowCreateInput): Promise<Window>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Window>;
-    list(): Promise<Window[]>;
-    update(id: string, input: WindowUpdateInput): Promise<Window>;
 }
 
 // @public (undocumented)

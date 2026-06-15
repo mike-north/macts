@@ -45,11 +45,8 @@ export interface AutomatorActionCreateInput {
 // @public
 export class AutomatorActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AutomatorActionCreateInput): Promise<AutomatorAction>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<AutomatorAction>;
     list(): Promise<AutomatorAction[]>;
-    update(id: string, input: AutomatorActionUpdateInput): Promise<AutomatorAction>;
 }
 
 // @public (undocumented)
@@ -147,11 +144,8 @@ export type RequiredResourceCreateInput = Record<string, never>;
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: RequiredResourceCreateInput): Promise<RequiredResource>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<RequiredResource>;
     list(): Promise<RequiredResource[]>;
-    update(name: string, input: RequiredResourceUpdateInput): Promise<RequiredResource>;
 }
 
 // @public (undocumented)
@@ -180,11 +174,8 @@ export interface SettingCreateInput {
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: SettingCreateInput): Promise<Setting>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Setting>;
     list(): Promise<Setting[]>;
-    update(name: string, input: SettingUpdateInput): Promise<Setting>;
 }
 
 // @public (undocumented)
@@ -214,11 +205,8 @@ export interface VariableCreateInput {
 // @public
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: VariableCreateInput): Promise<Variable>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Variable>;
     list(): Promise<Variable[]>;
-    update(id: string, input: VariableUpdateInput): Promise<Variable>;
 }
 
 // @public (undocumented)
@@ -251,12 +239,9 @@ export type WorkflowCreateInput = Record<string, never>;
 // @public
 export class WorkflowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: WorkflowCreateInput): Promise<Workflow>;
-    delete(name: string): Promise<void>;
     execute(workflow: unknown): Promise<void>;
     get(name: string): Promise<Workflow>;
     list(): Promise<Workflow[]>;
-    update(name: string, input: WorkflowUpdateInput): Promise<Workflow>;
 }
 
 // @public (undocumented)

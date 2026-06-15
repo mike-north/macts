@@ -40,7 +40,7 @@ export interface CanvasCreateInput {
     columnSpacing?: number;
     horizontalPages?: number;
     id?: string;
-    name?: string;
+    name: string;
     rowAlignment?: VerticalAlignment;
     rowSpacing?: number;
     verticalPages?: number;
@@ -50,10 +50,8 @@ export interface CanvasCreateInput {
 export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CanvasCreateInput): Promise<Canvas>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Canvas>;
     list(): Promise<Canvas[]>;
-    update(id: string, input: CanvasUpdateInput): Promise<Canvas>;
 }
 
 // @public (undocumented)
@@ -125,16 +123,6 @@ export interface ExportSettingsCreateInput {
     includeNonprintingLayers?: boolean;
     resolution?: number;
     useArtboards?: boolean;
-}
-
-// @public
-export class ExportSettingsResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ExportSettingsCreateInput): Promise<ExportSettings>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ExportSettings>;
-    list(): Promise<ExportSettings[]>;
-    update(id: string, input: ExportSettingsUpdateInput): Promise<ExportSettings>;
 }
 
 // @public (undocumented)
@@ -253,11 +241,8 @@ export interface GraphicCreateInput {
 // @public
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: GraphicCreateInput): Promise<Graphic>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Graphic>;
     list(): Promise<Graphic[]>;
-    update(id: string, input: GraphicUpdateInput): Promise<Graphic>;
 }
 
 // @public (undocumented)
@@ -351,16 +336,6 @@ export interface GridCreateInput {
     visible?: boolean;
 }
 
-// @public
-export class GridResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: GridCreateInput): Promise<Grid>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Grid>;
-    list(): Promise<Grid[]>;
-    update(id: string, input: GridUpdateInput): Promise<Grid>;
-}
-
 // @public (undocumented)
 export const GridSchema: z.ZodObject<{
     visible: z.ZodBoolean;
@@ -395,16 +370,6 @@ export interface Group {
 export interface GroupCreateInput {
     connectToGroupOnly?: boolean;
     rotation?: number;
-}
-
-// @public
-export class GroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: GroupCreateInput): Promise<Group>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Group>;
-    list(): Promise<Group[]>;
-    update(id: string, input: GroupUpdateInput): Promise<Group>;
 }
 
 // @public (undocumented)
@@ -452,16 +417,6 @@ export interface LabelCreateInput {
 // @public
 export type LabelOrientation = 'horizontal' | 'vertical' | 'parallel' | 'perpendicular' | 'custom';
 
-// @public
-export class LabelResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: LabelCreateInput): Promise<Label>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Label>;
-    list(): Promise<Label[]>;
-    update(id: string, input: LabelUpdateInput): Promise<Label>;
-}
-
 // @public (undocumented)
 export const LabelSchema: z.ZodObject<{
     id: z.ZodString;
@@ -484,8 +439,9 @@ export interface Layer {
 
 // @public
 export interface LayerCreateInput {
+    canvasId: string;
     locked?: boolean;
-    name?: string;
+    name: string;
     prints?: boolean;
     visible?: boolean;
 }
@@ -494,10 +450,8 @@ export interface LayerCreateInput {
 export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: LayerCreateInput): Promise<Layer>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Layer>;
     list(): Promise<Layer[]>;
-    update(name: string, input: LayerUpdateInput): Promise<Layer>;
 }
 
 // @public (undocumented)
@@ -545,11 +499,8 @@ export interface LineCreateInput {
 // @public
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: LineCreateInput): Promise<Line>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Line>;
     list(): Promise<Line[]>;
-    update(id: string, input: LineUpdateInput): Promise<Line>;
 }
 
 // @public (undocumented)
@@ -583,16 +534,6 @@ export interface MasterCreateInput {
     name?: string;
 }
 
-// @public
-export class MasterResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MasterCreateInput): Promise<Master>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Master>;
-    list(): Promise<Master[]>;
-    update(id: string, input: MasterUpdateInput): Promise<Master>;
-}
-
 // @public (undocumented)
 export const MasterSchema: z.ZodObject<{
     id: z.ZodString;
@@ -610,24 +551,18 @@ export class OmniGraffleClient {
     connect(from: string, to: string): Promise<void>;
     evaluateJavascript(script: string): Promise<void>;
     _export(as: string, scope: ExportAreaType, to: string): Promise<void>;
-    readonly exportsettings: ExportSettingsResourceClient;
     flip(over: Orientation): Promise<void>;
     readonly graphics: GraphicResourceClient;
-    readonly grids: GridResourceClient;
-    readonly groups: GroupResourceClient;
     get http(): HttpClient;
-    readonly labels: LabelResourceClient;
     readonly layers: LayerResourceClient;
     layout(): Promise<void>;
     readonly lines: LineResourceClient;
-    readonly masters: MasterResourceClient;
     pageAdjust(): Promise<void>;
     readonly shapes: ShapeResourceClient;
     slide(by: {
         x: number;
         y: number;
     }): Promise<void>;
-    readonly subgraphs: SubgraphResourceClient;
 }
 
 // @public
@@ -673,6 +608,7 @@ export interface Shape {
 // @public
 export interface ShapeCreateInput {
     autosizing?: TextAutosizing;
+    canvasId: number;
     fill?: FillType;
     fillColor?: {
         r: number;
@@ -686,8 +622,16 @@ export interface ShapeCreateInput {
         b: number;
     };
     name?: string;
+    origin: {
+        x: number;
+        y: number;
+    };
     rotation?: number;
     sidePadding?: number;
+    size: {
+        x: number;
+        y: number;
+    };
     text?: string;
     textPlacement?: VerticalAlignment;
     verticalPadding?: number;
@@ -697,10 +641,8 @@ export interface ShapeCreateInput {
 export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ShapeCreateInput): Promise<Shape>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Shape>;
     list(): Promise<Shape[]>;
-    update(id: string, input: ShapeUpdateInput): Promise<Shape>;
 }
 
 // @public (undocumented)
@@ -753,16 +695,6 @@ export interface SubgraphCreateInput {
     leftMargin?: number;
     rightMargin?: number;
     topMargin?: number;
-}
-
-// @public
-export class SubgraphResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SubgraphCreateInput): Promise<Subgraph>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Subgraph>;
-    list(): Promise<Subgraph[]>;
-    update(id: string, input: SubgraphUpdateInput): Promise<Subgraph>;
 }
 
 // @public (undocumented)

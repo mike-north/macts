@@ -1,6 +1,5 @@
 import type { CliPlugin } from '@macts/cli'
 import { ListAccountsCommand } from './commands/accounts/list.js'
-import { GetAccountCommand } from './commands/accounts/get.js'
 import { ListListsCommand } from './commands/lists/list.js'
 import { CreateListCommand } from './commands/lists/create.js'
 import { GetListCommand } from './commands/lists/get.js'
@@ -18,7 +17,6 @@ export const plugin: CliPlugin = {
   description: 'Commands for Reminders',
   commands: [
     ListAccountsCommand,
-    GetAccountCommand,
     ListListsCommand,
     CreateListCommand,
     GetListCommand,

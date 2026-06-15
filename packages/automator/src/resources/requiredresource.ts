@@ -4,11 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type {
-  RequiredResource,
-  RequiredResourceCreateInput,
-  RequiredResourceUpdateInput,
-} from '../types.js'
+import type { RequiredResource } from '../types.js'
 
 /**
  * Client for a resource required for proper operation of the action.
@@ -28,37 +24,17 @@ export class RequiredResourceResourceClient {
    * List all requiredresources.
    */
   async list(): Promise<RequiredResource[]> {
-    return this.#http.rpc<RequiredResource[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<RequiredResource[]>(
+      `${this.#app}.${this.#resource}.listRequiredResources`
+    )
   }
 
   /**
    * Get a requiredresource by name.
    */
   async get(name: string): Promise<RequiredResource> {
-    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new requiredresource.
-   */
-  async create(input: RequiredResourceCreateInput): Promise<RequiredResource> {
-    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing requiredresource.
-   */
-  async update(name: string, input: RequiredResourceUpdateInput): Promise<RequiredResource> {
-    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.update`, {
+    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.getRequiredResource`, {
       name,
-      ...input,
     })
-  }
-
-  /**
-   * Delete a requiredresource.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

@@ -193,6 +193,10 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
     }
 
     case 'create': {
+      // The SDK `create` method takes a single input object
+      // (`${resource}CreateInput`) which now includes the backing command's
+      // identifier parameters (e.g. `calendarId`). The MCP tool's input schema is
+      // built from those same fields, so the whole args object maps directly.
       const methodRef = `client.${resourceName}.create`
       return `async (args) => {
     const client = getClient();

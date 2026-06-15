@@ -53,7 +53,7 @@ export interface WindowCreateInput {
   visible?: boolean
   /** Whether the window is currently zoomed. */
   zoomed?: boolean
-  /** Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window. */
+  /** Window mode (normal or incognito) */
   mode?: string
   /** The index of the active tab. */
   activeTabIndex?: number
@@ -76,8 +76,10 @@ export interface Tab {
 
 /** Input for creating a Tab */
 export interface TabCreateInput {
-  /** The url visible to the user. */
+  /** URL to load in the tab */
   uRL?: string
+  /** Window identifier for the tab */
+  windowId: string
 }
 
 /** Input for updating a Tab */

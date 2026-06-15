@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Note, NoteCreateInput, NoteUpdateInput } from '../types.js'
+import type { Note, NoteCreateInput } from '../types.js'
 
 /**
  * Client for a note.
@@ -42,23 +42,9 @@ export class NoteResourceClient {
   }
 
   /**
-   * Update an existing note.
-   */
-  async update(name: string, input: NoteUpdateInput): Promise<Note> {
-    return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a note.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
-  }
-
-  /**
    * Show a note in the Notes app
    */
   async show(name: string): Promise<void> {
-    await this.#http.rpc<undefined>('notes.notes.show', { name })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, { name })
   }
 }

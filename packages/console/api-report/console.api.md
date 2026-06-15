@@ -28,7 +28,6 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class ConsoleClient {
     constructor(options: ConsoleClientOptions);
-    readonly devices: DeviceResourceClient;
     get http(): HttpClient;
     selectDevice(): Promise<void>;
 }
@@ -54,16 +53,6 @@ export interface Device {
 
 // @public
 export type DeviceCreateInput = Record<string, never>;
-
-// @public
-export class DeviceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DeviceCreateInput): Promise<Device>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Device>;
-    list(): Promise<Device[]>;
-    update(id: string, input: DeviceUpdateInput): Promise<Device>;
-}
 
 // @public (undocumented)
 export const DeviceSchema: z.ZodObject<{

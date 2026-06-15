@@ -38,11 +38,8 @@ export type ConnectionCreateInput = Record<string, never>;
 // @public
 export class ConnectionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ConnectionCreateInput): Promise<Connection>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Connection>;
     list(): Promise<Connection[]>;
-    update(id: string, input: ConnectionUpdateInput): Promise<Connection>;
 }
 
 // @public (undocumented)

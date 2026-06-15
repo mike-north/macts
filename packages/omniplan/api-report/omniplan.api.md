@@ -19,11 +19,7 @@ export interface AssignmentCreateInput {
 // @public
 export class AssignmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AssignmentCreateInput): Promise<Assignment>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Assignment>;
     list(): Promise<Assignment[]>;
-    update(id: string, input: AssignmentUpdateInput): Promise<Assignment>;
 }
 
 // @public (undocumented)
@@ -63,16 +59,6 @@ export interface Currency {
 // @public
 export type CurrencyCreateInput = Record<string, never>;
 
-// @public
-export class CurrencyResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CurrencyCreateInput): Promise<Currency>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Currency>;
-    list(): Promise<Currency[]>;
-    update(id: string, input: CurrencyUpdateInput): Promise<Currency>;
-}
-
 // @public (undocumented)
 export const CurrencySchema: z.ZodObject<{
     code: z.ZodString;
@@ -100,11 +86,7 @@ export interface DependencyCreateInput {
 // @public
 export class DependencyResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: DependencyCreateInput): Promise<Dependency>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Dependency>;
     list(): Promise<Dependency[]>;
-    update(id: string, input: DependencyUpdateInput): Promise<Dependency>;
 }
 
 // @public (undocumented)
@@ -136,7 +118,7 @@ export interface Milestone {
 
 // @public
 export interface MilestoneCreateInput {
-    name?: string;
+    name: string;
     note?: string;
     startingDate?: Date;
 }
@@ -145,10 +127,8 @@ export interface MilestoneCreateInput {
 export class MilestoneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: MilestoneCreateInput): Promise<Milestone>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Milestone>;
     list(): Promise<Milestone[]>;
-    update(id: string, input: MilestoneUpdateInput): Promise<Milestone>;
 }
 
 // @public (undocumented)
@@ -170,7 +150,6 @@ export class OmniPlanClient {
     readonly assignments: AssignmentResourceClient;
     baseline(): Promise<void>;
     changeMark(): Promise<void>;
-    readonly currencies: CurrencyResourceClient;
     depend(prerequisite: string, dependent: string): Promise<void>;
     readonly dependencies: DependencyResourceClient;
     _export(to: string): Promise<void>;
@@ -182,7 +161,6 @@ export class OmniPlanClient {
     redo(): Promise<void>;
     readonly resources: ResourceResourceClient;
     readonly scenarios: ScenarioResourceClient;
-    readonly schedules: ScheduleResourceClient;
     subtractWorkTime(schedule: string): Promise<void>;
     readonly tasks: TaskResourceClient;
     undo(): Promise<void>;
@@ -222,11 +200,8 @@ export interface ProjectCreateInput {
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ProjectCreateInput): Promise<Project>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Project>;
     list(): Promise<Project[]>;
-    update(id: string, input: ProjectUpdateInput): Promise<Project>;
 }
 
 // @public (undocumented)
@@ -267,7 +242,7 @@ export interface ResourceCreateInput {
     costPerUse?: number;
     efficiency?: number;
     emailAddress?: string;
-    name?: string;
+    name: string;
     note?: string;
     number?: number;
     resourceType?: ResourceType;
@@ -277,10 +252,8 @@ export interface ResourceCreateInput {
 export class ResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ResourceCreateInput): Promise<Resource>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Resource>;
     list(): Promise<Resource[]>;
-    update(id: string, input: ResourceUpdateInput): Promise<Resource>;
 }
 
 // @public (undocumented)
@@ -330,11 +303,8 @@ export interface ScenarioCreateInput {
 // @public
 export class ScenarioResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScenarioCreateInput): Promise<Scenario>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Scenario>;
     list(): Promise<Scenario[]>;
-    update(id: string, input: ScenarioUpdateInput): Promise<Scenario>;
 }
 
 // @public (undocumented)
@@ -359,16 +329,6 @@ export type Schedule = Record<string, never>;
 
 // @public
 export type ScheduleCreateInput = Record<string, never>;
-
-// @public
-export class ScheduleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScheduleCreateInput): Promise<Schedule>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Schedule>;
-    list(): Promise<Schedule[]>;
-    update(id: string, input: ScheduleUpdateInput): Promise<Schedule>;
-}
 
 // @public (undocumented)
 export const ScheduleSchema: z.ZodObject<{}, z.core.$strip>;
@@ -414,7 +374,7 @@ export interface TaskCreateInput {
     endingConstraintDate?: Date;
     endingDate?: Date;
     endingDateLocked?: boolean;
-    name?: string;
+    name: string;
     note?: string;
     priority?: number;
     startingConstraintDate?: Date;
@@ -428,10 +388,8 @@ export interface TaskCreateInput {
 export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Task>;
     list(): Promise<Task[]>;
-    update(id: string, input: TaskUpdateInput): Promise<Task>;
 }
 
 // @public (undocumented)
@@ -482,12 +440,8 @@ export type ViolationCreateInput = Record<string, never>;
 // @public
 export class ViolationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ViolationCreateInput): Promise<Violation>;
-    delete(id: string): Promise<void>;
     fix(): Promise<void>;
-    get(id: string): Promise<Violation>;
     list(): Promise<Violation[]>;
-    update(id: string, input: ViolationUpdateInput): Promise<Violation>;
 }
 
 // @public (undocumented)

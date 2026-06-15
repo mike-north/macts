@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Workflow, WorkflowCreateInput, WorkflowUpdateInput } from '../types.js'
+import type { Workflow } from '../types.js'
 
 /**
  * Client for a series of actions stored in a file.
@@ -35,30 +35,9 @@ export class WorkflowResourceClient {
   }
 
   /**
-   * Create a new workflow.
-   */
-  async create(input: WorkflowCreateInput): Promise<Workflow> {
-    return this.#http.rpc<Workflow>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing workflow.
-   */
-  async update(name: string, input: WorkflowUpdateInput): Promise<Workflow> {
-    return this.#http.rpc<Workflow>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a workflow.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
-  }
-
-  /**
    * Execute a workflow
    */
   async execute(workflow: unknown): Promise<void> {
-    await this.#http.rpc<undefined>('automator.workflows.execute', { workflow })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { workflow })
   }
 }

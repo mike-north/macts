@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Scenario, ScenarioCreateInput, ScenarioUpdateInput } from '../types.js'
+import type { Scenario } from '../types.js'
 
 /**
  * Client for an alternative project plan.
@@ -24,34 +24,13 @@ export class ScenarioResourceClient {
    * List all scenarios.
    */
   async list(): Promise<Scenario[]> {
-    return this.#http.rpc<Scenario[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Scenario[]>(`${this.#app}.${this.#resource}.listScenarios`)
   }
 
   /**
    * Get a scenario by id.
    */
   async get(id: string): Promise<Scenario> {
-    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new scenario.
-   */
-  async create(input: ScenarioCreateInput): Promise<Scenario> {
-    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing scenario.
-   */
-  async update(id: string, input: ScenarioUpdateInput): Promise<Scenario> {
-    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a scenario.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.getScenario`, { id })
   }
 }

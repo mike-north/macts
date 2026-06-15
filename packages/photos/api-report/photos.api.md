@@ -21,11 +21,8 @@ export interface AlbumCreateInput {
 // @public
 export class AlbumResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AlbumCreateInput): Promise<Album>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Album>;
     list(): Promise<Album[]>;
-    update(id: string, input: AlbumUpdateInput): Promise<Album>;
 }
 
 // @public (undocumented)
@@ -69,16 +66,6 @@ export interface ContainerCreateInput {
     name?: string;
 }
 
-// @public
-export class ContainerResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ContainerCreateInput): Promise<Container>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Container>;
-    list(): Promise<Container[]>;
-    update(id: string, input: ContainerUpdateInput): Promise<Container>;
-}
-
 // @public (undocumented)
 export const ContainerSchema: z.ZodObject<{
     id: z.ZodString;
@@ -104,11 +91,8 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Folder>;
     list(): Promise<Folder[]>;
-    update(id: string, input: FolderUpdateInput): Promise<Folder>;
 }
 
 // @public (undocumented)
@@ -157,12 +141,9 @@ export interface MediaItemCreateInput {
 // @public
 export class MediaItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: MediaItemCreateInput): Promise<MediaItem>;
-    delete(id: string): Promise<void>;
     duplicate(id: string): Promise<void>;
     get(id: string): Promise<MediaItem>;
     list(): Promise<MediaItem[]>;
-    update(id: string, input: MediaItemUpdateInput): Promise<MediaItem>;
 }
 
 // @public (undocumented)
@@ -193,16 +174,6 @@ export interface Moment {
 // @public
 export type MomentCreateInput = Record<string, never>;
 
-// @public
-export class MomentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MomentCreateInput): Promise<Moment>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Moment>;
-    list(): Promise<Moment[]>;
-    update(id: string, input: MomentUpdateInput): Promise<Moment>;
-}
-
 // @public (undocumented)
 export const MomentSchema: z.ZodObject<{
     id: z.ZodString;
@@ -217,7 +188,6 @@ export class PhotosClient {
     constructor(options: PhotosClientOptions);
     add(mediaItems: string, to: string): Promise<void>;
     readonly albums: AlbumResourceClient;
-    readonly containers: ContainerResourceClient;
     _delete(target: string): Promise<void>;
     _export(mediaItems: string, to: string, usingOriginals?: boolean): Promise<void>;
     readonly folders: FolderResourceClient;
@@ -225,7 +195,6 @@ export class PhotosClient {
     _import(files: string, into?: string, skipCheckDuplicates?: boolean): Promise<void>;
     make(_new: string, named?: string, at?: string): Promise<void>;
     readonly mediaitems: MediaItemResourceClient;
-    readonly moments: MomentResourceClient;
     nextSlide(): Promise<void>;
     pauseSlideshow(): Promise<void>;
     previousSlide(): Promise<void>;

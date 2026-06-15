@@ -14,16 +14,6 @@ export interface Application {
 // @public
 export type ApplicationCreateInput = Record<string, never>;
 
-// @public
-export class ApplicationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ApplicationCreateInput): Promise<Application>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<Application>;
-    list(): Promise<Application[]>;
-    update(name: string, input: ApplicationUpdateInput): Promise<Application>;
-}
-
 // @public (undocumented)
 export const ApplicationSchema: z.ZodObject<{
     name: z.ZodString;
@@ -35,7 +25,6 @@ export type ApplicationUpdateInput = Partial<ApplicationCreateInput>;
 // @public
 export class BluetoothFileExchangeClient {
     constructor(options: BluetoothFileExchangeClientOptions);
-    readonly applications: ApplicationResourceClient;
     browse(device?: string): Promise<void>;
     get http(): HttpClient;
     send(file?: string, toDevice?: string): Promise<void>;

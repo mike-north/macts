@@ -18,16 +18,6 @@ export interface BookmarkFolderCreateInput {
     title?: string;
 }
 
-// @public
-export class BookmarkFolderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BookmarkFolderCreateInput): Promise<BookmarkFolder>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BookmarkFolder>;
-    list(): Promise<BookmarkFolder[]>;
-    update(id: string, input: BookmarkFolderUpdateInput): Promise<BookmarkFolder>;
-}
-
 // @public (undocumented)
 export const BookmarkFolderSchema: z.ZodObject<{
     id: z.ZodString;
@@ -50,16 +40,6 @@ export interface BookmarkItem {
 export interface BookmarkItemCreateInput {
     title?: string;
     uRL?: string;
-}
-
-// @public
-export class BookmarkItemResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BookmarkItemCreateInput): Promise<BookmarkItem>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BookmarkItem>;
-    list(): Promise<BookmarkItem[]>;
-    update(id: string, input: BookmarkItemUpdateInput): Promise<BookmarkItem>;
 }
 
 // @public (undocumented)
@@ -95,8 +75,6 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 // @public
 export class GoogleChromeClient {
     constructor(options: GoogleChromeClientOptions);
-    readonly bookmarkfolders: BookmarkFolderResourceClient;
-    readonly bookmarkitems: BookmarkItemResourceClient;
     close(): Promise<void>;
     copySelection(): Promise<void>;
     count(each?: string): Promise<void>;
@@ -119,10 +97,8 @@ export class GoogleChromeClient {
     save(_in?: string, as?: string): Promise<void>;
     selectAll(): Promise<void>;
     stop(): Promise<void>;
-    readonly tabs: TabResourceClient;
     undo(): Promise<void>;
     viewSource(): Promise<void>;
-    readonly windows: WindowResourceClient;
 }
 
 // @public
@@ -155,16 +131,6 @@ export interface Tab {
 // @public
 export interface TabCreateInput {
     uRL?: string;
-}
-
-// @public
-export class TabResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabCreateInput): Promise<Tab>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Tab>;
-    list(): Promise<Tab[]>;
-    update(id: string, input: TabUpdateInput): Promise<Tab>;
 }
 
 // @public (undocumented)
@@ -217,16 +183,6 @@ export interface WindowCreateInput {
     mode?: string;
     visible?: boolean;
     zoomed?: boolean;
-}
-
-// @public
-export class WindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: WindowCreateInput): Promise<Window>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Window>;
-    list(): Promise<Window[]>;
-    update(id: string, input: WindowUpdateInput): Promise<Window>;
 }
 
 // @public (undocumented)

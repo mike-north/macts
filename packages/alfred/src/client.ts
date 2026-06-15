@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { ApplicationResourceClient } from './resources/application.js'
-
 /**
  * Client configuration options.
  */
@@ -84,13 +82,9 @@ export class AlfredError extends Error {
 export class AlfredClient {
   readonly #httpClient: HttpClient
 
-  /** The Alfred application */
-  readonly applications: ApplicationResourceClient
-
   constructor(options: AlfredClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.applications = new ApplicationResourceClient(this.#httpClient, 'alfred', 'applications')
   }
 
   /**

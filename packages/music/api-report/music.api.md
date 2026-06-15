@@ -25,16 +25,6 @@ export interface AirPlayDeviceCreateInput {
     soundVolume?: number;
 }
 
-// @public
-export class AirPlayDeviceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AirPlayDeviceCreateInput): Promise<AirPlayDevice>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AirPlayDevice>;
-    list(): Promise<AirPlayDevice[]>;
-    update(id: string, input: AirPlayDeviceUpdateInput): Promise<AirPlayDevice>;
-}
-
 // @public (undocumented)
 export const AirPlayDeviceSchema: z.ZodObject<{
     active: z.ZodBoolean;
@@ -67,16 +57,6 @@ export interface ArtworkCreateInput {
     description?: string;
     kind?: number;
     rawData?: unknown;
-}
-
-// @public
-export class ArtworkResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ArtworkCreateInput): Promise<Artwork>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Artwork>;
-    list(): Promise<Artwork[]>;
-    update(id: string, input: ArtworkUpdateInput): Promise<Artwork>;
 }
 
 // @public (undocumented)
@@ -114,16 +94,6 @@ export interface AudioCDPlaylistCreateInput {
     year?: number;
 }
 
-// @public
-export class AudioCDPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AudioCDPlaylistCreateInput): Promise<AudioCDPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AudioCDPlaylist>;
-    list(): Promise<AudioCDPlaylist[]>;
-    update(id: string, input: AudioCDPlaylistUpdateInput): Promise<AudioCDPlaylist>;
-}
-
 // @public (undocumented)
 export const AudioCDPlaylistSchema: z.ZodObject<{
     artist: z.ZodString;
@@ -146,16 +116,6 @@ export interface AudioCDTrack {
 // @public
 export type AudioCDTrackCreateInput = Record<string, never>;
 
-// @public
-export class AudioCDTrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AudioCDTrackCreateInput): Promise<AudioCDTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AudioCDTrack>;
-    list(): Promise<AudioCDTrack[]>;
-    update(id: string, input: AudioCDTrackUpdateInput): Promise<AudioCDTrack>;
-}
-
 // @public (undocumented)
 export const AudioCDTrackSchema: z.ZodObject<{
     location: z.ZodString;
@@ -173,16 +133,6 @@ export interface BrowserWindow {
 // @public
 export interface BrowserWindowCreateInput {
     view?: Playlist;
-}
-
-// @public
-export class BrowserWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BrowserWindowCreateInput): Promise<BrowserWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BrowserWindow>;
-    list(): Promise<BrowserWindow[]>;
-    update(id: string, input: BrowserWindowUpdateInput): Promise<BrowserWindow>;
 }
 
 // @public (undocumented)
@@ -236,16 +186,6 @@ export interface Encoder {
 // @public
 export type EncoderCreateInput = Record<string, never>;
 
-// @public
-export class EncoderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: EncoderCreateInput): Promise<Encoder>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Encoder>;
-    list(): Promise<Encoder[]>;
-    update(id: string, input: EncoderUpdateInput): Promise<Encoder>;
-}
-
 // @public (undocumented)
 export const EncoderSchema: z.ZodObject<{
     format: z.ZodString;
@@ -293,16 +233,6 @@ export interface EQPresetCreateInput {
     updateTracks?: boolean;
 }
 
-// @public
-export class EQPresetResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: EQPresetCreateInput): Promise<EQPreset>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<EQPreset>;
-    list(): Promise<EQPreset[]>;
-    update(id: string, input: EQPresetUpdateInput): Promise<EQPreset>;
-}
-
 // @public (undocumented)
 export const EQPresetSchema: z.ZodObject<{
     band1: z.ZodNumber;
@@ -330,16 +260,6 @@ export interface EQWindow {
 
 // @public
 export type EQWindowCreateInput = Record<string, never>;
-
-// @public
-export class EQWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: EQWindowCreateInput): Promise<EQWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<EQWindow>;
-    list(): Promise<EQWindow[]>;
-    update(id: string, input: EQWindowUpdateInput): Promise<EQWindow>;
-}
 
 // @public (undocumented)
 export const EQWindowSchema: z.ZodObject<{
@@ -380,12 +300,7 @@ export interface FileTrackCreateInput {
 // @public
 export class FileTrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FileTrackCreateInput): Promise<FileTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<FileTrack>;
-    list(): Promise<FileTrack[]>;
     refresh(): Promise<void>;
-    update(id: string, input: FileTrackUpdateInput): Promise<FileTrack>;
 }
 
 // @public (undocumented)
@@ -410,16 +325,6 @@ export interface LibraryPlaylist {
 // @public
 export type LibraryPlaylistCreateInput = Record<string, never>;
 
-// @public
-export class LibraryPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: LibraryPlaylistCreateInput): Promise<LibraryPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<LibraryPlaylist>;
-    list(): Promise<LibraryPlaylist[]>;
-    update(id: string, input: LibraryPlaylistUpdateInput): Promise<LibraryPlaylist>;
-}
-
 // @public (undocumented)
 export const LibraryPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -436,16 +341,6 @@ export interface MiniplayerWindow {
 // @public
 export type MiniplayerWindowCreateInput = Record<string, never>;
 
-// @public
-export class MiniplayerWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MiniplayerWindowCreateInput): Promise<MiniplayerWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MiniplayerWindow>;
-    list(): Promise<MiniplayerWindow[]>;
-    update(id: string, input: MiniplayerWindowUpdateInput): Promise<MiniplayerWindow>;
-}
-
 // @public (undocumented)
 export const MiniplayerWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -458,56 +353,36 @@ export type MiniplayerWindowUpdateInput = Partial<MiniplayerWindowCreateInput>;
 export class MusicClient {
     constructor(options: MusicClientOptions);
     add(to?: string): Promise<void>;
-    readonly airplaydevices: AirPlayDeviceResourceClient;
-    readonly artworks: ArtworkResourceClient;
-    readonly audiocdplaylists: AudioCDPlaylistResourceClient;
-    readonly audiocdtracks: AudioCDTrackResourceClient;
     backTrack(): Promise<void>;
-    readonly browserwindows: BrowserWindowResourceClient;
     close(): Promise<void>;
     convert(): Promise<void>;
     count(each: string): Promise<void>;
     _delete(): Promise<void>;
     download(): Promise<void>;
     duplicate(to?: string): Promise<void>;
-    readonly encoders: EncoderResourceClient;
-    readonly eqpresets: EQPresetResourceClient;
-    readonly eqwindows: EQWindowResourceClient;
     exists(): Promise<void>;
     _export(as?: string, to?: string): Promise<void>;
     fastForward(): Promise<void>;
     readonly filetracks: FileTrackResourceClient;
     get http(): HttpClient;
-    readonly libraryplaylists: LibraryPlaylistResourceClient;
     make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
-    readonly miniplayerwindows: MiniplayerWindowResourceClient;
     nextTrack(): Promise<void>;
     open(): Promise<void>;
     openLocation(): Promise<void>;
     pause(): Promise<void>;
     play(once?: boolean): Promise<void>;
     readonly playlists: PlaylistResourceClient;
-    readonly playlistwindows: PlaylistWindowResourceClient;
     playpause(): Promise<void>;
     previousTrack(): Promise<void>;
     print(printDialog?: boolean, withProperties?: string, kind?: string, theme?: string): Promise<void>;
     quit(): Promise<void>;
-    readonly radiotunerplaylists: RadioTunerPlaylistResourceClient;
     resume(): Promise<void>;
     reveal(): Promise<void>;
     rewind(): Promise<void>;
     run(): Promise<void>;
     save(): Promise<void>;
     select(): Promise<void>;
-    readonly sharedtracks: SharedTrackResourceClient;
-    readonly sources: SourceResourceClient;
     stop(): Promise<void>;
-    readonly subscriptionplaylists: SubscriptionPlaylistResourceClient;
-    readonly tracks: TrackResourceClient;
-    readonly urltracks: URLTrackResourceClient;
-    readonly userplaylists: UserPlaylistResourceClient;
-    readonly videowindows: VideoWindowResourceClient;
-    readonly visuals: VisualResourceClient;
 }
 
 // @public
@@ -548,13 +423,8 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: PlaylistCreateInput): Promise<Playlist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Playlist>;
-    list(): Promise<Playlist[]>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;
-    update(id: string, input: PlaylistUpdateInput): Promise<Playlist>;
 }
 
 // @public (undocumented)
@@ -583,16 +453,6 @@ export interface PlaylistWindow {
 // @public
 export type PlaylistWindowCreateInput = Record<string, never>;
 
-// @public
-export class PlaylistWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PlaylistWindowCreateInput): Promise<PlaylistWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PlaylistWindow>;
-    list(): Promise<PlaylistWindow[]>;
-    update(id: string, input: PlaylistWindowUpdateInput): Promise<PlaylistWindow>;
-}
-
 // @public (undocumented)
 export const PlaylistWindowSchema: z.ZodObject<{
     selection: z.ZodString;
@@ -610,16 +470,6 @@ export interface RadioTunerPlaylist {
 // @public
 export type RadioTunerPlaylistCreateInput = Record<string, never>;
 
-// @public
-export class RadioTunerPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RadioTunerPlaylistCreateInput): Promise<RadioTunerPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RadioTunerPlaylist>;
-    list(): Promise<RadioTunerPlaylist[]>;
-    update(id: string, input: RadioTunerPlaylistUpdateInput): Promise<RadioTunerPlaylist>;
-}
-
 // @public (undocumented)
 export const RadioTunerPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -635,16 +485,6 @@ export interface SharedTrack {
 
 // @public
 export type SharedTrackCreateInput = Record<string, never>;
-
-// @public
-export class SharedTrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SharedTrackCreateInput): Promise<SharedTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SharedTrack>;
-    list(): Promise<SharedTrack[]>;
-    update(id: string, input: SharedTrackUpdateInput): Promise<SharedTrack>;
-}
 
 // @public (undocumented)
 export const SharedTrackSchema: z.ZodObject<{
@@ -664,16 +504,6 @@ export interface Source {
 // @public
 export type SourceCreateInput = Record<string, never>;
 
-// @public
-export class SourceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SourceCreateInput): Promise<Source>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Source>;
-    list(): Promise<Source[]>;
-    update(id: string, input: SourceUpdateInput): Promise<Source>;
-}
-
 // @public (undocumented)
 export const SourceSchema: z.ZodObject<{
     capacity: z.ZodNumber;
@@ -691,16 +521,6 @@ export interface SubscriptionPlaylist {
 
 // @public
 export type SubscriptionPlaylistCreateInput = Record<string, never>;
-
-// @public
-export class SubscriptionPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SubscriptionPlaylistCreateInput): Promise<SubscriptionPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SubscriptionPlaylist>;
-    list(): Promise<SubscriptionPlaylist[]>;
-    update(id: string, input: SubscriptionPlaylistUpdateInput): Promise<SubscriptionPlaylist>;
-}
 
 // @public (undocumented)
 export const SubscriptionPlaylistSchema: z.ZodObject<{
@@ -841,16 +661,6 @@ export interface TrackCreateInput {
     year?: number;
 }
 
-// @public
-export class TrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TrackCreateInput): Promise<Track>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Track>;
-    list(): Promise<Track[]>;
-    update(id: string, input: TrackUpdateInput): Promise<Track>;
-}
-
 // @public (undocumented)
 export const TrackSchema: z.ZodObject<{
     album: z.ZodString;
@@ -938,16 +748,6 @@ export interface URLTrackCreateInput {
     address?: string;
 }
 
-// @public
-export class URLTrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: URLTrackCreateInput): Promise<URLTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<URLTrack>;
-    list(): Promise<URLTrack[]>;
-    update(id: string, input: URLTrackUpdateInput): Promise<URLTrack>;
-}
-
 // @public (undocumented)
 export const URLTrackSchema: z.ZodObject<{
     address: z.ZodString;
@@ -968,16 +768,6 @@ export interface UserPlaylistCreateInput {
     shared?: boolean;
 }
 
-// @public
-export class UserPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: UserPlaylistCreateInput): Promise<UserPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<UserPlaylist>;
-    list(): Promise<UserPlaylist[]>;
-    update(id: string, input: UserPlaylistUpdateInput): Promise<UserPlaylist>;
-}
-
 // @public (undocumented)
 export const UserPlaylistSchema: z.ZodObject<{
     shared: z.ZodBoolean;
@@ -996,16 +786,6 @@ export interface VideoWindow {
 // @public
 export type VideoWindowCreateInput = Record<string, never>;
 
-// @public
-export class VideoWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: VideoWindowCreateInput): Promise<VideoWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<VideoWindow>;
-    list(): Promise<VideoWindow[]>;
-    update(id: string, input: VideoWindowUpdateInput): Promise<VideoWindow>;
-}
-
 // @public (undocumented)
 export const VideoWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -1021,16 +801,6 @@ export interface Visual {
 
 // @public
 export type VisualCreateInput = Record<string, never>;
-
-// @public
-export class VisualResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: VisualCreateInput): Promise<Visual>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Visual>;
-    list(): Promise<Visual[]>;
-    update(id: string, input: VisualUpdateInput): Promise<Visual>;
-}
 
 // @public (undocumented)
 export const VisualSchema: z.ZodObject<{

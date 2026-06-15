@@ -37,16 +37,6 @@ export interface DocumentCreateInput {
     url?: string;
 }
 
-// @public
-export class DocumentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DocumentCreateInput): Promise<Document>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Document>;
-    list(): Promise<Document[]>;
-    update(id: string, input: DocumentUpdateInput): Promise<Document>;
-}
-
 // @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
     name: z.ZodString;
@@ -68,7 +58,6 @@ export class SafariClient {
     constructor(options: SafariClientOptions);
     addReadingListItem(andPreviewText?: string, withTitle?: string): Promise<void>;
     dispatchMessageToExtension(): Promise<void>;
-    readonly documents: DocumentResourceClient;
     doJavaScript(_in?: string): Promise<void>;
     emailContents(_of?: string): Promise<void>;
     get http(): HttpClient;
@@ -78,7 +67,6 @@ export class SafariClient {
     showExtensionsPreferences(): Promise<void>;
     showPrivacyReport(): Promise<void>;
     syncAllPlistToDisk(): Promise<void>;
-    readonly tabs: TabResourceClient;
 }
 
 // @public
@@ -106,16 +94,6 @@ export interface Tab {
 // @public
 export interface TabCreateInput {
     url?: string;
-}
-
-// @public
-export class TabResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabCreateInput): Promise<Tab>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Tab>;
-    list(): Promise<Tab[]>;
-    update(id: string, input: TabUpdateInput): Promise<Tab>;
 }
 
 // @public (undocumented)

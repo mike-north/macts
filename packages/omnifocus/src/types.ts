@@ -80,17 +80,17 @@ export interface Task {
 
 /** Input for creating a Task */
 export interface TaskCreateInput {
-  /** The name of the task */
-  name?: string
-  /** The note of the task */
+  /** Task name */
+  name: string
+  /** Task note */
   note?: string
   /** True if flagged */
   flagged?: boolean
-  /** When the task should become available for action */
+  /** Defer date */
   deferDate?: Date
   /** The date at which work for this task is intended */
   plannedDate?: Date
-  /** When the task must be finished */
+  /** Due date */
   dueDate?: Date
   /** The task's date of completion */
   completionDate?: Date
@@ -177,11 +177,11 @@ export interface Project {
 
 /** Input for creating a Project */
 export interface ProjectCreateInput {
-  /** The name of the project */
-  name?: string
-  /** The note of the project */
+  /** Project name */
+  name: string
+  /** Project note */
   note?: string
-  /** The status of the project */
+  /** Project status */
   status?: ProjectStatus
   /** True if flagged */
   flagged?: boolean
@@ -236,9 +236,9 @@ export interface Folder {
 
 /** Input for creating a Folder */
 export interface FolderCreateInput {
-  /** The name of the folder */
-  name?: string
-  /** The note of the folder */
+  /** Folder name */
+  name: string
+  /** Folder note */
   note?: string
   /** Set if the folder is currently hidden */
   hidden?: boolean
@@ -269,8 +269,8 @@ export interface Tag {
 
 /** Input for creating a Tag */
 export interface TagCreateInput {
-  /** The name of the tag */
-  name?: string
+  /** Tag name */
+  name: string
   /** The note of the tag */
   note?: string
   /** If false, tasks associated with this tag will be skipped when determining the next action for a project */
@@ -302,9 +302,9 @@ export interface InboxTask {
 
 /** Input for creating a InboxTask */
 export interface InboxTaskCreateInput {
-  /** The name of the inbox task */
-  name?: string
-  /** The note of the inbox task */
+  /** Task name */
+  name: string
+  /** Task note */
   note?: string
   /** True if flagged */
   flagged?: boolean

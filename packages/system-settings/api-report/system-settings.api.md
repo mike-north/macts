@@ -14,16 +14,6 @@ export interface Anchor {
 // @public
 export type AnchorCreateInput = Record<string, never>;
 
-// @public
-export class AnchorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AnchorCreateInput): Promise<Anchor>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Anchor>;
-    list(): Promise<Anchor[]>;
-    update(id: string, input: AnchorUpdateInput): Promise<Anchor>;
-}
-
 // @public (undocumented)
 export const AnchorSchema: z.ZodObject<{
     name: z.ZodString;
@@ -70,12 +60,7 @@ export type PaneCreateInput = Record<string, never>;
 export class PaneResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     authorize(): Promise<void>;
-    create(input: PaneCreateInput): Promise<Pane>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Pane>;
-    list(): Promise<Pane[]>;
     timedLoad(): Promise<void>;
-    update(id: string, input: PaneUpdateInput): Promise<Pane>;
 }
 
 // @public (undocumented)
@@ -90,7 +75,6 @@ export type PaneUpdateInput = Partial<PaneCreateInput>;
 // @public
 export class SystemSettingsClient {
     constructor(options: SystemSettingsClientOptions);
-    readonly anchors: AnchorResourceClient;
     get http(): HttpClient;
     readonly panes: PaneResourceClient;
     reveal(): Promise<void>;

@@ -53,7 +53,6 @@ export class iTermClient {
     requestCookie(andKeyForAppNamed?: string): Promise<void>;
     revealHotkeyWindow(): Promise<void>;
     select(): Promise<void>;
-    readonly sessions: SessionResourceClient;
     setVariable(named: string, to: string): Promise<void>;
     splitHorizontally(withProfile: string, command?: string): Promise<void>;
     splitHorizontallyWithDefaultProfile(command?: string): Promise<void>;
@@ -61,10 +60,8 @@ export class iTermClient {
     splitVertically(withProfile: string, command?: string): Promise<void>;
     splitVerticallyWithDefaultProfile(command?: string): Promise<void>;
     splitVerticallyWithSameProfile(command?: string): Promise<void>;
-    readonly tabs: TabResourceClient;
     toggleHotkeyWindow(): Promise<void>;
     variable(named: string): Promise<void>;
-    readonly windows: WindowResourceClient;
     write(contentsOfFile?: string, text?: string, newline?: boolean): Promise<void>;
 }
 
@@ -359,16 +356,6 @@ export interface SessionCreateInput {
     useUnderlineColor?: boolean;
 }
 
-// @public
-export class SessionResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SessionCreateInput): Promise<Session>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Session>;
-    list(): Promise<Session[]>;
-    update(id: string, input: SessionUpdateInput): Promise<Session>;
-}
-
 // @public (undocumented)
 export const SessionSchema: z.ZodObject<{
     id: z.ZodString;
@@ -526,16 +513,6 @@ export interface TabCreateInput {
     title?: string;
 }
 
-// @public
-export class TabResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabCreateInput): Promise<Tab>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Tab>;
-    list(): Promise<Tab[]>;
-    update(id: string, input: TabUpdateInput): Promise<Tab>;
-}
-
 // @public (undocumented)
 export const TabSchema: z.ZodObject<{
     currentSession: z.ZodString;
@@ -625,16 +602,6 @@ export interface WindowCreateInput {
     };
     visible?: boolean;
     zoomed?: boolean;
-}
-
-// @public
-export class WindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: WindowCreateInput): Promise<Window>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Window>;
-    list(): Promise<Window[]>;
-    update(id: string, input: WindowUpdateInput): Promise<Window>;
 }
 
 // @public (undocumented)

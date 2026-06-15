@@ -5,18 +5,8 @@
  * @packageDocumentation
  */
 
-import { ArtworkResourceClient } from './resources/artwork.js'
-import { BrowserWindowResourceClient } from './resources/browserwindow.js'
 import { FileTrackResourceClient } from './resources/filetrack.js'
-import { LibraryPlaylistResourceClient } from './resources/libraryplaylist.js'
 import { PlaylistResourceClient } from './resources/playlist.js'
-import { PlaylistWindowResourceClient } from './resources/playlistwindow.js'
-import { SharedTrackResourceClient } from './resources/sharedtrack.js'
-import { SourceResourceClient } from './resources/source.js'
-import { TrackResourceClient } from './resources/track.js'
-import { URLTrackResourceClient } from './resources/urltrack.js'
-import { UserPlaylistResourceClient } from './resources/userplaylist.js'
-import { VideoWindowResourceClient } from './resources/videowindow.js'
 
 /**
  * Client configuration options.
@@ -95,65 +85,17 @@ export class TVError extends Error {
 export class TVClient {
   readonly #httpClient: HttpClient
 
-  /** a piece of art within a track or playlist */
-  readonly artworks: ArtworkResourceClient
-
-  /** the main window */
-  readonly browserwindows: BrowserWindowResourceClient
-
   /** a track representing a video file */
   readonly filetracks: FileTrackResourceClient
-
-  /** the main library playlist */
-  readonly libraryplaylists: LibraryPlaylistResourceClient
 
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
 
-  /** a sub-window showing a single playlist */
-  readonly playlistwindows: PlaylistWindowResourceClient
-
-  /** a track residing in a shared library */
-  readonly sharedtracks: SharedTrackResourceClient
-
-  /** a media source (library, CD, device, etc.) */
-  readonly sources: SourceResourceClient
-
-  /** playable video source */
-  readonly tracks: TrackResourceClient
-
-  /** a track representing a network stream */
-  readonly urltracks: URLTrackResourceClient
-
-  /** custom playlists created by the user */
-  readonly userplaylists: UserPlaylistResourceClient
-
-  /** the video window */
-  readonly videowindows: VideoWindowResourceClient
-
   constructor(options: TVClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.artworks = new ArtworkResourceClient(this.#httpClient, 'tv', 'artworks')
-    this.browserwindows = new BrowserWindowResourceClient(this.#httpClient, 'tv', 'browserwindows')
     this.filetracks = new FileTrackResourceClient(this.#httpClient, 'tv', 'filetracks')
-    this.libraryplaylists = new LibraryPlaylistResourceClient(
-      this.#httpClient,
-      'tv',
-      'libraryplaylists'
-    )
     this.playlists = new PlaylistResourceClient(this.#httpClient, 'tv', 'playlists')
-    this.playlistwindows = new PlaylistWindowResourceClient(
-      this.#httpClient,
-      'tv',
-      'playlistwindows'
-    )
-    this.sharedtracks = new SharedTrackResourceClient(this.#httpClient, 'tv', 'sharedtracks')
-    this.sources = new SourceResourceClient(this.#httpClient, 'tv', 'sources')
-    this.tracks = new TrackResourceClient(this.#httpClient, 'tv', 'tracks')
-    this.urltracks = new URLTrackResourceClient(this.#httpClient, 'tv', 'urltracks')
-    this.userplaylists = new UserPlaylistResourceClient(this.#httpClient, 'tv', 'userplaylists')
-    this.videowindows = new VideoWindowResourceClient(this.#httpClient, 'tv', 'videowindows')
   }
 
   /**

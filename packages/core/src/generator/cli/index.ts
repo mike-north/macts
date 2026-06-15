@@ -46,23 +46,37 @@ export function generateCliPlugin(
     const commands: GeneratedCommand[] = []
 
     // Generate commands for each hierarchy path
+    const standardOps = new Set(['list', 'get', 'create', 'update', 'delete'])
     for (const hierarchyPath of ctx.getHierarchyPaths()) {
-      // List command
-      commands.push(generateListCommand(hierarchyPath, ctx))
+      // Only emit a CRUD subcommand when the generated SDK actually exposes the
+      // matching method — i.e. when the manifest declares a backing command for
+      // that operation. The SDK keys each method's route by the command key, and
+      // omits methods that have no backing command, so emitting a CLI command
+      // that calls a non-existent SDK method would not type-check.
+      const resourceCommands = ctx.getResourceCommands(hierarchyPath.resourceName)
+      const hasOp = (op: string): boolean => resourceCommands.some((c) => c.name === op)
 
-      // Create command (if writable)
-      const createCmd = generateCreateCommand(hierarchyPath, ctx)
-      if (createCmd) {
-        commands.push(createCmd)
+      // List command
+      if (hasOp('list')) {
+        commands.push(generateListCommand(hierarchyPath, ctx))
+      }
+
+      // Create command (only when a backing create command exists and the
+      // resource is writable)
+      if (hasOp('create')) {
+        const createCmd = generateCreateCommand(hierarchyPath, ctx)
+        if (createCmd) {
+          commands.push(createCmd)
+        }
       }
 
       // Get command
-      commands.push(generateGetCommand(hierarchyPath, ctx))
+      if (hasOp('get')) {
+        commands.push(generateGetCommand(hierarchyPath, ctx))
+      }
 
       // Resource-level commands (like "show" for events)
       // Skip standard CRUD commands since they're already generated above
-      const standardOps = new Set(['list', 'get', 'create', 'update', 'delete'])
-      const resourceCommands = ctx.getResourceCommands(hierarchyPath.resourceName)
       for (const cmd of resourceCommands) {
         if (standardOps.has(cmd.name)) continue
         commands.push(generateResourceCommand(cmd, hierarchyPath, ctx))
