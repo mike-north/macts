@@ -92,8 +92,9 @@ macts mcp start    # start the local MCP daemon
 ```
 
 macts exposes each app's capabilities as MCP tools through its server package (e.g.
-`@macts/calendar-server`). Start the MCP daemon and point Claude Desktop or another MCP client at
-the local MCP server to give it access to the calendar tools.
+`@macts/calendar-server`). Install the server package into the MCP plugins directory
+(`~/.macts/plugins`, override with `MACTS_HOME`), then start the daemon and point Claude Desktop or
+another MCP client at the local MCP server to give it access to the calendar tools.
 
 ## AI Agent Use Cases
 
@@ -269,7 +270,8 @@ machine unless an app capability itself (such as Mail's send operation) involves
 
 API keys are granted only the permissions listed at creation time. Wildcards (`*`) are matched at
 request time, so a key with `calendar:*:*` matches every current or future operation on any
-calendar resource (the fine-grained operations are `list`, `get`, `show`, `create`, and `delete`).
+calendar resource (the fine-grained operations — `list`, `get`, `create`, `update`, `delete`, and
+so on — are defined by each app's manifest).
 Pass `--manifest` to pre-expand a wildcard into only the explicit capabilities present in the
 manifest at key-creation time. Keys can be revoked at any time:
 
