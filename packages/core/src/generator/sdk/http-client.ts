@@ -587,6 +587,39 @@ function generateResourceClient(
     .map(([_, cmd]) => generateResourceCommandMethod(cmd, appNameLower, plural, resourceName))
     .join('\n')
 
+  // Collect custom types (enums, referenced resources) used by resource command
+  // method signatures so they can be imported. Without this, a command parameter
+  // or return value typed as an enum (e.g. SaveFormat) references an unimported name.
+  const extraTypeImports = new Set<string>()
+  for (const [, cmd] of resourceCommands) {
+    if (['list', 'get', 'create', 'update', 'delete'].includes(cmd.name)) continue
+    const referencedTypes = [
+      ...cmd.parameters.map((p) =>
+        typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
+      ),
+      ...(cmd.returns ? [cmd.returns as PropertyType] : []),
+    ]
+    for (const t of referencedTypes) {
+      const tsName = propertyTypeToTs(t)
+      // Strip array suffix and only import names that exist as manifest enums or
+      // resources (the resource's own type plus Create/Update are already imported).
+      const baseName = tsName.replace(/\[\]$/, '')
+      if (baseName === resourceName) continue
+      if (manifest.enums[baseName] || manifest.resources[baseName]) {
+        extraTypeImports.add(baseName)
+      }
+    }
+  }
+
+  // Merge the resource's own types with any extra referenced types into a single
+  // import from '../types.js' for clean, deterministic output.
+  const typeImports = [
+    resourceName,
+    `${resourceName}CreateInput`,
+    `${resourceName}UpdateInput`,
+    ...Array.from(extraTypeImports).sort(),
+  ]
+
   // Find identifiers
   const identifiers = resource.identifiers ?? []
   const primaryId = identifiers.find((id) => id.primary)?.property ?? identifiers[0]?.property
@@ -597,7 +630,7 @@ function generateResourceClient(
  */
 
 import type { HttpClient } from '../client.js';
-import type { ${resourceName}, ${resourceName}CreateInput, ${resourceName}UpdateInput } from '../types.js';
+import type { ${typeImports.join(', ')} } from '../types.js';
 
 /**
  * Client for ${resource.description.toLowerCase()}.

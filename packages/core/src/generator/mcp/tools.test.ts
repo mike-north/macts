@@ -160,6 +160,51 @@ describe('generateResourceOperationSchema', () => {
       description: 'Start date filter',
     })
   })
+
+  // Regression: custom resource commands (e.g. "show") take exactly their manifest
+  // parameters — the SDK does not synthesize an extra ID argument for them. Adding an
+  // implicit identifier made the MCP handler call `show(id)` while the SDK method is
+  // `show()`, producing a TS2554 "Expected 0 arguments, but got 1".
+  it('should not synthesize an implicit identifier for custom resource commands', () => {
+    const command: Command = {
+      name: 'show',
+      description: 'Show the calendar',
+      scope: 'resource',
+      parameters: [],
+    }
+
+    const schema = generateResourceOperationSchema(command, mockCalendar)
+
+    expect(schema.properties).toEqual({})
+    expect(schema.required).toBeUndefined()
+  })
+
+  // Regression: JSON Schema `items` must be a schema object. A primitive element type
+  // was emitted as a bare string (`items: 'string'`), which is not assignable to the
+  // `items?: JsonSchema` field (TS2322).
+  it('should emit array `items` as a schema object, not a bare type string', () => {
+    const command: Command = {
+      name: 'list',
+      description: 'List with array filter',
+      scope: 'resource',
+      parameters: [
+        {
+          name: 'tags',
+          type: { array: 'string' },
+          description: 'Tag filters',
+          required: false,
+        },
+      ],
+    }
+
+    const schema = generateResourceOperationSchema(command, mockCalendar)
+
+    expect(schema.properties?.['tags']).toEqual({
+      type: 'array',
+      items: { type: 'string' },
+      description: 'Tag filters',
+    })
+  })
 })
 
 describe('generateAppCommandSchema', () => {

@@ -13,8 +13,7 @@ import { discoverPlugins, loadPlugin } from './loader.js'
  */
 function addCliPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
-  dep.pkg = {
-    ...dep.pkg,
+  Object.assign(dep.pkg, {
     type: 'module',
     exports: {
       './cli': {
@@ -22,7 +21,7 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
         default: './dist/cli/index.js',
       },
     },
-  }
+  })
   dep.files = {
     dist: {
       cli: {
@@ -141,11 +140,10 @@ describe('CLI plugin discovery e2e', () => {
 
     it('should return errors for packages with broken /cli exports', async () => {
       const dep = pluginsProject.addDependency('@macts/broken-app', '1.0.0')
-      dep.pkg = {
-        ...dep.pkg,
+      Object.assign(dep.pkg, {
         type: 'module',
         exports: { './cli': './dist/cli/index.js' },
-      }
+      })
       // Don't create the actual JS file — should cause a load error
       dep.files = {}
       await pluginsProject.write()
@@ -187,11 +185,11 @@ describe('CLI plugin discovery e2e', () => {
     it('should return multiple errors for multiple broken plugins', async () => {
       // Create two broken plugins
       const broken1 = pluginsProject.addDependency('@macts/broken-one', '1.0.0')
-      broken1.pkg = { ...broken1.pkg, type: 'module', exports: { './cli': './dist/cli/index.js' } }
+      Object.assign(broken1.pkg, { type: 'module', exports: { './cli': './dist/cli/index.js' } })
       broken1.files = {}
 
       const broken2 = pluginsProject.addDependency('@macts/broken-two', '1.0.0')
-      broken2.pkg = { ...broken2.pkg, type: 'module', exports: { './cli': './dist/cli/index.js' } }
+      Object.assign(broken2.pkg, { type: 'module', exports: { './cli': './dist/cli/index.js' } })
       broken2.files = {}
 
       await pluginsProject.write()
@@ -211,7 +209,7 @@ describe('CLI plugin discovery e2e', () => {
       )
 
       const broken = pluginsProject.addDependency('@macts/bad-app', '1.0.0')
-      broken.pkg = { ...broken.pkg, type: 'module', exports: { './cli': './dist/cli/index.js' } }
+      Object.assign(broken.pkg, { type: 'module', exports: { './cli': './dist/cli/index.js' } })
       broken.files = {}
 
       await pluginsProject.write()

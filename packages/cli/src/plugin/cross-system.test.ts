@@ -27,8 +27,7 @@ function createPluginsProject(mactsHome: string): Project {
  */
 function addCliPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
-  dep.pkg = {
-    ...dep.pkg,
+  Object.assign(dep.pkg, {
     type: 'module',
     exports: {
       './cli': {
@@ -36,7 +35,7 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
         default: './dist/cli/index.js',
       },
     },
-  }
+  })
   dep.files = {
     dist: {
       cli: {
@@ -52,8 +51,7 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
  */
 function addMcpPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
-  dep.pkg = {
-    ...dep.pkg,
+  Object.assign(dep.pkg, {
     type: 'module',
     exports: {
       './mcp': {
@@ -61,7 +59,7 @@ function addMcpPlugin(pluginsProject: Project, packageName: string, entrySource:
         default: './dist/mcp/index.js',
       },
     },
-  }
+  })
   dep.files = {
     dist: {
       mcp: {

@@ -502,3 +502,92 @@ describe('generateMcpPlugin', () => {
     }
   })
 })
+
+/**
+ * Regression tests for the strict-typecheck failures in generated MCP handler code.
+ *
+ * MCP handlers receive `args: unknown` (validated against JSON Schema) and call SDK
+ * methods with precise parameter types. Earlier output cast arguments with bare
+ * `as unknown` (assignable to no concrete type) and `as Record<string, unknown>`, and
+ * the generic resource-command handler passed only an ID even when the SDK method took
+ * additional parameters. These caused TS2345/TS2554 failures.
+ */
+describe('generateMcpPlugin handler casts (regression)', () => {
+  const manifest: AppManifest = {
+    version: '1.0',
+    app: {
+      bundleId: 'com.example.browser',
+      name: 'Browser',
+      displayName: 'Browser',
+      tccEntitlements: [],
+    },
+    suites: [],
+    resources: {
+      Tab: {
+        name: 'Tab',
+        plural: 'Tabs',
+        description: 'A tab',
+        properties: {
+          id: { access: 'r', type: 'string', description: 'Tab ID', optional: false },
+        },
+        identifiers: [{ property: 'id', primary: true }],
+      },
+    },
+    enums: {},
+    hierarchy: { children: { tabs: { resource: 'Tab', access: 'r' } } },
+    relationships: [],
+    commands: {
+      // Resource command taking the resource ID plus an extra parameter — the handler
+      // must pass BOTH positionally, not just the ID.
+      execute: {
+        name: 'execute',
+        description: 'Execute javascript in a tab',
+        scope: 'resource',
+        resourceType: 'Tab',
+        parameters: [
+          { name: 'tabId', type: 'string', description: 'Tab ID', required: true },
+          { name: 'javascript', type: 'string', description: 'JS to run', required: true },
+        ],
+      },
+      // App command with a parameter — argument must be asserted to the SDK param type.
+      navigate: {
+        name: 'navigate',
+        description: 'Navigate to a URL',
+        scope: 'application',
+        parameters: [{ name: 'url', type: 'string', description: 'URL', required: true }],
+      },
+    },
+  }
+
+  function toolContent(fileName: string): string {
+    const context = createMcpGeneratorContext({ appName: 'browser', manifest })
+    const result = generateMcpPlugin(context)
+    const file = result.toolFiles.find((f) => f.fileName === fileName)
+    expect(file, `expected tool file ${fileName}`).toBeDefined()
+    return file?.content ?? ''
+  }
+
+  it('never emits bare `as unknown` or `as Record<string, unknown>` argument casts', () => {
+    const tabs = toolContent('tabs.ts')
+    const app = toolContent('app.ts')
+
+    for (const content of [tabs, app]) {
+      // Bare `as unknown` immediately before a call-closing paren or comma is the bug.
+      expect(content).not.toMatch(/ as unknown[),]/)
+      expect(content).not.toContain('as Record<string, unknown>')
+    }
+  })
+
+  it('passes all positional arguments to a resource command, asserting each SDK param type', () => {
+    const content = toolContent('tabs.ts')
+
+    expect(content).toContain('as unknown as Parameters<typeof client.tabs.execute>[0]')
+    expect(content).toContain('as unknown as Parameters<typeof client.tabs.execute>[1]')
+  })
+
+  it('asserts app-command arguments to the SDK method parameter type', () => {
+    const content = toolContent('app.ts')
+
+    expect(content).toContain('as unknown as Parameters<typeof client.navigate>[0]')
+  })
+})

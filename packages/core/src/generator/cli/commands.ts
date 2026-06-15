@@ -64,6 +64,26 @@ function safeIdentifier(name: string): string {
 }
 
 /**
+ * Instance members of Clipanion's \`Command\` base class. A generated option whose
+ * property name matches one of these would shadow the base member with an
+ * incompatible type (e.g. \`path: Array<string>\`), so such names must be renamed.
+ */
+const CLIPANION_RESERVED_MEMBERS = new Set(['path', 'cli', 'context', 'help'])
+
+/**
+ * Produce a collision-free class-property name for a command parameter.
+ *
+ * Parameters surface as Clipanion \`Option\` class fields and are referenced
+ * positionally (\`this.<prop>\`), so a name clashing with a Clipanion \`Command\`
+ * member is disambiguated by prefixing the (camelCase) command name —
+ * e.g. the \`path\` parameter of the \`browse\` command becomes \`browsePath\`.
+ */
+function safeParamProperty(paramName: string, commandName: string): string {
+  if (!CLIPANION_RESERVED_MEMBERS.has(paramName)) return paramName
+  return `${toCamelCase(commandName)}${toPascalCase(paramName)}`
+}
+
+/**
  * Generated command file.
  */
 export interface GeneratedCommand {
@@ -226,9 +246,13 @@ ${parentOptions}${propertyFlags}
 
     try {
       const client = getClient();
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // \`unknown\`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.${resourceAccess}.create({
 ${createInput}
-      } as Record<string, unknown>);
+      } as unknown as Parameters<typeof client.${resourceAccess}.create>[0]);
 
       const output = formatter.format({
         message: '${resource.name} created successfully',
@@ -272,10 +296,14 @@ export function generateGetCommand(
   // Build command path with positional ID
   const cliPath = [appName, ...hierarchyPath.path, 'get']
 
-  // Build parameter options for parent IDs
-  const parentOptions = generateParentOptions(hierarchyPath.parentParams)
-
   const idParamName = `${toCamelCase(resource.name)}Id`
+
+  // Build parameter options for parent IDs, skipping any whose name collides with
+  // the resource's own ID option (happens with self-nested hierarchies, e.g. a
+  // folder inside a folder) to prevent emitting a duplicate identifier.
+  const parentOptions = generateParentOptions(
+    hierarchyPath.parentParams.filter((p) => p.name !== idParamName)
+  )
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -344,13 +372,22 @@ export function generateAppCommand(
   })
 
   // Build parameter flags
-  const paramFlags = sortedParams.map((p) => generateParameterFlag(p, ctx)).join('\n')
-
-  // Build positional method call arguments (matching SDK method signature order)
-  const methodArgs = sortedParams.map((p) => `this.${p.name} as unknown`).join(', ')
+  const paramFlags = sortedParams.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
 
   // Use safe identifier for method name (e.g., 'delete' → '_delete', 'export' → '_export')
   const safeMethodName = safeIdentifier(cmd.name)
+
+  // Build positional method call arguments (matching SDK method signature order).
+  // Each flag is asserted to the SDK method's exact parameter type. CLI flags surface
+  // values as broad primitives (string/boolean) which may not structurally overlap the
+  // SDK's narrower types (enums, Date, number, arrays), so we assert via \`unknown\`.
+  // The RPC layer validates/coerces the value at runtime.
+  const methodArgs = sortedParams
+    .map(
+      (p, i) =>
+        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof client.${safeMethodName}>[${String(i)}]`
+    )
+    .join(', ')
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -416,13 +453,27 @@ export function generateResourceCommand(
   const cmdNameKebab = toKebabCase(cmd.name)
   const cliPath = [appName, ...hierarchyPath.path, cmdNameKebab]
 
-  // Build parameter options for parent IDs plus resource ID
-  const parentOptions = generateParentOptions(hierarchyPath.parentParams)
+  const idParamName = `${toCamelCase(resource.name)}Id`
+
+  // Names declared by command parameters; used to avoid emitting a duplicate
+  // identifier when a parameter already covers the resource ID or a parent ID
+  // (e.g. a command whose first parameter is literally the resource's own ID).
+  const paramNames = new Set(cmd.parameters.map((p) => p.name))
+
+  // Build parameter options for parent IDs, skipping any that a command parameter
+  // (or the resource ID itself) already declares to prevent duplicate identifiers.
+  const parentOptions = generateParentOptions(
+    hierarchyPath.parentParams.filter((p) => p.name !== idParamName && !paramNames.has(p.name))
+  )
 
   // Build parameter flags for command parameters
-  const paramFlags = cmd.parameters.map((p) => generateParameterFlag(p, ctx)).join('\n')
+  const paramFlags = cmd.parameters.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
 
-  const idParamName = `${toCamelCase(resource.name)}Id`
+  // Only declare the implicit resource-ID option when no command parameter already
+  // declares an identifier of the same name (otherwise we emit a duplicate field).
+  const idOption = paramNames.has(idParamName)
+    ? ''
+    : `  ${idParamName} = Option.String({ required: true });\n`
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -440,15 +491,13 @@ export class ${toPascalCase(cmd.name)}${resource.name}Command extends Command {
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
-${parentOptions}
-  ${idParamName} = Option.String({ required: true });
-${paramFlags}
+${parentOptions}${idOption}${paramFlags}
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
 
     try {
       const client = getClient();
-      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd)});
+      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
       this.context.stdout.write(output + '\\n');
@@ -473,8 +522,13 @@ ${paramFlags}
 /**
  * Generate positional arguments for a resource command call.
  * Matches the SDK method signature: sorted params (required first).
+ *
+ * Each argument is asserted to the SDK method's exact parameter type via
+ * \`unknown as Parameters<typeof methodRef>[i]\`. CLI flags surface values as broad
+ * primitives (string/boolean) which may not structurally overlap the SDK's narrower
+ * types (enums, Date, number, arrays); the RPC layer validates/coerces at runtime.
  */
-function generateResourceCommandArgs(cmd: ManifestCommand): string {
+function generateResourceCommandArgs(cmd: ManifestCommand, methodRef: string): string {
   if (cmd.parameters.length === 0) return ''
 
   const sorted = [...cmd.parameters].sort((a, b) => {
@@ -483,7 +537,12 @@ function generateResourceCommandArgs(cmd: ManifestCommand): string {
     return 0
   })
 
-  return sorted.map((p) => `this.${p.name} as unknown`).join(', ')
+  return sorted
+    .map(
+      (p, i) =>
+        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+    )
+    .join(', ')
 }
 
 function generateParentOptions(parentParams: ParentParam[]): string {
@@ -534,22 +593,27 @@ function generatePropertyFlags(resource: Resource, ctx: CliGeneratorContext): st
   return flags.length > 0 ? flags.join('\n') + '\n' : ''
 }
 
-function generateParameterFlag(param: CommandParameter, ctx: CliGeneratorContext): string {
+function generateParameterFlag(
+  param: CommandParameter,
+  ctx: CliGeneratorContext,
+  commandName: string
+): string {
   const flagName = toKebabCase(param.name)
+  const propName = safeParamProperty(param.name, commandName)
   const paramType = typeof param.type === 'string' ? param.type : 'string'
 
   // Check if parameter type is an enum
   const enumDef = ctx.getEnum(paramType)
   if (enumDef) {
     const enumValues = enumDef.values.map((v) => JSON.stringify(v.name)).join(', ')
-    return `  ${param.name} = Option.String('--${flagName}', { required: ${String(param.required)}, description: ${JSON.stringify(param.description)}, validator: t.isEnum([${enumValues}]) });`
+    return `  ${propName} = Option.String('--${flagName}', { required: ${String(param.required)}, description: ${JSON.stringify(param.description)}, validator: t.isEnum([${enumValues}]) });`
   }
 
   if (paramType === 'boolean') {
-    return `  ${param.name} = Option.Boolean('--${flagName}', { description: ${JSON.stringify(param.description)} });`
+    return `  ${propName} = Option.Boolean('--${flagName}', { description: ${JSON.stringify(param.description)} });`
   }
 
-  return `  ${param.name} = Option.String('--${flagName}', { required: ${String(param.required)}, description: ${JSON.stringify(param.description)} });`
+  return `  ${propName} = Option.String('--${flagName}', { required: ${String(param.required)}, description: ${JSON.stringify(param.description)} });`
 }
 
 function generateListFieldMapping(resource: Resource, indent = '        '): string {

@@ -184,17 +184,19 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
       const idProp = Object.keys(properties)[0] ?? 'id'
       const safeId = safeIdentifier(idProp)
       const getDestructured = safeId !== idProp ? `${idProp}: ${safeId}` : idProp
+      const methodRef = `client.${resourceName}.get`
       return `async (args) => {
     const { ${getDestructured} } = args as ${argsType};
     const client = getClient();
-    return client.${resourceName}.get(${safeId});
+    return client.${resourceName}.get(${safeId} as unknown as Parameters<typeof ${methodRef}>[0]);
   }`
     }
 
     case 'create': {
+      const methodRef = `client.${resourceName}.create`
       return `async (args) => {
     const client = getClient();
-    return client.${resourceName}.create(args as Record<string, unknown>);
+    return client.${resourceName}.create(args as Parameters<typeof ${methodRef}>[0]);
   }`
     }
 
@@ -202,44 +204,64 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
       const propNames = Object.keys(properties)
       const idProp = required[0] ?? propNames[0] ?? 'id'
       const updateProps = propNames.filter((p) => p !== idProp)
+      const methodRef = `client.${resourceName}.update`
       return `async (args) => {
     const { ${idProp}, ...updateFields } = args as ${argsType};
     void ${updateProps.length > 0 ? 'updateFields' : '0'};
     const client = getClient();
-    return client.${resourceName}.update(${idProp}, updateFields as Record<string, unknown>);
+    return client.${resourceName}.update(${idProp} as unknown as Parameters<typeof ${methodRef}>[0], updateFields as unknown as Parameters<typeof ${methodRef}>[1]);
   }`
     }
 
     case 'delete': {
       const idProp = Object.keys(properties)[0] ?? 'id'
       const resourceTypeName = tool.resourceType ?? 'Resource'
+      const methodRef = `client.${resourceName}.delete`
       return `async (args) => {
     const { ${idProp} } = args as ${argsType};
     const client = getClient();
-    await client.${resourceName}.delete(${idProp});
+    await client.${resourceName}.delete(${idProp} as unknown as Parameters<typeof ${methodRef}>[0]);
     return { success: true, message: \`Deleted ${resourceTypeName} \${${idProp}}\` };
   }`
     }
 
     default: {
-      // Generic operation (show, complete, etc.)
+      // Generic resource command (show, execute, complete, etc.). These take exactly
+      // their manifest parameters, which become the schema properties — so pass every
+      // property positionally (required-first, matching the SDK signature) rather than
+      // assuming a single ID argument.
       const propNames = Object.keys(properties)
-      const idProp = required[0] ?? propNames[0] ?? 'id'
-      const safeIdProp = safeIdentifier(idProp)
+      const methodName = safeIdentifier(tool.operationName)
+      const methodRef = `client.${resourceName}.${methodName}`
 
       if (propNames.length === 0) {
         return `async () => {
     const client = getClient();
-    await client.${resourceName}.${safeIdentifier(tool.operationName)}();
+    await ${methodRef}();
     return { success: true };
   }`
       }
 
-      const destructuredId = safeIdProp !== idProp ? `${idProp}: ${safeIdProp}` : idProp
+      // Sort props required-first to match the SDK method's positional signature.
+      const sortedProps = [...propNames].sort((a, b) => {
+        const aReq = required.includes(a)
+        const bReq = required.includes(b)
+        if (aReq && !bReq) return -1
+        if (!aReq && bReq) return 1
+        return 0
+      })
+      const { destructured } = safeDestructure(sortedProps)
+      const positionalArgs = sortedProps
+        .map(
+          (p, i) =>
+            `${safeIdentifier(p)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+        )
+        .join(', ')
+
       return `async (args) => {
-    const { ${destructuredId} } = args as ${argsType};
+    const { ${destructured} } = args as ${argsType};
     const client = getClient();
-    await client.${resourceName}.${safeIdentifier(tool.operationName)}(${safeIdProp});
+    await ${methodRef}(${positionalArgs});
     return { success: true };
   }`
     }
@@ -279,14 +301,21 @@ function generateAppToolHandler(tool: GeneratedTool): string {
   const argsType = `{ ${sortedProps.map((p) => `${p}${required.includes(p) ? '' : '?'}: ${inferTypeFromSchema(properties[p])}`).join('; ')} }`
   const { destructured } = safeDestructure(sortedProps)
 
-  // Pass arguments positionally to match SDK method signature.
-  // Cast each arg to satisfy SDK's precise types (MCP infers from JSON Schema which is less specific).
-  const positionalArgs = sortedProps.map((p) => `${safeIdentifier(p)} as unknown`).join(', ')
+  // Pass arguments positionally to match the SDK method signature, casting each to
+  // the method's exact parameter type. MCP infers types from JSON Schema, which is
+  // less specific than the SDK's (enums, branded values); the RPC layer validates
+  // at runtime, so asserting the precise parameter type here is sound.
+  const methodRef = `client.${methodName}`
+  const positionalArgs = sortedProps
+    .map(
+      (p, i) => `${safeIdentifier(p)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+    )
+    .join(', ')
 
   return `async (args) => {
     const { ${destructured} } = args as ${argsType};
     const client = getClient();
-    await client.${methodName}(${positionalArgs});
+    await ${methodRef}(${positionalArgs});
     return { success: true };
   }`
 }

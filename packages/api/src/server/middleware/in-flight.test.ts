@@ -176,8 +176,11 @@ describe('createInFlightTracker', () => {
       // Drain should not have resolved yet
       expect(drained).toBe(false)
 
-      // Complete the request (resolveRequest is guaranteed to be set by the loop above)
-      resolveRequest()
+      // Complete the request. The poll loop above guarantees resolveRequest is set;
+      // the assignment happens inside the route handler closure, which TypeScript's
+      // control-flow analysis cannot see, hence the non-null assertion.
+      const resolve = resolveRequest as unknown as () => void
+      resolve()
       await requestPromise
 
       // Now drain should resolve
@@ -219,8 +222,11 @@ describe('createInFlightTracker', () => {
         /Drain timeout: 1 requests still in-flight after 50ms/
       )
 
-      // Clean up: resolve the stuck request (resolveRequest is guaranteed to be set by the loop above)
-      resolveRequest()
+      // Clean up: resolve the stuck request. The poll loop above guarantees
+      // resolveRequest is set; the assignment happens inside the route handler
+      // closure, invisible to TypeScript's control-flow analysis.
+      const resolve = resolveRequest as unknown as () => void
+      resolve()
       await requestPromise
     })
 

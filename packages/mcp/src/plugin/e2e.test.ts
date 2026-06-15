@@ -30,8 +30,7 @@ function validMcpPluginSource(name: string, description: string, tools = '[]'): 
  */
 function addMcpPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
-  dep.pkg = {
-    ...dep.pkg,
+  Object.assign(dep.pkg, {
     type: 'module',
     exports: {
       './mcp': {
@@ -39,7 +38,7 @@ function addMcpPlugin(pluginsProject: Project, packageName: string, entrySource:
         default: './dist/mcp/index.js',
       },
     },
-  }
+  })
   dep.files = {
     dist: {
       mcp: {
@@ -150,11 +149,10 @@ describe('MCP plugin discovery e2e', () => {
 
     it('should return errors for plugins with broken /mcp exports', async () => {
       const dep = pluginsProject.addDependency('@macts/broken-server', '1.0.0')
-      dep.pkg = {
-        ...dep.pkg,
+      Object.assign(dep.pkg, {
         type: 'module',
         exports: { './mcp': './dist/mcp/index.js' },
-      }
+      })
       dep.files = {}
       await pluginsProject.write()
 
@@ -239,11 +237,11 @@ describe('MCP plugin discovery e2e', () => {
     it('should return multiple errors for multiple broken plugins', async () => {
       // Create two broken plugins
       const broken1 = pluginsProject.addDependency('@macts/broken-one-server', '1.0.0')
-      broken1.pkg = { ...broken1.pkg, type: 'module', exports: { './mcp': './dist/mcp/index.js' } }
+      Object.assign(broken1.pkg, { type: 'module', exports: { './mcp': './dist/mcp/index.js' } })
       broken1.files = {}
 
       const broken2 = pluginsProject.addDependency('@macts/broken-two-server', '1.0.0')
-      broken2.pkg = { ...broken2.pkg, type: 'module', exports: { './mcp': './dist/mcp/index.js' } }
+      Object.assign(broken2.pkg, { type: 'module', exports: { './mcp': './dist/mcp/index.js' } })
       broken2.files = {}
 
       await pluginsProject.write()
@@ -264,7 +262,7 @@ describe('MCP plugin discovery e2e', () => {
       )
 
       const broken = pluginsProject.addDependency('@macts/bad-app-server', '1.0.0')
-      broken.pkg = { ...broken.pkg, type: 'module', exports: { './mcp': './dist/mcp/index.js' } }
+      Object.assign(broken.pkg, { type: 'module', exports: { './mcp': './dist/mcp/index.js' } })
       broken.files = {}
 
       await pluginsProject.write()

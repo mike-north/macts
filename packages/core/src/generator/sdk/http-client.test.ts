@@ -65,6 +65,16 @@ const testManifest: AppManifest = {
       parameters: [{ name: 'id', type: 'string', description: 'Item ID', required: true }],
       permission: 'testapp:items:show',
     },
+    // Resource command with an enum-typed parameter: the generated resource client
+    // method references `Status`, so the file must import it from '../types.js'.
+    setStatus: {
+      name: 'setStatus',
+      description: 'Set the status of an item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [{ name: 'status', type: 'Status', description: 'New status', required: true }],
+      permission: 'testapp:items:setStatus',
+    },
   },
   suites: [],
   relationships: [],
@@ -163,6 +173,25 @@ describe('generateHttpClientSdk', () => {
 
     // Check custom command method
     expect(content).toContain('async show(id: string)')
+  })
+
+  // Regression: a resource command parameter typed as an enum (e.g. `Status`) makes the
+  // generated method reference that type, so it must be imported from '../types.js'.
+  // Previously the resource-file import was hardcoded to the resource's own
+  // Read/Create/Update types, leaving `Status` referenced but unimported (TS2304).
+  it('imports enum types used by resource command parameters', () => {
+    const result = generateHttpClientSdk(testManifest, {
+      packageName: '@macts/sdk-testapp',
+    })
+
+    const content = findFile(result.files, 'src/resources/item.ts').content
+
+    // The method signature references the enum...
+    expect(content).toContain('async setStatus(status: Status)')
+    // ...and the enum is imported alongside the resource's own types.
+    expect(content).toContain(
+      "import type { Item, ItemCreateInput, ItemUpdateInput, Status } from '../types.js';"
+    )
   })
 
   it('generates correct package.json', () => {
