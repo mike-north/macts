@@ -128,11 +128,12 @@ export function generateHttpClientSdk(
       content: generateClientFile(manifest, appName, appNameLower, baseUrl, port),
     })
 
-    // Generate resource clients
+    // Generate resource clients (only for resources that expose operations)
     for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+      if (!resourceHasOperations(manifest, resourceName)) continue
       files.push({
         path: `src/resources/${resourceName.toLowerCase()}.ts`,
-        content: generateResourceClient(resourceName, resource, manifest, appNameLower),
+        content: generateResourceClient(resourceName, resource, manifest),
       })
     }
 
@@ -255,21 +256,49 @@ function generateTypesFile(manifest: AppManifest): string {
     }
     lines.push('')
 
-    // Generate create input type (writable properties only)
+    // Generate create input type. The input is the union of the resource's
+    // writable properties and the backing create command's parameters. The
+    // command parameters are the single source of truth for what the server
+    // actually validates, so identifier parameters that are NOT writable
+    // properties (e.g. an Event's `calendarId`) must appear in the input —
+    // otherwise the create call cannot send the identifier the server requires.
     const writableProps = Object.entries(resource.properties).filter(
       ([_, prop]) => prop.access === 'rw'
     )
+    const createCommand = findResourceCreateCommand(manifest, resourceName)
+    const createFields = new Map<string, { tsType: string; required: boolean; doc: string }>()
+    for (const [propName, prop] of writableProps) {
+      createFields.set(propName, {
+        tsType: propertyTypeToTs(prop.type),
+        required: false,
+        doc: prop.description,
+      })
+    }
+    if (createCommand) {
+      for (const param of createCommand.parameters) {
+        // Command parameters override/augment writable properties. A required
+        // command parameter (typically an identifier like `calendarId`) is
+        // surfaced as a required field.
+        createFields.set(param.name, {
+          tsType: propertyTypeToTs(
+            typeof param.type === 'string' ? (param.type as PropertyType) : 'string'
+          ),
+          required: param.required,
+          doc: param.description,
+        })
+      }
+    }
 
     lines.push(`/** Input for creating a ${resourceName} */`)
-    if (writableProps.length === 0) {
-      // Use Record<string, never> for resources with no writable properties
+    if (createFields.size === 0) {
+      // Use Record<string, never> for resources with no create fields
       lines.push(`export type ${resourceName}CreateInput = Record<string, never>;`)
     } else {
       lines.push(`export interface ${resourceName}CreateInput {`)
-      for (const [propName, prop] of writableProps) {
-        const tsType = propertyTypeToTs(prop.type)
-        lines.push(`  /** ${prop.description} */`)
-        lines.push(`  ${propName}?: ${tsType};`)
+      for (const [fieldName, field] of createFields) {
+        const optional = field.required ? '' : '?'
+        lines.push(`  /** ${field.doc} */`)
+        lines.push(`  ${fieldName}${optional}: ${field.tsType};`)
       }
       lines.push('}')
     }
@@ -366,8 +395,13 @@ function generateClientFile(
   baseUrl: string,
   port: number
 ): string {
-  const resourceImports = Object.keys(manifest.resources)
-    .map((r) => `import { ${r}ResourceClient } from './resources/${r.toLowerCase()}.js';`)
+  // Only resources that expose operations get a generated client.
+  const operationalResources = Object.entries(manifest.resources).filter(([name]) =>
+    resourceHasOperations(manifest, name)
+  )
+
+  const resourceImports = operationalResources
+    .map(([r]) => `import { ${r}ResourceClient } from './resources/${r.toLowerCase()}.js';`)
     .join('\n')
 
   // Find enum types used in app-level commands
@@ -390,7 +424,7 @@ function generateClientFile(
       ? `import type { ${Array.from(enumsUsedInCommands).join(', ')} } from './types.js';`
       : ''
 
-  const resourceProperties = Object.entries(manifest.resources)
+  const resourceProperties = operationalResources
     .map(([name, resource]) => {
       const plural = resource.plural.toLowerCase()
       return `
@@ -399,7 +433,7 @@ function generateClientFile(
     })
     .join('\n')
 
-  const resourceInitializers = Object.entries(manifest.resources)
+  const resourceInitializers = operationalResources
     .map(([name, resource]) => {
       const plural = resource.plural.toLowerCase()
       return `    this.${plural} = new ${name}ResourceClient(this.#httpClient, '${appNameLower}', '${plural}');`
@@ -409,7 +443,7 @@ function generateClientFile(
   // Generate app-level command methods
   const appCommands = Object.entries(manifest.commands)
     .filter(([_, cmd]) => cmd.scope === 'application')
-    .map(([_, cmd]) => generateAppCommandMethod(cmd, appNameLower))
+    .map(([key, cmd]) => generateAppCommandMethod(key, cmd, appNameLower))
     .join('\n\n')
 
   return `/**
@@ -519,46 +553,99 @@ ${appCommands}
 
 /**
  * Generate method for app-level command.
+ *
+ * The route is keyed by the command's manifest key (`commandKey`), matching the
+ * server router. Application commands are addressed as `{app}.app.{commandKey}`.
  */
-function generateAppCommandMethod(cmd: Command, appNameLower: string): string {
-  // Sort parameters: required first, then optional
-  const sortedParams = [...cmd.parameters].sort((a, b) => {
-    if (a.required && !b.required) return -1
-    if (!a.required && b.required) return 1
-    return 0
-  })
-  const params = sortedParams.map((p) => {
-    const tsType = propertyTypeToTs(
-      typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
-    )
-    const optional = !p.required ? '?' : ''
-    const safeName = safeIdentifier(p.name)
-    return `${safeName}${optional}: ${tsType}`
-  })
+function generateAppCommandMethod(commandKey: string, cmd: Command, appNameLower: string): string {
+  const { signature, bodyArg } = buildParamsAndBody(cmd)
 
   const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
   const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
   const needsAwait = returnType === 'void'
 
-  const bodyProps = cmd.parameters
-    .map((p) => {
-      const safeName = safeIdentifier(p.name)
-      return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
-    })
-    .join(', ')
-  const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
-
   const rpcCall = needsAwait
-    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${cmd.name}', ${bodyArg});`
-    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${cmd.name}', ${bodyArg});`
+    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${commandKey}', ${bodyArg});`
+    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${commandKey}', ${bodyArg});`
 
   return `
   /**
    * ${cmd.description}
    */
-  async ${safeIdentifier(cmd.name)}(${params.join(', ')}): Promise<${returnType}> {
+  async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}
   }`
+}
+
+/**
+ * Standard CRUD operation names. A resource command's `name` field identifies
+ * which CRUD shape (if any) it fulfils; the command's *key* in
+ * `manifest.commands` is what addresses its route.
+ */
+const CRUD_OPERATIONS = ['list', 'get', 'create', 'update', 'delete'] as const
+
+/**
+ * Whether a command's `name` corresponds to a standard CRUD operation.
+ */
+function isCrudName(name: string): name is (typeof CRUD_OPERATIONS)[number] {
+  return (CRUD_OPERATIONS as readonly string[]).includes(name)
+}
+
+/**
+ * Whether a resource command applies to a given resource (matches its
+ * `resourceType`, or applies to all resources when `resourceType` is omitted).
+ */
+function commandAppliesToResource(cmd: Command, resourceName: string): boolean {
+  if (cmd.scope !== 'resource') return false
+  if (cmd.resourceType === undefined) return true
+  if (Array.isArray(cmd.resourceType)) return cmd.resourceType.includes(resourceName)
+  return cmd.resourceType === resourceName
+}
+
+/**
+ * Whether a resource has at least one operation (CRUD or custom command) in the
+ * manifest. Resources with no operations are omitted from the generated SDK
+ * entirely — there is nothing to call, and an empty resource client would be
+ * dead API surface.
+ */
+export function resourceHasOperations(manifest: AppManifest, resourceName: string): boolean {
+  return Object.values(manifest.commands).some((cmd) => commandAppliesToResource(cmd, resourceName))
+}
+
+/**
+ * Find the backing `create` command for a resource, if any. Used to augment the
+ * resource's create-input type with the command's required identifier parameters.
+ */
+function findResourceCreateCommand(
+  manifest: AppManifest,
+  resourceName: string
+): Command | undefined {
+  for (const cmd of Object.values(manifest.commands)) {
+    if (cmd.scope !== 'resource') continue
+    if (cmd.name !== 'create') continue
+    if (cmd.resourceType === undefined) return cmd
+    if (Array.isArray(cmd.resourceType)) {
+      if (cmd.resourceType.includes(resourceName)) return cmd
+    } else if (cmd.resourceType === resourceName) {
+      return cmd
+    }
+  }
+  return undefined
+}
+
+/**
+ * Find the backing command (key + definition) for a CRUD operation on a
+ * resource. The route is keyed by the command's manifest key (e.g.
+ * `createEvent`), NOT by its `name` (`create`) — those differ for manifest-named
+ * commands, and addressing by `name` is exactly what broke the structured write
+ * path. Returns undefined when the manifest declares no such operation, so the
+ * SDK omits the method instead of emitting an unreachable one.
+ */
+function findCrudCommand(
+  resourceCommands: [string, Command][],
+  operation: (typeof CRUD_OPERATIONS)[number]
+): [string, Command] | undefined {
+  return resourceCommands.find(([, cmd]) => cmd.name === operation)
 }
 
 /**
@@ -567,8 +654,7 @@ function generateAppCommandMethod(cmd: Command, appNameLower: string): string {
 function generateResourceClient(
   resourceName: string,
   resource: Resource,
-  manifest: AppManifest,
-  appNameLower: string
+  manifest: AppManifest
 ): string {
   const nameLower = resourceName.toLowerCase()
   const plural = resource.plural.toLowerCase()
@@ -583,16 +669,31 @@ function generateResourceClient(
     return cmd.resourceType === resourceName
   })
 
+  // Resolve the backing command for each CRUD shape so routes can be keyed by
+  // the command's manifest key (the single source of truth shared with the
+  // server router) rather than by the operation name.
+  const listCmd = findCrudCommand(resourceCommands, 'list')
+  const getCmd = findCrudCommand(resourceCommands, 'get')
+  const createCmd = findCrudCommand(resourceCommands, 'create')
+  const updateCmd = findCrudCommand(resourceCommands, 'update')
+  const deleteCmd = findCrudCommand(resourceCommands, 'delete')
+
   const commandMethods = resourceCommands
-    .map(([_, cmd]) => generateResourceCommandMethod(cmd, appNameLower, plural, resourceName))
+    .map(([key, cmd]) => generateResourceCommandMethod(key, cmd))
     .join('\n')
 
-  // Collect custom types (enums, referenced resources) used by resource command
-  // method signatures so they can be imported. Without this, a command parameter
-  // or return value typed as an enum (e.g. SaveFormat) references an unimported name.
+  // The resource's own type is referenced by the CRUD methods' return types
+  // (list/get/create/update). It may also be referenced by a non-CRUD command's
+  // parameter or return type. Only import it when something actually uses it,
+  // otherwise strict `noUnusedLocals` rejects the generated file.
+  let usesOwnType = Boolean(listCmd ?? getCmd ?? createCmd ?? updateCmd)
+
+  // Collect custom types (enums, referenced resources) used by non-CRUD resource
+  // command method signatures so they can be imported. Without this, a command
+  // parameter or return value typed as an enum (e.g. SaveFormat) references an
+  // unimported name.
   const extraTypeImports = new Set<string>()
-  for (const [, cmd] of resourceCommands) {
-    if (['list', 'get', 'create', 'update', 'delete'].includes(cmd.name)) continue
+  for (const [, cmd] of resourceCommands.filter(([, c]) => !isCrudName(c.name))) {
     const referencedTypes = [
       ...cmd.parameters.map((p) =>
         typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
@@ -602,35 +703,83 @@ function generateResourceClient(
     for (const t of referencedTypes) {
       const tsName = propertyTypeToTs(t)
       // Strip array suffix and only import names that exist as manifest enums or
-      // resources (the resource's own type plus Create/Update are already imported).
+      // resources (the Create/Update input types are already imported).
       const baseName = tsName.replace(/\[\]$/, '')
-      if (baseName === resourceName) continue
+      if (baseName === resourceName) {
+        usesOwnType = true
+        continue
+      }
       if (manifest.enums[baseName] || manifest.resources[baseName]) {
         extraTypeImports.add(baseName)
       }
     }
   }
 
-  // Merge the resource's own types with any extra referenced types into a single
-  // import from '../types.js' for clean, deterministic output.
-  const typeImports = [
-    resourceName,
-    `${resourceName}CreateInput`,
-    `${resourceName}UpdateInput`,
-    ...Array.from(extraTypeImports).sort(),
-  ]
-
   // Find identifiers
   const identifiers = resource.identifiers ?? []
   const primaryId = identifiers.find((id) => id.primary)?.property ?? identifiers[0]?.property
+
+  const crudMethods = [
+    listCmd ? generateListMethod(listCmd[0], resourceName, plural) : '',
+    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower, primaryId) : '',
+    createCmd ? generateCreateMethod(createCmd[0], createCmd[1], resourceName, nameLower) : '',
+    updateCmd
+      ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower, primaryId)
+      : '',
+    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower, primaryId) : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  const methodBody = [crudMethods, commandMethods].filter(Boolean).join('\n')
+  const hasMethods = methodBody.trim().length > 0
+
+  // A resource may declare no operations in the manifest. Its client is still
+  // exposed (e.g. `client.windows`) as a typed placeholder, but emitting unused
+  // private fields / type imports would trip strict `noUnusedLocals`. Guard the
+  // class body so the empty case stays clean under strict TypeScript.
+  if (!hasMethods) {
+    return `/**
+ * ${resourceName} client for ${manifest.app.name} SDK.
+ * Auto-generated - do not edit.
+ */
+
+import type { HttpClient } from '../client.js';
+
+/**
+ * Client for ${resource.description.toLowerCase()}.
+ *
+ * This resource has no operations defined in the manifest yet.
+ */
+export class ${resourceName}ResourceClient {
+  constructor(_http: HttpClient, _app: string, _resource: string) {
+    // No operations available for this resource.
+  }
+}
+`
+  }
+
+  // Merge the resource's own types with any extra referenced types into a single
+  // import from '../types.js' for clean, deterministic output. The Create/Update
+  // input types are only referenced when the matching command exists.
+  const typeImports = [
+    ...(usesOwnType ? [resourceName] : []),
+    ...(createCmd ? [`${resourceName}CreateInput`] : []),
+    ...(updateCmd ? [`${resourceName}UpdateInput`] : []),
+    ...Array.from(extraTypeImports).sort(),
+  ]
+
+  // The types import is omitted entirely when no emitted method references a
+  // type (e.g. a resource whose only operation is a void, parameter-less command).
+  const typesImportLine =
+    typeImports.length > 0 ? `\nimport type { ${typeImports.join(', ')} } from '../types.js';` : ''
 
   return `/**
  * ${resourceName} client for ${manifest.app.name} SDK.
  * Auto-generated - do not edit.
  */
 
-import type { HttpClient } from '../client.js';
-import type { ${typeImports.join(', ')} } from '../types.js';
+import type { HttpClient } from '../client.js';${typesImportLine}
 
 /**
  * Client for ${resource.description.toLowerCase()}.
@@ -645,74 +794,145 @@ export class ${resourceName}ResourceClient {
     this.#app = app;
     this.#resource = resource;
   }
-
-  /**
-   * List all ${plural}.
-   */
-  async list(): Promise<${resourceName}[]> {
-    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.list\`);
-  }
-
-  /**
-   * Get a ${nameLower} by ${primaryId ?? 'id'}.
-   */
-  async get(${primaryId ?? 'id'}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.get\`, { ${primaryId ?? 'id'} });
-  }
-
-  /**
-   * Create a new ${nameLower}.
-   */
-  async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.create\`, input);
-  }
-
-  /**
-   * Update an existing ${nameLower}.
-   */
-  async update(${primaryId ?? 'id'}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.update\`, { ${primaryId ?? 'id'}, ...input });
-  }
-
-  /**
-   * Delete a ${nameLower}.
-   */
-  async delete(${primaryId ?? 'id'}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.delete\`, { ${primaryId ?? 'id'} });
-  }
-${commandMethods}
+${methodBody}
 }
 `
 }
 
 /**
- * Generate method for resource-level command.
+ * Get the first-parameter name for a get/update/delete command, falling back to
+ * the resource's primary identifier and finally `id`. The server validates the
+ * request body against the command's declared parameters, so the SDK must use
+ * the command's parameter name when present.
  */
-function generateResourceCommandMethod(
-  cmd: Command,
-  appNameLower: string,
-  plural: string,
-  _resourceName: string
-): string {
-  // Skip standard CRUD commands as they're already generated
-  if (['list', 'get', 'create', 'update', 'delete'].includes(cmd.name)) {
-    return ''
+function idParamName(command: Command, primaryId: string | undefined): string {
+  return command.parameters[0]?.name ?? primaryId ?? 'id'
+}
+
+/**
+ * Generate the `list` method, routed by the backing command's key.
+ */
+function generateListMethod(commandKey: string, resourceName: string, plural: string): string {
+  return `
+  /**
+   * List all ${plural}.
+   */
+  async list(): Promise<${resourceName}[]> {
+    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${commandKey}\`);
   }
+`
+}
 
-  const params = cmd.parameters.map((p) => {
-    const tsType = propertyTypeToTs(
-      typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
-    )
-    const optional = !p.required ? '?' : ''
-    const safeName = safeIdentifier(p.name)
-    return `${safeName}${optional}: ${tsType}`
+/**
+ * Generate the `get` method, routed by the backing command's key.
+ */
+function generateGetMethod(
+  commandKey: string,
+  command: Command,
+  resourceName: string,
+  nameLower: string,
+  primaryId: string | undefined
+): string {
+  const id = idParamName(command, primaryId)
+  return `
+  /**
+   * Get a ${nameLower} by ${id}.
+   */
+  async get(${id}: string): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id} });
+  }
+`
+}
+
+/**
+ * Generate the `create` method, routed by the backing command's key.
+ *
+ * The single-object input keeps the SDK ergonomic and the MCP/CLI call shape
+ * stable. `${resourceName}CreateInput` now includes any identifier parameters the
+ * backing create command requires (e.g. an Event's `calendarId`), so the input
+ * carries everything the server validates against — reconciling the previous
+ * param-name drift where the property-derived input omitted `calendarId`.
+ */
+function generateCreateMethod(
+  commandKey: string,
+  _command: Command,
+  resourceName: string,
+  nameLower: string
+): string {
+  return `
+  /**
+   * Create a new ${nameLower}.
+   */
+  async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, input);
+  }
+`
+}
+
+/**
+ * Generate the `update` method, routed by the backing command's key.
+ */
+function generateUpdateMethod(
+  commandKey: string,
+  command: Command,
+  resourceName: string,
+  nameLower: string,
+  primaryId: string | undefined
+): string {
+  const id = idParamName(command, primaryId)
+  return `
+  /**
+   * Update an existing ${nameLower}.
+   */
+  async update(${id}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id}, ...input });
+  }
+`
+}
+
+/**
+ * Generate the `delete` method, routed by the backing command's key.
+ */
+function generateDeleteMethod(
+  commandKey: string,
+  command: Command,
+  nameLower: string,
+  primaryId: string | undefined
+): string {
+  const id = idParamName(command, primaryId)
+  return `
+  /**
+   * Delete a ${nameLower}.
+   */
+  async delete(${id}: string): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id} });
+  }
+`
+}
+
+/**
+ * Build a method signature parameter list and request-body argument from a
+ * command's declared parameters. Required parameters are sorted first; reserved
+ * identifiers are made safe; the body forwards parameters under their manifest
+ * names so the server schema validates them.
+ */
+function buildParamsAndBody(command: Command): { signature: string; bodyArg: string } {
+  const sortedParams = [...command.parameters].sort((a, b) => {
+    if (a.required && !b.required) return -1
+    if (!a.required && b.required) return 1
+    return 0
   })
+  const signature = sortedParams
+    .map((p) => {
+      const tsType = propertyTypeToTs(
+        typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
+      )
+      const optional = !p.required ? '?' : ''
+      return `${safeIdentifier(p.name)}${optional}: ${tsType}`
+    })
+    .join(', ')
 
-  const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
-  const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
-  const needsAwait = returnType === 'void'
-
-  const bodyProps = cmd.parameters
+  const bodyProps = command.parameters
     .map((p) => {
       const safeName = safeIdentifier(p.name)
       return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
@@ -720,18 +940,41 @@ function generateResourceCommandMethod(
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 
+  return { signature, bodyArg }
+}
+
+/**
+ * Generate method for a non-CRUD resource-level command.
+ *
+ * The route is keyed by the command's manifest key (`commandKey`), the same
+ * value the server router uses — addressing by `command.name` is what broke the
+ * structured path. CRUD-shaped commands are emitted separately by
+ * `generateResourceClient`, so they are skipped here.
+ */
+function generateResourceCommandMethod(commandKey: string, cmd: Command): string {
+  // Skip standard CRUD commands as they're already generated
+  if (isCrudName(cmd.name)) {
+    return ''
+  }
+
+  const { signature, bodyArg } = buildParamsAndBody(cmd)
+
+  const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
+  const rpcReturnType = returnType === 'void' ? 'undefined' : returnType
+  const needsAwait = returnType === 'void'
+
   const rpcCall = needsAwait
-    ? `await this.#http.rpc<${rpcReturnType}>('${appNameLower}.${plural}.${cmd.name}', ${bodyArg});`
-    : `return this.#http.rpc<${rpcReturnType}>('${appNameLower}.${plural}.${cmd.name}', ${bodyArg});`
+    ? `await this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});`
+    : `return this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});`
 
   return `
-
   /**
    * ${cmd.description}
    */
-  async ${safeIdentifier(cmd.name)}(${params.join(', ')}): Promise<${returnType}> {
+  async ${safeIdentifier(cmd.name)}(${signature}): Promise<${returnType}> {
     ${rpcCall}
-  }`
+  }
+`
 }
 
 /**
@@ -739,6 +982,7 @@ function generateResourceCommandMethod(
  */
 function generateIndexFile(manifest: AppManifest, appName: string): string {
   const resourceExports = Object.keys(manifest.resources)
+    .filter((r) => resourceHasOperations(manifest, r))
     .map((r) => `export { ${r}ResourceClient } from './resources/${r.toLowerCase()}.js';`)
     .join('\n')
 

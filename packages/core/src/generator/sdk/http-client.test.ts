@@ -57,6 +57,48 @@ const testManifest: AppManifest = {
       parameters: [],
       permission: 'testapp:app:refresh',
     },
+    // Standard CRUD commands. Keys differ from `name` (e.g. `createItem` vs
+    // `create`) so the generated routes must key by the command KEY.
+    listItems: {
+      name: 'list',
+      description: 'List all items',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [],
+      permission: 'testapp:items:list',
+    },
+    getItem: {
+      name: 'get',
+      description: 'Get an item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [{ name: 'id', type: 'string', description: 'Item ID', required: true }],
+      permission: 'testapp:items:get',
+    },
+    createItem: {
+      name: 'create',
+      description: 'Create an item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [{ name: 'name', type: 'string', description: 'Item name', required: true }],
+      permission: 'testapp:items:create',
+    },
+    updateItem: {
+      name: 'update',
+      description: 'Update an item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [{ name: 'id', type: 'string', description: 'Item ID', required: true }],
+      permission: 'testapp:items:update',
+    },
+    deleteItem: {
+      name: 'delete',
+      description: 'Delete an item',
+      scope: 'resource',
+      resourceType: 'Item',
+      parameters: [{ name: 'id', type: 'string', description: 'Item ID', required: true }],
+      permission: 'testapp:items:delete',
+    },
     show: {
       name: 'show',
       description: 'Show an item',
@@ -164,15 +206,93 @@ describe('generateHttpClientSdk', () => {
     // Check class name
     expect(content).toContain('export class ItemResourceClient')
 
-    // Check CRUD methods
+    // Check CRUD methods (named by operation, routed by command KEY)
     expect(content).toContain('async list(): Promise<Item[]>')
     expect(content).toContain('async get(id: string): Promise<Item>')
     expect(content).toContain('async create(input: ItemCreateInput): Promise<Item>')
     expect(content).toContain('async update(id: string, input: ItemUpdateInput): Promise<Item>')
     expect(content).toContain('async delete(id: string): Promise<void>')
 
-    // Check custom command method
+    // Routes use the manifest command KEY, not the operation name.
+    expect(content).toContain('${this.#app}.${this.#resource}.listItems`')
+    expect(content).toContain('${this.#app}.${this.#resource}.getItem`')
+    expect(content).toContain('${this.#app}.${this.#resource}.createItem`')
+    expect(content).toContain('${this.#app}.${this.#resource}.updateItem`')
+    expect(content).toContain('${this.#app}.${this.#resource}.deleteItem`')
+
+    // Check custom command method, routed by its key (`show`).
     expect(content).toContain('async show(id: string)')
+    expect(content).toContain('${this.#app}.${this.#resource}.show`')
+  })
+
+  it('omits CRUD methods with no backing manifest command', () => {
+    // A resource whose manifest declares no `create` command must not emit a
+    // `create()` method that would POST to a non-existent route.
+    const manifestNoCreate: AppManifest = {
+      ...testManifest,
+      commands: {
+        listItems: {
+          name: 'list',
+          description: 'List all items',
+          scope: 'resource',
+          resourceType: 'Item',
+          parameters: [],
+          permission: 'testapp:items:list',
+        },
+      },
+    }
+    const result = generateHttpClientSdk(manifestNoCreate, { packageName: '@macts/sdk-testapp' })
+    const content = findFile(result.files, 'src/resources/item.ts').content
+    expect(content).toContain('async list(): Promise<Item[]>')
+    expect(content).not.toContain('async create(')
+    expect(content).not.toContain('async get(')
+    expect(content).not.toContain('async delete(')
+  })
+
+  it('omits resources that declare no operations', () => {
+    // A resource with no applicable commands has nothing to call. It must not
+    // produce a resource file, a client property, an import, or an export — an
+    // empty resource client is dead API surface (and trips strict lint rules).
+    const manifestWithInertResource: AppManifest = {
+      ...testManifest,
+      resources: {
+        ...testManifest.resources,
+        Ghost: {
+          name: 'Ghost',
+          plural: 'Ghosts',
+          description: 'A resource with no operations',
+          properties: {
+            id: { access: 'r', type: 'string', description: 'ID', optional: false },
+          },
+          identifiers: [{ property: 'id', primary: true }],
+        },
+      },
+      commands: {
+        listItems: {
+          name: 'list',
+          description: 'List all items',
+          scope: 'resource',
+          resourceType: 'Item',
+          parameters: [],
+          permission: 'testapp:items:list',
+        },
+      },
+    }
+    const result = generateHttpClientSdk(manifestWithInertResource, {
+      packageName: '@macts/sdk-testapp',
+    })
+    const paths = result.files.map((f) => f.path)
+    // No resource file for the inert resource.
+    expect(paths).not.toContain('src/resources/ghost.ts')
+    // Item (which has a list command) is still generated.
+    expect(paths).toContain('src/resources/item.ts')
+    // The main client neither imports, declares, nor constructs the inert client.
+    const clientContent = findFile(result.files, 'src/client.ts').content
+    expect(clientContent).not.toContain('GhostResourceClient')
+    expect(clientContent).toContain('ItemResourceClient')
+    // The index does not export the inert client.
+    const indexContent = findFile(result.files, 'src/index.ts').content
+    expect(indexContent).not.toContain('GhostResourceClient')
   })
 
   // Regression: a resource command parameter typed as an enum (e.g. `Status`) makes the
