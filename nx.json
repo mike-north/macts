@@ -49,6 +49,7 @@
       "cache": true
     },
     "lint": {
+      "dependsOn": ["^build"],
       "inputs": [
         "default",
         "{workspaceRoot}/.eslintrc.json",
