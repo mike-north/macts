@@ -35,11 +35,11 @@ export interface Calendar {
 
 /** Input for creating a Calendar */
 export interface CalendarCreateInput {
-  /** The calendar title */
-  name?: string
+  /** Calendar name */
+  name: string
   /** The calendar title (synonym for name) */
   title?: string
-  /** The calendar color */
+  /** Calendar color */
   color?: { r: number; g: number; b: number }
   /** The calendar description */
   description?: string
@@ -80,17 +80,17 @@ export interface Event {
 
 /** Input for creating a Event */
 export interface EventCreateInput {
-  /** The event summary/title */
-  summary?: string
-  /** The event notes */
+  /** Event title */
+  summary: string
+  /** Event notes */
   description?: string
-  /** The event location */
+  /** Event location */
   location?: string
-  /** The event start date */
-  startDate?: Date
-  /** The event end date */
-  endDate?: Date
-  /** True if the event is an all-day event */
+  /** Event start date */
+  startDate: Date
+  /** Event end date */
+  endDate: Date
+  /** Whether this is an all-day event */
   alldayEvent?: boolean
   /** The iCalendar (RFC 2445) string describing the event recurrence, if defined */
   recurrence?: string
@@ -102,6 +102,8 @@ export interface EventCreateInput {
   excludedDates?: Date[]
   /** The URL associated with the event */
   url?: string
+  /** Calendar identifier for the event */
+  calendarId: string
 }
 
 /** Input for updating a Event */

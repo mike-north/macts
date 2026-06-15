@@ -1,7 +1,4 @@
 import type { CliPlugin } from '@macts/cli'
-import { ListDocumentsCommand } from './commands/documents/list.js'
-import { CreateDocumentCommand } from './commands/documents/create.js'
-import { GetDocumentCommand } from './commands/documents/get.js'
 import { OpenURLCommand } from './commands/open-url.js'
 import { PlayCommand } from './commands/play.js'
 import { StartCommand } from './commands/start.js'
@@ -25,9 +22,6 @@ export const plugin: CliPlugin = {
   name: 'quicktime-player',
   description: 'Commands for QuickTime Player',
   commands: [
-    ListDocumentsCommand,
-    CreateDocumentCommand,
-    GetDocumentCommand,
     OpenURLCommand,
     PlayCommand,
     StartCommand,

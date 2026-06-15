@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { ApplicationResourceClient } from './resources/application.js'
-
 /**
  * Client configuration options.
  */
@@ -84,17 +82,9 @@ export class BluetoothFileExchangeError extends Error {
 export class BluetoothFileExchangeClient {
   readonly #httpClient: HttpClient
 
-  /** The Bluetooth File Exchange application */
-  readonly applications: ApplicationResourceClient
-
   constructor(options: BluetoothFileExchangeClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.applications = new ApplicationResourceClient(
-      this.#httpClient,
-      'bluetooth-file-exchange',
-      'applications'
-    )
   }
 
   /**

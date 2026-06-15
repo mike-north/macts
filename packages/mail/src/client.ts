@@ -5,25 +5,8 @@
  * @packageDocumentation
  */
 
-import { RichTextResourceClient } from './resources/richtext.js'
-import { AttachmentResourceClient } from './resources/attachment.js'
-import { ParagraphResourceClient } from './resources/paragraph.js'
-import { WordResourceClient } from './resources/word.js'
-import { CharacterResourceClient } from './resources/character.js'
-import { AttributeRunResourceClient } from './resources/attributerun.js'
 import { OutgoingMessageResourceClient } from './resources/outgoingmessage.js'
-import { MessageViewerResourceClient } from './resources/messageviewer.js'
 import { MessageResourceClient } from './resources/message.js'
-import { AccountResourceClient } from './resources/account.js'
-import { MailboxResourceClient } from './resources/mailbox.js'
-import { RuleResourceClient } from './resources/rule.js'
-import { RuleConditionResourceClient } from './resources/rulecondition.js'
-import { RecipientResourceClient } from './resources/recipient.js'
-import { BccRecipientResourceClient } from './resources/bccrecipient.js'
-import { CcRecipientResourceClient } from './resources/ccrecipient.js'
-import { ToRecipientResourceClient } from './resources/torecipient.js'
-import { HeaderResourceClient } from './resources/header.js'
-import { MailAttachmentResourceClient } from './resources/mailattachment.js'
 
 /**
  * Client configuration options.
@@ -102,101 +85,21 @@ export class MailError extends Error {
 export class MailClient {
   readonly #httpClient: HttpClient
 
-  /** Rich (styled) text */
-  readonly richtext: RichTextResourceClient
-
-  /** Represents an inline text attachment. This class is used mainly for make commands. */
-  readonly attachments: AttachmentResourceClient
-
-  /** This subdivides the text into paragraphs. */
-  readonly paragraphs: ParagraphResourceClient
-
-  /** This subdivides the text into words. */
-  readonly words: WordResourceClient
-
-  /** This subdivides the text into characters. */
-  readonly characters: CharacterResourceClient
-
-  /** This subdivides the text into chunks that all have the same attributes. */
-  readonly attributeruns: AttributeRunResourceClient
-
   /** A new email message */
   readonly outgoingmessages: OutgoingMessageResourceClient
-
-  /** Represents the object responsible for managing a viewer window */
-  readonly messageviewers: MessageViewerResourceClient
 
   /** An email message */
   readonly messages: MessageResourceClient
 
-  /** A Mail account for receiving messages (POP/IMAP). To create a new receiving account, use the 'pop account', 'imap account', and 'iCloud account' objects */
-  readonly accounts: AccountResourceClient
-
-  /** A mailbox that holds messages */
-  readonly mailboxes: MailboxResourceClient
-
-  /** Class for message rules */
-  readonly rules: RuleResourceClient
-
-  /** Class for conditions that can be attached to a single rule */
-  readonly ruleconditions: RuleConditionResourceClient
-
-  /** An email recipient */
-  readonly recipients: RecipientResourceClient
-
-  /** An email recipient in the Bcc: field */
-  readonly bccrecipients: BccRecipientResourceClient
-
-  /** An email recipient in the Cc: field */
-  readonly ccrecipients: CcRecipientResourceClient
-
-  /** An email recipient in the To: field */
-  readonly torecipients: ToRecipientResourceClient
-
-  /** A header value for a message. E.g. To, Subject, From. */
-  readonly headers: HeaderResourceClient
-
-  /** A file attached to a received message. */
-  readonly mailattachments: MailAttachmentResourceClient
-
   constructor(options: MailClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.richtext = new RichTextResourceClient(this.#httpClient, 'mail', 'richtext')
-    this.attachments = new AttachmentResourceClient(this.#httpClient, 'mail', 'attachments')
-    this.paragraphs = new ParagraphResourceClient(this.#httpClient, 'mail', 'paragraphs')
-    this.words = new WordResourceClient(this.#httpClient, 'mail', 'words')
-    this.characters = new CharacterResourceClient(this.#httpClient, 'mail', 'characters')
-    this.attributeruns = new AttributeRunResourceClient(this.#httpClient, 'mail', 'attributeruns')
     this.outgoingmessages = new OutgoingMessageResourceClient(
       this.#httpClient,
       'mail',
       'outgoingmessages'
     )
-    this.messageviewers = new MessageViewerResourceClient(
-      this.#httpClient,
-      'mail',
-      'messageviewers'
-    )
     this.messages = new MessageResourceClient(this.#httpClient, 'mail', 'messages')
-    this.accounts = new AccountResourceClient(this.#httpClient, 'mail', 'accounts')
-    this.mailboxes = new MailboxResourceClient(this.#httpClient, 'mail', 'mailboxes')
-    this.rules = new RuleResourceClient(this.#httpClient, 'mail', 'rules')
-    this.ruleconditions = new RuleConditionResourceClient(
-      this.#httpClient,
-      'mail',
-      'ruleconditions'
-    )
-    this.recipients = new RecipientResourceClient(this.#httpClient, 'mail', 'recipients')
-    this.bccrecipients = new BccRecipientResourceClient(this.#httpClient, 'mail', 'bccrecipients')
-    this.ccrecipients = new CcRecipientResourceClient(this.#httpClient, 'mail', 'ccrecipients')
-    this.torecipients = new ToRecipientResourceClient(this.#httpClient, 'mail', 'torecipients')
-    this.headers = new HeaderResourceClient(this.#httpClient, 'mail', 'headers')
-    this.mailattachments = new MailAttachmentResourceClient(
-      this.#httpClient,
-      'mail',
-      'mailattachments'
-    )
   }
 
   /**

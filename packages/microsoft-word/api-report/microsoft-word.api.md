@@ -18,16 +18,6 @@ export interface BookmarkCreateInput {
     name?: string;
 }
 
-// @public
-export class BookmarkResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BookmarkCreateInput): Promise<Bookmark>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Bookmark>;
-    list(): Promise<Bookmark[]>;
-    update(id: string, input: BookmarkUpdateInput): Promise<Bookmark>;
-}
-
 // @public (undocumented)
 export const BookmarkSchema: z.ZodObject<{
     name: z.ZodString;
@@ -56,16 +46,6 @@ export interface CellCreateInput {
     width?: number;
 }
 
-// @public
-export class CellResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CellCreateInput): Promise<Cell>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Cell>;
-    list(): Promise<Cell[]>;
-    update(id: string, input: CellUpdateInput): Promise<Cell>;
-}
-
 // @public (undocumented)
 export const CellSchema: z.ZodObject<{
     content: z.ZodString;
@@ -89,16 +69,6 @@ export interface Column {
 export interface ColumnCreateInput {
     preferredWidth?: number;
     width?: number;
-}
-
-// @public
-export class ColumnResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ColumnCreateInput): Promise<Column>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Column>;
-    list(): Promise<Column[]>;
-    update(id: string, input: ColumnUpdateInput): Promise<Column>;
 }
 
 // @public (undocumented)
@@ -138,15 +108,12 @@ export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     activate(): Promise<void>;
     close(saving?: boolean): Promise<void>;
-    create(input: DocumentCreateInput): Promise<Document>;
     createRange(start?: number, end?: number): Promise<void>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<Document>;
+    get(id: string): Promise<Document>;
     list(): Promise<Document[]>;
     print(): Promise<void>;
     save(): Promise<void>;
     saveAs(fileName: string, fileFormat?: SaveFormat): Promise<void>;
-    update(name: string, input: DocumentUpdateInput): Promise<Document>;
 }
 
 // @public (undocumented)
@@ -182,16 +149,6 @@ export interface FieldCreateInput {
     fieldText?: string;
     locked?: boolean;
     showCodes?: boolean;
-}
-
-// @public
-export class FieldResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FieldCreateInput): Promise<Field>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Field>;
-    list(): Promise<Field[]>;
-    update(id: string, input: FieldUpdateInput): Promise<Field>;
 }
 
 // @public (undocumented)
@@ -245,16 +202,6 @@ export interface FontCreateInput {
     underline?: UnderlineType;
 }
 
-// @public
-export class FontResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FontCreateInput): Promise<Font>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Font>;
-    list(): Promise<Font[]>;
-    update(id: string, input: FontUpdateInput): Promise<Font>;
-}
-
 // @public (undocumented)
 export const FontSchema: z.ZodObject<{
     bold: z.ZodBoolean;
@@ -285,29 +232,17 @@ export class HttpClient {
 // @public
 export class MicrosoftWordClient {
     constructor(options: MicrosoftWordClientOptions);
-    readonly bookmarks: BookmarkResourceClient;
-    readonly cells: CellResourceClient;
-    readonly columns: ColumnResourceClient;
     copyObject(): Promise<void>;
     createNewDocument(attachedTemplate?: string): Promise<void>;
     cutObject(): Promise<void>;
     readonly documents: DocumentResourceClient;
-    readonly fields: FieldResourceClient;
     find(findText: string, matchCase?: boolean, matchWholeWord?: boolean): Promise<void>;
-    readonly fonts: FontResourceClient;
     get http(): HttpClient;
     insertText(text: string, at?: number): Promise<void>;
-    readonly pagesetups: PageSetupResourceClient;
-    readonly paragraphs: ParagraphResourceClient;
     pasteObject(): Promise<void>;
     redo(): Promise<void>;
     replace(findText: string, replaceWith: string, replaceAll?: boolean): Promise<void>;
-    readonly rows: RowResourceClient;
-    readonly sections: SectionResourceClient;
     selectAll(): Promise<void>;
-    readonly selections: SelectionResourceClient;
-    readonly tables: TableResourceClient;
-    readonly textranges: TextRangeResourceClient;
     undo(): Promise<void>;
 }
 
@@ -346,16 +281,6 @@ export interface PageSetupCreateInput {
     paperSize?: string;
     rightMargin?: number;
     topMargin?: number;
-}
-
-// @public
-export class PageSetupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PageSetupCreateInput): Promise<PageSetup>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PageSetup>;
-    list(): Promise<PageSetup[]>;
-    update(id: string, input: PageSetupUpdateInput): Promise<PageSetup>;
 }
 
 // @public (undocumented)
@@ -406,16 +331,6 @@ export interface ParagraphCreateInput {
     spaceBefore?: number;
 }
 
-// @public
-export class ParagraphResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ParagraphCreateInput): Promise<Paragraph>;
-    delete(paragraphId: string): Promise<void>;
-    get(paragraphId: string): Promise<Paragraph>;
-    list(): Promise<Paragraph[]>;
-    update(paragraphId: string, input: ParagraphUpdateInput): Promise<Paragraph>;
-}
-
 // @public (undocumented)
 export const ParagraphSchema: z.ZodObject<{
     alignment: z.ZodString;
@@ -449,16 +364,6 @@ export interface RowCreateInput {
     height?: number;
 }
 
-// @public
-export class RowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RowCreateInput): Promise<Row>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Row>;
-    list(): Promise<Row[]>;
-    update(id: string, input: RowUpdateInput): Promise<Row>;
-}
-
 // @public (undocumented)
 export const RowSchema: z.ZodObject<{
     height: z.ZodNumber;
@@ -481,16 +386,6 @@ export interface Section {
 // @public
 export interface SectionCreateInput {
     protectedForForms?: boolean;
-}
-
-// @public
-export class SectionResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SectionCreateInput): Promise<Section>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Section>;
-    list(): Promise<Section[]>;
-    update(id: string, input: SectionUpdateInput): Promise<Section>;
 }
 
 // @public (undocumented)
@@ -523,16 +418,6 @@ export interface SelectionCreateInput {
     italic?: boolean;
 }
 
-// @public
-export class SelectionResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SelectionCreateInput): Promise<Selection>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Selection>;
-    list(): Promise<Selection[]>;
-    update(id: string, input: SelectionUpdateInput): Promise<Selection>;
-}
-
 // @public (undocumented)
 export const SelectionSchema: z.ZodObject<{
     content: z.ZodString;
@@ -560,16 +445,6 @@ export interface Table {
 export interface TableCreateInput {
     allowAutoFit?: boolean;
     borders?: boolean;
-}
-
-// @public
-export class TableResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TableCreateInput): Promise<Table>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Table>;
-    list(): Promise<Table[]>;
-    update(id: string, input: TableUpdateInput): Promise<Table>;
 }
 
 // @public (undocumented)
@@ -605,16 +480,6 @@ export interface TextRangeCreateInput {
     italic?: boolean;
     start?: number;
     underline?: UnderlineType;
-}
-
-// @public
-export class TextRangeResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TextRangeCreateInput): Promise<TextRange>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<TextRange>;
-    list(): Promise<TextRange[]>;
-    update(id: string, input: TextRangeUpdateInput): Promise<TextRange>;
 }
 
 // @public (undocumented)

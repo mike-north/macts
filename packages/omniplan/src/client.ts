@@ -13,8 +13,6 @@ import { AssignmentResourceClient } from './resources/assignment.js'
 import { DependencyResourceClient } from './resources/dependency.js'
 import { ViolationResourceClient } from './resources/violation.js'
 import { ScenarioResourceClient } from './resources/scenario.js'
-import { ScheduleResourceClient } from './resources/schedule.js'
-import { CurrencyResourceClient } from './resources/currency.js'
 
 /**
  * Client configuration options.
@@ -117,12 +115,6 @@ export class OmniPlanClient {
   /** An alternative project plan */
   readonly scenarios: ScenarioResourceClient
 
-  /** A schedule of working time */
-  readonly schedules: ScheduleResourceClient
-
-  /** A locale based currency object */
-  readonly currencies: CurrencyResourceClient
-
   constructor(options: OmniPlanClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
@@ -134,8 +126,6 @@ export class OmniPlanClient {
     this.dependencies = new DependencyResourceClient(this.#httpClient, 'omniplan', 'dependencies')
     this.violations = new ViolationResourceClient(this.#httpClient, 'omniplan', 'violations')
     this.scenarios = new ScenarioResourceClient(this.#httpClient, 'omniplan', 'scenarios')
-    this.schedules = new ScheduleResourceClient(this.#httpClient, 'omniplan', 'schedules')
-    this.currencies = new CurrencyResourceClient(this.#httpClient, 'omniplan', 'currencies')
   }
 
   /**

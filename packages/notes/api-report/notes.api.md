@@ -19,11 +19,8 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AccountCreateInput): Promise<Account>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Account>;
     list(): Promise<Account[]>;
-    update(name: string, input: AccountUpdateInput): Promise<Account>;
 }
 
 // @public (undocumented)
@@ -51,11 +48,8 @@ export type AttachmentCreateInput = Record<string, never>;
 // @public
 export class AttachmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AttachmentCreateInput): Promise<Attachment>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Attachment>;
     list(): Promise<Attachment[]>;
-    update(name: string, input: AttachmentUpdateInput): Promise<Attachment>;
 }
 
 // @public (undocumented)
@@ -86,11 +80,8 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Folder>;
     list(): Promise<Folder[]>;
-    update(name: string, input: FolderUpdateInput): Promise<Folder>;
 }
 
 // @public (undocumented)
@@ -132,11 +123,9 @@ export interface NoteCreateInput {
 export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: NoteCreateInput): Promise<Note>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Note>;
     list(): Promise<Note[]>;
     show(name: string): Promise<void>;
-    update(name: string, input: NoteUpdateInput): Promise<Note>;
 }
 
 // @public (undocumented)

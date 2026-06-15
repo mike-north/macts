@@ -6,7 +6,6 @@
  */
 
 import { PaneResourceClient } from './resources/pane.js'
-import { AnchorResourceClient } from './resources/anchor.js'
 
 /**
  * Client configuration options.
@@ -88,14 +87,10 @@ export class SystemSettingsClient {
   /** A settings pane. */
   readonly panes: PaneResourceClient
 
-  /** An anchor within a settings pane. */
-  readonly anchors: AnchorResourceClient
-
   constructor(options: SystemSettingsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.panes = new PaneResourceClient(this.#httpClient, 'system-settings', 'panes')
-    this.anchors = new AnchorResourceClient(this.#httpClient, 'system-settings', 'anchors')
   }
 
   /**

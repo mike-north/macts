@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Tab, TabCreateInput, TabUpdateInput } from '../types.js'
+import type { Tab, TabCreateInput } from '../types.js'
 
 /**
  * Client for a tab..
@@ -24,118 +24,104 @@ export class TabResourceClient {
    * List all tabs.
    */
   async list(): Promise<Tab[]> {
-    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.listTabs`)
   }
 
   /**
    * Get a tab by id.
    */
   async get(id: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { id })
+    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.getTab`, { id })
   }
 
   /**
    * Create a new tab.
    */
   async create(input: TabCreateInput): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing tab.
-   */
-  async update(id: string, input: TabUpdateInput): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a tab.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.createTab`, input)
   }
 
   /**
    * Reload a tab
    */
   async reload(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.reload', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reload`, { tabId })
   }
 
   /**
    * Go Back (If Possible)
    */
   async goBack(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.goBack', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goBack`, { tabId })
   }
 
   /**
    * Go Forward (If Possible)
    */
   async goForward(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.goForward', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.goForward`, { tabId })
   }
 
   /**
    * Select all
    */
   async selectAll(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.selectAll', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.selectAll`, { tabId })
   }
 
   /**
    * Cut selected text (If Possible)
    */
   async cutSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.cutSelection', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.cutSelection`, { tabId })
   }
 
   /**
    * Copy text
    */
   async copySelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.copySelection', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.copySelection`, { tabId })
   }
 
   /**
    * Paste text (If Possible)
    */
   async pasteSelection(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.pasteSelection', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.pasteSelection`, { tabId })
   }
 
   /**
    * Undo the last change
    */
   async undo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.undo', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.undo`, { tabId })
   }
 
   /**
    * Redo the last change
    */
   async redo(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.redo', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redo`, { tabId })
   }
 
   /**
    * Stop the current tab from loading
    */
   async stop(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.stop', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { tabId })
   }
 
   /**
    * View the HTML source of the tab
    */
   async viewSource(tabId: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.viewSource', { tabId })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.viewSource`, { tabId })
   }
 
   /**
    * Execute a piece of javascript
    */
   async execute(tabId: string, javascript: string): Promise<void> {
-    await this.#http.rpc<undefined>('microsoft-edge.tabs.execute', { tabId, javascript })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.execute`, { tabId, javascript })
   }
 }

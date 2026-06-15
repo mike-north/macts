@@ -26,16 +26,6 @@ export interface AnalyzerIssueCreateInput {
     startingLineNumber?: number;
 }
 
-// @public
-export class AnalyzerIssueResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AnalyzerIssueCreateInput): Promise<AnalyzerIssue>;
-    delete(message: string): Promise<void>;
-    get(message: string): Promise<AnalyzerIssue>;
-    list(): Promise<AnalyzerIssue[]>;
-    update(message: string, input: AnalyzerIssueUpdateInput): Promise<AnalyzerIssue>;
-}
-
 // @public (undocumented)
 export const AnalyzerIssueSchema: z.ZodObject<{
     message: z.ZodString;
@@ -57,16 +47,6 @@ export interface BuildConfiguration {
 
 // @public
 export type BuildConfigurationCreateInput = Record<string, never>;
-
-// @public
-export class BuildConfigurationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BuildConfigurationCreateInput): Promise<BuildConfiguration>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BuildConfiguration>;
-    list(): Promise<BuildConfiguration[]>;
-    update(id: string, input: BuildConfigurationUpdateInput): Promise<BuildConfiguration>;
-}
 
 // @public (undocumented)
 export const BuildConfigurationSchema: z.ZodObject<{
@@ -97,16 +77,6 @@ export interface BuildErrorCreateInput {
     startingLineNumber?: number;
 }
 
-// @public
-export class BuildErrorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BuildErrorCreateInput): Promise<BuildError>;
-    delete(message: string): Promise<void>;
-    get(message: string): Promise<BuildError>;
-    list(): Promise<BuildError[]>;
-    update(message: string, input: BuildErrorUpdateInput): Promise<BuildError>;
-}
-
 // @public (undocumented)
 export const BuildErrorSchema: z.ZodObject<{
     message: z.ZodString;
@@ -130,16 +100,6 @@ export interface BuildSetting {
 export interface BuildSettingCreateInput {
     name?: string;
     value?: string;
-}
-
-// @public
-export class BuildSettingResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BuildSettingCreateInput): Promise<BuildSetting>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<BuildSetting>;
-    list(): Promise<BuildSetting[]>;
-    update(name: string, input: BuildSettingUpdateInput): Promise<BuildSetting>;
 }
 
 // @public (undocumented)
@@ -171,16 +131,6 @@ export interface BuildWarningCreateInput {
     startingLineNumber?: number;
 }
 
-// @public
-export class BuildWarningResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BuildWarningCreateInput): Promise<BuildWarning>;
-    delete(message: string): Promise<void>;
-    get(message: string): Promise<BuildWarning>;
-    list(): Promise<BuildWarning[]>;
-    update(message: string, input: BuildWarningUpdateInput): Promise<BuildWarning>;
-}
-
 // @public (undocumented)
 export const BuildWarningSchema: z.ZodObject<{
     message: z.ZodString;
@@ -206,16 +156,6 @@ export interface Device {
 // @public
 export type DeviceCreateInput = Record<string, never>;
 
-// @public
-export class DeviceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DeviceCreateInput): Promise<Device>;
-    delete(deviceIdentifier: string): Promise<void>;
-    get(deviceIdentifier: string): Promise<Device>;
-    list(): Promise<Device[]>;
-    update(deviceIdentifier: string, input: DeviceUpdateInput): Promise<Device>;
-}
-
 // @public (undocumented)
 export const DeviceSchema: z.ZodObject<{
     name: z.ZodString;
@@ -238,16 +178,6 @@ export interface FileDocument {
 
 // @public
 export type FileDocumentCreateInput = Record<string, never>;
-
-// @public
-export class FileDocumentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FileDocumentCreateInput): Promise<FileDocument>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<FileDocument>;
-    list(): Promise<FileDocument[]>;
-    update(name: string, input: FileDocumentUpdateInput): Promise<FileDocument>;
-}
 
 // @public (undocumented)
 export const FileDocumentSchema: z.ZodObject<{
@@ -278,11 +208,8 @@ export type ProjectCreateInput = Record<string, never>;
 // @public
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ProjectCreateInput): Promise<Project>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Project>;
     list(): Promise<Project[]>;
-    update(id: string, input: ProjectUpdateInput): Promise<Project>;
 }
 
 // @public (undocumented)
@@ -304,16 +231,6 @@ export interface ResolvedBuildSetting {
 export interface ResolvedBuildSettingCreateInput {
     name?: string;
     value?: string;
-}
-
-// @public
-export class ResolvedBuildSettingResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ResolvedBuildSettingCreateInput): Promise<ResolvedBuildSetting>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<ResolvedBuildSetting>;
-    list(): Promise<ResolvedBuildSetting[]>;
-    update(name: string, input: ResolvedBuildSettingUpdateInput): Promise<ResolvedBuildSetting>;
 }
 
 // @public (undocumented)
@@ -340,11 +257,8 @@ export type RunDestinationCreateInput = Record<string, never>;
 // @public
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: RunDestinationCreateInput): Promise<RunDestination>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<RunDestination>;
     list(): Promise<RunDestination[]>;
-    update(name: string, input: RunDestinationUpdateInput): Promise<RunDestination>;
 }
 
 // @public (undocumented)
@@ -381,16 +295,6 @@ export interface SchemeActionResultCreateInput {
     status?: SchemeActionResultStatus;
 }
 
-// @public
-export class SchemeActionResultResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SchemeActionResultCreateInput): Promise<SchemeActionResult>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SchemeActionResult>;
-    list(): Promise<SchemeActionResult[]>;
-    update(id: string, input: SchemeActionResultUpdateInput): Promise<SchemeActionResult>;
-}
-
 // @public (undocumented)
 export const SchemeActionResultSchema: z.ZodObject<{
     id: z.ZodString;
@@ -412,11 +316,8 @@ export type SchemeCreateInput = Record<string, never>;
 // @public
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: SchemeCreateInput): Promise<Scheme>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Scheme>;
     list(): Promise<Scheme[]>;
-    update(id: string, input: SchemeUpdateInput): Promise<Scheme>;
 }
 
 // @public (undocumented)
@@ -448,16 +349,6 @@ export interface SourceDocumentCreateInput {
     text?: string;
 }
 
-// @public
-export class SourceDocumentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SourceDocumentCreateInput): Promise<SourceDocument>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<SourceDocument>;
-    list(): Promise<SourceDocument[]>;
-    update(name: string, input: SourceDocumentUpdateInput): Promise<SourceDocument>;
-}
-
 // @public (undocumented)
 export const SourceDocumentSchema: z.ZodObject<{
     name: z.ZodString;
@@ -483,16 +374,6 @@ export interface Target {
 // @public
 export interface TargetCreateInput {
     name?: string;
-}
-
-// @public
-export class TargetResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TargetCreateInput): Promise<Target>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Target>;
-    list(): Promise<Target[]>;
-    update(id: string, input: TargetUpdateInput): Promise<Target>;
 }
 
 // @public (undocumented)
@@ -523,16 +404,6 @@ export interface TestFailureCreateInput {
     message?: string;
     startingColumnNumber?: number;
     startingLineNumber?: number;
-}
-
-// @public
-export class TestFailureResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TestFailureCreateInput): Promise<TestFailure>;
-    delete(message: string): Promise<void>;
-    get(message: string): Promise<TestFailure>;
-    list(): Promise<TestFailure[]>;
-    update(message: string, input: TestFailureUpdateInput): Promise<TestFailure>;
 }
 
 // @public (undocumented)
@@ -566,16 +437,6 @@ export interface TextDocumentCreateInput {
     selectedCharacterRange?: unknown;
     selectedParagraphRange?: unknown;
     text?: string;
-}
-
-// @public
-export class TextDocumentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TextDocumentCreateInput): Promise<TextDocument>;
-    delete(name: string): Promise<void>;
-    get(name: string): Promise<TextDocument>;
-    list(): Promise<TextDocument[]>;
-    update(name: string, input: TextDocumentUpdateInput): Promise<TextDocument>;
 }
 
 // @public (undocumented)
@@ -617,15 +478,12 @@ export class WorkspaceDocumentResourceClient {
     attach(workspaceName: string, toProcessIdentifier: number, suspended: boolean): Promise<void>;
     build(workspaceName: string): Promise<void>;
     clean(workspaceName: string): Promise<void>;
-    create(input: WorkspaceDocumentCreateInput): Promise<WorkspaceDocument>;
     debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<WorkspaceDocument>;
     list(): Promise<WorkspaceDocument[]>;
     run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
     stop(workspaceName: string): Promise<void>;
     test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
-    update(name: string, input: WorkspaceDocumentUpdateInput): Promise<WorkspaceDocument>;
 }
 
 // @public (undocumented)
@@ -646,23 +504,10 @@ export type WorkspaceDocumentUpdateInput = Partial<WorkspaceDocumentCreateInput>
 // @public
 export class XcodeClient {
     constructor(options: XcodeClientOptions);
-    readonly analyzerissues: AnalyzerIssueResourceClient;
-    readonly buildconfigurations: BuildConfigurationResourceClient;
-    readonly builderrors: BuildErrorResourceClient;
-    readonly buildsettings: BuildSettingResourceClient;
-    readonly buildwarnings: BuildWarningResourceClient;
-    readonly devices: DeviceResourceClient;
-    readonly filedocuments: FileDocumentResourceClient;
     get http(): HttpClient;
     readonly projects: ProjectResourceClient;
-    readonly resolvedbuildsettings: ResolvedBuildSettingResourceClient;
     readonly rundestinations: RunDestinationResourceClient;
-    readonly schemeactionresults: SchemeActionResultResourceClient;
     readonly schemes: SchemeResourceClient;
-    readonly sourcedocuments: SourceDocumentResourceClient;
-    readonly targets: TargetResourceClient;
-    readonly testfailures: TestFailureResourceClient;
-    readonly textdocuments: TextDocumentResourceClient;
     readonly workspacedocuments: WorkspaceDocumentResourceClient;
 }
 

@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Attachment, AttachmentCreateInput, AttachmentUpdateInput } from '../types.js'
+import type { Attachment } from '../types.js'
 
 /**
  * Client for a note attachment.
@@ -32,26 +32,5 @@ export class AttachmentResourceClient {
    */
   async get(name: string): Promise<Attachment> {
     return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new attachment.
-   */
-  async create(input: AttachmentCreateInput): Promise<Attachment> {
-    return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing attachment.
-   */
-  async update(name: string, input: AttachmentUpdateInput): Promise<Attachment> {
-    return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a attachment.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

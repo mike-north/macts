@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { List, ListCreateInput, ListUpdateInput } from '../types.js'
+import type { List, ListCreateInput } from '../types.js'
 
 /**
  * Client for a list of reminders.
@@ -39,19 +39,5 @@ export class ListResourceClient {
    */
   async create(input: ListCreateInput): Promise<List> {
     return this.#http.rpc<List>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing list.
-   */
-  async update(id: string, input: ListUpdateInput): Promise<List> {
-    return this.#http.rpc<List>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a list.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
   }
 }

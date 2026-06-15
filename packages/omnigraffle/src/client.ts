@@ -9,13 +9,7 @@ import { CanvasResourceClient } from './resources/canvas.js'
 import { GraphicResourceClient } from './resources/graphic.js'
 import { ShapeResourceClient } from './resources/shape.js'
 import { LineResourceClient } from './resources/line.js'
-import { GroupResourceClient } from './resources/group.js'
 import { LayerResourceClient } from './resources/layer.js'
-import { SubgraphResourceClient } from './resources/subgraph.js'
-import { LabelResourceClient } from './resources/label.js'
-import { GridResourceClient } from './resources/grid.js'
-import { MasterResourceClient } from './resources/master.js'
-import { ExportSettingsResourceClient } from './resources/exportsettings.js'
 import type { ExportAreaType, Orientation } from './types.js'
 
 /**
@@ -107,26 +101,8 @@ export class OmniGraffleClient {
   /** A line/connector in OmniGraffle */
   readonly lines: LineResourceClient
 
-  /** A group of graphics in OmniGraffle */
-  readonly groups: GroupResourceClient
-
   /** A drawing layer in OmniGraffle */
   readonly layers: LayerResourceClient
-
-  /** A subgraph container in OmniGraffle */
-  readonly subgraphs: SubgraphResourceClient
-
-  /** A text label on a line */
-  readonly labels: LabelResourceClient
-
-  /** Grid settings for a canvas */
-  readonly grids: GridResourceClient
-
-  /** A reusable template/master in OmniGraffle */
-  readonly masters: MasterResourceClient
-
-  /** Export configuration settings */
-  readonly exportsettings: ExportSettingsResourceClient
 
   constructor(options: OmniGraffleClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
@@ -135,17 +111,7 @@ export class OmniGraffleClient {
     this.graphics = new GraphicResourceClient(this.#httpClient, 'omnigraffle', 'graphics')
     this.shapes = new ShapeResourceClient(this.#httpClient, 'omnigraffle', 'shapes')
     this.lines = new LineResourceClient(this.#httpClient, 'omnigraffle', 'lines')
-    this.groups = new GroupResourceClient(this.#httpClient, 'omnigraffle', 'groups')
     this.layers = new LayerResourceClient(this.#httpClient, 'omnigraffle', 'layers')
-    this.subgraphs = new SubgraphResourceClient(this.#httpClient, 'omnigraffle', 'subgraphs')
-    this.labels = new LabelResourceClient(this.#httpClient, 'omnigraffle', 'labels')
-    this.grids = new GridResourceClient(this.#httpClient, 'omnigraffle', 'grids')
-    this.masters = new MasterResourceClient(this.#httpClient, 'omnigraffle', 'masters')
-    this.exportsettings = new ExportSettingsResourceClient(
-      this.#httpClient,
-      'omnigraffle',
-      'exportsettings'
-    )
   }
 
   /**

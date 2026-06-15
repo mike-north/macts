@@ -16,16 +16,6 @@ export interface Attendee {
 // @public
 export type AttendeeCreateInput = Record<string, never>;
 
-// @public
-export class AttendeeResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AttendeeCreateInput): Promise<Attendee>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Attendee>;
-    list(): Promise<Attendee[]>;
-    update(id: string, input: AttendeeUpdateInput): Promise<Attendee>;
-}
-
 // @public (undocumented)
 export const AttendeeSchema: z.ZodObject<{
     displayName: z.ZodString;
@@ -53,15 +43,10 @@ export interface Calendar {
 // @public
 export class CalendarClient {
     constructor(options: CalendarClientOptions);
-    readonly attendees: AttendeeResourceClient;
     readonly calendars: CalendarResourceClient;
-    readonly displayalarms: DisplayAlarmResourceClient;
     readonly events: EventResourceClient;
     get http(): HttpClient;
-    readonly mailalarms: MailAlarmResourceClient;
-    readonly openfilealarms: OpenFileAlarmResourceClient;
     reloadCalendars(): Promise<void>;
-    readonly soundalarms: SoundAlarmResourceClient;
     switchView(to: ViewType): Promise<void>;
     viewCalendar(at: Date): Promise<void>;
 }
@@ -80,7 +65,7 @@ export interface CalendarCreateInput {
         b: number;
     };
     description?: string;
-    name?: string;
+    name: string;
     title?: string;
 }
 
@@ -98,10 +83,8 @@ export type CalendarPriority = '0' | '9' | '5' | '1';
 export class CalendarResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CalendarCreateInput): Promise<Calendar>;
-    delete(calendarIdentifier: string): Promise<void>;
-    get(calendarIdentifier: string): Promise<Calendar>;
+    get(id: string): Promise<Calendar>;
     list(): Promise<Calendar[]>;
-    update(calendarIdentifier: string, input: CalendarUpdateInput): Promise<Calendar>;
 }
 
 // @public (undocumented)
@@ -131,16 +114,6 @@ export interface DisplayAlarm {
 export interface DisplayAlarmCreateInput {
     triggerDate?: Date;
     triggerInterval?: number;
-}
-
-// @public
-export class DisplayAlarmResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DisplayAlarmCreateInput): Promise<DisplayAlarm>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<DisplayAlarm>;
-    list(): Promise<DisplayAlarm[]>;
-    update(id: string, input: DisplayAlarmUpdateInput): Promise<DisplayAlarm>;
 }
 
 // @public (undocumented)
@@ -173,15 +146,16 @@ export { Event_2 as Event }
 // @public
 export interface EventCreateInput {
     alldayEvent?: boolean;
+    calendarId: string;
     description?: string;
-    endDate?: Date;
+    endDate: Date;
     excludedDates?: Date[];
     location?: string;
     recurrence?: string;
     stampDate?: Date;
-    startDate?: Date;
+    startDate: Date;
     status?: EventStatus;
-    summary?: string;
+    summary: string;
     url?: string;
 }
 
@@ -189,11 +163,9 @@ export interface EventCreateInput {
 export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: EventCreateInput): Promise<Event_2>;
-    delete(uid: string): Promise<void>;
-    get(uid: string): Promise<Event_2>;
+    get(id: string): Promise<Event_2>;
     list(): Promise<Event_2[]>;
     show(): Promise<void>;
-    update(uid: string, input: EventUpdateInput): Promise<Event_2>;
 }
 
 // @public (undocumented)
@@ -237,16 +209,6 @@ export interface MailAlarmCreateInput {
     triggerInterval?: number;
 }
 
-// @public
-export class MailAlarmResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MailAlarmCreateInput): Promise<MailAlarm>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MailAlarm>;
-    list(): Promise<MailAlarm[]>;
-    update(id: string, input: MailAlarmUpdateInput): Promise<MailAlarm>;
-}
-
 // @public (undocumented)
 export const MailAlarmSchema: z.ZodObject<{
     triggerInterval: z.ZodNumber;
@@ -268,16 +230,6 @@ export interface OpenFileAlarmCreateInput {
     filepath?: string;
     triggerDate?: Date;
     triggerInterval?: number;
-}
-
-// @public
-export class OpenFileAlarmResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: OpenFileAlarmCreateInput): Promise<OpenFileAlarm>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<OpenFileAlarm>;
-    list(): Promise<OpenFileAlarm[]>;
-    update(id: string, input: OpenFileAlarmUpdateInput): Promise<OpenFileAlarm>;
 }
 
 // @public (undocumented)
@@ -307,16 +259,6 @@ export interface SoundAlarmCreateInput {
     soundName?: string;
     triggerDate?: Date;
     triggerInterval?: number;
-}
-
-// @public
-export class SoundAlarmResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SoundAlarmCreateInput): Promise<SoundAlarm>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SoundAlarm>;
-    list(): Promise<SoundAlarm[]>;
-    update(id: string, input: SoundAlarmUpdateInput): Promise<SoundAlarm>;
 }
 
 // @public (undocumented)

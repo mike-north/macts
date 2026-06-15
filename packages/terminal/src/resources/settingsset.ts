@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { SettingsSet, SettingsSetCreateInput, SettingsSetUpdateInput } from '../types.js'
+import type { SettingsSet } from '../types.js'
 
 /**
  * Client for a terminal settings set (profile).
@@ -32,26 +32,5 @@ export class SettingsSetResourceClient {
    */
   async get(name: string): Promise<SettingsSet> {
     return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new settingsset.
-   */
-  async create(input: SettingsSetCreateInput): Promise<SettingsSet> {
-    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing settingsset.
-   */
-  async update(name: string, input: SettingsSetUpdateInput): Promise<SettingsSet> {
-    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a settingsset.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

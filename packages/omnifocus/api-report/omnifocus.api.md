@@ -20,7 +20,7 @@ export interface Folder {
 // @public
 export interface FolderCreateInput {
     hidden?: boolean;
-    name?: string;
+    name: string;
     note?: string;
 }
 
@@ -28,10 +28,8 @@ export interface FolderCreateInput {
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: FolderCreateInput): Promise<Folder>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Folder>;
     list(): Promise<Folder[]>;
-    update(id: string, input: FolderUpdateInput): Promise<Folder>;
 }
 
 // @public (undocumented)
@@ -71,7 +69,7 @@ export interface InboxTaskCreateInput {
     deferDate?: Date;
     dueDate?: Date;
     flagged?: boolean;
-    name?: string;
+    name: string;
     note?: string;
 }
 
@@ -79,10 +77,8 @@ export interface InboxTaskCreateInput {
 export class InboxTaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: InboxTaskCreateInput): Promise<InboxTask>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<InboxTask>;
     list(): Promise<InboxTask[]>;
-    update(id: string, input: InboxTaskUpdateInput): Promise<InboxTask>;
 }
 
 // @public (undocumented)
@@ -150,11 +146,8 @@ export type PerspectiveCreateInput = Record<string, never>;
 // @public
 export class PerspectiveResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: PerspectiveCreateInput): Promise<Perspective>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Perspective>;
     list(): Promise<Perspective[]>;
-    update(id: string, input: PerspectiveUpdateInput): Promise<Perspective>;
 }
 
 // @public (undocumented)
@@ -213,7 +206,7 @@ export interface ProjectCreateInput {
     estimatedMinutes?: number;
     flagged?: boolean;
     lastReviewDate?: Date;
-    name?: string;
+    name: string;
     nextReviewDate?: Date;
     note?: string;
     plannedDate?: Date;
@@ -226,10 +219,8 @@ export interface ProjectCreateInput {
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ProjectCreateInput): Promise<Project>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Project>;
     list(): Promise<Project[]>;
-    update(id: string, input: ProjectUpdateInput): Promise<Project>;
 }
 
 // @public (undocumented)
@@ -298,7 +289,7 @@ export interface Tag {
 export interface TagCreateInput {
     allowsNextAction?: boolean;
     hidden?: boolean;
-    name?: string;
+    name: string;
     note?: string;
 }
 
@@ -306,10 +297,8 @@ export interface TagCreateInput {
 export class TagResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TagCreateInput): Promise<Tag>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Tag>;
     list(): Promise<Tag[]>;
-    update(id: string, input: TagUpdateInput): Promise<Tag>;
 }
 
 // @public (undocumented)
@@ -368,7 +357,7 @@ export interface TaskCreateInput {
     dueDate?: Date;
     estimatedMinutes?: number;
     flagged?: boolean;
-    name?: string;
+    name: string;
     note?: string;
     plannedDate?: Date;
     sequential?: boolean;
@@ -378,10 +367,8 @@ export interface TaskCreateInput {
 export class TaskResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: TaskCreateInput): Promise<Task>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Task>;
     list(): Promise<Task[]>;
-    update(id: string, input: TaskUpdateInput): Promise<Task>;
 }
 
 // @public (undocumented)

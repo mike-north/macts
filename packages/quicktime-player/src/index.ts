@@ -21,4 +21,3 @@
 export { QuickTimePlayerClient, QuickTimePlayerError, HttpClient } from './client.js'
 export type { QuickTimePlayerClientOptions } from './client.js'
 export * from './types.js'
-export { DocumentResourceClient } from './resources/document.js'

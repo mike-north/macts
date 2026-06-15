@@ -55,16 +55,6 @@ export interface AccountCreateInput {
     usesSsl?: boolean;
 }
 
-// @public
-export class AccountResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AccountCreateInput): Promise<Account>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Account>;
-    list(): Promise<Account[]>;
-    update(id: string, input: AccountUpdateInput): Promise<Account>;
-}
-
 // @public (undocumented)
 export const AccountSchema: z.ZodObject<{
     deliveryAccount: z.ZodString;
@@ -104,16 +94,6 @@ export interface AttachmentCreateInput {
     fileName?: string;
 }
 
-// @public
-export class AttachmentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AttachmentCreateInput): Promise<Attachment>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Attachment>;
-    list(): Promise<Attachment[]>;
-    update(id: string, input: AttachmentUpdateInput): Promise<Attachment>;
-}
-
 // @public (undocumented)
 export const AttachmentSchema: z.ZodObject<{
     fileName: z.ZodString;
@@ -144,16 +124,6 @@ export interface AttributeRunCreateInput {
     size?: number;
 }
 
-// @public
-export class AttributeRunResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AttributeRunCreateInput): Promise<AttributeRun>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AttributeRun>;
-    list(): Promise<AttributeRun[]>;
-    update(id: string, input: AttributeRunUpdateInput): Promise<AttributeRun>;
-}
-
 // @public (undocumented)
 export const AttributeRunSchema: z.ZodObject<{
     color: z.ZodObject<{
@@ -179,16 +149,6 @@ export interface BccRecipient {
 // @public
 export type BccRecipientCreateInput = Record<string, never>;
 
-// @public
-export class BccRecipientResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BccRecipientCreateInput): Promise<BccRecipient>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BccRecipient>;
-    list(): Promise<BccRecipient[]>;
-    update(id: string, input: BccRecipientUpdateInput): Promise<BccRecipient>;
-}
-
 // @public (undocumented)
 export const BccRecipientSchema: z.ZodObject<{
     id: z.ZodString;
@@ -204,16 +164,6 @@ export interface CcRecipient {
 
 // @public
 export type CcRecipientCreateInput = Record<string, never>;
-
-// @public
-export class CcRecipientResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CcRecipientCreateInput): Promise<CcRecipient>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<CcRecipient>;
-    list(): Promise<CcRecipient[]>;
-    update(id: string, input: CcRecipientUpdateInput): Promise<CcRecipient>;
-}
 
 // @public (undocumented)
 export const CcRecipientSchema: z.ZodObject<{
@@ -243,16 +193,6 @@ export interface CharacterCreateInput {
     };
     font?: string;
     size?: number;
-}
-
-// @public
-export class CharacterResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CharacterCreateInput): Promise<Character>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Character>;
-    list(): Promise<Character[]>;
-    update(id: string, input: CharacterUpdateInput): Promise<Character>;
 }
 
 // @public (undocumented)
@@ -287,16 +227,6 @@ export interface HeaderCreateInput {
 // @public
 export type HeaderDetail = 'all' | 'custom' | 'default' | 'noHeaders';
 
-// @public
-export class HeaderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: HeaderCreateInput): Promise<Header>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Header>;
-    list(): Promise<Header[]>;
-    update(id: string, input: HeaderUpdateInput): Promise<Header>;
-}
-
 // @public (undocumented)
 export const HeaderSchema: z.ZodObject<{
     content: z.ZodString;
@@ -330,16 +260,6 @@ export interface MailAttachment {
 // @public
 export type MailAttachmentCreateInput = Record<string, never>;
 
-// @public
-export class MailAttachmentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MailAttachmentCreateInput): Promise<MailAttachment>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MailAttachment>;
-    list(): Promise<MailAttachment[]>;
-    update(id: string, input: MailAttachmentUpdateInput): Promise<MailAttachment>;
-}
-
 // @public (undocumented)
 export const MailAttachmentSchema: z.ZodObject<{
     name: z.ZodString;
@@ -365,16 +285,6 @@ export interface MailboxCreateInput {
     name?: string;
 }
 
-// @public
-export class MailboxResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MailboxCreateInput): Promise<Mailbox>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Mailbox>;
-    list(): Promise<Mailbox[]>;
-    update(id: string, input: MailboxUpdateInput): Promise<Mailbox>;
-}
-
 // @public (undocumented)
 export const MailboxSchema: z.ZodObject<{
     name: z.ZodString;
@@ -389,37 +299,20 @@ export type MailboxUpdateInput = Partial<MailboxCreateInput>;
 // @public
 export class MailClient {
     constructor(options: MailClientOptions);
-    readonly accounts: AccountResourceClient;
-    readonly attachments: AttachmentResourceClient;
-    readonly attributeruns: AttributeRunResourceClient;
-    readonly bccrecipients: BccRecipientResourceClient;
-    readonly ccrecipients: CcRecipientResourceClient;
-    readonly characters: CharacterResourceClient;
     checkForNewMail(_for?: string): Promise<void>;
     _delete(): Promise<void>;
     duplicate(to?: string, withProperties?: unknown): Promise<void>;
     extractAddressFrom(): Promise<void>;
     extractNameFrom(): Promise<void>;
     getURL(): Promise<void>;
-    readonly headers: HeaderResourceClient;
     get http(): HttpClient;
     importMailMailbox(at: string): Promise<void>;
-    readonly mailattachments: MailAttachmentResourceClient;
-    readonly mailboxes: MailboxResourceClient;
     mailto(): Promise<void>;
     readonly messages: MessageResourceClient;
-    readonly messageviewers: MessageViewerResourceClient;
     move(to: string): Promise<void>;
     readonly outgoingmessages: OutgoingMessageResourceClient;
-    readonly paragraphs: ParagraphResourceClient;
     performMailActionWithMessages(inMailboxes?: string, forRule?: string): Promise<void>;
-    readonly recipients: RecipientResourceClient;
-    readonly richtext: RichTextResourceClient;
-    readonly ruleconditions: RuleConditionResourceClient;
-    readonly rules: RuleResourceClient;
     synchronize(_with: string): Promise<void>;
-    readonly torecipients: ToRecipientResourceClient;
-    readonly words: WordResourceClient;
 }
 
 // @public
@@ -478,14 +371,9 @@ export interface MessageCreateInput {
 export class MessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     bounce(): Promise<void>;
-    create(input: MessageCreateInput): Promise<Message>;
-    delete(id: string): Promise<void>;
     forward(openingWindow?: boolean): Promise<void>;
-    get(id: string): Promise<Message>;
-    list(): Promise<Message[]>;
     redirect(openingWindow?: boolean): Promise<void>;
     reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void>;
-    update(id: string, input: MessageUpdateInput): Promise<Message>;
 }
 
 // @public (undocumented)
@@ -547,16 +435,6 @@ export interface MessageViewerCreateInput {
     visibleMessages?: string;
 }
 
-// @public
-export class MessageViewerResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MessageViewerCreateInput): Promise<MessageViewer>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MessageViewer>;
-    list(): Promise<MessageViewer[]>;
-    update(id: string, input: MessageViewerUpdateInput): Promise<MessageViewer>;
-}
-
 // @public (undocumented)
 export const MessageViewerSchema: z.ZodObject<{
     draftsMailbox: z.ZodString;
@@ -603,12 +481,7 @@ export interface OutgoingMessageCreateInput {
 // @public
 export class OutgoingMessageResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: OutgoingMessageCreateInput): Promise<OutgoingMessage>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<OutgoingMessage>;
-    list(): Promise<OutgoingMessage[]>;
     send(): Promise<void>;
-    update(id: string, input: OutgoingMessageUpdateInput): Promise<OutgoingMessage>;
 }
 
 // @public (undocumented)
@@ -647,16 +520,6 @@ export interface ParagraphCreateInput {
     size?: number;
 }
 
-// @public
-export class ParagraphResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ParagraphCreateInput): Promise<Paragraph>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Paragraph>;
-    list(): Promise<Paragraph[]>;
-    update(id: string, input: ParagraphUpdateInput): Promise<Paragraph>;
-}
-
 // @public (undocumented)
 export const ParagraphSchema: z.ZodObject<{
     color: z.ZodObject<{
@@ -684,16 +547,6 @@ export interface Recipient {
 export interface RecipientCreateInput {
     address?: string;
     name?: string;
-}
-
-// @public
-export class RecipientResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RecipientCreateInput): Promise<Recipient>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Recipient>;
-    list(): Promise<Recipient[]>;
-    update(id: string, input: RecipientUpdateInput): Promise<Recipient>;
 }
 
 // @public (undocumented)
@@ -725,16 +578,6 @@ export interface RichTextCreateInput {
     };
     font?: string;
     size?: number;
-}
-
-// @public
-export class RichTextResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RichTextCreateInput): Promise<RichText>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RichText>;
-    list(): Promise<RichText[]>;
-    update(id: string, input: RichTextUpdateInput): Promise<RichText>;
 }
 
 // @public (undocumented)
@@ -791,16 +634,6 @@ export interface RuleConditionCreateInput {
     ruleType?: string;
 }
 
-// @public
-export class RuleConditionResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RuleConditionCreateInput): Promise<RuleCondition>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RuleCondition>;
-    list(): Promise<RuleCondition[]>;
-    update(id: string, input: RuleConditionUpdateInput): Promise<RuleCondition>;
-}
-
 // @public (undocumented)
 export const RuleConditionSchema: z.ZodObject<{
     expression: z.ZodString;
@@ -838,16 +671,6 @@ export interface RuleCreateInput {
 
 // @public
 export type RuleQualifier = 'beginsWithValue' | 'doesContainValue' | 'doesNotContainValue' | 'endsWithValue' | 'equalToValue' | 'lessThanValue' | 'greaterThanValue' | 'none';
-
-// @public
-export class RuleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RuleCreateInput): Promise<Rule>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Rule>;
-    list(): Promise<Rule[]>;
-    update(id: string, input: RuleUpdateInput): Promise<Rule>;
-}
 
 // @public (undocumented)
 export const RuleSchema: z.ZodObject<{
@@ -890,16 +713,6 @@ export interface ToRecipient {
 // @public
 export type ToRecipientCreateInput = Record<string, never>;
 
-// @public
-export class ToRecipientResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ToRecipientCreateInput): Promise<ToRecipient>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ToRecipient>;
-    list(): Promise<ToRecipient[]>;
-    update(id: string, input: ToRecipientUpdateInput): Promise<ToRecipient>;
-}
-
 // @public (undocumented)
 export const ToRecipientSchema: z.ZodObject<{
     id: z.ZodString;
@@ -934,16 +747,6 @@ export interface WordCreateInput {
     };
     font?: string;
     size?: number;
-}
-
-// @public
-export class WordResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: WordCreateInput): Promise<Word>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Word>;
-    list(): Promise<Word[]>;
-    update(id: string, input: WordUpdateInput): Promise<Word>;
 }
 
 // @public (undocumented)

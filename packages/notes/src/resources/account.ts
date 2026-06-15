@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Account, AccountCreateInput, AccountUpdateInput } from '../types.js'
+import type { Account } from '../types.js'
 
 /**
  * Client for a notes account.
@@ -32,26 +32,5 @@ export class AccountResourceClient {
    */
   async get(name: string): Promise<Account> {
     return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new account.
-   */
-  async create(input: AccountCreateInput): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing account.
-   */
-  async update(name: string, input: AccountUpdateInput): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a account.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

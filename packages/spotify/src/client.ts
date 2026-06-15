@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { TrackResourceClient } from './resources/track.js'
-
 /**
  * Client configuration options.
  */
@@ -84,13 +82,9 @@ export class SpotifyError extends Error {
 export class SpotifyClient {
   readonly #httpClient: HttpClient
 
-  /** The currently playing track */
-  readonly tracks: TrackResourceClient
-
   constructor(options: SpotifyClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.tracks = new TrackResourceClient(this.#httpClient, 'spotify', 'tracks')
   }
 
   /**

@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Event, EventCreateInput, EventUpdateInput } from '../types.js'
+import type { Event, EventCreateInput } from '../types.js'
 
 /**
  * Client for a calendar event.
@@ -24,41 +24,27 @@ export class EventResourceClient {
    * List all events.
    */
   async list(): Promise<Event[]> {
-    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.listEvents`)
   }
 
   /**
-   * Get a event by uid.
+   * Get a event by id.
    */
-  async get(uid: string): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.get`, { uid })
+  async get(id: string): Promise<Event> {
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { id })
   }
 
   /**
    * Create a new event.
    */
   async create(input: EventCreateInput): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing event.
-   */
-  async update(uid: string, input: EventUpdateInput): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.update`, { uid, ...input })
-  }
-
-  /**
-   * Delete a event.
-   */
-  async delete(uid: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { uid })
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.createEvent`, input)
   }
 
   /**
    * Show the event or to-do in the calendar window
    */
   async show(): Promise<void> {
-    await this.#http.rpc<undefined>('calendar.events.show', {})
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.show`, {})
   }
 }

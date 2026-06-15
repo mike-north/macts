@@ -5,23 +5,6 @@
  * @packageDocumentation
  */
 
-import { ContainerResourceClient } from './resources/container.js'
-import { DiskResourceClient } from './resources/disk.js'
-import { FolderResourceClient } from './resources/folder.js'
-import { DesktopObjectResourceClient } from './resources/desktopobject.js'
-import { TrashObjectResourceClient } from './resources/trashobject.js'
-import { FileResourceClient } from './resources/file.js'
-import { AliasFileResourceClient } from './resources/aliasfile.js'
-import { ApplicationFileResourceClient } from './resources/applicationfile.js'
-import { DocumentFileResourceClient } from './resources/documentfile.js'
-import { InternetLocationFileResourceClient } from './resources/internetlocationfile.js'
-import { ClippingResourceClient } from './resources/clipping.js'
-import { PackageResourceClient } from './resources/package.js'
-import { FinderWindowResourceClient } from './resources/finderwindow.js'
-import { ClippingWindowResourceClient } from './resources/clippingwindow.js'
-import { ListViewOptionsResourceClient } from './resources/listviewoptions.js'
-import { ColumnResourceClient } from './resources/column.js'
-
 /**
  * Client configuration options.
  */
@@ -99,93 +82,9 @@ export class FinderError extends Error {
 export class FinderClient {
   readonly #httpClient: HttpClient
 
-  /** An item that contains other items */
-  readonly containers: ContainerResourceClient
-
-  /** A disk */
-  readonly disks: DiskResourceClient
-
-  /** A folder */
-  readonly folders: FolderResourceClient
-
-  /** Desktop-object is the class of the "desktop" object */
-  readonly desktopobjects: DesktopObjectResourceClient
-
-  /** Trash-object is the class of the “trash” object */
-  readonly trashobjects: TrashObjectResourceClient
-
-  /** A file */
-  readonly files: FileResourceClient
-
-  /** An alias file (created with “Make Alias”) */
-  readonly aliasfiles: AliasFileResourceClient
-
-  /** An application's file on disk */
-  readonly applicationfiles: ApplicationFileResourceClient
-
-  /** A document file */
-  readonly documentfiles: DocumentFileResourceClient
-
-  /** A file containing an internet location */
-  readonly internetlocationfiles: InternetLocationFileResourceClient
-
-  /** A clipping */
-  readonly clippings: ClippingResourceClient
-
-  /** A package */
-  readonly packages: PackageResourceClient
-
-  /** A file viewer window */
-  readonly finderwindows: FinderWindowResourceClient
-
-  /** The window containing a clipping */
-  readonly clippingwindows: ClippingWindowResourceClient
-
-  /** the list view options */
-  readonly listviewoptionss: ListViewOptionsResourceClient
-
-  /** a column of a list view */
-  readonly columns: ColumnResourceClient
-
   constructor(options: FinderClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.containers = new ContainerResourceClient(this.#httpClient, 'finder', 'containers')
-    this.disks = new DiskResourceClient(this.#httpClient, 'finder', 'disks')
-    this.folders = new FolderResourceClient(this.#httpClient, 'finder', 'folders')
-    this.desktopobjects = new DesktopObjectResourceClient(
-      this.#httpClient,
-      'finder',
-      'desktopobjects'
-    )
-    this.trashobjects = new TrashObjectResourceClient(this.#httpClient, 'finder', 'trashobjects')
-    this.files = new FileResourceClient(this.#httpClient, 'finder', 'files')
-    this.aliasfiles = new AliasFileResourceClient(this.#httpClient, 'finder', 'aliasfiles')
-    this.applicationfiles = new ApplicationFileResourceClient(
-      this.#httpClient,
-      'finder',
-      'applicationfiles'
-    )
-    this.documentfiles = new DocumentFileResourceClient(this.#httpClient, 'finder', 'documentfiles')
-    this.internetlocationfiles = new InternetLocationFileResourceClient(
-      this.#httpClient,
-      'finder',
-      'internetlocationfiles'
-    )
-    this.clippings = new ClippingResourceClient(this.#httpClient, 'finder', 'clippings')
-    this.packages = new PackageResourceClient(this.#httpClient, 'finder', 'packages')
-    this.finderwindows = new FinderWindowResourceClient(this.#httpClient, 'finder', 'finderwindows')
-    this.clippingwindows = new ClippingWindowResourceClient(
-      this.#httpClient,
-      'finder',
-      'clippingwindows'
-    )
-    this.listviewoptionss = new ListViewOptionsResourceClient(
-      this.#httpClient,
-      'finder',
-      'listviewoptionss'
-    )
-    this.columns = new ColumnResourceClient(this.#httpClient, 'finder', 'columns')
   }
 
   /**

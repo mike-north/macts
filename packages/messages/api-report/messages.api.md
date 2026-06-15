@@ -20,16 +20,6 @@ export interface AccountCreateInput {
     enabled?: boolean;
 }
 
-// @public
-export class AccountResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AccountCreateInput): Promise<Account>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Account>;
-    list(): Promise<Account[]>;
-    update(id: string, input: AccountUpdateInput): Promise<Account>;
-}
-
 // @public (undocumented)
 export const AccountSchema: z.ZodObject<{
     id: z.ZodString;
@@ -51,16 +41,6 @@ export interface Chat {
 
 // @public
 export type ChatCreateInput = Record<string, never>;
-
-// @public
-export class ChatResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ChatCreateInput): Promise<Chat>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Chat>;
-    list(): Promise<Chat[]>;
-    update(id: string, input: ChatUpdateInput): Promise<Chat>;
-}
 
 // @public (undocumented)
 export const ChatSchema: z.ZodObject<{
@@ -87,12 +67,9 @@ export class HttpClient {
 // @public
 export class MessagesClient {
     constructor(options: MessagesClientOptions);
-    readonly accounts: AccountResourceClient;
-    readonly chats: ChatResourceClient;
     get http(): HttpClient;
     login(): Promise<void>;
     logout(): Promise<void>;
-    readonly participants: ParticipantResourceClient;
     send(to: string): Promise<void>;
 }
 
@@ -122,16 +99,6 @@ export interface Participant {
 
 // @public
 export type ParticipantCreateInput = Record<string, never>;
-
-// @public
-export class ParticipantResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ParticipantCreateInput): Promise<Participant>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Participant>;
-    list(): Promise<Participant[]>;
-    update(id: string, input: ParticipantUpdateInput): Promise<Participant>;
-}
 
 // @public (undocumented)
 export const ParticipantSchema: z.ZodObject<{

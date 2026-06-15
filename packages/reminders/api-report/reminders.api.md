@@ -18,11 +18,7 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: AccountCreateInput): Promise<Account>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Account>;
     list(): Promise<Account[]>;
-    update(id: string, input: AccountUpdateInput): Promise<Account>;
 }
 
 // @public (undocumented)
@@ -60,17 +56,15 @@ export interface ListCreateInput {
         b: number;
     };
     emblem?: string;
-    name?: string;
+    name: string;
 }
 
 // @public
 export class ListResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ListCreateInput): Promise<List>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<List>;
     list(): Promise<List[]>;
-    update(id: string, input: ListUpdateInput): Promise<List>;
 }
 
 // @public (undocumented)
@@ -111,7 +105,8 @@ export interface ReminderCreateInput {
     completed?: boolean;
     dueDate?: Date;
     flagged?: boolean;
-    name?: string;
+    listId: string;
+    name: string;
     priority?: number;
     remindMeDate?: Date;
 }
@@ -128,7 +123,6 @@ export class ReminderResourceClient {
     get(id: string): Promise<Reminder>;
     list(): Promise<Reminder[]>;
     show(): Promise<void>;
-    update(id: string, input: ReminderUpdateInput): Promise<Reminder>;
 }
 
 // @public (undocumented)

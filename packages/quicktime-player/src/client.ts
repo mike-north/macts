@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { DocumentResourceClient } from './resources/document.js'
-
 /**
  * Client configuration options.
  */
@@ -84,13 +82,9 @@ export class QuickTimePlayerError extends Error {
 export class QuickTimePlayerClient {
   readonly #httpClient: HttpClient
 
-  /** A QuickTime Player document */
-  readonly documents: DocumentResourceClient
-
   constructor(options: QuickTimePlayerClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.documents = new DocumentResourceClient(this.#httpClient, 'quicktime-player', 'documents')
   }
 
   /**

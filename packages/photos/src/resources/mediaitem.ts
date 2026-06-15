@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { MediaItem, MediaItemCreateInput, MediaItemUpdateInput } from '../types.js'
+import type { MediaItem } from '../types.js'
 
 /**
  * Client for a media item, such as a photo or video.
@@ -24,41 +24,20 @@ export class MediaItemResourceClient {
    * List all mediaitems.
    */
   async list(): Promise<MediaItem[]> {
-    return this.#http.rpc<MediaItem[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<MediaItem[]>(`${this.#app}.${this.#resource}.listMediaItems`)
   }
 
   /**
    * Get a mediaitem by id.
    */
   async get(id: string): Promise<MediaItem> {
-    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new mediaitem.
-   */
-  async create(input: MediaItemCreateInput): Promise<MediaItem> {
-    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing mediaitem.
-   */
-  async update(id: string, input: MediaItemUpdateInput): Promise<MediaItem> {
-    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a mediaitem.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.getMediaItem`, { id })
   }
 
   /**
    * Duplicate a media item
    */
   async duplicate(id: string): Promise<void> {
-    await this.#http.rpc<undefined>('photos.mediaitems.duplicate', { id })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.duplicate`, { id })
   }
 }

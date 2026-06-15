@@ -254,7 +254,13 @@ export const AppMetadataSchema: z.ZodObject<{
 export const booleanCoercer: TypeCoercer<boolean>;
 
 // @public
+export function buildAppCommandRoute(appName: string, commandKey: string): string;
+
+// @public
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
+
+// @public
+export function buildResourceCommandRoute(appName: string, resourcePlural: string, commandKey: string): string;
 
 // @public (undocumented)
 export type Cardinality = z.infer<typeof CardinalitySchema>;
@@ -1039,6 +1045,15 @@ export class ManifestLoadError extends Error {
 }
 
 // @public
+export interface ManifestRoute {
+    command: Command;
+    commandKey: string;
+    resource: Resource | undefined;
+    resourceType: string | undefined;
+    route: string;
+}
+
+// @public
 export interface McpGeneratorContext {
     appName: string;
     manifest: AppManifest;
@@ -1046,6 +1061,12 @@ export interface McpGeneratorContext {
     sdkPackageName: string;
     version?: string | undefined;
 }
+
+// @public
+export function normalizeAppRouteSegment(appName: string): string;
+
+// @public
+export function normalizeResourceRouteSegment(plural: string): string;
 
 // @public
 export function nullSafe<T>(coercer: TypeCoercer<T>): TypeCoercer<T | null | undefined>;
@@ -1351,6 +1372,12 @@ export const RelationshipSchema: z.ZodObject<{
     property: z.ZodOptional<z.ZodString>;
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
+
+// @public
+export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[];
 
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;

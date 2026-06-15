@@ -13,12 +13,9 @@ import { ListResourcesCommand } from './commands/projects/scenarios/resources/li
 import { CreateResourceCommand } from './commands/projects/scenarios/resources/create.js'
 import { GetResourceCommand } from './commands/projects/scenarios/resources/get.js'
 import { ListViolationsCommand } from './commands/projects/scenarios/violations/list.js'
-import { GetViolationCommand } from './commands/projects/scenarios/violations/get.js'
 import { FixViolationCommand } from './commands/projects/scenarios/violations/fix.js'
 import { ListAssignmentsCommand } from './commands/projects/tasks/assignments/list.js'
-import { GetAssignmentCommand } from './commands/projects/tasks/assignments/get.js'
 import { ListDependenciesCommand } from './commands/projects/tasks/dependencies/list.js'
-import { GetDependencyCommand } from './commands/projects/tasks/dependencies/get.js'
 import { ExportCommand } from './commands/export.js'
 import { AssignCommand } from './commands/assign.js'
 import { DependCommand } from './commands/depend.js'
@@ -52,12 +49,9 @@ export const plugin: CliPlugin = {
     CreateResourceCommand,
     GetResourceCommand,
     ListViolationsCommand,
-    GetViolationCommand,
     FixViolationCommand,
     ListAssignmentsCommand,
-    GetAssignmentCommand,
     ListDependenciesCommand,
-    GetDependencyCommand,
     ExportCommand,
     AssignCommand,
     DependCommand,

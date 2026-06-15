@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { BookmarkItem, BookmarkItemCreateInput, BookmarkItemUpdateInput } from '../types.js'
+import type { BookmarkItem } from '../types.js'
 
 /**
  * Client for an item consists of an url and the title of a bookmark.
@@ -24,34 +24,13 @@ export class BookmarkItemResourceClient {
    * List all bookmarkitems.
    */
   async list(): Promise<BookmarkItem[]> {
-    return this.#http.rpc<BookmarkItem[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<BookmarkItem[]>(`${this.#app}.${this.#resource}.listBookmarkItems`)
   }
 
   /**
    * Get a bookmarkitem by id.
    */
   async get(id: string): Promise<BookmarkItem> {
-    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new bookmarkitem.
-   */
-  async create(input: BookmarkItemCreateInput): Promise<BookmarkItem> {
-    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing bookmarkitem.
-   */
-  async update(id: string, input: BookmarkItemUpdateInput): Promise<BookmarkItem> {
-    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a bookmarkitem.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.getBookmarkItem`, { id })
   }
 }

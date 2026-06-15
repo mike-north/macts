@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Perspective, PerspectiveCreateInput, PerspectiveUpdateInput } from '../types.js'
+import type { Perspective } from '../types.js'
 
 /**
  * Client for a saved view or filter configuration.
@@ -24,34 +24,13 @@ export class PerspectiveResourceClient {
    * List all perspectives.
    */
   async list(): Promise<Perspective[]> {
-    return this.#http.rpc<Perspective[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Perspective[]>(`${this.#app}.${this.#resource}.listPerspectives`)
   }
 
   /**
    * Get a perspective by id.
    */
   async get(id: string): Promise<Perspective> {
-    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new perspective.
-   */
-  async create(input: PerspectiveCreateInput): Promise<Perspective> {
-    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing perspective.
-   */
-  async update(id: string, input: PerspectiveUpdateInput): Promise<Perspective> {
-    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a perspective.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.getPerspective`, { id })
   }
 }

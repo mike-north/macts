@@ -21,7 +21,7 @@ export interface Document {
 export interface DocumentCreateInput {
   /** The name of the document */
   name?: string
-  /** The text content of the document */
+  /** Initial text content */
   text?: string
 }
 
