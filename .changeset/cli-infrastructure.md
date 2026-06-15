@@ -1,8 +1,8 @@
 ---
 '@macts/cli': minor
-'@macts/cli-calendar': minor
+'@macts/calendar': minor
 '@macts/mcp': minor
-'@macts/mcp-calendar': minor
+'@macts/calendar-server': minor
 '@macts/core': minor
 ---
 
