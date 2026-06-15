@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Document, DocumentCreateInput, DocumentUpdateInput } from '../types.js'
+import type { Document } from '../types.js'
 
 /**
  * Client for a preview document.
@@ -32,26 +32,5 @@ export class DocumentResourceClient {
    */
   async get(name: string): Promise<Document> {
     return this.#http.rpc<Document>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new document.
-   */
-  async create(input: DocumentCreateInput): Promise<Document> {
-    return this.#http.rpc<Document>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing document.
-   */
-  async update(name: string, input: DocumentUpdateInput): Promise<Document> {
-    return this.#http.rpc<Document>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a document.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

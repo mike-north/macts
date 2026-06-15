@@ -5,11 +5,6 @@
  * @packageDocumentation
  */
 
-import { WindowResourceClient } from './resources/window.js'
-import { TabResourceClient } from './resources/tab.js'
-import { BookmarkFolderResourceClient } from './resources/bookmarkfolder.js'
-import { BookmarkItemResourceClient } from './resources/bookmarkitem.js'
-
 /**
  * Client configuration options.
  */
@@ -87,33 +82,9 @@ export class GoogleChromeError extends Error {
 export class GoogleChromeClient {
   readonly #httpClient: HttpClient
 
-  /** A window. */
-  readonly windows: WindowResourceClient
-
-  /** A tab. */
-  readonly tabs: TabResourceClient
-
-  /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
-  readonly bookmarkfolders: BookmarkFolderResourceClient
-
-  /** An item consists of an URL and the title of a bookmark */
-  readonly bookmarkitems: BookmarkItemResourceClient
-
   constructor(options: GoogleChromeClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.windows = new WindowResourceClient(this.#httpClient, 'google-chrome', 'windows')
-    this.tabs = new TabResourceClient(this.#httpClient, 'google-chrome', 'tabs')
-    this.bookmarkfolders = new BookmarkFolderResourceClient(
-      this.#httpClient,
-      'google-chrome',
-      'bookmarkfolders'
-    )
-    this.bookmarkitems = new BookmarkItemResourceClient(
-      this.#httpClient,
-      'google-chrome',
-      'bookmarkitems'
-    )
   }
 
   /**

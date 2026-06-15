@@ -87,8 +87,8 @@ export interface Canvas {
 export interface CanvasCreateInput {
   /** Unique identifier */
   id?: string
-  /** Name of this canvas */
-  name?: string
+  /** Canvas name */
+  name: string
   /** Adjust number of pages on the canvas automatically? */
   adjustsPages?: boolean
   /** Whether canvas size is reported as multiples of page size */
@@ -261,7 +261,7 @@ export interface Shape {
 export interface ShapeCreateInput {
   /** Name of the shape */
   name?: string
-  /** The text inside the shape */
+  /** Text content */
   text?: string
   /** The type of fill for this shape */
   fill?: FillType
@@ -281,6 +281,12 @@ export interface ShapeCreateInput {
   sidePadding?: number
   /** Padding at the top and bottom of the text space */
   verticalPadding?: number
+  /** Canvas identifier for the shape */
+  canvasId: number
+  /** Shape origin */
+  origin: { x: number; y: number }
+  /** Shape size */
+  size: { x: number; y: number }
 }
 
 /** Input for updating a Shape */
@@ -366,14 +372,16 @@ export interface Layer {
 
 /** Input for creating a Layer */
 export interface LayerCreateInput {
-  /** Name of the layer */
-  name?: string
+  /** Layer name */
+  name: string
   /** Are the layer's graphics locked? */
   locked?: boolean
   /** Are the layer's graphics visible? */
   visible?: boolean
   /** Do the layer's graphics print? */
   prints?: boolean
+  /** Canvas identifier for the layer */
+  canvasId: string
 }
 
 /** Input for updating a Layer */

@@ -23,7 +23,7 @@ export interface Document {
 export interface DocumentCreateInput {
   /** The name of the document */
   name?: string
-  /** The source code of the script */
+  /** Initial script contents */
   contents?: string
   /** The scripting language (AppleScript or JavaScript) */
   language?: string

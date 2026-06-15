@@ -21,4 +21,3 @@
 export { BluetoothFileExchangeClient, BluetoothFileExchangeError, HttpClient } from './client.js'
 export type { BluetoothFileExchangeClientOptions } from './client.js'
 export * from './types.js'
-export { ApplicationResourceClient } from './resources/application.js'

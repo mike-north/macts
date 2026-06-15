@@ -25,16 +25,6 @@ export interface ArtworkCreateInput {
     rawData?: unknown;
 }
 
-// @public
-export class ArtworkResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ArtworkCreateInput): Promise<Artwork>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Artwork>;
-    list(): Promise<Artwork[]>;
-    update(id: string, input: ArtworkUpdateInput): Promise<Artwork>;
-}
-
 // @public (undocumented)
 export const ArtworkSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -59,16 +49,6 @@ export interface BrowserWindow {
 // @public
 export interface BrowserWindowCreateInput {
     view?: Playlist;
-}
-
-// @public
-export class BrowserWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BrowserWindowCreateInput): Promise<BrowserWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BrowserWindow>;
-    list(): Promise<BrowserWindow[]>;
-    update(id: string, input: BrowserWindowUpdateInput): Promise<BrowserWindow>;
 }
 
 // @public (undocumented)
@@ -113,12 +93,7 @@ export interface FileTrackCreateInput {
 // @public
 export class FileTrackResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FileTrackCreateInput): Promise<FileTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<FileTrack>;
-    list(): Promise<FileTrack[]>;
     refresh(): Promise<void>;
-    update(id: string, input: FileTrackUpdateInput): Promise<FileTrack>;
 }
 
 // @public (undocumented)
@@ -143,16 +118,6 @@ export interface LibraryPlaylist {
 
 // @public
 export type LibraryPlaylistCreateInput = Record<string, never>;
-
-// @public
-export class LibraryPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: LibraryPlaylistCreateInput): Promise<LibraryPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<LibraryPlaylist>;
-    list(): Promise<LibraryPlaylist[]>;
-    update(id: string, input: LibraryPlaylistUpdateInput): Promise<LibraryPlaylist>;
-}
 
 // @public (undocumented)
 export const LibraryPlaylistSchema: z.ZodObject<{
@@ -184,13 +149,8 @@ export interface PlaylistCreateInput {
 // @public
 export class PlaylistResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: PlaylistCreateInput): Promise<Playlist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Playlist>;
-    list(): Promise<Playlist[]>;
     move(to: string): Promise<void>;
     search(_for: string, only?: string): Promise<void>;
-    update(id: string, input: PlaylistUpdateInput): Promise<Playlist>;
 }
 
 // @public (undocumented)
@@ -219,16 +179,6 @@ export interface PlaylistWindow {
 // @public
 export type PlaylistWindowCreateInput = Record<string, never>;
 
-// @public
-export class PlaylistWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PlaylistWindowCreateInput): Promise<PlaylistWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PlaylistWindow>;
-    list(): Promise<PlaylistWindow[]>;
-    update(id: string, input: PlaylistWindowUpdateInput): Promise<PlaylistWindow>;
-}
-
 // @public (undocumented)
 export const PlaylistWindowSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -246,16 +196,6 @@ export interface SharedTrack {
 
 // @public
 export type SharedTrackCreateInput = Record<string, never>;
-
-// @public
-export class SharedTrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SharedTrackCreateInput): Promise<SharedTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SharedTrack>;
-    list(): Promise<SharedTrack[]>;
-    update(id: string, input: SharedTrackUpdateInput): Promise<SharedTrack>;
-}
 
 // @public (undocumented)
 export const SharedTrackSchema: z.ZodObject<{
@@ -275,16 +215,6 @@ export interface Source {
 
 // @public
 export type SourceCreateInput = Record<string, never>;
-
-// @public
-export class SourceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SourceCreateInput): Promise<Source>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Source>;
-    list(): Promise<Source[]>;
-    update(id: string, input: SourceUpdateInput): Promise<Source>;
-}
 
 // @public (undocumented)
 export const SourceSchema: z.ZodObject<{
@@ -392,16 +322,6 @@ export interface TrackCreateInput {
     year?: number;
 }
 
-// @public
-export class TrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TrackCreateInput): Promise<Track>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Track>;
-    list(): Promise<Track[]>;
-    update(id: string, input: TrackUpdateInput): Promise<Track>;
-}
-
 // @public (undocumented)
 export const TrackSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -465,9 +385,7 @@ export type TrackUpdateInput = Partial<TrackCreateInput>;
 export class TVClient {
     constructor(options: TVClientOptions);
     add(to?: string): Promise<void>;
-    readonly artworks: ArtworkResourceClient;
     backTrack(): Promise<void>;
-    readonly browserwindows: BrowserWindowResourceClient;
     close(): Promise<void>;
     convert(): Promise<void>;
     count(each: string): Promise<void>;
@@ -478,7 +396,6 @@ export class TVClient {
     fastForward(): Promise<void>;
     readonly filetracks: FileTrackResourceClient;
     get http(): HttpClient;
-    readonly libraryplaylists: LibraryPlaylistResourceClient;
     make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
     nextTrack(): Promise<void>;
     open(): Promise<void>;
@@ -486,7 +403,6 @@ export class TVClient {
     pause(): Promise<void>;
     play(once?: boolean): Promise<void>;
     readonly playlists: PlaylistResourceClient;
-    readonly playlistwindows: PlaylistWindowResourceClient;
     playpause(): Promise<void>;
     previousTrack(): Promise<void>;
     quit(): Promise<void>;
@@ -496,13 +412,7 @@ export class TVClient {
     run(): Promise<void>;
     save(): Promise<void>;
     select(): Promise<void>;
-    readonly sharedtracks: SharedTrackResourceClient;
-    readonly sources: SourceResourceClient;
     stop(): Promise<void>;
-    readonly tracks: TrackResourceClient;
-    readonly urltracks: URLTrackResourceClient;
-    readonly userplaylists: UserPlaylistResourceClient;
-    readonly videowindows: VideoWindowResourceClient;
 }
 
 // @public
@@ -529,16 +439,6 @@ export interface URLTrackCreateInput {
     address?: string;
 }
 
-// @public
-export class URLTrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: URLTrackCreateInput): Promise<URLTrack>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<URLTrack>;
-    list(): Promise<URLTrack[]>;
-    update(id: string, input: URLTrackUpdateInput): Promise<URLTrack>;
-}
-
 // @public (undocumented)
 export const URLTrackSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -560,16 +460,6 @@ export interface UserPlaylistCreateInput {
     shared?: boolean;
 }
 
-// @public
-export class UserPlaylistResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: UserPlaylistCreateInput): Promise<UserPlaylist>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<UserPlaylist>;
-    list(): Promise<UserPlaylist[]>;
-    update(id: string, input: UserPlaylistUpdateInput): Promise<UserPlaylist>;
-}
-
 // @public (undocumented)
 export const UserPlaylistSchema: z.ZodObject<{
     id: z.ZodNumber;
@@ -587,16 +477,6 @@ export interface VideoWindow {
 
 // @public
 export type VideoWindowCreateInput = Record<string, never>;
-
-// @public
-export class VideoWindowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: VideoWindowCreateInput): Promise<VideoWindow>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<VideoWindow>;
-    list(): Promise<VideoWindow[]>;
-    update(id: string, input: VideoWindowUpdateInput): Promise<VideoWindow>;
-}
 
 // @public (undocumented)
 export const VideoWindowSchema: z.ZodObject<{

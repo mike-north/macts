@@ -34,11 +34,8 @@ export interface SettingsSetCreateInput {
 // @public
 export class SettingsSetResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: SettingsSetCreateInput): Promise<SettingsSet>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<SettingsSet>;
     list(): Promise<SettingsSet[]>;
-    update(name: string, input: SettingsSetUpdateInput): Promise<SettingsSet>;
 }
 
 // @public (undocumented)
@@ -78,11 +75,8 @@ export interface TabCreateInput {
 // @public
 export class TabResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabCreateInput): Promise<Tab>;
-    delete(tty: string): Promise<void>;
-    get(tty: string): Promise<Tab>;
+    get(name: string): Promise<Tab>;
     list(): Promise<Tab[]>;
-    update(tty: string, input: TabUpdateInput): Promise<Tab>;
 }
 
 // @public (undocumented)
@@ -142,11 +136,8 @@ export interface WindowCreateInput {
 // @public
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: WindowCreateInput): Promise<Window>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Window>;
     list(): Promise<Window[]>;
-    update(name: string, input: WindowUpdateInput): Promise<Window>;
 }
 
 // @public (undocumented)

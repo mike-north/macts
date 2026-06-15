@@ -25,7 +25,6 @@ export class SpotifyClient {
     playpause(): Promise<void>;
     playTrack(inContext?: string): Promise<void>;
     previousTrack(): Promise<void>;
-    readonly tracks: TrackResourceClient;
 }
 
 // @public
@@ -60,16 +59,6 @@ export interface Track {
 
 // @public
 export type TrackCreateInput = Record<string, never>;
-
-// @public
-export class TrackResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TrackCreateInput): Promise<Track>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Track>;
-    list(): Promise<Track[]>;
-    update(id: string, input: TrackUpdateInput): Promise<Track>;
-}
 
 // @public (undocumented)
 export const TrackSchema: z.ZodObject<{

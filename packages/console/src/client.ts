@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { DeviceResourceClient } from './resources/device.js'
-
 /**
  * Client configuration options.
  */
@@ -84,13 +82,9 @@ export class ConsoleError extends Error {
 export class ConsoleClient {
   readonly #httpClient: HttpClient
 
-  /** A device in Console */
-  readonly devices: DeviceResourceClient
-
   constructor(options: ConsoleClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.devices = new DeviceResourceClient(this.#httpClient, 'console', 'devices')
   }
 
   /**

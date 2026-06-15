@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { InboxTask, InboxTaskCreateInput, InboxTaskUpdateInput } from '../types.js'
+import type { InboxTask, InboxTaskCreateInput } from '../types.js'
 
 /**
  * Client for a task that is in the document's inbox.
@@ -24,34 +24,20 @@ export class InboxTaskResourceClient {
    * List all inboxtasks.
    */
   async list(): Promise<InboxTask[]> {
-    return this.#http.rpc<InboxTask[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<InboxTask[]>(`${this.#app}.${this.#resource}.listInboxTasks`)
   }
 
   /**
    * Get a inboxtask by id.
    */
   async get(id: string): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.get`, { id })
+    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.getInboxTask`, { id })
   }
 
   /**
    * Create a new inboxtask.
    */
   async create(input: InboxTaskCreateInput): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing inboxtask.
-   */
-  async update(id: string, input: InboxTaskUpdateInput): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a inboxtask.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.createInboxTask`, input)
   }
 }

@@ -4,11 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type {
-  WorkspaceDocument,
-  WorkspaceDocumentCreateInput,
-  WorkspaceDocumentUpdateInput,
-} from '../types.js'
+import type { WorkspaceDocument } from '../types.js'
 
 /**
  * Client for a document that represents a workspace on disk. workspaces are the top-level container for almost all objects and commands in xcode.
@@ -28,59 +24,40 @@ export class WorkspaceDocumentResourceClient {
    * List all workspacedocuments.
    */
   async list(): Promise<WorkspaceDocument[]> {
-    return this.#http.rpc<WorkspaceDocument[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<WorkspaceDocument[]>(
+      `${this.#app}.${this.#resource}.listWorkspaceDocuments`
+    )
   }
 
   /**
    * Get a workspacedocument by name.
    */
   async get(name: string): Promise<WorkspaceDocument> {
-    return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new workspacedocument.
-   */
-  async create(input: WorkspaceDocumentCreateInput): Promise<WorkspaceDocument> {
-    return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing workspacedocument.
-   */
-  async update(name: string, input: WorkspaceDocumentUpdateInput): Promise<WorkspaceDocument> {
-    return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.update`, {
-      name,
-      ...input,
-    })
-  }
-
-  /**
-   * Delete a workspacedocument.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
+    return this.#http.rpc<WorkspaceDocument>(
+      `${this.#app}.${this.#resource}.getWorkspaceDocument`,
+      { name }
+    )
   }
 
   /**
    * Invoke the "build" scheme action
    */
   async build(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.build', { workspaceName })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.build`, { workspaceName })
   }
 
   /**
    * Invoke the "clean" scheme action
    */
   async clean(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.clean', { workspaceName })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.clean`, { workspaceName })
   }
 
   /**
    * Stop the active scheme action, if one is running
    */
   async stop(workspaceName: string): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.stop', { workspaceName })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.stop`, { workspaceName })
   }
 
   /**
@@ -91,7 +68,7 @@ export class WorkspaceDocumentResourceClient {
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown
   ): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.run', {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.run`, {
       workspaceName,
       withCommandLineArguments,
       withEnvironmentVariables,
@@ -106,7 +83,7 @@ export class WorkspaceDocumentResourceClient {
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown
   ): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.test', {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.test`, {
       workspaceName,
       withCommandLineArguments,
       withEnvironmentVariables,
@@ -121,7 +98,7 @@ export class WorkspaceDocumentResourceClient {
     toProcessIdentifier: number,
     suspended: boolean
   ): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.attach', {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.attach`, {
       workspaceName,
       toProcessIdentifier,
       suspended,
@@ -139,7 +116,7 @@ export class WorkspaceDocumentResourceClient {
     commandLineArguments?: unknown,
     environmentVariables?: unknown
   ): Promise<void> {
-    await this.#http.rpc<undefined>('xcode.workspacedocuments.debug', {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.debug`, {
       workspaceName,
       scheme,
       runDestinationSpecifier,

@@ -21,4 +21,3 @@
 export { ConsoleClient, ConsoleError, HttpClient } from './client.js'
 export type { ConsoleClientOptions } from './client.js'
 export * from './types.js'
-export { DeviceResourceClient } from './resources/device.js'

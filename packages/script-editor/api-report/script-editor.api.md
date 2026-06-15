@@ -26,10 +26,8 @@ export interface DocumentCreateInput {
 export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: DocumentCreateInput): Promise<Document>;
-    delete(name: string): Promise<void>;
     get(name: string): Promise<Document>;
     list(): Promise<Document[]>;
-    update(name: string, input: DocumentUpdateInput): Promise<Document>;
 }
 
 // @public (undocumented)

@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Album, AlbumCreateInput, AlbumUpdateInput } from '../types.js'
+import type { Album } from '../types.js'
 
 /**
  * Client for an album. a container that holds media items.
@@ -24,34 +24,13 @@ export class AlbumResourceClient {
    * List all albums.
    */
   async list(): Promise<Album[]> {
-    return this.#http.rpc<Album[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Album[]>(`${this.#app}.${this.#resource}.listAlbums`)
   }
 
   /**
    * Get a album by id.
    */
   async get(id: string): Promise<Album> {
-    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new album.
-   */
-  async create(input: AlbumCreateInput): Promise<Album> {
-    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing album.
-   */
-  async update(id: string, input: AlbumUpdateInput): Promise<Album> {
-    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a album.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.getAlbum`, { id })
   }
 }

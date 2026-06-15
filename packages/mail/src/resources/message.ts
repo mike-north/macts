@@ -4,7 +4,6 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Message, MessageCreateInput, MessageUpdateInput } from '../types.js'
 
 /**
  * Client for an email message.
@@ -21,65 +20,33 @@ export class MessageResourceClient {
   }
 
   /**
-   * List all messages.
-   */
-  async list(): Promise<Message[]> {
-    return this.#http.rpc<Message[]>(`${this.#app}.${this.#resource}.list`)
-  }
-
-  /**
-   * Get a message by id.
-   */
-  async get(id: string): Promise<Message> {
-    return this.#http.rpc<Message>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new message.
-   */
-  async create(input: MessageCreateInput): Promise<Message> {
-    return this.#http.rpc<Message>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing message.
-   */
-  async update(id: string, input: MessageUpdateInput): Promise<Message> {
-    return this.#http.rpc<Message>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a message.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
-  }
-
-  /**
    * Does nothing at all (deprecated)
    */
   async bounce(): Promise<void> {
-    await this.#http.rpc<undefined>('mail.messages.bounce', {})
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.bounce`, {})
   }
 
   /**
    * Creates a forwarded message.
    */
   async forward(openingWindow?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>('mail.messages.forward', { openingWindow })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.forward`, { openingWindow })
   }
 
   /**
    * Creates a redirected message.
    */
   async redirect(openingWindow?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>('mail.messages.redirect', { openingWindow })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.redirect`, { openingWindow })
   }
 
   /**
    * Creates a reply message.
    */
   async reply(openingWindow?: boolean, replyToAll?: boolean): Promise<void> {
-    await this.#http.rpc<undefined>('mail.messages.reply', { openingWindow, replyToAll })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.reply`, {
+      openingWindow,
+      replyToAll,
+    })
   }
 }

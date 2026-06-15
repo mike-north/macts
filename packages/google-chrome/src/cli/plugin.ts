@@ -1,9 +1,4 @@
 import type { CliPlugin } from '@macts/cli'
-import { ListBookmarkFoldersCommand } from './commands/bookmarkFolders/list.js'
-import { GetBookmarkFolderCommand } from './commands/bookmarkFolders/get.js'
-import { ListBookmarkItemsCommand } from './commands/bookmarkFolders/bookmarkItems/list.js'
-import { CreateBookmarkItemCommand } from './commands/bookmarkFolders/bookmarkItems/create.js'
-import { GetBookmarkItemCommand } from './commands/bookmarkFolders/bookmarkItems/get.js'
 import { SaveCommand } from './commands/save.js'
 import { OpenCommand } from './commands/open.js'
 import { CloseCommand } from './commands/close.js'
@@ -35,11 +30,6 @@ export const plugin: CliPlugin = {
   name: 'google-chrome',
   description: 'Commands for Google Chrome',
   commands: [
-    ListBookmarkFoldersCommand,
-    GetBookmarkFolderCommand,
-    ListBookmarkItemsCommand,
-    CreateBookmarkItemCommand,
-    GetBookmarkItemCommand,
     SaveCommand,
     OpenCommand,
     CloseCommand,

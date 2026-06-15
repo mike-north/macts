@@ -21,6 +21,3 @@
 export { MessagesClient, MessagesError, HttpClient } from './client.js'
 export type { MessagesClientOptions } from './client.js'
 export * from './types.js'
-export { ParticipantResourceClient } from './resources/participant.js'
-export { AccountResourceClient } from './resources/account.js'
-export { ChatResourceClient } from './resources/chat.js'

@@ -6,10 +6,6 @@ import { GetMediaItemCommand } from './commands/albums/mediaItems/get.js'
 import { DuplicateMediaItemCommand } from './commands/albums/mediaItems/duplicate.js'
 import { ListFoldersCommand } from './commands/folders/list.js'
 import { GetFolderCommand } from './commands/folders/get.js'
-import { ListContainersCommand } from './commands/folders/containers/list.js'
-import { GetContainerCommand } from './commands/folders/containers/get.js'
-import { ListMomentsCommand } from './commands/moments/list.js'
-import { GetMomentCommand } from './commands/moments/get.js'
 import { ImportCommand } from './commands/import.js'
 import { ExportCommand } from './commands/export.js'
 import { MakeCommand } from './commands/make.js'
@@ -38,10 +34,6 @@ export const plugin: CliPlugin = {
     DuplicateMediaItemCommand,
     ListFoldersCommand,
     GetFolderCommand,
-    ListContainersCommand,
-    GetContainerCommand,
-    ListMomentsCommand,
-    GetMomentCommand,
     ImportCommand,
     ExportCommand,
     MakeCommand,

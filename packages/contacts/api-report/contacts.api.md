@@ -31,16 +31,6 @@ export interface AddressCreateInput {
     zip?: string;
 }
 
-// @public
-export class AddressResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AddressCreateInput): Promise<Address>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Address>;
-    list(): Promise<Address[]>;
-    update(id: string, input: AddressUpdateInput): Promise<Address>;
-}
-
 // @public (undocumented)
 export const AddressSchema: z.ZodObject<{
     city: z.ZodString;
@@ -70,16 +60,6 @@ export interface AIMHandleCreateInput {
     value?: string;
 }
 
-// @public
-export class AIMHandleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AIMHandleCreateInput): Promise<AIMHandle>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<AIMHandle>;
-    list(): Promise<AIMHandle[]>;
-    update(id: string, input: AIMHandleUpdateInput): Promise<AIMHandle>;
-}
-
 // @public (undocumented)
 export const AIMHandleSchema: z.ZodObject<{
     id: z.ZodString;
@@ -96,27 +76,12 @@ export class ContactsClient {
     actionProperty(): Promise<void>;
     actionTitle(_with: unknown, _for: string): Promise<void>;
     add(to: string): Promise<void>;
-    readonly addresses: AddressResourceClient;
-    readonly aimhandles: AIMHandleResourceClient;
-    readonly customdates: CustomDateResourceClient;
-    readonly emails: EmailResourceClient;
-    readonly groups: GroupResourceClient;
     get http(): HttpClient;
-    readonly icqhandles: ICQHandleResourceClient;
-    readonly instantmessages: InstantMessageResourceClient;
-    readonly jabberhandles: JabberHandleResourceClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
-    readonly msnhandles: MSNHandleResourceClient;
-    readonly people: PersonResourceClient;
     performAction(_with: unknown, _for: string): Promise<void>;
-    readonly phones: PhoneResourceClient;
-    readonly relatednames: RelatedNameResourceClient;
     remove(from: string): Promise<void>;
     save(): Promise<void>;
     shouldEnableAction(_with: unknown, _for: string): Promise<void>;
-    readonly socialprofiles: SocialProfileResourceClient;
-    readonly urls: UrlResourceClient;
-    readonly yahoohandles: YahooHandleResourceClient;
 }
 
 // @public
@@ -145,16 +110,6 @@ export interface CustomDateCreateInput {
     value?: Date;
 }
 
-// @public
-export class CustomDateResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CustomDateCreateInput): Promise<CustomDate>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<CustomDate>;
-    list(): Promise<CustomDate[]>;
-    update(id: string, input: CustomDateUpdateInput): Promise<CustomDate>;
-}
-
 // @public (undocumented)
 export const CustomDateSchema: z.ZodObject<{
     id: z.ZodString;
@@ -178,16 +133,6 @@ export interface EmailCreateInput {
     value?: string;
 }
 
-// @public
-export class EmailResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: EmailCreateInput): Promise<Email>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Email>;
-    list(): Promise<Email[]>;
-    update(id: string, input: EmailUpdateInput): Promise<Email>;
-}
-
 // @public (undocumented)
 export const EmailSchema: z.ZodObject<{
     id: z.ZodString;
@@ -206,16 +151,6 @@ export interface Group {
 // @public
 export interface GroupCreateInput {
     name?: string;
-}
-
-// @public
-export class GroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: GroupCreateInput): Promise<Group>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Group>;
-    list(): Promise<Group[]>;
-    update(id: string, input: GroupUpdateInput): Promise<Group>;
 }
 
 // @public (undocumented)
@@ -245,16 +180,6 @@ export interface ICQHandleCreateInput {
     value?: string;
 }
 
-// @public
-export class ICQHandleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ICQHandleCreateInput): Promise<ICQHandle>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ICQHandle>;
-    list(): Promise<ICQHandle[]>;
-    update(id: string, input: ICQHandleUpdateInput): Promise<ICQHandle>;
-}
-
 // @public (undocumented)
 export const ICQHandleSchema: z.ZodObject<{
     id: z.ZodString;
@@ -276,16 +201,6 @@ export interface InstantMessage {
 export interface InstantMessageCreateInput {
     serviceType?: string;
     userName?: string;
-}
-
-// @public
-export class InstantMessageResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: InstantMessageCreateInput): Promise<InstantMessage>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<InstantMessage>;
-    list(): Promise<InstantMessage[]>;
-    update(id: string, input: InstantMessageUpdateInput): Promise<InstantMessage>;
 }
 
 // @public (undocumented)
@@ -314,16 +229,6 @@ export interface JabberHandleCreateInput {
     value?: string;
 }
 
-// @public
-export class JabberHandleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: JabberHandleCreateInput): Promise<JabberHandle>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<JabberHandle>;
-    list(): Promise<JabberHandle[]>;
-    update(id: string, input: JabberHandleUpdateInput): Promise<JabberHandle>;
-}
-
 // @public (undocumented)
 export const JabberHandleSchema: z.ZodObject<{
     id: z.ZodString;
@@ -345,16 +250,6 @@ export interface MSNHandle {
 export interface MSNHandleCreateInput {
     label?: string;
     value?: string;
-}
-
-// @public
-export class MSNHandleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MSNHandleCreateInput): Promise<MSNHandle>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MSNHandle>;
-    list(): Promise<MSNHandle[]>;
-    update(id: string, input: MSNHandleUpdateInput): Promise<MSNHandle>;
 }
 
 // @public (undocumented)
@@ -413,16 +308,6 @@ export interface PersonCreateInput {
     title?: string;
 }
 
-// @public
-export class PersonResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PersonCreateInput): Promise<Person>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Person>;
-    list(): Promise<Person[]>;
-    update(id: string, input: PersonUpdateInput): Promise<Person>;
-}
-
 // @public (undocumented)
 export const PersonSchema: z.ZodObject<{
     nickname: z.ZodString;
@@ -463,16 +348,6 @@ export interface PhoneCreateInput {
     value?: string;
 }
 
-// @public
-export class PhoneResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PhoneCreateInput): Promise<Phone>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Phone>;
-    list(): Promise<Phone[]>;
-    update(id: string, input: PhoneUpdateInput): Promise<Phone>;
-}
-
 // @public (undocumented)
 export const PhoneSchema: z.ZodObject<{
     id: z.ZodString;
@@ -494,16 +369,6 @@ export interface RelatedName {
 export interface RelatedNameCreateInput {
     label?: string;
     value?: string;
-}
-
-// @public
-export class RelatedNameResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RelatedNameCreateInput): Promise<RelatedName>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RelatedName>;
-    list(): Promise<RelatedName[]>;
-    update(id: string, input: RelatedNameUpdateInput): Promise<RelatedName>;
 }
 
 // @public (undocumented)
@@ -536,16 +401,6 @@ export interface SocialProfileCreateInput {
     userName?: string;
 }
 
-// @public
-export class SocialProfileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SocialProfileCreateInput): Promise<SocialProfile>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SocialProfile>;
-    list(): Promise<SocialProfile[]>;
-    update(id: string, input: SocialProfileUpdateInput): Promise<SocialProfile>;
-}
-
 // @public (undocumented)
 export const SocialProfileSchema: z.ZodObject<{
     id: z.ZodString;
@@ -571,16 +426,6 @@ export interface UrlCreateInput {
     value?: string;
 }
 
-// @public
-export class UrlResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: UrlCreateInput): Promise<Url>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Url>;
-    list(): Promise<Url[]>;
-    update(id: string, input: UrlUpdateInput): Promise<Url>;
-}
-
 // @public (undocumented)
 export const UrlSchema: z.ZodObject<{
     id: z.ZodString;
@@ -602,16 +447,6 @@ export interface YahooHandle {
 export interface YahooHandleCreateInput {
     label?: string;
     value?: string;
-}
-
-// @public
-export class YahooHandleResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: YahooHandleCreateInput): Promise<YahooHandle>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<YahooHandle>;
-    list(): Promise<YahooHandle[]>;
-    update(id: string, input: YahooHandleUpdateInput): Promise<YahooHandle>;
 }
 
 // @public (undocumented)

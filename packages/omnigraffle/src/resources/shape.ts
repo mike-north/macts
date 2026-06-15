@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Shape, ShapeCreateInput, ShapeUpdateInput } from '../types.js'
+import type { Shape, ShapeCreateInput } from '../types.js'
 
 /**
  * Client for a shape graphic in omnigraffle.
@@ -24,34 +24,20 @@ export class ShapeResourceClient {
    * List all shapes.
    */
   async list(): Promise<Shape[]> {
-    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.listShapes`)
   }
 
   /**
    * Get a shape by id.
    */
   async get(id: string): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.get`, { id })
+    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.getShape`, { id })
   }
 
   /**
    * Create a new shape.
    */
   async create(input: ShapeCreateInput): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing shape.
-   */
-  async update(id: string, input: ShapeUpdateInput): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a shape.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.createShape`, input)
   }
 }

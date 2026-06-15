@@ -21,4 +21,3 @@
 export { SpotifyClient, SpotifyError, HttpClient } from './client.js'
 export type { SpotifyClientOptions } from './client.js'
 export * from './types.js'
-export { TrackResourceClient } from './resources/track.js'

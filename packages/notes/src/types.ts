@@ -66,7 +66,7 @@ export interface Note {
 export interface NoteCreateInput {
   /** The name of the note (first line) */
   name?: string
-  /** The HTML content of the note body */
+  /** HTML content of the note */
   body?: string
 }
 

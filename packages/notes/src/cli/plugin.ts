@@ -2,7 +2,6 @@ import type { CliPlugin } from '@macts/cli'
 import { ListAccountsCommand } from './commands/accounts/list.js'
 import { GetAccountCommand } from './commands/accounts/get.js'
 import { ListFoldersCommand } from './commands/folders/list.js'
-import { CreateFolderCommand } from './commands/folders/create.js'
 import { GetFolderCommand } from './commands/folders/get.js'
 import { ListNotesCommand } from './commands/notes/list.js'
 import { CreateNoteCommand } from './commands/notes/create.js'
@@ -19,7 +18,6 @@ export const plugin: CliPlugin = {
     ListAccountsCommand,
     GetAccountCommand,
     ListFoldersCommand,
-    CreateFolderCommand,
     GetFolderCommand,
     ListNotesCommand,
     CreateNoteCommand,

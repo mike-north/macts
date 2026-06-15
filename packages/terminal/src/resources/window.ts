@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Window, WindowCreateInput, WindowUpdateInput } from '../types.js'
+import type { Window } from '../types.js'
 
 /**
  * Client for a terminal window.
@@ -32,26 +32,5 @@ export class WindowResourceClient {
    */
   async get(name: string): Promise<Window> {
     return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, { name })
-  }
-
-  /**
-   * Create a new window.
-   */
-  async create(input: WindowCreateInput): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing window.
-   */
-  async update(name: string, input: WindowUpdateInput): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.update`, { name, ...input })
-  }
-
-  /**
-   * Delete a window.
-   */
-  async delete(name: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { name })
   }
 }

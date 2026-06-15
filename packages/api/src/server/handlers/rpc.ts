@@ -9,7 +9,13 @@
 
 import { Hono } from 'hono'
 import type { AppManifest, Command, Resource } from '@macts/core'
-import { runWithApp } from '@macts/core'
+import {
+  runWithApp,
+  resolveCommandRoutes,
+  resolveManifestRoutes,
+  normalizeAppRouteSegment,
+  normalizeResourceRouteSegment,
+} from '@macts/core'
 import { requirePermission } from '../middleware/permission.js'
 import type { AuthVariables } from '../middleware/auth.js'
 import { withSpan } from '../../telemetry.js'
@@ -81,7 +87,7 @@ export interface RpcEndpointInfo {
  */
 export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVariables }> {
   const app = new Hono<{ Variables: AuthVariables }>()
-  const appName = manifest.app.name.toLowerCase()
+  const appName = normalizeAppRouteSegment(manifest.app.name)
   const bundleId = manifest.app.bundleId
 
   const ctx: RpcHandlerContext = {
@@ -93,7 +99,7 @@ export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVa
 
   // Register handlers for each command
   for (const [commandName, command] of Object.entries(manifest.commands)) {
-    const endpoints = getCommandEndpoints(appName, commandName, command, manifest)
+    const endpoints = getCommandEndpoints(commandName, command, manifest)
 
     for (const endpoint of endpoints) {
       // Register the endpoint with permission middleware
@@ -191,62 +197,51 @@ export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVa
 /**
  * Get all endpoints for a command.
  *
- * Resource-scoped commands may generate multiple endpoints
- * if they apply to multiple resource types.
+ * The route string is derived from the manifest's canonical route helpers
+ * (`@macts/core`) so the server router and the generated client SDK address
+ * every operation identically — keyed by the command's manifest key (not
+ * `command.name`). Resource-scoped commands may generate multiple endpoints if
+ * they apply to multiple resource types.
  */
 function getCommandEndpoints(
-  appName: string,
-  commandName: string,
+  commandKey: string,
   command: Command,
   manifest: AppManifest
 ): RpcEndpointInfo[] {
-  if (command.scope === 'application') {
-    // App-level commands: /rpc/{app}.app.{command}
-    const path = `/rpc/${appName}.app.${commandName}`
-    const permission = command.permission ?? `${appName}:app:${commandName}`
-    return [{ path, permission, command }]
-  }
-
-  // Resource-scoped commands
-  const resourceTypes = getResourceTypes(command, manifest)
-  const endpoints: RpcEndpointInfo[] = []
-  for (const resourceType of resourceTypes) {
-    const resource = manifest.resources[resourceType]
-    // Use plural resource name for paths (lowercase for consistency)
-    const resourcePath = (resource?.plural ?? `${resourceType}s`).toLowerCase()
-    const path = `/rpc/${appName}.${resourcePath}.${commandName}`
-    const permission = command.permission ?? `${appName}:${resourcePath}:${commandName}`
-    endpoints.push({ path, permission, command, resource })
-  }
-  return endpoints
-}
-
-/**
- * Get the resource types a command applies to.
- */
-function getResourceTypes(command: Command, manifest: AppManifest): string[] {
-  if (!command.resourceType) {
-    // Applies to all resources
-    return Object.keys(manifest.resources)
-  }
-  if (Array.isArray(command.resourceType)) {
-    return command.resourceType
-  }
-  return [command.resourceType]
+  const appSegment = normalizeAppRouteSegment(manifest.app.name)
+  return resolveCommandRoutes(manifest, commandKey, command).map((r) => {
+    const permissionScope =
+      r.resourceType === undefined
+        ? 'app'
+        : normalizeResourceRouteSegment(r.resource?.plural ?? `${r.resourceType}s`)
+    const permission = command.permission ?? `${appSegment}:${permissionScope}:${commandKey}`
+    return {
+      path: `/rpc/${r.route}`,
+      permission,
+      command,
+      resource: r.resource,
+    }
+  })
 }
 
 /**
  * Get all endpoints from a manifest.
  */
 function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
-  const appName = manifest.app.name.toLowerCase()
-  const endpoints: RpcEndpointInfo[] = []
-
-  for (const [commandName, command] of Object.entries(manifest.commands)) {
-    endpoints.push(...getCommandEndpoints(appName, commandName, command, manifest))
-  }
-
-  return endpoints
+  return resolveManifestRoutes(manifest).map((r) => {
+    const appSegment = normalizeAppRouteSegment(manifest.app.name)
+    const permissionScope =
+      r.resourceType === undefined
+        ? 'app'
+        : normalizeResourceRouteSegment(r.resource?.plural ?? `${r.resourceType}s`)
+    const permission = r.command.permission ?? `${appSegment}:${permissionScope}:${r.commandKey}`
+    return {
+      path: `/rpc/${r.route}`,
+      permission,
+      command: r.command,
+      resource: r.resource,
+    }
+  })
 }
 
 /**

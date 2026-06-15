@@ -20,11 +20,8 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Folder>;
     list(): Promise<Folder[]>;
-    update(id: string, input: FolderUpdateInput): Promise<Folder>;
 }
 
 // @public (undocumented)
@@ -66,12 +63,9 @@ export interface ShortcutCreateInput {
 // @public
 export class ShortcutResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ShortcutCreateInput): Promise<Shortcut>;
-    delete(id: string): Promise<void>;
     get(id: string): Promise<Shortcut>;
     list(): Promise<Shortcut[]>;
     run(id: string, withInput?: unknown): Promise<void>;
-    update(id: string, input: ShortcutUpdateInput): Promise<Shortcut>;
 }
 
 // @public (undocumented)

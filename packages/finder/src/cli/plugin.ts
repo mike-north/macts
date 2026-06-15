@@ -1,6 +1,4 @@
 import type { CliPlugin } from '@macts/cli'
-import { ListDisksCommand } from './commands/disks/list.js'
-import { GetDiskCommand } from './commands/disks/get.js'
 import { OpenCommand } from './commands/open.js'
 import { PrintCommand } from './commands/print.js'
 import { QuitCommand } from './commands/quit.js'
@@ -34,8 +32,6 @@ export const plugin: CliPlugin = {
   name: 'finder',
   description: 'Commands for Finder',
   commands: [
-    ListDisksCommand,
-    GetDiskCommand,
     OpenCommand,
     PrintCommand,
     QuitCommand,

@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Graphic, GraphicCreateInput, GraphicUpdateInput } from '../types.js'
+import type { Graphic } from '../types.js'
 
 /**
  * Client for base class for visual elements in omnigraffle.
@@ -24,34 +24,13 @@ export class GraphicResourceClient {
    * List all graphics.
    */
   async list(): Promise<Graphic[]> {
-    return this.#http.rpc<Graphic[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Graphic[]>(`${this.#app}.${this.#resource}.listGraphics`)
   }
 
   /**
    * Get a graphic by id.
    */
   async get(id: string): Promise<Graphic> {
-    return this.#http.rpc<Graphic>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new graphic.
-   */
-  async create(input: GraphicCreateInput): Promise<Graphic> {
-    return this.#http.rpc<Graphic>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing graphic.
-   */
-  async update(id: string, input: GraphicUpdateInput): Promise<Graphic> {
-    return this.#http.rpc<Graphic>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a graphic.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Graphic>(`${this.#app}.${this.#resource}.getGraphic`, { id })
   }
 }

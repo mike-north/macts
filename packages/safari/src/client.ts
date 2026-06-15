@@ -5,9 +5,6 @@
  * @packageDocumentation
  */
 
-import { DocumentResourceClient } from './resources/document.js'
-import { TabResourceClient } from './resources/tab.js'
-
 /**
  * Client configuration options.
  */
@@ -85,17 +82,9 @@ export class SafariError extends Error {
 export class SafariClient {
   readonly #httpClient: HttpClient
 
-  /** A Safari document (window) */
-  readonly documents: DocumentResourceClient
-
-  /** A Safari tab */
-  readonly tabs: TabResourceClient
-
   constructor(options: SafariClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.documents = new DocumentResourceClient(this.#httpClient, 'safari', 'documents')
-    this.tabs = new TabResourceClient(this.#httpClient, 'safari', 'tabs')
   }
 
   /**

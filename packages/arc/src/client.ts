@@ -5,10 +5,6 @@
  * @packageDocumentation
  */
 
-import { WindowResourceClient } from './resources/window.js'
-import { TabResourceClient } from './resources/tab.js'
-import { SpaceResourceClient } from './resources/space.js'
-
 /**
  * Client configuration options.
  */
@@ -86,21 +82,9 @@ export class ArcError extends Error {
 export class ArcClient {
   readonly #httpClient: HttpClient
 
-  /** An application's window */
-  readonly windows: WindowResourceClient
-
-  /** A window's tab */
-  readonly tabs: TabResourceClient
-
-  /** A space */
-  readonly spaces: SpaceResourceClient
-
   constructor(options: ArcClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.windows = new WindowResourceClient(this.#httpClient, 'arc', 'windows')
-    this.tabs = new TabResourceClient(this.#httpClient, 'arc', 'tabs')
-    this.spaces = new SpaceResourceClient(this.#httpClient, 'arc', 'spaces')
   }
 
   /**

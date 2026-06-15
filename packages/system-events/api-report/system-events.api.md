@@ -21,12 +21,7 @@ export type ActionCreateInput = Record<string, never>;
 // @public
 export class ActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: ActionCreateInput): Promise<Action>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Action>;
-    list(): Promise<Action[]>;
     perform(): Promise<void>;
-    update(id: string, input: ActionUpdateInput): Promise<Action>;
 }
 
 // @public (undocumented)
@@ -62,16 +57,6 @@ export interface AliasCreateInput {
     stationery?: boolean;
 }
 
-// @public
-export class AliasResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AliasCreateInput): Promise<Alias>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Alias>;
-    list(): Promise<Alias[]>;
-    update(id: string, input: AliasUpdateInput): Promise<Alias>;
-}
-
 // @public (undocumented)
 export const AliasSchema: z.ZodObject<{
     creatorType: z.ZodString;
@@ -103,16 +88,6 @@ export interface AttributeCreateInput {
     value?: string;
 }
 
-// @public
-export class AttributeResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: AttributeCreateInput): Promise<Attribute>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Attribute>;
-    list(): Promise<Attribute[]>;
-    update(id: string, input: AttributeUpdateInput): Promise<Attribute>;
-}
-
 // @public (undocumented)
 export const AttributeSchema: z.ZodObject<{
     name: z.ZodString;
@@ -131,16 +106,6 @@ export interface Browser {
 // @public
 export type BrowserCreateInput = Record<string, never>;
 
-// @public
-export class BrowserResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BrowserCreateInput): Promise<Browser>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Browser>;
-    list(): Promise<Browser[]>;
-    update(id: string, input: BrowserUpdateInput): Promise<Browser>;
-}
-
 // @public (undocumented)
 export const BrowserSchema: z.ZodObject<{
     id: z.ZodString;
@@ -156,16 +121,6 @@ export interface BusyIndicator {
 
 // @public
 export type BusyIndicatorCreateInput = Record<string, never>;
-
-// @public
-export class BusyIndicatorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: BusyIndicatorCreateInput): Promise<BusyIndicator>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<BusyIndicator>;
-    list(): Promise<BusyIndicator[]>;
-    update(id: string, input: BusyIndicatorUpdateInput): Promise<BusyIndicator>;
-}
 
 // @public (undocumented)
 export const BusyIndicatorSchema: z.ZodObject<{
@@ -183,16 +138,6 @@ export interface Button {
 // @public
 export type ButtonCreateInput = Record<string, never>;
 
-// @public
-export class ButtonResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ButtonCreateInput): Promise<Button>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Button>;
-    list(): Promise<Button[]>;
-    update(id: string, input: ButtonUpdateInput): Promise<Button>;
-}
-
 // @public (undocumented)
 export const ButtonSchema: z.ZodObject<{
     id: z.ZodString;
@@ -208,16 +153,6 @@ export interface Checkbox {
 
 // @public
 export type CheckboxCreateInput = Record<string, never>;
-
-// @public
-export class CheckboxResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: CheckboxCreateInput): Promise<Checkbox>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Checkbox>;
-    list(): Promise<Checkbox[]>;
-    update(id: string, input: CheckboxUpdateInput): Promise<Checkbox>;
-}
 
 // @public (undocumented)
 export const CheckboxSchema: z.ZodObject<{
@@ -245,16 +180,6 @@ export interface ClassicDomainObject {
 // @public
 export type ClassicDomainObjectCreateInput = Record<string, never>;
 
-// @public
-export class ClassicDomainObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ClassicDomainObjectCreateInput): Promise<ClassicDomainObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ClassicDomainObject>;
-    list(): Promise<ClassicDomainObject[]>;
-    update(id: string, input: ClassicDomainObjectUpdateInput): Promise<ClassicDomainObject>;
-}
-
 // @public (undocumented)
 export const ClassicDomainObjectSchema: z.ZodObject<{
     appleMenuFolder: z.ZodString;
@@ -281,16 +206,6 @@ export interface ColorWell {
 // @public
 export type ColorWellCreateInput = Record<string, never>;
 
-// @public
-export class ColorWellResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ColorWellCreateInput): Promise<ColorWell>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ColorWell>;
-    list(): Promise<ColorWell[]>;
-    update(id: string, input: ColorWellUpdateInput): Promise<ColorWell>;
-}
-
 // @public (undocumented)
 export const ColorWellSchema: z.ZodObject<{
     id: z.ZodString;
@@ -307,16 +222,6 @@ export interface Column {
 // @public
 export type ColumnCreateInput = Record<string, never>;
 
-// @public
-export class ColumnResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ColumnCreateInput): Promise<Column>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Column>;
-    list(): Promise<Column[]>;
-    update(id: string, input: ColumnUpdateInput): Promise<Column>;
-}
-
 // @public (undocumented)
 export const ColumnSchema: z.ZodObject<{
     id: z.ZodString;
@@ -332,16 +237,6 @@ export interface ComboBox {
 
 // @public
 export type ComboBoxCreateInput = Record<string, never>;
-
-// @public
-export class ComboBoxResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ComboBoxCreateInput): Promise<ComboBox>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ComboBox>;
-    list(): Promise<ComboBox[]>;
-    update(id: string, input: ComboBoxUpdateInput): Promise<ComboBox>;
-}
 
 // @public (undocumented)
 export const ComboBoxSchema: z.ZodObject<{
@@ -362,16 +257,6 @@ export interface Configuration {
 // @public
 export interface ConfigurationCreateInput {
     accountName?: string;
-}
-
-// @public
-export class ConfigurationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ConfigurationCreateInput): Promise<Configuration>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Configuration>;
-    list(): Promise<Configuration[]>;
-    update(id: string, input: ConfigurationUpdateInput): Promise<Configuration>;
 }
 
 // @public (undocumented)
@@ -436,11 +321,7 @@ export interface DiskItemCreateInput {
 // @public
 export class DiskItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    create(input: DiskItemCreateInput): Promise<DiskItem>;
     delete(id: string): Promise<void>;
-    get(id: string): Promise<DiskItem>;
-    list(): Promise<DiskItem[]>;
-    update(id: string, input: DiskItemUpdateInput): Promise<DiskItem>;
 }
 
 // @public (undocumented)
@@ -465,16 +346,6 @@ export const DiskItemSchema: z.ZodObject<{
 
 // @public
 export type DiskItemUpdateInput = Partial<DiskItemCreateInput>;
-
-// @public
-export class DiskResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DiskCreateInput): Promise<Disk>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Disk>;
-    list(): Promise<Disk[]>;
-    update(id: string, input: DiskUpdateInput): Promise<Disk>;
-}
 
 // @public (undocumented)
 export const DiskSchema: z.ZodObject<{
@@ -514,16 +385,6 @@ export interface Domain {
 // @public
 export type DomainCreateInput = Record<string, never>;
 
-// @public
-export class DomainResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DomainCreateInput): Promise<Domain>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Domain>;
-    list(): Promise<Domain[]>;
-    update(id: string, input: DomainUpdateInput): Promise<Domain>;
-}
-
 // @public (undocumented)
 export const DomainSchema: z.ZodObject<{
     applicationSupportFolder: z.ZodString;
@@ -562,16 +423,6 @@ export interface Drawer {
 
 // @public
 export type DrawerCreateInput = Record<string, never>;
-
-// @public
-export class DrawerResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DrawerCreateInput): Promise<Drawer>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Drawer>;
-    list(): Promise<Drawer[]>;
-    update(id: string, input: DrawerUpdateInput): Promise<Drawer>;
-}
 
 // @public (undocumented)
 export const DrawerSchema: z.ZodObject<{
@@ -626,16 +477,6 @@ export interface FilePackage {
 // @public
 export type FilePackageCreateInput = Record<string, never>;
 
-// @public
-export class FilePackageResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FilePackageCreateInput): Promise<FilePackage>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<FilePackage>;
-    list(): Promise<FilePackage[]>;
-    update(id: string, input: FilePackageUpdateInput): Promise<FilePackage>;
-}
-
 // @public (undocumented)
 export const FilePackageSchema: z.ZodObject<{
     id: z.ZodString;
@@ -643,16 +484,6 @@ export const FilePackageSchema: z.ZodObject<{
 
 // @public
 export type FilePackageUpdateInput = Partial<FilePackageCreateInput>;
-
-// @public
-export class FileResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FileCreateInput): Promise<File_2>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<File_2>;
-    list(): Promise<File_2[]>;
-    update(id: string, input: FileUpdateInput): Promise<File_2>;
-}
 
 // @public (undocumented)
 export const FileSchema: z.ZodObject<{
@@ -678,16 +509,6 @@ export interface Folder {
 // @public
 export type FolderCreateInput = Record<string, never>;
 
-// @public
-export class FolderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: FolderCreateInput): Promise<Folder>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Folder>;
-    list(): Promise<Folder[]>;
-    update(id: string, input: FolderUpdateInput): Promise<Folder>;
-}
-
 // @public (undocumented)
 export const FolderSchema: z.ZodObject<{
     id: z.ZodString;
@@ -707,16 +528,6 @@ export interface Group {
 // @public
 export type GroupCreateInput = Record<string, never>;
 
-// @public
-export class GroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: GroupCreateInput): Promise<Group>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Group>;
-    list(): Promise<Group[]>;
-    update(id: string, input: GroupUpdateInput): Promise<Group>;
-}
-
 // @public (undocumented)
 export const GroupSchema: z.ZodObject<{
     id: z.ZodString;
@@ -732,16 +543,6 @@ export interface GrowArea {
 
 // @public
 export type GrowAreaCreateInput = Record<string, never>;
-
-// @public
-export class GrowAreaResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: GrowAreaCreateInput): Promise<GrowArea>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<GrowArea>;
-    list(): Promise<GrowArea[]>;
-    update(id: string, input: GrowAreaUpdateInput): Promise<GrowArea>;
-}
 
 // @public (undocumented)
 export const GrowAreaSchema: z.ZodObject<{
@@ -768,16 +569,6 @@ export interface Image {
 // @public
 export type ImageCreateInput = Record<string, never>;
 
-// @public
-export class ImageResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ImageCreateInput): Promise<Image>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Image>;
-    list(): Promise<Image[]>;
-    update(id: string, input: ImageUpdateInput): Promise<Image>;
-}
-
 // @public (undocumented)
 export const ImageSchema: z.ZodObject<{
     id: z.ZodString;
@@ -793,16 +584,6 @@ export interface Incrementor {
 
 // @public
 export type IncrementorCreateInput = Record<string, never>;
-
-// @public
-export class IncrementorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: IncrementorCreateInput): Promise<Incrementor>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Incrementor>;
-    list(): Promise<Incrementor[]>;
-    update(id: string, input: IncrementorUpdateInput): Promise<Incrementor>;
-}
 
 // @public (undocumented)
 export const IncrementorSchema: z.ZodObject<{
@@ -832,16 +613,6 @@ export interface InterfaceCreateInput {
     speed?: number;
 }
 
-// @public
-export class InterfaceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: InterfaceCreateInput): Promise<Interface>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Interface>;
-    list(): Promise<Interface[]>;
-    update(id: string, input: InterfaceUpdateInput): Promise<Interface>;
-}
-
 // @public (undocumented)
 export const InterfaceSchema: z.ZodObject<{
     automatic: z.ZodBoolean;
@@ -865,16 +636,6 @@ export interface List {
 // @public
 export type ListCreateInput = Record<string, never>;
 
-// @public
-export class ListResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ListCreateInput): Promise<List>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<List>;
-    list(): Promise<List[]>;
-    update(id: string, input: ListUpdateInput): Promise<List>;
-}
-
 // @public (undocumented)
 export const ListSchema: z.ZodObject<{
     id: z.ZodString;
@@ -890,16 +651,6 @@ export interface LocalDomainObject {
 
 // @public
 export type LocalDomainObjectCreateInput = Record<string, never>;
-
-// @public
-export class LocalDomainObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: LocalDomainObjectCreateInput): Promise<LocalDomainObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<LocalDomainObject>;
-    list(): Promise<LocalDomainObject[]>;
-    update(id: string, input: LocalDomainObjectUpdateInput): Promise<LocalDomainObject>;
-}
 
 // @public (undocumented)
 export const LocalDomainObjectSchema: z.ZodObject<{
@@ -918,16 +669,6 @@ export interface Location {
 // @public
 export interface LocationCreateInput {
     name?: string;
-}
-
-// @public
-export class LocationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: LocationCreateInput): Promise<Location>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Location>;
-    list(): Promise<Location[]>;
-    update(id: string, input: LocationUpdateInput): Promise<Location>;
 }
 
 // @public (undocumented)
@@ -960,16 +701,6 @@ export interface MenuBarItem {
 // @public
 export type MenuBarItemCreateInput = Record<string, never>;
 
-// @public
-export class MenuBarItemResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MenuBarItemCreateInput): Promise<MenuBarItem>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MenuBarItem>;
-    list(): Promise<MenuBarItem[]>;
-    update(id: string, input: MenuBarItemUpdateInput): Promise<MenuBarItem>;
-}
-
 // @public (undocumented)
 export const MenuBarItemSchema: z.ZodObject<{
     id: z.ZodString;
@@ -977,16 +708,6 @@ export const MenuBarItemSchema: z.ZodObject<{
 
 // @public
 export type MenuBarItemUpdateInput = Partial<MenuBarItemCreateInput>;
-
-// @public
-export class MenuBarResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MenuBarCreateInput): Promise<MenuBar>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MenuBar>;
-    list(): Promise<MenuBar[]>;
-    update(id: string, input: MenuBarUpdateInput): Promise<MenuBar>;
-}
 
 // @public (undocumented)
 export const MenuBarSchema: z.ZodObject<{
@@ -1003,16 +724,6 @@ export interface MenuButton {
 
 // @public
 export type MenuButtonCreateInput = Record<string, never>;
-
-// @public
-export class MenuButtonResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MenuButtonCreateInput): Promise<MenuButton>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MenuButton>;
-    list(): Promise<MenuButton[]>;
-    update(id: string, input: MenuButtonUpdateInput): Promise<MenuButton>;
-}
 
 // @public (undocumented)
 export const MenuButtonSchema: z.ZodObject<{
@@ -1033,16 +744,6 @@ export interface MenuItem {
 // @public
 export type MenuItemCreateInput = Record<string, never>;
 
-// @public
-export class MenuItemResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MenuItemCreateInput): Promise<MenuItem>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<MenuItem>;
-    list(): Promise<MenuItem[]>;
-    update(id: string, input: MenuItemUpdateInput): Promise<MenuItem>;
-}
-
 // @public (undocumented)
 export const MenuItemSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1050,16 +751,6 @@ export const MenuItemSchema: z.ZodObject<{
 
 // @public
 export type MenuItemUpdateInput = Partial<MenuItemCreateInput>;
-
-// @public
-export class MenuResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: MenuCreateInput): Promise<Menu>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Menu>;
-    list(): Promise<Menu[]>;
-    update(id: string, input: MenuUpdateInput): Promise<Menu>;
-}
 
 // @public (undocumented)
 export const MenuSchema: z.ZodObject<{
@@ -1076,16 +767,6 @@ export interface NetworkDomainObject {
 
 // @public
 export type NetworkDomainObjectCreateInput = Record<string, never>;
-
-// @public
-export class NetworkDomainObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: NetworkDomainObjectCreateInput): Promise<NetworkDomainObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<NetworkDomainObject>;
-    list(): Promise<NetworkDomainObject[]>;
-    update(id: string, input: NetworkDomainObjectUpdateInput): Promise<NetworkDomainObject>;
-}
 
 // @public (undocumented)
 export const NetworkDomainObjectSchema: z.ZodObject<{
@@ -1105,16 +786,6 @@ export interface NetworkPreferencesObjectCreateInput {
     currentLocation?: Location;
 }
 
-// @public
-export class NetworkPreferencesObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: NetworkPreferencesObjectCreateInput): Promise<NetworkPreferencesObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<NetworkPreferencesObject>;
-    list(): Promise<NetworkPreferencesObject[]>;
-    update(id: string, input: NetworkPreferencesObjectUpdateInput): Promise<NetworkPreferencesObject>;
-}
-
 // @public (undocumented)
 export const NetworkPreferencesObjectSchema: z.ZodObject<{
     currentLocation: z.ZodString;
@@ -1130,16 +801,6 @@ export interface Outline {
 
 // @public
 export type OutlineCreateInput = Record<string, never>;
-
-// @public
-export class OutlineResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: OutlineCreateInput): Promise<Outline>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Outline>;
-    list(): Promise<Outline[]>;
-    update(id: string, input: OutlineUpdateInput): Promise<Outline>;
-}
 
 // @public (undocumented)
 export const OutlineSchema: z.ZodObject<{
@@ -1157,16 +818,6 @@ export interface PopOver {
 // @public
 export type PopOverCreateInput = Record<string, never>;
 
-// @public
-export class PopOverResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PopOverCreateInput): Promise<PopOver>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PopOver>;
-    list(): Promise<PopOver[]>;
-    update(id: string, input: PopOverUpdateInput): Promise<PopOver>;
-}
-
 // @public (undocumented)
 export const PopOverSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1182,16 +833,6 @@ export interface PopUpButton {
 
 // @public
 export type PopUpButtonCreateInput = Record<string, never>;
-
-// @public
-export class PopUpButtonResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PopUpButtonCreateInput): Promise<PopUpButton>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PopUpButton>;
-    list(): Promise<PopUpButton[]>;
-    update(id: string, input: PopUpButtonUpdateInput): Promise<PopUpButton>;
-}
 
 // @public (undocumented)
 export const PopUpButtonSchema: z.ZodObject<{
@@ -1230,16 +871,6 @@ export interface ProcessCreateInput {
     visible?: string;
 }
 
-// @public
-export class ProcessResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ProcessCreateInput): Promise<Process>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Process>;
-    list(): Promise<Process[]>;
-    update(id: string, input: ProcessUpdateInput): Promise<Process>;
-}
-
 // @public (undocumented)
 export const ProcessSchema: z.ZodObject<{
     acceptsHighLevelEvents: z.ZodBoolean;
@@ -1274,16 +905,6 @@ export interface ProgressIndicator {
 // @public
 export type ProgressIndicatorCreateInput = Record<string, never>;
 
-// @public
-export class ProgressIndicatorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ProgressIndicatorCreateInput): Promise<ProgressIndicator>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ProgressIndicator>;
-    list(): Promise<ProgressIndicator[]>;
-    update(id: string, input: ProgressIndicatorUpdateInput): Promise<ProgressIndicator>;
-}
-
 // @public (undocumented)
 export const ProgressIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1306,16 +927,6 @@ export interface PropertyListItemCreateInput {
     value?: string;
 }
 
-// @public
-export class PropertyListItemResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: PropertyListItemCreateInput): Promise<PropertyListItem>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<PropertyListItem>;
-    list(): Promise<PropertyListItem[]>;
-    update(id: string, input: PropertyListItemUpdateInput): Promise<PropertyListItem>;
-}
-
 // @public (undocumented)
 export const PropertyListItemSchema: z.ZodObject<{
     kind: z.ZodString;
@@ -1335,16 +946,6 @@ export interface RadioButton {
 // @public
 export type RadioButtonCreateInput = Record<string, never>;
 
-// @public
-export class RadioButtonResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RadioButtonCreateInput): Promise<RadioButton>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RadioButton>;
-    list(): Promise<RadioButton[]>;
-    update(id: string, input: RadioButtonUpdateInput): Promise<RadioButton>;
-}
-
 // @public (undocumented)
 export const RadioButtonSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1360,16 +961,6 @@ export interface RadioGroup {
 
 // @public
 export type RadioGroupCreateInput = Record<string, never>;
-
-// @public
-export class RadioGroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RadioGroupCreateInput): Promise<RadioGroup>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RadioGroup>;
-    list(): Promise<RadioGroup[]>;
-    update(id: string, input: RadioGroupUpdateInput): Promise<RadioGroup>;
-}
 
 // @public (undocumented)
 export const RadioGroupSchema: z.ZodObject<{
@@ -1387,16 +978,6 @@ export interface RelevanceIndicator {
 // @public
 export type RelevanceIndicatorCreateInput = Record<string, never>;
 
-// @public
-export class RelevanceIndicatorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RelevanceIndicatorCreateInput): Promise<RelevanceIndicator>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<RelevanceIndicator>;
-    list(): Promise<RelevanceIndicator[]>;
-    update(id: string, input: RelevanceIndicatorUpdateInput): Promise<RelevanceIndicator>;
-}
-
 // @public (undocumented)
 export const RelevanceIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1412,16 +993,6 @@ export interface Row {
 
 // @public
 export type RowCreateInput = Record<string, never>;
-
-// @public
-export class RowResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: RowCreateInput): Promise<Row>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Row>;
-    list(): Promise<Row[]>;
-    update(id: string, input: RowUpdateInput): Promise<Row>;
-}
 
 // @public (undocumented)
 export const RowSchema: z.ZodObject<{
@@ -1447,16 +1018,6 @@ export interface ScriptingClass {
 
 // @public
 export type ScriptingClassCreateInput = Record<string, never>;
-
-// @public
-export class ScriptingClassResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingClassCreateInput): Promise<ScriptingClass>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingClass>;
-    list(): Promise<ScriptingClass[]>;
-    update(id: string, input: ScriptingClassUpdateInput): Promise<ScriptingClass>;
-}
 
 // @public (undocumented)
 export const ScriptingClassSchema: z.ZodObject<{
@@ -1486,16 +1047,6 @@ export interface ScriptingCommand {
 // @public
 export type ScriptingCommandCreateInput = Record<string, never>;
 
-// @public
-export class ScriptingCommandResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingCommandCreateInput): Promise<ScriptingCommand>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingCommand>;
-    list(): Promise<ScriptingCommand[]>;
-    update(id: string, input: ScriptingCommandUpdateInput): Promise<ScriptingCommand>;
-}
-
 // @public (undocumented)
 export const ScriptingCommandSchema: z.ZodObject<{
     name: z.ZodString;
@@ -1518,16 +1069,6 @@ export interface ScriptingDefinitionObject {
 // @public
 export type ScriptingDefinitionObjectCreateInput = Record<string, never>;
 
-// @public
-export class ScriptingDefinitionObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingDefinitionObjectCreateInput): Promise<ScriptingDefinitionObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingDefinitionObject>;
-    list(): Promise<ScriptingDefinitionObject[]>;
-    update(id: string, input: ScriptingDefinitionObjectUpdateInput): Promise<ScriptingDefinitionObject>;
-}
-
 // @public (undocumented)
 export const ScriptingDefinitionObjectSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1543,16 +1084,6 @@ export interface ScriptingElement {
 
 // @public
 export type ScriptingElementCreateInput = Record<string, never>;
-
-// @public
-export class ScriptingElementResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingElementCreateInput): Promise<ScriptingElement>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingElement>;
-    list(): Promise<ScriptingElement[]>;
-    update(id: string, input: ScriptingElementUpdateInput): Promise<ScriptingElement>;
-}
 
 // @public (undocumented)
 export const ScriptingElementSchema: z.ZodObject<{
@@ -1571,16 +1102,6 @@ export interface ScriptingEnumeration {
 
 // @public
 export type ScriptingEnumerationCreateInput = Record<string, never>;
-
-// @public
-export class ScriptingEnumerationResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingEnumerationCreateInput): Promise<ScriptingEnumeration>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingEnumeration>;
-    list(): Promise<ScriptingEnumeration[]>;
-    update(id: string, input: ScriptingEnumerationUpdateInput): Promise<ScriptingEnumeration>;
-}
 
 // @public (undocumented)
 export const ScriptingEnumerationSchema: z.ZodObject<{
@@ -1602,16 +1123,6 @@ export interface ScriptingEnumerator {
 
 // @public
 export type ScriptingEnumeratorCreateInput = Record<string, never>;
-
-// @public
-export class ScriptingEnumeratorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingEnumeratorCreateInput): Promise<ScriptingEnumerator>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingEnumerator>;
-    list(): Promise<ScriptingEnumerator[]>;
-    update(id: string, input: ScriptingEnumeratorUpdateInput): Promise<ScriptingEnumerator>;
-}
 
 // @public (undocumented)
 export const ScriptingEnumeratorSchema: z.ZodObject<{
@@ -1636,16 +1147,6 @@ export interface ScriptingParameter {
 
 // @public
 export type ScriptingParameterCreateInput = Record<string, never>;
-
-// @public
-export class ScriptingParameterResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingParameterCreateInput): Promise<ScriptingParameter>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingParameter>;
-    list(): Promise<ScriptingParameter[]>;
-    update(id: string, input: ScriptingParameterUpdateInput): Promise<ScriptingParameter>;
-}
 
 // @public (undocumented)
 export const ScriptingParameterSchema: z.ZodObject<{
@@ -1675,16 +1176,6 @@ export interface ScriptingProperty {
 // @public
 export type ScriptingPropertyCreateInput = Record<string, never>;
 
-// @public
-export class ScriptingPropertyResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingPropertyCreateInput): Promise<ScriptingProperty>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingProperty>;
-    list(): Promise<ScriptingProperty[]>;
-    update(id: string, input: ScriptingPropertyUpdateInput): Promise<ScriptingProperty>;
-}
-
 // @public (undocumented)
 export const ScriptingPropertySchema: z.ZodObject<{
     name: z.ZodString;
@@ -1711,16 +1202,6 @@ export interface ScriptingSuite {
 // @public
 export type ScriptingSuiteCreateInput = Record<string, never>;
 
-// @public
-export class ScriptingSuiteResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScriptingSuiteCreateInput): Promise<ScriptingSuite>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScriptingSuite>;
-    list(): Promise<ScriptingSuite[]>;
-    update(id: string, input: ScriptingSuiteUpdateInput): Promise<ScriptingSuite>;
-}
-
 // @public (undocumented)
 export const ScriptingSuiteSchema: z.ZodObject<{
     name: z.ZodString;
@@ -1740,16 +1221,6 @@ export interface ScrollArea {
 // @public
 export type ScrollAreaCreateInput = Record<string, never>;
 
-// @public
-export class ScrollAreaResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScrollAreaCreateInput): Promise<ScrollArea>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScrollArea>;
-    list(): Promise<ScrollArea[]>;
-    update(id: string, input: ScrollAreaUpdateInput): Promise<ScrollArea>;
-}
-
 // @public (undocumented)
 export const ScrollAreaSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1765,16 +1236,6 @@ export interface ScrollBar {
 
 // @public
 export type ScrollBarCreateInput = Record<string, never>;
-
-// @public
-export class ScrollBarResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ScrollBarCreateInput): Promise<ScrollBar>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ScrollBar>;
-    list(): Promise<ScrollBar[]>;
-    update(id: string, input: ScrollBarUpdateInput): Promise<ScrollBar>;
-}
 
 // @public (undocumented)
 export const ScrollBarSchema: z.ZodObject<{
@@ -1803,16 +1264,6 @@ export interface ServiceCreateInput {
     name?: string;
 }
 
-// @public
-export class ServiceResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ServiceCreateInput): Promise<Service>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Service>;
-    list(): Promise<Service[]>;
-    update(id: string, input: ServiceUpdateInput): Promise<Service>;
-}
-
 // @public (undocumented)
 export const ServiceSchema: z.ZodObject<{
     active: z.ZodBoolean;
@@ -1834,16 +1285,6 @@ export interface Sheet {
 // @public
 export type SheetCreateInput = Record<string, never>;
 
-// @public
-export class SheetResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SheetCreateInput): Promise<Sheet>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Sheet>;
-    list(): Promise<Sheet[]>;
-    update(id: string, input: SheetUpdateInput): Promise<Sheet>;
-}
-
 // @public (undocumented)
 export const SheetSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1859,16 +1300,6 @@ export interface Slider {
 
 // @public
 export type SliderCreateInput = Record<string, never>;
-
-// @public
-export class SliderResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SliderCreateInput): Promise<Slider>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Slider>;
-    list(): Promise<Slider[]>;
-    update(id: string, input: SliderUpdateInput): Promise<Slider>;
-}
 
 // @public (undocumented)
 export const SliderSchema: z.ZodObject<{
@@ -1894,16 +1325,6 @@ export interface SplitterGroup {
 // @public
 export type SplitterGroupCreateInput = Record<string, never>;
 
-// @public
-export class SplitterGroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SplitterGroupCreateInput): Promise<SplitterGroup>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SplitterGroup>;
-    list(): Promise<SplitterGroup[]>;
-    update(id: string, input: SplitterGroupUpdateInput): Promise<SplitterGroup>;
-}
-
 // @public (undocumented)
 export const SplitterGroupSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1911,16 +1332,6 @@ export const SplitterGroupSchema: z.ZodObject<{
 
 // @public
 export type SplitterGroupUpdateInput = Partial<SplitterGroupCreateInput>;
-
-// @public
-export class SplitterResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SplitterCreateInput): Promise<Splitter>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Splitter>;
-    list(): Promise<Splitter[]>;
-    update(id: string, input: SplitterUpdateInput): Promise<Splitter>;
-}
 
 // @public (undocumented)
 export const SplitterSchema: z.ZodObject<{
@@ -1938,16 +1349,6 @@ export interface StaticText {
 // @public
 export type StaticTextCreateInput = Record<string, never>;
 
-// @public
-export class StaticTextResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: StaticTextCreateInput): Promise<StaticText>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<StaticText>;
-    list(): Promise<StaticText[]>;
-    update(id: string, input: StaticTextUpdateInput): Promise<StaticText>;
-}
-
 // @public (undocumented)
 export const StaticTextSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1964,16 +1365,6 @@ export interface SystemDomainObject {
 // @public
 export type SystemDomainObjectCreateInput = Record<string, never>;
 
-// @public
-export class SystemDomainObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: SystemDomainObjectCreateInput): Promise<SystemDomainObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<SystemDomainObject>;
-    list(): Promise<SystemDomainObject[]>;
-    update(id: string, input: SystemDomainObjectUpdateInput): Promise<SystemDomainObject>;
-}
-
 // @public (undocumented)
 export const SystemDomainObjectSchema: z.ZodObject<{
     id: z.ZodString;
@@ -1987,110 +1378,40 @@ export class SystemEventsClient {
     constructor(options: SystemEventsClientOptions);
     abortTransaction(): Promise<void>;
     readonly actions: ActionResourceClient;
-    readonly aliases: AliasResourceClient;
     attachActionTo(using: string): Promise<void>;
     attachedScripts(): Promise<void>;
-    readonly attributes: AttributeResourceClient;
     beginTransaction(): Promise<void>;
-    readonly browsers: BrowserResourceClient;
-    readonly busyindicators: BusyIndicatorResourceClient;
-    readonly buttons: ButtonResourceClient;
     cancel(): Promise<void>;
-    readonly checkboxes: CheckboxResourceClient;
-    readonly classicdomainobjects: ClassicDomainObjectResourceClient;
-    readonly colorwells: ColorWellResourceClient;
-    readonly columns: ColumnResourceClient;
-    readonly comboboxes: ComboBoxResourceClient;
-    readonly configurations: ConfigurationResourceClient;
     confirm(): Promise<void>;
     connect(): Promise<void>;
     decrement(): Promise<void>;
     disconnect(): Promise<void>;
     readonly diskitems: DiskItemResourceClient;
-    readonly disks: DiskResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
         x: number;
         y: number;
         width: number;
         height: number;
     }): Promise<void>;
-    readonly domains: DomainResourceClient;
-    readonly drawers: DrawerResourceClient;
     editActionOf(usingActionName?: string, usingActionNumber?: number): Promise<void>;
     endTransaction(): Promise<void>;
-    readonly filepackages: FilePackageResourceClient;
-    readonly files: FileResourceClient;
-    readonly folders: FolderResourceClient;
-    readonly groups: GroupResourceClient;
-    readonly growareas: GrowAreaResourceClient;
     get http(): HttpClient;
-    readonly images: ImageResourceClient;
     increment(): Promise<void>;
-    readonly incrementors: IncrementorResourceClient;
-    readonly interfaces: InterfaceResourceClient;
     keyCode(using?: string): Promise<void>;
     keyDown(): Promise<void>;
     keystroke(using?: string): Promise<void>;
     keyUp(): Promise<void>;
-    readonly lists: ListResourceClient;
-    readonly localdomainobjects: LocalDomainObjectResourceClient;
-    readonly locations: LocationResourceClient;
     logOut(): Promise<void>;
-    readonly menubaritems: MenuBarItemResourceClient;
-    readonly menubars: MenuBarResourceClient;
-    readonly menubuttons: MenuButtonResourceClient;
-    readonly menuitems: MenuItemResourceClient;
-    readonly menus: MenuResourceClient;
     move(to: string): Promise<void>;
-    readonly networkdomainobjects: NetworkDomainObjectResourceClient;
-    readonly networkpreferencesobjects: NetworkPreferencesObjectResourceClient;
     open(): Promise<void>;
-    readonly outlines: OutlineResourceClient;
     pick(): Promise<void>;
-    readonly popovers: PopOverResourceClient;
-    readonly popupbuttons: PopUpButtonResourceClient;
-    readonly processes: ProcessResourceClient;
-    readonly progressindicators: ProgressIndicatorResourceClient;
-    readonly propertylistitems: PropertyListItemResourceClient;
-    readonly radiobuttons: RadioButtonResourceClient;
-    readonly radiogroups: RadioGroupResourceClient;
-    readonly relevanceindicators: RelevanceIndicatorResourceClient;
     removeActionFrom(usingActionName?: string, usingActionNumber?: number): Promise<void>;
     restart(stateSavingPreference?: boolean): Promise<void>;
-    readonly rows: RowResourceClient;
-    readonly scriptingclasses: ScriptingClassResourceClient;
-    readonly scriptingcommands: ScriptingCommandResourceClient;
-    readonly scriptingdefinitionobjects: ScriptingDefinitionObjectResourceClient;
-    readonly scriptingelements: ScriptingElementResourceClient;
-    readonly scriptingenumerations: ScriptingEnumerationResourceClient;
-    readonly scriptingenumerators: ScriptingEnumeratorResourceClient;
-    readonly scriptingparameters: ScriptingParameterResourceClient;
-    readonly scriptingproperties: ScriptingPropertyResourceClient;
-    readonly scriptingsuites: ScriptingSuiteResourceClient;
-    readonly scrollareas: ScrollAreaResourceClient;
-    readonly scrollbars: ScrollBarResourceClient;
-    readonly services: ServiceResourceClient;
-    readonly sheets: SheetResourceClient;
     shutDown(stateSavingPreference?: boolean): Promise<void>;
     sleep(): Promise<void>;
-    readonly sliders: SliderResourceClient;
-    readonly splittergroups: SplitterGroupResourceClient;
-    readonly splitters: SplitterResourceClient;
     start(): Promise<void>;
-    readonly statictexts: StaticTextResourceClient;
     stop(): Promise<void>;
-    readonly systemdomainobjects: SystemDomainObjectResourceClient;
-    readonly tabgroups: TabGroupResourceClient;
-    readonly tables: TableResourceClient;
-    readonly textareas: TextAreaResourceClient;
-    readonly textfields: TextFieldResourceClient;
-    readonly toolbars: ToolbarResourceClient;
     readonly uielements: UIElementResourceClient;
-    readonly userdomainobjects: UserDomainObjectResourceClient;
-    readonly valueindicators: ValueIndicatorResourceClient;
-    readonly xmlattributes: XMLAttributeResourceClient;
-    readonly xmldatas: XMLDataResourceClient;
-    readonly xmlelements: XMLElementResourceClient;
 }
 
 // @public
@@ -2114,16 +1435,6 @@ export interface TabGroup {
 // @public
 export type TabGroupCreateInput = Record<string, never>;
 
-// @public
-export class TabGroupResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TabGroupCreateInput): Promise<TabGroup>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<TabGroup>;
-    list(): Promise<TabGroup[]>;
-    update(id: string, input: TabGroupUpdateInput): Promise<TabGroup>;
-}
-
 // @public (undocumented)
 export const TabGroupSchema: z.ZodObject<{
     id: z.ZodString;
@@ -2139,16 +1450,6 @@ export interface Table {
 
 // @public
 export type TableCreateInput = Record<string, never>;
-
-// @public
-export class TableResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TableCreateInput): Promise<Table>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Table>;
-    list(): Promise<Table[]>;
-    update(id: string, input: TableUpdateInput): Promise<Table>;
-}
 
 // @public (undocumented)
 export const TableSchema: z.ZodObject<{
@@ -2166,16 +1467,6 @@ export interface TextArea {
 // @public
 export type TextAreaCreateInput = Record<string, never>;
 
-// @public
-export class TextAreaResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TextAreaCreateInput): Promise<TextArea>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<TextArea>;
-    list(): Promise<TextArea[]>;
-    update(id: string, input: TextAreaUpdateInput): Promise<TextArea>;
-}
-
 // @public (undocumented)
 export const TextAreaSchema: z.ZodObject<{
     id: z.ZodString;
@@ -2192,16 +1483,6 @@ export interface TextField {
 // @public
 export type TextFieldCreateInput = Record<string, never>;
 
-// @public
-export class TextFieldResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: TextFieldCreateInput): Promise<TextField>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<TextField>;
-    list(): Promise<TextField[]>;
-    update(id: string, input: TextFieldUpdateInput): Promise<TextField>;
-}
-
 // @public (undocumented)
 export const TextFieldSchema: z.ZodObject<{
     id: z.ZodString;
@@ -2217,16 +1498,6 @@ export interface Toolbar {
 
 // @public
 export type ToolbarCreateInput = Record<string, never>;
-
-// @public
-export class ToolbarResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ToolbarCreateInput): Promise<Toolbar>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Toolbar>;
-    list(): Promise<Toolbar[]>;
-    update(id: string, input: ToolbarUpdateInput): Promise<Toolbar>;
-}
 
 // @public (undocumented)
 export const ToolbarSchema: z.ZodObject<{
@@ -2272,12 +1543,7 @@ export interface UIElementCreateInput {
 export class UIElementResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     click(at?: string): Promise<void>;
-    create(input: UIElementCreateInput): Promise<UIElement>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<UIElement>;
-    list(): Promise<UIElement[]>;
     select(): Promise<void>;
-    update(id: string, input: UIElementUpdateInput): Promise<UIElement>;
 }
 
 // @public (undocumented)
@@ -2324,16 +1590,6 @@ export interface UserDomainObject {
 // @public
 export type UserDomainObjectCreateInput = Record<string, never>;
 
-// @public
-export class UserDomainObjectResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: UserDomainObjectCreateInput): Promise<UserDomainObject>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<UserDomainObject>;
-    list(): Promise<UserDomainObject[]>;
-    update(id: string, input: UserDomainObjectUpdateInput): Promise<UserDomainObject>;
-}
-
 // @public (undocumented)
 export const UserDomainObjectSchema: z.ZodObject<{
     desktopFolder: z.ZodString;
@@ -2360,16 +1616,6 @@ export interface ValueIndicator {
 // @public
 export type ValueIndicatorCreateInput = Record<string, never>;
 
-// @public
-export class ValueIndicatorResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: ValueIndicatorCreateInput): Promise<ValueIndicator>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<ValueIndicator>;
-    list(): Promise<ValueIndicator[]>;
-    update(id: string, input: ValueIndicatorUpdateInput): Promise<ValueIndicator>;
-}
-
 // @public (undocumented)
 export const ValueIndicatorSchema: z.ZodObject<{
     id: z.ZodString;
@@ -2387,16 +1633,6 @@ export interface XMLAttribute {
 // @public
 export interface XMLAttributeCreateInput {
     value?: string;
-}
-
-// @public
-export class XMLAttributeResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: XMLAttributeCreateInput): Promise<XMLAttribute>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<XMLAttribute>;
-    list(): Promise<XMLAttribute[]>;
-    update(id: string, input: XMLAttributeUpdateInput): Promise<XMLAttribute>;
 }
 
 // @public (undocumented)
@@ -2421,16 +1657,6 @@ export interface XMLDataCreateInput {
     text?: string;
 }
 
-// @public
-export class XMLDataResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: XMLDataCreateInput): Promise<XMLData>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<XMLData>;
-    list(): Promise<XMLData[]>;
-    update(id: string, input: XMLDataUpdateInput): Promise<XMLData>;
-}
-
 // @public (undocumented)
 export const XMLDataSchema: z.ZodObject<{
     id: z.ZodString;
@@ -2451,16 +1677,6 @@ export interface XMLElement {
 // @public
 export interface XMLElementCreateInput {
     value?: string;
-}
-
-// @public
-export class XMLElementResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: XMLElementCreateInput): Promise<XMLElement>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<XMLElement>;
-    list(): Promise<XMLElement[]>;
-    update(id: string, input: XMLElementUpdateInput): Promise<XMLElement>;
 }
 
 // @public (undocumented)

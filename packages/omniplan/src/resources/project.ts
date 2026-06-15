@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Project, ProjectCreateInput, ProjectUpdateInput } from '../types.js'
+import type { Project } from '../types.js'
 
 /**
  * Client for an omniplan project.
@@ -24,34 +24,13 @@ export class ProjectResourceClient {
    * List all projects.
    */
   async list(): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.listProjects`)
   }
 
   /**
    * Get a project by id.
    */
   async get(id: string): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new project.
-   */
-  async create(input: ProjectCreateInput): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing project.
-   */
-  async update(id: string, input: ProjectUpdateInput): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a project.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.getProject`, { id })
   }
 }

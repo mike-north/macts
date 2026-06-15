@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Scheme, SchemeCreateInput, SchemeUpdateInput } from '../types.js'
+import type { Scheme } from '../types.js'
 
 /**
  * Client for a set of parameters for building, testing, launching or distributing the products of a workspace.
@@ -24,34 +24,13 @@ export class SchemeResourceClient {
    * List all schemes.
    */
   async list(): Promise<Scheme[]> {
-    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.list`)
+    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.listSchemes`)
   }
 
   /**
    * Get a scheme by id.
    */
   async get(id: string): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new scheme.
-   */
-  async create(input: SchemeCreateInput): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing scheme.
-   */
-  async update(id: string, input: SchemeUpdateInput): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a scheme.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.getScheme`, { id })
   }
 }

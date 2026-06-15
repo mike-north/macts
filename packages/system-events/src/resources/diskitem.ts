@@ -4,7 +4,6 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { DiskItem, DiskItemCreateInput, DiskItemUpdateInput } from '../types.js'
 
 /**
  * Client for an item stored in the file system.
@@ -18,34 +17,6 @@ export class DiskItemResourceClient {
     this.#http = http
     this.#app = app
     this.#resource = resource
-  }
-
-  /**
-   * List all diskitems.
-   */
-  async list(): Promise<DiskItem[]> {
-    return this.#http.rpc<DiskItem[]>(`${this.#app}.${this.#resource}.list`)
-  }
-
-  /**
-   * Get a diskitem by id.
-   */
-  async get(id: string): Promise<DiskItem> {
-    return this.#http.rpc<DiskItem>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new diskitem.
-   */
-  async create(input: DiskItemCreateInput): Promise<DiskItem> {
-    return this.#http.rpc<DiskItem>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing diskitem.
-   */
-  async update(id: string, input: DiskItemUpdateInput): Promise<DiskItem> {
-    return this.#http.rpc<DiskItem>(`${this.#app}.${this.#resource}.update`, { id, ...input })
   }
 
   /**

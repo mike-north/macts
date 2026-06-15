@@ -22,16 +22,6 @@ export interface DocumentCreateInput {
     playing?: boolean;
 }
 
-// @public
-export class DocumentResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    create(input: DocumentCreateInput): Promise<Document>;
-    delete(id: string): Promise<void>;
-    get(id: string): Promise<Document>;
-    list(): Promise<Document[]>;
-    update(id: string, input: DocumentUpdateInput): Promise<Document>;
-}
-
 // @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
     name: z.ZodString;
@@ -54,7 +44,6 @@ export class HttpClient {
 // @public
 export class QuickTimePlayerClient {
     constructor(options: QuickTimePlayerClientOptions);
-    readonly documents: DocumentResourceClient;
     _export(_in: string, usingSettingsPreset: string): Promise<void>;
     get http(): HttpClient;
     newAudioRecording(): Promise<void>;

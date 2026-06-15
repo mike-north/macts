@@ -7,11 +7,6 @@
 
 import { CalendarResourceClient } from './resources/calendar.js'
 import { EventResourceClient } from './resources/event.js'
-import { AttendeeResourceClient } from './resources/attendee.js'
-import { DisplayAlarmResourceClient } from './resources/displayalarm.js'
-import { MailAlarmResourceClient } from './resources/mailalarm.js'
-import { SoundAlarmResourceClient } from './resources/soundalarm.js'
-import { OpenFileAlarmResourceClient } from './resources/openfilealarm.js'
 import type { ViewType } from './types.js'
 
 /**
@@ -97,39 +92,11 @@ export class CalendarClient {
   /** A calendar event */
   readonly events: EventResourceClient
 
-  /** An event attendee */
-  readonly attendees: AttendeeResourceClient
-
-  /** A message/display alarm */
-  readonly displayalarms: DisplayAlarmResourceClient
-
-  /** A mail/email alarm */
-  readonly mailalarms: MailAlarmResourceClient
-
-  /** A sound alarm */
-  readonly soundalarms: SoundAlarmResourceClient
-
-  /** An 'open file' alarm */
-  readonly openfilealarms: OpenFileAlarmResourceClient
-
   constructor(options: CalendarClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.calendars = new CalendarResourceClient(this.#httpClient, 'calendar', 'calendars')
     this.events = new EventResourceClient(this.#httpClient, 'calendar', 'events')
-    this.attendees = new AttendeeResourceClient(this.#httpClient, 'calendar', 'attendees')
-    this.displayalarms = new DisplayAlarmResourceClient(
-      this.#httpClient,
-      'calendar',
-      'displayalarms'
-    )
-    this.mailalarms = new MailAlarmResourceClient(this.#httpClient, 'calendar', 'mailalarms')
-    this.soundalarms = new SoundAlarmResourceClient(this.#httpClient, 'calendar', 'soundalarms')
-    this.openfilealarms = new OpenFileAlarmResourceClient(
-      this.#httpClient,
-      'calendar',
-      'openfilealarms'
-    )
   }
 
   /**

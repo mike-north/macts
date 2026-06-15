@@ -21,4 +21,3 @@
 export { AlfredClient, AlfredError, HttpClient } from './client.js'
 export type { AlfredClientOptions } from './client.js'
 export * from './types.js'
-export { ApplicationResourceClient } from './resources/application.js'

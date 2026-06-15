@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Account, AccountCreateInput, AccountUpdateInput } from '../types.js'
+import type { Account } from '../types.js'
 
 /**
  * Client for an account in the reminders application.
@@ -24,34 +24,6 @@ export class AccountResourceClient {
    * List all accounts.
    */
   async list(): Promise<Account[]> {
-    return this.#http.rpc<Account[]>(`${this.#app}.${this.#resource}.list`)
-  }
-
-  /**
-   * Get a account by id.
-   */
-  async get(id: string): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { id })
-  }
-
-  /**
-   * Create a new account.
-   */
-  async create(input: AccountCreateInput): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing account.
-   */
-  async update(id: string, input: AccountUpdateInput): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.update`, { id, ...input })
-  }
-
-  /**
-   * Delete a account.
-   */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
+    return this.#http.rpc<Account[]>(`${this.#app}.${this.#resource}.listAccounts`)
   }
 }

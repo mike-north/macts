@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Calendar, CalendarCreateInput, CalendarUpdateInput } from '../types.js'
+import type { Calendar, CalendarCreateInput } from '../types.js'
 
 /**
  * Client for a calendar containing events.
@@ -28,10 +28,10 @@ export class CalendarResourceClient {
   }
 
   /**
-   * Get a calendar by calendarIdentifier.
+   * Get a calendar by id.
    */
-  async get(calendarIdentifier: string): Promise<Calendar> {
-    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { calendarIdentifier })
+  async get(id: string): Promise<Calendar> {
+    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
@@ -39,22 +39,5 @@ export class CalendarResourceClient {
    */
   async create(input: CalendarCreateInput): Promise<Calendar> {
     return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.create`, input)
-  }
-
-  /**
-   * Update an existing calendar.
-   */
-  async update(calendarIdentifier: string, input: CalendarUpdateInput): Promise<Calendar> {
-    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.update`, {
-      calendarIdentifier,
-      ...input,
-    })
-  }
-
-  /**
-   * Delete a calendar.
-   */
-  async delete(calendarIdentifier: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { calendarIdentifier })
   }
 }
