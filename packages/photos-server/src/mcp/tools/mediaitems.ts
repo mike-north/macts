@@ -44,7 +44,7 @@ export const mediaitemsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.mediaitems.get(id)
+    return client.mediaitems.get(id as unknown as Parameters<typeof client.mediaitems.get>[0])
   },
 }
 
@@ -68,7 +68,9 @@ export const mediaitemsDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.mediaitems.duplicate(id)
+    await client.mediaitems.duplicate(
+      id as unknown as Parameters<typeof client.mediaitems.duplicate>[0]
+    )
     return { success: true }
   },
 }

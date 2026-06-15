@@ -32,7 +32,10 @@ export const appAddReadingListItemTool: McpToolDefinition = {
   handler: async (args) => {
     const { andPreviewText, withTitle } = args as { andPreviewText?: string; withTitle?: string }
     const client = getClient()
-    await client.addReadingListItem(andPreviewText as unknown, withTitle as unknown)
+    await client.addReadingListItem(
+      andPreviewText as unknown as Parameters<typeof client.addReadingListItem>[0],
+      withTitle as unknown as Parameters<typeof client.addReadingListItem>[1]
+    )
     return { success: true }
   },
 }
@@ -56,7 +59,7 @@ export const appDoJavaScriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in } = args as { in?: string }
     const client = getClient()
-    await client.doJavaScript(_in as unknown)
+    await client.doJavaScript(_in as unknown as Parameters<typeof client.doJavaScript>[0])
     return { success: true }
   },
 }
@@ -80,7 +83,7 @@ export const appEmailContentsTool: McpToolDefinition = {
   handler: async (args) => {
     const { of: _of } = args as { of?: string }
     const client = getClient()
-    await client.emailContents(_of as unknown)
+    await client.emailContents(_of as unknown as Parameters<typeof client.emailContents>[0])
     return { success: true }
   },
 }
@@ -109,7 +112,10 @@ export const appSearchTheWebTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for, in: _in } = args as { for: string; in?: string }
     const client = getClient()
-    await client.searchTheWeb(_for as unknown, _in as unknown)
+    await client.searchTheWeb(
+      _for as unknown as Parameters<typeof client.searchTheWeb>[0],
+      _in as unknown as Parameters<typeof client.searchTheWeb>[1]
+    )
     return { success: true }
   },
 }

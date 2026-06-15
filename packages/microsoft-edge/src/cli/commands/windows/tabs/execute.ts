@@ -14,8 +14,6 @@ export class ExecuteTabCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
-
-  tabId = Option.String({ required: true })
   tabId = Option.String('--tab-id', { required: true, description: 'Tab identifier' })
   javascript = Option.String('--javascript', {
     required: true,
@@ -26,7 +24,10 @@ export class ExecuteTabCommand extends Command {
 
     try {
       const client = getClient()
-      await client.tabs.execute(this.tabId as unknown, this.javascript as unknown)
+      await client.tabs.execute(
+        this.tabId as unknown as Parameters<typeof client.tabs.execute>[0],
+        this.javascript as unknown as Parameters<typeof client.tabs.execute>[1]
+      )
 
       const output = formatter.formatSuccess('execute completed successfully')
       this.context.stdout.write(output + '\n')

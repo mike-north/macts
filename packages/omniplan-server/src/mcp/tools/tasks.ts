@@ -44,7 +44,7 @@ export const tasksGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: number }
     const client = getClient()
-    return client.tasks.get(id)
+    return client.tasks.get(id as unknown as Parameters<typeof client.tasks.get>[0])
   },
 }
 
@@ -137,6 +137,6 @@ export const tasksCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.tasks.create(args as Record<string, unknown>)
+    return client.tasks.create(args as Parameters<typeof client.tasks.create>[0])
   },
 }

@@ -19,7 +19,7 @@ export class LookupCommand extends Command {
 
     try {
       const client = getClient()
-      await client.lookup(this.key as unknown)
+      await client.lookup(this.key as unknown as Parameters<typeof client.lookup>[0])
 
       const output = formatter.formatSuccess('lookup completed successfully')
       this.context.stdout.write(output + '\n')

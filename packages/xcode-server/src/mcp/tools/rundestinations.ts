@@ -52,6 +52,8 @@ export const rundestinationsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.rundestinations.get(name)
+    return client.rundestinations.get(
+      name as unknown as Parameters<typeof client.rundestinations.get>[0]
+    )
   },
 }

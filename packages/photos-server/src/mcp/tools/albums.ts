@@ -44,6 +44,6 @@ export const albumsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.albums.get(id)
+    return client.albums.get(id as unknown as Parameters<typeof client.albums.get>[0])
   },
 }

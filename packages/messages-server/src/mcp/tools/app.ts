@@ -27,7 +27,7 @@ export const appSendTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.send(to as unknown)
+    await client.send(to as unknown as Parameters<typeof client.send>[0])
     return { success: true }
   },
 }

@@ -89,6 +89,10 @@ export class CreateAccountCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.accounts.create({
         deliveryAccount: this.deliveryAccount,
         name: this.name,
@@ -109,7 +113,7 @@ export class CreateAccountCommand extends Command {
         includeWhenGettingNewMail: this.includeWhenGettingNewMail,
         moveDeletedMessagesToTrash: this.moveDeletedMessagesToTrash,
         usesSsl: this.usesSsl,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.accounts.create>[0])
 
       const output = formatter.format({
         message: 'Account created successfully',

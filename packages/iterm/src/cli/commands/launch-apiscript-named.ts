@@ -22,7 +22,9 @@ export class LaunchAPIScriptNamedCommand extends Command {
 
     try {
       const client = getClient()
-      await client.launchAPIScriptNamed(this.arguments as unknown)
+      await client.launchAPIScriptNamed(
+        this.arguments as unknown as Parameters<typeof client.launchAPIScriptNamed>[0]
+      )
 
       const output = formatter.formatSuccess('launchAPIScriptNamed completed successfully')
       this.context.stdout.write(output + '\n')

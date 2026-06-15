@@ -44,6 +44,6 @@ export const documentsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.documents.get(name)
+    return client.documents.get(name as unknown as Parameters<typeof client.documents.get>[0])
   },
 }

@@ -26,7 +26,10 @@ export class EditActionOfCommand extends Command {
 
     try {
       const client = getClient()
-      await client.editActionOf(this.usingActionName as unknown, this.usingActionNumber as unknown)
+      await client.editActionOf(
+        this.usingActionName as unknown as Parameters<typeof client.editActionOf>[0],
+        this.usingActionNumber as unknown as Parameters<typeof client.editActionOf>[1]
+      )
 
       const output = formatter.formatSuccess('editActionOf completed successfully')
       this.context.stdout.write(output + '\n')

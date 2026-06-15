@@ -116,7 +116,7 @@ export const appPlayTrackTool: McpToolDefinition = {
   handler: async (args) => {
     const { inContext } = args as { inContext?: string }
     const client = getClient()
-    await client.playTrack(inContext as unknown)
+    await client.playTrack(inContext as unknown as Parameters<typeof client.playTrack>[0])
     return { success: true }
   },
 }

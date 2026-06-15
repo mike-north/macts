@@ -19,7 +19,7 @@ export class CompleteCommand extends Command {
 
     try {
       const client = getClient()
-      await client.complete(this.text as unknown)
+      await client.complete(this.text as unknown as Parameters<typeof client.complete>[0])
 
       const output = formatter.formatSuccess('complete completed successfully')
       this.context.stdout.write(output + '\n')

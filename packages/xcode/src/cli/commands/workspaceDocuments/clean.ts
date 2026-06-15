@@ -13,7 +13,6 @@ export class CleanWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   workspaceDocumentId = Option.String({ required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
@@ -24,7 +23,9 @@ export class CleanWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.clean(this.workspaceName as unknown)
+      await client.workspacedocuments.clean(
+        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.clean>[0]
+      )
 
       const output = formatter.formatSuccess('clean completed successfully')
       this.context.stdout.write(output + '\n')

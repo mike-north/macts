@@ -19,7 +19,7 @@ export class SearchCommand extends Command {
 
     try {
       const client = getClient()
-      await client.search(this.for as unknown)
+      await client.search(this.for as unknown as Parameters<typeof client.search>[0])
 
       const output = formatter.formatSuccess('search completed successfully')
       this.context.stdout.write(output + '\n')

@@ -52,7 +52,7 @@ export const layersGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.layers.get(name)
+    return client.layers.get(name as unknown as Parameters<typeof client.layers.get>[0])
   },
 }
 
@@ -91,6 +91,6 @@ export const layersCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.layers.create(args as Record<string, unknown>)
+    return client.layers.create(args as Parameters<typeof client.layers.create>[0])
   },
 }

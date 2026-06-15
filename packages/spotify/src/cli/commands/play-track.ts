@@ -22,7 +22,7 @@ export class PlayTrackCommand extends Command {
 
     try {
       const client = getClient()
-      await client.playTrack(this.inContext as unknown)
+      await client.playTrack(this.inContext as unknown as Parameters<typeof client.playTrack>[0])
 
       const output = formatter.formatSuccess('playTrack completed successfully')
       this.context.stdout.write(output + '\n')

@@ -31,10 +31,10 @@ export class PrintCommand extends Command {
     try {
       const client = getClient()
       await client.print(
-        this.printDialog as unknown,
-        this.withProperties as unknown,
-        this.kind as unknown,
-        this.theme as unknown
+        this.printDialog as unknown as Parameters<typeof client.print>[0],
+        this.withProperties as unknown as Parameters<typeof client.print>[1],
+        this.kind as unknown as Parameters<typeof client.print>[2],
+        this.theme as unknown as Parameters<typeof client.print>[3]
       )
 
       const output = formatter.formatSuccess('print completed successfully')

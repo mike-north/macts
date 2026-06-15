@@ -19,7 +19,7 @@ export class ExportCommand extends Command {
 
     try {
       const client = getClient()
-      await client._export(this.to as unknown)
+      await client._export(this.to as unknown as Parameters<typeof client._export>[0])
 
       const output = formatter.formatSuccess('export completed successfully')
       this.context.stdout.write(output + '\n')

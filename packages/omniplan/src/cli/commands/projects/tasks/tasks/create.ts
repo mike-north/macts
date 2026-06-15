@@ -72,6 +72,10 @@ export class CreateTaskCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.tasks.create({
         name: this.name,
         startingDate: this.startingDate,
@@ -88,7 +92,7 @@ export class CreateTaskCommand extends Command {
         startingDateLocked: this.startingDateLocked,
         endingDateLocked: this.endingDateLocked,
         note: this.note,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.tasks.create>[0])
 
       const output = formatter.format({
         message: 'Task created successfully',

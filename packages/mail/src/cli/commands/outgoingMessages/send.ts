@@ -13,7 +13,6 @@ export class SendOutgoingMessageCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   outgoingMessageId = Option.String({ required: true })
 
   async execute(): Promise<number> {

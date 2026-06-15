@@ -19,7 +19,7 @@ export class MarkDroppedCommand extends Command {
 
     try {
       const client = getClient()
-      await client.markDropped(this.targets as unknown)
+      await client.markDropped(this.targets as unknown as Parameters<typeof client.markDropped>[0])
 
       const output = formatter.formatSuccess('markDropped completed successfully')
       this.context.stdout.write(output + '\n')

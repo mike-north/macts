@@ -48,7 +48,7 @@ export const calendarsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string; calendarIdentifier: string }
     const client = getClient()
-    return client.calendars.get(id)
+    return client.calendars.get(id as unknown as Parameters<typeof client.calendars.get>[0])
   },
 }
 
@@ -83,6 +83,6 @@ export const calendarsCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.calendars.create(args as Record<string, unknown>)
+    return client.calendars.create(args as Parameters<typeof client.calendars.create>[0])
   },
 }

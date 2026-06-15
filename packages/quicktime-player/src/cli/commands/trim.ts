@@ -20,7 +20,10 @@ export class TrimCommand extends Command {
 
     try {
       const client = getClient()
-      await client.trim(this.from as unknown, this.to as unknown)
+      await client.trim(
+        this.from as unknown as Parameters<typeof client.trim>[0],
+        this.to as unknown as Parameters<typeof client.trim>[1]
+      )
 
       const output = formatter.formatSuccess('trim completed successfully')
       this.context.stdout.write(output + '\n')

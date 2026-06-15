@@ -29,9 +29,9 @@ export class RevealWorkflowCommand extends Command {
     try {
       const client = getClient()
       await client.revealWorkflow(
-        this.workflow as unknown,
-        this.configuration as unknown,
-        this.details as unknown
+        this.workflow as unknown as Parameters<typeof client.revealWorkflow>[0],
+        this.configuration as unknown as Parameters<typeof client.revealWorkflow>[1],
+        this.details as unknown as Parameters<typeof client.revealWorkflow>[2]
       )
 
       const output = formatter.formatSuccess('revealWorkflow completed successfully')

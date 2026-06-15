@@ -13,7 +13,6 @@ export class StopWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   workspaceDocumentId = Option.String({ required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
@@ -24,7 +23,9 @@ export class StopWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.stop(this.workspaceName as unknown)
+      await client.workspacedocuments.stop(
+        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.stop>[0]
+      )
 
       const output = formatter.formatSuccess('stop completed successfully')
       this.context.stdout.write(output + '\n')

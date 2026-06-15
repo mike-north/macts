@@ -44,7 +44,7 @@ export const windowsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.windows.get(id)
+    return client.windows.get(id as unknown as Parameters<typeof client.windows.get>[0])
   },
 }
 
@@ -95,6 +95,6 @@ export const windowsCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.windows.create(args as Record<string, unknown>)
+    return client.windows.create(args as Parameters<typeof client.windows.create>[0])
   },
 }

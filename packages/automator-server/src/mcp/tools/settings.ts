@@ -52,6 +52,6 @@ export const settingsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.settings.get(name)
+    return client.settings.get(name as unknown as Parameters<typeof client.settings.get>[0])
   },
 }

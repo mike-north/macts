@@ -22,7 +22,7 @@ export class DoJavaScriptCommand extends Command {
 
     try {
       const client = getClient()
-      await client.doJavaScript(this.in as unknown)
+      await client.doJavaScript(this.in as unknown as Parameters<typeof client.doJavaScript>[0])
 
       const output = formatter.formatSuccess('doJavaScript completed successfully')
       this.context.stdout.write(output + '\n')

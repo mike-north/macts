@@ -22,7 +22,7 @@ export class SetThemeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.setTheme(this.theme as unknown)
+      await client.setTheme(this.theme as unknown as Parameters<typeof client.setTheme>[0])
 
       const output = formatter.formatSuccess('setTheme completed successfully')
       this.context.stdout.write(output + '\n')

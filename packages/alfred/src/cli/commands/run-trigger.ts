@@ -31,9 +31,9 @@ export class RunTriggerCommand extends Command {
     try {
       const client = getClient()
       await client.runTrigger(
-        this.trigger as unknown,
-        this.inWorkflow as unknown,
-        this.withArgument as unknown
+        this.trigger as unknown as Parameters<typeof client.runTrigger>[0],
+        this.inWorkflow as unknown as Parameters<typeof client.runTrigger>[1],
+        this.withArgument as unknown as Parameters<typeof client.runTrigger>[2]
       )
 
       const output = formatter.formatSuccess('runTrigger completed successfully')

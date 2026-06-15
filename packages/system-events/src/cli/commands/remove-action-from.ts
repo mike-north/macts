@@ -27,8 +27,8 @@ export class RemoveActionFromCommand extends Command {
     try {
       const client = getClient()
       await client.removeActionFrom(
-        this.usingActionName as unknown,
-        this.usingActionNumber as unknown
+        this.usingActionName as unknown as Parameters<typeof client.removeActionFrom>[0],
+        this.usingActionNumber as unknown as Parameters<typeof client.removeActionFrom>[1]
       )
 
       const output = formatter.formatSuccess('removeActionFrom completed successfully')

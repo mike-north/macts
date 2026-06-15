@@ -13,7 +13,6 @@ export class ShowNoteCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   noteId = Option.String({ required: true })
   name = Option.String('--name', { required: true, description: 'Note name' })
   async execute(): Promise<number> {
@@ -21,7 +20,7 @@ export class ShowNoteCommand extends Command {
 
     try {
       const client = getClient()
-      await client.notes.show(this.name as unknown)
+      await client.notes.show(this.name as unknown as Parameters<typeof client.notes.show>[0])
 
       const output = formatter.formatSuccess('show completed successfully')
       this.context.stdout.write(output + '\n')

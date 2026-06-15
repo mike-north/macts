@@ -17,7 +17,6 @@ export class ForwardMessageCommand extends Command {
     required: true,
     description: 'MessageViewer ID',
   })
-
   messageId = Option.String({ required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
@@ -28,7 +27,9 @@ export class ForwardMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.messages.forward(this.openingWindow as unknown)
+      await client.messages.forward(
+        this.openingWindow as unknown as Parameters<typeof client.messages.forward>[0]
+      )
 
       const output = formatter.formatSuccess('forward completed successfully')
       this.context.stdout.write(output + '\n')

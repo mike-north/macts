@@ -44,7 +44,7 @@ export const workflowsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.workflows.get(name)
+    return client.workflows.get(name as unknown as Parameters<typeof client.workflows.get>[0])
   },
 }
 
@@ -68,7 +68,9 @@ export const workflowsExecuteTool: McpToolDefinition = {
   handler: async (args) => {
     const { workflow } = args as { workflow: string }
     const client = getClient()
-    await client.workflows.execute(workflow)
+    await client.workflows.execute(
+      workflow as unknown as Parameters<typeof client.workflows.execute>[0]
+    )
     return { success: true }
   },
 }

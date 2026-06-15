@@ -19,7 +19,7 @@ export class AssembleCommand extends Command {
 
     try {
       const client = getClient()
-      await client.assemble(this.subgraph as unknown)
+      await client.assemble(this.subgraph as unknown as Parameters<typeof client.assemble>[0])
 
       const output = formatter.formatSuccess('assemble completed successfully')
       this.context.stdout.write(output + '\n')

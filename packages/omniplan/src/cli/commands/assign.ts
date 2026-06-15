@@ -20,7 +20,10 @@ export class AssignCommand extends Command {
 
     try {
       const client = getClient()
-      await client.assign(this.resource as unknown, this.task as unknown)
+      await client.assign(
+        this.resource as unknown as Parameters<typeof client.assign>[0],
+        this.task as unknown as Parameters<typeof client.assign>[1]
+      )
 
       const output = formatter.formatSuccess('assign completed successfully')
       this.context.stdout.write(output + '\n')

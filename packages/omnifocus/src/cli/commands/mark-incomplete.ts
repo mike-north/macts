@@ -22,7 +22,9 @@ export class MarkIncompleteCommand extends Command {
 
     try {
       const client = getClient()
-      await client.markIncomplete(this.targets as unknown)
+      await client.markIncomplete(
+        this.targets as unknown as Parameters<typeof client.markIncomplete>[0]
+      )
 
       const output = formatter.formatSuccess('markIncomplete completed successfully')
       this.context.stdout.write(output + '\n')

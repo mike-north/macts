@@ -19,7 +19,9 @@ export class StartSlideshowCommand extends Command {
 
     try {
       const client = getClient()
-      await client.startSlideshow(this.using as unknown)
+      await client.startSlideshow(
+        this.using as unknown as Parameters<typeof client.startSlideshow>[0]
+      )
 
       const output = formatter.formatSuccess('startSlideshow completed successfully')
       this.context.stdout.write(output + '\n')

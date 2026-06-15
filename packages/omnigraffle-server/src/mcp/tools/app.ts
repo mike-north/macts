@@ -31,7 +31,10 @@ export const appConnectTool: McpToolDefinition = {
   handler: async (args) => {
     const { from, to } = args as { from: string; to: string }
     const client = getClient()
-    await client.connect(from as unknown, to as unknown)
+    await client.connect(
+      from as unknown as Parameters<typeof client.connect>[0],
+      to as unknown as Parameters<typeof client.connect>[1]
+    )
     return { success: true }
   },
 }
@@ -82,7 +85,11 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { as, scope, to } = args as { as: string; scope: string; to: string }
     const client = getClient()
-    await client._export(as as unknown, scope as unknown, to as unknown)
+    await client._export(
+      as as unknown as Parameters<typeof client._export>[0],
+      scope as unknown as Parameters<typeof client._export>[1],
+      to as unknown as Parameters<typeof client._export>[2]
+    )
     return { success: true }
   },
 }
@@ -107,7 +114,7 @@ export const appFlipTool: McpToolDefinition = {
   handler: async (args) => {
     const { over } = args as { over: string }
     const client = getClient()
-    await client.flip(over as unknown)
+    await client.flip(over as unknown as Parameters<typeof client.flip>[0])
     return { success: true }
   },
 }
@@ -132,7 +139,7 @@ export const appSlideTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by: Record<string, unknown> }
     const client = getClient()
-    await client.slide(by as unknown)
+    await client.slide(by as unknown as Parameters<typeof client.slide>[0])
     return { success: true }
   },
 }
@@ -156,7 +163,7 @@ export const appAssembleTool: McpToolDefinition = {
   handler: async (args) => {
     const { subgraph } = args as { subgraph?: boolean }
     const client = getClient()
-    await client.assemble(subgraph as unknown)
+    await client.assemble(subgraph as unknown as Parameters<typeof client.assemble>[0])
     return { success: true }
   },
 }
@@ -199,7 +206,9 @@ export const appEvaluateJavascriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { script } = args as { script: string }
     const client = getClient()
-    await client.evaluateJavascript(script as unknown)
+    await client.evaluateJavascript(
+      script as unknown as Parameters<typeof client.evaluateJavascript>[0]
+    )
     return { success: true }
   },
 }

@@ -19,7 +19,7 @@ export class SlideCommand extends Command {
 
     try {
       const client = getClient()
-      await client.slide(this.by as unknown)
+      await client.slide(this.by as unknown as Parameters<typeof client.slide>[0])
 
       const output = formatter.formatSuccess('slide completed successfully')
       this.context.stdout.write(output + '\n')

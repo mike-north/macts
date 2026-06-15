@@ -23,7 +23,10 @@ export class DependCommand extends Command {
 
     try {
       const client = getClient()
-      await client.depend(this.prerequisite as unknown, this.dependent as unknown)
+      await client.depend(
+        this.prerequisite as unknown as Parameters<typeof client.depend>[0],
+        this.dependent as unknown as Parameters<typeof client.depend>[1]
+      )
 
       const output = formatter.formatSuccess('depend completed successfully')
       this.context.stdout.write(output + '\n')

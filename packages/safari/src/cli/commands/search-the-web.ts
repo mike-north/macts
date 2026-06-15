@@ -23,7 +23,10 @@ export class SearchTheWebCommand extends Command {
 
     try {
       const client = getClient()
-      await client.searchTheWeb(this.for as unknown, this.in as unknown)
+      await client.searchTheWeb(
+        this.for as unknown as Parameters<typeof client.searchTheWeb>[0],
+        this.in as unknown as Parameters<typeof client.searchTheWeb>[1]
+      )
 
       const output = formatter.formatSuccess('searchTheWeb completed successfully')
       this.context.stdout.write(output + '\n')

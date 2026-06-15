@@ -25,7 +25,10 @@ export class ArchiveCommand extends Command {
 
     try {
       const client = getClient()
-      await client.archive(this.in as unknown, this.compression as unknown)
+      await client.archive(
+        this.in as unknown as Parameters<typeof client.archive>[0],
+        this.compression as unknown as Parameters<typeof client.archive>[1]
+      )
 
       const output = formatter.formatSuccess('archive completed successfully')
       this.context.stdout.write(output + '\n')

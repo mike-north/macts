@@ -22,7 +22,7 @@ export class ExecuteCommand extends Command {
 
     try {
       const client = getClient()
-      await client.execute(this.javascript as unknown)
+      await client.execute(this.javascript as unknown as Parameters<typeof client.execute>[0])
 
       const output = formatter.formatSuccess('execute completed successfully')
       this.context.stdout.write(output + '\n')

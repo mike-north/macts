@@ -23,7 +23,10 @@ export class SplitVerticallyCommand extends Command {
 
     try {
       const client = getClient()
-      await client.splitVertically(this.withProfile as unknown, this.command as unknown)
+      await client.splitVertically(
+        this.withProfile as unknown as Parameters<typeof client.splitVertically>[0],
+        this.command as unknown as Parameters<typeof client.splitVertically>[1]
+      )
 
       const output = formatter.formatSuccess('splitVertically completed successfully')
       this.context.stdout.write(output + '\n')

@@ -24,7 +24,10 @@ export class ShouldEnableActionCommand extends Command {
 
     try {
       const client = getClient()
-      await client.shouldEnableAction(this.with as unknown, this.for as unknown)
+      await client.shouldEnableAction(
+        this.with as unknown as Parameters<typeof client.shouldEnableAction>[0],
+        this.for as unknown as Parameters<typeof client.shouldEnableAction>[1]
+      )
 
       const output = formatter.formatSuccess('shouldEnableAction completed successfully')
       this.context.stdout.write(output + '\n')

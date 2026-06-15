@@ -27,7 +27,7 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client._export(to as unknown)
+    await client._export(to as unknown as Parameters<typeof client._export>[0])
     return { success: true }
   },
 }
@@ -56,7 +56,10 @@ export const appAssignTool: McpToolDefinition = {
   handler: async (args) => {
     const { resource, task } = args as { resource: string; task: string }
     const client = getClient()
-    await client.assign(resource as unknown, task as unknown)
+    await client.assign(
+      resource as unknown as Parameters<typeof client.assign>[0],
+      task as unknown as Parameters<typeof client.assign>[1]
+    )
     return { success: true }
   },
 }
@@ -85,7 +88,10 @@ export const appDependTool: McpToolDefinition = {
   handler: async (args) => {
     const { prerequisite, dependent } = args as { prerequisite: string; dependent: string }
     const client = getClient()
-    await client.depend(prerequisite as unknown, dependent as unknown)
+    await client.depend(
+      prerequisite as unknown as Parameters<typeof client.depend>[0],
+      dependent as unknown as Parameters<typeof client.depend>[1]
+    )
     return { success: true }
   },
 }
@@ -146,7 +152,7 @@ export const appLookupTool: McpToolDefinition = {
   handler: async (args) => {
     const { key } = args as { key: string }
     const client = getClient()
-    await client.lookup(key as unknown)
+    await client.lookup(key as unknown as Parameters<typeof client.lookup>[0])
     return { success: true }
   },
 }
@@ -189,7 +195,7 @@ export const appAddWorkTimeTool: McpToolDefinition = {
   handler: async (args) => {
     const { schedule } = args as { schedule: string }
     const client = getClient()
-    await client.addWorkTime(schedule as unknown)
+    await client.addWorkTime(schedule as unknown as Parameters<typeof client.addWorkTime>[0])
     return { success: true }
   },
 }
@@ -214,7 +220,9 @@ export const appSubtractWorkTimeTool: McpToolDefinition = {
   handler: async (args) => {
     const { schedule } = args as { schedule: string }
     const client = getClient()
-    await client.subtractWorkTime(schedule as unknown)
+    await client.subtractWorkTime(
+      schedule as unknown as Parameters<typeof client.subtractWorkTime>[0]
+    )
     return { success: true }
   },
 }

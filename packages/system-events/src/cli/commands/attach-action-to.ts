@@ -22,7 +22,9 @@ export class AttachActionToCommand extends Command {
 
     try {
       const client = getClient()
-      await client.attachActionTo(this.using as unknown)
+      await client.attachActionTo(
+        this.using as unknown as Parameters<typeof client.attachActionTo>[0]
+      )
 
       const output = formatter.formatSuccess('attachActionTo completed successfully')
       this.context.stdout.write(output + '\n')

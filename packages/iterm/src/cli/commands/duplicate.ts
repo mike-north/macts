@@ -23,7 +23,10 @@ export class DuplicateCommand extends Command {
 
     try {
       const client = getClient()
-      await client.duplicate(this.to as unknown, this.withProperties as unknown)
+      await client.duplicate(
+        this.to as unknown as Parameters<typeof client.duplicate>[0],
+        this.withProperties as unknown as Parameters<typeof client.duplicate>[1]
+      )
 
       const output = formatter.formatSuccess('duplicate completed successfully')
       this.context.stdout.write(output + '\n')

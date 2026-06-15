@@ -20,7 +20,10 @@ export class SetVariableCommand extends Command {
 
     try {
       const client = getClient()
-      await client.setVariable(this.named as unknown, this.to as unknown)
+      await client.setVariable(
+        this.named as unknown as Parameters<typeof client.setVariable>[0],
+        this.to as unknown as Parameters<typeof client.setVariable>[1]
+      )
 
       const output = formatter.formatSuccess('setVariable completed successfully')
       this.context.stdout.write(output + '\n')

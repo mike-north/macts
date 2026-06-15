@@ -14,7 +14,6 @@ export class CompleteReminderCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   listId = Option.String('--list-id', { required: true, description: 'List ID' })
-
   reminderId = Option.String({ required: true })
   id = Option.String('--id', { required: true, description: 'Reminder identifier' })
   async execute(): Promise<number> {
@@ -22,7 +21,9 @@ export class CompleteReminderCommand extends Command {
 
     try {
       const client = getClient()
-      await client.reminders.complete(this.id as unknown)
+      await client.reminders.complete(
+        this.id as unknown as Parameters<typeof client.reminders.complete>[0]
+      )
 
       const output = formatter.formatSuccess('complete completed successfully')
       this.context.stdout.write(output + '\n')

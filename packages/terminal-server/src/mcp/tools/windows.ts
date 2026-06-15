@@ -44,6 +44,6 @@ export const windowsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.windows.get(name)
+    return client.windows.get(name as unknown as Parameters<typeof client.windows.get>[0])
   },
 }

@@ -22,7 +22,7 @@ export class SortCommand extends Command {
 
     try {
       const client = getClient()
-      await client.sort(this.by as unknown)
+      await client.sort(this.by as unknown as Parameters<typeof client.sort>[0])
 
       const output = formatter.formatSuccess('sort completed successfully')
       this.context.stdout.write(output + '\n')

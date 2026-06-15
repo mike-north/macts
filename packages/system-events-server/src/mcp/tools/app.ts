@@ -153,7 +153,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.move(to as unknown)
+    await client.move(to as unknown as Parameters<typeof client.move>[0])
     return { success: true }
   },
 }
@@ -213,7 +213,7 @@ export const appRestartTool: McpToolDefinition = {
   handler: async (args) => {
     const { stateSavingPreference } = args as { stateSavingPreference?: boolean }
     const client = getClient()
-    await client.restart(stateSavingPreference as unknown)
+    await client.restart(stateSavingPreference as unknown as Parameters<typeof client.restart>[0])
     return { success: true }
   },
 }
@@ -237,7 +237,7 @@ export const appShutDownTool: McpToolDefinition = {
   handler: async (args) => {
     const { stateSavingPreference } = args as { stateSavingPreference?: boolean }
     const client = getClient()
-    await client.shutDown(stateSavingPreference as unknown)
+    await client.shutDown(stateSavingPreference as unknown as Parameters<typeof client.shutDown>[0])
     return { success: true }
   },
 }
@@ -279,7 +279,7 @@ export const appKeyCodeTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using?: string }
     const client = getClient()
-    await client.keyCode(using as unknown)
+    await client.keyCode(using as unknown as Parameters<typeof client.keyCode>[0])
     return { success: true }
   },
 }
@@ -303,7 +303,7 @@ export const appKeystrokeTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using?: string }
     const client = getClient()
-    await client.keystroke(using as unknown)
+    await client.keystroke(using as unknown as Parameters<typeof client.keystroke>[0])
     return { success: true }
   },
 }
@@ -328,7 +328,7 @@ export const appAttachActionToTool: McpToolDefinition = {
   handler: async (args) => {
     const { using } = args as { using: string }
     const client = getClient()
-    await client.attachActionTo(using as unknown)
+    await client.attachActionTo(using as unknown as Parameters<typeof client.attachActionTo>[0])
     return { success: true }
   },
 }
@@ -438,9 +438,9 @@ export const appDoFolderActionTool: McpToolDefinition = {
     }
     const client = getClient()
     await client.doFolderAction(
-      folderActionCode as unknown,
-      withItemList as unknown,
-      withWindowSize as unknown
+      folderActionCode as unknown as Parameters<typeof client.doFolderAction>[0],
+      withItemList as unknown as Parameters<typeof client.doFolderAction>[1],
+      withWindowSize as unknown as Parameters<typeof client.doFolderAction>[2]
     )
     return { success: true }
   },
@@ -472,7 +472,10 @@ export const appEditActionOfTool: McpToolDefinition = {
       usingActionNumber?: number
     }
     const client = getClient()
-    await client.editActionOf(usingActionName as unknown, usingActionNumber as unknown)
+    await client.editActionOf(
+      usingActionName as unknown as Parameters<typeof client.editActionOf>[0],
+      usingActionNumber as unknown as Parameters<typeof client.editActionOf>[1]
+    )
     return { success: true }
   },
 }
@@ -575,7 +578,10 @@ export const appRemoveActionFromTool: McpToolDefinition = {
       usingActionNumber?: number
     }
     const client = getClient()
-    await client.removeActionFrom(usingActionName as unknown, usingActionNumber as unknown)
+    await client.removeActionFrom(
+      usingActionName as unknown as Parameters<typeof client.removeActionFrom>[0],
+      usingActionNumber as unknown as Parameters<typeof client.removeActionFrom>[1]
+    )
     return { success: true }
   },
 }

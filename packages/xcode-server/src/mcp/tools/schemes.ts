@@ -52,6 +52,6 @@ export const schemesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.schemes.get(id)
+    return client.schemes.get(id as unknown as Parameters<typeof client.schemes.get>[0])
   },
 }

@@ -48,6 +48,6 @@ export const tabsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string; tty: string }
     const client = getClient()
-    return client.tabs.get(name)
+    return client.tabs.get(name as unknown as Parameters<typeof client.tabs.get>[0])
   },
 }

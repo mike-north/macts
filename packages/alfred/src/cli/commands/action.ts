@@ -23,7 +23,10 @@ export class ActionCommand extends Command {
 
     try {
       const client = getClient()
-      await client.action(this.items as unknown, this.asType as unknown)
+      await client.action(
+        this.items as unknown as Parameters<typeof client.action>[0],
+        this.asType as unknown as Parameters<typeof client.action>[1]
+      )
 
       const output = formatter.formatSuccess('action completed successfully')
       this.context.stdout.write(output + '\n')

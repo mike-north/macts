@@ -64,6 +64,10 @@ export class CreateLineCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.lines.create({
         lineType: this.lineType,
         hopType: this.hopType,
@@ -73,7 +77,7 @@ export class CreateLineCommand extends Command {
         tailScale: this.tailScale,
         headMagnet: this.headMagnet,
         tailMagnet: this.tailMagnet,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.lines.create>[0])
 
       const output = formatter.format({
         message: 'Line created successfully',

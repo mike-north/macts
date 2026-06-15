@@ -44,6 +44,6 @@ export const perspectivesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.perspectives.get(id)
+    return client.perspectives.get(id as unknown as Parameters<typeof client.perspectives.get>[0])
   },
 }

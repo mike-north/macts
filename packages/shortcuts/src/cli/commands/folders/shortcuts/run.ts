@@ -15,7 +15,6 @@ export class RunShortcutCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' })
-
   shortcutId = Option.String({ required: true })
   id = Option.String('--id', { required: true, description: 'The shortcut to run' })
   withInput = Option.String('--with-input', {
@@ -27,7 +26,10 @@ export class RunShortcutCommand extends Command {
 
     try {
       const client = getClient()
-      await client.shortcuts.run(this.id as unknown, this.withInput as unknown)
+      await client.shortcuts.run(
+        this.id as unknown as Parameters<typeof client.shortcuts.run>[0],
+        this.withInput as unknown as Parameters<typeof client.shortcuts.run>[1]
+      )
 
       const output = formatter.formatSuccess('run completed successfully')
       this.context.stdout.write(output + '\n')

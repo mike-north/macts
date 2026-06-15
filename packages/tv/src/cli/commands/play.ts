@@ -19,7 +19,7 @@ export class PlayCommand extends Command {
 
     try {
       const client = getClient()
-      await client.play(this.once as unknown)
+      await client.play(this.once as unknown as Parameters<typeof client.play>[0])
 
       const output = formatter.formatSuccess('play completed successfully')
       this.context.stdout.write(output + '\n')

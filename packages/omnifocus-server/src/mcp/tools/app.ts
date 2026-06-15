@@ -27,7 +27,7 @@ export const appCompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { text } = args as { text: string }
     const client = getClient()
-    await client.complete(text as unknown)
+    await client.complete(text as unknown as Parameters<typeof client.complete>[0])
     return { success: true }
   },
 }
@@ -52,7 +52,7 @@ export const appMarkCompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string }
     const client = getClient()
-    await client.markComplete(targets as unknown)
+    await client.markComplete(targets as unknown as Parameters<typeof client.markComplete>[0])
     return { success: true }
   },
 }
@@ -77,7 +77,7 @@ export const appMarkIncompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string }
     const client = getClient()
-    await client.markIncomplete(targets as unknown)
+    await client.markIncomplete(targets as unknown as Parameters<typeof client.markIncomplete>[0])
     return { success: true }
   },
 }
@@ -102,7 +102,7 @@ export const appMarkDroppedTool: McpToolDefinition = {
   handler: async (args) => {
     const { targets } = args as { targets: string }
     const client = getClient()
-    await client.markDropped(targets as unknown)
+    await client.markDropped(targets as unknown as Parameters<typeof client.markDropped>[0])
     return { success: true }
   },
 }
@@ -131,7 +131,10 @@ export const appParseTasksIntoTool: McpToolDefinition = {
   handler: async (args) => {
     const { text, into } = args as { text: string; into: string }
     const client = getClient()
-    await client.parseTasksInto(text as unknown, into as unknown)
+    await client.parseTasksInto(
+      text as unknown as Parameters<typeof client.parseTasksInto>[0],
+      into as unknown as Parameters<typeof client.parseTasksInto>[1]
+    )
     return { success: true }
   },
 }
@@ -160,7 +163,10 @@ export const appArchiveTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in, compression } = args as { in: string; compression?: boolean }
     const client = getClient()
-    await client.archive(_in as unknown, compression as unknown)
+    await client.archive(
+      _in as unknown as Parameters<typeof client.archive>[0],
+      compression as unknown as Parameters<typeof client.archive>[1]
+    )
     return { success: true }
   },
 }
@@ -221,7 +227,7 @@ export const appImportIntoTool: McpToolDefinition = {
   handler: async (args) => {
     const { file } = args as { file: string }
     const client = getClient()
-    await client.importInto(file as unknown)
+    await client.importInto(file as unknown as Parameters<typeof client.importInto>[0])
     return { success: true }
   },
 }

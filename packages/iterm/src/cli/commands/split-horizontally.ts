@@ -23,7 +23,10 @@ export class SplitHorizontallyCommand extends Command {
 
     try {
       const client = getClient()
-      await client.splitHorizontally(this.withProfile as unknown, this.command as unknown)
+      await client.splitHorizontally(
+        this.withProfile as unknown as Parameters<typeof client.splitHorizontally>[0],
+        this.command as unknown as Parameters<typeof client.splitHorizontally>[1]
+      )
 
       const output = formatter.formatSuccess('splitHorizontally completed successfully')
       this.context.stdout.write(output + '\n')

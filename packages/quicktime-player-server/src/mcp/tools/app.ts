@@ -134,7 +134,7 @@ export const appStepBackwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by?: number }
     const client = getClient()
-    await client.stepBackward(by as unknown)
+    await client.stepBackward(by as unknown as Parameters<typeof client.stepBackward>[0])
     return { success: true }
   },
 }
@@ -158,7 +158,7 @@ export const appStepForwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { by } = args as { by?: number }
     const client = getClient()
-    await client.stepForward(by as unknown)
+    await client.stepForward(by as unknown as Parameters<typeof client.stepForward>[0])
     return { success: true }
   },
 }
@@ -187,7 +187,10 @@ export const appTrimTool: McpToolDefinition = {
   handler: async (args) => {
     const { from, to } = args as { from: number; to: number }
     const client = getClient()
-    await client.trim(from as unknown, to as unknown)
+    await client.trim(
+      from as unknown as Parameters<typeof client.trim>[0],
+      to as unknown as Parameters<typeof client.trim>[1]
+    )
     return { success: true }
   },
 }
@@ -288,7 +291,10 @@ export const appExportTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in, usingSettingsPreset } = args as { in: string; usingSettingsPreset: string }
     const client = getClient()
-    await client._export(_in as unknown, usingSettingsPreset as unknown)
+    await client._export(
+      _in as unknown as Parameters<typeof client._export>[0],
+      usingSettingsPreset as unknown as Parameters<typeof client._export>[1]
+    )
     return { success: true }
   },
 }

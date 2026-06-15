@@ -22,7 +22,9 @@ export class ReloadWorkflowCommand extends Command {
 
     try {
       const client = getClient()
-      await client.reloadWorkflow(this.workflow as unknown)
+      await client.reloadWorkflow(
+        this.workflow as unknown as Parameters<typeof client.reloadWorkflow>[0]
+      )
 
       const output = formatter.formatSuccess('reloadWorkflow completed successfully')
       this.context.stdout.write(output + '\n')

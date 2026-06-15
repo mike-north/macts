@@ -23,7 +23,7 @@ export class PrintCommand extends Command {
 
     try {
       const client = getClient()
-      await client.print(this.withProperties as unknown)
+      await client.print(this.withProperties as unknown as Parameters<typeof client.print>[0])
 
       const output = formatter.formatSuccess('print completed successfully')
       this.context.stdout.write(output + '\n')

@@ -44,7 +44,7 @@ export const resourcesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: number }
     const client = getClient()
-    return client.resources.get(id)
+    return client.resources.get(id as unknown as Parameters<typeof client.resources.get>[0])
   },
 }
 
@@ -95,6 +95,6 @@ export const resourcesCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.resources.create(args as Record<string, unknown>)
+    return client.resources.create(args as Parameters<typeof client.resources.create>[0])
   },
 }

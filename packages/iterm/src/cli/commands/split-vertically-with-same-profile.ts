@@ -20,7 +20,9 @@ export class SplitVerticallyWithSameProfileCommand extends Command {
 
     try {
       const client = getClient()
-      await client.splitVerticallyWithSameProfile(this.command as unknown)
+      await client.splitVerticallyWithSameProfile(
+        this.command as unknown as Parameters<typeof client.splitVerticallyWithSameProfile>[0]
+      )
 
       const output = formatter.formatSuccess(
         'splitVerticallyWithSameProfile completed successfully'

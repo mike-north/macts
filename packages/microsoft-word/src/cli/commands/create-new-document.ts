@@ -22,7 +22,9 @@ export class CreateNewDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.createNewDocument(this.attachedTemplate as unknown)
+      await client.createNewDocument(
+        this.attachedTemplate as unknown as Parameters<typeof client.createNewDocument>[0]
+      )
 
       const output = formatter.formatSuccess('createNewDocument completed successfully')
       this.context.stdout.write(output + '\n')

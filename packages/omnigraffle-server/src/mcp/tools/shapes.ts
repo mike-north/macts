@@ -52,7 +52,7 @@ export const shapesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.shapes.get(id)
+    return client.shapes.get(id as unknown as Parameters<typeof client.shapes.get>[0])
   },
 }
 
@@ -141,6 +141,6 @@ export const shapesCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.shapes.create(args as Record<string, unknown>)
+    return client.shapes.create(args as Parameters<typeof client.shapes.create>[0])
   },
 }

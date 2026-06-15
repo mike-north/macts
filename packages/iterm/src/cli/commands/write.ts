@@ -27,9 +27,9 @@ export class WriteCommand extends Command {
     try {
       const client = getClient()
       await client.write(
-        this.contentsOfFile as unknown,
-        this.text as unknown,
-        this.newline as unknown
+        this.contentsOfFile as unknown as Parameters<typeof client.write>[0],
+        this.text as unknown as Parameters<typeof client.write>[1],
+        this.newline as unknown as Parameters<typeof client.write>[2]
       )
 
       const output = formatter.formatSuccess('write completed successfully')

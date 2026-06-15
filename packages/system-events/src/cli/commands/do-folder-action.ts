@@ -31,9 +31,9 @@ export class DoFolderActionCommand extends Command {
     try {
       const client = getClient()
       await client.doFolderAction(
-        this.folderActionCode as unknown,
-        this.withItemList as unknown,
-        this.withWindowSize as unknown
+        this.folderActionCode as unknown as Parameters<typeof client.doFolderAction>[0],
+        this.withItemList as unknown as Parameters<typeof client.doFolderAction>[1],
+        this.withWindowSize as unknown as Parameters<typeof client.doFolderAction>[2]
       )
 
       const output = formatter.formatSuccess('doFolderAction completed successfully')

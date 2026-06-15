@@ -24,9 +24,9 @@ export class FindCommand extends Command {
     try {
       const client = getClient()
       await client.find(
-        this.findText as unknown,
-        this.matchCase as unknown,
-        this.matchWholeWord as unknown
+        this.findText as unknown as Parameters<typeof client.find>[0],
+        this.matchCase as unknown as Parameters<typeof client.find>[1],
+        this.matchWholeWord as unknown as Parameters<typeof client.find>[2]
       )
 
       const output = formatter.formatSuccess('find completed successfully')

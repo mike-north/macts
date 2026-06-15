@@ -45,7 +45,9 @@ export const messagesForwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { openingWindow } = args as { openingWindow?: boolean }
     const client = getClient()
-    await client.messages.forward(openingWindow)
+    await client.messages.forward(
+      openingWindow as unknown as Parameters<typeof client.messages.forward>[0]
+    )
     return { success: true }
   },
 }
@@ -70,7 +72,9 @@ export const messagesRedirectTool: McpToolDefinition = {
   handler: async (args) => {
     const { openingWindow } = args as { openingWindow?: boolean }
     const client = getClient()
-    await client.messages.redirect(openingWindow)
+    await client.messages.redirect(
+      openingWindow as unknown as Parameters<typeof client.messages.redirect>[0]
+    )
     return { success: true }
   },
 }
@@ -97,9 +101,12 @@ export const messagesReplyTool: McpToolDefinition = {
     additionalProperties: false,
   },
   handler: async (args) => {
-    const { openingWindow } = args as { openingWindow?: boolean; replyToAll?: boolean }
+    const { openingWindow, replyToAll } = args as { openingWindow?: boolean; replyToAll?: boolean }
     const client = getClient()
-    await client.messages.reply(openingWindow)
+    await client.messages.reply(
+      openingWindow as unknown as Parameters<typeof client.messages.reply>[0],
+      replyToAll as unknown as Parameters<typeof client.messages.reply>[1]
+    )
     return { success: true }
   },
 }

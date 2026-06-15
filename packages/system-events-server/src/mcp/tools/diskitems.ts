@@ -27,7 +27,7 @@ export const diskitemsDeleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.diskitems.delete(id)
+    await client.diskitems.delete(id as unknown as Parameters<typeof client.diskitems.delete>[0])
     return { success: true, message: `Deleted DiskItem ${id}` }
   },
 }

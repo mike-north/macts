@@ -20,7 +20,10 @@ export class CreateTabCommand extends Command {
 
     try {
       const client = getClient()
-      await client.createTab(this.withProfile as unknown, this.command as unknown)
+      await client.createTab(
+        this.withProfile as unknown as Parameters<typeof client.createTab>[0],
+        this.command as unknown as Parameters<typeof client.createTab>[1]
+      )
 
       const output = formatter.formatSuccess('createTab completed successfully')
       this.context.stdout.write(output + '\n')

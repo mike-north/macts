@@ -19,7 +19,7 @@ export class AddCommand extends Command {
 
     try {
       const client = getClient()
-      await client.add(this.to as unknown)
+      await client.add(this.to as unknown as Parameters<typeof client.add>[0])
 
       const output = formatter.formatSuccess('add completed successfully')
       this.context.stdout.write(output + '\n')

@@ -27,7 +27,10 @@ export class OpenCommand extends Command {
 
     try {
       const client = getClient()
-      await client.open(this.using as unknown, this.withProperties as unknown)
+      await client.open(
+        this.using as unknown as Parameters<typeof client.open>[0],
+        this.withProperties as unknown as Parameters<typeof client.open>[1]
+      )
 
       const output = formatter.formatSuccess('open completed successfully')
       this.context.stdout.write(output + '\n')

@@ -14,7 +14,6 @@ export class ForwardMessageCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   mailboxId = Option.String('--mailbox-id', { required: true, description: 'Mailbox ID' })
-
   messageId = Option.String({ required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
@@ -25,7 +24,9 @@ export class ForwardMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.messages.forward(this.openingWindow as unknown)
+      await client.messages.forward(
+        this.openingWindow as unknown as Parameters<typeof client.messages.forward>[0]
+      )
 
       const output = formatter.formatSuccess('forward completed successfully')
       this.context.stdout.write(output + '\n')

@@ -35,7 +35,11 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { object, to, atIndex } = args as { object: string; to: string; atIndex?: number }
     const client = getClient()
-    await client.add(object as unknown, to as unknown, atIndex as unknown)
+    await client.add(
+      object as unknown as Parameters<typeof client.add>[0],
+      to as unknown as Parameters<typeof client.add>[1],
+      atIndex as unknown as Parameters<typeof client.add>[2]
+    )
     return { success: true }
   },
 }
@@ -60,7 +64,7 @@ export const appRemoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { object } = args as { object: string }
     const client = getClient()
-    await client.remove(object as unknown)
+    await client.remove(object as unknown as Parameters<typeof client.remove>[0])
     return { success: true }
   },
 }

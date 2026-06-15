@@ -13,7 +13,6 @@ export class CloseDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   documentId = Option.String({ required: true })
   saving = Option.Boolean('--saving', { description: 'Whether to save changes before closing' })
   async execute(): Promise<number> {
@@ -21,7 +20,9 @@ export class CloseDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.documents.close(this.saving as unknown)
+      await client.documents.close(
+        this.saving as unknown as Parameters<typeof client.documents.close>[0]
+      )
 
       const output = formatter.formatSuccess('close completed successfully')
       this.context.stdout.write(output + '\n')

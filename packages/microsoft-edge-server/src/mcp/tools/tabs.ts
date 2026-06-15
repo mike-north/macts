@@ -52,7 +52,7 @@ export const tabsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.tabs.get(id)
+    return client.tabs.get(id as unknown as Parameters<typeof client.tabs.get>[0])
   },
 }
 
@@ -79,7 +79,7 @@ export const tabsCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.tabs.create(args as Record<string, unknown>)
+    return client.tabs.create(args as Parameters<typeof client.tabs.create>[0])
   },
 }
 
@@ -103,7 +103,7 @@ export const tabsReloadTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.reload(tabId)
+    await client.tabs.reload(tabId as unknown as Parameters<typeof client.tabs.reload>[0])
     return { success: true }
   },
 }
@@ -128,7 +128,7 @@ export const tabsGoBackTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.goBack(tabId)
+    await client.tabs.goBack(tabId as unknown as Parameters<typeof client.tabs.goBack>[0])
     return { success: true }
   },
 }
@@ -153,7 +153,7 @@ export const tabsGoForwardTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.goForward(tabId)
+    await client.tabs.goForward(tabId as unknown as Parameters<typeof client.tabs.goForward>[0])
     return { success: true }
   },
 }
@@ -178,7 +178,7 @@ export const tabsSelectAllTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.selectAll(tabId)
+    await client.tabs.selectAll(tabId as unknown as Parameters<typeof client.tabs.selectAll>[0])
     return { success: true }
   },
 }
@@ -203,7 +203,9 @@ export const tabsCutSelectionTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.cutSelection(tabId)
+    await client.tabs.cutSelection(
+      tabId as unknown as Parameters<typeof client.tabs.cutSelection>[0]
+    )
     return { success: true }
   },
 }
@@ -228,7 +230,9 @@ export const tabsCopySelectionTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.copySelection(tabId)
+    await client.tabs.copySelection(
+      tabId as unknown as Parameters<typeof client.tabs.copySelection>[0]
+    )
     return { success: true }
   },
 }
@@ -253,7 +257,9 @@ export const tabsPasteSelectionTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.pasteSelection(tabId)
+    await client.tabs.pasteSelection(
+      tabId as unknown as Parameters<typeof client.tabs.pasteSelection>[0]
+    )
     return { success: true }
   },
 }
@@ -278,7 +284,7 @@ export const tabsUndoTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.undo(tabId)
+    await client.tabs.undo(tabId as unknown as Parameters<typeof client.tabs.undo>[0])
     return { success: true }
   },
 }
@@ -303,7 +309,7 @@ export const tabsRedoTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.redo(tabId)
+    await client.tabs.redo(tabId as unknown as Parameters<typeof client.tabs.redo>[0])
     return { success: true }
   },
 }
@@ -328,7 +334,7 @@ export const tabsStopTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.stop(tabId)
+    await client.tabs.stop(tabId as unknown as Parameters<typeof client.tabs.stop>[0])
     return { success: true }
   },
 }
@@ -353,7 +359,7 @@ export const tabsViewSourceTool: McpToolDefinition = {
   handler: async (args) => {
     const { tabId } = args as { tabId: string }
     const client = getClient()
-    await client.tabs.viewSource(tabId)
+    await client.tabs.viewSource(tabId as unknown as Parameters<typeof client.tabs.viewSource>[0])
     return { success: true }
   },
 }
@@ -380,9 +386,12 @@ export const tabsExecuteTool: McpToolDefinition = {
     required: ['tabId', 'javascript'],
   },
   handler: async (args) => {
-    const { tabId } = args as { tabId: string; javascript: string }
+    const { tabId, javascript } = args as { tabId: string; javascript: string }
     const client = getClient()
-    await client.tabs.execute(tabId)
+    await client.tabs.execute(
+      tabId as unknown as Parameters<typeof client.tabs.execute>[0],
+      javascript as unknown as Parameters<typeof client.tabs.execute>[1]
+    )
     return { success: true }
   },
 }

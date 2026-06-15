@@ -46,11 +46,13 @@ function propertyTypeToJsonSchemaType(propType: PropertyType): string | JsonSche
     }
   }
 
-  // Handle array types
+  // Handle array types. JSON Schema's `items` must be a schema object, so a
+  // primitive element type (returned as a bare type string) is wrapped accordingly.
   if (typeof propType === 'object' && 'array' in propType) {
+    const itemType = propertyTypeToJsonSchemaType(propType.array)
     return {
       type: 'array',
-      items: propertyTypeToJsonSchemaType(propType.array) as JsonSchema,
+      items: typeof itemType === 'string' ? { type: itemType } : itemType,
     }
   }
 
@@ -140,8 +142,10 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
     required.push(...paramSchema.required)
   }
 
-  // For operations that need identifier
-  const needsId = ['get', 'update', 'delete', 'show'].includes(command.name)
+  // For operations that need identifier. Custom resource commands (e.g. "show")
+  // take exactly their manifest parameters — the SDK does not synthesize an extra
+  // ID argument for them — so only the standard CRUD ops get an implicit identifier.
+  const needsId = ['get', 'update', 'delete'].includes(command.name)
   if (needsId && resource.identifiers && resource.identifiers.length > 0) {
     const primaryId = resource.identifiers.find((id) => id.primary) ?? resource.identifiers[0]
     if (primaryId) {

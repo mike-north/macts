@@ -45,10 +45,10 @@ export const appMakeTool: McpToolDefinition = {
     } = args as { new: string; at?: string; withData?: string; withProperties?: string }
     const client = getClient()
     await client.make(
-      _new as unknown,
-      at as unknown,
-      withData as unknown,
-      withProperties as unknown
+      _new as unknown as Parameters<typeof client.make>[0],
+      at as unknown as Parameters<typeof client.make>[1],
+      withData as unknown as Parameters<typeof client.make>[2],
+      withProperties as unknown as Parameters<typeof client.make>[3]
     )
     return { success: true }
   },
@@ -74,7 +74,7 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.add(to as unknown)
+    await client.add(to as unknown as Parameters<typeof client.add>[0])
     return { success: true }
   },
 }
@@ -99,7 +99,7 @@ export const appRemoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { from } = args as { from: string }
     const client = getClient()
-    await client.remove(from as unknown)
+    await client.remove(from as unknown as Parameters<typeof client.remove>[0])
     return { success: true }
   },
 }
@@ -166,7 +166,10 @@ export const appActionTitleTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string }
     const client = getClient()
-    await client.actionTitle(_with as unknown, _for as unknown)
+    await client.actionTitle(
+      _with as unknown as Parameters<typeof client.actionTitle>[0],
+      _for as unknown as Parameters<typeof client.actionTitle>[1]
+    )
     return { success: true }
   },
 }
@@ -195,7 +198,10 @@ export const appPerformActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string }
     const client = getClient()
-    await client.performAction(_with as unknown, _for as unknown)
+    await client.performAction(
+      _with as unknown as Parameters<typeof client.performAction>[0],
+      _for as unknown as Parameters<typeof client.performAction>[1]
+    )
     return { success: true }
   },
 }
@@ -225,7 +231,10 @@ export const appShouldEnableActionTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with, for: _for } = args as { with: string; for: string }
     const client = getClient()
-    await client.shouldEnableAction(_with as unknown, _for as unknown)
+    await client.shouldEnableAction(
+      _with as unknown as Parameters<typeof client.shouldEnableAction>[0],
+      _for as unknown as Parameters<typeof client.shouldEnableAction>[1]
+    )
     return { success: true }
   },
 }

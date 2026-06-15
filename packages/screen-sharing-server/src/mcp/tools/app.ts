@@ -27,7 +27,7 @@ export const appGetURLTool: McpToolDefinition = {
   handler: async (args) => {
     const { url } = args as { url: string }
     const client = getClient()
-    await client.getURL(url as unknown)
+    await client.getURL(url as unknown as Parameters<typeof client.getURL>[0])
     return { success: true }
   },
 }

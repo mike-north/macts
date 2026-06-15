@@ -26,7 +26,10 @@ export class RemoveConfigurationCommand extends Command {
 
     try {
       const client = getClient()
-      await client.removeConfiguration(this.variable as unknown, this.inWorkflow as unknown)
+      await client.removeConfiguration(
+        this.variable as unknown as Parameters<typeof client.removeConfiguration>[0],
+        this.inWorkflow as unknown as Parameters<typeof client.removeConfiguration>[1]
+      )
 
       const output = formatter.formatSuccess('removeConfiguration completed successfully')
       this.context.stdout.write(output + '\n')

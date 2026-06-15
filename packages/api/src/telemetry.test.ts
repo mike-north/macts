@@ -102,7 +102,7 @@ describe('NoopTracer / NoopSpan', () => {
 describe('withSpan', () => {
   it('should execute the function and return its result', async () => {
     const result = await withSpan('test-op', (_span) => {
-      return 42
+      return Promise.resolve(42)
     })
     expect(result).toBe(42)
   })
@@ -111,7 +111,7 @@ describe('withSpan', () => {
     let capturedSpan: Span | undefined
     await withSpan('test-op', (span) => {
       capturedSpan = span
-      return null
+      return Promise.resolve(null)
     })
     expect(capturedSpan).toBeDefined()
     expect(typeof capturedSpan?.setAttribute).toBe('function')
@@ -121,7 +121,9 @@ describe('withSpan', () => {
 
   it('should pass attributes to the span', async () => {
     // No-op tracer ignores attributes, but should not throw
-    const result = await withSpan('test-op', (_span) => 'done', { 'custom.attr': 'value' })
+    const result = await withSpan('test-op', (_span) => Promise.resolve('done'), {
+      'custom.attr': 'value',
+    })
     expect(result).toBe('done')
   })
 

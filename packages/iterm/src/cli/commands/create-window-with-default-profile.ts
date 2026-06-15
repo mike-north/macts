@@ -19,7 +19,9 @@ export class CreateWindowWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient()
-      await client.createWindowWithDefaultProfile(this.command as unknown)
+      await client.createWindowWithDefaultProfile(
+        this.command as unknown as Parameters<typeof client.createWindowWithDefaultProfile>[0]
+      )
 
       const output = formatter.formatSuccess(
         'createWindowWithDefaultProfile completed successfully'

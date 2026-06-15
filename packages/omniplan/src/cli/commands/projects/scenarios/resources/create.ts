@@ -49,6 +49,10 @@ export class CreateResourceCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.resources.create({
         name: this.name,
         resourceType: this.resourceType,
@@ -58,7 +62,7 @@ export class CreateResourceCommand extends Command {
         costPerHour: this.costPerHour,
         efficiency: this.efficiency,
         note: this.note,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.resources.create>[0])
 
       const output = formatter.format({
         message: 'Resource created successfully',

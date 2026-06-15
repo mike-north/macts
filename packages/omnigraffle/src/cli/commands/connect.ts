@@ -20,7 +20,10 @@ export class ConnectCommand extends Command {
 
     try {
       const client = getClient()
-      await client.connect(this.from as unknown, this.to as unknown)
+      await client.connect(
+        this.from as unknown as Parameters<typeof client.connect>[0],
+        this.to as unknown as Parameters<typeof client.connect>[1]
+      )
 
       const output = formatter.formatSuccess('connect completed successfully')
       this.context.stdout.write(output + '\n')

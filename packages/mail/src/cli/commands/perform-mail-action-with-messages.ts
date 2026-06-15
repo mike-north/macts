@@ -30,8 +30,8 @@ export class PerformMailActionWithMessagesCommand extends Command {
     try {
       const client = getClient()
       await client.performMailActionWithMessages(
-        this.inMailboxes as unknown,
-        this.forRule as unknown
+        this.inMailboxes as unknown as Parameters<typeof client.performMailActionWithMessages>[0],
+        this.forRule as unknown as Parameters<typeof client.performMailActionWithMessages>[1]
       )
 
       const output = formatter.formatSuccess('performMailActionWithMessages completed successfully')

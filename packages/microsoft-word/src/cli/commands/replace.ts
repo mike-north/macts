@@ -27,9 +27,9 @@ export class ReplaceCommand extends Command {
     try {
       const client = getClient()
       await client.replace(
-        this.findText as unknown,
-        this.replaceWith as unknown,
-        this.replaceAll as unknown
+        this.findText as unknown as Parameters<typeof client.replace>[0],
+        this.replaceWith as unknown as Parameters<typeof client.replace>[1],
+        this.replaceAll as unknown as Parameters<typeof client.replace>[2]
       )
 
       const output = formatter.formatSuccess('replace completed successfully')

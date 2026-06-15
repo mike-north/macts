@@ -19,7 +19,7 @@ export class EmailContentsCommand extends Command {
 
     try {
       const client = getClient()
-      await client.emailContents(this.of as unknown)
+      await client.emailContents(this.of as unknown as Parameters<typeof client.emailContents>[0])
 
       const output = formatter.formatSuccess('emailContents completed successfully')
       this.context.stdout.write(output + '\n')

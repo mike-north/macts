@@ -44,7 +44,7 @@ export const canvasesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.canvases.get(id)
+    return client.canvases.get(id as unknown as Parameters<typeof client.canvases.get>[0])
   },
 }
 
@@ -118,6 +118,6 @@ export const canvasesCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.canvases.create(args as Record<string, unknown>)
+    return client.canvases.create(args as Parameters<typeof client.canvases.create>[0])
   },
 }
