@@ -7,6 +7,24 @@ export const CommandScopeSchema = z.enum(['application', 'resource'])
 export type CommandScope = z.infer<typeof CommandScopeSchema>
 
 /**
+ * Risk classification for a command.
+ *
+ * Risk is normally *derived deterministically* from the operation semantics by
+ * the capability layer (see `capabilities/risk.ts`); this manifest field exists
+ * only as an optional override for the rare case where the derived value is
+ * wrong (lossless-plus). It must be one of the canonical risk classes.
+ */
+export const RiskClassSchema = z.enum([
+  'read',
+  'write',
+  'delete',
+  'send',
+  'execute',
+  'system-change',
+])
+export type RiskClassValue = z.infer<typeof RiskClassSchema>
+
+/**
  * Command parameter schema.
  */
 export const CommandParameterSchema = z.object({
@@ -64,6 +82,14 @@ export const CommandSchema = z.object({
    * Format: `app:resource:operation` (e.g., `calendar:events:list`)
    */
   permission: z.string().optional(),
+  /**
+   * Optional risk-classification override.
+   *
+   * When present, this wins over the value derived from the operation name.
+   * When absent (the common case), risk is derived deterministically so no
+   * manifest needs hand-annotation.
+   */
+  risk: RiskClassSchema.optional(),
   /**
    * History of permission changes for upgrade messages.
    * Sorted newest-first.
