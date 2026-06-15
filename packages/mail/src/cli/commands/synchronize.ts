@@ -19,7 +19,7 @@ export class SynchronizeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.synchronize(this.with as unknown)
+      await client.synchronize(this.with as unknown as Parameters<typeof client.synchronize>[0])
 
       const output = formatter.formatSuccess('synchronize completed successfully')
       this.context.stdout.write(output + '\n')

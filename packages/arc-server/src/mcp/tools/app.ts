@@ -31,7 +31,10 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, withProperties } = args as { new: string; withProperties?: string }
     const client = getClient()
-    await client.make(_new as unknown, withProperties as unknown)
+    await client.make(
+      _new as unknown as Parameters<typeof client.make>[0],
+      withProperties as unknown as Parameters<typeof client.make>[1]
+    )
     return { success: true }
   },
 }
@@ -55,7 +58,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each?: string }
     const client = getClient()
-    await client.count(each as unknown)
+    await client.count(each as unknown as Parameters<typeof client.count>[0])
     return { success: true }
   },
 }
@@ -188,7 +191,7 @@ export const appExecuteTool: McpToolDefinition = {
   handler: async (args) => {
     const { javascript } = args as { javascript: string }
     const client = getClient()
-    await client.execute(javascript as unknown)
+    await client.execute(javascript as unknown as Parameters<typeof client.execute>[0])
     return { success: true }
   },
 }

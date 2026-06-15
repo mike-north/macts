@@ -29,10 +29,14 @@ export class CreateColumnCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.columns.create({
         width: this.width,
         preferredWidth: this.preferredWidth,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.columns.create>[0])
 
       const output = formatter.format({
         message: 'Column created successfully',

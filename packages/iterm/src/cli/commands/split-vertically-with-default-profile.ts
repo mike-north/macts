@@ -19,7 +19,9 @@ export class SplitVerticallyWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient()
-      await client.splitVerticallyWithDefaultProfile(this.command as unknown)
+      await client.splitVerticallyWithDefaultProfile(
+        this.command as unknown as Parameters<typeof client.splitVerticallyWithDefaultProfile>[0]
+      )
 
       const output = formatter.formatSuccess(
         'splitVerticallyWithDefaultProfile completed successfully'

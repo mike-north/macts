@@ -23,7 +23,10 @@ export class SendCommand extends Command {
 
     try {
       const client = getClient()
-      await client.send(this.file as unknown, this.toDevice as unknown)
+      await client.send(
+        this.file as unknown as Parameters<typeof client.send>[0],
+        this.toDevice as unknown as Parameters<typeof client.send>[1]
+      )
 
       const output = formatter.formatSuccess('send completed successfully')
       this.context.stdout.write(output + '\n')

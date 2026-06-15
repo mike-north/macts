@@ -17,7 +17,6 @@ export class ReplyMessageCommand extends Command {
     required: true,
     description: 'MessageViewer ID',
   })
-
   messageId = Option.String({ required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
@@ -31,7 +30,10 @@ export class ReplyMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.messages.reply(this.openingWindow as unknown, this.replyToAll as unknown)
+      await client.messages.reply(
+        this.openingWindow as unknown as Parameters<typeof client.messages.reply>[0],
+        this.replyToAll as unknown as Parameters<typeof client.messages.reply>[1]
+      )
 
       const output = formatter.formatSuccess('reply completed successfully')
       this.context.stdout.write(output + '\n')

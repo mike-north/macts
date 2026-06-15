@@ -14,15 +14,15 @@ export class PasteSelectionTabCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
-
-  tabId = Option.String({ required: true })
   tabId = Option.String('--tab-id', { required: true, description: 'Tab identifier' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.tabs.pasteSelection(this.tabId as unknown)
+      await client.tabs.pasteSelection(
+        this.tabId as unknown as Parameters<typeof client.tabs.pasteSelection>[0]
+      )
 
       const output = formatter.formatSuccess('pasteSelection completed successfully')
       this.context.stdout.write(output + '\n')

@@ -26,7 +26,7 @@ export const appSearchTool: McpToolDefinition = {
   handler: async (args) => {
     const { query } = args as { query?: string }
     const client = getClient()
-    await client.search(query as unknown)
+    await client.search(query as unknown as Parameters<typeof client.search>[0])
     return { success: true }
   },
 }
@@ -43,7 +43,9 @@ export const appActionTool: McpToolDefinition = {
       items: {
         description: 'The items to show actions for',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       asType: {
         description: 'An optional type for the items - file, url or text',
@@ -54,9 +56,12 @@ export const appActionTool: McpToolDefinition = {
     required: ['items'],
   },
   handler: async (args) => {
-    const { items, asType } = args as { items: unknown[]; asType?: string }
+    const { items, asType } = args as { items: string[]; asType?: string }
     const client = getClient()
-    await client.action(items as unknown, asType as unknown)
+    await client.action(
+      items as unknown as Parameters<typeof client.action>[0],
+      asType as unknown as Parameters<typeof client.action>[1]
+    )
     return { success: true }
   },
 }
@@ -81,7 +86,7 @@ export const appBrowseTool: McpToolDefinition = {
   handler: async (args) => {
     const { path } = args as { path: string }
     const client = getClient()
-    await client.browse(path as unknown)
+    await client.browse(path as unknown as Parameters<typeof client.browse>[0])
     return { success: true }
   },
 }
@@ -118,7 +123,11 @@ export const appRunTriggerTool: McpToolDefinition = {
       withArgument?: string
     }
     const client = getClient()
-    await client.runTrigger(trigger as unknown, inWorkflow as unknown, withArgument as unknown)
+    await client.runTrigger(
+      trigger as unknown as Parameters<typeof client.runTrigger>[0],
+      inWorkflow as unknown as Parameters<typeof client.runTrigger>[1],
+      withArgument as unknown as Parameters<typeof client.runTrigger>[2]
+    )
     return { success: true }
   },
 }
@@ -143,7 +152,7 @@ export const appReloadWorkflowTool: McpToolDefinition = {
   handler: async (args) => {
     const { workflow } = args as { workflow: string }
     const client = getClient()
-    await client.reloadWorkflow(workflow as unknown)
+    await client.reloadWorkflow(workflow as unknown as Parameters<typeof client.reloadWorkflow>[0])
     return { success: true }
   },
 }
@@ -180,7 +189,11 @@ export const appRevealWorkflowTool: McpToolDefinition = {
       details?: boolean
     }
     const client = getClient()
-    await client.revealWorkflow(workflow as unknown, configuration as unknown, details as unknown)
+    await client.revealWorkflow(
+      workflow as unknown as Parameters<typeof client.revealWorkflow>[0],
+      configuration as unknown as Parameters<typeof client.revealWorkflow>[1],
+      details as unknown as Parameters<typeof client.revealWorkflow>[2]
+    )
     return { success: true }
   },
 }
@@ -224,10 +237,10 @@ export const appSetConfigurationTool: McpToolDefinition = {
     }
     const client = getClient()
     await client.setConfiguration(
-      variable as unknown,
-      toValue as unknown,
-      inWorkflow as unknown,
-      exportable as unknown
+      variable as unknown as Parameters<typeof client.setConfiguration>[0],
+      toValue as unknown as Parameters<typeof client.setConfiguration>[1],
+      inWorkflow as unknown as Parameters<typeof client.setConfiguration>[2],
+      exportable as unknown as Parameters<typeof client.setConfiguration>[3]
     )
     return { success: true }
   },
@@ -257,7 +270,10 @@ export const appRemoveConfigurationTool: McpToolDefinition = {
   handler: async (args) => {
     const { variable, inWorkflow } = args as { variable: string; inWorkflow: string }
     const client = getClient()
-    await client.removeConfiguration(variable as unknown, inWorkflow as unknown)
+    await client.removeConfiguration(
+      variable as unknown as Parameters<typeof client.removeConfiguration>[0],
+      inWorkflow as unknown as Parameters<typeof client.removeConfiguration>[1]
+    )
     return { success: true }
   },
 }
@@ -282,7 +298,7 @@ export const appSetThemeTool: McpToolDefinition = {
   handler: async (args) => {
     const { theme } = args as { theme: string }
     const client = getClient()
-    await client.setTheme(theme as unknown)
+    await client.setTheme(theme as unknown as Parameters<typeof client.setTheme>[0])
     return { success: true }
   },
 }

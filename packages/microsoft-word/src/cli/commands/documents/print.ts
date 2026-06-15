@@ -13,7 +13,6 @@ export class PrintDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   documentId = Option.String({ required: true })
 
   async execute(): Promise<number> {

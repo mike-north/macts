@@ -44,6 +44,6 @@ export const connectionsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.connections.get(id)
+    return client.connections.get(id as unknown as Parameters<typeof client.connections.get>[0])
   },
 }

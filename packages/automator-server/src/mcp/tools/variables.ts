@@ -52,6 +52,6 @@ export const variablesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.variables.get(id)
+    return client.variables.get(id as unknown as Parameters<typeof client.variables.get>[0])
   },
 }

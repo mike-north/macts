@@ -19,7 +19,9 @@ export class MarkCompleteCommand extends Command {
 
     try {
       const client = getClient()
-      await client.markComplete(this.targets as unknown)
+      await client.markComplete(
+        this.targets as unknown as Parameters<typeof client.markComplete>[0]
+      )
 
       const output = formatter.formatSuccess('markComplete completed successfully')
       this.context.stdout.write(output + '\n')

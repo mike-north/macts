@@ -19,7 +19,9 @@ export class CreateWindowWithProfileCommand extends Command {
 
     try {
       const client = getClient()
-      await client.createWindowWithProfile(this.command as unknown)
+      await client.createWindowWithProfile(
+        this.command as unknown as Parameters<typeof client.createWindowWithProfile>[0]
+      )
 
       const output = formatter.formatSuccess('createWindowWithProfile completed successfully')
       this.context.stdout.write(output + '\n')

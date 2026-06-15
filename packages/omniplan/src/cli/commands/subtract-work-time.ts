@@ -19,7 +19,9 @@ export class SubtractWorkTimeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.subtractWorkTime(this.schedule as unknown)
+      await client.subtractWorkTime(
+        this.schedule as unknown as Parameters<typeof client.subtractWorkTime>[0]
+      )
 
       const output = formatter.formatSuccess('subtractWorkTime completed successfully')
       this.context.stdout.write(output + '\n')

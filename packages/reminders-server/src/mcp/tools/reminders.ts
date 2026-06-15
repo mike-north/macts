@@ -52,7 +52,7 @@ export const remindersGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.reminders.get(id)
+    return client.reminders.get(id as unknown as Parameters<typeof client.reminders.get>[0])
   },
 }
 
@@ -107,7 +107,7 @@ export const remindersCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.reminders.create(args as Record<string, unknown>)
+    return client.reminders.create(args as Parameters<typeof client.reminders.create>[0])
   },
 }
 
@@ -131,7 +131,7 @@ export const remindersDeleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.reminders.delete(id)
+    await client.reminders.delete(id as unknown as Parameters<typeof client.reminders.delete>[0])
     return { success: true, message: `Deleted Reminder ${id}` }
   },
 }
@@ -156,7 +156,9 @@ export const remindersCompleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.reminders.complete(id)
+    await client.reminders.complete(
+      id as unknown as Parameters<typeof client.reminders.complete>[0]
+    )
     return { success: true }
   },
 }
@@ -169,19 +171,12 @@ export const remindersShowTool: McpToolDefinition = {
   description: 'Show the reminder in Reminders.app UI',
   inputSchema: {
     type: 'object',
-    properties: {
-      id: {
-        description: 'The unique identifier of the reminder',
-        type: 'string',
-      },
-    },
+    properties: {},
     additionalProperties: false,
-    required: ['id'],
   },
-  handler: async (args) => {
-    const { id } = args as { id: string }
+  handler: async () => {
     const client = getClient()
-    await client.reminders.show(id)
+    await client.reminders.show()
     return { success: true }
   },
 }

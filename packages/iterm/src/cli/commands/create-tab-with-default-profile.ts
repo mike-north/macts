@@ -19,7 +19,9 @@ export class CreateTabWithDefaultProfileCommand extends Command {
 
     try {
       const client = getClient()
-      await client.createTabWithDefaultProfile(this.command as unknown)
+      await client.createTabWithDefaultProfile(
+        this.command as unknown as Parameters<typeof client.createTabWithDefaultProfile>[0]
+      )
 
       const output = formatter.formatSuccess('createTabWithDefaultProfile completed successfully')
       this.context.stdout.write(output + '\n')

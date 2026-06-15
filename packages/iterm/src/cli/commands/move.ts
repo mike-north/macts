@@ -19,7 +19,7 @@ export class MoveCommand extends Command {
 
     try {
       const client = getClient()
-      await client.move(this.to as unknown)
+      await client.move(this.to as unknown as Parameters<typeof client.move>[0])
 
       const output = formatter.formatSuccess('move completed successfully')
       this.context.stdout.write(output + '\n')

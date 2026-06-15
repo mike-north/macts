@@ -28,7 +28,10 @@ export class AddReadingListItemCommand extends Command {
 
     try {
       const client = getClient()
-      await client.addReadingListItem(this.andPreviewText as unknown, this.withTitle as unknown)
+      await client.addReadingListItem(
+        this.andPreviewText as unknown as Parameters<typeof client.addReadingListItem>[0],
+        this.withTitle as unknown as Parameters<typeof client.addReadingListItem>[1]
+      )
 
       const output = formatter.formatSuccess('addReadingListItem completed successfully')
       this.context.stdout.write(output + '\n')

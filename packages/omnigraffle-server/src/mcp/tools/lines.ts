@@ -52,6 +52,6 @@ export const linesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.lines.get(id)
+    return client.lines.get(id as unknown as Parameters<typeof client.lines.get>[0])
   },
 }

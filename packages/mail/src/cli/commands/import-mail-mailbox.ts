@@ -22,7 +22,9 @@ export class ImportMailMailboxCommand extends Command {
 
     try {
       const client = getClient()
-      await client.importMailMailbox(this.at as unknown)
+      await client.importMailMailbox(
+        this.at as unknown as Parameters<typeof client.importMailMailbox>[0]
+      )
 
       const output = formatter.formatSuccess('importMailMailbox completed successfully')
       this.context.stdout.write(output + '\n')

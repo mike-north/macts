@@ -44,6 +44,10 @@ export class CreateAddressCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.addresses.create({
         city: this.city,
         street: this.street,
@@ -53,7 +57,7 @@ export class CreateAddressCommand extends Command {
         label: this.label,
         countryCode: this.countryCode,
         state: this.state,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.addresses.create>[0])
 
       const output = formatter.format({
         message: 'Address created successfully',

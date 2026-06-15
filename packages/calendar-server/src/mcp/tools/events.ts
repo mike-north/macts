@@ -56,7 +56,7 @@ export const eventsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string; uid: string }
     const client = getClient()
-    return client.events.get(id)
+    return client.events.get(id as unknown as Parameters<typeof client.events.get>[0])
   },
 }
 
@@ -112,7 +112,9 @@ export const eventsCreateTool: McpToolDefinition = {
       excludedDates: {
         description: 'The exception dates for recurring events',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       url: {
         description: 'The URL associated with the event',
@@ -134,7 +136,7 @@ export const eventsCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.events.create(args as Record<string, unknown>)
+    return client.events.create(args as Parameters<typeof client.events.create>[0])
   },
 }
 
@@ -146,19 +148,12 @@ export const eventsShowTool: McpToolDefinition = {
   description: 'Show the event or to-do in the calendar window',
   inputSchema: {
     type: 'object',
-    properties: {
-      uid: {
-        description: 'A unique event key',
-        type: 'string',
-      },
-    },
+    properties: {},
     additionalProperties: false,
-    required: ['uid'],
   },
-  handler: async (args) => {
-    const { uid } = args as { uid: string }
+  handler: async () => {
     const client = getClient()
-    await client.events.show(uid)
+    await client.events.show()
     return { success: true }
   },
 }

@@ -43,6 +43,10 @@ export class CreateReminderCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.reminders.create({
         name: this.name,
         body: this.body,
@@ -52,7 +56,7 @@ export class CreateReminderCommand extends Command {
         priority: this.priority,
         flagged: this.flagged,
         allDayDueDate: this.allDayDueDate,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.reminders.create>[0])
 
       const output = formatter.format({
         message: 'Reminder created successfully',

@@ -23,7 +23,7 @@ export class CountCommand extends Command {
 
     try {
       const client = getClient()
-      await client.count(this.each as unknown)
+      await client.count(this.each as unknown as Parameters<typeof client.count>[0])
 
       const output = formatter.formatSuccess('count completed successfully')
       this.context.stdout.write(output + '\n')

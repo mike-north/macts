@@ -22,7 +22,7 @@ export class RemoveCommand extends Command {
 
     try {
       const client = getClient()
-      await client.remove(this.from as unknown)
+      await client.remove(this.from as unknown as Parameters<typeof client.remove>[0])
 
       const output = formatter.formatSuccess('remove completed successfully')
       this.context.stdout.write(output + '\n')

@@ -22,7 +22,7 @@ export class SpotlightCommand extends Command {
 
     try {
       const client = getClient()
-      await client.spotlight(this.target as unknown)
+      await client.spotlight(this.target as unknown as Parameters<typeof client.spotlight>[0])
 
       const output = formatter.formatSuccess('spotlight completed successfully')
       this.context.stdout.write(output + '\n')

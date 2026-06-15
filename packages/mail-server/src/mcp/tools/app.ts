@@ -48,7 +48,10 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, withProperties } = args as { to?: string; withProperties?: string }
     const client = getClient()
-    await client.duplicate(to as unknown, withProperties as unknown)
+    await client.duplicate(
+      to as unknown as Parameters<typeof client.duplicate>[0],
+      withProperties as unknown as Parameters<typeof client.duplicate>[1]
+    )
     return { success: true }
   },
 }
@@ -73,7 +76,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.move(to as unknown)
+    await client.move(to as unknown as Parameters<typeof client.move>[0])
     return { success: true }
   },
 }
@@ -97,7 +100,7 @@ export const appCheckForNewMailTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for } = args as { for?: string }
     const client = getClient()
-    await client.checkForNewMail(_for as unknown)
+    await client.checkForNewMail(_for as unknown as Parameters<typeof client.checkForNewMail>[0])
     return { success: true }
   },
 }
@@ -178,7 +181,7 @@ export const appImportMailMailboxTool: McpToolDefinition = {
   handler: async (args) => {
     const { at } = args as { at: string }
     const client = getClient()
-    await client.importMailMailbox(at as unknown)
+    await client.importMailMailbox(at as unknown as Parameters<typeof client.importMailMailbox>[0])
     return { success: true }
   },
 }
@@ -227,7 +230,10 @@ export const appPerformMailActionWithMessagesTool: McpToolDefinition = {
   handler: async (args) => {
     const { inMailboxes, forRule } = args as { inMailboxes?: string; forRule?: string }
     const client = getClient()
-    await client.performMailActionWithMessages(inMailboxes as unknown, forRule as unknown)
+    await client.performMailActionWithMessages(
+      inMailboxes as unknown as Parameters<typeof client.performMailActionWithMessages>[0],
+      forRule as unknown as Parameters<typeof client.performMailActionWithMessages>[1]
+    )
     return { success: true }
   },
 }
@@ -252,7 +258,7 @@ export const appSynchronizeTool: McpToolDefinition = {
   handler: async (args) => {
     const { with: _with } = args as { with: string }
     const client = getClient()
-    await client.synchronize(_with as unknown)
+    await client.synchronize(_with as unknown as Parameters<typeof client.synchronize>[0])
     return { success: true }
   },
 }

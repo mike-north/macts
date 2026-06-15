@@ -23,7 +23,7 @@ export class CleanUpCommand extends Command {
 
     try {
       const client = getClient()
-      await client.cleanUp(this.by as unknown)
+      await client.cleanUp(this.by as unknown as Parameters<typeof client.cleanUp>[0])
 
       const output = formatter.formatSuccess('cleanUp completed successfully')
       this.context.stdout.write(output + '\n')

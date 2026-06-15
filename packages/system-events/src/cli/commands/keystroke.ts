@@ -22,7 +22,7 @@ export class KeystrokeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.keystroke(this.using as unknown)
+      await client.keystroke(this.using as unknown as Parameters<typeof client.keystroke>[0])
 
       const output = formatter.formatSuccess('keystroke completed successfully')
       this.context.stdout.write(output + '\n')

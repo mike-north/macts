@@ -48,7 +48,7 @@ export const documentsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string; name: string }
     const client = getClient()
-    return client.documents.get(id)
+    return client.documents.get(id as unknown as Parameters<typeof client.documents.get>[0])
   },
 }
 
@@ -92,9 +92,12 @@ export const documentsSaveAsTool: McpToolDefinition = {
     required: ['fileName'],
   },
   handler: async (args) => {
-    const { fileName } = args as { fileName: string; fileFormat?: string }
+    const { fileName, fileFormat } = args as { fileName: string; fileFormat?: string }
     const client = getClient()
-    await client.documents.saveAs(fileName)
+    await client.documents.saveAs(
+      fileName as unknown as Parameters<typeof client.documents.saveAs>[0],
+      fileFormat as unknown as Parameters<typeof client.documents.saveAs>[1]
+    )
     return { success: true }
   },
 }
@@ -118,7 +121,7 @@ export const documentsCloseTool: McpToolDefinition = {
   handler: async (args) => {
     const { saving } = args as { saving?: boolean }
     const client = getClient()
-    await client.documents.close(saving)
+    await client.documents.close(saving as unknown as Parameters<typeof client.documents.close>[0])
     return { success: true }
   },
 }
@@ -180,9 +183,12 @@ export const documentsCreateRangeTool: McpToolDefinition = {
     additionalProperties: false,
   },
   handler: async (args) => {
-    const { start } = args as { start?: number; end?: number }
+    const { start, end } = args as { start?: number; end?: number }
     const client = getClient()
-    await client.documents.createRange(start)
+    await client.documents.createRange(
+      start as unknown as Parameters<typeof client.documents.createRange>[0],
+      end as unknown as Parameters<typeof client.documents.createRange>[1]
+    )
     return { success: true }
   },
 }

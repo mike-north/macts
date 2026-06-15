@@ -22,7 +22,7 @@ export class KeyCodeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.keyCode(this.using as unknown)
+      await client.keyCode(this.using as unknown as Parameters<typeof client.keyCode>[0])
 
       const output = formatter.formatSuccess('keyCode completed successfully')
       this.context.stdout.write(output + '\n')

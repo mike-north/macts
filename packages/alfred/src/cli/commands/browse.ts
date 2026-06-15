@@ -22,7 +22,7 @@ export class BrowseCommand extends Command {
 
     try {
       const client = getClient()
-      await client.browse(this.browsePath as unknown)
+      await client.browse(this.browsePath as unknown as Parameters<typeof client.browse>[0])
 
       const output = formatter.formatSuccess('browse completed successfully')
       this.context.stdout.write(output + '\n')

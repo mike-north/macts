@@ -34,6 +34,10 @@ export class CreateInboxTaskCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.inboxtasks.create({
         name: this.name,
         note: this.note,
@@ -41,7 +45,7 @@ export class CreateInboxTaskCommand extends Command {
         deferDate: this.deferDate,
         dueDate: this.dueDate,
         creationDate: this.creationDate,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.inboxtasks.create>[0])
 
       const output = formatter.format({
         message: 'InboxTask created successfully',

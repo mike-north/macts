@@ -24,7 +24,7 @@ export class FlipCommand extends Command {
 
     try {
       const client = getClient()
-      await client.flip(this.over as unknown)
+      await client.flip(this.over as unknown as Parameters<typeof client.flip>[0])
 
       const output = formatter.formatSuccess('flip completed successfully')
       this.context.stdout.write(output + '\n')

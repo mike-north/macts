@@ -13,7 +13,6 @@ export class AttachWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   workspaceDocumentId = Option.String({ required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
@@ -32,9 +31,11 @@ export class AttachWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspacedocuments.attach(
-        this.workspaceName as unknown,
-        this.toProcessIdentifier as unknown,
-        this.suspended as unknown
+        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.attach>[0],
+        this.toProcessIdentifier as unknown as Parameters<
+          typeof client.workspacedocuments.attach
+        >[1],
+        this.suspended as unknown as Parameters<typeof client.workspacedocuments.attach>[2]
       )
 
       const output = formatter.formatSuccess('attach completed successfully')

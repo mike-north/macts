@@ -23,7 +23,10 @@ export class InsertTextCommand extends Command {
 
     try {
       const client = getClient()
-      await client.insertText(this.text as unknown, this.at as unknown)
+      await client.insertText(
+        this.text as unknown as Parameters<typeof client.insertText>[0],
+        this.at as unknown as Parameters<typeof client.insertText>[1]
+      )
 
       const output = formatter.formatSuccess('insertText completed successfully')
       this.context.stdout.write(output + '\n')

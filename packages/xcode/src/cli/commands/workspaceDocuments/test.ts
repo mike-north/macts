@@ -13,7 +13,6 @@ export class TestWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   workspaceDocumentId = Option.String({ required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
@@ -33,9 +32,13 @@ export class TestWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspacedocuments.test(
-        this.workspaceName as unknown,
-        this.withCommandLineArguments as unknown,
-        this.withEnvironmentVariables as unknown
+        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.test>[0],
+        this.withCommandLineArguments as unknown as Parameters<
+          typeof client.workspacedocuments.test
+        >[1],
+        this.withEnvironmentVariables as unknown as Parameters<
+          typeof client.workspacedocuments.test
+        >[2]
       )
 
       const output = formatter.formatSuccess('test completed successfully')

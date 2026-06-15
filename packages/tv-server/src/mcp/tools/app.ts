@@ -46,7 +46,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each: string }
     const client = getClient()
-    await client.count(each as unknown)
+    await client.count(each as unknown as Parameters<typeof client.count>[0])
     return { success: true }
   },
 }
@@ -88,7 +88,7 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to?: string }
     const client = getClient()
-    await client.duplicate(to as unknown)
+    await client.duplicate(to as unknown as Parameters<typeof client.duplicate>[0])
     return { success: true }
   },
 }
@@ -143,7 +143,11 @@ export const appMakeTool: McpToolDefinition = {
       withProperties,
     } = args as { new: string; at?: string; withProperties?: string }
     const client = getClient()
-    await client.make(_new as unknown, at as unknown, withProperties as unknown)
+    await client.make(
+      _new as unknown as Parameters<typeof client.make>[0],
+      at as unknown as Parameters<typeof client.make>[1],
+      withProperties as unknown as Parameters<typeof client.make>[2]
+    )
     return { success: true }
   },
 }
@@ -239,7 +243,7 @@ export const appAddTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to?: string }
     const client = getClient()
-    await client.add(to as unknown)
+    await client.add(to as unknown as Parameters<typeof client.add>[0])
     return { success: true }
   },
 }
@@ -372,7 +376,7 @@ export const appPlayTool: McpToolDefinition = {
   handler: async (args) => {
     const { once } = args as { once?: boolean }
     const client = getClient()
-    await client.play(once as unknown)
+    await client.play(once as unknown as Parameters<typeof client.play>[0])
     return { success: true }
   },
 }

@@ -26,7 +26,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each?: string }
     const client = getClient()
-    await client.count(each as unknown)
+    await client.count(each as unknown as Parameters<typeof client.count>[0])
     return { success: true }
   },
 }
@@ -73,7 +73,10 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, withProperties } = args as { to: string; withProperties?: string }
     const client = getClient()
-    await client.duplicate(to as unknown, withProperties as unknown)
+    await client.duplicate(
+      to as unknown as Parameters<typeof client.duplicate>[0],
+      withProperties as unknown as Parameters<typeof client.duplicate>[1]
+    )
     return { success: true }
   },
 }
@@ -134,10 +137,10 @@ export const appMakeTool: McpToolDefinition = {
     } = args as { new: string; at?: string; withData?: string; withProperties?: string }
     const client = getClient()
     await client.make(
-      _new as unknown,
-      at as unknown,
-      withData as unknown,
-      withProperties as unknown
+      _new as unknown as Parameters<typeof client.make>[0],
+      at as unknown as Parameters<typeof client.make>[1],
+      withData as unknown as Parameters<typeof client.make>[2],
+      withProperties as unknown as Parameters<typeof client.make>[3]
     )
     return { success: true }
   },
@@ -163,7 +166,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.move(to as unknown)
+    await client.move(to as unknown as Parameters<typeof client.move>[0])
     return { success: true }
   },
 }
@@ -205,7 +208,9 @@ export const appRequestCookieTool: McpToolDefinition = {
   handler: async (args) => {
     const { andKeyForAppNamed } = args as { andKeyForAppNamed?: string }
     const client = getClient()
-    await client.requestCookie(andKeyForAppNamed as unknown)
+    await client.requestCookie(
+      andKeyForAppNamed as unknown as Parameters<typeof client.requestCookie>[0]
+    )
     return { success: true }
   },
 }
@@ -234,7 +239,10 @@ export const appCreateTabTool: McpToolDefinition = {
   handler: async (args) => {
     const { withProfile, command } = args as { withProfile: string; command?: string }
     const client = getClient()
-    await client.createTab(withProfile as unknown, command as unknown)
+    await client.createTab(
+      withProfile as unknown as Parameters<typeof client.createTab>[0],
+      command as unknown as Parameters<typeof client.createTab>[1]
+    )
     return { success: true }
   },
 }
@@ -258,7 +266,9 @@ export const appCreateTabWithDefaultProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.createTabWithDefaultProfile(command as unknown)
+    await client.createTabWithDefaultProfile(
+      command as unknown as Parameters<typeof client.createTabWithDefaultProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -282,7 +292,9 @@ export const appCreateWindowWithProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.createWindowWithProfile(command as unknown)
+    await client.createWindowWithProfile(
+      command as unknown as Parameters<typeof client.createWindowWithProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -324,7 +336,9 @@ export const appLaunchAPIScriptNamedTool: McpToolDefinition = {
   handler: async (args) => {
     const { arguments: _arguments } = args as { arguments?: string }
     const client = getClient()
-    await client.launchAPIScriptNamed(_arguments as unknown)
+    await client.launchAPIScriptNamed(
+      _arguments as unknown as Parameters<typeof client.launchAPIScriptNamed>[0]
+    )
     return { success: true }
   },
 }
@@ -366,7 +380,9 @@ export const appCreateWindowWithDefaultProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.createWindowWithDefaultProfile(command as unknown)
+    await client.createWindowWithDefaultProfile(
+      command as unknown as Parameters<typeof client.createWindowWithDefaultProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -402,7 +418,11 @@ export const appWriteTool: McpToolDefinition = {
       newline?: boolean
     }
     const client = getClient()
-    await client.write(contentsOfFile as unknown, text as unknown, newline as unknown)
+    await client.write(
+      contentsOfFile as unknown as Parameters<typeof client.write>[0],
+      text as unknown as Parameters<typeof client.write>[1],
+      newline as unknown as Parameters<typeof client.write>[2]
+    )
     return { success: true }
   },
 }
@@ -449,7 +469,10 @@ export const appSplitVerticallyTool: McpToolDefinition = {
   handler: async (args) => {
     const { withProfile, command } = args as { withProfile: string; command?: string }
     const client = getClient()
-    await client.splitVertically(withProfile as unknown, command as unknown)
+    await client.splitVertically(
+      withProfile as unknown as Parameters<typeof client.splitVertically>[0],
+      command as unknown as Parameters<typeof client.splitVertically>[1]
+    )
     return { success: true }
   },
 }
@@ -473,7 +496,9 @@ export const appSplitVerticallyWithDefaultProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.splitVerticallyWithDefaultProfile(command as unknown)
+    await client.splitVerticallyWithDefaultProfile(
+      command as unknown as Parameters<typeof client.splitVerticallyWithDefaultProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -498,7 +523,9 @@ export const appSplitVerticallyWithSameProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.splitVerticallyWithSameProfile(command as unknown)
+    await client.splitVerticallyWithSameProfile(
+      command as unknown as Parameters<typeof client.splitVerticallyWithSameProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -527,7 +554,10 @@ export const appSplitHorizontallyTool: McpToolDefinition = {
   handler: async (args) => {
     const { withProfile, command } = args as { withProfile: string; command?: string }
     const client = getClient()
-    await client.splitHorizontally(withProfile as unknown, command as unknown)
+    await client.splitHorizontally(
+      withProfile as unknown as Parameters<typeof client.splitHorizontally>[0],
+      command as unknown as Parameters<typeof client.splitHorizontally>[1]
+    )
     return { success: true }
   },
 }
@@ -551,7 +581,9 @@ export const appSplitHorizontallyWithDefaultProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.splitHorizontallyWithDefaultProfile(command as unknown)
+    await client.splitHorizontallyWithDefaultProfile(
+      command as unknown as Parameters<typeof client.splitHorizontallyWithDefaultProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -576,7 +608,9 @@ export const appSplitHorizontallyWithSameProfileTool: McpToolDefinition = {
   handler: async (args) => {
     const { command } = args as { command?: string }
     const client = getClient()
-    await client.splitHorizontallyWithSameProfile(command as unknown)
+    await client.splitHorizontallyWithSameProfile(
+      command as unknown as Parameters<typeof client.splitHorizontallyWithSameProfile>[0]
+    )
     return { success: true }
   },
 }
@@ -601,7 +635,7 @@ export const appVariableTool: McpToolDefinition = {
   handler: async (args) => {
     const { named } = args as { named: string }
     const client = getClient()
-    await client.variable(named as unknown)
+    await client.variable(named as unknown as Parameters<typeof client.variable>[0])
     return { success: true }
   },
 }
@@ -630,7 +664,10 @@ export const appSetVariableTool: McpToolDefinition = {
   handler: async (args) => {
     const { named, to } = args as { named: string; to: string }
     const client = getClient()
-    await client.setVariable(named as unknown, to as unknown)
+    await client.setVariable(
+      named as unknown as Parameters<typeof client.setVariable>[0],
+      to as unknown as Parameters<typeof client.setVariable>[1]
+    )
     return { success: true }
   },
 }

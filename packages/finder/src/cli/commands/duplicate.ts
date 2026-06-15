@@ -31,10 +31,10 @@ export class DuplicateCommand extends Command {
     try {
       const client = getClient()
       await client.duplicate(
-        this.to as unknown,
-        this.replacing as unknown,
-        this.routingSuppressed as unknown,
-        this.exactCopy as unknown
+        this.to as unknown as Parameters<typeof client.duplicate>[0],
+        this.replacing as unknown as Parameters<typeof client.duplicate>[1],
+        this.routingSuppressed as unknown as Parameters<typeof client.duplicate>[2],
+        this.exactCopy as unknown as Parameters<typeof client.duplicate>[3]
       )
 
       const output = formatter.formatSuccess('duplicate completed successfully')

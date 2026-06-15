@@ -44,7 +44,9 @@ export const workspacedocumentsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.workspacedocuments.get(name)
+    return client.workspacedocuments.get(
+      name as unknown as Parameters<typeof client.workspacedocuments.get>[0]
+    )
   },
 }
 
@@ -68,7 +70,9 @@ export const workspacedocumentsBuildTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.build(workspaceName)
+    await client.workspacedocuments.build(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.build>[0]
+    )
     return { success: true }
   },
 }
@@ -93,7 +97,9 @@ export const workspacedocumentsCleanTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.clean(workspaceName)
+    await client.workspacedocuments.clean(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.clean>[0]
+    )
     return { success: true }
   },
 }
@@ -118,7 +124,9 @@ export const workspacedocumentsStopTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.stop(workspaceName)
+    await client.workspacedocuments.stop(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.stop>[0]
+    )
     return { success: true }
   },
 }
@@ -149,13 +157,17 @@ export const workspacedocumentsRunTool: McpToolDefinition = {
     required: ['workspaceName'],
   },
   handler: async (args) => {
-    const { workspaceName } = args as {
+    const { workspaceName, withCommandLineArguments, withEnvironmentVariables } = args as {
       workspaceName: string
       withCommandLineArguments?: string
       withEnvironmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.run(workspaceName)
+    await client.workspacedocuments.run(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.run>[0],
+      withCommandLineArguments as unknown as Parameters<typeof client.workspacedocuments.run>[1],
+      withEnvironmentVariables as unknown as Parameters<typeof client.workspacedocuments.run>[2]
+    )
     return { success: true }
   },
 }
@@ -186,13 +198,17 @@ export const workspacedocumentsTestTool: McpToolDefinition = {
     required: ['workspaceName'],
   },
   handler: async (args) => {
-    const { workspaceName } = args as {
+    const { workspaceName, withCommandLineArguments, withEnvironmentVariables } = args as {
       workspaceName: string
       withCommandLineArguments?: string
       withEnvironmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.test(workspaceName)
+    await client.workspacedocuments.test(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.test>[0],
+      withCommandLineArguments as unknown as Parameters<typeof client.workspacedocuments.test>[1],
+      withEnvironmentVariables as unknown as Parameters<typeof client.workspacedocuments.test>[2]
+    )
     return { success: true }
   },
 }
@@ -223,13 +239,17 @@ export const workspacedocumentsAttachTool: McpToolDefinition = {
     required: ['workspaceName', 'toProcessIdentifier', 'suspended'],
   },
   handler: async (args) => {
-    const { workspaceName } = args as {
+    const { workspaceName, toProcessIdentifier, suspended } = args as {
       workspaceName: string
       toProcessIdentifier: number
       suspended: boolean
     }
     const client = getClient()
-    await client.workspacedocuments.attach(workspaceName)
+    await client.workspacedocuments.attach(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.attach>[0],
+      toProcessIdentifier as unknown as Parameters<typeof client.workspacedocuments.attach>[1],
+      suspended as unknown as Parameters<typeof client.workspacedocuments.attach>[2]
+    )
     return { success: true }
   },
 }
@@ -272,7 +292,14 @@ export const workspacedocumentsDebugTool: McpToolDefinition = {
     required: ['workspaceName'],
   },
   handler: async (args) => {
-    const { workspaceName } = args as {
+    const {
+      workspaceName,
+      scheme,
+      runDestinationSpecifier,
+      skipBuilding,
+      commandLineArguments,
+      environmentVariables,
+    } = args as {
       workspaceName: string
       scheme?: string
       runDestinationSpecifier?: string
@@ -281,7 +308,14 @@ export const workspacedocumentsDebugTool: McpToolDefinition = {
       environmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.debug(workspaceName)
+    await client.workspacedocuments.debug(
+      workspaceName as unknown as Parameters<typeof client.workspacedocuments.debug>[0],
+      scheme as unknown as Parameters<typeof client.workspacedocuments.debug>[1],
+      runDestinationSpecifier as unknown as Parameters<typeof client.workspacedocuments.debug>[2],
+      skipBuilding as unknown as Parameters<typeof client.workspacedocuments.debug>[3],
+      commandLineArguments as unknown as Parameters<typeof client.workspacedocuments.debug>[4],
+      environmentVariables as unknown as Parameters<typeof client.workspacedocuments.debug>[5]
+    )
     return { success: true }
   },
 }

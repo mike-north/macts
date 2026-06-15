@@ -27,7 +27,7 @@ export const playlistsMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.playlists.move(to)
+    await client.playlists.move(to as unknown as Parameters<typeof client.playlists.move>[0])
     return { success: true }
   },
 }
@@ -55,9 +55,12 @@ export const playlistsSearchTool: McpToolDefinition = {
     required: ['for'],
   },
   handler: async (args) => {
-    const { for: _for } = args as { for: string; only?: string }
+    const { for: _for, only } = args as { for: string; only?: string }
     const client = getClient()
-    await client.playlists.search(_for)
+    await client.playlists.search(
+      _for as unknown as Parameters<typeof client.playlists.search>[0],
+      only as unknown as Parameters<typeof client.playlists.search>[1]
+    )
     return { success: true }
   },
 }

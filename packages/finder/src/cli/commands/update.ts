@@ -25,7 +25,10 @@ export class UpdateCommand extends Command {
 
     try {
       const client = getClient()
-      await client.update(this.necessity as unknown, this.registeringApplications as unknown)
+      await client.update(
+        this.necessity as unknown as Parameters<typeof client.update>[0],
+        this.registeringApplications as unknown as Parameters<typeof client.update>[1]
+      )
 
       const output = formatter.formatSuccess('update completed successfully')
       this.context.stdout.write(output + '\n')

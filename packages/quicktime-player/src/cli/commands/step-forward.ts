@@ -19,7 +19,7 @@ export class StepForwardCommand extends Command {
 
     try {
       const client = getClient()
-      await client.stepForward(this.by as unknown)
+      await client.stepForward(this.by as unknown as Parameters<typeof client.stepForward>[0])
 
       const output = formatter.formatSuccess('stepForward completed successfully')
       this.context.stdout.write(output + '\n')

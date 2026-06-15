@@ -22,7 +22,7 @@ export class DeleteCommand extends Command {
 
     try {
       const client = getClient()
-      await client._delete(this.target as unknown)
+      await client._delete(this.target as unknown as Parameters<typeof client._delete>[0])
 
       const output = formatter.formatSuccess('delete completed successfully')
       this.context.stdout.write(output + '\n')

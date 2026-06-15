@@ -27,9 +27,9 @@ export class ExportCommand extends Command {
     try {
       const client = getClient()
       await client._export(
-        this.mediaItems as unknown,
-        this.to as unknown,
-        this.usingOriginals as unknown
+        this.mediaItems as unknown as Parameters<typeof client._export>[0],
+        this.to as unknown as Parameters<typeof client._export>[1],
+        this.usingOriginals as unknown as Parameters<typeof client._export>[2]
       )
 
       const output = formatter.formatSuccess('export completed successfully')

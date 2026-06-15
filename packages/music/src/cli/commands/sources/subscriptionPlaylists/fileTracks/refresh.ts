@@ -18,7 +18,6 @@ export class RefreshFileTrackCommand extends Command {
     required: true,
     description: 'SubscriptionPlaylist ID',
   })
-
   fileTrackId = Option.String({ required: true })
 
   async execute(): Promise<number> {

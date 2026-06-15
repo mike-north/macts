@@ -31,7 +31,10 @@ export const appSaveTool: McpToolDefinition = {
   handler: async (args) => {
     const { in: _in, as } = args as { in?: string; as?: string }
     const client = getClient()
-    await client.save(_in as unknown, as as unknown)
+    await client.save(
+      _in as unknown as Parameters<typeof client.save>[0],
+      as as unknown as Parameters<typeof client.save>[1]
+    )
     return { success: true }
   },
 }
@@ -109,7 +112,7 @@ export const appCountTool: McpToolDefinition = {
   handler: async (args) => {
     const { each } = args as { each?: string }
     const client = getClient()
-    await client.count(each as unknown)
+    await client.count(each as unknown as Parameters<typeof client.count>[0])
     return { success: true }
   },
 }
@@ -155,7 +158,10 @@ export const appDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { to, withProperties } = args as { to?: string; withProperties?: string }
     const client = getClient()
-    await client.duplicate(to as unknown, withProperties as unknown)
+    await client.duplicate(
+      to as unknown as Parameters<typeof client.duplicate>[0],
+      withProperties as unknown as Parameters<typeof client.duplicate>[1]
+    )
     return { success: true }
   },
 }
@@ -216,10 +222,10 @@ export const appMakeTool: McpToolDefinition = {
     } = args as { new: string; at?: string; withData?: string; withProperties?: string }
     const client = getClient()
     await client.make(
-      _new as unknown,
-      at as unknown,
-      withData as unknown,
-      withProperties as unknown
+      _new as unknown as Parameters<typeof client.make>[0],
+      at as unknown as Parameters<typeof client.make>[1],
+      withData as unknown as Parameters<typeof client.make>[2],
+      withProperties as unknown as Parameters<typeof client.make>[3]
     )
     return { success: true }
   },
@@ -245,7 +251,7 @@ export const appMoveTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.move(to as unknown)
+    await client.move(to as unknown as Parameters<typeof client.move>[0])
     return { success: true }
   },
 }
@@ -486,7 +492,7 @@ export const appExecuteTool: McpToolDefinition = {
   handler: async (args) => {
     const { javascript } = args as { javascript: string }
     const client = getClient()
-    await client.execute(javascript as unknown)
+    await client.execute(javascript as unknown as Parameters<typeof client.execute>[0])
     return { success: true }
   },
 }

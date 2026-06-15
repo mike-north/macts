@@ -14,7 +14,6 @@ export class BounceMessageCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   mailboxId = Option.String('--mailbox-id', { required: true, description: 'Mailbox ID' })
-
   messageId = Option.String({ required: true })
 
   async execute(): Promise<number> {

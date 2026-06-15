@@ -44,6 +44,6 @@ export const scenariosGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.scenarios.get(id)
+    return client.scenarios.get(id as unknown as Parameters<typeof client.scenarios.get>[0])
   },
 }

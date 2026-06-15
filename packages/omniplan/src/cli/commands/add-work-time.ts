@@ -19,7 +19,7 @@ export class AddWorkTimeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.addWorkTime(this.schedule as unknown)
+      await client.addWorkTime(this.schedule as unknown as Parameters<typeof client.addWorkTime>[0])
 
       const output = formatter.formatSuccess('addWorkTime completed successfully')
       this.context.stdout.write(output + '\n')

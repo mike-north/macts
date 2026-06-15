@@ -44,7 +44,7 @@ export const tagsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.tags.get(id)
+    return client.tags.get(id as unknown as Parameters<typeof client.tags.get>[0])
   },
 }
 
@@ -80,6 +80,6 @@ export const tagsCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.tags.create(args as Record<string, unknown>)
+    return client.tags.create(args as Parameters<typeof client.tags.create>[0])
   },
 }

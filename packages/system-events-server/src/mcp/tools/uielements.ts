@@ -27,7 +27,7 @@ export const uielementsClickTool: McpToolDefinition = {
   handler: async (args) => {
     const { at } = args as { at?: string }
     const client = getClient()
-    await client.uielements.click(at)
+    await client.uielements.click(at as unknown as Parameters<typeof client.uielements.click>[0])
     return { success: true }
   },
 }

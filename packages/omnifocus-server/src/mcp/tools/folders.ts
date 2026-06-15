@@ -44,7 +44,7 @@ export const foldersGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.folders.get(id)
+    return client.folders.get(id as unknown as Parameters<typeof client.folders.get>[0])
   },
 }
 
@@ -75,6 +75,6 @@ export const foldersCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.folders.create(args as Record<string, unknown>)
+    return client.folders.create(args as Parameters<typeof client.folders.create>[0])
   },
 }

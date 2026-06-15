@@ -24,9 +24,9 @@ export class ImportCommand extends Command {
     try {
       const client = getClient()
       await client._import(
-        this.files as unknown,
-        this.into as unknown,
-        this.skipCheckDuplicates as unknown
+        this.files as unknown as Parameters<typeof client._import>[0],
+        this.into as unknown as Parameters<typeof client._import>[1],
+        this.skipCheckDuplicates as unknown as Parameters<typeof client._import>[2]
       )
 
       const output = formatter.formatSuccess('import completed successfully')

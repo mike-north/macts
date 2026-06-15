@@ -14,7 +14,6 @@ export class DebugWorkspaceDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   workspaceDocumentId = Option.String({ required: true })
   workspaceName = Option.String('--workspace-name', {
     required: true,
@@ -42,12 +41,18 @@ export class DebugWorkspaceDocumentCommand extends Command {
     try {
       const client = getClient()
       await client.workspacedocuments.debug(
-        this.workspaceName as unknown,
-        this.scheme as unknown,
-        this.runDestinationSpecifier as unknown,
-        this.skipBuilding as unknown,
-        this.commandLineArguments as unknown,
-        this.environmentVariables as unknown
+        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.debug>[0],
+        this.scheme as unknown as Parameters<typeof client.workspacedocuments.debug>[1],
+        this.runDestinationSpecifier as unknown as Parameters<
+          typeof client.workspacedocuments.debug
+        >[2],
+        this.skipBuilding as unknown as Parameters<typeof client.workspacedocuments.debug>[3],
+        this.commandLineArguments as unknown as Parameters<
+          typeof client.workspacedocuments.debug
+        >[4],
+        this.environmentVariables as unknown as Parameters<
+          typeof client.workspacedocuments.debug
+        >[5]
       )
 
       const output = formatter.formatSuccess('debug completed successfully')

@@ -19,7 +19,7 @@ export class GetURLCommand extends Command {
 
     try {
       const client = getClient()
-      await client.getURL(this.url as unknown)
+      await client.getURL(this.url as unknown as Parameters<typeof client.getURL>[0])
 
       const output = formatter.formatSuccess('getURL completed successfully')
       this.context.stdout.write(output + '\n')

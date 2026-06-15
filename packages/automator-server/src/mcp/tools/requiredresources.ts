@@ -52,6 +52,8 @@ export const requiredresourcesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.requiredresources.get(name)
+    return client.requiredresources.get(
+      name as unknown as Parameters<typeof client.requiredresources.get>[0]
+    )
   },
 }

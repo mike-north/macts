@@ -19,7 +19,7 @@ export class ViewCalendarCommand extends Command {
 
     try {
       const client = getClient()
-      await client.viewCalendar(this.at as unknown)
+      await client.viewCalendar(this.at as unknown as Parameters<typeof client.viewCalendar>[0])
 
       const output = formatter.formatSuccess('viewCalendar completed successfully')
       this.context.stdout.write(output + '\n')

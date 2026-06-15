@@ -22,7 +22,9 @@ export class RequestCookieCommand extends Command {
 
     try {
       const client = getClient()
-      await client.requestCookie(this.andKeyForAppNamed as unknown)
+      await client.requestCookie(
+        this.andKeyForAppNamed as unknown as Parameters<typeof client.requestCookie>[0]
+      )
 
       const output = formatter.formatSuccess('requestCookie completed successfully')
       this.context.stdout.write(output + '\n')

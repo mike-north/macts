@@ -30,7 +30,11 @@ export class MakeCommand extends Command {
 
     try {
       const client = getClient()
-      await client.make(this.new as unknown, this.at as unknown, this.withProperties as unknown)
+      await client.make(
+        this.new as unknown as Parameters<typeof client.make>[0],
+        this.at as unknown as Parameters<typeof client.make>[1],
+        this.withProperties as unknown as Parameters<typeof client.make>[2]
+      )
 
       const output = formatter.formatSuccess('make completed successfully')
       this.context.stdout.write(output + '\n')

@@ -147,7 +147,11 @@ export const appFindTool: McpToolDefinition = {
       matchWholeWord?: boolean
     }
     const client = getClient()
-    await client.find(findText as unknown, matchCase as unknown, matchWholeWord as unknown)
+    await client.find(
+      findText as unknown as Parameters<typeof client.find>[0],
+      matchCase as unknown as Parameters<typeof client.find>[1],
+      matchWholeWord as unknown as Parameters<typeof client.find>[2]
+    )
     return { success: true }
   },
 }
@@ -184,7 +188,11 @@ export const appReplaceTool: McpToolDefinition = {
       replaceAll?: boolean
     }
     const client = getClient()
-    await client.replace(findText as unknown, replaceWith as unknown, replaceAll as unknown)
+    await client.replace(
+      findText as unknown as Parameters<typeof client.replace>[0],
+      replaceWith as unknown as Parameters<typeof client.replace>[1],
+      replaceAll as unknown as Parameters<typeof client.replace>[2]
+    )
     return { success: true }
   },
 }
@@ -213,7 +221,10 @@ export const appInsertTextTool: McpToolDefinition = {
   handler: async (args) => {
     const { text, at } = args as { text: string; at?: number }
     const client = getClient()
-    await client.insertText(text as unknown, at as unknown)
+    await client.insertText(
+      text as unknown as Parameters<typeof client.insertText>[0],
+      at as unknown as Parameters<typeof client.insertText>[1]
+    )
     return { success: true }
   },
 }
@@ -237,7 +248,9 @@ export const appCreateNewDocumentTool: McpToolDefinition = {
   handler: async (args) => {
     const { attachedTemplate } = args as { attachedTemplate?: string }
     const client = getClient()
-    await client.createNewDocument(attachedTemplate as unknown)
+    await client.createNewDocument(
+      attachedTemplate as unknown as Parameters<typeof client.createNewDocument>[0]
+    )
     return { success: true }
   },
 }

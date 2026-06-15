@@ -44,7 +44,7 @@ export const shortcutsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.shortcuts.get(id)
+    return client.shortcuts.get(id as unknown as Parameters<typeof client.shortcuts.get>[0])
   },
 }
 
@@ -71,9 +71,12 @@ export const shortcutsRunTool: McpToolDefinition = {
     required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; withInput?: string }
+    const { id, withInput } = args as { id: string; withInput?: string }
     const client = getClient()
-    await client.shortcuts.run(id)
+    await client.shortcuts.run(
+      id as unknown as Parameters<typeof client.shortcuts.run>[0],
+      withInput as unknown as Parameters<typeof client.shortcuts.run>[1]
+    )
     return { success: true }
   },
 }

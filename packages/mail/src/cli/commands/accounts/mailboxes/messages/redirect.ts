@@ -15,7 +15,6 @@ export class RedirectMessageCommand extends Command {
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   accountId = Option.String('--account-id', { required: true, description: 'Account ID' })
   mailboxId = Option.String('--mailbox-id', { required: true, description: 'Mailbox ID' })
-
   messageId = Option.String({ required: true })
   openingWindow = Option.Boolean('--opening-window', {
     description:
@@ -26,7 +25,9 @@ export class RedirectMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.messages.redirect(this.openingWindow as unknown)
+      await client.messages.redirect(
+        this.openingWindow as unknown as Parameters<typeof client.messages.redirect>[0]
+      )
 
       const output = formatter.formatSuccess('redirect completed successfully')
       this.context.stdout.write(output + '\n')

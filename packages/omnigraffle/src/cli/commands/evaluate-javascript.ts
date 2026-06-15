@@ -19,7 +19,9 @@ export class EvaluateJavascriptCommand extends Command {
 
     try {
       const client = getClient()
-      await client.evaluateJavascript(this.script as unknown)
+      await client.evaluateJavascript(
+        this.script as unknown as Parameters<typeof client.evaluateJavascript>[0]
+      )
 
       const output = formatter.formatSuccess('evaluateJavascript completed successfully')
       this.context.stdout.write(output + '\n')

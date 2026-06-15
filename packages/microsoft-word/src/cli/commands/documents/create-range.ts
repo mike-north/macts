@@ -13,7 +13,6 @@ export class CreateRangeDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   documentId = Option.String({ required: true })
   start = Option.String('--start', {
     required: false,
@@ -25,7 +24,10 @@ export class CreateRangeDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.documents.createRange(this.start as unknown, this.end as unknown)
+      await client.documents.createRange(
+        this.start as unknown as Parameters<typeof client.documents.createRange>[0],
+        this.end as unknown as Parameters<typeof client.documents.createRange>[1]
+      )
 
       const output = formatter.formatSuccess('createRange completed successfully')
       this.context.stdout.write(output + '\n')

@@ -19,7 +19,7 @@ export class EmptyCommand extends Command {
 
     try {
       const client = getClient()
-      await client.empty(this.security as unknown)
+      await client.empty(this.security as unknown as Parameters<typeof client.empty>[0])
 
       const output = formatter.formatSuccess('empty completed successfully')
       this.context.stdout.write(output + '\n')

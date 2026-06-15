@@ -52,6 +52,8 @@ export const automatoractionsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.automatoractions.get(id)
+    return client.automatoractions.get(
+      id as unknown as Parameters<typeof client.automatoractions.get>[0]
+    )
   },
 }

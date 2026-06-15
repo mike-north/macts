@@ -13,7 +13,6 @@ export class MovePlaylistCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   playlistId = Option.String({ required: true })
   to = Option.String('--to', {
     required: true,
@@ -24,7 +23,7 @@ export class MovePlaylistCommand extends Command {
 
     try {
       const client = getClient()
-      await client.playlists.move(this.to as unknown)
+      await client.playlists.move(this.to as unknown as Parameters<typeof client.playlists.move>[0])
 
       const output = formatter.formatSuccess('move completed successfully')
       this.context.stdout.write(output + '\n')

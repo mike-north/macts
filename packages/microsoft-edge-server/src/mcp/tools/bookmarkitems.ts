@@ -52,6 +52,6 @@ export const bookmarkitemsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.bookmarkitems.get(id)
+    return client.bookmarkitems.get(id as unknown as Parameters<typeof client.bookmarkitems.get>[0])
   },
 }

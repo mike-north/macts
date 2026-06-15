@@ -31,7 +31,10 @@ export const appDoScriptTool: McpToolDefinition = {
   handler: async (args) => {
     const { command, in: _in } = args as { command: string; in?: string }
     const client = getClient()
-    await client.doScript(command as unknown, _in as unknown)
+    await client.doScript(
+      command as unknown as Parameters<typeof client.doScript>[0],
+      _in as unknown as Parameters<typeof client.doScript>[1]
+    )
     return { success: true }
   },
 }

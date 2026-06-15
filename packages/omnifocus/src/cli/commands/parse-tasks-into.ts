@@ -20,7 +20,10 @@ export class ParseTasksIntoCommand extends Command {
 
     try {
       const client = getClient()
-      await client.parseTasksInto(this.text as unknown, this.into as unknown)
+      await client.parseTasksInto(
+        this.text as unknown as Parameters<typeof client.parseTasksInto>[0],
+        this.into as unknown as Parameters<typeof client.parseTasksInto>[1]
+      )
 
       const output = formatter.formatSuccess('parseTasksInto completed successfully')
       this.context.stdout.write(output + '\n')

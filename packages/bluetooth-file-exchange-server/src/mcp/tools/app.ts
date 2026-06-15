@@ -26,7 +26,7 @@ export const appBrowseTool: McpToolDefinition = {
   handler: async (args) => {
     const { device } = args as { device?: string }
     const client = getClient()
-    await client.browse(device as unknown)
+    await client.browse(device as unknown as Parameters<typeof client.browse>[0])
     return { success: true }
   },
 }
@@ -43,7 +43,9 @@ export const appSendTool: McpToolDefinition = {
       file: {
         description: 'The file(s) to send',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       toDevice: {
         description: 'The device to send the file to',
@@ -53,9 +55,12 @@ export const appSendTool: McpToolDefinition = {
     additionalProperties: false,
   },
   handler: async (args) => {
-    const { file, toDevice } = args as { file?: unknown[]; toDevice?: string }
+    const { file, toDevice } = args as { file?: string[]; toDevice?: string }
     const client = getClient()
-    await client.send(file as unknown, toDevice as unknown)
+    await client.send(
+      file as unknown as Parameters<typeof client.send>[0],
+      toDevice as unknown as Parameters<typeof client.send>[1]
+    )
     return { success: true }
   },
 }

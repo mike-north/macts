@@ -44,7 +44,7 @@ export const notesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.notes.get(name)
+    return client.notes.get(name as unknown as Parameters<typeof client.notes.get>[0])
   },
 }
 
@@ -70,7 +70,7 @@ export const notesCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.notes.create(args as Record<string, unknown>)
+    return client.notes.create(args as Parameters<typeof client.notes.create>[0])
   },
 }
 
@@ -94,7 +94,7 @@ export const notesShowTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    await client.notes.show(name)
+    await client.notes.show(name as unknown as Parameters<typeof client.notes.show>[0])
     return { success: true }
   },
 }

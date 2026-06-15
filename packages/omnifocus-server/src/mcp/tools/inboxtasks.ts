@@ -44,7 +44,7 @@ export const inboxtasksGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.inboxtasks.get(id)
+    return client.inboxtasks.get(id as unknown as Parameters<typeof client.inboxtasks.get>[0])
   },
 }
 
@@ -87,6 +87,6 @@ export const inboxtasksCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.inboxtasks.create(args as Record<string, unknown>)
+    return client.inboxtasks.create(args as Parameters<typeof client.inboxtasks.create>[0])
   },
 }

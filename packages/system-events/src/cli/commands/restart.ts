@@ -21,7 +21,9 @@ export class RestartCommand extends Command {
 
     try {
       const client = getClient()
-      await client.restart(this.stateSavingPreference as unknown)
+      await client.restart(
+        this.stateSavingPreference as unknown as Parameters<typeof client.restart>[0]
+      )
 
       const output = formatter.formatSuccess('restart completed successfully')
       this.context.stdout.write(output + '\n')

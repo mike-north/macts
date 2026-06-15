@@ -21,7 +21,9 @@ export class ShutDownCommand extends Command {
 
     try {
       const client = getClient()
-      await client.shutDown(this.stateSavingPreference as unknown)
+      await client.shutDown(
+        this.stateSavingPreference as unknown as Parameters<typeof client.shutDown>[0]
+      )
 
       const output = formatter.formatSuccess('shutDown completed successfully')
       this.context.stdout.write(output + '\n')

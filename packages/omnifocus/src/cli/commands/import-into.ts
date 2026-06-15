@@ -19,7 +19,7 @@ export class ImportIntoCommand extends Command {
 
     try {
       const client = getClient()
-      await client.importInto(this.file as unknown)
+      await client.importInto(this.file as unknown as Parameters<typeof client.importInto>[0])
 
       const output = formatter.formatSuccess('importInto completed successfully')
       this.context.stdout.write(output + '\n')

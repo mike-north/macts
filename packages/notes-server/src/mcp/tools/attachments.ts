@@ -44,6 +44,6 @@ export const attachmentsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.attachments.get(name)
+    return client.attachments.get(name as unknown as Parameters<typeof client.attachments.get>[0])
   },
 }

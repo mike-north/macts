@@ -24,7 +24,7 @@ export class SwitchViewCommand extends Command {
 
     try {
       const client = getClient()
-      await client.switchView(this.to as unknown)
+      await client.switchView(this.to as unknown as Parameters<typeof client.switchView>[0])
 
       const output = formatter.formatSuccess('switchView completed successfully')
       this.context.stdout.write(output + '\n')

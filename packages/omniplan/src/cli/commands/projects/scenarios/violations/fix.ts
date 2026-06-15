@@ -15,7 +15,6 @@ export class FixViolationCommand extends Command {
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   projectId = Option.String('--project-id', { required: true, description: 'Project ID' })
   scenarioId = Option.String('--scenario-id', { required: true, description: 'Scenario ID' })
-
   violationId = Option.String({ required: true })
 
   async execute(): Promise<number> {

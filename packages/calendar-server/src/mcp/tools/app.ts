@@ -45,7 +45,7 @@ export const appSwitchViewTool: McpToolDefinition = {
   handler: async (args) => {
     const { to } = args as { to: string }
     const client = getClient()
-    await client.switchView(to as unknown)
+    await client.switchView(to as unknown as Parameters<typeof client.switchView>[0])
     return { success: true }
   },
 }
@@ -70,7 +70,7 @@ export const appViewCalendarTool: McpToolDefinition = {
   handler: async (args) => {
     const { at } = args as { at: string }
     const client = getClient()
-    await client.viewCalendar(at as unknown)
+    await client.viewCalendar(at as unknown as Parameters<typeof client.viewCalendar>[0])
     return { success: true }
   },
 }

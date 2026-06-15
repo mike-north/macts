@@ -19,7 +19,7 @@ export class VariableCommand extends Command {
 
     try {
       const client = getClient()
-      await client.variable(this.named as unknown)
+      await client.variable(this.named as unknown as Parameters<typeof client.variable>[0])
 
       const output = formatter.formatSuccess('variable completed successfully')
       this.context.stdout.write(output + '\n')

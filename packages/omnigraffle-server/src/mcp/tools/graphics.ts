@@ -52,6 +52,6 @@ export const graphicsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.graphics.get(id)
+    return client.graphics.get(id as unknown as Parameters<typeof client.graphics.get>[0])
   },
 }

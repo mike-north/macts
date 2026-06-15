@@ -13,7 +13,6 @@ export class GetTagCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  tagId = Option.String('--tag-id', { required: true, description: 'Tag ID' })
 
   tagId = Option.String({ required: true })
 

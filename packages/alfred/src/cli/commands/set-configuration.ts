@@ -32,10 +32,10 @@ export class SetConfigurationCommand extends Command {
     try {
       const client = getClient()
       await client.setConfiguration(
-        this.variable as unknown,
-        this.toValue as unknown,
-        this.inWorkflow as unknown,
-        this.exportable as unknown
+        this.variable as unknown as Parameters<typeof client.setConfiguration>[0],
+        this.toValue as unknown as Parameters<typeof client.setConfiguration>[1],
+        this.inWorkflow as unknown as Parameters<typeof client.setConfiguration>[2],
+        this.exportable as unknown as Parameters<typeof client.setConfiguration>[3]
       )
 
       const output = formatter.formatSuccess('setConfiguration completed successfully')

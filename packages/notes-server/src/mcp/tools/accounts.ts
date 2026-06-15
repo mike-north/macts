@@ -44,6 +44,6 @@ export const accountsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.accounts.get(name)
+    return client.accounts.get(name as unknown as Parameters<typeof client.accounts.get>[0])
   },
 }

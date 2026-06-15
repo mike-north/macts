@@ -14,7 +14,6 @@ export class SaveAsDocumentCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
   documentId = Option.String({ required: true })
   fileName = Option.String('--file-name', {
     required: true,
@@ -30,7 +29,10 @@ export class SaveAsDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.documents.saveAs(this.fileName as unknown, this.fileFormat as unknown)
+      await client.documents.saveAs(
+        this.fileName as unknown as Parameters<typeof client.documents.saveAs>[0],
+        this.fileFormat as unknown as Parameters<typeof client.documents.saveAs>[1]
+      )
 
       const output = formatter.formatSuccess('saveAs completed successfully')
       this.context.stdout.write(output + '\n')

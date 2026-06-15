@@ -19,7 +19,7 @@ export class StepBackwardCommand extends Command {
 
     try {
       const client = getClient()
-      await client.stepBackward(this.by as unknown)
+      await client.stepBackward(this.by as unknown as Parameters<typeof client.stepBackward>[0])
 
       const output = formatter.formatSuccess('stepBackward completed successfully')
       this.context.stdout.write(output + '\n')

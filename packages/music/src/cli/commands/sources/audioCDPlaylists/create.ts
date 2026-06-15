@@ -36,6 +36,10 @@ export class CreateAudioCDPlaylistCommand extends Command {
 
     try {
       const client = getClient()
+      // Assert the SDK's precise create-input type. CLI flags surface every field as a
+      // string/boolean primitive, which may not structurally overlap the input's richer
+      // member types (e.g. a color object) or exact-optional members, so we assert via
+      // `unknown`. The RPC layer coerces/validates the payload at runtime.
       const item = await client.audiocdplaylists.create({
         artist: this.artist,
         compilation: this.compilation,
@@ -44,7 +48,7 @@ export class CreateAudioCDPlaylistCommand extends Command {
         discNumber: this.discNumber,
         genre: this.genre,
         year: this.year,
-      } as Record<string, unknown>)
+      } as unknown as Parameters<typeof client.audiocdplaylists.create>[0])
 
       const output = formatter.format({
         message: 'AudioCDPlaylist created successfully',

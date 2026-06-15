@@ -19,7 +19,9 @@ export const appImportTool: McpToolDefinition = {
       files: {
         description: 'The list of files to copy',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       into: {
         description: 'The album to import into',
@@ -35,12 +37,16 @@ export const appImportTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { files, into, skipCheckDuplicates } = args as {
-      files: unknown[]
+      files: string[]
       into?: string
       skipCheckDuplicates?: boolean
     }
     const client = getClient()
-    await client._import(files as unknown, into as unknown, skipCheckDuplicates as unknown)
+    await client._import(
+      files as unknown as Parameters<typeof client._import>[0],
+      into as unknown as Parameters<typeof client._import>[1],
+      skipCheckDuplicates as unknown as Parameters<typeof client._import>[2]
+    )
     return { success: true }
   },
 }
@@ -57,7 +63,9 @@ export const appExportTool: McpToolDefinition = {
       mediaItems: {
         description: 'The list of media items to export',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       to: {
         description: 'The destination of the export',
@@ -73,12 +81,16 @@ export const appExportTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { mediaItems, to, usingOriginals } = args as {
-      mediaItems: unknown[]
+      mediaItems: string[]
       to: string
       usingOriginals?: boolean
     }
     const client = getClient()
-    await client._export(mediaItems as unknown, to as unknown, usingOriginals as unknown)
+    await client._export(
+      mediaItems as unknown as Parameters<typeof client._export>[0],
+      to as unknown as Parameters<typeof client._export>[1],
+      usingOriginals as unknown as Parameters<typeof client._export>[2]
+    )
     return { success: true }
   },
 }
@@ -111,7 +123,11 @@ export const appMakeTool: McpToolDefinition = {
   handler: async (args) => {
     const { new: _new, named, at } = args as { new: string; named?: string; at?: string }
     const client = getClient()
-    await client.make(_new as unknown, named as unknown, at as unknown)
+    await client.make(
+      _new as unknown as Parameters<typeof client.make>[0],
+      named as unknown as Parameters<typeof client.make>[1],
+      at as unknown as Parameters<typeof client.make>[2]
+    )
     return { success: true }
   },
 }
@@ -136,7 +152,7 @@ export const appDeleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { target } = args as { target: string }
     const client = getClient()
-    await client._delete(target as unknown)
+    await client._delete(target as unknown as Parameters<typeof client._delete>[0])
     return { success: true }
   },
 }
@@ -153,7 +169,9 @@ export const appAddTool: McpToolDefinition = {
       mediaItems: {
         description: 'The list of media items to add',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
       to: {
         description: 'The album to add to',
@@ -164,9 +182,12 @@ export const appAddTool: McpToolDefinition = {
     required: ['mediaItems', 'to'],
   },
   handler: async (args) => {
-    const { mediaItems, to } = args as { mediaItems: unknown[]; to: string }
+    const { mediaItems, to } = args as { mediaItems: string[]; to: string }
     const client = getClient()
-    await client.add(mediaItems as unknown, to as unknown)
+    await client.add(
+      mediaItems as unknown as Parameters<typeof client.add>[0],
+      to as unknown as Parameters<typeof client.add>[1]
+    )
     return { success: true }
   },
 }
@@ -183,16 +204,18 @@ export const appStartSlideshowTool: McpToolDefinition = {
       using: {
         description: 'The media items to show',
         type: 'array',
-        items: 'string',
+        items: {
+          type: 'string',
+        },
       },
     },
     additionalProperties: false,
     required: ['using'],
   },
   handler: async (args) => {
-    const { using } = args as { using: unknown[] }
+    const { using } = args as { using: string[] }
     const client = getClient()
-    await client.startSlideshow(using as unknown)
+    await client.startSlideshow(using as unknown as Parameters<typeof client.startSlideshow>[0])
     return { success: true }
   },
 }
@@ -307,7 +330,7 @@ export const appSpotlightTool: McpToolDefinition = {
   handler: async (args) => {
     const { target } = args as { target: string }
     const client = getClient()
-    await client.spotlight(target as unknown)
+    await client.spotlight(target as unknown as Parameters<typeof client.spotlight>[0])
     return { success: true }
   },
 }
@@ -332,7 +355,7 @@ export const appSearchTool: McpToolDefinition = {
   handler: async (args) => {
     const { for: _for } = args as { for: string }
     const client = getClient()
-    await client.search(_for as unknown)
+    await client.search(_for as unknown as Parameters<typeof client.search>[0])
     return { success: true }
   },
 }
