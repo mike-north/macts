@@ -45,9 +45,29 @@ describe('runJxa', () => {
     }
   })
 
+  // Regression test for issue #17: the original test used a 1ms timeout on
+  // `return 42;` and raced the wall clock — on a fast/warm machine the script
+  // could complete before the timer, resolving instead of rejecting. Fix:
+  // drive a script that *intentionally* runs longer than the timeout (JXA
+  // `delay(2)` ≈ 2 s) with a 100 ms timeout so the timer always fires first.
   it('should handle timeout option', async () => {
-    // This should complete well within 1ms, but if it doesn't, it will timeout
-    await expect(runJxa('return 42;', { timeout: 1 })).rejects.toThrow()
+    let thrownError: unknown
+    try {
+      // delay(2) sleeps for ~2 seconds; the 100 ms timeout fires well before
+      // the script can finish, guaranteeing the timeout path wins every time.
+      await runJxa('delay(2);', { timeout: 100 })
+    } catch (err) {
+      thrownError = err
+    }
+
+    // Must throw a JxaExecutionError (not a bare Error or some other type).
+    expect(thrownError).toBeInstanceOf(JxaExecutionError)
+    const jxaErr = thrownError as JxaExecutionError
+
+    // The subprocess is killed by the timeout, so `cause.killed` is true.
+    // This is the specific signal that the *timeout* mechanism fired (not a
+    // script syntax error, a missing osascript binary, etc.).
+    expect((jxaErr.cause as { killed?: boolean } | undefined)?.killed).toBe(true)
   }, 10000)
 })
 
