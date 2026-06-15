@@ -1,8 +1,8 @@
 ---
 '@macts/cli': minor
-'@macts/cli-calendar': minor
+'@macts/calendar': minor
 '@macts/mcp': minor
-'@macts/mcp-calendar': minor
+'@macts/calendar-server': minor
 '@macts/core': minor
 ---
 
@@ -19,9 +19,9 @@ Add CLI and MCP plugin systems with Calendar plugins
 - Add `--mcp` flag to start MCP server with discovered plugins
 - Add `--serve` flag stub for Phase 8
 
-**@macts/cli-calendar:**
+**@macts/calendar:**
 
-- CLI plugin for macOS Calendar.app (install via `macts plugin install @macts/cli-calendar`)
+- CLI plugin for macOS Calendar.app (install via `macts plugin install @macts/calendar`)
 - Calendar management commands: list, create, get
 - Event management commands: list, create, get, show
 - Application control: reload calendars, switch view, view calendar
@@ -36,9 +36,9 @@ Add CLI and MCP plugin systems with Calendar plugins
 - Stdio transport for MCP protocol communication
 - Export types: `McpPlugin`, `McpToolDefinition`, `McpServerOptions`
 
-**@macts/mcp-calendar:**
+**@macts/calendar-server:**
 
-- MCP plugin for macOS Calendar.app (install via `macts plugin install @macts/mcp-calendar`)
+- MCP plugin for macOS Calendar.app (install via `macts plugin install @macts/calendar-server`)
 - 10 tools following naming convention `macts__calendar__<resource>_<operation>`
 - Calendar tools: list, get, create
 - Event tools: list, get, create, show
