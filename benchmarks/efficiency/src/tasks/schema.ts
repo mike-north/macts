@@ -65,7 +65,8 @@ export function parseTaskDefinition(value: unknown): TaskDefinition {
  * Validate an array of unknown values into task definitions, additionally
  * enforcing that task `id`s are unique across the set.
  *
- * @throws Error if any entry is invalid or if two tasks share an `id`.
+ * @throws ZodError if the input is not an array of >=1 valid task definitions.
+ * @throws Error if two tasks share an `id`.
  */
 export function parseTaskSet(values: unknown): TaskDefinition[] {
   const arraySchema = z.array(taskDefinitionSchema).min(1)

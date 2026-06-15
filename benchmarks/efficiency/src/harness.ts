@@ -60,12 +60,17 @@ export async function runTask(
   const start = clock()
   try {
     const outcome: RunOutcome = await runner.run({ task, maxRetries })
+    // Wall-clock is measured by the harness via the injected clock for EVERY
+    // outcome (success and failure alike), so it is consistent across runners and
+    // deterministic in tests — overriding whatever the runner self-reported.
+    const wallClockMs = Math.max(0, clock() - start)
+    const metrics = { ...outcome.metrics, wallClockMs }
     const result: TaskResult = {
       taskId: task.id,
       runner: runner.kind,
-      metrics: outcome.metrics,
+      metrics,
     }
-    if (!outcome.metrics.success) {
+    if (!metrics.success) {
       return {
         ...result,
         failureReason: outcome.failureReason ?? 'Runner reported task failure',
