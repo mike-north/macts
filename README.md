@@ -1,15 +1,25 @@
 # macts
 
-TypeScript SDKs for macOS app automation -- control Calendar, Reminders, OmniFocus, Xcode, and 30+ other native macOS applications from your code.
+macts turns scriptable macOS apps into secure, typed, agent-ready APIs.
 
-## What is macts?
+It provides TypeScript SDKs, CLI commands, HTTP endpoints, and MCP tools for interacting with
+native macOS applications through a local permissioned automation server. Instead of relying on
+brittle UI automation, agents and developer tools can interact with real application concepts like
+calendar events, reminders, files, messages, notes, tasks, projects, and windows.
 
-macts (macOS Automation Control TypeScript SDKs) lets you programmatically interact with macOS applications. It provides:
+Use macts to build local automations, give AI assistants scoped access to desktop apps, and create
+integrations that are structured, auditable, and safe to approve.
 
-- **Type-safe APIs** -- Full TypeScript support with autocomplete and type checking
-- **HTTP-based architecture** -- A local API server handles JXA/AppleScript execution securely
-- **Multiple interfaces** -- Use via SDK, CLI, or MCP (Model Context Protocol) for AI assistants
-- **Manifest-driven** -- App interfaces are defined in YAML manifests, with packages generated automatically
+## Why macts?
+
+Direct UI automation — clicking, typing, reading screens — is a reasonable fallback, but it is
+expensive in tokens, fragile under visual changes, and difficult to govern. macts offers a better
+path for agents that need to work with macOS applications repeatedly:
+
+- **Token-efficient**: a single typed API call replaces a multi-step observe-click-observe loop
+- **Reliable**: structured app interfaces are more durable than visual layouts
+- **Auditable**: every capability call can be logged with the app, resource, and operation
+- **Governable**: narrow API keys let you grant exactly the access an agent needs and nothing more
 
 ## Quick Start
 
@@ -19,23 +29,39 @@ macts (macOS Automation Control TypeScript SDKs) lets you programmatically inter
 npm install -g @macts/cli
 ```
 
-### 2. Start the API server
+### 2. Start the local API server
 
 ```bash
-macts api start
+macts service install   # install as a background service (auto-starts on login)
+macts service status    # verify it is running
 ```
 
-This starts a local HTTP server (default: `http://localhost:8372`) that executes commands against macOS applications.
-
-### 3. Create an API key
+Or start it directly for the current session:
 
 ```bash
-macts api-key create --name "my-app" --permissions "calendar:*"
+macts --serve            # start on the default port (8372)
+macts --serve --port 9000  # start on a custom port
 ```
 
-Save the generated API key -- you'll need it to authenticate SDK requests.
+This starts a local HTTP server at `http://localhost:8372` that routes calls to macOS applications.
 
-### 4. Use the SDK
+### 3. Create a scoped API key
+
+```bash
+# Grant exactly what the example below needs (list calendars, create events)
+macts api-key create --name "assistant" \
+  --permission "calendar:calendars:list" \
+  --permission "calendar:events:create"
+
+# …or grant every calendar operation with a wildcard
+macts api-key create --name "scheduler" --permission "calendar:*:*"
+```
+
+Save the generated token — you need it to authenticate SDK requests.
+
+### 4. Use the SDK or MCP tools
+
+**TypeScript SDK:**
 
 ```bash
 npm install @macts/calendar
@@ -50,7 +76,7 @@ const client = new CalendarClient({
 
 // List all calendars
 const calendars = await client.calendars.list()
-console.log('Your calendars:', calendars)
+console.log(calendars)
 
 // Create an event
 const event = await client.events.create({
@@ -58,8 +84,63 @@ const event = await client.events.create({
   startDate: new Date('2026-02-17T10:00:00'),
   endDate: new Date('2026-02-17T11:00:00'),
 })
-console.log('Created event:', event.uid)
+console.log(event.uid)
 ```
+
+**MCP tools (for AI assistants):**
+
+macts exposes each app's capabilities as MCP tools through its server package (e.g.
+`@macts/calendar-server`). The MCP daemon discovers server packages installed under the macts
+plugins directory (`~/.macts/plugins`, override with `MACTS_HOME`):
+
+```bash
+# Install an app's server package into the plugins directory…
+# (--ignore-scripts mirrors the built-in installer and avoids running package lifecycle scripts)
+npm install --ignore-scripts --prefix ~/.macts/plugins @macts/calendar-server
+# …then start the daemon and point Claude Desktop (or another MCP client) at it.
+macts mcp start
+```
+
+> **Note:** installing MCP **server** packages is currently a manual `npm install` step —
+> `macts plugin install` manages CLI plugins only and does not yet handle `-server` packages. A
+> first-class command is tracked in [#27](https://github.com/mike-north/macts/issues/27).
+
+## AI Agent Use Cases
+
+macts is designed to fit naturally into the way agents should use local applications.
+
+### One-off work
+
+For unusual, low-risk, or unlikely-to-repeat tasks, the agent can use a direct SDK call or CLI
+command without any special setup.
+
+### Existing capability
+
+When macts already exposes the right operation, the agent should prefer it over UI automation.
+
+Example — scheduling a meeting:
+
+1. Check whether `calendar:events:create` permission is already granted to the active API key.
+2. If not, create a key with that narrow permission.
+3. Call `client.events.create(...)`.
+4. Report success.
+
+This path is faster, cheaper in tokens, and easier to verify than driving the Calendar UI directly.
+
+### Repeated workflow
+
+When an agent notices it is performing the same multi-app sequence repeatedly, that pattern is a
+good candidate for a persistent automation (a shell script, a CLI alias, or a custom MCP tool built
+on macts primitives).
+
+### Missing capability
+
+If macts does not yet expose the operation the agent needs, the app manifest can be extended and a
+new SDK/CLI/MCP binding generated. Filing an issue or contributing a manifest entry is the
+structured path to grow the available toolset.
+
+> **Roadmap:** future releases will add `macts capabilities list/inspect` for programmatic
+> discovery, and agent-assisted manifest expansion so agents can propose new capabilities directly.
 
 ## Supported Applications
 
@@ -123,21 +204,23 @@ console.log('Created event:', event.uid)
 | Package       | Description                                   |
 | ------------- | --------------------------------------------- |
 | `@macts/cli`  | Command-line interface                        |
-| `@macts/api`  | HTTP API server                               |
-| `@macts/core` | Manifest schemas, code generators, JXA bridge |
-| `@macts/mcp`  | MCP server framework                          |
+| `@macts/api`  | Local HTTP API server                         |
+| `@macts/core` | Manifest schemas, code generators, app bridge |
+| `@macts/mcp`  | MCP server framework and plugin loader        |
 
 ### Which package should I use?
 
-- **Building an app?** Install the client package for your target app (e.g., `@macts/calendar`) for programmatic access
-- **Quick automation?** Use `@macts/cli` for command-line operations
-- **AI assistant integration?** Install the server package (e.g., `@macts/calendar-server`) for MCP tools compatible with Claude, Copilot, or other MCP clients
+- **Building an app or script?** Install the client package for your target app (e.g.
+  `@macts/calendar`) for programmatic access via the TypeScript SDK.
+- **Running quick automations?** Use `@macts/cli` for one-off command-line operations.
+- **Connecting an AI assistant?** Install the server package (e.g. `@macts/calendar-server`) for
+  MCP tools compatible with Claude Desktop, Copilot, or other MCP clients.
 
 ## Architecture
 
 ```
 ┌───────────────────────────────────────────────────────┐
-│  YOUR CODE                                            │
+│  YOUR CODE / AI AGENT                                 │
 │                                                       │
 │  SDK  (@macts/calendar)         ──► HTTP requests     │
 │  CLI  (@macts/cli)              ──► HTTP requests     │
@@ -146,45 +229,85 @@ console.log('Created event:', event.uid)
                          │ HTTP + Bearer Token
                          ▼
 ┌───────────────────────────────────────────────────────┐
-│  API SERVER (@macts/api)                              │
+│  LOCAL API SERVER (@macts/api)                        │
 │      ├── API key validation                           │
-│      ├── Permission checking                          │
-│      └── JXA execution                                │
+│      ├── Permission checking (app:resource:operation) │
+│      ├── Rate limiting                                │
+│      └── Structured command execution                 │
 └────────────────────────┬──────────────────────────────┘
-                         │ osascript
+                         │ native macOS automation
                          ▼
                    macOS Applications
 ```
 
-## Requirements
+All execution happens locally on your Mac. No cloud dependency is required.
 
-- **macOS** -- macts uses JXA (JavaScript for Automation) which is macOS-only
-- **Node.js 20+** -- Required for the API server and SDK
-- **Target apps** -- Must be installed and have granted automation permissions
+## Security Model
 
-## Permissions
+macts uses a capability-scoped permission model designed to make the safe path also the easy path.
 
-macts uses a three-tier permission system to control API key access. Permissions follow the format `app:resource:operation`:
+### Permissions follow `app:resource:operation`
+
+Every API key is granted a set of explicit capability scopes:
 
 ```bash
-# Full access to an app
-macts api-key create --name "full-access" --permissions "calendar:*"
+# Grant only what is needed
+macts api-key create --name "assistant" --permission "calendar:events:create"
 
-# Read-only access
-macts api-key create --name "read-only" --permissions "calendar:*:read"
+# Read-only access (list/get/show are the read-type operations)
+macts api-key create --name "reader" \
+  --permission "calendar:calendars:list" \
+  --permission "calendar:events:list" \
+  --permission "calendar:events:get" \
+  --permission "calendar:events:show"
 
-# Specific operations
-macts api-key create --name "events-only" --permissions "calendar:events:*"
-
-# Fine-grained
-macts api-key create --name "list-only" --permissions "calendar:events:list,calendar:calendars:list"
+# Multiple apps, fine-grained (repeat --permission for each scope)
+macts api-key create --name "scheduler" \
+  --permission "calendar:events:list" \
+  --permission "calendar:events:create" \
+  --permission "reminders:reminders:list"
 ```
 
-See [manifests/README.md](manifests/README.md) for the full permissions model documentation.
+This is the difference between "let the AI control my computer" and "let the AI create Calendar
+events." The narrower grant is easier to approve, easier to revoke, and easier to audit.
+
+### Local-first execution
+
+The local API server accepts connections only from `localhost` by default. No requests leave your
+machine unless an app capability itself (such as Mail's send operation) involves sending data.
+
+### Narrow defaults, explicit escalation
+
+API keys are granted only the permissions listed at creation time. Wildcards (`*`) are matched at
+request time, so a key with `calendar:*:*` matches every current or future operation on any
+calendar resource (the fine-grained operations — `list`, `get`, `create`, `update`, `delete`, and
+so on — are defined by each app's manifest).
+Pass `--manifest` to pre-expand a wildcard into only the explicit capabilities present in the
+manifest at key-creation time. Keys can be revoked at any time:
+
+```bash
+macts api-key revoke <key-id>
+```
+
+### Sensitive operations are distinct scopes
+
+Operations that send data, delete content, or change system state have their own operation
+identifiers (`send`, `delete`, `execute`, `create` vs `read` vs `list`). You can grant read
+access without granting write or delete access, or grant create without granting delete.
+
+> **Roadmap:** planned additions include human-readable permission explanations, approval gates for
+> sensitive operations, and structured audit logs.
+
+## Requirements
+
+- **macOS** -- macts automates native macOS applications, which are only available on macOS
+- **Node.js 20+** -- Required for the API server and SDK
+- **Target apps** -- Must be installed and have granted automation permissions when first prompted
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing, including how to add support for new macOS applications.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, including how to add support for new macOS
+applications.
 
 ```bash
 git clone https://github.com/mike-north/macts.git
