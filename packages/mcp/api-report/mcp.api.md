@@ -4,6 +4,8 @@
 
 ```ts
 
+import { CapabilityRegistry } from '@macts/core';
+import { GovernanceFilter } from '@macts/core';
 import { Server } from 'node:http';
 import { VERSION } from '@macts/core';
 
@@ -16,6 +18,9 @@ export interface CachedPlugin {
 
 // @public
 export function createDaemon(options: DaemonOptions): DaemonServer;
+
+// @public
+export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefinition;
 
 // @public
 export function createMcpServer(plugins: readonly McpPlugin[], options?: McpServerOptions): Promise<void>;
@@ -40,6 +45,15 @@ export interface DaemonServer {
 
 // @public
 export function discoverMcpPlugins(): Promise<PluginDiscoveryResult>;
+
+// @public
+export const DISCOVERY_TOOL_NAME = "macts__capabilities__discover";
+
+// @public
+export interface DiscoveryToolOptions {
+    readonly governance?: GovernanceFilter;
+    readonly registry: CapabilityRegistry;
+}
 
 // @public
 export function getPidFile(): string;
