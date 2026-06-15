@@ -61,7 +61,7 @@ describe('MCP Generator Integration', () => {
       name: string
       version: string
     }
-    expect(packageJson.name).toBe('@macts/mcp-calendar')
+    expect(packageJson.name).toBe('@macts/calendar-server')
     expect(packageJson.version).toBe('0.1.0')
   })
 

@@ -94,7 +94,7 @@ describe('generateMcpPlugin', () => {
     expect(result.pluginContent).toContain('export const testappPlugin')
     expect(result.indexContent).toContain('export { testappPlugin as plugin, testappPlugin }')
     expect(result.toolsIndexContent).toContain('export const allTools')
-    expect(result.packageJson).toContain('@macts/mcp-testapp')
+    expect(result.packageJson).toContain('@macts/testapp-server')
     expect(result.tools.length).toBeGreaterThan(0)
     expect(result.toolFiles.length).toBeGreaterThan(0)
   })
@@ -202,19 +202,19 @@ describe('generateMcpPlugin', () => {
       scripts: Record<string, string>
     }
 
-    expect(packageJson.name).toBe('@macts/mcp-testapp')
+    expect(packageJson.name).toBe('@macts/testapp-server')
     expect(packageJson.version).toBe('1.0.0')
     expect(packageJson.type).toBe('module')
     expect(packageJson.keywords).toEqual(['macts-mcp-plugin'])
     expect(packageJson.description).toBe('MCP plugin for macOS TestApp.app')
     expect(packageJson.exports).toEqual({
       '.': {
-        types: './dist/mcp-testapp.d.ts',
+        types: './dist/testapp-server.d.ts',
         import: './dist/index.js',
       },
     })
     expect(packageJson.main).toBe('./dist/index.js')
-    expect(packageJson.types).toBe('./dist/mcp-testapp.d.ts')
+    expect(packageJson.types).toBe('./dist/testapp-server.d.ts')
     expect(packageJson.files).toEqual(['dist'])
     expect(packageJson.dependencies).toHaveProperty('@macts/mcp')
     expect(packageJson.dependencies).toHaveProperty('@macts/sdk-testapp')

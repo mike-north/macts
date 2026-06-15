@@ -15,7 +15,7 @@ export interface CreateMcpContextOptions {
   appName: string
   /** App manifest */
   manifest: AppManifest
-  /** Package name (defaults to @macts/mcp-{appName}) */
+  /** Package name (defaults to @macts/{appName}-server) */
   packageName?: string
   /** SDK package name (defaults to @macts/sdk-{appName}) */
   sdkPackageName?: string
@@ -31,7 +31,7 @@ export interface CreateMcpContextOptions {
  */
 export function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext {
   const { appName, manifest, version } = options
-  const packageName = options.packageName ?? `@macts/mcp-${appName.toLowerCase()}`
+  const packageName = options.packageName ?? `@macts/${appName.toLowerCase()}-server`
   const sdkPackageName = options.sdkPackageName ?? `@macts/sdk-${appName.toLowerCase()}`
 
   return {

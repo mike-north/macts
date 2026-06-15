@@ -1,7 +1,7 @@
 import type { AppManifest, Resource, Command, Enum, HierarchyChild } from '../../manifest/index.js'
 
 export interface CliGeneratorOptions {
-  /** Package name (e.g., @macts/cli-calendar) */
+  /** Package name (e.g., @macts/calendar) */
   packageName: string
   /** SDK package name (e.g., @macts/sdk-calendar) */
   sdkPackageName: string
