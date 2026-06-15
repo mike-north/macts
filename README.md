@@ -87,14 +87,20 @@ const event = await client.events.create({
 
 **MCP tools (for AI assistants):**
 
+macts exposes each app's capabilities as MCP tools through its server package (e.g.
+`@macts/calendar-server`). The MCP daemon discovers server packages installed under the macts
+plugins directory (`~/.macts/plugins`, override with `MACTS_HOME`):
+
 ```bash
-macts mcp start    # start the local MCP daemon
+# Install an app's server package into the plugins directory…
+npm install --prefix ~/.macts/plugins @macts/calendar-server
+# …then start the daemon and point Claude Desktop (or another MCP client) at it.
+macts mcp start
 ```
 
-macts exposes each app's capabilities as MCP tools through its server package (e.g.
-`@macts/calendar-server`). Install the server package into the MCP plugins directory
-(`~/.macts/plugins`, override with `MACTS_HOME`), then start the daemon and point Claude Desktop or
-another MCP client at the local MCP server to give it access to the calendar tools.
+> **Note:** installing MCP **server** packages is currently a manual `npm install` step —
+> `macts plugin install` manages CLI plugins only and does not yet handle `-server` packages. A
+> first-class command is tracked in [#27](https://github.com/mike-north/macts/issues/27).
 
 ## AI Agent Use Cases
 
