@@ -115,6 +115,10 @@ describe('resolveDiscoveryLimit', () => {
 
   it('falls back to the default for fractional values', () => {
     expect(resolveDiscoveryLimit(2.5, 10)).toBe(10)
+    // String '2.5': Number.parseInt would silently truncate to 2; we must reject it.
+    expect(resolveDiscoveryLimit('2.5', 10)).toBe(10)
+    // Scientific notation strings are also not plain integer strings.
+    expect(resolveDiscoveryLimit('1e3', 10)).toBe(10)
   })
 
   it('falls back to the default for NaN / Infinity numbers', () => {

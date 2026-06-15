@@ -41,8 +41,18 @@ import type { Capability, CapabilityRegistry } from './types.js'
  * @returns A positive integer limit, or `defaultLimit` when `raw` is invalid
  */
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number {
+  // For string inputs, require an exact base-10 integer representation before
+  // parsing. `Number.parseInt('2.5', 10)` silently yields 2, which would let a
+  // fractional CLI value like `--limit 2.5` appear valid. `/^\d+$/` on the
+  // trimmed string rejects `2.5`, `1e3`, and `foo` before parseInt ever runs.
   const value =
-    typeof raw === 'string' ? Number.parseInt(raw, 10) : typeof raw === 'number' ? raw : Number.NaN
+    typeof raw === 'string'
+      ? /^\d+$/.test(raw.trim())
+        ? Number.parseInt(raw, 10)
+        : Number.NaN
+      : typeof raw === 'number'
+        ? raw
+        : Number.NaN
   if (Number.isInteger(value) && value > 0) {
     return value
   }

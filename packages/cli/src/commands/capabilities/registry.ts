@@ -5,6 +5,7 @@
  * @packageDocumentation
  */
 
+import * as os from 'node:os'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { loadCapabilityRegistry, type CapabilityRegistry } from '@macts/core'
@@ -25,7 +26,9 @@ export function manifestsDirCandidates(explicit?: string): string[] {
   // 1. Current working directory's manifests/.
   candidates.push(path.join(process.cwd(), 'manifests'))
   // 2. User's macts config directory.
-  candidates.push(path.join(process.env['HOME'] ?? '', '.macts', 'manifests'))
+  // os.homedir() is more robust than process.env['HOME']: it never returns an
+  // empty string and works correctly when HOME is unset (e.g. some CI envs).
+  candidates.push(path.join(os.homedir(), '.macts', 'manifests'))
   // 3. Relative to the built CLI (packages/cli/dist/...).
   candidates.push(path.resolve(import.meta.dirname, '../../../../manifests'))
   // 4. Relative to source (packages/cli/src/commands/capabilities/...).

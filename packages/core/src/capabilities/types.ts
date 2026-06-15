@@ -38,7 +38,13 @@ export interface Capability {
   /** Resource the operation targets (e.g. `events`), or `app` for app-scoped. */
   readonly resource: string
 
-  /** Operation name (e.g. `create`, `list`, `do-script`). */
+  /**
+   * Operation name — the manifest command key (camelCase).
+   *
+   * Examples: `create`, `list`, `doScript`. The CLI surfaces convert this to
+   * kebab-case for display (e.g. `doScript` → `do-script`); the raw value
+   * here preserves the manifest key so capability names are stable.
+   */
   readonly operation: string
 
   /** Human-readable description, sourced from the manifest command. */
