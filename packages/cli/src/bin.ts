@@ -26,6 +26,10 @@ import {
 } from './commands/api-key/index.js'
 import { PermissionsListCommand, PermissionsExpandCommand } from './commands/permissions/index.js'
 import {
+  CapabilitiesSearchCommand,
+  CapabilitiesInspectCommand,
+} from './commands/capabilities/index.js'
+import {
   ServiceInstallCommand,
   ServiceUninstallCommand,
   ServiceStatusCommand,
@@ -66,6 +70,10 @@ cli.register(ApiKeyVerifyCommand)
 // Register permissions commands
 cli.register(PermissionsListCommand)
 cli.register(PermissionsExpandCommand)
+
+// Register capability discovery commands
+cli.register(CapabilitiesSearchCommand)
+cli.register(CapabilitiesInspectCommand)
 
 // Register service management commands
 cli.register(ServiceInstallCommand)
