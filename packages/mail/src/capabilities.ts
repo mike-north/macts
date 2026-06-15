@@ -109,7 +109,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     description:
       'Command to get just the email address of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "jdoe@example.com"',
     permission: null,
-    risk: 'write',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},

@@ -99,7 +99,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'cutSelection',
     description: 'Cut selected text (If Possible).',
     permission: null,
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -204,7 +204,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'goForward',
     description: 'Go Forward (If Possible).',
     permission: null,
-    risk: 'send',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -288,7 +288,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'pasteSelection',
     description: 'Paste text (If Possible).',
     permission: null,
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},

@@ -194,7 +194,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'parseTasksInto',
     description: 'Converts a textual representation of tasks into tasks',
     permission: 'omnifocus:app:parseTasksInto',
-    risk: 'write',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {

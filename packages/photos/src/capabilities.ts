@@ -242,7 +242,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'pauseSlideshow',
     description: 'Pause the currently-playing slideshow',
     permission: 'photos:slideshow:pause',
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -272,7 +272,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'resumeSlideshow',
     description: 'Resume the currently-playing slideshow',
     permission: 'photos:slideshow:resume',
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -329,7 +329,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'startSlideshow',
     description: 'Display an ad-hoc slide show from a list of media items',
     permission: 'photos:slideshow:start',
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {
@@ -353,7 +353,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'stopSlideshow',
     description: 'End the currently-playing slideshow',
     permission: 'photos:slideshow:stop',
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},

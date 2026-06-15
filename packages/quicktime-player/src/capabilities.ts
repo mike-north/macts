@@ -244,7 +244,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'stepForward',
     description: 'Step the movie forward the specified number of steps (default is 1).',
     permission: null,
-    risk: 'send',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {

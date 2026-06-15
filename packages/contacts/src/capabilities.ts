@@ -207,7 +207,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     description:
       'RollOver - Determines if the rollover action should be enabled for the given person and value',
     permission: null,
-    risk: 'system-change',
+    risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {

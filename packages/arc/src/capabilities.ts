@@ -135,7 +135,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'goForward',
     description: 'Go Forward (If Possible).',
     permission: null,
-    risk: 'send',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},

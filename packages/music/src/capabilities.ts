@@ -226,7 +226,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'fastForward',
     description: 'skip forward in a playing track',
     permission: null,
-    risk: 'send',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},

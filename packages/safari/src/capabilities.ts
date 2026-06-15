@@ -75,7 +75,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'dispatchMessageToExtension',
     description: 'Dispatch a message to a Safari Extension.',
     permission: null,
-    risk: 'read',
+    risk: 'execute',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -170,7 +170,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'showCreditCardSettings',
     description: 'Show Safari Credit Card Settings.',
     permission: null,
-    risk: 'write',
+    risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {},
