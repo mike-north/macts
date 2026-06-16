@@ -79,8 +79,10 @@ describe('loadPolicyFromFile — invalid schema', () => {
     expect((result.issues ?? []).length).toBeGreaterThan(0)
   })
 
-  it('reports all validation issues in the error', async () => {
-    // Multiple violations: bad version + bad defaultDisposition.
+  it('reports ALL validation issues — not just the first one', async () => {
+    // Two distinct violations: bad version AND bad defaultDisposition.
+    // A loader that short-circuits on the first issue would return only one;
+    // this test would catch that regression.
     const filePath = await writePolicyFile(
       JSON.stringify({ version: 'bad', defaultDisposition: 'not-a-disposition' })
     )
@@ -89,8 +91,12 @@ describe('loadPolicyFromFile — invalid schema', () => {
     if (!result.found) return
     expect('error' in result).toBe(true)
     if (!('error' in result)) return
-    // Should mention both issues.
-    expect((result.issues ?? []).length).toBeGreaterThanOrEqual(1)
+    const issues = result.issues ?? []
+    // Both violations must be reported — >= 1 is not sufficient.
+    expect(issues.length).toBeGreaterThanOrEqual(2)
+    const paths = issues.map((i) => i.path)
+    expect(paths).toContain('version')
+    expect(paths).toContain('defaultDisposition')
   })
 })
 
