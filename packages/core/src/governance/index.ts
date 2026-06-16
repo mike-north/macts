@@ -75,3 +75,13 @@ export {
   findMatchingPolicyRule,
   type PolicyRuleMatch,
 } from './policy-matcher.js'
+
+// Call-time policy enforcement engine.
+export {
+  type EnforcementOutcome,
+  type EnforcementDecision,
+  type CallAuditContext,
+  type EnforceCallOptions,
+  resolveDisposition,
+  enforceCall,
+} from './enforcement.js'
