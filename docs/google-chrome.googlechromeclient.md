@@ -72,40 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[bookmarkfolders](./google-chrome.googlechromeclient.bookmarkfolders.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[BookmarkFolderResourceClient](./google-chrome.bookmarkfolderresourceclient.md)
-
-</td><td>
-
-A bookmarks folder that contains other bookmarks folder and bookmark items.
-
-</td></tr>
-<tr><td>
-
-[bookmarkitems](./google-chrome.googlechromeclient.bookmarkitems.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[BookmarkItemResourceClient](./google-chrome.bookmarkitemresourceclient.md)
-
-</td><td>
-
-An item consists of an URL and the title of a bookmark
-
-</td></tr>
-<tr><td>
-
 [http](./google-chrome.googlechromeclient.http.md)
 
 </td><td>
@@ -119,40 +85,6 @@ An item consists of an URL and the title of a bookmark
 </td><td>
 
 Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[tabs](./google-chrome.googlechromeclient.tabs.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TabResourceClient](./google-chrome.tabresourceclient.md)
-
-</td><td>
-
-A tab.
-
-</td></tr>
-<tr><td>
-
-[windows](./google-chrome.googlechromeclient.windows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[WindowResourceClient](./google-chrome.windowresourceclient.md)
-
-</td><td>
-
-A window.
 
 </td></tr>
 </tbody></table>

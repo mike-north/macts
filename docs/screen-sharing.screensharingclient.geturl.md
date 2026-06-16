@@ -9,8 +9,36 @@ Open a vnc URL
 **Signature:**
 
 ```typescript
-getURL(): Promise<void>;
+getURL(url: string): Promise<void>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+url
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

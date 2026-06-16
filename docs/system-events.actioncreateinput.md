@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ActionCreateInput](./system-events.actioncreateinput.md)
 
-## ActionCreateInput interface
+## ActionCreateInput type
 
 Input for creating a Action
 
 **Signature:**
 
 ```typescript
-interface ActionCreateInput
+type ActionCreateInput = Record<string, never>
 ```

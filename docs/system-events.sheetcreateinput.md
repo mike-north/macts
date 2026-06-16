@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [SheetCreateInput](./system-events.sheetcreateinput.md)
 
-## SheetCreateInput interface
+## SheetCreateInput type
 
 Input for creating a Sheet
 
 **Signature:**
 
 ```typescript
-interface SheetCreateInput
+type SheetCreateInput = Record<string, never>
 ```

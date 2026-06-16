@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [EncoderCreateInput](./music.encodercreateinput.md)
 
-## EncoderCreateInput interface
+## EncoderCreateInput type
 
 Input for creating a Encoder
 
 **Signature:**
 
 ```typescript
-interface EncoderCreateInput
+type EncoderCreateInput = Record<string, never>
 ```

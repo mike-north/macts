@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [PopOverCreateInput](./system-events.popovercreateinput.md)
 
-## PopOverCreateInput interface
+## PopOverCreateInput type
 
 Input for creating a PopOver
 
 **Signature:**
 
 ```typescript
-interface PopOverCreateInput
+type PopOverCreateInput = Record<string, never>
 ```

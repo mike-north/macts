@@ -66,6 +66,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./script-editor.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Document](./script-editor.document.md)
 
 </td><td>
@@ -106,6 +115,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./script-editor.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Script Editor, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DocumentSchema](./script-editor.documentschema.md)
 
 </td><td>
@@ -125,6 +143,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./script-editor.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [DocumentUpdateInput](./script-editor.documentupdateinput.md)
 

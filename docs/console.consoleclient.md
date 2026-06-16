@@ -72,23 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[devices](./console.consoleclient.devices.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DeviceResourceClient](./console.deviceresourceclient.md)
-
-</td><td>
-
-A device in Console
-
-</td></tr>
-<tr><td>
-
 [http](./console.consoleclient.http.md)
 
 </td><td>

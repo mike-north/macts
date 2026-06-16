@@ -57,50 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./tv.filetrackresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new filetrack.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./tv.filetrackresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a filetrack.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./tv.filetrackresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a filetrack by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./tv.filetrackresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all filetracks.
-
-</td></tr>
-<tr><td>
-
 [refresh()](./tv.filetrackresourceclient.refresh.md)
 
 </td><td>
@@ -108,17 +64,6 @@ List all filetracks.
 </td><td>
 
 update file track information from the current information in the track’s file
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./tv.filetrackresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing filetrack.
 
 </td></tr>
 </tbody></table>

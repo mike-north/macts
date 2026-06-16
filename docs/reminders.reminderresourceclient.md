@@ -101,7 +101,7 @@ Get a reminder by id.
 </td></tr>
 <tr><td>
 
-[list()](./reminders.reminderresourceclient.list.md)
+[list(listId)](./reminders.reminderresourceclient.list.md)
 
 </td><td>
 
@@ -119,17 +119,6 @@ List all reminders.
 </td><td>
 
 Show the reminder in Reminders.app UI
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./reminders.reminderresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing reminder.
 
 </td></tr>
 </tbody></table>

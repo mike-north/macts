@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/notes](./notes.md) &gt; [AttachmentCreateInput](./notes.attachmentcreateinput.md)
 
-## AttachmentCreateInput interface
+## AttachmentCreateInput type
 
 Input for creating a Attachment
 
 **Signature:**
 
 ```typescript
-interface AttachmentCreateInput
+type AttachmentCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)
 
-## ClippingWindowCreateInput interface
+## ClippingWindowCreateInput type
 
 Input for creating a ClippingWindow
 
 **Signature:**
 
 ```typescript
-interface ClippingWindowCreateInput
+type ClippingWindowCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/arc](./arc.md) &gt; [SpaceCreateInput](./arc.spacecreateinput.md)
 
-## SpaceCreateInput interface
+## SpaceCreateInput type
 
 Input for creating a Space
 
 **Signature:**
 
 ```typescript
-interface SpaceCreateInput
+type SpaceCreateInput = Record<string, never>
 ```

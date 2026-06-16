@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [GrowAreaCreateInput](./system-events.growareacreateinput.md)
 
-## GrowAreaCreateInput interface
+## GrowAreaCreateInput type
 
 Input for creating a GrowArea
 
 **Signature:**
 
 ```typescript
-interface GrowAreaCreateInput
+type GrowAreaCreateInput = Record<string, never>
 ```

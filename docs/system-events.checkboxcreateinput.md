@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [CheckboxCreateInput](./system-events.checkboxcreateinput.md)
 
-## CheckboxCreateInput interface
+## CheckboxCreateInput type
 
 Input for creating a Checkbox
 
 **Signature:**
 
 ```typescript
-interface CheckboxCreateInput
+type CheckboxCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)
 
-## RadioButtonCreateInput interface
+## RadioButtonCreateInput type
 
 Input for creating a RadioButton
 
 **Signature:**
 
 ```typescript
-interface RadioButtonCreateInput
+type RadioButtonCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [FolderCreateInput](./finder.foldercreateinput.md)
 
-## FolderCreateInput interface
+## FolderCreateInput type
 
 Input for creating a Folder
 
 **Signature:**
 
 ```typescript
-interface FolderCreateInput
+type FolderCreateInput = Record<string, never>
 ```

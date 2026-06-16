@@ -4,7 +4,7 @@
 
 ## EventCreateInput.alldayEvent property
 
-True if the event is an all-day event
+Whether this is an all-day event
 
 **Signature:**
 

@@ -4,7 +4,11 @@
 
 ## COARSE_OPERATIONS variable
 
-Standard CRUD operations for coarse permissions.
+The canonical, fixed set of coarse CRUD operations.
+
+This is the ONLY place this list is defined. Coarse operations are aliases that group fine-grained operations; they are expanded against a manifest at key-creation time and never authorize a call directly.
+
+Note there is intentionally \*\*no\*\* standalone `read` \*that authorizes\*: a coarse `read` only ever resolves to the concrete fine-grained operations (`list`<!-- -->, `get`<!-- -->, `show`<!-- -->, …) declared by the manifest. A bare `app:resource:read` scope that is not expanded against a manifest authorizes nothing and is therefore rejected at creation time rather than stored.
 
 **Signature:**
 

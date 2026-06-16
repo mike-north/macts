@@ -9,6 +9,7 @@
 ```typescript
 DocumentSchema: z.ZodObject<
   {
+    id: z.ZodOptional<z.ZodString>
     name: z.ZodString
     path: z.ZodOptional<z.ZodString>
     modified: z.ZodBoolean

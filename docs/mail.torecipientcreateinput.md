@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [ToRecipientCreateInput](./mail.torecipientcreateinput.md)
 
-## ToRecipientCreateInput interface
+## ToRecipientCreateInput type
 
 Input for creating a ToRecipient
 
 **Signature:**
 
 ```typescript
-interface ToRecipientCreateInput
+type ToRecipientCreateInput = Record<string, never>
 ```

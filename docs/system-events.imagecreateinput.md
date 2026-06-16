@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ImageCreateInput](./system-events.imagecreateinput.md)
 
-## ImageCreateInput interface
+## ImageCreateInput type
 
 Input for creating a Image
 
 **Signature:**
 
 ```typescript
-interface ImageCreateInput
+type ImageCreateInput = Record<string, never>
 ```

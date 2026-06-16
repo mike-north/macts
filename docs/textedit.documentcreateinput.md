@@ -58,7 +58,7 @@ string
 
 </td><td>
 
-_(Optional)_ The text content of the document
+_(Optional)_ Initial text content
 
 </td></tr>
 </tbody></table>

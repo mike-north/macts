@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [IncrementorCreateInput](./system-events.incrementorcreateinput.md)
 
-## IncrementorCreateInput interface
+## IncrementorCreateInput type
 
 Input for creating a Incrementor
 
 **Signature:**
 
 ```typescript
-interface IncrementorCreateInput
+type IncrementorCreateInput = Record<string, never>
 ```

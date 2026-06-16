@@ -17,24 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AccountResourceClient](./messages.accountresourceclient.md)
-
-</td><td>
-
-Client for an account that can be logged in to from this system.
-
-</td></tr>
-<tr><td>
-
-[ChatResourceClient](./messages.chatresourceclient.md)
-
-</td><td>
-
-Client for an sms or imessage chat..
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./messages.httpclient.md)
 
 </td><td>
@@ -58,15 +40,6 @@ Messages client for HTTP-based macOS automation.
 </td><td>
 
 Error class for Messages API errors.
-
-</td></tr>
-<tr><td>
-
-[ParticipantResourceClient](./messages.participantresourceclient.md)
-
-</td><td>
-
-Client for a participant for an account..
 
 </td></tr>
 </tbody></table>
@@ -102,20 +75,20 @@ Input for creating a Account
 </td></tr>
 <tr><td>
 
+[CapabilityMetadata](./messages.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Chat](./messages.chat.md)
 
 </td><td>
 
 An SMS or iMessage chat.
-
-</td></tr>
-<tr><td>
-
-[ChatCreateInput](./messages.chatcreateinput.md)
-
-</td><td>
-
-Input for creating a Chat
 
 </td></tr>
 <tr><td>
@@ -136,15 +109,6 @@ Client configuration options.
 A participant for an account.
 
 </td></tr>
-<tr><td>
-
-[ParticipantCreateInput](./messages.participantcreateinput.md)
-
-</td><td>
-
-Input for creating a Participant
-
-</td></tr>
 </tbody></table>
 
 ## Variables
@@ -163,6 +127,15 @@ Description
 [AccountSchema](./messages.accountschema.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[capabilities](./messages.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Messages, with risk metadata.
 
 </td></tr>
 <tr><td>
@@ -203,6 +176,24 @@ Input for updating a Account
 </td></tr>
 <tr><td>
 
+[CapabilityRisk](./messages.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[ChatCreateInput](./messages.chatcreateinput.md)
+
+</td><td>
+
+Input for creating a Chat
+
+</td></tr>
+<tr><td>
+
 [ChatUpdateInput](./messages.chatupdateinput.md)
 
 </td><td>
@@ -226,6 +217,15 @@ ConnectionStatus
 </td><td>
 
 Direction
+
+</td></tr>
+<tr><td>
+
+[ParticipantCreateInput](./messages.participantcreateinput.md)
+
+</td><td>
+
+Input for creating a Participant
 
 </td></tr>
 <tr><td>

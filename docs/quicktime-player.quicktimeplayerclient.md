@@ -72,23 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[documents](./quicktime-player.quicktimeplayerclient.documents.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DocumentResourceClient](./quicktime-player.documentresourceclient.md)
-
-</td><td>
-
-A QuickTime Player document
-
-</td></tr>
-<tr><td>
-
 [http](./quicktime-player.quicktimeplayerclient.http.md)
 
 </td><td>

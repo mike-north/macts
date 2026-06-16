@@ -58,7 +58,7 @@ string
 
 </td><td>
 
-_(Optional)_ The notes attached to the reminder
+_(Optional)_ Reminder notes
 
 </td></tr>
 <tr><td>
@@ -88,7 +88,7 @@ Date
 
 </td><td>
 
-_(Optional)_ The due date of the reminder
+_(Optional)_ Due date
 
 </td></tr>
 <tr><td>
@@ -103,12 +103,12 @@ boolean
 
 </td><td>
 
-_(Optional)_ Whether the reminder is flagged
+_(Optional)_ Whether to flag the reminder
 
 </td></tr>
 <tr><td>
 
-[name?](./reminders.remindercreateinput.name.md)
+[listId](./reminders.remindercreateinput.listid.md)
 
 </td><td>
 
@@ -118,7 +118,22 @@ string
 
 </td><td>
 
-_(Optional)_ The name of the reminder
+List identifier for the reminder
+
+</td></tr>
+<tr><td>
+
+[name](./reminders.remindercreateinput.name.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+Reminder name
 
 </td></tr>
 <tr><td>
@@ -133,7 +148,7 @@ number
 
 </td><td>
 
-_(Optional)_ The priority of the reminder (0=none, 1=high, 5=medium, 9=low)
+_(Optional)_ Priority (0=none, 1=high, 5=medium, 9=low)
 
 </td></tr>
 <tr><td>
@@ -148,7 +163,7 @@ Date
 
 </td><td>
 
-_(Optional)_ The remind date of the reminder
+_(Optional)_ Remind me date
 
 </td></tr>
 </tbody></table>

@@ -87,57 +87,6 @@ Description
 Get the HTTP client for making custom requests.
 
 </td></tr>
-<tr><td>
-
-[spaces](./arc.arcclient.spaces.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[SpaceResourceClient](./arc.spaceresourceclient.md)
-
-</td><td>
-
-A space
-
-</td></tr>
-<tr><td>
-
-[tabs](./arc.arcclient.tabs.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TabResourceClient](./arc.tabresourceclient.md)
-
-</td><td>
-
-A window's tab
-
-</td></tr>
-<tr><td>
-
-[windows](./arc.arcclient.windows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[WindowResourceClient](./arc.windowresourceclient.md)
-
-</td><td>
-
-An application's window
-
-</td></tr>
 </tbody></table>
 
 ## Methods

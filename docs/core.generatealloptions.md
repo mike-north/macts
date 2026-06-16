@@ -73,7 +73,7 @@ string
 
 </td><td>
 
-_(Optional)_ CLI package name (defaults to @<!-- -->macts/cli-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+_(Optional)_ CLI package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
 
 </td></tr>
 <tr><td>
@@ -88,7 +88,7 @@ string
 
 </td><td>
 
-_(Optional)_ MCP package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+_(Optional)_ MCP package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->-server)
 
 </td></tr>
 <tr><td>

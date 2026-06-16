@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)
 
-## ScriptingPropertyCreateInput interface
+## ScriptingPropertyCreateInput type
 
 Input for creating a ScriptingProperty
 
 **Signature:**
 
 ```typescript
-interface ScriptingPropertyCreateInput
+type ScriptingPropertyCreateInput = Record<string, never>
 ```

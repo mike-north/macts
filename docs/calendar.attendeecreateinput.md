@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/calendar](./calendar.md) &gt; [AttendeeCreateInput](./calendar.attendeecreateinput.md)
 
-## AttendeeCreateInput interface
+## AttendeeCreateInput type
 
 Input for creating a Attendee
 
 **Signature:**
 
 ```typescript
-interface AttendeeCreateInput
+type AttendeeCreateInput = Record<string, never>
 ```

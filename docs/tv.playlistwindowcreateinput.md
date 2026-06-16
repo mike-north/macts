@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [PlaylistWindowCreateInput](./tv.playlistwindowcreateinput.md)
 
-## PlaylistWindowCreateInput interface
+## PlaylistWindowCreateInput type
 
 Input for creating a PlaylistWindow
 
 **Signature:**
 
 ```typescript
-interface PlaylistWindowCreateInput
+type PlaylistWindowCreateInput = Record<string, never>
 ```

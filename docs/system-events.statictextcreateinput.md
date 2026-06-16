@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [StaticTextCreateInput](./system-events.statictextcreateinput.md)
 
-## StaticTextCreateInput interface
+## StaticTextCreateInput type
 
 Input for creating a StaticText
 
 **Signature:**
 
 ```typescript
-interface StaticTextCreateInput
+type StaticTextCreateInput = Record<string, never>
 ```

@@ -4,7 +4,7 @@
 
 ## ReminderCreateInput.dueDate property
 
-The due date of the reminder
+Due date
 
 **Signature:**
 

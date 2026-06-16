@@ -24,6 +24,15 @@ Description
 A generic in-memory cache where each entry expires after a configurable TTL.
 
 </td></tr>
+<tr><td>
+
+[UnexpandableCoarsePermissionError](./api.unexpandablecoarsepermissionerror.md)
+
+</td><td>
+
+Error thrown when a coarse permission is requested without a manifest to expand it against. Coarse operations (read/create/write/delete) are sugar that must be resolved into fine-grained operations at creation time; storing one unexpanded would silently authorize nothing, so we reject it instead.
+
+</td></tr>
 </tbody></table>
 
 ## Functions

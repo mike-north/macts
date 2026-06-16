@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/reminders](./reminders.md) &gt; [AccountCreateInput](./reminders.accountcreateinput.md)
 
-## AccountCreateInput interface
+## AccountCreateInput type
 
 Input for creating a Account
 
 **Signature:**
 
 ```typescript
-interface AccountCreateInput
+type AccountCreateInput = Record<string, never>
 ```

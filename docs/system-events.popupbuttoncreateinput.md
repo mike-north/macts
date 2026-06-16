@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)
 
-## PopUpButtonCreateInput interface
+## PopUpButtonCreateInput type
 
 Input for creating a PopUpButton
 
 **Signature:**
 
 ```typescript
-interface PopUpButtonCreateInput
+type PopUpButtonCreateInput = Record<string, never>
 ```

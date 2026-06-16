@@ -4,7 +4,7 @@
 
 ## NoteCreateInput.body property
 
-The HTML content of the note body
+HTML content of the note
 
 **Signature:**
 

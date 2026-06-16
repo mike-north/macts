@@ -4,12 +4,12 @@
 
 ## EventResourceClient.get() method
 
-Get a event by uid.
+Get a event by id.
 
 **Signature:**
 
 ```typescript
-get(uid: string): Promise<Event>;
+get(id: string): Promise<Event>;
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-uid
+id
 
 </td><td>
 

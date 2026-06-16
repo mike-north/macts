@@ -93,11 +93,11 @@ An account in the Reminders application
 </td></tr>
 <tr><td>
 
-[AccountCreateInput](./reminders.accountcreateinput.md)
+[CapabilityMetadata](./reminders.capabilitymetadata.md)
 
 </td><td>
 
-Input for creating a Account
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -167,6 +167,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./reminders.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Reminders, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [ListSchema](./reminders.listschema.md)
 
 </td><td>
@@ -194,11 +203,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AccountCreateInput](./reminders.accountcreateinput.md)
+
+</td><td>
+
+Input for creating a Account
+
+</td></tr>
+<tr><td>
+
 [AccountUpdateInput](./reminders.accountupdateinput.md)
 
 </td><td>
 
 Input for updating a Account
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./reminders.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>

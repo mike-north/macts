@@ -4,7 +4,7 @@
 
 ## ReminderCreateInput.body property
 
-The notes attached to the reminder
+Reminder notes
 
 **Signature:**
 

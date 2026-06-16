@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
 
-## InternetLocationFileCreateInput interface
+## InternetLocationFileCreateInput type
 
 Input for creating a InternetLocationFile
 
 **Signature:**
 
 ```typescript
-interface InternetLocationFileCreateInput
+type InternetLocationFileCreateInput = Record<string, never>
 ```

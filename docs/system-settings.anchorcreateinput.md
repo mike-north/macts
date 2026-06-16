@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-settings](./system-settings.md) &gt; [AnchorCreateInput](./system-settings.anchorcreateinput.md)
 
-## AnchorCreateInput interface
+## AnchorCreateInput type
 
 Input for creating a Anchor
 
 **Signature:**
 
 ```typescript
-interface AnchorCreateInput
+type AnchorCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/tv](./tv.md) &gt; [VideoWindowCreateInput](./tv.videowindowcreateinput.md)
 
-## VideoWindowCreateInput interface
+## VideoWindowCreateInput type
 
 Input for creating a VideoWindow
 
 **Signature:**
 
 ```typescript
-interface VideoWindowCreateInput
+type VideoWindowCreateInput = Record<string, never>
 ```

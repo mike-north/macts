@@ -17,15 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AttendeeResourceClient](./calendar.attendeeresourceclient.md)
-
-</td><td>
-
-Client for an event attendee.
-
-</td></tr>
-<tr><td>
-
 [CalendarClient](./calendar.calendarclient.md)
 
 </td><td>
@@ -53,15 +44,6 @@ Client for a calendar containing events.
 </td></tr>
 <tr><td>
 
-[DisplayAlarmResourceClient](./calendar.displayalarmresourceclient.md)
-
-</td><td>
-
-Client for a message/display alarm.
-
-</td></tr>
-<tr><td>
-
 [EventResourceClient](./calendar.eventresourceclient.md)
 
 </td><td>
@@ -76,33 +58,6 @@ Client for a calendar event.
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[MailAlarmResourceClient](./calendar.mailalarmresourceclient.md)
-
-</td><td>
-
-Client for a mail/email alarm.
-
-</td></tr>
-<tr><td>
-
-[OpenFileAlarmResourceClient](./calendar.openfilealarmresourceclient.md)
-
-</td><td>
-
-Client for an 'open file' alarm.
-
-</td></tr>
-<tr><td>
-
-[SoundAlarmResourceClient](./calendar.soundalarmresourceclient.md)
-
-</td><td>
-
-Client for a sound alarm.
 
 </td></tr>
 </tbody></table>
@@ -125,15 +80,6 @@ Description
 </td><td>
 
 An event attendee
-
-</td></tr>
-<tr><td>
-
-[AttendeeCreateInput](./calendar.attendeecreateinput.md)
-
-</td><td>
-
-Input for creating a Attendee
 
 </td></tr>
 <tr><td>
@@ -161,6 +107,15 @@ Client configuration options.
 </td><td>
 
 Input for creating a Calendar
+
+</td></tr>
+<tr><td>
+
+[CapabilityMetadata](./calendar.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -282,6 +237,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./calendar.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Calendar, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DisplayAlarmSchema](./calendar.displayalarmschema.md)
 
 </td><td>
@@ -330,6 +294,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AttendeeCreateInput](./calendar.attendeecreateinput.md)
+
+</td><td>
+
+Input for creating a Attendee
+
+</td></tr>
+<tr><td>
+
 [AttendeeUpdateInput](./calendar.attendeeupdateinput.md)
 
 </td><td>
@@ -353,6 +326,15 @@ Priority level for calendar items
 </td><td>
 
 Input for updating a Calendar
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./calendar.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>

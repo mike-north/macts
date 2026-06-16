@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScriptingEnumeratorCreateInput](./system-events.scriptingenumeratorcreateinput.md)
 
-## ScriptingEnumeratorCreateInput interface
+## ScriptingEnumeratorCreateInput type
 
 Input for creating a ScriptingEnumerator
 
 **Signature:**
 
 ```typescript
-interface ScriptingEnumeratorCreateInput
+type ScriptingEnumeratorCreateInput = Record<string, never>
 ```

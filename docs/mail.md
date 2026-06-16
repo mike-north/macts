@@ -17,92 +17,11 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AccountResourceClient](./mail.accountresourceclient.md)
-
-</td><td>
-
-Client for a mail account for receiving messages (pop/imap). to create a new receiving account, use the 'pop account', 'imap account', and 'icloud account' objects.
-
-</td></tr>
-<tr><td>
-
-[AttachmentResourceClient](./mail.attachmentresourceclient.md)
-
-</td><td>
-
-Client for represents an inline text attachment. this class is used mainly for make commands..
-
-</td></tr>
-<tr><td>
-
-[AttributeRunResourceClient](./mail.attributerunresourceclient.md)
-
-</td><td>
-
-Client for this subdivides the text into chunks that all have the same attributes..
-
-</td></tr>
-<tr><td>
-
-[BccRecipientResourceClient](./mail.bccrecipientresourceclient.md)
-
-</td><td>
-
-Client for an email recipient in the bcc: field.
-
-</td></tr>
-<tr><td>
-
-[CcRecipientResourceClient](./mail.ccrecipientresourceclient.md)
-
-</td><td>
-
-Client for an email recipient in the cc: field.
-
-</td></tr>
-<tr><td>
-
-[CharacterResourceClient](./mail.characterresourceclient.md)
-
-</td><td>
-
-Client for this subdivides the text into characters..
-
-</td></tr>
-<tr><td>
-
-[HeaderResourceClient](./mail.headerresourceclient.md)
-
-</td><td>
-
-Client for a header value for a message. e.g. to, subject, from..
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./mail.httpclient.md)
 
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[MailAttachmentResourceClient](./mail.mailattachmentresourceclient.md)
-
-</td><td>
-
-Client for a file attached to a received message..
-
-</td></tr>
-<tr><td>
-
-[MailboxResourceClient](./mail.mailboxresourceclient.md)
-
-</td><td>
-
-Client for a mailbox that holds messages.
 
 </td></tr>
 <tr><td>
@@ -134,83 +53,11 @@ Client for an email message.
 </td></tr>
 <tr><td>
 
-[MessageViewerResourceClient](./mail.messageviewerresourceclient.md)
-
-</td><td>
-
-Client for represents the object responsible for managing a viewer window.
-
-</td></tr>
-<tr><td>
-
 [OutgoingMessageResourceClient](./mail.outgoingmessageresourceclient.md)
 
 </td><td>
 
 Client for a new email message.
-
-</td></tr>
-<tr><td>
-
-[ParagraphResourceClient](./mail.paragraphresourceclient.md)
-
-</td><td>
-
-Client for this subdivides the text into paragraphs..
-
-</td></tr>
-<tr><td>
-
-[RecipientResourceClient](./mail.recipientresourceclient.md)
-
-</td><td>
-
-Client for an email recipient.
-
-</td></tr>
-<tr><td>
-
-[RichTextResourceClient](./mail.richtextresourceclient.md)
-
-</td><td>
-
-Client for rich (styled) text.
-
-</td></tr>
-<tr><td>
-
-[RuleConditionResourceClient](./mail.ruleconditionresourceclient.md)
-
-</td><td>
-
-Client for class for conditions that can be attached to a single rule.
-
-</td></tr>
-<tr><td>
-
-[RuleResourceClient](./mail.ruleresourceclient.md)
-
-</td><td>
-
-Client for class for message rules.
-
-</td></tr>
-<tr><td>
-
-[ToRecipientResourceClient](./mail.torecipientresourceclient.md)
-
-</td><td>
-
-Client for an email recipient in the to: field.
-
-</td></tr>
-<tr><td>
-
-[WordResourceClient](./mail.wordresourceclient.md)
-
-</td><td>
-
-Client for this subdivides the text into words..
 
 </td></tr>
 </tbody></table>
@@ -291,11 +138,11 @@ An email recipient in the Bcc: field
 </td></tr>
 <tr><td>
 
-[BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)
+[CapabilityMetadata](./mail.capabilitymetadata.md)
 
 </td><td>
 
-Input for creating a BccRecipient
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -305,15 +152,6 @@ Input for creating a BccRecipient
 </td><td>
 
 An email recipient in the Cc: field
-
-</td></tr>
-<tr><td>
-
-[CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)
-
-</td><td>
-
-Input for creating a CcRecipient
 
 </td></tr>
 <tr><td>
@@ -359,15 +197,6 @@ Input for creating a Header
 </td><td>
 
 A file attached to a received message.
-
-</td></tr>
-<tr><td>
-
-[MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)
-
-</td><td>
-
-Input for creating a MailAttachment
 
 </td></tr>
 <tr><td>
@@ -552,15 +381,6 @@ An email recipient in the To: field
 </td></tr>
 <tr><td>
 
-[ToRecipientCreateInput](./mail.torecipientcreateinput.md)
-
-</td><td>
-
-Input for creating a ToRecipient
-
-</td></tr>
-<tr><td>
-
 [Word](./mail.word.md)
 
 </td><td>
@@ -616,6 +436,15 @@ Description
 [BccRecipientSchema](./mail.bccrecipientschema.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[capabilities](./mail.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Mail, with risk metadata.
 
 </td></tr>
 <tr><td>
@@ -774,11 +603,38 @@ Authentication
 </td></tr>
 <tr><td>
 
+[BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)
+
+</td><td>
+
+Input for creating a BccRecipient
+
+</td></tr>
+<tr><td>
+
 [BccRecipientUpdateInput](./mail.bccrecipientupdateinput.md)
 
 </td><td>
 
 Input for updating a BccRecipient
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./mail.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)
+
+</td><td>
+
+Input for creating a CcRecipient
 
 </td></tr>
 <tr><td>
@@ -842,6 +698,15 @@ HighlightColors
 </td><td>
 
 LdapScope
+
+</td></tr>
+<tr><td>
+
+[MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)
+
+</td><td>
+
+Input for creating a MailAttachment
 
 </td></tr>
 <tr><td>
@@ -977,6 +842,15 @@ Input for updating a Rule
 </td><td>
 
 SaveableFileFormat
+
+</td></tr>
+<tr><td>
+
+[ToRecipientCreateInput](./mail.torecipientcreateinput.md)
+
+</td><td>
+
+Input for creating a ToRecipient
 
 </td></tr>
 <tr><td>

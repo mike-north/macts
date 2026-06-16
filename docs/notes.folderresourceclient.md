@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./notes.folderresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new folder.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./notes.folderresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a folder.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./notes.folderresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a folder by name.
 </td><td>
 
 List all folders.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./notes.folderresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing folder.
 
 </td></tr>
 </tbody></table>

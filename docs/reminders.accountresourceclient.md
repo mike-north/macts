@@ -57,39 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./reminders.accountresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new account.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./reminders.accountresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a account.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./reminders.accountresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a account by id.
-
-</td></tr>
-<tr><td>
-
 [list()](./reminders.accountresourceclient.list.md)
 
 </td><td>
@@ -97,17 +64,6 @@ Get a account by id.
 </td><td>
 
 List all accounts.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./reminders.accountresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing account.
 
 </td></tr>
 </tbody></table>

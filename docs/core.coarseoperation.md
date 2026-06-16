@@ -4,6 +4,8 @@
 
 ## CoarseOperation type
 
+A coarse CRUD operation name.
+
 **Signature:**
 
 ```typescript

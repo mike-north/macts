@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [TabGroupCreateInput](./system-events.tabgroupcreateinput.md)
 
-## TabGroupCreateInput interface
+## TabGroupCreateInput type
 
 Input for creating a TabGroup
 
 **Signature:**
 
 ```typescript
-interface TabGroupCreateInput
+type TabGroupCreateInput = Record<string, never>
 ```

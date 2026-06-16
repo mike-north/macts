@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [DocumentFileCreateInput](./finder.documentfilecreateinput.md)
 
-## DocumentFileCreateInput interface
+## DocumentFileCreateInput type
 
 Input for creating a DocumentFile
 
 **Signature:**
 
 ```typescript
-interface DocumentFileCreateInput
+type DocumentFileCreateInput = Record<string, never>
 ```

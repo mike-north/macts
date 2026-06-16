@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./preview.documentresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new document.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./preview.documentresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a document.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./preview.documentresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a document by name.
 </td><td>
 
 List all documents.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./preview.documentresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing document.
 
 </td></tr>
 </tbody></table>

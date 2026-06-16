@@ -4,7 +4,7 @@
 
 ## isCoarseOperation() function
 
-Check if an operation is a standard coarse CRUD operation.
+Check whether an operation token is one of the canonical coarse operations.
 
 **Signature:**
 

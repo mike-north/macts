@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./notes.accountresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new account.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./notes.accountresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a account.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./notes.accountresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a account by name.
 </td><td>
 
 List all accounts.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./notes.accountresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing account.
 
 </td></tr>
 </tbody></table>

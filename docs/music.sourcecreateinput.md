@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [SourceCreateInput](./music.sourcecreateinput.md)
 
-## SourceCreateInput interface
+## SourceCreateInput type
 
 Input for creating a Source
 
 **Signature:**
 
 ```typescript
-interface SourceCreateInput
+type SourceCreateInput = Record<string, never>
 ```

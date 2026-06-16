@@ -4,7 +4,7 @@
 
 ## DocumentCreateInput.contents property
 
-The source code of the script
+Initial script contents
 
 **Signature:**
 

@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./notes.attachmentresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new attachment.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./notes.attachmentresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a attachment.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./notes.attachmentresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a attachment by name.
 </td><td>
 
 List all attachments.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./notes.attachmentresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing attachment.
 
 </td></tr>
 </tbody></table>

@@ -35,15 +35,6 @@ Error class for Console API errors.
 </td></tr>
 <tr><td>
 
-[DeviceResourceClient](./console.deviceresourceclient.md)
-
-</td><td>
-
-Client for a device in console.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./console.httpclient.md)
 
 </td><td>
@@ -66,6 +57,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./console.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [ConsoleClientOptions](./console.consoleclientoptions.md)
 
 </td><td>
@@ -82,15 +82,6 @@ Client configuration options.
 A device in Console
 
 </td></tr>
-<tr><td>
-
-[DeviceCreateInput](./console.devicecreateinput.md)
-
-</td><td>
-
-Input for creating a Device
-
-</td></tr>
 </tbody></table>
 
 ## Variables
@@ -105,6 +96,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[capabilities](./console.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Console, with risk metadata.
+
+</td></tr>
+<tr><td>
 
 [DeviceSchema](./console.deviceschema.md)
 
@@ -125,6 +125,24 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./console.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[DeviceCreateInput](./console.devicecreateinput.md)
+
+</td><td>
+
+Input for creating a Device
+
+</td></tr>
+<tr><td>
 
 [DeviceUpdateInput](./console.deviceupdateinput.md)
 

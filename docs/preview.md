@@ -66,6 +66,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./preview.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Document](./preview.document.md)
 
 </td><td>
@@ -106,6 +115,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./preview.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Preview, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DocumentSchema](./preview.documentschema.md)
 
 </td><td>
@@ -125,6 +143,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./preview.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [DocumentUpdateInput](./preview.documentupdateinput.md)
 

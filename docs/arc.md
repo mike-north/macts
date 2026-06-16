@@ -42,33 +42,6 @@ Error class for Arc API errors.
 HTTP client wrapper for making authenticated requests.
 
 </td></tr>
-<tr><td>
-
-[SpaceResourceClient](./arc.spaceresourceclient.md)
-
-</td><td>
-
-Client for a space.
-
-</td></tr>
-<tr><td>
-
-[TabResourceClient](./arc.tabresourceclient.md)
-
-</td><td>
-
-Client for a window's tab.
-
-</td></tr>
-<tr><td>
-
-[WindowResourceClient](./arc.windowresourceclient.md)
-
-</td><td>
-
-Client for an application's window.
-
-</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -93,20 +66,20 @@ Client configuration options.
 </td></tr>
 <tr><td>
 
+[CapabilityMetadata](./arc.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Space](./arc.space.md)
 
 </td><td>
 
 A space
-
-</td></tr>
-<tr><td>
-
-[SpaceCreateInput](./arc.spacecreateinput.md)
-
-</td><td>
-
-Input for creating a Space
 
 </td></tr>
 <tr><td>
@@ -160,6 +133,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./arc.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Arc, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [SpaceSchema](./arc.spaceschema.md)
 
 </td><td>
@@ -193,6 +175,24 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./arc.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[SpaceCreateInput](./arc.spacecreateinput.md)
+
+</td><td>
+
+Input for creating a Space
+
+</td></tr>
+<tr><td>
 
 [SpaceUpdateInput](./arc.spaceupdateinput.md)
 

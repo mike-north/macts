@@ -17,6 +17,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[@macts/alfred](./alfred.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/api](./api.md)
 
 </td><td>
@@ -25,6 +32,20 @@ Description
 <tr><td>
 
 [@macts/arc](./arc.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/automator](./automator.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/bluetooth-file-exchange](./bluetooth-file-exchange.md)
 
 </td><td>
 
@@ -94,6 +115,20 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/microsoft-edge](./microsoft-edge.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/microsoft-word](./microsoft-word.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/music](./music.md)
 
 </td><td>
@@ -102,6 +137,34 @@ Description
 <tr><td>
 
 [@macts/notes](./notes.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omnifocus](./omnifocus.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omnigraffle](./omnigraffle.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/omniplan](./omniplan.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/photos](./photos.md)
 
 </td><td>
 
@@ -150,6 +213,13 @@ Description
 </td></tr>
 <tr><td>
 
+[@macts/shortcuts](./shortcuts.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
 [@macts/spotify](./spotify.md)
 
 </td><td>
@@ -158,6 +228,13 @@ Description
 <tr><td>
 
 [@macts/system-events](./system-events.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/system-information](./system-information.md)
 
 </td><td>
 
@@ -186,6 +263,13 @@ Description
 <tr><td>
 
 [@macts/tv](./tv.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[@macts/xcode](./xcode.md)
 
 </td><td>
 

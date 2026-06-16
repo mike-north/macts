@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)
 
-## BusyIndicatorCreateInput interface
+## BusyIndicatorCreateInput type
 
 Input for creating a BusyIndicator
 
 **Signature:**
 
 ```typescript
-interface BusyIndicatorCreateInput
+type BusyIndicatorCreateInput = Record<string, never>
 ```

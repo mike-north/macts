@@ -69,7 +69,7 @@ Tool description
 
 </td><td>
 
-JsonSchema
+[JsonSchema](./core.jsonschema.md)
 
 </td><td>
 

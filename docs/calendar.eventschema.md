@@ -9,6 +9,7 @@
 ```typescript
 EventSchema: z.ZodObject<
   {
+    id: z.ZodOptional<z.ZodString>
     summary: z.ZodString
     description: z.ZodString
     location: z.ZodString

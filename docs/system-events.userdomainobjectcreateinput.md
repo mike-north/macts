@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)
 
-## UserDomainObjectCreateInput interface
+## UserDomainObjectCreateInput type
 
 Input for creating a UserDomainObject
 
 **Signature:**
 
 ```typescript
-interface UserDomainObjectCreateInput
+type UserDomainObjectCreateInput = Record<string, never>
 ```

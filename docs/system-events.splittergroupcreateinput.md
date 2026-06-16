@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)
 
-## SplitterGroupCreateInput interface
+## SplitterGroupCreateInput type
 
 Input for creating a SplitterGroup
 
 **Signature:**
 
 ```typescript
-interface SplitterGroupCreateInput
+type SplitterGroupCreateInput = Record<string, never>
 ```

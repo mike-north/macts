@@ -4,7 +4,7 @@
 
 ## GenerateAllOptions.mcpPackageName property
 
-MCP package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+MCP package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->-server)
 
 **Signature:**
 

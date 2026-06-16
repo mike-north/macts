@@ -84,6 +84,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./terminal.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [SettingsSet](./terminal.settingsset.md)
 
 </td><td>
@@ -160,6 +169,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./terminal.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Terminal, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [SettingsSetSchema](./terminal.settingssetschema.md)
 
 </td><td>
@@ -193,6 +211,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./terminal.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [SettingsSetUpdateInput](./terminal.settingssetupdateinput.md)
 

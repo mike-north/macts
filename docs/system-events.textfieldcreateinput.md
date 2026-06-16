@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [TextFieldCreateInput](./system-events.textfieldcreateinput.md)
 
-## TextFieldCreateInput interface
+## TextFieldCreateInput type
 
 Input for creating a TextField
 
 **Signature:**
 
 ```typescript
-interface TextFieldCreateInput
+type TextFieldCreateInput = Record<string, never>
 ```

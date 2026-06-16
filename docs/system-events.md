@@ -26,105 +26,6 @@ Client for an action that can be performed on the ui element.
 </td></tr>
 <tr><td>
 
-[AliasResourceClient](./system-events.aliasresourceclient.md)
-
-</td><td>
-
-Client for an alias in the file system.
-
-</td></tr>
-<tr><td>
-
-[AttributeResourceClient](./system-events.attributeresourceclient.md)
-
-</td><td>
-
-Client for an named data value associated with the ui element.
-
-</td></tr>
-<tr><td>
-
-[BrowserResourceClient](./system-events.browserresourceclient.md)
-
-</td><td>
-
-Client for a browser belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[BusyIndicatorResourceClient](./system-events.busyindicatorresourceclient.md)
-
-</td><td>
-
-Client for a busy indicator belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ButtonResourceClient](./system-events.buttonresourceclient.md)
-
-</td><td>
-
-Client for a button belonging to a window or scroll bar.
-
-</td></tr>
-<tr><td>
-
-[CheckboxResourceClient](./system-events.checkboxresourceclient.md)
-
-</td><td>
-
-Client for a checkbox belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ClassicDomainObjectResourceClient](./system-events.classicdomainobjectresourceclient.md)
-
-</td><td>
-
-Client for the classic domain in the file system.
-
-</td></tr>
-<tr><td>
-
-[ColorWellResourceClient](./system-events.colorwellresourceclient.md)
-
-</td><td>
-
-Client for a color well belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ColumnResourceClient](./system-events.columnresourceclient.md)
-
-</td><td>
-
-Client for a column belonging to a table.
-
-</td></tr>
-<tr><td>
-
-[ComboBoxResourceClient](./system-events.comboboxresourceclient.md)
-
-</td><td>
-
-Client for a combo box belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ConfigurationResourceClient](./system-events.configurationresourceclient.md)
-
-</td><td>
-
-Client for a collection of settings for configuring a connection.
-
-</td></tr>
-<tr><td>
-
 [DiskItemResourceClient](./system-events.diskitemresourceclient.md)
 
 </td><td>
@@ -134,452 +35,11 @@ Client for an item stored in the file system.
 </td></tr>
 <tr><td>
 
-[DiskResourceClient](./system-events.diskresourceclient.md)
-
-</td><td>
-
-Client for a disk in the file system.
-
-</td></tr>
-<tr><td>
-
-[DomainResourceClient](./system-events.domainresourceclient.md)
-
-</td><td>
-
-Client for a domain in the file system.
-
-</td></tr>
-<tr><td>
-
-[DrawerResourceClient](./system-events.drawerresourceclient.md)
-
-</td><td>
-
-Client for a drawer that may be extended from a window.
-
-</td></tr>
-<tr><td>
-
-[FilePackageResourceClient](./system-events.filepackageresourceclient.md)
-
-</td><td>
-
-Client for a file package in the file system.
-
-</td></tr>
-<tr><td>
-
-[FileResourceClient](./system-events.fileresourceclient.md)
-
-</td><td>
-
-Client for a file in the file system.
-
-</td></tr>
-<tr><td>
-
-[FolderResourceClient](./system-events.folderresourceclient.md)
-
-</td><td>
-
-Client for a folder in the file system.
-
-</td></tr>
-<tr><td>
-
-[GroupResourceClient](./system-events.groupresourceclient.md)
-
-</td><td>
-
-Client for a group belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[GrowAreaResourceClient](./system-events.growarearesourceclient.md)
-
-</td><td>
-
-Client for a grow area belonging to a window.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./system-events.httpclient.md)
 
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[ImageResourceClient](./system-events.imageresourceclient.md)
-
-</td><td>
-
-Client for an image belonging to a static text field.
-
-</td></tr>
-<tr><td>
-
-[IncrementorResourceClient](./system-events.incrementorresourceclient.md)
-
-</td><td>
-
-Client for a incrementor belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[InterfaceResourceClient](./system-events.interfaceresourceclient.md)
-
-</td><td>
-
-Client for a collection of settings for a network interface.
-
-</td></tr>
-<tr><td>
-
-[ListResourceClient](./system-events.listresourceclient.md)
-
-</td><td>
-
-Client for a list belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[LocalDomainObjectResourceClient](./system-events.localdomainobjectresourceclient.md)
-
-</td><td>
-
-Client for the local domain in the file system.
-
-</td></tr>
-<tr><td>
-
-[LocationResourceClient](./system-events.locationresourceclient.md)
-
-</td><td>
-
-Client for a set of services.
-
-</td></tr>
-<tr><td>
-
-[MenuBarItemResourceClient](./system-events.menubaritemresourceclient.md)
-
-</td><td>
-
-Client for a menu bar item belonging to a menu bar.
-
-</td></tr>
-<tr><td>
-
-[MenuBarResourceClient](./system-events.menubarresourceclient.md)
-
-</td><td>
-
-Client for a menu bar belonging to a process.
-
-</td></tr>
-<tr><td>
-
-[MenuButtonResourceClient](./system-events.menubuttonresourceclient.md)
-
-</td><td>
-
-Client for a menu button belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[MenuItemResourceClient](./system-events.menuitemresourceclient.md)
-
-</td><td>
-
-Client for a menu item belonging to a menu.
-
-</td></tr>
-<tr><td>
-
-[MenuResourceClient](./system-events.menuresourceclient.md)
-
-</td><td>
-
-Client for a menu belonging to a menu bar item.
-
-</td></tr>
-<tr><td>
-
-[NetworkDomainObjectResourceClient](./system-events.networkdomainobjectresourceclient.md)
-
-</td><td>
-
-Client for the network domain in the file system.
-
-</td></tr>
-<tr><td>
-
-[NetworkPreferencesObjectResourceClient](./system-events.networkpreferencesobjectresourceclient.md)
-
-</td><td>
-
-Client for the preferences for the current user's network.
-
-</td></tr>
-<tr><td>
-
-[OutlineResourceClient](./system-events.outlineresourceclient.md)
-
-</td><td>
-
-Client for a outline belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[PopOverResourceClient](./system-events.popoverresourceclient.md)
-
-</td><td>
-
-Client for a pop over belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[PopUpButtonResourceClient](./system-events.popupbuttonresourceclient.md)
-
-</td><td>
-
-Client for a pop up button belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ProcessResourceClient](./system-events.processresourceclient.md)
-
-</td><td>
-
-Client for a process running on this computer.
-
-</td></tr>
-<tr><td>
-
-[ProgressIndicatorResourceClient](./system-events.progressindicatorresourceclient.md)
-
-</td><td>
-
-Client for a progress indicator belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[PropertyListItemResourceClient](./system-events.propertylistitemresourceclient.md)
-
-</td><td>
-
-Client for a unit of data in property list format.
-
-</td></tr>
-<tr><td>
-
-[RadioButtonResourceClient](./system-events.radiobuttonresourceclient.md)
-
-</td><td>
-
-Client for a radio button belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[RadioGroupResourceClient](./system-events.radiogroupresourceclient.md)
-
-</td><td>
-
-Client for a radio button group belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[RelevanceIndicatorResourceClient](./system-events.relevanceindicatorresourceclient.md)
-
-</td><td>
-
-Client for a relevance indicator belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[RowResourceClient](./system-events.rowresourceclient.md)
-
-</td><td>
-
-Client for a row belonging to a table.
-
-</td></tr>
-<tr><td>
-
-[ScriptingClassResourceClient](./system-events.scriptingclassresourceclient.md)
-
-</td><td>
-
-Client for a class within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingCommandResourceClient](./system-events.scriptingcommandresourceclient.md)
-
-</td><td>
-
-Client for a command within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingDefinitionObjectResourceClient](./system-events.scriptingdefinitionobjectresourceclient.md)
-
-</td><td>
-
-Client for the scripting definition of the system events applicaation.
-
-</td></tr>
-<tr><td>
-
-[ScriptingElementResourceClient](./system-events.scriptingelementresourceclient.md)
-
-</td><td>
-
-Client for an element within a class within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingEnumerationResourceClient](./system-events.scriptingenumerationresourceclient.md)
-
-</td><td>
-
-Client for an enumeration within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingEnumeratorResourceClient](./system-events.scriptingenumeratorresourceclient.md)
-
-</td><td>
-
-Client for an enumerator within an enumeration within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingParameterResourceClient](./system-events.scriptingparameterresourceclient.md)
-
-</td><td>
-
-Client for a parameter within a command within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingPropertyResourceClient](./system-events.scriptingpropertyresourceclient.md)
-
-</td><td>
-
-Client for a property within a class within a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScriptingSuiteResourceClient](./system-events.scriptingsuiteresourceclient.md)
-
-</td><td>
-
-Client for a suite within a scripting definition.
-
-</td></tr>
-<tr><td>
-
-[ScrollAreaResourceClient](./system-events.scrollarearesourceclient.md)
-
-</td><td>
-
-Client for a scroll area belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ScrollBarResourceClient](./system-events.scrollbarresourceclient.md)
-
-</td><td>
-
-Client for a scroll bar belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ServiceResourceClient](./system-events.serviceresourceclient.md)
-
-</td><td>
-
-Client for a collection of settings for a network service.
-
-</td></tr>
-<tr><td>
-
-[SheetResourceClient](./system-events.sheetresourceclient.md)
-
-</td><td>
-
-Client for a sheet displayed over a window.
-
-</td></tr>
-<tr><td>
-
-[SliderResourceClient](./system-events.sliderresourceclient.md)
-
-</td><td>
-
-Client for a slider belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[SplitterGroupResourceClient](./system-events.splittergroupresourceclient.md)
-
-</td><td>
-
-Client for a splitter group belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[SplitterResourceClient](./system-events.splitterresourceclient.md)
-
-</td><td>
-
-Client for a splitter belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[StaticTextResourceClient](./system-events.statictextresourceclient.md)
-
-</td><td>
-
-Client for a static text field belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[SystemDomainObjectResourceClient](./system-events.systemdomainobjectresourceclient.md)
-
-</td><td>
-
-Client for the system domain in the file system.
 
 </td></tr>
 <tr><td>
@@ -602,101 +62,11 @@ Error class for SystemEvents API errors.
 </td></tr>
 <tr><td>
 
-[TabGroupResourceClient](./system-events.tabgroupresourceclient.md)
-
-</td><td>
-
-Client for a tab group belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[TableResourceClient](./system-events.tableresourceclient.md)
-
-</td><td>
-
-Client for a table belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[TextAreaResourceClient](./system-events.textarearesourceclient.md)
-
-</td><td>
-
-Client for a text area belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[TextFieldResourceClient](./system-events.textfieldresourceclient.md)
-
-</td><td>
-
-Client for a text field belonging to a window.
-
-</td></tr>
-<tr><td>
-
-[ToolbarResourceClient](./system-events.toolbarresourceclient.md)
-
-</td><td>
-
-Client for a toolbar belonging to a window.
-
-</td></tr>
-<tr><td>
-
 [UIElementResourceClient](./system-events.uielementresourceclient.md)
 
 </td><td>
 
 Client for a piece of the user interface of a process.
-
-</td></tr>
-<tr><td>
-
-[UserDomainObjectResourceClient](./system-events.userdomainobjectresourceclient.md)
-
-</td><td>
-
-Client for the user domain in the file system.
-
-</td></tr>
-<tr><td>
-
-[ValueIndicatorResourceClient](./system-events.valueindicatorresourceclient.md)
-
-</td><td>
-
-Client for a value indicator ( thumb or slider ) belonging to a scroll bar.
-
-</td></tr>
-<tr><td>
-
-[XMLAttributeResourceClient](./system-events.xmlattributeresourceclient.md)
-
-</td><td>
-
-Client for a named value associated with a unit of data in xml format.
-
-</td></tr>
-<tr><td>
-
-[XMLDataResourceClient](./system-events.xmldataresourceclient.md)
-
-</td><td>
-
-Client for data in xml format.
-
-</td></tr>
-<tr><td>
-
-[XMLElementResourceClient](./system-events.xmlelementresourceclient.md)
-
-</td><td>
-
-Client for a unit of data in xml format.
 
 </td></tr>
 </tbody></table>
@@ -719,15 +89,6 @@ Description
 </td><td>
 
 An action that can be performed on the UI element
-
-</td></tr>
-<tr><td>
-
-[ActionCreateInput](./system-events.actioncreateinput.md)
-
-</td><td>
-
-Input for creating a Action
 
 </td></tr>
 <tr><td>
@@ -777,29 +138,11 @@ A browser belonging to a window
 </td></tr>
 <tr><td>
 
-[BrowserCreateInput](./system-events.browsercreateinput.md)
-
-</td><td>
-
-Input for creating a Browser
-
-</td></tr>
-<tr><td>
-
 [BusyIndicator](./system-events.busyindicator.md)
 
 </td><td>
 
 A busy indicator belonging to a window
-
-</td></tr>
-<tr><td>
-
-[BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)
-
-</td><td>
-
-Input for creating a BusyIndicator
 
 </td></tr>
 <tr><td>
@@ -813,11 +156,11 @@ A button belonging to a window or scroll bar
 </td></tr>
 <tr><td>
 
-[ButtonCreateInput](./system-events.buttoncreateinput.md)
+[CapabilityMetadata](./system-events.capabilitymetadata.md)
 
 </td><td>
 
-Input for creating a Button
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -831,29 +174,11 @@ A checkbox belonging to a window
 </td></tr>
 <tr><td>
 
-[CheckboxCreateInput](./system-events.checkboxcreateinput.md)
-
-</td><td>
-
-Input for creating a Checkbox
-
-</td></tr>
-<tr><td>
-
 [ClassicDomainObject](./system-events.classicdomainobject.md)
 
 </td><td>
 
 The Classic domain in the file system
-
-</td></tr>
-<tr><td>
-
-[ClassicDomainObjectCreateInput](./system-events.classicdomainobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a ClassicDomainObject
 
 </td></tr>
 <tr><td>
@@ -867,15 +192,6 @@ A color well belonging to a window
 </td></tr>
 <tr><td>
 
-[ColorWellCreateInput](./system-events.colorwellcreateinput.md)
-
-</td><td>
-
-Input for creating a ColorWell
-
-</td></tr>
-<tr><td>
-
 [Column](./system-events.column.md)
 
 </td><td>
@@ -885,29 +201,11 @@ A column belonging to a table
 </td></tr>
 <tr><td>
 
-[ColumnCreateInput](./system-events.columncreateinput.md)
-
-</td><td>
-
-Input for creating a Column
-
-</td></tr>
-<tr><td>
-
 [ComboBox](./system-events.combobox.md)
 
 </td><td>
 
 A combo box belonging to a window
-
-</td></tr>
-<tr><td>
-
-[ComboBoxCreateInput](./system-events.comboboxcreateinput.md)
-
-</td><td>
-
-Input for creating a ComboBox
 
 </td></tr>
 <tr><td>
@@ -975,29 +273,11 @@ A domain in the file system
 </td></tr>
 <tr><td>
 
-[DomainCreateInput](./system-events.domaincreateinput.md)
-
-</td><td>
-
-Input for creating a Domain
-
-</td></tr>
-<tr><td>
-
 [Drawer](./system-events.drawer.md)
 
 </td><td>
 
 A drawer that may be extended from a window
-
-</td></tr>
-<tr><td>
-
-[DrawerCreateInput](./system-events.drawercreateinput.md)
-
-</td><td>
-
-Input for creating a Drawer
 
 </td></tr>
 <tr><td>
@@ -1029,29 +309,11 @@ A file package in the file system
 </td></tr>
 <tr><td>
 
-[FilePackageCreateInput](./system-events.filepackagecreateinput.md)
-
-</td><td>
-
-Input for creating a FilePackage
-
-</td></tr>
-<tr><td>
-
 [Folder](./system-events.folder.md)
 
 </td><td>
 
 A folder in the file system
-
-</td></tr>
-<tr><td>
-
-[FolderCreateInput](./system-events.foldercreateinput.md)
-
-</td><td>
-
-Input for creating a Folder
 
 </td></tr>
 <tr><td>
@@ -1065,29 +327,11 @@ A group belonging to a window
 </td></tr>
 <tr><td>
 
-[GroupCreateInput](./system-events.groupcreateinput.md)
-
-</td><td>
-
-Input for creating a Group
-
-</td></tr>
-<tr><td>
-
 [GrowArea](./system-events.growarea.md)
 
 </td><td>
 
 A grow area belonging to a window
-
-</td></tr>
-<tr><td>
-
-[GrowAreaCreateInput](./system-events.growareacreateinput.md)
-
-</td><td>
-
-Input for creating a GrowArea
 
 </td></tr>
 <tr><td>
@@ -1101,29 +345,11 @@ An image belonging to a static text field
 </td></tr>
 <tr><td>
 
-[ImageCreateInput](./system-events.imagecreateinput.md)
-
-</td><td>
-
-Input for creating a Image
-
-</td></tr>
-<tr><td>
-
 [Incrementor](./system-events.incrementor.md)
 
 </td><td>
 
 A incrementor belonging to a window
-
-</td></tr>
-<tr><td>
-
-[IncrementorCreateInput](./system-events.incrementorcreateinput.md)
-
-</td><td>
-
-Input for creating a Incrementor
 
 </td></tr>
 <tr><td>
@@ -1155,29 +381,11 @@ A list belonging to a window
 </td></tr>
 <tr><td>
 
-[ListCreateInput](./system-events.listcreateinput.md)
-
-</td><td>
-
-Input for creating a List
-
-</td></tr>
-<tr><td>
-
 [LocalDomainObject](./system-events.localdomainobject.md)
 
 </td><td>
 
 The local domain in the file system
-
-</td></tr>
-<tr><td>
-
-[LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a LocalDomainObject
 
 </td></tr>
 <tr><td>
@@ -1218,29 +426,11 @@ A menu bar belonging to a process
 </td></tr>
 <tr><td>
 
-[MenuBarCreateInput](./system-events.menubarcreateinput.md)
-
-</td><td>
-
-Input for creating a MenuBar
-
-</td></tr>
-<tr><td>
-
 [MenuBarItem](./system-events.menubaritem.md)
 
 </td><td>
 
 A menu bar item belonging to a menu bar
-
-</td></tr>
-<tr><td>
-
-[MenuBarItemCreateInput](./system-events.menubaritemcreateinput.md)
-
-</td><td>
-
-Input for creating a MenuBarItem
 
 </td></tr>
 <tr><td>
@@ -1254,24 +444,6 @@ A menu button belonging to a window
 </td></tr>
 <tr><td>
 
-[MenuButtonCreateInput](./system-events.menubuttoncreateinput.md)
-
-</td><td>
-
-Input for creating a MenuButton
-
-</td></tr>
-<tr><td>
-
-[MenuCreateInput](./system-events.menucreateinput.md)
-
-</td><td>
-
-Input for creating a Menu
-
-</td></tr>
-<tr><td>
-
 [MenuItem](./system-events.menuitem.md)
 
 </td><td>
@@ -1281,29 +453,11 @@ A menu item belonging to a menu
 </td></tr>
 <tr><td>
 
-[MenuItemCreateInput](./system-events.menuitemcreateinput.md)
-
-</td><td>
-
-Input for creating a MenuItem
-
-</td></tr>
-<tr><td>
-
 [NetworkDomainObject](./system-events.networkdomainobject.md)
 
 </td><td>
 
 The network domain in the file system
-
-</td></tr>
-<tr><td>
-
-[NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a NetworkDomainObject
 
 </td></tr>
 <tr><td>
@@ -1335,15 +489,6 @@ A outline belonging to a window
 </td></tr>
 <tr><td>
 
-[OutlineCreateInput](./system-events.outlinecreateinput.md)
-
-</td><td>
-
-Input for creating a Outline
-
-</td></tr>
-<tr><td>
-
 [PopOver](./system-events.popover.md)
 
 </td><td>
@@ -1353,29 +498,11 @@ A pop over belonging to a window
 </td></tr>
 <tr><td>
 
-[PopOverCreateInput](./system-events.popovercreateinput.md)
-
-</td><td>
-
-Input for creating a PopOver
-
-</td></tr>
-<tr><td>
-
 [PopUpButton](./system-events.popupbutton.md)
 
 </td><td>
 
 A pop up button belonging to a window
-
-</td></tr>
-<tr><td>
-
-[PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)
-
-</td><td>
-
-Input for creating a PopUpButton
 
 </td></tr>
 <tr><td>
@@ -1407,15 +534,6 @@ A progress indicator belonging to a window
 </td></tr>
 <tr><td>
 
-[ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)
-
-</td><td>
-
-Input for creating a ProgressIndicator
-
-</td></tr>
-<tr><td>
-
 [PropertyListItem](./system-events.propertylistitem.md)
 
 </td><td>
@@ -1443,29 +561,11 @@ A radio button belonging to a window
 </td></tr>
 <tr><td>
 
-[RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)
-
-</td><td>
-
-Input for creating a RadioButton
-
-</td></tr>
-<tr><td>
-
 [RadioGroup](./system-events.radiogroup.md)
 
 </td><td>
 
 A radio button group belonging to a window
-
-</td></tr>
-<tr><td>
-
-[RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)
-
-</td><td>
-
-Input for creating a RadioGroup
 
 </td></tr>
 <tr><td>
@@ -1479,29 +579,11 @@ A relevance indicator belonging to a window
 </td></tr>
 <tr><td>
 
-[RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)
-
-</td><td>
-
-Input for creating a RelevanceIndicator
-
-</td></tr>
-<tr><td>
-
 [Row](./system-events.row.md)
 
 </td><td>
 
 A row belonging to a table
-
-</td></tr>
-<tr><td>
-
-[RowCreateInput](./system-events.rowcreateinput.md)
-
-</td><td>
-
-Input for creating a Row
 
 </td></tr>
 <tr><td>
@@ -1515,29 +597,11 @@ A class within a suite within a scripting definition
 </td></tr>
 <tr><td>
 
-[ScriptingClassCreateInput](./system-events.scriptingclasscreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingClass
-
-</td></tr>
-<tr><td>
-
 [ScriptingCommand](./system-events.scriptingcommand.md)
 
 </td><td>
 
 A command within a suite within a scripting definition
-
-</td></tr>
-<tr><td>
-
-[ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingCommand
 
 </td></tr>
 <tr><td>
@@ -1551,29 +615,11 @@ The scripting definition of the System Events applicaation
 </td></tr>
 <tr><td>
 
-[ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingDefinitionObject
-
-</td></tr>
-<tr><td>
-
 [ScriptingElement](./system-events.scriptingelement.md)
 
 </td><td>
 
 An element within a class within a suite within a scripting definition
-
-</td></tr>
-<tr><td>
-
-[ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingElement
 
 </td></tr>
 <tr><td>
@@ -1587,29 +633,11 @@ An enumeration within a suite within a scripting definition
 </td></tr>
 <tr><td>
 
-[ScriptingEnumerationCreateInput](./system-events.scriptingenumerationcreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingEnumeration
-
-</td></tr>
-<tr><td>
-
 [ScriptingEnumerator](./system-events.scriptingenumerator.md)
 
 </td><td>
 
 An enumerator within an enumeration within a suite within a scripting definition
-
-</td></tr>
-<tr><td>
-
-[ScriptingEnumeratorCreateInput](./system-events.scriptingenumeratorcreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingEnumerator
 
 </td></tr>
 <tr><td>
@@ -1623,29 +651,11 @@ A parameter within a command within a suite within a scripting definition
 </td></tr>
 <tr><td>
 
-[ScriptingParameterCreateInput](./system-events.scriptingparametercreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingParameter
-
-</td></tr>
-<tr><td>
-
 [ScriptingProperty](./system-events.scriptingproperty.md)
 
 </td><td>
 
 A property within a class within a suite within a scripting definition
-
-</td></tr>
-<tr><td>
-
-[ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingProperty
 
 </td></tr>
 <tr><td>
@@ -1659,15 +669,6 @@ A suite within a scripting definition
 </td></tr>
 <tr><td>
 
-[ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)
-
-</td><td>
-
-Input for creating a ScriptingSuite
-
-</td></tr>
-<tr><td>
-
 [ScrollArea](./system-events.scrollarea.md)
 
 </td><td>
@@ -1677,29 +678,11 @@ A scroll area belonging to a window
 </td></tr>
 <tr><td>
 
-[ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)
-
-</td><td>
-
-Input for creating a ScrollArea
-
-</td></tr>
-<tr><td>
-
 [ScrollBar](./system-events.scrollbar.md)
 
 </td><td>
 
 A scroll bar belonging to a window
-
-</td></tr>
-<tr><td>
-
-[ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)
-
-</td><td>
-
-Input for creating a ScrollBar
 
 </td></tr>
 <tr><td>
@@ -1731,29 +714,11 @@ A sheet displayed over a window
 </td></tr>
 <tr><td>
 
-[SheetCreateInput](./system-events.sheetcreateinput.md)
-
-</td><td>
-
-Input for creating a Sheet
-
-</td></tr>
-<tr><td>
-
 [Slider](./system-events.slider.md)
 
 </td><td>
 
 A slider belonging to a window
-
-</td></tr>
-<tr><td>
-
-[SliderCreateInput](./system-events.slidercreateinput.md)
-
-</td><td>
-
-Input for creating a Slider
 
 </td></tr>
 <tr><td>
@@ -1767,29 +732,11 @@ A splitter belonging to a window
 </td></tr>
 <tr><td>
 
-[SplitterCreateInput](./system-events.splittercreateinput.md)
-
-</td><td>
-
-Input for creating a Splitter
-
-</td></tr>
-<tr><td>
-
 [SplitterGroup](./system-events.splittergroup.md)
 
 </td><td>
 
 A splitter group belonging to a window
-
-</td></tr>
-<tr><td>
-
-[SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)
-
-</td><td>
-
-Input for creating a SplitterGroup
 
 </td></tr>
 <tr><td>
@@ -1803,29 +750,11 @@ A static text field belonging to a window
 </td></tr>
 <tr><td>
 
-[StaticTextCreateInput](./system-events.statictextcreateinput.md)
-
-</td><td>
-
-Input for creating a StaticText
-
-</td></tr>
-<tr><td>
-
 [SystemDomainObject](./system-events.systemdomainobject.md)
 
 </td><td>
 
 The system domain in the file system
-
-</td></tr>
-<tr><td>
-
-[SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a SystemDomainObject
 
 </td></tr>
 <tr><td>
@@ -1848,29 +777,11 @@ A tab group belonging to a window
 </td></tr>
 <tr><td>
 
-[TabGroupCreateInput](./system-events.tabgroupcreateinput.md)
-
-</td><td>
-
-Input for creating a TabGroup
-
-</td></tr>
-<tr><td>
-
 [Table](./system-events.table.md)
 
 </td><td>
 
 A table belonging to a window
-
-</td></tr>
-<tr><td>
-
-[TableCreateInput](./system-events.tablecreateinput.md)
-
-</td><td>
-
-Input for creating a Table
 
 </td></tr>
 <tr><td>
@@ -1884,15 +795,6 @@ A text area belonging to a window
 </td></tr>
 <tr><td>
 
-[TextAreaCreateInput](./system-events.textareacreateinput.md)
-
-</td><td>
-
-Input for creating a TextArea
-
-</td></tr>
-<tr><td>
-
 [TextField](./system-events.textfield.md)
 
 </td><td>
@@ -1902,29 +804,11 @@ A text field belonging to a window
 </td></tr>
 <tr><td>
 
-[TextFieldCreateInput](./system-events.textfieldcreateinput.md)
-
-</td><td>
-
-Input for creating a TextField
-
-</td></tr>
-<tr><td>
-
 [Toolbar](./system-events.toolbar.md)
 
 </td><td>
 
 A toolbar belonging to a window
-
-</td></tr>
-<tr><td>
-
-[ToolbarCreateInput](./system-events.toolbarcreateinput.md)
-
-</td><td>
-
-Input for creating a Toolbar
 
 </td></tr>
 <tr><td>
@@ -1956,29 +840,11 @@ The user domain in the file system
 </td></tr>
 <tr><td>
 
-[UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a UserDomainObject
-
-</td></tr>
-<tr><td>
-
 [ValueIndicator](./system-events.valueindicator.md)
 
 </td><td>
 
 A value indicator ( thumb or slider ) belonging to a scroll bar
-
-</td></tr>
-<tr><td>
-
-[ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)
-
-</td><td>
-
-Input for creating a ValueIndicator
 
 </td></tr>
 <tr><td>
@@ -2088,6 +954,15 @@ Description
 [ButtonSchema](./system-events.buttonschema.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[capabilities](./system-events.capabilities.md)
+
+</td><td>
+
+Every capability exposed by System Events, with risk metadata.
 
 </td></tr>
 <tr><td>
@@ -2583,6 +1458,15 @@ Accs
 </td></tr>
 <tr><td>
 
+[ActionCreateInput](./system-events.actioncreateinput.md)
+
+</td><td>
+
+Input for creating a Action
+
+</td></tr>
+<tr><td>
+
 [ActionUpdateInput](./system-events.actionupdateinput.md)
 
 </td><td>
@@ -2628,11 +1512,29 @@ Input for updating a Attribute
 </td></tr>
 <tr><td>
 
+[BrowserCreateInput](./system-events.browsercreateinput.md)
+
+</td><td>
+
+Input for creating a Browser
+
+</td></tr>
+<tr><td>
+
 [BrowserUpdateInput](./system-events.browserupdateinput.md)
 
 </td><td>
 
 Input for updating a Browser
+
+</td></tr>
+<tr><td>
+
+[BusyIndicatorCreateInput](./system-events.busyindicatorcreateinput.md)
+
+</td><td>
+
+Input for creating a BusyIndicator
 
 </td></tr>
 <tr><td>
@@ -2646,11 +1548,38 @@ Input for updating a BusyIndicator
 </td></tr>
 <tr><td>
 
+[ButtonCreateInput](./system-events.buttoncreateinput.md)
+
+</td><td>
+
+Input for creating a Button
+
+</td></tr>
+<tr><td>
+
 [ButtonUpdateInput](./system-events.buttonupdateinput.md)
 
 </td><td>
 
 Input for updating a Button
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./system-events.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[CheckboxCreateInput](./system-events.checkboxcreateinput.md)
+
+</td><td>
+
+Input for creating a Checkbox
 
 </td></tr>
 <tr><td>
@@ -2664,11 +1593,29 @@ Input for updating a Checkbox
 </td></tr>
 <tr><td>
 
+[ClassicDomainObjectCreateInput](./system-events.classicdomainobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a ClassicDomainObject
+
+</td></tr>
+<tr><td>
+
 [ClassicDomainObjectUpdateInput](./system-events.classicdomainobjectupdateinput.md)
 
 </td><td>
 
 Input for updating a ClassicDomainObject
+
+</td></tr>
+<tr><td>
+
+[ColorWellCreateInput](./system-events.colorwellcreateinput.md)
+
+</td><td>
+
+Input for creating a ColorWell
 
 </td></tr>
 <tr><td>
@@ -2682,11 +1629,29 @@ Input for updating a ColorWell
 </td></tr>
 <tr><td>
 
+[ColumnCreateInput](./system-events.columncreateinput.md)
+
+</td><td>
+
+Input for creating a Column
+
+</td></tr>
+<tr><td>
+
 [ColumnUpdateInput](./system-events.columnupdateinput.md)
 
 </td><td>
 
 Input for updating a Column
+
+</td></tr>
+<tr><td>
+
+[ComboBoxCreateInput](./system-events.comboboxcreateinput.md)
+
+</td><td>
+
+Input for creating a ComboBox
 
 </td></tr>
 <tr><td>
@@ -2736,6 +1701,15 @@ Input for updating a Disk
 </td></tr>
 <tr><td>
 
+[DomainCreateInput](./system-events.domaincreateinput.md)
+
+</td><td>
+
+Input for creating a Domain
+
+</td></tr>
+<tr><td>
+
 [DomainUpdateInput](./system-events.domainupdateinput.md)
 
 </td><td>
@@ -2768,6 +1742,15 @@ Dpef
 </td><td>
 
 Dpls
+
+</td></tr>
+<tr><td>
+
+[DrawerCreateInput](./system-events.drawercreateinput.md)
+
+</td><td>
+
+Input for creating a Drawer
 
 </td></tr>
 <tr><td>
@@ -2826,6 +1809,15 @@ Enum
 </td></tr>
 <tr><td>
 
+[FilePackageCreateInput](./system-events.filepackagecreateinput.md)
+
+</td><td>
+
+Input for creating a FilePackage
+
+</td></tr>
+<tr><td>
+
 [FilePackageUpdateInput](./system-events.filepackageupdateinput.md)
 
 </td><td>
@@ -2840,6 +1832,15 @@ Input for updating a FilePackage
 </td><td>
 
 Input for updating a File
+
+</td></tr>
+<tr><td>
+
+[FolderCreateInput](./system-events.foldercreateinput.md)
+
+</td><td>
+
+Input for creating a Folder
 
 </td></tr>
 <tr><td>
@@ -2862,11 +1863,29 @@ FontSmoothingStyles
 </td></tr>
 <tr><td>
 
+[GroupCreateInput](./system-events.groupcreateinput.md)
+
+</td><td>
+
+Input for creating a Group
+
+</td></tr>
+<tr><td>
+
 [GroupUpdateInput](./system-events.groupupdateinput.md)
 
 </td><td>
 
 Input for updating a Group
+
+</td></tr>
+<tr><td>
+
+[GrowAreaCreateInput](./system-events.growareacreateinput.md)
+
+</td><td>
+
+Input for creating a GrowArea
 
 </td></tr>
 <tr><td>
@@ -2889,11 +1908,29 @@ HighlightColors
 </td></tr>
 <tr><td>
 
+[ImageCreateInput](./system-events.imagecreateinput.md)
+
+</td><td>
+
+Input for creating a Image
+
+</td></tr>
+<tr><td>
+
 [ImageUpdateInput](./system-events.imageupdateinput.md)
 
 </td><td>
 
 Input for updating a Image
+
+</td></tr>
+<tr><td>
+
+[IncrementorCreateInput](./system-events.incrementorcreateinput.md)
+
+</td><td>
+
+Input for creating a Incrementor
 
 </td></tr>
 <tr><td>
@@ -2916,11 +1953,29 @@ Input for updating a Interface
 </td></tr>
 <tr><td>
 
+[ListCreateInput](./system-events.listcreateinput.md)
+
+</td><td>
+
+Input for creating a List
+
+</td></tr>
+<tr><td>
+
 [ListUpdateInput](./system-events.listupdateinput.md)
 
 </td><td>
 
 Input for updating a List
+
+</td></tr>
+<tr><td>
+
+[LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a LocalDomainObject
 
 </td></tr>
 <tr><td>
@@ -2943,6 +1998,24 @@ Input for updating a Location
 </td></tr>
 <tr><td>
 
+[MenuBarCreateInput](./system-events.menubarcreateinput.md)
+
+</td><td>
+
+Input for creating a MenuBar
+
+</td></tr>
+<tr><td>
+
+[MenuBarItemCreateInput](./system-events.menubaritemcreateinput.md)
+
+</td><td>
+
+Input for creating a MenuBarItem
+
+</td></tr>
+<tr><td>
+
 [MenuBarItemUpdateInput](./system-events.menubaritemupdateinput.md)
 
 </td><td>
@@ -2961,11 +2034,38 @@ Input for updating a MenuBar
 </td></tr>
 <tr><td>
 
+[MenuButtonCreateInput](./system-events.menubuttoncreateinput.md)
+
+</td><td>
+
+Input for creating a MenuButton
+
+</td></tr>
+<tr><td>
+
 [MenuButtonUpdateInput](./system-events.menubuttonupdateinput.md)
 
 </td><td>
 
 Input for updating a MenuButton
+
+</td></tr>
+<tr><td>
+
+[MenuCreateInput](./system-events.menucreateinput.md)
+
+</td><td>
+
+Input for creating a Menu
+
+</td></tr>
+<tr><td>
+
+[MenuItemCreateInput](./system-events.menuitemcreateinput.md)
+
+</td><td>
+
+Input for creating a MenuItem
 
 </td></tr>
 <tr><td>
@@ -2988,6 +2088,15 @@ Input for updating a Menu
 </td></tr>
 <tr><td>
 
+[NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a NetworkDomainObject
+
+</td></tr>
+<tr><td>
+
 [NetworkDomainObjectUpdateInput](./system-events.networkdomainobjectupdateinput.md)
 
 </td><td>
@@ -3006,6 +2115,15 @@ Input for updating a NetworkPreferencesObject
 </td></tr>
 <tr><td>
 
+[OutlineCreateInput](./system-events.outlinecreateinput.md)
+
+</td><td>
+
+Input for creating a Outline
+
+</td></tr>
+<tr><td>
+
 [OutlineUpdateInput](./system-events.outlineupdateinput.md)
 
 </td><td>
@@ -3015,11 +2133,29 @@ Input for updating a Outline
 </td></tr>
 <tr><td>
 
+[PopOverCreateInput](./system-events.popovercreateinput.md)
+
+</td><td>
+
+Input for creating a PopOver
+
+</td></tr>
+<tr><td>
+
 [PopOverUpdateInput](./system-events.popoverupdateinput.md)
 
 </td><td>
 
 Input for updating a PopOver
+
+</td></tr>
+<tr><td>
+
+[PopUpButtonCreateInput](./system-events.popupbuttoncreateinput.md)
+
+</td><td>
+
+Input for creating a PopUpButton
 
 </td></tr>
 <tr><td>
@@ -3042,6 +2178,15 @@ Input for updating a Process
 </td></tr>
 <tr><td>
 
+[ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)
+
+</td><td>
+
+Input for creating a ProgressIndicator
+
+</td></tr>
+<tr><td>
+
 [ProgressIndicatorUpdateInput](./system-events.progressindicatorupdateinput.md)
 
 </td><td>
@@ -3060,11 +2205,29 @@ Input for updating a PropertyListItem
 </td></tr>
 <tr><td>
 
+[RadioButtonCreateInput](./system-events.radiobuttoncreateinput.md)
+
+</td><td>
+
+Input for creating a RadioButton
+
+</td></tr>
+<tr><td>
+
 [RadioButtonUpdateInput](./system-events.radiobuttonupdateinput.md)
 
 </td><td>
 
 Input for updating a RadioButton
+
+</td></tr>
+<tr><td>
+
+[RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)
+
+</td><td>
+
+Input for creating a RadioGroup
 
 </td></tr>
 <tr><td>
@@ -3078,11 +2241,29 @@ Input for updating a RadioGroup
 </td></tr>
 <tr><td>
 
+[RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)
+
+</td><td>
+
+Input for creating a RelevanceIndicator
+
+</td></tr>
+<tr><td>
+
 [RelevanceIndicatorUpdateInput](./system-events.relevanceindicatorupdateinput.md)
 
 </td><td>
 
 Input for updating a RelevanceIndicator
+
+</td></tr>
+<tr><td>
+
+[RowCreateInput](./system-events.rowcreateinput.md)
+
+</td><td>
+
+Input for creating a Row
 
 </td></tr>
 <tr><td>
@@ -3105,11 +2286,29 @@ SaveableFileFormat
 </td></tr>
 <tr><td>
 
+[ScriptingClassCreateInput](./system-events.scriptingclasscreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingClass
+
+</td></tr>
+<tr><td>
+
 [ScriptingClassUpdateInput](./system-events.scriptingclassupdateinput.md)
 
 </td><td>
 
 Input for updating a ScriptingClass
+
+</td></tr>
+<tr><td>
+
+[ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingCommand
 
 </td></tr>
 <tr><td>
@@ -3123,11 +2322,29 @@ Input for updating a ScriptingCommand
 </td></tr>
 <tr><td>
 
+[ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingDefinitionObject
+
+</td></tr>
+<tr><td>
+
 [ScriptingDefinitionObjectUpdateInput](./system-events.scriptingdefinitionobjectupdateinput.md)
 
 </td><td>
 
 Input for updating a ScriptingDefinitionObject
+
+</td></tr>
+<tr><td>
+
+[ScriptingElementCreateInput](./system-events.scriptingelementcreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingElement
 
 </td></tr>
 <tr><td>
@@ -3141,11 +2358,29 @@ Input for updating a ScriptingElement
 </td></tr>
 <tr><td>
 
+[ScriptingEnumerationCreateInput](./system-events.scriptingenumerationcreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingEnumeration
+
+</td></tr>
+<tr><td>
+
 [ScriptingEnumerationUpdateInput](./system-events.scriptingenumerationupdateinput.md)
 
 </td><td>
 
 Input for updating a ScriptingEnumeration
+
+</td></tr>
+<tr><td>
+
+[ScriptingEnumeratorCreateInput](./system-events.scriptingenumeratorcreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingEnumerator
 
 </td></tr>
 <tr><td>
@@ -3159,11 +2394,29 @@ Input for updating a ScriptingEnumerator
 </td></tr>
 <tr><td>
 
+[ScriptingParameterCreateInput](./system-events.scriptingparametercreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingParameter
+
+</td></tr>
+<tr><td>
+
 [ScriptingParameterUpdateInput](./system-events.scriptingparameterupdateinput.md)
 
 </td><td>
 
 Input for updating a ScriptingParameter
+
+</td></tr>
+<tr><td>
+
+[ScriptingPropertyCreateInput](./system-events.scriptingpropertycreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingProperty
 
 </td></tr>
 <tr><td>
@@ -3177,6 +2430,15 @@ Input for updating a ScriptingProperty
 </td></tr>
 <tr><td>
 
+[ScriptingSuiteCreateInput](./system-events.scriptingsuitecreateinput.md)
+
+</td><td>
+
+Input for creating a ScriptingSuite
+
+</td></tr>
+<tr><td>
+
 [ScriptingSuiteUpdateInput](./system-events.scriptingsuiteupdateinput.md)
 
 </td><td>
@@ -3186,11 +2448,29 @@ Input for updating a ScriptingSuite
 </td></tr>
 <tr><td>
 
+[ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)
+
+</td><td>
+
+Input for creating a ScrollArea
+
+</td></tr>
+<tr><td>
+
 [ScrollAreaUpdateInput](./system-events.scrollareaupdateinput.md)
 
 </td><td>
 
 Input for updating a ScrollArea
+
+</td></tr>
+<tr><td>
+
+[ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)
+
+</td><td>
+
+Input for creating a ScrollBar
 
 </td></tr>
 <tr><td>
@@ -3222,6 +2502,15 @@ Input for updating a Service
 </td></tr>
 <tr><td>
 
+[SheetCreateInput](./system-events.sheetcreateinput.md)
+
+</td><td>
+
+Input for creating a Sheet
+
+</td></tr>
+<tr><td>
+
 [SheetUpdateInput](./system-events.sheetupdateinput.md)
 
 </td><td>
@@ -3231,11 +2520,38 @@ Input for updating a Sheet
 </td></tr>
 <tr><td>
 
+[SliderCreateInput](./system-events.slidercreateinput.md)
+
+</td><td>
+
+Input for creating a Slider
+
+</td></tr>
+<tr><td>
+
 [SliderUpdateInput](./system-events.sliderupdateinput.md)
 
 </td><td>
 
 Input for updating a Slider
+
+</td></tr>
+<tr><td>
+
+[SplitterCreateInput](./system-events.splittercreateinput.md)
+
+</td><td>
+
+Input for creating a Splitter
+
+</td></tr>
+<tr><td>
+
+[SplitterGroupCreateInput](./system-events.splittergroupcreateinput.md)
+
+</td><td>
+
+Input for creating a SplitterGroup
 
 </td></tr>
 <tr><td>
@@ -3258,11 +2574,29 @@ Input for updating a Splitter
 </td></tr>
 <tr><td>
 
+[StaticTextCreateInput](./system-events.statictextcreateinput.md)
+
+</td><td>
+
+Input for creating a StaticText
+
+</td></tr>
+<tr><td>
+
 [StaticTextUpdateInput](./system-events.statictextupdateinput.md)
 
 </td><td>
 
 Input for updating a StaticText
+
+</td></tr>
+<tr><td>
+
+[SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a SystemDomainObject
 
 </td></tr>
 <tr><td>
@@ -3276,11 +2610,29 @@ Input for updating a SystemDomainObject
 </td></tr>
 <tr><td>
 
+[TabGroupCreateInput](./system-events.tabgroupcreateinput.md)
+
+</td><td>
+
+Input for creating a TabGroup
+
+</td></tr>
+<tr><td>
+
 [TabGroupUpdateInput](./system-events.tabgroupupdateinput.md)
 
 </td><td>
 
 Input for updating a TabGroup
+
+</td></tr>
+<tr><td>
+
+[TableCreateInput](./system-events.tablecreateinput.md)
+
+</td><td>
+
+Input for creating a Table
 
 </td></tr>
 <tr><td>
@@ -3294,6 +2646,15 @@ Input for updating a Table
 </td></tr>
 <tr><td>
 
+[TextAreaCreateInput](./system-events.textareacreateinput.md)
+
+</td><td>
+
+Input for creating a TextArea
+
+</td></tr>
+<tr><td>
+
 [TextAreaUpdateInput](./system-events.textareaupdateinput.md)
 
 </td><td>
@@ -3303,11 +2664,29 @@ Input for updating a TextArea
 </td></tr>
 <tr><td>
 
+[TextFieldCreateInput](./system-events.textfieldcreateinput.md)
+
+</td><td>
+
+Input for creating a TextField
+
+</td></tr>
+<tr><td>
+
 [TextFieldUpdateInput](./system-events.textfieldupdateinput.md)
 
 </td><td>
 
 Input for updating a TextField
+
+</td></tr>
+<tr><td>
+
+[ToolbarCreateInput](./system-events.toolbarcreateinput.md)
+
+</td><td>
+
+Input for creating a Toolbar
 
 </td></tr>
 <tr><td>
@@ -3330,11 +2709,29 @@ Input for updating a UIElement
 </td></tr>
 <tr><td>
 
+[UserDomainObjectCreateInput](./system-events.userdomainobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a UserDomainObject
+
+</td></tr>
+<tr><td>
+
 [UserDomainObjectUpdateInput](./system-events.userdomainobjectupdateinput.md)
 
 </td><td>
 
 Input for updating a UserDomainObject
+
+</td></tr>
+<tr><td>
+
+[ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)
+
+</td><td>
+
+Input for creating a ValueIndicator
 
 </td></tr>
 <tr><td>
