@@ -164,8 +164,20 @@ describe('validateApiKey', () => {
   describe('negative cases - signature errors', () => {
     it('should reject token with tampered signature', async () => {
       const token = await createTestToken({ permissions: ['calendar:events:list'] })
-      // Tamper with the signature by changing last character
-      const tamperedToken = token.slice(0, -1) + (token.endsWith('a') ? 'b' : 'a')
+      // Tamper with the FIRST character of the signature segment (the 3rd JWT
+      // part). Flipping the *last* base64url character is unreliable: the final
+      // character of a signature can carry fewer than 6 significant bits, so the
+      // flip may decode to the same signature bytes and leave the token valid
+      // (this made the test flaky — the iat timestamp changes the signature each
+      // run). The first character always encodes fully-significant bits, so
+      // flipping it always changes the decoded signature.
+      // The token is `macts_sk_<header>.<payload>.<signature>`, so the first
+      // segment is the macts-prefixed JWT header; join() preserves it verbatim.
+      const [prefixedHeader, payload, signature = ''] = token.split('.')
+      const tamperedSignature = (signature.startsWith('A') ? 'B' : 'A') + signature.slice(1)
+      const tamperedToken = [prefixedHeader, payload, tamperedSignature].join('.')
+      // Guard: the tamper must actually change the token.
+      expect(tamperedToken).not.toBe(token)
 
       const result = await validateApiKey(tamperedToken)
 
