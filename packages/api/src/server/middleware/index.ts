@@ -17,6 +17,14 @@ export {
   type PermissionMiddlewareOptions,
 } from './permission.js'
 
+export {
+  requirePolicy,
+  type GovernanceContext,
+  type RequirePolicyOptions,
+  type GovernanceDeniedResponse,
+  type GovernancePendingResponse,
+} from './governance.js'
+
 export { requestLogger } from './request-logger.js'
 
 export { createInFlightTracker, type InFlightTracker } from './in-flight.js'

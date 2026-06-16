@@ -11,11 +11,20 @@
  * 2. Structured, attributable *audit records* for capability calls — a typed
  *    record plus a pure constructor and serializer ({@link ./audit.js}).
  *
- * It deliberately does NOT implement policy compilation (declaration →
- * `app:resource:operation` permissions), approval-gate wiring, discovery
- * filtering, or any storage backend — those depend on an open governance-policy
- * design decision and land separately. The discovery-time governance *filter
- * seam* already lives in `../capabilities/governance.js`.
+ * On top of that foundation it adds the **decision** layer:
+ *
+ * 3. The policy *evaluator* ({@link ./evaluator.js}) — the single source of
+ *    truth for "does this policy allow this capability?", returning a structured
+ *    allow / deny / confirm-first decision with the matched rule and a reason.
+ * 4. *Compile-to-permissions* ({@link ./compile.js}) — projects a policy onto
+ *    the concrete `app:resource:operation` permissions it grants, consistent
+ *    with the evaluator.
+ * 5. Call-time *enforcement* ({@link ./enforcement.js}) — the audit-writing
+ *    wrapper that checks each invocation and records every decision.
+ *
+ * Approval-gate wiring (issue #54) and discovery filtering (issue #55) consume
+ * the evaluator rather than re-implementing the decision. The discovery-time
+ * governance *filter seam* lives in `../capabilities/governance.js`.
  *
  * @packageDocumentation
  */
@@ -76,13 +85,28 @@ export {
   type PolicyRuleMatch,
 } from './policy-matcher.js'
 
-// Call-time policy enforcement engine.
+// Policy evaluator — the single source of truth for allow/deny/confirm-first.
+export {
+  type PolicyDecision,
+  type PolicyRuleSource,
+  type MatchedPolicyRule,
+  type PolicyEvaluation,
+  evaluatePolicy,
+} from './evaluator.js'
+
+// Compile a policy to the concrete permissions it grants.
+export {
+  type PolicyCandidate,
+  compilePolicyToPermissions,
+  policyGrantsPermission,
+} from './compile.js'
+
+// Call-time policy enforcement (audit-writing wrapper around the evaluator).
 export {
   type EnforcementOutcome,
   type EnforcementDecision,
   type CallAuditContext,
   type EnforceCallOptions,
-  resolveDisposition,
   enforceCall,
 } from './enforcement.js'
 
