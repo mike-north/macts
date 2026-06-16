@@ -11,6 +11,7 @@ import { createServer, DEFAULT_PORT } from '@macts/api/server'
 import { loadManifest, loadCapabilityRegistry } from '@macts/core'
 import { resolveManifestsDir } from './capabilities/registry.js'
 import { getMactsHome } from '../plugin/paths.js'
+import { loadActiveGovernanceFilter } from './capabilities/policy.js'
 
 /**
  * Root command that handles global flags like --mcp and --serve.
@@ -133,12 +134,17 @@ export class RootCommand extends Command {
       return []
     }
 
-    const { registry, errors } = await loadCapabilityRegistry(manifestsDir)
+    const [{ registry, errors }, governance] = await Promise.all([
+      loadCapabilityRegistry(manifestsDir),
+      loadActiveGovernanceFilter(this.context.stderr),
+    ])
     for (const error of errors) {
       this.context.stderr.write(`Manifest load error: ${error.app}: ${error.message}\n`)
     }
 
-    const discoveryTool = createDiscoveryTool({ registry })
+    // Pass the real policy-backed governance filter into the discovery tool
+    // so the MCP surface honours the same policy as CLI capabilities search.
+    const discoveryTool = createDiscoveryTool({ registry, governance })
     return [
       {
         name: 'capabilities',

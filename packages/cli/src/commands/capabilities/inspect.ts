@@ -1,7 +1,8 @@
 import { Command, Option } from 'clipanion'
-import { inspectCapability, ALLOW_ALL_GOVERNANCE } from '@macts/core'
+import { inspectCapability } from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import { loadRegistry } from './registry.js'
+import { loadActiveGovernanceFilter } from './policy.js'
 
 /**
  * Inspect a single capability by its stable name.
@@ -36,10 +37,14 @@ export class CapabilitiesInspectCommand extends Command {
     const formatter = createFormatter(this.json ?? false)
 
     try {
-      const { registry } = await loadRegistry(this.manifestsDir)
+      const [{ registry }, governance] = await Promise.all([
+        loadRegistry(this.manifestsDir),
+        loadActiveGovernanceFilter(this.context.stderr),
+      ])
       // Route inspection through the same governance seam as search, so a
       // capability denied by the active policy cannot be retrieved by name.
-      const outcome = inspectCapability(registry, this.capability, ALLOW_ALL_GOVERNANCE)
+      // The active filter is loaded from $MACTS_HOME/policy.json when present.
+      const outcome = inspectCapability(registry, this.capability, governance)
 
       if (outcome.kind === 'not-found') {
         this.context.stderr.write(
