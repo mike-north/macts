@@ -139,7 +139,7 @@ const nonIdDeleteManifest: AppManifest = {
       description: 'Delete a widget by name',
       scope: 'resource',
       resourceType: 'Widget',
-      // Identifier param is "name", NOT "id"
+      // Identifier param is "widgetName", NOT "id"
       parameters: [
         { name: 'widgetName', type: 'string', description: 'Widget name', required: true },
       ],
@@ -299,7 +299,98 @@ describe('RPC get/delete identifier resolution (issue #26 regression)', () => {
     })
   })
 
-  // Criterion C: representative coverage — id-based commands still work (non-regression)
+  // Criterion C: delete with no required identifier falls through to generic handler
+  //
+  // Regression guard: before the fix, the delete branch would fall back to
+  // `?? 'id'` when no required param exists, generating `byId(id)` where `id`
+  // is undefined — breaking resources like System Events DiskItem whose delete
+  // command has parameters: [].
+  describe('delete command with no required identifier uses generic handler (not byId)', () => {
+    /**
+     * Mirrors the System Events DiskItem `delete` command: scope=resource but
+     * parameters is empty — no identifier to resolve.
+     */
+    const noIdentifierDeleteManifest: AppManifest = {
+      version: '1.0',
+      app: {
+        name: 'TestNoIdDelete',
+        bundleId: 'com.test.noiddelete',
+        version: '1.0.0',
+        tccEntitlements: [],
+      },
+      resources: {
+        DiskItem: {
+          name: 'DiskItem',
+          plural: 'diskItems',
+          description: 'A disk item',
+          properties: {
+            name: { access: 'r', type: 'string', description: 'Name', optional: false },
+          },
+        },
+      },
+      hierarchy: {
+        children: {
+          diskItems: { resource: 'DiskItem', access: 'rw' },
+        },
+      },
+      commands: {
+        delete: {
+          name: 'delete',
+          description: 'Delete disk item(s).',
+          scope: 'resource',
+          resourceType: 'DiskItem',
+          // No identifier parameters — mirrors System Events DiskItem delete
+          parameters: [],
+          permission: 'testnoiddelete:diskitems:delete',
+        },
+        list: {
+          name: 'list',
+          description: 'List disk items',
+          scope: 'resource',
+          resourceType: 'DiskItem',
+          parameters: [],
+          permission: 'testnoiddelete:diskitems:list',
+        },
+      },
+      enums: {},
+      suites: [],
+      relationships: [],
+    }
+
+    it('does NOT generate byId(id) when no required identifier param exists', async () => {
+      // Regression: with the old `?? 'id'` fallback, this would generate
+      // `app.diskItems.byId(id)` where `id` is undefined — wrong for
+      // parameter-free delete commands.
+      const { status, capturedJxaCode } = await callRpc(
+        noIdentifierDeleteManifest,
+        'testnoiddelete.diskitems.delete',
+        {}
+      )
+
+      // Must reach runWithApp without an error (200 or delegated result)
+      expect(status).toBe(200)
+
+      // Must NOT contain byId(id) with an undefined variable
+      expect(capturedJxaCode).not.toContain('byId(id)')
+
+      // Must NOT contain `var id =` — there is no identifier param to assign
+      expect(capturedJxaCode).not.toContain('var id =')
+    })
+
+    it('falls through to generic delete() call without a byId() lookup', async () => {
+      // The generic branch generates: app.delete()
+      // This is the correct JXA for a parameter-free resource-scoped delete.
+      const { capturedJxaCode } = await callRpc(
+        noIdentifierDeleteManifest,
+        'testnoiddelete.diskitems.delete',
+        {}
+      )
+
+      expect(capturedJxaCode).toContain('app.delete()')
+    })
+  })
+
+  // Criterion D: representative coverage — id-based commands still work (non-regression)
   describe('commands that use "id" as the identifier continue to work', () => {
     /**
      * A manifest with the classic "id" identifier — verifies the fix doesn't

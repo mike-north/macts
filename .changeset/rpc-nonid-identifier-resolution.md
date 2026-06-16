@@ -1,5 +1,5 @@
 ---
-"@macts/api": patch
+'@macts/api': patch
 ---
 
 Fix RPC get and delete handlers to resolve identifier param name from the manifest

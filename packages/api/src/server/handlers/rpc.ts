@@ -368,18 +368,37 @@ async function executeResourceCommand(
       return obj;
     `
   } else if (command.name === 'delete') {
-    // Delete by identifier: app.calendars.byId(<identifierParam>).delete()
+    // Delete by identifier: app.resource.byId(<identifierParam>).delete()
     // Resolve the identifier variable name from the first required parameter in
     // the manifest definition — never hardcode 'id'.
-    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+    //
+    // If there is no required identifier parameter (e.g. System Events DiskItem
+    // delete which has parameters: []), fall through to the generic handler
+    // rather than silently using an undefined variable in byId().
+    const identifierParam = command.parameters.find((p) => p.required)?.name
 
-    code = `
+    if (identifierParam !== undefined) {
+      code = `
       ${paramAssignments}
       // Delete ${resource?.name ?? 'item'} by identifier
       var item = app.${resourcePlural}.byId(${identifierParam});
       item.delete();
       return null;
     `
+    } else {
+      // No required identifier: fall through to generic resource command execution
+      // (e.g. app.delete() for parameter-free delete operations)
+      const paramObj = command.parameters
+        .filter((p) => args[p.name] !== undefined || p.required)
+        .map((p) => p.name)
+
+      code = `
+      ${paramAssignments}
+      // Execute resource delete command (no identifier required)
+      var result = app.${command.name}(${paramObj.length > 0 ? `{${paramObj.join(', ')}}` : ''});
+      return result;
+    `
+    }
   } else if (command.name === 'create') {
     // Create: app.Calendar({props}).make()
     const resourceName = resource?.name ?? 'Item'
