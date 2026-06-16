@@ -281,6 +281,56 @@ describe('createPolicyGovernanceFilter — reason propagation', () => {
     const decision = filter.evaluate(makeCapability('notebook', 'notes', 'list'))
     expect(decision.reason).toBeUndefined()
   })
+
+  it('falls back to app-level reason when op rule matches but has no reason of its own', () => {
+    // Regression: before fix, op rule without reason returned undefined reason even
+    // when the app rule carried one, leaving a denied/warned capability unexplained.
+    const policy = parseValidPolicy({
+      version: '1',
+      defaultDisposition: 'allowed',
+      apps: [
+        {
+          app: 'notebook',
+          disposition: 'allowed',
+          reason: 'notebook is restricted',
+          operations: [
+            // op rule overrides disposition but gives no reason of its own
+            { operation: 'delete', disposition: 'forbidden' },
+          ],
+        },
+      ],
+    })
+    const filter = createPolicyGovernanceFilter(policy)
+    const decision = filter.evaluate(makeCapability('notebook', 'notes', 'delete'))
+    expect(decision.disposition).toBe('deny')
+    // Must surface the app-level reason since op rule has none.
+    expect(decision.reason).toBe('notebook is restricted')
+  })
+
+  it('op-level reason wins over app-level reason when both are present', () => {
+    const policy = parseValidPolicy({
+      version: '1',
+      defaultDisposition: 'allowed',
+      apps: [
+        {
+          app: 'notebook',
+          disposition: 'allowed',
+          reason: 'app-level reason',
+          operations: [
+            {
+              operation: 'delete',
+              disposition: 'forbidden',
+              reason: 'op-level reason',
+            },
+          ],
+        },
+      ],
+    })
+    const filter = createPolicyGovernanceFilter(policy)
+    const decision = filter.evaluate(makeCapability('notebook', 'notes', 'delete'))
+    expect(decision.disposition).toBe('deny')
+    expect(decision.reason).toBe('op-level reason')
+  })
 })
 
 // ---------------------------------------------------------------------------

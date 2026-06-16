@@ -107,7 +107,11 @@ export class PolicyGovernanceFilter implements GovernanceFilter {
         }
       }
       const disposition = policyDispositionToGovernanceDisposition(opRule.disposition)
-      return { disposition, ...(opRule.reason !== undefined ? { reason: opRule.reason } : {}) }
+      // Operation reason takes precedence; fall back to the app-level reason so a
+      // denied/warned capability is never left unexplained when the app rule has
+      // a reason but the operation override omits one (review comment #3422506192).
+      const reason = opRule.reason ?? appRule.reason
+      return { disposition, ...(reason !== undefined ? { reason } : {}) }
     }
 
     // App-level disposition applies.
