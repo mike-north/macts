@@ -1,5 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { Resource } from '../manifest/index.js'
+import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
 
 export interface GeneratedCollection {
   name: string
@@ -18,6 +19,13 @@ export function generateCollectionClass(
   const instanceClass = `${resource.name}Instance`
   const createInputType = `${resource.name}CreateInput`
   const createInputSchema = `${resource.name}CreateInputSchema`
+
+  // Resolve the manifest-declared primary identifier property at generation
+  // time so the emitted code uses the correct field for each resource rather
+  // than the hardcoded `uid ?? id` fallback. Falls back to 'id' for the rare
+  // case where a resource declares no identifiers (so `byId` still receives a
+  // string, even if it is empty for an unresolvable item).
+  const idProp = resolvePrimaryIdentifierProperty(resource) ?? 'id'
 
   const imports = [
     "import type { JxaExecutor } from '@macts/core';",
@@ -40,7 +48,7 @@ export class ${className} {
     const data = await this.#executor.query(this.#specifier) as ${resource.name}[];
     return data.map(item => new ${instanceClass}(
       this.#executor,
-      this.#specifier.byId(item.uid ?? item.id ?? ''),
+      this.#specifier.byId((item as Record<string, unknown>)['${idProp}'] as string ?? ''),
       item
     ));
   }
@@ -87,7 +95,7 @@ export class ${className} {
     ) as ${resource.name};
     return new ${instanceClass}(
       this.#executor,
-      this.#specifier.byId(data.uid ?? data.id ?? ''),
+      this.#specifier.byId((data as Record<string, unknown>)['${idProp}'] as string ?? ''),
       data
     );
   }
