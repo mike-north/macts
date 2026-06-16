@@ -89,14 +89,39 @@ describe('getMactsHome', () => {
   })
 
   it('produces an absolute path regardless of cwd when MACTS_HOME is unset', () => {
-    // Negative: the resolved path must not depend on process.cwd(), which the
-    // cwd-relative `./~/.macts` defect did.
+    // Negative: the resolved path must be absolute and must not contain a bare
+    // "~" segment (the cwd-relative `./~/.macts` defect produced both).
+    // `startsWith(process.cwd())` is deliberately NOT used here: if the runner's
+    // cwd happened to be the home directory, a cwd-relative path would falsely
+    // pass that check.
     delete process.env['HOME']
     delete process.env['MACTS_HOME']
 
     const resolved = getMactsHome()
 
-    expect(resolved.startsWith(process.cwd())).toBe(false)
+    expect(path.isAbsolute(resolved)).toBe(true)
+    expect(resolved.split(path.sep)).not.toContain('~')
+  })
+
+  it('falls back to os.homedir()/.macts when MACTS_HOME is empty string', () => {
+    // Regression: `??` only catches null/undefined; an empty MACTS_HOME was
+    // returned as-is, making all derived paths cwd-relative ("").
+    process.env['MACTS_HOME'] = ''
+
+    const resolved = getMactsHome()
+
+    expect(resolved).toBe(path.join(os.homedir(), '.macts'))
+    expect(path.isAbsolute(resolved)).toBe(true)
+  })
+
+  it('falls back to os.homedir()/.macts when MACTS_HOME is whitespace-only', () => {
+    // Regression: a whitespace-only MACTS_HOME trims to "" and must not be used
+    // as the base directory for signing secrets and key storage.
+    process.env['MACTS_HOME'] = '   '
+
+    const resolved = getMactsHome()
+
+    expect(resolved).toBe(path.join(os.homedir(), '.macts'))
     expect(path.isAbsolute(resolved)).toBe(true)
   })
 })
