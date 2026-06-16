@@ -10,6 +10,7 @@ import {
 import { createServer, DEFAULT_PORT } from '@macts/api/server'
 import { loadManifest, loadCapabilityRegistry } from '@macts/core'
 import { resolveManifestsDir } from './capabilities/registry.js'
+import { getMactsHome } from '../plugin/paths.js'
 
 /**
  * Root command that handles global flags like --mcp and --serve.
@@ -155,8 +156,9 @@ export class RootCommand extends Command {
       const manifestLocations = [
         // 1. Current working directory
         path.join(process.cwd(), 'manifests/calendar/app.yaml'),
-        // 2. User's macts config directory
-        path.join(process.env['HOME'] ?? '', '.macts/manifests/calendar/app.yaml'),
+        // 2. User's macts config directory (honors MACTS_HOME, falls back to
+        //    os.homedir() — never a cwd-relative path when HOME is unset)
+        path.join(getMactsHome(), 'manifests/calendar/app.yaml'),
         // 3. Relative to dist/ (when running built CLI from packages/cli/dist/)
         path.resolve(import.meta.dirname, '../../../manifests/calendar/app.yaml'),
         // 4. Relative to src/ (when running with tsx from packages/cli/src/)
