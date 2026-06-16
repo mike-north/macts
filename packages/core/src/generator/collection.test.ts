@@ -37,7 +37,7 @@ const calendarIdentifierManifest: AppManifest = {
   app: {
     bundleId: 'com.apple.iCal',
     name: 'Calendar',
-    tccEntitlements: ['kTCCServiceCalendar'],
+    tccEntitlements: ['calendar'],
   },
   suites: [],
   resources: {
