@@ -44,7 +44,7 @@ Two halves. The **engine** does deterministic work up front so the
 ```text
 ENGINE  (deterministic, self-extending)          ENGAGEMENT LAYER  (domain-agnostic)
   source dictionary                                 1. Discover     — find a typed capability for an intent
-      ↓  deterministic codegen                       2. Govern       — boundaries, permissions, audit (AgentRC)
+      ↓  deterministic codegen                       2. Govern       — boundaries, permissions, audit
   manifest (lossless-plus, source of truth)          3. Compose      — code-mode: one execution, N operations
       ↓                                              4. Reuse        — recipes/skills that compound over time
   semantic SDK / CLI / MCP / HTTP API
@@ -69,16 +69,16 @@ We prove the seam on macOS first; we do **not** build webacts speculatively.
 
 ## Epics
 
-| Epic                                    | Scope                                                                                                                                                | Vision §             | Status                  |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ----------------------- |
-| **Spike · Efficiency benchmark**        | Reproducible harness: same task set via raw computer-use vs. macts discovery + code-mode. Measure tokens, round-trips, reliability.                  | §4.4, §5             | **Greenlit (do first)** |
-| **0 · Positioning**                     | Reframe README to "agent-ready APIs"; add security-model and agent-use-case sections.                                                                | §12, roadmap P1      | Greenlit (quick win)    |
-| **A · Discovery + Risk Classification** | Manifest-derived capability registry tagged read/write/delete/send/execute/system-change; `macts capabilities search/inspect`; MCP discovery tool.   | §7.1–7.2, P2         | **Greenlit**            |
-| **B · Trust & Governance (AgentRC)**    | `.agentrc` + org policy spec; compile-to-permissions; human-readable permission negotiation; audit log; approval gates; discovery filtering.         | §6, §7.3, §10, P3+P6 | **Greenlit**            |
-| **C · Code-mode Runtime**               | Sandboxed agent-authored TS against `@macts/*` — one execution, N operations — bounded by Epic B.                                                    | §5.1, §14            | **Greenlit**            |
-| **F · Agent-driven Generation**         | Runtime, local-first: unsupported app → inspect dictionary → mint a **local private capability** → permission it → use now. Upstream PR is optional. | §9.4, P5             | **Greenlit**            |
-| **D · Recipes / Skills + Steering**     | Named, inspectable, permissioned recipes that double as governance artifacts; plus the §9 agent decision-ladder steering content.                    | §4.5, §9, P4         | Backlog                 |
-| **G · webacts provider seam**           | Keep the engagement layer domain-agnostic; spike the Chrome bridge. Design the seam now, build later.                                                | §8, P7               | Backlog                 |
+| Epic                                    | Scope                                                                                                                                                           | Vision §             | Status                  |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ----------------------- |
+| **Spike · Efficiency benchmark**        | Reproducible harness: same task set via raw computer-use vs. macts discovery + code-mode. Measure tokens, round-trips, reliability.                             | §4.4, §5             | **Greenlit (do first)** |
+| **0 · Positioning**                     | Reframe README to "agent-ready APIs"; add security-model and agent-use-case sections.                                                                           | §12, roadmap P1      | Greenlit (quick win)    |
+| **A · Discovery + Risk Classification** | Manifest-derived capability registry tagged read/write/delete/send/execute/system-change; `macts capabilities search/inspect`; MCP discovery tool.              | §7.1–7.2, P2         | **Greenlit**            |
+| **B · Trust & Governance**              | Governance policy declaration + org policy spec; compile-to-permissions; human-readable permission negotiation; audit log; approval gates; discovery filtering. | §6, §7.3, §10, P3+P6 | **Greenlit**            |
+| **C · Code-mode Runtime**               | Sandboxed agent-authored TS against `@macts/*` — one execution, N operations — bounded by Epic B.                                                               | §5.1, §14            | **Greenlit**            |
+| **F · Agent-driven Generation**         | Runtime, local-first: unsupported app → inspect dictionary → mint a **local private capability** → permission it → use now. Upstream PR is optional.            | §9.4, P5             | **Greenlit**            |
+| **D · Recipes / Skills + Steering**     | Named, inspectable, permissioned recipes that double as governance artifacts; plus the §9 agent decision-ladder steering content.                               | §4.5, §9, P4         | Backlog                 |
+| **G · webacts provider seam**           | Keep the engagement layer domain-agnostic; spike the Chrome bridge. Design the seam now, build later.                                                           | §8, P7               | Backlog                 |
 
 ## Sequencing
 
