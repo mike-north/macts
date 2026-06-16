@@ -3,10 +3,20 @@
  *
  * Capability call arguments may contain sensitive values (passwords, tokens,
  * API keys, etc.). Before those arguments are stored in an audit record they
- * must be summarised and sanitised: sensitive values replaced with a stable
- * placeholder and large/non-scalar values collapsed to a safe summary so the
- * `argsSummary` field in an {@link AuditRecord} is always safe to persist and
- * display.
+ * are summarised and sanitised: values under a configurable set of known
+ * sensitive top-level key names (matched case-insensitively) are replaced with
+ * a stable placeholder, and large/non-scalar values are collapsed to a bounded
+ * summary so the `argsSummary` field in an {@link AuditRecord} avoids dumping
+ * raw bulk data.
+ *
+ * This is best-effort redaction, NOT a guarantee that all sensitive data is
+ * removed: only top-level keys whose names match the sensitive set are redacted.
+ * Secrets stored under unrecognised key names, or nested inside object/array
+ * values, are NOT detected (nested values are summarised structurally rather
+ * than expanded, so their contents are not emitted verbatim — but a sensitive
+ * scalar at an unrecognised top-level key would pass through). Callers that need
+ * stronger guarantees should extend the sensitive-key set or pre-sanitise their
+ * arguments.
  *
  * This module is pure and has no I/O side-effects — it transforms a
  * `Record<string, unknown>` into a human-readable `string`. Storing the

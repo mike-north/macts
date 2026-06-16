@@ -85,9 +85,12 @@ export interface AuditRecordInput {
 /**
  * A structured, attributable record of a single capability call.
  *
- * Every field is a primitive or `string`, so a record serializes losslessly to
- * JSON (the `timestamp` is an ISO-8601 string in serialized form — see
- * {@link serializeAuditRecord}). Records are immutable.
+ * Every field is a string except `timestamp`, which is a `Date`. To serialize a
+ * record losslessly to JSON, convert it with {@link serializeAuditRecord}, which
+ * renders the `timestamp` as an ISO-8601 string. All fields are `readonly`, so
+ * the record reference is shallowly immutable; note the `timestamp` `Date` is
+ * itself mutable (the constructor stores a defensive copy — see
+ * {@link createAuditRecord}).
  */
 export interface AuditRecord {
   /** Capability invoked, in `app:resource:operation` form. */

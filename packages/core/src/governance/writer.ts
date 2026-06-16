@@ -1,11 +1,14 @@
 /**
- * Durable audit-record writer (JSON-lines format).
+ * Audit-record writer (JSON-lines format).
  *
  * Appends serialised {@link AuditRecord} instances to a file, one JSON object
  * per line (the JSON-lines / NDJSON convention). Each call to
- * {@link AuditWriter.append} performs an atomic, newline-terminated append so
- * individual records are never split across lines even under concurrent writes
- * to the same file.
+ * {@link AuditWriter.append} performs a best-effort, newline-terminated append
+ * of a single serialised record via `fs.appendFile`. Strict write atomicity and
+ * concurrency guarantees are NOT provided here: `fs.appendFile` does not
+ * guarantee that concurrent appends from multiple writers (or processes) are
+ * interleaved cleanly, so callers that require those guarantees must add their
+ * own serialisation (e.g. a queue or external lock).
  *
  * ## Layering invariant
  *
@@ -31,7 +34,7 @@ import { serializeAuditRecord } from './audit.js'
 import type { AuditRecord } from './audit.js'
 
 /**
- * A durable sink for {@link AuditRecord} instances.
+ * A sink for {@link AuditRecord} instances.
  *
  * Implementations must append one complete, newline-terminated JSON object per
  * call and must surface I/O errors rather than swallowing them.
@@ -41,7 +44,9 @@ export interface AuditWriter {
    * Append a single audit record to the sink.
    *
    * @param record - The record to persist.
-   * @returns A promise that resolves when the record has been durably written.
+   * @returns A promise that resolves once the record has been appended (handed
+   *   off to the underlying write). It does NOT `fsync`, so resolution does not
+   *   guarantee the bytes have been flushed to durable storage.
    * @throws If the underlying I/O operation fails.
    */
   append(record: AuditRecord): Promise<void>
