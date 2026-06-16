@@ -17,9 +17,12 @@ import {
   normalizeResourceRouteSegment,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
+  classifyCommandRisk,
   CANONICAL_IDENTIFIER_KEY,
 } from '@macts/core'
 import { requirePermission } from '../middleware/permission.js'
+import { requirePolicy, type GovernanceContext } from '../middleware/governance.js'
+import { ALLOW_ALL_POLICY } from '../governance/active-policy.js'
 import type { AuthVariables } from '../middleware/auth.js'
 import { withSpan } from '../../telemetry.js'
 import { buildSchemaRegistry } from './validation.js'
@@ -74,6 +77,9 @@ export interface RpcEndpointInfo {
  * Create a Hono router with RPC endpoints from a manifest.
  *
  * @param manifest - The app manifest containing commands
+ * @param governance - Optional governance context (active policy + audit
+ *   writer). When omitted, defaults to the allow-all policy so call-time policy
+ *   enforcement is a no-op and pre-governance behavior is preserved.
  * @returns Hono app with RPC routes
  *
  * @example
@@ -88,7 +94,10 @@ export interface RpcEndpointInfo {
  * app.route('/api/v1', rpc);
  * ```
  */
-export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVariables }> {
+export function createRpcRouter(
+  manifest: AppManifest,
+  governance: GovernanceContext = { policy: ALLOW_ALL_POLICY }
+): Hono<{ Variables: AuthVariables }> {
   const app = new Hono<{ Variables: AuthVariables }>()
   const appName = normalizeAppRouteSegment(manifest.app.name)
   const bundleId = manifest.app.bundleId
@@ -103,9 +112,12 @@ export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVa
   // Register handlers for each command
   for (const [commandName, command] of Object.entries(manifest.commands)) {
     const endpoints = getCommandEndpoints(commandName, command, manifest)
+    // Risk class drives read-only governance semantics; derived once per command.
+    const risk = classifyCommandRisk(command)
 
     for (const endpoint of endpoints) {
-      // Register the endpoint with permission middleware
+      // Register the endpoint with permission middleware (API-key check) followed
+      // by governance-policy enforcement (additive call-time policy check).
       app.post(
         endpoint.path,
         requirePermission(
@@ -116,6 +128,7 @@ export function createRpcRouter(manifest: AppManifest): Hono<{ Variables: AuthVa
               }
             : {}
         ),
+        requirePolicy({ permission: endpoint.permission, risk, governance }),
         async (c) => {
           try {
             // Parse JSON body
@@ -679,15 +692,18 @@ async function executeResourceCommand(
  * Create an RPC router for multiple manifests (multi-app support).
  *
  * @param manifests - Array of app manifests
+ * @param governance - Optional governance context, forwarded to every per-app
+ *   router. Defaults to allow-all (enforcement is a no-op).
  * @returns Combined Hono router
  */
 export function createMultiAppRpcRouter(
-  manifests: AppManifest[]
+  manifests: AppManifest[],
+  governance: GovernanceContext = { policy: ALLOW_ALL_POLICY }
 ): Hono<{ Variables: AuthVariables }> {
   const app = new Hono<{ Variables: AuthVariables }>()
 
   for (const manifest of manifests) {
-    const router = createRpcRouter(manifest)
+    const router = createRpcRouter(manifest, governance)
     app.route('/', router)
   }
 
