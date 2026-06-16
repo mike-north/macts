@@ -80,6 +80,25 @@ export const CanvasSchema: z.ZodObject<{
 export type CanvasUpdateInput = Partial<CanvasCreateInput>;
 
 // @public
+export const capabilities: readonly CapabilityMetadata[];
+
+// @public
+export interface CapabilityMetadata {
+    readonly app: string;
+    readonly appBundleId: string;
+    readonly description: string;
+    readonly inputSchema: Record<string, unknown>;
+    readonly name: string;
+    readonly operation: string;
+    readonly permission: string | null;
+    readonly resource: string;
+    readonly risk: CapabilityRisk;
+}
+
+// @public
+export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
+
+// @public
 export type ExportAreaType = 'selectedGraphics' | 'allGraphics' | 'currentCanvas' | 'entireDocument';
 
 // @public

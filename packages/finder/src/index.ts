@@ -21,3 +21,6 @@
 export { FinderClient, FinderError, HttpClient } from './client.js'
 export type { FinderClientOptions } from './client.js'
 export * from './types.js'
+
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

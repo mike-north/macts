@@ -52,10 +52,10 @@ describe('RootCommand', () => {
     expect(getStdout()).toContain('Use --help to see available commands')
   })
 
-  it('should start MCP server when --mcp is provided with no plugins', async () => {
+  it('should start MCP server with only the built-in discovery plugin when no plugins are installed', async () => {
     const { stdout, stderr, getStderr } = createMockStreams()
 
-    // Mock plugin discovery to return no plugins
+    // Mock plugin discovery to return no installed plugins
     vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
       plugins: [],
       errors: [],
@@ -67,11 +67,16 @@ describe('RootCommand', () => {
     const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
     expect(exitCode).toBe(0)
-    expect(createServerSpy).toHaveBeenCalledWith([])
-    expect(getStderr()).toContain('Starting MCP server with 0 plugin(s)')
+    // The built-in capability-discovery plugin is always prepended, so the
+    // server starts with exactly one plugin exposing the discovery tool.
+    const plugins = createServerSpy.mock.calls[0]?.[0] as mcp.McpPlugin[]
+    expect(plugins).toHaveLength(1)
+    expect(plugins[0]?.name).toBe('capabilities')
+    expect(plugins[0]?.tools.map((t) => t.name)).toContain('macts__capabilities__discover')
+    expect(getStderr()).toContain('Starting MCP server with 1 plugin(s)')
   })
 
-  it('should start MCP server with discovered plugins', async () => {
+  it('should start MCP server with the discovery plugin plus discovered plugins', async () => {
     const { stdout, stderr, getStderr } = createMockStreams()
 
     const mockPlugin = {
@@ -92,8 +97,12 @@ describe('RootCommand', () => {
     const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
     expect(exitCode).toBe(0)
-    expect(createServerSpy).toHaveBeenCalledWith([mockPlugin])
-    expect(getStderr()).toContain('Starting MCP server with 1 plugin(s)')
+    // Discovery plugin is prepended ahead of the discovered plugin.
+    const plugins = createServerSpy.mock.calls[0]?.[0] as mcp.McpPlugin[]
+    expect(plugins).toHaveLength(2)
+    expect(plugins[0]?.name).toBe('capabilities')
+    expect(plugins[1]).toEqual(mockPlugin)
+    expect(getStderr()).toContain('Starting MCP server with 2 plugin(s)')
   })
 
   it('should log plugin errors to stderr when --mcp is provided', async () => {

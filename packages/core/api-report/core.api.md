@@ -11,6 +11,9 @@ import { z } from 'zod';
 export function activateApp(bundleId: string): Promise<undefined>;
 
 // @public
+export const ALLOW_ALL_GOVERNANCE: GovernanceFilter;
+
+// @public
 export interface ApiKeyMetadata {
     createdAt: Date;
     expiresAt?: Date | undefined;
@@ -65,6 +68,9 @@ export interface AppConnectionOptions {
     // (undocumented)
     timeout?: number;
 }
+
+// @public
+export function applyGovernance(capabilities: readonly Capability[], filter?: GovernanceFilter): GovernedCapability[];
 
 // @public (undocumented)
 export type AppManifest = z.infer<typeof AppManifestSchema>;
@@ -197,6 +203,14 @@ export const AppManifestSchema: z.ZodObject<{
         returns: z.ZodOptional<z.ZodString>;
         code: z.ZodOptional<z.ZodString>;
         permission: z.ZodOptional<z.ZodString>;
+        risk: z.ZodOptional<z.ZodEnum<{
+            read: "read";
+            write: "write";
+            delete: "delete";
+            send: "send";
+            execute: "execute";
+            "system-change": "system-change";
+        }>>;
         permissionHistory: z.ZodOptional<z.ZodArray<z.ZodObject<{
             version: z.ZodString;
             permission: z.ZodString;
@@ -257,10 +271,43 @@ export const booleanCoercer: TypeCoercer<boolean>;
 export function buildAppCommandRoute(appName: string, commandKey: string): string;
 
 // @public
+export function buildCapabilityRegistry(manifests: readonly AppManifest[]): CapabilityRegistry;
+
+// @public
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, commandKey: string): string;
+
+// @public
+export interface Capability {
+    readonly app: string;
+    readonly appBundleId: string;
+    readonly cliSnippet: string;
+    readonly description: string;
+    readonly inputSchema: JsonSchema;
+    readonly keywords: readonly string[];
+    readonly mcpToolName: string;
+    readonly name: string;
+    readonly operation: string;
+    readonly outputSchema: JsonSchema | undefined;
+    readonly permission: string | undefined;
+    readonly resource: string;
+    readonly risk: RiskClass;
+}
+
+// @public
+export interface CapabilityRegistry {
+    readonly capabilities: readonly Capability[];
+    get(name: string): Capability | undefined;
+    readonly names: readonly string[];
+}
+
+// @public
+export interface CapabilitySearchResult {
+    readonly capability: Capability;
+    readonly score: number;
+}
 
 // @public (undocumented)
 export type Cardinality = z.infer<typeof CardinalitySchema>;
@@ -281,6 +328,12 @@ export function checkPermissions(grantedPermissions: string[], requiredPermissio
     granted: boolean;
     results: PermissionCheckResult[];
 };
+
+// @public
+export function classifyCommandRisk(command: Command): RiskClass;
+
+// @public
+export function classifyRiskFromOperation(operationName: string): RiskClass;
 
 // @public (undocumented)
 export interface CliGeneratorContext {
@@ -379,6 +432,14 @@ export const CommandSchema: z.ZodObject<{
     returns: z.ZodOptional<z.ZodString>;
     code: z.ZodOptional<z.ZodString>;
     permission: z.ZodOptional<z.ZodString>;
+    risk: z.ZodOptional<z.ZodEnum<{
+        read: "read";
+        write: "write";
+        delete: "delete";
+        send: "send";
+        execute: "execute";
+        "system-change": "system-change";
+    }>>;
     permissionHistory: z.ZodOptional<z.ZodArray<z.ZodObject<{
         version: z.ZodString;
         permission: z.ZodString;
@@ -395,6 +456,9 @@ export const CommandScopeSchema: z.ZodEnum<{
     resource: "resource";
     application: "application";
 }>;
+
+// @public
+export function compareRisk(a: RiskClass, b: RiskClass): number;
 
 // @public (undocumented)
 export type Confidence = z.infer<typeof ConfidenceSchema>;
@@ -438,6 +502,9 @@ export type DateType = z.infer<typeof DateTypeSchema>;
 // @public
 export const DateTypeSchema: z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>;
 
+// @public
+export const DEFAULT_RISK: RiskClass;
+
 // @public (undocumented)
 export type Deprecation = z.infer<typeof DeprecationSchema>;
 
@@ -450,7 +517,21 @@ export const DeprecationSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function deriveCapabilities(manifest: AppManifest): Capability[];
+
+// @public
 export function describePermissions(permissions: string[]): string;
+
+// @public
+export type DiscoverySearchOutcome = {
+    readonly kind: 'matches';
+    readonly governed: readonly GovernedCapability[];
+} | {
+    readonly kind: 'no-match';
+} | {
+    readonly kind: 'governance-blocked';
+    readonly deniedCount: number;
+};
 
 // @public (undocumented)
 export type DistributionModel = z.infer<typeof DistributionModelSchema>;
@@ -632,6 +713,9 @@ export interface GenerateApiPluginResult {
 export function generateApplicationClass(ctx: GeneratorContext): GeneratedApplication;
 
 // @public
+export function generateCapabilitiesModule(manifest: AppManifest): string;
+
+// @public
 export function generateClientPackage(manifest: AppManifest, options: GenerateClientPackageOptions): GenerateClientPackageResult;
 
 // @public
@@ -789,7 +873,6 @@ export interface GeneratedSchema {
 export interface GeneratedTool {
     commandName: string;
     description: string;
-    // Warning: (ae-forgotten-export) The symbol "JsonSchema" needs to be exported by the entry point index.d.ts
     inputSchema: JsonSchema;
     isResourceOperation: boolean;
     name: string;
@@ -913,6 +996,26 @@ export interface GeneratorOptions {
 export function getAppName(bundleId: string): Promise<string>;
 
 // @public
+export interface GovernanceDecision {
+    readonly disposition: GovernanceDisposition;
+    readonly reason?: string;
+}
+
+// @public
+export type GovernanceDisposition = 'allow' | 'warn' | 'deny';
+
+// @public
+export interface GovernanceFilter {
+    evaluate(capability: Capability): GovernanceDecision;
+}
+
+// @public
+export interface GovernedCapability {
+    readonly capability: Capability;
+    readonly decision: GovernanceDecision;
+}
+
+// @public
 export function groupPermissionsByResource(permissions: string[]): Map<string, string[]>;
 
 // @public
@@ -993,13 +1096,51 @@ export const InheritanceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function inspectCapability(registry: CapabilityRegistry, name: string, filter?: GovernanceFilter): InspectOutcome;
+
+// @public
+export type InspectOutcome = {
+    readonly kind: 'found';
+    readonly capability: Capability;
+    readonly decision: GovernanceDecision;
+} | {
+    readonly kind: 'not-found';
+} | {
+    readonly kind: 'denied';
+    readonly reason: string | undefined;
+};
+
+// @public
 export function isAppRunning(bundleId: string): Promise<boolean>;
 
 // @public
 export function isCoarseOperation(operation: string): operation is CoarseOperation;
 
 // @public
+export function isRiskClass(value: unknown): value is RiskClass;
+
+// @public
 export function isValidPermission(permission: string): boolean;
+
+// @public
+export interface JsonSchema {
+    // (undocumented)
+    readonly [key: string]: unknown;
+    // (undocumented)
+    readonly additionalProperties?: boolean;
+    // (undocumented)
+    readonly description?: string;
+    // (undocumented)
+    readonly enum?: readonly unknown[];
+    // (undocumented)
+    readonly items?: JsonSchema;
+    // (undocumented)
+    readonly properties?: Record<string, JsonSchema>;
+    // (undocumented)
+    readonly required?: readonly string[];
+    // (undocumented)
+    readonly type?: string;
+}
 
 // @public
 export interface JsonSchemaOptions {
@@ -1033,7 +1174,25 @@ export interface JxaExecutorOptions {
 }
 
 // @public
+export function loadCapabilityRegistry(manifestsDir: string): Promise<{
+    registry: CapabilityRegistry;
+    errors: {
+        app: string;
+        message: string;
+    }[];
+}>;
+
+// @public
 export function loadManifest(manifestPath: string): Promise<AppManifest>;
+
+// @public
+export function loadManifestsFromDir(manifestsDir: string): Promise<{
+    manifests: AppManifest[];
+    errors: {
+        app: string;
+        message: string;
+    }[];
+}>;
 
 // @public
 export class ManifestLoadError extends Error {
@@ -1377,6 +1536,9 @@ export const RelationshipSchema: z.ZodObject<{
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
 
 // @public
+export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
+
+// @public
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[];
 
 // @public (undocumented)
@@ -1433,11 +1595,50 @@ export const RgbTypeSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export const RISK_CLASSES: readonly ["read", "write", "delete", "send", "execute", "system-change"];
+
+// @public
+export type RiskClass = (typeof RISK_CLASSES)[number];
+
+// @public
+export const RiskClassSchema: z.ZodEnum<{
+    read: "read";
+    write: "write";
+    delete: "delete";
+    send: "send";
+    execute: "execute";
+    "system-change": "system-change";
+}>;
+
+// @public (undocumented)
+export type RiskClassValue = z.infer<typeof RiskClassSchema>;
+
+// @public
 export function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>;
 
 // @public
 export function runWithApp<T>(bundleId: string, fn: string, // Function body as string
 options?: JxaExecutorOptions): Promise<T>;
+
+// @public
+export function scoreCapability(capability: Capability, terms: readonly string[]): number;
+
+// @public
+export const SEARCH_WEIGHTS: {
+    readonly operationExact: 10;
+    readonly resourceExact: 8;
+    readonly appExact: 6;
+    readonly keywordExact: 4;
+    readonly keywordPrefix: 2;
+};
+
+// @public
+export function searchCapabilities(registry: CapabilityRegistry | readonly Capability[], intent: string, options?: SearchCapabilitiesOptions): CapabilitySearchResult[];
+
+// @public
+export interface SearchCapabilitiesOptions {
+    readonly limit?: number;
+}
 
 // @public
 export type Selector = {
@@ -1483,6 +1684,9 @@ export const SuiteSchema: z.ZodObject<{
     enums: z.ZodDefault<z.ZodArray<z.ZodString>>;
 }, z.core.$strip>;
 
+// @public
+export function summarizeDiscoverySearch(ranked: readonly CapabilitySearchResult[], filter?: GovernanceFilter): DiscoverySearchOutcome;
+
 // @public (undocumented)
 export type TccEntitlement = z.infer<typeof TccEntitlementSchema>;
 
@@ -1503,6 +1707,9 @@ export function toJsonSchema(schema: z.ZodType, options?: JsonSchemaOptions): Js
 
 // @public
 export function toJsonSchemaWithDefinitions(schema: z.ZodType, name: string): JsonSchema7Type;
+
+// @public
+export function tokenizeIntent(intent: string): string[];
 
 // @public
 export interface TypeCoercer<T> {

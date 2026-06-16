@@ -21,3 +21,6 @@
 export { SafariClient, SafariError, HttpClient } from './client.js'
 export type { SafariClientOptions } from './client.js'
 export * from './types.js'
+
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

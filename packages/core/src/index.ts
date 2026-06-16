@@ -36,3 +36,6 @@ export * from './generator/index.js'
 
 // Permissions
 export * from './permissions/index.js'
+
+// Capability discovery (registry, risk classification, search, governance seam)
+export * from './capabilities/index.js'

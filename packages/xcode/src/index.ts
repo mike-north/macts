@@ -25,3 +25,5 @@ export { WorkspaceDocumentResourceClient } from './resources/workspacedocument.j
 export { ProjectResourceClient } from './resources/project.js'
 export { SchemeResourceClient } from './resources/scheme.js'
 export { RunDestinationResourceClient } from './resources/rundestination.js'
+export { capabilities } from './capabilities.js'
+export type { CapabilityMetadata, CapabilityRisk } from './capabilities.js'

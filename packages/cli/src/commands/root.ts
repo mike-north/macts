@@ -1,9 +1,15 @@
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 import { Command, Option } from 'clipanion'
-import { createMcpServer, discoverMcpPlugins } from '@macts/mcp'
+import {
+  createMcpServer,
+  discoverMcpPlugins,
+  createDiscoveryTool,
+  type McpPlugin,
+} from '@macts/mcp'
 import { createServer, DEFAULT_PORT } from '@macts/api/server'
-import { loadManifest } from '@macts/core'
+import { loadManifest, loadCapabilityRegistry } from '@macts/core'
+import { resolveManifestsDir } from './capabilities/registry.js'
 
 /**
  * Root command that handles global flags like --mcp and --serve.
@@ -89,19 +95,56 @@ export class RootCommand extends Command {
       this.context.stderr.write(`Plugin load error: ${error.packageName}: ${error.message}\n`)
     }
 
+    // Build the built-in capability-discovery plugin from the manifests
+    // directory, so agents can search/inspect typed capabilities without every
+    // app plugin being installed. The discovery tool degrades gracefully: if no
+    // manifests directory is found, it is simply omitted.
+    const discoveryPlugins = await this.buildDiscoveryPlugins()
+
+    const allPlugins = [...discoveryPlugins, ...plugins]
+
     // Log plugin count to stderr for debugging
-    this.context.stderr.write(`Starting MCP server with ${String(plugins.length)} plugin(s)\n`)
+    this.context.stderr.write(`Starting MCP server with ${String(allPlugins.length)} plugin(s)\n`)
 
     try {
       // Start MCP server on stdio
       // This will run until stdin closes
-      await createMcpServer(plugins)
+      await createMcpServer(allPlugins)
       return 0
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       this.context.stderr.write(`Failed to start MCP server: ${message}\n`)
       return 1
     }
+  }
+
+  /**
+   * Build the built-in capability-discovery plugin (a single discovery tool)
+   * from the auto-detected manifests directory. Returns an empty array when no
+   * manifests directory can be located, so the server still starts.
+   */
+  private async buildDiscoveryPlugins(): Promise<McpPlugin[]> {
+    const manifestsDir = resolveManifestsDir()
+    if (!manifestsDir) {
+      this.context.stderr.write(
+        'No manifests directory found; capability-discovery tool disabled.\n'
+      )
+      return []
+    }
+
+    const { registry, errors } = await loadCapabilityRegistry(manifestsDir)
+    for (const error of errors) {
+      this.context.stderr.write(`Manifest load error: ${error.app}: ${error.message}\n`)
+    }
+
+    const discoveryTool = createDiscoveryTool({ registry })
+    return [
+      {
+        name: 'capabilities',
+        description: 'Built-in macts capability discovery',
+        tools: [discoveryTool],
+      },
+    ]
   }
 
   private async runHttpServer(): Promise<number> {

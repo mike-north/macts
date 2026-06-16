@@ -10,6 +10,7 @@
 import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
+import { generateCapabilitiesModule } from '../capabilities/index.js'
 
 /**
  * Options for client package generation.
@@ -82,12 +83,28 @@ export function generateClientPackage(
   })
   errors.push(...sdkResult.errors)
 
-  // Keep only source files from the SDK (those starting with "src/")
+  // Keep only source files from the SDK (those starting with "src/").
+  // Append the capability-metadata export to the SDK index so the generated
+  // package re-exports its machine-readable risk metadata from its entrypoint.
   for (const file of sdkResult.files) {
-    if (!CONFIG_FILE_PATHS.has(file.path)) {
+    if (CONFIG_FILE_PATHS.has(file.path)) {
+      continue
+    }
+    if (file.path === 'src/index.ts') {
+      files.push({
+        path: file.path,
+        content: `${file.content}export { capabilities } from './capabilities.js';\nexport type { CapabilityMetadata, CapabilityRisk } from './capabilities.js';\n`,
+      })
+    } else {
       files.push(file)
     }
   }
+
+  // Emit the machine-readable capability metadata module (risk + permissions).
+  files.push({
+    path: 'src/capabilities.ts',
+    content: generateCapabilitiesModule(manifest),
+  })
 
   // --- Generate CLI files ---
   const cliResult = generateCliPlugin(manifest, {

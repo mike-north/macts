@@ -11,6 +11,40 @@ import { CommandClass } from 'clipanion';
 import { VERSION } from '@macts/core';
 
 // @public
+export class CapabilitiesInspectCommand extends Command {
+    // (undocumented)
+    capability: string;
+    // (undocumented)
+    execute(): Promise<number>;
+    // (undocumented)
+    json: boolean | undefined;
+    // (undocumented)
+    manifestsDir: string | undefined;
+    // (undocumented)
+    static paths: string[][];
+    // (undocumented)
+    static usage: clipanion.Usage;
+}
+
+// @public
+export class CapabilitiesSearchCommand extends Command {
+    // (undocumented)
+    execute(): Promise<number>;
+    // (undocumented)
+    intent: string;
+    // (undocumented)
+    json: boolean | undefined;
+    // (undocumented)
+    limit: string | undefined;
+    // (undocumented)
+    manifestsDir: string | undefined;
+    // (undocumented)
+    static paths: string[][];
+    // (undocumented)
+    static usage: clipanion.Usage;
+}
+
+// @public
 export interface CliPlugin {
     readonly commands: readonly CommandClass[];
     readonly description: string;

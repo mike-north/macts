@@ -54,6 +54,10 @@ export {
   type GeneratedMcpPlugin,
   type GeneratedTool,
   type GeneratedToolFile,
+  // `JsonSchema` is referenced by the public `Capability.inputSchema` /
+  // `outputSchema` and `GeneratedTool.inputSchema` types, so it must be part of
+  // the public API surface to keep those types self-contained for consumers.
+  type JsonSchema,
 } from './mcp/index.js'
 
 // HTTP Client SDK generator
@@ -93,6 +97,9 @@ export {
   type GenerateServerPackageOptions,
   type GenerateServerPackageResult,
 } from './server/index.js'
+
+// Capability metadata module generator (per-app machine-readable risk metadata)
+export { generateCapabilitiesModule } from './capabilities/index.js'
 
 // File writer
 export { writeFiles } from './write.js'

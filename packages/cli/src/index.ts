@@ -56,6 +56,21 @@ export { VERSION } from '@macts/core'
 export { GenerateCommand } from './commands/generate.js'
 
 /**
+ * Commands for discovering typed capabilities (`macts capabilities search` and
+ * `macts capabilities inspect`).
+ *
+ * @example
+ * ```bash
+ * macts capabilities search "create a calendar event"
+ * macts capabilities inspect calendar.events.create
+ * ```
+ */
+export {
+  CapabilitiesSearchCommand,
+  CapabilitiesInspectCommand,
+} from './commands/capabilities/index.js'
+
+/**
  * Root command that handles global flags like --mcp and --serve.
  *
  * @example

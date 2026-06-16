@@ -11,6 +11,9 @@ export { createMcpServer } from './server.js'
 // Types
 export type { McpPlugin, McpToolDefinition, McpServerOptions, JsonSchema } from './types.js'
 
+// Built-in capability-discovery tool
+export { createDiscoveryTool, DISCOVERY_TOOL_NAME, type DiscoveryToolOptions } from './discovery.js'
+
 // Plugin utilities
 export {
   discoverMcpPlugins,
