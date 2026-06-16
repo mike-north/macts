@@ -1130,6 +1130,9 @@ export function getFineOperations(permissionsSection: PermissionsSection): Set<s
 export function getOperationVocabulary(permissionsSection: PermissionsSection): OperationVocabulary;
 
 // @public
+export const GOVERNANCE_POLICY_RELATIVE_PATH = "governance/policy.json";
+
+// @public
 export interface GovernanceDecision {
     readonly disposition: GovernanceDisposition;
     readonly reason?: string;
@@ -1145,6 +1148,9 @@ export interface GovernanceFilter {
 
 // @public
 export type GovernancePolicy = z.infer<typeof PolicySchema>;
+
+// @public
+export function governancePolicyPath(home: string): string;
 
 // @public
 export interface GovernedCapability {

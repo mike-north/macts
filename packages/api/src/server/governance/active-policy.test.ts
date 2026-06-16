@@ -14,12 +14,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { governancePolicyPath } from '@macts/core'
 import {
   ALLOW_ALL_POLICY,
   ActivePolicyError,
   getActivePolicyPath,
   loadActivePolicy,
 } from './active-policy.js'
+import { getMactsHome } from '../../paths.js'
 
 describe('loadActivePolicy', () => {
   let dir: string
@@ -92,6 +94,14 @@ describe('getActivePolicyPath', () => {
   it('resolves under the macts home, at governance/policy.json', () => {
     const path = getActivePolicyPath()
     expect(path.endsWith(join('governance', 'policy.json'))).toBe(true)
+  })
+
+  it('resolves the SAME path the shared definition produces (no split-brain)', () => {
+    // Coherence guard: API enforcement must resolve the policy via the single
+    // shared `governancePolicyPath` definition in @macts/core, the same one
+    // CLI/MCP discovery uses. If this drifts, a user's policy would be honoured
+    // by one surface and ignored by another.
+    expect(getActivePolicyPath()).toBe(governancePolicyPath(getMactsHome()))
   })
 })
 
