@@ -1,0 +1,22 @@
+{
+  "name": "@macts-e2e/round-trip",
+  "version": "0.0.0",
+  "private": true,
+  "description": "E2E round-trip gate: live create→list→delete per app (locally-automatable, attest-it sealed)",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src test",
+    "test": "vitest run --exclude 'test/local/**'",
+    "test:local": "vitest run --dir test/local",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@macts/calendar": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
