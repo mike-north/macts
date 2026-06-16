@@ -4,7 +4,7 @@
 
 **Date:** February 15, 2026
 
-**Related:** AgentRC Flow
+**Related:** Trust & governance layer
 
 **Repo:** [github.com/mike-north/macts](http://github.com/mike-north/macts)
 
@@ -128,7 +128,7 @@ The manifest must be rich enough that generation is fully automated with zero hu
 
 **4. Human-readable.** The manifest should be reviewable by a human. YAML for structural/relational information, JSON Schema files for data shapes.
 
-**5. No permissions, no classification.** The manifest is purely structural and syntactic. It describes what exists and how to call it. What it _means_ semantically and what should be _allowed_ are concerns for AgentRC Flow.
+**5. No permissions, no classification.** The manifest is purely structural and syntactic. It describes what exists and how to call it. What it _means_ semantically and what should be _allowed_ are concerns for the trust & governance layer.
 
 ---
 
