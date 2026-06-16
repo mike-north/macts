@@ -27,13 +27,19 @@
  *
  * - `allowed`  — the call was permitted and executed.
  * - `denied`   — the call was blocked by policy (out-of-bounds capability).
+ * - `pending`  — the call requires human confirmation (`confirm-first`) and is
+ *                withheld awaiting approval. It has neither been approved nor
+ *                rejected yet, and it did NOT execute.
  * - `approved` — the call required confirmation and a human approved it.
  * - `rejected` — the call required confirmation and a human declined it.
  *
  * Distinguishing `denied` (policy) from `rejected` (human) keeps the audit
- * trail precise about *why* a call did not run.
+ * trail precise about *why* a call did not run. Likewise, `pending` is kept
+ * distinct from `denied`: a confirm-first call is not a policy denial — it is a
+ * deferral awaiting approval — so recording it as `denied` would misattribute
+ * the reason the call did not proceed.
  */
-export const AUDIT_DECISIONS = ['allowed', 'denied', 'approved', 'rejected'] as const
+export const AUDIT_DECISIONS = ['allowed', 'denied', 'pending', 'approved', 'rejected'] as const
 
 /**
  * A single audit decision value.

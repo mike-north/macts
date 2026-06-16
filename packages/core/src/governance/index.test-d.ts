@@ -24,6 +24,10 @@ import {
   appPatternMatches,
   operationPatternMatches,
   findMatchingPolicyRule,
+  evaluatePolicy,
+  enforceCall,
+  compilePolicyToPermissions,
+  policyGrantsPermission,
   REDACTED_PLACEHOLDER,
   DEFAULT_SENSITIVE_KEYS,
   type GovernancePolicy,
@@ -37,6 +41,13 @@ import {
   type RedactArgsOptions,
   type AuditWriter,
   type PolicyRuleMatch,
+  type PolicyDecision,
+  type PolicyRuleSource,
+  type PolicyEvaluation,
+  type MatchedPolicyRule,
+  type EnforcementOutcome,
+  type EnforcementDecision,
+  type PolicyCandidate,
 } from './index.js'
 
 // =============================================================================
@@ -80,9 +91,10 @@ expectType<boolean>(r.success)
 
 expectAssignable<AuditDecision>('allowed')
 expectAssignable<AuditDecision>('denied')
+expectAssignable<AuditDecision>('pending')
 expectAssignable<AuditDecision>('approved')
 expectAssignable<AuditDecision>('rejected')
-expectNotAssignable<AuditDecision>('pending')
+expectNotAssignable<AuditDecision>('maybe')
 
 // =============================================================================
 // createAuditRecord / serializeAuditRecord — signatures
@@ -123,7 +135,7 @@ expectNotAssignable<AuditRecordInput>({
   app: 'calendar',
   argsSummary: 'Summary: x',
   apiKeyId: 'key-1',
-  decision: 'pending',
+  decision: 'maybe',
   timestamp: new Date('2026-06-14T10:42:12.000Z'),
 })
 
@@ -139,8 +151,9 @@ expectType<string>(redactArgs({}, { extraSensitiveKeys: ['mykey'] }))
 expectType<boolean>(isSensitiveKey('password'))
 expectType<boolean>(isSensitiveKey('token', ['pincode']))
 
-// REDACTED_PLACEHOLDER is a string constant.
-expectType<string>(REDACTED_PLACEHOLDER)
+// REDACTED_PLACEHOLDER is a string constant (a string literal type, so it is
+// assignable to `string` rather than invariantly equal to it).
+expectAssignable<string>(REDACTED_PLACEHOLDER)
 
 // DEFAULT_SENSITIVE_KEYS is a readonly string array.
 expectAssignable<readonly string[]>(DEFAULT_SENSITIVE_KEYS)
@@ -179,3 +192,72 @@ expectAssignable<PolicyRuleMatch | undefined>(
 // PolicyRuleMatch shape.
 declare const matchResult: PolicyRuleMatch
 expectType<number>(matchResult.operationRuleIndex)
+
+// =============================================================================
+// PolicyDecision / PolicyRuleSource — closed unions
+// =============================================================================
+
+expectAssignable<PolicyDecision>('allowed')
+expectAssignable<PolicyDecision>('denied')
+expectAssignable<PolicyDecision>('confirm-first')
+expectNotAssignable<PolicyDecision>('pending-approval')
+expectNotAssignable<PolicyDecision>('')
+
+expectAssignable<PolicyRuleSource>('operation')
+expectAssignable<PolicyRuleSource>('app')
+expectAssignable<PolicyRuleSource>('default')
+expectNotAssignable<PolicyRuleSource>('wildcard')
+
+// =============================================================================
+// evaluatePolicy — signature & PolicyEvaluation shape
+// =============================================================================
+
+declare const evaluated: PolicyEvaluation
+expectType<PolicyEvaluation>(evaluatePolicy(policy, 'calendar:events:create', 'write'))
+expectType<PolicyDecision>(evaluated.decision)
+expectType<string>(evaluated.permission)
+expectType<string>(evaluated.reason)
+expectType<MatchedPolicyRule>(evaluated.rule)
+expectType<PolicyRuleSource>(evaluated.rule.source)
+expectType<PolicyDisposition>(evaluated.rule.disposition)
+
+// risk must be a RiskClass — an arbitrary string is not assignable.
+expectNotAssignable<Parameters<typeof evaluatePolicy>[2]>('not-a-risk')
+
+// =============================================================================
+// enforceCall — outcome union & async signature
+// =============================================================================
+
+expectAssignable<EnforcementOutcome>('allowed')
+expectAssignable<EnforcementOutcome>('denied')
+expectAssignable<EnforcementOutcome>('pending-approval')
+expectNotAssignable<EnforcementOutcome>('confirm-first')
+
+expectType<Promise<EnforcementDecision>>(
+  enforceCall({
+    policy,
+    permission: 'calendar:events:create',
+    risk: 'write',
+    audit: {
+      apiKeyId: 'k',
+      argsSummary: 's',
+      timestamp: new Date('2026-06-14T10:42:12.000Z'),
+    },
+  })
+)
+
+declare const enforcement: EnforcementDecision
+expectType<EnforcementOutcome>(enforcement.outcome)
+expectType<string>(enforcement.reason)
+expectType<PolicyEvaluation>(enforcement.evaluation)
+
+// =============================================================================
+// compilePolicyToPermissions / policyGrantsPermission — signatures
+// =============================================================================
+
+const candidate: PolicyCandidate = { permission: 'calendar:events:list', risk: 'read' }
+expectType<string[]>(compilePolicyToPermissions(policy, [candidate]))
+expectType<boolean>(policyGrantsPermission(policy, candidate))
+
+// PolicyCandidate requires a RiskClass — an arbitrary string risk is not assignable.
+expectNotAssignable<PolicyCandidate>({ permission: 'a:b:c', risk: 'not-a-risk' })

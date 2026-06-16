@@ -30,13 +30,27 @@ export {
   createInFlightTracker,
   requirePermission,
   rpcPathToPermission,
+  requirePolicy,
   type AuthVariables,
   type AuthErrorCode,
   type AuthErrorResponse,
   type InFlightTracker,
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
+  type GovernanceContext,
+  type RequirePolicyOptions,
+  type GovernanceDeniedResponse,
+  type GovernancePendingResponse,
 } from './server/middleware/index.js'
+
+// Active governance policy loading
+export {
+  loadActivePolicy,
+  getActivePolicyPath,
+  ALLOW_ALL_POLICY,
+  ActivePolicyError,
+  type LoadActivePolicyOptions,
+} from './server/governance/active-policy.js'
 
 // RPC handlers
 export {

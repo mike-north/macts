@@ -18,6 +18,8 @@ import { createInFlightTracker } from './middleware/in-flight.js'
 import { createRateLimiter, type RateLimitOptions } from './middleware/rate-limit.js'
 import { requestLogger } from './middleware/request-logger.js'
 import { createRpcRouter, createMultiAppRpcRouter } from './handlers/rpc.js'
+import type { GovernanceContext } from './middleware/governance.js'
+import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { loadTlsOptions, type TlsOptions } from './tls.js'
 
 // Re-export middleware and handlers
@@ -33,6 +35,20 @@ export {
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
 } from './middleware/permission.js'
+export {
+  requirePolicy,
+  type GovernanceContext,
+  type RequirePolicyOptions,
+  type GovernanceDeniedResponse,
+  type GovernancePendingResponse,
+} from './middleware/governance.js'
+export {
+  loadActivePolicy,
+  getActivePolicyPath,
+  ALLOW_ALL_POLICY,
+  ActivePolicyError,
+  type LoadActivePolicyOptions,
+} from './governance/active-policy.js'
 export {
   createRpcRouter,
   createMultiAppRpcRouter,
@@ -73,6 +89,16 @@ export interface ServerOptions {
   tls?: TlsOptions
   /** Rate limiting configuration, or false to disable (default: enabled with 100 req/min) */
   rateLimit?: RateLimitOptions | false
+  /**
+   * Governance enforcement context (active policy + optional audit writer).
+   *
+   * When omitted, defaults to the allow-all policy with no audit writer, so
+   * call-time policy enforcement is a no-op and pre-governance behavior is
+   * preserved. Supply a loaded {@link GovernanceContext} (see
+   * {@link loadActivePolicy} and `createFileAuditWriter`) to enforce a
+   * real policy and record an audit trail.
+   */
+  governance?: GovernanceContext
 }
 
 /**
@@ -155,6 +181,7 @@ export function createMultiServer(
     gracefulShutdownTimeout = 10_000,
     tls,
     rateLimit,
+    governance = { policy: ALLOW_ALL_POLICY },
   } = options
 
   if (customLogger) {
@@ -213,12 +240,13 @@ export function createMultiServer(
     app.use('/api/v1/rpc/*', limiter.middleware())
   }
 
-  // Mount RPC router
+  // Mount RPC router, threading the governance context so call-time policy
+  // enforcement runs after the API-key permission check on every endpoint.
   const firstManifest = manifests[0]
   const rpcRouter =
     manifests.length === 1 && firstManifest
-      ? createRpcRouter(firstManifest)
-      : createMultiAppRpcRouter(manifests)
+      ? createRpcRouter(firstManifest, governance)
+      : createMultiAppRpcRouter(manifests, governance)
   app.route('/api/v1', rpcRouter)
 
   // Error handling

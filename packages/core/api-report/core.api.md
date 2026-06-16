@@ -307,7 +307,7 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
-export const AUDIT_DECISIONS: readonly ["allowed", "denied", "approved", "rejected"];
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected"];
 
 // @public
 export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
@@ -545,6 +545,9 @@ export const CommandScopeSchema: z.ZodEnum<{
 // @public
 export function compareRisk(a: RiskClass, b: RiskClass): number;
 
+// @public
+export function compilePolicyToPermissions(policy: GovernancePolicy, candidates: readonly PolicyCandidate[]): string[];
+
 // @public (undocumented)
 export type Confidence = z.infer<typeof ConfidenceSchema>;
 
@@ -660,9 +663,9 @@ export interface EnforceCallOptions {
 
 // @public
 export interface EnforcementDecision {
-    readonly disposition: PolicyDisposition;
+    readonly evaluation: PolicyEvaluation;
     readonly outcome: EnforcementOutcome;
-    readonly reason?: string;
+    readonly reason: string;
 }
 
 // @public
@@ -694,6 +697,9 @@ export const EnumValueSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodString>;
     code: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export function evaluatePolicy(policy: GovernancePolicy, permission: string, risk: RiskClass): PolicyEvaluation;
 
 // @public
 export function expandCoarsePermission(permission: string, permissionsSection: PermissionsSection): string[];
@@ -1373,6 +1379,14 @@ export interface ManifestRoute {
 }
 
 // @public
+export interface MatchedPolicyRule {
+    readonly appRule?: AppRule | undefined;
+    readonly disposition: PolicyDisposition;
+    readonly operationRule?: OperationRule | undefined;
+    readonly source: PolicyRuleSource;
+}
+
+// @public
 export interface McpGeneratorContext {
     appName: string;
     manifest: AppManifest;
@@ -1549,6 +1563,15 @@ export const PointTypeSchema: z.ZodObject<{
 export const POLICY_DISPOSITIONS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
 
 // @public
+export interface PolicyCandidate {
+    readonly permission: string;
+    readonly risk: RiskClass;
+}
+
+// @public
+export type PolicyDecision = 'allowed' | 'denied' | 'confirm-first';
+
+// @public
 export type PolicyDisposition = (typeof POLICY_DISPOSITIONS)[number];
 
 // @public
@@ -1560,11 +1583,22 @@ export const PolicyDispositionSchema: z.ZodEnum<{
 }>;
 
 // @public
+export interface PolicyEvaluation {
+    readonly decision: PolicyDecision;
+    readonly permission: string;
+    readonly reason: string;
+    readonly rule: MatchedPolicyRule;
+}
+
+// @public
 export class PolicyGovernanceFilter implements GovernanceFilter {
     // @internal
     constructor(policy: GovernancePolicy);
     evaluate(capability: Capability): GovernanceDecision;
 }
+
+// @public
+export function policyGrantsPermission(policy: GovernancePolicy, candidate: PolicyCandidate): boolean;
 
 // @public
 export interface PolicyIssue {
@@ -1577,6 +1611,9 @@ export interface PolicyRuleMatch {
     readonly appRule: AppRule;
     readonly operationRuleIndex: number;
 }
+
+// @public
+export type PolicyRuleSource = 'operation' | 'app' | 'default';
 
 // @public
 export const PolicySchema: z.ZodObject<{
@@ -1833,9 +1870,6 @@ export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, 
 
 // @public
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
-
-// @public
-export function resolveDisposition(policy: GovernancePolicy, app: string, resource: string, operation: string): PolicyDisposition;
 
 // @public
 export function resolveListOutputProperties(resource: Resource | undefined): string[];

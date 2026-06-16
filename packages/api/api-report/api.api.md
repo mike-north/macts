@@ -11,6 +11,7 @@ import { ApiKeyValidationResult } from '@macts/core';
 import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
+import { AuditWriter } from '@macts/core';
 import { booleanCoercer } from '@macts/core';
 import { checkPermission } from '@macts/core';
 import { checkPermissions } from '@macts/core';
@@ -21,6 +22,7 @@ import { createArrayCoercer } from '@macts/core';
 import { createEnumCoercer } from '@macts/core';
 import { dateCoercer } from '@macts/core';
 import { getAppName } from '@macts/core';
+import { GovernancePolicy } from '@macts/core';
 import { hasPermission } from '@macts/core';
 import { HexColor } from '@macts/core';
 import { HexColorSchema } from '@macts/core';
@@ -41,6 +43,7 @@ import { PermissionsSection } from '@macts/core';
 import pino from 'pino';
 import { quitApp } from '@macts/core';
 import { Resource } from '@macts/core';
+import { RiskClass } from '@macts/core';
 import { runJxa } from '@macts/core';
 import { runWithApp } from '@macts/core';
 import { Selector } from '@macts/core';
@@ -52,7 +55,17 @@ import { VERSION } from '@macts/core';
 export { activateApp }
 
 // @public
+export class ActivePolicyError extends Error {
+    constructor(
+    path: string, message: string);
+    readonly path: string;
+}
+
+// @public
 export function addKeyMetadata(metadata: ApiKeyMetadata): void;
+
+// @public
+export const ALLOW_ALL_POLICY: GovernancePolicy;
 
 export { ApiKeyMetadata }
 
@@ -153,7 +166,7 @@ export function createInFlightTracker(): InFlightTracker;
 export function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 // @public
-export function createMultiAppRpcRouter(manifests: AppManifest[]): Hono<{
+export function createMultiAppRpcRouter(manifests: AppManifest[], governance?: GovernanceContext): Hono<{
     Variables: AuthVariables;
 }>;
 
@@ -164,7 +177,7 @@ export function createMultiServer(manifests: AppManifest[], options?: ServerOpti
 export function createReadOnlyKey(appName: string, name: string, permissionsSection: PermissionsSection, expires?: Date | number | string): Promise<CreateApiKeyResult>;
 
 // @public
-export function createRpcRouter(manifest: AppManifest): Hono<{
+export function createRpcRouter(manifest: AppManifest, governance?: GovernanceContext): Hono<{
     Variables: AuthVariables;
 }>;
 
@@ -206,6 +219,9 @@ export function generateKeyId(): string;
 // @public
 export function generateSecret(): string;
 
+// @public
+export function getActivePolicyPath(): string;
+
 export { getAppName }
 
 // @public
@@ -219,6 +235,31 @@ export function getSigningSecret(): Promise<string>;
 
 // @public
 export function getTracer(_name?: string): Tracer;
+
+// @public
+export interface GovernanceContext {
+    readonly policy: GovernancePolicy;
+    readonly writer?: AuditWriter | undefined;
+}
+
+// @public
+export interface GovernanceDeniedResponse {
+    // (undocumented)
+    error: {
+        code: 'GOVERNANCE_DENIED';
+        message: string;
+        permission: string;
+    };
+}
+
+// @public
+export interface GovernancePendingResponse {
+    // (undocumented)
+    pendingApproval: {
+        message: string;
+        permission: string;
+    };
+}
 
 export { hasPermission }
 
@@ -248,6 +289,14 @@ export { JxaExecutorOptions }
 export interface ListApiKeysOptions {
     includeRevoked?: boolean;
     namePattern?: string;
+}
+
+// @public
+export function loadActivePolicy(options?: LoadActivePolicyOptions): Promise<GovernancePolicy>;
+
+// @public
+export interface LoadActivePolicyOptions {
+    readonly path?: string;
 }
 
 // @public
@@ -303,6 +352,18 @@ export { quitApp }
 export function requirePermission(requiredPermission: string, options?: PermissionMiddlewareOptions): MiddlewareHandler<{
     Variables: AuthVariables;
 }>;
+
+// @public
+export function requirePolicy(options: RequirePolicyOptions): MiddlewareHandler<{
+    Variables: AuthVariables;
+}>;
+
+// @public
+export interface RequirePolicyOptions {
+    readonly governance: GovernanceContext;
+    readonly permission: string;
+    readonly risk: RiskClass;
+}
 
 // @public
 export function revokeKey(keyId: string): boolean;
@@ -376,6 +437,7 @@ export interface ServerOptions {
     cors?: boolean | {
         origin: string | string[];
     };
+    governance?: GovernanceContext;
     gracefulShutdownTimeout?: number;
     host?: string;
     logger?: pino.Logger;
