@@ -369,7 +369,7 @@ export type CoarseMapping = z.infer<typeof CoarseMappingSchema>;
 // @public
 export const CoarseMappingSchema: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>;
 
-// @public (undocumented)
+// @public
 export type CoarseOperation = (typeof COARSE_OPERATIONS)[number];
 
 // @public
@@ -996,6 +996,12 @@ export interface GeneratorOptions {
 export function getAppName(bundleId: string): Promise<string>;
 
 // @public
+export function getFineOperations(permissionsSection: PermissionsSection): Set<string>;
+
+// @public
+export function getOperationVocabulary(permissionsSection: PermissionsSection): OperationVocabulary;
+
+// @public
 export interface GovernanceDecision {
     readonly disposition: GovernanceDisposition;
     readonly reason?: string;
@@ -1115,6 +1121,9 @@ export function isAppRunning(bundleId: string): Promise<boolean>;
 
 // @public
 export function isCoarseOperation(operation: string): operation is CoarseOperation;
+
+// @public
+export function isPureCoarseOperation(operation: string): operation is PureCoarseOperation;
 
 // @public
 export function isRiskClass(value: unknown): value is RiskClass;
@@ -1259,6 +1268,12 @@ export const OpenQuestionSchema: z.ZodObject<{
     suggestions: z.ZodOptional<z.ZodArray<z.ZodString>>;
     relatedTo: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export interface OperationVocabulary {
+    readonly coarse: readonly CoarseOperation[];
+    readonly fine: ReadonlySet<string>;
+}
 
 // @public
 export type ParsedPermission = FinePermission | CoarsePermission | WildcardPermission;
@@ -1415,6 +1430,12 @@ export function propertyTypeToTs(type: PropertyType | undefined): string;
 
 // @public
 export function propertyTypeToZod(type: PropertyType | undefined, optional: boolean): string;
+
+// @public
+export const PURE_COARSE_OPERATIONS: readonly ["read", "write"];
+
+// @public
+export type PureCoarseOperation = (typeof PURE_COARSE_OPERATIONS)[number];
 
 // @public
 export function quitApp(bundleId: string): Promise<undefined>;
@@ -1722,6 +1743,9 @@ export function validateCommandPermissions(commandPermissions: Map<string, strin
 
 // @public
 export const VERSION = "0.0.0";
+
+// @public
+export const WILDCARD: "*";
 
 // @public
 export interface WildcardPermission {

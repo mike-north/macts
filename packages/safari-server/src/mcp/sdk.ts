@@ -21,7 +21,7 @@ export function getSafariClient(): SafariClient {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions safari:*:*'
+        'Create an API key with: macts api-key create --name "<name>" --permission safari:*:*'
     )
   }
 

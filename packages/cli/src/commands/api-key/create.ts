@@ -16,23 +16,37 @@ export class ApiKeyCreateCommand extends Command {
     details: `
       Creates a signed API key with the specified permissions.
 
-      Permissions can be fine-grained (calendar:events:list) or coarse
-      (calendar:events:read). Coarse permissions are expanded to their
-      fine-grained equivalents at creation time.
+      Permission format is "app:resource:operation". A grant authorizes a call
+      when it matches exactly or via a wildcard:
 
-      Wildcards are supported: calendar:*:read grants read on all resources.
+        - Fine-grained (calendar:events:list) authorizes exactly that call.
+        - Resource wildcard (calendar:events:*) authorizes every operation on
+          the resource; app wildcard (calendar:*:*) authorizes everything.
+
+      Coarse operations (read/create/write/delete) are sugar that must be
+      expanded against a manifest with --manifest; they are resolved into the
+      fine-grained operations they cover at creation time. A coarse permission
+      without --manifest is rejected (it would authorize nothing), with a hint
+      naming the wildcard or fine-grained permissions to use instead.
 
       The key is displayed once and cannot be retrieved later.
     `,
     examples: [
-      ['Create read-only key', '$0 api-key create --name "CI" --permission "calendar:*:read"'],
       [
-        'Create key with specific permissions',
-        '$0 api-key create --name "Bot" --permission "calendar:events:list" --permission "calendar:events:show"',
+        'Create a read-only key (all read operations, via manifest expansion)',
+        '$0 api-key create --name "CI" --permission "calendar:*:read" --manifest ./manifests/calendar/app.yaml',
       ],
       [
-        'Create key with expiration',
-        '$0 api-key create --name "Temp" --permission "calendar:events:read" --expires 30d',
+        'Create a key for all operations on a resource',
+        '$0 api-key create --name "Bot" --permission "calendar:events:*"',
+      ],
+      [
+        'Create a key with specific fine-grained permissions',
+        '$0 api-key create --name "Bot" --permission "calendar:events:list" --permission "calendar:events:create"',
+      ],
+      [
+        'Create a key with expiration',
+        '$0 api-key create --name "Temp" --permission "calendar:events:list" --expires 30d',
       ],
     ],
   })

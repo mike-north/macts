@@ -21,7 +21,7 @@ export function getOmniPlanClient(): OmniPlanClient {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions omniplan:*:*'
+        'Create an API key with: macts api-key create --name "<name>" --permission omniplan:*:*'
     )
   }
 

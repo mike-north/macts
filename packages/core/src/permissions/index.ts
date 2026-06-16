@@ -18,14 +18,26 @@ export {
   type CoarsePermission,
   type WildcardPermission,
   type ParsedPermission,
-  type CoarseOperation,
   type SpecialOperation,
   type ApiKeyPayload,
   type ApiKeyMetadata,
   type ApiKeyValidationResult,
   type PermissionCheckResult,
-  COARSE_OPERATIONS,
 } from './types.js'
+
+// Operation vocabulary - the single source of truth for the operation set.
+export {
+  type CoarseOperation,
+  type PureCoarseOperation,
+  type OperationVocabulary,
+  COARSE_OPERATIONS,
+  PURE_COARSE_OPERATIONS,
+  WILDCARD,
+  isCoarseOperation,
+  isPureCoarseOperation,
+  getFineOperations,
+  getOperationVocabulary,
+} from './vocabulary.js'
 
 // Re-export manifest types for convenience
 export type { PermissionsSection, CoarseMapping } from '../manifest/schemas/app.js'
@@ -42,7 +54,6 @@ export {
   extractAppName,
   extractResourceName,
   extractOperation,
-  isCoarseOperation,
   PermissionParseError,
 } from './parser.js'
 

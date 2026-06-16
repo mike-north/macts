@@ -46,7 +46,7 @@ export class ApiKeyListCommand extends Command {
         } else {
           this.context.stdout.write('No API keys found.\n')
           this.context.stdout.write(
-            'Create one with: macts api-key create --name "My Key" --permission "calendar:*:read"\n'
+            'Create one with: macts api-key create --name "My Key" --permission "calendar:events:*"\n'
           )
         }
         return 0

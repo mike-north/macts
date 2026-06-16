@@ -21,7 +21,7 @@ export function getMicrosoftWordClient(): MicrosoftWordClient {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions microsoft-word:*:*'
+        'Create an API key with: macts api-key create --name "<name>" --permission microsoft-word:*:*'
     )
   }
 

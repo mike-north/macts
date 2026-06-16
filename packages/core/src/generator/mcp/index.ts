@@ -478,7 +478,7 @@ export function get${capitalizedAppName}Client(): ${capitalizedAppName}Client {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions ${context.appName}:*:*'
+        'Create an API key with: macts api-key create --name "<name>" --permission ${context.appName}:*:*'
     );
   }
 

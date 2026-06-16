@@ -10,13 +10,14 @@ import type {
   FinePermission,
   CoarsePermission,
   WildcardPermission,
-  CoarseOperation,
   ParsedPermission,
   ApiKeyPayload,
   ApiKeyMetadata,
   ApiKeyValidationResult,
   PermissionCheckResult,
 } from './types.js'
+// CoarseOperation is single-sourced in the vocabulary module.
+import type { CoarseOperation } from './vocabulary.js'
 
 // =============================================================================
 // CoarseOperation Type Tests

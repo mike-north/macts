@@ -3,9 +3,9 @@ import type {
   FinePermission,
   CoarsePermission,
   WildcardPermission,
-  CoarseOperation,
 } from './types.js'
-import { COARSE_OPERATIONS } from './types.js'
+import type { CoarseOperation } from './vocabulary.js'
+import { isCoarseOperation } from './vocabulary.js'
 
 /**
  * Permission string validation regex.
@@ -25,13 +25,6 @@ export class PermissionParseError extends Error {
     super(`Invalid permission "${permission}": ${message}`)
     this.name = 'PermissionParseError'
   }
-}
-
-/**
- * Check if an operation is a standard coarse CRUD operation.
- */
-export function isCoarseOperation(operation: string): operation is CoarseOperation {
-  return (COARSE_OPERATIONS as readonly string[]).includes(operation)
 }
 
 /**

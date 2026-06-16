@@ -2,10 +2,16 @@
  * Permission string format: `<app>:<resource>:<operation>`
  *
  * Examples:
- * - Fine-grained: `calendar:events:list`, `calendar:events:show`
- * - Coarse: `calendar:events:read`, `calendar:calendars:write`
- * - Wildcard: `calendar:*:read`, `calendar:events:*`
+ * - Fine-grained: `calendar:events:list`, `calendar:events:show` (authorize directly)
+ * - Wildcard: `calendar:events:*` (all ops on a resource), `calendar:*:*` (all)
+ * - Coarse: `calendar:events:read` — *sugar* that is expanded against the
+ *   manifest at key-creation time into fine-grained operations. A coarse
+ *   operation never authorizes a call on its own.
+ *
+ * The operation vocabulary has a single source of truth in `vocabulary.ts`.
  */
+
+import type { CoarseOperation } from './vocabulary.js'
 
 // Note: Manifest-related types (PermissionsSection, CoarseMapping, PermissionHistoryEntry)
 // are defined in and exported from manifest/schemas/app.ts and manifest/schemas/command.ts.
@@ -43,12 +49,6 @@ export interface WildcardPermission {
   readonly resource: string
   readonly operation: string
 }
-
-/**
- * Standard CRUD operations for coarse permissions.
- */
-export const COARSE_OPERATIONS = ['read', 'create', 'write', 'delete'] as const
-export type CoarseOperation = (typeof COARSE_OPERATIONS)[number]
 
 /**
  * Special coarse operations beyond standard CRUD.
