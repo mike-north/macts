@@ -9,6 +9,7 @@
 
 import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
+import { CANONICAL_IDENTIFIER_KEY, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { propertyTypeToTs } from '../types.js'
 
 /**
@@ -240,12 +241,32 @@ function generateTypesFile(manifest: AppManifest): string {
   // Generate resource types
   for (const [resourceName, resource] of Object.entries(manifest.resources)) {
     const props = Object.entries(resource.properties)
+
+    // List output surfaces the resource's primary identifier under the canonical
+    // `id` key (see the server list executor) so a consumer can always read
+    // `item.id` to obtain the value sibling get/delete/write operations require,
+    // regardless of the app-specific identifier property name. Surface that field
+    // on the read type so it is type-visible — unless the manifest already
+    // declares a property literally named `id` (then `id` is a regular property).
+    const idProperty = resolvePrimaryIdentifierProperty(resource)
+    const emitCanonicalId =
+      idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
+
     lines.push(`/** ${resource.description} */`)
-    if (props.length === 0) {
+    if (props.length === 0 && !emitCanonicalId) {
       // Use Record<string, never> for resources with no properties
       lines.push(`export type ${resourceName} = Record<string, never>;`)
     } else {
       lines.push(`export interface ${resourceName} {`)
+      if (emitCanonicalId) {
+        // Optional on the type: `list` always populates it (the value sibling
+        // operations require), but other read paths (get/create returns) may
+        // surface only the app-specific identifier property.
+        lines.push(
+          `  /** Canonical identifier (mirrors \`${idProperty}\`); populated by list, pass to get/delete and to write operations that reference this resource. */`
+        )
+        lines.push(`  ${CANONICAL_IDENTIFIER_KEY}?: string;`)
+      }
       for (const [propName, prop] of props) {
         const tsType = propertyTypeToTs(prop.type)
         const optional = prop.optional ? '?' : ''
@@ -314,7 +335,16 @@ function generateTypesFile(manifest: AppManifest): string {
   lines.push('// Zod schemas for runtime validation')
   lines.push('')
   for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+    // Mirror the canonical `id` field added to the read type, so runtime
+    // validation accepts the identifier the list output surfaces.
+    const idProperty = resolvePrimaryIdentifierProperty(resource)
+    const emitCanonicalId =
+      idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
+
     lines.push(`export const ${resourceName}Schema = z.object({`)
+    if (emitCanonicalId) {
+      lines.push(`  ${CANONICAL_IDENTIFIER_KEY}: z.string().optional(),`)
+    }
     for (const [propName, prop] of Object.entries(resource.properties)) {
       const zodType = propertyTypeToZod(prop.type, prop.optional)
       lines.push(`  ${propName}: ${zodType},`)

@@ -15,6 +15,9 @@ import {
   resolveManifestRoutes,
   normalizeAppRouteSegment,
   normalizeResourceRouteSegment,
+  resolveListOutputProperties,
+  resolvePrimaryIdentifierProperty,
+  CANONICAL_IDENTIFIER_KEY,
 } from '@macts/core'
 import { requirePermission } from '../middleware/permission.js'
 import type { AuthVariables } from '../middleware/auth.js'
@@ -307,6 +310,66 @@ async function executeAppCommand(
  * - create: app.Calendar({props}).make() -> new item
  * - delete: app.calendars.byId(id).delete()
  */
+/**
+ * Build the JXA program a `list` resource command runs.
+ *
+ * Every item in the returned array carries each manifest-declared property
+ * PLUS the resource's primary identifier (even when the manifest declares the
+ * identifier only in `identifiers`, not as a regular property) AND a canonical
+ * `id` alias mirroring that identifier. This guarantees list output surfaces
+ * the value sibling get/delete/write operations require, under a name the
+ * consumer can always rely on — the gap a live `calendars.list` exposed, where
+ * the returned objects carried no usable id (`calendarIdentifier` vs the
+ * `calendarId` the create route wants).
+ *
+ * Exported for testing: the JXA runs only against a live app (not in CI), so we
+ * assert on the generated program text at the schema level.
+ *
+ * @param resource - The resource the list targets (may be undefined).
+ * @param paramAssignments - Pre-rendered `var x = ...;` parameter bindings.
+ * @returns The JXA program source.
+ */
+export function buildListCommandCode(
+  resource: Resource | undefined,
+  paramAssignments: string
+): string {
+  const resourcePlural = resource?.plural.toLowerCase() ?? 'items'
+
+  // Build the property accessor list from the manifest. We derive it through
+  // resolveListOutputProperties so the resource's primary identifier is ALWAYS
+  // read, even when the manifest declares it only in `identifiers` (not as a
+  // regular property) — sibling get/delete/write operations need that id, and
+  // listing is how an agent obtains it.
+  const propNames = resolveListOutputProperties(resource)
+
+  // The identifier is exposed under an app-specific property name
+  // (e.g. `calendarIdentifier`), but write/get/delete reference it under
+  // various names. Expose the same value under the canonical `id` key as well,
+  // so a consumer can always read `item.id` regardless of the app's property
+  // name (single source: the manifest's primary identifier).
+  const idProperty = resolvePrimaryIdentifierProperty(resource)
+  const idAlias =
+    idProperty !== undefined
+      ? `if (obj.${idProperty} !== undefined) { obj.${CANONICAL_IDENTIFIER_KEY} = obj.${idProperty}; }`
+      : ''
+
+  return `
+      ${paramAssignments}
+      // List ${resourcePlural}
+      var items = app.${resourcePlural}();
+      // Convert JXA references to plain objects by accessing each property
+      var result = [];
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var obj = {};
+        ${propNames.map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`).join('\n        ')}
+        ${idAlias}
+        result.push(obj);
+      }
+      return result;
+    `
+}
+
 async function executeResourceCommand(
   command: Command,
   resource: Resource | undefined,
@@ -334,24 +397,7 @@ async function executeResourceCommand(
   let code: string
 
   if (command.name === 'list') {
-    // List command: app.calendars() or app.calendars[0].events()
-    // Build property accessor list from manifest
-    const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
-
-    code = `
-      ${paramAssignments}
-      // List ${resourcePlural}
-      var items = app.${resourcePlural}();
-      // Convert JXA references to plain objects by accessing each property
-      var result = [];
-      for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-        var obj = {};
-        ${propNames.map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`).join('\n        ')}
-        result.push(obj);
-      }
-      return result;
-    `
+    code = buildListCommandCode(resource, paramAssignments)
   } else if (command.name === 'get') {
     // Get by ID: app.calendars.byId(id)
     const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
