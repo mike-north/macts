@@ -149,6 +149,24 @@ const RISK_KEYWORDS: Record<Exclude<RiskClass, never>, readonly string[]> = {
     'new',
     'import',
     'upload',
+    // Compound/paired mutation verbs that appear as non-leading tokens in
+    // names like `searchAndReplace`, `findAndReplace`, `findAndReorder`.
+    // Without these, the read token (`search`/`find`) would be the only
+    // match and the operation would silently under-gate as `read`.
+    'replace',
+    'reorder',
+    'rewrite',
+    'normalize',
+    'sanitize',
+    'toggle',
+    'apply',
+    'commit',
+    'flush',
+    'patch',
+    'transform',
+    'convert',
+    'merge',
+    'assign',
   ],
   // Pure observation.
   read: [
@@ -224,11 +242,17 @@ const PREDICATE_PREFIXES: ReadonlySet<string> = new Set([
 ])
 
 /**
- * Resolution order for keyword tables. Earlier classes win, so an operation
- * whose name contains both a write-ish and a send-ish token (e.g.
- * `createInvite`) classifies by the more sensitive intent. Ordering is from
- * most to least sensitive *intent specificity*, NOT raw severity, because the
- * verb that names the operation is the strongest signal.
+ * Iteration order for collecting candidate risk classes from keyword tables.
+ * All classes in this order are checked; every match is collected, and the
+ * most sensitive match (by {@link RISK_SEVERITY}) wins. Ordering here affects
+ * nothing about which class wins — it only ensures every table is visited.
+ *
+ * Previously this was a "first match wins" order, which caused compound
+ * operation names like `searchAndReplace` to under-gate as `read` because the
+ * `search` token (a read keyword) was found before any write keyword was
+ * checked. Now all matching classes are gathered and the most sensitive is
+ * returned, so a name carrying both a read token and a mutating token resolves
+ * to the mutating class.
  */
 const RESOLUTION_ORDER: readonly RiskClass[] = [
   'send',
@@ -303,28 +327,46 @@ export function classifyRiskFromOperation(operationName: string): RiskClass {
   const tokenSet = new Set(tokens)
   const joined = tokens.join('')
 
+  // Collect every risk class matched by any keyword in the name, then resolve
+  // to the most sensitive. This prevents compound names like `searchAndReplace`
+  // from under-gating: both `read` (via `search`) and `write` (via `replace`)
+  // match, and the more sensitive class (`write`) wins.
+  let best: RiskClass | undefined
   for (const riskClass of RESOLUTION_ORDER) {
+    let matched = false
     // Whole-token keywords.
     for (const keyword of RISK_KEYWORDS[riskClass]) {
       if (tokenSet.has(keyword)) {
-        return riskClass
+        matched = true
+        break
       }
     }
-    // Compound keywords match the joined token sequence (e.g. `doscript`).
-    for (const keyword of COMPOUND_KEYWORDS[riskClass] ?? []) {
-      if (joined.includes(keyword)) {
-        return riskClass
+    if (!matched) {
+      // Compound keywords match the joined token sequence (e.g. `doscript`).
+      for (const keyword of COMPOUND_KEYWORDS[riskClass] ?? []) {
+        if (joined.includes(keyword)) {
+          matched = true
+          break
+        }
       }
     }
-    // Leading-only keywords match only when they are the first token.
-    for (const keyword of LEADING_ONLY_KEYWORDS[riskClass] ?? []) {
-      if (leadingToken === keyword) {
-        return riskClass
+    if (!matched) {
+      // Leading-only keywords match only when they are the first token.
+      for (const keyword of LEADING_ONLY_KEYWORDS[riskClass] ?? []) {
+        if (leadingToken === keyword) {
+          matched = true
+          break
+        }
+      }
+    }
+    if (matched) {
+      if (best === undefined || compareRisk(riskClass, best) > 0) {
+        best = riskClass
       }
     }
   }
 
-  return DEFAULT_RISK
+  return best ?? DEFAULT_RISK
 }
 
 /**
