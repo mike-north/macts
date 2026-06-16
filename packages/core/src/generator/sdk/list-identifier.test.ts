@@ -108,6 +108,62 @@ describe('generated read type — canonical identifier population', () => {
   })
 })
 
+/**
+ * A manifest whose Calendar identifier is targeted `byProperty` on `name` —
+ * matching the shipped fix for issue #81, where the dictionary-declared
+ * `calendarIdentifier` is not runtime-valid via JXA. The canonical `id` must
+ * mirror the RUNTIME property (`name`), since that is the value get/delete/create
+ * accept as the lookup.
+ */
+const byPropertyCalendarManifest: AppManifest = {
+  ...calendarManifest,
+  resources: {
+    Calendar: {
+      name: 'Calendar',
+      plural: 'Calendars',
+      description: 'A calendar containing events',
+      properties: {
+        name: { access: 'rw', type: 'string', description: 'Title', optional: false },
+        calendarIdentifier: {
+          access: 'r',
+          type: 'string',
+          description: 'A unique calendar key',
+          optional: false,
+        },
+      },
+      identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
+    },
+  },
+  commands: {
+    listCalendars: {
+      name: 'list',
+      description: 'List calendars',
+      scope: 'resource',
+      resourceType: 'Calendar',
+      parameters: [],
+      permission: 'calendar:calendars:list',
+    },
+  },
+}
+
+describe('generated read type — byProperty identifier mirrors the runtime property', () => {
+  const result = generateHttpClientSdk(byPropertyCalendarManifest, {
+    packageName: '@macts/sdk-calendar',
+  })
+  const types = findFile(result.files, 'src/types.ts').content
+
+  it('documents the canonical `id` as mirroring the runtime property `name`', () => {
+    // For a byProperty resource the runtime/canonical value is the working
+    // property (`name`), NOT the broken declared `calendarIdentifier`.
+    expect(types).toContain('mirrors `name`')
+    expect(types).not.toContain('mirrors `calendarIdentifier`')
+  })
+
+  it('still surfaces the canonical `id` field on the read type', () => {
+    expect(types).toMatch(/export interface Calendar \{[\s\S]*\bid\?: string;[\s\S]*\}/)
+  })
+})
+
 describe('drift guard — list output identifier matches the manifest single source', () => {
   it('the canonical `id` mirrors the resource primary identifier from the manifest', () => {
     // The value the read type aliases to `id` must be the SAME property the

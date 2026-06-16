@@ -119,21 +119,31 @@ describe('Calendar request-param coherence (real manifest)', () => {
     })
   })
 
-  describe('get (Calendar) — request param is `id` (not the `calendarIdentifier` property)', () => {
-    it('accepts { id } and binds `var id` + byId(id) in JXA', async () => {
+  describe('get (Calendar) — request param is `id`, targeted by name (byProperty)', () => {
+    it('accepts { id } and binds `var id` + whose({ name: id })[0] in JXA', async () => {
+      // The Calendar resource declares a `byProperty` identifier (`name`) because
+      // its dictionary `calendarIdentifier` throws via JXA at runtime (issue #81).
+      // The request PARAM is still `id` (schema contract unchanged); only the JXA
+      // targeting changes from byId() to a whose({ name: ... }) lookup.
       const { status, capturedJxaCode } = await callRpc(
         calendarManifest,
         'calendar.calendars.get',
         {
-          id: 'CAL-456',
+          id: 'Work',
         }
       )
       expect(status).toBe(200)
+      // Still binds the request param `id` (the value var), not a property name.
       expect(capturedJxaCode).toContain('var id =')
-      expect(capturedJxaCode).toContain('"CAL-456"')
-      expect(capturedJxaCode).toContain('byId(id)')
+      expect(capturedJxaCode).toContain('"Work"')
+      // Targets by the runtime-working property `name`, not byId().
+      expect(capturedJxaCode).toContain('whose({ name: id })[0]')
+      expect(capturedJxaCode).not.toContain('.byId(id)')
+      // Never TARGETS the lookup by the broken declared identifier. (The get
+      // output may still best-effort read `calendarIdentifier` as an ordinary
+      // property — that read is try/catch-swallowed and not load-bearing.)
+      expect(capturedJxaCode).not.toContain('whose({ calendarIdentifier')
       expect(capturedJxaCode).not.toContain('byId(calendarIdentifier)')
-      expect(capturedJxaCode).not.toContain('var calendarIdentifier =')
     })
 
     it('rejects a body keyed by the property name `calendarIdentifier`', async () => {
@@ -146,19 +156,57 @@ describe('Calendar request-param coherence (real manifest)', () => {
     })
   })
 
-  describe('listEvents — parent param is `calendarId`, scoped JXA uses byId(calendarId)', () => {
-    it('binds `var calendarId` and scopes the collection to the parent', async () => {
+  describe('listEvents — parent param `calendarId`, parent targeted by name (byProperty)', () => {
+    it('binds `var calendarId` and scopes via whose({ name: calendarId })[0]', async () => {
       const { status, capturedJxaCode } = await callRpc(
         calendarManifest,
         'calendar.events.listEvents',
-        { calendarId: 'CAL-789' }
+        { calendarId: 'Work' }
       )
       expect(status).toBe(200)
       expect(capturedJxaCode).toContain('var calendarId =')
-      expect(capturedJxaCode).toContain('"CAL-789"')
+      expect(capturedJxaCode).toContain('"Work"')
+      // Parent (Calendar) is byProperty, so the scope matches on its `name`.
+      expect(capturedJxaCode).toContain('whose({ name: calendarId })[0]')
+      expect(capturedJxaCode).not.toContain('.byId(calendarId)')
       // Scoped to the parent calendar's events collection.
-      expect(capturedJxaCode).toContain('byId(calendarId)')
       expect(capturedJxaCode).toContain('.events()')
+    })
+  })
+
+  describe('createEvent — parent calendar targeted by name (byProperty)', () => {
+    it('resolves the parent calendar via whose({ name: calendarId })[0]', async () => {
+      // The create-event path targets the parent calendar to make the event in.
+      // Since Calendar is byProperty, the parent must be matched by name.
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.createEvent',
+        {
+          calendarId: 'Work',
+          summary: 'Standup',
+          startDate: '2026-01-01T10:00:00Z',
+          endDate: '2026-01-01T11:00:00Z',
+        }
+      )
+      expect(status).toBe(200)
+      expect(capturedJxaCode).toContain('var calendarId =')
+      expect(capturedJxaCode).toContain('whose({ name: calendarId })[0]')
+      expect(capturedJxaCode).not.toContain('.byId(calendarId)')
+    })
+  })
+
+  describe('events stay byId — Event `uid` is runtime-valid, unlike Calendar', () => {
+    it('getEvent still targets via byId(id), not a whose() lookup', async () => {
+      // Regression guard: the byProperty change must be scoped to Calendar only.
+      // Events (whose `uid` works at runtime) must keep their byId targeting.
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.getEvent',
+        { id: 'EVENT-123' }
+      )
+      expect(status).toBe(200)
+      expect(capturedJxaCode).toContain('byId(id)')
+      expect(capturedJxaCode).not.toContain('whose(')
     })
   })
 })

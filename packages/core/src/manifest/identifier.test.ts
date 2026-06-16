@@ -14,6 +14,7 @@ import { describe, it, expect } from 'vitest'
 import type { Resource } from './schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
   resolveListOutputProperties,
 } from './identifier.js'
@@ -66,6 +67,71 @@ describe('resolvePrimaryIdentifierProperty', () => {
 
   it('returns undefined for an undefined resource', () => {
     expect(resolvePrimaryIdentifierProperty(undefined)).toBeUndefined()
+  })
+})
+
+describe('resolveIdentifierTargeting', () => {
+  it('defaults to byId targeting on the declared identifier property', () => {
+    // schema: `targeting` is optional and absent means the byId default. The
+    // runtime property for byId is the identifier property itself.
+    const resource = makeResource({
+      identifiers: [{ property: 'uid', primary: true }],
+    })
+    expect(resolveIdentifierTargeting(resource)).toEqual({
+      strategy: 'byId',
+      property: 'uid',
+    })
+  })
+
+  it('returns byProperty targeting matching on the identifier property', () => {
+    // Calendar fix: the declared id is the working property (`name`) and the
+    // runtime targets via whose({ name: ... }) rather than byId().
+    const resource = makeResource({
+      identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
+    })
+    expect(resolveIdentifierTargeting(resource)).toEqual({
+      strategy: 'byProperty',
+      property: 'name',
+    })
+  })
+
+  it('uses runtimeProperty as the whose-match key when provided', () => {
+    // When the value-carrying property differs from the whose-match property,
+    // runtimeProperty wins for the runtime lookup.
+    const resource = makeResource({
+      identifiers: [
+        {
+          property: 'calendarIdentifier',
+          primary: true,
+          targeting: 'byProperty',
+          runtimeProperty: 'name',
+        },
+      ],
+    })
+    expect(resolveIdentifierTargeting(resource)).toEqual({
+      strategy: 'byProperty',
+      property: 'name',
+    })
+  })
+
+  it('honors the primary entry when multiple identifiers are declared', () => {
+    const resource = makeResource({
+      identifiers: [
+        { property: 'uid', primary: false },
+        { property: 'name', primary: true, targeting: 'byProperty' },
+      ],
+    })
+    expect(resolveIdentifierTargeting(resource)).toEqual({
+      strategy: 'byProperty',
+      property: 'name',
+    })
+  })
+
+  it('returns undefined when no identifier is declared', () => {
+    // Negative: a resource with no manifest identifier cannot be targeted at all.
+    expect(resolveIdentifierTargeting(makeResource({}))).toBeUndefined()
+    expect(resolveIdentifierTargeting(makeResource({ identifiers: [] }))).toBeUndefined()
+    expect(resolveIdentifierTargeting(undefined)).toBeUndefined()
   })
 })
 

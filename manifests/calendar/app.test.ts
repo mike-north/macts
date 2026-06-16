@@ -91,12 +91,17 @@ describe('Calendar manifest', () => {
     })
 
     it('should have primary identifiers', () => {
+      // Calendar is targeted by NAME via byProperty (#81): the dictionary
+      // `calendarIdentifier` throws via JXA at runtime, so `name` (which works)
+      // is the runtime identifier and the resource is matched on it.
       const calendar = manifest.resources.Calendar
       expect(calendar.identifiers).toContainEqual({
-        property: 'calendarIdentifier',
+        property: 'name',
         primary: true,
+        targeting: 'byProperty',
       })
 
+      // Event's `uid` IS runtime-valid, so it keeps the default byId targeting.
       const event = manifest.resources.Event
       expect(event.identifiers).toContainEqual({
         property: 'uid',
