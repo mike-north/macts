@@ -70,7 +70,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'assign',
     description: 'Assign resources to tasks',
     permission: 'omniplan:app:assign',
-    risk: 'execute',
+    risk: 'write',
     inputSchema: {
       type: 'object',
       properties: {

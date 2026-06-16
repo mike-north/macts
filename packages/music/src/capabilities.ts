@@ -100,7 +100,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'convert',
     description: 'convert one or more files or tracks',
     permission: null,
-    risk: 'execute',
+    risk: 'write',
     inputSchema: {
       type: 'object',
       properties: {},

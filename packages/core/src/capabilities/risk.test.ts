@@ -162,6 +162,57 @@ describe('classifyRiskFromOperation — predicate-style queries classify as read
   })
 })
 
+describe('classifyRiskFromOperation — compound read+mutator names resolve to most sensitive (regression #43)', () => {
+  // Bug: multi-token names whose first matching keyword is a read verb (search,
+  // find, get, list) classified as `read` even when the name also contains a
+  // mutating verb token. The read token won via first-match; now all matched
+  // classes are collected and the most sensitive wins.
+  //
+  // These cases MUST fail against the pre-fix classifier (first-match wins) and
+  // pass after the fix (most-sensitive wins).
+  const compoundMutatorCases: readonly (readonly [operation: string, expected: RiskClass])[] = [
+    // Regression: previously classified as `read` because `search`/`find` matched
+    // first and `replace` was not in any keyword table.
+    ['searchAndReplace', 'write'], // search→read + replace→write → write wins
+    ['findAndReplace', 'write'], // find→read + replace→write → write wins
+    // Additional read+mutator combos covering the issue's listed mutation verbs.
+    ['findAndReorder', 'write'], // find→read + reorder→write → write wins
+    ['getAndRewrite', 'write'], // get→read + rewrite→write → write wins
+    ['listAndMerge', 'write'], // list→read + merge→write → write wins
+    // A read-only compound must still classify as read (no mutation token).
+    ['searchAndCount', 'read'], // search→read + count→read → read (both read)
+  ]
+
+  it.each(compoundMutatorCases)(
+    'classifies %s as %s (most-sensitive token wins)',
+    (operation, expected) => {
+      expect(classifyRiskFromOperation(operation)).toBe(expected)
+    }
+  )
+
+  it('does not regress compound system-change ops (setVolume, shutDown, logOut)', () => {
+    // These rely on COMPOUND_KEYWORDS; `set` would match write but `setvolume`
+    // compound keyword must still escalate to system-change.
+    expect(classifyRiskFromOperation('setVolume')).toBe('system-change')
+    expect(classifyRiskFromOperation('shutDown')).toBe('system-change')
+    expect(classifyRiskFromOperation('logOut')).toBe('system-change')
+  })
+
+  it('does not regress execute compound ops (doScript, doJavaScript, runScript)', () => {
+    expect(classifyRiskFromOperation('doScript')).toBe('execute')
+    expect(classifyRiskFromOperation('doJavaScript')).toBe('execute')
+    expect(classifyRiskFromOperation('runScript')).toBe('execute')
+  })
+
+  it('does not regress read+mutator when the mutator is a delete keyword (already safe pre-fix)', () => {
+    // `search`+`delete` — `delete` was always in the keyword table and ranked
+    // above `read` in RESOLUTION_ORDER, so these were never under-gated.
+    // Verify they remain correct after the algorithmic change.
+    expect(classifyRiskFromOperation('searchAndDelete')).toBe('delete')
+    expect(classifyRiskFromOperation('findAndRemove')).toBe('delete')
+  })
+})
+
 describe('classifyCommandRisk', () => {
   it('derives risk from the operation name when no override is present', () => {
     expect(classifyCommandRisk(command('createEvent'))).toBe('write')
