@@ -171,9 +171,11 @@ describe('validateApiKey', () => {
       // (this made the test flaky — the iat timestamp changes the signature each
       // run). The first character always encodes fully-significant bits, so
       // flipping it always changes the decoded signature.
-      const [header, payloadPart, signature = ''] = token.split('.')
+      // The token is `macts_sk_<header>.<payload>.<signature>`, so the first
+      // segment is the macts-prefixed JWT header; join() preserves it verbatim.
+      const [prefixedHeader, payload, signature = ''] = token.split('.')
       const tamperedSignature = (signature.startsWith('A') ? 'B' : 'A') + signature.slice(1)
-      const tamperedToken = [header, payloadPart, tamperedSignature].join('.')
+      const tamperedToken = [prefixedHeader, payload, tamperedSignature].join('.')
       // Guard: the tamper must actually change the token.
       expect(tamperedToken).not.toBe(token)
 
