@@ -268,6 +268,9 @@ export const AppMetadataSchema: z.ZodObject<{
 export type AppPattern = z.infer<typeof AppPatternSchema>;
 
 // @public
+export function appPatternMatches(ruleApp: string, concreteApp: string): boolean;
+
+// @public
 export const AppPatternSchema: z.ZodString;
 
 // @public
@@ -329,6 +332,11 @@ export interface AuditRecordInput {
     readonly decision: AuditDecision;
     readonly reason?: string;
     readonly timestamp: Date;
+}
+
+// @public
+export interface AuditWriter {
+    append(record: AuditRecord): Promise<void>;
 }
 
 // @public
@@ -548,6 +556,9 @@ export function createAuditRecord(input: AuditRecordInput): AuditRecord;
 // @public
 export function createEnumCoercer(values: JxaEnumValue[]): TypeCoercer<string>;
 
+// @public
+export function createFileAuditWriter(path: string): AuditWriter;
+
 // @public (undocumented)
 export function createGeneratorContext(manifest: AppManifest, options: GeneratorOptions): GeneratorContext;
 
@@ -574,6 +585,9 @@ export const DateTypeSchema: z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>;
 
 // @public
 export const DEFAULT_RISK: RiskClass;
+
+// @public
+export const DEFAULT_SENSITIVE_KEYS: readonly string[];
 
 // @public (undocumented)
 export type Deprecation = z.infer<typeof DeprecationSchema>;
@@ -695,6 +709,9 @@ export function filterPermissionsByApp(permissions: string[], app: string): stri
 
 // @public
 export function findCoarseCategory(finePermission: string, permissionsSection: PermissionsSection): string | undefined;
+
+// @public
+export function findMatchingPolicyRule(policy: GovernancePolicy, app: string, _resource: string, operation: string): PolicyRuleMatch | undefined;
 
 // @public
 export interface FinePermission {
@@ -1202,6 +1219,9 @@ export function isPureCoarseOperation(operation: string): operation is PureCoars
 export function isRiskClass(value: unknown): value is RiskClass;
 
 // @public
+export function isSensitiveKey(key: string, extraSensitiveKeys?: readonly string[]): boolean;
+
+// @public
 export function isValidPermission(permission: string): boolean;
 
 // @public
@@ -1346,6 +1366,9 @@ export const OpenQuestionSchema: z.ZodObject<{
 export type OperationPattern = z.infer<typeof OperationPatternSchema>;
 
 // @public
+export function operationPatternMatches(ruleOperation: string, concreteOperation: string): boolean;
+
+// @public
 export const OperationPatternSchema: z.ZodString;
 
 // @public
@@ -1482,6 +1505,12 @@ export const PolicyDispositionSchema: z.ZodEnum<{
 export interface PolicyIssue {
     readonly message: string;
     readonly path: string;
+}
+
+// @public
+export interface PolicyRuleMatch {
+    readonly appRule: AppRule;
+    readonly operationRuleIndex: number;
 }
 
 // @public
@@ -1704,6 +1733,17 @@ export const RectTypeSchema: z.ZodObject<{
     width: z.ZodNumber;
     height: z.ZodNumber;
 }, z.core.$strip>;
+
+// @public
+export function redactArgs(args: Record<string, unknown>, options?: RedactArgsOptions): string;
+
+// @public
+export interface RedactArgsOptions {
+    readonly extraSensitiveKeys?: readonly string[];
+}
+
+// @public
+export const REDACTED_PLACEHOLDER = "[redacted]";
 
 // @public (undocumented)
 export type Relationship = z.infer<typeof RelationshipSchema>;

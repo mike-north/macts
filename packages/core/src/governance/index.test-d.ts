@@ -18,6 +18,14 @@ import {
   parsePolicy,
   createAuditRecord,
   serializeAuditRecord,
+  redactArgs,
+  isSensitiveKey,
+  createFileAuditWriter,
+  appPatternMatches,
+  operationPatternMatches,
+  findMatchingPolicyRule,
+  REDACTED_PLACEHOLDER,
+  DEFAULT_SENSITIVE_KEYS,
   type GovernancePolicy,
   type PolicyDisposition,
   type ParsePolicyResult,
@@ -26,6 +34,9 @@ import {
   type AuditRecord,
   type AuditRecordInput,
   type SerializedAuditRecord,
+  type RedactArgsOptions,
+  type AuditWriter,
+  type PolicyRuleMatch,
 } from './index.js'
 
 // =============================================================================
@@ -115,3 +126,56 @@ expectNotAssignable<AuditRecordInput>({
   decision: 'pending',
   timestamp: new Date('2026-06-14T10:42:12.000Z'),
 })
+
+// =============================================================================
+// redactArgs — signature
+// =============================================================================
+
+// redactArgs returns a string.
+expectType<string>(redactArgs({ key: 'value' }))
+expectType<string>(redactArgs({}, { extraSensitiveKeys: ['mykey'] }))
+
+// isSensitiveKey returns a boolean.
+expectType<boolean>(isSensitiveKey('password'))
+expectType<boolean>(isSensitiveKey('token', ['pincode']))
+
+// REDACTED_PLACEHOLDER is a string constant.
+expectType<string>(REDACTED_PLACEHOLDER)
+
+// DEFAULT_SENSITIVE_KEYS is a readonly string array.
+expectAssignable<readonly string[]>(DEFAULT_SENSITIVE_KEYS)
+
+// RedactArgsOptions has extraSensitiveKeys as optional readonly string[].
+declare const opts: RedactArgsOptions
+expectAssignable<readonly string[] | undefined>(opts.extraSensitiveKeys)
+
+// =============================================================================
+// AuditWriter — signature
+// =============================================================================
+
+// createFileAuditWriter returns an AuditWriter.
+declare const writer: AuditWriter
+// append(record) returns Promise<void>
+declare const sampleRecord: AuditRecord
+expectType<Promise<void>>(writer.append(sampleRecord))
+
+const fileWriter = createFileAuditWriter('/tmp/audit.jsonl')
+expectAssignable<AuditWriter>(fileWriter)
+
+// =============================================================================
+// Policy matcher — signatures
+// =============================================================================
+
+// appPatternMatches and operationPatternMatches return boolean.
+expectType<boolean>(appPatternMatches('*', 'calendar'))
+expectType<boolean>(operationPatternMatches('create', 'create'))
+
+// findMatchingPolicyRule returns PolicyRuleMatch | undefined.
+declare const policy: GovernancePolicy
+expectAssignable<PolicyRuleMatch | undefined>(
+  findMatchingPolicyRule(policy, 'calendar', 'events', 'create')
+)
+
+// PolicyRuleMatch shape.
+declare const matchResult: PolicyRuleMatch
+expectType<number>(matchResult.operationRuleIndex)

@@ -55,3 +55,23 @@ export {
   createAuditRecord,
   serializeAuditRecord,
 } from './audit.js'
+
+// Argument-redaction helper: sanitises raw call args for argsSummary.
+export {
+  REDACTED_PLACEHOLDER,
+  DEFAULT_SENSITIVE_KEYS,
+  isSensitiveKey,
+  redactArgs,
+  type RedactArgsOptions,
+} from './redaction.js'
+
+// Durable audit-record writer (JSON-lines / NDJSON).
+export { createFileAuditWriter, type AuditWriter } from './writer.js'
+
+// Governance-policy wildcard matching (foundation; no enforcement).
+export {
+  appPatternMatches,
+  operationPatternMatches,
+  findMatchingPolicyRule,
+  type PolicyRuleMatch,
+} from './policy-matcher.js'
