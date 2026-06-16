@@ -5,6 +5,7 @@
 
 import { Cli, Builtins } from 'clipanion'
 import { GenerateCommand } from './commands/generate.js'
+import { ProbeCommand } from './commands/probe.js'
 import { RootCommand } from './commands/root.js'
 import {
   PluginInstallCommand,
@@ -49,6 +50,7 @@ const cli = new Cli({
 // Register built-in commands
 cli.register(RootCommand)
 cli.register(GenerateCommand)
+cli.register(ProbeCommand)
 cli.register(Builtins.HelpCommand)
 cli.register(Builtins.VersionCommand)
 

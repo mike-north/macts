@@ -141,6 +141,21 @@ export interface PluginRegistrationResult {
 }
 
 // @public
+export class ProbeCommand extends Command {
+    app: string;
+    dryRun: boolean | undefined;
+    // (undocumented)
+    execute(): Promise<number>;
+    json: boolean | undefined;
+    manifestsDir: string | undefined;
+    // (undocumented)
+    static paths: string[][];
+    resource: string[] | undefined;
+    // (undocumented)
+    static usage: clipanion.Usage;
+}
+
+// @public
 export function registerAllPlugins(cli: Cli, discoveryResult: PluginDiscoveryResult): PluginRegistrationResult;
 
 // @public

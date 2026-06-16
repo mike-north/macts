@@ -146,6 +146,17 @@ export const AppManifestSchema: z.ZodObject<{
             property: z.ZodString;
             primary: z.ZodDefault<z.ZodBoolean>;
         }, z.core.$strip>>>;
+        probe: z.ZodOptional<z.ZodObject<{
+            runtimeIdentifier: z.ZodOptional<z.ZodString>;
+            status: z.ZodEnum<{
+                error: "error";
+                probed: "probed";
+                "no-items": "no-items";
+                failed: "failed";
+            }>;
+            probedAt: z.ZodOptional<z.ZodString>;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -272,6 +283,14 @@ export function appPatternMatches(ruleApp: string, concreteApp: string): boolean
 
 // @public
 export const AppPatternSchema: z.ZodString;
+
+// @public
+export interface AppProbeResult {
+    appName: string;
+    bundleId: string;
+    probedAt: string;
+    resources: Record<string, ResourceProbeResult>;
+}
 
 // @public
 export type AppRule = z.infer<typeof AppRuleSchema>;
@@ -1222,6 +1241,13 @@ export interface HttpClientGeneratorOptions {
 export type Identifier = z.infer<typeof IdentifierSchema>;
 
 // @public
+export interface IdentifierProbeResult {
+    error?: string;
+    property: string;
+    succeeded: boolean;
+}
+
+// @public
 export const IdentifierSchema: z.ZodObject<{
     property: z.ZodString;
     primary: z.ZodDefault<z.ZodBoolean>;
@@ -1323,6 +1349,9 @@ export interface JxaExecutorOptions {
     // (undocumented)
     timeout?: number;
 }
+
+// @public
+export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>;
 
 // @public
 export function loadCapabilityRegistry(manifestsDir: string): Promise<{
@@ -1673,6 +1702,26 @@ export const PrimitiveTypeSchema: z.ZodEnum<{
     rgb: "rgb";
 }>;
 
+// @public
+export function probeManifest(manifest: AppManifest, runner: JxaRunner, options?: ProbeManifestOptions): Promise<AppProbeResult>;
+
+// @public
+export interface ProbeManifestOptions {
+    now?: string;
+    resources?: string[];
+}
+
+// @public (undocumented)
+export type ProbeStatus = z.infer<typeof ProbeStatusSchema>;
+
+// @public
+export const ProbeStatusSchema: z.ZodEnum<{
+    error: "error";
+    probed: "probed";
+    "no-items": "no-items";
+    failed: "failed";
+}>;
+
 // @public (undocumented)
 export type Property = z.infer<typeof PropertySchema>;
 
@@ -1884,6 +1933,14 @@ export function resolvePrimaryIdentifierProperty(resource: Resource | undefined)
 export type Resource = z.infer<typeof ResourceSchema>;
 
 // @public
+export interface ResourceProbeResult {
+    candidates: IdentifierProbeResult[];
+    probe: RuntimeProbe;
+    resource: string;
+    runtimeIdentifier: string | undefined;
+}
+
+// @public
 export const ResourceSchema: z.ZodObject<{
     name: z.ZodString;
     plural: z.ZodString;
@@ -1921,6 +1978,17 @@ export const ResourceSchema: z.ZodObject<{
         property: z.ZodString;
         primary: z.ZodDefault<z.ZodBoolean>;
     }, z.core.$strip>>>;
+    probe: z.ZodOptional<z.ZodObject<{
+        runtimeIdentifier: z.ZodOptional<z.ZodString>;
+        status: z.ZodEnum<{
+            error: "error";
+            probed: "probed";
+            "no-items": "no-items";
+            failed: "failed";
+        }>;
+        probedAt: z.ZodOptional<z.ZodString>;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 
 // @public
@@ -1965,6 +2033,22 @@ export type RiskClassValue = z.infer<typeof RiskClassSchema>;
 
 // @public
 export function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>;
+
+// @public (undocumented)
+export type RuntimeProbe = z.infer<typeof RuntimeProbeSchema>;
+
+// @public
+export const RuntimeProbeSchema: z.ZodObject<{
+    runtimeIdentifier: z.ZodOptional<z.ZodString>;
+    status: z.ZodEnum<{
+        error: "error";
+        probed: "probed";
+        "no-items": "no-items";
+        failed: "failed";
+    }>;
+    probedAt: z.ZodOptional<z.ZodString>;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
 
 // @public
 export function runWithApp<T>(bundleId: string, fn: string, // Function body as string
@@ -2117,6 +2201,9 @@ export function writeFiles(files: {
     path: string;
     content: string;
 }[], outDir: string): Promise<void>;
+
+// @public
+export function writeProbeResults(manifestPath: string, result: AppProbeResult): Promise<void>;
 
 // @public
 export function writeSdk(result: GenerateSdkResult, outDir: string): Promise<void>;
