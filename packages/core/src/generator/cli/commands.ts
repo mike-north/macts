@@ -147,6 +147,15 @@ export function generateListCommand(
   // Build parameter options for parent IDs
   const parentOptions = generateParentOptions(hierarchyPath.parentParams)
 
+  // Forward the parent ID params to the list() call so the SDK can scope the
+  // request to the correct parent resource. Without this the generated list()
+  // call omits the required argument, causing a TypeScript compile error and a
+  // runtime scoping failure on the server.
+  const listArgs =
+    hierarchyPath.parentParams.length > 0
+      ? `this.${hierarchyPath.parentParams.map((p) => p.name).join(', this.')}`
+      : ''
+
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
@@ -168,7 +177,7 @@ ${parentOptions}
 
     try {
       const client = getClient();
-      const items = await client.${resourceAccess}.list();
+      const items = await client.${resourceAccess}.list(${listArgs});
 
       const output = formatter.formatList(items.map(item => ({
 ${generateListFieldMapping(resource)}

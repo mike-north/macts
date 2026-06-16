@@ -165,6 +165,27 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
 
   switch (tool.operationName) {
     case 'list':
+      if (required.length > 0) {
+        // The list command has required parameters (e.g. parent identifier like
+        // calendarId). Forward them as positional arguments to the SDK list()
+        // method — the SDK now accepts them and sends them in the request body
+        // so the server can scope the JXA to the parent resource.
+        const requiredOnly = required.filter((p) => Object.hasOwn(properties, p))
+        const { destructured: listDestructured } = safeDestructure(requiredOnly)
+        const safeListArgs = requiredOnly.map((p) => safeIdentifier(p)).join(', ')
+        // Also void optional properties to prevent unused-variable errors.
+        const optionalProps = Object.keys(properties).filter((p) => !required.includes(p))
+        const voidStatement =
+          optionalProps.length > 0
+            ? `void ${optionalProps.map((p) => safeIdentifier(p)).join('; void ')};`
+            : ''
+        return `async (args) => {
+    const { ${listDestructured} } = args as ${argsType};
+    ${voidStatement}
+    const client = getClient();
+    return client.${resourceName}.list(${safeListArgs});
+  }`
+      }
       if (Object.keys(properties).length > 0) {
         const { destructured: listDestructured } = safeDestructure(Object.keys(properties))
         const safeListProps = Object.keys(properties).map((p) => safeIdentifier(p))
