@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [MenuCreateInput](./system-events.menucreateinput.md)
 
-## MenuCreateInput interface
+## MenuCreateInput type
 
 Input for creating a Menu
 
 **Signature:**
 
 ```typescript
-interface MenuCreateInput
+type MenuCreateInput = Record<string, never>
 ```

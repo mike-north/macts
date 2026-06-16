@@ -4,10 +4,10 @@
 
 ## CalendarCreateInput.name property
 
-The calendar title
+Calendar name
 
 **Signature:**
 
 ```typescript
-name?: string;
+name: string
 ```

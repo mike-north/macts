@@ -73,7 +73,7 @@ string
 
 </td><td>
 
-Package name (e.g., '<!-- -->@<!-- -->macts/mcp-calendar')
+Package name (e.g., '<!-- -->@<!-- -->macts/calendar-server')
 
 </td></tr>
 <tr><td>

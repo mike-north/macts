@@ -9,6 +9,7 @@
 ```typescript
 TabSchema: z.ZodObject<
   {
+    id: z.ZodOptional<z.ZodString>
     contents: z.ZodString
     history: z.ZodString
     busy: z.ZodBoolean

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)
 
-## AudioCDTrackCreateInput interface
+## AudioCDTrackCreateInput type
 
 Input for creating a AudioCDTrack
 
 **Signature:**
 
 ```typescript
-interface AudioCDTrackCreateInput
+type AudioCDTrackCreateInput = Record<string, never>
 ```

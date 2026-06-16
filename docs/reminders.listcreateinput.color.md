@@ -4,7 +4,7 @@
 
 ## ListCreateInput.color property
 
-The color of the list
+List color
 
 **Signature:**
 

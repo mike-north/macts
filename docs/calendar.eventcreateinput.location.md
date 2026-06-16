@@ -4,7 +4,7 @@
 
 ## EventCreateInput.location property
 
-The event location
+Event location
 
 **Signature:**
 

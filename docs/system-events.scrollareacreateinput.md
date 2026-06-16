@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScrollAreaCreateInput](./system-events.scrollareacreateinput.md)
 
-## ScrollAreaCreateInput interface
+## ScrollAreaCreateInput type
 
 Input for creating a ScrollArea
 
 **Signature:**
 
 ```typescript
-interface ScrollAreaCreateInput
+type ScrollAreaCreateInput = Record<string, never>
 ```

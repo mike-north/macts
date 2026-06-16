@@ -43,7 +43,7 @@ string
 
 </td><td>
 
-_(Optional)_ The source code of the script
+_(Optional)_ Initial script contents
 
 </td></tr>
 <tr><td>

@@ -17,24 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AddressResourceClient](./contacts.addressresourceclient.md)
-
-</td><td>
-
-Client for address for the given record..
-
-</td></tr>
-<tr><td>
-
-[AIMHandleResourceClient](./contacts.aimhandleresourceclient.md)
-
-</td><td>
-
-Client for user name for america online (aol) instant messaging..
-
-</td></tr>
-<tr><td>
-
 [ContactsClient](./contacts.contactsclient.md)
 
 </td><td>
@@ -53,128 +35,11 @@ Error class for Contacts API errors.
 </td></tr>
 <tr><td>
 
-[CustomDateResourceClient](./contacts.customdateresourceclient.md)
-
-</td><td>
-
-Client for arbitrary date associated with this person..
-
-</td></tr>
-<tr><td>
-
-[EmailResourceClient](./contacts.emailresourceclient.md)
-
-</td><td>
-
-Client for email address for a person..
-
-</td></tr>
-<tr><td>
-
-[GroupResourceClient](./contacts.groupresourceclient.md)
-
-</td><td>
-
-Client for a group record in the address book database.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./contacts.httpclient.md)
 
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[ICQHandleResourceClient](./contacts.icqhandleresourceclient.md)
-
-</td><td>
-
-Client for user name for icq instant messaging..
-
-</td></tr>
-<tr><td>
-
-[InstantMessageResourceClient](./contacts.instantmessageresourceclient.md)
-
-</td><td>
-
-Client for address for instant messaging..
-
-</td></tr>
-<tr><td>
-
-[JabberHandleResourceClient](./contacts.jabberhandleresourceclient.md)
-
-</td><td>
-
-Client for user name for jabber instant messaging..
-
-</td></tr>
-<tr><td>
-
-[MSNHandleResourceClient](./contacts.msnhandleresourceclient.md)
-
-</td><td>
-
-Client for user name for microsoft network (msn) instant messaging..
-
-</td></tr>
-<tr><td>
-
-[PersonResourceClient](./contacts.personresourceclient.md)
-
-</td><td>
-
-Client for a person in the address book database..
-
-</td></tr>
-<tr><td>
-
-[PhoneResourceClient](./contacts.phoneresourceclient.md)
-
-</td><td>
-
-Client for phone number for a person..
-
-</td></tr>
-<tr><td>
-
-[RelatedNameResourceClient](./contacts.relatednameresourceclient.md)
-
-</td><td>
-
-Client for other names related to this person..
-
-</td></tr>
-<tr><td>
-
-[SocialProfileResourceClient](./contacts.socialprofileresourceclient.md)
-
-</td><td>
-
-Client for profile for social networks..
-
-</td></tr>
-<tr><td>
-
-[UrlResourceClient](./contacts.urlresourceclient.md)
-
-</td><td>
-
-Client for urls for this person..
-
-</td></tr>
-<tr><td>
-
-[YahooHandleResourceClient](./contacts.yahoohandleresourceclient.md)
-
-</td><td>
-
-Client for user name for yahoo instant messaging..
 
 </td></tr>
 </tbody></table>
@@ -224,6 +89,15 @@ User name for America Online (AOL) instant messaging.
 </td><td>
 
 Input for creating a AIMHandle
+
+</td></tr>
+<tr><td>
+
+[CapabilityMetadata](./contacts.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -498,6 +372,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./contacts.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Contacts, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [CustomDateSchema](./contacts.customdateschema.md)
 
 </td><td>
@@ -616,6 +499,15 @@ Input for updating a Address
 </td><td>
 
 Input for updating a AIMHandle
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./contacts.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>

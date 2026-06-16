@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [OutlineCreateInput](./system-events.outlinecreateinput.md)
 
-## OutlineCreateInput interface
+## OutlineCreateInput type
 
 Input for creating a Outline
 
 **Signature:**
 
 ```typescript
-interface OutlineCreateInput
+type OutlineCreateInput = Record<string, never>
 ```

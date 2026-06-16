@@ -57,50 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./music.playlistresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new playlist.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./music.playlistresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a playlist.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./music.playlistresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a playlist by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./music.playlistresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all playlists.
-
-</td></tr>
-<tr><td>
-
 [move(to)](./music.playlistresourceclient.move.md)
 
 </td><td>
@@ -119,17 +75,6 @@ Move playlist(s) to a new location
 </td><td>
 
 search a playlist for tracks matching the search string. Identical to entering search text in the Search field.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./music.playlistresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing playlist.
 
 </td></tr>
 </tbody></table>

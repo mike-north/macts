@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ListCreateInput](./system-events.listcreateinput.md)
 
-## ListCreateInput interface
+## ListCreateInput type
 
 Input for creating a List
 
 **Signature:**
 
 ```typescript
-interface ListCreateInput
+type ListCreateInput = Record<string, never>
 ```

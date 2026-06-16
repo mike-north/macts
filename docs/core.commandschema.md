@@ -36,6 +36,16 @@ CommandSchema: z.ZodObject<
     returns: z.ZodOptional<z.ZodString>
     code: z.ZodOptional<z.ZodString>
     permission: z.ZodOptional<z.ZodString>
+    risk: z.ZodOptional<
+      z.ZodEnum<{
+        read: 'read'
+        write: 'write'
+        delete: 'delete'
+        send: 'send'
+        execute: 'execute'
+        'system-change': 'system-change'
+      }>
+    >
     permissionHistory: z.ZodOptional<
       z.ZodArray<
         z.ZodObject<

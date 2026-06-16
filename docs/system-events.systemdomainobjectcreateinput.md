@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [SystemDomainObjectCreateInput](./system-events.systemdomainobjectcreateinput.md)
 
-## SystemDomainObjectCreateInput interface
+## SystemDomainObjectCreateInput type
 
 Input for creating a SystemDomainObject
 
 **Signature:**
 
 ```typescript
-interface SystemDomainObjectCreateInput
+type SystemDomainObjectCreateInput = Record<string, never>
 ```

@@ -43,7 +43,22 @@ boolean
 
 </td><td>
 
-_(Optional)_ True if the event is an all-day event
+_(Optional)_ Whether this is an all-day event
+
+</td></tr>
+<tr><td>
+
+[calendarId](./calendar.eventcreateinput.calendarid.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+Calendar identifier for the event
 
 </td></tr>
 <tr><td>
@@ -58,12 +73,12 @@ string
 
 </td><td>
 
-_(Optional)_ The event notes
+_(Optional)_ Event notes
 
 </td></tr>
 <tr><td>
 
-[endDate?](./calendar.eventcreateinput.enddate.md)
+[endDate](./calendar.eventcreateinput.enddate.md)
 
 </td><td>
 
@@ -73,7 +88,7 @@ Date
 
 </td><td>
 
-_(Optional)_ The event end date
+Event end date
 
 </td></tr>
 <tr><td>
@@ -103,7 +118,7 @@ string
 
 </td><td>
 
-_(Optional)_ The event location
+_(Optional)_ Event location
 
 </td></tr>
 <tr><td>
@@ -138,7 +153,7 @@ _(Optional)_ The event modification date
 </td></tr>
 <tr><td>
 
-[startDate?](./calendar.eventcreateinput.startdate.md)
+[startDate](./calendar.eventcreateinput.startdate.md)
 
 </td><td>
 
@@ -148,7 +163,7 @@ Date
 
 </td><td>
 
-_(Optional)_ The event start date
+Event start date
 
 </td></tr>
 <tr><td>
@@ -168,7 +183,7 @@ _(Optional)_ The event status
 </td></tr>
 <tr><td>
 
-[summary?](./calendar.eventcreateinput.summary.md)
+[summary](./calendar.eventcreateinput.summary.md)
 
 </td><td>
 
@@ -178,7 +193,7 @@ string
 
 </td><td>
 
-_(Optional)_ The event summary/title
+Event title
 
 </td></tr>
 <tr><td>

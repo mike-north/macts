@@ -17,15 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[DocumentResourceClient](./quicktime-player.documentresourceclient.md)
-
-</td><td>
-
-Client for a quicktime player document.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./quicktime-player.httpclient.md)
 
 </td><td>
@@ -65,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityMetadata](./quicktime-player.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
 
 [Document](./quicktime-player.document.md)
 
@@ -106,6 +106,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./quicktime-player.capabilities.md)
+
+</td><td>
+
+Every capability exposed by QuickTime Player, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DocumentSchema](./quicktime-player.documentschema.md)
 
 </td><td>
@@ -125,6 +134,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./quicktime-player.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [DocumentUpdateInput](./quicktime-player.documentupdateinput.md)
 

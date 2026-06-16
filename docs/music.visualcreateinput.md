@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [VisualCreateInput](./music.visualcreateinput.md)
 
-## VisualCreateInput interface
+## VisualCreateInput type
 
 Input for creating a Visual
 
 **Signature:**
 
 ```typescript
-interface VisualCreateInput
+type VisualCreateInput = Record<string, never>
 ```

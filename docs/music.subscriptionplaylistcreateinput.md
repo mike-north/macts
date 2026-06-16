@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)
 
-## SubscriptionPlaylistCreateInput interface
+## SubscriptionPlaylistCreateInput type
 
 Input for creating a SubscriptionPlaylist
 
 **Signature:**
 
 ```typescript
-interface SubscriptionPlaylistCreateInput
+type SubscriptionPlaylistCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [RelevanceIndicatorCreateInput](./system-events.relevanceindicatorcreateinput.md)
 
-## RelevanceIndicatorCreateInput interface
+## RelevanceIndicatorCreateInput type
 
 Input for creating a RelevanceIndicator
 
 **Signature:**
 
 ```typescript
-interface RelevanceIndicatorCreateInput
+type RelevanceIndicatorCreateInput = Record<string, never>
 ```

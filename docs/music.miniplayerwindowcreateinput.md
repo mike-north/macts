@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)
 
-## MiniplayerWindowCreateInput interface
+## MiniplayerWindowCreateInput type
 
 Input for creating a MiniplayerWindow
 
 **Signature:**
 
 ```typescript
-interface MiniplayerWindowCreateInput
+type MiniplayerWindowCreateInput = Record<string, never>
 ```

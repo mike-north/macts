@@ -43,7 +43,7 @@ Description
 
 </td><td>
 
-_(Optional)_ The calendar color
+_(Optional)_ Calendar color
 
 </td></tr>
 <tr><td>
@@ -63,7 +63,7 @@ _(Optional)_ The calendar description
 </td></tr>
 <tr><td>
 
-[name?](./calendar.calendarcreateinput.name.md)
+[name](./calendar.calendarcreateinput.name.md)
 
 </td><td>
 
@@ -73,7 +73,7 @@ string
 
 </td><td>
 
-_(Optional)_ The calendar title
+Calendar name
 
 </td></tr>
 <tr><td>

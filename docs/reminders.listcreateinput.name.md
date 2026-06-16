@@ -4,10 +4,10 @@
 
 ## ListCreateInput.name property
 
-The name of the list
+List name
 
 **Signature:**
 
 ```typescript
-name?: string;
+name: string
 ```

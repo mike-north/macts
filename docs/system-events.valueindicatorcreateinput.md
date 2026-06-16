@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ValueIndicatorCreateInput](./system-events.valueindicatorcreateinput.md)
 
-## ValueIndicatorCreateInput interface
+## ValueIndicatorCreateInput type
 
 Input for creating a ValueIndicator
 
 **Signature:**
 
 ```typescript
-interface ValueIndicatorCreateInput
+type ValueIndicatorCreateInput = Record<string, never>
 ```

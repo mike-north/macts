@@ -72,23 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[anchors](./system-settings.systemsettingsclient.anchors.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[AnchorResourceClient](./system-settings.anchorresourceclient.md)
-
-</td><td>
-
-An anchor within a settings pane.
-
-</td></tr>
-<tr><td>
-
 [http](./system-settings.systemsettingsclient.http.md)
 
 </td><td>

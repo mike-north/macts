@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/screen-sharing](./screen-sharing.md) &gt; [ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
 
-## ConnectionCreateInput interface
+## ConnectionCreateInput type
 
 Input for creating a Connection
 
 **Signature:**
 
 ```typescript
-interface ConnectionCreateInput
+type ConnectionCreateInput = Record<string, never>
 ```

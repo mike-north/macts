@@ -4,7 +4,7 @@
 
 ## EventCreateInput.description property
 
-The event notes
+Event notes
 
 **Signature:**
 

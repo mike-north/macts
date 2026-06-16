@@ -66,20 +66,20 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./screen-sharing.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Connection](./screen-sharing.connection.md)
 
 </td><td>
 
 A screen sharing connection
-
-</td></tr>
-<tr><td>
-
-[ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
-
-</td><td>
-
-Input for creating a Connection
 
 </td></tr>
 <tr><td>
@@ -106,6 +106,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./screen-sharing.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Screen Sharing, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [ConnectionSchema](./screen-sharing.connectionschema.md)
 
 </td><td>
@@ -125,6 +134,24 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./screen-sharing.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[ConnectionCreateInput](./screen-sharing.connectioncreateinput.md)
+
+</td><td>
+
+Input for creating a Connection
+
+</td></tr>
+<tr><td>
 
 [ConnectionUpdateInput](./screen-sharing.connectionupdateinput.md)
 

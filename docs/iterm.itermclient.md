@@ -87,57 +87,6 @@ Description
 Get the HTTP client for making custom requests.
 
 </td></tr>
-<tr><td>
-
-[sessions](./iterm.itermclient.sessions.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[SessionResourceClient](./iterm.sessionresourceclient.md)
-
-</td><td>
-
-A terminal session
-
-</td></tr>
-<tr><td>
-
-[tabs](./iterm.itermclient.tabs.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TabResourceClient](./iterm.tabresourceclient.md)
-
-</td><td>
-
-A terminal tab
-
-</td></tr>
-<tr><td>
-
-[windows](./iterm.itermclient.windows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[WindowResourceClient](./iterm.windowresourceclient.md)
-
-</td><td>
-
-A window.
-
-</td></tr>
 </tbody></table>
 
 ## Methods

@@ -9,8 +9,36 @@ List all events.
 **Signature:**
 
 ```typescript
-list(): Promise<Event[]>;
+list(calendarId: string): Promise<Event[]>;
 ```
+
+## Parameters
+
+<table><thead><tr><th>
+
+Parameter
+
+</th><th>
+
+Type
+
+</th><th>
+
+Description
+
+</th></tr></thead>
+<tbody><tr><td>
+
+calendarId
+
+</td><td>
+
+string
+
+</td><td>
+
+</td></tr>
+</tbody></table>
 
 **Returns:**
 

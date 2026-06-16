@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [DomainCreateInput](./system-events.domaincreateinput.md)
 
-## DomainCreateInput interface
+## DomainCreateInput type
 
 Input for creating a Domain
 
 **Signature:**
 
 ```typescript
-interface DomainCreateInput
+type DomainCreateInput = Record<string, never>
 ```

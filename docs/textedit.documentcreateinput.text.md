@@ -4,7 +4,7 @@
 
 ## DocumentCreateInput.text property
 
-The text content of the document
+Initial text content
 
 **Signature:**
 

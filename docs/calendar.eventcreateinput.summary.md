@@ -4,10 +4,10 @@
 
 ## EventCreateInput.summary property
 
-The event summary/title
+Event title
 
 **Signature:**
 
 ```typescript
-summary?: string;
+summary: string
 ```

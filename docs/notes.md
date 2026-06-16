@@ -102,15 +102,6 @@ A Notes account
 </td></tr>
 <tr><td>
 
-[AccountCreateInput](./notes.accountcreateinput.md)
-
-</td><td>
-
-Input for creating a Account
-
-</td></tr>
-<tr><td>
-
 [Attachment](./notes.attachment.md)
 
 </td><td>
@@ -120,11 +111,11 @@ A note attachment
 </td></tr>
 <tr><td>
 
-[AttachmentCreateInput](./notes.attachmentcreateinput.md)
+[CapabilityMetadata](./notes.capabilitymetadata.md)
 
 </td><td>
 
-Input for creating a Attachment
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -201,6 +192,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./notes.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Notes, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [FolderSchema](./notes.folderschema.md)
 
 </td><td>
@@ -228,6 +228,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AccountCreateInput](./notes.accountcreateinput.md)
+
+</td><td>
+
+Input for creating a Account
+
+</td></tr>
+<tr><td>
+
 [AccountUpdateInput](./notes.accountupdateinput.md)
 
 </td><td>
@@ -237,11 +246,29 @@ Input for updating a Account
 </td></tr>
 <tr><td>
 
+[AttachmentCreateInput](./notes.attachmentcreateinput.md)
+
+</td><td>
+
+Input for creating a Attachment
+
+</td></tr>
+<tr><td>
+
 [AttachmentUpdateInput](./notes.attachmentupdateinput.md)
 
 </td><td>
 
 Input for updating a Attachment
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./notes.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>

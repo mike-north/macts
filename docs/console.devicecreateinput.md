@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/console](./console.md) &gt; [DeviceCreateInput](./console.devicecreateinput.md)
 
-## DeviceCreateInput interface
+## DeviceCreateInput type
 
 Input for creating a Device
 
 **Signature:**
 
 ```typescript
-interface DeviceCreateInput
+type DeviceCreateInput = Record<string, never>
 ```

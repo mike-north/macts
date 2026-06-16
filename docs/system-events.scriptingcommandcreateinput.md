@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScriptingCommandCreateInput](./system-events.scriptingcommandcreateinput.md)
 
-## ScriptingCommandCreateInput interface
+## ScriptingCommandCreateInput type
 
 Input for creating a ScriptingCommand
 
 **Signature:**
 
 ```typescript
-interface ScriptingCommandCreateInput
+type ScriptingCommandCreateInput = Record<string, never>
 ```

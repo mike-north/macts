@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [NetworkDomainObjectCreateInput](./system-events.networkdomainobjectcreateinput.md)
 
-## NetworkDomainObjectCreateInput interface
+## NetworkDomainObjectCreateInput type
 
 Input for creating a NetworkDomainObject
 
 **Signature:**
 
 ```typescript
-interface NetworkDomainObjectCreateInput
+type NetworkDomainObjectCreateInput = Record<string, never>
 ```

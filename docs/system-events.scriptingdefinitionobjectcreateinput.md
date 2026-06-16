@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScriptingDefinitionObjectCreateInput](./system-events.scriptingdefinitionobjectcreateinput.md)
 
-## ScriptingDefinitionObjectCreateInput interface
+## ScriptingDefinitionObjectCreateInput type
 
 Input for creating a ScriptingDefinitionObject
 
 **Signature:**
 
 ```typescript
-interface ScriptingDefinitionObjectCreateInput
+type ScriptingDefinitionObjectCreateInput = Record<string, never>
 ```

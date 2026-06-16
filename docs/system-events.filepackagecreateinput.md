@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [FilePackageCreateInput](./system-events.filepackagecreateinput.md)
 
-## FilePackageCreateInput interface
+## FilePackageCreateInput type
 
 Input for creating a FilePackage
 
 **Signature:**
 
 ```typescript
-interface FilePackageCreateInput
+type FilePackageCreateInput = Record<string, never>
 ```

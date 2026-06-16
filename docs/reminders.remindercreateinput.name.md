@@ -4,10 +4,10 @@
 
 ## ReminderCreateInput.name property
 
-The name of the reminder
+Reminder name
 
 **Signature:**
 
 ```typescript
-name?: string;
+name: string
 ```

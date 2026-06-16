@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [RowCreateInput](./system-events.rowcreateinput.md)
 
-## RowCreateInput interface
+## RowCreateInput type
 
 Input for creating a Row
 
 **Signature:**
 
 ```typescript
-interface RowCreateInput
+type RowCreateInput = Record<string, never>
 ```

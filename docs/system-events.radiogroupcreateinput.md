@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [RadioGroupCreateInput](./system-events.radiogroupcreateinput.md)
 
-## RadioGroupCreateInput interface
+## RadioGroupCreateInput type
 
 Input for creating a RadioGroup
 
 **Signature:**
 
 ```typescript
-interface RadioGroupCreateInput
+type RadioGroupCreateInput = Record<string, never>
 ```

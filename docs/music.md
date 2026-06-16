@@ -17,78 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AirPlayDeviceResourceClient](./music.airplaydeviceresourceclient.md)
-
-</td><td>
-
-Client for an airplay device.
-
-</td></tr>
-<tr><td>
-
-[ArtworkResourceClient](./music.artworkresourceclient.md)
-
-</td><td>
-
-Client for a piece of art within a track or playlist.
-
-</td></tr>
-<tr><td>
-
-[AudioCDPlaylistResourceClient](./music.audiocdplaylistresourceclient.md)
-
-</td><td>
-
-Client for a playlist representing an audio cd.
-
-</td></tr>
-<tr><td>
-
-[AudioCDTrackResourceClient](./music.audiocdtrackresourceclient.md)
-
-</td><td>
-
-Client for a track on an audio cd.
-
-</td></tr>
-<tr><td>
-
-[BrowserWindowResourceClient](./music.browserwindowresourceclient.md)
-
-</td><td>
-
-Client for the main window.
-
-</td></tr>
-<tr><td>
-
-[EncoderResourceClient](./music.encoderresourceclient.md)
-
-</td><td>
-
-Client for converts a track to a specific file format.
-
-</td></tr>
-<tr><td>
-
-[EQPresetResourceClient](./music.eqpresetresourceclient.md)
-
-</td><td>
-
-Client for equalizer preset configuration.
-
-</td></tr>
-<tr><td>
-
-[EQWindowResourceClient](./music.eqwindowresourceclient.md)
-
-</td><td>
-
-Client for the equalizer window.
-
-</td></tr>
-<tr><td>
-
 [FileTrackResourceClient](./music.filetrackresourceclient.md)
 
 </td><td>
@@ -103,24 +31,6 @@ Client for a track representing an audio file (mp3, aiff, etc.).
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[LibraryPlaylistResourceClient](./music.libraryplaylistresourceclient.md)
-
-</td><td>
-
-Client for the main library playlist.
-
-</td></tr>
-<tr><td>
-
-[MiniplayerWindowResourceClient](./music.miniplayerwindowresourceclient.md)
-
-</td><td>
-
-Client for the miniplayer window.
 
 </td></tr>
 <tr><td>
@@ -148,96 +58,6 @@ Error class for Music API errors.
 </td><td>
 
 Client for a list of tracks/streams.
-
-</td></tr>
-<tr><td>
-
-[PlaylistWindowResourceClient](./music.playlistwindowresourceclient.md)
-
-</td><td>
-
-Client for a sub-window showing a single playlist.
-
-</td></tr>
-<tr><td>
-
-[RadioTunerPlaylistResourceClient](./music.radiotunerplaylistresourceclient.md)
-
-</td><td>
-
-Client for the radio tuner playlist.
-
-</td></tr>
-<tr><td>
-
-[SharedTrackResourceClient](./music.sharedtrackresourceclient.md)
-
-</td><td>
-
-Client for a track residing in a shared library.
-
-</td></tr>
-<tr><td>
-
-[SourceResourceClient](./music.sourceresourceclient.md)
-
-</td><td>
-
-Client for a media source (library, cd, device, etc.).
-
-</td></tr>
-<tr><td>
-
-[SubscriptionPlaylistResourceClient](./music.subscriptionplaylistresourceclient.md)
-
-</td><td>
-
-Client for a subscription playlist from apple music.
-
-</td></tr>
-<tr><td>
-
-[TrackResourceClient](./music.trackresourceclient.md)
-
-</td><td>
-
-Client for playable audio source.
-
-</td></tr>
-<tr><td>
-
-[URLTrackResourceClient](./music.urltrackresourceclient.md)
-
-</td><td>
-
-Client for a track representing a network stream.
-
-</td></tr>
-<tr><td>
-
-[UserPlaylistResourceClient](./music.userplaylistresourceclient.md)
-
-</td><td>
-
-Client for custom playlists created by the user.
-
-</td></tr>
-<tr><td>
-
-[VideoWindowResourceClient](./music.videowindowresourceclient.md)
-
-</td><td>
-
-Client for the video window.
-
-</td></tr>
-<tr><td>
-
-[VisualResourceClient](./music.visualresourceclient.md)
-
-</td><td>
-
-Client for a visual plug-in.
 
 </td></tr>
 </tbody></table>
@@ -318,15 +138,6 @@ a track on an audio CD
 </td></tr>
 <tr><td>
 
-[AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)
-
-</td><td>
-
-Input for creating a AudioCDTrack
-
-</td></tr>
-<tr><td>
-
 [BrowserWindow](./music.browserwindow.md)
 
 </td><td>
@@ -345,20 +156,20 @@ Input for creating a BrowserWindow
 </td></tr>
 <tr><td>
 
+[CapabilityMetadata](./music.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Encoder](./music.encoder.md)
 
 </td><td>
 
 converts a track to a specific file format
-
-</td></tr>
-<tr><td>
-
-[EncoderCreateInput](./music.encodercreateinput.md)
-
-</td><td>
-
-Input for creating a Encoder
 
 </td></tr>
 <tr><td>
@@ -390,15 +201,6 @@ the equalizer window
 </td></tr>
 <tr><td>
 
-[EQWindowCreateInput](./music.eqwindowcreateinput.md)
-
-</td><td>
-
-Input for creating a EQWindow
-
-</td></tr>
-<tr><td>
-
 [FileTrack](./music.filetrack.md)
 
 </td><td>
@@ -426,29 +228,11 @@ the main library playlist
 </td></tr>
 <tr><td>
 
-[LibraryPlaylistCreateInput](./music.libraryplaylistcreateinput.md)
-
-</td><td>
-
-Input for creating a LibraryPlaylist
-
-</td></tr>
-<tr><td>
-
 [MiniplayerWindow](./music.miniplayerwindow.md)
 
 </td><td>
 
 the miniplayer window
-
-</td></tr>
-<tr><td>
-
-[MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)
-
-</td><td>
-
-Input for creating a MiniplayerWindow
 
 </td></tr>
 <tr><td>
@@ -489,29 +273,11 @@ a sub-window showing a single playlist
 </td></tr>
 <tr><td>
 
-[PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)
-
-</td><td>
-
-Input for creating a PlaylistWindow
-
-</td></tr>
-<tr><td>
-
 [RadioTunerPlaylist](./music.radiotunerplaylist.md)
 
 </td><td>
 
 the radio tuner playlist
-
-</td></tr>
-<tr><td>
-
-[RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)
-
-</td><td>
-
-Input for creating a RadioTunerPlaylist
 
 </td></tr>
 <tr><td>
@@ -525,15 +291,6 @@ a track residing in a shared library
 </td></tr>
 <tr><td>
 
-[SharedTrackCreateInput](./music.sharedtrackcreateinput.md)
-
-</td><td>
-
-Input for creating a SharedTrack
-
-</td></tr>
-<tr><td>
-
 [Source](./music.source.md)
 
 </td><td>
@@ -543,29 +300,11 @@ a media source (library, CD, device, etc.)
 </td></tr>
 <tr><td>
 
-[SourceCreateInput](./music.sourcecreateinput.md)
-
-</td><td>
-
-Input for creating a Source
-
-</td></tr>
-<tr><td>
-
 [SubscriptionPlaylist](./music.subscriptionplaylist.md)
 
 </td><td>
 
 a subscription playlist from Apple Music
-
-</td></tr>
-<tr><td>
-
-[SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)
-
-</td><td>
-
-Input for creating a SubscriptionPlaylist
 
 </td></tr>
 <tr><td>
@@ -633,29 +372,11 @@ the video window
 </td></tr>
 <tr><td>
 
-[VideoWindowCreateInput](./music.videowindowcreateinput.md)
-
-</td><td>
-
-Input for creating a VideoWindow
-
-</td></tr>
-<tr><td>
-
 [Visual](./music.visual.md)
 
 </td><td>
 
 a visual plug-in
-
-</td></tr>
-<tr><td>
-
-[VisualCreateInput](./music.visualcreateinput.md)
-
-</td><td>
-
-Input for creating a Visual
 
 </td></tr>
 </tbody></table>
@@ -704,6 +425,15 @@ Description
 [BrowserWindowSchema](./music.browserwindowschema.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[capabilities](./music.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Music, with risk metadata.
 
 </td></tr>
 <tr><td>
@@ -867,6 +597,15 @@ Input for updating a AudioCDPlaylist
 </td></tr>
 <tr><td>
 
+[AudioCDTrackCreateInput](./music.audiocdtrackcreateinput.md)
+
+</td><td>
+
+Input for creating a AudioCDTrack
+
+</td></tr>
+<tr><td>
+
 [AudioCDTrackUpdateInput](./music.audiocdtrackupdateinput.md)
 
 </td><td>
@@ -881,6 +620,15 @@ Input for updating a AudioCDTrack
 </td><td>
 
 Input for updating a BrowserWindow
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./music.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>
@@ -930,6 +678,15 @@ EMdK
 </td></tr>
 <tr><td>
 
+[EncoderCreateInput](./music.encodercreateinput.md)
+
+</td><td>
+
+Input for creating a Encoder
+
+</td></tr>
+<tr><td>
+
 [EncoderUpdateInput](./music.encoderupdateinput.md)
 
 </td><td>
@@ -962,6 +719,15 @@ EPlS
 </td><td>
 
 Input for updating a EQPreset
+
+</td></tr>
+<tr><td>
+
+[EQWindowCreateInput](./music.eqwindowcreateinput.md)
+
+</td><td>
+
+Input for creating a EQWindow
 
 </td></tr>
 <tr><td>
@@ -1038,11 +804,29 @@ Input for updating a FileTrack
 </td></tr>
 <tr><td>
 
+[LibraryPlaylistCreateInput](./music.libraryplaylistcreateinput.md)
+
+</td><td>
+
+Input for creating a LibraryPlaylist
+
+</td></tr>
+<tr><td>
+
 [LibraryPlaylistUpdateInput](./music.libraryplaylistupdateinput.md)
 
 </td><td>
 
 Input for updating a LibraryPlaylist
+
+</td></tr>
+<tr><td>
+
+[MiniplayerWindowCreateInput](./music.miniplayerwindowcreateinput.md)
+
+</td><td>
+
+Input for creating a MiniplayerWindow
 
 </td></tr>
 <tr><td>
@@ -1065,11 +849,29 @@ Input for updating a Playlist
 </td></tr>
 <tr><td>
 
+[PlaylistWindowCreateInput](./music.playlistwindowcreateinput.md)
+
+</td><td>
+
+Input for creating a PlaylistWindow
+
+</td></tr>
+<tr><td>
+
 [PlaylistWindowUpdateInput](./music.playlistwindowupdateinput.md)
 
 </td><td>
 
 Input for updating a PlaylistWindow
+
+</td></tr>
+<tr><td>
+
+[RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)
+
+</td><td>
+
+Input for creating a RadioTunerPlaylist
 
 </td></tr>
 <tr><td>
@@ -1083,6 +885,15 @@ Input for updating a RadioTunerPlaylist
 </td></tr>
 <tr><td>
 
+[SharedTrackCreateInput](./music.sharedtrackcreateinput.md)
+
+</td><td>
+
+Input for creating a SharedTrack
+
+</td></tr>
+<tr><td>
+
 [SharedTrackUpdateInput](./music.sharedtrackupdateinput.md)
 
 </td><td>
@@ -1092,11 +903,29 @@ Input for updating a SharedTrack
 </td></tr>
 <tr><td>
 
+[SourceCreateInput](./music.sourcecreateinput.md)
+
+</td><td>
+
+Input for creating a Source
+
+</td></tr>
+<tr><td>
+
 [SourceUpdateInput](./music.sourceupdateinput.md)
 
 </td><td>
 
 Input for updating a Source
+
+</td></tr>
+<tr><td>
+
+[SubscriptionPlaylistCreateInput](./music.subscriptionplaylistcreateinput.md)
+
+</td><td>
+
+Input for creating a SubscriptionPlaylist
 
 </td></tr>
 <tr><td>
@@ -1137,11 +966,29 @@ Input for updating a UserPlaylist
 </td></tr>
 <tr><td>
 
+[VideoWindowCreateInput](./music.videowindowcreateinput.md)
+
+</td><td>
+
+Input for creating a VideoWindow
+
+</td></tr>
+<tr><td>
+
 [VideoWindowUpdateInput](./music.videowindowupdateinput.md)
 
 </td><td>
 
 Input for updating a VideoWindow
+
+</td></tr>
+<tr><td>
+
+[VisualCreateInput](./music.visualcreateinput.md)
+
+</td><td>
+
+Input for creating a Visual
 
 </td></tr>
 <tr><td>

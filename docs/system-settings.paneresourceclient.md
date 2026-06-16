@@ -68,50 +68,6 @@ Prompt for authorization for a settings pane. Deprecated: no longer does anythin
 </td></tr>
 <tr><td>
 
-[create(input)](./system-settings.paneresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new pane.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./system-settings.paneresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a pane.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./system-settings.paneresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a pane by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./system-settings.paneresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all panes.
-
-</td></tr>
-<tr><td>
-
 [timedLoad()](./system-settings.paneresourceclient.timedload.md)
 
 </td><td>
@@ -119,17 +75,6 @@ List all panes.
 </td><td>
 
 Times and loads given settings pane and returns load time. Deprecated: no longer does anything.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./system-settings.paneresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing pane.
 
 </td></tr>
 </tbody></table>

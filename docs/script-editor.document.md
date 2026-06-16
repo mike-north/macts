@@ -48,6 +48,21 @@ The source code of the script
 </td></tr>
 <tr><td>
 
+[id?](./script-editor.document.id.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Canonical identifier (mirrors `name`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+
+</td></tr>
+<tr><td>
+
 [language](./script-editor.document.language.md)
 
 </td><td>

@@ -43,7 +43,7 @@ Description
 
 </td><td>
 
-_(Optional)_ The color of the list
+_(Optional)_ List color
 
 </td></tr>
 <tr><td>
@@ -63,7 +63,7 @@ _(Optional)_ The emblem icon name of the list
 </td></tr>
 <tr><td>
 
-[name?](./reminders.listcreateinput.name.md)
+[name](./reminders.listcreateinput.name.md)
 
 </td><td>
 
@@ -73,7 +73,7 @@ string
 
 </td><td>
 
-_(Optional)_ The name of the list
+List name
 
 </td></tr>
 </tbody></table>

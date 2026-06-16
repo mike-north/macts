@@ -9,6 +9,7 @@
 ```typescript
 CalendarSchema: z.ZodObject<
   {
+    id: z.ZodOptional<z.ZodString>
     name: z.ZodString
     title: z.ZodString
     color: z.ZodObject<

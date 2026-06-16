@@ -9,5 +9,13 @@ Authentication
 **Signature:**
 
 ```typescript
-type Authentication = 'password' | 'apop' | '5' | 'ntlm' | '5' | 'external' | 'appleToken' | 'none'
+type Authentication =
+  | 'password'
+  | 'apop'
+  | 'kerberos5'
+  | 'ntlm'
+  | 'md5'
+  | 'external'
+  | 'appleToken'
+  | 'none'
 ```

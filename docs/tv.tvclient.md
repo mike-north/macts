@@ -72,40 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[artworks](./tv.tvclient.artworks.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ArtworkResourceClient](./tv.artworkresourceclient.md)
-
-</td><td>
-
-a piece of art within a track or playlist
-
-</td></tr>
-<tr><td>
-
-[browserwindows](./tv.tvclient.browserwindows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[BrowserWindowResourceClient](./tv.browserwindowresourceclient.md)
-
-</td><td>
-
-the main window
-
-</td></tr>
-<tr><td>
-
 [filetracks](./tv.tvclient.filetracks.md)
 
 </td><td>
@@ -140,23 +106,6 @@ Get the HTTP client for making custom requests.
 </td></tr>
 <tr><td>
 
-[libraryplaylists](./tv.tvclient.libraryplaylists.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[LibraryPlaylistResourceClient](./tv.libraryplaylistresourceclient.md)
-
-</td><td>
-
-the main library playlist
-
-</td></tr>
-<tr><td>
-
 [playlists](./tv.tvclient.playlists.md)
 
 </td><td>
@@ -170,125 +119,6 @@ the main library playlist
 </td><td>
 
 a list of tracks/streams
-
-</td></tr>
-<tr><td>
-
-[playlistwindows](./tv.tvclient.playlistwindows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[PlaylistWindowResourceClient](./tv.playlistwindowresourceclient.md)
-
-</td><td>
-
-a sub-window showing a single playlist
-
-</td></tr>
-<tr><td>
-
-[sharedtracks](./tv.tvclient.sharedtracks.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[SharedTrackResourceClient](./tv.sharedtrackresourceclient.md)
-
-</td><td>
-
-a track residing in a shared library
-
-</td></tr>
-<tr><td>
-
-[sources](./tv.tvclient.sources.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[SourceResourceClient](./tv.sourceresourceclient.md)
-
-</td><td>
-
-a media source (library, CD, device, etc.)
-
-</td></tr>
-<tr><td>
-
-[tracks](./tv.tvclient.tracks.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TrackResourceClient](./tv.trackresourceclient.md)
-
-</td><td>
-
-playable video source
-
-</td></tr>
-<tr><td>
-
-[urltracks](./tv.tvclient.urltracks.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[URLTrackResourceClient](./tv.urltrackresourceclient.md)
-
-</td><td>
-
-a track representing a network stream
-
-</td></tr>
-<tr><td>
-
-[userplaylists](./tv.tvclient.userplaylists.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[UserPlaylistResourceClient](./tv.userplaylistresourceclient.md)
-
-</td><td>
-
-custom playlists created by the user
-
-</td></tr>
-<tr><td>
-
-[videowindows](./tv.tvclient.videowindows.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[VideoWindowResourceClient](./tv.videowindowresourceclient.md)
-
-</td><td>
-
-the video window
 
 </td></tr>
 </tbody></table>

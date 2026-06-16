@@ -42,15 +42,6 @@ Spotify client for HTTP-based macOS automation.
 Error class for Spotify API errors.
 
 </td></tr>
-<tr><td>
-
-[TrackResourceClient](./spotify.trackresourceclient.md)
-
-</td><td>
-
-Client for the currently playing track.
-
-</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -65,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityMetadata](./spotify.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
 
 [SpotifyClientOptions](./spotify.spotifyclientoptions.md)
 
@@ -82,15 +82,6 @@ Client configuration options.
 The currently playing track
 
 </td></tr>
-<tr><td>
-
-[TrackCreateInput](./spotify.trackcreateinput.md)
-
-</td><td>
-
-Input for creating a Track
-
-</td></tr>
 </tbody></table>
 
 ## Variables
@@ -105,6 +96,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[capabilities](./spotify.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Spotify, with risk metadata.
+
+</td></tr>
+<tr><td>
 
 [TrackSchema](./spotify.trackschema.md)
 
@@ -126,11 +126,29 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityRisk](./spotify.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
 [PlayerState](./spotify.playerstate.md)
 
 </td><td>
 
 PlayerState
+
+</td></tr>
+<tr><td>
+
+[TrackCreateInput](./spotify.trackcreateinput.md)
+
+</td><td>
+
+Input for creating a Track
 
 </td></tr>
 <tr><td>

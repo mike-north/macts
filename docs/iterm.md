@@ -42,33 +42,6 @@ iTerm client for HTTP-based macOS automation.
 Error class for iTerm API errors.
 
 </td></tr>
-<tr><td>
-
-[SessionResourceClient](./iterm.sessionresourceclient.md)
-
-</td><td>
-
-Client for a terminal session.
-
-</td></tr>
-<tr><td>
-
-[TabResourceClient](./iterm.tabresourceclient.md)
-
-</td><td>
-
-Client for a terminal tab.
-
-</td></tr>
-<tr><td>
-
-[WindowResourceClient](./iterm.windowresourceclient.md)
-
-</td><td>
-
-Client for a window..
-
-</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -83,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityMetadata](./iterm.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
 
 [iTermClientOptions](./iterm.itermclientoptions.md)
 
@@ -160,6 +142,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./iterm.capabilities.md)
+
+</td><td>
+
+Every capability exposed by iTerm, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [SessionSchema](./iterm.sessionschema.md)
 
 </td><td>
@@ -193,6 +184,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./iterm.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [SaveOptions](./iterm.saveoptions.md)
 

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [SliderCreateInput](./system-events.slidercreateinput.md)
 
-## SliderCreateInput interface
+## SliderCreateInput type
 
 Input for creating a Slider
 
 **Signature:**
 
 ```typescript
-interface SliderCreateInput
+type SliderCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
 
-## DesktopObjectCreateInput interface
+## DesktopObjectCreateInput type
 
 Input for creating a DesktopObject
 
 **Signature:**
 
 ```typescript
-interface DesktopObjectCreateInput
+type DesktopObjectCreateInput = Record<string, never>
 ```

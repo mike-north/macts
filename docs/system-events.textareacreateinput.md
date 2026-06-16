@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [TextAreaCreateInput](./system-events.textareacreateinput.md)
 
-## TextAreaCreateInput interface
+## TextAreaCreateInput type
 
 Input for creating a TextArea
 
 **Signature:**
 
 ```typescript
-interface TextAreaCreateInput
+type TextAreaCreateInput = Record<string, never>
 ```
