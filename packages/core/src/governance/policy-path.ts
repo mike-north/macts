@@ -46,9 +46,12 @@ import { join } from 'node:path'
  * this function — never build the path inline — so that both always read the
  * same file.
  *
- * @param home - The macts home directory (from `getMactsHome()` in the calling
- *   package — this module never reads `MACTS_HOME` itself).
- * @returns Absolute path to the active governance policy JSON file.
+ * @param home - The macts home directory as an **absolute** path. Callers
+ *   obtain this from their own `getMactsHome()` helper (which uses
+ *   `os.homedir()` so it is always absolute). Passing a relative path will
+ *   produce a relative result.
+ * @returns Absolute path to the active governance policy JSON file (when
+ *   `home` is absolute, which it always is when obtained via `getMactsHome()`).
  *
  * @example
  * ```typescript

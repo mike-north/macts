@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { resolveActivePolicyPath } from './policy-path.js'
 
@@ -20,7 +21,7 @@ describe('resolveActivePolicyPath', () => {
   })
 
   it('handles the default ~/.macts home', () => {
-    const home = `${process.env['HOME'] ?? '/root'}/.macts`
+    const home = join(homedir(), '.macts')
     const result = resolveActivePolicyPath(home)
     expect(result).toContain(join('governance', 'policy.json'))
     expect(result.startsWith(home)).toBe(true)

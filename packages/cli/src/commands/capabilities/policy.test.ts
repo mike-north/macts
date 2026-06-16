@@ -21,7 +21,7 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
-import { resolveActivePolicyPath } from '@macts/core'
+import { ALLOW_ALL_GOVERNANCE, resolveActivePolicyPath } from '@macts/core'
 import { getPolicyFilePath, loadActiveGovernanceFilter } from './policy.js'
 
 // ---------------------------------------------------------------------------
@@ -104,11 +104,8 @@ describe('loadActiveGovernanceFilter — no file', () => {
       // Point MACTS_HOME at our temp dir where no governance/policy.json exists.
       process.env['MACTS_HOME'] = tmpDir
       const filter = await loadActiveGovernanceFilter(stream)
-      // ALLOW_ALL_GOVERNANCE.evaluate returns allow for any input.
-      // We cannot easily construct a full Capability; instead verify the
-      // returned object is the pass-through by checking it doesn't deny.
-      expect(filter).toBeDefined()
-      expect(typeof filter.evaluate).toBe('function')
+      // No policy → must be the exact ALLOW_ALL_GOVERNANCE singleton.
+      expect(filter).toBe(ALLOW_ALL_GOVERNANCE)
     } finally {
       if (original === undefined) {
         delete process.env['MACTS_HOME']
@@ -134,10 +131,9 @@ describe('loadActiveGovernanceFilter — valid policy', () => {
     try {
       process.env['MACTS_HOME'] = tmpDir
       const filter = await loadActiveGovernanceFilter(stream)
-      // A policy-backed filter is a different object from ALLOW_ALL_GOVERNANCE
-      // and should reflect the declared defaultDisposition.
-      expect(filter).toBeDefined()
-      expect(typeof filter.evaluate).toBe('function')
+      // A valid policy produces a distinct policy-backed filter — not the
+      // allow-all singleton.
+      expect(filter).not.toBe(ALLOW_ALL_GOVERNANCE)
     } finally {
       if (original === undefined) {
         delete process.env['MACTS_HOME']
@@ -159,9 +155,8 @@ describe('loadActiveGovernanceFilter — invalid policy', () => {
     try {
       process.env['MACTS_HOME'] = tmpDir
       const filter = await loadActiveGovernanceFilter(stream)
-      // Should degrade to a defined (allow-all) filter.
-      expect(filter).toBeDefined()
-      expect(typeof filter.evaluate).toBe('function')
+      // Malformed policy degrades to the exact ALLOW_ALL_GOVERNANCE singleton.
+      expect(filter).toBe(ALLOW_ALL_GOVERNANCE)
       // A warning must have been written to stderr.
       expect(output.join('')).toMatch(/\[governance\] Warning:/)
       expect(output.join('')).toMatch(/\[governance\] Continuing with allow-all filter/)
