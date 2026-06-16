@@ -265,6 +265,81 @@ export const AppMetadataSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export type AppPattern = z.infer<typeof AppPatternSchema>;
+
+// @public
+export function appPatternMatches(ruleApp: string, concreteApp: string): boolean;
+
+// @public
+export const AppPatternSchema: z.ZodString;
+
+// @public
+export type AppRule = z.infer<typeof AppRuleSchema>;
+
+// @public
+export const AppRuleSchema: z.ZodObject<{
+    app: z.ZodString;
+    disposition: z.ZodEnum<{
+        allowed: "allowed";
+        "read-only": "read-only";
+        "confirm-first": "confirm-first";
+        forbidden: "forbidden";
+    }>;
+    operations: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        operation: z.ZodString;
+        disposition: z.ZodEnum<{
+            allowed: "allowed";
+            "read-only": "read-only";
+            "confirm-first": "confirm-first";
+            forbidden: "forbidden";
+        }>;
+        tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        reason: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>>>;
+    restrictions: z.ZodDefault<z.ZodObject<{
+        pathsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        pathsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        urlsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        urlsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    }, z.core.$strict>>;
+    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    reason: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+
+// @public
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "approved", "rejected"];
+
+// @public
+export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
+
+// @public
+export interface AuditRecord {
+    readonly apiKeyId: string;
+    readonly app: string;
+    readonly argsSummary: string;
+    readonly capability: string;
+    readonly decision: AuditDecision;
+    readonly reason?: string;
+    readonly timestamp: Date;
+}
+
+// @public
+export interface AuditRecordInput {
+    readonly apiKeyId: string;
+    readonly app: string;
+    readonly argsSummary: string;
+    readonly capability: string;
+    readonly decision: AuditDecision;
+    readonly reason?: string;
+    readonly timestamp: Date;
+}
+
+// @public
+export interface AuditWriter {
+    append(record: AuditRecord): Promise<void>;
+}
+
+// @public
 export const booleanCoercer: TypeCoercer<boolean>;
 
 // @public
@@ -479,7 +554,13 @@ export function connect(bundleId: string, _options?: AppConnectionOptions): Prom
 export function createArrayCoercer<T>(elementCoercer: TypeCoercer<T>): TypeCoercer<T[]>;
 
 // @public
+export function createAuditRecord(input: AuditRecordInput): AuditRecord;
+
+// @public
 export function createEnumCoercer(values: JxaEnumValue[]): TypeCoercer<string>;
+
+// @public
+export function createFileAuditWriter(path: string): AuditWriter;
 
 // @public (undocumented)
 export function createGeneratorContext(manifest: AppManifest, options: GeneratorOptions): GeneratorContext;
@@ -507,6 +588,9 @@ export const DateTypeSchema: z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>;
 
 // @public
 export const DEFAULT_RISK: RiskClass;
+
+// @public
+export const DEFAULT_SENSITIVE_KEYS: readonly string[];
 
 // @public (undocumented)
 export type Deprecation = z.infer<typeof DeprecationSchema>;
@@ -628,6 +712,9 @@ export function filterPermissionsByApp(permissions: string[], app: string): stri
 
 // @public
 export function findCoarseCategory(finePermission: string, permissionsSection: PermissionsSection): string | undefined;
+
+// @public
+export function findMatchingPolicyRule(policy: GovernancePolicy, app: string, _resource: string, operation: string): PolicyRuleMatch | undefined;
 
 // @public
 export interface FinePermission {
@@ -1019,6 +1106,9 @@ export interface GovernanceFilter {
 }
 
 // @public
+export type GovernancePolicy = z.infer<typeof PolicySchema>;
+
+// @public
 export interface GovernedCapability {
     readonly capability: Capability;
     readonly decision: GovernanceDecision;
@@ -1138,6 +1228,9 @@ export function isPureCoarseOperation(operation: string): operation is PureCoars
 
 // @public
 export function isRiskClass(value: unknown): value is RiskClass;
+
+// @public
+export function isSensitiveKey(key: string, extraSensitiveKeys?: readonly string[]): boolean;
 
 // @public
 export function isValidPermission(permission: string): boolean;
@@ -1281,6 +1374,31 @@ export const OpenQuestionSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export type OperationPattern = z.infer<typeof OperationPatternSchema>;
+
+// @public
+export function operationPatternMatches(ruleOperation: string, concreteOperation: string): boolean;
+
+// @public
+export const OperationPatternSchema: z.ZodString;
+
+// @public
+export type OperationRule = z.infer<typeof OperationRuleSchema>;
+
+// @public
+export const OperationRuleSchema: z.ZodObject<{
+    operation: z.ZodString;
+    disposition: z.ZodEnum<{
+        allowed: "allowed";
+        "read-only": "read-only";
+        "confirm-first": "confirm-first";
+        forbidden: "forbidden";
+    }>;
+    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    reason: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+
+// @public
 export interface OperationVocabulary {
     readonly coarse: readonly CoarseOperation[];
     readonly fine: ReadonlySet<string>;
@@ -1296,6 +1414,18 @@ export function parseManifestYaml(yamlContent: string): AppManifest;
 export function parsePermission(permission: string): ParsedPermission;
 
 // @public
+export function parsePolicy(input: unknown): ParsePolicyResult;
+
+// @public
+export type ParsePolicyResult = {
+    readonly success: true;
+    readonly data: GovernancePolicy;
+} | {
+    readonly success: false;
+    readonly issues: readonly PolicyIssue[];
+};
+
+// @public
 export const pathCoercer: TypeCoercer<string>;
 
 // @public (undocumented)
@@ -1303,6 +1433,9 @@ export type PathType = z.infer<typeof PathTypeSchema>;
 
 // @public
 export const PathTypeSchema: z.ZodString;
+
+// @public
+export const PatternRestrictionSchema: z.ZodString;
 
 // @public
 export interface PermissionCheckResult {
@@ -1364,6 +1497,72 @@ export const PointTypeSchema: z.ZodObject<{
     x: z.ZodNumber;
     y: z.ZodNumber;
 }, z.core.$strip>;
+
+// @public
+export const POLICY_DISPOSITIONS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
+
+// @public
+export type PolicyDisposition = (typeof POLICY_DISPOSITIONS)[number];
+
+// @public
+export const PolicyDispositionSchema: z.ZodEnum<{
+    allowed: "allowed";
+    "read-only": "read-only";
+    "confirm-first": "confirm-first";
+    forbidden: "forbidden";
+}>;
+
+// @public
+export interface PolicyIssue {
+    readonly message: string;
+    readonly path: string;
+}
+
+// @public
+export interface PolicyRuleMatch {
+    readonly appRule: AppRule;
+    readonly operationRuleIndex: number;
+}
+
+// @public
+export const PolicySchema: z.ZodObject<{
+    version: z.ZodDefault<z.ZodLiteral<"1">>;
+    defaultDisposition: z.ZodDefault<z.ZodEnum<{
+        allowed: "allowed";
+        "read-only": "read-only";
+        "confirm-first": "confirm-first";
+        forbidden: "forbidden";
+    }>>;
+    apps: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        app: z.ZodString;
+        disposition: z.ZodEnum<{
+            allowed: "allowed";
+            "read-only": "read-only";
+            "confirm-first": "confirm-first";
+            forbidden: "forbidden";
+        }>;
+        operations: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            operation: z.ZodString;
+            disposition: z.ZodEnum<{
+                allowed: "allowed";
+                "read-only": "read-only";
+                "confirm-first": "confirm-first";
+                forbidden: "forbidden";
+            }>;
+            tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            reason: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>>>;
+        restrictions: z.ZodDefault<z.ZodObject<{
+            pathsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            pathsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            urlsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            urlsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        }, z.core.$strict>>;
+        tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        reason: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>>>;
+    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strict>;
 
 // @public (undocumented)
 export type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>;
@@ -1546,6 +1745,17 @@ export const RectTypeSchema: z.ZodObject<{
     height: z.ZodNumber;
 }, z.core.$strip>;
 
+// @public
+export function redactArgs(args: Record<string, unknown>, options?: RedactArgsOptions): string;
+
+// @public
+export interface RedactArgsOptions {
+    readonly extraSensitiveKeys?: readonly string[];
+}
+
+// @public
+export const REDACTED_PLACEHOLDER = "[redacted]";
+
 // @public (undocumented)
 export type Relationship = z.infer<typeof RelationshipSchema>;
 
@@ -1622,6 +1832,17 @@ export const ResourceSchema: z.ZodObject<{
     }, z.core.$strip>>>;
 }, z.core.$strip>;
 
+// @public
+export type Restrictions = z.infer<typeof RestrictionsSchema>;
+
+// @public
+export const RestrictionsSchema: z.ZodObject<{
+    pathsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    pathsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    urlsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+    urlsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strict>;
+
 // @public (undocumented)
 export type RgbType = z.infer<typeof RgbTypeSchema>;
 
@@ -1693,6 +1914,26 @@ export type Selector = {
     type: 'whose';
     predicate: Record<string, unknown>;
 };
+
+// @public
+export type SensitivityTag = z.infer<typeof SensitivityTagSchema>;
+
+// @public
+export const SensitivityTagSchema: z.ZodString;
+
+// @public
+export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord;
+
+// @public
+export interface SerializedAuditRecord {
+    readonly apiKeyId: string;
+    readonly app: string;
+    readonly argsSummary: string;
+    readonly capability: string;
+    readonly decision: AuditDecision;
+    readonly reason?: string;
+    readonly timestamp: string;
+}
 
 // @public
 export type SpecialOperation = string;
