@@ -9,9 +9,11 @@
  * ## Where the active policy lives
  *
  * The policy file is resolved under the shared macts home directory (see
- * `getMactsHome` in `../../paths.js`), at `governance/policy.json`, so it
- * agrees with where every other macts surface keeps configuration. The path can
- * be overridden explicitly (tests, custom installs).
+ * `getMactsHome` in `../../paths.js`), at `governance/policy.json`, via the
+ * single shared {@link governancePolicyPath} definition in `@macts/core`. That
+ * one definition is also used by CLI/MCP discovery, so every macts surface reads
+ * the exact same file — they can never drift. The path can be overridden
+ * explicitly (tests, custom installs).
  *
  * ## No-policy default (fail-open at this layer)
  *
@@ -31,9 +33,8 @@
  */
 
 import { readFile } from 'node:fs/promises'
-import { join } from 'node:path'
 import type { GovernancePolicy } from '@macts/core'
-import { parsePolicy } from '@macts/core'
+import { parsePolicy, governancePolicyPath } from '@macts/core'
 import { getMactsHome } from '../../paths.js'
 
 /**
@@ -73,12 +74,14 @@ export const ALLOW_ALL_POLICY: GovernancePolicy = deepFreeze({
 /**
  * Resolve the absolute path to the active governance policy file.
  *
- * Defaults to `<macts-home>/governance/policy.json` (see `getMactsHome`).
+ * Defaults to `<macts-home>/governance/policy.json`, resolved via the shared
+ * {@link governancePolicyPath} definition in `@macts/core` so API enforcement
+ * and CLI/MCP discovery can never read different files.
  *
  * @returns Absolute path to the policy JSON file.
  */
 export function getActivePolicyPath(): string {
-  return join(getMactsHome(), 'governance', 'policy.json')
+  return governancePolicyPath(getMactsHome())
 }
 
 /**

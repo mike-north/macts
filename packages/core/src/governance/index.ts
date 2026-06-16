@@ -112,3 +112,7 @@ export {
 
 // Policy loader: reads and validates a policy declaration from a JSON file.
 export { loadPolicyFromFile, type LoadPolicyResult } from './loader.js'
+
+// Single source of truth for the on-disk policy location, so API enforcement,
+// CLI discovery, and the MCP discovery tool can never read different files.
+export { GOVERNANCE_POLICY_RELATIVE_PATH, governancePolicyPath } from './policy-path.js'
