@@ -1,15 +1,15 @@
 ---
-"@macts/core": patch
-"@macts/iterm": patch
-"@macts/microsoft-word": patch
-"@macts/music": patch
-"@macts/tv": patch
-"@macts/omniplan": patch
-"@macts/iterm-server": patch
-"@macts/microsoft-word-server": patch
-"@macts/music-server": patch
-"@macts/tv-server": patch
-"@macts/omniplan-server": patch
+'@macts/core': patch
+'@macts/iterm': patch
+'@macts/microsoft-word': patch
+'@macts/music': patch
+'@macts/tv': patch
+'@macts/omniplan': patch
+'@macts/iterm-server': patch
+'@macts/microsoft-word-server': patch
+'@macts/music-server': patch
+'@macts/tv-server': patch
+'@macts/omniplan-server': patch
 ---
 
 Fix risk classifier to resolve the most sensitive class for compound operation names
