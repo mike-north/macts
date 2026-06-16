@@ -1,10 +1,13 @@
 import { Command } from 'clipanion'
 import { unlinkSync, existsSync } from 'node:fs'
 import { execFile } from 'node:child_process'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 const PLIST_LABEL = 'com.macts.server'
-const PLIST_DIR = join(process.env['HOME'] ?? '', 'Library/LaunchAgents')
+// LaunchAgents is a fixed macOS location under the real home directory, so it
+// uses os.homedir() directly (never a cwd-relative path when HOME is unset).
+const PLIST_DIR = join(homedir(), 'Library/LaunchAgents')
 
 /**
  * Uninstall the macts launchd service.

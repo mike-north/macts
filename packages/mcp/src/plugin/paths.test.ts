@@ -36,6 +36,22 @@ describe('paths', () => {
       const home = getMactsHome()
       expect(home).toBe('/custom/path')
     })
+
+    it('should fall back to ~/.macts when MACTS_HOME is empty string', () => {
+      // Regression: `??` only catches null/undefined; an empty MACTS_HOME was
+      // returned as-is, making derived plugin paths cwd-relative.
+      process.env['MACTS_HOME'] = ''
+      const home = getMactsHome()
+      expect(home).toBe(join(homedir(), '.macts'))
+    })
+
+    it('should fall back to ~/.macts when MACTS_HOME is whitespace-only', () => {
+      // Regression: a whitespace-only MACTS_HOME trims to "" and must not be
+      // used as the base directory.
+      process.env['MACTS_HOME'] = '   '
+      const home = getMactsHome()
+      expect(home).toBe(join(homedir(), '.macts'))
+    })
   })
 
   describe('getPluginsDir', () => {

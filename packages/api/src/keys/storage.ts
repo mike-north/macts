@@ -20,10 +20,19 @@ import * as crypto from 'node:crypto'
 import Database from 'better-sqlite3'
 import type { ApiKeyMetadata } from '@macts/core'
 import { getLogger } from '../logger.js'
+import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
 
-/** Default directory for macts configuration */
-const MACTS_DIR = path.join(process.env['HOME'] ?? '~', '.macts')
+/**
+ * Default directory for macts configuration.
+ *
+ * Resolved via {@link getMactsHome} so the signing secret and key database
+ * live in the same place as plugins and other configuration: `MACTS_HOME`
+ * when set, otherwise `~/.macts` (via `os.homedir()`). Never a cwd-relative
+ * `./~/.macts`, which the previous `process.env['HOME'] ?? '~'` fallback
+ * produced when `HOME` was unset.
+ */
+const MACTS_DIR = getMactsHome()
 
 /** Directory for secrets */
 const SECRETS_DIR = path.join(MACTS_DIR, 'secrets')

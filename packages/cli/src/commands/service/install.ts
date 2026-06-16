@@ -1,12 +1,17 @@
 import { Command, Option } from 'clipanion'
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
 import { execFile } from 'node:child_process'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { generatePlist } from './plist.js'
+import { getMactsHome } from '../../plugin/paths.js'
 
 const PLIST_LABEL = 'com.macts.server'
-const PLIST_DIR = join(process.env['HOME'] ?? '', 'Library/LaunchAgents')
-const LOG_DIR = join(process.env['HOME'] ?? '', '.macts/logs')
+// LaunchAgents is a fixed macOS location under the real home directory, so it
+// uses os.homedir() directly (never MACTS_HOME).
+const PLIST_DIR = join(homedir(), 'Library/LaunchAgents')
+// Logs live under the macts home directory, so they honor MACTS_HOME.
+const LOG_DIR = join(getMactsHome(), 'logs')
 
 /**
  * Install the macts service as a macOS launchd agent.
