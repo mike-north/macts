@@ -1,11 +1,17 @@
 /**
  * Active-policy loader for the `macts capabilities` commands.
  *
- * Loads the governance policy from `$MACTS_HOME/policy.json` (when the file
- * exists) and constructs a {@link GovernanceFilter} from it. When no policy
- * file is present the no-op {@link ALLOW_ALL_GOVERNANCE} pass-through is
+ * Loads the governance policy from `$MACTS_HOME/governance/policy.json` (when
+ * the file exists) and constructs a {@link GovernanceFilter} from it. When no
+ * policy file is present the no-op {@link ALLOW_ALL_GOVERNANCE} pass-through is
  * returned so discovery behaviour is unchanged for users who have not
  * configured a policy.
+ *
+ * ## Canonical path
+ *
+ * The active-policy path is resolved by {@link resolveActivePolicyPath} from
+ * `@macts/core`. The enforcement layer (`@macts/api`) uses the same resolver,
+ * so both always read the same file (issue #79).
  *
  * ## Errors
  *
@@ -17,29 +23,32 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path'
 import {
   ALLOW_ALL_GOVERNANCE,
   loadPolicyFromFile,
   createPolicyGovernanceFilter,
+  resolveActivePolicyPath,
   type GovernanceFilter,
 } from '@macts/core'
 import { getMactsHome } from '../../plugin/paths.js'
 
 /**
- * The conventional location of the governance policy file.
+ * The canonical location of the active governance policy file.
  *
- * Resolves to `$MACTS_HOME/policy.json`, honouring the `MACTS_HOME`
+ * Delegates to {@link resolveActivePolicyPath} (from `@macts/core`) so that
+ * discovery always reads the same file as enforcement (issue #79).
+ *
+ * Resolves to `$MACTS_HOME/governance/policy.json`, honouring the `MACTS_HOME`
  * environment variable (falls back to `~/.macts`).
  */
 export function getPolicyFilePath(): string {
-  return path.join(getMactsHome(), 'policy.json')
+  return resolveActivePolicyPath(getMactsHome())
 }
 
 /**
  * Load the active governance filter for capability discovery.
  *
- * Tries to load `$MACTS_HOME/policy.json`. Returns:
+ * Tries to load `$MACTS_HOME/governance/policy.json`. Returns:
  * - A policy-backed {@link GovernanceFilter} when the file exists and is valid.
  * - {@link ALLOW_ALL_GOVERNANCE} when no file is found (policy is optional).
  * - {@link ALLOW_ALL_GOVERNANCE} when the file is found but invalid, after
