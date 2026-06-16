@@ -12,6 +12,9 @@ import { McpStartCommand } from './start.js'
 import { McpStopCommand } from './stop.js'
 import { McpStatusCommand } from './status.js'
 import { McpDiagnoseCommand } from './diagnose.js'
+import { McpInstallCommand } from './install.js'
+import { McpUninstallCommand } from './uninstall.js'
+import { McpListCommand } from './list.js'
 import * as mcp from '@macts/mcp'
 import { createMockStreams } from './test-helpers.js'
 import type { McpPlugin, DaemonServer } from '@macts/mcp'
@@ -62,6 +65,21 @@ describe('MCP Command Registration', () => {
   it('should register diagnose command', () => {
     cli.register(McpDiagnoseCommand)
     expect(McpDiagnoseCommand.paths).toEqual([['mcp', 'diagnose']])
+  })
+
+  it('should register install command', () => {
+    cli.register(McpInstallCommand)
+    expect(McpInstallCommand.paths).toEqual([['mcp', 'install']])
+  })
+
+  it('should register uninstall command', () => {
+    cli.register(McpUninstallCommand)
+    expect(McpUninstallCommand.paths).toEqual([['mcp', 'uninstall']])
+  })
+
+  it('should register list command', () => {
+    cli.register(McpListCommand)
+    expect(McpListCommand.paths).toEqual([['mcp', 'list']])
   })
 })
 
@@ -233,7 +251,7 @@ describe('McpDiagnoseCommand', () => {
       plugins: [mockPlugin],
       errors: [
         {
-          packageName: '@macts/mcp-broken',
+          packageName: '@macts/broken-server',
           message: 'Load failed',
         },
       ],
@@ -252,6 +270,6 @@ describe('McpDiagnoseCommand', () => {
       tools: 1,
     })
     expect(output.plugins.errors).toHaveLength(1)
-    expect(output.plugins.errors[0]?.packageName).toBe('@macts/mcp-broken')
+    expect(output.plugins.errors[0]?.packageName).toBe('@macts/broken-server')
   })
 })

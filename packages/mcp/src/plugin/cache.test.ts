@@ -88,7 +88,7 @@ describe('readMcpPluginCache', () => {
   it('should return cached plugins when valid', () => {
     const mockPlugins: CachedPlugin[] = [
       {
-        packageName: '@macts/mcp-calendar',
+        packageName: '@macts/calendar-server',
         name: 'calendar',
         description: 'Calendar plugin',
       },
@@ -132,7 +132,7 @@ describe('writeMcpPluginCache', () => {
   it('should write cache when lockfile exists', () => {
     const mockPlugins: CachedPlugin[] = [
       {
-        packageName: '@macts/mcp-calendar',
+        packageName: '@macts/calendar-server',
         name: 'calendar',
         description: 'Calendar plugin',
       },
@@ -218,8 +218,8 @@ describe('cache edge cases', () => {
 
   it('should handle large plugin list', () => {
     const manyPlugins: CachedPlugin[] = Array.from({ length: 100 }, (_, i) => ({
-      packageName: `@macts/mcp-plugin-${i.toString()}`,
-      name: `plugin-${i.toString()}`,
+      packageName: `@macts/app-${i.toString()}-server`,
+      name: `app-${i.toString()}`,
       description: `Plugin ${i.toString()}`,
     }))
 

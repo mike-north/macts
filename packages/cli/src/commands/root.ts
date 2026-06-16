@@ -35,15 +35,15 @@ export class RootCommand extends Command {
 
       MCP Mode:
         The MCP server exposes automation tools for AI assistants via the
-        Model Context Protocol. Install MCP plugins with:
-          macts plugin install @macts/mcp-calendar
+        Model Context Protocol. Install an app's MCP server plugin with:
+          macts mcp install calendar
 
         The MCP server discovers plugins from ~/.macts/plugins/ automatically.
     `,
     examples: [
       ['List available commands', '$0 --help'],
       ['Start MCP server', '$0 --mcp'],
-      ['Install MCP plugin', '$0 plugin install @macts/mcp-calendar'],
+      ['Install an app MCP server plugin', '$0 mcp install calendar'],
       ['Start HTTP server on port 8080', '$0 --serve --port 8080'],
     ],
   })

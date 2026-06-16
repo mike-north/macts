@@ -26,8 +26,11 @@ macts generate manifests/calendar/app.yaml \
 macts api-key create --name "My Key" --permission "calendar:events:read"
 macts api-key list
 
-# Install plugins
-macts plugin install @macts/cli-calendar
+# Install a CLI plugin (adds `macts calendar ...` commands)
+macts plugin install @macts/calendar
+
+# Install an app's MCP server plugin (so the MCP daemon exposes its tools)
+macts mcp install calendar
 ```
 
 ## Command Reference
@@ -471,7 +474,16 @@ Exit codes:
 
 ### Plugin Management
 
-Plugins extend the CLI with commands for specific macOS applications. They are installed to `~/.macts/plugins/` and discovered automatically.
+Plugins extend macts with capabilities for specific macOS applications. They are
+installed to `~/.macts/plugins/` (override with the `MACTS_HOME` environment
+variable) and discovered automatically. There are two kinds:
+
+- **CLI plugins** — published as `@macts/<app>` (SDK + CLI commands). Installed
+  with `macts plugin install` and discovered by the CLI, adding
+  `macts <app> ...` commands.
+- **MCP server plugins** — published as `@macts/<app>-server` (HTTP API + MCP
+  plugin). Installed with [`macts mcp install`](#macts-mcp-install) and
+  discovered by the MCP daemon, exposing the app's tools to MCP clients.
 
 #### `plugin install <package> [options]`
 
@@ -489,16 +501,17 @@ Install a CLI plugin from npm.
 
 ```bash
 # Install the calendar plugin
-macts plugin install @macts/cli-calendar
+macts plugin install @macts/calendar
 
 # Install a specific version
-macts plugin install @macts/cli-calendar@1.0.0
+macts plugin install @macts/calendar@1.0.0
 
 # Output as JSON
-macts plugin install @macts/cli-calendar --json
+macts plugin install @macts/calendar --json
 ```
 
-Plugins must be scoped under `@macts/cli-*` for security.
+CLI plugins must be scoped under `@macts/<app>` for security. To install an
+app's MCP server plugin instead, use `macts mcp install <app>`.
 
 #### `plugin list [options]`
 
@@ -521,8 +534,8 @@ macts plugin list --json
 **Output:**
 
 ```
-Package                Version
-@macts/cli-calendar    1.0.0
+Package            Version
+@macts/calendar    1.0.0
 ```
 
 #### `plugin uninstall <package> [options]`
@@ -541,10 +554,65 @@ Uninstall a CLI plugin.
 
 ```bash
 # Uninstall the calendar plugin
-macts plugin uninstall @macts/cli-calendar
+macts plugin uninstall @macts/calendar
 
 # Output as JSON
-macts plugin uninstall @macts/cli-calendar --json
+macts plugin uninstall @macts/calendar --json
+```
+
+### MCP Server Plugin Management
+
+MCP server plugins (`@macts/<app>-server`) expose an app's tools to MCP clients
+through the MCP daemon. They are installed into the same `~/.macts/plugins/`
+directory as CLI plugins and discovered automatically by `macts mcp start`.
+
+#### `macts mcp install <app> [options]`
+
+Install an app's MCP server plugin.
+
+**Arguments:**
+
+- `<app>` - App name (e.g. `calendar`) or full package name
+  (e.g. `@macts/calendar-server`), optionally with a version suffix
+  (e.g. `calendar@1.0.0`) (required)
+
+**Options:**
+
+- `--json` - Output as JSON (optional)
+
+**Examples:**
+
+```bash
+# Install by app name
+macts mcp install calendar
+
+# Install by full package name
+macts mcp install @macts/calendar-server
+
+# Install a specific version
+macts mcp install calendar@1.0.0
+```
+
+After installing, restart the daemon so it exposes the new tools:
+
+```bash
+macts mcp start
+```
+
+#### `macts mcp uninstall <app> [options]`
+
+Remove an app's MCP server plugin.
+
+```bash
+macts mcp uninstall calendar
+```
+
+#### `macts mcp list [options]`
+
+List installed MCP server plugins.
+
+```bash
+macts mcp list
 ```
 
 ### Permissions Commands
@@ -821,20 +889,21 @@ macts uses a plugin architecture to extend functionality. There are three types 
 
 ### Available Plugins
 
-| Plugin                | Type | Description                          |
-| --------------------- | ---- | ------------------------------------ |
-| `@macts/cli-calendar` | CLI  | Calendar.app automation commands     |
-| `@macts/mcp-calendar` | MCP  | Calendar.app tools for AI assistants |
+| Plugin                   | Type | Description                          |
+| ------------------------ | ---- | ------------------------------------ |
+| `@macts/calendar`        | CLI  | Calendar.app automation commands     |
+| `@macts/calendar-server` | MCP  | Calendar.app tools for AI assistants |
 
 ### Creating CLI Plugins
 
 CLI plugins are npm packages that:
 
-1. Are scoped under `@macts/cli-*`
+1. Are scoped under `@macts/<app>` (the consolidated client package; MCP server
+   plugins use the `@macts/<app>-server` name instead)
 2. Include `macts-cli-plugin` in package.json keywords
 3. Export a `plugin` object conforming to the `CliPlugin` interface
 
-**Example plugin (`@macts/cli-myapp`):**
+**Example plugin (`@macts/myapp`):**
 
 ```typescript
 // src/index.ts
@@ -866,7 +935,7 @@ export const plugin: CliPlugin = {
 
 ```json
 {
-  "name": "@macts/cli-myapp",
+  "name": "@macts/myapp",
   "version": "1.0.0",
   "type": "module",
   "keywords": ["macts", "macts-cli-plugin"],
@@ -884,7 +953,7 @@ export const plugin: CliPlugin = {
 **Installation:**
 
 ```bash
-macts plugin install @macts/cli-myapp
+macts plugin install @macts/myapp
 ```
 
 **Usage:**
@@ -1060,11 +1129,11 @@ macts mcp stop && macts mcp start
 **No plugins loaded:**
 
 ```bash
-# Check installed plugins
-macts plugin list
+# Check installed MCP server plugins
+macts mcp list
 
-# Install plugins
-macts plugin install @macts/mcp-calendar
+# Install an app's MCP server plugin
+macts mcp install calendar
 
 # Restart daemon to reload plugins
 macts mcp stop && macts mcp start
@@ -1076,7 +1145,8 @@ macts mcp stop && macts mcp start
 
 - Verify package name spelling
 - Check that package is published to npm
-- Ensure package is scoped under `@macts/cli-*`
+- Ensure CLI plugins are scoped under `@macts/<app>` and MCP server plugins
+  under `@macts/<app>-server`
 
 **Plugin won't load:**
 
@@ -1087,9 +1157,13 @@ cat ~/.macts/plugins/.plugins-cache.json
 # Clear cache (forces plugin rediscovery)
 rm ~/.macts/plugins/.plugins-cache.json
 
-# Reinstall plugin
-macts plugin uninstall @macts/cli-calendar
-macts plugin install @macts/cli-calendar
+# Reinstall a CLI plugin
+macts plugin uninstall @macts/calendar
+macts plugin install @macts/calendar
+
+# Reinstall an MCP server plugin
+macts mcp uninstall calendar
+macts mcp install calendar
 ```
 
 ### Manifest Errors
@@ -1203,7 +1277,7 @@ for (const error of errors) {
 }
 
 // Load specific plugin
-const plugin = await loadPlugin('@macts/cli-calendar', '/path/to/node_modules')
+const plugin = await loadPlugin('@macts/calendar')
 ```
 
 ### Plugin Registration

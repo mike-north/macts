@@ -29,7 +29,7 @@ export interface McpGeneratorContext {
   appName: string
   /** App manifest */
   manifest: AppManifest
-  /** Package name (e.g., '@macts/mcp-calendar') */
+  /** Package name (e.g., '@macts/calendar-server') */
   packageName: string
   /** SDK package name (e.g., '@macts/sdk-calendar') */
   sdkPackageName: string

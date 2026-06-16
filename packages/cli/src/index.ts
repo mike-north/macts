@@ -116,7 +116,7 @@ export type {
  * Discover all installed CLI plugins from ~/.macts/plugins/.
  *
  * Uses npm's package-lock.json hash to cache plugin metadata for fast startup.
- * Plugins must be scoped under @macts/cli-* for security.
+ * Plugins must be scoped under @macts/<app> for security.
  *
  * @returns Discovery result with loaded plugins and any errors
  *
@@ -134,12 +134,12 @@ export { discoverPlugins } from './plugin/index.js'
 /**
  * Load a single plugin by package name.
  *
- * @param packageName - npm package name (e.g., '@macts/cli-calendar')
+ * @param packageName - npm package name (e.g., '@macts/calendar')
  * @returns Result with plugin or error
  *
  * @example
  * ```typescript
- * const result = await loadPlugin('@macts/cli-calendar');
+ * const result = await loadPlugin('@macts/calendar');
  * if (result.success) {
  *   console.log(`Loaded plugin: ${result.plugin.name}`);
  * } else {

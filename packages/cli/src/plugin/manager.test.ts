@@ -7,6 +7,10 @@ import {
   listInstalledPlugins,
   getPluginResolutionPath,
   findInstalledPluginPackages,
+  resolveMcpServerPackageName,
+  installMcpServerPlugin,
+  uninstallMcpServerPlugin,
+  listInstalledMcpServerPlugins,
 } from './manager.js'
 
 // Mock child_process module
@@ -675,5 +679,252 @@ describe('findInstalledPluginPackages', () => {
     const result = findInstalledPluginPackages()
 
     expect(result).toEqual([])
+  })
+})
+
+describe('resolveMcpServerPackageName', () => {
+  it('should synthesize @macts/<app>-server from a bare app name', () => {
+    expect(resolveMcpServerPackageName('calendar')).toBe('@macts/calendar-server')
+  })
+
+  it('should accept a hyphenated app name', () => {
+    expect(resolveMcpServerPackageName('google-chrome')).toBe('@macts/google-chrome-server')
+  })
+
+  it('should pass through a fully-qualified @macts/<app>-server name', () => {
+    expect(resolveMcpServerPackageName('@macts/calendar-server')).toBe('@macts/calendar-server')
+  })
+
+  it('should reject a bare app name that already ends in -server', () => {
+    // Passing "calendar-server" as a bare slug would produce the nonsense package
+    // "@macts/calendar-server-server". The resolver must return null so callers
+    // know to either treat it as a fully-qualified name or reject it outright.
+    expect(resolveMcpServerPackageName('calendar-server')).toBeNull()
+  })
+
+  it('should reject a wrong-scope server package', () => {
+    expect(resolveMcpServerPackageName('@other/calendar-server')).toBeNull()
+  })
+
+  it('should reject a CLI (non-server) scoped package name', () => {
+    expect(resolveMcpServerPackageName('@macts/calendar')).toBeNull()
+  })
+
+  it('should reject infrastructure app names', () => {
+    expect(resolveMcpServerPackageName('core')).toBeNull()
+    expect(resolveMcpServerPackageName('mcp')).toBeNull()
+    expect(resolveMcpServerPackageName('@macts/core-server')).toBeNull()
+  })
+
+  it('should reject empty input', () => {
+    expect(resolveMcpServerPackageName('')).toBeNull()
+  })
+
+  it('should reject names with invalid characters', () => {
+    expect(resolveMcpServerPackageName('Calendar')).toBeNull()
+    expect(resolveMcpServerPackageName('cal endar')).toBeNull()
+    expect(resolveMcpServerPackageName('../evil')).toBeNull()
+  })
+})
+
+describe('installMcpServerPlugin', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should install @macts/<app>-server into the plugins dir from a bare app name', async () => {
+    const { existsSync } = await import('node:fs')
+    const { spawnSync } = await import('node:child_process')
+    const { invalidatePluginCache } = await import('./cache.js')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(spawnSync).mockReturnValue({
+      status: 0,
+      stdout: '',
+      stderr: '',
+    } as SpawnSyncReturns<string>)
+
+    const result = installMcpServerPlugin('calendar')
+
+    expect(result.success).toBe(true)
+    // Discovery looks for @macts/<app>-server in ~/.macts/plugins/node_modules/@macts/,
+    // so install must place exactly that package into the plugins dir.
+    expect(spawnSync).toHaveBeenCalledWith(
+      'npm',
+      ['install', '--ignore-scripts', '@macts/calendar-server'],
+      expect.objectContaining({ cwd: '/home/user/.macts/plugins' })
+    )
+    expect(invalidatePluginCache).toHaveBeenCalled()
+  })
+
+  it('should install from a fully-qualified package name', async () => {
+    const { existsSync } = await import('node:fs')
+    const { spawnSync } = await import('node:child_process')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(spawnSync).mockReturnValue({
+      status: 0,
+      stdout: '',
+      stderr: '',
+    } as SpawnSyncReturns<string>)
+
+    const result = installMcpServerPlugin('@macts/calendar-server')
+
+    expect(result.success).toBe(true)
+    expect(spawnSync).toHaveBeenCalledWith(
+      'npm',
+      ['install', '--ignore-scripts', '@macts/calendar-server'],
+      expect.anything()
+    )
+  })
+
+  it('should pass a version specifier through to npm', async () => {
+    const { existsSync } = await import('node:fs')
+    const { spawnSync } = await import('node:child_process')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(spawnSync).mockReturnValue({
+      status: 0,
+      stdout: '',
+      stderr: '',
+    } as SpawnSyncReturns<string>)
+
+    installMcpServerPlugin('calendar', '1.2.3')
+
+    expect(spawnSync).toHaveBeenCalledWith(
+      'npm',
+      ['install', '--ignore-scripts', '@macts/calendar-server@1.2.3'],
+      expect.anything()
+    )
+  })
+
+  it('should reject a nonexistent/invalid app name without invoking npm', async () => {
+    const { spawnSync } = await import('node:child_process')
+
+    const result = installMcpServerPlugin('@other/calendar-server')
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Invalid MCP server plugin')
+    expect(spawnSync).not.toHaveBeenCalled()
+  })
+
+  it('should reject a non-@macts (CLI) package name', async () => {
+    const { spawnSync } = await import('node:child_process')
+
+    const result = installMcpServerPlugin('@macts/calendar')
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Invalid MCP server plugin')
+    expect(spawnSync).not.toHaveBeenCalled()
+  })
+
+  it('should reject an invalid version specifier', async () => {
+    const { existsSync } = await import('node:fs')
+    vi.mocked(existsSync).mockReturnValue(true)
+
+    const result = installMcpServerPlugin('calendar', 'https://evil.example/pkg.tgz')
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Invalid version specifier')
+  })
+
+  it('should surface npm failures (e.g. package not found on registry)', async () => {
+    const { existsSync } = await import('node:fs')
+    const { spawnSync } = await import('node:child_process')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(spawnSync).mockReturnValue({
+      status: 1,
+      stdout: '',
+      stderr: '404 Not Found - @macts/nonexistent-server',
+    } as SpawnSyncReturns<string>)
+
+    const result = installMcpServerPlugin('nonexistent')
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Failed to install')
+    expect(result.message).toContain('404 Not Found')
+  })
+})
+
+describe('uninstallMcpServerPlugin', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should uninstall @macts/<app>-server from a bare app name', async () => {
+    const { existsSync } = await import('node:fs')
+    const { spawnSync } = await import('node:child_process')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(spawnSync).mockReturnValue({
+      status: 0,
+      stdout: '',
+      stderr: '',
+    } as SpawnSyncReturns<string>)
+
+    const result = uninstallMcpServerPlugin('calendar')
+
+    expect(result.success).toBe(true)
+    expect(spawnSync).toHaveBeenCalledWith(
+      'npm',
+      ['uninstall', '@macts/calendar-server'],
+      expect.anything()
+    )
+  })
+
+  it('should reject an invalid app name without invoking npm', async () => {
+    const { spawnSync } = await import('node:child_process')
+
+    const result = uninstallMcpServerPlugin('@macts/calendar')
+
+    expect(result.success).toBe(false)
+    expect(result.message).toContain('Invalid MCP server plugin')
+    expect(spawnSync).not.toHaveBeenCalled()
+  })
+})
+
+describe('listInstalledMcpServerPlugins', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should return empty when no package.json', async () => {
+    const { existsSync } = await import('node:fs')
+    vi.mocked(existsSync).mockReturnValue(false)
+
+    expect(listInstalledMcpServerPlugins()).toEqual([])
+  })
+
+  it('should return only @macts/<app>-server dependencies', async () => {
+    const { existsSync, readFileSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readFileSync).mockReturnValue(
+      JSON.stringify({
+        name: 'macts-plugins',
+        version: '1.0.0',
+        dependencies: {
+          '@macts/calendar': '1.0.0',
+          '@macts/calendar-server': '1.0.0',
+          '@macts/contacts-server': '2.1.0',
+        },
+      })
+    )
+
+    // Server packages are what the MCP daemon discovers; CLI plugins are excluded.
+    expect(listInstalledMcpServerPlugins()).toEqual([
+      { packageName: '@macts/calendar-server', version: '1.0.0' },
+      { packageName: '@macts/contacts-server', version: '2.1.0' },
+    ])
+  })
+
+  it('should handle corrupted package.json', async () => {
+    const { existsSync, readFileSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readFileSync).mockReturnValue('not json')
+
+    expect(listInstalledMcpServerPlugins()).toEqual([])
   })
 })

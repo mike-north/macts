@@ -1,8 +1,9 @@
 /**
  * Consolidated client package generator for macts.
  *
- * Generates a single package that combines the HTTP client SDK and CLI plugin,
- * eliminating the need for separate `@macts/sdk-*` and `@macts/cli-*` packages.
+ * Generates a single package that combines the HTTP client SDK and CLI plugin
+ * into one published package, `@macts/<app>`, rather than separate per-surface
+ * packages.
  *
  * @packageDocumentation
  */
@@ -73,8 +74,11 @@ export function generateClientPackage(
 
   // Synthetic SDK package name used internally for the CLI generator context.
   // The CLI generator uses this to generate the sdk.ts import, which we then
-  // transform to a relative import.
-  const syntheticSdkPackageName = `@macts/sdk-${appName}`
+  // transform to a relative import. It never appears in the emitted output:
+  // the unified package.json (using the real @macts/<app> name) replaces the
+  // SDK and CLI generators' package.json, and the sdk.ts import is rewritten to
+  // a relative path below.
+  const syntheticSdkPackageName = `@macts/${appName}-sdk-internal`
 
   // --- Generate SDK files ---
   const sdkResult = generateHttpClientSdk(manifest, {
@@ -107,8 +111,11 @@ export function generateClientPackage(
   })
 
   // --- Generate CLI files ---
+  // The CLI generator's package.json is filtered out and replaced by the unified
+  // one below, so the package name passed here is internal-only. Use the real
+  // consolidated client package name (@macts/<app>) rather than a phantom name.
   const cliResult = generateCliPlugin(manifest, {
-    packageName: `@macts/cli-${appName}`,
+    packageName: options.clientPackageName,
     sdkPackageName: syntheticSdkPackageName,
     version: options.version,
   })

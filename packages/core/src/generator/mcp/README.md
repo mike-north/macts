@@ -27,7 +27,7 @@ const manifest = await loadManifest('path/to/app.yaml')
 const context = createMcpGeneratorContext({
   appName: 'calendar',
   manifest,
-  packageName: '@macts/mcp-calendar', // optional
+  packageName: '@macts/calendar-server', // optional
   version: '0.1.0', // optional
 })
 
@@ -52,7 +52,7 @@ for (const toolFile of result.toolFiles) {
 The generator produces a complete MCP plugin package:
 
 ```
-@macts/mcp-calendar/
+@macts/calendar-server/
 ├── package.json
 ├── index.ts              # Main plugin export
 ├── plugin.ts             # Plugin definition

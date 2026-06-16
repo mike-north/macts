@@ -21,9 +21,9 @@ export interface GenerateAllOptions {
   appName: string
   /** SDK package name (defaults to @macts/sdk-{appName}) */
   sdkPackageName?: string
-  /** MCP package name (defaults to @macts/mcp-{appName}) */
+  /** MCP package name (defaults to @macts/{appName}-server) */
   mcpPackageName?: string
-  /** CLI package name (defaults to @macts/cli-{appName}) */
+  /** CLI package name (defaults to @macts/{appName}) */
   cliPackageName?: string
   /** API package name (defaults to @macts/api-{appName}) */
   apiPackageName?: string
@@ -59,8 +59,8 @@ export function generateAllHttpPackages(
   const appName = options.appName.replace(/\s+/g, '-').toLowerCase()
 
   const sdkPackageName = options.sdkPackageName ?? `@macts/sdk-${appName}`
-  const mcpPackageName = options.mcpPackageName ?? `@macts/mcp-${appName}`
-  const cliPackageName = options.cliPackageName ?? `@macts/cli-${appName}`
+  const mcpPackageName = options.mcpPackageName ?? `@macts/${appName}-server`
+  const cliPackageName = options.cliPackageName ?? `@macts/${appName}`
   const apiPackageName = options.apiPackageName ?? `@macts/api-${appName}`
 
   const errors: string[] = []

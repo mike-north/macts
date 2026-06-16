@@ -13,7 +13,7 @@ export class PluginUninstallCommand extends Command {
     details: `
       Removes a macts CLI plugin from ~/.macts/plugins/.
     `,
-    examples: [['Uninstall the calendar plugin', '$0 plugin uninstall @macts/cli-calendar']],
+    examples: [['Uninstall the calendar plugin', '$0 plugin uninstall @macts/calendar']],
   })
 
   packageName = Option.String({ required: true, name: 'package' })

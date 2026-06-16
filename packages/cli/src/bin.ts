@@ -17,6 +17,9 @@ import {
   McpStopCommand,
   McpStatusCommand,
   McpDiagnoseCommand,
+  McpInstallCommand,
+  McpUninstallCommand,
+  McpListCommand,
 } from './commands/mcp/index.js'
 import {
   ApiKeyCreateCommand,
@@ -60,6 +63,9 @@ cli.register(McpStartCommand)
 cli.register(McpStopCommand)
 cli.register(McpStatusCommand)
 cli.register(McpDiagnoseCommand)
+cli.register(McpInstallCommand)
+cli.register(McpUninstallCommand)
+cli.register(McpListCommand)
 
 // Register API key management commands
 cli.register(ApiKeyCreateCommand)

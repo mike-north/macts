@@ -113,7 +113,7 @@ describe('RootCommand', () => {
       plugins: [],
       errors: [
         {
-          packageName: '@macts/mcp-broken',
+          packageName: '@macts/broken-server',
           message: 'Failed to load plugin',
         },
       ],
@@ -125,7 +125,7 @@ describe('RootCommand', () => {
     const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
     expect(exitCode).toBe(0)
-    expect(getStderr()).toContain('Plugin load error: @macts/mcp-broken: Failed to load plugin')
+    expect(getStderr()).toContain('Plugin load error: @macts/broken-server: Failed to load plugin')
   })
 
   it('should handle MCP server creation failure', async () => {

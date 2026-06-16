@@ -41,7 +41,7 @@ import { VERSION } from '@macts/core'
  * - SDK methods execute JXA scripts via HTTP API
  * - Results flow back through: JXA → API → SDK → MCP → Client
  *
- * @param plugins - Array of plugins providing tools (discovered from `@macts/mcp-*` packages)
+ * @param plugins - Array of plugins providing tools (discovered from `@macts/<app>-server` packages)
  * @param options - Server configuration options
  * @returns Promise that resolves when the server is running
  * @throws Error if duplicate tool names are found across plugins

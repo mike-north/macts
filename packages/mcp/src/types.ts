@@ -187,7 +187,7 @@ export interface McpToolDefinition {
  * MCP plugin interface.
  *
  * A plugin provides tools for a specific application SDK.
- * Plugins are dynamically discovered from `@macts/mcp-*` packages.
+ * Plugins are dynamically discovered from `@macts/<app>-server` packages.
  *
  * **Plugin Structure:**
  * Each plugin maps commands from an app manifest to MCP tools:
@@ -196,7 +196,7 @@ export interface McpToolDefinition {
  * - Tool names follow convention: `macts__<app>__<resource>_<operation>`
  *
  * **Discovery Process:**
- * 1. MCP server scans `~/.macts/plugins/node_modules/` for `@macts/mcp-*` packages
+ * 1. MCP server scans `~/.macts/plugins/node_modules/` for `@macts/<app>-server` packages
  * 2. Each package must export a `plugin` object of type `McpPlugin`
  * 3. Tools from all plugins are registered in the MCP server
  * 4. Tool names must be globally unique across all plugins
