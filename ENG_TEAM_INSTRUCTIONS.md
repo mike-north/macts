@@ -141,6 +141,13 @@ Follow a multi-layer strategy — do not default to "unit tests only."
 - **PRs** target `main`, link the issue, and — when CLI/MCP/API user-visible
   output changes — include before/after diff blocks in the description.
 - Split obviously-distinct concerns into separate commits at the file level.
+- **Engineering opens PRs and stops — the PM owns the merge gate.** Get the PR
+  green and review-ready, then hand it off. **Do not self-merge** (no
+  `gh pr merge`, no `--admin`), even for your own PR and even when checks are
+  green. The PM merges after the gate passes: Copilot feedback addressed or
+  tracked in an issue, PM review resolved, and CI green on its merits. If a PR is
+  blocked, stale, or contested, comment on it — never force it through. This
+  holds regardless of role defaults: in this repo the merge decision is the PM's.
 
 ## 8. Definition of Done
 
