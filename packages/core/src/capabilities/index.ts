@@ -61,3 +61,6 @@ export {
 
 // Registry loading from a manifests directory
 export { loadManifestsFromDir, loadCapabilityRegistry } from './loader.js'
+
+// Policy-backed governance filter: bridges GovernancePolicy → GovernanceFilter
+export { createPolicyGovernanceFilter, PolicyGovernanceFilter } from './policy-filter.js'

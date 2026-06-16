@@ -1,7 +1,8 @@
 import { Command, Option } from 'clipanion'
-import { resolveDiscoveryLimit, governedDiscoverySearch, ALLOW_ALL_GOVERNANCE } from '@macts/core'
+import { resolveDiscoveryLimit, governedDiscoverySearch } from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import { loadRegistry } from './registry.js'
+import { loadActiveGovernanceFilter } from './policy.js'
 
 /** Default number of search results when `--limit` is absent or invalid. */
 const DEFAULT_SEARCH_LIMIT = 10
@@ -45,7 +46,10 @@ export class CapabilitiesSearchCommand extends Command {
     const formatter = createFormatter(this.json ?? false)
 
     try {
-      const { registry } = await loadRegistry(this.manifestsDir)
+      const [{ registry }, governance] = await Promise.all([
+        loadRegistry(this.manifestsDir),
+        loadActiveGovernanceFilter(this.context.stderr),
+      ])
       // Validate `--limit`: a non-positive-integer value (e.g. `--limit foo`)
       // would otherwise reach `slice(0, NaN)` and silently empty the results.
       const limit = resolveDiscoveryLimit(this.limit, DEFAULT_SEARCH_LIMIT)
@@ -53,9 +57,9 @@ export class CapabilitiesSearchCommand extends Command {
       // governedDiscoverySearch applies governance BEFORE slicing so that
       // denied capabilities are replaced by lower-ranked allowed ones, and
       // "--limit N" means "N usable results", not "N results then drop some".
-      // The active governance filter (no-op pass-through by default) is
-      // supplied by the governance workstream when a real policy is active.
-      const outcome = governedDiscoverySearch(registry, this.intent, limit, ALLOW_ALL_GOVERNANCE)
+      // The active governance filter is loaded from $MACTS_HOME/policy.json
+      // when present; falls back to the no-op allow-all filter when absent.
+      const outcome = governedDiscoverySearch(registry, this.intent, limit, governance)
 
       // Distinguish "nothing matched" (suggest generating a capability) from
       // "matches existed but governance denied them all" (do NOT suggest
