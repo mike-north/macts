@@ -2,7 +2,7 @@
  * Type-level tests for the governance foundation public types.
  *
  * These complement the runtime tests in `*.test.ts`, verifying that the
- * discriminated `ParseAgentRcResult` narrows correctly, that the disposition /
+ * discriminated `ParsePolicyResult` narrows correctly, that the disposition /
  * decision unions are closed, and that the audit constructor/serializer carry
  * the intended signatures.
  *
@@ -15,13 +15,13 @@
 
 import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 import {
-  parseAgentRc,
+  parsePolicy,
   createAuditRecord,
   serializeAuditRecord,
-  type AgentRc,
-  type AgentRcDisposition,
-  type ParseAgentRcResult,
-  type AgentRcIssue,
+  type GovernancePolicy,
+  type PolicyDisposition,
+  type ParsePolicyResult,
+  type PolicyIssue,
   type AuditDecision,
   type AuditRecord,
   type AuditRecordInput,
@@ -29,38 +29,38 @@ import {
 } from './index.js'
 
 // =============================================================================
-// AgentRcDisposition — closed union
+// PolicyDisposition — closed union
 // =============================================================================
 
-expectAssignable<AgentRcDisposition>('allowed')
-expectAssignable<AgentRcDisposition>('read-only')
-expectAssignable<AgentRcDisposition>('confirm-first')
-expectAssignable<AgentRcDisposition>('forbidden')
-expectNotAssignable<AgentRcDisposition>('maybe')
-expectNotAssignable<AgentRcDisposition>('')
+expectAssignable<PolicyDisposition>('allowed')
+expectAssignable<PolicyDisposition>('read-only')
+expectAssignable<PolicyDisposition>('confirm-first')
+expectAssignable<PolicyDisposition>('forbidden')
+expectNotAssignable<PolicyDisposition>('maybe')
+expectNotAssignable<PolicyDisposition>('')
 
 // =============================================================================
-// ParseAgentRcResult — discriminated union narrowing
+// ParsePolicyResult — discriminated union narrowing
 // =============================================================================
 
-const result: ParseAgentRcResult = parseAgentRc({})
-expectType<ParseAgentRcResult>(result)
+const result: ParsePolicyResult = parsePolicy({})
+expectType<ParsePolicyResult>(result)
 
 if (result.success) {
-  // success branch exposes `data: AgentRc`.
-  expectType<AgentRc>(result.data)
+  // success branch exposes `data: GovernancePolicy`.
+  expectType<GovernancePolicy>(result.data)
 } else {
-  // failure branch exposes `issues: readonly AgentRcIssue[]`.
-  expectType<readonly AgentRcIssue[]>(result.issues)
+  // failure branch exposes `issues: readonly PolicyIssue[]`.
+  expectType<readonly PolicyIssue[]>(result.issues)
 }
 
-// AgentRcIssue shape
-declare const issue: AgentRcIssue
+// PolicyIssue shape
+declare const issue: PolicyIssue
 expectType<string>(issue.path)
 expectType<string>(issue.message)
 
 // The `success` discriminant is a boolean literal union.
-declare const r: ParseAgentRcResult
+declare const r: ParsePolicyResult
 expectType<boolean>(r.success)
 
 // =============================================================================

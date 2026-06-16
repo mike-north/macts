@@ -11,69 +11,6 @@ import { z } from 'zod';
 export function activateApp(bundleId: string): Promise<undefined>;
 
 // @public
-export const AGENT_RC_DISPOSITIONS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
-
-// @public
-export type AgentRc = z.infer<typeof AgentRcSchema>;
-
-// @public
-export type AgentRcDisposition = (typeof AGENT_RC_DISPOSITIONS)[number];
-
-// @public
-export const AgentRcDispositionSchema: z.ZodEnum<{
-    allowed: "allowed";
-    "read-only": "read-only";
-    "confirm-first": "confirm-first";
-    forbidden: "forbidden";
-}>;
-
-// @public
-export interface AgentRcIssue {
-    readonly message: string;
-    readonly path: string;
-}
-
-// @public
-export const AgentRcSchema: z.ZodObject<{
-    version: z.ZodDefault<z.ZodLiteral<"1">>;
-    defaultDisposition: z.ZodDefault<z.ZodEnum<{
-        allowed: "allowed";
-        "read-only": "read-only";
-        "confirm-first": "confirm-first";
-        forbidden: "forbidden";
-    }>>;
-    apps: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        app: z.ZodString;
-        disposition: z.ZodEnum<{
-            allowed: "allowed";
-            "read-only": "read-only";
-            "confirm-first": "confirm-first";
-            forbidden: "forbidden";
-        }>;
-        operations: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            operation: z.ZodString;
-            disposition: z.ZodEnum<{
-                allowed: "allowed";
-                "read-only": "read-only";
-                "confirm-first": "confirm-first";
-                forbidden: "forbidden";
-            }>;
-            tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
-            reason: z.ZodOptional<z.ZodString>;
-        }, z.core.$strict>>>;
-        restrictions: z.ZodDefault<z.ZodObject<{
-            pathsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
-            pathsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
-            urlsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
-            urlsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
-        }, z.core.$strict>>;
-        tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
-        reason: z.ZodOptional<z.ZodString>;
-    }, z.core.$strict>>>;
-    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
-}, z.core.$strict>;
-
-// @public
 export const ALLOW_ALL_GOVERNANCE: GovernanceFilter;
 
 // @public
@@ -1149,6 +1086,9 @@ export interface GovernanceFilter {
 }
 
 // @public
+export type GovernancePolicy = z.infer<typeof PolicySchema>;
+
+// @public
 export interface GovernedCapability {
     readonly capability: Capability;
     readonly decision: GovernanceDecision;
@@ -1431,18 +1371,6 @@ export interface OperationVocabulary {
 }
 
 // @public
-export function parseAgentRc(input: unknown): ParseAgentRcResult;
-
-// @public
-export type ParseAgentRcResult = {
-    readonly success: true;
-    readonly data: AgentRc;
-} | {
-    readonly success: false;
-    readonly issues: readonly AgentRcIssue[];
-};
-
-// @public
 export type ParsedPermission = FinePermission | CoarsePermission | WildcardPermission;
 
 // @public
@@ -1450,6 +1378,18 @@ export function parseManifestYaml(yamlContent: string): AppManifest;
 
 // @public
 export function parsePermission(permission: string): ParsedPermission;
+
+// @public
+export function parsePolicy(input: unknown): ParsePolicyResult;
+
+// @public
+export type ParsePolicyResult = {
+    readonly success: true;
+    readonly data: GovernancePolicy;
+} | {
+    readonly success: false;
+    readonly issues: readonly PolicyIssue[];
+};
 
 // @public
 export const pathCoercer: TypeCoercer<string>;
@@ -1523,6 +1463,66 @@ export const PointTypeSchema: z.ZodObject<{
     x: z.ZodNumber;
     y: z.ZodNumber;
 }, z.core.$strip>;
+
+// @public
+export const POLICY_DISPOSITIONS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
+
+// @public
+export type PolicyDisposition = (typeof POLICY_DISPOSITIONS)[number];
+
+// @public
+export const PolicyDispositionSchema: z.ZodEnum<{
+    allowed: "allowed";
+    "read-only": "read-only";
+    "confirm-first": "confirm-first";
+    forbidden: "forbidden";
+}>;
+
+// @public
+export interface PolicyIssue {
+    readonly message: string;
+    readonly path: string;
+}
+
+// @public
+export const PolicySchema: z.ZodObject<{
+    version: z.ZodDefault<z.ZodLiteral<"1">>;
+    defaultDisposition: z.ZodDefault<z.ZodEnum<{
+        allowed: "allowed";
+        "read-only": "read-only";
+        "confirm-first": "confirm-first";
+        forbidden: "forbidden";
+    }>>;
+    apps: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        app: z.ZodString;
+        disposition: z.ZodEnum<{
+            allowed: "allowed";
+            "read-only": "read-only";
+            "confirm-first": "confirm-first";
+            forbidden: "forbidden";
+        }>;
+        operations: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            operation: z.ZodString;
+            disposition: z.ZodEnum<{
+                allowed: "allowed";
+                "read-only": "read-only";
+                "confirm-first": "confirm-first";
+                forbidden: "forbidden";
+            }>;
+            tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            reason: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>>>;
+        restrictions: z.ZodDefault<z.ZodObject<{
+            pathsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            pathsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            urlsAllow: z.ZodDefault<z.ZodArray<z.ZodString>>;
+            urlsDeny: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        }, z.core.$strict>>;
+        tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+        reason: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>>>;
+    tags: z.ZodDefault<z.ZodArray<z.ZodString>>;
+}, z.core.$strict>;
 
 // @public (undocumented)
 export type PrimitiveType = z.infer<typeof PrimitiveTypeSchema>;

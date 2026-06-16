@@ -1,11 +1,11 @@
 /**
- * `.agentrc` / org-policy *declaration* schema, parser, and types.
+ * Governance policy *declaration* schema, parser, and types.
  *
- * The `.agentrc` file (and its org-policy counterpart) is how a user or a
- * security team declares the boundary an agent must stay inside: which apps and
- * operations are allowed, read-only, forbidden, or require confirmation; which
- * filesystem paths and URLs are in or out of bounds; and which sensitivity tags
- * apply (VISION.md §6, §7.3, §10; issue #7).
+ * A governance policy declaration is how a user or a security team declares
+ * the boundary an agent must stay inside: which apps and operations are
+ * allowed, read-only, forbidden, or require confirmation; which filesystem
+ * paths and URLs are in or out of bounds; and which sensitivity tags apply
+ * (VISION.md §6, §7.3, §10; issue #7).
  *
  * This module is intentionally limited to the **decision-invariant** half of
  * that story: parsing, validating, and typing the declaration. It deliberately
@@ -38,18 +38,18 @@ import { z } from 'zod'
  *
  * Ordered least-to-most restrictive for stable, deterministic iteration.
  */
-export const AGENT_RC_DISPOSITIONS = ['allowed', 'read-only', 'confirm-first', 'forbidden'] as const
+export const POLICY_DISPOSITIONS = ['allowed', 'read-only', 'confirm-first', 'forbidden'] as const
 
 /**
  * A single policy disposition value (`allowed` | `read-only` | `confirm-first`
  * | `forbidden`).
  */
-export type AgentRcDisposition = (typeof AGENT_RC_DISPOSITIONS)[number]
+export type PolicyDisposition = (typeof POLICY_DISPOSITIONS)[number]
 
 /**
- * Zod schema for {@link AgentRcDisposition}.
+ * Zod schema for {@link PolicyDisposition}.
  */
-export const AgentRcDispositionSchema = z.enum(AGENT_RC_DISPOSITIONS)
+export const PolicyDispositionSchema = z.enum(POLICY_DISPOSITIONS)
 
 /**
  * Sensitivity tags applied to an app or operation rule.
@@ -109,7 +109,7 @@ export const OperationRuleSchema = z
     /** The operation this rule targets (a concrete name or `*`). */
     operation: OperationPatternSchema,
     /** Disposition to apply to this operation. */
-    disposition: AgentRcDispositionSchema,
+    disposition: PolicyDispositionSchema,
     /** Sensitivity tags attached to this operation. */
     tags: z.array(SensitivityTagSchema).default([]),
     /**
@@ -192,7 +192,7 @@ export const AppRuleSchema = z
     /** The app this rule targets (a concrete name or `*`). */
     app: AppPatternSchema,
     /** Default disposition for operations on this app. */
-    disposition: AgentRcDispositionSchema,
+    disposition: PolicyDispositionSchema,
     /** Per-operation overrides; the most specific match wins at compile time. */
     operations: z.array(OperationRuleSchema).default([]),
     /** Path/URL boundaries for this app. */
@@ -215,7 +215,7 @@ export const AppRuleSchema = z
 export type AppRule = z.infer<typeof AppRuleSchema>
 
 /**
- * The top-level `.agentrc` / org-policy declaration.
+ * The top-level governance policy declaration.
  *
  * A declaration is a list of app rules plus a global `defaultDisposition` that
  * applies to any app/operation no rule covers. Making the default explicit (and
@@ -223,7 +223,7 @@ export type AppRule = z.infer<typeof AppRuleSchema>
  * fail-closed: an operation no rule mentions is denied rather than silently
  * permitted.
  */
-export const AgentRcSchema = z
+export const PolicySchema = z
   .object({
     /**
      * Declaration format version. Fixed at `'1'` for now; bumped if the shape
@@ -234,7 +234,7 @@ export const AgentRcSchema = z
      * Disposition applied to any app/operation not matched by a rule. Defaults
      * to `forbidden` so the boundary is fail-closed.
      */
-    defaultDisposition: AgentRcDispositionSchema.default('forbidden'),
+    defaultDisposition: PolicyDispositionSchema.default('forbidden'),
     /** The app-scoped governance rules, in declaration order. */
     apps: z.array(AppRuleSchema).default([]),
     /** Global sensitivity tags applied to the whole declaration. */
@@ -243,22 +243,22 @@ export const AgentRcSchema = z
   .strict()
 
 /**
- * A fully-parsed, validated `.agentrc` / org-policy declaration.
+ * A fully-parsed, validated governance policy declaration.
  *
  * All defaultable fields are present after parsing (defaults applied), so
  * consumers never have to special-case "absent vs. default".
  */
-export type AgentRc = z.infer<typeof AgentRcSchema>
+export type GovernancePolicy = z.infer<typeof PolicySchema>
 
 /**
- * A single structured validation issue from {@link parseAgentRc}.
+ * A single structured validation issue from {@link parsePolicy}.
  *
  * `path` is the dotted/indexed location of the offending field (e.g.
  * `apps.0.disposition`); `message` is the human-readable reason. This is a
  * stable, serializable shape so callers (CLI, API) can surface errors without
  * depending on Zod's internal error object.
  */
-export interface AgentRcIssue {
+export interface PolicyIssue {
   /** Location of the problem within the input (e.g. `apps.0.operations.1.operation`). */
   readonly path: string
   /** Human-readable description of what is wrong. */
@@ -266,15 +266,15 @@ export interface AgentRcIssue {
 }
 
 /**
- * The result of {@link parseAgentRc}: a discriminated union of success/failure.
+ * The result of {@link parsePolicy}: a discriminated union of success/failure.
  *
- * Success carries the parsed, defaults-applied {@link AgentRc}; failure carries
- * the structured {@link AgentRcIssue} list. Returning a result (rather than
- * throwing) makes this safe to call directly at a trust boundary.
+ * Success carries the parsed, defaults-applied {@link GovernancePolicy}; failure
+ * carries the structured {@link PolicyIssue} list. Returning a result (rather
+ * than throwing) makes this safe to call directly at a trust boundary.
  */
-export type ParseAgentRcResult =
-  | { readonly success: true; readonly data: AgentRc }
-  | { readonly success: false; readonly issues: readonly AgentRcIssue[] }
+export type ParsePolicyResult =
+  | { readonly success: true; readonly data: GovernancePolicy }
+  | { readonly success: false; readonly issues: readonly PolicyIssue[] }
 
 /**
  * Convert a Zod issue path (an array of string/number/symbol segments) into a
@@ -289,14 +289,14 @@ function formatIssuePath(path: readonly PropertyKey[]): string {
 }
 
 /**
- * Parse and validate an untrusted value as an `.agentrc` / org-policy
- * declaration at a trust boundary.
+ * Parse and validate an untrusted value as a governance policy declaration at
+ * a trust boundary.
  *
  * Uses Zod's `.safeParse()` so malformed input never throws; instead it returns
- * a structured {@link ParseAgentRcResult}. On success the returned
- * {@link AgentRc} has all defaults applied (e.g. `defaultDisposition` becomes
- * `forbidden` when omitted). On failure, every validation problem is reported
- * as an {@link AgentRcIssue} with a dotted `path` and a human-readable
+ * a structured {@link ParsePolicyResult}. On success the returned
+ * {@link GovernancePolicy} has all defaults applied (e.g. `defaultDisposition`
+ * becomes `forbidden` when omitted). On failure, every validation problem is
+ * reported as a {@link PolicyIssue} with a dotted `path` and a human-readable
  * `message`.
  *
  * This function does NOT compile the declaration to enforcement permissions,
@@ -307,12 +307,12 @@ function formatIssuePath(path: readonly PropertyKey[]): string {
  * @returns A success result with the parsed declaration, or a failure result
  *   with structured issues.
  */
-export function parseAgentRc(input: unknown): ParseAgentRcResult {
-  const result = AgentRcSchema.safeParse(input)
+export function parsePolicy(input: unknown): ParsePolicyResult {
+  const result = PolicySchema.safeParse(input)
   if (result.success) {
     return { success: true, data: result.data }
   }
-  const issues: AgentRcIssue[] = result.error.issues.map((issue) => ({
+  const issues: PolicyIssue[] = result.error.issues.map((issue) => ({
     path: formatIssuePath(issue.path),
     message: issue.message,
   }))

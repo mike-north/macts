@@ -6,7 +6,7 @@
  * timestamp, decision) and the VISION.md §5.4 audit-log example — never from
  * program output.
  *
- * @see Issue #7 — Trust & Governance (AgentRC): boundaries, permissions, audit.
+ * @see Issue #7 — Trust & Governance: boundaries, permissions, audit.
  * @see VISION.md §5.4 "Stronger auditability".
  */
 

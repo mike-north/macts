@@ -1,13 +1,13 @@
 /**
- * Governance foundation for macts (issue #7, Trust & Governance / AgentRC).
+ * Governance foundation for macts (issue #7, Trust & Governance).
  *
  * This module provides the **decision-invariant** building blocks for the trust
  * boundary:
  *
- * 1. The `.agentrc` / org-policy *declaration* — a Zod schema, parser, and
- *    types for declaring apps/operations as allowed / read-only / confirm-first
- *    / forbidden, with path and URL restrictions and sensitivity tags
- *    ({@link ./agentrc.js}).
+ * 1. The governance policy *declaration* — a Zod schema, parser, and types for
+ *    declaring apps/operations as allowed / read-only / confirm-first /
+ *    forbidden, with path and URL restrictions and sensitivity tags
+ *    ({@link ./policy.js}).
  * 2. Structured, attributable *audit records* for capability calls — a typed
  *    record plus a pure constructor and serializer ({@link ./audit.js}).
  *
@@ -20,11 +20,11 @@
  * @packageDocumentation
  */
 
-// `.agentrc` / org-policy declaration: schema, parser, and types.
+// Governance policy declaration: schema, parser, and types.
 export {
-  AGENT_RC_DISPOSITIONS,
-  type AgentRcDisposition,
-  AgentRcDispositionSchema,
+  POLICY_DISPOSITIONS,
+  type PolicyDisposition,
+  PolicyDispositionSchema,
   SensitivityTagSchema,
   type SensitivityTag,
   OperationPatternSchema,
@@ -38,12 +38,12 @@ export {
   type AppPattern,
   AppRuleSchema,
   type AppRule,
-  AgentRcSchema,
-  type AgentRc,
-  type AgentRcIssue,
-  type ParseAgentRcResult,
-  parseAgentRc,
-} from './agentrc.js'
+  PolicySchema,
+  type GovernancePolicy,
+  type PolicyIssue,
+  type ParsePolicyResult,
+  parsePolicy,
+} from './policy.js'
 
 // Structured audit records: types, constructor, serializer.
 export {

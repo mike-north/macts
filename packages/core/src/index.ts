@@ -40,5 +40,5 @@ export * from './permissions/index.js'
 // Capability discovery (registry, risk classification, search, governance seam)
 export * from './capabilities/index.js'
 
-// Governance foundation (.agentrc / org-policy declaration parsing, audit records)
+// Governance foundation (policy declaration parsing, audit records)
 export * from './governance/index.js'
