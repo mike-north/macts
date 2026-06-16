@@ -112,3 +112,7 @@ export {
 
 // Policy loader: reads and validates a policy declaration from a JSON file.
 export { loadPolicyFromFile, type LoadPolicyResult } from './loader.js'
+
+// Canonical active-policy path: single source of truth for where enforcement
+// and discovery both read the active governance policy (issue #79).
+export { resolveActivePolicyPath } from './policy-path.js'

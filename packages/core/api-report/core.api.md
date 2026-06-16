@@ -1866,6 +1866,9 @@ export const RelationshipSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function resolveActivePolicyPath(home: string): string;
+
+// @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
 
 // @public
