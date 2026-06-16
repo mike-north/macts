@@ -42,6 +42,7 @@ export {
   type GovernanceDisposition,
   type GovernanceDecision,
   type GovernedCapability,
+  type GovernedCapabilityResult,
   type GovernanceFilter,
   ALLOW_ALL_GOVERNANCE,
   applyGovernance,

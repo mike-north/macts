@@ -51,6 +51,19 @@ export interface GovernedCapability {
 }
 
 /**
+ * A capability paired with its governance decision **and** its lexical search
+ * score. Returned by {@link governedDiscoverySearch} so callers (e.g. the
+ * CLI's JSON output) can expose the score without a second search pass.
+ *
+ * Extends {@link GovernedCapability} — callers that only need `capability` and
+ * `decision` remain unaffected.
+ */
+export interface GovernedCapabilityResult extends GovernedCapability {
+  /** The total lexical score from {@link scoreCapability} (higher is better). */
+  readonly score: number
+}
+
+/**
  * Governance filter interface.
  *
  * Implemented by the governance workstream to plug a real policy into

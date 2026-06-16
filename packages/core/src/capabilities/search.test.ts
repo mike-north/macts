@@ -188,6 +188,30 @@ describe('searchCapabilities', () => {
       'notebook.notes.share',
     ])
   })
+
+  // -----------------------------------------------------------------------
+  // Regression: limit <= 0 parity between filter and non-filter paths
+  // -----------------------------------------------------------------------
+  // Before the fix, the governed loop never hit `governed.length === limit`
+  // when limit <= 0, so it returned all allowed results instead of [].
+  // The non-filter path correctly returned [] via slice(0, 0) / slice(0, -1).
+  // Both paths must return [] for limit <= 0 even when matches exist.
+
+  it('regression: filter path returns [] for limit=0 even when matches exist', () => {
+    const allowAll: GovernanceFilter = { evaluate: () => ({ disposition: 'allow' }) }
+    expect(searchCapabilities(registry, 'note', { limit: 0, filter: allowAll })).toEqual([])
+  })
+
+  it('regression: filter path returns [] for negative limit even when matches exist', () => {
+    const allowAll: GovernanceFilter = { evaluate: () => ({ disposition: 'allow' }) }
+    expect(searchCapabilities(registry, 'note', { limit: -5, filter: allowAll })).toEqual([])
+  })
+
+  it('non-filter path also returns [] for limit=0 (confirming parity)', () => {
+    // Baseline: the pre-fix non-filter path used slice(0, limit); this asserts
+    // the existing behaviour so parity can be verified by inspection.
+    expect(searchCapabilities(registry, 'note', { limit: 0 })).toEqual([])
+  })
 })
 
 describe('searchCapabilitiesHasAnyMatch', () => {

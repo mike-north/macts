@@ -354,6 +354,65 @@ describe('governedDiscoverySearch', () => {
       ])
     }
   })
+
+  // -----------------------------------------------------------------------
+  // Regression: limit <= 0 must return no-match (parity with slice semantics)
+  // -----------------------------------------------------------------------
+  // Before the fix, the governed-filter loop in searchCapabilities never
+  // satisfied `governed.length === limit` when limit <= 0, so it iterated all
+  // matches and returned them all. governedDiscoverySearch must short-circuit
+  // to no-match for limit <= 0, matching slice(0, 0) / slice(0, -N) → [].
+
+  it('regression: returns no-match for limit=0 even when matches and allowed results exist', () => {
+    // intent "note" has 6 matching, allowed capabilities; limit=0 must still yield no-match.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 0)
+    expect(outcome.kind).toBe('no-match')
+  })
+
+  it('regression: returns no-match for negative limit even when matches exist', () => {
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', -1)
+    expect(outcome.kind).toBe('no-match')
+  })
+
+  // -----------------------------------------------------------------------
+  // Score field threading: governed results must carry the lexical score
+  // -----------------------------------------------------------------------
+  // Before the fix the CLI JSON output dropped the `score` field because
+  // GovernedCapability did not carry it. GovernedCapabilityResult now extends
+  // GovernedCapability with `score` so callers get it without a second search.
+
+  it('threads the lexical score through to each governed result', () => {
+    // intent "note" scores: create/delete/share = 4, doScript/quit/list = 2.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 10)
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      // Top three must have score 4 (keywordExact weight from SEARCH_WEIGHTS).
+      const top3 = outcome.governed.slice(0, 3)
+      for (const g of top3) {
+        expect(typeof g.score).toBe('number')
+        expect(g.score).toBe(4)
+      }
+      // Lower three must have score 2 (keywordPrefix weight).
+      const lower3 = outcome.governed.slice(3)
+      for (const g of lower3) {
+        expect(g.score).toBe(2)
+      }
+    }
+  })
+
+  it('threads score correctly through governance backfilling', () => {
+    // Deny "write" (create, score 4). Remaining top results:
+    //   delete (4), share (4), doScript (2). Scores must reflect true ranking.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 3, denyRisk('write'))
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      expect(outcome.governed.map((g) => ({ name: g.capability.name, score: g.score }))).toEqual([
+        { name: 'notebook.notes.delete', score: 4 },
+        { name: 'notebook.notes.share', score: 4 },
+        { name: 'notebook.app.doScript', score: 2 }, // backfilled; score reflects true rank
+      ])
+    }
+  })
 })
 
 describe('inspectCapability', () => {

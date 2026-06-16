@@ -81,6 +81,7 @@ export class CapabilitiesSearchCommand extends Command {
               description: g.capability.description,
               call: g.capability.cliSnippet,
               governance: g.decision.disposition,
+              score: g.score,
             })),
           }) + '\n'
         )

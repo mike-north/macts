@@ -241,6 +241,13 @@ export function searchCapabilities(
   // a caller asking for "N results" gets N *usable* results, not N results
   // that may be reduced by silent denial.
   if (options.filter !== undefined) {
+    // Parity with the non-filter path: slice(0, limit) returns [] for limit <= 0.
+    // Without this guard the loop below would never hit `governed.length === limit`
+    // (since length starts at 0 and limit <= 0), returning all allowed results
+    // instead of the expected empty array.
+    if (limit <= 0) {
+      return []
+    }
     const governed: CapabilitySearchResult[] = []
     for (const result of results) {
       const decision = filter.evaluate(result.capability)

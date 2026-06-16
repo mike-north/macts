@@ -20,8 +20,12 @@
  * @packageDocumentation
  */
 
-import { applyGovernance, ALLOW_ALL_GOVERNANCE } from './governance.js'
-import type { GovernanceDecision, GovernanceFilter, GovernedCapability } from './governance.js'
+import { ALLOW_ALL_GOVERNANCE } from './governance.js'
+import type {
+  GovernanceDecision,
+  GovernanceFilter,
+  GovernedCapabilityResult,
+} from './governance.js'
 import { searchCapabilities, searchCapabilitiesHasAnyMatch } from './search.js'
 import type { CapabilitySearchResult, SearchCapabilitiesOptions } from './search.js'
 import type { Capability, CapabilityRegistry } from './types.js'
@@ -71,8 +75,13 @@ export type DiscoverySearchOutcome =
   | {
       /** At least one capability matched and survived governance. */
       readonly kind: 'matches'
-      /** Surviving capabilities paired with their governance decisions. */
-      readonly governed: readonly GovernedCapability[]
+      /**
+       * Surviving capabilities paired with their governance decisions and
+       * lexical scores. Use {@link GovernedCapabilityResult.score} to expose
+       * the ranking score in output (e.g. CLI JSON) without a second search
+       * pass.
+       */
+      readonly governed: readonly GovernedCapabilityResult[]
     }
   | {
       /** No capability matched the intent at all. */
@@ -115,10 +124,16 @@ export function summarizeDiscoverySearch(
   if (ranked.length === 0) {
     return { kind: 'no-match' }
   }
-  const governed = applyGovernance(
-    ranked.map((r) => r.capability),
-    filter
-  )
+  // Thread the lexical score through so callers have it available (e.g. for
+  // JSON output). Filter inline rather than calling applyGovernance so we keep
+  // the score paired with each result.
+  const governed: GovernedCapabilityResult[] = []
+  for (const r of ranked) {
+    const decision = filter.evaluate(r.capability)
+    if (decision.disposition !== 'deny') {
+      governed.push({ capability: r.capability, decision, score: r.score })
+    }
+  }
   if (governed.length === 0) {
     // Matches existed (ranked.length > 0) but governance denied all of them.
     return { kind: 'governance-blocked', deniedCount: ranked.length }
@@ -152,6 +167,13 @@ export function governedDiscoverySearch(
   limit: number,
   filter: GovernanceFilter = ALLOW_ALL_GOVERNANCE
 ): DiscoverySearchOutcome {
+  // Parity with the pre-filter slice path: slice(0, limit) for limit <= 0
+  // returns an empty array. Apply the same semantic here so the governed path
+  // never returns results when the caller explicitly requested none.
+  if (limit <= 0) {
+    return { kind: 'no-match' }
+  }
+
   // Check whether any capability matches before governance is applied, so
   // we can distinguish "nothing matched" (no-match) from "matches existed
   // but all were denied" (governance-blocked).
@@ -173,10 +195,12 @@ export function governedDiscoverySearch(
   }
 
   // governed contains only allow/warn results (up to limit), with scores.
-  // Convert to GovernedCapability pairs by re-evaluating decisions.
-  const governedCapabilities: GovernedCapability[] = governed.map((r) => ({
+  // Thread the lexical score through so callers (e.g. the CLI JSON output)
+  // can expose it without a second search pass.
+  const governedCapabilities: GovernedCapabilityResult[] = governed.map((r) => ({
     capability: r.capability,
     decision: filter.evaluate(r.capability),
+    score: r.score,
   }))
 
   return { kind: 'matches', governed: governedCapabilities }

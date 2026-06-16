@@ -525,7 +525,7 @@ export function describePermissions(permissions: string[]): string;
 // @public
 export type DiscoverySearchOutcome = {
     readonly kind: 'matches';
-    readonly governed: readonly GovernedCapability[];
+    readonly governed: readonly GovernedCapabilityResult[];
 } | {
     readonly kind: 'no-match';
 } | {
@@ -1019,6 +1019,11 @@ export interface GovernanceFilter {
 export interface GovernedCapability {
     readonly capability: Capability;
     readonly decision: GovernanceDecision;
+}
+
+// @public
+export interface GovernedCapabilityResult extends GovernedCapability {
+    readonly score: number;
 }
 
 // @public
