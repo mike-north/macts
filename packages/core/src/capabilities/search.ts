@@ -33,6 +33,8 @@
  * @packageDocumentation
  */
 
+import type { GovernanceFilter } from './governance.js'
+import { ALLOW_ALL_GOVERNANCE } from './governance.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
 /** Per-location scoring weights. Exported for tests to derive expectations. */
@@ -138,16 +140,65 @@ function bestTermScore(
 export interface SearchCapabilitiesOptions {
   /** Maximum number of results to return (default: 10). */
   readonly limit?: number
+  /**
+   * Active governance filter to apply **before** slicing to `limit`.
+   *
+   * When provided, `deny`-d capabilities are dropped from the ranked list
+   * before the limit is applied, so lower-ranked allowed capabilities
+   * backfill the result set up to `limit`. This ensures "give me the top N"
+   * means "N *usable* results", not "N results then silently drop some".
+   *
+   * The returned array contains only `allow`/`warn` capabilities (up to
+   * `limit`). Use {@link governedDiscoverySearch} (in `discovery.ts`) when
+   * you also need to distinguish "nothing matched" from "all matches denied".
+   */
+  readonly filter?: GovernanceFilter
+}
+
+/**
+ * Whether any capability in the registry matched the given intent (before
+ * governance). Used by the discovery layer to distinguish a genuine "no match"
+ * from "matches existed but were all denied by the active governance policy".
+ *
+ * @param registry - Capability registry (or any iterable of capabilities)
+ * @param intent - Free-text intent
+ * @returns `true` if at least one capability has a positive score for `intent`
+ */
+export function searchCapabilitiesHasAnyMatch(
+  registry: CapabilityRegistry | readonly Capability[],
+  intent: string
+): boolean {
+  const capabilities = Array.isArray(registry)
+    ? (registry as readonly Capability[])
+    : (registry as CapabilityRegistry).capabilities
+  const terms = tokenizeIntent(intent)
+  if (terms.length === 0) {
+    return false
+  }
+  for (const capability of capabilities) {
+    if (scoreCapability(capability, terms) > 0) {
+      return true
+    }
+  }
+  return false
 }
 
 /**
  * Rank capabilities in a registry by how well they match an intent.
  *
+ * When `options.filter` is provided, governance is applied to the **full**
+ * ranked list *before* the limit is applied. This ensures that denied
+ * capabilities are replaced by lower-ranked allowed ones so the caller
+ * receives up to `limit` usable results rather than up to `limit` results
+ * that may include silently-dropped denied entries.
+ *
  * @param registry - Capability registry (or any iterable of capabilities)
  * @param intent - Free-text intent
  * @param options - Search options
  * @returns Matching results in descending score order; ties broken by name.
- *   Returns an empty array when nothing matches.
+ *   When `options.filter` is set, only `allow`/`warn` capabilities are
+ *   returned (up to `limit`). Returns an empty array when nothing matches
+ *   or when all matches are denied.
  */
 export function searchCapabilities(
   registry: CapabilityRegistry | readonly Capability[],
@@ -182,5 +233,26 @@ export function searchCapabilities(
   })
 
   const limit = options.limit ?? 10
+  const filter = options.filter ?? ALLOW_ALL_GOVERNANCE
+
+  // When a real governance filter is active (not the default allow-all
+  // pass-through), apply governance to the FULL sorted list BEFORE slicing.
+  // This lets lower-ranked allowed capabilities backfill up to `limit` so that
+  // a caller asking for "N results" gets N *usable* results, not N results
+  // that may be reduced by silent denial.
+  if (options.filter !== undefined) {
+    const governed: CapabilitySearchResult[] = []
+    for (const result of results) {
+      const decision = filter.evaluate(result.capability)
+      if (decision.disposition !== 'deny') {
+        governed.push(result)
+        if (governed.length === limit) {
+          break
+        }
+      }
+    }
+    return governed
+  }
+
   return results.slice(0, limit)
 }

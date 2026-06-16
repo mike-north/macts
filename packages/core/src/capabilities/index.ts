@@ -54,6 +54,7 @@ export {
   type InspectOutcome,
   resolveDiscoveryLimit,
   summarizeDiscoverySearch,
+  governedDiscoverySearch,
   inspectCapability,
 } from './discovery.js'
 

@@ -1022,6 +1022,9 @@ export interface GovernedCapability {
 }
 
 // @public
+export function governedDiscoverySearch(registry: CapabilityRegistry | readonly Capability[], intent: string, limit: number, filter?: GovernanceFilter): DiscoverySearchOutcome;
+
+// @public
 export function groupPermissionsByResource(permissions: string[]): Map<string, string[]>;
 
 // @public
@@ -1658,6 +1661,7 @@ export function searchCapabilities(registry: CapabilityRegistry | readonly Capab
 
 // @public
 export interface SearchCapabilitiesOptions {
+    readonly filter?: GovernanceFilter;
     readonly limit?: number;
 }
 

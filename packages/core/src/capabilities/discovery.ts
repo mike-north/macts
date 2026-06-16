@@ -22,7 +22,8 @@
 
 import { applyGovernance, ALLOW_ALL_GOVERNANCE } from './governance.js'
 import type { GovernanceDecision, GovernanceFilter, GovernedCapability } from './governance.js'
-import type { CapabilitySearchResult } from './search.js'
+import { searchCapabilities, searchCapabilitiesHasAnyMatch } from './search.js'
+import type { CapabilitySearchResult, SearchCapabilitiesOptions } from './search.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
 /**
@@ -93,8 +94,18 @@ export type DiscoverySearchOutcome =
  * Classify ranked search results against a governance filter into one of the
  * three {@link DiscoverySearchOutcome} cases.
  *
- * @param ranked - Ranked search results (already limited)
- * @param filter - Active governance filter (defaults to allow-all)
+ * **Governance ordering:** For correct `--limit` behaviour, governance must be
+ * applied *before* slicing. Use {@link governedDiscoverySearch} (the
+ * all-in-one entry point) instead of calling `searchCapabilities` then this
+ * function, unless you have already applied governance upstream.
+ *
+ * @param ranked - Ranked search results. For `no-match` / `governance-blocked`
+ *   to be distinguishable these must represent all matches for the intent, not
+ *   a pre-sliced subset (or the caller must guarantee they were pre-governed
+ *   with `options.filter` in {@link searchCapabilities}).
+ * @param filter - Active governance filter (defaults to allow-all). When
+ *   {@link searchCapabilities} was called with `options.filter`, pass
+ *   {@link ALLOW_ALL_GOVERNANCE} here (or omit it) to avoid double-applying.
  * @returns The discovery outcome
  */
 export function summarizeDiscoverySearch(
@@ -113,6 +124,62 @@ export function summarizeDiscoverySearch(
     return { kind: 'governance-blocked', deniedCount: ranked.length }
   }
   return { kind: 'matches', governed }
+}
+
+/**
+ * Governance-first capability discovery: apply governance to the **full**
+ * ranked match set, then slice to `limit`.
+ *
+ * This is the correct entry point for discovery surfaces (CLI, MCP). It
+ * guarantees that "give me the top N results" means "N *allowed* results",
+ * backfilling from lower-ranked capabilities when higher-ranked ones are
+ * denied by the active policy.
+ *
+ * Prefer this over calling `searchCapabilities` and
+ * `summarizeDiscoverySearch` separately when a real governance policy is
+ * active. With the default allow-all filter the behaviour is identical to the
+ * pre-fix call sequence.
+ *
+ * @param registry - Capability registry (or any iterable of capabilities)
+ * @param intent - Free-text intent
+ * @param limit - Maximum number of *allowed* results to return
+ * @param filter - Active governance filter (defaults to allow-all)
+ * @returns The discovery outcome
+ */
+export function governedDiscoverySearch(
+  registry: CapabilityRegistry | readonly Capability[],
+  intent: string,
+  limit: number,
+  filter: GovernanceFilter = ALLOW_ALL_GOVERNANCE
+): DiscoverySearchOutcome {
+  // Check whether any capability matches before governance is applied, so
+  // we can distinguish "nothing matched" (no-match) from "matches existed
+  // but all were denied" (governance-blocked).
+  const hasAnyMatch = searchCapabilitiesHasAnyMatch(registry, intent)
+  if (!hasAnyMatch) {
+    return { kind: 'no-match' }
+  }
+
+  // Apply governance BEFORE slicing: fetch all matches, govern, then trim.
+  const options: SearchCapabilitiesOptions = { limit, filter }
+  const governed = searchCapabilities(registry, intent, options)
+
+  if (governed.length === 0) {
+    // At least one match existed (hasAnyMatch) but governance denied them all
+    // before we could collect `limit` results. Count the full denied set by
+    // fetching without governance to get the total match count.
+    const allMatches = searchCapabilities(registry, intent, { limit: Number.MAX_SAFE_INTEGER })
+    return { kind: 'governance-blocked', deniedCount: allMatches.length }
+  }
+
+  // governed contains only allow/warn results (up to limit), with scores.
+  // Convert to GovernedCapability pairs by re-evaluating decisions.
+  const governedCapabilities: GovernedCapability[] = governed.map((r) => ({
+    capability: r.capability,
+    decision: filter.evaluate(r.capability),
+  }))
+
+  return { kind: 'matches', governed: governedCapabilities }
 }
 
 /**
