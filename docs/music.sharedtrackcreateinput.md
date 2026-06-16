@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [SharedTrackCreateInput](./music.sharedtrackcreateinput.md)
 
-## SharedTrackCreateInput interface
+## SharedTrackCreateInput type
 
 Input for creating a SharedTrack
 
 **Signature:**
 
 ```typescript
-interface SharedTrackCreateInput
+type SharedTrackCreateInput = Record<string, never>
 ```

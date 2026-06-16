@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ColorWellCreateInput](./system-events.colorwellcreateinput.md)
 
-## ColorWellCreateInput interface
+## ColorWellCreateInput type
 
 Input for creating a ColorWell
 
 **Signature:**
 
 ```typescript
-interface ColorWellCreateInput
+type ColorWellCreateInput = Record<string, never>
 ```

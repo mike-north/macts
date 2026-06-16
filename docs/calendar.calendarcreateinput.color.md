@@ -4,7 +4,7 @@
 
 ## CalendarCreateInput.color property
 
-The calendar color
+Calendar color
 
 **Signature:**
 

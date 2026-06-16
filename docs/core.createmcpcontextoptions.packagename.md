@@ -4,7 +4,7 @@
 
 ## CreateMcpContextOptions.packageName property
 
-Package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+Package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->-server)
 
 **Signature:**
 

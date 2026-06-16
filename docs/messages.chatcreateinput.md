@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/messages](./messages.md) &gt; [ChatCreateInput](./messages.chatcreateinput.md)
 
-## ChatCreateInput interface
+## ChatCreateInput type
 
 Input for creating a Chat
 
 **Signature:**
 
 ```typescript
-interface ChatCreateInput
+type ChatCreateInput = Record<string, never>
 ```

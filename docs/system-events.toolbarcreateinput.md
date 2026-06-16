@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ToolbarCreateInput](./system-events.toolbarcreateinput.md)
 
-## ToolbarCreateInput interface
+## ToolbarCreateInput type
 
 Input for creating a Toolbar
 
 **Signature:**
 
 ```typescript
-interface ToolbarCreateInput
+type ToolbarCreateInput = Record<string, never>
 ```

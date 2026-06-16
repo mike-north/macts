@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-settings](./system-settings.md) &gt; [PaneCreateInput](./system-settings.panecreateinput.md)
 
-## PaneCreateInput interface
+## PaneCreateInput type
 
 Input for creating a Pane
 
 **Signature:**
 
 ```typescript
-interface PaneCreateInput
+type PaneCreateInput = Record<string, never>
 ```

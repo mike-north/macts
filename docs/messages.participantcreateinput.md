@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/messages](./messages.md) &gt; [ParticipantCreateInput](./messages.participantcreateinput.md)
 
-## ParticipantCreateInput interface
+## ParticipantCreateInput type
 
 Input for creating a Participant
 
 **Signature:**
 
 ```typescript
-interface ParticipantCreateInput
+type ParticipantCreateInput = Record<string, never>
 ```

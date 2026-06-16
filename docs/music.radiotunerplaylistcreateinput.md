@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [RadioTunerPlaylistCreateInput](./music.radiotunerplaylistcreateinput.md)
 
-## RadioTunerPlaylistCreateInput interface
+## RadioTunerPlaylistCreateInput type
 
 Input for creating a RadioTunerPlaylist
 
 **Signature:**
 
 ```typescript
-interface RadioTunerPlaylistCreateInput
+type RadioTunerPlaylistCreateInput = Record<string, never>
 ```

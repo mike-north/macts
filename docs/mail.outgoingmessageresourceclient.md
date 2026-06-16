@@ -57,50 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./mail.outgoingmessageresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new outgoingmessage.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./mail.outgoingmessageresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a outgoingmessage.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./mail.outgoingmessageresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a outgoingmessage by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./mail.outgoingmessageresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all outgoingmessages.
-
-</td></tr>
-<tr><td>
-
 [send()](./mail.outgoingmessageresourceclient.send.md)
 
 </td><td>
@@ -108,17 +64,6 @@ List all outgoingmessages.
 </td><td>
 
 Sends a message.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./mail.outgoingmessageresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing outgoingmessage.
 
 </td></tr>
 </tbody></table>

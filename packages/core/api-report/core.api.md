@@ -588,6 +588,9 @@ export interface CreateMcpContextOptions {
 export function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext;
 
 // @public
+export function createPolicyGovernanceFilter(policy: GovernancePolicy): GovernanceFilter;
+
+// @public
 export const dateCoercer: TypeCoercer<Date>;
 
 // @public (undocumented)
@@ -1343,6 +1346,21 @@ export function loadManifestsFromDir(manifestsDir: string): Promise<{
 }>;
 
 // @public
+export function loadPolicyFromFile(path: string): Promise<LoadPolicyResult>;
+
+// @public
+export type LoadPolicyResult = {
+    readonly found: false;
+} | {
+    readonly found: true;
+    readonly error: string;
+    readonly issues?: readonly PolicyIssue[];
+} | {
+    readonly found: true;
+    readonly policy: GovernancePolicy;
+};
+
+// @public
 export class ManifestLoadError extends Error {
     constructor(message: string, path: string, originalError?: unknown);
     // (undocumented)
@@ -1570,6 +1588,13 @@ export interface PolicyEvaluation {
     readonly permission: string;
     readonly reason: string;
     readonly rule: MatchedPolicyRule;
+}
+
+// @public
+export class PolicyGovernanceFilter implements GovernanceFilter {
+    // @internal
+    constructor(policy: GovernancePolicy);
+    evaluate(capability: Capability): GovernanceDecision;
 }
 
 // @public

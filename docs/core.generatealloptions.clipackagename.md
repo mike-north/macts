@@ -4,7 +4,7 @@
 
 ## GenerateAllOptions.cliPackageName property
 
-CLI package name (defaults to @<!-- -->macts/cli-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+CLI package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
 
 **Signature:**
 

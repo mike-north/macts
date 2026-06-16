@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [DrawerCreateInput](./system-events.drawercreateinput.md)
 
-## DrawerCreateInput interface
+## DrawerCreateInput type
 
 Input for creating a Drawer
 
 **Signature:**
 
 ```typescript
-interface DrawerCreateInput
+type DrawerCreateInput = Record<string, never>
 ```

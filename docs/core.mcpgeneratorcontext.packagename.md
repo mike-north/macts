@@ -4,7 +4,7 @@
 
 ## McpGeneratorContext.packageName property
 
-Package name (e.g., '<!-- -->@<!-- -->macts/mcp-calendar')
+Package name (e.g., '<!-- -->@<!-- -->macts/calendar-server')
 
 **Signature:**
 

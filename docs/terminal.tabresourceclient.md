@@ -57,35 +57,13 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./terminal.tabresourceclient.create.md)
+[get(name)](./terminal.tabresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Create a new tab.
-
-</td></tr>
-<tr><td>
-
-[delete(tty)](./terminal.tabresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a tab.
-
-</td></tr>
-<tr><td>
-
-[get(tty)](./terminal.tabresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a tab by tty.
+Get a tab by name.
 
 </td></tr>
 <tr><td>
@@ -97,17 +75,6 @@ Get a tab by tty.
 </td><td>
 
 List all tabs.
-
-</td></tr>
-<tr><td>
-
-[update(tty, input)](./terminal.tabresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing tab.
 
 </td></tr>
 </tbody></table>

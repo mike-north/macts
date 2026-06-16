@@ -66,6 +66,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[CapabilityMetadata](./textedit.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Document](./textedit.document.md)
 
 </td><td>
@@ -106,6 +115,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./textedit.capabilities.md)
+
+</td><td>
+
+Every capability exposed by TextEdit, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DocumentSchema](./textedit.documentschema.md)
 
 </td><td>
@@ -125,6 +143,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./textedit.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [DocumentUpdateInput](./textedit.documentupdateinput.md)
 

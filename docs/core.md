@@ -82,6 +82,50 @@ Activate (bring to foreground) an application.
 </td></tr>
 <tr><td>
 
+[applyGovernance(capabilities, filter)](./core.applygovernance.md)
+
+</td><td>
+
+Apply a governance filter to a list of capabilities.
+
+Capabilities the filter `deny`<!-- -->s are dropped; `allow` and `warn` capabilities are kept, each paired with its decision so callers can annotate `warn` results. Order is preserved.
+
+</td></tr>
+<tr><td>
+
+[appPatternMatches(ruleApp, concreteApp)](./core.apppatternmatches.md)
+
+</td><td>
+
+Check whether a governance policy rule's `app` pattern matches a concrete app name.
+
+Mirrors the permission-system rule: the wildcard `'*'` matches any value; any other pattern must equal the concrete value exactly.
+
+</td></tr>
+<tr><td>
+
+[buildAppCommandRoute(appName, commandKey)](./core.buildappcommandroute.md)
+
+</td><td>
+
+Build the canonical route for an application-scoped command.
+
+Application commands are addressed as `{app}.app.{commandKey}`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[buildCapabilityRegistry(manifests)](./core.buildcapabilityregistry.md)
+
+</td><td>
+
+Build a [CapabilityRegistry](./core.capabilityregistry.md) from one or more manifests.
+
+Capabilities are indexed by their stable name for O(1) lookup. If two manifests produce the same capability name, the later one wins (callers are expected to pass distinct apps); the registry is otherwise order-independent.
+
+</td></tr>
+<tr><td>
+
 [buildHierarchy(sdef)](./core.buildhierarchy.md)
 
 </td><td>
@@ -89,6 +133,17 @@ Activate (bring to foreground) an application.
 Build a containment hierarchy from SDEF data.
 
 This function analyzes element relationships to determine: - Which classes are resources (have elements) vs value types (no elements) - The parent-child containment tree - The root class (typically 'application') - Classes with ambiguous placement (multiple parents)
+
+</td></tr>
+<tr><td>
+
+[buildResourceCommandRoute(appName, resourcePlural, commandKey)](./core.buildresourcecommandroute.md)
+
+</td><td>
+
+Build the canonical route for a resource-scoped command.
+
+Resource commands are addressed as `{app}.{resourcePlural}.{commandKey}`<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -111,11 +166,42 @@ Check multiple required permissions against granted permissions.
 </td></tr>
 <tr><td>
 
+[classifyCommandRisk(command)](./core.classifycommandrisk.md)
+
+</td><td>
+
+Classify the risk of a manifest [Command](./core.command.md)<!-- -->.
+
+Precedence: 1. An explicit, valid `risk` on the command (manifest override / lossless-plus). 2. Otherwise, the risk derived from the command's operation name via [classifyRiskFromOperation()](./core.classifyriskfromoperation.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[classifyRiskFromOperation(operationName)](./core.classifyriskfromoperation.md)
+
+</td><td>
+
+Classify a risk purely from an operation name, using the keyword tables.
+
+This is the deterministic core: given the same operation name it always returns the same risk class. Classification is word-token aware (it splits the operation name into words on camelCase boundaries and separators) so navigation verbs (`goForward`<!-- -->, `stepForward`<!-- -->) and predicate queries (`shouldEnableAction`<!-- -->, `canDelete`<!-- -->) are not misclassified by incidental substrings. Unknown / ambiguous names resolve to [DEFAULT_RISK](./core.default_risk.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
 [coarsePermission(app, resource, operation)](./core.coarsepermission.md)
 
 </td><td>
 
 Create a coarse permission string.
+
+</td></tr>
+<tr><td>
+
+[compareRisk(a, b)](./core.comparerisk.md)
+
+</td><td>
+
+Compare two risk classes by severity (ascending). Useful for deterministic sorting of capabilities by sensitivity.
 
 </td></tr>
 <tr><td>
@@ -138,11 +224,35 @@ Create an array coercer from element coercer.
 </td></tr>
 <tr><td>
 
+[createAuditRecord(input)](./core.createauditrecord.md)
+
+</td><td>
+
+Construct an immutable [AuditRecord](./core.auditrecord.md) from its inputs.
+
+Pure and deterministic: given the same input (including the injected `timestamp`<!-- -->) it always produces the same record. The input `timestamp` is defensively copied so the returned record cannot be mutated by later changes to the caller's `Date` instance. The optional `reason` is included only when provided, matching `exactOptionalPropertyTypes` semantics.
+
+</td></tr>
+<tr><td>
+
 [createEnumCoercer(values)](./core.createenumcoercer.md)
 
 </td><td>
 
 Create an enum coercer from enum definition.
+
+</td></tr>
+<tr><td>
+
+[createFileAuditWriter(path)](./core.createfileauditwriter.md)
+
+</td><td>
+
+Create an [AuditWriter](./core.auditwriter.md) that appends to a JSON-lines file at the given absolute path.
+
+Parent directories are created automatically on first use (equivalent to `mkdir -p`<!-- -->). Each call to `append` serialises the record via [serializeAuditRecord()](./core.serializeauditrecord.md)<!-- -->, JSON-encodes the result, appends it with a trailing newline, and resolves. Errors are propagated to the caller.
+
+The destination path is accepted as-is — no home-directory expansion, no environment-variable lookup. Callers are responsible for supplying an absolute path.
 
 </td></tr>
 <tr><td>
@@ -159,6 +269,17 @@ Create an enum coercer from enum definition.
 </td><td>
 
 Create an MCP generator context.
+
+</td></tr>
+<tr><td>
+
+[deriveCapabilities(manifest)](./core.derivecapabilities.md)
+
+</td><td>
+
+Derive the list of capabilities from a single manifest.
+
+Mirrors the MCP generator's traversal so the registry and generated tools stay in lock-step: one capability per resource command per matching resource, plus one per application command.
 
 </td></tr>
 <tr><td>
@@ -235,6 +356,21 @@ Find the coarse category that contains a fine-grained permission.
 </td></tr>
 <tr><td>
 
+[findMatchingPolicyRule(policy, app, \_resource, operation)](./core.findmatchingpolicyrule.md)
+
+</td><td>
+
+Find the first governance policy rule that governs a given capability call, expressed as `app`<!-- -->, `resource`<!-- -->, and `operation` segments parsed from an `app:resource:operation` string.
+
+Resolution order (first match wins, consistent with how `hasPermission` in `../permissions/matcher.ts` iterates granted permissions):
+
+1. Iterate `policy.apps` in declaration order. 2. For each app rule whose `app` pattern matches (via [appPatternMatches()](./core.apppatternmatches.md)<!-- -->), check `operations` for a per-operation override that matches (via [operationPatternMatches()](./core.operationpatternmatches.md)<!-- -->). 3. The first matching operation override wins; if none match, the app rule's own `disposition` applies (returned with `operationRuleIndex: -1`<!-- -->). 4. If no app rule matches at all, returns `undefined` and the caller should apply `policy.defaultDisposition`<!-- -->.
+
+Note: `resource` is accepted so this function can be called directly with a parsed `app:resource:operation` triple, but the current policy model does not have resource-level rules — only app-level and operation-level. The `resource` parameter is accepted for forward compatibility and to make the call-site signature self-documenting.
+
+</td></tr>
+<tr><td>
+
 [finePermission(app, resource, operation)](./core.finepermission.md)
 
 </td><td>
@@ -278,6 +414,15 @@ The API plugin packages up the app manifest and metadata so the core API server 
 </td><td>
 
 Generate the root application class.
+
+</td></tr>
+<tr><td>
+
+[generateCapabilitiesModule(manifest)](./core.generatecapabilitiesmodule.md)
+
+</td><td>
+
+Generate the contents of the `src/capabilities.ts` metadata module for an app.
 
 </td></tr>
 <tr><td>
@@ -485,6 +630,39 @@ Get the display name of an application.
 </td></tr>
 <tr><td>
 
+[getFineOperations(permissionsSection)](./core.getfineoperations.md)
+
+</td><td>
+
+Extract the set of fine-grained operation names a manifest declares.
+
+The manifest's `permissions` section maps each coarse alias to the fully-qualified fine-grained permissions it covers (e.g. `calendar:events:list`<!-- -->). The fine-grained \*operation\* is the third segment. This is the authoritative per-app fine-grained operation set — callers must not re-type it.
+
+</td></tr>
+<tr><td>
+
+[getOperationVocabulary(permissionsSection)](./core.getoperationvocabulary.md)
+
+</td><td>
+
+Build the full operation vocabulary for an app from its manifest.
+
+</td></tr>
+<tr><td>
+
+[governedDiscoverySearch(registry, intent, limit, filter)](./core.governeddiscoverysearch.md)
+
+</td><td>
+
+Governance-first capability discovery: apply governance to the \*\*full\*\* ranked match set, then slice to `limit`<!-- -->.
+
+This is the correct entry point for discovery surfaces (CLI, MCP). It guarantees that "give me the top N results" means "N \*allowed\* results", backfilling from lower-ranked capabilities when higher-ranked ones are denied by the active policy.
+
+Prefer this over calling `searchCapabilities` and `summarizeDiscoverySearch` separately when a real governance policy is active. With the default allow-all filter the behaviour is identical to the pre-fix call sequence.
+
+</td></tr>
+<tr><td>
+
 [groupPermissionsByResource(permissions)](./core.grouppermissionsbyresource.md)
 
 </td><td>
@@ -505,6 +683,15 @@ Permissions are stored and matched as fine-grained only. Coarse permissions are 
 </td></tr>
 <tr><td>
 
+[inspectCapability(registry, name, filter)](./core.inspectcapability.md)
+
+</td><td>
+
+Inspect a single capability by exact name, applying the active governance filter — the same seam search uses — so a `deny`<!-- -->d capability is never leaked through inspection.
+
+</td></tr>
+<tr><td>
+
 [isAppRunning(bundleId)](./core.isapprunning.md)
 
 </td><td>
@@ -518,7 +705,36 @@ Check if an application is currently running.
 
 </td><td>
 
-Check if an operation is a standard coarse CRUD operation.
+Check whether an operation token is one of the canonical coarse operations.
+
+</td></tr>
+<tr><td>
+
+[isPureCoarseOperation(operation)](./core.ispurecoarseoperation.md)
+
+</td><td>
+
+Check whether an operation token is a grouping-only coarse alias (`read` / `write`<!-- -->) — one that never names a real command and therefore authorizes nothing unless expanded against a manifest.
+
+</td></tr>
+<tr><td>
+
+[isRiskClass(value)](./core.isriskclass.md)
+
+</td><td>
+
+Type guard: is the given string a valid [RiskClass](./core.riskclass.md)<!-- -->?
+
+</td></tr>
+<tr><td>
+
+[isSensitiveKey(key, extraSensitiveKeys)](./core.issensitivekey.md)
+
+</td><td>
+
+Determine whether a key name should be treated as sensitive.
+
+Comparison is case-insensitive and the default sensitive-key list is always checked; `extraSensitiveKeys` (if provided) are merged in.
 
 </td></tr>
 <tr><td>
@@ -532,6 +748,15 @@ Validate a permission string without parsing it.
 </td></tr>
 <tr><td>
 
+[loadCapabilityRegistry(manifestsDir)](./core.loadcapabilityregistry.md)
+
+</td><td>
+
+Build a [CapabilityRegistry](./core.capabilityregistry.md) from every manifest under a directory.
+
+</td></tr>
+<tr><td>
+
 [loadManifest(manifestPath)](./core.loadmanifest.md)
 
 </td><td>
@@ -541,11 +766,53 @@ Load and validate a manifest from a YAML file.
 </td></tr>
 <tr><td>
 
+[loadManifestsFromDir(manifestsDir)](./core.loadmanifestsfromdir.md)
+
+</td><td>
+
+Load every manifest under a manifests root directory.
+
+Each immediate subdirectory containing an `app.yaml` is treated as one app. Subdirectories without an `app.yaml` are skipped. Manifests that fail to load are collected as errors rather than aborting the whole load, so one malformed manifest does not break discovery for the rest.
+
+</td></tr>
+<tr><td>
+
+[normalizeAppRouteSegment(appName)](./core.normalizeapproutesegment.md)
+
+</td><td>
+
+Normalize an application name into the canonical route segment.
+
+Whitespace is collapsed to single hyphens and the result is lowercased, so multi-word apps (e.g. "Google Chrome") produce a stable, URL-safe segment (`google-chrome`<!-- -->) identical on both the client and the server. Both surfaces MUST use this function rather than ad-hoc `toLowerCase()` calls.
+
+</td></tr>
+<tr><td>
+
+[normalizeResourceRouteSegment(plural)](./core.normalizeresourceroutesegment.md)
+
+</td><td>
+
+Normalize a resource's plural name into the canonical route segment.
+
+</td></tr>
+<tr><td>
+
 [nullSafe(coercer)](./core.nullsafe.md)
 
 </td><td>
 
 Wrap a coercer to handle null/undefined values.
+
+</td></tr>
+<tr><td>
+
+[operationPatternMatches(ruleOperation, concreteOperation)](./core.operationpatternmatches.md)
+
+</td><td>
+
+Check whether a governance policy operation pattern matches a concrete operation name.
+
+Mirrors the permission-system rule: the wildcard `'*'` matches any value; any other pattern must equal the concrete value exactly.
 
 </td></tr>
 <tr><td>
@@ -568,6 +835,19 @@ Parse a permission string into a structured permission object.
 The parser determines permission type based on: 1. If resource or operation contains `*`<!-- -->, it's a wildcard 2. If operation is a standard CRUD operation (read/create/write/delete), it's coarse 3. Otherwise, it's fine-grained
 
 Note: The distinction between coarse and fine is contextual. The manifest's permissions section defines which operations are coarse for each resource. This parser makes a best-effort guess based on standard conventions.
+
+</td></tr>
+<tr><td>
+
+[parsePolicy(input)](./core.parsepolicy.md)
+
+</td><td>
+
+Parse and validate an untrusted value as a governance policy declaration at a trust boundary.
+
+Uses Zod's `.safeParse()` so malformed input never throws; instead it returns a structured [ParsePolicyResult](./core.parsepolicyresult.md)<!-- -->. On success the returned [GovernancePolicy](./core.governancepolicy.md) has all defaults applied (e.g. `defaultDisposition` becomes `forbidden` when omitted). On failure, every validation problem is reported as a [PolicyIssue](./core.policyissue.md) with a dotted `path` and a human-readable `message`<!-- -->.
+
+This function does NOT compile the declaration to enforcement permissions, resolve rule precedence, or validate that referenced apps/operations exist — those are governed by the open \#7 design decision and live elsewhere.
 
 </td></tr>
 <tr><td>
@@ -603,6 +883,72 @@ Quit an application.
 </td></tr>
 <tr><td>
 
+[redactArgs(args, options)](./core.redactargs.md)
+
+</td><td>
+
+Redact sensitive values from a capability-call argument map and return a human-readable summary string suitable for [AuditRecordInput.argsSummary](./core.auditrecordinput.argssummary.md)<!-- -->.
+
+Sensitive key names (matched case-insensitively against [DEFAULT_SENSITIVE_KEYS](./core.default_sensitive_keys.md) plus any `extraSensitiveKeys`<!-- -->) have their values replaced with [REDACTED_PLACEHOLDER](./core.redacted_placeholder.md)<!-- -->. All other values are summarised safely (scalars inline, large objects/arrays collapsed to a size hint) so the record never contains raw bulk data.
+
+An empty argument map produces the string `"(no arguments)"` so the field is always non-empty and audit-record consumers can distinguish "no args" from "redaction removed everything".
+
+Key ordering in the output follows `Object.entries` order (i.e. insertion order of the original map).
+
+</td></tr>
+<tr><td>
+
+[resolveCommandRoutes(manifest, commandKey, command)](./core.resolvecommandroutes.md)
+
+</td><td>
+
+Resolve every canonical RPC route for a single manifest command.
+
+</td></tr>
+<tr><td>
+
+[resolveDiscoveryLimit(raw, defaultLimit)](./core.resolvediscoverylimit.md)
+
+</td><td>
+
+Validate a user-supplied result limit, falling back to a default when the input is not a positive integer.
+
+The discovery surfaces accept a `--limit` flag / `limit` argument that flows into `Array.prototype.slice`<!-- -->. A `NaN` (e.g. `--limit foo`<!-- -->), zero, negative, or fractional value would silently produce wrong results (`slice(0, NaN)` yields an empty list), so anything that is not a positive integer is rejected in favor of the default.
+
+</td></tr>
+<tr><td>
+
+[resolveListOutputProperties(resource)](./core.resolvelistoutputproperties.md)
+
+</td><td>
+
+Resolve the set of property names a `list` operation must read for a resource so its output is usable by sibling operations.
+
+This is every declared property plus the primary-identifier property (which a manifest may declare in `identifiers` without also listing it under `properties`<!-- -->). Deriving the list here — rather than reading `Object.keys(resource.properties)` directly — guarantees the identifier is always present in list output even when it is not a regular property.
+
+</td></tr>
+<tr><td>
+
+[resolveManifestRoutes(manifest)](./core.resolvemanifestroutes.md)
+
+</td><td>
+
+Resolve every canonical RPC route for an entire manifest, across all commands.
+
+</td></tr>
+<tr><td>
+
+[resolvePrimaryIdentifierProperty(resource)](./core.resolveprimaryidentifierproperty.md)
+
+</td><td>
+
+Resolve the manifest-declared primary identifier property name for a resource.
+
+The identifier is taken from the resource's `identifiers` array: the entry flagged `primary` wins; otherwise the first declared entry is used. Returns `undefined` when the resource declares no identifiers — callers MUST handle this (a resource with no manifest identifier cannot be addressed by id, so list output simply omits the canonical alias rather than inventing one).
+
+</td></tr>
+<tr><td>
+
 [runJxa(code, options)](./core.runjxa.md)
 
 </td><td>
@@ -621,6 +967,48 @@ Execute JXA code in the context of an application.
 </td></tr>
 <tr><td>
 
+[scoreCapability(capability, terms)](./core.scorecapability.md)
+
+</td><td>
+
+Score a single capability against a set of intent terms.
+
+</td></tr>
+<tr><td>
+
+[searchCapabilities(registry, intent, options)](./core.searchcapabilities.md)
+
+</td><td>
+
+Rank capabilities in a registry by how well they match an intent.
+
+When `options.filter` is provided, governance is applied to the \*\*full\*\* ranked list \*before\* the limit is applied. This ensures that denied capabilities are replaced by lower-ranked allowed ones so the caller receives up to `limit` usable results rather than up to `limit` results that may include silently-dropped denied entries.
+
+</td></tr>
+<tr><td>
+
+[serializeAuditRecord(record)](./core.serializeauditrecord.md)
+
+</td><td>
+
+Serialize an [AuditRecord](./core.auditrecord.md) to its JSON-safe [SerializedAuditRecord](./core.serializedauditrecord.md) form.
+
+Deterministic: the `timestamp` becomes a stable ISO-8601 string and `reason` is included only when present. No storage is performed — the caller decides where the serialized record goes.
+
+</td></tr>
+<tr><td>
+
+[summarizeDiscoverySearch(ranked, filter)](./core.summarizediscoverysearch.md)
+
+</td><td>
+
+Classify ranked search results against a governance filter into one of the three [DiscoverySearchOutcome](./core.discoverysearchoutcome.md) cases.
+
+\*\*Governance ordering:\*\* For correct `--limit` behaviour, governance must be applied \*before\* slicing. Use [governedDiscoverySearch()](./core.governeddiscoverysearch.md) (the all-in-one entry point) instead of calling `searchCapabilities` then this function, unless you have already applied governance upstream.
+
+</td></tr>
+<tr><td>
+
 [toJsonSchema(schema, options)](./core.tojsonschema.md)
 
 </td><td>
@@ -635,6 +1023,15 @@ Convert a Zod schema to JSON Schema Draft 7.
 </td><td>
 
 Convert a Zod schema to JSON Schema with definitions. Useful for complex schemas with cross-references.
+
+</td></tr>
+<tr><td>
+
+[tokenizeIntent(intent)](./core.tokenizeintent.md)
+
+</td><td>
+
+Tokenize an intent string into lowercase terms.
 
 </td></tr>
 <tr><td>
@@ -736,6 +1133,68 @@ Options for generating an API plugin.
 [AppConnectionOptions](./core.appconnectionoptions.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[AuditRecord](./core.auditrecord.md)
+
+</td><td>
+
+A structured, attributable record of a single capability call.
+
+Every field is a string except `timestamp`<!-- -->, which is a `Date`<!-- -->. To serialize a record losslessly to JSON, convert it with [serializeAuditRecord()](./core.serializeauditrecord.md)<!-- -->, which renders the `timestamp` as an ISO-8601 string. All fields are `readonly`<!-- -->, so the record reference is shallowly immutable; note the `timestamp` `Date` is itself mutable (the constructor stores a defensive copy — see [createAuditRecord()](./core.createauditrecord.md)<!-- -->).
+
+</td></tr>
+<tr><td>
+
+[AuditRecordInput](./core.auditrecordinput.md)
+
+</td><td>
+
+The inputs needed to construct an [AuditRecord](./core.auditrecord.md)<!-- -->.
+
+The timestamp is supplied by the caller (injected, never read from `Date.now()` inside this module) so records are deterministic and testable.
+
+</td></tr>
+<tr><td>
+
+[AuditWriter](./core.auditwriter.md)
+
+</td><td>
+
+A sink for [AuditRecord](./core.auditrecord.md) instances.
+
+Implementations must append one complete, newline-terminated JSON object per call and must surface I/O errors rather than swallowing them.
+
+</td></tr>
+<tr><td>
+
+[Capability](./core.capability.md)
+
+</td><td>
+
+A single discoverable capability.
+
+Every field is derived deterministically from the manifest, so the same manifest always yields the same capability descriptor.
+
+</td></tr>
+<tr><td>
+
+[CapabilityRegistry](./core.capabilityregistry.md)
+
+</td><td>
+
+A capability registry: the set of capabilities derived from one or more manifests, indexed by stable name.
+
+</td></tr>
+<tr><td>
+
+[CapabilitySearchResult](./core.capabilitysearchresult.md)
+
+</td><td>
+
+A scored search result.
 
 </td></tr>
 <tr><td>
@@ -983,6 +1442,46 @@ Result of generating a server package.
 </td></tr>
 <tr><td>
 
+[GovernanceDecision](./core.governancedecision.md)
+
+</td><td>
+
+A governance decision for a single capability.
+
+</td></tr>
+<tr><td>
+
+[GovernanceFilter](./core.governancefilter.md)
+
+</td><td>
+
+Governance filter interface.
+
+Implemented by the governance workstream to plug a real policy into discovery. Implementations must be pure with respect to their input (deciding the same way for the same capability + context) so discovery stays deterministic.
+
+</td></tr>
+<tr><td>
+
+[GovernedCapability](./core.governedcapability.md)
+
+</td><td>
+
+A capability paired with its governance decision.
+
+</td></tr>
+<tr><td>
+
+[GovernedCapabilityResult](./core.governedcapabilityresult.md)
+
+</td><td>
+
+A capability paired with its governance decision \*\*and\*\* its lexical search score. Returned by [governedDiscoverySearch()](./core.governeddiscoverysearch.md) so callers (e.g. the CLI's JSON output) can expose the score without a second search pass.
+
+Extends [GovernedCapability](./core.governedcapability.md) — callers that only need `capability` and `decision` remain unaffected.
+
+</td></tr>
+<tr><td>
+
 [HierarchyResult](./core.hierarchyresult.md)
 
 </td><td>
@@ -997,6 +1496,15 @@ Result of hierarchy analysis.
 </td><td>
 
 Options for HTTP client SDK generation.
+
+</td></tr>
+<tr><td>
+
+[JsonSchema](./core.jsonschema.md)
+
+</td><td>
+
+JSON Schema for MCP tool inputs. Simplified representation matching MCP's JsonSchema interface.
 
 </td></tr>
 <tr><td>
@@ -1026,11 +1534,33 @@ Enum value for JXA coercion (name and four-char code).
 </td></tr>
 <tr><td>
 
+[ManifestRoute](./core.manifestroute.md)
+
+</td><td>
+
+A single resolved RPC route for a manifest command.
+
+A resource-scoped command may resolve to multiple routes if it applies to multiple resource types; each entry carries the resolved resource.
+
+</td></tr>
+<tr><td>
+
 [McpGeneratorContext](./core.mcpgeneratorcontext.md)
 
 </td><td>
 
 Context for MCP generator.
+
+</td></tr>
+<tr><td>
+
+[OperationVocabulary](./core.operationvocabulary.md)
+
+</td><td>
+
+The operation vocabulary for a single app, derived from its manifest.
+
+`coarse` is always the fixed [COARSE_OPERATIONS](./core.coarse_operations.md) set; `fine` is the set of fine-grained operation names the manifest actually declares.
 
 </td></tr>
 <tr><td>
@@ -1049,6 +1579,26 @@ Result of permission check.
 </td><td>
 
 Generate a complete permission map from a manifest's permissions section. The map contains both directions: coarse→fine and fine→coarse.
+
+</td></tr>
+<tr><td>
+
+[PolicyIssue](./core.policyissue.md)
+
+</td><td>
+
+A single structured validation issue from [parsePolicy()](./core.parsepolicy.md)<!-- -->.
+
+`path` is the dotted/indexed location of the offending field (e.g. `apps.0.disposition`<!-- -->); `message` is the human-readable reason. This is a stable, serializable shape so callers (CLI, API) can surface errors without depending on Zod's internal error object.
+
+</td></tr>
+<tr><td>
+
+[PolicyRuleMatch](./core.policyrulematch.md)
+
+</td><td>
+
+The result of resolving which governance rule governs a capability call.
 
 </td></tr>
 <tr><td>
@@ -1134,6 +1684,35 @@ Raw suite - a logical grouping of related classes, commands, and enumerations. S
 </td></tr>
 <tr><td>
 
+[RedactArgsOptions](./core.redactargsoptions.md)
+
+</td><td>
+
+Options for [redactArgs()](./core.redactargs.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[SearchCapabilitiesOptions](./core.searchcapabilitiesoptions.md)
+
+</td><td>
+
+Options for [searchCapabilities()](./core.searchcapabilities.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[SerializedAuditRecord](./core.serializedauditrecord.md)
+
+</td><td>
+
+The JSON-serializable form of an [AuditRecord](./core.auditrecord.md)<!-- -->.
+
+Identical to [AuditRecord](./core.auditrecord.md) except `timestamp` is an ISO-8601 string so the record round-trips through JSON without losing precision or type. The `reason` field is omitted entirely when absent (rather than serialized as `null`<!-- -->/`undefined`<!-- -->) to keep records compact and stable.
+
+</td></tr>
+<tr><td>
+
 [SpecifierStep](./core.specifierstep.md)
 
 </td><td>
@@ -1174,6 +1753,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[ALLOW_ALL_GOVERNANCE](./core.allow_all_governance.md)
+
+</td><td>
+
+The default governance filter: a no-op pass-through that allows every capability. Used when no policy is active, so discovery behaves identically to having no governance layer at all.
+
+</td></tr>
+<tr><td>
+
 [AppManifestSchema](./core.appmanifestschema.md)
 
 </td><td>
@@ -1192,11 +1780,57 @@ Schema for app-level metadata.
 </td></tr>
 <tr><td>
 
+[AppPatternSchema](./core.apppatternschema.md)
+
+</td><td>
+
+An app-name pattern in a rule.
+
+The app segment of `app:resource:operation`<!-- -->, or `*` to mean "every app".
+
+</td></tr>
+<tr><td>
+
+[AppRuleSchema](./core.appruleschema.md)
+
+</td><td>
+
+A governance rule scoped to one app (or all apps via `*`<!-- -->).
+
+The `disposition` is the app-level default; `operations` carries finer-grained overrides for specific operations. `restrictions` bounds where the app may act (paths/URLs), and `tags` carries app-wide sensitivity labels.
+
+</td></tr>
+<tr><td>
+
+[AUDIT_DECISIONS](./core.audit_decisions.md)
+
+</td><td>
+
+The outcome a governance evaluation reached for a capability call.
+
+- `allowed` — the call was permitted and executed. - `denied` — the call was blocked by policy (out-of-bounds capability). - `approved` — the call required confirmation and a human approved it. - `rejected` — the call required confirmation and a human declined it.
+
+Distinguishing `denied` (policy) from `rejected` (human) keeps the audit trail precise about \*why\* a call did not run.
+
+</td></tr>
+<tr><td>
+
 [booleanCoercer](./core.booleancoercer.md)
 
 </td><td>
 
 Coerce booleans - JXA uses JavaScript booleans.
+
+</td></tr>
+<tr><td>
+
+[CANONICAL_IDENTIFIER_KEY](./core.canonical_identifier_key.md)
+
+</td><td>
+
+The canonical key under which every generated surface exposes a resource's primary identifier.
+
+App manifests declare the identifier under an app-specific property name (e.g. `calendarIdentifier`<!-- -->, `uid`<!-- -->, `name`<!-- -->), and sibling write operations may reference it under yet another name (e.g. `calendarId`<!-- -->). Rather than force consumers to know each app's property name, list output additionally exposes the identifier value under this single, stable alias. A consumer that has a list item can always read `item[CANONICAL_IDENTIFIER_KEY]` and pass it to the route that needs it.
 
 </td></tr>
 <tr><td>
@@ -1214,7 +1848,11 @@ Relationship cardinality.
 
 </td><td>
 
-Standard CRUD operations for coarse permissions.
+The canonical, fixed set of coarse CRUD operations.
+
+This is the ONLY place this list is defined. Coarse operations are aliases that group fine-grained operations; they are expanded against a manifest at key-creation time and never authorize a call directly.
+
+Note there is intentionally \*\*no\*\* standalone `read` \*that authorizes\*: a coarse `read` only ever resolves to the concrete fine-grained operations (`list`<!-- -->, `get`<!-- -->, `show`<!-- -->, …) declared by the manifest. A bare `app:resource:read` scope that is not expanded against a manifest authorizes nothing and is therefore rejected at creation time rather than stored.
 
 </td></tr>
 <tr><td>
@@ -1296,6 +1934,28 @@ Coerce dates between TypeScript Date and JXA. JXA handles dates as JavaScript Da
 </td><td>
 
 ISO 8601 date-time string or Date object. Used for dates throughout macts.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_RISK](./core.default_risk.md)
+
+</td><td>
+
+Default classification for an operation whose intent cannot be determined.
+
+The safe default is the most conservative \*gateable\* class rather than the least sensitive one: misclassifying a mutating or code-running operation as `read` would silently bypass governance, whereas over-classifying an unknown operation as `execute` only prompts for explicit escalation. We therefore fail safe toward `execute`<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[DEFAULT_SENSITIVE_KEYS](./core.default_sensitive_keys.md)
+
+</td><td>
+
+Default set of key names (compared case-insensitively) whose values are unconditionally replaced with [REDACTED_PLACEHOLDER](./core.redacted_placeholder.md)<!-- -->.
+
+The list covers the most common secrets that appear as call arguments. Callers may extend it by passing `extraSensitiveKeys` to [redactArgs()](./core.redactargs.md)<!-- -->.
 
 </td></tr>
 <tr><td>
@@ -1426,6 +2086,28 @@ Schema for open questions from extraction.
 </td></tr>
 <tr><td>
 
+[OperationPatternSchema](./core.operationpatternschema.md)
+
+</td><td>
+
+An operation name within an app rule.
+
+This is the \*operation\* segment of the enforcement model's `app:resource:operation` triple, or the wildcard `*` meaning "every operation". The declaration stays domain-agnostic: it does not require the operation to exist in any particular manifest (that cross-check is part of compilation, which is out of scope here).
+
+</td></tr>
+<tr><td>
+
+[OperationRuleSchema](./core.operationruleschema.md)
+
+</td><td>
+
+Per-operation override inside an app rule.
+
+Lets a declaration set a disposition (and optional tags / human-readable reason) for a specific operation that differs from the app-level default. Storing this as a structured record — rather than inferring it — keeps the declaration explicit and auditable.
+
+</td></tr>
+<tr><td>
+
 [pathCoercer](./core.pathcoercer.md)
 
 </td><td>
@@ -1440,6 +2122,17 @@ Coerce paths between POSIX and AppleScript Path format.
 </td><td>
 
 POSIX path string.
+
+</td></tr>
+<tr><td>
+
+[PatternRestrictionSchema](./core.patternrestrictionschema.md)
+
+</td><td>
+
+A glob/pattern restriction on filesystem paths or URLs.
+
+Restrictions are expressed as opaque, non-empty pattern strings; this module validates only that they are well-formed strings, not that a given path matches (matching semantics belong to the enforcement/compilation layer that the design decision governs).
 
 </td></tr>
 <tr><td>
@@ -1467,6 +2160,41 @@ Permissions section - maps resources to their coarse→fine permission mappings.
 </td><td>
 
 Point with x, y coordinates.
+
+</td></tr>
+<tr><td>
+
+[POLICY_DISPOSITIONS](./core.policy_dispositions.md)
+
+</td><td>
+
+The disposition a policy assigns to an app or operation.
+
+Mirrors the four states the issue enumerates:
+
+- `allowed` — the agent may invoke the operation without friction. - `read-only` — only non-mutating (observational) use is permitted; any mutating use is treated as if forbidden. - `confirm-first` — permitted, but a human must approve each invocation before it runs (the approval-gate wiring itself is decision-dependent and is NOT implemented here). - `forbidden` — the agent may never invoke the operation.
+
+Ordered least-to-most restrictive for stable, deterministic iteration.
+
+</td></tr>
+<tr><td>
+
+[PolicyDispositionSchema](./core.policydispositionschema.md)
+
+</td><td>
+
+Zod schema for [PolicyDisposition](./core.policydisposition.md)<!-- -->.
+
+</td></tr>
+<tr><td>
+
+[PolicySchema](./core.policyschema.md)
+
+</td><td>
+
+The top-level governance policy declaration.
+
+A declaration is a list of app rules plus a global `defaultDisposition` that applies to any app/operation no rule covers. Making the default explicit (and defaulting it to the most restrictive `forbidden`<!-- -->) keeps the boundary fail-closed: an operation no rule mentions is denied rather than silently permitted.
 
 </td></tr>
 <tr><td>
@@ -1507,11 +2235,33 @@ Property type - can be primitive, array, resource reference, or enum reference.
 </td></tr>
 <tr><td>
 
+[PURE_COARSE_OPERATIONS](./core.pure_coarse_operations.md)
+
+</td><td>
+
+Coarse operations that are \*grouping-only\*: they are never a real fine-grained command operation, so a bare `app:resource:<op>` scope using one of these authorizes nothing unless expanded against a manifest.
+
+`read` and `write` are pure aliases (commands use concrete operations like `list`<!-- -->/`get`<!-- -->/`show` and `update`<!-- -->/`insert`<!-- -->/`save`<!-- -->). By contrast `create` and `delete` double as genuine fine-grained operations (a command's operation may literally be `create`<!-- -->), so they are \*not\* grouping-only — a `calendar:events:create` scope authorizes the `create` call directly.
+
+Manifests must not declare a command whose operation is a grouping-only coarse alias; [isPureCoarseOperation()](./core.ispurecoarseoperation.md) backs the validation that enforces this.
+
+</td></tr>
+<tr><td>
+
 [RectTypeSchema](./core.recttypeschema.md)
 
 </td><td>
 
 Rectangle with position and size.
+
+</td></tr>
+<tr><td>
+
+[REDACTED_PLACEHOLDER](./core.redacted_placeholder.md)
+
+</td><td>
+
+The placeholder written in place of a sensitive argument value.
 
 </td></tr>
 <tr><td>
@@ -1534,11 +2284,64 @@ Schema for a resource type definition.
 </td></tr>
 <tr><td>
 
+[RestrictionsSchema](./core.restrictionsschema.md)
+
+</td><td>
+
+Path and URL restrictions that bound where an app rule may operate.
+
+`allow`<!-- -->/`deny` lists are kept separate (rather than a single signed list) so the declaration is explicit about intent and a reviewer can read the boundary directly. Empty lists mean "no restriction of this kind"; the precedence of allow vs. deny when both match is a compilation concern and is not decided here.
+
+</td></tr>
+<tr><td>
+
 [RgbTypeSchema](./core.rgbtypeschema.md)
 
 </td><td>
 
 RGB color with 0-255 values.
+
+</td></tr>
+<tr><td>
+
+[RISK_CLASSES](./core.risk_classes.md)
+
+</td><td>
+
+The closed set of risk classifications a capability can carry.
+
+Ordered from least to most sensitive for stable, deterministic sorting.
+
+</td></tr>
+<tr><td>
+
+[RiskClassSchema](./core.riskclassschema.md)
+
+</td><td>
+
+Risk classification for a command.
+
+Risk is normally \*derived deterministically\* from the operation semantics by the capability layer (see `capabilities/risk.ts`<!-- -->); this manifest field exists only as an optional override for the rare case where the derived value is wrong (lossless-plus). It must be one of the canonical risk classes.
+
+</td></tr>
+<tr><td>
+
+[SEARCH_WEIGHTS](./core.search_weights.md)
+
+</td><td>
+
+Per-location scoring weights. Exported for tests to derive expectations.
+
+</td></tr>
+<tr><td>
+
+[SensitivityTagSchema](./core.sensitivitytagschema.md)
+
+</td><td>
+
+Sensitivity tags applied to an app or operation rule.
+
+Tags are free-form labels a security team uses to group and reason about capabilities (e.g. `pii`<!-- -->, `financial`<!-- -->, `outbound`<!-- -->, `irreversible`<!-- -->). They are declarative metadata only — how a downstream policy \*acts\* on a tag is part of the open compilation decision and is not modeled here. Tags are lowercased, non-empty, and use a restricted charset so they are stable identifiers rather than prose.
 
 </td></tr>
 <tr><td>
@@ -1577,6 +2380,17 @@ TCC (Transparency, Consent, and Control) entitlements.
 Current version of the macts packages. All `@macts/*` packages use fixed versioning and stay in sync.
 
 </td></tr>
+<tr><td>
+
+[WILDCARD](./core.wildcard.md)
+
+</td><td>
+
+The wildcard operation token.
+
+`app:resource:*` authorizes every fine-grained operation on a resource; `app:*:*` authorizes every operation on every resource for an app. Unlike a coarse operation, a wildcard is matched directly by the matcher and needs no manifest to be meaningful.
+
+</td></tr>
 </tbody></table>
 
 ## Type Aliases
@@ -1606,6 +2420,33 @@ Description
 </td></tr>
 <tr><td>
 
+[AppPattern](./core.apppattern.md)
+
+</td><td>
+
+An app pattern: a concrete app name or the `*` wildcard.
+
+</td></tr>
+<tr><td>
+
+[AppRule](./core.apprule.md)
+
+</td><td>
+
+A single app-scoped governance rule.
+
+</td></tr>
+<tr><td>
+
+[AuditDecision](./core.auditdecision.md)
+
+</td><td>
+
+A single audit decision value.
+
+</td></tr>
+<tr><td>
+
 [Cardinality](./core.cardinality.md)
 
 </td><td>
@@ -1623,6 +2464,8 @@ Description
 [CoarseOperation](./core.coarseoperation.md)
 
 </td><td>
+
+A coarse CRUD operation name.
 
 </td></tr>
 <tr><td>
@@ -1676,6 +2519,17 @@ Description
 </td></tr>
 <tr><td>
 
+[DiscoverySearchOutcome](./core.discoverysearchoutcome.md)
+
+</td><td>
+
+The outcome of a governance-aware discovery search.
+
+A discriminated union so callers can render the three distinct cases correctly — critically, only `no-match` should suggest generating a new capability; `governance-blocked` means matches existed but policy hid them.
+
+</td></tr>
+<tr><td>
+
 [DistributionModel](./core.distributionmodel.md)
 
 </td><td>
@@ -1718,6 +2572,28 @@ Description
 </td></tr>
 <tr><td>
 
+[GovernanceDisposition](./core.governancedisposition.md)
+
+</td><td>
+
+The disposition a governance policy assigns to a capability at discovery time.
+
+- `allow` — surface normally. - `warn` — surface, but flag it (e.g. requires explicit escalation). - `deny` — hide from discovery results entirely.
+
+</td></tr>
+<tr><td>
+
+[GovernancePolicy](./core.governancepolicy.md)
+
+</td><td>
+
+A fully-parsed, validated governance policy declaration.
+
+All defaultable fields are present after parsing (defaults applied), so consumers never have to special-case "absent vs. default".
+
+</td></tr>
+<tr><td>
+
 [HexColor](./core.hexcolor.md)
 
 </td><td>
@@ -1753,9 +2629,36 @@ Description
 </td></tr>
 <tr><td>
 
+[InspectOutcome](./core.inspectoutcome.md)
+
+</td><td>
+
+The outcome of a governance-aware inspect-by-name lookup.
+
+</td></tr>
+<tr><td>
+
 [OpenQuestion](./core.openquestion.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[OperationPattern](./core.operationpattern.md)
+
+</td><td>
+
+An operation pattern: a concrete operation name or the `*` wildcard.
+
+</td></tr>
+<tr><td>
+
+[OperationRule](./core.operationrule.md)
+
+</td><td>
+
+A single operation-level rule within an app rule.
 
 </td></tr>
 <tr><td>
@@ -1765,6 +2668,17 @@ Description
 </td><td>
 
 Union type for all parsed permission types.
+
+</td></tr>
+<tr><td>
+
+[ParsePolicyResult](./core.parsepolicyresult.md)
+
+</td><td>
+
+The result of [parsePolicy()](./core.parsepolicy.md)<!-- -->: a discriminated union of success/failure.
+
+Success carries the parsed, defaults-applied [GovernancePolicy](./core.governancepolicy.md)<!-- -->; failure carries the structured [PolicyIssue](./core.policyissue.md) list. Returning a result (rather than throwing) makes this safe to call directly at a trust boundary.
 
 </td></tr>
 <tr><td>
@@ -1797,6 +2711,15 @@ Union type for all parsed permission types.
 </td></tr>
 <tr><td>
 
+[PolicyDisposition](./core.policydisposition.md)
+
+</td><td>
+
+A single policy disposition value (`allowed` \| `read-only` \| `confirm-first` \| `forbidden`<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [PrimitiveType](./core.primitivetype.md)
 
 </td><td>
@@ -1825,6 +2748,15 @@ Union type for all parsed permission types.
 </td></tr>
 <tr><td>
 
+[PureCoarseOperation](./core.purecoarseoperation.md)
+
+</td><td>
+
+A grouping-only coarse operation name (`read` \| `write`<!-- -->).
+
+</td></tr>
+<tr><td>
+
 [RectType](./core.recttype.md)
 
 </td><td>
@@ -1846,7 +2778,32 @@ Union type for all parsed permission types.
 </td></tr>
 <tr><td>
 
+[Restrictions](./core.restrictions.md)
+
+</td><td>
+
+Path and URL restriction lists for an app rule.
+
+</td></tr>
+<tr><td>
+
 [RgbType](./core.rgbtype.md)
+
+</td><td>
+
+</td></tr>
+<tr><td>
+
+[RiskClass](./core.riskclass.md)
+
+</td><td>
+
+A single risk classification value.
+
+</td></tr>
+<tr><td>
+
+[RiskClassValue](./core.riskclassvalue.md)
 
 </td><td>
 
@@ -1858,6 +2815,15 @@ Union type for all parsed permission types.
 </td><td>
 
 Selector types for narrowing collections.
+
+</td></tr>
+<tr><td>
+
+[SensitivityTag](./core.sensitivitytag.md)
+
+</td><td>
+
+A sensitivity tag — a stable, lowercase label (e.g. `pii`<!-- -->, `outbound`<!-- -->).
 
 </td></tr>
 <tr><td>

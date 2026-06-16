@@ -93,6 +93,21 @@ The exception dates for recurring events
 </td></tr>
 <tr><td>
 
+[id?](./calendar.event_2.id.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Canonical identifier (mirrors `uid`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+
+</td></tr>
+<tr><td>
+
 [location](./calendar.event_2.location.md)
 
 </td><td>

@@ -68,17 +68,6 @@ Create a new note.
 </td></tr>
 <tr><td>
 
-[delete(name)](./notes.noteresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a note.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./notes.noteresourceclient.get.md)
 
 </td><td>
@@ -108,17 +97,6 @@ List all notes.
 </td><td>
 
 Show a note in the Notes app
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./notes.noteresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing note.
 
 </td></tr>
 </tbody></table>

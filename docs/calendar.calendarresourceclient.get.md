@@ -4,12 +4,12 @@
 
 ## CalendarResourceClient.get() method
 
-Get a calendar by calendarIdentifier.
+Get a calendar by id.
 
 **Signature:**
 
 ```typescript
-get(calendarIdentifier: string): Promise<Calendar>;
+get(id: string): Promise<Calendar>;
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-calendarIdentifier
+id
 
 </td><td>
 

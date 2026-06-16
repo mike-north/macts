@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./terminal.settingssetresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new settingsset.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./terminal.settingssetresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a settingsset.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./terminal.settingssetresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a settingsset by name.
 </td><td>
 
 List all settingssets.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./terminal.settingssetresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing settingsset.
 
 </td></tr>
 </tbody></table>

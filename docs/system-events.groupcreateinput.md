@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [GroupCreateInput](./system-events.groupcreateinput.md)
 
-## GroupCreateInput interface
+## GroupCreateInput type
 
 Input for creating a Group
 
 **Signature:**
 
 ```typescript
-interface GroupCreateInput
+type GroupCreateInput = Record<string, never>
 ```

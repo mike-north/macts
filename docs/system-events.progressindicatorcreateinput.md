@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ProgressIndicatorCreateInput](./system-events.progressindicatorcreateinput.md)
 
-## ProgressIndicatorCreateInput interface
+## ProgressIndicatorCreateInput type
 
 Input for creating a ProgressIndicator
 
 **Signature:**
 
 ```typescript
-interface ProgressIndicatorCreateInput
+type ProgressIndicatorCreateInput = Record<string, never>
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [LibraryPlaylistCreateInput](./music.libraryplaylistcreateinput.md)
 
-## LibraryPlaylistCreateInput interface
+## LibraryPlaylistCreateInput type
 
 Input for creating a LibraryPlaylist
 
 **Signature:**
 
 ```typescript
-interface LibraryPlaylistCreateInput
+type LibraryPlaylistCreateInput = Record<string, never>
 ```

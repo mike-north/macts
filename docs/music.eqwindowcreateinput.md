@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/music](./music.md) &gt; [EQWindowCreateInput](./music.eqwindowcreateinput.md)
 
-## EQWindowCreateInput interface
+## EQWindowCreateInput type
 
 Input for creating a EQWindow
 
 **Signature:**
 
 ```typescript
-interface EQWindowCreateInput
+type EQWindowCreateInput = Record<string, never>
 ```

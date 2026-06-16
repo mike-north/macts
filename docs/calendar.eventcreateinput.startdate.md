@@ -4,10 +4,10 @@
 
 ## EventCreateInput.startDate property
 
-The event start date
+Event start date
 
 **Signature:**
 
 ```typescript
-startDate?: Date;
+startDate: Date
 ```

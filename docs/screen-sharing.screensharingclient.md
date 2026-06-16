@@ -123,7 +123,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[getURL()](./screen-sharing.screensharingclient.geturl.md)
+[getURL(url)](./screen-sharing.screensharingclient.geturl.md)
 
 </td><td>
 

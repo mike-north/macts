@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [ClippingCreateInput](./finder.clippingcreateinput.md)
 
-## ClippingCreateInput interface
+## ClippingCreateInput type
 
 Input for creating a Clipping
 
 **Signature:**
 
 ```typescript
-interface ClippingCreateInput
+type ClippingCreateInput = Record<string, never>
 ```

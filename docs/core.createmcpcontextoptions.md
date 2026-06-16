@@ -73,7 +73,7 @@ string
 
 </td><td>
 
-_(Optional)_ Package name (defaults to @<!-- -->macts/mcp-<!-- -->{<!-- -->appName<!-- -->}<!-- -->)
+_(Optional)_ Package name (defaults to @<!-- -->macts/<!-- -->{<!-- -->appName<!-- -->}<!-- -->-server)
 
 </td></tr>
 <tr><td>

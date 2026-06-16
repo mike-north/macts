@@ -41,7 +41,7 @@ string
 
 </td><td>
 
-Package name (e.g., @<!-- -->macts/cli-calendar)
+Package name (e.g., @<!-- -->macts/calendar)
 
 </td></tr>
 <tr><td>

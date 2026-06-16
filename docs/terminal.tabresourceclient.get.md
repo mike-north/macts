@@ -4,12 +4,12 @@
 
 ## TabResourceClient.get() method
 
-Get a tab by tty.
+Get a tab by name.
 
 **Signature:**
 
 ```typescript
-get(tty: string): Promise<Tab>;
+get(name: string): Promise<Tab>;
 ```
 
 ## Parameters
@@ -29,7 +29,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-tty
+name
 
 </td><td>
 

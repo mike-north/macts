@@ -4,7 +4,7 @@
 
 ## ReminderCreateInput.remindMeDate property
 
-The remind date of the reminder
+Remind me date
 
 **Signature:**
 

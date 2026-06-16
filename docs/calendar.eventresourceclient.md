@@ -68,29 +68,18 @@ Create a new event.
 </td></tr>
 <tr><td>
 
-[delete(uid)](./calendar.eventresourceclient.delete.md)
+[get(id)](./calendar.eventresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Delete a event.
+Get a event by id.
 
 </td></tr>
 <tr><td>
 
-[get(uid)](./calendar.eventresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a event by uid.
-
-</td></tr>
-<tr><td>
-
-[list()](./calendar.eventresourceclient.list.md)
+[list(calendarId)](./calendar.eventresourceclient.list.md)
 
 </td><td>
 
@@ -108,17 +97,6 @@ List all events.
 </td><td>
 
 Show the event or to-do in the calendar window
-
-</td></tr>
-<tr><td>
-
-[update(uid, input)](./calendar.eventresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing event.
 
 </td></tr>
 </tbody></table>

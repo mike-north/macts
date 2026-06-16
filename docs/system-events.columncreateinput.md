@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ColumnCreateInput](./system-events.columncreateinput.md)
 
-## ColumnCreateInput interface
+## ColumnCreateInput type
 
 Input for creating a Column
 
 **Signature:**
 
 ```typescript
-interface ColumnCreateInput
+type ColumnCreateInput = Record<string, never>
 ```

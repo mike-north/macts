@@ -4,10 +4,10 @@
 
 ## EventCreateInput.endDate property
 
-The event end date
+Event end date
 
 **Signature:**
 
 ```typescript
-endDate?: Date;
+endDate: Date
 ```

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [MailAttachmentCreateInput](./mail.mailattachmentcreateinput.md)
 
-## MailAttachmentCreateInput interface
+## MailAttachmentCreateInput type
 
 Input for creating a MailAttachment
 
 **Signature:**
 
 ```typescript
-interface MailAttachmentCreateInput
+type MailAttachmentCreateInput = Record<string, never>
 ```

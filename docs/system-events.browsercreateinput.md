@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [BrowserCreateInput](./system-events.browsercreateinput.md)
 
-## BrowserCreateInput interface
+## BrowserCreateInput type
 
 Input for creating a Browser
 
 **Signature:**
 
 ```typescript
-interface BrowserCreateInput
+type BrowserCreateInput = Record<string, never>
 ```

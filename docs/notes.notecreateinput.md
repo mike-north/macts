@@ -43,7 +43,7 @@ string
 
 </td><td>
 
-_(Optional)_ The HTML content of the note body
+_(Optional)_ HTML content of the note
 
 </td></tr>
 <tr><td>

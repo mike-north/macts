@@ -57,28 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./terminal.windowresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new window.
-
-</td></tr>
-<tr><td>
-
-[delete(name)](./terminal.windowresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a window.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./terminal.windowresourceclient.get.md)
 
 </td><td>
@@ -97,17 +75,6 @@ Get a window by name.
 </td><td>
 
 List all windows.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./terminal.windowresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing window.
 
 </td></tr>
 </tbody></table>

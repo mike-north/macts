@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/spotify](./spotify.md) &gt; [TrackCreateInput](./spotify.trackcreateinput.md)
 
-## TrackCreateInput interface
+## TrackCreateInput type
 
 Input for creating a Track
 
 **Signature:**
 
 ```typescript
-interface TrackCreateInput
+type TrackCreateInput = Record<string, never>
 ```

@@ -72,40 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[accounts](./messages.messagesclient.accounts.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[AccountResourceClient](./messages.accountresourceclient.md)
-
-</td><td>
-
-An account that can be logged in to from this system
-
-</td></tr>
-<tr><td>
-
-[chats](./messages.messagesclient.chats.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ChatResourceClient](./messages.chatresourceclient.md)
-
-</td><td>
-
-An SMS or iMessage chat.
-
-</td></tr>
-<tr><td>
-
 [http](./messages.messagesclient.http.md)
 
 </td><td>
@@ -119,23 +85,6 @@ An SMS or iMessage chat.
 </td><td>
 
 Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[participants](./messages.messagesclient.participants.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[ParticipantResourceClient](./messages.participantresourceclient.md)
-
-</td><td>
-
-A participant for an account.
 
 </td></tr>
 </tbody></table>

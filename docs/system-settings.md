@@ -17,15 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AnchorResourceClient](./system-settings.anchorresourceclient.md)
-
-</td><td>
-
-Client for an anchor within a settings pane..
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./system-settings.httpclient.md)
 
 </td><td>
@@ -84,11 +75,11 @@ An anchor within a settings pane.
 </td></tr>
 <tr><td>
 
-[AnchorCreateInput](./system-settings.anchorcreateinput.md)
+[CapabilityMetadata](./system-settings.capabilitymetadata.md)
 
 </td><td>
 
-Input for creating a Anchor
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -98,15 +89,6 @@ Input for creating a Anchor
 </td><td>
 
 A settings pane.
-
-</td></tr>
-<tr><td>
-
-[PaneCreateInput](./system-settings.panecreateinput.md)
-
-</td><td>
-
-Input for creating a Pane
 
 </td></tr>
 <tr><td>
@@ -140,6 +122,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./system-settings.capabilities.md)
+
+</td><td>
+
+Every capability exposed by System Settings, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [PaneSchema](./system-settings.paneschema.md)
 
 </td><td>
@@ -160,11 +151,38 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[AnchorCreateInput](./system-settings.anchorcreateinput.md)
+
+</td><td>
+
+Input for creating a Anchor
+
+</td></tr>
+<tr><td>
+
 [AnchorUpdateInput](./system-settings.anchorupdateinput.md)
 
 </td><td>
 
 Input for updating a Anchor
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./system-settings.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[PaneCreateInput](./system-settings.panecreateinput.md)
+
+</td><td>
+
+Input for creating a Pane
 
 </td></tr>
 <tr><td>

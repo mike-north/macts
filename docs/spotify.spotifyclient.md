@@ -87,23 +87,6 @@ Description
 Get the HTTP client for making custom requests.
 
 </td></tr>
-<tr><td>
-
-[tracks](./spotify.spotifyclient.tracks.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TrackResourceClient](./spotify.trackresourceclient.md)
-
-</td><td>
-
-The currently playing track
-
-</td></tr>
 </tbody></table>
 
 ## Methods

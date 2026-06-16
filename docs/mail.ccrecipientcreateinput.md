@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [CcRecipientCreateInput](./mail.ccrecipientcreateinput.md)
 
-## CcRecipientCreateInput interface
+## CcRecipientCreateInput type
 
 Input for creating a CcRecipient
 
 **Signature:**
 
 ```typescript
-interface CcRecipientCreateInput
+type CcRecipientCreateInput = Record<string, never>
 ```

@@ -68,17 +68,6 @@ Create a new document.
 </td></tr>
 <tr><td>
 
-[delete(name)](./script-editor.documentresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a document.
-
-</td></tr>
-<tr><td>
-
 [get(name)](./script-editor.documentresourceclient.get.md)
 
 </td><td>
@@ -97,17 +86,6 @@ Get a document by name.
 </td><td>
 
 List all documents.
-
-</td></tr>
-<tr><td>
-
-[update(name, input)](./script-editor.documentresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing document.
 
 </td></tr>
 </tbody></table>

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/finder](./finder.md) &gt; [PackageCreateInput](./finder.packagecreateinput.md)
 
-## PackageCreateInput interface
+## PackageCreateInput type
 
 Input for creating a Package
 
 **Signature:**
 
 ```typescript
-interface PackageCreateInput
+type PackageCreateInput = Record<string, never>
 ```

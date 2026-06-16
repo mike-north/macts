@@ -68,28 +68,6 @@ Does nothing at all (deprecated)
 </td></tr>
 <tr><td>
 
-[create(input)](./mail.messageresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new message.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./mail.messageresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a message.
-
-</td></tr>
-<tr><td>
-
 [forward(openingWindow)](./mail.messageresourceclient.forward.md)
 
 </td><td>
@@ -97,28 +75,6 @@ Delete a message.
 </td><td>
 
 Creates a forwarded message.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./mail.messageresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a message by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./mail.messageresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all messages.
 
 </td></tr>
 <tr><td>
@@ -141,17 +97,6 @@ Creates a redirected message.
 </td><td>
 
 Creates a reply message.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./mail.messageresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing message.
 
 </td></tr>
 </tbody></table>

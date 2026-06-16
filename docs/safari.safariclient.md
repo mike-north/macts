@@ -72,23 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[documents](./safari.safariclient.documents.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DocumentResourceClient](./safari.documentresourceclient.md)
-
-</td><td>
-
-A Safari document (window)
-
-</td></tr>
-<tr><td>
-
 [http](./safari.safariclient.http.md)
 
 </td><td>
@@ -102,23 +85,6 @@ A Safari document (window)
 </td><td>
 
 Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[tabs](./safari.safariclient.tabs.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[TabResourceClient](./safari.tabresourceclient.md)
-
-</td><td>
-
-A Safari tab
 
 </td></tr>
 </tbody></table>

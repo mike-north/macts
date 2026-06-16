@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ScrollBarCreateInput](./system-events.scrollbarcreateinput.md)
 
-## ScrollBarCreateInput interface
+## ScrollBarCreateInput type
 
 Input for creating a ScrollBar
 
 **Signature:**
 
 ```typescript
-interface ScrollBarCreateInput
+type ScrollBarCreateInput = Record<string, never>
 ```

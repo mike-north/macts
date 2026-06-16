@@ -4,7 +4,7 @@
 
 ## CliGeneratorOptions.packageName property
 
-Package name (e.g., @<!-- -->macts/cli-calendar)
+Package name (e.g., @<!-- -->macts/calendar)
 
 **Signature:**
 

@@ -108,6 +108,21 @@ The complete history contents of the tab
 </td></tr>
 <tr><td>
 
+[id?](./terminal.tab.id.md)
+
+</td><td>
+
+</td><td>
+
+string
+
+</td><td>
+
+_(Optional)_ Canonical identifier (mirrors `tty`<!-- -->); populated by list, pass to get/delete and to write operations that reference this resource.
+
+</td></tr>
+<tr><td>
+
 [processes](./terminal.tab.processes.md)
 
 </td><td>

@@ -109,3 +109,6 @@ export {
   type EnforceCallOptions,
   enforceCall,
 } from './enforcement.js'
+
+// Policy loader: reads and validates a policy declaration from a JSON file.
+export { loadPolicyFromFile, type LoadPolicyResult } from './loader.js'

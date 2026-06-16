@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [TableCreateInput](./system-events.tablecreateinput.md)
 
-## TableCreateInput interface
+## TableCreateInput type
 
 Input for creating a Table
 
 **Signature:**
 
 ```typescript
-interface TableCreateInput
+type TableCreateInput = Record<string, never>
 ```

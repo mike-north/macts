@@ -17,15 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[DocumentResourceClient](./safari.documentresourceclient.md)
-
-</td><td>
-
-Client for a safari document (window).
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./safari.httpclient.md)
 
 </td><td>
@@ -51,15 +42,6 @@ Safari client for HTTP-based macOS automation.
 Error class for Safari API errors.
 
 </td></tr>
-<tr><td>
-
-[TabResourceClient](./safari.tabresourceclient.md)
-
-</td><td>
-
-Client for a safari tab.
-
-</td></tr>
 </tbody></table>
 
 ## Interfaces
@@ -74,6 +56,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityMetadata](./safari.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
 
 [Document](./safari.document.md)
 
@@ -133,6 +124,15 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[capabilities](./safari.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Safari, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [DocumentSchema](./safari.documentschema.md)
 
 </td><td>
@@ -159,6 +159,15 @@ Description
 
 </th></tr></thead>
 <tbody><tr><td>
+
+[CapabilityRisk](./safari.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
 
 [DocumentUpdateInput](./safari.documentupdateinput.md)
 

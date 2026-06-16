@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [LocalDomainObjectCreateInput](./system-events.localdomainobjectcreateinput.md)
 
-## LocalDomainObjectCreateInput interface
+## LocalDomainObjectCreateInput type
 
 Input for creating a LocalDomainObject
 
 **Signature:**
 
 ```typescript
-interface LocalDomainObjectCreateInput
+type LocalDomainObjectCreateInput = Record<string, never>
 ```

@@ -17,24 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[BookmarkFolderResourceClient](./google-chrome.bookmarkfolderresourceclient.md)
-
-</td><td>
-
-Client for a bookmarks folder that contains other bookmarks folder and bookmark items..
-
-</td></tr>
-<tr><td>
-
-[BookmarkItemResourceClient](./google-chrome.bookmarkitemresourceclient.md)
-
-</td><td>
-
-Client for an item consists of an url and the title of a bookmark.
-
-</td></tr>
-<tr><td>
-
 [GoogleChromeClient](./google-chrome.googlechromeclient.md)
 
 </td><td>
@@ -58,24 +40,6 @@ Error class for GoogleChrome API errors.
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[TabResourceClient](./google-chrome.tabresourceclient.md)
-
-</td><td>
-
-Client for a tab..
-
-</td></tr>
-<tr><td>
-
-[WindowResourceClient](./google-chrome.windowresourceclient.md)
-
-</td><td>
-
-Client for a window..
 
 </td></tr>
 </tbody></table>
@@ -125,6 +89,15 @@ An item consists of an URL and the title of a bookmark
 </td><td>
 
 Input for creating a BookmarkItem
+
+</td></tr>
+<tr><td>
+
+[CapabilityMetadata](./google-chrome.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
 
 </td></tr>
 <tr><td>
@@ -201,6 +174,15 @@ Description
 </td></tr>
 <tr><td>
 
+[capabilities](./google-chrome.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Google Chrome, with risk metadata.
+
+</td></tr>
+<tr><td>
+
 [TabSchema](./google-chrome.tabschema.md)
 
 </td><td>
@@ -242,6 +224,15 @@ Input for updating a BookmarkFolder
 </td><td>
 
 Input for updating a BookmarkItem
+
+</td></tr>
+<tr><td>
+
+[CapabilityRisk](./google-chrome.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
 
 </td></tr>
 <tr><td>

@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ComboBoxCreateInput](./system-events.comboboxcreateinput.md)
 
-## ComboBoxCreateInput interface
+## ComboBoxCreateInput type
 
 Input for creating a ComboBox
 
 **Signature:**
 
 ```typescript
-interface ComboBoxCreateInput
+type ComboBoxCreateInput = Record<string, never>
 ```

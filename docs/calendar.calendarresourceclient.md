@@ -68,24 +68,13 @@ Create a new calendar.
 </td></tr>
 <tr><td>
 
-[delete(calendarIdentifier)](./calendar.calendarresourceclient.delete.md)
+[get(id)](./calendar.calendarresourceclient.get.md)
 
 </td><td>
 
 </td><td>
 
-Delete a calendar.
-
-</td></tr>
-<tr><td>
-
-[get(calendarIdentifier)](./calendar.calendarresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a calendar by calendarIdentifier.
+Get a calendar by id.
 
 </td></tr>
 <tr><td>
@@ -97,17 +86,6 @@ Get a calendar by calendarIdentifier.
 </td><td>
 
 List all calendars.
-
-</td></tr>
-<tr><td>
-
-[update(calendarIdentifier, input)](./calendar.calendarresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing calendar.
 
 </td></tr>
 </tbody></table>

@@ -68,17 +68,6 @@ Create a new list.
 </td></tr>
 <tr><td>
 
-[delete(id)](./reminders.listresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a list.
-
-</td></tr>
-<tr><td>
-
 [get(id)](./reminders.listresourceclient.get.md)
 
 </td><td>
@@ -97,17 +86,6 @@ Get a list by id.
 </td><td>
 
 List all lists.
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./reminders.listresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing list.
 
 </td></tr>
 </tbody></table>

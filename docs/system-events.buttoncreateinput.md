@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [ButtonCreateInput](./system-events.buttoncreateinput.md)
 
-## ButtonCreateInput interface
+## ButtonCreateInput type
 
 Input for creating a Button
 
 **Signature:**
 
 ```typescript
-interface ButtonCreateInput
+type ButtonCreateInput = Record<string, never>
 ```

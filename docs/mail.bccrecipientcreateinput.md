@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/mail](./mail.md) &gt; [BccRecipientCreateInput](./mail.bccrecipientcreateinput.md)
 
-## BccRecipientCreateInput interface
+## BccRecipientCreateInput type
 
 Input for creating a BccRecipient
 
 **Signature:**
 
 ```typescript
-interface BccRecipientCreateInput
+type BccRecipientCreateInput = Record<string, never>
 ```

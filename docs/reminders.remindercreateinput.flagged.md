@@ -4,7 +4,7 @@
 
 ## ReminderCreateInput.flagged property
 
-Whether the reminder is flagged
+Whether to flag the reminder
 
 **Signature:**
 

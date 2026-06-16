@@ -57,50 +57,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[create(input)](./system-events.actionresourceclient.create.md)
-
-</td><td>
-
-</td><td>
-
-Create a new action.
-
-</td></tr>
-<tr><td>
-
-[delete(id)](./system-events.actionresourceclient.delete.md)
-
-</td><td>
-
-</td><td>
-
-Delete a action.
-
-</td></tr>
-<tr><td>
-
-[get(id)](./system-events.actionresourceclient.get.md)
-
-</td><td>
-
-</td><td>
-
-Get a action by id.
-
-</td></tr>
-<tr><td>
-
-[list()](./system-events.actionresourceclient.list.md)
-
-</td><td>
-
-</td><td>
-
-List all actions.
-
-</td></tr>
-<tr><td>
-
 [perform()](./system-events.actionresourceclient.perform.md)
 
 </td><td>
@@ -108,17 +64,6 @@ List all actions.
 </td><td>
 
 cause the target process to behave as if the action were applied to its UI element
-
-</td></tr>
-<tr><td>
-
-[update(id, input)](./system-events.actionresourceclient.update.md)
-
-</td><td>
-
-</td><td>
-
-Update an existing action.
 
 </td></tr>
 </tbody></table>

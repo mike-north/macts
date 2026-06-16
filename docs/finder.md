@@ -17,96 +17,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[AliasFileResourceClient](./finder.aliasfileresourceclient.md)
-
-</td><td>
-
-Client for an alias file (created with “make alias”).
-
-</td></tr>
-<tr><td>
-
-[ApplicationFileResourceClient](./finder.applicationfileresourceclient.md)
-
-</td><td>
-
-Client for an application's file on disk.
-
-</td></tr>
-<tr><td>
-
-[ClippingResourceClient](./finder.clippingresourceclient.md)
-
-</td><td>
-
-Client for a clipping.
-
-</td></tr>
-<tr><td>
-
-[ClippingWindowResourceClient](./finder.clippingwindowresourceclient.md)
-
-</td><td>
-
-Client for the window containing a clipping.
-
-</td></tr>
-<tr><td>
-
-[ColumnResourceClient](./finder.columnresourceclient.md)
-
-</td><td>
-
-Client for a column of a list view.
-
-</td></tr>
-<tr><td>
-
-[ContainerResourceClient](./finder.containerresourceclient.md)
-
-</td><td>
-
-Client for an item that contains other items.
-
-</td></tr>
-<tr><td>
-
-[DesktopObjectResourceClient](./finder.desktopobjectresourceclient.md)
-
-</td><td>
-
-Client for desktop-object is the class of the "desktop" object.
-
-</td></tr>
-<tr><td>
-
-[DiskResourceClient](./finder.diskresourceclient.md)
-
-</td><td>
-
-Client for a disk.
-
-</td></tr>
-<tr><td>
-
-[DocumentFileResourceClient](./finder.documentfileresourceclient.md)
-
-</td><td>
-
-Client for a document file.
-
-</td></tr>
-<tr><td>
-
-[FileResourceClient](./finder.fileresourceclient.md)
-
-</td><td>
-
-Client for a file.
-
-</td></tr>
-<tr><td>
-
 [FinderClient](./finder.finderclient.md)
 
 </td><td>
@@ -125,65 +35,11 @@ Error class for Finder API errors.
 </td></tr>
 <tr><td>
 
-[FinderWindowResourceClient](./finder.finderwindowresourceclient.md)
-
-</td><td>
-
-Client for a file viewer window.
-
-</td></tr>
-<tr><td>
-
-[FolderResourceClient](./finder.folderresourceclient.md)
-
-</td><td>
-
-Client for a folder.
-
-</td></tr>
-<tr><td>
-
 [HttpClient](./finder.httpclient.md)
 
 </td><td>
 
 HTTP client wrapper for making authenticated requests.
-
-</td></tr>
-<tr><td>
-
-[InternetLocationFileResourceClient](./finder.internetlocationfileresourceclient.md)
-
-</td><td>
-
-Client for a file containing an internet location.
-
-</td></tr>
-<tr><td>
-
-[ListViewOptionsResourceClient](./finder.listviewoptionsresourceclient.md)
-
-</td><td>
-
-Client for the list view options.
-
-</td></tr>
-<tr><td>
-
-[PackageResourceClient](./finder.packageresourceclient.md)
-
-</td><td>
-
-Client for a package.
-
-</td></tr>
-<tr><td>
-
-[TrashObjectResourceClient](./finder.trashobjectresourceclient.md)
-
-</td><td>
-
-Client for trash-object is the class of the “trash” object.
 
 </td></tr>
 </tbody></table>
@@ -237,6 +93,15 @@ Input for creating a ApplicationFile
 </td></tr>
 <tr><td>
 
+[CapabilityMetadata](./finder.capabilitymetadata.md)
+
+</td><td>
+
+Machine-readable description of a single capability.
+
+</td></tr>
+<tr><td>
+
 [Clipping](./finder.clipping.md)
 
 </td><td>
@@ -246,29 +111,11 @@ A clipping
 </td></tr>
 <tr><td>
 
-[ClippingCreateInput](./finder.clippingcreateinput.md)
-
-</td><td>
-
-Input for creating a Clipping
-
-</td></tr>
-<tr><td>
-
 [ClippingWindow](./finder.clippingwindow.md)
 
 </td><td>
 
 The window containing a clipping
-
-</td></tr>
-<tr><td>
-
-[ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)
-
-</td><td>
-
-Input for creating a ClippingWindow
 
 </td></tr>
 <tr><td>
@@ -318,15 +165,6 @@ Desktop-object is the class of the "desktop" object
 </td></tr>
 <tr><td>
 
-[DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
-
-</td><td>
-
-Input for creating a DesktopObject
-
-</td></tr>
-<tr><td>
-
 [Disk](./finder.disk.md)
 
 </td><td>
@@ -350,15 +188,6 @@ Input for creating a Disk
 </td><td>
 
 A document file
-
-</td></tr>
-<tr><td>
-
-[DocumentFileCreateInput](./finder.documentfilecreateinput.md)
-
-</td><td>
-
-Input for creating a DocumentFile
 
 </td></tr>
 <tr><td>
@@ -417,29 +246,11 @@ A folder
 </td></tr>
 <tr><td>
 
-[FolderCreateInput](./finder.foldercreateinput.md)
-
-</td><td>
-
-Input for creating a Folder
-
-</td></tr>
-<tr><td>
-
 [InternetLocationFile](./finder.internetlocationfile.md)
 
 </td><td>
 
 A file containing an internet location
-
-</td></tr>
-<tr><td>
-
-[InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
-
-</td><td>
-
-Input for creating a InternetLocationFile
 
 </td></tr>
 <tr><td>
@@ -467,15 +278,6 @@ Input for creating a ListViewOptions
 </td><td>
 
 A package
-
-</td></tr>
-<tr><td>
-
-[PackageCreateInput](./finder.packagecreateinput.md)
-
-</td><td>
-
-Input for creating a Package
 
 </td></tr>
 <tr><td>
@@ -521,6 +323,15 @@ Description
 [ApplicationFileSchema](./finder.applicationfileschema.md)
 
 </td><td>
+
+</td></tr>
+<tr><td>
+
+[capabilities](./finder.capabilities.md)
+
+</td><td>
+
+Every capability exposed by Finder, with risk metadata.
 
 </td></tr>
 <tr><td>
@@ -654,11 +465,38 @@ Input for updating a ApplicationFile
 </td></tr>
 <tr><td>
 
+[CapabilityRisk](./finder.capabilityrisk.md)
+
+</td><td>
+
+Risk classification for a capability.
+
+</td></tr>
+<tr><td>
+
+[ClippingCreateInput](./finder.clippingcreateinput.md)
+
+</td><td>
+
+Input for creating a Clipping
+
+</td></tr>
+<tr><td>
+
 [ClippingUpdateInput](./finder.clippingupdateinput.md)
 
 </td><td>
 
 Input for updating a Clipping
+
+</td></tr>
+<tr><td>
+
+[ClippingWindowCreateInput](./finder.clippingwindowcreateinput.md)
+
+</td><td>
+
+Input for creating a ClippingWindow
 
 </td></tr>
 <tr><td>
@@ -690,6 +528,15 @@ Input for updating a Container
 </td></tr>
 <tr><td>
 
+[DesktopObjectCreateInput](./finder.desktopobjectcreateinput.md)
+
+</td><td>
+
+Input for creating a DesktopObject
+
+</td></tr>
+<tr><td>
+
 [DesktopObjectUpdateInput](./finder.desktopobjectupdateinput.md)
 
 </td><td>
@@ -704,6 +551,15 @@ Input for updating a DesktopObject
 </td><td>
 
 Input for updating a Disk
+
+</td></tr>
+<tr><td>
+
+[DocumentFileCreateInput](./finder.documentfilecreateinput.md)
+
+</td><td>
+
+Input for creating a DocumentFile
 
 </td></tr>
 <tr><td>
@@ -780,11 +636,29 @@ Input for updating a FinderWindow
 </td></tr>
 <tr><td>
 
+[FolderCreateInput](./finder.foldercreateinput.md)
+
+</td><td>
+
+Input for creating a Folder
+
+</td></tr>
+<tr><td>
+
 [FolderUpdateInput](./finder.folderupdateinput.md)
 
 </td><td>
 
 Input for updating a Folder
+
+</td></tr>
+<tr><td>
+
+[InternetLocationFileCreateInput](./finder.internetlocationfilecreateinput.md)
+
+</td><td>
+
+Input for creating a InternetLocationFile
 
 </td></tr>
 <tr><td>
@@ -830,6 +704,15 @@ Input for updating a ListViewOptions
 </td><td>
 
 Lvic
+
+</td></tr>
+<tr><td>
+
+[PackageCreateInput](./finder.packagecreateinput.md)
+
+</td><td>
+
+Input for creating a Package
 
 </td></tr>
 <tr><td>

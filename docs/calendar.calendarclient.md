@@ -72,23 +72,6 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[attendees](./calendar.calendarclient.attendees.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[AttendeeResourceClient](./calendar.attendeeresourceclient.md)
-
-</td><td>
-
-An event attendee
-
-</td></tr>
-<tr><td>
-
 [calendars](./calendar.calendarclient.calendars.md)
 
 </td><td>
@@ -102,23 +85,6 @@ An event attendee
 </td><td>
 
 A calendar containing events
-
-</td></tr>
-<tr><td>
-
-[displayalarms](./calendar.calendarclient.displayalarms.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[DisplayAlarmResourceClient](./calendar.displayalarmresourceclient.md)
-
-</td><td>
-
-A message/display alarm
 
 </td></tr>
 <tr><td>
@@ -153,57 +119,6 @@ A calendar event
 </td><td>
 
 Get the HTTP client for making custom requests.
-
-</td></tr>
-<tr><td>
-
-[mailalarms](./calendar.calendarclient.mailalarms.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[MailAlarmResourceClient](./calendar.mailalarmresourceclient.md)
-
-</td><td>
-
-A mail/email alarm
-
-</td></tr>
-<tr><td>
-
-[openfilealarms](./calendar.calendarclient.openfilealarms.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[OpenFileAlarmResourceClient](./calendar.openfilealarmresourceclient.md)
-
-</td><td>
-
-An 'open file' alarm
-
-</td></tr>
-<tr><td>
-
-[soundalarms](./calendar.calendarclient.soundalarms.md)
-
-</td><td>
-
-`readonly`
-
-</td><td>
-
-[SoundAlarmResourceClient](./calendar.soundalarmresourceclient.md)
-
-</td><td>
-
-A sound alarm
 
 </td></tr>
 </tbody></table>

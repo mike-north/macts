@@ -2,12 +2,12 @@
 
 [Home](./index.md) &gt; [@macts/system-events](./system-events.md) &gt; [FolderCreateInput](./system-events.foldercreateinput.md)
 
-## FolderCreateInput interface
+## FolderCreateInput type
 
 Input for creating a Folder
 
 **Signature:**
 
 ```typescript
-interface FolderCreateInput
+type FolderCreateInput = Record<string, never>
 ```
