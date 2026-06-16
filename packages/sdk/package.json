@@ -1,0 +1,214 @@
+{
+  "name": "@macts/sdk",
+  "version": "0.0.0",
+  "description": "Frictionless authoring helper for governed macts scripts — resolves the API key and base URL once, returns ready-to-use typed clients for every installed @macts/* app SDK",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/sdk.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/sdk.d.ts",
+  "files": [
+    "dist",
+    "AUTHORING.md"
+  ],
+  "keywords": [
+    "macts-sdk"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "api-extractor": "api-extractor run --local",
+    "api-extractor:ci": "api-extractor run",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@macts/alfred": "*",
+    "@macts/arc": "*",
+    "@macts/automator": "*",
+    "@macts/bluetooth-file-exchange": "*",
+    "@macts/calendar": "*",
+    "@macts/console": "*",
+    "@macts/contacts": "*",
+    "@macts/finder": "*",
+    "@macts/google-chrome": "*",
+    "@macts/iterm": "*",
+    "@macts/mail": "*",
+    "@macts/messages": "*",
+    "@macts/microsoft-edge": "*",
+    "@macts/microsoft-word": "*",
+    "@macts/music": "*",
+    "@macts/notes": "*",
+    "@macts/omnifocus": "*",
+    "@macts/omnigraffle": "*",
+    "@macts/omniplan": "*",
+    "@macts/photos": "*",
+    "@macts/preview": "*",
+    "@macts/quicktime-player": "*",
+    "@macts/reminders": "*",
+    "@macts/safari": "*",
+    "@macts/screen-sharing": "*",
+    "@macts/script-editor": "*",
+    "@macts/shortcuts": "*",
+    "@macts/spotify": "*",
+    "@macts/system-events": "*",
+    "@macts/system-information": "*",
+    "@macts/system-settings": "*",
+    "@macts/terminal": "*",
+    "@macts/textedit": "*",
+    "@macts/tv": "*",
+    "@macts/xcode": "*"
+  },
+  "peerDependenciesMeta": {
+    "@macts/alfred": {
+      "optional": true
+    },
+    "@macts/arc": {
+      "optional": true
+    },
+    "@macts/automator": {
+      "optional": true
+    },
+    "@macts/bluetooth-file-exchange": {
+      "optional": true
+    },
+    "@macts/calendar": {
+      "optional": true
+    },
+    "@macts/console": {
+      "optional": true
+    },
+    "@macts/contacts": {
+      "optional": true
+    },
+    "@macts/finder": {
+      "optional": true
+    },
+    "@macts/google-chrome": {
+      "optional": true
+    },
+    "@macts/iterm": {
+      "optional": true
+    },
+    "@macts/mail": {
+      "optional": true
+    },
+    "@macts/messages": {
+      "optional": true
+    },
+    "@macts/microsoft-edge": {
+      "optional": true
+    },
+    "@macts/microsoft-word": {
+      "optional": true
+    },
+    "@macts/music": {
+      "optional": true
+    },
+    "@macts/notes": {
+      "optional": true
+    },
+    "@macts/omnifocus": {
+      "optional": true
+    },
+    "@macts/omnigraffle": {
+      "optional": true
+    },
+    "@macts/omniplan": {
+      "optional": true
+    },
+    "@macts/photos": {
+      "optional": true
+    },
+    "@macts/preview": {
+      "optional": true
+    },
+    "@macts/quicktime-player": {
+      "optional": true
+    },
+    "@macts/reminders": {
+      "optional": true
+    },
+    "@macts/safari": {
+      "optional": true
+    },
+    "@macts/screen-sharing": {
+      "optional": true
+    },
+    "@macts/script-editor": {
+      "optional": true
+    },
+    "@macts/shortcuts": {
+      "optional": true
+    },
+    "@macts/spotify": {
+      "optional": true
+    },
+    "@macts/system-events": {
+      "optional": true
+    },
+    "@macts/system-information": {
+      "optional": true
+    },
+    "@macts/system-settings": {
+      "optional": true
+    },
+    "@macts/terminal": {
+      "optional": true
+    },
+    "@macts/textedit": {
+      "optional": true
+    },
+    "@macts/tv": {
+      "optional": true
+    },
+    "@macts/xcode": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@macts/alfred": "workspace:*",
+    "@macts/arc": "workspace:*",
+    "@macts/automator": "workspace:*",
+    "@macts/bluetooth-file-exchange": "workspace:*",
+    "@macts/calendar": "workspace:*",
+    "@macts/console": "workspace:*",
+    "@macts/contacts": "workspace:*",
+    "@macts/finder": "workspace:*",
+    "@macts/google-chrome": "workspace:*",
+    "@macts/iterm": "workspace:*",
+    "@macts/mail": "workspace:*",
+    "@macts/messages": "workspace:*",
+    "@macts/microsoft-edge": "workspace:*",
+    "@macts/microsoft-word": "workspace:*",
+    "@macts/music": "workspace:*",
+    "@macts/notes": "workspace:*",
+    "@macts/omnifocus": "workspace:*",
+    "@macts/omnigraffle": "workspace:*",
+    "@macts/omniplan": "workspace:*",
+    "@macts/photos": "workspace:*",
+    "@macts/preview": "workspace:*",
+    "@macts/quicktime-player": "workspace:*",
+    "@macts/reminders": "workspace:*",
+    "@macts/safari": "workspace:*",
+    "@macts/screen-sharing": "workspace:*",
+    "@macts/script-editor": "workspace:*",
+    "@macts/shortcuts": "workspace:*",
+    "@macts/spotify": "workspace:*",
+    "@macts/system-events": "workspace:*",
+    "@macts/system-information": "workspace:*",
+    "@macts/system-settings": "workspace:*",
+    "@macts/terminal": "workspace:*",
+    "@macts/textedit": "workspace:*",
+    "@macts/tv": "workspace:*",
+    "@macts/xcode": "workspace:*",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
