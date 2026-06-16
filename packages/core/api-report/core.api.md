@@ -355,6 +355,13 @@ export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, commandKey: string): string;
 
 // @public
+export interface CallAuditContext {
+    readonly apiKeyId: string;
+    readonly argsSummary: string;
+    readonly timestamp: Date;
+}
+
+// @public
 export const CANONICAL_IDENTIFIER_KEY = "id";
 
 // @public
@@ -635,6 +642,28 @@ export type DurationType = z.infer<typeof DurationTypeSchema>;
 
 // @public
 export const DurationTypeSchema: z.ZodString;
+
+// @public
+export function enforceCall(options: EnforceCallOptions): Promise<EnforcementDecision>;
+
+// @public
+export interface EnforceCallOptions {
+    readonly audit: CallAuditContext;
+    readonly permission: string;
+    readonly policy: GovernancePolicy;
+    readonly risk: RiskClass;
+    readonly writer?: AuditWriter | undefined;
+}
+
+// @public
+export interface EnforcementDecision {
+    readonly disposition: PolicyDisposition;
+    readonly outcome: EnforcementOutcome;
+    readonly reason?: string;
+}
+
+// @public
+export type EnforcementOutcome = 'allowed' | 'denied' | 'pending-approval';
 
 // @public (undocumented)
 export type Enum = z.infer<typeof EnumSchema>;
@@ -1779,6 +1808,9 @@ export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, 
 
 // @public
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
+
+// @public
+export function resolveDisposition(policy: GovernancePolicy, app: string, resource: string, operation: string): PolicyDisposition;
 
 // @public
 export function resolveListOutputProperties(resource: Resource | undefined): string[];
