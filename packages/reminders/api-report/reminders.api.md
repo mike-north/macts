@@ -140,7 +140,7 @@ export class ReminderResourceClient {
     create(input: ReminderCreateInput): Promise<Reminder>;
     delete(id: string): Promise<void>;
     get(id: string): Promise<Reminder>;
-    list(): Promise<Reminder[]>;
+    list(listId: string): Promise<Reminder[]>;
     show(): Promise<void>;
 }
 

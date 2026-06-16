@@ -26,9 +26,9 @@ export const eventsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { calendarId } = args as { calendarId: string }
-    void calendarId
+
     const client = getClient()
-    return client.events.list()
+    return client.events.list(calendarId)
   },
 }
 

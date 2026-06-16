@@ -26,9 +26,9 @@ export const remindersListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { listId } = args as { listId: string }
-    void listId
+
     const client = getClient()
-    return client.reminders.list()
+    return client.reminders.list(listId)
   },
 }
 

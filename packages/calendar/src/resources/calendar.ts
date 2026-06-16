@@ -28,10 +28,10 @@ export class CalendarResourceClient {
   }
 
   /**
-   * Get a calendar by id.
+   * Get a calendar by calendarIdentifier.
    */
-  async get(id: string): Promise<Calendar> {
-    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(calendarIdentifier: string): Promise<Calendar> {
+    return this.#http.rpc<Calendar>(`${this.#app}.${this.#resource}.get`, { calendarIdentifier })
   }
 
   /**

@@ -23,8 +23,8 @@ export class ReminderResourceClient {
   /**
    * List all reminders.
    */
-  async list(): Promise<Reminder[]> {
-    return this.#http.rpc<Reminder[]>(`${this.#app}.${this.#resource}.listReminders`)
+  async list(listId: string): Promise<Reminder[]> {
+    return this.#http.rpc<Reminder[]>(`${this.#app}.${this.#resource}.listReminders`, { listId })
   }
 
   /**
