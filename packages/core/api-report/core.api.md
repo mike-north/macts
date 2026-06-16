@@ -528,7 +528,7 @@ export function describePermissions(permissions: string[]): string;
 // @public
 export type DiscoverySearchOutcome = {
     readonly kind: 'matches';
-    readonly governed: readonly GovernedCapability[];
+    readonly governed: readonly GovernedCapabilityResult[];
 } | {
     readonly kind: 'no-match';
 } | {
@@ -1023,6 +1023,14 @@ export interface GovernedCapability {
     readonly capability: Capability;
     readonly decision: GovernanceDecision;
 }
+
+// @public
+export interface GovernedCapabilityResult extends GovernedCapability {
+    readonly score: number;
+}
+
+// @public
+export function governedDiscoverySearch(registry: CapabilityRegistry | readonly Capability[], intent: string, limit: number, filter?: GovernanceFilter): DiscoverySearchOutcome;
 
 // @public
 export function groupPermissionsByResource(permissions: string[]): Map<string, string[]>;
@@ -1667,6 +1675,7 @@ export function searchCapabilities(registry: CapabilityRegistry | readonly Capab
 
 // @public
 export interface SearchCapabilitiesOptions {
+    readonly filter?: GovernanceFilter;
     readonly limit?: number;
 }
 

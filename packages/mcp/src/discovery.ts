@@ -15,9 +15,8 @@
  */
 
 import {
-  searchCapabilities,
   resolveDiscoveryLimit,
-  summarizeDiscoverySearch,
+  governedDiscoverySearch,
   inspectCapability,
   ALLOW_ALL_GOVERNANCE,
   type CapabilityRegistry,
@@ -146,8 +145,10 @@ export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefin
       }
 
       const max = resolveDiscoveryLimit(limit, DEFAULT_DISCOVERY_LIMIT)
-      const ranked = searchCapabilities(registry, intent, { limit: max })
-      const outcome = summarizeDiscoverySearch(ranked, governance)
+      // governedDiscoverySearch applies governance BEFORE slicing so that
+      // denied capabilities are backfilled with lower-ranked allowed ones,
+      // and the caller receives up to `max` usable (non-denied) results.
+      const outcome = governedDiscoverySearch(registry, intent, max, governance)
 
       // Genuine no-match: suggest generating a new capability.
       if (outcome.kind === 'no-match') {

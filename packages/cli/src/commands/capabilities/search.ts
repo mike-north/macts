@@ -1,10 +1,5 @@
 import { Command, Option } from 'clipanion'
-import {
-  searchCapabilities,
-  resolveDiscoveryLimit,
-  summarizeDiscoverySearch,
-  ALLOW_ALL_GOVERNANCE,
-} from '@macts/core'
+import { resolveDiscoveryLimit, governedDiscoverySearch, ALLOW_ALL_GOVERNANCE } from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import { loadRegistry } from './registry.js'
 
@@ -54,12 +49,13 @@ export class CapabilitiesSearchCommand extends Command {
       // Validate `--limit`: a non-positive-integer value (e.g. `--limit foo`)
       // would otherwise reach `slice(0, NaN)` and silently empty the results.
       const limit = resolveDiscoveryLimit(this.limit, DEFAULT_SEARCH_LIMIT)
-      const ranked = searchCapabilities(registry, this.intent, { limit })
 
-      // Apply the active governance filter (no-op pass-through by default).
-      // The governance workstream will supply a real policy here.
-      const outcome = summarizeDiscoverySearch(ranked, ALLOW_ALL_GOVERNANCE)
-      const scoreByName = new Map(ranked.map((r) => [r.capability.name, r.score]))
+      // governedDiscoverySearch applies governance BEFORE slicing so that
+      // denied capabilities are replaced by lower-ranked allowed ones, and
+      // "--limit N" means "N usable results", not "N results then drop some".
+      // The active governance filter (no-op pass-through by default) is
+      // supplied by the governance workstream when a real policy is active.
+      const outcome = governedDiscoverySearch(registry, this.intent, limit, ALLOW_ALL_GOVERNANCE)
 
       // Distinguish "nothing matched" (suggest generating a capability) from
       // "matches existed but governance denied them all" (do NOT suggest
@@ -83,9 +79,9 @@ export class CapabilitiesSearchCommand extends Command {
               risk: g.capability.risk,
               permission: g.capability.permission ?? null,
               description: g.capability.description,
-              score: scoreByName.get(g.capability.name) ?? 0,
               call: g.capability.cliSnippet,
               governance: g.decision.disposition,
+              score: g.score,
             })),
           }) + '\n'
         )

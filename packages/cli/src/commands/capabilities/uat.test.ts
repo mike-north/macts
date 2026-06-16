@@ -66,13 +66,34 @@ describe('macts capabilities (UAT)', () => {
     expect(code).toBe(0)
     // The JSON formatter wraps payloads in a top-level `data` object.
     const parsed = JSON.parse(stdout) as {
-      data: { results: { name: string; call: string; risk: string }[] }
+      data: { results: { name: string; call: string; risk: string; score: number }[] }
     }
     expect(parsed.data.results.length).toBeGreaterThan(0)
     // The top match for this intent should be the create-event capability.
     expect(parsed.data.results[0]?.name).toBe('calendar.events.create')
     expect(parsed.data.results[0]?.call).toContain('macts calendar calendars events create')
     expect(parsed.data.results[0]?.risk).toBe('write')
+  })
+
+  it('search JSON output includes a numeric score for each result', async () => {
+    // Regression: governedDiscoverySearch previously dropped the lexical score,
+    // so the CLI JSON output was missing the `score` field. Verify it is present
+    // and is a positive number for matched results.
+    const { stdout, code } = await runCli([
+      'capabilities',
+      'search',
+      'create calendar event',
+      '--json',
+    ])
+    expect(code).toBe(0)
+    const parsed = JSON.parse(stdout) as {
+      data: { results: { score: unknown }[] }
+    }
+    expect(parsed.data.results.length).toBeGreaterThan(0)
+    for (const result of parsed.data.results) {
+      expect(typeof result.score).toBe('number')
+      expect(result.score).toBeGreaterThan(0)
+    }
   })
 
   it('search human output includes the call snippet', async () => {

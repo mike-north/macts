@@ -4,12 +4,21 @@
  *
  * Expected outcomes are derived by hand from the contract documented in
  * `discovery.ts`, not from program output.
+ *
+ * @see packages/core/src/capabilities/discovery.ts
+ * @see packages/core/src/capabilities/search.ts (ranking weights)
  */
 
 import { describe, expect, it } from 'vitest'
-import { resolveDiscoveryLimit, summarizeDiscoverySearch, inspectCapability } from './discovery.js'
+import {
+  resolveDiscoveryLimit,
+  summarizeDiscoverySearch,
+  inspectCapability,
+  governedDiscoverySearch,
+} from './discovery.js'
 import { buildCapabilityRegistry } from './registry.js'
 import { parseManifestYaml } from '../manifest/loader.js'
+import { notebookManifest } from './test-fixtures.js'
 import type { GovernanceFilter } from './governance.js'
 import type { CapabilitySearchResult } from './search.js'
 import type { Capability } from './types.js'
@@ -169,6 +178,239 @@ describe('summarizeDiscoverySearch', () => {
     expect(outcome.kind).toBe('matches')
     if (outcome.kind === 'matches') {
       expect(outcome.governed.map((g) => g.capability.name)).toEqual(['notebook.notes.list'])
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// governedDiscoverySearch — the governance-first entry point
+// ---------------------------------------------------------------------------
+//
+// The Notebook fixture (notebookManifest) provides 6 capabilities with known
+// risks. For intent "note", all 6 match (hand-derived from SEARCH_WEIGHTS):
+//
+//   "note" exact keyword match (keywordExact = 4):
+//     notebook.notes.create  (write)
+//     notebook.notes.delete  (delete)
+//     notebook.notes.share   (send)
+//
+//   "note" prefix-matches "notebook" keyword (keywordPrefix = 2):
+//     notebook.app.doScript  (execute)   — "notebook".startsWith("note")
+//     notebook.app.quit      (system-change)
+//
+//   "note" prefix-matches "notes" keyword (keywordPrefix = 2):
+//     notebook.notes.list    (read)      — "notes".startsWith("note")
+//
+// Tie-breaking at score 2 by name ascending:
+//   notebook.app.doScript < notebook.app.quit < notebook.notes.list
+//
+// Full rank order for "note":
+//   1. notebook.notes.create  (4)
+//   2. notebook.notes.delete  (4)
+//   3. notebook.notes.share   (4)
+//   4. notebook.app.doScript  (2)
+//   5. notebook.app.quit      (2)
+//   6. notebook.notes.list    (2)
+
+const notebookRegistry = buildCapabilityRegistry([notebookManifest()])
+
+/** Deny the given set of risk classes. */
+function denyRisk(...risks: string[]): GovernanceFilter {
+  return {
+    evaluate: (c) =>
+      risks.includes(c.risk)
+        ? { disposition: 'deny', reason: `${c.risk} denied by test policy` }
+        : { disposition: 'allow' },
+  }
+}
+
+describe('governedDiscoverySearch', () => {
+  it('returns kind=no-match when the intent has no matching capabilities', () => {
+    const outcome = governedDiscoverySearch(notebookRegistry, 'frobnicate quux', 10)
+    expect(outcome.kind).toBe('no-match')
+  })
+
+  it('returns kind=no-match for an empty / whitespace-only intent', () => {
+    expect(governedDiscoverySearch(notebookRegistry, '', 10).kind).toBe('no-match')
+    expect(governedDiscoverySearch(notebookRegistry, '   ', 10).kind).toBe('no-match')
+  })
+
+  it('returns kind=matches with all matching capabilities when none are denied (allow-all)', () => {
+    // intent "note" matches all 6 fixture capabilities; limit=10 → all 6 returned.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 10)
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      // Full rank order: create(4), delete(4), share(4), doScript(2), quit(2), list(2).
+      expect(outcome.governed.map((g) => g.capability.name)).toEqual([
+        'notebook.notes.create',
+        'notebook.notes.delete',
+        'notebook.notes.share',
+        'notebook.app.doScript',
+        'notebook.app.quit',
+        'notebook.notes.list',
+      ])
+    }
+  })
+
+  it('returns kind=governance-blocked when all matches are denied', () => {
+    // Deny all 6 risk classes that the fixture capabilities carry.
+    const outcome = governedDiscoverySearch(
+      notebookRegistry,
+      'note',
+      10,
+      denyRisk('write', 'delete', 'send', 'execute', 'system-change', 'read')
+    )
+    expect(outcome.kind).toBe('governance-blocked')
+    if (outcome.kind === 'governance-blocked') {
+      // All 6 matching capabilities were denied.
+      expect(outcome.deniedCount).toBe(6)
+    }
+  })
+
+  // -----------------------------------------------------------------------
+  // Regression: partial-denial-under-limit (the core fix for issue #42)
+  // -----------------------------------------------------------------------
+  // Before the fix: governance was applied AFTER slicing to limit, so denied
+  // capabilities in the top-N left gaps rather than being backfilled.
+  //
+  // Scenario: limit=3, deny "write" (only notebook.notes.create is write risk).
+  //
+  // Pre-fix (broken):
+  //   slice first → [create, delete, share] → apply gov →
+  //   [delete, share] — only 2 results, not 3
+  //
+  // Post-fix (correct):
+  //   govern ALL 6 matches → [delete(4), share(4), doScript(2), quit(2), list(2)] →
+  //   slice to 3 → [delete, share, doScript] — 3 results, backfilled
+
+  it('regression #42: backfills denied top results from lower-ranked allowed matches', () => {
+    // Deny "write" → notebook.notes.create (rank 1, score 4) is skipped.
+    // Governance iterates all 6 matches and collects the first 3 allowed:
+    //   notebook.notes.delete (rank 2, score 4)
+    //   notebook.notes.share  (rank 3, score 4)
+    //   notebook.app.doScript (rank 4, score 2) — backfilled
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 3, denyRisk('write'))
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      expect(outcome.governed.map((g) => g.capability.name)).toEqual([
+        'notebook.notes.delete',
+        'notebook.notes.share',
+        'notebook.app.doScript', // backfilled — absent in the pre-fix code
+      ])
+      // All three governance decisions must be 'allow'.
+      expect(outcome.governed.map((g) => g.decision.disposition)).toEqual([
+        'allow',
+        'allow',
+        'allow',
+      ])
+    }
+  })
+
+  it('regression #42: returns all allowed when limit > count of allowed results', () => {
+    // Deny "write" → 5 capabilities survive governance (all except create).
+    // limit=100 → returns all 5, not fewer.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 100, denyRisk('write'))
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      expect(outcome.governed).toHaveLength(5)
+      expect(outcome.governed.map((g) => g.capability.name)).toEqual([
+        'notebook.notes.delete',
+        'notebook.notes.share',
+        'notebook.app.doScript',
+        'notebook.app.quit',
+        'notebook.notes.list',
+      ])
+    }
+  })
+
+  it('preserves governance disposition (warn) for capabilities that are not denied', () => {
+    const warnDeletes: GovernanceFilter = {
+      evaluate: (c) =>
+        c.risk === 'delete'
+          ? { disposition: 'warn', reason: 'needs approval' }
+          : { disposition: 'allow' },
+    }
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 10, warnDeletes)
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      const deleteResult = outcome.governed.find(
+        (g) => g.capability.name === 'notebook.notes.delete'
+      )
+      expect(deleteResult?.decision.disposition).toBe('warn')
+      expect(deleteResult?.decision.reason).toBe('needs approval')
+    }
+  })
+
+  it('respects the limit after backfilling', () => {
+    // Even with backfilling, must not exceed limit.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 2, denyRisk('write'))
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      expect(outcome.governed).toHaveLength(2)
+      // delete and share are the two highest-scoring allowed results.
+      expect(outcome.governed.map((g) => g.capability.name)).toEqual([
+        'notebook.notes.delete',
+        'notebook.notes.share',
+      ])
+    }
+  })
+
+  // -----------------------------------------------------------------------
+  // Regression: limit <= 0 must return no-match (parity with slice semantics)
+  // -----------------------------------------------------------------------
+  // Before the fix, the governed-filter loop in searchCapabilities never
+  // satisfied `governed.length === limit` when limit <= 0, so it iterated all
+  // matches and returned them all. governedDiscoverySearch must short-circuit
+  // to no-match for limit <= 0, matching slice(0, 0) / slice(0, -N) → [].
+
+  it('regression: returns no-match for limit=0 even when matches and allowed results exist', () => {
+    // intent "note" has 6 matching, allowed capabilities; limit=0 must still yield no-match.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 0)
+    expect(outcome.kind).toBe('no-match')
+  })
+
+  it('regression: returns no-match for negative limit even when matches exist', () => {
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', -1)
+    expect(outcome.kind).toBe('no-match')
+  })
+
+  // -----------------------------------------------------------------------
+  // Score field threading: governed results must carry the lexical score
+  // -----------------------------------------------------------------------
+  // Before the fix the CLI JSON output dropped the `score` field because
+  // GovernedCapability did not carry it. GovernedCapabilityResult now extends
+  // GovernedCapability with `score` so callers get it without a second search.
+
+  it('threads the lexical score through to each governed result', () => {
+    // intent "note" scores: create/delete/share = 4, doScript/quit/list = 2.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 10)
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      // Top three must have score 4 (keywordExact weight from SEARCH_WEIGHTS).
+      const top3 = outcome.governed.slice(0, 3)
+      for (const g of top3) {
+        expect(typeof g.score).toBe('number')
+        expect(g.score).toBe(4)
+      }
+      // Lower three must have score 2 (keywordPrefix weight).
+      const lower3 = outcome.governed.slice(3)
+      for (const g of lower3) {
+        expect(g.score).toBe(2)
+      }
+    }
+  })
+
+  it('threads score correctly through governance backfilling', () => {
+    // Deny "write" (create, score 4). Remaining top results:
+    //   delete (4), share (4), doScript (2). Scores must reflect true ranking.
+    const outcome = governedDiscoverySearch(notebookRegistry, 'note', 3, denyRisk('write'))
+    expect(outcome.kind).toBe('matches')
+    if (outcome.kind === 'matches') {
+      expect(outcome.governed.map((g) => ({ name: g.capability.name, score: g.score }))).toEqual([
+        { name: 'notebook.notes.delete', score: 4 },
+        { name: 'notebook.notes.share', score: 4 },
+        { name: 'notebook.app.doScript', score: 2 }, // backfilled; score reflects true rank
+      ])
     }
   })
 })

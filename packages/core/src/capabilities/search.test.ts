@@ -3,11 +3,20 @@
  *
  * Expected scores and orderings are derived by hand from the weight table
  * documented in `search.ts`, NOT from program output.
+ *
+ * @see packages/core/src/capabilities/search.ts (SEARCH_WEIGHTS table)
  */
 
 import { describe, expect, it } from 'vitest'
 import { buildCapabilityRegistry } from './registry.js'
-import { searchCapabilities, scoreCapability, tokenizeIntent, SEARCH_WEIGHTS } from './search.js'
+import {
+  searchCapabilities,
+  searchCapabilitiesHasAnyMatch,
+  scoreCapability,
+  tokenizeIntent,
+  SEARCH_WEIGHTS,
+} from './search.js'
+import type { GovernanceFilter } from './governance.js'
 import { notebookManifest } from './test-fixtures.js'
 
 const registry = buildCapabilityRegistry([notebookManifest()])
@@ -103,5 +112,124 @@ describe('searchCapabilities', () => {
   it('accepts a bare capability array as well as a registry', () => {
     const results = searchCapabilities(registry.capabilities, 'delete note')
     expect(results[0]?.capability.name).toBe('notebook.notes.delete')
+  })
+
+  // -----------------------------------------------------------------------
+  // Governance filter (options.filter): govern BEFORE slicing to limit
+  // -----------------------------------------------------------------------
+  //
+  // For intent "note", all 6 fixture capabilities match (hand-derived from
+  // SEARCH_WEIGHTS and the manifest keywords):
+  //
+  //   "note" exact keyword match (keywordExact = 4):
+  //     notebook.notes.create  (write)
+  //     notebook.notes.delete  (delete)
+  //     notebook.notes.share   (send)
+  //
+  //   "note" prefix-matches "notebook" keyword (keywordPrefix = 2):
+  //     notebook.app.doScript  (execute)   — "notebook".startsWith("note")
+  //     notebook.app.quit      (system-change)
+  //
+  //   "note" prefix-matches "notes" keyword (keywordPrefix = 2):
+  //     notebook.notes.list    (read)      — "notes".startsWith("note")
+  //
+  // Tie-breaking at score 2 by name ascending:
+  //   notebook.app.doScript < notebook.app.quit < notebook.notes.list
+  //
+  // Full rank order for "note":
+  //   1. notebook.notes.create  (4)
+  //   2. notebook.notes.delete  (4)
+  //   3. notebook.notes.share   (4)
+  //   4. notebook.app.doScript  (2)
+  //   5. notebook.app.quit      (2)
+  //   6. notebook.notes.list    (2)
+
+  it('applies the governance filter before slicing, backfilling denied top results', () => {
+    // Deny "write" → notebook.notes.create (rank 1, score 4) is excluded.
+    // With limit=3: governance iterates the full 6-entry ranked list,
+    // skips create, and collects the next 3 allowed entries:
+    //   delete (rank 2, score 4), share (rank 3, score 4), doScript (rank 4, score 2)
+    const denyWrite: GovernanceFilter = {
+      evaluate: (c) => (c.risk === 'write' ? { disposition: 'deny' } : { disposition: 'allow' }),
+    }
+    const results = searchCapabilities(registry, 'note', { limit: 3, filter: denyWrite })
+    // Only allowed capabilities are returned (no 'write' risk in results).
+    expect(results.map((r) => r.capability.name)).toEqual([
+      'notebook.notes.delete', // rank 2, score 4
+      'notebook.notes.share', // rank 3, score 4
+      'notebook.app.doScript', // rank 4, score 2 — backfilled
+    ])
+    expect(results.every((r) => r.capability.risk !== 'write')).toBe(true)
+  })
+
+  it('returns all allowed capabilities up to limit when filter passes all', () => {
+    const allowAll: GovernanceFilter = { evaluate: () => ({ disposition: 'allow' }) }
+    const results = searchCapabilities(registry, 'note', { limit: 3, filter: allowAll })
+    expect(results).toHaveLength(3)
+    expect(results.map((r) => r.capability.name)).toEqual([
+      'notebook.notes.create',
+      'notebook.notes.delete',
+      'notebook.notes.share',
+    ])
+  })
+
+  it('returns an empty array when the filter denies all matching capabilities', () => {
+    const denyAll: GovernanceFilter = { evaluate: () => ({ disposition: 'deny' }) }
+    const results = searchCapabilities(registry, 'note', { filter: denyAll })
+    expect(results).toEqual([])
+  })
+
+  it('without a filter option, slices the full sorted list (pre-fix path unchanged)', () => {
+    // Baseline: no filter → default behaviour, top 3 by rank including any risk.
+    const results = searchCapabilities(registry, 'note', { limit: 3 })
+    expect(results.map((r) => r.capability.name)).toEqual([
+      'notebook.notes.create',
+      'notebook.notes.delete',
+      'notebook.notes.share',
+    ])
+  })
+
+  // -----------------------------------------------------------------------
+  // Regression: limit <= 0 parity between filter and non-filter paths
+  // -----------------------------------------------------------------------
+  // Before the fix, the governed loop never hit `governed.length === limit`
+  // when limit <= 0, so it returned all allowed results instead of [].
+  // The non-filter path correctly returned [] via slice(0, 0) / slice(0, -1).
+  // Both paths must return [] for limit <= 0 even when matches exist.
+
+  it('regression: filter path returns [] for limit=0 even when matches exist', () => {
+    const allowAll: GovernanceFilter = { evaluate: () => ({ disposition: 'allow' }) }
+    expect(searchCapabilities(registry, 'note', { limit: 0, filter: allowAll })).toEqual([])
+  })
+
+  it('regression: filter path returns [] for negative limit even when matches exist', () => {
+    const allowAll: GovernanceFilter = { evaluate: () => ({ disposition: 'allow' }) }
+    expect(searchCapabilities(registry, 'note', { limit: -5, filter: allowAll })).toEqual([])
+  })
+
+  it('non-filter path also returns [] for limit=0 (confirming parity)', () => {
+    // Baseline: the pre-fix non-filter path used slice(0, limit); this asserts
+    // the existing behaviour so parity can be verified by inspection.
+    expect(searchCapabilities(registry, 'note', { limit: 0 })).toEqual([])
+  })
+})
+
+describe('searchCapabilitiesHasAnyMatch', () => {
+  it('returns true when at least one capability matches the intent', () => {
+    expect(searchCapabilitiesHasAnyMatch(registry, 'create note')).toBe(true)
+  })
+
+  it('returns false when no capability matches the intent', () => {
+    expect(searchCapabilitiesHasAnyMatch(registry, 'frobnicate quux')).toBe(false)
+  })
+
+  it('returns false for an empty intent', () => {
+    expect(searchCapabilitiesHasAnyMatch(registry, '')).toBe(false)
+    expect(searchCapabilitiesHasAnyMatch(registry, '  ')).toBe(false)
+  })
+
+  it('accepts a bare capability array as well as a registry', () => {
+    expect(searchCapabilitiesHasAnyMatch(registry.capabilities, 'delete note')).toBe(true)
+    expect(searchCapabilitiesHasAnyMatch(registry.capabilities, 'frobnicate')).toBe(false)
   })
 })
