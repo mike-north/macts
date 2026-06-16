@@ -1,6 +1,14 @@
 import { Command, Option } from 'clipanion'
 import { createApiKey, type CreateApiKeyResult } from '@macts/api'
-import { loadManifest, type PermissionsSection, isValidPermission } from '@macts/core'
+import {
+  loadManifest,
+  type AppManifest,
+  type PermissionsSection,
+  isValidPermission,
+  explainScope,
+  renderScopeExplanation,
+  type ScopeExplanation,
+} from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
@@ -85,8 +93,10 @@ export class ApiKeyCreateCommand extends Command {
     }
 
     try {
-      // Load permissions section from manifest if provided
+      // Load manifest if provided (needed for coarse-permission expansion and
+      // the full scope explanation including not-granted operations).
       let permissionsSection: PermissionsSection | undefined
+      let loadedManifest: AppManifest | undefined
       if (this.manifest) {
         const manifestPath = path.resolve(this.manifest)
         if (!fs.existsSync(manifestPath)) {
@@ -95,8 +105,8 @@ export class ApiKeyCreateCommand extends Command {
           )
           return 1
         }
-        const manifest = await loadManifest(manifestPath)
-        permissionsSection = manifest.permissions
+        loadedManifest = await loadManifest(manifestPath)
+        permissionsSection = loadedManifest.permissions
       }
 
       const result = await createApiKey(
@@ -108,8 +118,15 @@ export class ApiKeyCreateCommand extends Command {
         permissionsSection
       )
 
+      // Build the scope explanation when a manifest is available. The expanded
+      // (fine-grained) permissions stored on the key are the authoritative scope;
+      // we explain those against the manifest to show what the key can and cannot do.
+      const scopeExplanation: ScopeExplanation | undefined = loadedManifest
+        ? explainScope(result.metadata.permissions, loadedManifest)
+        : undefined
+
       if (this.json) {
-        this.context.stdout.write(formatter.format(formatResult(result)) + '\n')
+        this.context.stdout.write(formatter.format(formatResult(result, scopeExplanation)) + '\n')
       } else {
         this.context.stdout.write('\n')
         this.context.stdout.write(`API Key: ${result.token}\n`)
@@ -118,6 +135,10 @@ export class ApiKeyCreateCommand extends Command {
         this.context.stdout.write(`Permissions: ${result.metadata.permissions.join(', ')}\n`)
         if (result.metadata.expiresAt) {
           this.context.stdout.write(`Expires: ${result.metadata.expiresAt.toISOString()}\n`)
+        }
+        if (scopeExplanation) {
+          this.context.stdout.write('\n')
+          this.context.stdout.write(renderScopeExplanation(scopeExplanation) + '\n')
         }
         this.context.stdout.write('\n')
         this.context.stdout.write('Save this key securely - it cannot be retrieved later.\n')
@@ -132,8 +153,11 @@ export class ApiKeyCreateCommand extends Command {
   }
 }
 
-function formatResult(result: CreateApiKeyResult): object {
-  return {
+function formatResult(
+  result: CreateApiKeyResult,
+  scopeExplanation: ScopeExplanation | undefined
+): object {
+  const base = {
     token: result.token,
     keyId: result.keyId,
     name: result.metadata.name,
@@ -141,5 +165,33 @@ function formatResult(result: CreateApiKeyResult): object {
     originalPermissions: result.metadata.originalPermissions,
     createdAt: result.metadata.createdAt.toISOString(),
     expiresAt: result.metadata.expiresAt?.toISOString(),
+  }
+
+  if (!scopeExplanation) {
+    return base
+  }
+
+  // Include the structured scope explanation in JSON output.
+  const scopeJson = scopeExplanation.resources.map((r) => ({
+    resource: r.resource,
+    granted: r.granted.map((op) => ({
+      permission: op.permission,
+      operation: op.operation,
+      description: op.description,
+    })),
+    notGranted: r.notGranted.map((op) => ({
+      permission: op.permission,
+      operation: op.operation,
+      description: op.description,
+    })),
+  }))
+
+  return {
+    ...base,
+    scopeExplanation: {
+      app: scopeExplanation.app,
+      grantsNothing: scopeExplanation.grantsNothing,
+      resources: scopeJson,
+    },
   }
 }
