@@ -322,16 +322,26 @@ async function executeAppCommand(
  * the returned objects carried no usable id (`calendarIdentifier` vs the
  * `calendarId` the create route wants).
  *
+ * When the command has a required parent identifier (e.g. `calendarId` in
+ * `listEvents`), the JXA is scoped to the parent resource so only the children
+ * belonging to that parent are returned. The parent's plural resource name and
+ * the identifier parameter name are resolved from the manifest command
+ * parameters — never hardcoded.
+ *
  * Exported for testing: the JXA runs only against a live app (not in CI), so we
  * assert on the generated program text at the schema level.
  *
  * @param resource - The resource the list targets (may be undefined).
  * @param paramAssignments - Pre-rendered `var x = ...;` parameter bindings.
+ * @param command - The list command definition (used to resolve required parent params).
+ * @param manifest - The full app manifest (used to resolve the parent resource plural).
  * @returns The JXA program source.
  */
 export function buildListCommandCode(
   resource: Resource | undefined,
-  paramAssignments: string
+  paramAssignments: string,
+  command?: { parameters: { name: string; required: boolean }[] },
+  manifest?: { resources: Record<string, Resource> }
 ): string {
   const resourcePlural = resource?.plural.toLowerCase() ?? 'items'
 
@@ -353,10 +363,66 @@ export function buildListCommandCode(
       ? `if (obj.${idProperty} !== undefined) { obj.${CANONICAL_IDENTIFIER_KEY} = obj.${idProperty}; }`
       : ''
 
+  // Resolve the required parent identifier parameter (if any) so the JXA can
+  // scope the list to the parent resource. The parent param is the first
+  // required command parameter that is NOT one of the listed resource's own
+  // properties (e.g. `calendarId` for `listEvents`). Its name — the
+  // schema-validated request key bound by paramAssignments — is what we use in
+  // the byId(...) call, never the parent resource's identifier property.
+  const parentParam = command?.parameters.find(
+    (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
+  )
+
+  // When we have a required parent param, resolve the parent resource so we can
+  // derive its plural. We look through the manifest resources and find the one
+  // whose primary identifier property name (lowercased + 'Id') matches the
+  // param name (e.g. `calendarId` → look for resource with primary id
+  // `calendarIdentifier` in the Calendar resource). As a fallback we strip the
+  // trailing 'Id' suffix and treat the remainder as the parent plural.
+  let collectionExpr = `app.${resourcePlural}()`
+  if (parentParam !== undefined) {
+    const parentIdParam = parentParam.name // e.g. "calendarId"
+
+    // Try to find the parent resource by matching the param name against each
+    // resource's primary identifier property or its plural.
+    let parentPlural: string | undefined
+    if (manifest !== undefined) {
+      for (const res of Object.values(manifest.resources)) {
+        const primaryId = resolvePrimaryIdentifierProperty(res)
+        // Match heuristic: "calendarId" → Calendar has primaryId "calendarIdentifier"
+        // whose prefix ("calendar") matches the param name prefix.
+        const paramBase = parentIdParam.endsWith('Id')
+          ? parentIdParam.slice(0, -2).toLowerCase()
+          : parentIdParam.toLowerCase()
+        const resNameLower = res.name.toLowerCase()
+        const resPluralLower = res.plural.toLowerCase()
+        if (
+          primaryId?.toLowerCase().startsWith(paramBase) === true ||
+          resNameLower === paramBase ||
+          resPluralLower === paramBase + 's' ||
+          resPluralLower === paramBase
+        ) {
+          parentPlural = res.plural.toLowerCase()
+          break
+        }
+      }
+    }
+
+    // Fallback: derive the plural from the param name by stripping the "Id" suffix.
+    if (parentPlural === undefined) {
+      const paramBase = parentIdParam.endsWith('Id')
+        ? parentIdParam.slice(0, -2).toLowerCase()
+        : parentIdParam.toLowerCase()
+      parentPlural = `${paramBase}s`
+    }
+
+    collectionExpr = `app.${parentPlural}.byId(${parentIdParam}).${resourcePlural}()`
+  }
+
   return `
       ${paramAssignments}
       // List ${resourcePlural}
-      var items = app.${resourcePlural}();
+      var items = ${collectionExpr};
       // Convert JXA references to plain objects by accessing each property
       var result = [];
       for (var i = 0; i < items.length; i++) {
@@ -376,7 +442,7 @@ async function executeResourceCommand(
   args: RpcRequest,
   ctx: RpcHandlerContext
 ): Promise<unknown> {
-  const { bundleId } = ctx
+  const { bundleId, manifest } = ctx
 
   // Build JXA code for resource command
   const paramAssignments = command.parameters
@@ -397,12 +463,31 @@ async function executeResourceCommand(
   let code: string
 
   if (command.name === 'list') {
-    code = buildListCommandCode(resource, paramAssignments)
+    // Pass the command and manifest so buildListCommandCode can scope the list
+    // to the parent resource when the command has a required parent identifier.
+    code = buildListCommandCode(resource, paramAssignments, command, manifest)
   } else if (command.name === 'get') {
-    // Get by identifier: app.calendars.byId(<identifierParam>)
-    // Resolve the identifier variable name from the first required parameter in
-    // the manifest definition — never hardcode 'id'.
+    // Get by identifier: app.resource.byId(<identifierParam>)
+    //
+    // The lookup variable name MUST be the command's required *parameter* name
+    // (e.g. `id`, `name`, `widgetName`) — that is the key the request schema
+    // (Zod) validates and the only var `paramAssignments` binds. It is NOT the
+    // resource's primary identifier *property* (`uid`, `calendarIdentifier`),
+    // which is an output/canonicalization concern; using that here would emit
+    // `byId(uid)` with no `var uid` declared and reject the request the schema
+    // accepts. See manifests/calendar/app.yaml: get.parameters[0].name = 'id'.
     const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+
+    // Validate: if the identifier param is required but not provided, return a
+    // structured error rather than emit `byId(undefined)` into JXA.
+    if (args[identifierParam] === undefined) {
+      return Promise.reject(
+        Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
+          code: 'VALIDATION_ERROR',
+        })
+      )
+    }
+
     const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
 
     code = `
@@ -415,15 +500,26 @@ async function executeResourceCommand(
     `
   } else if (command.name === 'delete') {
     // Delete by identifier: app.resource.byId(<identifierParam>).delete()
-    // Resolve the identifier variable name from the first required parameter in
-    // the manifest definition — never hardcode 'id'.
     //
-    // If there is no required identifier parameter (e.g. System Events DiskItem
-    // delete which has parameters: []), fall through to the generic handler
-    // rather than silently using an undefined variable in byId().
+    // As with get, the lookup variable is the command's required *parameter*
+    // name (the schema-validated request key), NOT the resource's primary
+    // identifier property.
+    //
+    // If the command declares no required parameter (e.g. System Events
+    // DiskItem delete which has parameters: []), `identifierParam` is undefined
+    // and we fall through to the generic handler — never emit `byId(undefined)`.
     const identifierParam = command.parameters.find((p) => p.required)?.name
 
     if (identifierParam !== undefined) {
+      // Guard: emit a structured error if the required identifier is absent.
+      if (args[identifierParam] === undefined) {
+        return Promise.reject(
+          Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
+            code: 'VALIDATION_ERROR',
+          })
+        )
+      }
+
       code = `
       ${paramAssignments}
       // Delete ${resource?.name ?? 'item'} by identifier
@@ -446,24 +542,79 @@ async function executeResourceCommand(
     `
     }
   } else if (command.name === 'create') {
-    // Create: app.Calendar({props}).make()
+    // Create: app.ResourceName({props}).make()
+    //
+    // This branch is fully manifest-driven. When the command has a required
+    // parent identifier parameter (e.g. `calendarId` for createEvent,
+    // `listId` for createReminder), it is the required *parameter* whose name
+    // is NOT one of the resource's own writable properties (those are the
+    // props we set on the new item). The parent BINDING name is therefore the
+    // command parameter name — the schema-validated request key — never the
+    // parent resource's identifier property. We use the manifest only to map
+    // that param to the parent resource's plural for collection access.
     const resourceName = resource?.name ?? 'Item'
-    const props = command.parameters
-      .filter((p) => p.name !== 'calendarId' && args[p.name] !== undefined)
-      .map((p) => p.name)
 
-    // Check if we're creating within a parent (e.g., event in calendar)
-    if (args['calendarId']) {
+    const parentParam = command.parameters.find(
+      (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
+    )
+
+    if (parentParam !== undefined) {
+      const parentIdParam = parentParam.name // e.g. "calendarId", "listId"
+
+      // Guard: emit a structured error if the parent identifier is absent.
+      if (args[parentIdParam] === undefined) {
+        return Promise.reject(
+          Object.assign(new Error(`Missing required parameter: ${parentIdParam}`), {
+            code: 'VALIDATION_ERROR',
+          })
+        )
+      }
+
+      // Resolve the parent resource's plural by matching the param name against
+      // each resource's primary identifier or name — manifest-driven, not hardcoded.
+      let parentPlural: string | undefined
+      for (const res of Object.values(manifest.resources)) {
+        const primaryId = resolvePrimaryIdentifierProperty(res)
+        const paramBase = parentIdParam.endsWith('Id')
+          ? parentIdParam.slice(0, -2).toLowerCase()
+          : parentIdParam.toLowerCase()
+        const resNameLower = res.name.toLowerCase()
+        const resPluralLower = res.plural.toLowerCase()
+        if (
+          primaryId?.toLowerCase().startsWith(paramBase) === true ||
+          resNameLower === paramBase ||
+          resPluralLower === paramBase + 's' ||
+          resPluralLower === paramBase
+        ) {
+          parentPlural = res.plural.toLowerCase()
+          break
+        }
+      }
+      if (parentPlural === undefined) {
+        const paramBase = parentIdParam.endsWith('Id')
+          ? parentIdParam.slice(0, -2).toLowerCase()
+          : parentIdParam.toLowerCase()
+        parentPlural = `${paramBase}s`
+      }
+
+      // Props are all parameters except the parent identifier.
+      const props = command.parameters
+        .filter((p) => p.name !== parentIdParam && args[p.name] !== undefined)
+        .map((p) => p.name)
+
       code = `
         ${paramAssignments}
-        // Create ${resourceName} in calendar
-        var calendar = app.calendars.byId(calendarId);
+        // Create ${resourceName} within parent (${parentIdParam})
+        var parent = app.${parentPlural}.byId(${parentIdParam});
         var props = {${props.join(', ')}};
         var item = app.${resourceName}(props);
-        item.make({ at: calendar.${resourcePlural} });
+        item.make({ at: parent.${resourcePlural} });
         return item.properties();
       `
     } else {
+      // No parent identifier: create at the top level.
+      const props = command.parameters.filter((p) => args[p.name] !== undefined).map((p) => p.name)
+
       code = `
         ${paramAssignments}
         // Create ${resourceName}
@@ -473,6 +624,40 @@ async function executeResourceCommand(
         return item.properties();
       `
     }
+  } else if (command.name === 'update') {
+    // Update by identifier: set each provided field on the resource item.
+    //
+    // The target lookup variable is the command's required *parameter* name
+    // (the schema-validated request key), consistent with get/delete — NOT the
+    // resource's primary identifier property.
+    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+
+    // Guard: emit a structured error if the required identifier is absent.
+    if (args[identifierParam] === undefined) {
+      return Promise.reject(
+        Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
+          code: 'VALIDATION_ERROR',
+        })
+      )
+    }
+
+    // Collect the writable fields from the provided args (excluding the identifier).
+    const writableFields = command.parameters
+      .filter((p) => p.name !== identifierParam && args[p.name] !== undefined)
+      .map((p) => p.name)
+
+    // Generate a property-assignment statement for each updated field.
+    const fieldAssignments = writableFields
+      .map((fieldName) => `try { item.${fieldName} = ${fieldName}; } catch(e) {}`)
+      .join('\n      ')
+
+    code = `
+      ${paramAssignments}
+      // Update ${resource?.name ?? 'item'} by identifier
+      var item = app.${resourcePlural}.byId(${identifierParam});
+      ${fieldAssignments}
+      return item.properties();
+    `
   } else {
     // Generic command execution
     const paramObj = command.parameters

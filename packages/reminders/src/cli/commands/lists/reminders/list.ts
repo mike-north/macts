@@ -20,7 +20,7 @@ export class ListRemindersCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.reminders.list()
+      const items = await client.reminders.list(this.listId)
 
       const output = formatter.formatList(
         items.map((item) => ({

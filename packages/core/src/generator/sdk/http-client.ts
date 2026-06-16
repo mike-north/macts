@@ -745,18 +745,12 @@ function generateResourceClient(
     }
   }
 
-  // Find identifiers
-  const identifiers = resource.identifiers ?? []
-  const primaryId = identifiers.find((id) => id.primary)?.property ?? identifiers[0]?.property
-
   const crudMethods = [
-    listCmd ? generateListMethod(listCmd[0], resourceName, plural) : '',
-    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower, primaryId) : '',
+    listCmd ? generateListMethod(listCmd[0], listCmd[1], resourceName, plural) : '',
+    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower) : '',
     createCmd ? generateCreateMethod(createCmd[0], createCmd[1], resourceName, nameLower) : '',
-    updateCmd
-      ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower, primaryId)
-      : '',
-    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower, primaryId) : '',
+    updateCmd ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower) : '',
+    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower) : '',
   ]
     .filter(Boolean)
     .join('\n')
@@ -830,25 +824,85 @@ ${methodBody}
 }
 
 /**
- * Get the first-parameter name for a get/update/delete command, falling back to
- * the resource's primary identifier and finally `id`. The server validates the
- * request body against the command's declared parameters, so the SDK must use
- * the command's parameter name when present.
+ * Resolve the request *parameter* name for a get/update/delete command.
+ *
+ * This MUST be the command's required parameter name (e.g. `id`, `name`,
+ * `widgetName`) — the key the server's request schema (Zod) validates and the
+ * value the SDK puts in the request body. It is matched exactly by the server's
+ * `executeResourceCommand`, which binds its JXA lookup variable from the same
+ * `command.parameters` required entry.
+ *
+ * It is NOT the resource's primary identifier *property* (`uid`,
+ * `calendarIdentifier`): that name is for output canonicalization only. In the
+ * shipped Calendar manifest, `getEvent` declares param `id` while the Event
+ * property is `uid` — sending `{ uid }` would fail schema validation and emit
+ * `byId(uid)` with no bound variable. The single source of truth for the
+ * request key is therefore the command parameter, on both surfaces.
+ *
+ * @param command - The command definition for the CRUD operation.
  */
-function idParamName(command: Command, primaryId: string | undefined): string {
-  return command.parameters[0]?.name ?? primaryId ?? 'id'
+function idParamName(command: Command): string {
+  return command.parameters.find((p) => p.required)?.name ?? 'id'
 }
 
 /**
  * Generate the `list` method, routed by the backing command's key.
+ *
+ * When the list command has required parameters (e.g. a parent `calendarId`),
+ * they are included in the method signature and forwarded in the request body —
+ * mirroring how get/delete/create thread their identifier params, and matching
+ * what the server's `buildListCommandCode` requires to scope the JXA to the
+ * parent resource.
+ *
+ * Identifier resolution follows the same unified path as other CRUD branches:
+ * required parameters from the manifest command definition, read via
+ * `buildParamsAndBody`, so SDK and server always agree on parameter names.
  */
-function generateListMethod(commandKey: string, resourceName: string, plural: string): string {
-  return `
+function generateListMethod(
+  commandKey: string,
+  command: Command,
+  resourceName: string,
+  plural: string
+): string {
+  // Collect only required parameters for the list signature (optional ones are
+  // not part of a standard list call and would complicate the API surface).
+  const requiredParams = command.parameters.filter((p) => p.required)
+
+  if (requiredParams.length === 0) {
+    return `
   /**
    * List all ${plural}.
    */
   async list(): Promise<${resourceName}[]> {
     return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${commandKey}\`);
+  }
+`
+  }
+
+  // Build the parameter signature and body for required params only.
+  const signature = requiredParams
+    .map((p) => {
+      const tsType = propertyTypeToTs(
+        typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
+      )
+      return `${safeIdentifier(p.name)}: ${tsType}`
+    })
+    .join(', ')
+
+  const bodyProps = requiredParams
+    .map((p) => {
+      const safeName = safeIdentifier(p.name)
+      return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
+    })
+    .join(', ')
+  const bodyArg = `{ ${bodyProps} }`
+
+  return `
+  /**
+   * List all ${plural}.
+   */
+  async list(${signature}): Promise<${resourceName}[]> {
+    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});
   }
 `
 }
@@ -860,10 +914,9 @@ function generateGetMethod(
   commandKey: string,
   command: Command,
   resourceName: string,
-  nameLower: string,
-  primaryId: string | undefined
+  nameLower: string
 ): string {
-  const id = idParamName(command, primaryId)
+  const id = idParamName(command)
   return `
   /**
    * Get a ${nameLower} by ${id}.
@@ -906,10 +959,9 @@ function generateUpdateMethod(
   commandKey: string,
   command: Command,
   resourceName: string,
-  nameLower: string,
-  primaryId: string | undefined
+  nameLower: string
 ): string {
-  const id = idParamName(command, primaryId)
+  const id = idParamName(command)
   return `
   /**
    * Update an existing ${nameLower}.
@@ -923,13 +975,8 @@ function generateUpdateMethod(
 /**
  * Generate the `delete` method, routed by the backing command's key.
  */
-function generateDeleteMethod(
-  commandKey: string,
-  command: Command,
-  nameLower: string,
-  primaryId: string | undefined
-): string {
-  const id = idParamName(command, primaryId)
+function generateDeleteMethod(commandKey: string, command: Command, nameLower: string): string {
+  const id = idParamName(command)
   return `
   /**
    * Delete a ${nameLower}.

@@ -186,7 +186,7 @@ export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: EventCreateInput): Promise<Event_2>;
     get(id: string): Promise<Event_2>;
-    list(): Promise<Event_2[]>;
+    list(calendarId: string): Promise<Event_2[]>;
     show(): Promise<void>;
 }
 

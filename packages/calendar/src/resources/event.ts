@@ -23,8 +23,8 @@ export class EventResourceClient {
   /**
    * List all events.
    */
-  async list(): Promise<Event[]> {
-    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.listEvents`)
+  async list(calendarId: string): Promise<Event[]> {
+    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.listEvents`, { calendarId })
   }
 
   /**
