@@ -276,7 +276,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'createRange',
     description: 'Create a text range by character positions',
-    permission: 'word:documents:read',
+    permission: 'word:documents:createRange',
     risk: 'write',
     inputSchema: {
       type: 'object',

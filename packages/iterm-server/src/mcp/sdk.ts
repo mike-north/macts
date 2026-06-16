@@ -21,7 +21,7 @@ export function getiTermClient(): iTermClient {
   if (!apiKey) {
     throw new Error(
       'MACTS_API_KEY environment variable is required. ' +
-        'Create an API key with: macts api-key create --permissions iterm:*:*'
+        'Create an API key with: macts api-key create --name "<name>" --permission iterm:*:*'
     )
   }
 

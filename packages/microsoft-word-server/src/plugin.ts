@@ -1281,13 +1281,13 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:documents:read',
+        permission: 'word:documents:createRange',
       },
     },
     permissions: {
       documents: {
-        read: ['word:documents:list', 'word:documents:get', 'word:documents:read'],
-        create: ['word:documents:create'],
+        read: ['word:documents:list', 'word:documents:get'],
+        create: ['word:documents:create', 'word:documents:createRange'],
         write: ['word:documents:save', 'word:documents:insert', 'word:documents:update'],
         delete: ['word:documents:close', 'word:documents:delete'],
       },
