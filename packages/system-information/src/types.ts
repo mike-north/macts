@@ -10,6 +10,8 @@ export type DetailLevel = 'mini' | 'basic' | 'full'
 
 /** A system profile document */
 export interface Document {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The document name */
   name: string
   /** Plain text representation of the system profile document */
@@ -32,6 +34,7 @@ export type DocumentUpdateInput = Partial<DocumentCreateInput>
 // Zod schemas for runtime validation
 
 export const DocumentSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   plainText: z.string(),
   xmlText: z.string(),

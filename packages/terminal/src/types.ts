@@ -32,6 +32,8 @@ export type WindowUpdateInput = Partial<WindowCreateInput>
 
 /** A Terminal tab */
 export interface Tab {
+  /** Canonical identifier (mirrors `tty`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The visible contents of the tab */
   contents: string
   /** The complete history contents of the tab */
@@ -111,6 +113,7 @@ export const WindowSchema = z.object({
 })
 
 export const TabSchema = z.object({
+  id: z.string().optional(),
   contents: z.string(),
   history: z.string(),
   busy: z.boolean(),

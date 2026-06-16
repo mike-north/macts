@@ -360,6 +360,8 @@ export type GroupUpdateInput = Partial<GroupCreateInput>
 
 /** A drawing layer in OmniGraffle */
 export interface Layer {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** Name of the layer */
   name: string
   /** Are the layer's graphics locked? */
@@ -635,6 +637,7 @@ export const GroupSchema = z.object({
 })
 
 export const LayerSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   locked: z.boolean(),
   visible: z.boolean(),

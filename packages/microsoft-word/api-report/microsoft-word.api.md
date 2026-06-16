@@ -105,6 +105,7 @@ export interface Document {
     content: string;
     defaultTabStop: number;
     fullName: string;
+    id?: string;
     name: string;
     path: string;
     posixFullName: string;
@@ -137,6 +138,7 @@ export class DocumentResourceClient {
 
 // @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     fullName: z.ZodString;
     posixFullName: z.ZodString;
@@ -322,6 +324,7 @@ export interface Paragraph {
     alignment: ParagraphAlignment;
     content: string;
     firstLineIndent: number;
+    id?: string;
     keepTogether: boolean;
     keepWithNext: boolean;
     leftIndent: number;
@@ -352,6 +355,7 @@ export interface ParagraphCreateInput {
 
 // @public (undocumented)
 export const ParagraphSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     alignment: z.ZodString;
     firstLineIndent: z.ZodNumber;
     leftIndent: z.ZodNumber;

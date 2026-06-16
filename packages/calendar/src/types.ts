@@ -19,6 +19,8 @@ export type ViewType = 'dayView' | 'weekView' | 'monthView'
 
 /** A calendar containing events */
 export interface Calendar {
+  /** Canonical identifier (mirrors `calendarIdentifier`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The calendar title */
   name: string
   /** The calendar title (synonym for name) */
@@ -50,6 +52,8 @@ export type CalendarUpdateInput = Partial<CalendarCreateInput>
 
 /** A calendar event */
 export interface Event {
+  /** Canonical identifier (mirrors `uid`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The event summary/title */
   summary: string
   /** The event notes */
@@ -216,6 +220,7 @@ export type OpenFileAlarmUpdateInput = Partial<OpenFileAlarmCreateInput>
 // Zod schemas for runtime validation
 
 export const CalendarSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   title: z.string(),
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
@@ -225,6 +230,7 @@ export const CalendarSchema = z.object({
 })
 
 export const EventSchema = z.object({
+  id: z.string().optional(),
   summary: z.string(),
   description: z.string(),
   location: z.string(),

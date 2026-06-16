@@ -34,6 +34,8 @@ export type FieldType =
 
 /** A Microsoft Word document */
 export interface Document {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The name of the document */
   name: string
   /** The full path of the document in HFS format */
@@ -75,6 +77,8 @@ export type DocumentUpdateInput = Partial<DocumentCreateInput>
 
 /** A single paragraph in a document */
 export interface Paragraph {
+  /** Canonical identifier (mirrors `paragraphId`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The alignment for the paragraph */
   alignment: ParagraphAlignment
   /** The first-line or hanging indent value in points */
@@ -466,6 +470,7 @@ export type FieldUpdateInput = Partial<FieldCreateInput>
 // Zod schemas for runtime validation
 
 export const DocumentSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   fullName: z.string(),
   posixFullName: z.string(),
@@ -480,6 +485,7 @@ export const DocumentSchema = z.object({
 })
 
 export const ParagraphSchema = z.object({
+  id: z.string().optional(),
   alignment: z.string(),
   firstLineIndent: z.number(),
   leftIndent: z.number(),

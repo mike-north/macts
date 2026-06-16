@@ -36,6 +36,7 @@ export class AlfredError extends Error {
 
 // @public
 export interface Application {
+    id?: string;
     name: string;
 }
 
@@ -44,6 +45,7 @@ export type ApplicationCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const ApplicationSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
 }, z.core.$strip>;
 

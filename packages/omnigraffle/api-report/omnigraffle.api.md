@@ -431,6 +431,7 @@ export type LabelUpdateInput = Partial<LabelCreateInput>;
 
 // @public
 export interface Layer {
+    id?: string;
     locked: boolean;
     name: string;
     prints: boolean;
@@ -456,6 +457,7 @@ export class LayerResourceClient {
 
 // @public (undocumented)
 export const LayerSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     locked: z.ZodBoolean;
     visible: z.ZodBoolean;

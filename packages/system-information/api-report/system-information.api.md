@@ -31,6 +31,7 @@ export type DetailLevel = 'mini' | 'basic' | 'full';
 // @public
 export interface Document {
     detailLevel: DetailLevel;
+    id?: string;
     name: string;
     plainText: string;
     xmlText: string;
@@ -50,6 +51,7 @@ export class DocumentResourceClient {
 
 // @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     plainText: z.ZodString;
     xmlText: z.ZodString;
