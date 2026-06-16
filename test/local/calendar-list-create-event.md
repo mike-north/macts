@@ -44,7 +44,10 @@ export MACTS_BASE_URL=http://localhost:8372
 ```ts
 import { CalendarClient } from '@macts/calendar'
 
-const client = new CalendarClient({ apiKey: process.env.MACTS_API_KEY! })
+const client = new CalendarClient({
+  apiKey: process.env.MACTS_API_KEY!,
+  baseUrl: process.env.MACTS_BASE_URL, // falls back to http://localhost:8372 when unset
+})
 
 // 1. List calendars and take the canonical identifier of a writable one.
 const calendars = await client.calendars.list()
@@ -80,5 +83,7 @@ console.log('PASS: created event', event)
 
 ## Cleanup
 
-Delete the created event (`client.events.delete(event.id)`), or remove it in
-Calendar.app.
+Remove the created event in Calendar.app. (This check only exercises
+`calendars.list()` → `events.create()`; it does not depend on an API delete
+path — `events.delete` may not be exposed on the generated SDK and `create` does
+not guarantee a populated `event.id`.)
