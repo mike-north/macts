@@ -84,7 +84,7 @@ export type CalendarPriority = '0' | '9' | '5' | '1';
 export class CalendarResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CalendarCreateInput): Promise<Calendar>;
-    get(calendarIdentifier: string): Promise<Calendar>;
+    get(id: string): Promise<Calendar>;
     list(): Promise<Calendar[]>;
 }
 
@@ -185,7 +185,7 @@ export interface EventCreateInput {
 export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: EventCreateInput): Promise<Event_2>;
-    get(uid: string): Promise<Event_2>;
+    get(id: string): Promise<Event_2>;
     list(calendarId: string): Promise<Event_2[]>;
     show(): Promise<void>;
 }

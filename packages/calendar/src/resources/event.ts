@@ -28,10 +28,10 @@ export class EventResourceClient {
   }
 
   /**
-   * Get a event by uid.
+   * Get a event by id.
    */
-  async get(uid: string): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { uid })
+  async get(id: string): Promise<Event> {
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { id })
   }
 
   /**
