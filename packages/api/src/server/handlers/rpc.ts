@@ -364,12 +364,14 @@ export function buildListCommandCode(
       : ''
 
   // Resolve the required parent identifier parameter (if any) so the JXA can
-  // scope the list to the parent resource. We use the manifest's parameter list
-  // for the command — the first required parameter that is NOT the resource's
-  // own primary identifier is the parent scoping param (e.g. `calendarId` for
-  // `listEvents`).
-  const ownIdProperty = resolvePrimaryIdentifierProperty(resource)
-  const parentParam = command?.parameters.find((p) => p.required && p.name !== ownIdProperty)
+  // scope the list to the parent resource. The parent param is the first
+  // required command parameter that is NOT one of the listed resource's own
+  // properties (e.g. `calendarId` for `listEvents`). Its name — the
+  // schema-validated request key bound by paramAssignments — is what we use in
+  // the byId(...) call, never the parent resource's identifier property.
+  const parentParam = command?.parameters.find(
+    (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
+  )
 
   // When we have a required parent param, resolve the parent resource so we can
   // derive its plural. We look through the manifest resources and find the one
@@ -466,14 +468,15 @@ async function executeResourceCommand(
     code = buildListCommandCode(resource, paramAssignments, command, manifest)
   } else if (command.name === 'get') {
     // Get by identifier: app.resource.byId(<identifierParam>)
-    // Resolve the identifier variable name from the manifest via the shared
-    // resolver — never hardcode 'id'. The primary identifier is the single
-    // source of truth (manifest/identifier.ts); the command's required
-    // parameter must match it.
-    const identifierParam =
-      resolvePrimaryIdentifierProperty(resource) ??
-      command.parameters.find((p) => p.required)?.name ??
-      'id'
+    //
+    // The lookup variable name MUST be the command's required *parameter* name
+    // (e.g. `id`, `name`, `widgetName`) — that is the key the request schema
+    // (Zod) validates and the only var `paramAssignments` binds. It is NOT the
+    // resource's primary identifier *property* (`uid`, `calendarIdentifier`),
+    // which is an output/canonicalization concern; using that here would emit
+    // `byId(uid)` with no `var uid` declared and reject the request the schema
+    // accepts. See manifests/calendar/app.yaml: get.parameters[0].name = 'id'.
+    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
 
     // Validate: if the identifier param is required but not provided, return a
     // structured error rather than emit `byId(undefined)` into JXA.
@@ -497,14 +500,15 @@ async function executeResourceCommand(
     `
   } else if (command.name === 'delete') {
     // Delete by identifier: app.resource.byId(<identifierParam>).delete()
-    // Resolve the identifier from the manifest via the shared resolver so this
-    // branch stays consistent with get — never hardcode 'id'.
     //
-    // If the resource declares no identifier (e.g. System Events DiskItem
-    // delete which has parameters: []), fall through to the generic handler
-    // rather than silently using an undefined variable in byId().
-    const identifierParam =
-      resolvePrimaryIdentifierProperty(resource) ?? command.parameters.find((p) => p.required)?.name
+    // As with get, the lookup variable is the command's required *parameter*
+    // name (the schema-validated request key), NOT the resource's primary
+    // identifier property.
+    //
+    // If the command declares no required parameter (e.g. System Events
+    // DiskItem delete which has parameters: []), `identifierParam` is undefined
+    // and we fall through to the generic handler — never emit `byId(undefined)`.
+    const identifierParam = command.parameters.find((p) => p.required)?.name
 
     if (identifierParam !== undefined) {
       // Guard: emit a structured error if the required identifier is absent.
@@ -542,17 +546,16 @@ async function executeResourceCommand(
     //
     // This branch is fully manifest-driven. When the command has a required
     // parent identifier parameter (e.g. `calendarId` for createEvent,
-    // `listId` for createReminder), we resolve the parent resource's plural
-    // via `resolvePrimaryIdentifierProperty` + manifest lookup — never
-    // hardcode 'calendarId' or 'calendars'.
+    // `listId` for createReminder), it is the required *parameter* whose name
+    // is NOT one of the resource's own writable properties (those are the
+    // props we set on the new item). The parent BINDING name is therefore the
+    // command parameter name — the schema-validated request key — never the
+    // parent resource's identifier property. We use the manifest only to map
+    // that param to the parent resource's plural for collection access.
     const resourceName = resource?.name ?? 'Item'
 
-    // Detect a required parent identifier: a required parameter whose name
-    // does NOT correspond to the resource's own primary identifier.
-    const ownIdProperty = resolvePrimaryIdentifierProperty(resource)
     const parentParam = command.parameters.find(
-      (p) =>
-        p.required && p.name !== ownIdProperty && !Object.hasOwn(resource?.properties ?? {}, p.name)
+      (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
     )
 
     if (parentParam !== undefined) {
@@ -623,12 +626,11 @@ async function executeResourceCommand(
     }
   } else if (command.name === 'update') {
     // Update by identifier: set each provided field on the resource item.
-    // Resolve the target identifier from the manifest via the shared resolver
-    // (consistent with get/delete above) — never hardcode 'id'.
-    const identifierParam =
-      resolvePrimaryIdentifierProperty(resource) ??
-      command.parameters.find((p) => p.required)?.name ??
-      'id'
+    //
+    // The target lookup variable is the command's required *parameter* name
+    // (the schema-validated request key), consistent with get/delete — NOT the
+    // resource's primary identifier property.
+    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
 
     // Guard: emit a structured error if the required identifier is absent.
     if (args[identifierParam] === undefined) {

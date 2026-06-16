@@ -6,22 +6,36 @@
  *
  * 1. The SDK-emitted request-body keys ⊇ the server's required parameters for
  *    that command (the SDK sends at least everything the server requires).
- * 2. Both the SDK and the server resolve the SAME identifier parameter name for
- *    the resource (get/update/delete) — they both now use the same resolver:
- *    `resolvePrimaryIdentifierProperty` from `manifest/identifier.ts`.
+ * 2. The SDK and the server resolve the SAME *request parameter name* for the
+ *    resource (get/update/delete) — both derive it from the manifest command's
+ *    required parameter (`command.parameters`), which is the key the request
+ *    schema (Zod) validates and the value the SDK puts in the body.
+ *
+ * The request parameter name is deliberately NOT the resource's primary
+ * identifier *property* (`uid`, `calendarIdentifier`). That property name is an
+ * output/canonicalization concern only. In the shipped Calendar manifest,
+ * `get`/`getEvent` declare the request param as `id` even though the resource
+ * properties are `calendarIdentifier`/`uid` — so the body key, the server's
+ * Zod-validated key, and the JXA-bound variable must all be `id`. Asserting
+ * against the property name here would encode a contract the server rejects.
+ *
+ * Expected param names are derived BY HAND from the manifest command parameters
+ * (the spec), not from generator output.
  *
  * Fixtures cover the cases that were previously broken or under-tested:
  *   - list-with-required-parent (calendarId in listEvents, listId in listReminders)
+ *   - get/delete/update where the resource property name ≠ the request param name
+ *     (Calendar `id` vs property `calendarIdentifier`; Event `id` vs `uid`)
  *   - update (previously fell through to a generic else that emitted invalid JXA)
  *   - non-calendar create-within-parent (listId in createReminder)
  *
- * @see ../../manifest/identifier.ts (resolvePrimaryIdentifierProperty, CANONICAL_IDENTIFIER_KEY)
+ * @see manifests/calendar/app.yaml (get/getEvent parameters[0].name = 'id')
+ * @see ../../manifest/identifier.ts (resolvePrimaryIdentifierProperty — OUTPUT canonicalization only)
  * @see ../../../api/src/server/handlers/rpc.ts (executeResourceCommand, buildListCommandCode)
  */
 
 import { describe, it, expect } from 'vitest'
 import type { AppManifest, Command, Resource } from '../../manifest/index.js'
-import { resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { generateHttpClientSdk } from './http-client.js'
 
 // ---------------------------------------------------------------------------
@@ -40,29 +54,33 @@ function findFile(
 }
 
 /**
- * Resolve the identifier param name using the SAME logic as the server's
- * `executeResourceCommand`: primary identifier from the manifest first, then
- * the first required command param, then 'id'.
+ * The request parameter name a get/update/delete command uses — the command's
+ * required parameter. This is the single source of truth for the request body
+ * key on BOTH surfaces (server `executeResourceCommand` and SDK `idParamName`).
  *
- * This mirrors `idParamName` in http-client.ts (which now uses
- * `resolvePrimaryIdentifierProperty`) so the test can verify both sides agree.
+ * It is intentionally independent of the resource's identifier *property*.
  */
-function resolveServerIdentifierParam(command: Command, resource: Resource | undefined): string {
-  return (
-    resolvePrimaryIdentifierProperty(resource) ??
-    command.parameters.find((p) => p.required)?.name ??
-    'id'
-  )
+function requestIdentifierParam(command: Command): string {
+  return command.parameters.find((p) => p.required)?.name ?? 'id'
 }
 
 /**
- * Extract the parameter names a `list` command requires (required params only).
- * The server's `buildListCommandCode` uses the first required param as the
- * parent scoping identifier when it doesn't match the resource's own primary id.
+ * Extract the request parameter names a command requires (required params).
+ * The server scopes/looks up using these exact names; the SDK must send them.
  */
-function requiredListParams(command: Command, resource: Resource | undefined): string[] {
-  const ownId = resolvePrimaryIdentifierProperty(resource)
-  return command.parameters.filter((p) => p.required && p.name !== ownId).map((p) => p.name)
+function requiredParams(command: Command): string[] {
+  return command.parameters.filter((p) => p.required).map((p) => p.name)
+}
+
+/**
+ * The required parent-scoping parameters for a `list` command: required params
+ * that are NOT one of the listed resource's own properties (e.g. `calendarId`
+ * for `listEvents`). The server binds and looks up by this exact name.
+ */
+function requiredListParentParams(command: Command, resource: Resource | undefined): string[] {
+  return command.parameters
+    .filter((p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name))
+    .map((p) => p.name)
 }
 
 // ---------------------------------------------------------------------------
@@ -103,6 +121,9 @@ const calendarManifest: AppManifest = {
       description: 'A calendar event',
       properties: {
         summary: { access: 'rw', type: 'string', description: 'Summary', optional: false },
+        startDate: { access: 'rw', type: 'date', description: 'Start', optional: false },
+        endDate: { access: 'rw', type: 'date', description: 'End', optional: false },
+        location: { access: 'rw', type: 'string', description: 'Location', optional: true },
         uid: { access: 'r', type: 'string', description: 'Unique event key', optional: false },
       },
       identifiers: [{ property: 'uid', primary: true }],
@@ -132,13 +153,11 @@ const calendarManifest: AppManifest = {
       description: 'Get a calendar by ID',
       scope: 'resource',
       resourceType: 'Calendar',
+      // Matches the shipped manifest (manifests/calendar/app.yaml:412-413): the
+      // request param is `id`, even though the Calendar's identifier *property*
+      // is `calendarIdentifier`. The request key is the command param name.
       parameters: [
-        {
-          name: 'calendarIdentifier',
-          type: 'string',
-          description: 'Calendar identifier',
-          required: true,
-        },
+        { name: 'id', type: 'string', description: 'Calendar identifier', required: true },
       ],
       permission: 'calendar:calendars:get',
     },
@@ -373,11 +392,11 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       const eventResource = calendarManifest.resources['Event']
       expect(listEventsCmd).toBeDefined()
       if (listEventsCmd === undefined) return
-      const serverRequiredParams = requiredListParams(listEventsCmd, eventResource)
-      // Server expects: ['calendarId']
-      expect(serverRequiredParams).toEqual(['calendarId'])
+      const serverParentParams = requiredListParentParams(listEventsCmd, eventResource)
+      // Spec (manifest): listEvents.parameters = [{ name: 'calendarId', required }].
+      expect(serverParentParams).toEqual(['calendarId'])
       // SDK list() body arg must include all server-required params.
-      for (const param of serverRequiredParams) {
+      for (const param of serverParentParams) {
         expect(eventClient).toContain(param)
       }
     })
@@ -403,9 +422,10 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       const reminderResource = remindersManifest.resources['Reminder']
       expect(listRemindersCmd).toBeDefined()
       if (listRemindersCmd === undefined) return
-      const serverRequiredParams = requiredListParams(listRemindersCmd, reminderResource)
-      expect(serverRequiredParams).toEqual(['listId'])
-      for (const param of serverRequiredParams) {
+      const serverParentParams = requiredListParentParams(listRemindersCmd, reminderResource)
+      // Spec (manifest): listReminders.parameters = [{ name: 'listId', required }].
+      expect(serverParentParams).toEqual(['listId'])
+      for (const param of serverParentParams) {
         expect(reminderClient).toContain(param)
       }
     })
@@ -422,25 +442,21 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       expect(noteClient).toMatch(/async update\(/)
     })
 
-    it('SDK update() sends the identifier (id) in the request body', () => {
-      // The server's update branch looks for the identifier from
-      // resolvePrimaryIdentifierProperty (= 'id' for Note). The SDK must send
-      // 'id' in the body so the server can perform byId(id) scoping.
+    it('SDK update() sends the request param (id) in the request body', () => {
+      // The server's update branch binds and looks up by the command's required
+      // *parameter* name (= 'id' for updateNote). The SDK must send 'id' in the
+      // body so the server can perform byId(id) scoping.
       expect(noteClient).toContain('{ id, ...input }')
     })
 
-    it('SDK and server resolve the SAME identifier (id) for update', () => {
+    it('SDK and server resolve the SAME request param (id) for update', () => {
       const updateNoteCmd = updateManifest.commands['updateNote']
-      const noteResource = updateManifest.resources['Note']
       expect(updateNoteCmd).toBeDefined()
       if (updateNoteCmd === undefined) return
-      // Server resolution: resolvePrimaryIdentifierProperty first
-      const serverId = resolveServerIdentifierParam(updateNoteCmd, noteResource)
-      // SDK resolution (same function): resolvePrimaryIdentifierProperty first
-      const sdkId = resolvePrimaryIdentifierProperty(noteResource) ?? 'id'
-      expect(serverId).toBe('id')
-      expect(sdkId).toBe('id')
-      expect(serverId).toBe(sdkId)
+      // Both surfaces resolve the request key from the command's required param.
+      // Spec (manifest): updateNote.parameters[0].name = 'id'.
+      const param = requestIdentifierParam(updateNoteCmd)
+      expect(param).toBe('id')
     })
 
     it('SDK update() routes to the correct manifest command key (updateNote)', () => {
@@ -477,9 +493,13 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       const reminderResource = remindersManifest.resources['Reminder']
       expect(createReminderCmd).toBeDefined()
       if (createReminderCmd === undefined) return
-      const ownId = resolvePrimaryIdentifierProperty(reminderResource)
-      const parentParam = createReminderCmd.parameters.find((p) => p.required && p.name !== ownId)
-      // Server looks for a required param that is NOT the resource's own id.
+      // Server identifies the parent param as a required param that is NOT one
+      // of the resource's own properties. Its NAME (the request key) is the
+      // command parameter name, never the parent resource's identifier property.
+      const parentParam = createReminderCmd.parameters.find(
+        (p) => p.required && !Object.hasOwn(reminderResource?.properties ?? {}, p.name)
+      )
+      // Spec (manifest): createReminder.parameters includes { name: 'listId' }.
       expect(parentParam?.name).toBe('listId')
       // The SDK's input type must include this field (already asserted above,
       // this assertion documents the contract explicitly).
@@ -488,45 +508,102 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
   })
 
   // -------------------------------------------------------------------------
-  // Identifier coherence: SDK and server use the SAME resolver for get/delete
+  // Request-param coherence: the body key == the manifest command parameter,
+  // even when it differs from the resource identifier *property*.
+  //
+  // These guard the regression where the SDK sent the resource property name
+  // (`uid`/`calendarIdentifier`) while the server validated the command param
+  // (`id`) — a guaranteed VALIDATION_ERROR plus byId(<unbound var>) in JXA.
   // -------------------------------------------------------------------------
-  describe('identifier coherence (same resolver for get/delete on both surfaces)', () => {
-    it('Calendar events: SDK and server both resolve uid as the get identifier', () => {
-      // Calendar Event has identifiers: [{ property: 'uid', primary: true }].
-      // Both sides must use resolvePrimaryIdentifierProperty → 'uid'.
+  describe('request-param coherence (body key == manifest command param, not the id property)', () => {
+    it('Calendar Event get: request param is `id` (command param), NOT `uid` (property)', () => {
+      // Spec (manifests/calendar/app.yaml:456-457): getEvent.parameters[0].name = 'id'.
+      // The Event identifier *property* is `uid`, but that is NOT the request key.
       const getEventCmd = calendarManifest.commands['getEvent']
-      const eventResource = calendarManifest.resources['Event']
       expect(getEventCmd).toBeDefined()
       if (getEventCmd === undefined) return
+      expect(requestIdentifierParam(getEventCmd)).toBe('id')
 
-      const serverIdentifier = resolveServerIdentifierParam(getEventCmd, eventResource)
-      const sdkIdentifier = resolvePrimaryIdentifierProperty(eventResource) ?? 'id'
-      expect(serverIdentifier).toBe('uid')
-      expect(sdkIdentifier).toBe('uid')
-      expect(serverIdentifier).toBe(sdkIdentifier)
-    })
-
-    it('SDK get() for Events uses the manifest identifier (uid), not the param name (id)', () => {
-      // Previously idParamName used parameters[0].name = 'id' (the getEvent param).
-      // Now it uses resolvePrimaryIdentifierProperty = 'uid'.
-      // Both the SDK method signature and request body must use 'uid'.
       const result = generateHttpClientSdk(calendarManifest, { packageName: '@macts/sdk-calendar' })
       const eventClient = findFile(result.files, 'src/resources/event.ts').content
-      expect(eventClient).toMatch(/async get\(uid:\s*string\)/)
-      expect(eventClient).toContain('{ uid }')
+      // SDK method signature and body must use the command param `id`.
+      expect(eventClient).toMatch(/async get\(id:\s*string\)/)
+      expect(eventClient).toContain('{ id }')
+      // And must NOT use the property name `uid` as the request key.
+      expect(eventClient).not.toMatch(/async get\(uid:\s*string\)/)
+      expect(eventClient).not.toContain('{ uid }')
     })
 
-    it('Calendar: SDK and server both resolve calendarIdentifier for Calendar get', () => {
+    it('Calendar get: request param is `id` (command param), NOT `calendarIdentifier` (property)', () => {
+      // Spec (manifests/calendar/app.yaml:412-413): get.parameters[0].name = 'id'.
       const getCalendarCmd = calendarManifest.commands['get']
-      const calendarResource = calendarManifest.resources['Calendar']
       expect(getCalendarCmd).toBeDefined()
       if (getCalendarCmd === undefined) return
+      expect(requestIdentifierParam(getCalendarCmd)).toBe('id')
 
-      const serverIdentifier = resolveServerIdentifierParam(getCalendarCmd, calendarResource)
-      const sdkIdentifier = resolvePrimaryIdentifierProperty(calendarResource) ?? 'id'
-      expect(serverIdentifier).toBe('calendarIdentifier')
-      expect(sdkIdentifier).toBe('calendarIdentifier')
-      expect(serverIdentifier).toBe(sdkIdentifier)
+      const result = generateHttpClientSdk(calendarManifest, { packageName: '@macts/sdk-calendar' })
+      const calendarClient = findFile(result.files, 'src/resources/calendar.ts').content
+      expect(calendarClient).toMatch(/async get\(id:\s*string\)/)
+      expect(calendarClient).toContain('{ id }')
+      expect(calendarClient).not.toContain('calendarIdentifier:')
+    })
+
+    it('Reminders delete: request param is the command param `id`', () => {
+      // Spec (manifest): deleteReminder.parameters[0].name = 'id'.
+      const deleteReminderCmd = remindersManifest.commands['deleteReminder']
+      expect(deleteReminderCmd).toBeDefined()
+      if (deleteReminderCmd === undefined) return
+      expect(requestIdentifierParam(deleteReminderCmd)).toBe('id')
+
+      const result = generateHttpClientSdk(remindersManifest, {
+        packageName: '@macts/sdk-reminders',
+      })
+      const reminderClient = findFile(result.files, 'src/resources/reminder.ts').content
+      expect(reminderClient).toMatch(/async delete\(id:\s*string\)/)
+      expect(reminderClient).toContain('{ id }')
+    })
+
+    it('SDK body key == server required param == manifest command param, for every CRUD op', () => {
+      // The unifying invariant: for each CRUD command, the SDK-sent request key
+      // and the server-validated required param are BOTH the manifest command
+      // parameter name. We derive the expected name from the manifest (the spec)
+      // and assert the generated SDK emits exactly that key.
+      const result = generateHttpClientSdk(calendarManifest, { packageName: '@macts/sdk-calendar' })
+      const eventClient = findFile(result.files, 'src/resources/event.ts').content
+      const calendarClient = findFile(result.files, 'src/resources/calendar.ts').content
+
+      // get (Event): manifest param 'id'
+      const getEvent = calendarManifest.commands['getEvent']
+      expect(getEvent).toBeDefined()
+      if (getEvent !== undefined) {
+        expect(requiredParams(getEvent)).toEqual(['id'])
+        expect(eventClient).toContain('{ id }')
+      }
+
+      // list (Event): manifest param 'calendarId' (parent scope)
+      const listEvents = calendarManifest.commands['listEvents']
+      expect(listEvents).toBeDefined()
+      if (listEvents !== undefined) {
+        expect(requiredParams(listEvents)).toEqual(['calendarId'])
+        expect(eventClient).toContain('{ calendarId }')
+      }
+
+      // create (Event): manifest requires calendarId + summary + startDate + endDate;
+      // the SDK forwards the whole input object (which the input type requires).
+      const createEvent = calendarManifest.commands['createEvent']
+      expect(createEvent).toBeDefined()
+      if (createEvent !== undefined) {
+        expect(requiredParams(createEvent)).toContain('calendarId')
+        expect(eventClient).toContain('createEvent`, input)')
+      }
+
+      // get (Calendar): manifest param 'id'
+      const getCalendar = calendarManifest.commands['get']
+      expect(getCalendar).toBeDefined()
+      if (getCalendar !== undefined) {
+        expect(requiredParams(getCalendar)).toEqual(['id'])
+        expect(calendarClient).toContain('{ id }')
+      }
     })
   })
 })

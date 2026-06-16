@@ -747,12 +747,10 @@ function generateResourceClient(
 
   const crudMethods = [
     listCmd ? generateListMethod(listCmd[0], listCmd[1], resourceName, plural) : '',
-    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower, resource) : '',
+    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower) : '',
     createCmd ? generateCreateMethod(createCmd[0], createCmd[1], resourceName, nameLower) : '',
-    updateCmd
-      ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower, resource)
-      : '',
-    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower, resource) : '',
+    updateCmd ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower) : '',
+    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower) : '',
   ]
     .filter(Boolean)
     .join('\n')
@@ -826,25 +824,25 @@ ${methodBody}
 }
 
 /**
- * Resolve the parameter name for the resource's own identifier in a
- * get/update/delete command, using the same priority order as the server's
- * `executeResourceCommand`: manifest primary identifier property first (via
- * `resolvePrimaryIdentifierProperty`), then the command's first required
- * parameter, then a final fallback of `'id'`.
+ * Resolve the request *parameter* name for a get/update/delete command.
  *
- * Keeping SDK and server on the SAME resolution order prevents the parameter-
- * name drift where one side picked `id` and the other picked `uid` for the
- * same resource.
+ * This MUST be the command's required parameter name (e.g. `id`, `name`,
+ * `widgetName`) — the key the server's request schema (Zod) validates and the
+ * value the SDK puts in the request body. It is matched exactly by the server's
+ * `executeResourceCommand`, which binds its JXA lookup variable from the same
+ * `command.parameters` required entry.
+ *
+ * It is NOT the resource's primary identifier *property* (`uid`,
+ * `calendarIdentifier`): that name is for output canonicalization only. In the
+ * shipped Calendar manifest, `getEvent` declares param `id` while the Event
+ * property is `uid` — sending `{ uid }` would fail schema validation and emit
+ * `byId(uid)` with no bound variable. The single source of truth for the
+ * request key is therefore the command parameter, on both surfaces.
  *
  * @param command - The command definition for the CRUD operation.
- * @param resource - The target resource (used for manifest identifier lookup).
  */
-function idParamName(command: Command, resource: Resource | undefined): string {
-  return (
-    resolvePrimaryIdentifierProperty(resource) ??
-    command.parameters.find((p) => p.required)?.name ??
-    'id'
-  )
+function idParamName(command: Command): string {
+  return command.parameters.find((p) => p.required)?.name ?? 'id'
 }
 
 /**
@@ -916,10 +914,9 @@ function generateGetMethod(
   commandKey: string,
   command: Command,
   resourceName: string,
-  nameLower: string,
-  resource: Resource | undefined
+  nameLower: string
 ): string {
-  const id = idParamName(command, resource)
+  const id = idParamName(command)
   return `
   /**
    * Get a ${nameLower} by ${id}.
@@ -962,10 +959,9 @@ function generateUpdateMethod(
   commandKey: string,
   command: Command,
   resourceName: string,
-  nameLower: string,
-  resource: Resource | undefined
+  nameLower: string
 ): string {
-  const id = idParamName(command, resource)
+  const id = idParamName(command)
   return `
   /**
    * Update an existing ${nameLower}.
@@ -979,13 +975,8 @@ function generateUpdateMethod(
 /**
  * Generate the `delete` method, routed by the backing command's key.
  */
-function generateDeleteMethod(
-  commandKey: string,
-  command: Command,
-  nameLower: string,
-  resource: Resource | undefined
-): string {
-  const id = idParamName(command, resource)
+function generateDeleteMethod(commandKey: string, command: Command, nameLower: string): string {
+  const id = idParamName(command)
   return `
   /**
    * Delete a ${nameLower}.
