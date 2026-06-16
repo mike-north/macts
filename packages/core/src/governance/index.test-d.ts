@@ -91,9 +91,10 @@ expectType<boolean>(r.success)
 
 expectAssignable<AuditDecision>('allowed')
 expectAssignable<AuditDecision>('denied')
+expectAssignable<AuditDecision>('pending')
 expectAssignable<AuditDecision>('approved')
 expectAssignable<AuditDecision>('rejected')
-expectNotAssignable<AuditDecision>('pending')
+expectNotAssignable<AuditDecision>('maybe')
 
 // =============================================================================
 // createAuditRecord / serializeAuditRecord — signatures
@@ -134,7 +135,7 @@ expectNotAssignable<AuditRecordInput>({
   app: 'calendar',
   argsSummary: 'Summary: x',
   apiKeyId: 'key-1',
-  decision: 'pending',
+  decision: 'maybe',
   timestamp: new Date('2026-06-14T10:42:12.000Z'),
 })
 

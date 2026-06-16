@@ -307,7 +307,7 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
-export const AUDIT_DECISIONS: readonly ["allowed", "denied", "approved", "rejected"];
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected"];
 
 // @public
 export type AuditDecision = (typeof AUDIT_DECISIONS)[number];

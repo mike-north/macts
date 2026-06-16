@@ -154,10 +154,14 @@ function evaluationToOutcome(evaluation: PolicyEvaluation): EnforcementOutcome {
 
 /**
  * Map an {@link EnforcementOutcome} to the {@link AuditDecision} recorded in the
- * audit log. `'pending-approval'` records as `'approved'` is intentionally NOT
- * used — a pending call has not been approved yet — so it records as the neutral
- * policy decision the foundation provides: we use `'denied'` only for hard
- * denials and surface pending approvals distinctly.
+ * audit log.
+ *
+ * A `'pending-approval'` outcome records as the dedicated {@link AuditDecision}
+ * `'pending'` — NOT `'denied'`. A confirm-first call is not a policy denial; it
+ * is a deferral awaiting human approval. Recording it as `'denied'` would
+ * misattribute the audit trail (a reader could not tell a hard policy block from
+ * a withheld confirm-first call). It is likewise not `'approved'`, since no human
+ * has approved it yet.
  */
 function outcomeToAuditDecision(outcome: EnforcementOutcome): AuditDecision {
   switch (outcome) {
@@ -166,13 +170,29 @@ function outcomeToAuditDecision(outcome: EnforcementOutcome): AuditDecision {
     case 'denied':
       return 'denied'
     case 'pending-approval':
-      // The call awaits human confirmation; it has neither been approved nor
-      // rejected. The audit foundation's closest pre-decision state is omitted,
-      // so we record it as 'denied' for now (the call did not proceed) and rely
-      // on the reason text to mark it as pending. Distinguishing a dedicated
-      // 'pending' audit decision is part of the approval-flow work (issue #54).
-      return 'denied'
+      return 'pending'
   }
+}
+
+/**
+ * Derive the non-empty `app` segment for an audit record from a permission
+ * string.
+ *
+ * The `app` is the first `:`-delimited segment of `app:resource:operation`. For
+ * malformed permissions the segment may be empty (e.g. `':a:b'` or `''`); an
+ * empty `app` would make the audit record ambiguous, so we fall back to the full
+ * permission string when it is non-empty, and to a clearly-marked
+ * `'<unknown>'` sentinel when even that is empty. This keeps the audit `app`
+ * field always meaningful and never silently blank.
+ */
+function deriveAuditApp(permission: string): string {
+  const first = permission.split(':')[0]
+  if (first !== undefined && first.length > 0) {
+    return first
+  }
+  // First segment empty (e.g. ':a:b' or ''). Prefer the full permission if it
+  // carries any signal; otherwise mark the app explicitly unknown.
+  return permission.length > 0 ? permission : '<unknown>'
 }
 
 // ---------------------------------------------------------------------------
@@ -207,7 +227,7 @@ export async function enforceCall(options: EnforceCallOptions): Promise<Enforcem
 
   // Write the audit record unconditionally (whether allowed, denied, or pending).
   if (writer !== undefined) {
-    const app = permission.split(':')[0] ?? permission
+    const app = deriveAuditApp(permission)
     const record = createAuditRecord({
       capability: permission,
       app,

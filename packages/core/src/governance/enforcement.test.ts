@@ -206,6 +206,10 @@ describe('enforceCall audit writing', () => {
 
     const record = records[0]
     expect(record).toBeDefined()
+    // A confirm-first call records the dedicated 'pending' decision — NOT
+    // 'denied' (it is a deferral, not a policy block) and NOT 'approved' (no
+    // human has approved it yet).
+    expect(record?.decision).toBe('pending')
     // The pending call did not proceed; the reason marks it as awaiting approval.
     expect(record?.reason).toContain('approval')
   })
@@ -229,5 +233,34 @@ describe('enforceCall audit writing', () => {
     expect(record?.capability).toBe('weird')
     expect(record?.app).toBe('weird')
     expect(record?.decision).toBe('denied')
+  })
+
+  // Regression: a permission whose first segment is empty (e.g. ':a:b') must not
+  // produce an empty `app` in the audit record — an empty app is ambiguous and
+  // loses attribution. Fall back to the full permission string.
+  it('falls back to the full permission when the first segment is empty (":a:b")', async () => {
+    const policy = makePolicy([], 'forbidden')
+    const { writer, records } = makeCapturingWriter()
+
+    await enforceCall(makeOpts({ policy, permission: ':a:b', risk: 'read', writer }))
+
+    const record = records[0]
+    expect(record?.capability).toBe(':a:b')
+    expect(record?.app).toBe(':a:b')
+    expect(record?.app).not.toBe('')
+  })
+
+  // Regression: an empty permission string must not yield an empty `app`; it
+  // records the explicit '<unknown>' sentinel instead of a blank field.
+  it('marks the app "<unknown>" for an empty permission string ("")', async () => {
+    const policy = makePolicy([], 'forbidden')
+    const { writer, records } = makeCapturingWriter()
+
+    await enforceCall(makeOpts({ policy, permission: '', risk: 'read', writer }))
+
+    const record = records[0]
+    expect(record?.capability).toBe('')
+    expect(record?.app).toBe('<unknown>')
+    expect(record?.app).not.toBe('')
   })
 })

@@ -12,12 +12,17 @@
  * 1. Evaluates the active `GovernancePolicy` against the endpoint's
  *    `app:resource:operation` permission and the command's risk class, using
  *    {@link enforceCall} from `@macts/core` (the single source of truth).
- * 2. Writes one audit record per decision (via the injected `AuditWriter`).
+ * 2. Writes one audit record per decision (via the injected `AuditWriter`),
+ *    using the `'pending'` audit decision for confirm-first calls (never
+ *    `'denied'`).
  * 3. On a denial, fails loud with a 403 and the human-readable reason naming the
  *    violated rule and the exact permission.
- * 4. On a `confirm-first` rule, surfaces a structured pending-approval signal
- *    (HTTP 202-style body) — it does NOT actually gate the call behind an
- *    approval flow (issue #54); it makes the pending state observable.
+ * 4. On a `confirm-first` rule, **withholds the call** — it does NOT call
+ *    `next()`, so the underlying operation never executes — and returns a
+ *    structured 202 pending-approval response naming the gating rule and the
+ *    exact permission. This is safe-by-default: with no approval flow yet
+ *    (issue #54), executing a confirm-first op would be a governance hole, so
+ *    the operation is held pending approval rather than allowed through.
  *
  * The active policy and audit writer are resolved by a {@link GovernanceContext}
  * supplied when the router is built, so a server with no policy configured
@@ -47,15 +52,21 @@ export interface GovernanceDeniedResponse {
 }
 
 /**
- * Response body surfaced when a capability requires human confirmation
- * (`confirm-first`). The call is NOT executed; the approval flow (issue #54)
- * owns the actual gating. This makes the pending state observable to clients.
+ * Response body returned when a capability requires human confirmation
+ * (`confirm-first`).
+ *
+ * The underlying operation is **not executed**: the middleware short-circuits
+ * with this body and HTTP 202 (Accepted-but-not-yet-acted-on) instead of calling
+ * `next()`. The approval flow itself (issue #54) is not built yet, so the call is
+ * withheld pending approval rather than allowed through — executing it would be a
+ * governance hole. Clients receive the gating rule and exact permission so they
+ * can surface "approval required" to the user.
  */
 export interface GovernancePendingResponse {
   pendingApproval: {
     /** Human-readable reason naming the gating rule and the exact permission. */
     message: string
-    /** The `app:resource:operation` awaiting approval. */
+    /** The `app:resource:operation` awaiting approval (and withheld). */
     permission: string
   }
 }
@@ -96,14 +107,17 @@ export interface RequirePolicyOptions {
  * Must run AFTER {@link ../middleware/auth.js} (so the API-key id is available
  * for audit attribution) and is intended to run AFTER
  * {@link ../middleware/permission.js} (policy enforcement is an additive layer,
- * not a replacement). On a policy denial it short-circuits with 403; otherwise
- * (allowed or pending-approval) it calls `next()` so the existing handler runs.
+ * not a replacement).
  *
- * A `confirm-first` decision currently surfaces the pending signal *and lets the
- * call proceed* — the real approval gate is issue #54. This keeps the change
- * surgical: enforcement denies out-of-policy calls today, and the pending signal
- * is observable, without prematurely blocking confirm-first calls behind an
- * approval flow that does not exist yet.
+ * Short-circuit behavior by outcome:
+ *
+ * - `allowed` → calls `next()`; the existing handler runs.
+ * - `denied` → 403 {@link GovernanceDeniedResponse}; the handler never runs.
+ * - `pending-approval` (`confirm-first`) → 202 {@link GovernancePendingResponse};
+ *   the handler **never runs**. The operation is withheld pending approval. This
+ *   is safe-by-default: with no approval flow yet (issue #54), letting a
+ *   confirm-first call execute would be a governance hole, so it is held rather
+ *   than allowed through. The decision is audited as `'pending'`.
  *
  * @param options - Endpoint permission, risk class, and governance context.
  * @returns A Hono middleware handler.
@@ -176,10 +190,19 @@ export function requirePolicy(
     }
 
     if (decision.outcome === 'pending-approval') {
-      // Surface the pending signal in a response header so clients can observe
-      // it without changing the success-body contract. The call still proceeds;
-      // the real gate is issue #54.
-      c.header('X-Macts-Governance', 'pending-approval')
+      // Safe-by-default: a confirm-first call must NOT execute while no approval
+      // flow exists (issue #54). Withhold the operation — do not call next() —
+      // and return a structured 202 pending-approval body naming the gating rule
+      // and the exact permission. The decision was already audited as 'pending'.
+      return c.json<GovernancePendingResponse>(
+        {
+          pendingApproval: {
+            message: decision.reason,
+            permission,
+          },
+        },
+        202
+      )
     }
 
     return next()

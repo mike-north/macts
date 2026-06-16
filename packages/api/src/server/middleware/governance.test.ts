@@ -8,7 +8,7 @@
  * - an in-policy call passes through to the handler,
  * - an out-of-policy call is rejected (403) with the human-readable reason,
  * - read-only semantics gate mutating calls,
- * - confirm-first surfaces a pending-approval signal without blocking,
+ * - confirm-first withholds the call (202, handler NOT run) and audits 'pending',
  * - every decision is recorded in the audit log.
  *
  * @see https://github.com/mike-north/macts/issues/53
@@ -22,7 +22,7 @@ import { Hono } from 'hono'
 import type { ApiKeyPayload, GovernancePolicy } from '@macts/core'
 import { createFileAuditWriter } from '@macts/core'
 import { requirePolicy, type GovernanceContext } from './governance.js'
-import type { GovernanceDeniedResponse } from './governance.js'
+import type { GovernanceDeniedResponse, GovernancePendingResponse } from './governance.js'
 import type { AuthVariables } from './auth.js'
 
 // ---------------------------------------------------------------------------
@@ -43,16 +43,23 @@ const PAYLOAD: ApiKeyPayload = {
 function makeApp(
   permission: string,
   risk: Parameters<typeof requirePolicy>[0]['risk'],
-  governance: GovernanceContext
+  governance: GovernanceContext,
+  /**
+   * Optional spy invoked iff the underlying handler actually runs. Lets tests
+   * prove that a withheld (confirm-first / denied) call never reaches the
+   * handler — i.e. the operation did not execute.
+   */
+  onHandlerRun?: () => void
 ): Hono<{ Variables: AuthVariables }> {
   const app = new Hono<{ Variables: AuthVariables }>()
   app.use('/*', async (c, next) => {
     c.set('apiKeyPayload', PAYLOAD)
     await next()
   })
-  app.post('/rpc/call', requirePolicy({ permission, risk, governance }), (c) =>
-    c.json({ ok: true })
-  )
+  app.post('/rpc/call', requirePolicy({ permission, risk, governance }), (c) => {
+    onHandlerRun?.()
+    return c.json({ ok: true })
+  })
   return app
 }
 
@@ -192,8 +199,17 @@ describe('requirePolicy integration', () => {
     expect(res.status).toBe(200)
   })
 
-  it('surfaces a pending-approval signal for confirm-first without blocking', async () => {
-    const app = makeApp('calendar:events:create', 'write', { policy: CONFIRM_FIRST_CALENDAR })
+  it('withholds a confirm-first call: 202 pending-approval body, handler NOT run, audited "pending"', async () => {
+    const writer = createFileAuditWriter(auditPath)
+    let handlerRan = false
+    const app = makeApp(
+      'calendar:events:create',
+      'write',
+      { policy: CONFIRM_FIRST_CALENDAR, writer },
+      () => {
+        handlerRan = true
+      }
+    )
 
     const res = await app.request('/rpc/call', {
       method: 'POST',
@@ -201,10 +217,21 @@ describe('requirePolicy integration', () => {
       body: JSON.stringify({ summary: 'x' }),
     })
 
-    // confirm-first does not block today (issue #54 owns the gate); it surfaces
-    // a header so the pending state is observable.
-    expect(res.status).toBe(200)
-    expect(res.headers.get('X-Macts-Governance')).toBe('pending-approval')
+    // Safe-by-default: the operation is withheld pending approval (issue #54).
+    // The handler must NOT execute, so the body is the pending-approval shape,
+    // NOT the handler's { ok: true }.
+    expect(res.status).toBe(202)
+    expect(handlerRan).toBe(false)
+
+    const body = (await res.json()) as GovernancePendingResponse
+    expect(body.pendingApproval.permission).toBe('calendar:events:create')
+    expect(body.pendingApproval.message).toContain('approval')
+
+    // The decision is audited as 'pending' — never 'denied'.
+    const log = await readFile(auditPath, 'utf8')
+    const record = JSON.parse(log.trim()) as Record<string, unknown>
+    expect(record['decision']).toBe('pending')
+    expect(record['capability']).toBe('calendar:events:create')
   })
 
   it('defaults to allow-all when given the empty/allow-all policy (no-policy default)', async () => {

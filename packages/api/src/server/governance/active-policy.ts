@@ -37,13 +37,33 @@ import { parsePolicy } from '@macts/core'
 import { getMactsHome } from '../../paths.js'
 
 /**
+ * Recursively freeze a value and all of its nested arrays/objects.
+ *
+ * `Object.freeze` is shallow: it freezes the top-level object but leaves nested
+ * arrays/objects mutable. For a shared constant exposed to consumers, that is a
+ * footgun — a caller could `ALLOW_ALL_POLICY.apps.push(...)` and silently
+ * corrupt the shared default. This helper freezes nested structures too, so the
+ * returned value is truly immutable.
+ */
+function deepFreeze<T>(value: T): T {
+  if (value !== null && typeof value === 'object') {
+    for (const key of Object.keys(value as Record<string, unknown>)) {
+      deepFreeze((value as Record<string, unknown>)[key])
+    }
+    Object.freeze(value)
+  }
+  return value
+}
+
+/**
  * The allow-all policy used when no policy file is configured.
  *
  * `defaultDisposition: 'allowed'` + an empty `apps` list means every capability
- * is permitted, preserving pre-governance behavior. Frozen so it cannot be
- * mutated by a consumer.
+ * is permitted, preserving pre-governance behavior. Deep-frozen (including the
+ * nested `apps` / `tags` arrays) so this shared constant cannot be mutated by a
+ * consumer — a shallow `Object.freeze` would leave those arrays writable.
  */
-export const ALLOW_ALL_POLICY: GovernancePolicy = Object.freeze({
+export const ALLOW_ALL_POLICY: GovernancePolicy = deepFreeze({
   version: '1',
   defaultDisposition: 'allowed',
   apps: [],

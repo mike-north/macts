@@ -14,6 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import type { GovernancePolicy } from '@macts/core'
 import {
   ALLOW_ALL_POLICY,
   ActivePolicyError,
@@ -100,5 +101,36 @@ describe('ALLOW_ALL_POLICY', () => {
     expect(Object.isFrozen(ALLOW_ALL_POLICY)).toBe(true)
     expect(ALLOW_ALL_POLICY.defaultDisposition).toBe('allowed')
     expect(ALLOW_ALL_POLICY.apps).toEqual([])
+  })
+
+  // Regression: a shallow Object.freeze leaves the nested `apps`/`tags` arrays
+  // mutable, so a consumer could corrupt the shared default. Deep-freezing must
+  // make the nested arrays immutable too.
+  it('deep-freezes the nested apps array (mutation throws in strict mode, no effect otherwise)', () => {
+    expect(Object.isFrozen(ALLOW_ALL_POLICY.apps)).toBe(true)
+    // In ESM (strict mode) a push to a frozen array throws; defensively assert
+    // both the throw and that no mutation took effect. (The Zod-inferred type
+    // for `apps` is a mutable array, so this would compile — runtime freezing is
+    // exactly the guarantee under test.)
+    const appRule: GovernancePolicy['apps'][number] = {
+      app: 'sneaky',
+      disposition: 'allowed',
+      operations: [],
+      restrictions: { pathsAllow: [], pathsDeny: [], urlsAllow: [], urlsDeny: [] },
+      tags: [],
+    }
+    expect(() => {
+      ALLOW_ALL_POLICY.apps.push(appRule)
+    }).toThrow(TypeError)
+    expect(ALLOW_ALL_POLICY.apps).toHaveLength(0)
+  })
+
+  it('deep-freezes the nested tags array', () => {
+    expect(Object.isFrozen(ALLOW_ALL_POLICY.tags)).toBe(true)
+    const tag: GovernancePolicy['tags'][number] = 'pii'
+    expect(() => {
+      ALLOW_ALL_POLICY.tags.push(tag)
+    }).toThrow(TypeError)
+    expect(ALLOW_ALL_POLICY.tags).toHaveLength(0)
   })
 })
