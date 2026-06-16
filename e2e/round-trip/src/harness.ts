@@ -39,8 +39,9 @@ export interface EventSummary {
 /**
  * Input for creating a test event.
  *
- * Uses ISO-8601 strings rather than `Date` objects so that the harness is
- * decoupled from date-parsing behaviour and test data stays deterministic.
+ * `startDate` and `endDate` are `Date` objects, matching `@macts/calendar`'s
+ * `EventCreateInput`. The harness constructs them from fixed constants so that
+ * test data stays deterministic (no `new Date()` at call-site).
  */
 export interface CreateEventInput {
   readonly calendarId: string
@@ -88,13 +89,15 @@ export interface RoundTripResult {
 /**
  * Run the Calendar create→list round-trip against the supplied client.
  *
- * 1. Lists calendars and selects a writable one.
+ * 1. Lists calendars and selects a writable one; falls back to the first
+ *    calendar if none are marked writable.
  * 2. Creates a test event in that calendar.
  * 3. Lists events in the calendar and asserts the created event appears.
  * 4. Records cleanup status (delete not yet in the SDK — tracked in #84).
  *
  * Throws if:
- * - No writable calendar is found.
+ * - `calendars.list()` returns no calendars at all.
+ * - The selected calendar has no `id` (the regression guard for #30/#81).
  * - `events.create()` throws (server error, identifier mismatch, etc.).
  * - The created event does not appear in the follow-up list.
  *

@@ -22,9 +22,9 @@
  *
  * The test is committed in its failing state intentionally — that is the point.
  * It is the regression guard that would have caught #30 and #81 before they
- * shipped. Attest-it sealing records a "PASS" only after a maintainer has
- * verified that the test passes locally with a working server, and CI enforces
- * that seal so the fix cannot regress.
+ * shipped. Once #83 lands, a maintainer runs this suite locally, confirms a
+ * PASS, and produces an attest-it seal (see step 5 below). CI enforcement of
+ * that seal is wired as a follow-up once the seal file exists.
  *
  * ## Why this cannot run in CI
  *
@@ -70,13 +70,13 @@
  * 5. Seal the result with attest-it (requires a PASS first):
  *    ```sh
  *    pnpm dlx @attest-it/cli seal \
- *      --suite e2e/test/local/calendar-round-trip.test.ts \
- *      --sources e2e/src/harness.ts \
+ *      --suite e2e/round-trip/test/local/calendar-round-trip.test.ts \
+ *      --sources e2e/round-trip/src/harness.ts \
  *      --sources packages/calendar/src
  *    ```
- *    This writes a seal file that CI verifies. The seal automatically
- *    invalidates whenever the harness source or Calendar SDK source changes,
- *    ensuring a stale seal cannot pass CI after a regression is introduced.
+ *    This writes a seal file. The seal automatically invalidates whenever the
+ *    harness source or Calendar SDK source changes. CI enforcement of the seal
+ *    is wired as a follow-up once the seal file has been produced and committed.
  *
  * ## Cleanup
  *
@@ -123,7 +123,8 @@ describe.skipIf(!liveEnvPresent)(
       expect(result.calendarId).toBeTruthy() // criterion 1: a writable calendar was identified
       expect(result.calendarName).toBeTruthy() // sanity: server returned a real calendar name
 
-      // Criterion 2 is attested externally by attest-it (see procedure above).
+      // Criterion 2: attest-it sealing is done locally after #83 lands (see
+      // step 5 in the file header). CI enforcement is wired once the seal exists.
       // Criterion 3 (extensible) is satisfied by the harness design: adding
       // Finder/Mail/Reminders requires only a new runXxxRoundTrip() function
       // and a new describe block — no harness changes needed.
