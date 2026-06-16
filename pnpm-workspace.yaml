@@ -2,6 +2,7 @@
 packages:
   - 'packages/*'
   - 'manifests/*'
+  - 'benchmarks/*'
 
 # Allow build scripts for approved packages
 onlyBuiltDependencies:
