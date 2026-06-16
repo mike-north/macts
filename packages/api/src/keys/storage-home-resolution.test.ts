@@ -86,9 +86,12 @@ describe('storage directory resolution (issue #44)', () => {
 
       const secretFile = path.join(mactsHome, 'secrets', 'api-key-secret')
       expect(fs.existsSync(secretFile)).toBe(true)
-      // The resolved location is absolute, not cwd-relative.
+      // The resolved location is absolute and contains no bare "~" segment.
+      // `startsWith(process.cwd())` is deliberately NOT used: if the runner's
+      // cwd were the home directory (or a parent of it), a cwd-relative path
+      // would falsely pass that check.
       expect(path.isAbsolute(secretFile)).toBe(true)
-      expect(secretFile.startsWith(process.cwd())).toBe(false)
+      expect(secretFile.split(path.sep)).not.toContain('~')
     } finally {
       storage.closeDatabase()
     }

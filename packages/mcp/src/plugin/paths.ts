@@ -14,10 +14,20 @@ import { homedir } from 'node:os'
  *
  * Defaults to ~/.macts but can be overridden via MACTS_HOME environment variable.
  *
+ * An empty or whitespace-only `MACTS_HOME` is treated as **unset** and the
+ * default `~/.macts` is used instead. This prevents a set-but-empty variable
+ * from producing a cwd-relative path.
+ *
  * @returns Path to macts home directory
  */
 export function getMactsHome(): string {
-  return process.env['MACTS_HOME'] ?? join(homedir(), '.macts')
+  // `?.trim()` turns an empty or whitespace-only string into `undefined`/`""`.
+  // `||` falls back on any falsy value (empty string included), which is the
+  // correct semantic here. `??` would not work: it only catches null/undefined,
+  // so `MACTS_HOME=""` would pass through as an empty string and make all
+  // derived paths cwd-relative.
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  return process.env['MACTS_HOME']?.trim() || join(homedir(), '.macts')
 }
 
 /**
