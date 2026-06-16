@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm exec prettier *)",
+      "Bash(pnpm exec eslint *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm format *)",
+      "Bash(pnpm format)",
+      "Bash(pnpm format:check *)",
+      "Bash(pnpm format:check)",
+      "Bash(node --check *)"
+    ]
+  },
+  "env": {
+    "PLEF_EXCLUDE_LABELS": "in progress,needs-decision,backlog,blocked",
+    "PLEF_PRIORITY_LABELS": "priority:next"
+  }
+}
