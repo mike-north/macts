@@ -708,6 +708,16 @@ export function expandCoarsePermission(permission: string, permissionsSection: P
 export function expandPermissions(permissions: string[], permissionsSection: PermissionsSection): string[];
 
 // @public
+export interface ExplainedOperation {
+    readonly description: string | undefined;
+    readonly operation: string;
+    readonly permission: string;
+}
+
+// @public
+export function explainScope(scope: readonly string[], manifest: AppManifest): ScopeExplanation;
+
+// @public
 export function extractAppName(permission: string): string | undefined;
 
 // @public (undocumented)
@@ -1866,6 +1876,9 @@ export const RelationshipSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function renderScopeExplanation(explanation: ScopeExplanation): string;
+
+// @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
 
 // @public
@@ -1882,6 +1895,13 @@ export function resolvePrimaryIdentifierProperty(resource: Resource | undefined)
 
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;
+
+// @public
+export interface ResourceExplanation {
+    readonly granted: readonly ExplainedOperation[];
+    readonly notGranted: readonly ExplainedOperation[];
+    readonly resource: string;
+}
 
 // @public
 export const ResourceSchema: z.ZodObject<{
@@ -1969,6 +1989,13 @@ export function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T
 // @public
 export function runWithApp<T>(bundleId: string, fn: string, // Function body as string
 options?: JxaExecutorOptions): Promise<T>;
+
+// @public
+export interface ScopeExplanation {
+    readonly app: string;
+    readonly grantsNothing: boolean;
+    readonly resources: readonly ResourceExplanation[];
+}
 
 // @public
 export function scoreCapability(capability: Capability, terms: readonly string[]): number;

@@ -77,3 +77,12 @@ export {
   groupPermissionsByResource,
   describePermissions,
 } from './matcher.js'
+
+// Scope explainer
+export {
+  type ExplainedOperation,
+  type ResourceExplanation,
+  type ScopeExplanation,
+  explainScope,
+  renderScopeExplanation,
+} from './explain.js'
