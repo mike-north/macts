@@ -107,8 +107,9 @@ export const calendarApiPlugin = {
         },
         identifiers: [
           {
-            property: 'calendarIdentifier',
+            property: 'name',
             primary: true,
+            targeting: 'byProperty',
           },
         ],
       },

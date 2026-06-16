@@ -145,6 +145,11 @@ export const AppManifestSchema: z.ZodObject<{
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
             property: z.ZodString;
             primary: z.ZodDefault<z.ZodBoolean>;
+            targeting: z.ZodOptional<z.ZodEnum<{
+                byId: "byId";
+                byProperty: "byProperty";
+            }>>;
+            runtimeProperty: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
@@ -1225,7 +1230,27 @@ export type Identifier = z.infer<typeof IdentifierSchema>;
 export const IdentifierSchema: z.ZodObject<{
     property: z.ZodString;
     primary: z.ZodDefault<z.ZodBoolean>;
+    targeting: z.ZodOptional<z.ZodEnum<{
+        byId: "byId";
+        byProperty: "byProperty";
+    }>>;
+    runtimeProperty: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public (undocumented)
+export type IdentifierTargeting = z.infer<typeof IdentifierTargetingSchema>;
+
+// @public
+export interface IdentifierTargetingResolution {
+    property: string;
+    strategy: IdentifierTargeting;
+}
+
+// @public
+export const IdentifierTargetingSchema: z.ZodEnum<{
+    byId: "byId";
+    byProperty: "byProperty";
+}>;
 
 // @public (undocumented)
 export type Inheritance = z.infer<typeof InheritanceSchema>;
@@ -1872,6 +1897,9 @@ export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, 
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
 
 // @public
+export function resolveIdentifierTargeting(resource: Resource | undefined): IdentifierTargetingResolution | undefined;
+
+// @public
 export function resolveListOutputProperties(resource: Resource | undefined): string[];
 
 // @public
@@ -1920,6 +1948,11 @@ export const ResourceSchema: z.ZodObject<{
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         property: z.ZodString;
         primary: z.ZodDefault<z.ZodBoolean>;
+        targeting: z.ZodOptional<z.ZodEnum<{
+            byId: "byId";
+            byProperty: "byProperty";
+        }>>;
+        runtimeProperty: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>>;
 }, z.core.$strip>;
 

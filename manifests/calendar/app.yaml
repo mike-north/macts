@@ -41,9 +41,14 @@ resources:
     plural: Calendars
     description: A calendar containing events
     code: wres
+    # The dictionary-declared `calendarIdentifier` is NOT runtime-valid: JXA
+    # throws on `calendar.calendarIdentifier()` (and `uid`/`id`/`properties()`).
+    # Only `name` works at runtime, so the calendar is targeted by name via a
+    # `whose({ name: ... })[0]` lookup rather than `byId(...)`.
     identifiers:
-      - property: calendarIdentifier
+      - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: rw
