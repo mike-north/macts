@@ -551,7 +551,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     description:
       'Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.',
     permission: null,
-    risk: 'execute',
+    risk: 'write',
     inputSchema: {
       type: 'object',
       properties: {},

@@ -183,7 +183,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'replace',
     description: 'Replace text in the document',
     permission: 'word:app:replace',
-    risk: 'execute',
+    risk: 'write',
     inputSchema: {
       type: 'object',
       properties: {
