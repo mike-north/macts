@@ -33,8 +33,15 @@ governability at the same time.
 - If an issue is ambiguous, under-specified, or you discover it conflicts with
   another in-flight issue, **stop and ask in the issue thread** before building.
   Do not guess at product intent.
-- Keep scope tight to the issue. File a follow-up issue for adjacent
-  improvements rather than expanding the diff.
+- Keep scope tight to the issue. If you discover an adjacent bug or improvement,
+  **file a follow-up issue labeled `backlog`** (never `greenlit`) and link it —
+  do not expand the diff, and do not start that issue yourself. Only the PM
+  promotes `backlog` → `greenlit`, and the PM decides order.
+- **Never start a `needs-decision` issue or an epic.** Epics are decomposed by
+  the PM into pickup-ready sub-issues first; if an epic looks ready, it isn't —
+  wait for its sub-issues. The queue engine's `list` will show any non-excluded
+  issue, but the **binding rule is `greenlit`-only** — trust the label, not a raw
+  listing. When in doubt, leave it and pick the next greenlit issue.
 
 ## 3. Product principles (non-negotiable)
 
