@@ -27,6 +27,7 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Document {
+    id?: string;
     modified: boolean;
     name: string;
     path?: string;
@@ -49,6 +50,7 @@ export class DocumentResourceClient {
 
 // @public (undocumented)
 export const DocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     path: z.ZodOptional<z.ZodString>;
     modified: z.ZodBoolean;

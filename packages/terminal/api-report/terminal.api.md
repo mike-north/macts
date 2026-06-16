@@ -77,6 +77,7 @@ export interface Tab {
     currentSettings: string;
     customTitle: string;
     history: string;
+    id?: string;
     processes: string;
     selected: boolean;
     titleDisplaysCustomTitle: boolean;
@@ -100,6 +101,7 @@ export class TabResourceClient {
 
 // @public (undocumented)
 export const TabSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     contents: z.ZodString;
     history: z.ZodString;
     busy: z.ZodBoolean;

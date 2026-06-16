@@ -19,3 +19,8 @@ export * from './json-schema.js'
 // Canonical RPC route derivation (single source of truth shared by the
 // client SDK generator and the server router)
 export * from './route.js'
+
+// Canonical resource-identifier derivation (single source of truth for which
+// property identifies a resource and the canonical key list output exposes it
+// under, shared by the server list executor and identifier-consuming surfaces)
+export * from './identifier.js'

@@ -7,6 +7,8 @@ import { z } from 'zod'
 
 /** A TextEdit document */
 export interface Document {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The name of the document */
   name: string
   /** The file path of the document */
@@ -31,6 +33,7 @@ export type DocumentUpdateInput = Partial<DocumentCreateInput>
 // Zod schemas for runtime validation
 
 export const DocumentSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   path: z.string().optional(),
   modified: z.boolean(),

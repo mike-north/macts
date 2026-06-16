@@ -132,6 +132,7 @@ export class HttpClient {
 
 // @public
 export interface RequiredResource {
+    id?: string;
     kind: string;
     name: string;
     resource: string;
@@ -150,6 +151,7 @@ export class RequiredResourceResourceClient {
 
 // @public (undocumented)
 export const RequiredResourceSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     kind: z.ZodString;
     name: z.ZodString;
     resource: z.ZodString;
@@ -162,6 +164,7 @@ export type RequiredResourceUpdateInput = Partial<RequiredResourceCreateInput>;
 // @public
 export interface Setting {
     defaultValue: unknown;
+    id?: string;
     name: string;
     value: unknown;
 }
@@ -180,6 +183,7 @@ export class SettingResourceClient {
 
 // @public (undocumented)
 export const SettingSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     value: z.ZodUnknown;
     defaultValue: z.ZodUnknown;
@@ -230,6 +234,7 @@ export interface Workflow {
     executionErrorNumber: number;
     executionId: string;
     executionResult: unknown;
+    id?: string;
     name: string;
 }
 
@@ -246,6 +251,7 @@ export class WorkflowResourceClient {
 
 // @public (undocumented)
 export const WorkflowSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     currentAction: z.ZodUnknown;
     executionResult: z.ZodUnknown;

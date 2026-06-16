@@ -11,6 +11,7 @@ export interface AnalyzerIssue {
     endingColumnNumber: number;
     endingLineNumber: number;
     filePath: string;
+    id?: string;
     message: string;
     startingColumnNumber: number;
     startingLineNumber: number;
@@ -28,6 +29,7 @@ export interface AnalyzerIssueCreateInput {
 
 // @public (undocumented)
 export const AnalyzerIssueSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
     filePath: z.ZodString;
     startingLineNumber: z.ZodNumber;
@@ -62,6 +64,7 @@ export interface BuildError {
     endingColumnNumber: number;
     endingLineNumber: number;
     filePath: string;
+    id?: string;
     message: string;
     startingColumnNumber: number;
     startingLineNumber: number;
@@ -79,6 +82,7 @@ export interface BuildErrorCreateInput {
 
 // @public (undocumented)
 export const BuildErrorSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
     filePath: z.ZodString;
     startingLineNumber: z.ZodNumber;
@@ -92,6 +96,7 @@ export type BuildErrorUpdateInput = Partial<BuildErrorCreateInput>;
 
 // @public
 export interface BuildSetting {
+    id?: string;
     name: string;
     value: string;
 }
@@ -104,6 +109,7 @@ export interface BuildSettingCreateInput {
 
 // @public (undocumented)
 export const BuildSettingSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
@@ -116,6 +122,7 @@ export interface BuildWarning {
     endingColumnNumber: number;
     endingLineNumber: number;
     filePath: string;
+    id?: string;
     message: string;
     startingColumnNumber: number;
     startingLineNumber: number;
@@ -133,6 +140,7 @@ export interface BuildWarningCreateInput {
 
 // @public (undocumented)
 export const BuildWarningSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
     filePath: z.ZodString;
     startingLineNumber: z.ZodNumber;
@@ -168,6 +176,7 @@ export interface Device {
     deviceIdentifier: string;
     deviceModel: string;
     generic: boolean;
+    id?: string;
     name: string;
     operatingSystemVersion: string;
 }
@@ -177,6 +186,7 @@ export type DeviceCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const DeviceSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     deviceIdentifier: z.ZodString;
     operatingSystemVersion: z.ZodString;
@@ -190,6 +200,7 @@ export type DeviceUpdateInput = Partial<DeviceCreateInput>;
 // @public
 export interface FileDocument {
     file: string;
+    id?: string;
     modified: boolean;
     name: string;
     path: string;
@@ -200,6 +211,7 @@ export type FileDocumentCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const FileDocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     modified: z.ZodBoolean;
     file: z.ZodString;
@@ -242,6 +254,7 @@ export type ProjectUpdateInput = Partial<ProjectCreateInput>;
 
 // @public
 export interface ResolvedBuildSetting {
+    id?: string;
     name: string;
     value: string;
 }
@@ -254,6 +267,7 @@ export interface ResolvedBuildSettingCreateInput {
 
 // @public (undocumented)
 export const ResolvedBuildSettingSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     value: z.ZodString;
 }, z.core.$strip>;
@@ -266,6 +280,7 @@ export interface RunDestination {
     architecture: string;
     companionDevice: Device;
     device: Device;
+    id?: string;
     name: string;
     platform: string;
 }
@@ -282,6 +297,7 @@ export class RunDestinationResourceClient {
 
 // @public (undocumented)
 export const RunDestinationSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     architecture: z.ZodString;
     platform: z.ZodString;
@@ -351,6 +367,7 @@ export type SchemeUpdateInput = Partial<SchemeCreateInput>;
 // @public
 export interface SourceDocument {
     file: string;
+    id?: string;
     modified: boolean;
     name: string;
     notifiesWhenClosing: boolean;
@@ -370,6 +387,7 @@ export interface SourceDocumentCreateInput {
 
 // @public (undocumented)
 export const SourceDocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     modified: z.ZodBoolean;
     file: z.ZodString;
@@ -410,6 +428,7 @@ export interface TestFailure {
     endingColumnNumber: number;
     endingLineNumber: number;
     filePath: string;
+    id?: string;
     message: string;
     startingColumnNumber: number;
     startingLineNumber: number;
@@ -427,6 +446,7 @@ export interface TestFailureCreateInput {
 
 // @public (undocumented)
 export const TestFailureSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     message: z.ZodString;
     filePath: z.ZodString;
     startingLineNumber: z.ZodNumber;
@@ -441,6 +461,7 @@ export type TestFailureUpdateInput = Partial<TestFailureCreateInput>;
 // @public
 export interface TextDocument {
     file: string;
+    id?: string;
     modified: boolean;
     name: string;
     notifiesWhenClosing: boolean;
@@ -460,6 +481,7 @@ export interface TextDocumentCreateInput {
 
 // @public (undocumented)
 export const TextDocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     modified: z.ZodBoolean;
     file: z.ZodString;
@@ -478,6 +500,7 @@ export interface WorkspaceDocument {
     activeRunDestination: RunDestination;
     activeScheme: Scheme;
     file: string;
+    id?: string;
     lastSchemeActionResult: SchemeActionResult;
     loaded: boolean;
     modified: boolean;
@@ -507,6 +530,7 @@ export class WorkspaceDocumentResourceClient {
 
 // @public (undocumented)
 export const WorkspaceDocumentSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     modified: z.ZodBoolean;
     file: z.ZodString;

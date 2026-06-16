@@ -7,6 +7,8 @@ import { z } from 'zod'
 
 /** The Alfred application */
 export interface Application {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The name of the application */
   name: string
 }
@@ -20,5 +22,6 @@ export type ApplicationUpdateInput = Partial<ApplicationCreateInput>
 // Zod schemas for runtime validation
 
 export const ApplicationSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
 })

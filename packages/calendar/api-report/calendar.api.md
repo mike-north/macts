@@ -35,6 +35,7 @@ export interface Calendar {
         b: number;
     };
     description: string;
+    id?: string;
     name: string;
     title: string;
     writable: boolean;
@@ -89,6 +90,7 @@ export class CalendarResourceClient {
 
 // @public (undocumented)
 export const CalendarSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     name: z.ZodString;
     title: z.ZodString;
     color: z.ZodObject<{
@@ -150,6 +152,7 @@ interface Event_2 {
     description: string;
     endDate: Date;
     excludedDates: Date[];
+    id?: string;
     location: string;
     recurrence: string;
     sequence: number;
@@ -189,6 +192,7 @@ export class EventResourceClient {
 
 // @public (undocumented)
 export const EventSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
     summary: z.ZodString;
     description: z.ZodString;
     location: z.ZodString;

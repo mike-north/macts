@@ -280,6 +280,9 @@ export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, commandKey: string): string;
 
 // @public
+export const CANONICAL_IDENTIFIER_KEY = "id";
+
+// @public
 export interface Capability {
     readonly app: string;
     readonly appBundleId: string;
@@ -1560,7 +1563,13 @@ export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, 
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
 
 // @public
+export function resolveListOutputProperties(resource: Resource | undefined): string[];
+
+// @public
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[];
+
+// @public
+export function resolvePrimaryIdentifierProperty(resource: Resource | undefined): string | undefined;
 
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;

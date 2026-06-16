@@ -10,6 +10,8 @@ export type WarningLevel = 'none' | 'reversible' | 'irreversible'
 
 /** A series of actions stored in a file */
 export interface Workflow {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The name of the workflow */
   name: string
   /** The current or most recent action of the workflow */
@@ -122,6 +124,8 @@ export type VariableUpdateInput = Partial<VariableCreateInput>
 
 /** A named value in an action */
 export interface Setting {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The name of the setting */
   name: string
   /** The value of the setting */
@@ -141,6 +145,8 @@ export type SettingUpdateInput = Partial<SettingCreateInput>
 
 /** A resource required for proper operation of the action */
 export interface RequiredResource {
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  id?: string
   /** The kind of required resource */
   kind: string
   /** The name of the required resource */
@@ -160,6 +166,7 @@ export type RequiredResourceUpdateInput = Partial<RequiredResourceCreateInput>
 // Zod schemas for runtime validation
 
 export const WorkflowSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   currentAction: z.unknown(),
   executionResult: z.unknown(),
@@ -202,12 +209,14 @@ export const VariableSchema = z.object({
 })
 
 export const SettingSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   value: z.unknown(),
   defaultValue: z.unknown(),
 })
 
 export const RequiredResourceSchema = z.object({
+  id: z.string().optional(),
   kind: z.string(),
   name: z.string(),
   resource: z.string(),
