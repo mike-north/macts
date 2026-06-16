@@ -44,7 +44,7 @@
     "vitest": "catalog:"
   },
   "tsd": {
-    "directory": "src/permissions",
-    "testFilePattern": "*.test-d.ts"
+    "directory": "src",
+    "testFilePattern": "**/*.test-d.ts"
   }
 }
