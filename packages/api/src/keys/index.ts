@@ -57,6 +57,7 @@ export {
   createApiKeySimple,
   createFullAccessKey,
   createReadOnlyKey,
+  UnexpandableCoarsePermissionError,
 } from './generator.js'
 
 // Validator

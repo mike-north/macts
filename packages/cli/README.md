@@ -23,7 +23,7 @@ macts generate manifests/calendar/app.yaml \
   --package-name @macts/sdk-calendar
 
 # Manage API keys
-macts api-key create --name "My Key" --permission "calendar:events:read"
+macts api-key create --name "My Key" --permission "calendar:events:*"
 macts api-key list
 
 # Install a CLI plugin (adds `macts calendar ...` commands)
@@ -147,34 +147,52 @@ Create a new API key with specified permissions.
 
 **Permission Format:**
 
-Permissions follow the format: `app:resource:operation`
+Permissions follow the format: `app:resource:operation`. A grant authorizes a
+call when it matches the call's required permission exactly or via a wildcard:
 
-- Fine-grained: `calendar:events:list` (specific operation)
-- Coarse: `calendar:events:read` (expands to list, show, count)
-- Wildcard resource: `calendar:*:read` (all resources, read operations)
-- Full wildcard: `calendar:*:*` (all operations on all resources)
+- **Fine-grained**: `calendar:events:list` — authorizes exactly that call.
+- **Resource wildcard**: `calendar:events:*` — authorizes every operation on
+  the `events` resource.
+- **App wildcard**: `calendar:*:*` — authorizes every operation on every
+  resource.
+- **Coarse** (`read` / `create` / `write` / `delete`): `calendar:events:read` —
+  _sugar_, not a standalone grant. It only authorizes calls after being
+  expanded against a manifest at creation time (pass `--manifest`); it then
+  resolves to the fine-grained operations it covers (for `read`, e.g.
+  `calendar:events:list`, `calendar:events:get`, `calendar:events:show`).
+  Creating a key with a coarse permission and **no** `--manifest` is rejected
+  with a hint, because an unexpanded coarse scope authorizes nothing.
+
+See [Wildcard & coarse semantics](#wildcard--coarse-semantics) for the full
+mental model.
 
 **Examples:**
 
 ```bash
-# Create read-only key for calendar events
+# Create a key for all operations on calendar events (resource wildcard)
+macts api-key create \
+  --name "Bot" \
+  --permission "calendar:events:*"
+
+# Create a read-only key by expanding a coarse permission against the manifest
 macts api-key create \
   --name "CI" \
-  --permission "calendar:events:read"
+  --permission "calendar:*:read" \
+  --manifest ./manifests/calendar/app.yaml
 
 # Create key with multiple specific permissions
 macts api-key create \
   --name "Bot" \
   --permission "calendar:events:list" \
-  --permission "calendar:events:show"
+  --permission "calendar:events:create"
 
 # Create key with expiration
 macts api-key create \
   --name "Temp" \
-  --permission "calendar:events:read" \
+  --permission "calendar:events:list" \
   --expires 30d
 
-# Create key with wildcard permissions
+# Create key with full wildcard permissions
 macts api-key create \
   --name "Admin" \
   --permission "calendar:*:*"
@@ -182,7 +200,7 @@ macts api-key create \
 # Output as JSON
 macts api-key create \
   --name "CI" \
-  --permission "calendar:events:read" \
+  --permission "calendar:events:*" \
   --json
 ```
 
@@ -192,13 +210,55 @@ macts api-key create \
 API Key: macts_sk_eyJhbGc...
 Key ID: key_abc123
 Name: CI
-Permissions: calendar:events:list, calendar:events:show, calendar:events:count
+Permissions: calendar:events:list, calendar:events:get, calendar:events:show
 Expires: 2026-03-19T12:00:00.000Z
 
 Save this key securely - it cannot be retrieved later.
 ```
 
 The key is displayed once and cannot be retrieved later. Store it securely.
+
+##### Wildcard & coarse semantics
+
+A key stores **fine-grained** permissions and an authorization check passes when
+a granted permission covers the call's required `app:resource:operation`. There
+are exactly two ways a granted permission covers a required one:
+
+1. **Exact match** — granted `calendar:events:list` covers required
+   `calendar:events:list`.
+2. **Wildcard match** — a `*` in the granted permission's resource and/or
+   operation segment matches anything in that segment:
+   - `calendar:events:*` covers every operation on `events`
+     (`calendar:events:list`, `calendar:events:create`, …).
+   - `calendar:*:list` covers `list` on every resource.
+   - `calendar:*:*` covers every call for the app.
+
+The app segment must always match exactly. There is **no** implicit grouping:
+`calendar:events:list` does **not** cover `calendar:events:get`. To authorize a
+set of operations, use a wildcard or list the fine-grained permissions.
+
+**Coarse operations are not a third matching rule.** `read` / `create` /
+`write` / `delete` are authoring sugar, expanded into fine-grained permissions
+**at key creation** against a manifest. They never participate in matching:
+
+- `--permission calendar:events:read --manifest <path>` stores the fine-grained
+  operations the manifest's `permissions` section lists under `events.read`
+  (e.g. `calendar:events:list`, `calendar:events:get`, `calendar:events:show`).
+- `--permission calendar:events:read` **without** `--manifest` is rejected,
+  because an unexpanded coarse scope would authorize nothing. The error names
+  the wildcard (`calendar:events:*`) and a fine-grained example to use instead.
+
+**When a call is denied**, the error names the exact required permission and the
+resource wildcard that would also authorize it, so the fix is a single grant:
+
+```
+Missing required permission "calendar:events:create". Grant
+"calendar:events:create" (or the resource wildcard "calendar:events:*") to
+authorize this call.
+```
+
+Use `macts permissions expand "<coarse>" --manifest <path>` to preview what a
+coarse or wildcard permission resolves to before creating a key.
 
 #### `macts api-key list [options]`
 
@@ -818,7 +878,7 @@ MACTS_HOME=/custom/path macts plugin list
 
 # Set explicit API key signing secret
 export MACTS_API_KEY_SECRET=your-secret-key-here
-macts api-key create --name "CI" --permission "calendar:events:read"
+macts api-key create --name "CI" --permission "calendar:events:*"
 
 # Enable debug logging
 LOG_LEVEL=debug macts mcp serve
@@ -1072,7 +1132,7 @@ macts api-key verify <your-key>
 macts api-key verify <your-key>
 
 # Create new key with longer expiration
-macts api-key create --name "New" --permission "calendar:*:read" --expires 365d
+macts api-key create --name "New" --permission "calendar:*:*" --expires 365d
 ```
 
 **Insufficient permissions:**

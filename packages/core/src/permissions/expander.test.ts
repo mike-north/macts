@@ -256,5 +256,36 @@ describe('validateCommandPermissions', () => {
       const errors = validateCommandPermissions(commandPermissions, calendarPermissions)
       expect(errors).toHaveLength(2)
     })
+
+    it('should reject a command whose operation is a grouping-only coarse alias (read)', () => {
+      // Regression guard: a command must not use `read`/`write` as its
+      // operation (the microsoft-word `createRange` -> `word:documents:read`
+      // bug). Such a permission collides with the coarse vocabulary and
+      // authorizes nothing on its own.
+      const commandPermissions = new Map([['createRange', 'word:documents:read']])
+
+      const errors = validateCommandPermissions(commandPermissions, {
+        documents: { read: ['word:documents:list', 'word:documents:get'] },
+      })
+
+      expect(errors.some((e) => e.includes('grouping-only coarse alias'))).toBe(true)
+    })
+
+    it('should reject a command whose operation is `write`', () => {
+      const commandPermissions = new Map([['save', 'word:documents:write']])
+
+      const errors = validateCommandPermissions(commandPermissions, {
+        documents: { write: ['word:documents:save'] },
+      })
+
+      expect(errors.some((e) => e.includes('grouping-only coarse alias'))).toBe(true)
+    })
+
+    it('should NOT reject a command whose operation is `create` (a real fine-grained op)', () => {
+      const commandPermissions = new Map([['create', 'calendar:events:create']])
+
+      const errors = validateCommandPermissions(commandPermissions, calendarPermissions)
+      expect(errors).toEqual([])
+    })
   })
 })

@@ -1,5 +1,6 @@
 import type { PermissionsSection } from '../manifest/schemas/app.js'
 import { parsePermission } from './parser.js'
+import { isPureCoarseOperation } from './vocabulary.js'
 
 /**
  * Error thrown when permission expansion fails.
@@ -238,8 +239,18 @@ export function validateCommandPermissions(
     }
   }
 
-  // Check that each command permission is in the mapping
+  // Check that each command permission is in the mapping and does not use a
+  // grouping-only coarse alias (read/write). A command must name a real
+  // fine-grained operation; using a pure-coarse alias as its operation would
+  // collide with the coarse vocabulary and authorize nothing on its own.
   for (const [commandName, permission] of commandPermissions) {
+    const operation = parsePermission(permission).operation
+    if (isPureCoarseOperation(operation)) {
+      errors.push(
+        `Command "${commandName}" has permission "${permission}" whose operation "${operation}" ` +
+          `is a grouping-only coarse alias; use a concrete fine-grained operation instead`
+      )
+    }
     if (!allFinePermissions.has(permission)) {
       errors.push(
         `Command "${commandName}" has permission "${permission}" which is not in the permissions mapping`

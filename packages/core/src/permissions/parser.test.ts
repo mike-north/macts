@@ -9,9 +9,10 @@ import {
   extractAppName,
   extractResourceName,
   extractOperation,
-  isCoarseOperation,
   PermissionParseError,
 } from './parser.js'
+// isCoarseOperation is the single-sourced vocabulary authority (see vocabulary.ts).
+import { isCoarseOperation } from './vocabulary.js'
 
 describe('parsePermission', () => {
   describe('positive cases', () => {

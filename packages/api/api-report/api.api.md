@@ -452,6 +452,13 @@ export class TtlCache<T> {
 export { TypeCoercer }
 
 // @public
+export class UnexpandableCoarsePermissionError extends Error {
+    constructor(permission: string);
+    // (undocumented)
+    readonly permission: string;
+}
+
+// @public
 export function updateKeyMetadata(keyId: string, updates: Partial<ApiKeyMetadata>): ApiKeyMetadata | undefined;
 
 // @public

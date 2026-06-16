@@ -15,8 +15,11 @@ export class PermissionsListCommand extends Command {
     details: `
       Shows all fine-grained and coarse permissions defined in a manifest.
 
-      Fine-grained permissions are one per command (calendar:events:list).
-      Coarse permissions group related fine-grained permissions (calendar:events:read).
+      Fine-grained permissions are one per command (calendar:events:list) and
+      authorize that call directly. Coarse permissions (calendar:events:read)
+      are sugar that group related fine-grained permissions; they only
+      authorize calls after being expanded against this manifest at key
+      creation time.
     `,
     examples: [
       ['List calendar permissions', '$0 permissions list --manifest ./manifests/calendar/app.yaml'],

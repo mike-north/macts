@@ -1290,19 +1290,38 @@ The database file is created with restricted permissions (`0600` on Unix-like sy
 
 ### Permission Expansion
 
-Permissions are expanded at key creation time, not at validation time:
+Coarse permissions are expanded at key creation time, not at validation time.
+At validation time, only **exact** and **wildcard** matching apply (see below).
 
-- **Coarse permissions** (e.g., `calendar:events:read`) expand to all matching fine-grained permissions (e.g., `calendar:events:list`, `calendar:events:get`)
-- **Wildcard permissions** (e.g., `calendar:*:read`) expand to all matching operations
+- **Coarse permissions** (e.g., `calendar:events:read`) are _sugar_ that must be
+  expanded against a manifest's `permissions` section. Pass the section to
+  `createApiKey` to expand `read` into the fine-grained operations it covers
+  (e.g., `calendar:events:list`, `calendar:events:get`, `calendar:events:show`).
+  A coarse permission requested **without** a `permissionsSection` is rejected
+  with `UnexpandableCoarsePermissionError`, because an unexpanded coarse scope
+  authorizes nothing — the error names the wildcard and fine-grained
+  alternatives to use instead.
+- **Wildcard permissions** (e.g., `calendar:events:*`, `calendar:*:*`) are
+  stored as-is and matched directly: a `*` in the resource and/or operation
+  segment matches anything in that segment. The app segment must match exactly.
 - **Fine-grained permissions** (e.g., `calendar:events:list`) are stored as-is
+  and authorize exactly that call.
 
 This means:
 
-- Keys contain an explicit list of fine-grained permissions
+- Keys contain an explicit list of fine-grained and/or wildcard permissions
 - You can't grant new permissions to existing keys by updating the manifest
 - Revoking a permission in the manifest doesn't affect existing keys
 
 To apply permission changes, revoke and recreate the key.
+
+### Matching & Denials
+
+`hasPermission(granted, required)` grants when any granted permission covers the
+required `app:resource:operation` by exact or wildcard match. There is no
+implicit grouping — `calendar:events:list` does not cover `calendar:events:get`.
+A denial names the precise missing permission and the resource wildcard that
+would also authorize the call, so the fix is a single grant.
 
 ### Token Expiration
 
@@ -1312,7 +1331,7 @@ Set expiration times for API keys when possible:
 // Expire in 30 days
 const key = await createApiKey({
   name: 'temporary',
-  permissions: ['calendar:*:read'],
+  permissions: ['calendar:events:*'],
   expires: '30d',
 })
 ```

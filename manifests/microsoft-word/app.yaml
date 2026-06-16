@@ -963,16 +963,16 @@ commands:
         description: The ending character position
         required: false
         code: '5264'
-    permission: word:documents:read
+    permission: word:documents:createRange
 
 permissions:
   documents:
     read:
       - word:documents:list
       - word:documents:get
-      - word:documents:read
     create:
       - word:documents:create
+      - word:documents:createRange
     write:
       - word:documents:save
       - word:documents:insert

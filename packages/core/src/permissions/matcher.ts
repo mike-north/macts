@@ -69,10 +69,28 @@ export function hasPermission(
     }
   }
 
-  // Default hint if no changelog applies
-  result.hint ??= `Missing required permission: ${requiredPermission}`
+  // Default hint if no changelog applies. Name the exact fine-grained
+  // permission to add so the caller can fix the denial in one step. We also
+  // suggest the resource wildcard, which authorizes every operation on the
+  // resource (see the matcher's wildcard rule below).
+  result.hint ??= buildMissingPermissionHint(parsed, requiredPermission)
 
   return result
+}
+
+/**
+ * Build an actionable denial hint that names the precise missing permission and
+ * the resource-wildcard alternative that would also authorize the call.
+ */
+function buildMissingPermissionHint(
+  required: ReturnType<typeof parsePermission>,
+  requiredPermission: string
+): string {
+  const resourceWildcard = `${required.app}:${required.resource}:*`
+  return (
+    `Missing required permission "${requiredPermission}". ` +
+    `Grant "${requiredPermission}" (or the resource wildcard "${resourceWildcard}") to authorize this call.`
+  )
 }
 
 /**

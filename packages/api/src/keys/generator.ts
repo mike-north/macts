@@ -9,13 +9,67 @@
 
 import * as jose from 'jose'
 import type { ApiKeyPayload, ApiKeyMetadata, PermissionsSection } from '@macts/core'
-import { expandPermissions } from '@macts/core'
+import { expandPermissions, parsePermission, isPureCoarseOperation } from '@macts/core'
 import type { CreateApiKeyOptions, CreateApiKeyResult } from './types.js'
 import { calculateExpiration } from './types.js'
 import { getSigningSecret, addKeyMetadata, generateKeyId } from './storage.js'
 
 /** API key prefix for identification */
 const KEY_PREFIX = 'macts_sk_'
+
+/**
+ * Error thrown when a coarse permission is requested without a manifest to
+ * expand it against. Coarse operations (read/create/write/delete) are sugar
+ * that must be resolved into fine-grained operations at creation time; storing
+ * one unexpanded would silently authorize nothing, so we reject it instead.
+ */
+export class UnexpandableCoarsePermissionError extends Error {
+  constructor(public readonly permission: string) {
+    super(
+      `Cannot create a key with coarse permission "${permission}" without a manifest. ` +
+        `The coarse operations "read" and "write" only authorize calls once expanded ` +
+        `against a manifest's permissions section. ` +
+        `Pass a manifest (the CLI's --manifest flag) to expand it, ` +
+        `grant the resource wildcard "${asResourceWildcard(permission)}", ` +
+        `or grant fine-grained permissions directly (e.g. "${asFineExample(permission)}").`
+    )
+    this.name = 'UnexpandableCoarsePermissionError'
+  }
+}
+
+/** Build the resource wildcard suggestion (`app:resource:*`) for an error hint. */
+function asResourceWildcard(permission: string): string {
+  const parsed = parsePermission(permission)
+  return `${parsed.app}:${parsed.resource}:*`
+}
+
+/** Build a concrete fine-grained example (`app:resource:list`) for an error hint. */
+function asFineExample(permission: string): string {
+  const parsed = parsePermission(permission)
+  const resource = parsed.resource === '*' ? 'resource' : parsed.resource
+  return `${parsed.app}:${resource}:list`
+}
+
+/**
+ * Identify any requested permission that uses a *grouping-only* coarse
+ * operation (`read` / `write`). These never name a real command, so a bare
+ * scope using one authorizes nothing unless expanded against a manifest — we
+ * reject them rather than store a dead scope.
+ *
+ * This covers both a concrete resource (`calendar:events:read`) and a wildcard
+ * resource paired with a grouping-only operation (`calendar:*:read`).
+ *
+ * `create` / `delete` are intentionally *not* flagged: they double as genuine
+ * fine-grained operations, so `calendar:events:create` authorizes the `create`
+ * call directly and needs no manifest. A wildcard operation (`*`) is likewise
+ * matched directly and needs no expansion.
+ */
+function findUnexpandableCoarsePermissions(permissions: string[]): string[] {
+  return permissions.filter((permission) => {
+    const parsed = parsePermission(permission)
+    return parsed.operation !== '*' && isPureCoarseOperation(parsed.operation)
+  })
+}
 
 /**
  * Create a new API key with the specified permissions.
@@ -36,12 +90,18 @@ export async function createApiKey(
   const keyId = generateKeyId()
   const now = Math.floor(Date.now() / 1000)
 
-  // Expand permissions if mapping is provided
+  // Expand permissions if a manifest mapping is provided. Without one, coarse
+  // operations cannot be resolved to the fine-grained operations they cover, so
+  // we reject them precisely rather than store a scope that authorizes nothing.
   let expandedPermissions: string[]
   if (permissionsSection) {
     expandedPermissions = expandPermissions(options.permissions, permissionsSection)
   } else {
-    // Without mapping, keep permissions as-is (they're assumed to be fine-grained)
+    const coarse = findUnexpandableCoarsePermissions(options.permissions)
+    if (coarse.length > 0 && coarse[0] !== undefined) {
+      throw new UnexpandableCoarsePermissionError(coarse[0])
+    }
+    // Remaining permissions are fine-grained or wildcards; store as-is.
     expandedPermissions = [...options.permissions]
   }
 
