@@ -410,6 +410,40 @@ describe('explainScope', () => {
       expect(names).toEqual([...names].sort())
     })
   })
+
+  // ---------------------------------------------------------------------------
+  // Regression: case-insensitive app matching
+  //
+  // The app segment of a scope pattern must match the manifest's app name
+  // case-insensitively. Previously a mixed-case app segment (`Testapp:...`) was
+  // silently dropped by a case-sensitive equality check, wrongly yielding
+  // grantsNothing: true.
+  // ---------------------------------------------------------------------------
+
+  describe('regression — case-insensitive app segment matching', () => {
+    // manifest.app.name = "testapp"; scope uses mixed-case "Testapp".
+    const scope = ['Testapp:events:list']
+    const explanation = explainScope(scope, MANIFEST)
+
+    it('does not drop a mixed-case app segment (grantsNothing is false)', () => {
+      expect(explanation.grantsNothing).toBe(false)
+    })
+
+    it('explains the mixed-case scope as granting the list operation', () => {
+      const events = findResource(explanation, 'events')
+      const listOp = events.granted.find((op) => op.operation === 'list')
+      expect(listOp).toBeDefined()
+      // Description still sourced from MANIFEST.commands.listEvents.description
+      expect(listOp?.description).toBe('List all events')
+    })
+
+    it('matches an upper-case app segment too (CALENDAR-style shouting)', () => {
+      const upper = explainScope(['TESTAPP:events:create'], MANIFEST)
+      const events = findResource(upper, 'events')
+      expect(events.granted.some((op) => op.operation === 'create')).toBe(true)
+      expect(upper.grantsNothing).toBe(false)
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------

@@ -32,6 +32,10 @@ const binPath = resolve(cliPackageDir, 'dist/bin.js')
 // The real calendar manifest shipped with the repo.
 const calendarManifest = resolve(repoRoot, 'manifests/calendar/app.yaml')
 
+// Building the CLI plus its workspace dependencies can take a while on a cold
+// cache; give the one-time bootstrap build a generous ceiling.
+const BUILD_TIMEOUT_MS = 180_000
+
 interface CliResult {
   stdout: string
   stderr: string
@@ -51,17 +55,41 @@ async function runCli(args: string[]): Promise<CliResult> {
   }
 }
 
+/**
+ * Build `@macts/cli` and its workspace dependencies via Nx, so the UAT is
+ * self-sufficient and does not depend on a separate build step running first
+ * (the package `test` script and Nx's `test` target do not depend on `build`).
+ *
+ * The CLI bundle imports `@macts/core` / `@macts/api` / `@macts/mcp` from
+ * `node_modules` at runtime, so the CLI's own `dist/bin.js` is not enough — we
+ * go through Nx (`run @macts/cli:build`) whose `build` target depends on
+ * `^build`, ensuring every dependency's `dist/` is produced too.
+ */
+async function ensureCliBuilt(): Promise<void> {
+  await execFileAsync('pnpm', ['exec', 'nx', 'run', '@macts/cli:build'], {
+    cwd: repoRoot,
+    env: { ...process.env },
+    timeout: BUILD_TIMEOUT_MS,
+  })
+}
+
 describe('macts api-key create — scope explanation (UAT)', () => {
-  beforeAll(() => {
-    if (!existsSync(binPath)) {
-      throw new Error(
-        `Built CLI not found at ${binPath}. Run \`pnpm --filter @macts/cli build\` before this UAT.`
-      )
-    }
+  beforeAll(async () => {
     if (!existsSync(calendarManifest)) {
       throw new Error(`Calendar manifest not found at ${calendarManifest}`)
     }
-  })
+    // Self-sufficiency: build on demand if the binary is missing rather than
+    // relying on an external build having run first.
+    if (!existsSync(binPath)) {
+      await ensureCliBuilt()
+    }
+    if (!existsSync(binPath)) {
+      throw new Error(
+        `Built CLI still not found at ${binPath} after an on-demand build. ` +
+          `Try \`pnpm exec nx run @macts/cli:build\` manually.`
+      )
+    }
+  }, BUILD_TIMEOUT_MS)
 
   // --------------------------------------------------------------------------
   // Human-mode output

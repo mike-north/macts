@@ -19,7 +19,8 @@
  */
 
 import type { AppManifest } from '../manifest/schemas/app.js'
-import { expandPermissions } from './expander.js'
+import { expandPermissions, PermissionExpansionError } from './expander.js'
+import { PermissionParseError } from './parser.js'
 
 // ---------------------------------------------------------------------------
 // Structured result types
@@ -148,14 +149,19 @@ export function explainScope(scope: readonly string[], manifest: AppManifest): S
   const appName = manifest.app.name.toLowerCase()
 
   // Filter the scope to patterns relevant to this manifest's app.
+  //
   // We extract the app segment by splitting on ':' rather than calling
   // parsePermission so that patterns containing camelCase operation names
   // (e.g. `calendar:app:switchView`) are not silently dropped by the
   // all-lowercase parser regex.
+  //
+  // App matching is case-insensitive: both sides are lowercased so a scope
+  // written as `Calendar:events:list` matches a manifest whose `app.name` is
+  // `calendar` (and vice versa). `appName` is already lowercased above.
   const appScope = scope.filter((pattern) => {
     const colonIdx = pattern.indexOf(':')
     const app = colonIdx >= 0 ? pattern.slice(0, colonIdx) : pattern
-    return app === appName
+    return app.toLowerCase() === appName
   })
 
   // Build the set of all fine-grained permission strings declared in the
@@ -176,16 +182,22 @@ export function explainScope(scope: readonly string[], manifest: AppManifest): S
   //
   // 1. Try the standard expander first. It handles wildcards and coarse
   //    aliases correctly.
-  // 2. If expansion fails (the expander calls parsePermission internally, which
-  //    rejects camelCase operation names like `switchView`), fall back to a
+  // 2. If expansion fails with a KNOWN, expected failure, fall back to a
   //    literal membership check: if the pattern is directly declared as a
-  //    fine-grained permission in the permissions section, add it as-is.
+  //    fine-grained permission in the permissions section, grant it as-is.
   //    This covers the common case where the caller supplies an already-expanded
   //    fine-grained permission list (e.g. the `result.metadata.permissions`
-  //    stored on a created API key).
+  //    stored on a created API key) whose entries may use camelCase operation
+  //    names (`switchView`) that the all-lowercase parser rejects.
   //
-  // If neither strategy resolves the pattern, it is silently ignored — the
-  // caller gets a valid (partial) result rather than an unhandled error.
+  // We only tolerate the two known failure modes of `expandPermissions`:
+  //   - `PermissionParseError`: the pattern's format is rejected by
+  //     `parsePermission` (e.g. a camelCase operation/app segment).
+  //   - `PermissionExpansionError`: the pattern is well-formed but cannot be
+  //     expanded against this manifest (unknown resource/operation, or an
+  //     empty/absent permissions section).
+  // Any OTHER error (e.g. an internal invariant violation) is a real bug and is
+  // rethrown rather than silently swallowed.
   const expandedSet = new Set<string>()
   for (const pattern of appScope) {
     try {
@@ -193,14 +205,27 @@ export function explainScope(scope: readonly string[], manifest: AppManifest): S
       for (const p of expanded) {
         expandedSet.add(p)
       }
-    } catch {
-      // Expansion failed (e.g. camelCase operation rejected by the parser, or
-      // resource not in permissions mapping). Check if the pattern is a
-      // declared fine-grained permission and grant it directly.
+    } catch (error) {
+      if (
+        !(error instanceof PermissionParseError) &&
+        !(error instanceof PermissionExpansionError)
+      ) {
+        // Not a known expansion/parse failure — surface the real error.
+        throw error
+      }
+      // Known failure: fall back to a literal membership check. Permissions are
+      // declared all-lowercase in the manifest, so compare case-insensitively
+      // to also resolve mixed-case scope entries (e.g. `Calendar:events:list`).
       if (allDeclaredFine.has(pattern)) {
         expandedSet.add(pattern)
+      } else {
+        const lowered = pattern.toLowerCase()
+        if (allDeclaredFine.has(lowered)) {
+          expandedSet.add(lowered)
+        }
+        // If still not a declared fine permission, ignore silently — the scope
+        // simply grants nothing for this (unresolvable) pattern.
       }
-      // If not a declared fine permission either, ignore silently.
     }
   }
 
