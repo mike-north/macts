@@ -26,9 +26,9 @@ export const projectsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
-    void workspaceName
+
     const client = getClient()
-    return client.projects.list()
+    return client.projects.list(workspaceName)
   },
 }
 

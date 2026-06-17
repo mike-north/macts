@@ -13,9 +13,9 @@ export class ListBookmarkItemsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  bookmarkFolderId = Option.String('--bookmark-folder-id', {
+  folderId = Option.String('--folder-id', {
     required: true,
-    description: 'BookmarkFolder ID',
+    description: 'Bookmark folder identifier',
   })
 
   async execute(): Promise<number> {
@@ -23,7 +23,7 @@ export class ListBookmarkItemsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.bookmarkitems.list()
+      const items = await client.bookmarkitems.list(this.folderId)
 
       const output = formatter.formatList(
         items.map((item) => ({

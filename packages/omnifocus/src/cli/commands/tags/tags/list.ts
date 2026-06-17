@@ -13,7 +13,6 @@ export class ListTagsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  tagId = Option.String('--tag-id', { required: true, description: 'Tag ID' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

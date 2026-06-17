@@ -28,6 +28,12 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Guard against committed generated artifacts drifting from the generator.
+      # Regenerates every package from its manifest and fails if the working tree
+      # changes — committed output must exactly match a fresh regeneration.
+      - name: Generated artifacts are up to date
+        run: pnpm generate:check
+
       - name: Typecheck
         run: pnpm typecheck
 

@@ -13,7 +13,6 @@ export class ListResourcesCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  projectId = Option.String('--project-id', { required: true, description: 'Project ID' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

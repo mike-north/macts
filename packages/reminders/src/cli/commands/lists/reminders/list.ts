@@ -13,7 +13,7 @@ export class ListRemindersCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  listId = Option.String('--list-id', { required: true, description: 'List ID' })
+  listId = Option.String('--list-id', { required: true, description: 'List identifier' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

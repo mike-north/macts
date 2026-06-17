@@ -144,16 +144,28 @@ export function generateListCommand(
   // Build command path
   const cliPath = [appName, ...hierarchyPath.path, 'list']
 
-  // Build parameter options for parent IDs
-  const parentOptions = generateParentOptions(hierarchyPath.parentParams)
+  // The arguments forwarded to the SDK `list()` call must exactly match the
+  // SDK's `list()` signature, which is derived from the backing list command's
+  // *required parameters* (see `generateListMethod` in the SDK generator). The
+  // CLI hierarchy parent params (derived from manifest nesting) are a separate
+  // notion and can diverge — e.g. a self-nested resource whose list command
+  // takes no parent scope. Forwarding hierarchy params the SDK does not accept
+  // produced a `TS2554: Expected 0 arguments, but got 1` compile error. Drive
+  // both the forwarded args AND the CLI options from the list command's required
+  // parameters so the CLI, SDK, server, and MCP inputSchema all agree.
+  const listCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((cmd) => cmd.name === 'list')
+  const listRequiredParams = (listCommand?.parameters ?? []).filter((p) => p.required)
 
-  // Forward the parent ID params to the list() call so the SDK can scope the
-  // request to the correct parent resource. Without this the generated list()
-  // call omits the required argument, causing a TypeScript compile error and a
-  // runtime scoping failure on the server.
+  // Generate a `--<param>` option for each required list parameter so it is
+  // bindable from the CLI, then forward them positionally in manifest order to
+  // match the SDK signature.
+  const parentOptions = generateListParamOptions(listRequiredParams)
+
   const listArgs =
-    hierarchyPath.parentParams.length > 0
-      ? `this.${hierarchyPath.parentParams.map((p) => p.name).join(', this.')}`
+    listRequiredParams.length > 0
+      ? listRequiredParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`).join(', ')
       : ''
 
   const content = `import { Command, Option } from 'clipanion';
@@ -563,6 +575,27 @@ function generateParentOptions(parentParams: ParentParam[]): string {
         (p) =>
           `  ${p.name} = Option.String('--${toKebabCase(p.name)}', { required: true, description: '${p.resourceName} ID' });`
       )
+      .join('\n') + '\n'
+  )
+}
+
+/**
+ * Generate `--<param>` options for a list command's required parameters.
+ *
+ * The option property name is run through `safeParamProperty` so it matches the
+ * value the list-call forwarding uses, and the flag name is the kebab-cased
+ * manifest parameter name. This keeps the CLI option, the forwarded SDK argument,
+ * and the SDK `list()` signature in lockstep.
+ */
+function generateListParamOptions(params: CommandParameter[]): string {
+  if (params.length === 0) return ''
+
+  return (
+    params
+      .map((p) => {
+        const property = safeParamProperty(p.name, 'list')
+        return `  ${property} = Option.String('--${toKebabCase(p.name)}', { required: true, description: ${JSON.stringify(p.description)} });`
+      })
       .join('\n') + '\n'
   )
 }

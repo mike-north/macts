@@ -240,7 +240,7 @@ export type ProjectCreateInput = Record<string, never>;
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(): Promise<Project[]>;
+    list(workspaceName: string): Promise<Project[]>;
 }
 
 // @public (undocumented)
@@ -292,7 +292,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<RunDestination>;
-    list(): Promise<RunDestination[]>;
+    list(workspaceName: string): Promise<RunDestination[]>;
 }
 
 // @public (undocumented)
@@ -352,7 +352,7 @@ export type SchemeCreateInput = Record<string, never>;
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scheme>;
-    list(): Promise<Scheme[]>;
+    list(workspaceName: string): Promise<Scheme[]>;
 }
 
 // @public (undocumented)

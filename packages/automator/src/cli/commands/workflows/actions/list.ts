@@ -13,14 +13,14 @@ export class ListAutomatorActionsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
+  workflowName = Option.String('--workflow-name', { required: true, description: 'Workflow name' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.automatoractions.list()
+      const items = await client.automatoractions.list(this.workflowName)
 
       const output = formatter.formatList(
         items.map((item) => ({

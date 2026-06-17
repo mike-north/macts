@@ -23,8 +23,8 @@ export class LayerResourceClient {
   /**
    * List all layers.
    */
-  async list(): Promise<Layer[]> {
-    return this.#http.rpc<Layer[]>(`${this.#app}.${this.#resource}.listLayers`)
+  async list(canvasId: string): Promise<Layer[]> {
+    return this.#http.rpc<Layer[]>(`${this.#app}.${this.#resource}.listLayers`, { canvasId })
   }
 
   /**

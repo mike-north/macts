@@ -23,8 +23,10 @@ export class AutomatorActionResourceClient {
   /**
    * List all automatoractions.
    */
-  async list(): Promise<AutomatorAction[]> {
-    return this.#http.rpc<AutomatorAction[]>(`${this.#app}.${this.#resource}.listActions`)
+  async list(workflowName: string): Promise<AutomatorAction[]> {
+    return this.#http.rpc<AutomatorAction[]>(`${this.#app}.${this.#resource}.listActions`, {
+      workflowName,
+    })
   }
 
   /**

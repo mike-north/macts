@@ -23,8 +23,8 @@ export class SchemeResourceClient {
   /**
    * List all schemes.
    */
-  async list(): Promise<Scheme[]> {
-    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.listSchemes`)
+  async list(workspaceName: string): Promise<Scheme[]> {
+    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.listSchemes`, { workspaceName })
   }
 
   /**

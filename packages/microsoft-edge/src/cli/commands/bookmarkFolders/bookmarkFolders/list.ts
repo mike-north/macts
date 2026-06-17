@@ -13,10 +13,6 @@ export class ListBookmarkFoldersCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  bookmarkFolderId = Option.String('--bookmark-folder-id', {
-    required: true,
-    description: 'BookmarkFolder ID',
-  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

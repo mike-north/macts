@@ -13,14 +13,14 @@ export class ListTabsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
+  windowId = Option.String('--window-id', { required: true, description: 'Window identifier' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.tabs.list()
+      const items = await client.tabs.list(this.windowId)
 
       const output = formatter.formatList(
         items.map((item) => ({

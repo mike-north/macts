@@ -23,8 +23,8 @@ export class TabResourceClient {
   /**
    * List all tabs.
    */
-  async list(): Promise<Tab[]> {
-    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.listTabs`)
+  async list(windowId: string): Promise<Tab[]> {
+    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.listTabs`, { windowId })
   }
 
   /**

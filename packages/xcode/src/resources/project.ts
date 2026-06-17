@@ -23,8 +23,10 @@ export class ProjectResourceClient {
   /**
    * List all projects.
    */
-  async list(): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.listProjects`)
+  async list(workspaceName: string): Promise<Project[]> {
+    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.listProjects`, {
+      workspaceName,
+    })
   }
 
   /**

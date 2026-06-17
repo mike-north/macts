@@ -23,8 +23,8 @@ export class ShapeResourceClient {
   /**
    * List all shapes.
    */
-  async list(): Promise<Shape[]> {
-    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.listShapes`)
+  async list(canvasId: string): Promise<Shape[]> {
+    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.listShapes`, { canvasId })
   }
 
   /**

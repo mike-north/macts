@@ -23,9 +23,10 @@ export class RequiredResourceResourceClient {
   /**
    * List all requiredresources.
    */
-  async list(): Promise<RequiredResource[]> {
+  async list(actionId: string): Promise<RequiredResource[]> {
     return this.#http.rpc<RequiredResource[]>(
-      `${this.#app}.${this.#resource}.listRequiredResources`
+      `${this.#app}.${this.#resource}.listRequiredResources`,
+      { actionId }
     )
   }
 

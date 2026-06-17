@@ -13,7 +13,6 @@ export class ListAlbumsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
