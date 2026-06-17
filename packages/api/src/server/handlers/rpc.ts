@@ -439,38 +439,49 @@ export function buildListCommandCode(
       ? declaredIdProperty
       : undefined
 
-  // Non-identifier properties are copied from the batched properties() record
-  // rather than called one-by-one. The runtime-identifier property is excluded
-  // here and emitted separately (unswallowed) below, as is any non-runtime-valid
-  // declared identifier (skipPropertyRead) — the alias below mirrors the working
-  // property into the declared identifier key so output shape is preserved.
+  // Non-identifier properties are read via a hybrid two-path strategy.
+  // The runtime-identifier property is excluded here and emitted separately
+  // (unswallowed), as is any non-runtime-valid declared identifier
+  // (skipPropertyRead) — the alias below mirrors the working property into the
+  // declared identifier key so output shape is preserved.
   //
   // Issue #89: the per-property accessor loop (item.p1(); item.p2(); ...) was
   // O(items × properties) AppleEvents. For 35 Calendar events × 13 properties
   // that is ~455 round-trips / 37 s — enough to exceed the JXA runner timeout.
-  // item.properties() is ONE AppleEvent per item, collapsing N×M to ~N.
+  //
+  // Fast path (try): item.properties() is ONE AppleEvent per item, collapsing
+  // N×M to ~N. This works for most resources (e.g. events).
+  //
+  // Fallback (catch): some items' properties() call throws (e.g. Calendar items
+  // whose calendarIdentifier accessor fails with -10000 when read as part of the
+  // full record). In that case fall back to the original per-field loop with
+  // individual try/catch per field so one bad property cannot fail the whole item.
   const bestEffortProps = allPropNames.filter(
     (p) => p !== runtimeIdProperty && p !== skipPropertyRead
   )
 
-  // Batch all non-id property reads into a single item.properties() call.
-  // Fields absent from the returned record are simply undefined — the same
-  // graceful outcome as the old per-field try/catch. We read props once and
-  // copy the manifest-declared keys out of it.
-  const propReads =
-    bestEffortProps.length > 0
-      ? `var props = item.properties();\n        ${bestEffortProps
-          .map((p) => `if (props.${p} !== undefined) { obj.${p} = props.${p}; }`)
-          .join('\n        ')}`
-      : `var props = item.properties();`
+  // Fast-path: copy manifest-declared keys from the batched properties() record.
+  // Fields absent from the record are simply undefined (same outcome as old try/catch).
+  const fastPathPropReads = bestEffortProps
+    .map((p) => `if (props.${p} !== undefined) { obj.${p} = props.${p}; }`)
+    .join('\n          ')
+
+  // Fallback: per-field reads, each wrapped in its own try/catch so one throwing
+  // field (e.g. calendarIdentifier) does not abort the remaining fields.
+  const fallbackPropReads = bestEffortProps
+    .map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`)
+    .join('\n          ')
 
   // The runtime identifier read is emitted WITHOUT a swallowing catch so a
   // misconfigured identifier surfaces as a real error rather than a silent
-  // empty id (the regression issue #81 documents). With the batched approach
-  // the value is read from the already-fetched props record — no extra
-  // AppleEvent — but the intentional absence of error-suppression is preserved.
-  const idRead =
+  // empty id (the regression issue #81 documents).
+  // In the fast path the value comes from the already-fetched props record.
+  // In the fallback path it is read directly from the item accessor — same
+  // unswallowed semantics.
+  const idReadFast =
     runtimeIdProperty !== undefined ? `obj.${runtimeIdProperty} = props.${runtimeIdProperty};` : ''
+  const idReadFallback =
+    runtimeIdProperty !== undefined ? `obj.${runtimeIdProperty} = item.${runtimeIdProperty}();` : ''
 
   // Expose the runtime identifier value under the canonical `id` key so a
   // consumer can always read `item.id` regardless of the app's property name.
@@ -486,6 +497,18 @@ export function buildListCommandCode(
           ? `\n        obj.${declaredIdProperty} = obj.${runtimeIdProperty};`
           : '')
       : ''
+
+  // Combine fast-path and fallback into a single try/catch block so the template
+  // stays flat. The identifier reads are inside the block so `props` is in scope
+  // for the fast path and `item` is used directly in the fallback.
+  const itemReadBlock = `try {
+          var props = item.properties();
+          ${fastPathPropReads}
+          ${idReadFast}
+        } catch(e) {
+          ${fallbackPropReads}
+          ${idReadFallback}
+        }`
 
   // Resolve the required parent identifier parameter (if any) so the JXA can
   // scope the list to the parent resource. The parent param is the first
@@ -553,14 +576,14 @@ export function buildListCommandCode(
       ${paramAssignments}
       // List ${resourcePlural}
       var items = ${collectionExpr};
-      // Batch all property reads: one item.properties() call per item instead of
-      // one accessor per property per item. Collapses N×M AppleEvents to ~N.
+      // Hybrid property reads: fast path (item.properties() — one AppleEvent per
+      // item) with a per-field fallback for items whose properties() call throws
+      // (e.g. Calendar items where calendarIdentifier accessor fails with -10000).
       var result = [];
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
         var obj = {};
-        ${propReads}
-        ${idRead}
+        ${itemReadBlock}
         ${idAlias}
         result.push(obj);
       }
