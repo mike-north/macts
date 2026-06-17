@@ -39,6 +39,12 @@ export async function writeProbeResults(
     if (typeof raw['resources'] !== 'object' || raw['resources'] === null) continue
     if (!Object.prototype.hasOwnProperty.call(raw['resources'], resourceName)) continue
 
+    // Guard that the individual resource entry is a plain object before writing
+    // to it — a malformed manifest YAML should not throw and block other resources.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const entry: unknown = raw['resources'][resourceName]
+    if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) continue
+
     // Build a compact probe block — only include fields that have values
     const probeBlock: Record<string, string> = {
       status: r.probe.status,
@@ -53,8 +59,8 @@ export async function writeProbeResults(
       probeBlock['note'] = r.probe.note
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    raw['resources'][resourceName].probe = probeBlock
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(entry as Record<string, any>)['probe'] = probeBlock
   }
 
   const updated = yaml.dump(raw, { lineWidth: 120, quotingType: '"', noRefs: true })

@@ -24,7 +24,7 @@
  * # manifests/calendar/app.yaml with updated probe metadata.
  *
  * macts probe calendar --resource Calendar --dry-run
- * # Probe only the Calendar resource, print JSON, do not write.
+ * # Probe only the Calendar resource, print human-readable output, do not write.
  * ```
  *
  * @packageDocumentation

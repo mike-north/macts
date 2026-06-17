@@ -71,11 +71,11 @@ function makeManifest(
  * The probe module makes two types of JXA calls:
  *   1. **Collection-length check** — contains `return items ? items.length : 0`
  *      (unique to `probeCollectionLength`).  Script via the `'__length__'` key.
- *   2. **Property probe** — contains `var first = items[0]` and
- *      `first.<property>`.  Script via `'<property>'` (bare property name).
+ *   2. **Property probe** — contains `var prop = "<property>"` (bracket-notation
+ *      form emitted by `probeProperty`).  Script via `'<property>'` (bare name).
  *
- * Matching is type-aware to avoid accidental collisions (a property named
- * `length` would otherwise match both calls).
+ * Matching is type-aware so a property named `length` cannot accidentally
+ * match the length-check body.
  */
 function makeFakeRunner(config: Record<string, { returns?: unknown; throws?: string }>): JxaRunner {
   return (_bundleId: string, jsBody: string): Promise<unknown> => {
@@ -87,8 +87,9 @@ function makeFakeRunner(config: Record<string, { returns?: unknown; throws?: str
       if (key === '__length__') {
         matches = isLengthCheck
       } else {
-        // Property probe: key is the property name; match only in property-probe bodies
-        matches = !isLengthCheck && jsBody.includes(`first.${key}`)
+        // Property probe: match `var prop = "<property>"` in the JXA body —
+        // that's the JSON-stringified bracket-notation form emitted by probeProperty.
+        matches = !isLengthCheck && jsBody.includes(`var prop = ${JSON.stringify(key)}`)
       }
 
       if (matches) {
@@ -336,9 +337,9 @@ describe('probeManifest', () => {
     const tryOrder: string[] = []
     const runner: JxaRunner = (_bundleId, jsBody) => {
       if (jsBody.includes('return items ? items.length : 0')) return Promise.resolve(1)
-      // Record which property is being probed via the JS body
-      // The property probe body contains `first.<property>()` — extract the name
-      const match = /first\.(\w+)\(\)/.exec(jsBody)
+      // Record which property is being probed.  The new bracket-notation body
+      // emits `var prop = "<property>"` — extract the name from that assignment.
+      const match = /var prop = "([^"]+)"/.exec(jsBody)
       if (match?.[1]) tryOrder.push(match[1])
       return Promise.resolve('ok')
     }

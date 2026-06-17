@@ -102,40 +102,74 @@ export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>
 const COMMON_FALLBACK_PROPERTIES = ['name', 'id'] as const
 
 // ---------------------------------------------------------------------------
+// JXA name helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a PascalCase or otherwise capitalised plural to lowerCamelCase so
+ * it matches the JXA collection accessor.
+ *
+ * Manifest `plural` values come from the sdef and are PascalCase
+ * (e.g. `Calendars`, `DisplayAlarms`).  JXA exposes collections in
+ * lowerCamelCase (`calendars()`, `displayAlarms()`).  Without this
+ * conversion every `app[plural]()` call returns undefined and the probe
+ * silently reports `no-items` for every resource.
+ */
+function toLowerCamelCase(s: string): string {
+  if (s.length === 0) return s
+  return s.charAt(0).toLowerCase() + s.slice(1)
+}
+
+// ---------------------------------------------------------------------------
 // Core probe logic
 // ---------------------------------------------------------------------------
 
 /**
  * Probe a single property on the first item of a resource collection.
  *
+ * Uses bracket notation with JSON-stringified names throughout so that:
+ *  - Arbitrary property names (with spaces, hyphens, etc.) are safe.
+ *  - There is no code-injection surface from manifest-supplied strings.
+ *  - The runner receives a throw when a property access fails, which is
+ *    captured as a per-candidate error (that's the whole detection mechanism).
+ *
+ * The JXA body reads `first[prop]`.  In JXA, AppleScript properties surface
+ * as zero-argument functions, so we check `typeof val === 'function'` and
+ * call it if so, then coerce to string.  We do NOT swallow exceptions here —
+ * a throwing property causes the runner to reject, and the caller catches
+ * that rejection and records it as `succeeded: false` with the error text.
+ *
  * @param runner - Injectable JXA executor
  * @param bundleId - App bundle ID
- * @param resourcePlural - Plural form of the resource (e.g. "calendars")
+ * @param collectionAccessor - lowerCamelCase accessor for the collection
  * @param property - Property name to probe
  * @returns Probe outcome for this property
  */
 async function probeProperty(
   runner: JxaRunner,
   bundleId: string,
-  resourcePlural: string,
+  collectionAccessor: string,
   property: string
 ): Promise<IdentifierProbeResult> {
-  // Language: JXA.  We read app[plural]()[0][property]() or app[plural]()[0][property].
-  // We try the function-call form first (most AppleScript properties are methods
-  // in JXA), then the bare property form, and return the first truthy result.
+  const safeCollection = JSON.stringify(collectionAccessor)
+  const safeProp = JSON.stringify(property)
+
+  // Build the JXA body using bracket notation only — no interpolation of
+  // user-supplied strings into JS syntax positions.
   const jsBody = `
-    var items = app.${resourcePlural}();
+    var col = ${safeCollection};
+    var prop = ${safeProp};
+    var items = app[col]();
     if (!items || items.length === 0) { return null; }
     var first = items[0];
-    var val;
-    try { val = first.${property}(); } catch(_) {}
-    if (val === undefined || val === null) {
-      try { val = first.${property}; } catch(_) {}
-    }
+    var val = first[prop];
+    if (typeof val === 'function') { val = val.call(first); }
     if (val === undefined || val === null) { return null; }
     return String(val);
   `
 
+  // Let exceptions propagate — a throwing property access is exactly what we
+  // want to detect.  The catch here records the runner's rejection as an error.
   try {
     const result = await runner(bundleId, jsBody)
     const succeeded = result !== null && result !== undefined && result !== ''
@@ -149,17 +183,20 @@ async function probeProperty(
 /**
  * Probe whether the resource's collection has any items.
  *
+ * Uses bracket notation with a JSON-stringified accessor name.
  * Returns `null` when we cannot determine (runner error); returns the count
  * (which may be 0) on success.
  */
 async function probeCollectionLength(
   runner: JxaRunner,
   bundleId: string,
-  resourcePlural: string
+  collectionAccessor: string
 ): Promise<number | null> {
+  const safeCollection = JSON.stringify(collectionAccessor)
   const jsBody = `
     try {
-      var items = app.${resourcePlural}();
+      var col = ${safeCollection};
+      var items = app[col]();
       return items ? items.length : 0;
     } catch(_) {
       return -1;
@@ -184,10 +221,12 @@ async function probeResource(
   resourceDef: AppManifest['resources'][string],
   now: string
 ): Promise<ResourceProbeResult> {
-  const resourcePlural = resourceDef.plural
+  // Manifest plural is PascalCase (e.g. "Calendars"); JXA accessors are
+  // lowerCamelCase ("calendars").  Convert before building any JXA body.
+  const collectionAccessor = toLowerCamelCase(resourceDef.plural)
 
   // Check if the collection is non-empty
-  const length = await probeCollectionLength(runner, bundleId, resourcePlural)
+  const length = await probeCollectionLength(runner, bundleId, collectionAccessor)
 
   if (length === null) {
     // Could not read the collection at all
@@ -198,7 +237,7 @@ async function probeResource(
       probe: {
         status: 'error',
         probedAt: now,
-        note: `Could not read ${resourcePlural}() collection`,
+        note: `Could not read ${collectionAccessor}() collection`,
       },
     }
   }
@@ -211,7 +250,7 @@ async function probeResource(
       probe: {
         status: 'no-items',
         probedAt: now,
-        note: `${resourcePlural}() collection is empty; cannot probe identifiers`,
+        note: `${collectionAccessor}() collection is empty; cannot probe identifiers`,
       },
     }
   }
@@ -234,7 +273,7 @@ async function probeResource(
 
   // Probe each candidate
   const results: IdentifierProbeResult[] = await Promise.all(
-    candidates.map((prop) => probeProperty(runner, bundleId, resourcePlural, prop))
+    candidates.map((prop) => probeProperty(runner, bundleId, collectionAccessor, prop))
   )
 
   const firstSuccess = results.find((r) => r.succeeded)
