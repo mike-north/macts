@@ -3,7 +3,7 @@
  *
  * A parent-scoped list (e.g. "list the tabs of a window", "list the schemes of
  * a workspace") is modeled by a list command that declares a required parameter
- * naming the parent scope (e.g. `windowId`). For that one manifest fact, FOUR
+ * naming the parent scope (e.g. `windowId`). For that one manifest fact, FIVE
  * generated surfaces must agree, or the generated packages will not compile or
  * will silently drop the scope:
  *
