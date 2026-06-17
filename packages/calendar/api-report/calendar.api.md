@@ -171,12 +171,12 @@ export interface EventCreateInput {
     calendarId: string;
     description?: string;
     endDate: Date;
-    excludedDates?: Date[];
+    excludedDates?: string;
     location?: string;
     recurrence?: string;
     stampDate?: Date;
     startDate: Date;
-    status?: EventStatus;
+    status?: string;
     summary: string;
     url?: string;
 }
@@ -185,9 +185,11 @@ export interface EventCreateInput {
 export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: EventCreateInput): Promise<Event_2>;
+    delete(id: string): Promise<void>;
     get(id: string): Promise<Event_2>;
     list(calendarId: string): Promise<Event_2[]>;
     show(): Promise<void>;
+    update(id: string, input: EventUpdateInput): Promise<Event_2>;
 }
 
 // @public (undocumented)
