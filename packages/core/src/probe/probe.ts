@@ -163,7 +163,9 @@ async function probeProperty(
     if (!items || items.length === 0) { return null; }
     var first = items[0];
     var val = first[prop];
-    if (typeof val === 'function') { val = val.call(first); }
+    // Invoke the bound JXA accessor directly via first[prop]() — re-binding it
+    // with .call(first) breaks the specifier and throws -1700 "Can't convert types".
+    if (typeof val === 'function') { val = first[prop](); }
     if (val === undefined || val === null) { return null; }
     return String(val);
   `

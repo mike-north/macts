@@ -353,6 +353,35 @@ describe('probeManifest', () => {
     expect(primaryIdx).toBeLessThan(secondaryIdx)
   })
 
+  // ----- JXA accessor invocation form (regression: -1700 "Can't convert types") ----
+
+  it('generates JXA body using first[prop]() not val.call(first) — prevents -1700 type-conversion error', async () => {
+    // Regression for the bug where probeProperty emitted `val.call(first)`,
+    // which re-binds the bound JXA specifier and throws -1700 "Can't convert types",
+    // falsely reporting working identifiers as failed.
+    // The correct form is `first[prop]()` — direct invocation on the specifier.
+    const capturedBodies: string[] = []
+    const runner: JxaRunner = (_bundleId, jsBody) => {
+      capturedBodies.push(jsBody)
+      if (jsBody.includes('return items ? items.length : 0')) return Promise.resolve(1)
+      return Promise.resolve('captured-value')
+    }
+
+    await probeManifest(makeManifest(), runner, { now: PROBE_TIME })
+
+    const propertyBodies = capturedBodies.filter((b) => !b.includes('return items ? items.length : 0'))
+    expect(propertyBodies.length).toBeGreaterThan(0)
+
+    for (const body of propertyBodies) {
+      // Must use the direct invocation form
+      expect(body).toContain('first[prop]()')
+      // Must NOT use the re-binding form that causes -1700 "Can't convert types".
+      // Check the specific code pattern (val.call(first)), not just the string fragment
+      // which also appears in the explanatory comment inside the generated body.
+      expect(body).not.toContain('val.call(first)')
+    }
+  })
+
   // ----- Duplicate fallbacks not added when already declared -----------------
 
   it('does not duplicate name in candidates when name is already a declared identifier', async () => {
