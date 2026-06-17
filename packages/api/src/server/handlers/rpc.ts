@@ -17,6 +17,7 @@ import {
   normalizeResourceRouteSegment,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
+  resolveIdentifierTargeting,
   classifyCommandRisk,
   CANONICAL_IDENTIFIER_KEY,
 } from '@macts/core'
@@ -296,6 +297,11 @@ async function executeAppCommand(
       if (value === undefined && !p.required) {
         return null
       }
+      // Date-typed params arrive as ISO strings over JSON; rehydrate them as
+      // JXA Date objects (a raw string makes Calendar's make/push throw).
+      if (p.type === 'date') {
+        return `var ${p.name} = new Date(${JSON.stringify(value)});`
+      }
       return `var ${p.name} = ${JSON.stringify(value)};`
     })
     .filter(Boolean)
@@ -323,6 +329,47 @@ async function executeAppCommand(
  * - create: app.Calendar({props}).make() -> new item
  * - delete: app.calendars.byId(id).delete()
  */
+/**
+ * Build the JXA expression that targets a single resource item by identifier.
+ *
+ * The structured layer addresses a resource through its primary identifier, but
+ * a dictionary-declared identifier is not always runtime-valid via JXA. The
+ * manifest's identifier `targeting` selects the expression:
+ *
+ * - `byId` (default): `app.<plural>.byId(<valueVar>)` — the dictionary id
+ *   specifier works at runtime.
+ * - `byProperty`: `app.<plural>.whose({ <property>: <valueVar> })[0]` — the
+ *   declared identifier throws at runtime (e.g. Calendar's `calendarIdentifier()`),
+ *   so the resource is matched on a property that works (e.g. `name`).
+ *
+ * `valueVar` is the JXA variable/expression holding the lookup value — for the
+ * common CRUD path this is the command's required *request parameter* name (the
+ * schema-validated key, e.g. `id` / `calendarId`), NOT the runtime property. The
+ * targeting `property` (e.g. `name`) is only the JXA `whose` match key.
+ *
+ * Exported for testing: the emitted text is asserted at the schema level since
+ * JXA only runs against a live app (not in CI).
+ *
+ * @param resource - The resource being targeted (may be undefined).
+ * @param resourcePlural - The lowercased plural collection name (e.g. `calendars`).
+ * @param valueVar - The JXA variable/expression holding the lookup value.
+ * @returns The JXA expression evaluating to the targeted item.
+ */
+export function buildTargetExpression(
+  resource: Resource | undefined,
+  resourcePlural: string,
+  valueVar: string
+): string {
+  const targeting = resolveIdentifierTargeting(resource)
+  if (targeting?.strategy === 'byProperty') {
+    // Match on the runtime-working property (e.g. `name`) since the declared
+    // identifier is not addressable via byId() at runtime.
+    return `app.${resourcePlural}.whose({ ${targeting.property}: ${valueVar} })[0]`
+  }
+  // Default: the dictionary id specifier works at runtime.
+  return `app.${resourcePlural}.byId(${valueVar})`
+}
+
 /**
  * Build the JXA program a `list` resource command runs.
  *
@@ -363,17 +410,67 @@ export function buildListCommandCode(
   // read, even when the manifest declares it only in `identifiers` (not as a
   // regular property) — sibling get/delete/write operations need that id, and
   // listing is how an agent obtains it.
-  const propNames = resolveListOutputProperties(resource)
+  const allPropNames = resolveListOutputProperties(resource)
 
-  // The identifier is exposed under an app-specific property name
-  // (e.g. `calendarIdentifier`), but write/get/delete reference it under
-  // various names. Expose the same value under the canonical `id` key as well,
-  // so a consumer can always read `item.id` regardless of the app's property
-  // name (single source: the manifest's primary identifier).
-  const idProperty = resolvePrimaryIdentifierProperty(resource)
+  // Resolve how the resource is targeted at runtime. The canonical `id` must
+  // mirror the property the runtime ACTUALLY uses to address the resource:
+  // - byId: the declared identifier property (e.g. `uid`).
+  // - byProperty: the runtime-working property (e.g. `name`), because the
+  //   declared identifier (e.g. `calendarIdentifier`) throws via JXA and get/
+  //   delete/create target by that working property instead.
+  // The runtime-identifier read is load-bearing — it must NOT be wrapped in a
+  // silent try/catch. A live `calendars.list` previously swallowed the failing
+  // `calendarIdentifier()` read, leaving items with no usable id and no signal.
+  // If the configured runtime identifier read throws, that surfaces (the whole
+  // list command fails with a real error) instead of returning empty ids.
+  const targeting = resolveIdentifierTargeting(resource)
+  const runtimeIdProperty = targeting?.property
+  const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
+
+  // For a `byProperty` resource the declared identifier property (e.g.
+  // `calendarIdentifier`) is precisely the one that throws via JXA at runtime —
+  // it is the whole reason targeting falls back to a working property. We must
+  // NOT call `item.calendarIdentifier()` for it (that re-introduces the throw);
+  // its value is instead mirrored from the working property in the alias below.
+  const skipPropertyRead =
+    targeting?.strategy === 'byProperty' &&
+    declaredIdProperty !== undefined &&
+    declaredIdProperty !== runtimeIdProperty
+      ? declaredIdProperty
+      : undefined
+
+  // Non-identifier property reads stay best-effort: individual items may
+  // legitimately throw for some optional properties, and one bad property must
+  // not fail the whole listing. The runtime-identifier property is excluded here
+  // and emitted separately (unswallowed) below, as is any non-runtime-valid
+  // declared identifier (skipPropertyRead).
+  const bestEffortProps = allPropNames.filter(
+    (p) => p !== runtimeIdProperty && p !== skipPropertyRead
+  )
+
+  const propReads = bestEffortProps
+    .map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`)
+    .join('\n        ')
+
+  // The runtime identifier read is emitted WITHOUT a swallowing catch so a
+  // misconfigured identifier surfaces as a real error rather than a silent
+  // empty id (the regression issue #81 documents).
+  const idRead =
+    runtimeIdProperty !== undefined ? `obj.${runtimeIdProperty} = item.${runtimeIdProperty}();` : ''
+
+  // Expose the runtime identifier value under the canonical `id` key so a
+  // consumer can always read `item.id` regardless of the app's property name.
+  // For byProperty resources this is the working property (`name`); for byId it
+  // is the declared identifier property — both are the value get/delete/create
+  // accept as the lookup. We also mirror the declared identifier property name
+  // when it differs from the runtime property, so output remains shape-stable
+  // for consumers that read the declared name directly.
   const idAlias =
-    idProperty !== undefined
-      ? `if (obj.${idProperty} !== undefined) { obj.${CANONICAL_IDENTIFIER_KEY} = obj.${idProperty}; }`
+    runtimeIdProperty !== undefined
+      ? `obj.${CANONICAL_IDENTIFIER_KEY} = obj.${runtimeIdProperty};` +
+        (declaredIdProperty !== undefined && declaredIdProperty !== runtimeIdProperty
+          ? `\n        obj.${declaredIdProperty} = obj.${runtimeIdProperty};`
+          : '')
       : ''
 
   // Resolve the required parent identifier parameter (if any) so the JXA can
@@ -398,6 +495,7 @@ export function buildListCommandCode(
 
     // Try to find the parent resource by matching the param name against each
     // resource's primary identifier property or its plural.
+    let parentResource: Resource | undefined
     let parentPlural: string | undefined
     if (manifest !== undefined) {
       for (const res of Object.values(manifest.resources)) {
@@ -415,6 +513,7 @@ export function buildListCommandCode(
           resPluralLower === paramBase + 's' ||
           resPluralLower === paramBase
         ) {
+          parentResource = res
           parentPlural = res.plural.toLowerCase()
           break
         }
@@ -429,7 +528,11 @@ export function buildListCommandCode(
       parentPlural = `${paramBase}s`
     }
 
-    collectionExpr = `app.${parentPlural}.byId(${parentIdParam}).${resourcePlural}()`
+    // Target the parent honoring its identifier targeting strategy, so a parent
+    // whose declared id is not runtime-valid (e.g. Calendar) is matched on its
+    // working property instead of an `byId()` that throws.
+    const parentTarget = buildTargetExpression(parentResource, parentPlural, parentIdParam)
+    collectionExpr = `${parentTarget}.${resourcePlural}()`
   }
 
   return `
@@ -441,7 +544,8 @@ export function buildListCommandCode(
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
         var obj = {};
-        ${propNames.map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`).join('\n        ')}
+        ${propReads}
+        ${idRead}
         ${idAlias}
         result.push(obj);
       }
@@ -463,6 +567,11 @@ async function executeResourceCommand(
       const value = args[p.name]
       if (value === undefined && !p.required) {
         return null
+      }
+      // Date-typed params arrive as ISO strings over JSON; rehydrate them as
+      // JXA Date objects (a raw string makes Calendar's make/push throw).
+      if (p.type === 'date') {
+        return `var ${p.name} = new Date(${JSON.stringify(value)});`
       }
       return `var ${p.name} = ${JSON.stringify(value)};`
     })
@@ -503,10 +612,15 @@ async function executeResourceCommand(
 
     const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
 
+    // Target the item honoring the resource's identifier targeting strategy:
+    // `byId(<param>)` by default, or `whose({ <property>: <param> })[0]` when the
+    // declared identifier is not runtime-valid (e.g. Calendar matched by name).
+    const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+
     code = `
       ${paramAssignments}
       // Get ${resource?.name ?? 'item'} by identifier
-      var item = app.${resourcePlural}.byId(${identifierParam});
+      var item = ${targetExpr};
       var obj = {};
       ${propNames.map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`).join('\n      ')}
       return obj;
@@ -533,10 +647,13 @@ async function executeResourceCommand(
         )
       }
 
+      // Honor the resource's identifier targeting strategy (byId vs byProperty).
+      const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+
       code = `
       ${paramAssignments}
       // Delete ${resource?.name ?? 'item'} by identifier
-      var item = app.${resourcePlural}.byId(${identifierParam});
+      var item = ${targetExpr};
       item.delete();
       return null;
     `
@@ -583,8 +700,9 @@ async function executeResourceCommand(
         )
       }
 
-      // Resolve the parent resource's plural by matching the param name against
-      // each resource's primary identifier or name — manifest-driven, not hardcoded.
+      // Resolve the parent resource by matching the param name against each
+      // resource's primary identifier or name — manifest-driven, not hardcoded.
+      let parentResource: Resource | undefined
       let parentPlural: string | undefined
       for (const res of Object.values(manifest.resources)) {
         const primaryId = resolvePrimaryIdentifierProperty(res)
@@ -599,6 +717,7 @@ async function executeResourceCommand(
           resPluralLower === paramBase + 's' ||
           resPluralLower === paramBase
         ) {
+          parentResource = res
           parentPlural = res.plural.toLowerCase()
           break
         }
@@ -615,19 +734,30 @@ async function executeResourceCommand(
         .filter((p) => p.name !== parentIdParam && args[p.name] !== undefined)
         .map((p) => p.name)
 
+      // Target the parent honoring its identifier targeting strategy, so a parent
+      // whose declared id is not runtime-valid (e.g. Calendar) is matched on its
+      // working property (`name`) instead of a `byId()` that throws.
+      const parentTarget = buildTargetExpression(parentResource, parentPlural, parentIdParam)
+
       code = `
         ${paramAssignments}
         // Create ${resourceName} within parent (${parentIdParam})
-        var parent = app.${parentPlural}.byId(${parentIdParam});
+        var parent = ${parentTarget};
         var props = {${props.join(', ')}};
         var item = app.${resourceName}(props);
-        item.make({ at: parent.${resourcePlural} });
+        // Append to the parent's element collection. item.make({ at: ... }) throws
+        // -10024 "Can't make or move that element into that container" in JXA;
+        // pushing onto the parent specifier's collection is the working idiom.
+        parent.${resourcePlural}.push(item);
         return item.properties();
       `
     } else {
       // No parent identifier: create at the top level.
       const props = command.parameters.filter((p) => args[p.name] !== undefined).map((p) => p.name)
 
+      // TODO(#81 follow-up): top-level `item.make()` is unverified against a live app
+      // and likely shares the within-parent -10024 idiom bug; the working form is
+      // probably `app.${resourcePlural}.push(item)`. Verify live before relying on it.
       code = `
         ${paramAssignments}
         // Create ${resourceName}
@@ -664,10 +794,13 @@ async function executeResourceCommand(
       .map((fieldName) => `try { item.${fieldName} = ${fieldName}; } catch(e) {}`)
       .join('\n      ')
 
+    // Honor the resource's identifier targeting strategy (byId vs byProperty).
+    const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+
     code = `
       ${paramAssignments}
       // Update ${resource?.name ?? 'item'} by identifier
-      var item = app.${resourcePlural}.byId(${identifierParam});
+      var item = ${targetExpr};
       ${fieldAssignments}
       return item.properties();
     `

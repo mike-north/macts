@@ -19,7 +19,7 @@ export type ViewType = 'dayView' | 'weekView' | 'monthView'
 
 /** A calendar containing events */
 export interface Calendar {
-  /** Canonical identifier (mirrors `calendarIdentifier`); populated by list, pass to get/delete and to write operations that reference this resource. */
+  /** Canonical identifier (mirrors `name`); populated by list, pass to get/delete and to write operations that reference this resource. */
   id?: string
   /** The calendar title */
   name: string

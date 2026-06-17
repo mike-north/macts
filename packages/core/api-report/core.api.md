@@ -145,6 +145,11 @@ export const AppManifestSchema: z.ZodObject<{
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
             property: z.ZodString;
             primary: z.ZodDefault<z.ZodBoolean>;
+            targeting: z.ZodOptional<z.ZodEnum<{
+                byId: "byId";
+                byProperty: "byProperty";
+            }>>;
+            runtimeProperty: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>>;
         probe: z.ZodOptional<z.ZodObject<{
             runtimeIdentifier: z.ZodOptional<z.ZodString>;
@@ -1251,7 +1256,27 @@ export interface IdentifierProbeResult {
 export const IdentifierSchema: z.ZodObject<{
     property: z.ZodString;
     primary: z.ZodDefault<z.ZodBoolean>;
+    targeting: z.ZodOptional<z.ZodEnum<{
+        byId: "byId";
+        byProperty: "byProperty";
+    }>>;
+    runtimeProperty: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public (undocumented)
+export type IdentifierTargeting = z.infer<typeof IdentifierTargetingSchema>;
+
+// @public
+export interface IdentifierTargetingResolution {
+    property: string;
+    strategy: IdentifierTargeting;
+}
+
+// @public
+export const IdentifierTargetingSchema: z.ZodEnum<{
+    byId: "byId";
+    byProperty: "byProperty";
+}>;
 
 // @public (undocumented)
 export type Inheritance = z.infer<typeof InheritanceSchema>;
@@ -1915,10 +1940,16 @@ export const RelationshipSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export function resolveActivePolicyPath(home: string): string;
+
+// @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
 
 // @public
 export function resolveDiscoveryLimit(raw: unknown, defaultLimit: number): number;
+
+// @public
+export function resolveIdentifierTargeting(resource: Resource | undefined): IdentifierTargetingResolution | undefined;
 
 // @public
 export function resolveListOutputProperties(resource: Resource | undefined): string[];
@@ -1977,6 +2008,11 @@ export const ResourceSchema: z.ZodObject<{
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         property: z.ZodString;
         primary: z.ZodDefault<z.ZodBoolean>;
+        targeting: z.ZodOptional<z.ZodEnum<{
+            byId: "byId";
+            byProperty: "byProperty";
+        }>>;
+        runtimeProperty: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>>;
     probe: z.ZodOptional<z.ZodObject<{
         runtimeIdentifier: z.ZodOptional<z.ZodString>;

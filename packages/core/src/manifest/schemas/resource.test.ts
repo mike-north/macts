@@ -1,11 +1,24 @@
 import { describe, it, expect } from 'vitest'
 import {
   IdentifierSchema,
+  IdentifierTargetingSchema,
   ResourceSchema,
   RuntimeProbeSchema,
   ProbeStatusSchema,
 } from './resource.js'
 import { ZodError } from 'zod'
+
+describe('IdentifierTargetingSchema', () => {
+  it('accepts the two valid strategies', () => {
+    expect(IdentifierTargetingSchema.parse('byId')).toBe('byId')
+    expect(IdentifierTargetingSchema.parse('byProperty')).toBe('byProperty')
+  })
+
+  it('rejects any other value', () => {
+    expect(() => IdentifierTargetingSchema.parse('byName')).toThrow(ZodError)
+    expect(() => IdentifierTargetingSchema.parse('')).toThrow(ZodError)
+  })
+})
 
 describe('IdentifierSchema', () => {
   describe('positive cases', () => {
@@ -43,6 +56,51 @@ describe('IdentifierSchema', () => {
         primary: false,
       })
     })
+
+    it('should accept identifier with byProperty targeting', () => {
+      // resource.ts: `targeting` selects how the runtime addresses the resource.
+      const result = IdentifierSchema.parse({
+        property: 'name',
+        primary: true,
+        targeting: 'byProperty',
+      })
+
+      expect(result).toEqual({
+        property: 'name',
+        primary: true,
+        targeting: 'byProperty',
+      })
+    })
+
+    it('should accept identifier with explicit byId targeting', () => {
+      const result = IdentifierSchema.parse({
+        property: 'uid',
+        primary: true,
+        targeting: 'byId',
+      })
+
+      expect(result.targeting).toBe('byId')
+    })
+
+    it('should accept identifier with an explicit runtimeProperty', () => {
+      const result = IdentifierSchema.parse({
+        property: 'calendarIdentifier',
+        primary: true,
+        targeting: 'byProperty',
+        runtimeProperty: 'name',
+      })
+
+      expect(result.runtimeProperty).toBe('name')
+    })
+
+    it('leaves targeting undefined when omitted (byId is applied by the resolver, not the schema)', () => {
+      // The schema keeps `targeting` optional rather than defaulting it, so the
+      // inferred Identifier type stays narrow and already-generated manifest
+      // literals (which omit `targeting`) still satisfy `as AppManifest`.
+      const result = IdentifierSchema.parse({ property: 'uid', primary: true })
+      expect(result.targeting).toBeUndefined()
+      expect('runtimeProperty' in result).toBe(false)
+    })
   })
 
   describe('negative cases', () => {
@@ -68,6 +126,28 @@ describe('IdentifierSchema', () => {
         IdentifierSchema.parse({
           property: 'id',
           primary: 'yes',
+        })
+      ).toThrow(ZodError)
+    })
+
+    it('should reject identifier with an unknown targeting strategy', () => {
+      // Only the enum members byId / byProperty are valid.
+      expect(() =>
+        IdentifierSchema.parse({
+          property: 'name',
+          primary: true,
+          targeting: 'byMagic',
+        })
+      ).toThrow(ZodError)
+    })
+
+    it('should reject identifier with non-string runtimeProperty', () => {
+      expect(() =>
+        IdentifierSchema.parse({
+          property: 'name',
+          primary: true,
+          targeting: 'byProperty',
+          runtimeProperty: 123,
         })
       ).toThrow(ZodError)
     })

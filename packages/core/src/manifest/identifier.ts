@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-import type { Resource } from './schemas/resource.js'
+import type { Identifier, IdentifierTargeting, Resource } from './schemas/resource.js'
 
 /**
  * The canonical key under which every generated surface exposes a resource's
@@ -35,6 +35,24 @@ import type { Resource } from './schemas/resource.js'
 export const CANONICAL_IDENTIFIER_KEY = 'id'
 
 /**
+ * Resolve the manifest-declared primary identifier entry for a resource.
+ *
+ * The entry flagged `primary` wins; otherwise the first declared entry is used.
+ * Returns `undefined` when the resource declares no identifiers.
+ *
+ * @param resource - The resource definition from the manifest, or `undefined`.
+ * @returns The primary identifier entry, or `undefined` if none is declared.
+ */
+function resolvePrimaryIdentifier(resource: Resource | undefined): Identifier | undefined {
+  const identifiers = resource?.identifiers
+  if (!identifiers || identifiers.length === 0) {
+    return undefined
+  }
+  const primary = identifiers.find((entry) => entry.primary)
+  return primary ?? identifiers[0]
+}
+
+/**
  * Resolve the manifest-declared primary identifier property name for a resource.
  *
  * The identifier is taken from the resource's `identifiers` array: the entry
@@ -49,13 +67,67 @@ export const CANONICAL_IDENTIFIER_KEY = 'id'
 export function resolvePrimaryIdentifierProperty(
   resource: Resource | undefined
 ): string | undefined {
-  const identifiers = resource?.identifiers
-  if (!identifiers || identifiers.length === 0) {
+  return resolvePrimaryIdentifier(resource)?.property
+}
+
+/**
+ * How the runtime layer must target a resource by its primary identifier.
+ *
+ * @public
+ */
+export interface IdentifierTargetingResolution {
+  /**
+   * The targeting strategy: `byId` emits a JXA `byId(value)` lookup; `byProperty`
+   * emits a `whose({ <property>: value })[0]` lookup.
+   */
+  strategy: IdentifierTargeting
+  /**
+   * The runtime property to read for list output and to match against for a
+   * `byProperty` lookup. For `byId` this is the identifier property; for
+   * `byProperty` it is `runtimeProperty` when set, else the identifier property.
+   *
+   * This is the value-carrying property — NOT the request parameter name. The
+   * request parameter (e.g. `id`, `calendarId`) is a separate schema-contract
+   * concern resolved from the command's parameters.
+   */
+  property: string
+}
+
+/**
+ * Resolve how the runtime layer must target a resource by its primary identifier.
+ *
+ * The structured layer addresses a resource through its primary identifier, but
+ * a dictionary-declared identifier is not always runtime-valid via JXA. This
+ * resolution captures BOTH which property carries the identifier value AND how
+ * the runtime must use it:
+ *
+ * - `byId` (default): `app.<plural>.byId(value)` — the dictionary id specifier
+ *   works at runtime.
+ * - `byProperty`: `app.<plural>.whose({ <property>: value })[0]` — the declared
+ *   identifier throws at runtime (e.g. Calendar's `calendarIdentifier()`), so the
+ *   resource is matched on a property that works (e.g. `name`).
+ *
+ * Returns `undefined` when the resource declares no identifiers — such a resource
+ * cannot be addressed by identifier at all, and callers handle that explicitly.
+ *
+ * @param resource - The resource definition from the manifest, or `undefined`.
+ * @returns The targeting resolution, or `undefined` if no identifier is declared.
+ */
+export function resolveIdentifierTargeting(
+  resource: Resource | undefined
+): IdentifierTargetingResolution | undefined {
+  const entry = resolvePrimaryIdentifier(resource)
+  if (entry === undefined) {
     return undefined
   }
-  const primary = identifiers.find((entry) => entry.primary)
-  const chosen = primary ?? identifiers[0]
-  return chosen?.property
+  // The schema leaves `targeting` optional to avoid widening the inferred type;
+  // absent means the `byId` default.
+  const strategy: IdentifierTargeting = entry.targeting ?? 'byId'
+  // For byProperty, the JXA `whose` key may be an explicit runtimeProperty; for
+  // byId, the runtime property IS the identifier property (the value read in list).
+  const property =
+    strategy === 'byProperty' ? (entry.runtimeProperty ?? entry.property) : entry.property
+  return { strategy, property }
 }
 
 /**

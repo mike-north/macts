@@ -91,6 +91,22 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@types/node@22.19.11)(tsx@4.22.4)(yaml@2.8.2)
 
+  e2e/round-trip:
+    dependencies:
+      '@macts/calendar':
+        specifier: workspace:*
+        version: link:../../packages/calendar
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.0
+        version: 22.19.11
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@22.19.11)(tsx@4.22.4)(yaml@2.8.2)
+
   manifests/calendar:
     devDependencies:
       '@macts/core':

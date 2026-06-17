@@ -8,6 +8,7 @@
  *   never silently downgraded to allow-all).
  *
  * @see https://github.com/mike-north/macts/issues/53
+ * @see https://github.com/mike-north/macts/issues/79
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -15,6 +16,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { GovernancePolicy } from '@macts/core'
+import { resolveActivePolicyPath } from '@macts/core'
 import {
   ALLOW_ALL_POLICY,
   ActivePolicyError,
@@ -93,6 +95,26 @@ describe('getActivePolicyPath', () => {
   it('resolves under the macts home, at governance/policy.json', () => {
     const path = getActivePolicyPath()
     expect(path.endsWith(join('governance', 'policy.json'))).toBe(true)
+  })
+
+  // Regression #79: enforcement previously built the path inline rather than
+  // delegating to the shared resolver. Both enforcement and discovery must call
+  // resolveActivePolicyPath so they always resolve the same file.
+  it('returns the same path as resolveActivePolicyPath(home) for any home value (regression #79)', () => {
+    const syntheticHome = '/tmp/synthetic-macts-home'
+    // getActivePolicyPath() reads getMactsHome() internally; override MACTS_HOME
+    // so we can compare against resolveActivePolicyPath with a known value.
+    const original = process.env['MACTS_HOME']
+    try {
+      process.env['MACTS_HOME'] = syntheticHome
+      expect(getActivePolicyPath()).toBe(resolveActivePolicyPath(syntheticHome))
+    } finally {
+      if (original === undefined) {
+        delete process.env['MACTS_HOME']
+      } else {
+        process.env['MACTS_HOME'] = original
+      }
+    }
   })
 })
 
