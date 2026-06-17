@@ -13,18 +13,14 @@ export class ListRequiredResourcesCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
-  automatorActionId = Option.String('--automator-action-id', {
-    required: true,
-    description: 'AutomatorAction ID',
-  })
+  actionId = Option.String('--action-id', { required: true, description: 'Action identifier' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.requiredresources.list()
+      const items = await client.requiredresources.list(this.actionId)
 
       const output = formatter.formatList(
         items.map((item) => ({

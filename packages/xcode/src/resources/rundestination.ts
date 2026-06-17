@@ -23,8 +23,10 @@ export class RunDestinationResourceClient {
   /**
    * List all rundestinations.
    */
-  async list(): Promise<RunDestination[]> {
-    return this.#http.rpc<RunDestination[]>(`${this.#app}.${this.#resource}.listRunDestinations`)
+  async list(workspaceName: string): Promise<RunDestination[]> {
+    return this.#http.rpc<RunDestination[]>(`${this.#app}.${this.#resource}.listRunDestinations`, {
+      workspaceName,
+    })
   }
 
   /**

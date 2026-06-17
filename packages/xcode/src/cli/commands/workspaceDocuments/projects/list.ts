@@ -13,9 +13,9 @@ export class ListProjectsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workspaceDocumentId = Option.String('--workspace-document-id', {
+  workspaceName = Option.String('--workspace-name', {
     required: true,
-    description: 'WorkspaceDocument ID',
+    description: 'Workspace document name',
   })
 
   async execute(): Promise<number> {
@@ -23,7 +23,7 @@ export class ListProjectsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.projects.list()
+      const items = await client.projects.list(this.workspaceName)
 
       const output = formatter.formatList(
         items.map((item) => ({

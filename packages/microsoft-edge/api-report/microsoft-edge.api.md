@@ -53,7 +53,7 @@ export interface BookmarkItemCreateInput {
 export class BookmarkItemResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<BookmarkItem>;
-    list(): Promise<BookmarkItem[]>;
+    list(folderId: string): Promise<BookmarkItem[]>;
 }
 
 // @public (undocumented)
@@ -139,7 +139,7 @@ export class TabResourceClient {
     get(id: string): Promise<Tab>;
     goBack(tabId: string): Promise<void>;
     goForward(tabId: string): Promise<void>;
-    list(): Promise<Tab[]>;
+    list(windowId: string): Promise<Tab[]>;
     pasteSelection(tabId: string): Promise<void>;
     redo(tabId: string): Promise<void>;
     reload(tabId: string): Promise<void>;

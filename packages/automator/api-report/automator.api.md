@@ -46,7 +46,7 @@ export interface AutomatorActionCreateInput {
 export class AutomatorActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<AutomatorAction>;
-    list(): Promise<AutomatorAction[]>;
+    list(workflowName: string): Promise<AutomatorAction[]>;
 }
 
 // @public (undocumented)
@@ -146,7 +146,7 @@ export type RequiredResourceCreateInput = Record<string, never>;
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<RequiredResource>;
-    list(): Promise<RequiredResource[]>;
+    list(actionId: string): Promise<RequiredResource[]>;
 }
 
 // @public (undocumented)
@@ -178,7 +178,7 @@ export interface SettingCreateInput {
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<Setting>;
-    list(): Promise<Setting[]>;
+    list(actionId: string): Promise<Setting[]>;
 }
 
 // @public (undocumented)
@@ -210,7 +210,7 @@ export interface VariableCreateInput {
 export class VariableResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Variable>;
-    list(): Promise<Variable[]>;
+    list(workflowName: string): Promise<Variable[]>;
 }
 
 // @public (undocumented)

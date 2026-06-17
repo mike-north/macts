@@ -23,8 +23,8 @@ export class LineResourceClient {
   /**
    * List all lines.
    */
-  async list(): Promise<Line[]> {
-    return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.listLines`)
+  async list(canvasId: string): Promise<Line[]> {
+    return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.listLines`, { canvasId })
   }
 
   /**

@@ -23,8 +23,8 @@ export class SettingResourceClient {
   /**
    * List all settings.
    */
-  async list(): Promise<Setting[]> {
-    return this.#http.rpc<Setting[]>(`${this.#app}.${this.#resource}.listSettings`)
+  async list(actionId: string): Promise<Setting[]> {
+    return this.#http.rpc<Setting[]>(`${this.#app}.${this.#resource}.listSettings`, { actionId })
   }
 
   /**

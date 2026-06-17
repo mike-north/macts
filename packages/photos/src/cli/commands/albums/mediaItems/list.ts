@@ -13,7 +13,6 @@ export class ListMediaItemsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  albumId = Option.String('--album-id', { required: true, description: 'Album ID' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

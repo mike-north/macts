@@ -13,7 +13,10 @@ export class ListEventsCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
+  calendarId = Option.String('--calendar-id', {
+    required: true,
+    description: 'Calendar identifier',
+  })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
