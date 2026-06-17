@@ -152,6 +152,143 @@ describe('route coherence across all app manifests', () => {
   })
 })
 
+describe('@macts/calendar events update and delete', () => {
+  let calendar: AppManifest
+
+  beforeAll(async () => {
+    calendar = await loadManifest(resolve(MANIFESTS_DIR, 'calendar', 'app.yaml'))
+  })
+
+  it('manifest declares updateEvent command for Event resource', () => {
+    // The updateEvent command must be present with name: update, scope: resource,
+    // resourceType: Event, and a required `id` param (the request parameter — NOT
+    // `uid`, which is the resource's identifier PROPERTY).
+    const cmd = calendar.commands['updateEvent']
+    expect(cmd).toBeDefined()
+    expect(cmd?.name).toBe('update')
+    expect(cmd?.scope).toBe('resource')
+    expect(cmd?.resourceType).toBe('Event')
+    const idParam = cmd?.parameters.find((p) => p.required)
+    expect(idParam?.name).toBe('id')
+    expect(idParam?.type).toBe('string')
+  })
+
+  it('manifest declares deleteEvent command for Event resource', () => {
+    // The deleteEvent command must be present with name: delete, scope: resource,
+    // resourceType: Event, and a required `id` param consistent with getEvent.
+    const cmd = calendar.commands['deleteEvent']
+    expect(cmd).toBeDefined()
+    expect(cmd?.name).toBe('delete')
+    expect(cmd?.scope).toBe('resource')
+    expect(cmd?.resourceType).toBe('Event')
+    const idParam = cmd?.parameters.find((p) => p.required)
+    expect(idParam?.name).toBe('id')
+    expect(idParam?.type).toBe('string')
+  })
+
+  it('updateEvent identifier param name matches getEvent identifier param name', () => {
+    // Coherence guard: get/update/delete must agree on the request parameter name.
+    // The server's executeResourceCommand resolves the lookup var from
+    // `command.parameters.find((p) => p.required)?.name` — if get uses `id` and
+    // update uses `uid`, the server would emit `byId(uid)` with no `uid` var bound.
+    const getCmd = calendar.commands['getEvent']
+    const updateCmd = calendar.commands['updateEvent']
+    const deleteCmd = calendar.commands['deleteEvent']
+    const getIdParam = getCmd?.parameters.find((p) => p.required)?.name
+    const updateIdParam = updateCmd?.parameters.find((p) => p.required)?.name
+    const deleteIdParam = deleteCmd?.parameters.find((p) => p.required)?.name
+    expect(updateIdParam).toBe(getIdParam)
+    expect(deleteIdParam).toBe(getIdParam)
+  })
+
+  it('updateEvent has date-typed params for startDate and endDate', () => {
+    // Date-typed params are rehydrated as JXA Date objects by the RPC executor.
+    // Without type: date the ISO string would be assigned directly, which may
+    // throw or silently produce wrong results in Calendar.app JXA.
+    const cmd = calendar.commands['updateEvent']
+    const startDate = cmd?.parameters.find((p) => p.name === 'startDate')
+    const endDate = cmd?.parameters.find((p) => p.name === 'endDate')
+    expect(startDate?.type).toBe('date')
+    expect(endDate?.type).toBe('date')
+  })
+
+  it('routes events.update() to calendar.events.updateEvent', () => {
+    // The manifest key for the update command is `updateEvent`; the server
+    // registers the route under that key. The client must use the same key.
+    const canonical = new Set(resolveManifestRoutes(calendar).map((r) => r.route))
+    expect(canonical).toContain('calendar.events.updateEvent')
+
+    const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
+    const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
+    if (!eventFile) throw new Error('generated calendar SDK missing event resource')
+
+    expect(eventFile.content).toContain('async update(id: string, input: EventUpdateInput)')
+    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.updateEvent`')
+    // Must NOT emit the name-keyed route `update` — that would 404.
+    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.update`')
+
+    const clientRoutes = extractClientRoutes(sdk.files)
+    expect(clientRoutes).toContain('calendar.events.updateEvent')
+    expect(clientRoutes.has('calendar.events.update')).toBe(false)
+  })
+
+  it('routes events.delete() to calendar.events.deleteEvent', () => {
+    // Same key-coherence contract as update: manifest key is `deleteEvent`.
+    const canonical = new Set(resolveManifestRoutes(calendar).map((r) => r.route))
+    expect(canonical).toContain('calendar.events.deleteEvent')
+
+    const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
+    const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
+    if (!eventFile) throw new Error('generated calendar SDK missing event resource')
+
+    expect(eventFile.content).toContain('async delete(id: string)')
+    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.deleteEvent`')
+    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.delete`')
+
+    const clientRoutes = extractClientRoutes(sdk.files)
+    expect(clientRoutes).toContain('calendar.events.deleteEvent')
+    expect(clientRoutes.has('calendar.events.delete')).toBe(false)
+  })
+
+  it('EventUpdateInput carries date-typed optional fields for startDate and endDate', () => {
+    // The updateEvent command has date-typed startDate/endDate params. The
+    // generated EventUpdateInput (Partial<EventCreateInput>) must type those
+    // fields as Date (not string) — the RPC executor rehydrates date params
+    // before forwarding them to JXA.
+    const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
+    const typesFile = sdk.files.find((f) => f.path === 'src/types.ts')
+    if (!typesFile) throw new Error('generated calendar SDK missing types')
+
+    // EventUpdateInput = Partial<EventCreateInput>, so we check EventCreateInput
+    // for the date fields.
+    const createInputMatch = /export interface EventCreateInput \{([\s\S]*?)\n\}/.exec(
+      typesFile.content
+    )
+    expect(createInputMatch).not.toBeNull()
+    const body = createInputMatch?.[1] ?? ''
+    expect(body).toContain('startDate')
+    expect(body).toContain('endDate')
+  })
+
+  it('updateEvent has mutable event fields as optional parameters', () => {
+    // All writable event properties except the identifier should be optional
+    // in the update command so partial updates are supported.
+    const cmd = calendar.commands['updateEvent']
+    expect(cmd).toBeDefined()
+    const paramNames = cmd?.parameters.map((p) => p.name) ?? []
+    // Required field: only the identifier
+    const requiredParams = cmd?.parameters.filter((p) => p.required).map((p) => p.name) ?? []
+    expect(requiredParams).toEqual(['id'])
+    // Mutable fields must be optional
+    expect(paramNames).toContain('summary')
+    expect(paramNames).toContain('description')
+    expect(paramNames).toContain('location')
+    expect(paramNames).toContain('startDate')
+    expect(paramNames).toContain('endDate')
+    expect(paramNames).toContain('recurrence')
+  })
+})
+
 describe('@macts/calendar events.create regression', () => {
   let calendar: AppManifest
 
