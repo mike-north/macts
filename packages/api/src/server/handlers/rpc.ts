@@ -320,6 +320,100 @@ async function executeAppCommand(
 }
 
 /**
+ * Resolve the parent identifier parameter and derive the parent target expression
+ * for a resource command that operates on a nested child resource.
+ *
+ * A "parent param" is a required command parameter whose name is NOT one of the
+ * child resource's own properties (e.g. `calendarId` on `getEvent` / `deleteEvent`
+ * / `updateEvent` — it is not an Event property, so it must refer to the parent
+ * Calendar). This mirrors the same detection used in the `create` and `list`
+ * branches.
+ *
+ * When found, returns the JXA expression for the parent specifier (e.g.
+ * `app.calendars.whose({ name: calendarId })[0]`) and the parent param name.
+ * Returns `undefined` when the command has no parent scope (flat top-level
+ * resource — keep using `app.<plural>.byId(id)`).
+ *
+ * @param command - The command definition.
+ * @param _resource - The child resource (reserved; not currently used).
+ * @param manifest - Full manifest, used to resolve parent resource + targeting.
+ */
+function resolveParentScope(
+  command: Command,
+  _resource: Resource | undefined,
+  manifest: AppManifest
+): { parentTarget: string; parentIdParam: string } | undefined {
+  // A parent scope exists ONLY when the command has ≥2 required params.
+  // The first required param is the parent identifier; the last is the child id.
+  // Single-required-param commands (flat top-level resources) never have a parent.
+  const requiredParams = command.parameters.filter((p) => p.required)
+  if (requiredParams.length < 2) return undefined
+
+  const parentParam = requiredParams[0]
+  if (parentParam === undefined) return undefined
+
+  const parentIdParam = parentParam.name // e.g. "calendarId"
+
+  // Resolve the parent resource by matching the param name against each resource's
+  // primary identifier property or name/plural — the same heuristic the list/create
+  // branches use so parent targeting is consistent across all operations.
+  let parentResource: Resource | undefined
+  let parentPlural: string | undefined
+  for (const res of Object.values(manifest.resources)) {
+    const primaryId = resolvePrimaryIdentifierProperty(res)
+    const paramBase = parentIdParam.endsWith('Id')
+      ? parentIdParam.slice(0, -2).toLowerCase()
+      : parentIdParam.toLowerCase()
+    const resNameLower = res.name.toLowerCase()
+    const resPluralLower = res.plural.toLowerCase()
+    if (
+      primaryId?.toLowerCase().startsWith(paramBase) === true ||
+      resNameLower === paramBase ||
+      resPluralLower === paramBase + 's' ||
+      resPluralLower === paramBase
+    ) {
+      parentResource = res
+      parentPlural = res.plural.toLowerCase()
+      break
+    }
+  }
+  if (parentPlural === undefined) {
+    const paramBase = parentIdParam.endsWith('Id')
+      ? parentIdParam.slice(0, -2).toLowerCase()
+      : parentIdParam.toLowerCase()
+    parentPlural = `${paramBase}s`
+  }
+
+  // Honor the parent's identifier targeting strategy (byId vs byProperty) so a
+  // parent whose declared id is not runtime-valid (e.g. Calendar matched by name)
+  // is reached correctly.
+  const parentTarget = buildTargetExpression(parentResource, parentPlural, parentIdParam)
+  return { parentTarget, parentIdParam }
+}
+
+/**
+ * Build the JXA expression that targets a child resource item nested under a
+ * parent specifier. Used by the parent-scoped get/update/delete branches where
+ * the child resource is not a top-level collection (e.g. Calendar events).
+ *
+ * The emitted expression is `<parentTarget>.<childPlural>.byId(<childIdVar>)`.
+ * Events in Calendar.app are only addressable this way — `app.events.byId(uid)`
+ * builds a lazy specifier that throws -1728 "Can't get object" at runtime because
+ * events are not a top-level JXA collection.
+ *
+ * @param parentTarget - The JXA expression for the parent specifier.
+ * @param childPlural - The lowercased plural of the child collection.
+ * @param childIdVar - The JXA variable holding the child's identifier value.
+ */
+export function buildNestedTargetExpression(
+  parentTarget: string,
+  childPlural: string,
+  childIdVar: string
+): string {
+  return `${parentTarget}.${childPlural}.byId(${childIdVar})`
+}
+
+/**
  * Execute a resource-level command.
  *
  * Resource commands typically operate on collections or specific items.
@@ -627,19 +721,32 @@ async function executeResourceCommand(
     // to the parent resource when the command has a required parent identifier.
     code = buildListCommandCode(resource, paramAssignments, command, manifest)
   } else if (command.name === 'get') {
-    // Get by identifier: app.resource.byId(<identifierParam>)
+    // Get by identifier. When the command declares a parent scope parameter (a
+    // required param NOT present in the child resource's own properties, e.g.
+    // `calendarId` on `getEvent`), the child is nested under the parent and must
+    // be targeted as `<parentTarget>.<childPlural>.byId(<childId>)` instead of
+    // `app.<childPlural>.byId(<childId>)`. Calendar events are the canonical case:
+    // `app.events.byId(uid)` throws -1728 because events are not a top-level JXA
+    // collection; they must be reached via the calendar specifier.
     //
-    // The lookup variable name MUST be the command's required *parameter* name
-    // (e.g. `id`, `name`, `widgetName`) — that is the key the request schema
-    // (Zod) validates and the only var `paramAssignments` binds. It is NOT the
-    // resource's primary identifier *property* (`uid`, `calendarIdentifier`),
-    // which is an output/canonicalization concern; using that here would emit
-    // `byId(uid)` with no `var uid` declared and reject the request the schema
-    // accepts. See manifests/calendar/app.yaml: get.parameters[0].name = 'id'.
-    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+    // When no parent scope exists, fall back to the flat top-level target
+    // (honoring byId vs byProperty targeting as before).
+    //
+    // The lookup variable name MUST be the command's non-parent required *parameter*
+    // name (e.g. `id`) — the key the request schema validates.
+    const parentScope = resolveParentScope(command, resource, manifest)
+    const identifierParam =
+      command.parameters.find((p) => p.required && p.name !== parentScope?.parentIdParam)?.name ??
+      'id'
 
-    // Validate: if the identifier param is required but not provided, return a
-    // structured error rather than emit `byId(undefined)` into JXA.
+    // Validate required params before building JXA.
+    if (parentScope !== undefined && args[parentScope.parentIdParam] === undefined) {
+      return Promise.reject(
+        Object.assign(new Error(`Missing required parameter: ${parentScope.parentIdParam}`), {
+          code: 'VALIDATION_ERROR',
+        })
+      )
+    }
     if (args[identifierParam] === undefined) {
       return Promise.reject(
         Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
@@ -650,10 +757,10 @@ async function executeResourceCommand(
 
     const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
 
-    // Target the item honoring the resource's identifier targeting strategy:
-    // `byId(<param>)` by default, or `whose({ <property>: <param> })[0]` when the
-    // declared identifier is not runtime-valid (e.g. Calendar matched by name).
-    const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+    const targetExpr =
+      parentScope !== undefined
+        ? buildNestedTargetExpression(parentScope.parentTarget, resourcePlural, identifierParam)
+        : buildTargetExpression(resource, resourcePlural, identifierParam)
 
     code = `
       ${paramAssignments}
@@ -664,19 +771,28 @@ async function executeResourceCommand(
       return obj;
     `
   } else if (command.name === 'delete') {
-    // Delete by identifier: app.resource.byId(<identifierParam>).delete()
+    // Delete by identifier. Mirrors the get branch: when a parent scope parameter
+    // exists (required param not in child resource's own properties), target the
+    // child via `<parentTarget>.<childPlural>.byId(<childId>)`. This is required
+    // for nested resources like Calendar events. Falls back to flat top-level
+    // targeting for non-nested resources.
     //
-    // As with get, the lookup variable is the command's required *parameter*
-    // name (the schema-validated request key), NOT the resource's primary
-    // identifier property.
-    //
-    // If the command declares no required parameter (e.g. System Events
-    // DiskItem delete which has parameters: []), `identifierParam` is undefined
-    // and we fall through to the generic handler — never emit `byId(undefined)`.
-    const identifierParam = command.parameters.find((p) => p.required)?.name
+    // If the command declares no required parameter at all (e.g. System Events
+    // DiskItem delete), fall through to the generic handler.
+    const parentScope = resolveParentScope(command, resource, manifest)
+    const identifierParam = command.parameters.find(
+      (p) => p.required && p.name !== parentScope?.parentIdParam
+    )?.name
 
     if (identifierParam !== undefined) {
-      // Guard: emit a structured error if the required identifier is absent.
+      // Guard: emit structured errors if required params are absent.
+      if (parentScope !== undefined && args[parentScope.parentIdParam] === undefined) {
+        return Promise.reject(
+          Object.assign(new Error(`Missing required parameter: ${parentScope.parentIdParam}`), {
+            code: 'VALIDATION_ERROR',
+          })
+        )
+      }
       if (args[identifierParam] === undefined) {
         return Promise.reject(
           Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
@@ -685,8 +801,10 @@ async function executeResourceCommand(
         )
       }
 
-      // Honor the resource's identifier targeting strategy (byId vs byProperty).
-      const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+      const targetExpr =
+        parentScope !== undefined
+          ? buildNestedTargetExpression(parentScope.parentTarget, resourcePlural, identifierParam)
+          : buildTargetExpression(resource, resourcePlural, identifierParam)
 
       code = `
       ${paramAssignments}
@@ -806,14 +924,24 @@ async function executeResourceCommand(
       `
     }
   } else if (command.name === 'update') {
-    // Update by identifier: set each provided field on the resource item.
-    //
-    // The target lookup variable is the command's required *parameter* name
-    // (the schema-validated request key), consistent with get/delete — NOT the
-    // resource's primary identifier property.
-    const identifierParam = command.parameters.find((p) => p.required)?.name ?? 'id'
+    // Update by identifier. Mirrors the get branch: when a parent scope parameter
+    // exists, target the child via `<parentTarget>.<childPlural>.byId(<childId>)`.
+    // This is required for nested resources like Calendar events where
+    // `app.events.byId(uid)` is not settable (-10006) but
+    // `app.calendars.whose({name: calendarId})[0].events.byId(uid)` is.
+    const parentScope = resolveParentScope(command, resource, manifest)
+    const identifierParam =
+      command.parameters.find((p) => p.required && p.name !== parentScope?.parentIdParam)?.name ??
+      'id'
 
-    // Guard: emit a structured error if the required identifier is absent.
+    // Guard: emit structured errors if required params are absent.
+    if (parentScope !== undefined && args[parentScope.parentIdParam] === undefined) {
+      return Promise.reject(
+        Object.assign(new Error(`Missing required parameter: ${parentScope.parentIdParam}`), {
+          code: 'VALIDATION_ERROR',
+        })
+      )
+    }
     if (args[identifierParam] === undefined) {
       return Promise.reject(
         Object.assign(new Error(`Missing required parameter: ${identifierParam}`), {
@@ -822,9 +950,13 @@ async function executeResourceCommand(
       )
     }
 
-    // Collect the writable fields from the provided args (excluding the identifier).
+    // Collect the writable fields: all provided params that are neither the child
+    // identifier nor the parent scope param.
+    const excludedParams = new Set(
+      [identifierParam, parentScope?.parentIdParam].filter(Boolean) as string[]
+    )
     const writableFields = command.parameters
-      .filter((p) => p.name !== identifierParam && args[p.name] !== undefined)
+      .filter((p) => !excludedParams.has(p.name) && args[p.name] !== undefined)
       .map((p) => p.name)
 
     // Generate a property-assignment statement for each updated field.
@@ -832,8 +964,10 @@ async function executeResourceCommand(
       .map((fieldName) => `try { item.${fieldName} = ${fieldName}; } catch(e) {}`)
       .join('\n      ')
 
-    // Honor the resource's identifier targeting strategy (byId vs byProperty).
-    const targetExpr = buildTargetExpression(resource, resourcePlural, identifierParam)
+    const targetExpr =
+      parentScope !== undefined
+        ? buildNestedTargetExpression(parentScope.parentTarget, resourcePlural, identifierParam)
+        : buildTargetExpression(resource, resourcePlural, identifierParam)
 
     code = `
       ${paramAssignments}

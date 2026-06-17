@@ -20,7 +20,7 @@ export class DiskItemResourceClient {
   }
 
   /**
-   * Delete a diskitem.
+   * Delete an diskitem.
    */
   async delete(id: string): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })

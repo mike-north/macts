@@ -28,10 +28,10 @@ export class EventResourceClient {
   }
 
   /**
-   * Get a event by id.
+   * Get a event by id within a parent scope.
    */
-  async get(id: string): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { id })
+  async get(calendarId: string, id: string): Promise<Event> {
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { calendarId, id })
   }
 
   /**
@@ -42,17 +42,29 @@ export class EventResourceClient {
   }
 
   /**
-   * Update an existing event.
+   * Update an existing event within a parent scope.
    */
-  async update(id: string, input: EventUpdateInput): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.updateEvent`, { id, ...input })
+  async update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event> {
+    const { calendarId: _p, ...updateFields } = input as EventUpdateInput & { calendarId?: string }
+    void _p
+    const defined = Object.fromEntries(
+      Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined)
+    )
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.updateEvent`, {
+      calendarId,
+      id,
+      ...defined,
+    })
   }
 
   /**
-   * Delete a event.
+   * Delete an event within a parent scope.
    */
-  async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteEvent`, { id })
+  async delete(calendarId: string, id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteEvent`, {
+      calendarId,
+      id,
+    })
   }
 
   /**

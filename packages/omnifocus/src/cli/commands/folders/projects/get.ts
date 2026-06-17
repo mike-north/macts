@@ -13,7 +13,6 @@ export class GetProjectCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' })
 
   projectId = Option.String({ required: true })
 

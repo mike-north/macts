@@ -161,44 +161,59 @@ describe('@macts/calendar events update and delete', () => {
 
   it('manifest declares updateEvent command for Event resource', () => {
     // The updateEvent command must be present with name: update, scope: resource,
-    // resourceType: Event, and a required `id` param (the request parameter — NOT
-    // `uid`, which is the resource's identifier PROPERTY).
+    // resourceType: Event. Events are nested under calendars, so two required
+    // params are expected: calendarId (parent) and id (child — the request
+    // parameter; NOT `uid`, which is the resource's identifier PROPERTY).
     const cmd = calendar.commands['updateEvent']
     expect(cmd).toBeDefined()
     expect(cmd?.name).toBe('update')
     expect(cmd?.scope).toBe('resource')
     expect(cmd?.resourceType).toBe('Event')
-    const idParam = cmd?.parameters.find((p) => p.required)
-    expect(idParam?.name).toBe('id')
-    expect(idParam?.type).toBe('string')
+    const requiredParams = cmd?.parameters.filter((p) => p.required) ?? []
+    expect(requiredParams).toHaveLength(2)
+    expect(requiredParams[0]?.name).toBe('calendarId')
+    expect(requiredParams[0]?.type).toBe('string')
+    expect(requiredParams[1]?.name).toBe('id')
+    expect(requiredParams[1]?.type).toBe('string')
   })
 
   it('manifest declares deleteEvent command for Event resource', () => {
     // The deleteEvent command must be present with name: delete, scope: resource,
-    // resourceType: Event, and a required `id` param consistent with getEvent.
+    // resourceType: Event. Two required params: calendarId (parent) and id (child).
     const cmd = calendar.commands['deleteEvent']
     expect(cmd).toBeDefined()
     expect(cmd?.name).toBe('delete')
     expect(cmd?.scope).toBe('resource')
     expect(cmd?.resourceType).toBe('Event')
-    const idParam = cmd?.parameters.find((p) => p.required)
-    expect(idParam?.name).toBe('id')
-    expect(idParam?.type).toBe('string')
+    const requiredParams = cmd?.parameters.filter((p) => p.required) ?? []
+    expect(requiredParams).toHaveLength(2)
+    expect(requiredParams[0]?.name).toBe('calendarId')
+    expect(requiredParams[0]?.type).toBe('string')
+    expect(requiredParams[1]?.name).toBe('id')
+    expect(requiredParams[1]?.type).toBe('string')
   })
 
   it('updateEvent identifier param name matches getEvent identifier param name', () => {
-    // Coherence guard: get/update/delete must agree on the request parameter name.
-    // The server's executeResourceCommand resolves the lookup var from
-    // `command.parameters.find((p) => p.required)?.name` — if get uses `id` and
-    // update uses `uid`, the server would emit `byId(uid)` with no `uid` var bound.
+    // Coherence guard: get/update/delete must agree on the request parameter names.
+    // The server's executeResourceCommand uses the LAST required param as the child
+    // id var (the one passed to byId()). All three commands must use the same
+    // calendarId param as parent and the same id param as child.
     const getCmd = calendar.commands['getEvent']
     const updateCmd = calendar.commands['updateEvent']
     const deleteCmd = calendar.commands['deleteEvent']
-    const getIdParam = getCmd?.parameters.find((p) => p.required)?.name
-    const updateIdParam = updateCmd?.parameters.find((p) => p.required)?.name
-    const deleteIdParam = deleteCmd?.parameters.find((p) => p.required)?.name
-    expect(updateIdParam).toBe(getIdParam)
-    expect(deleteIdParam).toBe(getIdParam)
+    const getRequired = getCmd?.parameters.filter((p) => p.required) ?? []
+    const updateRequired = updateCmd?.parameters.filter((p) => p.required) ?? []
+    const deleteRequired = deleteCmd?.parameters.filter((p) => p.required) ?? []
+    // Parent params must match.
+    expect(updateRequired[0]?.name).toBe(getRequired[0]?.name)
+    expect(deleteRequired[0]?.name).toBe(getRequired[0]?.name)
+    // Child id params must match.
+    expect(updateRequired[updateRequired.length - 1]?.name).toBe(
+      getRequired[getRequired.length - 1]?.name
+    )
+    expect(deleteRequired[deleteRequired.length - 1]?.name).toBe(
+      getRequired[getRequired.length - 1]?.name
+    )
   })
 
   it('updateEvent has date-typed params for startDate and endDate', () => {
@@ -222,7 +237,11 @@ describe('@macts/calendar events update and delete', () => {
     const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
     if (!eventFile) throw new Error('generated calendar SDK missing event resource')
 
-    expect(eventFile.content).toContain('async update(id: string, input: EventUpdateInput)')
+    // Events are nested under calendars: the generated method must take both
+    // calendarId (parent) and id (child event uid).
+    expect(eventFile.content).toContain(
+      'async update(calendarId: string, id: string, input: EventUpdateInput)'
+    )
     expect(eventFile.content).toContain('${this.#app}.${this.#resource}.updateEvent`')
     // Must NOT emit the name-keyed route `update` — that would 404.
     expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.update`')
@@ -241,7 +260,9 @@ describe('@macts/calendar events update and delete', () => {
     const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
     if (!eventFile) throw new Error('generated calendar SDK missing event resource')
 
-    expect(eventFile.content).toContain('async delete(id: string)')
+    // Events are nested under calendars: the generated method must take both
+    // calendarId (parent) and id (child event uid).
+    expect(eventFile.content).toContain('async delete(calendarId: string, id: string)')
     expect(eventFile.content).toContain('${this.#app}.${this.#resource}.deleteEvent`')
     expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.delete`')
 
@@ -266,26 +287,31 @@ describe('@macts/calendar events update and delete', () => {
     )
     expect(createInputMatch).not.toBeNull()
     const body = createInputMatch?.[1] ?? ''
-    expect(body).toContain('startDate')
-    expect(body).toContain('endDate')
+    // Must be typed as Date (not string) — the HTTP client serialises dates to
+    // ISO strings; the RPC server deserialises them back to Date before JXA.
+    expect(body).toContain('startDate: Date;')
+    expect(body).toContain('endDate: Date;')
   })
 
   it('updateEvent has mutable event fields as optional parameters', () => {
-    // All writable event properties except the identifier should be optional
-    // in the update command so partial updates are supported.
+    // All writable event properties except the identifiers (calendarId + id)
+    // should be optional in the update command so partial updates are supported.
     const cmd = calendar.commands['updateEvent']
     expect(cmd).toBeDefined()
     const paramNames = cmd?.parameters.map((p) => p.name) ?? []
-    // Required field: only the identifier
+    // Required fields: parent (calendarId) + child identifier (id).
     const requiredParams = cmd?.parameters.filter((p) => p.required).map((p) => p.name) ?? []
-    expect(requiredParams).toEqual(['id'])
-    // Mutable fields must be optional
+    expect(requiredParams).toEqual(['calendarId', 'id'])
+    // Core mutable fields must be optional params.
     expect(paramNames).toContain('summary')
     expect(paramNames).toContain('description')
     expect(paramNames).toContain('location')
     expect(paramNames).toContain('startDate')
     expect(paramNames).toContain('endDate')
     expect(paramNames).toContain('recurrence')
+    expect(paramNames).toContain('status')
+    expect(paramNames).toContain('alldayEvent')
+    expect(paramNames).toContain('excludedDates')
   })
 })
 

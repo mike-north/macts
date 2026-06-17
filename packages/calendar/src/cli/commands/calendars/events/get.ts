@@ -13,7 +13,10 @@ export class GetEventCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
+  calendarId = Option.String('--calendar-id', {
+    required: true,
+    description: 'Calendar identifier (the calendar containing the event)',
+  })
 
   eventId = Option.String({ required: true })
 
@@ -22,7 +25,7 @@ export class GetEventCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.events.get(this.eventId)
+      const item = await client.events.get(this.calendarId, this.eventId)
 
       const output = formatter.format({
         summary: item.summary,

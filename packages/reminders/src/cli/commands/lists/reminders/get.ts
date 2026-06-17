@@ -13,7 +13,6 @@ export class GetReminderCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  listId = Option.String('--list-id', { required: true, description: 'List ID' })
 
   reminderId = Option.String({ required: true })
 

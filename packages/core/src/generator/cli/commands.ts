@@ -319,12 +319,17 @@ export function generateGetCommand(
 
   const idParamName = `${toCamelCase(resource.name)}Id`
 
-  // Build parameter options for parent IDs, skipping any whose name collides with
-  // the resource's own ID option (happens with self-nested hierarchies, e.g. a
-  // folder inside a folder) to prevent emitting a duplicate identifier.
-  const parentOptions = generateParentOptions(
-    hierarchyPath.parentParams.filter((p) => p.name !== idParamName)
-  )
+  // Drive the get() arguments from the GET command's required params (single source of
+  // truth, like list — NOT the resource hierarchy), so the CLI passes exactly what the
+  // SDK get() accepts. By convention the last required param is the child id (rendered
+  // positionally below); the rest are parent-scope params (rendered as --<param> options
+  // and forwarded in manifest order).
+  const getCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((cmd) => cmd.name === 'get')
+  const getRequiredParams = (getCommand?.parameters ?? []).filter((p) => p.required)
+  const parentScopeParams = getRequiredParams.slice(0, -1)
+  const parentOptions = generateListParamOptions(parentScopeParams)
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
@@ -349,7 +354,7 @@ ${parentOptions}
 
     try {
       const client = getClient();
-      const item = await client.${resourceAccess}.get(this.${idParamName});
+      const item = await client.${resourceAccess}.get(${[...parentScopeParams.map((p) => `this.${safeParamProperty(p.name, 'list')}`), `this.${idParamName}`].join(', ')});
 
       const output = formatter.format({
 ${generateListFieldMapping(resource)}

@@ -41,8 +41,12 @@ export const eventsGetTool: McpToolDefinition = {
   inputSchema: {
     type: 'object',
     properties: {
+      calendarId: {
+        description: 'Calendar identifier (the calendar containing the event)',
+        type: 'string',
+      },
       id: {
-        description: 'Event identifier',
+        description: 'Event identifier (uid)',
         type: 'string',
       },
       uid: {
@@ -51,12 +55,15 @@ export const eventsGetTool: McpToolDefinition = {
       },
     },
     additionalProperties: false,
-    required: ['id'],
+    required: ['calendarId', 'id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; uid?: string }
+    const { calendarId, id } = args as { calendarId: string; id: string; uid?: string }
     const client = getClient()
-    return client.events.get(id as unknown as Parameters<typeof client.events.get>[0])
+    return client.events.get(
+      calendarId as unknown as Parameters<typeof client.events.get>[0],
+      id as unknown as Parameters<typeof client.events.get>[1]
+    )
   },
 }
 
@@ -102,7 +109,7 @@ export const eventsCreateTool: McpToolDefinition = {
         type: 'string',
       },
       status: {
-        description: 'Event status (cancelled/confirmed/none/tentative)',
+        description: 'Event status',
         type: 'string',
       },
       stampDate: {
@@ -110,8 +117,11 @@ export const eventsCreateTool: McpToolDefinition = {
         type: 'string',
       },
       excludedDates: {
-        description: 'Comma-separated exception dates for recurring events (ISO 8601)',
-        type: 'string',
+        description: 'Exception dates for recurring events',
+        type: 'array',
+        items: {
+          type: 'string',
+        },
       },
       url: {
         description: 'URL associated with the event',
@@ -136,6 +146,10 @@ export const eventsUpdateTool: McpToolDefinition = {
   inputSchema: {
     type: 'object',
     properties: {
+      calendarId: {
+        description: 'Calendar identifier (the calendar containing the event)',
+        type: 'string',
+      },
       id: {
         description: 'Event identifier (uid)',
         type: 'string',
@@ -169,12 +183,19 @@ export const eventsUpdateTool: McpToolDefinition = {
         type: 'string',
       },
       status: {
-        description: 'Event status (cancelled/confirmed/none/tentative)',
+        description: 'Event status',
         type: 'string',
       },
       stampDate: {
         description: 'Event modification date',
         type: 'string',
+      },
+      excludedDates: {
+        description: 'Exception dates for recurring events',
+        type: 'array',
+        items: {
+          type: 'string',
+        },
       },
       url: {
         description: 'URL associated with the event',
@@ -184,19 +205,17 @@ export const eventsUpdateTool: McpToolDefinition = {
         description: 'A unique event key',
         type: 'string',
       },
-      excludedDates: {
-        description: 'The exception dates for recurring events',
-        type: 'array',
-        items: {
-          type: 'string',
-        },
-      },
     },
     additionalProperties: false,
-    required: ['id'],
+    required: ['calendarId', 'id'],
   },
   handler: async (args) => {
-    const { id, ...updateFields } = args as {
+    const {
+      calendarId: calendarId,
+      id: id,
+      ...updateFields
+    } = args as {
+      calendarId: string
       id: string
       summary?: string
       description?: string
@@ -207,15 +226,15 @@ export const eventsUpdateTool: McpToolDefinition = {
       recurrence?: string
       status?: string
       stampDate?: string
+      excludedDates?: string[]
       url?: string
       uid?: string
-      excludedDates?: string[]
     }
-    void updateFields
     const client = getClient()
     return client.events.update(
-      id as unknown as Parameters<typeof client.events.update>[0],
-      updateFields as unknown as Parameters<typeof client.events.update>[1]
+      calendarId as unknown as Parameters<typeof client.events.update>[0],
+      id as unknown as Parameters<typeof client.events.update>[1],
+      updateFields as unknown as Parameters<typeof client.events.update>[2]
     )
   },
 }
@@ -229,6 +248,10 @@ export const eventsDeleteTool: McpToolDefinition = {
   inputSchema: {
     type: 'object',
     properties: {
+      calendarId: {
+        description: 'Calendar identifier (the calendar containing the event)',
+        type: 'string',
+      },
       id: {
         description: 'Event identifier (uid)',
         type: 'string',
@@ -239,12 +262,15 @@ export const eventsDeleteTool: McpToolDefinition = {
       },
     },
     additionalProperties: false,
-    required: ['id'],
+    required: ['calendarId', 'id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; uid?: string }
+    const { calendarId, id } = args as { calendarId: string; id: string; uid?: string }
     const client = getClient()
-    await client.events.delete(id as unknown as Parameters<typeof client.events.delete>[0])
+    await client.events.delete(
+      calendarId as unknown as Parameters<typeof client.events.delete>[0],
+      id as unknown as Parameters<typeof client.events.delete>[1]
+    )
     return { success: true, message: `Deleted Event ${id}` }
   },
 }

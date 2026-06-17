@@ -216,7 +216,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'string',
         },
         status: {
-          description: 'Event status (cancelled/confirmed/none/tentative)',
+          description: 'Event status',
           type: 'string',
         },
         stampDate: {
@@ -224,8 +224,11 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'string',
         },
         excludedDates: {
-          description: 'Comma-separated exception dates for recurring events (ISO 8601)',
-          type: 'string',
+          description: 'Exception dates for recurring events',
+          type: 'array',
+          items: {
+            type: 'string',
+          },
         },
         url: {
           description: 'URL associated with the event',
@@ -248,6 +251,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
         id: {
           description: 'Event identifier (uid)',
           type: 'string',
@@ -258,7 +265,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['calendarId', 'id'],
     },
   },
   {
@@ -273,8 +280,12 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
         id: {
-          description: 'Event identifier',
+          description: 'Event identifier (uid)',
           type: 'string',
         },
         uid: {
@@ -283,7 +294,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['calendarId', 'id'],
     },
   },
   {
@@ -334,6 +345,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
         id: {
           description: 'Event identifier (uid)',
           type: 'string',
@@ -367,12 +382,19 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'string',
         },
         status: {
-          description: 'Event status (cancelled/confirmed/none/tentative)',
+          description: 'Event status',
           type: 'string',
         },
         stampDate: {
           description: 'Event modification date',
           type: 'string',
+        },
+        excludedDates: {
+          description: 'Exception dates for recurring events',
+          type: 'array',
+          items: {
+            type: 'string',
+          },
         },
         url: {
           description: 'URL associated with the event',
@@ -382,16 +404,9 @@ export const capabilities: readonly CapabilityMetadata[] = [
           description: 'A unique event key',
           type: 'string',
         },
-        excludedDates: {
-          description: 'The exception dates for recurring events',
-          type: 'array',
-          items: {
-            type: 'string',
-          },
-        },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['calendarId', 'id'],
     },
   },
 ]

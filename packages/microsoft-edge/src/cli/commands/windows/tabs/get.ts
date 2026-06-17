@@ -13,7 +13,6 @@ export class GetTabCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  windowId = Option.String('--window-id', { required: true, description: 'Window ID' })
 
   tabId = Option.String({ required: true })
 

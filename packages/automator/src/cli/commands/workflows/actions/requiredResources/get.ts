@@ -13,11 +13,6 @@ export class GetRequiredResourceCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
-  automatorActionId = Option.String('--automator-action-id', {
-    required: true,
-    description: 'AutomatorAction ID',
-  })
 
   requiredResourceId = Option.String({ required: true })
 

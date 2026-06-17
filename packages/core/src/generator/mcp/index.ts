@@ -202,10 +202,26 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
   }`
 
     case 'get': {
-      const idProp = Object.keys(properties)[0] ?? 'id'
+      const methodRef = `client.${resourceName}.get`
+      if (required.length >= 2) {
+        // Two required params: first = parent id, last = child id.
+        const parentProp = required[0] ?? 'parentId'
+        const childProp = required[required.length - 1] ?? 'id'
+        const safeParent = safeIdentifier(parentProp)
+        const safeChild = safeIdentifier(childProp)
+        const getDestructured = [
+          safeParent !== parentProp ? `${parentProp}: ${safeParent}` : parentProp,
+          safeChild !== childProp ? `${childProp}: ${safeChild}` : childProp,
+        ].join(', ')
+        return `async (args) => {
+    const { ${getDestructured} } = args as ${argsType};
+    const client = getClient();
+    return client.${resourceName}.get(${safeParent} as unknown as Parameters<typeof ${methodRef}>[0], ${safeChild} as unknown as Parameters<typeof ${methodRef}>[1]);
+  }`
+      }
+      const idProp = required[0] ?? Object.keys(properties)[0] ?? 'id'
       const safeId = safeIdentifier(idProp)
       const getDestructured = safeId !== idProp ? `${idProp}: ${safeId}` : idProp
-      const methodRef = `client.${resourceName}.get`
       return `async (args) => {
     const { ${getDestructured} } = args as ${argsType};
     const client = getClient();
@@ -227,26 +243,58 @@ function generateResourceToolHandler(tool: GeneratedTool): string {
 
     case 'update': {
       const propNames = Object.keys(properties)
+      const methodRef = `client.${resourceName}.update`
+      if (required.length >= 2) {
+        // Two required params: first = parent id, last = child id.
+        // Strip both from the spread so updateFields contains only mutable fields.
+        const parentProp = required[0] ?? 'parentId'
+        const childProp = required[required.length - 1] ?? 'id'
+        const safeParent = safeIdentifier(parentProp)
+        const safeChild = safeIdentifier(childProp)
+        return `async (args) => {
+    const { ${parentProp}: ${safeParent}, ${childProp}: ${safeChild}, ...updateFields } = args as ${argsType};
+    const client = getClient();
+    return client.${resourceName}.update(${safeParent} as unknown as Parameters<typeof ${methodRef}>[0], ${safeChild} as unknown as Parameters<typeof ${methodRef}>[1], updateFields as unknown as Parameters<typeof ${methodRef}>[2]);
+  }`
+      }
       const idProp = required[0] ?? propNames[0] ?? 'id'
       const updateProps = propNames.filter((p) => p !== idProp)
-      const methodRef = `client.${resourceName}.update`
+      // When there are no mutable fields, updateFields is empty and unused — void it.
+      const voidLine = updateProps.length === 0 ? '\n    void updateFields;' : ''
       return `async (args) => {
-    const { ${idProp}, ...updateFields } = args as ${argsType};
-    void ${updateProps.length > 0 ? 'updateFields' : '0'};
+    const { ${idProp}, ...updateFields } = args as ${argsType};${voidLine}
     const client = getClient();
     return client.${resourceName}.update(${idProp} as unknown as Parameters<typeof ${methodRef}>[0], updateFields as unknown as Parameters<typeof ${methodRef}>[1]);
   }`
     }
 
     case 'delete': {
-      const idProp = Object.keys(properties)[0] ?? 'id'
       const resourceTypeName = tool.resourceType ?? 'Resource'
       const methodRef = `client.${resourceName}.delete`
+      if (required.length >= 2) {
+        // Two required params: first = parent id, last = child id.
+        const parentProp = required[0] ?? 'parentId'
+        const childProp = required[required.length - 1] ?? 'id'
+        const safeParent = safeIdentifier(parentProp)
+        const safeChild = safeIdentifier(childProp)
+        const deleteDestructured = [
+          safeParent !== parentProp ? `${parentProp}: ${safeParent}` : parentProp,
+          safeChild !== childProp ? `${childProp}: ${safeChild}` : childProp,
+        ].join(', ')
+        return `async (args) => {
+    const { ${deleteDestructured} } = args as ${argsType};
+    const client = getClient();
+    await client.${resourceName}.delete(${safeParent} as unknown as Parameters<typeof ${methodRef}>[0], ${safeChild} as unknown as Parameters<typeof ${methodRef}>[1]);
+    return { success: true, message: \`Deleted ${resourceTypeName} \${${safeChild}}\` };
+  }`
+      }
+      const idProp = required[0] ?? Object.keys(properties)[0] ?? 'id'
+      const safeId = safeIdentifier(idProp)
       return `async (args) => {
     const { ${idProp} } = args as ${argsType};
     const client = getClient();
-    await client.${resourceName}.delete(${idProp} as unknown as Parameters<typeof ${methodRef}>[0]);
-    return { success: true, message: \`Deleted ${resourceTypeName} \${${idProp}}\` };
+    await client.${resourceName}.delete(${safeId} as unknown as Parameters<typeof ${methodRef}>[0]);
+    return { success: true, message: \`Deleted ${resourceTypeName} \${${safeId}}\` };
   }`
     }
 

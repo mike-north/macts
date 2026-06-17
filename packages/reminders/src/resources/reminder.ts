@@ -42,7 +42,7 @@ export class ReminderResourceClient {
   }
 
   /**
-   * Delete a reminder.
+   * Delete an reminder.
    */
   async delete(id: string): Promise<void> {
     await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteReminder`, { id })

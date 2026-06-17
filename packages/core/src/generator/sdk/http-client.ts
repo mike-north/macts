@@ -836,25 +836,32 @@ ${methodBody}
 }
 
 /**
- * Resolve the request *parameter* name for a get/update/delete command.
+ * Resolve the request *parameter* names for a get/update/delete command.
  *
- * This MUST be the command's required parameter name (e.g. `id`, `name`,
- * `widgetName`) — the key the server's request schema (Zod) validates and the
- * value the SDK puts in the request body. It is matched exactly by the server's
- * `executeResourceCommand`, which binds its JXA lookup variable from the same
- * `command.parameters` required entry.
+ * Some commands have two required identifiers: a parent scope (e.g. `calendarId`
+ * for getEvent/updateEvent/deleteEvent) and the child identifier (e.g. `id`).
+ * The parent scope param is the first required param declared; the child id is
+ * the last required param. When there is only one required param it is the child
+ * identifier and there is no parent scope.
  *
- * It is NOT the resource's primary identifier *property* (`uid`,
- * `calendarIdentifier`): that name is for output canonicalization only. In the
- * shipped Calendar manifest, `getEvent` declares param `id` while the Event
- * property is `uid` — sending `{ uid }` would fail schema validation and emit
- * `byId(uid)` with no bound variable. The single source of truth for the
- * request key is therefore the command parameter, on both surfaces.
+ * The returned names MUST match exactly what the server's request schema (Zod)
+ * validates — they are the same `command.parameters` entries the server's
+ * `executeResourceCommand` reads to bind JXA lookup variables.
  *
  * @param command - The command definition for the CRUD operation.
  */
-function idParamName(command: Command): string {
-  return command.parameters.find((p) => p.required)?.name ?? 'id'
+function resolveIdParams(command: Command): {
+  parentParam: string | undefined
+  childParam: string
+} {
+  const requiredParams = command.parameters.filter((p) => p.required)
+  if (requiredParams.length >= 2) {
+    // First required = parent scope; last required = child identifier.
+    const parentParam = requiredParams[0]?.name
+    const childParam = requiredParams[requiredParams.length - 1]?.name ?? 'id'
+    return { parentParam, childParam }
+  }
+  return { parentParam: undefined, childParam: requiredParams[0]?.name ?? 'id' }
 }
 
 /**
@@ -921,6 +928,11 @@ function generateListMethod(
 
 /**
  * Generate the `get` method, routed by the backing command's key.
+ *
+ * When the command has a parent scope parameter (e.g. `calendarId` on `getEvent`),
+ * it is included as the first argument so the server can scope the JXA query to
+ * the correct parent collection — e.g. `app.calendars.whose({name:calendarId})[0]
+ * .events.byId(id)` instead of the broken `app.events.byId(id)`.
  */
 function generateGetMethod(
   commandKey: string,
@@ -928,13 +940,23 @@ function generateGetMethod(
   resourceName: string,
   nameLower: string
 ): string {
-  const id = idParamName(command)
+  const { parentParam, childParam } = resolveIdParams(command)
+  if (parentParam !== undefined) {
+    return `
+  /**
+   * Get a ${nameLower} by ${childParam} within a parent scope.
+   */
+  async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam} });
+  }
+`
+  }
   return `
   /**
-   * Get a ${nameLower} by ${id}.
+   * Get a ${nameLower} by ${childParam}.
    */
-  async get(${id}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id} });
+  async get(${childParam}: string): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam} });
   }
 `
 }
@@ -966,6 +988,12 @@ function generateCreateMethod(
 
 /**
  * Generate the `update` method, routed by the backing command's key.
+ *
+ * When the command has a parent scope parameter (e.g. `calendarId` on
+ * `updateEvent`), it is the first argument. The request body sends parent param,
+ * child id, and then only the defined fields from the update input — filtering
+ * out `undefined` values and identifier params so the server schema
+ * (`additionalProperties: false`) does not reject the request.
  */
 function generateUpdateMethod(
   commandKey: string,
@@ -973,28 +1001,56 @@ function generateUpdateMethod(
   resourceName: string,
   nameLower: string
 ): string {
-  const id = idParamName(command)
+  const { parentParam, childParam } = resolveIdParams(command)
+  if (parentParam !== undefined) {
+    return `
+  /**
+   * Update an existing ${nameLower} within a parent scope.
+   */
+  async update(${parentParam}: string, ${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+    const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
+    void _p;
+    const defined = Object.fromEntries(Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined));
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam}, ...defined });
+  }
+`
+  }
   return `
   /**
    * Update an existing ${nameLower}.
    */
-  async update(${id}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id}, ...input });
+  async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
+    const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam}, ...defined });
   }
 `
 }
 
 /**
  * Generate the `delete` method, routed by the backing command's key.
+ *
+ * When the command has a parent scope parameter (e.g. `calendarId` on
+ * `deleteEvent`), it is the first argument so the server can scope the JXA
+ * query to the correct parent collection.
  */
 function generateDeleteMethod(commandKey: string, command: Command, nameLower: string): string {
-  const id = idParamName(command)
+  const { parentParam, childParam } = resolveIdParams(command)
+  if (parentParam !== undefined) {
+    return `
+  /**
+   * Delete an ${nameLower} within a parent scope.
+   */
+  async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam} });
+  }
+`
+  }
   return `
   /**
-   * Delete a ${nameLower}.
+   * Delete an ${nameLower}.
    */
-  async delete(${id}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${id} });
+  async delete(${childParam}: string): Promise<void> {
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam} });
   }
 `
 }

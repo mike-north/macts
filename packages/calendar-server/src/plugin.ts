@@ -618,9 +618,15 @@ export const calendarApiPlugin = {
         resourceType: 'Event',
         parameters: [
           {
+            name: 'calendarId',
+            type: 'string',
+            description: 'Calendar identifier (the calendar containing the event)',
+            required: true,
+          },
+          {
             name: 'id',
             type: 'string',
-            description: 'Event identifier',
+            description: 'Event identifier (uid)',
             required: true,
           },
         ],
@@ -683,8 +689,10 @@ export const calendarApiPlugin = {
           },
           {
             name: 'status',
-            type: 'string',
-            description: 'Event status (cancelled/confirmed/none/tentative)',
+            type: {
+              enum: 'EventStatus',
+            },
+            description: 'Event status',
             required: false,
           },
           {
@@ -695,8 +703,10 @@ export const calendarApiPlugin = {
           },
           {
             name: 'excludedDates',
-            type: 'string',
-            description: 'Comma-separated exception dates for recurring events (ISO 8601)',
+            type: {
+              array: 'date',
+            },
+            description: 'Exception dates for recurring events',
             required: false,
           },
           {
@@ -715,6 +725,12 @@ export const calendarApiPlugin = {
         scope: 'resource',
         resourceType: 'Event',
         parameters: [
+          {
+            name: 'calendarId',
+            type: 'string',
+            description: 'Calendar identifier (the calendar containing the event)',
+            required: true,
+          },
           {
             name: 'id',
             type: 'string',
@@ -765,14 +781,24 @@ export const calendarApiPlugin = {
           },
           {
             name: 'status',
-            type: 'string',
-            description: 'Event status (cancelled/confirmed/none/tentative)',
+            type: {
+              enum: 'EventStatus',
+            },
+            description: 'Event status',
             required: false,
           },
           {
             name: 'stampDate',
             type: 'date',
             description: 'Event modification date',
+            required: false,
+          },
+          {
+            name: 'excludedDates',
+            type: {
+              array: 'date',
+            },
+            description: 'Exception dates for recurring events',
             required: false,
           },
           {
@@ -791,6 +817,12 @@ export const calendarApiPlugin = {
         scope: 'resource',
         resourceType: 'Event',
         parameters: [
+          {
+            name: 'calendarId',
+            type: 'string',
+            description: 'Calendar identifier (the calendar containing the event)',
+            required: true,
+          },
           {
             name: 'id',
             type: 'string',
