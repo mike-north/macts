@@ -89,10 +89,15 @@ const runtimePropertyResource: Resource = {
 }
 
 describe('buildListCommandCode — identifier population', () => {
-  it('reads the manifest primary identifier property', () => {
+  it('reads the manifest primary identifier property via batched properties()', () => {
+    // Issue #89: the list JXA now calls item.properties() once per item (not once
+    // per property per item) and reads the identifier from the returned record.
     const code = buildListCommandCode(calendarResource, '')
-    // The executor must read `calendarIdentifier()` so the value is in output.
-    expect(code).toContain('obj.calendarIdentifier = item.calendarIdentifier();')
+    // Batched form: identifier read from the properties() record, no per-field call.
+    expect(code).toContain('var props = item.properties();')
+    expect(code).toContain('obj.calendarIdentifier = props.calendarIdentifier;')
+    // Must NOT use the old per-field method-call form (issue #89 regression guard).
+    expect(code).not.toContain('item.calendarIdentifier()')
   })
 
   it('reads the configured identifier WITHOUT a swallowing try/catch', () => {
@@ -101,7 +106,7 @@ describe('buildListCommandCode — identifier population', () => {
     // leaving items with no usable id and no signal. The identifier read must be
     // emitted unswallowed so a misconfigured identifier surfaces as a real error.
     const code = buildListCommandCode(calendarResource, '')
-    expect(code).not.toContain('try { obj.calendarIdentifier = item.calendarIdentifier(); } catch')
+    expect(code).not.toContain('try { obj.calendarIdentifier = props.calendarIdentifier; } catch')
   })
 
   it('exposes the identifier under the canonical `id` key', () => {
@@ -114,22 +119,27 @@ describe('buildListCommandCode — identifier population', () => {
   it('sources the canonical id from the runtime property for byProperty resources', () => {
     // For the shipped #81 Calendar fix, the primary identifier property IS the
     // runtime-working `name`, so list reads `name` unswallowed and the canonical
-    // `id` mirrors it.
+    // `id` mirrors it. With batched reads, `name` comes from props.name.
     const code = buildListCommandCode(byPropertyCalendarResource, '')
-    expect(code).toContain('obj.name = item.name();')
+    expect(code).toContain('var props = item.properties();')
+    expect(code).toContain('obj.name = props.name;')
     expect(code).toContain('obj.id = obj.name;')
-    // `name` is the identifier here, so it is read unswallowed (not in a catch).
-    expect(code).not.toContain('try { obj.name = item.name(); } catch')
+    // `name` is the identifier — must not be in a swallowing catch.
+    expect(code).not.toContain('try { obj.name = props.name; } catch')
+    // Must NOT use old per-field method-call form (issue #89 regression guard).
+    expect(code).not.toContain('item.name()')
   })
 
   it('does NOT call the non-runtime-valid declared identifier accessor (runtimeProperty case)', () => {
     // When the declared identifier (`calendarIdentifier`) throws at runtime and a
     // distinct `runtimeProperty` (`name`) is used, list must NOT emit
     // `item.calendarIdentifier()` — that re-introduces the runtime throw.
+    // With batched reads this is naturally avoided: we never call individual
+    // property accessors as methods.
     const code = buildListCommandCode(runtimePropertyResource, '')
-    expect(code).not.toContain('item.calendarIdentifier();')
-    // It reads the working property unswallowed and aliases the canonical id.
-    expect(code).toContain('obj.name = item.name();')
+    expect(code).not.toContain('item.calendarIdentifier()')
+    // The working property read flows from props; the canonical id mirrors it.
+    expect(code).toContain('obj.name = props.name;')
     expect(code).toContain('obj.id = obj.name;')
   })
 
@@ -153,8 +163,12 @@ describe('buildListCommandCode — identifier population', () => {
       identifiers: [{ property: 'calendarIdentifier', primary: true }],
     }
     const code = buildListCommandCode(resourceWithIdOnlyInIdentifiers, '')
-    expect(code).toContain('obj.calendarIdentifier = item.calendarIdentifier();')
+    // Batched: identifier read from props record.
+    expect(code).toContain('var props = item.properties();')
+    expect(code).toContain('obj.calendarIdentifier = props.calendarIdentifier;')
     expect(code).toContain('obj.id = obj.calendarIdentifier;')
+    // Must NOT use old per-field method-call form.
+    expect(code).not.toContain('item.calendarIdentifier()')
   })
 
   it('handles a resource with no identifier gracefully (no canonical alias)', () => {
@@ -169,15 +183,24 @@ describe('buildListCommandCode — identifier population', () => {
       },
     }
     const code = buildListCommandCode(widget, '')
-    expect(code).toContain('obj.label = item.label();')
+    // Batched: label read from props record, no per-field method call.
+    expect(code).toContain('var props = item.properties();')
+    expect(code).toContain('props.label !== undefined')
+    expect(code).toContain('obj.label = props.label')
     expect(code).not.toContain('obj.id =')
+    // Must NOT use old per-field method-call form (issue #89 regression guard).
+    expect(code).not.toContain('item.label()')
   })
 
   it('handles an undefined resource gracefully', () => {
     const code = buildListCommandCode(undefined, '')
-    // Falls back to reading `name`; no identifier alias.
-    expect(code).toContain('obj.name = item.name();')
+    // Falls back to reading `name` from batched properties(); no identifier alias.
+    expect(code).toContain('var props = item.properties();')
+    expect(code).toContain('props.name !== undefined')
+    expect(code).toContain('obj.name = props.name')
     expect(code).not.toContain('obj.id =')
+    // Must NOT use old per-field method-call form.
+    expect(code).not.toContain('item.name()')
   })
 })
 

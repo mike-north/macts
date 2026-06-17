@@ -439,24 +439,38 @@ export function buildListCommandCode(
       ? declaredIdProperty
       : undefined
 
-  // Non-identifier property reads stay best-effort: individual items may
-  // legitimately throw for some optional properties, and one bad property must
-  // not fail the whole listing. The runtime-identifier property is excluded here
-  // and emitted separately (unswallowed) below, as is any non-runtime-valid
-  // declared identifier (skipPropertyRead).
+  // Non-identifier properties are copied from the batched properties() record
+  // rather than called one-by-one. The runtime-identifier property is excluded
+  // here and emitted separately (unswallowed) below, as is any non-runtime-valid
+  // declared identifier (skipPropertyRead) — the alias below mirrors the working
+  // property into the declared identifier key so output shape is preserved.
+  //
+  // Issue #89: the per-property accessor loop (item.p1(); item.p2(); ...) was
+  // O(items × properties) AppleEvents. For 35 Calendar events × 13 properties
+  // that is ~455 round-trips / 37 s — enough to exceed the JXA runner timeout.
+  // item.properties() is ONE AppleEvent per item, collapsing N×M to ~N.
   const bestEffortProps = allPropNames.filter(
     (p) => p !== runtimeIdProperty && p !== skipPropertyRead
   )
 
-  const propReads = bestEffortProps
-    .map((p) => `try { obj.${p} = item.${p}(); } catch(e) {}`)
-    .join('\n        ')
+  // Batch all non-id property reads into a single item.properties() call.
+  // Fields absent from the returned record are simply undefined — the same
+  // graceful outcome as the old per-field try/catch. We read props once and
+  // copy the manifest-declared keys out of it.
+  const propReads =
+    bestEffortProps.length > 0
+      ? `var props = item.properties();\n        ${bestEffortProps
+          .map((p) => `if (props.${p} !== undefined) { obj.${p} = props.${p}; }`)
+          .join('\n        ')}`
+      : `var props = item.properties();`
 
   // The runtime identifier read is emitted WITHOUT a swallowing catch so a
   // misconfigured identifier surfaces as a real error rather than a silent
-  // empty id (the regression issue #81 documents).
+  // empty id (the regression issue #81 documents). With the batched approach
+  // the value is read from the already-fetched props record — no extra
+  // AppleEvent — but the intentional absence of error-suppression is preserved.
   const idRead =
-    runtimeIdProperty !== undefined ? `obj.${runtimeIdProperty} = item.${runtimeIdProperty}();` : ''
+    runtimeIdProperty !== undefined ? `obj.${runtimeIdProperty} = props.${runtimeIdProperty};` : ''
 
   // Expose the runtime identifier value under the canonical `id` key so a
   // consumer can always read `item.id` regardless of the app's property name.
@@ -539,7 +553,8 @@ export function buildListCommandCode(
       ${paramAssignments}
       // List ${resourcePlural}
       var items = ${collectionExpr};
-      // Convert JXA references to plain objects by accessing each property
+      // Batch all property reads: one item.properties() call per item instead of
+      // one accessor per property per item. Collapses N×M AppleEvents to ~N.
       var result = [];
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
