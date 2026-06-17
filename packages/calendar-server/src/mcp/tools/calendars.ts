@@ -43,10 +43,10 @@ export const calendarsGetTool: McpToolDefinition = {
       },
     },
     additionalProperties: false,
-    required: ['id', 'name'],
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; name: string }
+    const { id } = args as { id: string; name?: string }
     const client = getClient()
     return client.calendars.get(id as unknown as Parameters<typeof client.calendars.get>[0])
   },

@@ -51,10 +51,10 @@ export const eventsGetTool: McpToolDefinition = {
       },
     },
     additionalProperties: false,
-    required: ['id', 'uid'],
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; uid: string }
+    const { id } = args as { id: string; uid?: string }
     const client = getClient()
     return client.events.get(id as unknown as Parameters<typeof client.events.get>[0])
   },

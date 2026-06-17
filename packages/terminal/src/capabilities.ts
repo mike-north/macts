@@ -124,7 +124,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['name', 'tty'],
+      required: ['name'],
     },
   },
   {

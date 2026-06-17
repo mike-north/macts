@@ -26,9 +26,9 @@ export const automatoractionsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { workflowName } = args as { workflowName: string }
-    void workflowName
+
     const client = getClient()
-    return client.automatoractions.list()
+    return client.automatoractions.list(workflowName)
   },
 }
 

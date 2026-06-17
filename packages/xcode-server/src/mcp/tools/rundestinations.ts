@@ -26,9 +26,9 @@ export const rundestinationsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
-    void workspaceName
+
     const client = getClient()
-    return client.rundestinations.list()
+    return client.rundestinations.list(workspaceName)
   },
 }
 

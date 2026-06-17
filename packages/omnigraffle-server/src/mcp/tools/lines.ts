@@ -26,9 +26,9 @@ export const linesListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { canvasId } = args as { canvasId: string }
-    void canvasId
+
     const client = getClient()
-    return client.lines.list()
+    return client.lines.list(canvasId)
   },
 }
 
