@@ -89,17 +89,30 @@ const runtimePropertyResource: Resource = {
 }
 
 describe('buildListCommandCode — identifier population', () => {
-  it('reads the manifest primary identifier property', () => {
+  it('reads the manifest primary identifier property via the fast-path properties() record', () => {
+    // Issue #89: the list JXA now attempts item.properties() (fast path) and
+    // reads the identifier from the returned record. A per-field fallback is also
+    // emitted in the catch branch for resources whose properties() call throws.
     const code = buildListCommandCode(calendarResource, '')
-    // The executor must read `calendarIdentifier()` so the value is in output.
+    // Fast path: properties() call must be present (inside the try block).
+    expect(code).toContain('item.properties()')
+    // Fast-path identifier read: from the props record.
+    expect(code).toContain('obj.calendarIdentifier = props.calendarIdentifier;')
+    // Fallback identifier read: from item directly (catch branch).
     expect(code).toContain('obj.calendarIdentifier = item.calendarIdentifier();')
   })
 
-  it('reads the configured identifier WITHOUT a swallowing try/catch', () => {
-    // Bug guard (#81): the live `calendars.list` wrapped the identifier read in
-    // `try { ... } catch(e) {}`, silently swallowing the runtime failure and
-    // leaving items with no usable id and no signal. The identifier read must be
-    // emitted unswallowed so a misconfigured identifier surfaces as a real error.
+  it('reads the configured identifier WITHOUT a swallowing try/catch in the fast path', () => {
+    // Bug guard (#81): the identifier read must be emitted unswallowed so a
+    // misconfigured identifier surfaces as a real error rather than silent empty output.
+    // This applies to the fast-path read from props (not wrapped in try/catch).
+    const code = buildListCommandCode(calendarResource, '')
+    expect(code).not.toContain('try { obj.calendarIdentifier = props.calendarIdentifier; } catch')
+  })
+
+  it('reads the configured identifier WITHOUT a swallowing try/catch in the fallback path', () => {
+    // Same #81 guard for the fallback path: the per-field fallback identifier
+    // read (item.calendarIdentifier()) must also be unswallowed.
     const code = buildListCommandCode(calendarResource, '')
     expect(code).not.toContain('try { obj.calendarIdentifier = item.calendarIdentifier(); } catch')
   })
@@ -114,22 +127,31 @@ describe('buildListCommandCode — identifier population', () => {
   it('sources the canonical id from the runtime property for byProperty resources', () => {
     // For the shipped #81 Calendar fix, the primary identifier property IS the
     // runtime-working `name`, so list reads `name` unswallowed and the canonical
-    // `id` mirrors it.
+    // `id` mirrors it. In the fast path `name` comes from props.name; in the
+    // fallback it is read directly as item.name().
     const code = buildListCommandCode(byPropertyCalendarResource, '')
-    expect(code).toContain('obj.name = item.name();')
+    // Fast path: properties() present and identifier from props.
+    expect(code).toContain('item.properties()')
+    expect(code).toContain('obj.name = props.name;')
     expect(code).toContain('obj.id = obj.name;')
-    // `name` is the identifier here, so it is read unswallowed (not in a catch).
+    // Fast-path identifier must not be in a swallowing catch.
+    expect(code).not.toContain('try { obj.name = props.name; } catch')
+    // Fallback path: identifier read directly from item, also unswallowed.
+    expect(code).toContain('obj.name = item.name();')
     expect(code).not.toContain('try { obj.name = item.name(); } catch')
   })
 
-  it('does NOT call the non-runtime-valid declared identifier accessor (runtimeProperty case)', () => {
+  it('does NOT call the non-runtime-valid declared identifier accessor in a per-field loop (runtimeProperty case)', () => {
     // When the declared identifier (`calendarIdentifier`) throws at runtime and a
-    // distinct `runtimeProperty` (`name`) is used, list must NOT emit
-    // `item.calendarIdentifier()` — that re-introduces the runtime throw.
+    // distinct `runtimeProperty` (`name`) is used, `calendarIdentifier` must be
+    // listed in skipPropertyRead — it must NOT appear in the per-field fallback
+    // loop as a swallowed try/catch accessor, because that re-introduces the throw
+    // in a confusing way. The value is instead mirrored from the working property.
     const code = buildListCommandCode(runtimePropertyResource, '')
-    expect(code).not.toContain('item.calendarIdentifier();')
-    // It reads the working property unswallowed and aliases the canonical id.
-    expect(code).toContain('obj.name = item.name();')
+    // The per-field fallback must NOT contain a swallowed read of calendarIdentifier.
+    expect(code).not.toContain('try { obj.calendarIdentifier = item.calendarIdentifier(); } catch')
+    // The working property read (fast path) and canonical id alias must still be present.
+    expect(code).toContain('obj.name = props.name;')
     expect(code).toContain('obj.id = obj.name;')
   })
 
@@ -153,8 +175,14 @@ describe('buildListCommandCode — identifier population', () => {
       identifiers: [{ property: 'calendarIdentifier', primary: true }],
     }
     const code = buildListCommandCode(resourceWithIdOnlyInIdentifiers, '')
-    expect(code).toContain('obj.calendarIdentifier = item.calendarIdentifier();')
+    // Fast path: properties() call present; identifier read from props record.
+    expect(code).toContain('item.properties()')
+    expect(code).toContain('obj.calendarIdentifier = props.calendarIdentifier;')
     expect(code).toContain('obj.id = obj.calendarIdentifier;')
+    // Fallback path: identifier read directly from item (in catch branch).
+    expect(code).toContain('obj.calendarIdentifier = item.calendarIdentifier();')
+    // Must NOT be in a per-field swallowed loop (identifier reads are unswallowed).
+    expect(code).not.toContain('try { obj.calendarIdentifier = item.calendarIdentifier(); } catch')
   })
 
   it('handles a resource with no identifier gracefully (no canonical alias)', () => {
@@ -169,14 +197,23 @@ describe('buildListCommandCode — identifier population', () => {
       },
     }
     const code = buildListCommandCode(widget, '')
-    expect(code).toContain('obj.label = item.label();')
+    // Fast path: properties() present; label written from props record.
+    expect(code).toContain('item.properties()')
+    expect(code).toContain('props.label !== undefined')
+    expect(code).toContain('obj.label = props.label')
+    // Fallback path: label read per-field in catch branch.
+    expect(code).toContain('try { obj.label = item.label(); } catch(e) {}')
     expect(code).not.toContain('obj.id =')
   })
 
   it('handles an undefined resource gracefully', () => {
     const code = buildListCommandCode(undefined, '')
-    // Falls back to reading `name`; no identifier alias.
-    expect(code).toContain('obj.name = item.name();')
+    // Fast path: properties() present; name written from props record.
+    expect(code).toContain('item.properties()')
+    expect(code).toContain('props.name !== undefined')
+    expect(code).toContain('obj.name = props.name')
+    // Fallback path: name read per-field in catch branch.
+    expect(code).toContain('try { obj.name = item.name(); } catch(e) {}')
     expect(code).not.toContain('obj.id =')
   })
 })
