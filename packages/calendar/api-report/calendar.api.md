@@ -171,12 +171,12 @@ export interface EventCreateInput {
     calendarId: string;
     description?: string;
     endDate: Date;
-    excludedDates?: string;
+    excludedDates?: Date[];
     location?: string;
     recurrence?: string;
     stampDate?: Date;
     startDate: Date;
-    status?: string;
+    status?: EventStatus;
     summary: string;
     url?: string;
 }

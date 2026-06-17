@@ -310,10 +310,14 @@ function generateTypesFile(manifest: AppManifest): string {
         // Command parameters override/augment writable properties. A required
         // command parameter (typically an identifier like `calendarId`) is
         // surfaced as a required field.
+        //
+        // `param.type` is `string | Record<string, string>` from the schema.
+        // When it is an object it is structurally compatible with `PropertyType`
+        // (e.g. `{ enum: 'EventStatus' }`, `{ array: 'date' }`), so we cast
+        // directly rather than falling back to 'string', which would widen
+        // enum and array types unnecessarily.
         createFields.set(param.name, {
-          tsType: propertyTypeToTs(
-            typeof param.type === 'string' ? (param.type as PropertyType) : 'string'
-          ),
+          tsType: propertyTypeToTs(param.type as PropertyType),
           required: param.required,
           doc: param.description,
         })
@@ -446,24 +450,33 @@ function generateClientFile(
     .map(([r]) => `import { ${r}ResourceClient } from './resources/${r.toLowerCase()}.js';`)
     .join('\n')
 
-  // Find enum types used in app-level commands
-  const enumsUsedInCommands = new Set<string>()
+  // Find enum and resource types used in app-level commands that must be
+  // imported from './types.js' in the generated client file.
+  const typesUsedInAppCommands = new Set<string>()
   for (const cmd of Object.values(manifest.commands)) {
     if (cmd.scope === 'application') {
       for (const param of cmd.parameters) {
-        // Check if type is an enum reference
         const paramType = param.type as PropertyType | undefined
-        if (typeof paramType === 'object' && 'enum' in paramType) {
-          enumsUsedInCommands.add(paramType.enum)
-        } else if (typeof paramType === 'string' && manifest.enums[paramType]) {
-          enumsUsedInCommands.add(paramType)
+        if (typeof paramType === 'object') {
+          if ('enum' in paramType) {
+            // Enum reference: the type name is the enum's name directly
+            typesUsedInAppCommands.add(paramType.enum)
+          } else if ('resource' in paramType) {
+            // Resource reference: capitalise to match the generated interface name
+            const name = paramType.resource.charAt(0).toUpperCase() + paramType.resource.slice(1)
+            typesUsedInAppCommands.add(name)
+          }
+        } else if (typeof paramType === 'string') {
+          if (manifest.enums[paramType]) {
+            typesUsedInAppCommands.add(paramType)
+          }
         }
       }
     }
   }
   const enumImports =
-    enumsUsedInCommands.size > 0
-      ? `import type { ${Array.from(enumsUsedInCommands).join(', ')} } from './types.js';`
+    typesUsedInAppCommands.size > 0
+      ? `import type { ${Array.from(typesUsedInAppCommands).join(', ')} } from './types.js';`
       : ''
 
   const resourceProperties = operationalResources
@@ -901,9 +914,7 @@ function generateListMethod(
   // Build the parameter signature and body for required params only.
   const signature = requiredParams
     .map((p) => {
-      const tsType = propertyTypeToTs(
-        typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
-      )
+      const tsType = propertyTypeToTs(p.type as PropertyType)
       return `${safeIdentifier(p.name)}: ${tsType}`
     })
     .join(', ')
@@ -1069,9 +1080,7 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
   })
   const signature = sortedParams
     .map((p) => {
-      const tsType = propertyTypeToTs(
-        typeof p.type === 'string' ? (p.type as PropertyType) : 'string'
-      )
+      const tsType = propertyTypeToTs(p.type as PropertyType)
       const optional = !p.required ? '?' : ''
       return `${safeIdentifier(p.name)}${optional}: ${tsType}`
     })

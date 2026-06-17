@@ -291,6 +291,11 @@ describe('@macts/calendar events update and delete', () => {
     // ISO strings; the RPC server deserialises them back to Date before JXA.
     expect(body).toContain('startDate: Date;')
     expect(body).toContain('endDate: Date;')
+    expect(body).toContain('stampDate?: Date;')
+    // excludedDates is an array of date, not a comma-separated string.
+    expect(body).toContain('excludedDates?: Date[];')
+    // status references the EventStatus enum, not widened to string.
+    expect(body).toContain('status?: EventStatus;')
   })
 
   it('updateEvent has mutable event fields as optional parameters', () => {
@@ -302,7 +307,9 @@ describe('@macts/calendar events update and delete', () => {
     // Required fields: parent (calendarId) + child identifier (id).
     const requiredParams = cmd?.parameters.filter((p) => p.required).map((p) => p.name) ?? []
     expect(requiredParams).toEqual(['calendarId', 'id'])
-    // Core mutable fields must be optional params.
+    // ALL mutable event properties must be optional params — this guards against
+    // regressions where a newly-added writable field disappears from the manifest.
+    // Cross-checked against the Event resource's `access: rw` properties.
     expect(paramNames).toContain('summary')
     expect(paramNames).toContain('description')
     expect(paramNames).toContain('location')
@@ -311,7 +318,9 @@ describe('@macts/calendar events update and delete', () => {
     expect(paramNames).toContain('recurrence')
     expect(paramNames).toContain('status')
     expect(paramNames).toContain('alldayEvent')
+    expect(paramNames).toContain('stampDate')
     expect(paramNames).toContain('excludedDates')
+    expect(paramNames).toContain('url')
   })
 })
 

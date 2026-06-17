@@ -99,11 +99,11 @@ export interface EventCreateInput {
   /** The iCalendar (RFC 2445) recurrence string */
   recurrence?: string
   /** Event status */
-  status?: string
+  status?: EventStatus
   /** Event modification date */
   stampDate?: Date
   /** Exception dates for recurring events */
-  excludedDates?: string
+  excludedDates?: Date[]
   /** URL associated with the event */
   url?: string
   /** Calendar identifier for the event */

@@ -318,7 +318,7 @@ export type MailboxUpdateInput = Partial<MailboxCreateInput>;
 // @public
 export class MailClient {
     constructor(options: MailClientOptions);
-    checkForNewMail(_for?: string): Promise<void>;
+    checkForNewMail(_for?: Account): Promise<void>;
     _delete(): Promise<void>;
     duplicate(to?: string, withProperties?: unknown): Promise<void>;
     extractAddressFrom(): Promise<void>;
@@ -330,8 +330,8 @@ export class MailClient {
     readonly messages: MessageResourceClient;
     move(to: string): Promise<void>;
     readonly outgoingmessages: OutgoingMessageResourceClient;
-    performMailActionWithMessages(inMailboxes?: string, forRule?: string): Promise<void>;
-    synchronize(_with: string): Promise<void>;
+    performMailActionWithMessages(inMailboxes?: Mailbox, forRule?: Rule): Promise<void>;
+    synchronize(_with: Account): Promise<void>;
 }
 
 // @public

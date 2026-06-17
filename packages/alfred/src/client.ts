@@ -104,7 +104,7 @@ export class AlfredClient {
   /**
    * Show Alfred actions for the given file
    */
-  async action(items: string, asType?: string): Promise<void> {
+  async action(items: string[], asType?: string): Promise<void> {
     await this.#httpClient.rpc<undefined>('alfred.app.action', { items, asType })
   }
 
