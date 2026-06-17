@@ -369,7 +369,9 @@ describe('probeManifest', () => {
 
     await probeManifest(makeManifest(), runner, { now: PROBE_TIME })
 
-    const propertyBodies = capturedBodies.filter((b) => !b.includes('return items ? items.length : 0'))
+    const propertyBodies = capturedBodies.filter(
+      (b) => !b.includes('return items ? items.length : 0')
+    )
     expect(propertyBodies.length).toBeGreaterThan(0)
 
     for (const body of propertyBodies) {
