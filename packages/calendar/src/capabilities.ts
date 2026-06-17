@@ -147,13 +147,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
           description: 'Calendar identifier',
           type: 'string',
         },
-        calendarIdentifier: {
-          description: 'A unique calendar key',
+        name: {
+          description: 'The calendar title',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['id', 'calendarIdentifier'],
+      required: ['id', 'name'],
     },
   },
   {

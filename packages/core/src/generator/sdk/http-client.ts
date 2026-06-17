@@ -9,7 +9,11 @@
 
 import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
-import { CANONICAL_IDENTIFIER_KEY, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
+import {
+  CANONICAL_IDENTIFIER_KEY,
+  resolveIdentifierTargeting,
+  resolvePrimaryIdentifierProperty,
+} from '../../manifest/index.js'
 import { propertyTypeToTs } from '../types.js'
 
 /**
@@ -248,7 +252,13 @@ function generateTypesFile(manifest: AppManifest): string {
     // regardless of the app-specific identifier property name. Surface that field
     // on the read type so it is type-visible — unless the manifest already
     // declares a property literally named `id` (then `id` is a regular property).
-    const idProperty = resolvePrimaryIdentifierProperty(resource)
+    //
+    // The value mirrors the RUNTIME targeting property, not necessarily the
+    // declared identifier: a `byProperty` resource (e.g. Calendar, whose declared
+    // `calendarIdentifier` throws via JXA) surfaces its working property (`name`),
+    // since that is the value get/delete/create accept as the lookup.
+    const targeting = resolveIdentifierTargeting(resource)
+    const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
     const emitCanonicalId =
       idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
 
@@ -336,8 +346,10 @@ function generateTypesFile(manifest: AppManifest): string {
   lines.push('')
   for (const [resourceName, resource] of Object.entries(manifest.resources)) {
     // Mirror the canonical `id` field added to the read type, so runtime
-    // validation accepts the identifier the list output surfaces.
-    const idProperty = resolvePrimaryIdentifierProperty(resource)
+    // validation accepts the identifier the list output surfaces. Uses the same
+    // runtime-targeting-aware resolution as the read type above.
+    const targeting = resolveIdentifierTargeting(resource)
+    const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
     const emitCanonicalId =
       idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
 
