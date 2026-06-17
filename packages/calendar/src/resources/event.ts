@@ -4,7 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
-import type { Event, EventCreateInput } from '../types.js'
+import type { Event, EventCreateInput, EventUpdateInput } from '../types.js'
 
 /**
  * Client for a calendar event.
@@ -39,6 +39,20 @@ export class EventResourceClient {
    */
   async create(input: EventCreateInput): Promise<Event> {
     return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.createEvent`, input)
+  }
+
+  /**
+   * Update an existing event.
+   */
+  async update(id: string, input: EventUpdateInput): Promise<Event> {
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.updateEvent`, { id, ...input })
+  }
+
+  /**
+   * Delete a event.
+   */
+  async delete(id: string): Promise<void> {
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteEvent`, { id })
   }
 
   /**

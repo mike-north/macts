@@ -98,15 +98,90 @@ export const eventsCreateTool: McpToolDefinition = {
         type: 'boolean',
       },
       recurrence: {
-        description: 'The iCalendar (RFC 2445) string describing the event recurrence, if defined',
+        description: 'The iCalendar (RFC 2445) recurrence string',
         type: 'string',
       },
       status: {
-        description: 'The event status',
+        description: 'Event status (cancelled/confirmed/none/tentative)',
         type: 'string',
       },
       stampDate: {
-        description: 'The event modification date',
+        description: 'Event modification date',
+        type: 'string',
+      },
+      excludedDates: {
+        description: 'Comma-separated exception dates for recurring events (ISO 8601)',
+        type: 'string',
+      },
+      url: {
+        description: 'URL associated with the event',
+        type: 'string',
+      },
+    },
+    additionalProperties: false,
+    required: ['calendarId', 'summary', 'startDate', 'endDate'],
+  },
+  handler: async (args) => {
+    const client = getClient()
+    return client.events.create(args as Parameters<typeof client.events.create>[0])
+  },
+}
+
+/**
+ * Update an existing event
+ */
+export const eventsUpdateTool: McpToolDefinition = {
+  name: 'macts__calendar__events_update',
+  description: 'Update an existing event',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      id: {
+        description: 'Event identifier (uid)',
+        type: 'string',
+      },
+      summary: {
+        description: 'Event title',
+        type: 'string',
+      },
+      description: {
+        description: 'Event notes',
+        type: 'string',
+      },
+      location: {
+        description: 'Event location',
+        type: 'string',
+      },
+      startDate: {
+        description: 'Event start date',
+        type: 'string',
+      },
+      endDate: {
+        description: 'Event end date',
+        type: 'string',
+      },
+      alldayEvent: {
+        description: 'Whether this is an all-day event',
+        type: 'boolean',
+      },
+      recurrence: {
+        description: 'The iCalendar (RFC 2445) recurrence string',
+        type: 'string',
+      },
+      status: {
+        description: 'Event status (cancelled/confirmed/none/tentative)',
+        type: 'string',
+      },
+      stampDate: {
+        description: 'Event modification date',
+        type: 'string',
+      },
+      url: {
+        description: 'URL associated with the event',
+        type: 'string',
+      },
+      uid: {
+        description: 'A unique event key',
         type: 'string',
       },
       excludedDates: {
@@ -116,27 +191,61 @@ export const eventsCreateTool: McpToolDefinition = {
           type: 'string',
         },
       },
-      url: {
-        description: 'The URL associated with the event',
+    },
+    additionalProperties: false,
+    required: ['id'],
+  },
+  handler: async (args) => {
+    const { id, ...updateFields } = args as {
+      id: string
+      summary?: string
+      description?: string
+      location?: string
+      startDate?: string
+      endDate?: string
+      alldayEvent?: boolean
+      recurrence?: string
+      status?: string
+      stampDate?: string
+      url?: string
+      uid?: string
+      excludedDates?: string[]
+    }
+    void updateFields
+    const client = getClient()
+    return client.events.update(
+      id as unknown as Parameters<typeof client.events.update>[0],
+      updateFields as unknown as Parameters<typeof client.events.update>[1]
+    )
+  },
+}
+
+/**
+ * Delete an event by ID
+ */
+export const eventsDeleteTool: McpToolDefinition = {
+  name: 'macts__calendar__events_delete',
+  description: 'Delete an event by ID',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      id: {
+        description: 'Event identifier (uid)',
+        type: 'string',
+      },
+      uid: {
+        description: 'A unique event key',
         type: 'string',
       },
     },
     additionalProperties: false,
-    required: [
-      'calendarId',
-      'summary',
-      'startDate',
-      'endDate',
-      'recurrence',
-      'status',
-      'stampDate',
-      'excludedDates',
-      'url',
-    ],
+    required: ['id'],
   },
   handler: async (args) => {
+    const { id } = args as { id: string; uid?: string }
     const client = getClient()
-    return client.events.create(args as Parameters<typeof client.events.create>[0])
+    await client.events.delete(id as unknown as Parameters<typeof client.events.delete>[0])
+    return { success: true, message: `Deleted Event ${id}` }
   },
 }
 

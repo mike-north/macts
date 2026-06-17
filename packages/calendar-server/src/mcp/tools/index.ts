@@ -10,6 +10,8 @@ import { calendarsCreateTool } from './calendars.js'
 import { eventsListTool } from './events.js'
 import { eventsGetTool } from './events.js'
 import { eventsCreateTool } from './events.js'
+import { eventsUpdateTool } from './events.js'
+import { eventsDeleteTool } from './events.js'
 import { eventsShowTool } from './events.js'
 import { appReloadCalendarsTool } from './app.js'
 import { appSwitchViewTool } from './app.js'
@@ -25,6 +27,8 @@ export const allTools = [
   eventsListTool,
   eventsGetTool,
   eventsCreateTool,
+  eventsUpdateTool,
+  eventsDeleteTool,
   eventsShowTool,
   appReloadCalendarsTool,
   appSwitchViewTool,
