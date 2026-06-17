@@ -83,8 +83,8 @@ if (target.id !== calendarName) {
 const created = await client.events.create({
   calendarId: calendarName, // value passed to whose({ name: ... })[0] server-side
   summary: 'macts #81 live-verification event',
-  startDate: '2026-01-01T10:00:00Z',
-  endDate: '2026-01-01T11:00:00Z',
+  startDate: new Date('2026-01-01T10:00:00Z'), // EventCreateInput types these as Date; the SDK serializes them
+  endDate: new Date('2026-01-01T11:00:00Z'),
 })
 console.log('PASS create:', created)
 

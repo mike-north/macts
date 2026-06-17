@@ -297,6 +297,11 @@ async function executeAppCommand(
       if (value === undefined && !p.required) {
         return null
       }
+      // Date-typed params arrive as ISO strings over JSON; rehydrate them as
+      // JXA Date objects (a raw string makes Calendar's make/push throw).
+      if (p.type === 'date') {
+        return `var ${p.name} = new Date(${JSON.stringify(value)});`
+      }
       return `var ${p.name} = ${JSON.stringify(value)};`
     })
     .filter(Boolean)
@@ -563,6 +568,11 @@ async function executeResourceCommand(
       if (value === undefined && !p.required) {
         return null
       }
+      // Date-typed params arrive as ISO strings over JSON; rehydrate them as
+      // JXA Date objects (a raw string makes Calendar's make/push throw).
+      if (p.type === 'date') {
+        return `var ${p.name} = new Date(${JSON.stringify(value)});`
+      }
       return `var ${p.name} = ${JSON.stringify(value)};`
     })
     .filter(Boolean)
@@ -735,13 +745,19 @@ async function executeResourceCommand(
         var parent = ${parentTarget};
         var props = {${props.join(', ')}};
         var item = app.${resourceName}(props);
-        item.make({ at: parent.${resourcePlural} });
+        // Append to the parent's element collection. item.make({ at: ... }) throws
+        // -10024 "Can't make or move that element into that container" in JXA;
+        // pushing onto the parent specifier's collection is the working idiom.
+        parent.${resourcePlural}.push(item);
         return item.properties();
       `
     } else {
       // No parent identifier: create at the top level.
       const props = command.parameters.filter((p) => args[p.name] !== undefined).map((p) => p.name)
 
+      // TODO(#81 follow-up): top-level `item.make()` is unverified against a live app
+      // and likely shares the within-parent -10024 idiom bug; the working form is
+      // probably `app.${resourcePlural}.push(item)`. Verify live before relying on it.
       code = `
         ${paramAssignments}
         // Create ${resourceName}

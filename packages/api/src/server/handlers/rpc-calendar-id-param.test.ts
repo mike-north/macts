@@ -209,4 +209,85 @@ describe('Calendar request-param coherence (real manifest)', () => {
       expect(capturedJxaCode).not.toContain('whose(')
     })
   })
+
+  describe('createEvent — create-within-parent JXA idiom (-10024 regression)', () => {
+    // Regression guard: item.make({ at: parent.events }) throws -10024 "Can't make
+    // or move that element into that container" in JXA. The working idiom is
+    // parent.events.push(item). Assert the generated code uses push, not make({ at: }).
+    it('uses parent.<plural>.push(item) to create the event, not item.make({ at: ... })', async () => {
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.createEvent',
+        {
+          calendarId: 'Work',
+          summary: 'Standup',
+          startDate: '2026-01-01T10:00:00Z',
+          endDate: '2026-01-01T11:00:00Z',
+        }
+      )
+      expect(status).toBe(200)
+      // The working create-within-parent idiom: push onto the parent collection.
+      expect(capturedJxaCode).toContain('parent.events.push(item)')
+      // Must NOT use the broken make({ at: parent.... }) form that throws -10024.
+      // Match the actual broken call pattern (not the comment that documents it).
+      expect(capturedJxaCode).not.toContain('item.make({ at: parent')
+    })
+  })
+
+  describe('createEvent — date-typed params must be rehydrated as JXA Date objects', () => {
+    // Regression guard: date params (startDate, endDate) arrive over JSON as ISO
+    // strings. Emitting them as bare quoted strings makes Calendar's create fail
+    // because JXA requires real Date objects for date-typed properties. The codegen
+    // must emit `var x = new Date("...")` not `var x = "..."`.
+    it('emits startDate as new Date(...), not a bare ISO string', async () => {
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.createEvent',
+        {
+          calendarId: 'Work',
+          summary: 'Standup',
+          startDate: '2026-01-01T10:00:00Z',
+          endDate: '2026-01-01T11:00:00Z',
+        }
+      )
+      expect(status).toBe(200)
+      // startDate must be rehydrated as a JXA Date, not left as a bare string.
+      expect(capturedJxaCode).toContain('var startDate = new Date(')
+      expect(capturedJxaCode).not.toMatch(/var startDate = "/)
+    })
+
+    it('emits endDate as new Date(...), not a bare ISO string', async () => {
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.createEvent',
+        {
+          calendarId: 'Work',
+          summary: 'Standup',
+          startDate: '2026-01-01T10:00:00Z',
+          endDate: '2026-01-01T11:00:00Z',
+        }
+      )
+      expect(status).toBe(200)
+      // endDate must be rehydrated as a JXA Date, not left as a bare string.
+      expect(capturedJxaCode).toContain('var endDate = new Date(')
+      expect(capturedJxaCode).not.toMatch(/var endDate = "/)
+    })
+
+    it('preserves non-date params (summary) as plain JSON-stringified values', async () => {
+      const { status, capturedJxaCode } = await callRpc(
+        calendarManifest,
+        'calendar.events.createEvent',
+        {
+          calendarId: 'Work',
+          summary: 'Standup',
+          startDate: '2026-01-01T10:00:00Z',
+          endDate: '2026-01-01T11:00:00Z',
+        }
+      )
+      expect(status).toBe(200)
+      // `summary` is a string, not a date — must remain a plain quoted value.
+      expect(capturedJxaCode).toContain('var summary = "Standup"')
+      expect(capturedJxaCode).not.toContain('var summary = new Date(')
+    })
+  })
 })
