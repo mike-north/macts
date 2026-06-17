@@ -26,9 +26,9 @@ export const graphicsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { canvasId } = args as { canvasId: string }
-
+    void canvasId
     const client = getClient()
-    return client.graphics.list(canvasId)
+    return client.graphics.list()
   },
 }
 

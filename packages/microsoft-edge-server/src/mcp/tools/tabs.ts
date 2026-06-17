@@ -26,9 +26,9 @@ export const tabsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { windowId } = args as { windowId: string }
-
+    void windowId
     const client = getClient()
-    return client.tabs.list(windowId)
+    return client.tabs.list()
   },
 }
 

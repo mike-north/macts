@@ -26,9 +26,9 @@ export const requiredresourcesListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { actionId } = args as { actionId: string }
-
+    void actionId
     const client = getClient()
-    return client.requiredresources.list(actionId)
+    return client.requiredresources.list()
   },
 }
 

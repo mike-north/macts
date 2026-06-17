@@ -26,9 +26,9 @@ export const layersListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { canvasId } = args as { canvasId: string }
-
+    void canvasId
     const client = getClient()
-    return client.layers.list(canvasId)
+    return client.layers.list()
   },
 }
 

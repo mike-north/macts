@@ -26,9 +26,9 @@ export const variablesListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { workflowName } = args as { workflowName: string }
-
+    void workflowName
     const client = getClient()
-    return client.variables.list(workflowName)
+    return client.variables.list()
   },
 }
 

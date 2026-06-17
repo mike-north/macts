@@ -26,9 +26,9 @@ export const bookmarkitemsListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { folderId } = args as { folderId: string }
-
+    void folderId
     const client = getClient()
-    return client.bookmarkitems.list(folderId)
+    return client.bookmarkitems.list()
   },
 }
 

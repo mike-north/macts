@@ -26,9 +26,9 @@ export const shapesListTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const { canvasId } = args as { canvasId: string }
-
+    void canvasId
     const client = getClient()
-    return client.shapes.list(canvasId)
+    return client.shapes.list()
   },
 }
 
