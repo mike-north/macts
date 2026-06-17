@@ -13,10 +13,6 @@ export class GetBookmarkItemCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  bookmarkFolderId = Option.String('--bookmark-folder-id', {
-    required: true,
-    description: 'BookmarkFolder ID',
-  })
 
   bookmarkItemId = Option.String({ required: true })
 

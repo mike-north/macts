@@ -13,10 +13,6 @@ export class GetProjectCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workspaceDocumentId = Option.String('--workspace-document-id', {
-    required: true,
-    description: 'WorkspaceDocument ID',
-  })
 
   projectId = Option.String({ required: true })
 

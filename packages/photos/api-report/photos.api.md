@@ -186,13 +186,13 @@ export type MomentUpdateInput = Partial<MomentCreateInput>;
 // @public
 export class PhotosClient {
     constructor(options: PhotosClientOptions);
-    add(mediaItems: string, to: string): Promise<void>;
+    add(mediaItems: string[], to: string): Promise<void>;
     readonly albums: AlbumResourceClient;
     _delete(target: string): Promise<void>;
-    _export(mediaItems: string, to: string, usingOriginals?: boolean): Promise<void>;
+    _export(mediaItems: string[], to: string, usingOriginals?: boolean): Promise<void>;
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
-    _import(files: string, into?: string, skipCheckDuplicates?: boolean): Promise<void>;
+    _import(files: string[], into?: string, skipCheckDuplicates?: boolean): Promise<void>;
     make(_new: string, named?: string, at?: string): Promise<void>;
     readonly mediaitems: MediaItemResourceClient;
     nextSlide(): Promise<void>;
@@ -201,7 +201,7 @@ export class PhotosClient {
     resumeSlideshow(): Promise<void>;
     search(_for: string): Promise<void>;
     spotlight(target: string): Promise<void>;
-    startSlideshow(using: string): Promise<void>;
+    startSlideshow(using: string[]): Promise<void>;
     stopSlideshow(): Promise<void>;
 }
 

@@ -13,7 +13,6 @@ export class GetLayerCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  canvasId = Option.String('--canvas-id', { required: true, description: 'Canvas ID' })
 
   layerId = Option.String({ required: true })
 

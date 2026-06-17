@@ -113,14 +113,14 @@ export class PhotosClient {
   /**
    * Import files into the library
    */
-  async _import(files: string, into?: string, skipCheckDuplicates?: boolean): Promise<void> {
+  async _import(files: string[], into?: string, skipCheckDuplicates?: boolean): Promise<void> {
     await this.#httpClient.rpc<undefined>('photos.app.import', { files, into, skipCheckDuplicates })
   }
 
   /**
    * Export media items to the specified location as files
    */
-  async _export(mediaItems: string, to: string, usingOriginals?: boolean): Promise<void> {
+  async _export(mediaItems: string[], to: string, usingOriginals?: boolean): Promise<void> {
     await this.#httpClient.rpc<undefined>('photos.app.export', { mediaItems, to, usingOriginals })
   }
 
@@ -141,14 +141,14 @@ export class PhotosClient {
   /**
    * Add media items to an album
    */
-  async add(mediaItems: string, to: string): Promise<void> {
+  async add(mediaItems: string[], to: string): Promise<void> {
     await this.#httpClient.rpc<undefined>('photos.app.add', { mediaItems, to })
   }
 
   /**
    * Display an ad-hoc slide show from a list of media items
    */
-  async startSlideshow(using: string): Promise<void> {
+  async startSlideshow(using: string[]): Promise<void> {
     await this.#httpClient.rpc<undefined>('photos.app.startSlideshow', { using })
   }
 

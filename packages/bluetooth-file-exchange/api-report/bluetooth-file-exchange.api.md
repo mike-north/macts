@@ -29,7 +29,7 @@ export class BluetoothFileExchangeClient {
     constructor(options: BluetoothFileExchangeClientOptions);
     browse(device?: string): Promise<void>;
     get http(): HttpClient;
-    send(file?: string, toDevice?: string): Promise<void>;
+    send(file?: string[], toDevice?: string): Promise<void>;
 }
 
 // @public

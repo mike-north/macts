@@ -13,7 +13,6 @@ export class GetMediaItemCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  albumId = Option.String('--album-id', { required: true, description: 'Album ID' })
 
   mediaItemId = Option.String({ required: true })
 

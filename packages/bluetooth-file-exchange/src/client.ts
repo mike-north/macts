@@ -104,7 +104,7 @@ export class BluetoothFileExchangeClient {
   /**
    * Send a file to a bluetooth device
    */
-  async send(file?: string, toDevice?: string): Promise<void> {
+  async send(file?: string[], toDevice?: string): Promise<void> {
     await this.#httpClient.rpc<undefined>('bluetooth-file-exchange.app.send', { file, toDevice })
   }
 }

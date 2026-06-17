@@ -185,9 +185,11 @@ export interface EventCreateInput {
 export class EventResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: EventCreateInput): Promise<Event_2>;
-    get(id: string): Promise<Event_2>;
+    delete(calendarId: string, id: string): Promise<void>;
+    get(calendarId: string, id: string): Promise<Event_2>;
     list(calendarId: string): Promise<Event_2[]>;
     show(): Promise<void>;
+    update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event_2>;
 }
 
 // @public (undocumented)

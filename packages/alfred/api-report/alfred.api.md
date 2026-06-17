@@ -9,7 +9,7 @@ import { z } from 'zod';
 // @public
 export class AlfredClient {
     constructor(options: AlfredClientOptions);
-    action(items: string, asType?: string): Promise<void>;
+    action(items: string[], asType?: string): Promise<void>;
     browse(path: string): Promise<void>;
     get http(): HttpClient;
     reloadWorkflow(workflow: string): Promise<void>;

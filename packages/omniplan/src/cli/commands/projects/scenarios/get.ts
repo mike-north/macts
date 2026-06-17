@@ -13,7 +13,6 @@ export class GetScenarioCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  projectId = Option.String('--project-id', { required: true, description: 'Project ID' })
 
   scenarioId = Option.String({ required: true })
 

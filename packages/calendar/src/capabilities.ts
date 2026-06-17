@@ -212,42 +212,60 @@ export const capabilities: readonly CapabilityMetadata[] = [
           type: 'boolean',
         },
         recurrence: {
-          description:
-            'The iCalendar (RFC 2445) string describing the event recurrence, if defined',
+          description: 'The iCalendar (RFC 2445) recurrence string',
           type: 'string',
         },
         status: {
-          description: 'The event status',
+          description: 'Event status',
           type: 'string',
         },
         stampDate: {
-          description: 'The event modification date',
+          description: 'Event modification date',
           type: 'string',
         },
         excludedDates: {
-          description: 'The exception dates for recurring events',
+          description: 'Exception dates for recurring events',
           type: 'array',
           items: {
             type: 'string',
           },
         },
         url: {
-          description: 'The URL associated with the event',
+          description: 'URL associated with the event',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: [
-        'calendarId',
-        'summary',
-        'startDate',
-        'endDate',
-        'recurrence',
-        'status',
-        'stampDate',
-        'excludedDates',
-        'url',
-      ],
+      required: ['calendarId', 'summary', 'startDate', 'endDate'],
+    },
+  },
+  {
+    name: 'calendar.events.delete',
+    app: 'calendar',
+    appBundleId: 'com.apple.iCal',
+    resource: 'events',
+    operation: 'delete',
+    description: 'Delete an event by ID',
+    permission: 'calendar:events:delete',
+    risk: 'delete',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
+        id: {
+          description: 'Event identifier (uid)',
+          type: 'string',
+        },
+        uid: {
+          description: 'A unique event key',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['calendarId', 'id'],
     },
   },
   {
@@ -262,8 +280,12 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
         id: {
-          description: 'Event identifier',
+          description: 'Event identifier (uid)',
           type: 'string',
         },
         uid: {
@@ -272,7 +294,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['id'],
+      required: ['calendarId', 'id'],
     },
   },
   {
@@ -309,6 +331,82 @@ export const capabilities: readonly CapabilityMetadata[] = [
       type: 'object',
       properties: {},
       additionalProperties: false,
+    },
+  },
+  {
+    name: 'calendar.events.update',
+    app: 'calendar',
+    appBundleId: 'com.apple.iCal',
+    resource: 'events',
+    operation: 'update',
+    description: 'Update an existing event',
+    permission: 'calendar:events:update',
+    risk: 'write',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        calendarId: {
+          description: 'Calendar identifier (the calendar containing the event)',
+          type: 'string',
+        },
+        id: {
+          description: 'Event identifier (uid)',
+          type: 'string',
+        },
+        summary: {
+          description: 'Event title',
+          type: 'string',
+        },
+        description: {
+          description: 'Event notes',
+          type: 'string',
+        },
+        location: {
+          description: 'Event location',
+          type: 'string',
+        },
+        startDate: {
+          description: 'Event start date',
+          type: 'string',
+        },
+        endDate: {
+          description: 'Event end date',
+          type: 'string',
+        },
+        alldayEvent: {
+          description: 'Whether this is an all-day event',
+          type: 'boolean',
+        },
+        recurrence: {
+          description: 'The iCalendar (RFC 2445) recurrence string',
+          type: 'string',
+        },
+        status: {
+          description: 'Event status',
+          type: 'string',
+        },
+        stampDate: {
+          description: 'Event modification date',
+          type: 'string',
+        },
+        excludedDates: {
+          description: 'Exception dates for recurring events',
+          type: 'array',
+          items: {
+            type: 'string',
+          },
+        },
+        url: {
+          description: 'URL associated with the event',
+          type: 'string',
+        },
+        uid: {
+          description: 'A unique event key',
+          type: 'string',
+        },
+      },
+      additionalProperties: false,
+      required: ['calendarId', 'id'],
     },
   },
 ]

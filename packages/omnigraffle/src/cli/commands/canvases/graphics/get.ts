@@ -13,7 +13,6 @@ export class GetGraphicCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  canvasId = Option.String('--canvas-id', { required: true, description: 'Canvas ID' })
 
   graphicId = Option.String({ required: true })
 

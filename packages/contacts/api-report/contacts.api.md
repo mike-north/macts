@@ -93,14 +93,14 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 export class ContactsClient {
     constructor(options: ContactsClientOptions);
     actionProperty(): Promise<void>;
-    actionTitle(_with: unknown, _for: string): Promise<void>;
+    actionTitle(_with: unknown, _for: Person): Promise<void>;
     add(to: string): Promise<void>;
     get http(): HttpClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
-    performAction(_with: unknown, _for: string): Promise<void>;
+    performAction(_with: unknown, _for: Person): Promise<void>;
     remove(from: string): Promise<void>;
     save(): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: string): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: Person): Promise<void>;
 }
 
 // @public

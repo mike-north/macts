@@ -446,7 +446,9 @@ describe('cross-surface body-coherence: SDK vs. server required params', () => {
       // The server's update branch binds and looks up by the command's required
       // *parameter* name (= 'id' for updateNote). The SDK must send 'id' in the
       // body so the server can perform byId(id) scoping.
-      expect(noteClient).toContain('{ id, ...input }')
+      // The generated update() filters undefined values from the input before
+      // spreading, so the body is { id, ...defined } rather than { id, ...input }.
+      expect(noteClient).toContain('{ id, ...defined }')
     })
 
     it('SDK and server resolve the SAME request param (id) for update', () => {

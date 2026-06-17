@@ -13,7 +13,6 @@ export class GetVariableCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workflowId = Option.String('--workflow-id', { required: true, description: 'Workflow ID' })
 
   variableId = Option.String({ required: true })
 

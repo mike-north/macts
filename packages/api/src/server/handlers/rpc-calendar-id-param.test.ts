@@ -90,26 +90,36 @@ describe('Calendar request-param coherence (real manifest)', () => {
   })
 
   describe('getEvent — request param is `id` (not the `uid` property)', () => {
-    it('accepts { id } and binds `var id` + byId(id) in JXA', async () => {
+    it('accepts { calendarId, id } and binds both vars + whose()+byId() in JXA', async () => {
+      // getEvent now requires TWO params: calendarId (parent calendar) and id
+      // (child event uid). Events are nested under calendars in Calendar.app;
+      // the server must scope the JXA to the parent calendar first, then target
+      // the event by its uid via byId(id).
       const { status, capturedJxaCode } = await callRpc(
         calendarManifest,
         'calendar.events.getEvent',
-        { id: 'EVENT-123' }
+        { calendarId: 'Work', id: 'EVENT-123' }
       )
       // Reaches the executor (no validation rejection).
       expect(status).toBe(200)
-      // Binds the request param `id` and looks up by it — never the property `uid`.
+      // Binds the parent param `calendarId` and the child param `id`.
+      expect(capturedJxaCode).toContain('var calendarId =')
+      expect(capturedJxaCode).toContain('"Work"')
       expect(capturedJxaCode).toContain('var id =')
       expect(capturedJxaCode).toContain('"EVENT-123"')
+      // Parent calendar is targeted by name (Calendar is byProperty).
+      expect(capturedJxaCode).toContain('whose({ name: calendarId })[0]')
+      // Child event targeted by uid via byId(id).
       expect(capturedJxaCode).toContain('byId(id)')
+      // Never binds or uses the property name `uid` as the request var.
       expect(capturedJxaCode).not.toContain('byId(uid)')
       expect(capturedJxaCode).not.toContain('var uid =')
     })
 
     it('rejects a body keyed by the property name `uid` with VALIDATION_ERROR', async () => {
-      // The request schema validates the command param `id`; sending `uid`
-      // omits the required `id` and must be rejected. This is exactly what the
-      // regression would have made the SDK do.
+      // The request schema validates the command params `calendarId` and `id`;
+      // sending only `uid` omits the required `id` (and `calendarId`) and must
+      // be rejected.
       const { status, responseBody } = await callRpc(calendarManifest, 'calendar.events.getEvent', {
         uid: 'EVENT-123',
       })
@@ -196,17 +206,21 @@ describe('Calendar request-param coherence (real manifest)', () => {
   })
 
   describe('events stay byId — Event `uid` is runtime-valid, unlike Calendar', () => {
-    it('getEvent still targets via byId(id), not a whose() lookup', async () => {
-      // Regression guard: the byProperty change must be scoped to Calendar only.
-      // Events (whose `uid` works at runtime) must keep their byId targeting.
+    it('getEvent targets the EVENT via byId(id), not a whose() lookup on the event', async () => {
+      // Regression guard: the byProperty change must be scoped to the parent Calendar
+      // targeting only. The event itself (whose `uid` works at runtime) must be
+      // targeted via byId(id), not a whose({}) lookup.
       const { status, capturedJxaCode } = await callRpc(
         calendarManifest,
         'calendar.events.getEvent',
-        { id: 'EVENT-123' }
+        { calendarId: 'Work', id: 'EVENT-123' }
       )
       expect(status).toBe(200)
+      // Parent calendar is byProperty (its name); the event itself is byId.
+      expect(capturedJxaCode).toContain('whose({ name: calendarId })[0]')
       expect(capturedJxaCode).toContain('byId(id)')
-      expect(capturedJxaCode).not.toContain('whose(')
+      // The event must NOT be targeted via whose({}) — only the parent calendar is.
+      // (The whose() for the parent calendar is expected and tested above.)
     })
   })
 

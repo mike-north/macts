@@ -96,15 +96,15 @@ export interface EventCreateInput {
   endDate: Date
   /** Whether this is an all-day event */
   alldayEvent?: boolean
-  /** The iCalendar (RFC 2445) string describing the event recurrence, if defined */
+  /** The iCalendar (RFC 2445) recurrence string */
   recurrence?: string
-  /** The event status */
+  /** Event status */
   status?: EventStatus
-  /** The event modification date */
+  /** Event modification date */
   stampDate?: Date
-  /** The exception dates for recurring events */
+  /** Exception dates for recurring events */
   excludedDates?: Date[]
-  /** The URL associated with the event */
+  /** URL associated with the event */
   url?: string
   /** Calendar identifier for the event */
   calendarId: string
