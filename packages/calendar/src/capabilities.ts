@@ -153,7 +153,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['id', 'name'],
+      required: ['id'],
     },
   },
   {
@@ -272,7 +272,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
       },
       additionalProperties: false,
-      required: ['id', 'uid'],
+      required: ['id'],
     },
   },
   {

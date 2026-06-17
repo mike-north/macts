@@ -43,10 +43,10 @@ export const documentsGetTool: McpToolDefinition = {
       },
     },
     additionalProperties: false,
-    required: ['id', 'name'],
+    required: ['id'],
   },
   handler: async (args) => {
-    const { id } = args as { id: string; name: string }
+    const { id } = args as { id: string; name?: string }
     const client = getClient()
     return client.documents.get(id as unknown as Parameters<typeof client.documents.get>[0])
   },

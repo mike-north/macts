@@ -151,8 +151,15 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
     if (primaryId) {
       const idProperty = resource.properties[primaryId.property]
       if (idProperty && !properties[primaryId.property]) {
+        // Only add the identifier property to the schema if the command did not
+        // already declare its own required param (e.g. an explicit `id` param).
+        // When the command already has required params the identifier property is
+        // informational only — it must NOT appear in `required` because the handler
+        // consumes the command param, not the resource property name.
         properties[primaryId.property] = propertyToJsonSchema(idProperty)
-        required.push(primaryId.property)
+        if (required.length === 0) {
+          required.push(primaryId.property)
+        }
       }
     }
   }

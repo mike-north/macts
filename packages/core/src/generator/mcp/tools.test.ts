@@ -161,6 +161,69 @@ describe('generateResourceOperationSchema', () => {
     })
   })
 
+  // Regression (#90): when a get/update/delete command already declares a required
+  // param (e.g. `id`), the resource's primary identifier property (e.g. `name`) must
+  // NOT appear in `required`, even when that property is added to `properties` so
+  // callers can see it.  Before the fix, `required` was `['id', 'name']`; after the
+  // fix it is exactly the command's declared required params: `['id']`.
+  it('should not include identifier property in required when the command already has a required param', () => {
+    // Mirrors Calendar.calendars.get: param `id` (required), identifier property `name`.
+    const calendarResource: Resource = {
+      name: 'Calendar',
+      plural: 'Calendars',
+      description: 'A calendar',
+      properties: {
+        name: {
+          access: 'rw',
+          type: 'string',
+          description: 'The calendar title',
+          optional: false,
+        },
+        color: {
+          access: 'rw',
+          type: 'string',
+          description: 'Calendar color',
+          optional: true,
+        },
+        calendarIdentifier: {
+          access: 'r',
+          type: 'string',
+          description: 'A unique calendar key',
+          optional: false,
+        },
+      },
+      identifiers: [
+        {
+          property: 'name',
+          primary: true,
+        },
+      ],
+    }
+
+    const command: Command = {
+      name: 'get',
+      description: 'Get a calendar by ID',
+      scope: 'resource',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Calendar identifier',
+          required: true,
+        },
+      ],
+    }
+
+    const schema = generateResourceOperationSchema(command, calendarResource)
+
+    // Positive case: the command param is in required
+    expect(schema.required).toEqual(['id'])
+    // Negative case: the identifier property name ('name') is NOT in required
+    expect(schema.required).not.toContain('name')
+    // The identifier property is still present in properties (informational)
+    expect(schema.properties).toHaveProperty('name')
+  })
+
   // Regression: custom resource commands (e.g. "show") take exactly their manifest
   // parameters — the SDK does not synthesize an extra ID argument for them. Adding an
   // implicit identifier made the MCP handler call `show(id)` while the SDK method is
