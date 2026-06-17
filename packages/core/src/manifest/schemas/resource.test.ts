@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { IdentifierSchema, IdentifierTargetingSchema, ResourceSchema } from './resource.js'
+import {
+  IdentifierSchema,
+  IdentifierTargetingSchema,
+  ResourceSchema,
+  RuntimeProbeSchema,
+  ProbeStatusSchema,
+} from './resource.js'
 import { ZodError } from 'zod'
 
 describe('IdentifierTargetingSchema', () => {
@@ -457,6 +463,130 @@ describe('ResourceSchema', () => {
       expect(result.schema).toBeUndefined()
       expect(result.code).toBeUndefined()
       expect(result.identifiers).toBeUndefined()
+    })
+
+    it('should accept a resource with probe metadata (probed status)', () => {
+      const result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        identifiers: [{ property: 'calendarIdentifier', primary: true }],
+        probe: {
+          status: 'probed',
+          runtimeIdentifier: 'name',
+          probedAt: '2024-03-15T10:00:00.000Z',
+        },
+      })
+
+      expect(result.probe?.status).toBe('probed')
+      expect(result.probe?.runtimeIdentifier).toBe('name')
+      expect(result.probe?.probedAt).toBe('2024-03-15T10:00:00.000Z')
+    })
+
+    it('should accept a resource with probe metadata (no-items status)', () => {
+      const result = ResourceSchema.parse({
+        name: 'Event',
+        plural: 'events',
+        description: 'A calendar event',
+        properties: {},
+        probe: {
+          status: 'no-items',
+          note: 'Collection was empty',
+          probedAt: '2024-03-15T10:00:00.000Z',
+        },
+      })
+
+      expect(result.probe?.status).toBe('no-items')
+      expect(result.probe?.runtimeIdentifier).toBeUndefined()
+      expect(result.probe?.note).toBe('Collection was empty')
+    })
+
+    it('should accept probe field as undefined', () => {
+      const result = ResourceSchema.parse({
+        name: 'Calendar',
+        plural: 'calendars',
+        description: 'A calendar',
+        properties: {},
+        probe: undefined,
+      })
+
+      expect(result.probe).toBeUndefined()
+    })
+  })
+})
+
+describe('ProbeStatusSchema', () => {
+  describe('positive cases', () => {
+    it('accepts probed', () => {
+      expect(ProbeStatusSchema.parse('probed')).toBe('probed')
+    })
+    it('accepts no-items', () => {
+      expect(ProbeStatusSchema.parse('no-items')).toBe('no-items')
+    })
+    it('accepts failed', () => {
+      expect(ProbeStatusSchema.parse('failed')).toBe('failed')
+    })
+    it('accepts error', () => {
+      expect(ProbeStatusSchema.parse('error')).toBe('error')
+    })
+  })
+
+  describe('negative cases', () => {
+    it('rejects unknown status string', () => {
+      expect(() => ProbeStatusSchema.parse('unknown')).toThrow(ZodError)
+    })
+
+    it('rejects non-string', () => {
+      expect(() => ProbeStatusSchema.parse(42)).toThrow(ZodError)
+    })
+  })
+})
+
+describe('RuntimeProbeSchema', () => {
+  describe('positive cases', () => {
+    it('accepts minimal valid probe with just status', () => {
+      const result = RuntimeProbeSchema.parse({ status: 'probed' })
+      expect(result.status).toBe('probed')
+      expect(result.runtimeIdentifier).toBeUndefined()
+    })
+
+    it('accepts full probe with all fields', () => {
+      const result = RuntimeProbeSchema.parse({
+        status: 'probed',
+        runtimeIdentifier: 'name',
+        probedAt: '2024-03-15T10:00:00.000Z',
+        note: 'Verified against Calendar app',
+      })
+      expect(result.runtimeIdentifier).toBe('name')
+      expect(result.probedAt).toBe('2024-03-15T10:00:00.000Z')
+      expect(result.note).toBe('Verified against Calendar app')
+    })
+
+    it('accepts probe with failed status and no runtimeIdentifier', () => {
+      const result = RuntimeProbeSchema.parse({
+        status: 'failed',
+        probedAt: '2024-03-15T10:00:00.000Z',
+        note: 'All candidates threw',
+      })
+      expect(result.status).toBe('failed')
+      expect(result.runtimeIdentifier).toBeUndefined()
+    })
+  })
+
+  describe('negative cases', () => {
+    it('rejects probe without status', () => {
+      expect(() => RuntimeProbeSchema.parse({ runtimeIdentifier: 'name' })).toThrow(ZodError)
+    })
+
+    it('rejects probe with invalid status', () => {
+      expect(() => RuntimeProbeSchema.parse({ status: 'unknown' })).toThrow(ZodError)
+    })
+
+    it('rejects probe with non-string runtimeIdentifier', () => {
+      expect(() => RuntimeProbeSchema.parse({ status: 'probed', runtimeIdentifier: 42 })).toThrow(
+        ZodError
+      )
     })
   })
 })

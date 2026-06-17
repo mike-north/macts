@@ -56,6 +56,18 @@ export { VERSION } from '@macts/core'
 export { GenerateCommand } from './commands/generate.js'
 
 /**
+ * Command that runtime-probes an app manifest's declared identifiers against
+ * the live application and persists the result as `resource.probe` metadata.
+ *
+ * @example
+ * ```bash
+ * macts probe calendar
+ * macts probe calendar --resource Calendar --dry-run
+ * ```
+ */
+export { ProbeCommand } from './commands/probe.js'
+
+/**
  * Commands for discovering typed capabilities (`macts capabilities search` and
  * `macts capabilities inspect`).
  *

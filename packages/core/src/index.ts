@@ -42,3 +42,6 @@ export * from './capabilities/index.js'
 
 // Governance foundation (policy declaration parsing, audit records)
 export * from './governance/index.js'
+
+// Runtime identifier probe
+export * from './probe/index.js'
