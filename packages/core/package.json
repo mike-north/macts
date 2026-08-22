@@ -19,6 +19,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "tsup",
     "api-extractor": "api-extractor run --local",

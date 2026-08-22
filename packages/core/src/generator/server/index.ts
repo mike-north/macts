@@ -185,6 +185,9 @@ function generatePackageJson(
       main: './dist/index.js',
       types: typesPath,
       files: ['dist'],
+      engines: {
+        node: '>=22',
+      },
       scripts: {
         build: 'tsup',
         lint: 'eslint src',
