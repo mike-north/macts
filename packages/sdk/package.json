@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "description": "Frictionless authoring helper for governed macts scripts — resolves the API key and base URL once, returns ready-to-use typed clients for every installed @macts/* app SDK",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/sdk"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": {
