@@ -70,6 +70,43 @@ describe('generateSdk', () => {
     expect(pkg).toMatchObject({ engines: { node: '>=22' } })
   })
 
+  it('should generate package.json with npm publishing metadata', () => {
+    const result = generateSdk(mockManifest, {
+      outDir: '/tmp/sdk',
+      packageName: '@macts/sdk-calendar',
+      version: '1.0.0',
+    })
+
+    const pkgFile = result.files.find((f) => f.path === 'package.json')
+    if (!pkgFile) throw new Error('package.json not found')
+
+    const pkg = JSON.parse(pkgFile.content) as {
+      license: string
+      repository: { type: string; url: string; directory: string }
+      publishConfig: { access: string }
+    }
+
+    expect(pkg.license).toBe('MIT')
+    expect(pkg.repository).toEqual({
+      type: 'git',
+      url: 'git+https://github.com/mike-north/macts.git',
+      directory: 'packages/sdk-calendar',
+    })
+    expect(pkg.publishConfig).toEqual({ access: 'public' })
+  })
+
+  it('should emit a LICENSE file with the MIT license text', () => {
+    const result = generateSdk(mockManifest, {
+      outDir: '/tmp/sdk',
+      packageName: '@macts/sdk-calendar',
+    })
+
+    const licenseFiles = result.files.filter((f) => f.path === 'LICENSE')
+    expect(licenseFiles).toHaveLength(1)
+    expect(licenseFiles[0]?.content).toContain('MIT License')
+    expect(licenseFiles[0]?.content).toContain('Copyright (c) 2026 Michael North')
+  })
+
   it('should generate index file', () => {
     const result = generateSdk(mockManifest, {
       outDir: '/tmp/sdk',
