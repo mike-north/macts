@@ -5,10 +5,11 @@
   "type": "module",
   "description": "TypeScript SDKs for macOS automation - generate type-safe APIs from AppleScript dictionaries",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "nx run-many -t build",
+    "clean": "nx reset && git clean -fdX -e '!**/node_modules' -e '!**/node_modules/**' -e '!.env*'",
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",
     "typecheck": "nx run-many -t typecheck",
@@ -33,7 +34,7 @@
     "@eslint/js": "^9.20.0",
     "@microsoft/api-documenter": "^7.26.0",
     "@microsoft/api-extractor": "^7.56.0",
-    "@types/node": "^22.13.0",
+    "@types/node": "^26.0.0",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.0.2",
     "fixturify-project": "^7.1.3",
