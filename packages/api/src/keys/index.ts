@@ -42,6 +42,9 @@
 export type {
   ApiKeyPayload,
   ApiKeyMetadata,
+  ApiKeyValidationErrorCode,
+  ApiKeyValidationSuccess,
+  ApiKeyValidationFailure,
   ApiKeyValidationResult,
   PermissionCheckResult,
   CreateApiKeyOptions,

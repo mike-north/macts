@@ -36,11 +36,22 @@ export interface ApiKeyPayload {
 }
 
 // @public
-export interface ApiKeyValidationResult {
-    error?: string;
-    errorCode?: 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
-    payload?: ApiKeyPayload;
-    valid: boolean;
+export type ApiKeyValidationErrorCode = 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+
+// @public
+export interface ApiKeyValidationFailure {
+    error: string;
+    errorCode: ApiKeyValidationErrorCode;
+    valid: false;
+}
+
+// @public
+export type ApiKeyValidationResult = ApiKeyValidationSuccess | ApiKeyValidationFailure;
+
+// @public
+export interface ApiKeyValidationSuccess {
+    payload: ApiKeyPayload;
+    valid: true;
 }
 
 // @public

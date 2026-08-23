@@ -103,18 +103,44 @@ export interface ApiKeyMetadata {
 }
 
 /**
- * Result of API key validation.
+ * Error codes for API key validation failures.
  */
-export interface ApiKeyValidationResult {
+export type ApiKeyValidationErrorCode =
+  | 'INVALID_FORMAT'
+  | 'INVALID_SIGNATURE'
+  | 'EXPIRED'
+  | 'REVOKED'
+  | 'MALFORMED_PAYLOAD'
+
+/**
+ * Successful API key validation.
+ */
+export interface ApiKeyValidationSuccess {
   /** Whether the key is valid */
-  valid: boolean
-  /** Decoded payload if valid */
-  payload?: ApiKeyPayload
-  /** Error message if invalid */
-  error?: string
-  /** Error code for programmatic handling */
-  errorCode?: 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD'
+  valid: true
+  /** Decoded payload */
+  payload: ApiKeyPayload
 }
+
+/**
+ * Failed API key validation.
+ */
+export interface ApiKeyValidationFailure {
+  /** Whether the key is valid */
+  valid: false
+  /** Error message */
+  error: string
+  /** Error code for programmatic handling */
+  errorCode: ApiKeyValidationErrorCode
+}
+
+/**
+ * Result of API key validation.
+ *
+ * Discriminated on `valid`: narrowing on `result.valid` gives direct access
+ * to `payload` (success) or `error`/`errorCode` (failure) without guards.
+ */
+export type ApiKeyValidationResult = ApiKeyValidationSuccess | ApiKeyValidationFailure
 
 /**
  * Result of permission check.

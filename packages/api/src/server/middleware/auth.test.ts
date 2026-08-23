@@ -328,30 +328,10 @@ describe('authMiddleware', () => {
   })
 
   describe('edge cases', () => {
-    it('should handle validation errors without error message', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
-
-      vi.mocked(validateApiKey).mockResolvedValue({
-        valid: false,
-        errorCode: 'INVALID_FORMAT',
-      })
-
-      const app = new Hono<{ Variables: AuthVariables }>()
-      app.use('/*', authMiddleware())
-      app.get('/test', (c) => c.json({ ok: true }))
-
-      const res = await app.request('/test', {
-        headers: {
-          Authorization: 'Bearer macts_sk_test',
-        },
-      })
-
-      expect(res.status).toBe(401)
-
-      const body = (await res.json()) as AuthErrorResponse
-      expect(body.error.code).toBe('INVALID_FORMAT')
-      expect(body.error.message).toBe('Token validation failed')
-    })
+    // Note: a former test covered a validation failure with no error message;
+    // the ApiKeyValidationResult discriminated union now makes that state
+    // unrepresentable (failure always carries error + errorCode), so the
+    // middleware's message fallback and its test were removed.
 
     it('should not proceed to handler when validation fails', async () => {
       const { validateApiKey } = await import('../../keys/validator.js')

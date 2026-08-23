@@ -14,6 +14,7 @@ import type {
   ApiKeyPayload,
   ApiKeyMetadata,
   ApiKeyValidationResult,
+  ApiKeyValidationErrorCode,
   PermissionCheckResult,
 } from './types.js'
 // CoarseOperation is single-sourced in the vocabulary module.
@@ -212,7 +213,7 @@ const validResult: ApiKeyValidationResult = {
   valid: true,
   payload: validPayload,
 }
-expectType<ApiKeyValidationResult>(validResult)
+expectAssignable<ApiKeyValidationResult>(validResult)
 
 // Positive: Invalid result with error
 const invalidResult: ApiKeyValidationResult = {
@@ -220,15 +221,44 @@ const invalidResult: ApiKeyValidationResult = {
   error: 'Token expired',
   errorCode: 'EXPIRED',
 }
-expectType<ApiKeyValidationResult>(invalidResult)
+expectAssignable<ApiKeyValidationResult>(invalidResult)
+
+// Discriminated union narrowing on `valid`
+declare const validationResult: ApiKeyValidationResult
+
+if (validationResult.valid) {
+  expectType<true>(validationResult.valid)
+  expectType<ApiKeyPayload>(validationResult.payload)
+} else {
+  expectType<false>(validationResult.valid)
+  expectType<string>(validationResult.error)
+  expectType<ApiKeyValidationErrorCode>(validationResult.errorCode)
+}
+
+// Negative: success arm requires payload
+expectNotAssignable<ApiKeyValidationResult>({ valid: true as const })
+
+// Negative: failure arm requires error and errorCode
+expectNotAssignable<ApiKeyValidationResult>({ valid: false as const })
+expectNotAssignable<ApiKeyValidationResult>({
+  valid: false as const,
+  error: 'Token expired',
+})
+
+// Negative: unknown error code is rejected
+expectNotAssignable<ApiKeyValidationResult>({
+  valid: false as const,
+  error: 'nope',
+  errorCode: 'UNKNOWN_CODE',
+})
 
 // Test all error codes are assignable
-expectAssignable<ApiKeyValidationResult['errorCode']>('INVALID_FORMAT')
-expectAssignable<ApiKeyValidationResult['errorCode']>('INVALID_SIGNATURE')
-expectAssignable<ApiKeyValidationResult['errorCode']>('EXPIRED')
-expectAssignable<ApiKeyValidationResult['errorCode']>('REVOKED')
-expectAssignable<ApiKeyValidationResult['errorCode']>('MALFORMED_PAYLOAD')
-expectAssignable<ApiKeyValidationResult['errorCode']>(undefined)
+expectAssignable<ApiKeyValidationErrorCode>('INVALID_FORMAT')
+expectAssignable<ApiKeyValidationErrorCode>('INVALID_SIGNATURE')
+expectAssignable<ApiKeyValidationErrorCode>('EXPIRED')
+expectAssignable<ApiKeyValidationErrorCode>('REVOKED')
+expectAssignable<ApiKeyValidationErrorCode>('MALFORMED_PAYLOAD')
+expectNotAssignable<ApiKeyValidationErrorCode>(undefined)
 
 // =============================================================================
 // PermissionCheckResult Type Tests
