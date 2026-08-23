@@ -7,7 +7,7 @@ Thank you for your interest in contributing to macts. This guide covers how to s
 ### Prerequisites
 
 - **macOS** - macts uses JXA (JavaScript for Automation), which is macOS-only
-- **Node.js 20+**
+- **Node.js 22+**
 - **pnpm** - this project uses pnpm as its package manager
 
 ### Setup

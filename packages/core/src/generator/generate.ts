@@ -98,6 +98,9 @@ function generatePackageJson(ctx: GeneratorContext): string {
     main: './dist/index.js',
     types: typesPath,
     files: ['dist'],
+    engines: {
+      node: '>=22',
+    },
     dependencies: {
       '@macts/core': 'workspace:*',
       zod: '^4.3.6',

@@ -15,7 +15,7 @@
     "@macts/calendar": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^22.13.0",
+    "@types/node": "^26.0.0",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

@@ -308,7 +308,7 @@ access without granting write or delete access, or grant create without granting
 ## Requirements
 
 - **macOS** -- macts automates native macOS applications, which are only available on macOS
-- **Node.js 20+** -- Required for the API server and SDK
+- **Node.js 22+** -- Required for the API server and SDK
 - **Target apps** -- Must be installed and have granted automation permissions when first prompted
 
 ## Contributing
