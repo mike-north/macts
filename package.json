@@ -19,6 +19,7 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish",
+    "ci:publish": "pnpm build && pnpm publish -r --access public --no-git-checks && changeset tag",
     "api-extractor": "nx run-many -t api-extractor",
     "api-extractor:ci": "nx run-many -t api-extractor:ci",
     "api-docs": "mkdir -p temp && cp packages/*/temp/*.api.json temp/ && rm -f temp/cli.api.json temp/mcp.api.json && api-documenter markdown -i temp -o docs",
@@ -26,7 +27,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.29.3",
   "devDependencies": {
     "@changesets/cli": "^2.27.11",

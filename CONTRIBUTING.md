@@ -69,6 +69,8 @@ pnpm changeset
 
 Follow the prompts to describe your changes. Changesets are committed alongside the code and consumed during release.
 
+See [RELEASING.md](RELEASING.md) for how those changesets turn into published npm releases.
+
 ## Types of Contributions
 
 ### Adding Support for a New macOS Application
