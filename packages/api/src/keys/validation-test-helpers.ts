@@ -19,6 +19,10 @@ export function assertValidationSuccess(
   result: ApiKeyValidationResult
 ): asserts result is ApiKeyValidationSuccess {
   expect(result.valid).toBe(true)
+  // Guard against ill-typed mocks that claim success without a payload.
+  if (result.valid) {
+    expect(result.payload).toBeDefined()
+  }
 }
 
 /**
@@ -28,4 +32,9 @@ export function assertValidationFailure(
   result: ApiKeyValidationResult
 ): asserts result is ApiKeyValidationFailure {
   expect(result.valid).toBe(false)
+  // Guard against ill-typed mocks that claim failure without error details.
+  if (!result.valid) {
+    expect(result.error).toBeTruthy()
+    expect(result.errorCode).toBeTruthy()
+  }
 }
