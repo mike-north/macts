@@ -118,12 +118,14 @@ describe('McpServeCommand', () => {
       plugins: [mockPlugin],
       port: undefined,
       socketPath: '/tmp/test.sock',
+      disableApiKeyValidation: false,
     })
 
     // eslint-disable-next-line @typescript-eslint/unbound-method -- mock assertion
     expect(mockDaemon.start).toHaveBeenCalled()
     expect(getStderr()).toContain('MCP server running')
     expect(getStderr()).toContain('Loaded 1 plugin(s)')
+    expect(getStderr()).toContain('API key validation: enabled')
 
     // Clean up
     await Promise.race([promise, new Promise((resolve) => setTimeout(resolve, 10))])
@@ -164,11 +166,49 @@ describe('McpServeCommand', () => {
       plugins: [mockPlugin],
       port: 3000,
       socketPath: expect.any(String) as string,
+      disableApiKeyValidation: false,
     })
 
     expect(getStderr()).toContain('http://127.0.0.1:3000')
 
     // Clean up
+    await Promise.race([promise, new Promise((resolve) => setTimeout(resolve, 10))])
+  })
+
+  it('should forward --disable-api-key-validation to createDaemon and log disabled state', async () => {
+    const { stdout, stderr, getStderr } = createMockStreams()
+
+    const mockPlugin: McpPlugin = {
+      name: 'test-plugin',
+      description: 'Test plugin',
+      tools: [],
+    }
+
+    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
+      plugins: [mockPlugin],
+      errors: [],
+    })
+
+    const mockDaemon: DaemonServer = {
+      start: vi.fn().mockResolvedValue(undefined),
+      stop: vi.fn().mockResolvedValue(undefined),
+      isRunning: vi.fn().mockReturnValue(false),
+      httpServer: null,
+    }
+
+    const createDaemonSpy = vi.spyOn(mcp, 'createDaemon').mockReturnValue(mockDaemon)
+
+    const promise = cli.run(['mcp', 'serve', '--disable-api-key-validation'], { stdout, stderr })
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+
+    expect(createDaemonSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ disableApiKeyValidation: true })
+    )
+    expect(getStderr()).toContain('API key validation: disabled')
+
     await Promise.race([promise, new Promise((resolve) => setTimeout(resolve, 10))])
   })
 

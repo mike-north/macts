@@ -11,6 +11,10 @@ export { createMcpServer } from './server.js'
 // Types
 export type { McpPlugin, McpToolDefinition, McpServerOptions, JsonSchema } from './types.js'
 
+// API key authentication
+export { requireStartupApiKey, authenticateHttpRequest } from './auth.js'
+export type { McpAuthOptions, McpAuthErrorCode, AuthResult } from './auth.js'
+
 // Built-in capability-discovery tool
 export { createDiscoveryTool, DISCOVERY_TOOL_NAME, type DiscoveryToolOptions } from './discovery.js'
 

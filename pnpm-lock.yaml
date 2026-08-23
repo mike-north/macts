@@ -785,6 +785,9 @@ importers:
 
   packages/mcp:
     dependencies:
+      '@macts/api':
+        specifier: workspace:*
+        version: link:../api
       '@macts/core':
         specifier: workspace:*
         version: link:../core

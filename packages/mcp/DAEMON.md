@@ -60,7 +60,12 @@ const daemon = createDaemon({
 
 ## HTTP Endpoints
 
-The daemon exposes the following HTTP endpoints:
+| Endpoint                               | Auth required? | Purpose                                                                                   |
+| -------------------------------------- | -------------- | ----------------------------------------------------------------------------------------- |
+| `GET /health`                          | No             | Health check; always open, even with API key validation enabled.                          |
+| `POST /mcp`, `GET /mcp`, `DELETE /mcp` | Yes            | Streamable HTTP transport — the current MCP transport. This is the primary HTTP endpoint. |
+| `GET /sse`                             | Yes            | Legacy HTTP+SSE transport: server-to-client event stream. Deprecated but functional.      |
+| `POST /message`                        | Yes            | Legacy HTTP+SSE transport: client-to-server messages.                                     |
 
 ### `GET /health`
 
@@ -71,13 +76,31 @@ curl http://localhost:3000/health
 # {"status":"ok","plugins":2}
 ```
 
-### `GET /sse`
+### Streamable HTTP (`/mcp`)
 
-Server-Sent Events endpoint for establishing MCP connections. This endpoint creates a persistent connection for server-to-client messages.
+The current MCP transport, per the [MCP streamable HTTP spec](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http). Requires `Authorization: Bearer macts_sk_...` unless the daemon was started with `--disable-api-key-validation`.
 
-### `POST /message`
+### Legacy SSE (`/sse` + `/message`)
 
-Client-to-server message endpoint for sending MCP protocol messages.
+The deprecated [HTTP+SSE transport](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports#http-with-sse), kept for older clients. `GET /sse` establishes a persistent server-to-client event stream; `POST /message` carries client-to-server messages. Both require the same bearer-token authentication as `/mcp`.
+
+## Authentication
+
+Every route other than `GET /health` requires a valid macts API key by default:
+
+```
+Authorization: Bearer macts_sk_...
+```
+
+Create a key with:
+
+```bash
+macts api-key create --name <name> --permission <app:resource:operation>
+```
+
+Requests without a valid `Authorization` header receive a `401` with a JSON error body. Pass `--disable-api-key-validation` to `macts mcp serve` / `macts mcp start` to skip this check entirely (not recommended — only for local development or trusted embedding scenarios).
+
+**`macts-mcp-stdio` caveat:** the socat-based stdio bridge (`packages/cli/scripts/macts-mcp-stdio.sh`) connects directly to the daemon's Unix socket and sends no HTTP headers at all — it cannot inject an `Authorization` header. Against an auth-enabled daemon, its requests fail with `401`. Until per-connection header injection is added (future work), run the daemon with `--disable-api-key-validation` if you're bridging to it via `macts-mcp-stdio`.
 
 ## Architecture
 
@@ -188,22 +211,22 @@ When using TCP mode:
 
 - Server binds to `127.0.0.1` (localhost only) by default
 - Suitable for local development and testing
-- Consider authentication for production use
+- Every route except `/health` requires a valid `macts_sk_` API key (Bearer token) by default — see [Authentication](#authentication)
 - Use firewall rules to restrict access
 
 ## Limitations
 
-- **Transport**: SSE is one-way (server → client), requires POST for client → server
+- **Legacy transport**: SSE is one-way (server → client), requires POST for client → server
 - **Scalability**: Single process, not designed for high-concurrency scenarios
 - **State**: No shared state between client connections
-- **Authentication**: No built-in authentication (add middleware if needed)
+- **Authentication**: Bearer-token API key validation on every route except `/health`; no per-connection header injection for the `macts-mcp-stdio` socat bridge (see caveat above)
 
 ## Future Enhancements
 
 Potential improvements for future versions:
 
 - WebSocket transport for bidirectional communication
-- Built-in authentication and authorization
+- Per-connection header injection for the `macts-mcp-stdio` bridge, so it can carry a bearer token
 - Connection pooling and rate limiting
 - Metrics and monitoring endpoints
 - Multi-process scaling with shared state

@@ -27,6 +27,7 @@
     "api-extractor:ci": "api-extractor run"
   },
   "dependencies": {
+    "@macts/api": "workspace:*",
     "@macts/core": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.0.4"
   },

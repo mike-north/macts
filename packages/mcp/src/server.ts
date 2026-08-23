@@ -16,6 +16,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import type { McpPlugin, McpServerOptions } from './types.js'
 import { VERSION } from '@macts/core'
+import { requireStartupApiKey } from './auth.js'
 
 /**
  * Create and start an MCP server with the given plugins.
@@ -41,10 +42,14 @@ import { VERSION } from '@macts/core'
  * - SDK methods execute JXA scripts via HTTP API
  * - Results flow back through: JXA → API → SDK → MCP → Client
  *
+ * Unless `options.disableApiKeyValidation` is set, a valid `MACTS_API_KEY` is
+ * required before the stdio transport connects (see {@link requireStartupApiKey}).
+ *
  * @param plugins - Array of plugins providing tools (discovered from `@macts/<app>-server` packages)
  * @param options - Server configuration options
  * @returns Promise that resolves when the server is running
  * @throws Error if duplicate tool names are found across plugins
+ * @throws Error if `MACTS_API_KEY` is missing or invalid and validation is not disabled
  *
  * @example
  * ```typescript
@@ -143,6 +148,10 @@ export async function createMcpServer(
       }
     }
   })
+
+  if (!options.disableApiKeyValidation) {
+    await requireStartupApiKey()
+  }
 
   // Connect to stdio transport
   const transport = new StdioServerTransport()

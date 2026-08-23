@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { createMcpServer } from './server.js'
 import type { McpPlugin } from './types.js'
+import * as auth from './auth.js'
 
 // Mock the MCP SDK
 vi.mock('@modelcontextprotocol/sdk/server/index.js', () => {
@@ -18,9 +19,16 @@ vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
   StdioServerTransport: vi.fn(() => ({})),
 }))
 
+// Mock startup API key validation so these tests don't depend on real
+// @macts/api key storage; the auth module itself is covered by auth.test.ts.
+vi.mock('./auth.js', () => ({
+  requireStartupApiKey: vi.fn().mockResolvedValue(undefined),
+}))
+
 describe('createMcpServer', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(auth.requireStartupApiKey).mockResolvedValue(undefined)
   })
 
   it('should create a server with no plugins', async () => {
@@ -106,5 +114,32 @@ describe('createMcpServer', () => {
         },
       }
     )
+  })
+
+  describe('API key validation', () => {
+    afterEach(() => {
+      vi.mocked(auth.requireStartupApiKey).mockReset()
+    })
+
+    it('rejects with the remediation message when MACTS_API_KEY is missing', async () => {
+      vi.mocked(auth.requireStartupApiKey).mockRejectedValue(
+        new Error(
+          'MACTS_API_KEY environment variable is not set.\n' +
+            'Create an API key with:\n' +
+            '  macts api-key create --name <name> --permission <app:resource:operation>'
+        )
+      )
+
+      await expect(createMcpServer([])).rejects.toThrow(/MACTS_API_KEY/)
+      await expect(createMcpServer([])).rejects.toThrow(/macts api-key create/)
+      expect(auth.requireStartupApiKey).toHaveBeenCalled()
+    })
+
+    it('resolves without checking the API key when disableApiKeyValidation is true', async () => {
+      vi.mocked(auth.requireStartupApiKey).mockRejectedValue(new Error('should not be called'))
+
+      await expect(createMcpServer([], { disableApiKeyValidation: true })).resolves.toBeUndefined()
+      expect(auth.requireStartupApiKey).not.toHaveBeenCalled()
+    })
   })
 })

@@ -52,6 +52,8 @@ The MCP server:
 - Communicates over stdio (standard input/output)
 - Automatically discovers plugins from `~/.macts/plugins/`
 - Logs to stderr (stdout is reserved for MCP protocol)
+- Requires a valid `MACTS_API_KEY` environment variable by default; validated once at startup. Set it in your MCP client's `env` config, or create a key with `macts api-key create --name <name> --permission <app:resource:operation>`
+- `--disable-api-key-validation` skips this check (not recommended — local development or trusted embedding only)
 
 #### `macts --serve [options]`
 
@@ -361,7 +363,7 @@ Useful for debugging access issues or inspecting key contents.
 
 ### MCP Daemon Management
 
-The MCP daemon runs as a background HTTP server over Unix sockets (or TCP), allowing multiple clients to share a single MCP instance.
+The MCP daemon runs as a background HTTP server over Unix sockets (or TCP), allowing multiple clients to share a single MCP instance. By default, every route except `GET /health` requires a valid `macts_sk_` API key as a `Bearer` token.
 
 #### `mcp serve [options]`
 
@@ -371,6 +373,7 @@ Start the MCP server in the foreground (for development/debugging).
 
 - `--port <number>` - TCP port to listen on (optional)
 - `--socket <path>` - Unix socket path (default: ~/.macts/mcp.sock)
+- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Examples:**
 
@@ -383,13 +386,18 @@ macts mcp serve --port 3000
 
 # Use custom socket path
 macts mcp serve --socket /tmp/custom.sock
+
+# Start without API key validation (not recommended)
+macts mcp serve --disable-api-key-validation
 ```
 
 The server will:
 
 - Load all installed MCP plugins
 - Listen on the specified socket or port
-- Handle MCP protocol requests over HTTP/SSE
+- Handle MCP protocol requests over streamable HTTP (`/mcp`) and legacy SSE (`/sse` + `/message`)
+- Require `Authorization: Bearer macts_sk_...` on every route except `/health`, unless `--disable-api-key-validation` is passed
+- Log whether API key validation is enabled or disabled to stderr on startup
 - Display logs to stderr
 
 Press Ctrl+C to stop the server.
@@ -402,6 +410,7 @@ Start the MCP server in the background as a detached process.
 
 - `--port <number>` - TCP port to listen on (optional)
 - `--socket <path>` - Unix socket path (default: ~/.macts/mcp.sock)
+- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Examples:**
 
@@ -414,6 +423,9 @@ macts mcp start --port 3000
 
 # Use custom socket path
 macts mcp start --socket /tmp/custom.sock
+
+# Start without API key validation (not recommended)
+macts mcp start --disable-api-key-validation
 ```
 
 The server will:
@@ -422,6 +434,7 @@ The server will:
 - Continue running after the terminal closes
 - Write logs to `~/.macts/mcp.log`
 - Store its PID in `~/.macts/mcp.pid`
+- Forward `--disable-api-key-validation` to the spawned `mcp serve` process, when passed
 
 Use `macts mcp stop` to stop the server.
 
