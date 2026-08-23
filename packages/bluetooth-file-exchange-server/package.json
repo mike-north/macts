@@ -2,6 +2,12 @@
   "name": "@macts/bluetooth-file-exchange-server",
   "version": "0.0.0",
   "description": "Server package for macOS BluetoothFileExchange.app (API + MCP)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/bluetooth-file-exchange-server"
+  },
   "keywords": [
     "macts-server"
   ],
@@ -21,6 +27,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "lint": "eslint src",

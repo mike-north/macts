@@ -15,7 +15,7 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { readdirSync, existsSync } from 'node:fs'
+import { readdirSync, existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -26,6 +26,19 @@ const cliBin = join(repoRoot, 'packages', 'cli', 'dist', 'bin.js')
 
 if (!existsSync(cliBin)) {
   console.error(`CLI binary not found at ${cliBin}. Run "pnpm build" first.`)
+  process.exit(1)
+}
+
+// Under Changesets fixed-versioning, every @macts/* package always shares one
+// version. packages/core/package.json is the single source of truth for it —
+// read it here so every generated package.json carries the real, current
+// version instead of drifting back to the generator's "0.0.0" default on
+// every regeneration.
+const corePackageJsonPath = join(packagesDir, 'core', 'package.json')
+const corePackageJson = JSON.parse(readFileSync(corePackageJsonPath, 'utf-8'))
+const version = corePackageJson.version
+if (typeof version !== 'string' || version.length === 0) {
+  console.error(`Could not read a valid "version" from ${corePackageJsonPath}.`)
   process.exit(1)
 }
 
@@ -46,7 +59,17 @@ for (const app of apps) {
   console.log(`  - ${app}`)
   execFileSync(
     process.execPath,
-    [cliBin, 'generate', manifestPath, '--out-dir', packagesDir, '--target', 'all'],
+    [
+      cliBin,
+      'generate',
+      manifestPath,
+      '--out-dir',
+      packagesDir,
+      '--target',
+      'all',
+      '--version',
+      version,
+    ],
     { stdio: ['ignore', 'ignore', 'inherit'] }
   )
 }

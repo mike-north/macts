@@ -7,6 +7,7 @@ import { generateSchemas } from './schemas.js'
 import { generateResourceClass } from './resource.js'
 import { generateCollectionClass } from './collection.js'
 import { generateApplicationClass } from './application.js'
+import { MIT_LICENSE } from './license.js'
 
 export interface GenerateSdkResult {
   files: { path: string; content: string }[]
@@ -73,6 +74,12 @@ export function generateSdk(manifest: AppManifest, options: GeneratorOptions): G
       path: join('src', 'index.ts'),
       content: generateIndexFile(ctx, appClass.name),
     })
+
+    // Generate LICENSE
+    files.push({
+      path: 'LICENSE',
+      content: MIT_LICENSE,
+    })
   } catch (error) {
     errors.push(error instanceof Error ? error.message : String(error))
   }
@@ -88,6 +95,13 @@ function generatePackageJson(ctx: GeneratorContext): string {
     name: ctx.options.packageName,
     version: ctx.options.version ?? '0.0.0',
     description: `TypeScript SDK for ${ctx.manifest.app.name}`,
+    license: 'MIT',
+    repository: {
+      type: 'git',
+      url: 'git+https://github.com/mike-north/macts.git',
+      directory: `packages/${unscopedName}`,
+    },
+    publishConfig: { access: 'public' },
     type: 'module',
     exports: {
       '.': {

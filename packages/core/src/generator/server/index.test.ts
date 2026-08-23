@@ -273,6 +273,9 @@ describe('generateServerPackage', () => {
     const pkg = JSON.parse(pkgFile.content) as {
       name: string
       version: string
+      license: string
+      repository: { type: string; url: string; directory: string }
+      publishConfig: { access: string }
       type: string
       exports: Record<string, { types: string; import: string }>
       dependencies: Record<string, string>
@@ -284,6 +287,15 @@ describe('generateServerPackage', () => {
     expect(pkg.name).toBe('@macts/calendar-server')
     expect(pkg.version).toBe('1.2.3')
     expect(pkg.type).toBe('module')
+
+    // npm publishing metadata
+    expect(pkg.license).toBe('MIT')
+    expect(pkg.repository).toEqual({
+      type: 'git',
+      url: 'git+https://github.com/mike-north/macts.git',
+      directory: 'packages/calendar-server',
+    })
+    expect(pkg.publishConfig).toEqual({ access: 'public' })
 
     // Subpath exports
     expect(pkg.exports['.']).toEqual({
@@ -429,6 +441,21 @@ describe('generateServerPackage', () => {
     }
     expect(pkg.name).toBe('@macts/google-chrome-server')
     expect(pkg.dependencies['@macts/google-chrome']).toBe('workspace:*')
+  })
+
+  it('should emit a LICENSE file with the MIT license text', () => {
+    const manifest = createCalendarManifest()
+    const result = generateServerPackage(manifest, {
+      appName: 'calendar',
+      serverPackageName: '@macts/calendar-server',
+      clientPackageName: '@macts/calendar',
+    })
+
+    const licenseFiles = result.files.filter((f) => f.path === 'LICENSE')
+    expect(licenseFiles).toHaveLength(1)
+    expect(licenseFiles[0]?.content).toContain('MIT License')
+    expect(licenseFiles[0]?.content).toContain('Copyright (c) 2026 Michael North')
+    expect(licenseFiles[0]?.content).toContain('THE SOFTWARE IS PROVIDED "AS IS"')
   })
 
   it('should not include api-extractor placeholder directories', () => {

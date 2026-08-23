@@ -11,6 +11,7 @@ import type { AppManifest } from '../../manifest/index.js'
 import { generateApiPlugin } from '../api/index.js'
 import { generateMcpPlugin } from '../mcp/index.js'
 import { createMcpGeneratorContext } from '../mcp/context.js'
+import { MIT_LICENSE } from '../license.js'
 
 /**
  * Options for generating a server package.
@@ -143,6 +144,11 @@ export function generateServerPackage(
       path: '.gitignore',
       content: GITIGNORE,
     })
+
+    files.push({
+      path: 'LICENSE',
+      content: MIT_LICENSE,
+    })
   } catch (error) {
     errors.push(error instanceof Error ? error.message : String(error))
   }
@@ -170,6 +176,12 @@ function generatePackageJson(
       name: serverPackageName,
       version: versionStr,
       description: `Server package for macOS ${capitalizedAppName}.app (API + MCP)`,
+      license: 'MIT',
+      repository: {
+        type: 'git',
+        url: 'git+https://github.com/mike-north/macts.git',
+        directory: `packages/${unscopedName}`,
+      },
       keywords: ['macts-server'],
       type: 'module',
       exports: {
@@ -185,6 +197,7 @@ function generatePackageJson(
       main: './dist/index.js',
       types: typesPath,
       files: ['dist'],
+      publishConfig: { access: 'public' },
       scripts: {
         build: 'tsup',
         lint: 'eslint src',
