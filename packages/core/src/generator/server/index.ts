@@ -198,6 +198,9 @@ function generatePackageJson(
       types: typesPath,
       files: ['dist'],
       publishConfig: { access: 'public' },
+      engines: {
+        node: '>=22',
+      },
       scripts: {
         build: 'tsup',
         lint: 'eslint src',

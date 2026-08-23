@@ -65,6 +65,9 @@ describe('generateSdk', () => {
     expect(pkgFile).toBeDefined()
     expect(pkgFile?.content).toContain('@macts/sdk-calendar')
     expect(pkgFile?.content).toContain('1.0.0')
+
+    const pkg: unknown = JSON.parse(pkgFile?.content ?? '{}')
+    expect(pkg).toMatchObject({ engines: { node: '>=22' } })
   })
 
   it('should generate package.json with npm publishing metadata', () => {

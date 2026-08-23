@@ -149,11 +149,11 @@ export async function validateAndCheckPermission(
     return {
       granted: false,
       required: requiredPermission,
-      hint: validation.error ?? 'Invalid token',
+      hint: validation.error,
     }
   }
 
-  return hasPermission(validation.payload?.permissions ?? [], requiredPermission, permissionHistory)
+  return hasPermission(validation.payload.permissions, requiredPermission, permissionHistory)
 }
 
 /**

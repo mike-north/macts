@@ -28,6 +28,7 @@ import { dirname, join } from 'node:path'
 import { loadManifest, type PermissionsSection } from '@macts/core'
 import { createApiKey, UnexpandableCoarsePermissionError } from './generator.js'
 import { validateApiKey, checkPayloadPermission } from './validator.js'
+import { assertValidationSuccess } from './validation-test-helpers.js'
 import * as storage from './storage.js'
 
 vi.mock('./storage.js', async () => {
@@ -64,8 +65,7 @@ beforeEach(async () => {
 /** Validate a token and return its payload, failing the test if invalid. */
 async function payloadOf(token: string) {
   const result = await validateApiKey(token)
-  expect(result.valid).toBe(true)
-  if (!result.payload) throw new Error('expected a valid payload')
+  assertValidationSuccess(result)
   return result.payload
 }
 

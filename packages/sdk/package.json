@@ -24,6 +24,9 @@
     "dist",
     "AUTHORING.md"
   ],
+  "engines": {
+    "node": ">=22"
+  },
   "keywords": [
     "macts-sdk"
   ],

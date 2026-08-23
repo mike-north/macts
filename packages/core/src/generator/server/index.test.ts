@@ -277,6 +277,7 @@ describe('generateServerPackage', () => {
       repository: { type: string; url: string; directory: string }
       publishConfig: { access: string }
       type: string
+      engines: Record<string, string>
       exports: Record<string, { types: string; import: string }>
       dependencies: Record<string, string>
       peerDependencies: Record<string, string>
@@ -287,6 +288,7 @@ describe('generateServerPackage', () => {
     expect(pkg.name).toBe('@macts/calendar-server')
     expect(pkg.version).toBe('1.2.3')
     expect(pkg.type).toBe('module')
+    expect(pkg.engines).toEqual({ node: '>=22' })
 
     // npm publishing metadata
     expect(pkg.license).toBe('MIT')

@@ -218,6 +218,9 @@ function generatePackageJson(
     main: './dist/index.js',
     types: `./dist/${unscopedName}.d.ts`,
     files: ['dist'],
+    engines: {
+      node: '>=22',
+    },
     keywords: ['macts-sdk', 'macts-cli-plugin'],
     scripts: {
       build: 'tsup',
