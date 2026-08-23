@@ -19,6 +19,14 @@ recover manually if the automated flow needs help.
    changesets and shows the version bumps and changelog entries that will
    result from merging it.
 
+   > **Note:** GitHub suppresses workflow triggers for pull requests created
+   > with the default `GITHUB_TOKEN`, so CI does not run automatically on the
+   > "Version Packages" PR. Close and reopen the PR to trigger CI (including
+   > the `generate:check` gate) before merging. To make this automatic,
+   > provide a fine-grained personal access token (contents + pull-requests
+   > read/write) to the `changesets/action` checkout step instead of the
+   > default token.
+
 3. Merging the "Version Packages" PR triggers the same workflow to publish:
    every `@macts/*` package is built and published to npm using
    [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)
