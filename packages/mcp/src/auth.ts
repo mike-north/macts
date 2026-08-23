@@ -17,19 +17,6 @@ import type { ApiKeyPayload } from '@macts/core'
 import { validateApiKey } from '@macts/api/keys'
 
 /**
- * Options controlling API key enforcement for the MCP server.
- */
-export interface McpAuthOptions {
-  /**
-   * Skip API key validation entirely.
-   *
-   * Intended only for local development or trusted embedding scenarios.
-   * Defaults to `false` (validation required).
-   */
-  readonly disableApiKeyValidation?: boolean
-}
-
-/**
  * Error codes for authentication failures.
  *
  * Mirrors {@link import('@macts/api/server').AuthErrorResponse}'s `error.code`

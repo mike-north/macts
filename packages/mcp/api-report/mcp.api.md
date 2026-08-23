@@ -116,11 +116,6 @@ export function loadMcpPlugin(packageName: string): Promise<{
 export type McpAuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
 
 // @public
-export interface McpAuthOptions {
-    readonly disableApiKeyValidation?: boolean;
-}
-
-// @public
 export interface McpPlugin {
     readonly description: string;
     readonly name: string;
