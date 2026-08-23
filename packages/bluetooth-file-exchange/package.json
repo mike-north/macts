@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "description": "SDK and CLI for macOS bluetooth-file-exchange automation",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/bluetooth-file-exchange"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": {

@@ -1,0 +1,1 @@
+# @macts/automator-server

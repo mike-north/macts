@@ -7,7 +7,10 @@
 import { activateApp } from '@macts/core';
 import { ApiKeyMetadata } from '@macts/core';
 import { ApiKeyPayload } from '@macts/core';
+import { ApiKeyValidationErrorCode } from '@macts/core';
+import { ApiKeyValidationFailure } from '@macts/core';
 import { ApiKeyValidationResult } from '@macts/core';
+import { ApiKeyValidationSuccess } from '@macts/core';
 import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
@@ -71,7 +74,13 @@ export { ApiKeyMetadata }
 
 export { ApiKeyPayload }
 
+export { ApiKeyValidationErrorCode }
+
+export { ApiKeyValidationFailure }
+
 export { ApiKeyValidationResult }
+
+export { ApiKeyValidationSuccess }
 
 export { AppConnection }
 
@@ -81,7 +90,7 @@ export { AppConnectionOptions }
 export type AttributeValue = string | number | boolean;
 
 // @public
-export type AuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+export type AuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | ApiKeyValidationErrorCode;
 
 // @public
 export interface AuthErrorResponse {

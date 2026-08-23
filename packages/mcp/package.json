@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "description": "Model Context Protocol server for macOS app automation",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/mcp"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": {

@@ -2,6 +2,12 @@
   "name": "@macts/xcode-server",
   "version": "0.0.0",
   "description": "Server package for macOS Xcode.app (API + MCP)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/xcode-server"
+  },
   "keywords": [
     "macts-server"
   ],
@@ -21,6 +27,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=22"
   },

@@ -3,6 +3,14 @@
   "version": "0.0.0",
   "description": "Core runtime and manifest parsing for macts - TypeScript SDKs for macOS automation",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": {

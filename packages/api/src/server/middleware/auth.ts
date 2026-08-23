@@ -8,7 +8,7 @@
  */
 
 import type { MiddlewareHandler } from 'hono'
-import type { ApiKeyPayload } from '@macts/core'
+import type { ApiKeyPayload, ApiKeyValidationErrorCode } from '@macts/core'
 import { validateApiKey } from '../../keys/validator.js'
 import { withSpan } from '../../telemetry.js'
 
@@ -26,11 +26,7 @@ export interface AuthVariables {
 export type AuthErrorCode =
   | 'MISSING_AUTHORIZATION'
   | 'INVALID_AUTH_SCHEME'
-  | 'INVALID_FORMAT'
-  | 'INVALID_SIGNATURE'
-  | 'EXPIRED'
-  | 'REVOKED'
-  | 'MALFORMED_PAYLOAD'
+  | ApiKeyValidationErrorCode
 
 /**
  * Authentication error response structure.
@@ -105,8 +101,8 @@ export function authMiddleware(): MiddlewareHandler<{ Variables: AuthVariables }
       return c.json<AuthErrorResponse>(
         {
           error: {
-            code: result.errorCode as AuthErrorCode,
-            message: result.error ?? 'Token validation failed',
+            code: result.errorCode,
+            message: result.error,
           },
         },
         401
@@ -114,9 +110,7 @@ export function authMiddleware(): MiddlewareHandler<{ Variables: AuthVariables }
     }
 
     // Attach payload to context
-    if (result.payload) {
-      c.set('apiKeyPayload', result.payload)
-    }
+    c.set('apiKeyPayload', result.payload)
 
     return next()
   }

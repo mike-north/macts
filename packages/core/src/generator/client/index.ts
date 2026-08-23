@@ -12,6 +12,7 @@ import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { generateCapabilitiesModule } from '../capabilities/index.js'
+import { MIT_LICENSE } from '../license.js'
 
 /**
  * Options for client package generation.
@@ -174,6 +175,11 @@ export function generateClientPackage(
 
   files.push({ path: 'api-report/.gitkeep', content: '' })
 
+  files.push({
+    path: 'LICENSE',
+    content: MIT_LICENSE,
+  })
+
   return {
     dir: appName,
     files,
@@ -192,6 +198,12 @@ function generatePackageJson(
     version: version ?? '0.0.0',
     description: `SDK and CLI for macOS ${appName} automation`,
     license: 'MIT',
+    repository: {
+      type: 'git',
+      url: 'git+https://github.com/mike-north/macts.git',
+      directory: `packages/${unscopedName}`,
+    },
+    publishConfig: { access: 'public' },
     type: 'module',
     exports: {
       '.': {
