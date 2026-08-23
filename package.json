@@ -8,6 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "clean": "nx reset && pnpm -r exec rm -rf dist temp .tsbuildinfo",
     "build": "nx run-many -t build",
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",
