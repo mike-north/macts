@@ -10,6 +10,7 @@ import {
 } from './validator.js'
 import type { ApiKeyPayload, PermissionHistoryEntry } from '@macts/core'
 import * as storage from './storage.js'
+import { assertValidationSuccess, assertValidationFailure } from './validation-test-helpers.js'
 
 // Mock storage module
 vi.mock('./storage.js', () => ({
@@ -79,9 +80,9 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(true)
+      assertValidationSuccess(result)
       expect(result.payload).toBeDefined()
-      expect(result.payload?.permissions).toContain('calendar:events:list')
+      expect(result.payload.permissions).toContain('calendar:events:list')
     })
 
     it('should validate token with multiple permissions', async () => {
@@ -91,8 +92,8 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(true)
-      expect(result.payload?.permissions).toHaveLength(3)
+      assertValidationSuccess(result)
+      expect(result.payload.permissions).toHaveLength(3)
     })
 
     it('should validate token with optional name field', async () => {
@@ -103,8 +104,8 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(true)
-      expect(result.payload?.name).toBe('My Test Key')
+      assertValidationSuccess(result)
+      expect(result.payload.name).toBe('My Test Key')
     })
 
     it('should validate token with future expiration', async () => {
@@ -115,7 +116,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(true)
+      assertValidationSuccess(result)
     })
 
     it('should validate token with wildcard permissions', async () => {
@@ -125,8 +126,8 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(true)
-      expect(result.payload?.permissions).toContain('calendar:*:read')
+      assertValidationSuccess(result)
+      expect(result.payload.permissions).toContain('calendar:*:read')
     })
   })
 
@@ -134,7 +135,7 @@ describe('validateApiKey', () => {
     it('should reject token without macts_sk_ prefix', async () => {
       const result = await validateApiKey('invalid_token')
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_FORMAT')
       expect(result.error).toContain('must start with macts_sk_')
     })
@@ -142,21 +143,21 @@ describe('validateApiKey', () => {
     it('should reject empty token', async () => {
       const result = await validateApiKey('')
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_FORMAT')
     })
 
     it('should reject token with only prefix', async () => {
       const result = await validateApiKey('macts_sk_')
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_FORMAT')
     })
 
     it('should reject malformed JWT (not 3 parts)', async () => {
       const result = await validateApiKey('macts_sk_not.a.valid.jwt.token')
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_FORMAT')
     })
   })
@@ -181,7 +182,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(tamperedToken)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_SIGNATURE')
     })
 
@@ -193,7 +194,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_SIGNATURE')
     })
   })
@@ -204,7 +205,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('EXPIRED')
       expect(result.error).toContain('expired')
     })
@@ -221,7 +222,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(token)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('REVOKED')
       expect(storage.isKeyRevoked).toHaveBeenCalledWith('key_revoked123')
     })
@@ -240,7 +241,7 @@ describe('validateApiKey', () => {
       const result = await validateApiKey(`macts_sk_${jwt}`)
 
       // jose.jwtVerify checks issuer and throws
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
     })
 
     it('should reject token missing permissions array', async () => {
@@ -254,7 +255,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(`macts_sk_${jwt}`)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('MALFORMED_PAYLOAD')
     })
 
@@ -269,7 +270,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(`macts_sk_${jwt}`)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('MALFORMED_PAYLOAD')
     })
 
@@ -286,7 +287,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(`macts_sk_${jwt}`)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('MALFORMED_PAYLOAD')
     })
 
@@ -303,7 +304,7 @@ describe('validateApiKey', () => {
 
       const result = await validateApiKey(`macts_sk_${jwt}`)
 
-      expect(result.valid).toBe(false)
+      assertValidationFailure(result)
       expect(result.errorCode).toBe('MALFORMED_PAYLOAD')
     })
   })

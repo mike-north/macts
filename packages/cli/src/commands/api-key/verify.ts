@@ -32,7 +32,7 @@ export class ApiKeyVerifyCommand extends Command {
       const result = await validateApiKey(this.token)
 
       if (this.json) {
-        if (result.valid && result.payload) {
+        if (result.valid) {
           this.context.stdout.write(
             formatter.format({
               valid: true,
@@ -55,7 +55,7 @@ export class ApiKeyVerifyCommand extends Command {
           )
         }
       } else {
-        if (result.valid && result.payload) {
+        if (result.valid) {
           this.context.stdout.write('\n')
           this.context.stdout.write('Key is valid\n\n')
           this.context.stdout.write(`Key ID: ${result.payload.sub}\n`)
@@ -79,9 +79,7 @@ export class ApiKeyVerifyCommand extends Command {
             this.context.stdout.write(`  - ${perm}\n`)
           }
         } else {
-          this.context.stderr.write(
-            formatter.formatError(`Invalid key: ${result.error ?? ''}`) + '\n'
-          )
+          this.context.stderr.write(formatter.formatError(`Invalid key: ${result.error}`) + '\n')
 
           // Try to extract info even from invalid token for debugging
           const keyId = extractKeyIdFromToken(this.token)

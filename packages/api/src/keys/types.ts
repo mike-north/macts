@@ -10,6 +10,9 @@
 export type {
   ApiKeyPayload,
   ApiKeyMetadata,
+  ApiKeyValidationErrorCode,
+  ApiKeyValidationSuccess,
+  ApiKeyValidationFailure,
   ApiKeyValidationResult,
   PermissionCheckResult,
 } from '@macts/core'

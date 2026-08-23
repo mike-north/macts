@@ -21,6 +21,9 @@ export {
   type SpecialOperation,
   type ApiKeyPayload,
   type ApiKeyMetadata,
+  type ApiKeyValidationErrorCode,
+  type ApiKeyValidationSuccess,
+  type ApiKeyValidationFailure,
   type ApiKeyValidationResult,
   type PermissionCheckResult,
 } from './types.js'
