@@ -309,6 +309,98 @@ export interface AppProbeResult {
 }
 
 // @public
+export const APPROVAL_LAYERS: readonly ["host", "key"];
+
+// @public
+export const APPROVAL_STATES: readonly ["approved", "rejected", "timeout"];
+
+// @public
+export type ApprovalConfig = z.infer<typeof ApprovalConfigSchema>;
+
+// @public
+export interface ApprovalConfigIssue {
+    readonly message: string;
+    readonly path: string;
+}
+
+// @public
+export const ApprovalConfigSchema: z.ZodObject<{
+    version: z.ZodDefault<z.ZodLiteral<"1">>;
+    provider: z.ZodString;
+    timeoutMs: z.ZodDefault<z.ZodNumber>;
+    options: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+}, z.core.$strict>;
+
+// @public
+export interface ApprovalDecision {
+    readonly evidence?: unknown;
+    readonly policySuggestion?: ApprovalPolicySuggestion | undefined;
+    readonly reason?: string | undefined;
+    readonly state: ApprovalState;
+}
+
+// @public
+export type ApprovalLayer = (typeof APPROVAL_LAYERS)[number];
+
+// @public
+export interface ApprovalOutcome {
+    readonly approved: boolean;
+    readonly evidence?: unknown;
+    readonly policySuggestion?: ApprovalPolicySuggestion | undefined;
+    readonly providerFailure?: string | undefined;
+    readonly reason: string;
+    readonly state: ApprovalState;
+}
+
+// @public
+export interface ApprovalPolicySuggestion {
+    readonly disposition: PolicyDisposition;
+    readonly permission: string;
+    readonly rationale?: string | undefined;
+}
+
+// @public
+export interface ApprovalProvider {
+    readonly capabilities: ApprovalProviderCapabilities;
+    readonly name: string;
+    requestApproval(request: ApprovalRequest, context: ApprovalRequestContext): Promise<ApprovalDecision>;
+}
+
+// @public
+export interface ApprovalProviderCapabilities {
+    readonly supportsDistinctRouting: boolean;
+    readonly supportsPolicySuggestions: boolean;
+}
+
+// @public
+export interface ApprovalRequest {
+    readonly argsSummary: string;
+    readonly id: string;
+    readonly identity: ApprovalRequesterIdentity;
+    readonly layer: ApprovalLayer;
+    readonly permission: string;
+    readonly reason: string;
+    readonly requestedAt: Date;
+    readonly risk: RiskClass;
+    readonly rule: MatchedPolicyRule;
+    readonly timeoutMs: number;
+}
+
+// @public
+export interface ApprovalRequestContext {
+    readonly signal: AbortSignal;
+}
+
+// @public
+export interface ApprovalRequesterIdentity {
+    readonly apiKeyId: string;
+    readonly apiKeyName?: string | undefined;
+}
+
+// @public
+export type ApprovalState = (typeof APPROVAL_STATES)[number];
+
+// @public
 export type AppRule = z.infer<typeof AppRuleSchema>;
 
 // @public
@@ -626,6 +718,9 @@ export function createMcpGeneratorContext(options: CreateMcpContextOptions): Mcp
 export function createPolicyGovernanceFilter(policy: GovernancePolicy): GovernanceFilter;
 
 // @public
+export function createStaticApprovalProvider(options: StaticApprovalProviderOptions): ApprovalProvider;
+
+// @public
 export const dateCoercer: TypeCoercer<Date>;
 
 // @public (undocumented)
@@ -633,6 +728,9 @@ export type DateType = z.infer<typeof DateTypeSchema>;
 
 // @public
 export const DateTypeSchema: z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>;
+
+// @public
+export const DEFAULT_APPROVAL_TIMEOUT_MS = 120000;
 
 // @public
 export const DEFAULT_RISK: RiskClass;
@@ -1318,6 +1416,9 @@ export type InspectOutcome = {
 };
 
 // @public
+export function isApprovalState(value: unknown): value is ApprovalState;
+
+// @public
 export function isAppRunning(bundleId: string): Promise<boolean>;
 
 // @public
@@ -1452,6 +1553,9 @@ export interface MatchedPolicyRule {
 }
 
 // @public
+export const MAX_APPROVAL_TIMEOUT_MS = 3600000;
+
+// @public
 export interface McpGeneratorContext {
     appName: string;
     manifest: AppManifest;
@@ -1529,6 +1633,18 @@ export interface OperationVocabulary {
     readonly coarse: readonly CoarseOperation[];
     readonly fine: ReadonlySet<string>;
 }
+
+// @public
+export function parseApprovalConfig(input: unknown): ParseApprovalConfigResult;
+
+// @public
+export type ParseApprovalConfigResult = {
+    readonly success: true;
+    readonly data: ApprovalConfig;
+} | {
+    readonly success: false;
+    readonly issues: readonly ApprovalConfigIssue[];
+};
 
 // @public
 export type ParsedPermission = FinePermission | CoarsePermission | WildcardPermission;
@@ -1910,6 +2026,17 @@ export interface RawSuite {
     name: string;
 }
 
+// @public
+export function recordApprovalDecision(options: RecordApprovalDecisionOptions): Promise<AuditDecision>;
+
+// @public
+export interface RecordApprovalDecisionOptions {
+    readonly audit: CallAuditContext;
+    readonly outcome: ApprovalOutcome;
+    readonly permission: string;
+    readonly writer?: AuditWriter | undefined;
+}
+
 // @public (undocumented)
 export type RectType = z.infer<typeof RectTypeSchema>;
 
@@ -1952,6 +2079,9 @@ export const RelationshipSchema: z.ZodObject<{
 
 // @public
 export function resolveActivePolicyPath(home: string): string;
+
+// @public
+export function resolveApprovalConfigPath(home: string): string;
 
 // @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];
@@ -2123,6 +2253,15 @@ export interface SearchCapabilitiesOptions {
 }
 
 // @public
+export function seekApproval(options: SeekApprovalOptions): Promise<ApprovalOutcome>;
+
+// @public
+export interface SeekApprovalOptions {
+    readonly provider: ApprovalProvider;
+    readonly request: ApprovalRequest;
+}
+
+// @public
 export type Selector = {
     type: 'id';
     value: string;
@@ -2168,6 +2307,15 @@ export interface SpecifierStep {
     name: string;
     // (undocumented)
     selector?: Selector;
+}
+
+// @public
+export interface StaticApprovalProviderOptions {
+    readonly capabilities?: ApprovalProviderCapabilities;
+    readonly evidence?: unknown;
+    readonly name?: string;
+    readonly reason?: string | undefined;
+    readonly state: ApprovalState;
 }
 
 // @public

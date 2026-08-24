@@ -12,8 +12,11 @@
  *
  * - evaluator `'allowed'`       → outcome `'allowed'` (the call proceeds).
  * - evaluator `'denied'`        → outcome `'denied'` (the call is blocked).
- * - evaluator `'confirm-first'` → outcome `'pending-approval'` (the caller, not
- *                                 this module, owns the approval flow — issue #54).
+ * - evaluator `'confirm-first'` → outcome `'pending-approval'` (the caller owns
+ *                                 the approval flow; it asks a human through the
+ *                                 approval seam in {@link ./approval.js} and
+ *                                 records the answer with
+ *                                 {@link recordApprovalDecision}).
  *
  * **Fail-closed** behavior (default `forbidden`, malformed-permission denial,
  * `read-only` semantics) all live in the evaluator; enforcement inherits them.
@@ -32,6 +35,7 @@
 import type { GovernancePolicy } from './policy.js'
 import type { AuditWriter } from './writer.js'
 import type { PolicyEvaluation } from './evaluator.js'
+import type { ApprovalOutcome } from './approval.js'
 import { createAuditRecord, type AuditDecision } from './audit.js'
 import { evaluatePolicy } from './evaluator.js'
 import type { RiskClass } from '../capabilities/risk.js'
@@ -48,8 +52,9 @@ import type { RiskClass } from '../capabilities/risk.js'
  * - `'denied'`           — the policy blocks the call; it must not proceed.
  * - `'pending-approval'` — the policy requires human confirmation before the
  *                          call runs (evaluator decision `'confirm-first'`). The
- *                          approval flow itself is issue #54; this module only
- *                          surfaces the signal.
+ *                          approval flow itself lives behind the approval seam
+ *                          ({@link ./approval.js}); this module only surfaces
+ *                          the signal.
  */
 export type EnforcementOutcome = 'allowed' | 'denied' | 'pending-approval'
 
@@ -211,9 +216,10 @@ function deriveAuditApp(permission: string): string {
  * 3. Writes an audit record to `options.writer` (when supplied), unconditionally,
  *    for allow, deny, and pending-approval alike.
  *
- * **Note on `confirm-first`**: this module surfaces a `'pending-approval'`
- * outcome; it does not implement the approval flow. Callers must gate the actual
- * invocation on human approval (issue #54).
+ * **Note on `confirm-first`**: this function surfaces a `'pending-approval'`
+ * outcome; it does not ask anyone. Callers must gate the actual invocation on a
+ * human decision obtained through the approval seam (`seekApproval`), then
+ * record the answer with {@link recordApprovalDecision}.
  *
  * @param options - Enforcement options (policy, permission, risk, audit context,
  *   optional writer).
@@ -241,4 +247,70 @@ export async function enforceCall(options: EnforceCallOptions): Promise<Enforcem
   }
 
   return { outcome, reason: evaluation.reason, evaluation }
+}
+
+// ---------------------------------------------------------------------------
+// Approval outcome auditing
+// ---------------------------------------------------------------------------
+
+/**
+ * Options for {@link recordApprovalDecision}.
+ */
+export interface RecordApprovalDecisionOptions {
+  /**
+   * The capability the human decided on, in `app:resource:operation` form. Must
+   * be the same permission that was held as `'pending'`, so the two records
+   * pair up in the trail.
+   */
+  readonly permission: string
+  /** The normalized outcome returned by the approval gate. */
+  readonly outcome: ApprovalOutcome
+  /** Audit context for this call (see {@link CallAuditContext}). */
+  readonly audit: CallAuditContext
+  /**
+   * Optional audit writer. When omitted the mapped decision is still returned
+   * but nothing is persisted.
+   */
+  readonly writer?: AuditWriter | undefined
+}
+
+/**
+ * Record the human decision that resolved a previously-held `confirm-first`
+ * call.
+ *
+ * A held call produces **two** audit records, not one: {@link enforceCall}
+ * writes `'pending'` when the call is withheld, and this writes `'approved'` or
+ * `'rejected'` when a human (or the fail-closed gate) resolves it. Keeping both
+ * preserves the sequence — a reader can see how long a call waited and how it
+ * ended, which a single collapsed record would lose.
+ *
+ * The mapping is deliberately binary: anything other than an explicit approval
+ * — an explicit rejection, a timeout, a provider failure — records as
+ * `'rejected'`, because the call did not run and a human did not permit it. The
+ * finer distinction (a human declined vs. nobody answered) is preserved in the
+ * record's human-readable `reason`, which carries the gate's explanation.
+ *
+ * @param options - Permission, approval outcome, audit context, optional writer.
+ * @returns The {@link AuditDecision} that was recorded.
+ */
+export async function recordApprovalDecision(
+  options: RecordApprovalDecisionOptions
+): Promise<AuditDecision> {
+  const { permission, outcome, audit, writer } = options
+  const decision: AuditDecision = outcome.approved ? 'approved' : 'rejected'
+
+  if (writer !== undefined) {
+    const record = createAuditRecord({
+      capability: permission,
+      app: deriveAuditApp(permission),
+      argsSummary: audit.argsSummary,
+      apiKeyId: audit.apiKeyId,
+      decision,
+      timestamp: audit.timestamp,
+      reason: outcome.reason,
+    })
+    await writer.append(record)
+  }
+
+  return decision
 }
