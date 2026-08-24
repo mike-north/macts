@@ -1,6 +1,6 @@
 {
   "name": "@macts/cli",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Command-line interface for macOS app automation via TypeScript-based SDKs",
   "license": "MIT",
   "repository": {

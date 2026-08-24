@@ -1,6 +1,6 @@
 {
   "name": "@macts/bluetooth-file-exchange-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Server package for macOS BluetoothFileExchange.app (API + MCP)",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "@macts/shortcuts-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Server package for macOS Shortcuts.app (API + MCP)",
   "license": "MIT",
   "repository": {

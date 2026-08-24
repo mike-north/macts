@@ -1,1 +1,290 @@
 # @macts/api
+
+## 1.0.0
+
+### Minor Changes
+
+- 1454024: Convert `ApiKeyValidationResult` to a discriminated union on `valid`
+
+  `ApiKeyValidationResult` was a single interface with `valid: boolean` and
+  optional `payload`, `error`, and `errorCode` fields, forcing consumers to add
+  defensive guards (e.g. `result.valid && result.payload`) that the type system
+  could not verify. It is now a discriminated union of `ApiKeyValidationSuccess`
+  (`valid: true`, required `payload`) and `ApiKeyValidationFailure`
+  (`valid: false`, required `error` and `errorCode`), so narrowing on
+  `result.valid` gives direct, type-safe access to the appropriate fields.
+
+  The failure error codes are extracted into a new exported
+  `ApiKeyValidationErrorCode` type, which the API server's `AuthErrorCode` now
+  builds on instead of duplicating the code list. Consumers (API auth middleware,
+  CLI `api-key verify`) drop their defensive `payload` guards and error-message
+  fallbacks in favor of narrowing.
+
+  Breaking for TypeScript consumers that constructed partial results (e.g.
+  `{ valid: false }` without `error`/`errorCode`); runtime behavior is unchanged
+  except that a failure response message can no longer silently fall back to a
+  generic string.
+
+- f1e103f: Enforce the declared governance policy at capability call time
+
+  `@macts/core` now turns a declared governance policy into call-time decisions and the `@macts/api` server enforces them on every capability invocation, layered after the existing API-key permission check.
+
+  **`@macts/core` — the decision layer:**
+  - `evaluatePolicy(policy, permission, risk)` — the single source of truth for "does this policy allow this capability?". Returns a structured `PolicyEvaluation` with a decision (`allowed` | `denied` | `confirm-first`), the matched rule and its provenance, and a human-readable reason naming the rule and the exact `app:resource:operation`. Discovery filtering and enforcement both consume this so they can never drift.
+  - `compilePolicyToPermissions(policy, candidates)` / `policyGrantsPermission(policy, candidate)` — project a policy onto the concrete `app:resource:operation` permissions it grants (allowed plus read-only-as-read), consistent with the evaluator.
+  - `enforceCall(options)` — the audit-writing wrapper: evaluates the policy, maps the decision to an enforcement outcome (`allowed` | `denied` | `pending-approval`), and writes one audit record per decision via the injected `AuditWriter`. A `confirm-first` (pending-approval) outcome is recorded with the dedicated `pending` audit decision — distinct from `denied` — so a withheld confirmation is never misattributed as a policy denial.
+  - `AUDIT_DECISIONS` now includes `pending` (a confirm-first call withheld awaiting approval), alongside `allowed`, `denied`, `approved`, and `rejected`.
+
+  Disposition semantics: `allowed` permits; `read-only` permits only read-class operations (mutating operations are denied); `confirm-first` surfaces a pending-approval signal and the operation is withheld; `forbidden` denies; an unmatched capability falls back to `policy.defaultDisposition` (fail-closed `forbidden` by default).
+
+  **`@macts/api` — call-time enforcement:**
+  - `requirePolicy(...)` middleware checks every RPC endpoint against the active policy after the API-key permission check; out-of-policy calls fail with `403 GOVERNANCE_DENIED` and the human-readable reason. A `confirm-first` call is withheld safe-by-default: the operation does **not** execute, and the middleware returns `202` with a `GovernancePendingResponse` body naming the gating rule and the exact `app:resource:operation` (audited as `pending`). The dedicated approval flow that would let such a call proceed is a separate change.
+  - The active policy is loaded via `loadActivePolicy` from `<macts-home>/governance/policy.json`. When no policy file is configured, the server defaults to an allow-all policy so existing behavior is preserved; a malformed policy file is a hard error (never silently downgraded to allow-all).
+  - Every decision is audited (with redacted argument summaries) through the foundation's file audit writer, whose destination is injected by the API layer.
+
+- b72513a: Make the permission and operation vocabulary coherent so a granted scope reliably authorizes the calls it is meant for.
+
+  **Single-sourced operation vocabulary (`@macts/core`)**
+  - The operation vocabulary now has one authority. A new `permissions/vocabulary` module exports `COARSE_OPERATIONS` (the fixed CRUD aliases), `PURE_COARSE_OPERATIONS` (`read`/`write`, the grouping-only aliases), `isCoarseOperation`, `isPureCoarseOperation`, and `getOperationVocabulary`/`getFineOperations` (which derive the app-specific fine-grained operation set from a manifest). CLI help, the code generator, and docs consume these instead of re-typing the set; a drift-guard test fails if any surface re-defines it.
+
+  **Phantom `read` eliminated**
+  - A grouping-only coarse operation (`read`/`write`) never authorizes a call on its own. Creating a key with such a scope and no manifest to expand it is now rejected with `UnexpandableCoarsePermissionError`, which names the wildcard and fine-grained permissions to use instead — rather than silently storing a scope that denies every real call.
+  - `validateCommandPermissions` now rejects a manifest command whose operation is a grouping-only coarse alias, preventing a phantom `read` from re-entering a manifest. The Microsoft Word `createRange` command, which incorrectly required `word:documents:read`, now requires `word:documents:createRange`.
+  - Generated SDK key-creation hints use the real `--permission` flag (was the non-existent `--permissions`) and a wildcard scope that actually authorizes calls.
+
+  **Coherent wildcard and `--manifest` semantics**
+  - Authorization is exact-match-or-wildcard: a granted permission covers a call when it matches exactly or has `*` in the resource and/or operation segment. Coarse operations are creation-time sugar expanded against a manifest, never a matching rule. This mental model is now documented in the CLI and API READMEs to match the matcher's actual behavior.
+
+  **Precise denials**
+  - A denied permission check names the exact missing `app:resource:operation` and the resource wildcard that would also authorize the call, so the fix is a single grant.
+
+- 4851845: Add two-layer permissions system and JWT-based API key management
+
+  **@macts/core - Permissions System:**
+  - Fine-grained permissions (one per command): `app:resource:operation`
+  - Coarse-grained permissions (CRUD-style groups): `app:resource:read`
+  - Wildcard permissions for broad grants: `app:*:read`, `app:resource:*`
+  - Permission parsing, expansion, and matching utilities
+  - Permission history tracking for helpful upgrade error messages
+  - Manifest schema updates to support `permission` field on commands and `permissions` section for coarse-to-fine mappings
+
+  **@macts/api - API Key Management:**
+  - JWT-based API key generation with HMAC-SHA256 signatures
+  - Token format: `macts_sk_<jwt>` for easy identification
+  - Permission expansion at key creation time (coarse/wildcard → fine-grained)
+  - Key metadata storage with revocation support
+  - Secure secret storage in `~/.macts/secrets/` with proper file permissions
+  - Environment variable override: `MACTS_API_KEY_SECRET`
+  - Validation utilities with detailed error codes
+
+  **Key Features:**
+  - Coarse permissions expand at creation, not validation (security: new permissions require new keys)
+  - Permission history provides actionable error messages when requirements change
+  - Keys store only fine-grained permissions for precise access control
+  - Helper functions for common patterns: `createFullAccessKey()`, `createReadOnlyKey()`
+
+### Patch Changes
+
+- 613ffcf: Add 12 new macOS app packages, fix all lint errors, and add plugin discovery e2e tests
+
+  **New apps (12):**
+  - Shortcuts, Automator, Photos, Xcode, Microsoft Edge, Microsoft Word, OmniFocus, OmniGraffle, OmniPlan, Alfred 5, Bluetooth File Exchange, System Information
+
+  **Generator improvements:**
+  - Fix code generators to emit lint-clean TypeScript (no-invalid-void-type, no-explicit-any, restrict-template-expressions, no-unnecessary-condition, no-useless-escape)
+  - Generated code now uses `rpc<undefined>` instead of `rpc<void>`, `as unknown` instead of `as any`, and proper template literal interpolation
+
+  **Infrastructure lint fixes:**
+  - Fix all ESLint errors across @macts/core, @macts/cli, @macts/mcp, @macts/api
+  - Replace deprecated Zod v4 APIs (.passthrough → .loose, .datetime → z.iso.datetime)
+  - Add isValidCachedPlugin type guard to CLI cache for consistency with MCP cache
+
+  **Plugin discovery e2e tests:**
+  - Add e2e tests for CLI and MCP plugin discovery using fixturify-project
+  - Add unit tests for CLI plugin manager, cache, and path utilities
+  - Add MCP path utility tests
+  - Add cross-system integration test validating CLI/MCP coexistence
+  - Add cache integration tests (fast path, invalidation)
+
+  **Manifest fixes:**
+  - Fix duplicate enum values in mail (kerberos5, md5) and music (mP3CD, m3U, m3U8) manifests
+  - Fix Script Editor manifest name for correct package directory naming
+
+  **Documentation:**
+  - Add comprehensive manifests/README.md documenting YAML schema and permissions model
+  - Add CONTRIBUTING.md with guidelines for adding new macOS app packages
+  - Update root README.md with current package names and full supported apps table
+
+  **Infrastructure:**
+  - Remove Verdaccio registry from .npmrc
+  - Add fixturify-project devDependency for e2e test fixtures
+  - Add scratch/ to .gitignore
+
+- 37fc2aa: Fix generated CLI and MCP code so the whole workspace passes strict `pnpm typecheck`
+
+  The code generators emitted argument casts that strict TypeScript rejects, so every
+  generated app package failed type checking. The generators now emit sound, precise
+  assertions and all app packages have been regenerated from their manifests.
+
+  **Generator fixes (`@macts/core`):**
+  - Generated CLI `create` commands assert the SDK's exact `*CreateInput` type instead of
+    the unsound `as Record<string, unknown>` (which strict mode rejected, including for
+    inputs with no writable fields).
+  - Generated CLI and MCP command/tool handlers assert each argument to the SDK method's
+    exact parameter type (`Parameters<typeof method>[i]`) instead of the bare `as unknown`
+    cast, which is assignable to no concrete parameter type.
+  - A command parameter named `path` no longer produces a class field that shadows
+    Clipanion's `Command.path` member; it is renamed (e.g. `browsePath`) while keeping the
+    `--path` flag.
+  - Self-nested resource hierarchies (and commands whose parameter is the resource's own
+    ID) no longer emit a duplicate identifier for the resource-ID option.
+  - MCP tools no longer synthesize an implicit identifier for custom resource commands
+    (e.g. `show`), and the generic resource-command handler now passes every parameter
+    positionally to match the SDK signature.
+  - MCP array parameters emit `items` as a JSON Schema object instead of a bare type
+    string.
+  - Resource client files now import enum types referenced by resource command parameters
+    (e.g. `SaveFormat`).
+
+  **Other fixes:**
+  - `pnpm typecheck` now runs in CI, after `pnpm build`, so this class of error cannot
+    regress unnoticed.
+  - Fixed strict-mode type errors in `@macts/api`, `@macts/cli`, and `@macts/mcp` plugin
+    and middleware tests.
+
+- 7f3f095: Fix governance policy-path split-brain: enforcement and discovery now read the same file
+
+  Enforcement (`@macts/api`) and discovery (`@macts/cli`) previously resolved the
+  active policy from different paths — enforcement used
+  `<macts-home>/governance/policy.json` while discovery used
+  `<macts-home>/policy.json`. A policy placed in one location had no effect on the
+  other, silently undermining governance.
+
+  **`@macts/core`** — new `resolveActivePolicyPath(home)` exported from the
+  governance barrel. This is the single source of truth for where the active policy
+  lives on disk: `<home>/governance/policy.json`. Both the enforcement layer and
+  the discovery layer now call this function instead of building the path
+  themselves, so they always read the same file.
+
+  **`@macts/api`** — `getActivePolicyPath()` in
+  `server/governance/active-policy.ts` now delegates to `resolveActivePolicyPath`
+  from `@macts/core` instead of joining the path inline.
+
+  **`@macts/cli`** — `getPolicyFilePath()` in
+  `commands/capabilities/policy.ts` now delegates to `resolveActivePolicyPath`
+  from `@macts/core` instead of joining to `policy.json` at the home root.
+
+  **Canonical path:** `<macts-home>/governance/policy.json` (unchanged from
+  enforcement; the discovery path was the one that was wrong).
+
+- d4fa5be: Ensure list output surfaces the identifier sibling operations require, under one canonical name
+
+  To call a write/get/delete route an agent first needs the target's identifier, and the
+  natural way to obtain it is to `list` the resource. But list output left two gaps: the
+  identifier could be missing (the executor read only declared `properties`, so an
+  identifier declared solely in a resource's `identifiers` was omitted), and the value was
+  exposed under an app-specific property name (e.g. `calendarIdentifier`) that differs from
+  what sibling operations reference (e.g. `calendarId`) — leaving the consumer no reliable
+  way to map one to the other. A live `calendars.list()` hit exactly this: it returned no
+  usable id for `events.create`.
+
+  **Single source of truth (`@macts/core`):** a new identifier module derives a resource's
+  primary identifier property from the manifest's `identifiers` array (primary-first) and
+  defines the canonical key (`id`) under which every surface exposes it. The server's list
+  executor now (1) always reads the manifest-declared primary identifier — even when it is
+  not also a regular property — and (2) mirrors that value onto the canonical `id` key, so
+  a consumer can always read `item.id` regardless of the app's property name. The generated
+  SDK read type surfaces an optional `id` field (and its Zod schema) for resources whose
+  identifier is not already named `id`.
+
+  Resources that declare no identifier are handled gracefully: list still returns their
+  declared properties and simply omits the canonical alias rather than inventing one.
+
+  All app packages were regenerated from their manifests; no generated files were
+  hand-edited.
+
+- 245273b: Fix RPC get and delete handlers to resolve identifier param name from the manifest
+
+  The `get` branch in the RPC resource command executor hardcoded `id` in the generated
+  JXA lookup (`app.<resource>.byId(id)`), causing failures for resources whose identifier
+  parameter is declared with any other name (e.g. `name`, `widgetName`). Several apps in
+  the current manifests — Notes, Automator, TextEdit, Terminal, Preview, Script Editor,
+  Xcode, OmniGraffle — already use `name` as their `get` identifier.
+
+  The `delete` branch was missing entirely and fell through to the generic handler, which
+  called `app.delete(...)` instead of the correct `app.<resource>.byId(<identifier>).delete()`.
+
+  Both branches now resolve the identifier variable name from the first required parameter
+  declared in the manifest command definition.
+
+- a68161c: Make the client SDK and server router address every RPC operation with the same route
+
+  The generated client SDK and the server router are both produced from the manifest,
+  but they keyed RPC routes differently for manifest-named commands: the server used the
+  command's manifest **key** (e.g. `createEvent`) while the client used the command's
+  **name** (`create`). As a result, structured writes were unreachable —
+  `@macts/calendar` `events.create()` posted to `calendar.events.create` and the server
+  (which exposed `calendar.events.createEvent`) returned `404 NOT_FOUND`. Multi-word apps
+  drifted too: the server kept the space (`google chrome`) while the client hyphenated
+  (`google-chrome`), breaking every route for those apps.
+
+  **Single source of truth (`@macts/core`):** a new route module derives the canonical
+  `app.resource.operation` string (keyed by the command's manifest key, with a normalized
+  app segment) and is used by both surfaces — the SDK generator emits it as a literal and
+  the server router registers it at runtime. New generator-level tests assert, for every
+  manifest operation across every app, that the client route equals the route the server
+  exposes.
+
+  **Reachable surface only:** the SDK now emits a CRUD method only when a backing manifest
+  command exists (routing it by that command's key), and omits resource clients for
+  resources that declare no operations — eliminating methods that always 404'd.
+
+  **Identifier reconciliation:** a resource's create-input type now includes the backing
+  create command's parameters, so identifiers the server requires (e.g. an Event's
+  `calendarId`) are surfaced under the exact name the server validates.
+
+  All app packages were regenerated from their manifests; no generated files were
+  hand-edited.
+
+- cd2860a: Resolve key/secret storage paths from `MACTS_HOME` (then `os.homedir()`), never a cwd-relative `./~/.macts`
+
+  API-key storage previously computed its directory as
+  `path.join(process.env['HOME'] ?? '~', '.macts')`. This had two problems:
+  - It ignored `MACTS_HOME`, so a custom install put plugins under `MACTS_HOME`
+    but the JWT signing secret and `api-keys.db` under `$HOME/.macts` — a silent
+    split-brain.
+  - When `HOME` was unset (cron, containers, CI, some service managers), the
+    `?? '~'` fallback produced a **cwd-relative** `./~/.macts`, writing the
+    signing secret (mode `0o600`) and key database wherever the process ran. Since
+    that secret signs every API key, a predictable or shared location is an
+    auth-bypass risk.
+
+  Storage now resolves its directory the same way plugin paths do — `MACTS_HOME`
+  when set, otherwise `~/.macts` via `os.homedir()` — so every macts surface
+  agrees on a single, absolute location. Secret-file (`0o600`) and directory
+  (`0o700`) permissions are unchanged. The same unsafe `process.env['HOME']`
+  pattern in the CLI's serve/manifest lookup and `service` commands has been
+  migrated to the same resolution (`os.homedir()` for fixed macOS paths such as
+  `~/Library/LaunchAgents`).
+
+- Updated dependencies [1454024]
+- Updated dependencies [613ffcf]
+- Updated dependencies [2ad7c96]
+- Updated dependencies [4851845]
+- Updated dependencies [4898fbd]
+- Updated dependencies [68bf762]
+- Updated dependencies [37fc2aa]
+- Updated dependencies [8143d36]
+- Updated dependencies [41274b5]
+- Updated dependencies [f1e103f]
+- Updated dependencies [17166aa]
+- Updated dependencies [7f3f095]
+- Updated dependencies [d4fa5be]
+- Updated dependencies [6225db2]
+- Updated dependencies [0a6f7e1]
+- Updated dependencies [b72513a]
+- Updated dependencies [4851845]
+- Updated dependencies [d1f350e]
+- Updated dependencies [a68161c]
+- Updated dependencies [9a98e47]
+  - @macts/core@1.0.0

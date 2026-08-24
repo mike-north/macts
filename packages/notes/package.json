@@ -1,6 +1,6 @@
 {
   "name": "@macts/notes",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "SDK and CLI for macOS notes automation",
   "license": "MIT",
   "repository": {

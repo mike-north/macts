@@ -1,6 +1,6 @@
 {
   "name": "@macts/console",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "SDK and CLI for macOS console automation",
   "license": "MIT",
   "repository": {

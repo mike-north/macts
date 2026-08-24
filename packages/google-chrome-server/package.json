@@ -1,6 +1,6 @@
 {
   "name": "@macts/google-chrome-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Server package for macOS GoogleChrome.app (API + MCP)",
   "license": "MIT",
   "repository": {

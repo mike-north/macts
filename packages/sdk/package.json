@@ -1,6 +1,6 @@
 {
   "name": "@macts/sdk",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Frictionless authoring helper for governed macts scripts — resolves the API key and base URL once, returns ready-to-use typed clients for every installed @macts/* app SDK",
   "license": "MIT",
   "repository": {

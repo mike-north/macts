@@ -1,6 +1,6 @@
 {
   "name": "@macts/api",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "HTTP API server for macOS app automation",
   "license": "MIT",
   "repository": {

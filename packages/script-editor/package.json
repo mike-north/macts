@@ -1,6 +1,6 @@
 {
   "name": "@macts/script-editor",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "SDK and CLI for macOS script-editor automation",
   "license": "MIT",
   "repository": {

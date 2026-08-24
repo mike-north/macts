@@ -1,6 +1,6 @@
 {
   "name": "@macts/script-editor-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Server package for macOS ScriptEditor.app (API + MCP)",
   "license": "MIT",
   "repository": {
