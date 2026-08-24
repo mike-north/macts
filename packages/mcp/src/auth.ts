@@ -94,7 +94,7 @@ export async function requireStartupApiKey(): Promise<void> {
   const result = await validateApiKey(token)
 
   if (!result.valid) {
-    throw new Error(buildInvalidKeyMessage(result.error ?? 'token validation failed'))
+    throw new Error(buildInvalidKeyMessage(result.error))
   }
 }
 
@@ -144,17 +144,14 @@ export async function authenticateHttpRequest(req: IncomingMessage): Promise<Aut
   const token = parts[1] ?? ''
   const result = await validateApiKey(token)
 
-  // `ApiKeyValidationResult.valid` is a plain `boolean` (not a `true`/`false`
-  // literal discriminant), so checking `result.valid` alone does not narrow
-  // `payload` to defined. Require both explicitly rather than casting.
-  if (!result.valid || !result.payload) {
+  if (!result.valid) {
     return {
       ok: false,
       status: 401,
       body: {
         error: {
-          code: result.errorCode ?? 'MALFORMED_PAYLOAD',
-          message: result.error ?? 'Token validation failed',
+          code: result.errorCode,
+          message: result.error,
         },
       },
     }
