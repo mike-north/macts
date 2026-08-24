@@ -578,10 +578,33 @@ export const CommandScopeSchema: z.ZodEnum<{
 }>;
 
 // @public
+export function compareDispositionStrictness(a: PolicyDisposition, b: PolicyDisposition): number;
+
+// @public
+export function comparePolicyDecisionStrictness(a: PolicyDecision, b: PolicyDecision): number;
+
+// @public
 export function compareRisk(a: RiskClass, b: RiskClass): number;
 
 // @public
 export function compilePolicyToPermissions(policy: GovernancePolicy, candidates: readonly PolicyCandidate[]): string[];
+
+// @public
+export interface ComposedRestrictions {
+    readonly pathsAllowGroups: readonly (readonly string[])[];
+    readonly pathsDeny: readonly string[];
+    readonly urlsAllowGroups: readonly (readonly string[])[];
+    readonly urlsDeny: readonly string[];
+}
+
+// @public
+export function composedRestrictionsPermit(composed: ComposedRestrictions, kind: RestrictionKind, candidate: string, matches: RestrictionPatternMatcher): boolean;
+
+// @public
+export function composePolicyEvaluations(host: PolicyEvaluation, key: PolicyEvaluation | undefined): LayeredPolicyEvaluation;
+
+// @public
+export function composeRestrictions(host: Restrictions | undefined, key: Restrictions | undefined): ComposedRestrictions;
 
 // @public (undocumented)
 export type Confidence = z.infer<typeof ConfidenceSchema>;
@@ -690,6 +713,7 @@ export function enforceCall(options: EnforceCallOptions): Promise<EnforcementDec
 // @public
 export interface EnforceCallOptions {
     readonly audit: CallAuditContext;
+    readonly keyPolicy?: GovernancePolicy | undefined;
     readonly permission: string;
     readonly policy: GovernancePolicy;
     readonly risk: RiskClass;
@@ -698,7 +722,7 @@ export interface EnforceCallOptions {
 
 // @public
 export interface EnforcementDecision {
-    readonly evaluation: PolicyEvaluation;
+    readonly evaluation: LayeredPolicyEvaluation;
     readonly outcome: EnforcementOutcome;
     readonly reason: string;
 }
@@ -732,6 +756,17 @@ export const EnumValueSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodString>;
     code: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export function evaluateLayeredPolicy(options: EvaluateLayeredPolicyOptions): LayeredPolicyEvaluation;
+
+// @public
+export interface EvaluateLayeredPolicyOptions {
+    readonly hostPolicy: GovernancePolicy;
+    readonly keyPolicy?: GovernancePolicy | undefined;
+    readonly permission: string;
+    readonly risk: RiskClass;
+}
 
 // @public
 export function evaluatePolicy(policy: GovernancePolicy, permission: string, risk: RiskClass): PolicyEvaluation;
@@ -1390,6 +1425,14 @@ export interface JxaExecutorOptions {
 export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>;
 
 // @public
+export interface LayeredPolicyEvaluation extends PolicyEvaluation {
+    readonly host: PolicyEvaluation;
+    readonly key?: PolicyEvaluation | undefined;
+    readonly layer: PolicyLayer;
+    readonly restrictions: ComposedRestrictions;
+}
+
+// @public
 export function loadCapabilityRegistry(manifestsDir: string): Promise<{
     registry: CapabilityRegistry;
     errors: {
@@ -1625,7 +1668,16 @@ export const PointTypeSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export const POLICY_DECISIONS_BY_STRICTNESS: readonly ["allowed", "confirm-first", "denied"];
+
+// @public
 export const POLICY_DISPOSITIONS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
+
+// @public
+export const POLICY_DISPOSITIONS_BY_STRICTNESS: readonly ["allowed", "read-only", "confirm-first", "forbidden"];
+
+// @public
+export const POLICY_LAYERS: readonly ["host", "key"];
 
 // @public
 export interface PolicyCandidate {
@@ -1670,6 +1722,9 @@ export interface PolicyIssue {
     readonly message: string;
     readonly path: string;
 }
+
+// @public
+export type PolicyLayer = (typeof POLICY_LAYERS)[number];
 
 // @public
 export interface PolicyRuleMatch {
@@ -2039,6 +2094,12 @@ export const ResourceSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export type RestrictionKind = 'path' | 'url';
+
+// @public
+export type RestrictionPatternMatcher = (pattern: string, candidate: string) => boolean;
+
+// @public
 export type Restrictions = z.infer<typeof RestrictionsSchema>;
 
 // @public
@@ -2169,6 +2230,9 @@ export interface SpecifierStep {
     // (undocumented)
     selector?: Selector;
 }
+
+// @public
+export function strictestPolicyDecision(a: PolicyDecision, b: PolicyDecision): PolicyDecision;
 
 // @public
 export const stringCoercer: TypeCoercer<string>;

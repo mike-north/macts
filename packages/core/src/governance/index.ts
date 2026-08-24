@@ -21,6 +21,10 @@
  *    with the evaluator.
  * 5. Call-time *enforcement* ({@link ./enforcement.js}) — the audit-writing
  *    wrapper that checks each invocation and records every decision.
+ * 6. Layered *composition* ({@link ./composition.js}) — combines the machine-wide
+ *    host policy with an optional per-API-key policy, taking the stricter
+ *    decision so a key policy can only ever tighten, and reporting which layer
+ *    governed (which is what an approval hold routes on).
  *
  * Approval-gate wiring (issue #54) and discovery filtering (issue #55) consume
  * the evaluator rather than re-implementing the decision. The discovery-time
@@ -93,6 +97,26 @@ export {
   type PolicyEvaluation,
   evaluatePolicy,
 } from './evaluator.js'
+
+// Layered composition: host policy × per-API-key policy (key may only tighten).
+export {
+  POLICY_LAYERS,
+  type PolicyLayer,
+  POLICY_DECISIONS_BY_STRICTNESS,
+  comparePolicyDecisionStrictness,
+  strictestPolicyDecision,
+  POLICY_DISPOSITIONS_BY_STRICTNESS,
+  compareDispositionStrictness,
+  type ComposedRestrictions,
+  composeRestrictions,
+  type RestrictionPatternMatcher,
+  type RestrictionKind,
+  composedRestrictionsPermit,
+  type LayeredPolicyEvaluation,
+  composePolicyEvaluations,
+  type EvaluateLayeredPolicyOptions,
+  evaluateLayeredPolicy,
+} from './composition.js'
 
 // Compile a policy to the concrete permissions it grants.
 export {

@@ -18,6 +18,13 @@
  * **Fail-closed** behavior (default `forbidden`, malformed-permission denial,
  * `read-only` semantics) all live in the evaluator; enforcement inherits them.
  *
+ * When the caller supplies a per-API-key policy alongside the host policy, the
+ * two layers are composed by {@link evaluateLayeredPolicy} (see
+ * {@link ./composition.js}) before the outcome is derived: the effective
+ * decision is the stricter of the two, so a key policy can only tighten. With no
+ * key policy the evaluation — decision, matched rule, and reason string alike —
+ * is the host policy's own, unchanged.
+ *
  * Every decision is written to the injected {@link AuditWriter} so the audit
  * trail is never optional. The writer is a plain interface — callers supply
  * whatever backend they need (file, in-memory, etc.).
@@ -33,7 +40,8 @@ import type { GovernancePolicy } from './policy.js'
 import type { AuditWriter } from './writer.js'
 import type { PolicyEvaluation } from './evaluator.js'
 import { createAuditRecord, type AuditDecision } from './audit.js'
-import { evaluatePolicy } from './evaluator.js'
+import type { LayeredPolicyEvaluation } from './composition.js'
+import { evaluateLayeredPolicy } from './composition.js'
 import type { RiskClass } from '../capabilities/risk.js'
 
 // ---------------------------------------------------------------------------
@@ -74,8 +82,13 @@ export interface EnforcementDecision {
    * The underlying policy evaluation that produced this outcome (decision,
    * matched rule, permission, reason). Surfaced for diagnostics so callers do
    * not have to re-evaluate.
+   *
+   * A {@link LayeredPolicyEvaluation}, so it also reports which policy layer
+   * (host or key) produced the effective decision, plus each layer's own
+   * evaluation. With no key policy in play it is the host evaluation verbatim
+   * with `layer: 'host'`.
    */
-  readonly evaluation: PolicyEvaluation
+  readonly evaluation: LayeredPolicyEvaluation
 }
 
 /**
@@ -109,8 +122,17 @@ export interface CallAuditContext {
  * Options for a single {@link enforceCall} invocation.
  */
 export interface EnforceCallOptions {
-  /** The validated governance policy to enforce. */
+  /** The validated machine-wide (host) governance policy to enforce. */
   readonly policy: GovernancePolicy
+  /**
+   * The authenticated API key's own governance policy, when it has one.
+   *
+   * Composed with the host policy by {@link evaluateLayeredPolicy}: the
+   * effective decision is the stricter of the two, so a key policy can only ever
+   * tighten and can never grant what the host policy withholds. Omitted or
+   * `undefined` means the host policy alone governs.
+   */
+  readonly keyPolicy?: GovernancePolicy | undefined
   /**
    * The capability being invoked, in `app:resource:operation` form
    * (e.g. `'calendar:events:create'`). This string is the single source of
@@ -204,9 +226,11 @@ function deriveAuditApp(permission: string): string {
  *
  * This is the primary entry point for call-time enforcement. It:
  *
- * 1. Evaluates the policy via {@link evaluatePolicy} (the single source of
- *    truth — all decision semantics, including fail-closed defaults, malformed
- *    permission denial, and `read-only` handling, live there).
+ * 1. Evaluates the host policy — and the key policy, when `options.keyPolicy` is
+ *    supplied — via {@link evaluateLayeredPolicy}, which delegates each layer to
+ *    the evaluator (the single source of truth: fail-closed defaults, malformed
+ *    permission denial, and `read-only` handling all live there) and returns the
+ *    stricter decision along with the layer that produced it.
  * 2. Maps the evaluation decision to an {@link EnforcementOutcome}.
  * 3. Writes an audit record to `options.writer` (when supplied), unconditionally,
  *    for allow, deny, and pending-approval alike.
@@ -220,9 +244,14 @@ function deriveAuditApp(permission: string): string {
  * @returns A promise resolving to the {@link EnforcementDecision} for this call.
  */
 export async function enforceCall(options: EnforceCallOptions): Promise<EnforcementDecision> {
-  const { policy, permission, risk, audit, writer } = options
+  const { policy, keyPolicy, permission, risk, audit, writer } = options
 
-  const evaluation = evaluatePolicy(policy, permission, risk)
+  const evaluation = evaluateLayeredPolicy({
+    hostPolicy: policy,
+    keyPolicy,
+    permission,
+    risk,
+  })
   const outcome = evaluationToOutcome(evaluation)
 
   // Write the audit record unconditionally (whether allowed, denied, or pending).
