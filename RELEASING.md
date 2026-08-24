@@ -23,9 +23,9 @@ recover manually if the automated flow needs help.
    > with the default `GITHUB_TOKEN`, so CI does not run automatically on the
    > "Version Packages" PR. Close and reopen the PR to trigger CI (including
    > the `generate:check` gate) before merging. To make this automatic,
-   > provide a fine-grained personal access token (contents + pull-requests
-   > read/write) to the `changesets/action` checkout step instead of the
-   > default token.
+   > pass a fine-grained personal access token (contents + pull-requests
+   > read/write) as the `GITHUB_TOKEN` env of the `changesets/action` step in
+   > `release.yml` instead of the default token.
 
 3. Merging the "Version Packages" PR triggers the same workflow to publish:
    every `@macts/*` package is built and published to npm using
