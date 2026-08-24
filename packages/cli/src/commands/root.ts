@@ -41,10 +41,16 @@ export class RootCommand extends Command {
           macts mcp install calendar
 
         The MCP server discovers plugins from ~/.macts/plugins/ automatically.
+
+        By default, the MCP server requires a valid MACTS_API_KEY environment
+        variable at startup. Create one with:
+          macts api-key create --name <name> --permission <app:resource:operation>
+        Pass --disable-api-key-validation to skip this check (not recommended).
     `,
     examples: [
       ['List available commands', '$0 --help'],
       ['Start MCP server', '$0 --mcp'],
+      ['Start MCP server without API key validation', '$0 --mcp --disable-api-key-validation'],
       ['Install an app MCP server plugin', '$0 mcp install calendar'],
       ['Start HTTP server on port 8080', '$0 --serve --port 8080'],
     ],
@@ -52,6 +58,10 @@ export class RootCommand extends Command {
 
   mcp = Option.Boolean('--mcp', {
     description: 'Start as an MCP (Model Context Protocol) server',
+  })
+
+  disableApiKeyValidation = Option.Boolean('--disable-api-key-validation', false, {
+    description: 'Skip MACTS_API_KEY validation at MCP server startup (not recommended)',
   })
 
   serve = Option.Boolean('--serve', {
@@ -111,9 +121,12 @@ export class RootCommand extends Command {
     try {
       // Start MCP server on stdio
       // This will run until stdin closes
-      await createMcpServer(allPlugins)
+      await createMcpServer(allPlugins, { disableApiKeyValidation: this.disableApiKeyValidation })
       return 0
     } catch (error) {
+      // Startup validation errors (e.g. missing/invalid MACTS_API_KEY) carry
+      // an actionable, remediation-bearing message and no useful stack trace
+      // for operators, so print only the message, not the stack.
       const message = error instanceof Error ? error.message : String(error)
       this.context.stderr.write(`Failed to start MCP server: ${message}\n`)
       return 1

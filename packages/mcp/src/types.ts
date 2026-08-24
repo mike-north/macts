@@ -251,4 +251,13 @@ export interface McpServerOptions {
 
   /** Server version */
   readonly version?: string
+
+  /**
+   * Skip validating a `MACTS_API_KEY` before connecting the stdio transport.
+   *
+   * Defaults to `false` — a valid API key is required by default. Only set
+   * this for local development or trusted embedding scenarios; it disables
+   * the one authentication check the stdio transport has.
+   */
+  readonly disableApiKeyValidation?: boolean
 }

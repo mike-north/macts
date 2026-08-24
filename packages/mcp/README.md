@@ -54,7 +54,29 @@ The daemon supports:
 - **Unix socket** (default): Fast local IPC at `~/.macts/mcp.sock`
 - **TCP port**: Optional HTTP/SSE server for remote access (`--port 3000`)
 
+The daemon exposes two HTTP transports:
+
+- **Streamable HTTP** at `/mcp` — the current MCP transport, and the primary way to talk to the daemon over HTTP.
+- **Legacy SSE** at `/sse` + `/message` — the deprecated HTTP+SSE transport, kept for older clients.
+
 See [DAEMON.md](./DAEMON.md) for complete daemon documentation.
+
+## Authentication
+
+The MCP server requires a valid macts API key by default, on every transport:
+
+- **stdio** (`macts --mcp`) — validated once at startup, from the `MACTS_API_KEY` environment variable. Set it in your MCP client's `env` config (see [Integration with Claude Desktop](#integration-with-claude-desktop) below). If the key is missing or invalid, the server exits immediately with an actionable error.
+- **HTTP** (`macts mcp serve` / `macts mcp start`) — every request must include `Authorization: Bearer macts_sk_...`, except `GET /health`, which is always open.
+
+Create a key with:
+
+```bash
+macts api-key create --name <name> --permission <app:resource:operation>
+```
+
+To opt out (not recommended — only for local development or trusted embedding scenarios), pass `--disable-api-key-validation` to `macts --mcp`, `macts mcp serve`, or `macts mcp start`.
+
+**Migration note:** if you have an existing MCP client config or daemon setup that doesn't set `MACTS_API_KEY` (or send a bearer token), it will start failing at startup/on every request until you create a key and configure it, or pass `--disable-api-key-validation`.
 
 ### Fast Stdio Adapter
 
@@ -89,7 +111,10 @@ Add this configuration to your Claude Desktop config file:
   "mcpServers": {
     "macts": {
       "command": "macts",
-      "args": ["--mcp"]
+      "args": ["--mcp"],
+      "env": {
+        "MACTS_API_KEY": "macts_sk_..."
+      }
     }
   }
 }
@@ -466,6 +491,7 @@ interface McpToolDefinition {
 interface McpServerOptions {
   readonly name?: string
   readonly version?: string
+  readonly disableApiKeyValidation?: boolean
 }
 ```
 
@@ -636,7 +662,7 @@ interface JsonSchema {
    Error: fetch failed (ECONNREFUSED)
    ```
 
-   **Solution:** Start API server: `macts api start`
+   **Solution:** Start the HTTP API server: `macts --serve`
 
 3. **Permission denied:**
 
@@ -644,10 +670,10 @@ interface JsonSchema {
    Error: Permission denied: calendar:events:create
    ```
 
-   **Solution:** Create API key with appropriate permissions:
+   **Solution:** Create an API key with the appropriate permission(s) (repeat `--permission` for more than one):
 
    ```bash
-   macts api-key create --permissions calendar:*:*
+   macts api-key create --name <name> --permission calendar:events:create
    ```
 
 4. **Invalid input:**

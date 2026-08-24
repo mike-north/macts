@@ -28,16 +28,24 @@ export class McpStartCommand extends Command {
 
       Use 'macts mcp stop' to stop the server.
       Use 'macts mcp status' to check if it's running.
+
+      By default, every route except GET /health requires a valid
+      MACTS_API_KEY (as a Bearer token). Pass --disable-api-key-validation
+      to skip this check (not recommended).
     `,
     examples: [
       ['Start on default Unix socket', '$0 mcp start'],
       ['Start on TCP port', '$0 mcp start --port 3000'],
       ['Use custom socket path', '$0 mcp start --socket /tmp/mcp.sock'],
+      ['Start without API key validation', '$0 mcp start --disable-api-key-validation'],
     ],
   })
 
   port = Option.String('--port', { description: 'TCP port to listen on' })
   socket = Option.String('--socket', { description: 'Unix socket path' })
+  disableApiKeyValidation = Option.Boolean('--disable-api-key-validation', false, {
+    description: 'Skip API key validation on all daemon routes (not recommended)',
+  })
 
   async execute(): Promise<number> {
     const pidFile = getPidFile()
@@ -77,6 +85,9 @@ export class McpStartCommand extends Command {
     }
     if (this.socket !== undefined) {
       args.push('--socket', this.socket)
+    }
+    if (this.disableApiKeyValidation) {
+      args.push('--disable-api-key-validation')
     }
 
     // Spawn daemon process

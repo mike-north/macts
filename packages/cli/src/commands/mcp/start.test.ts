@@ -203,6 +203,67 @@ describe('McpStartCommand', () => {
       expect(getStdout()).toContain('/custom/path.sock')
     })
 
+    it('should append --disable-api-key-validation to spawned args when flag is set', async () => {
+      const { stdout, stderr } = createMockStreams()
+
+      const mockChild = {
+        unref: vi.fn(),
+      }
+      vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
+
+      let pidCheckCount = 0
+      vi.mocked(fs.existsSync).mockImplementation((path) => {
+        if (path === '/tmp/test-mcp.pid') {
+          pidCheckCount++
+          return pidCheckCount > 1
+        }
+        return true
+      })
+
+      vi.mocked(fs.readFileSync).mockReturnValue('5678')
+
+      const exitCode = await cli.run(['mcp', 'start', '--disable-api-key-validation'], {
+        stdout,
+        stderr,
+      })
+
+      expect(exitCode).toBe(0)
+      expect(childProcess.spawn).toHaveBeenCalledWith(
+        process.execPath,
+        expect.arrayContaining(['mcp', 'serve', '--disable-api-key-validation']) as string[],
+        expect.objectContaining({
+          detached: true,
+          stdio: 'ignore',
+        })
+      )
+    })
+
+    it('should not include --disable-api-key-validation in spawned args by default', async () => {
+      const { stdout, stderr } = createMockStreams()
+
+      const mockChild = {
+        unref: vi.fn(),
+      }
+      vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
+
+      let pidCheckCount = 0
+      vi.mocked(fs.existsSync).mockImplementation((path) => {
+        if (path === '/tmp/test-mcp.pid') {
+          pidCheckCount++
+          return pidCheckCount > 1
+        }
+        return true
+      })
+
+      vi.mocked(fs.readFileSync).mockReturnValue('5678')
+
+      const exitCode = await cli.run(['mcp', 'start'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      const spawnArgs = vi.mocked(childProcess.spawn).mock.calls[0]?.[1] as string[]
+      expect(spawnArgs).not.toContain('--disable-api-key-validation')
+    })
+
     it('should handle missing binary path', async () => {
       const { stdout, stderr, getStderr } = createMockStreams()
 

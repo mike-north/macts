@@ -146,6 +146,65 @@ describe('RootCommand', () => {
     expect(getStderr()).toContain('Failed to start MCP server: Server start failed')
   })
 
+  it('should forward disableApiKeyValidation: false to createMcpServer by default', async () => {
+    const { stdout, stderr } = createMockStreams()
+
+    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
+      plugins: [],
+      errors: [],
+    })
+
+    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+
+    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+
+    expect(exitCode).toBe(0)
+    expect(createServerSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ disableApiKeyValidation: false })
+    )
+  })
+
+  it('should forward disableApiKeyValidation: true to createMcpServer when flag is set', async () => {
+    const { stdout, stderr } = createMockStreams()
+
+    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
+      plugins: [],
+      errors: [],
+    })
+
+    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+
+    const exitCode = await cli.run(['--mcp', '--disable-api-key-validation'], { stdout, stderr })
+
+    expect(exitCode).toBe(0)
+    expect(createServerSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ disableApiKeyValidation: true })
+    )
+  })
+
+  it('should exit 1 and print only the error message (no stack) when startup API key validation fails', async () => {
+    const { stdout, stderr, getStderr } = createMockStreams()
+
+    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
+      plugins: [],
+      errors: [],
+    })
+
+    const authError = new Error(
+      'MACTS_API_KEY environment variable is not set.\nCreate an API key with:'
+    )
+    vi.spyOn(mcp, 'createMcpServer').mockRejectedValue(authError)
+
+    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+
+    expect(exitCode).toBe(1)
+    expect(getStderr()).toContain('MACTS_API_KEY environment variable is not set.')
+    expect(getStderr()).not.toContain(authError.stack ?? '__unused__')
+    expect(getStderr()).not.toMatch(/at .*:\d+:\d+/)
+  })
+
   describe('--serve flag', () => {
     let mockServer: { start: ReturnType<typeof vi.fn>; stop: ReturnType<typeof vi.fn>; url: string }
 

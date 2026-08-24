@@ -105,6 +105,13 @@ macts mcp start
 > `macts plugin install` manages CLI plugins only and does not yet handle `-server` packages. A
 > first-class command is tracked in [#27](https://github.com/mike-north/macts/issues/27).
 
+The MCP server requires a valid API key by default, on every transport: `MACTS_API_KEY` for
+stdio (`macts --mcp`), and `Authorization: Bearer macts_sk_...` for HTTP (the daemon started by
+`macts mcp start`/`macts mcp serve`). Create one with
+`macts api-key create --name <name> --permission <app:resource:operation>`, or pass
+`--disable-api-key-validation` to opt out (not recommended). See
+[`packages/mcp/README.md`](./packages/mcp/README.md#authentication) for details.
+
 ## AI Agent Use Cases
 
 macts is designed to fit naturally into the way agents should use local applications.

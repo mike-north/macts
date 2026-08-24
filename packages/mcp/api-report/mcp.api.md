@@ -4,10 +4,30 @@
 
 ```ts
 
+import { ApiKeyPayload } from '@macts/core';
 import { CapabilityRegistry } from '@macts/core';
 import { GovernanceFilter } from '@macts/core';
+import { IncomingMessage } from 'node:http';
 import { Server } from 'node:http';
 import { VERSION } from '@macts/core';
+
+// @public
+export function authenticateHttpRequest(req: IncomingMessage): Promise<AuthResult>;
+
+// @public
+export type AuthResult = {
+    readonly ok: true;
+    readonly payload: ApiKeyPayload;
+} | {
+    readonly ok: false;
+    readonly status: 401;
+    readonly body: {
+        readonly error: {
+            readonly code: McpAuthErrorCode;
+            readonly message: string;
+        };
+    };
+};
 
 // @public
 export interface CachedPlugin {
@@ -27,6 +47,7 @@ export function createMcpServer(plugins: readonly McpPlugin[], options?: McpServ
 
 // @public
 export interface DaemonOptions {
+    readonly disableApiKeyValidation?: boolean;
     readonly name?: string;
     readonly plugins: readonly McpPlugin[];
     readonly port?: number;
@@ -92,6 +113,9 @@ export function loadMcpPlugin(packageName: string): Promise<{
 }>;
 
 // @public
+export type McpAuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+
+// @public
 export interface McpPlugin {
     readonly description: string;
     readonly name: string;
@@ -100,6 +124,7 @@ export interface McpPlugin {
 
 // @public
 export interface McpServerOptions {
+    readonly disableApiKeyValidation?: boolean;
     readonly name?: string;
     readonly version?: string;
 }
@@ -127,6 +152,9 @@ export interface PluginLoadError {
 
 // @public
 export function readMcpPluginCache(): readonly CachedPlugin[] | null;
+
+// @public
+export function requireStartupApiKey(): Promise<void>;
 
 export { VERSION }
 

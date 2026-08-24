@@ -95,6 +95,7 @@ Start the MCP daemon server in the foreground. Useful for development and debugg
 
 - `--port <number>` - TCP port to listen on (instead of Unix socket)
 - `--socket <path>` - Custom Unix socket path (default: `~/.macts/mcp.sock`)
+- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Usage:**
 
@@ -107,12 +108,17 @@ macts mcp serve --port 3000
 
 # Use custom socket path
 macts mcp serve --socket /tmp/my-mcp.sock
+
+# Start without API key validation (not recommended)
+macts mcp serve --disable-api-key-validation
 ```
 
 **Behavior:**
 
 - Discovers and loads all installed MCP plugins
-- Starts HTTP/SSE server on Unix socket or TCP port
+- Starts the MCP HTTP transports (streamable HTTP at `/mcp`, legacy SSE at `/sse` + `/message`) on Unix socket or TCP port
+- Requires `Authorization: Bearer macts_sk_...` on every route except `GET /health`, unless `--disable-api-key-validation` is passed
+- Logs whether API key validation is enabled or disabled to stderr on startup
 - Runs in foreground (use Ctrl+C to stop)
 - Logs output to stderr
 - Returns exit code 1 if no plugins found or startup fails
@@ -125,6 +131,7 @@ Start the MCP daemon server in the background as a detached process.
 
 - `--port <number>` - TCP port to listen on
 - `--socket <path>` - Custom Unix socket path
+- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Usage:**
 
@@ -134,11 +141,14 @@ macts mcp start
 
 # Start on TCP port
 macts mcp start --port 3000
+
+# Start without API key validation (not recommended)
+macts mcp start --disable-api-key-validation
 ```
 
 **Behavior:**
 
-- Spawns `mcp serve` as detached background process
+- Spawns `mcp serve` as detached background process, forwarding `--disable-api-key-validation` when passed
 - Checks for existing daemon (fails if already running)
 - Removes stale PID files automatically
 - Writes PID to `~/.macts/mcp.pid`

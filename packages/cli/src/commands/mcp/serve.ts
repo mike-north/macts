@@ -23,16 +23,24 @@ export class McpServeCommand extends Command {
 
       This is useful for development and debugging. For production use,
       consider running the server in the background with 'macts mcp start'.
+
+      By default, every route except GET /health requires a valid
+      MACTS_API_KEY (as a Bearer token). Pass --disable-api-key-validation
+      to skip this check (not recommended).
     `,
     examples: [
       ['Start on default Unix socket', '$0 mcp serve'],
       ['Start on TCP port', '$0 mcp serve --port 3000'],
       ['Use custom socket path', '$0 mcp serve --socket /tmp/mcp.sock'],
+      ['Start without API key validation', '$0 mcp serve --disable-api-key-validation'],
     ],
   })
 
   port = Option.String('--port', { description: 'TCP port to listen on' })
   socket = Option.String('--socket', { description: 'Unix socket path' })
+  disableApiKeyValidation = Option.Boolean('--disable-api-key-validation', false, {
+    description: 'Skip API key validation on all daemon routes (not recommended)',
+  })
 
   async execute(): Promise<number> {
     // Discover MCP plugins
@@ -60,6 +68,7 @@ export class McpServeCommand extends Command {
       plugins,
       ...(port !== undefined && { port }),
       socketPath: this.socket ?? getSocketPath(),
+      disableApiKeyValidation: this.disableApiKeyValidation,
     })
 
     try {
@@ -71,6 +80,9 @@ export class McpServeCommand extends Command {
 
       this.context.stderr.write(`MCP server running at ${endpoint}\n`)
       this.context.stderr.write(`Loaded ${String(plugins.length)} plugin(s)\n`)
+      this.context.stderr.write(
+        `API key validation: ${this.disableApiKeyValidation ? 'disabled' : 'enabled'}\n`
+      )
       this.context.stderr.write('Press Ctrl+C to stop.\n')
 
       // Block until signal received
