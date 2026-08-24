@@ -19,6 +19,14 @@ recover manually if the automated flow needs help.
    changesets and shows the version bumps and changelog entries that will
    result from merging it.
 
+   > **Note:** GitHub suppresses workflow triggers for pull requests created
+   > with the default `GITHUB_TOKEN`, so CI does not run automatically on the
+   > "Version Packages" PR. Close and reopen the PR to trigger CI (including
+   > the `generate:check` gate) before merging. To make this automatic,
+   > pass a fine-grained personal access token (contents + pull-requests
+   > read/write) as the `GITHUB_TOKEN` env of the `changesets/action` step in
+   > `release.yml` instead of the default token.
+
 3. Merging the "Version Packages" PR triggers the same workflow to publish:
    every `@macts/*` package is built and published to npm using
    [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) (OIDC)
@@ -57,17 +65,19 @@ use it, so the very first release needs a manual bootstrap:
    pnpm build && pnpm publish -r --access public --no-git-checks && pnpm changeset tag && git push --follow-tags
    ```
 
-4. Bulk-configure trusted publishers (requires npm CLI >= 11.10). For every
-   package, run `npm trust add` with the GitHub Actions provider, this
-   repository, and `release.yml` as the workflow — verify the exact flags with
-   `npm trust --help`, since the CLI surface is new:
+4. Bulk-configure trusted publishers (requires npm CLI >= 11.10, and 2FA
+   enabled on your npm account — granular access tokens with 2FA bypass are
+   not accepted by the trust endpoints):
 
    ```bash
    for pkg in packages/*/package.json; do
      name=$(node -p "require('./$pkg').name")
-     npm trust add "$name" --provider github-actions --repository mike-north/macts --workflow release.yml
+     npm trust github "$name" --repo mike-north/macts --file release.yml --allow-publish --yes
    done
    ```
+
+   Verify with `npm trust list <pkg-name>` or by spot-checking a package's
+   settings page on npmjs.com.
 
 5. Merge a trivial changeset to confirm CI can publish via OIDC end-to-end —
    check that the resulting npm versions show provenance badges.
@@ -89,7 +99,7 @@ introduces it:
 2. Give it a trusted publisher:
 
    ```bash
-   npm trust add <pkg-name> --provider github-actions --repository mike-north/macts --workflow release.yml
+   npm trust github <pkg-name> --repo mike-north/macts --file release.yml --allow-publish --yes
    ```
 
 After that, CI can publish it like every other package.
