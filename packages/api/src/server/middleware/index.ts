@@ -19,7 +19,9 @@ export {
 
 export {
   requirePolicy,
+  resolveGovernanceForRequest,
   type GovernanceContext,
+  type ResolvedGovernanceContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,

@@ -31,6 +31,7 @@ export {
   requirePermission,
   rpcPathToPermission,
   requirePolicy,
+  resolveGovernanceForRequest,
   type AuthVariables,
   type AuthErrorCode,
   type AuthErrorResponse,
@@ -38,6 +39,7 @@ export {
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
   type GovernanceContext,
+  type ResolvedGovernanceContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
@@ -51,6 +53,16 @@ export {
   ActivePolicyError,
   type LoadActivePolicyOptions,
 } from './server/governance/active-policy.js'
+
+// Per-request resolution of the policy attached to an API key
+export {
+  createKeyPolicyResolver,
+  createStoredKeyPolicyResolver,
+  DEFAULT_KEY_POLICY_CACHE_TTL_MS,
+  type KeyPolicyResolver,
+  type KeyPolicyLoader,
+  type CreateKeyPolicyResolverOptions,
+} from './server/governance/key-policy.js'
 
 // RPC handlers
 export {

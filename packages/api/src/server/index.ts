@@ -37,7 +37,9 @@ export {
 } from './middleware/permission.js'
 export {
   requirePolicy,
+  resolveGovernanceForRequest,
   type GovernanceContext,
+  type ResolvedGovernanceContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
@@ -49,6 +51,14 @@ export {
   ActivePolicyError,
   type LoadActivePolicyOptions,
 } from './governance/active-policy.js'
+export {
+  createKeyPolicyResolver,
+  createStoredKeyPolicyResolver,
+  DEFAULT_KEY_POLICY_CACHE_TTL_MS,
+  type KeyPolicyResolver,
+  type KeyPolicyLoader,
+  type CreateKeyPolicyResolverOptions,
+} from './governance/key-policy.js'
 export {
   createRpcRouter,
   createMultiAppRpcRouter,
@@ -97,6 +107,11 @@ export interface ServerOptions {
    * preserved. Supply a loaded {@link GovernanceContext} (see
    * {@link loadActivePolicy} and `createFileAuditWriter`) to enforce a
    * real policy and record an audit trail.
+   *
+   * To also honor the policy attached to an individual API key — which can only
+   * ever tighten the host policy for that key — set the context's `keyPolicies`
+   * to {@link createStoredKeyPolicyResolver}. Keys with no policy of their own
+   * are unaffected.
    */
   governance?: GovernanceContext
 }
