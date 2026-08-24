@@ -18,22 +18,42 @@
  * 3. On a denial, fails loud with a 403 and the human-readable reason naming the
  *    violated rule and the exact permission.
  * 4. On a `confirm-first` rule, **withholds the call** — it does NOT call
- *    `next()`, so the underlying operation never executes — and returns a
- *    structured 202 pending-approval response naming the gating rule and the
- *    exact permission. This is safe-by-default: with no approval flow yet
- *    (issue #54), executing a confirm-first op would be a governance hole, so
- *    the operation is held pending approval rather than allowed through.
+ *    `next()` — and then either asks a human or reports the call as held:
  *
- * The active policy and audit writer are resolved by a {@link GovernanceContext}
- * supplied when the router is built, so a server with no policy configured
- * defaults to allow-all and existing behavior is preserved.
+ *    - **With an approval provider configured**, it asks that provider for a
+ *      decision and awaits it in-request within a bounded timeout. An explicit
+ *      approval releases the call to `next()` and is audited `'approved'`;
+ *      everything else (rejection, timeout, provider failure) denies with a 403
+ *      and is audited `'rejected'`.
+ *    - **With no provider configured**, the operation stays withheld and the
+ *      middleware returns a structured 202 pending-approval response naming the
+ *      gating rule and the exact permission. This is safe-by-default: executing
+ *      a confirm-first op with nobody to ask would be a governance hole.
+ *
+ * The active policy, audit writer, and approval gate are resolved by a
+ * {@link GovernanceContext} supplied when the router is built, so a server with
+ * no policy configured defaults to allow-all and existing behavior is preserved.
  *
  * @packageDocumentation
  */
 
+import { randomUUID } from 'node:crypto'
 import type { MiddlewareHandler } from 'hono'
-import type { GovernancePolicy, AuditWriter, RiskClass } from '@macts/core'
-import { enforceCall, redactArgs } from '@macts/core'
+import type {
+  GovernancePolicy,
+  ApprovalProvider,
+  ApprovalRequest,
+  ApprovalState,
+  AuditWriter,
+  RiskClass,
+} from '@macts/core'
+import {
+  DEFAULT_APPROVAL_TIMEOUT_MS,
+  enforceCall,
+  recordApprovalDecision,
+  redactArgs,
+  seekApproval,
+} from '@macts/core'
 import { getTracer, SpanStatusCode } from '../../telemetry.js'
 import { getLogger } from '../../logger.js'
 import type { AuthVariables } from './auth.js'
@@ -53,14 +73,17 @@ export interface GovernanceDeniedResponse {
 
 /**
  * Response body returned when a capability requires human confirmation
- * (`confirm-first`).
+ * (`confirm-first`) and **no approval provider is configured**.
  *
  * The underlying operation is **not executed**: the middleware short-circuits
  * with this body and HTTP 202 (Accepted-but-not-yet-acted-on) instead of calling
- * `next()`. The approval flow itself (issue #54) is not built yet, so the call is
- * withheld pending approval rather than allowed through — executing it would be a
- * governance hole. Clients receive the gating rule and exact permission so they
- * can surface "approval required" to the user.
+ * `next()`. With nobody to ask, the call is withheld pending approval rather
+ * than allowed through — executing it would be a governance hole. Clients
+ * receive the gating rule and exact permission so they can surface "approval
+ * required" to the user.
+ *
+ * Configure an approval provider (see {@link ApprovalGateContext}) to have the
+ * middleware seek a human decision in-request instead.
  */
 export interface GovernancePendingResponse {
   pendingApproval: {
@@ -72,8 +95,52 @@ export interface GovernancePendingResponse {
 }
 
 /**
- * Shared governance state for an RPC router: the active policy to enforce and an
- * optional audit writer to record decisions.
+ * Error-response body returned when a `confirm-first` call was put to a human
+ * and did not come back approved.
+ *
+ * Distinct from {@link GovernanceDeniedResponse}: that means "policy forbids
+ * this outright", whereas this means "policy routed this to a human, and the
+ * answer was not yes". Clients that surface these differently can tell a user
+ * "your admin does not allow this" from "your approval request was declined /
+ * timed out — try again".
+ */
+export interface GovernanceApprovalDeniedResponse {
+  error: {
+    code: 'GOVERNANCE_APPROVAL_DENIED'
+    /** Human-readable reason, naming the permission and how the request ended. */
+    message: string
+    /** The `app:resource:operation` that was denied. */
+    permission: string
+    /**
+     * How the approval request ended: `'rejected'` (a human declined, or the
+     * approval channel failed) or `'timeout'` (no decision arrived in time).
+     * Both deny the call — the distinction is diagnostic.
+     */
+    approval: ApprovalState
+  }
+}
+
+/**
+ * The configured human-in-the-loop approval gate.
+ *
+ * Supplying one turns a `confirm-first` hold from "return 202, call withheld"
+ * into "ask a human now, within a bounded wait".
+ */
+export interface ApprovalGateContext {
+  /** The provider asked to obtain a human decision. */
+  readonly provider: ApprovalProvider
+  /**
+   * Bound, in milliseconds, on how long a request waits for a human. Past it
+   * the call is denied (fail-closed).
+   *
+   * @defaultValue `DEFAULT_APPROVAL_TIMEOUT_MS` (two minutes)
+   */
+  readonly timeoutMs?: number | undefined
+}
+
+/**
+ * Shared governance state for an RPC router: the active policy to enforce, an
+ * optional audit writer to record decisions, and an optional approval gate.
  *
  * When `policy` permits everything (allow-all) and `writer` is omitted, the
  * middleware is a near-no-op — preserving pre-governance behavior.
@@ -82,11 +149,17 @@ export interface GovernanceContext {
   /** The active governance policy to enforce against every call. */
   readonly policy: GovernancePolicy
   /**
-   * Optional audit sink. When provided, every decision (allow / deny / pending)
-   * is appended to it. When omitted, enforcement still runs but nothing is
-   * persisted.
+   * Optional audit sink. When provided, every decision (allow / deny / pending /
+   * approved / rejected) is appended to it. When omitted, enforcement still runs
+   * but nothing is persisted.
    */
   readonly writer?: AuditWriter | undefined
+  /**
+   * Optional approval gate. When omitted, `confirm-first` calls are withheld and
+   * reported as {@link GovernancePendingResponse} (202) — the behavior of a
+   * deployment with no approval channel installed.
+   */
+  readonly approvals?: ApprovalGateContext | undefined
 }
 
 /**
@@ -97,7 +170,9 @@ export interface RequirePolicyOptions {
   readonly permission: string
   /** The pre-computed risk class of the endpoint's operation. */
   readonly risk: RiskClass
-  /** The shared governance context (active policy + audit writer). */
+  /**
+   * The shared governance context (active policy, audit writer, approval gate).
+   */
   readonly governance: GovernanceContext
 }
 
@@ -113,11 +188,16 @@ export interface RequirePolicyOptions {
  *
  * - `allowed` → calls `next()`; the existing handler runs.
  * - `denied` → 403 {@link GovernanceDeniedResponse}; the handler never runs.
- * - `pending-approval` (`confirm-first`) → 202 {@link GovernancePendingResponse};
- *   the handler **never runs**. The operation is withheld pending approval. This
- *   is safe-by-default: with no approval flow yet (issue #54), letting a
- *   confirm-first call execute would be a governance hole, so it is held rather
- *   than allowed through. The decision is audited as `'pending'`.
+ * - `pending-approval` (`confirm-first`) → the handler is withheld and the
+ *   decision is audited as `'pending'`. Then:
+ *   - with an approval gate configured, a human is asked in-request within the
+ *     gate's bounded timeout. Approved → audited `'approved'` and released to
+ *     `next()`. Rejected, timed out, or the provider failed → audited
+ *     `'rejected'` and answered 403 {@link GovernanceApprovalDeniedResponse}.
+ *   - with no gate configured, 202 {@link GovernancePendingResponse}; the
+ *     handler **never runs**. Letting a confirm-first call execute with nobody
+ *     to ask would be a governance hole, so it is held rather than allowed
+ *     through.
  *
  * @param options - Endpoint permission, risk class, and governance context.
  * @returns A Hono middleware handler.
@@ -128,9 +208,11 @@ export function requirePolicy(
   const { permission, risk, governance } = options
 
   return async (c, next) => {
-    // The API-key id (`sub`) attributes the audit record. This middleware runs
+    // The API-key id (`sub`) attributes the audit record, and the optional
+    // human-readable name makes an approval prompt legible. This middleware runs
     // after auth, so the payload is present and typed as such.
-    const apiKeyId = c.get('apiKeyPayload').sub
+    const payload = c.get('apiKeyPayload')
+    const apiKeyId = payload.sub
 
     // Summarize the request body for the audit record. Redaction is best-effort;
     // a body that is absent or not an object yields "(no arguments)".
@@ -190,18 +272,123 @@ export function requirePolicy(
     }
 
     if (decision.outcome === 'pending-approval') {
-      // Safe-by-default: a confirm-first call must NOT execute while no approval
-      // flow exists (issue #54). Withhold the operation — do not call next() —
-      // and return a structured 202 pending-approval body naming the gating rule
-      // and the exact permission. The decision was already audited as 'pending'.
-      return c.json<GovernancePendingResponse>(
-        {
-          pendingApproval: {
-            message: decision.reason,
+      const gate = governance.approvals
+
+      if (gate === undefined) {
+        // Safe-by-default: with no approval channel configured there is nobody
+        // to ask, so a confirm-first call must NOT execute. Withhold the
+        // operation — do not call next() — and return a structured 202
+        // pending-approval body naming the gating rule and the exact permission.
+        // The decision was already audited as 'pending'.
+        return c.json<GovernancePendingResponse>(
+          {
+            pendingApproval: {
+              message: decision.reason,
+              permission,
+            },
+          },
+          202
+        )
+      }
+
+      const approvalSpan = getTracer('macts-api').startSpan('governance.approval', {
+        attributes: {
+          'governance.permission': permission,
+          'governance.risk': risk,
+          'governance.approval.provider': gate.provider.name,
+        },
+      })
+
+      const request: ApprovalRequest = {
+        id: randomUUID(),
+        permission,
+        risk,
+        identity: {
+          apiKeyId,
+          ...(payload.name === undefined ? {} : { apiKeyName: payload.name }),
+        },
+        argsSummary,
+        rule: decision.evaluation.rule,
+        reason: decision.reason,
+        timeoutMs: gate.timeoutMs ?? DEFAULT_APPROVAL_TIMEOUT_MS,
+        requestedAt: new Date(),
+        // Only a host-layer policy holds calls today; see ApprovalRequest.layer.
+        layer: 'host',
+      }
+
+      // seekApproval never rejects and never returns `approved` for a hang, a
+      // provider failure, or a malformed response — so no branch below can turn
+      // a broken approval channel into an executed call.
+      const outcome = await seekApproval({ provider: gate.provider, request })
+
+      approvalSpan.setAttribute('governance.approval.state', outcome.state)
+      approvalSpan.setAttribute('governance.approval.id', request.id)
+      approvalSpan.setStatus({
+        code: outcome.approved ? SpanStatusCode.OK : SpanStatusCode.ERROR,
+      })
+      approvalSpan.end()
+
+      try {
+        await recordApprovalDecision({
+          permission,
+          outcome,
+          audit: { apiKeyId, argsSummary, timestamp: new Date() },
+          ...(governance.writer ? { writer: governance.writer } : {}),
+        })
+      } catch (error) {
+        // A human decision that cannot be recorded is a decision that did not
+        // happen, as far as the audit trail is concerned. Fail closed rather
+        // than executing an operation with no record of who approved it.
+        getLogger().error(
+          { err: error, permission, approvalId: request.id },
+          'Failed to record approval decision'
+        )
+        return c.json(
+          {
+            error: {
+              code: 'INTERNAL_ERROR',
+              message: 'Governance enforcement failed',
+            },
+          },
+          500
+        )
+      }
+
+      if (outcome.approved) {
+        getLogger().info(
+          {
             permission,
+            approvalId: request.id,
+            provider: gate.provider.name,
+            hasEvidence: outcome.evidence !== undefined,
+          },
+          'Capability call approved by a human'
+        )
+        return next()
+      }
+
+      getLogger().warn(
+        {
+          permission,
+          approvalId: request.id,
+          provider: gate.provider.name,
+          approvalState: outcome.state,
+          ...(outcome.providerFailure === undefined
+            ? {}
+            : { providerFailure: outcome.providerFailure }),
+        },
+        'Capability call denied at the approval gate'
+      )
+      return c.json<GovernanceApprovalDeniedResponse>(
+        {
+          error: {
+            code: 'GOVERNANCE_APPROVAL_DENIED',
+            message: outcome.reason,
+            permission,
+            approval: outcome.state,
           },
         },
-        202
+        403
       )
     }
 

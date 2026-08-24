@@ -14,6 +14,9 @@ import { ApiKeyValidationSuccess } from '@macts/core';
 import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
+import { ApprovalConfig } from '@macts/core';
+import { ApprovalProvider } from '@macts/core';
+import { ApprovalState } from '@macts/core';
 import { AuditWriter } from '@macts/core';
 import { booleanCoercer } from '@macts/core';
 import { checkPermission } from '@macts/core';
@@ -85,6 +88,22 @@ export { ApiKeyValidationSuccess }
 export { AppConnection }
 
 export { AppConnectionOptions }
+
+// @public
+export interface ApprovalGateContext {
+    readonly provider: ApprovalProvider;
+    readonly timeoutMs?: number | undefined;
+}
+
+// @public
+export class ApprovalProviderError extends Error {
+    constructor(
+    path: string, message: string);
+    readonly path: string;
+}
+
+// @public
+export type ApprovalProviderFactory = (options: Readonly<Record<string, unknown>>) => ApprovalProvider | Promise<ApprovalProvider>;
 
 // @public
 export type AttributeValue = string | number | boolean;
@@ -234,6 +253,9 @@ export function getActivePolicyPath(): string;
 export { getAppName }
 
 // @public
+export function getApprovalConfigPath(): string;
+
+// @public
 export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
 
 // @public
@@ -246,7 +268,19 @@ export function getSigningSecret(): Promise<string>;
 export function getTracer(_name?: string): Tracer;
 
 // @public
+export interface GovernanceApprovalDeniedResponse {
+    // (undocumented)
+    error: {
+        code: 'GOVERNANCE_APPROVAL_DENIED';
+        message: string;
+        permission: string;
+        approval: ApprovalState;
+    };
+}
+
+// @public
 export interface GovernanceContext {
+    readonly approvals?: ApprovalGateContext | undefined;
     readonly policy: GovernancePolicy;
     readonly writer?: AuditWriter | undefined;
 }
@@ -305,6 +339,17 @@ export function loadActivePolicy(options?: LoadActivePolicyOptions): Promise<Gov
 
 // @public
 export interface LoadActivePolicyOptions {
+    readonly path?: string;
+}
+
+// @public
+export function loadApprovalConfig(options?: LoadApprovalOptions): Promise<ApprovalConfig | undefined>;
+
+// @public
+export function loadApprovalGate(options?: LoadApprovalOptions): Promise<ApprovalGateContext | undefined>;
+
+// @public
+export interface LoadApprovalOptions {
     readonly path?: string;
 }
 
