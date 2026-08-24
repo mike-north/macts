@@ -38,6 +38,8 @@ export {
 export {
   requirePolicy,
   type GovernanceContext,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
   type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
@@ -58,6 +60,8 @@ export {
   ApprovalProviderError,
   type ApprovalProviderFactory,
   type LoadApprovalOptions,
+  type LoadApprovalGateOptions,
+  type LoadedApprovalGate,
 } from './governance/approval-provider.js'
 export {
   createRpcRouter,

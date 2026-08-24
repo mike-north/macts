@@ -309,10 +309,23 @@ export interface AppProbeResult {
 }
 
 // @public
+export const APPROVAL_FAILURES: readonly ["provider-error", "malformed-response"];
+
+// @public
 export const APPROVAL_LAYERS: readonly ["host", "key"];
 
 // @public
 export const APPROVAL_STATES: readonly ["approved", "rejected", "timeout"];
+
+// Warning: (ae-forgotten-export) The symbol "ApprovalOutcomeBase" needs to be exported by the entry point index.d.ts
+//
+// @public
+export interface ApprovalApprovedOutcome extends ApprovalOutcomeBase {
+    // (undocumented)
+    readonly approved: true;
+    // (undocumented)
+    readonly state: 'approved';
+}
 
 // @public
 export type ApprovalConfig = z.infer<typeof ApprovalConfigSchema>;
@@ -340,17 +353,24 @@ export interface ApprovalDecision {
 }
 
 // @public
+export interface ApprovalDeniedOutcome extends ApprovalOutcomeBase {
+    // (undocumented)
+    readonly approved: false;
+    readonly failure?: ApprovalFailure | undefined;
+    readonly state: ApprovalDeniedState;
+}
+
+// @public
+export type ApprovalDeniedState = Exclude<ApprovalState, 'approved'>;
+
+// @public
+export type ApprovalFailure = (typeof APPROVAL_FAILURES)[number];
+
+// @public
 export type ApprovalLayer = (typeof APPROVAL_LAYERS)[number];
 
 // @public
-export interface ApprovalOutcome {
-    readonly approved: boolean;
-    readonly evidence?: unknown;
-    readonly policySuggestion?: ApprovalPolicySuggestion | undefined;
-    readonly providerFailure?: string | undefined;
-    readonly reason: string;
-    readonly state: ApprovalState;
-}
+export type ApprovalOutcome = ApprovalApprovedOutcome | ApprovalDeniedOutcome;
 
 // @public
 export interface ApprovalPolicySuggestion {
@@ -443,6 +463,7 @@ export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
 export interface AuditRecord {
     readonly apiKeyId: string;
     readonly app: string;
+    readonly approvalId?: string;
     readonly argsSummary: string;
     readonly capability: string;
     readonly decision: AuditDecision;
@@ -454,6 +475,7 @@ export interface AuditRecord {
 export interface AuditRecordInput {
     readonly apiKeyId: string;
     readonly app: string;
+    readonly approvalId?: string;
     readonly argsSummary: string;
     readonly capability: string;
     readonly decision: AuditDecision;
@@ -484,6 +506,7 @@ export function buildResourceCommandRoute(appName: string, resourcePlural: strin
 // @public
 export interface CallAuditContext {
     readonly apiKeyId: string;
+    readonly approvalId?: string | undefined;
     readonly argsSummary: string;
     readonly timestamp: Date;
 }
@@ -2034,7 +2057,7 @@ export interface RecordApprovalDecisionOptions {
     readonly audit: CallAuditContext;
     readonly outcome: ApprovalOutcome;
     readonly permission: string;
-    readonly writer?: AuditWriter | undefined;
+    readonly writer: AuditWriter;
 }
 
 // @public (undocumented)
@@ -2289,6 +2312,7 @@ export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord
 export interface SerializedAuditRecord {
     readonly apiKeyId: string;
     readonly app: string;
+    readonly approvalId?: string;
     readonly argsSummary: string;
     readonly capability: string;
     readonly decision: AuditDecision;

@@ -15,8 +15,8 @@ import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
 import { ApprovalConfig } from '@macts/core';
+import { ApprovalDeniedState } from '@macts/core';
 import { ApprovalProvider } from '@macts/core';
-import { ApprovalState } from '@macts/core';
 import { AuditWriter } from '@macts/core';
 import { booleanCoercer } from '@macts/core';
 import { checkPermission } from '@macts/core';
@@ -274,13 +274,23 @@ export interface GovernanceApprovalDeniedResponse {
         code: 'GOVERNANCE_APPROVAL_DENIED';
         message: string;
         permission: string;
-        approval: ApprovalState;
+        approval: ApprovalDeniedState;
     };
 }
 
 // @public
-export interface GovernanceContext {
-    readonly approvals?: ApprovalGateContext | undefined;
+export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals;
+
+// @public
+export interface GovernanceContextWithApprovals {
+    readonly approvals: ApprovalGateContext;
+    readonly policy: GovernancePolicy;
+    readonly writer: AuditWriter;
+}
+
+// @public
+export interface GovernanceContextWithoutApprovals {
+    readonly approvals?: undefined;
     readonly policy: GovernancePolicy;
     readonly writer?: AuditWriter | undefined;
 }
@@ -346,12 +356,20 @@ export interface LoadActivePolicyOptions {
 export function loadApprovalConfig(options?: LoadApprovalOptions): Promise<ApprovalConfig | undefined>;
 
 // @public
-export function loadApprovalGate(options?: LoadApprovalOptions): Promise<ApprovalGateContext | undefined>;
+export function loadApprovalGate(options: LoadApprovalGateOptions): Promise<LoadedApprovalGate | undefined>;
+
+// @public
+export interface LoadApprovalGateOptions extends LoadApprovalOptions {
+    readonly writer: AuditWriter;
+}
 
 // @public
 export interface LoadApprovalOptions {
     readonly path?: string;
 }
+
+// @public
+export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' | 'approvals'>;
 
 // @public
 export interface LoadedTlsOptions {

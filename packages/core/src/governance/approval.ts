@@ -49,6 +49,19 @@
  * `rejected`) so operators can tell "a human said no" from "no human answered"
  * while both deny.
  *
+ * ## Two audiences for one denial
+ *
+ * A provider is third-party code that commonly wraps network and auth failures,
+ * and those exception messages can carry relay URLs, account identifiers, or
+ * request headers. Embedding them in a response would hand operator-only
+ * diagnostics to any caller that trips a `confirm-first` rule. Every outcome
+ * therefore carries two explanations:
+ *
+ * - {@link ApprovalOutcome.reason} — client-safe. For provider failures it names
+ *   a stable {@link ApprovalFailure} category and never the underlying text.
+ * - {@link ApprovalOutcome.auditReason} — full detail, for the audit record and
+ *   server-side logs only. Never return it to a caller.
+ *
  * ## Evidence
  *
  * {@link ApprovalDecision.evidence} is an opaque slot for a provider's own
@@ -61,13 +74,11 @@
  * permission string, a {@link RiskClass}, and opaque identifiers. No
  * macOS-specific assumptions, no I/O, no wall-clock reads (the request's
  * `requestedAt` is injected by the caller).
- *
- * @packageDocumentation
  */
 
 import type { RiskClass } from '../capabilities/risk.js'
 import type { MatchedPolicyRule } from './evaluator.js'
-import type { PolicyDisposition } from './policy.js'
+import { POLICY_DISPOSITIONS, type PolicyDisposition } from './policy.js'
 
 // ---------------------------------------------------------------------------
 // Terminal states
@@ -102,6 +113,33 @@ export type ApprovalState = (typeof APPROVAL_STATES)[number]
 export function isApprovalState(value: unknown): value is ApprovalState {
   return typeof value === 'string' && (APPROVAL_STATES as readonly string[]).includes(value)
 }
+
+/**
+ * The terminal states that deny a held call.
+ *
+ * Everything except `approved`. Response and audit shapes that only ever
+ * describe a denial should use this rather than {@link ApprovalState}, so an
+ * "approved denial" is not merely undocumented but unrepresentable.
+ */
+export type ApprovalDeniedState = Exclude<ApprovalState, 'approved'>
+
+/**
+ * Why an approval attempt failed on the macts side rather than producing a
+ * human decision.
+ *
+ * - `provider-error`      — the provider threw or its promise rejected.
+ * - `malformed-response`  — the provider resolved with something that is not a
+ *                           valid {@link ApprovalDecision}.
+ *
+ * Both deny the call. The category is stable and safe to surface to a caller;
+ * the underlying detail is not (see {@link ApprovalOutcome.auditReason}).
+ */
+export const APPROVAL_FAILURES = ['provider-error', 'malformed-response'] as const
+
+/**
+ * A single approval-failure category. See {@link APPROVAL_FAILURES}.
+ */
+export type ApprovalFailure = (typeof APPROVAL_FAILURES)[number]
 
 /**
  * Which policy layer held the call and is asking for approval.
@@ -320,21 +358,22 @@ export interface ApprovalProvider {
 export const DEFAULT_APPROVAL_TIMEOUT_MS = 120_000
 
 /**
- * The normalized result of asking a provider for a decision.
- *
- * `approved` is the only field callers should gate on; `state` explains *why*
- * for logs, audit reasons, and clients.
+ * Fields every {@link ApprovalOutcome} carries, whichever way it went.
  */
-export interface ApprovalOutcome {
+interface ApprovalOutcomeBase {
   /**
-   * True **only** when a human explicitly approved. False for every rejection,
-   * timeout, provider error, and malformed response.
+   * Client-safe explanation, always present, naming the permission.
+   *
+   * Safe to return in an HTTP response: for a provider failure it names the
+   * {@link ApprovalFailure} category rather than the underlying exception text.
    */
-  readonly approved: boolean
-  /** The terminal state reached. See {@link APPROVAL_STATES}. */
-  readonly state: ApprovalState
-  /** Human-readable explanation, always present, naming the permission. */
   readonly reason: string
+  /**
+   * Full explanation for the audit record and server-side logs, including any
+   * third-party exception text. **Never return this to a caller** — see the
+   * module documentation.
+   */
+  readonly auditReason: string
   /** Opaque provider artifact, when the provider supplied one. */
   readonly evidence?: unknown
   /**
@@ -343,14 +382,41 @@ export interface ApprovalOutcome {
    * one. Never auto-applied.
    */
   readonly policySuggestion?: ApprovalPolicySuggestion | undefined
-  /**
-   * Set when the provider itself misbehaved (threw, or returned a malformed
-   * decision) rather than reporting a state. The call is denied either way;
-   * this distinguishes "a human declined" from "the approval channel is
-   * broken" for operators.
-   */
-  readonly providerFailure?: string | undefined
 }
+
+/**
+ * A held call that a human explicitly approved.
+ */
+export interface ApprovalApprovedOutcome extends ApprovalOutcomeBase {
+  readonly approved: true
+  readonly state: 'approved'
+}
+
+/**
+ * A held call that was not approved, for any reason.
+ */
+export interface ApprovalDeniedOutcome extends ApprovalOutcomeBase {
+  readonly approved: false
+  /** Why the call was denied. Never `approved`. */
+  readonly state: ApprovalDeniedState
+  /**
+   * Set when the provider itself misbehaved rather than reporting a state. The
+   * call is denied either way; this distinguishes "a human declined" from "the
+   * approval channel is broken" for operators, and is the only part of a
+   * provider failure that is safe to surface.
+   */
+  readonly failure?: ApprovalFailure | undefined
+}
+
+/**
+ * The normalized result of asking a provider for a decision.
+ *
+ * A discriminated union on `approved`: `approved: true` implies
+ * `state: 'approved'`, and `approved: false` implies a denied state.
+ * Contradictory combinations are unrepresentable, so a consumer-supplied
+ * outcome cannot be persisted as approved while carrying a rejected state.
+ */
+export type ApprovalOutcome = ApprovalApprovedOutcome | ApprovalDeniedOutcome
 
 /**
  * Options for {@link seekApproval}.
@@ -380,13 +446,10 @@ export async function seekApproval(options: SeekApprovalOptions): Promise<Approv
   // A non-positive or non-finite bound leaves no time for a human to answer.
   // Fail closed immediately rather than asking a provider we will not wait for.
   if (!Number.isFinite(request.timeoutMs) || request.timeoutMs <= 0) {
-    return {
-      approved: false,
-      state: 'timeout',
-      reason: `Approval for "${request.permission}" was not sought: the approval timeout (${String(
-        request.timeoutMs
-      )}ms) leaves no time for a human decision. Treated as rejected (fail-closed).`,
-    }
+    const reason = `Approval for "${request.permission}" was not sought: the approval timeout (${String(
+      request.timeoutMs
+    )}ms) leaves no time for a human decision. Treated as rejected (fail-closed).`
+    return { approved: false, state: 'timeout', reason, auditReason: reason }
   }
 
   const controller = new AbortController()
@@ -424,7 +487,7 @@ export async function seekApproval(options: SeekApprovalOptions): Promise<Approv
  */
 type ProviderResult =
   | { readonly kind: 'decision'; readonly decision: ApprovalDecision }
-  | { readonly kind: 'error'; readonly message: string }
+  | { readonly kind: 'failed'; readonly failure: ApprovalFailure; readonly detail: string }
   | { readonly kind: 'timeout' }
 
 /**
@@ -443,28 +506,79 @@ async function invokeProvider(
     const decision = await provider.requestApproval(request, { signal })
     if (!isApprovalDecision(decision)) {
       return {
-        kind: 'error',
-        message: 'returned a malformed decision (missing or unrecognized "state")',
+        kind: 'failed',
+        failure: 'malformed-response',
+        detail: 'the provider returned a malformed decision',
       }
     }
     return { kind: 'decision', decision }
   } catch (error) {
-    return { kind: 'error', message: error instanceof Error ? error.message : String(error) }
+    return {
+      kind: 'failed',
+      failure: 'provider-error',
+      detail: error instanceof Error ? error.message : String(error),
+    }
   }
 }
 
 /**
  * Validate a provider's returned value at the trust boundary.
  *
- * Only `state` is required and it must be a known {@link ApprovalState}; an
- * unrecognized state (e.g. a future `'escalated'`) is malformed for this version
- * of the interface and therefore denies, rather than being silently ignored.
+ * A provider is third-party code, so **every** field it can influence is
+ * checked, not just the one the gate branches on. `state` must be a known
+ * {@link ApprovalState} — an unrecognized state (a future `'escalated'`, say) is
+ * malformed for this version of the interface and therefore denies rather than
+ * being silently ignored. `reason` and any `policySuggestion` are validated too,
+ * because both flow onward into audit records and HTTP responses, where a
+ * non-string would surface as `[object Object]` or worse.
+ *
+ * `evidence` is deliberately unchecked: it is declared opaque, macts never
+ * interprets it, and constraining it would defeat its purpose.
  */
 function isApprovalDecision(value: unknown): value is ApprovalDecision {
   if (typeof value !== 'object' || value === null) {
     return false
   }
-  return isApprovalState((value as { state?: unknown }).state)
+  const candidate = value as {
+    state?: unknown
+    reason?: unknown
+    policySuggestion?: unknown
+  }
+  if (!isApprovalState(candidate.state)) {
+    return false
+  }
+  if (candidate.reason !== undefined && typeof candidate.reason !== 'string') {
+    return false
+  }
+  return candidate.policySuggestion === undefined || isPolicySuggestion(candidate.policySuggestion)
+}
+
+/**
+ * Validate a provider-supplied {@link ApprovalPolicySuggestion}.
+ *
+ * Suggestions are never auto-applied, but they are surfaced to an operator, so
+ * a malformed one is still a malformed decision rather than something to drop
+ * silently.
+ */
+function isPolicySuggestion(value: unknown): value is ApprovalPolicySuggestion {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+  const candidate = value as {
+    permission?: unknown
+    disposition?: unknown
+    rationale?: unknown
+  }
+  if (typeof candidate.permission !== 'string') {
+    return false
+  }
+  if (
+    typeof candidate.disposition !== 'string' ||
+    !(POLICY_DISPOSITIONS as readonly string[]).includes(candidate.disposition)
+  ) {
+    return false
+  }
+  return candidate.rationale === undefined || typeof candidate.rationale === 'string'
 }
 
 /**
@@ -476,28 +590,26 @@ function normalizeProviderResult(
   result: ProviderResult
 ): ApprovalOutcome {
   if (result.kind === 'timeout') {
-    return {
-      approved: false,
-      state: 'timeout',
-      reason: `No approval decision for "${request.permission}" from provider "${provider.name}" within ${String(request.timeoutMs)}ms. Treated as rejected (fail-closed).`,
-    }
+    const reason = `No approval decision for "${request.permission}" from provider "${provider.name}" within ${String(request.timeoutMs)}ms. Treated as rejected (fail-closed).`
+    return { approved: false, state: 'timeout', reason, auditReason: reason }
   }
 
-  if (result.kind === 'error') {
+  if (result.kind === 'failed') {
+    // The public reason names the failure *category* only. The provider's own
+    // message can carry relay URLs, account identifiers, or headers, and any
+    // authenticated caller can trip a confirm-first rule — so that text goes to
+    // the audit record and server logs, never to a response.
     return {
       approved: false,
       state: 'rejected',
-      reason: `Approval provider "${provider.name}" failed for "${request.permission}": ${result.message}. Treated as rejected (fail-closed).`,
-      providerFailure: result.message,
+      reason: `Approval for "${request.permission}" could not be obtained (${result.failure}). Treated as rejected (fail-closed).`,
+      auditReason: `Approval provider "${provider.name}" failed for "${request.permission}" (${result.failure}): ${result.detail}. Treated as rejected (fail-closed).`,
+      failure: result.failure,
     }
   }
 
   const { decision } = result
-  const base = {
-    approved: decision.state === 'approved',
-    state: decision.state,
-    reason: decision.reason ?? defaultDecisionReason(provider, request, decision.state),
-  }
+  const reason = decision.reason ?? defaultDecisionReason(provider, request, decision.state)
 
   // A suggestion from a provider that did not declare support is dropped, not
   // forwarded: capability flags are the contract, and honouring an undeclared
@@ -506,11 +618,19 @@ function normalizeProviderResult(
     ? decision.policySuggestion
     : undefined
 
-  return {
-    ...base,
+  // A provider-authored reason is shown to the human who asked, so it is
+  // client-safe by construction — unlike an exception message, it is copy the
+  // provider chose to display.
+  const extras = {
+    reason,
+    auditReason: reason,
     ...(decision.evidence === undefined ? {} : { evidence: decision.evidence }),
     ...(suggestion === undefined ? {} : { policySuggestion: suggestion }),
   }
+
+  return decision.state === 'approved'
+    ? { approved: true, state: 'approved', ...extras }
+    : { approved: false, state: decision.state, ...extras }
 }
 
 /**

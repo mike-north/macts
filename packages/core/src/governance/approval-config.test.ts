@@ -99,6 +99,27 @@ describe('parseApprovalConfig', () => {
     expect(result.success).toBe(false)
   })
 
+  it('labels a declaration-wide issue with a root marker, not an empty path', () => {
+    // Zod reports unrecognized keys against the object itself, so the path is
+    // empty. Rendered into a summary that reads ": Unrecognized key(s)...",
+    // which looks like a formatting bug rather than a configuration error.
+    const result = parseApprovalConfig({ provider: '@example/macts-approval', timeout: 30_000 })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    const issue = result.issues[0]
+    expect(issue?.path).toBe('<root>')
+    expect(issue?.path).not.toBe('')
+  })
+
+  it('labels a non-object declaration with the root marker too', () => {
+    const result = parseApprovalConfig('not a declaration')
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(result.issues.every((issue) => issue.path.length > 0)).toBe(true)
+  })
+
   it('rejects a future declaration version', () => {
     const result = parseApprovalConfig({ version: '2', provider: '@example/macts-approval' })
 

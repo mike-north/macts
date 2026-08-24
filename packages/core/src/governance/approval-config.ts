@@ -35,8 +35,6 @@
  * Like {@link ./policy-path.js}, {@link resolveApprovalConfigPath} takes `home`
  * as an explicit parameter and never reads `MACTS_HOME` itself — each surface
  * passes in its own `getMactsHome()` result.
- *
- * @packageDocumentation
  */
 
 import { join } from 'node:path'
@@ -117,9 +115,24 @@ export type ParseApprovalConfigResult =
   | { readonly success: false; readonly issues: readonly ApprovalConfigIssue[] }
 
 /**
+ * Marker used as the `path` of an issue that applies to the declaration as a
+ * whole rather than to a named field (an unrecognized top-level key, or a
+ * declaration that is not an object at all).
+ */
+const ROOT_ISSUE_PATH = '<root>'
+
+/**
  * Convert a Zod issue path into a stable dotted string.
+ *
+ * Root-level issues carry an empty path, which would render as
+ * `": Unrecognized key(s)…"` once joined into a summary. They get
+ * {@link ROOT_ISSUE_PATH} instead so every issue reads as a location plus a
+ * message.
  */
 function formatIssuePath(path: readonly PropertyKey[]): string {
+  if (path.length === 0) {
+    return ROOT_ISSUE_PATH
+  }
   return path
     .map((segment) => (typeof segment === 'symbol' ? segment.toString() : String(segment)))
     .join('.')

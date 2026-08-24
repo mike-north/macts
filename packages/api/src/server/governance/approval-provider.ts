@@ -18,9 +18,10 @@
  * run, so it is activated only by being named in the registration file.
  *
  * The package is asked for a `createApprovalProvider` factory, tried first at
- * the `macts-approval-provider` subpath (mirroring the `/cli` and `/mcp` subpath
- * convention, for a package that also ships other surfaces) and then at the
- * package root (the common case: a package that exists only to be a provider).
+ * the `approval` subpath — a concise sibling of the established `<package>/cli`
+ * and `<package>/mcp` entry points, for a package that also ships other
+ * surfaces — and then at the package root (the common case: a package that
+ * exists only to be a provider).
  *
  * ## Failure policy
  *
@@ -29,6 +30,11 @@
  * - **A registration file that is malformed, names a package that cannot be
  *   resolved, or yields something that is not a provider** → throws
  *   {@link ApprovalProviderError}.
+ * - **No audit writer supplied** → throws {@link ApprovalProviderError}. An
+ *   approval gate may not exist without a durable audit sink, because a
+ *   `confirm-first` operation must never execute without its decision being
+ *   persisted. The returned value carries the writer so a caller cannot
+ *   assemble a governance context that seeks approval and records nothing.
  *
  * A configured-but-broken approval channel is a hard startup error, never a
  * silent downgrade. Degrading to "no provider" would look identical to a machine
@@ -43,16 +49,17 @@ import { readFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import type { ApprovalConfig, ApprovalProvider } from '@macts/core'
+import type { ApprovalConfig, ApprovalProvider, AuditWriter } from '@macts/core'
 import { parseApprovalConfig, resolveApprovalConfigPath } from '@macts/core'
 import { getMactsHome } from '../../paths.js'
-import type { ApprovalGateContext } from '../middleware/governance.js'
+import type { GovernanceContextWithApprovals } from '../middleware/governance.js'
 
 /**
  * Subpath a provider package may export its factory from, for packages that
- * also ship unrelated surfaces. Mirrors the `/cli` and `/mcp` plugin subpaths.
+ * also ship unrelated surfaces. A concise sibling of the `/cli` and `/mcp`
+ * plugin subpaths, so the convention is inferable rather than one-off.
  */
-const PROVIDER_SUBPATH = 'macts-approval-provider'
+const PROVIDER_SUBPATH = 'approval'
 
 /**
  * The factory a provider package must export.
@@ -94,7 +101,7 @@ export function getApprovalConfigPath(): string {
 }
 
 /**
- * Options for {@link loadApprovalConfig} and {@link loadApprovalGate}.
+ * Options for {@link loadApprovalConfig}.
  */
 export interface LoadApprovalOptions {
   /**
@@ -103,6 +110,26 @@ export interface LoadApprovalOptions {
    */
   readonly path?: string
 }
+
+/**
+ * Options for {@link loadApprovalGate}.
+ */
+export interface LoadApprovalGateOptions extends LoadApprovalOptions {
+  /**
+   * Audit sink for governance decisions. **Required**: an approval gate may not
+   * exist without somewhere to record the decisions it obtains.
+   */
+  readonly writer: AuditWriter
+}
+
+/**
+ * The governance-context fragment a loaded approval gate produces.
+ *
+ * Carries the writer alongside the gate so the two travel together — a caller
+ * spreads this into their governance context and cannot end up seeking approval
+ * with no audit sink.
+ */
+export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' | 'approvals'>
 
 /**
  * Read and validate the approval-provider registration.
@@ -150,27 +177,43 @@ export async function loadApprovalConfig(
  * Load the configured approval provider and build the gate context the
  * enforcement middleware consumes.
  *
- * @param options - Optional registration path override.
- * @returns The gate context, or `undefined` when no provider is configured.
+ * @param options - The audit writer (required) and an optional registration
+ *   path override.
+ * @returns The `{ writer, approvals }` fragment to spread into a governance
+ *   context, or `undefined` when no provider is configured.
  * @throws {@link ApprovalProviderError} when a provider is configured but cannot
- *   be loaded.
+ *   be loaded, or when no usable audit writer was supplied.
  *
  * @example
  * ```typescript
  * import { createMultiServer } from '@macts/api/server';
  * import { loadActivePolicy, loadApprovalGate } from '@macts/api/server';
+ * import { createFileAuditWriter } from '@macts/core';
  *
  * const policy = await loadActivePolicy();
- * const approvals = await loadApprovalGate();
+ * const writer = createFileAuditWriter('/path/to/audit.jsonl');
+ * const approvals = await loadApprovalGate({ writer });
  * const server = createMultiServer(manifests, {
- *   governance: { policy, ...(approvals ? { approvals } : {}) },
+ *   governance: approvals ? { policy, ...approvals } : { policy, writer },
  * });
  * ```
  */
 export async function loadApprovalGate(
-  options: LoadApprovalOptions = {}
-): Promise<ApprovalGateContext | undefined> {
+  options: LoadApprovalGateOptions
+): Promise<LoadedApprovalGate | undefined> {
   const path = options.path ?? getApprovalConfigPath()
+
+  // Checked before anything else, and at runtime as well as in the type system:
+  // a JavaScript caller can still omit it, and discovering that only when the
+  // first held call is approved would be exactly the failure this guards.
+  if (!isAuditWriter(options.writer)) {
+    throw new ApprovalProviderError(
+      path,
+      'an approval gate requires an audit writer (an object with an `append` method), ' +
+        'so that no approved call can execute without its decision being recorded'
+    )
+  }
+
   const config = await loadApprovalConfig({ path })
   if (config === undefined) {
     return undefined
@@ -197,12 +240,29 @@ export async function loadApprovalGate(
     )
   }
 
-  return { provider, timeoutMs: config.timeoutMs }
+  return {
+    writer: options.writer,
+    approvals: { provider, timeoutMs: config.timeoutMs },
+  }
 }
 
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Validate that a value can serve as an {@link AuditWriter}.
+ *
+ * A structural check, not a `instanceof`: callers legitimately supply their own
+ * sinks (in-memory, SIEM export) rather than only `createFileAuditWriter`.
+ */
+function isAuditWriter(value: unknown): value is AuditWriter {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { append?: unknown }).append === 'function'
+  )
+}
 
 /**
  * Import a provider package and return its `createApprovalProvider` factory.

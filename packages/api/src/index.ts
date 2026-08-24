@@ -38,6 +38,8 @@ export {
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
   type GovernanceContext,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
   type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
@@ -62,6 +64,8 @@ export {
   ApprovalProviderError,
   type ApprovalProviderFactory,
   type LoadApprovalOptions,
+  type LoadApprovalGateOptions,
+  type LoadedApprovalGate,
 } from './server/governance/approval-provider.js'
 
 // RPC handlers

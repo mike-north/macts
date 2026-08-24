@@ -26,6 +26,7 @@ import type {
   ApprovalProvider,
   ApprovalProviderCapabilities,
   ApprovalRequest,
+  AuditWriter,
   GovernancePolicy,
 } from '@macts/core'
 import { createFileAuditWriter, createStaticApprovalProvider } from '@macts/core'
@@ -123,6 +124,16 @@ async function readAudit(path: string): Promise<Record<string, unknown>[]> {
     .split('\n')
     .filter((line) => line.trim().length > 0)
     .map((line) => JSON.parse(line) as Record<string, unknown>)
+}
+
+/**
+ * A writer that discards records.
+ *
+ * An approval gate cannot exist without an audit writer, so tests that assert
+ * something other than the audit trail still have to supply one.
+ */
+const DISCARDING_WRITER: AuditWriter = {
+  append: () => Promise.resolve(),
 }
 
 // ---------------------------------------------------------------------------
@@ -238,7 +249,9 @@ describe('requirePolicy approval gate', () => {
     const body = (await res.json()) as GovernanceApprovalDeniedResponse
     expect(body.error.code).toBe('GOVERNANCE_APPROVAL_DENIED')
     expect(body.error.approval).toBe('rejected')
-    expect(body.error.message).toContain('approval relay unreachable')
+    // The category is client-safe; the underlying message is not (see the
+    // disclosure test below).
+    expect(body.error.message).toContain('provider-error')
 
     const records = await readAudit(auditPath)
     expect(records.map((r) => r['decision'])).toEqual(['pending', 'rejected'])
@@ -285,7 +298,7 @@ describe('requirePolicy approval gate', () => {
     expect(records.map((r) => r['decision'])).toEqual(['pending'])
   })
 
-  it('fails closed with a 500 when the approval decision cannot be audited', async () => {
+  it('denies an approved call whose decision cannot be audited', async () => {
     const harness = makeApp({
       policy: CONFIRM_FIRST_CALENDAR,
       writer: {
@@ -300,15 +313,102 @@ describe('requirePolicy approval gate', () => {
 
     const res = await call(harness)
 
-    // An approved call with no record of the approval must not execute.
-    expect(res.status).toBe(500)
+    // Approved but unauditable: no durable record, no release.
+    expect(res.status).toBe(403)
     expect(harness.handlerRan()).toBe(false)
+
+    const body = (await res.json()) as GovernanceApprovalDeniedResponse
+    expect(body.error.code).toBe('GOVERNANCE_APPROVAL_DENIED')
+    expect(body.error.approval).toBe('rejected')
+    // A reason distinct from a human declining, so an operator can tell the two
+    // apart from the response alone.
+    expect(body.error.message).toContain('durably recorded')
+  })
+
+  it('pairs the pending and terminal audit records with one correlation id', async () => {
+    const writer = createFileAuditWriter(auditPath)
+    const harness = makeApp({
+      policy: CONFIRM_FIRST_CALENDAR,
+      writer,
+      approvals: { provider: createStaticApprovalProvider({ state: 'approved' }) },
+    })
+
+    await call(harness)
+
+    const records = await readAudit(auditPath)
+    expect(records[0]?.['approvalId']).toBeTypeOf('string')
+    expect(records[0]?.['approvalId']).toBe(records[1]?.['approvalId'])
+  })
+
+  it('gives overlapping identical held calls distinct correlation ids', async () => {
+    const writer = createFileAuditWriter(auditPath)
+    const harness = makeApp({
+      policy: CONFIRM_FIRST_CALENDAR,
+      writer,
+      approvals: { provider: createStaticApprovalProvider({ state: 'rejected' }) },
+    })
+
+    await Promise.all([call(harness), call(harness)])
+
+    // Same capability, same key, same args — the correlation id is the only
+    // thing that lets an audit consumer pair each hold with its resolution.
+    const records = await readAudit(auditPath)
+    const ids = new Set(records.map((r) => r['approvalId']))
+    expect(records).toHaveLength(4)
+    expect(ids.size).toBe(2)
+  })
+
+  it('gives the provider the same id that correlates the audit records', async () => {
+    const writer = createFileAuditWriter(auditPath)
+    let seenId: string | undefined
+    const harness = makeApp({
+      policy: CONFIRM_FIRST_CALENDAR,
+      writer,
+      approvals: {
+        provider: makeProvider((request) => {
+          seenId = request.id
+          return Promise.resolve<ApprovalDecision>({ state: 'approved' })
+        }),
+      },
+    })
+
+    await call(harness)
+
+    const records = await readAudit(auditPath)
+    expect(seenId).toBeDefined()
+    expect(records[0]?.['approvalId']).toBe(seenId)
+    expect(records[1]?.['approvalId']).toBe(seenId)
+  })
+
+  it('keeps provider exception detail out of the response but in the audit trail', async () => {
+    const leaky =
+      'POST https://relay.internal.example/approvals failed: 401 (authorization: Bearer sk-live-abc123)'
+    const writer = createFileAuditWriter(auditPath)
+    const harness = makeApp({
+      policy: CONFIRM_FIRST_CALENDAR,
+      writer,
+      approvals: { provider: makeProvider(() => Promise.reject(new Error(leaky))) },
+    })
+
+    const res = await call(harness)
+    const body = (await res.json()) as GovernanceApprovalDeniedResponse
+
+    // Any authenticated caller can trip a confirm-first rule; none of them
+    // should learn the relay host or the bearer token from doing so.
+    expect(body.error.message).not.toContain('relay.internal.example')
+    expect(body.error.message).not.toContain('sk-live-abc123')
+    expect(body.error.message).toContain('provider-error')
+
+    // The operator still gets the whole story.
+    const records = await readAudit(auditPath)
+    expect(String(records[1]?.['reason'])).toContain('relay.internal.example')
   })
 
   it('sends the provider a decision-grade request with redacted arguments', async () => {
     let seen: ApprovalRequest | undefined
     const harness = makeApp({
       policy: CONFIRM_FIRST_CALENDAR,
+      writer: DISCARDING_WRITER,
       approvals: {
         provider: makeProvider((request) => {
           seen = request
@@ -343,6 +443,7 @@ describe('requirePolicy approval gate', () => {
     let seen: ApprovalRequest | undefined
     const harness = makeApp({
       policy: CONFIRM_FIRST_CALENDAR,
+      writer: DISCARDING_WRITER,
       approvals: {
         provider: makeProvider((request) => {
           seen = request
@@ -360,6 +461,7 @@ describe('requirePolicy approval gate', () => {
     const ids: string[] = []
     const harness = makeApp({
       policy: CONFIRM_FIRST_CALENDAR,
+      writer: DISCARDING_WRITER,
       approvals: {
         provider: makeProvider((request) => {
           ids.push(request.id)
@@ -385,6 +487,7 @@ describe('requirePolicy approval gate', () => {
     }
     const harness = makeApp({
       policy: allowAll,
+      writer: DISCARDING_WRITER,
       approvals: {
         provider: makeProvider(() => {
           asked = true
@@ -409,6 +512,7 @@ describe('requirePolicy approval gate', () => {
     }
     const harness = makeApp({
       policy: forbidAll,
+      writer: DISCARDING_WRITER,
       approvals: {
         provider: makeProvider(() => {
           asked = true

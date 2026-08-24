@@ -9,8 +9,6 @@
  * They ask **no human anything**. A static provider is never a substitute for a
  * real HITL channel: configuring one in production would turn every
  * `confirm-first` hold into an unattended, pre-decided answer.
- *
- * @packageDocumentation
  */
 
 import type {

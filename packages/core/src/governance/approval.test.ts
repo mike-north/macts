@@ -13,6 +13,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type {
   ApprovalDecision,
+  ApprovalDeniedOutcome,
+  ApprovalOutcome,
   ApprovalProvider,
   ApprovalProviderCapabilities,
   ApprovalRequest,
@@ -61,6 +63,18 @@ function makeProvider(
   return { name, capabilities, requestApproval }
 }
 
+/**
+ * Assert an outcome denied the call, and narrow it to the denied arm so its
+ * failure category can be inspected.
+ */
+function expectDenied(outcome: ApprovalOutcome): ApprovalDeniedOutcome {
+  expect(outcome.approved).toBe(false)
+  if (outcome.approved) {
+    throw new Error('expected a denied outcome')
+  }
+  return outcome
+}
+
 afterEach(() => {
   vi.useRealTimers()
 })
@@ -79,8 +93,10 @@ describe('seekApproval: approved', () => {
 
     expect(outcome.approved).toBe(true)
     expect(outcome.state).toBe('approved')
+    // A provider-authored reason is copy it chose to show a human, so it is
+    // safe on both sides of the boundary.
     expect(outcome.reason).toBe('Looks fine to me')
-    expect(outcome.providerFailure).toBeUndefined()
+    expect(outcome.auditReason).toBe('Looks fine to me')
   })
 
   it('synthesizes a reason naming the permission when the provider omits one', async () => {
@@ -187,9 +203,8 @@ describe('seekApproval: rejection paths', () => {
 
     expect(outcome.approved).toBe(false)
     expect(outcome.state).toBe('rejected')
-    expect(outcome.reason).toContain('relay unreachable')
     // A broken channel is distinguishable from a human declining.
-    expect(outcome.providerFailure).toBe('relay unreachable')
+    expect(expectDenied(outcome).failure).toBe('provider-error')
   })
 
   it('denies when the provider throws synchronously instead of returning a promise', async () => {
@@ -201,7 +216,7 @@ describe('seekApproval: rejection paths', () => {
 
     expect(outcome.approved).toBe(false)
     expect(outcome.state).toBe('rejected')
-    expect(outcome.providerFailure).toBe('provider is misconfigured')
+    expect(expectDenied(outcome).failure).toBe('provider-error')
   })
 
   it.each([
@@ -210,14 +225,40 @@ describe('seekApproval: rejection paths', () => {
     ['a non-string state', { state: 42 }],
     ['null', null],
     ['a bare string', 'approved'],
+    // Optional fields are part of the trust boundary too: a non-string reason
+    // would otherwise reach an audit record and an HTTP body as "[object
+    // Object]".
+    ['a non-string reason', { state: 'approved', reason: { text: 'ok' } }],
+    ['a numeric reason', { state: 'rejected', reason: 42 }],
+    ['a non-object policy suggestion', { state: 'approved', policySuggestion: 'allow it' }],
+    [
+      'a policy suggestion with a non-string permission',
+      { state: 'approved', policySuggestion: { permission: 1, disposition: 'allowed' } },
+    ],
+    [
+      'a policy suggestion with an unknown disposition',
+      { state: 'approved', policySuggestion: { permission: 'a:b:c', disposition: 'maybe' } },
+    ],
+    [
+      'a policy suggestion with a non-string rationale',
+      {
+        state: 'approved',
+        policySuggestion: { permission: 'a:b:c', disposition: 'allowed', rationale: 7 },
+      },
+    ],
   ])('denies when the provider returns %s', async (_label, value) => {
-    const provider = makeProvider(() => Promise.resolve(value as unknown as ApprovalDecision))
+    const provider = makeProvider(
+      () => Promise.resolve(value as unknown as ApprovalDecision),
+      // Declared support, so a malformed suggestion is not merely dropped —
+      // it must fail the decision outright.
+      { supportsPolicySuggestions: true, supportsDistinctRouting: false }
+    )
 
     const outcome = await seekApproval({ provider, request: makeRequest() })
 
     expect(outcome.approved).toBe(false)
     expect(outcome.state).toBe('rejected')
-    expect(outcome.providerFailure).toContain('malformed')
+    expect(expectDenied(outcome).failure).toBe('malformed-response')
   })
 
   it.each([
@@ -236,6 +277,74 @@ describe('seekApproval: rejection paths', () => {
     expect(called).toBe(false)
     expect(outcome.approved).toBe(false)
     expect(outcome.state).toBe('timeout')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Client-safe vs. operator-only explanations
+// ---------------------------------------------------------------------------
+
+describe('seekApproval: reason disclosure', () => {
+  /** A provider exception carrying operator-only connection details. */
+  const LEAKY_MESSAGE =
+    'POST https://relay.internal.example/approvals failed: 401 (authorization: Bearer sk-live-abc123)'
+
+  it('keeps a provider exception out of the client-safe reason', async () => {
+    const provider = makeProvider(() => Promise.reject(new Error(LEAKY_MESSAGE)))
+
+    const outcome = await seekApproval({ provider, request: makeRequest() })
+
+    // Any authenticated caller can trip a confirm-first rule, so the reason
+    // they receive must not carry relay URLs, tokens, or headers.
+    expect(outcome.reason).not.toContain('relay.internal.example')
+    expect(outcome.reason).not.toContain('sk-live-abc123')
+    expect(outcome.reason).not.toContain('authorization')
+    // It still says enough to act on: which capability, and what went wrong.
+    expect(outcome.reason).toContain('calendar:events:create')
+    expect(outcome.reason).toContain('provider-error')
+  })
+
+  it('keeps the full provider exception in the operator-only audit reason', async () => {
+    const provider = makeProvider(() => Promise.reject(new Error(LEAKY_MESSAGE)))
+
+    const outcome = await seekApproval({ provider, request: makeRequest() })
+
+    expect(outcome.auditReason).toContain(LEAKY_MESSAGE)
+    expect(outcome.auditReason).toContain('test-provider')
+  })
+
+  it('does not leak the provider name or detail through a malformed response', async () => {
+    const provider = makeProvider(() =>
+      Promise.resolve({
+        state: 'approved',
+        reason: { secret: 'internal' },
+      } as unknown as ApprovalDecision)
+    )
+
+    const outcome = await seekApproval({ provider, request: makeRequest() })
+
+    expect(outcome.reason).toContain('malformed-response')
+    expect(outcome.reason).not.toContain('internal')
+  })
+
+  it('carries the same explanation on both sides when a human decided', async () => {
+    const provider = makeProvider(() =>
+      Promise.resolve<ApprovalDecision>({ state: 'rejected', reason: 'Not during a release' })
+    )
+
+    const outcome = await seekApproval({ provider, request: makeRequest() })
+
+    expect(outcome.reason).toBe('Not during a release')
+    expect(outcome.auditReason).toBe('Not during a release')
+  })
+
+  it('carries the same explanation on both sides when nobody answered', async () => {
+    const provider = makeProvider(() => Promise.resolve<ApprovalDecision>({ state: 'timeout' }))
+
+    const outcome = await seekApproval({ provider, request: makeRequest() })
+
+    expect(outcome.auditReason).toBe(outcome.reason)
+    expect(outcome.reason).toContain('fail-closed')
   })
 })
 
