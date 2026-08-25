@@ -163,13 +163,13 @@ describe('generateMcpPlugin', () => {
     const result = generateMcpPlugin(context)
 
     // Plugin file should have proper imports and exports
-    expect(result.pluginContent).toContain("import type { McpPlugin } from '@macts/mcp'")
+    expect(result.pluginContent).toContain("import type { McpPlugin } from '@macts/types'")
     expect(result.pluginContent).toContain("import { allTools } from './tools/index.js'")
     expect(result.pluginContent).toContain('export const testappPlugin: McpPlugin')
 
     // Tool files should use HTTP client pattern
     for (const toolFile of result.toolFiles) {
-      expect(toolFile.content).toContain("import type { McpToolDefinition } from '@macts/mcp'")
+      expect(toolFile.content).toContain("import type { McpToolDefinition } from '@macts/types'")
       expect(toolFile.content).toContain("import { getClient } from '../sdk.js'")
       expect(toolFile.content).toContain('export const')
     }
@@ -336,7 +336,7 @@ describe('generateMcpPlugin', () => {
 
     expect(result.indexContent).toContain('export { testappPlugin as plugin, testappPlugin }')
     expect(result.indexContent).toContain(
-      "export type { McpPlugin, McpToolDefinition } from '@macts/mcp'"
+      "export type { McpPlugin, McpToolDefinition } from '@macts/types'"
     )
   })
 

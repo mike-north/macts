@@ -207,18 +207,17 @@ function generatePackageJson(
         test: 'vitest run',
         typecheck: 'tsc --noEmit',
       },
+      // `@macts/types` carries the MCP plugin type definitions and emits no
+      // runtime code, so it is an ordinary dependency rather than a peer of
+      // `@macts/mcp`. Server packages reference those types in their public
+      // `.d.ts`, and a peer dependency on the MCP server implementation would
+      // both overstate the coupling and drag every server package into
+      // Changesets' peer-dependent major-bump rule.
       dependencies: {
         '@macts/api': 'workspace:*',
         '@macts/core': 'workspace:*',
+        '@macts/types': 'workspace:*',
         [clientPackageName]: 'workspace:*',
-      },
-      peerDependencies: {
-        '@macts/mcp': 'workspace:*',
-      },
-      peerDependenciesMeta: {
-        '@macts/mcp': {
-          optional: true,
-        },
       },
       devDependencies: {
         tsup: 'catalog:',

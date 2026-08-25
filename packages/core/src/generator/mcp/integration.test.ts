@@ -80,7 +80,7 @@ describe('MCP Generator Integration', () => {
     // Check that all generated code has valid syntax patterns
     for (const toolFile of result.toolFiles) {
       // Should have proper imports
-      expect(toolFile.content).toMatch(/import type { McpToolDefinition } from '@macts\/mcp'/)
+      expect(toolFile.content).toMatch(/import type { McpToolDefinition } from '@macts\/types'/)
       expect(toolFile.content).toMatch(/import { getClient } from '\.\.\/sdk\.js'/)
 
       // Should export tool constants

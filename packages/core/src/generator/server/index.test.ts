@@ -314,9 +314,13 @@ describe('generateServerPackage', () => {
     expect(pkg.dependencies['@macts/core']).toBe('workspace:*')
     expect(pkg.dependencies['@macts/calendar']).toBe('workspace:*')
 
-    // Peer dependencies
-    expect(pkg.peerDependencies['@macts/mcp']).toBe('workspace:*')
-    expect(pkg.peerDependenciesMeta['@macts/mcp']?.optional).toBe(true)
+    // MCP plugin types come from the zero-runtime @macts/types package, so
+    // they are a plain dependency — server packages must not peer-depend on
+    // the @macts/mcp server implementation.
+    expect(pkg.dependencies['@macts/types']).toBe('workspace:*')
+    expect(pkg.dependencies['@macts/mcp']).toBeUndefined()
+    expect(pkg.peerDependencies).toBeUndefined()
+    expect(pkg.peerDependenciesMeta).toBeUndefined()
   })
 
   it('should generate package.json with version defaulting to 0.0.0', () => {

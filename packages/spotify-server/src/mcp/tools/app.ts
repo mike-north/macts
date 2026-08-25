@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp'
+import type { McpToolDefinition } from '@macts/types'
 import { getClient } from '../sdk.js'
 
 /**
