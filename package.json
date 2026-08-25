@@ -20,6 +20,7 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish",
+    "release:plan-check": "node scripts/check-release-plan.mjs",
     "ci:publish": "pnpm build && pnpm publish -r --access public --no-git-checks && changeset tag",
     "api-extractor": "nx run-many -t api-extractor",
     "api-extractor:ci": "nx run-many -t api-extractor:ci",

@@ -39,6 +39,52 @@ All `@macts/*` packages share a single version number. Every release
 republishes **all** packages at that version (even ones with no changes) and
 creates one git tag per package (via `changeset tag`).
 
+## Staying pre-1.0
+
+macts is deliberately on a `0.x` line. `0.x` is semver's signal that the public
+API is still moving, and it is the honest posture until the SDK surface settles.
+CI enforces it: the `Release plan stays below 1.0` step runs
+`pnpm release:plan-check`, which computes the pending release plan and fails if
+any package would land at `1.0.0` or above.
+
+**A major bump can appear without anyone writing a `major` changeset.**
+Changesets majors any package that _peer-depends_ on a package receiving a
+non-patch bump, and because every `@macts/*` package is in one `fixed` group, a
+single major spreads to all of them. Two things keep that in check:
+
+- `.changeset/config.json` sets
+  `___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH.onlyUpdatePeerDependentsWhenOutOfRange`
+  to `true`, so a peer dependent is only majored when the new version actually
+  leaves its declared range. Without it, the legitimate `@macts/cli` peers in
+  the app packages major the entire workspace.
+- **`peerDependencies` must declare a real, published semver range.** A
+  `workspace:*` peer can never satisfy a range check, so it majors its package
+  on every release. Use `dependencies` (or `devDependencies`) for
+  workspace-internal links.
+
+If a version bump ever looks wrong, `pnpm exec changeset status --verbose`
+shows which changesets drive each package, and `pnpm release:plan-check` names
+the offending packages.
+
+### Type-only dependencies
+
+Types alone never justify a peer dependency. `@macts/types` exists for exactly
+this: it holds the shared MCP plugin type definitions and emits no runtime code,
+so generated `@macts/<app>-server` packages can describe an MCP plugin through
+an ordinary `dependencies` entry instead of peer-depending on the `@macts/mcp`
+server implementation. `@macts/mcp` re-exports those types, so importing them
+from `@macts/mcp` still works.
+
+### Cutting a real 1.0
+
+When the API is genuinely stable and the decision is deliberate:
+
+1. Add a `major` changeset.
+2. Set `ALLOW_MAJOR_RELEASE=1` on the CI job (and locally) to bypass the guard.
+3. Consider removing the guard entirely once past 1.0 — it exists to protect a
+   pre-1.0 project from an accidental stability promise, not to block real
+   majors forever.
+
 ## Generator contract
 
 Generated packages' `package.json` files are owned by the code generator, not
