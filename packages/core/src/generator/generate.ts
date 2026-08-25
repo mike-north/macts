@@ -117,7 +117,7 @@ function generatePackageJson(ctx: GeneratorContext): string {
     },
     dependencies: {
       '@macts/core': 'workspace:*',
-      zod: '^4.3.6',
+      zod: 'catalog:',
     },
   }
   return JSON.stringify(pkg, null, 2)
