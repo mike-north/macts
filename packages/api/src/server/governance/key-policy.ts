@@ -24,6 +24,13 @@
  * policy. A resolved policy is also frozen before it is cached, so a caller
  * cannot mutate the shared entry out from under the next request.
  *
+ * Invalidation is immediate and stays immediate: each load is stamped with the
+ * key's invalidation generation when it starts, and a load whose generation has
+ * advanced by the time it finishes does not write to the cache. Without that
+ * guard, a load already in flight when an operator tightened a key would
+ * complete afterwards and reinstate the *pre-update* policy for a full TTL —
+ * the tightening silently failing to take effect.
+ *
  * ## Failure handling
  *
  * A loader failure propagates. It is never converted into "this key has no
@@ -56,6 +63,10 @@ export interface KeyPolicyResolver {
    * Drop cached state for one key, or for every key when `apiKeyId` is omitted.
    * Call this after a key's policy is written or removed so the change takes
    * effect immediately rather than at the next TTL expiry.
+   *
+   * Loads already in flight when this is called will not repopulate the cache
+   * with their pre-invalidation result, so "immediately" holds even under
+   * concurrency.
    */
   invalidate(apiKeyId?: string): void
 }
@@ -136,6 +147,14 @@ export function createKeyPolicyResolver(
   // resolved" policy, so one key's result can never be served to another.
   const cache = new Map<string, CacheEntry>()
 
+  // Invalidation generations. `epoch` advances on a global invalidation;
+  // `generations` advances per key. A load stamps both when it starts and
+  // re-checks them when it finishes — see `resolve`.
+  let epoch = 0
+  const generations = new Map<string, number>()
+
+  const generationOf = (apiKeyId: string): number => generations.get(apiKeyId) ?? 0
+
   return {
     async resolve(apiKeyId: string): Promise<GovernancePolicy | undefined> {
       if (ttlMs > 0) {
@@ -145,23 +164,43 @@ export function createKeyPolicyResolver(
         }
       }
 
+      // Stamp the load. An invalidation that lands while it is in flight must
+      // not be undone by this load completing afterwards and writing its
+      // pre-invalidation answer into the cache: later requests would then run
+      // under the stale — and possibly wider — policy for a full TTL, which is
+      // precisely backwards for a layer whose only job is tightening.
+      const startedAtEpoch = epoch
+      const startedAtGeneration = generationOf(apiKeyId)
+
       // A loader rejection propagates: see the module docs on why an unreadable
       // key policy must not degrade into "no key policy".
       const loaded = await load(apiKeyId)
       const policy = loaded === undefined ? undefined : deepFreeze(loaded)
 
-      if (ttlMs > 0) {
+      const raced = epoch !== startedAtEpoch || generationOf(apiKeyId) !== startedAtGeneration
+
+      // The guard covers a resolved *absence* as well as a resolved policy:
+      // caching "this key has no policy" across an invalidation is the same bug
+      // wearing different clothes.
+      if (ttlMs > 0 && !raced) {
         cache.set(apiKeyId, { policy, expiresAt: now() + ttlMs })
       }
+
+      // This caller still gets what its own load returned. Its request began
+      // before the invalidation, so that answer was current when it was asked
+      // for; the guarantee being restored here is that no *later* request is
+      // served it. The next resolve re-reads.
       return policy
     },
 
     invalidate(apiKeyId?: string): void {
       if (apiKeyId === undefined) {
         cache.clear()
+        epoch += 1
         return
       }
       cache.delete(apiKeyId)
+      generations.set(apiKeyId, generationOf(apiKeyId) + 1)
     },
   }
 }

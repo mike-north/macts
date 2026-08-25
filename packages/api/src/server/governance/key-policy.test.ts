@@ -203,6 +203,138 @@ describe('createKeyPolicyResolver', () => {
       expect(calls).toEqual(['key_a', 'key_b', 'key_a'])
     })
 
+    /**
+     * Regression: an invalidation that lands while a load is in flight was
+     * erased when that load completed and wrote its (pre-update) result into the
+     * cache, so every later request ran under the stale — potentially wider —
+     * policy for a full TTL. This is exactly backwards for a layer whose whole
+     * job is tightening: an operator narrowing a key would see the narrower
+     * policy silently fail to take effect.
+     */
+    describe('a load that races an invalidation', () => {
+      /** A loader whose completion the test controls, one deferral per call. */
+      function deferredLoader(): {
+        load: (id: string) => Promise<GovernancePolicy | undefined>
+        settle: (value: GovernancePolicy | undefined) => void
+        callCount: () => number
+      } {
+        let resolveCurrent: ((value: GovernancePolicy | undefined) => void) | undefined
+        let calls = 0
+        return {
+          load: () => {
+            calls += 1
+            return new Promise<GovernancePolicy | undefined>((res) => {
+              resolveCurrent = res
+            })
+          },
+          settle: (value) => {
+            resolveCurrent?.(value)
+          },
+          callCount: () => calls,
+        }
+      }
+
+      it('does not cache the stale result when the policy was updated mid-flight', async () => {
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        // Request A starts while the key still has the wide policy.
+        const inFlight = resolver.resolve('key_a')
+
+        // Operator tightens the key and invalidates.
+        resolver.invalidate('key_a')
+
+        // A's load now completes with the pre-update (wider) policy.
+        deferred.settle(policyFor('allowed'))
+        await inFlight
+
+        // The next request must NOT be served the stale entry.
+        const next = resolver.resolve('key_a')
+        expect(deferred.callCount()).toBe(2)
+        deferred.settle(policyFor('forbidden'))
+        expect((await next)?.apps[0]?.disposition).toBe('forbidden')
+      })
+
+      it('does not cache a stale absence when the policy was deleted mid-flight', async () => {
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        const inFlight = resolver.resolve('key_a')
+        resolver.invalidate('key_a')
+        // The in-flight load completes with the policy as it was before deletion.
+        deferred.settle(policyFor('allowed'))
+        await inFlight
+
+        const next = resolver.resolve('key_a')
+        expect(deferred.callCount()).toBe(2)
+        deferred.settle(undefined)
+        await expect(next).resolves.toBeUndefined()
+      })
+
+      it('does not cache a stale absence that a mid-flight write superseded', async () => {
+        // The negative (absence) case in the other direction: the racing load
+        // resolved "no policy", but a policy was written before it completed.
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        const inFlight = resolver.resolve('key_a')
+        resolver.invalidate('key_a')
+        deferred.settle(undefined)
+        await inFlight
+
+        const next = resolver.resolve('key_a')
+        expect(deferred.callCount()).toBe(2)
+        deferred.settle(policyFor('forbidden'))
+        expect((await next)?.apps[0]?.disposition).toBe('forbidden')
+      })
+
+      it('honors a global invalidation that lands mid-flight', async () => {
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        const inFlight = resolver.resolve('key_a')
+        resolver.invalidate()
+        deferred.settle(policyFor('allowed'))
+        await inFlight
+
+        const next = resolver.resolve('key_a')
+        expect(deferred.callCount()).toBe(2)
+        deferred.settle(policyFor('forbidden'))
+        expect((await next)?.apps[0]?.disposition).toBe('forbidden')
+      })
+
+      it('still caches an in-flight load that no invalidation raced', async () => {
+        // The guard must not defeat caching in the ordinary case.
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        const inFlight = resolver.resolve('key_a')
+        deferred.settle(policyFor('allowed'))
+        await inFlight
+
+        expect((await resolver.resolve('key_a'))?.apps[0]?.disposition).toBe('allowed')
+        expect(deferred.callCount()).toBe(1)
+      })
+
+      it('leaves other keys’ cached entries alone', async () => {
+        const deferred = deferredLoader()
+        const resolver = createKeyPolicyResolver({ load: deferred.load })
+
+        const cachedB = resolver.resolve('key_b')
+        deferred.settle(policyFor('allowed'))
+        await cachedB
+
+        const inFlight = resolver.resolve('key_a')
+        resolver.invalidate('key_a')
+        deferred.settle(policyFor('allowed'))
+        await inFlight
+
+        // key_b was never invalidated, so it is still served from cache.
+        expect((await resolver.resolve('key_b'))?.apps[0]?.disposition).toBe('allowed')
+        expect(deferred.callCount()).toBe(2)
+      })
+    })
+
     it('drops every cached entry when called with no key', async () => {
       const calls: string[] = []
       const resolver = createKeyPolicyResolver({

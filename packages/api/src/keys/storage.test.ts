@@ -648,6 +648,69 @@ describe('storage integration', () => {
       expect(storage.listKeyPolicyIds()).toEqual([])
     })
 
+    /**
+     * Regression: replacing the key set left policy rows for the discarded keys
+     * behind. They stayed visible through getKeyPolicy()/listKeyPolicyIds(), and
+     * a later key issued with the same id silently inherited the old policy —
+     * unpredictable in both directions (an unexpected grant, or an unexplained
+     * restriction).
+     */
+    describe('replacing the key set', () => {
+      it('should remove policies belonging to discarded keys', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        // key_a is dropped from the set.
+        storage.saveKeyMetadata([createTestMetadata('key_b')])
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.listKeyPolicyIds()).toEqual(['key_b'])
+      })
+
+      it('should keep the policy of a key that survives the replacement', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        storage.saveKeyMetadata([createTestMetadata('key_b')])
+
+        expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
+      })
+
+      it('should remove every policy when the key set is cleared', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a')])
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+        storage.saveKeyMetadata([])
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.listKeyPolicyIds()).toEqual([])
+      })
+
+      it('should not let a re-issued key id inherit the old key’s policy', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_reused')])
+        storage.setKeyPolicy('key_reused', policyFor('forbidden'))
+
+        // The key is removed, then the same id is issued again later.
+        storage.saveKeyMetadata([])
+        storage.addKeyMetadata(createTestMetadata('key_reused'))
+
+        expect(storage.getKeyPolicy('key_reused')).toBeUndefined()
+      })
+
+      it('should leave other keys’ policies alone on a targeted delete', () => {
+        storage.addKeyMetadata(createTestMetadata('key_a'))
+        storage.addKeyMetadata(createTestMetadata('key_b'))
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        storage.deleteKeyMetadata('key_a')
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
+      })
+    })
+
     it('should list the keys that carry a policy, most recently updated first', () => {
       storage.setKeyPolicy('key_old', policyFor('allowed'), new Date('2024-01-15T10:00:00Z'))
       storage.setKeyPolicy('key_new', policyFor('forbidden'), new Date('2024-02-15T10:00:00Z'))

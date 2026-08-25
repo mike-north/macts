@@ -128,8 +128,9 @@ function getDb(): Database.Database {
   //
   // No `user_version` migration is needed: `CREATE TABLE IF NOT EXISTS` runs on
   // every open, so a database created before per-key policies existed picks the
-  // table up the next time it is opened. Deleting a key deletes its policy (see
-  // {@link deleteKeyMetadata}) rather than leaving an orphan behind.
+  // table up the next time it is opened. A key's policy is removed with the key
+  // rather than left as an orphan, whether it goes through
+  // {@link deleteKeyMetadata} or through a {@link saveKeyMetadata} replacement.
   db.exec(`
     CREATE TABLE IF NOT EXISTS api_key_policies (
       key_id TEXT PRIMARY KEY,
@@ -464,6 +465,10 @@ export function loadKeyMetadata(): ApiKeyMetadata[] {
 /**
  * Save key metadata to storage (replaces all keys).
  *
+ * Any per-key governance policy belonging to a key that is not in `keys` is
+ * removed in the same transaction, so a discarded key cannot leave a policy
+ * behind for a future key with the same id to inherit.
+ *
  * Note: This is provided for API compatibility but is less efficient than
  * individual operations. Prefer addKeyMetadata, updateKeyMetadata, etc.
  *
@@ -478,6 +483,13 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
     (id, name, permissions, original_permissions, created_at, expires_at, revoked, key_prefix, encrypted)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
   `)
+  // Run after the replacement rows are in place, so "orphan" means "not in the
+  // key set this call just established". The tables carry no foreign keys (this
+  // schema has never enabled them), so referential cleanup is explicit here, as
+  // it is in deleteKeyMetadata.
+  const dropOrphanedPolicies = database.prepare(
+    'DELETE FROM api_key_policies WHERE key_id NOT IN (SELECT id FROM api_keys)'
+  )
 
   const replaceAll = database.transaction((keysToSave: ApiKeyMetadata[]) => {
     deleteAll.run()
@@ -498,6 +510,11 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
         encrypted.keyPrefix
       )
     }
+    // Replacing the key set discards keys; their policies go with them, in the
+    // same transaction. Left behind, a policy would stay visible through
+    // getKeyPolicy()/listKeyPolicyIds() and would be silently inherited by any
+    // later key issued with the same id.
+    dropOrphanedPolicies.run()
   })
 
   replaceAll(keys)
