@@ -38,6 +38,4 @@ export interface McpToolDefinition {
     readonly outputSchema?: JsonSchema;
 }
 
-// (No @packageDocumentation comment for this package)
-
 ```

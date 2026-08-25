@@ -1,25 +1,29 @@
 /**
  * Guard against accidentally cutting a 1.0 release.
  *
- * macts is pre-1.0 on purpose: nothing has been published yet, and a 1.0 is a
- * stability promise the project has not made. Changesets can arrive at a major
- * bump without anyone writing a `major` changeset — its peer-dependency rule
- * majors any package that peer-depends on something receiving a non-patch
- * bump, and `fixed: [["@macts/*"]]` then propagates that single major across
- * every package in the workspace.
+ * macts is pre-1.0 on purpose. Changesets can arrive at a major bump without
+ * anyone writing a `major` changeset: its peer-dependency rule majors any
+ * package that peer-depends on something receiving a non-patch bump, and
+ * `fixed: [["@macts/*"]]` then propagates that single major across every
+ * package in the workspace.
  *
  * This script computes the pending release plan and fails if any package would
  * land at >= 1.0.0. It runs in CI so the problem surfaces on the pull request
  * that introduces it, rather than in a "Version Packages" PR nobody expected.
  *
+ * It reads the plan through `@changesets/get-release-plan`, which assembles
+ * from the changeset files, the workspace manifests, and any pre-release state
+ * on disk. Deliberately not the `changeset status` CLI: that resolves changed
+ * packages against the base branch via git, which fails on CI's shallow
+ * checkout where `main` has no local ref.
+ *
  * To cut a real 1.0 deliberately, add a `major` changeset AND set
  * `ALLOW_MAJOR_RELEASE=1` in the environment.
  */
 
-import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, rmSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import getReleasePlanModule from '@changesets/get-release-plan'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -28,29 +32,18 @@ if (process.env['ALLOW_MAJOR_RELEASE'] === '1') {
   process.exit(0)
 }
 
-// `changeset status --output` resolves its path relative to the working
-// directory, so an OS temp path would be joined onto the repo root. Write
-// inside the already-ignored pnpm cache directory instead.
-const outputDir = join('node_modules', '.cache', 'macts')
-const relativePlanPath = join(outputDir, 'release-plan.json')
-mkdirSync(join(repoRoot, outputDir), { recursive: true })
+// The package is CJS with a `default` export; interop shape varies by loader.
+const getReleasePlan = getReleasePlanModule?.default ?? getReleasePlanModule
 
-let plan
+let releases
 try {
-  execFileSync('pnpm', ['exec', 'changeset', 'status', `--output=${relativePlanPath}`], {
-    cwd: repoRoot,
-    stdio: ['ignore', 'ignore', 'inherit'],
-  })
-  plan = JSON.parse(readFileSync(join(repoRoot, relativePlanPath), 'utf8'))
+  const plan = await getReleasePlan(repoRoot)
+  releases = Array.isArray(plan?.releases) ? plan.releases : []
 } catch (error) {
   console.error('Could not compute the changesets release plan.')
-  console.error(error instanceof Error ? error.message : error)
+  console.error(error instanceof Error ? error.stack : error)
   process.exit(1)
-} finally {
-  rmSync(join(repoRoot, relativePlanPath), { force: true })
 }
-
-const releases = Array.isArray(plan?.releases) ? plan.releases : []
 
 if (releases.length === 0) {
   console.log('No pending releases — nothing to check.')

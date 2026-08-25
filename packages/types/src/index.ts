@@ -22,6 +22,8 @@
  * - **Handler returns:** `unknown` — any JSON-serializable value (must match `outputSchema` if provided)
  * - **Runtime validation:** the MCP server validates inputs, but outputs are not enforced
  * - **Documentation:** `outputSchema` serves as self-documentation for AI assistants
+ *
+ * @packageDocumentation
  */
 
 /**
