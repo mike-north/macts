@@ -64,9 +64,25 @@ function writeRegistration(config: unknown): void {
 function writeProviderPackage(
   packageName: string,
   files: Record<string, string>,
-  exportsField?: Record<string, string>
+  exportsField?: unknown
 ): void {
-  const dir = join(home, 'plugins', 'node_modules', ...packageName.split('/'))
+  writePackageAt(join(home, 'plugins', 'node_modules'), packageName, files, exportsField)
+}
+
+/**
+ * Write a package into an arbitrary `node_modules` root.
+ *
+ * Used to plant a package *outside* the managed plugins directory and prove it
+ * cannot become the approval authority.
+ */
+function writePackageAt(
+  nodeModules: string,
+  packageName: string,
+  files: Record<string, string>,
+  exportsField?: unknown,
+  manifestOverrides: Record<string, unknown> = {}
+): void {
+  const dir = join(nodeModules, ...packageName.split('/'))
   mkdirSync(dir, { recursive: true })
   writeFileSync(
     join(dir, 'package.json'),
@@ -76,6 +92,7 @@ function writeProviderPackage(
       type: 'module',
       main: './index.js',
       ...(exportsField === undefined ? {} : { exports: exportsField }),
+      ...manifestOverrides,
     })
   )
   for (const [name, source] of Object.entries(files)) {
@@ -210,6 +227,186 @@ describe('loadApprovalGate with a valid registration', () => {
     // The pair travels together, so a caller cannot assemble a governance
     // context that seeks approval and records nothing.
     expect(gate?.writer).toBe(WRITER)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Export-map shapes
+//
+// A provider is imported as ESM, so resolution must match the `import`
+// condition. Matching `require` instead makes a pure-ESM package — which is
+// what macts's own packages and any modern provider publish — throw
+// ERR_PACKAGE_PATH_NOT_EXPORTED and get misreported as uninstalled.
+// ---------------------------------------------------------------------------
+
+describe('loadApprovalGate export-map resolution', () => {
+  it('loads a package whose subpath is exported only under "import"', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'provider.js': providerSource('import-only-subpath') },
+      { './approval': { import: './provider.js' } }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('import-only-subpath')
+  })
+
+  it('loads a package whose root is exported only under "import"', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'index.js': providerSource('import-only-root') },
+      { '.': { import: './index.js' } }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('import-only-root')
+  })
+
+  it('loads a package using a bare conditions object as root sugar', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'index.js': providerSource('conditions-sugar') },
+      { import: './index.js' }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('conditions-sugar')
+  })
+
+  it('loads a package whose exports field is a plain string', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'index.js': providerSource('string-exports') },
+      './index.js'
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('string-exports')
+  })
+
+  it('honors a dual export map by taking the "import" branch', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      {
+        'index.mjs': providerSource('esm-branch'),
+        // Deliberately not valid ESM: picking this branch would fail the import.
+        'index.cjs': 'module.exports.createApprovalProvider = () => { throw new Error("cjs") }',
+      },
+      { '.': { require: './index.cjs', import: './index.mjs' } }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('esm-branch')
+  })
+
+  it('follows an array of conditional fallbacks', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'index.js': providerSource('array-fallback') },
+      { '.': [{ types: './index.d.ts' }, { import: './index.js' }] }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('array-fallback')
+  })
+
+  it('falls back to "main" for a package with no exports map', async () => {
+    // A bare `main`, without the leading "./" that packages often omit.
+    writePackageAt(
+      join(home, 'plugins', 'node_modules'),
+      PACKAGE_NAME,
+      { 'entry.js': providerSource('main-field') },
+      undefined,
+      { main: 'entry.js' }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('main-field')
+  })
+
+  it('reports an installed package with no usable entry as such, not as uninstalled', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'other.js': providerSource('unreachable') },
+      { './something-else': './other.js' }
+    )
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    // "not installed" would send an operator to reinstall a package that is
+    // already there; the real problem is its export map.
+    await expect(loadApprovalGate({ writer: WRITER })).rejects.toThrow(
+      /installed but exposes no importable entry point/
+    )
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Resolution boundary
+// ---------------------------------------------------------------------------
+
+describe('loadApprovalGate resolution boundary', () => {
+  it('refuses a package installed outside the managed plugins directory', async () => {
+    // A sibling node_modules that CommonJS resolution would happily walk up
+    // into. Only the managed directory may supply the approval authority, so a
+    // package here must not be found at all.
+    writePackageAt(join(home, 'node_modules'), PACKAGE_NAME, {
+      'index.js': providerSource('outside-the-boundary'),
+    })
+    mkdirSync(join(home, 'plugins', 'node_modules'), { recursive: true })
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    await expect(loadApprovalGate({ writer: WRITER })).rejects.toThrow(/is not installed under/)
+  })
+
+  it('prefers the managed copy when the same package exists in a parent', async () => {
+    writePackageAt(join(home, 'node_modules'), PACKAGE_NAME, {
+      'index.js': providerSource('outside-the-boundary'),
+    })
+    writeProviderPackage(PACKAGE_NAME, { 'index.js': providerSource('managed-copy') })
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    const gate = await loadApprovalGate({ writer: WRITER })
+
+    expect(gate?.approvals.provider.name).toBe('managed-copy')
+  })
+
+  it.each([
+    ['a parent-directory traversal', '../../../evil'],
+    ['an absolute path', '/etc/passwd'],
+    ['a nested path', '@example/a/b'],
+    ['a bare dot-dot', '..'],
+  ])('rejects %s as a provider package name', async (_label, provider) => {
+    writeRegistration({ provider })
+
+    await expect(loadApprovalGate({ writer: WRITER })).rejects.toThrow(/is not installed under/)
+  })
+
+  it('refuses an exports target that escapes the package directory', async () => {
+    writeProviderPackage(
+      PACKAGE_NAME,
+      { 'index.js': providerSource('escapes') },
+      { '.': './../../../../outside.js' }
+    )
+    writeFileSync(join(home, 'outside.js'), providerSource('outside'))
+    writeRegistration({ provider: PACKAGE_NAME })
+
+    await expect(loadApprovalGate({ writer: WRITER })).rejects.toThrow(
+      /installed but exposes no importable entry point/
+    )
   })
 })
 

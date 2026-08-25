@@ -56,6 +56,10 @@ A provider is installed like any other macts plugin, into
 approval provider decides whether held calls run rather than adding capability
 the way CLI and MCP plugins do. Its factory is looked up at the package's
 `approval` subpath (a sibling of the established `cli` and `mcp` entry points)
-and then at the package root. `loadApprovalGate` resolves and validates it; a
-configured provider that cannot be loaded is a hard error rather than a silent
-downgrade to "no approval channel".
+and then at the package root, resolved by path under the managed directory and
+honouring the package's `exports` map with ESM conditions — so a pure-ESM
+provider loads, and a package outside that directory can never act as the
+approval authority. `loadApprovalGate` resolves and validates it; a configured
+provider that cannot be loaded is a hard error rather than a silent downgrade
+to "no approval channel", and an installed package with no usable entry point
+says so instead of claiming to be uninstalled.

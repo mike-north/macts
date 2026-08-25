@@ -10,12 +10,19 @@
  * ## Resolution
  *
  * Providers are installed like every other macts plugin — into
- * `<macts-home>/plugins` — and are resolved with the same
- * `createRequire(<plugins>/node_modules)` mechanism the CLI and MCP loaders use,
- * so one `macts plugin install` serves all of them. What differs is
- * *activation*: CLI and MCP plugins are additive and are discovered by scanning,
- * whereas the approval provider is a single authority over whether held calls
- * run, so it is activated only by being named in the registration file.
+ * `<macts-home>/plugins`, by the same `macts plugin install` — but they are
+ * *activated* differently: CLI and MCP plugins are additive and are discovered
+ * by scanning, whereas the approval provider is a single authority over whether
+ * held calls run, so it is activated only by being named in the registration
+ * file.
+ *
+ * That difference extends to how the module is located. The plugins directory
+ * is a **boundary**: only something installed there may act as the approval
+ * authority. Node's CommonJS resolver cannot express that — it walks up every
+ * ancestor `node_modules`, and it matches the `require` condition, which makes
+ * a pure-ESM provider look uninstalled. So resolution here is done by path
+ * under the managed root, honouring the package's own `exports` map with ESM
+ * conditions. See {@link resolveProviderModule}.
  *
  * The package is asked for a `createApprovalProvider` factory, tried first at
  * the `approval` subpath — a concise sibling of the established `<package>/cli`
@@ -46,9 +53,9 @@
  */
 
 import { readFile } from 'node:fs/promises'
-import { createRequire } from 'node:module'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readFileSync, realpathSync } from 'node:fs'
+import { isAbsolute, join, relative, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import type { ApprovalConfig, ApprovalProvider, AuditWriter } from '@macts/core'
 import { parseApprovalConfig, resolveApprovalConfigPath } from '@macts/core'
 import { getMactsHome } from '../../paths.js'
@@ -60,6 +67,15 @@ import type { GovernanceContextWithApprovals } from '../middleware/governance.js
  * plugin subpaths, so the convention is inferable rather than one-off.
  */
 const PROVIDER_SUBPATH = 'approval'
+
+/**
+ * Accepted npm package names: `name` or `@scope/name`.
+ *
+ * The name arrives from a configuration file and becomes a filesystem path, so
+ * it is matched against this rather than trusted — `..`, absolute paths, and
+ * extra segments are all rejected before any path is built.
+ */
+const PACKAGE_NAME_PATTERN = /^(?:@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*$/i
 
 /**
  * The factory a provider package must export.
@@ -271,17 +287,26 @@ async function importProviderFactory(
   packageName: string,
   configPath: string
 ): Promise<ApprovalProviderFactory> {
-  const specifier = resolveProviderSpecifier(packageName)
-  if (specifier === undefined) {
+  const resolution = resolveProviderModule(packageName)
+
+  if (resolution.kind === 'not-installed') {
     throw new ApprovalProviderError(
       configPath,
-      `package "${packageName}" could not be resolved. Install it with \`macts plugin install ${packageName}\`.`
+      `package "${packageName}" is not installed under ${pluginNodeModules()}. Install it with \`macts plugin install ${packageName}\`.`
+    )
+  }
+  if (resolution.kind === 'no-entry') {
+    // The package is present, so "not installed" would send an operator down
+    // the wrong path. Say what is actually wrong with it.
+    throw new ApprovalProviderError(
+      configPath,
+      `package "${packageName}" is installed but exposes no importable entry point: ${resolution.detail}`
     )
   }
 
   let module: { createApprovalProvider?: unknown }
   try {
-    module = (await import(specifier)) as { createApprovalProvider?: unknown }
+    module = (await import(resolution.url)) as { createApprovalProvider?: unknown }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     throw new ApprovalProviderError(
@@ -300,36 +325,266 @@ async function importProviderFactory(
 }
 
 /**
- * Resolve a provider package to an importable specifier.
- *
- * Tries the dedicated subpath first, then the package root, resolving both from
- * the plugins directory when one is present (the installed case) and falling
- * back to ordinary resolution otherwise (development, tests, and workspaces
- * where the provider is a direct dependency).
- *
- * @returns An importable specifier, or `undefined` when nothing resolves.
+ * The outcome of locating a provider package's entry module.
  */
-function resolveProviderSpecifier(packageName: string): string | undefined {
-  const root = pluginResolutionRoot()
-  const require = createRequire(root === undefined ? import.meta.url : `${root}/.`)
+type ProviderResolution =
+  | { readonly kind: 'ok'; readonly url: string }
+  | { readonly kind: 'not-installed' }
+  | { readonly kind: 'no-entry'; readonly detail: string }
 
-  for (const candidate of [`${packageName}/${PROVIDER_SUBPATH}`, packageName]) {
-    try {
-      return require.resolve(candidate)
-    } catch {
-      // Try the next candidate; an unresolvable package is reported by the
-      // caller with actionable install guidance.
+/**
+ * Locate a provider package's entry module inside the managed plugins tree.
+ *
+ * ## Why this does not use `require.resolve`
+ *
+ * The obvious implementation — `createRequire(<plugins>/node_modules).resolve()`
+ * — is wrong twice over:
+ *
+ * 1. **It resolves with the `require` condition.** A provider published as pure
+ *    ESM (an `exports` map with only an `"import"` condition, which is what
+ *    macts's own packages and any modern provider ship) throws
+ *    `ERR_PACKAGE_PATH_NOT_EXPORTED`, and a correctly-installed provider gets
+ *    reported as missing.
+ * 2. **It walks up the directory chain.** CommonJS resolution tries every
+ *    ancestor's `node_modules`, so a package that is *not* in the managed
+ *    directory can still resolve — from the operator's home directory, or from
+ *    the API server's own dependencies. The plugins root is meant to be the
+ *    boundary for what may act as the approval authority, and a resolver that
+ *    escapes it makes that boundary decorative.
+ *
+ * Node offers no supported way to run its ESM resolver against an arbitrary
+ * base: `import.meta.resolve`'s `parent` argument requires
+ * `--experimental-import-meta-resolve` and is otherwise **silently ignored**,
+ * which would resolve against this file and reintroduce (2) invisibly.
+ *
+ * So resolution is done by path, strictly under the managed root, honouring the
+ * package's own `exports` map with ESM conditions.
+ *
+ * @returns Where the entry module is, or why there isn't one.
+ */
+function resolveProviderModule(packageName: string): ProviderResolution {
+  const nodeModules = pluginNodeModules()
+  const packageDir = resolvePackageDir(packageName, nodeModules)
+  if (packageDir === undefined) {
+    return { kind: 'not-installed' }
+  }
+
+  const manifestPath = join(packageDir, 'package.json')
+  if (!existsSync(manifestPath)) {
+    return { kind: 'not-installed' }
+  }
+
+  let manifest: PackageManifest
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PackageManifest
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    return { kind: 'no-entry', detail: `its package.json could not be read (${message})` }
+  }
+
+  // The dedicated subpath first, then the package root.
+  for (const subpath of [`./${PROVIDER_SUBPATH}`, '.']) {
+    const target = resolveExportTarget(manifest, subpath)
+    if (target === undefined) {
+      continue
+    }
+    const file = resolveInsidePackage(packageDir, target)
+    if (file !== undefined && existsSync(file)) {
+      return { kind: 'ok', url: pathToFileURL(file).href }
+    }
+  }
+
+  return {
+    kind: 'no-entry',
+    detail: `neither "${packageName}/${PROVIDER_SUBPATH}" nor its package root resolves to a file (check its "exports" map or "main")`,
+  }
+}
+
+/**
+ * The managed plugins `node_modules` directory. The single root every provider
+ * is resolved under, whether or not it currently exists.
+ */
+function pluginNodeModules(): string {
+  return join(getMactsHome(), 'plugins', 'node_modules')
+}
+
+/**
+ * Map an npm package name to its directory under the managed root.
+ *
+ * The name comes from a configuration file, so it is validated rather than
+ * pasted into a path: an unscoped name is one segment, a scoped name is two,
+ * and nothing else is accepted. The resolved directory is then re-checked to be
+ * inside the root, so neither a crafted name nor a symlink can point the
+ * approval authority somewhere else.
+ *
+ * @returns The package directory, or `undefined` when the name is invalid or
+ *   nothing is installed there.
+ */
+function resolvePackageDir(packageName: string, nodeModules: string): string | undefined {
+  if (!PACKAGE_NAME_PATTERN.test(packageName)) {
+    return undefined
+  }
+
+  const candidate = resolve(nodeModules, ...packageName.split('/'))
+  if (!existsSync(candidate)) {
+    return undefined
+  }
+
+  // Compare real paths so a symlinked package directory (how pnpm installs) is
+  // judged by where it actually is, not by the link's location.
+  const rootReal = safeRealpath(nodeModules)
+  const candidateReal = safeRealpath(candidate)
+  if (rootReal === undefined || candidateReal === undefined) {
+    return undefined
+  }
+  return isInside(rootReal, candidateReal) ? candidateReal : undefined
+}
+
+/**
+ * Resolve a package-relative `exports` target to an absolute path, refusing
+ * anything that escapes the package directory.
+ */
+function resolveInsidePackage(packageDir: string, target: string): string | undefined {
+  if (!target.startsWith('./')) {
+    return undefined
+  }
+  const file = resolve(packageDir, target)
+  return isInside(packageDir, file) ? file : undefined
+}
+
+/**
+ * True when `child` is `parent` itself or sits beneath it.
+ */
+function isInside(parent: string, child: string): boolean {
+  const rel = relative(parent, child)
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))
+}
+
+/**
+ * `realpathSync` that reports failure as `undefined` rather than throwing.
+ */
+function safeRealpath(path: string): string | undefined {
+  try {
+    return realpathSync(path)
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * The fields of a package manifest this module reads.
+ */
+interface PackageManifest {
+  readonly exports?: unknown
+  readonly main?: unknown
+}
+
+/**
+ * Conditions honoured when walking an `exports` map, in addition to any subpath
+ * keys.
+ *
+ * This module always imports as ESM from Node, so `require` is deliberately
+ * absent — matching it is what made a pure-ESM provider look uninstalled.
+ */
+const SUPPORTED_CONDITIONS = new Set(['node', 'import', 'default'])
+
+/**
+ * Resolve one subpath (`'.'` or `'./approval'`) against a package manifest.
+ *
+ * Covers the shapes real packages publish: a string `exports`, a subpath map, a
+ * bare conditions object (sugar for `.`), nested conditions, and array
+ * fallbacks — plus `main`/`index.js` for a package with no `exports` at all.
+ * Wildcard subpath patterns (`"./*"`) are not matched; a package that exposes
+ * its provider only through one can still be named at its root.
+ *
+ * @returns A package-relative target such as `'./dist/index.js'`, or
+ *   `undefined` when this subpath is not exported.
+ */
+function resolveExportTarget(manifest: PackageManifest, subpath: string): string | undefined {
+  const { exports: exportsField } = manifest
+
+  if (exportsField === undefined || exportsField === null) {
+    // No exports map: only the package root is importable, via `main` (or the
+    // implicit index).
+    if (subpath !== '.') {
+      return undefined
+    }
+    return typeof manifest.main === 'string' && manifest.main.length > 0
+      ? normalizeRelative(manifest.main)
+      : './index.js'
+  }
+
+  if (typeof exportsField === 'string') {
+    return subpath === '.' ? normalizeRelative(exportsField) : undefined
+  }
+
+  if (Array.isArray(exportsField)) {
+    return subpath === '.' ? resolveConditionValue(exportsField) : undefined
+  }
+
+  if (typeof exportsField !== 'object') {
+    return undefined
+  }
+
+  const map = exportsField as Record<string, unknown>
+  const hasSubpathKeys = Object.keys(map).some((key) => key.startsWith('.'))
+
+  if (!hasSubpathKeys) {
+    // A bare conditions object is sugar for the package root.
+    return subpath === '.' ? resolveConditionValue(map) : undefined
+  }
+
+  return Object.hasOwn(map, subpath) ? resolveConditionValue(map[subpath]) : undefined
+}
+
+/**
+ * Resolve an `exports` value — a string, a conditions object, or an array of
+ * fallbacks — to a package-relative target.
+ *
+ * Conditions are matched in the order the package declares them, which is what
+ * the resolution algorithm specifies; `null` (an explicitly blocked target) and
+ * unsupported conditions are skipped.
+ */
+function resolveConditionValue(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    return normalizeRelative(value)
+  }
+
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      const resolved = resolveConditionValue(entry)
+      if (resolved !== undefined) {
+        return resolved
+      }
+    }
+    return undefined
+  }
+
+  if (typeof value !== 'object' || value === null) {
+    return undefined
+  }
+
+  for (const [condition, target] of Object.entries(value as Record<string, unknown>)) {
+    if (!SUPPORTED_CONDITIONS.has(condition)) {
+      continue
+    }
+    const resolved = resolveConditionValue(target)
+    if (resolved !== undefined) {
+      return resolved
     }
   }
   return undefined
 }
 
 /**
- * The managed plugins `node_modules` directory, when it exists.
+ * Normalize a manifest path (`main` may omit the leading `./`) to the
+ * package-relative form the rest of this module expects.
  */
-function pluginResolutionRoot(): string | undefined {
-  const nodeModules = join(getMactsHome(), 'plugins', 'node_modules')
-  return existsSync(nodeModules) ? nodeModules : undefined
+function normalizeRelative(target: string): string {
+  if (target.startsWith('./')) {
+    return target
+  }
+  return target.startsWith('/') ? `.${target}` : `./${target}`
 }
 
 /**
