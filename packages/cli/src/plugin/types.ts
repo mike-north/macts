@@ -29,15 +29,37 @@ export interface PluginDiscoveryResult {
 }
 
 /**
+ * Classification of why a plugin failed to load.
+ *
+ * Discriminates a genuinely-absent package (the user simply hasn't installed
+ * that app's plugin — expected, and not worth reporting) from every other
+ * failure (the package is present but broken in some way — always worth
+ * surfacing to the user). Consumers should branch on this field rather than
+ * pattern-matching {@link PluginLoadError.message}, since a real breakage can
+ * legitimately contain the same substrings a "not installed" message would.
+ */
+export type PluginLoadFailureReason = 'not-installed' | 'load-error'
+
+/**
  * Error that occurred while loading a plugin.
  */
 export interface PluginLoadError {
   /** Package name that failed to load */
   readonly packageName: string
 
+  /** Structural classification of the failure. */
+  readonly reason: PluginLoadFailureReason
+
   /** Error message */
   readonly message: string
 }
+
+/**
+ * Result of loading a single plugin by package name.
+ */
+export type LoadPluginResult =
+  | { success: true; plugin: CliPlugin }
+  | { success: false; reason: PluginLoadFailureReason; error: string }
 
 /**
  * Result of registering plugins with the CLI.

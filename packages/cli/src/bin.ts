@@ -92,10 +92,12 @@ cli.register(ServiceStatusCommand)
 const pluginResults = await discoverPlugins()
 const registration = registerAllPlugins(cli, pluginResults)
 
-// Log plugin load errors (only in verbose mode or if there are errors with found packages)
+// Log plugin load errors. A package that simply isn't installed is expected
+// and stays quiet; anything else means the plugin is present but broken, and
+// must be surfaced — silently swallowing it would make "installed but
+// broken" indistinguishable from "not installed".
 for (const error of registration.loadErrors) {
-  // Skip errors about packages not being installed (expected)
-  if (error.message.includes('Cannot find package')) {
+  if (error.reason === 'not-installed') {
     continue
   }
   console.error(`Warning: Failed to load plugin ${error.packageName}: ${error.message}`)

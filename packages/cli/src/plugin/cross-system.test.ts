@@ -29,10 +29,12 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
   Object.assign(dep.pkg, {
     type: 'module',
+    // Deliberately only "import" (no "default"/"require"), matching the real
+    // shape generated for every `@macts/<app>` package — see e.g.
+    // packages/calendar/package.json.
     exports: {
       './cli': {
         import: './dist/cli/index.js',
-        default: './dist/cli/index.js',
       },
     },
   })

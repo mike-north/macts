@@ -15,10 +15,15 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
   const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
   Object.assign(dep.pkg, {
     type: 'module',
+    // Deliberately only "import" (no "default"/"require"), matching the real
+    // shape generated for every `@macts/<app>` package — see e.g.
+    // packages/calendar/package.json. A prior version of this fixture also
+    // declared "default", which masked the real-world resolution bug these
+    // packages hit (require.resolve() only matches "require", but these
+    // packages are ESM-only and never declare it).
     exports: {
       './cli': {
         import: './dist/cli/index.js',
-        default: './dist/cli/index.js',
       },
     },
   })
@@ -152,6 +157,26 @@ describe('CLI plugin discovery e2e', () => {
       expect(result.plugins).toEqual([])
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]?.packageName).toBe('@macts/broken-app')
+      // A package that IS installed but is broken must never be classified
+      // as 'not-installed' — that's the distinction bin.ts relies on to
+      // decide whether to warn (regression coverage for bug 1).
+      expect(result.errors[0]?.reason).toBe('load-error')
+    })
+
+    it('should return a load-error (not "not-installed") when a package has no ./cli export', async () => {
+      const dep = pluginsProject.addDependency('@macts/no-cli-export', '1.0.0')
+      Object.assign(dep.pkg, {
+        type: 'module',
+        exports: { '.': { import: './dist/index.js' } },
+      })
+      dep.files = { dist: { 'index.js': 'export const plugin = {};' } }
+      await pluginsProject.write()
+
+      const result = await discoverPlugins()
+      expect(result.plugins).toEqual([])
+      expect(result.errors).toHaveLength(1)
+      expect(result.errors[0]?.reason).toBe('load-error')
+      expect(result.errors[0]?.message).toContain("does not define a './cli' export")
     })
 
     it('should return error when plugin exports object without plugin property', async () => {
@@ -166,6 +191,7 @@ describe('CLI plugin discovery e2e', () => {
       expect(result.plugins).toEqual([])
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]?.message).toContain('plugin')
+      expect(result.errors[0]?.reason).toBe('load-error')
     })
 
     it('should return error when plugin export has invalid shape', async () => {
@@ -180,6 +206,7 @@ describe('CLI plugin discovery e2e', () => {
       expect(result.plugins).toEqual([])
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]?.message).toContain('invalid plugin')
+      expect(result.errors[0]?.reason).toBe('load-error')
     })
 
     it('should return multiple errors for multiple broken plugins', async () => {
@@ -273,6 +300,43 @@ describe('CLI plugin discovery e2e', () => {
       // Discovery should use slow path (cache hash mismatch)
       const result2 = await discoverPlugins()
       expect(result2.plugins).toHaveLength(1)
+    })
+
+    it('should classify a package removed after caching as not-installed', async () => {
+      // Regression test for bug 1: bin.ts must be able to tell "genuinely not
+      // installed" apart from "installed but broken" without pattern-matching
+      // error text. A stale cache entry for a package that has since been
+      // removed from disk (e.g. a partial/failed uninstall) is exactly the
+      // "not installed" case — it must never surface as a warning.
+      addCliPlugin(
+        pluginsProject,
+        'removed-app',
+        `export const plugin = { name: 'removed-app', description: 'Removed', commands: [] };`
+      )
+      await pluginsProject.write()
+
+      writeFileSync(
+        join(mactsHome, 'plugins', 'package-lock.json'),
+        JSON.stringify({ lockfileVersion: 3 })
+      )
+
+      // Populate the cache while the package is still present.
+      const result1 = await discoverPlugins()
+      expect(result1.plugins).toHaveLength(1)
+      expect(result1.errors).toEqual([])
+
+      // Remove the installed package from disk, but leave the lockfile (and
+      // therefore the cache) untouched, simulating a stale cache entry.
+      rmSync(join(pluginsProject.baseDir, 'node_modules', '@macts', 'removed-app'), {
+        recursive: true,
+        force: true,
+      })
+
+      const result2 = await discoverPlugins()
+      expect(result2.plugins).toEqual([])
+      expect(result2.errors).toHaveLength(1)
+      expect(result2.errors[0]?.packageName).toBe('@macts/removed-app')
+      expect(result2.errors[0]?.reason).toBe('not-installed')
     })
   })
 
