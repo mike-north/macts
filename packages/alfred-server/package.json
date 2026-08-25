@@ -42,15 +42,8 @@
   "dependencies": {
     "@macts/api": "workspace:*",
     "@macts/core": "workspace:*",
+    "@macts/types": "workspace:*",
     "@macts/alfred": "workspace:*"
-  },
-  "peerDependencies": {
-    "@macts/mcp": "workspace:*"
-  },
-  "peerDependenciesMeta": {
-    "@macts/mcp": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "tsup": "catalog:",
