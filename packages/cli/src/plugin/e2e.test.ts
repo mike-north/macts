@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import { tmpdir } from 'node:os'
 import { Project } from 'fixturify-project'
 import { discoverPlugins, loadPlugin } from './loader.js'
@@ -176,7 +176,12 @@ describe('CLI plugin discovery e2e', () => {
       expect(result.plugins).toEqual([])
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]?.reason).toBe('load-error')
+      // resolveExportsConditions() accepts both "import" and "default"
+      // conditions, so the message must name both — not just "import" —
+      // or a plugin author debugging their exports map is sent looking
+      // for the wrong condition.
       expect(result.errors[0]?.message).toContain("does not define a './cli' export")
+      expect(result.errors[0]?.message).toContain('"import" or "default"')
     })
 
     it('should return error when plugin exports object without plugin property', async () => {
@@ -246,6 +251,138 @@ describe('CLI plugin discovery e2e', () => {
       expect(result.plugins[0]?.name).toBe('good-app')
       expect(result.errors).toHaveLength(1)
       expect(result.errors[0]?.packageName).toBe('@macts/bad-app')
+    })
+  })
+
+  /**
+   * resolveCliEntryUrl() reads a plugin package's `exports` map directly
+   * (rather than going through Node's own resolver), so it bypasses Node's
+   * built-in validation of `exports` target strings. These tests enforce the
+   * equivalent constraints by hand:
+   *
+   *   - A target MUST be a string beginning with "./" — a bare specifier, an
+   *     absolute path, or a "../" escape is ERR_INVALID_PACKAGE_TARGET.
+   *   - A target MUST NOT contain a "node_modules" path segment.
+   *   - A target MUST NOT resolve outside the package directory.
+   *
+   * @see https://nodejs.org/api/packages.html#exports-sugar
+   * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
+   */
+  describe('exports target validation', () => {
+    it('should reject a "../" traversal target and refuse to load a file outside the package directory', async () => {
+      // Plant a real, otherwise-valid plugin module OUTSIDE the plugin
+      // package's own directory, and point the plugin's './cli' export at it
+      // via a "../" escape computed to land exactly on that file. If the
+      // resolver ever joins this target onto packageDir without validating
+      // it first, the escape succeeds and this "outside" module gets loaded
+      // as if it were the plugin's own entry point.
+      const outsideFile = join(mactsHome, 'escape-payload.mjs')
+      writeFileSync(
+        outsideFile,
+        `export const plugin = { name: 'escaped', description: 'should never load', commands: [] };\n`
+      )
+
+      const dep = pluginsProject.addDependency('@macts/escape-app', '1.0.0')
+      const packageDir = join(pluginsProject.baseDir, 'node_modules', '@macts', 'escape-app')
+      const escapeTarget = relative(packageDir, outsideFile).split(sep).join('/')
+      Object.assign(dep.pkg, {
+        type: 'module',
+        exports: { './cli': escapeTarget },
+      })
+      dep.files = {}
+      await pluginsProject.write()
+
+      const result = await loadPlugin('@macts/escape-app')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.reason).toBe('load-error')
+        // The message must name the package and the offending target so a
+        // plugin author can diagnose a malformed exports map.
+        expect(result.error).toContain('@macts/escape-app')
+        expect(result.error).toContain(escapeTarget)
+      }
+    })
+
+    it('should reject an absolute-path export target', async () => {
+      const dep = pluginsProject.addDependency('@macts/abs-path-app', '1.0.0')
+      Object.assign(dep.pkg, {
+        type: 'module',
+        exports: { './cli': '/etc/cli-entry.js' },
+      })
+      dep.files = {}
+      await pluginsProject.write()
+
+      const result = await loadPlugin('@macts/abs-path-app')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.reason).toBe('load-error')
+        expect(result.error).toContain('@macts/abs-path-app')
+        expect(result.error).toContain('/etc/cli-entry.js')
+      }
+    })
+
+    it('should reject a bare-specifier export target', async () => {
+      const dep = pluginsProject.addDependency('@macts/bare-specifier-app', '1.0.0')
+      Object.assign(dep.pkg, {
+        type: 'module',
+        exports: { './cli': 'some-other-package' },
+      })
+      dep.files = {}
+      await pluginsProject.write()
+
+      const result = await loadPlugin('@macts/bare-specifier-app')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.reason).toBe('load-error')
+        expect(result.error).toContain('@macts/bare-specifier-app')
+        expect(result.error).toContain('some-other-package')
+      }
+    })
+
+    it('should reject an export target containing a "node_modules" path segment', async () => {
+      const dep = pluginsProject.addDependency('@macts/node-modules-app', '1.0.0')
+      Object.assign(dep.pkg, {
+        type: 'module',
+        exports: { './cli': './node_modules/vendored-dep/cli.js' },
+      })
+      // Plant a real module at the vendored location so a fix regression
+      // (accepting this target) would actually succeed at loading it.
+      dep.files = {
+        node_modules: {
+          'vendored-dep': {
+            'cli.js': `export const plugin = { name: 'vendored', description: 'should never load', commands: [] };\n`,
+          },
+        },
+      }
+      await pluginsProject.write()
+
+      const result = await loadPlugin('@macts/node-modules-app')
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.reason).toBe('load-error')
+        expect(result.error).toContain('@macts/node-modules-app')
+        expect(result.error).toContain('./node_modules/vendored-dep/cli.js')
+      }
+    })
+
+    it('should accept a normal relative export target and load the plugin', async () => {
+      addCliPlugin(
+        pluginsProject,
+        'valid-target-app',
+        `export const plugin = { name: 'valid-target-app', description: 'Valid', commands: [] };`
+      )
+      await pluginsProject.write()
+
+      const result = await loadPlugin('@macts/valid-target-app')
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.plugin.name).toBe('valid-target-app')
+      }
     })
   })
 

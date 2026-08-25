@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type {
   CliPlugin,
@@ -123,13 +123,34 @@ export async function loadPlugin(packageName: string): Promise<LoadPluginResult>
   // Fall back to normal Node module resolution (for development, where the
   // plugin lives in this process's own node_modules rather than the managed
   // plugins directory).
+  //
+  // Resolution and execution are deliberately separate steps here.
+  // `import.meta.resolve` resolves the specifier WITHOUT executing the
+  // module, so a failure there means the package itself genuinely cannot be
+  // found ('not-installed'). Once resolution succeeds, any failure from the
+  // subsequent `import()` — including an ERR_MODULE_NOT_FOUND thrown while
+  // the package's own code resolves one of ITS dependencies (e.g. a missing
+  // transitive dependency like `clipanion`) — is a load-time break in an
+  // installed package, never "not installed". Collapsing these two failure
+  // modes together (as a single try/catch around both resolve-and-import
+  // would) is the exact bug this function exists to avoid: an
+  // installed-but-broken plugin would otherwise be silently misreported as
+  // "not installed" and its warning suppressed.
+  const specifier = `${packageName}/cli`
+  let resolvedUrl: string
   try {
-    const module = await importModule(`${packageName}/cli`)
+    resolvedUrl = import.meta.resolve(specifier)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    return { success: false, reason: 'not-installed', error: message }
+  }
+
+  try {
+    const module = await importModule(resolvedUrl)
     return validatePluginModule(packageName, module)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    const reason = isModuleNotFoundError(error) ? 'not-installed' : 'load-error'
-    return { success: false, reason, error: message }
+    return { success: false, reason: 'load-error', error: message }
   }
 }
 
@@ -163,18 +184,6 @@ function validatePluginModule(packageName: string, module: { plugin?: unknown })
   }
 
   return { success: true, plugin }
-}
-
-/**
- * Whether a caught error represents Node being unable to find a module at all
- * (as opposed to finding it but failing to resolve/load/execute it).
- */
-function isModuleNotFoundError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    'code' in error &&
-    (error as NodeJS.ErrnoException).code === 'ERR_MODULE_NOT_FOUND'
-  )
 }
 
 /**
@@ -225,11 +234,16 @@ function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryR
     return {
       found: false,
       reason: 'load-error',
-      error: `Package ${packageName} does not define a './cli' export (or none of its conditions include "import")`,
+      error: `Package ${packageName} does not define a './cli' export (or none of its conditions include "import" or "default")`,
     }
   }
 
-  const resolvedPath = join(packageDir, cliEntry)
+  const validatedTarget = validateExportsTarget(packageName, packageDir, cliEntry)
+  if (!validatedTarget.ok) {
+    return { found: false, reason: 'load-error', error: validatedTarget.error }
+  }
+
+  const resolvedPath = validatedTarget.path
   if (!existsSync(resolvedPath)) {
     return {
       found: false,
@@ -239,6 +253,72 @@ function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryR
   }
 
   return { found: true, url: pathToFileURL(resolvedPath).href }
+}
+
+/**
+ * Result of validating an `exports` map target string.
+ */
+type ExportsTargetValidation = { ok: true; path: string } | { ok: false; error: string }
+
+/**
+ * Validate an `exports` map target string against Node's own constraints on
+ * package-target values, then resolve it to an absolute path within
+ * `packageDir`.
+ *
+ * Reading the `exports` map by hand (see {@link resolveCliEntryUrl}) means we
+ * bypass Node's built-in resolver entirely — including the validation Node
+ * would otherwise perform on the target string before ever touching the
+ * filesystem. A malicious or malformed target (a bare specifier, an absolute
+ * path, or a `../` escape) must be rejected here for the same reason Node
+ * itself rejects it: an `exports` target is only ever supposed to point
+ * somewhere inside the package that declares it.
+ *
+ * @see https://nodejs.org/api/packages.html#exports-sugar
+ * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
+ */
+function validateExportsTarget(
+  packageName: string,
+  packageDir: string,
+  target: string
+): ExportsTargetValidation {
+  const invalid = (detail: string): ExportsTargetValidation => ({
+    ok: false,
+    error: `Package ${packageName}'s './cli' export target ${JSON.stringify(target)} is invalid: ${detail}`,
+  })
+
+  // Node's PACKAGE_TARGET_RESOLVE requires a target to be a string starting
+  // with "./"; anything else (a bare specifier, an absolute path like
+  // "/abs/path.js", or a "../" escape) is ERR_INVALID_PACKAGE_TARGET.
+  if (!target.startsWith('./')) {
+    return invalid('exports targets must be relative paths beginning with "./"')
+  }
+
+  // Beyond the leading "./", Node also rejects any "." or ".." segment (which
+  // would otherwise let a target escape the package directory) and any
+  // "node_modules" segment.
+  const segments = target.split('/').slice(1)
+  const hasForbiddenSegment = segments.some(
+    (segment) =>
+      segment === '' ||
+      segment === '.' ||
+      segment === '..' ||
+      segment.toLowerCase() === 'node_modules'
+  )
+  if (hasForbiddenSegment) {
+    return invalid('exports targets must not contain "..", ".", or "node_modules" path segments')
+  }
+
+  // Defense in depth: confirm the normalized, resolved path is still inside
+  // packageDir. Comparing against packageDir plus a trailing separator
+  // ensures a sibling directory with a shared prefix (e.g. "packageDir-evil")
+  // can't pass this check.
+  const resolvedPath = resolve(packageDir, target)
+  const packageDirWithSep = packageDir.endsWith(sep) ? packageDir : `${packageDir}${sep}`
+  if (resolvedPath !== packageDir && !resolvedPath.startsWith(packageDirWithSep)) {
+    return invalid('resolves outside the package directory')
+  }
+
+  return { ok: true, path: resolvedPath }
 }
 
 /**
