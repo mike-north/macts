@@ -39,6 +39,70 @@ All `@macts/*` packages share a single version number. Every release
 republishes **all** packages at that version (even ones with no changes) and
 creates one git tag per package (via `changeset tag`).
 
+## Staying pre-1.0
+
+macts is deliberately on a `0.x` line. `0.x` is semver's signal that the public
+API is still moving, and it is the honest posture until the SDK surface settles.
+CI enforces it: the `Release plan stays below 1.0` step runs
+`pnpm release:plan-check`, which computes the pending release plan and fails if
+any package would land at `1.0.0` or above.
+
+### The peerDependencies rule
+
+**A major bump can appear without anyone writing a `major` changeset.** This is
+the single most likely cause of a surprise version, so it is worth understanding
+exactly. Changesets' rule (`shouldBumpMajor`) is:
+
+> A package that _peer-depends_ on a package receiving a **minor or major** bump
+> is itself majored. By default the declared range is **not consulted at all** —
+> a maximally wide `"*"` peer is majored just the same as a narrow one. Only with
+> `onlyUpdatePeerDependentsWhenOutOfRange: true` does the range matter, and then
+> the dependent is majored **iff the new version leaves the declared range**.
+
+`.changeset/config.json` opts into that flag, so the range now governs. Because
+every `@macts/*` package is in one `fixed` group, a single major anywhere spreads
+to all of them — which is how one peer edge produced a workspace-wide `1.0.0`.
+
+That leaves one standing invariant:
+
+> **Never narrow a `peerDependencies` range on a `@macts/*` sibling.**
+
+Any change that shrinks the supported range means the next release's version
+falls outside it, which Changesets reads as a breaking change and majors. The
+app packages declare `"@macts/cli": "*"`, which nothing can ever fall outside;
+tightening it to something like `"^0.2.0"` would major the workspace on the very
+next minor. Since all `@macts/*` packages are released in lockstep at an
+identical version, a narrow range buys no real protection anyway.
+
+The degenerate case of the same rule: **a peer range must be a valid published
+semver range.** `workspace:*` is not one, so `semverSatisfies` is false for
+_every_ version — effectively an infinitely narrow range that always reads as
+"left the range." Use `dependencies` or `devDependencies` for workspace-internal
+links; see "Type-only dependencies" below.
+
+If a version bump ever looks wrong, `pnpm exec changeset status --verbose`
+shows which changesets drive each package, and `pnpm release:plan-check` names
+the offending packages.
+
+### Type-only dependencies
+
+Types alone never justify a peer dependency. `@macts/types` exists for exactly
+this: it holds the shared MCP plugin type definitions and emits no runtime code,
+so generated `@macts/<app>-server` packages can describe an MCP plugin through
+an ordinary `dependencies` entry instead of peer-depending on the `@macts/mcp`
+server implementation. `@macts/mcp` re-exports those types, so importing them
+from `@macts/mcp` still works.
+
+### Cutting a real 1.0
+
+When the API is genuinely stable and the decision is deliberate:
+
+1. Add a `major` changeset.
+2. Set `ALLOW_MAJOR_RELEASE=1` on the CI job (and locally) to bypass the guard.
+3. Consider removing the guard entirely once past 1.0 — it exists to protect a
+   pre-1.0 project from an accidental stability promise, not to block real
+   majors forever.
+
 ## Generator contract
 
 Generated packages' `package.json` files are owned by the code generator, not

@@ -17,7 +17,9 @@
  * - Canonical negative #2: host forbids, key says `allowed` → 403, never 202 —
  *   the call is denied outright rather than escalated to an approval request.
  * - A key with no policy behaves exactly as before per-key policies existed.
- * - A confirm-first hold reports which layer produced it.
+ * - A confirm-first hold reports which layer produced it, and — with an approval
+ *   provider configured — routes to that provider carrying the layer, which is
+ *   the data behind the provider's `supportsDistinctRouting` capability.
  * - An unreadable key policy fails the request closed rather than falling back
  *   to the host policy alone.
  *
@@ -29,7 +31,16 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Hono } from 'hono'
-import type { ApiKeyPayload, GovernancePolicy, PolicyDisposition } from '@macts/core'
+import type {
+  ApiKeyPayload,
+  ApprovalDecision,
+  ApprovalProvider,
+  ApprovalRequest,
+  AuditRecord,
+  AuditWriter,
+  GovernancePolicy,
+  PolicyDisposition,
+} from '@macts/core'
 import { createFileAuditWriter } from '@macts/core'
 import { requirePolicy, type GovernanceContext } from './governance.js'
 import type { GovernanceDeniedResponse, GovernancePendingResponse } from './governance.js'
@@ -333,6 +344,179 @@ describe('requirePolicy with per-key policies', () => {
       // policy must not silently widen the boundary back to it.
       expect(res.status).toBe(500)
       expect(ran).toEqual([])
+    })
+  })
+
+  describe('routing a hold to an approval provider', () => {
+    /** Collects audit records in memory so a test can assert on decisions. */
+    function recordingWriter(): { writer: AuditWriter; records: AuditRecord[] } {
+      const records: AuditRecord[] = []
+      return {
+        records,
+        writer: {
+          append: (record) => {
+            records.push(record)
+            return Promise.resolve()
+          },
+        },
+      }
+    }
+
+    /** A provider that records the request it was handed and answers with `decision`. */
+    function capturingProvider(decision: ApprovalDecision): {
+      provider: ApprovalProvider
+      seen: () => ApprovalRequest | undefined
+      callCount: () => number
+    } {
+      let seen: ApprovalRequest | undefined
+      let calls = 0
+      return {
+        seen: () => seen,
+        callCount: () => calls,
+        provider: {
+          name: 'capturing-provider',
+          capabilities: { supportsPolicySuggestions: false, supportsDistinctRouting: true },
+          requestApproval: (request) => {
+            calls += 1
+            seen = request
+            return Promise.resolve(decision)
+          },
+        },
+      }
+    }
+
+    it('routes a key-layer hold to the provider carrying layer "key"', async () => {
+      const { writer } = recordingWriter()
+      const gate = capturingProvider({ state: 'approved' })
+      const keyPolicies = createKeyPolicyResolver({
+        load: (apiKeyId) => (apiKeyId === STRICT_KEY.sub ? policyFor('confirm-first') : undefined),
+      })
+      const ran: string[] = []
+      const app = makeApp(
+        'calendar:events:create',
+        'write',
+        {
+          // The host policy allows outright; only the key policy holds the call.
+          policy: policyFor('allowed'),
+          writer,
+          keyPolicies,
+          approvals: { provider: gate.provider, timeoutMs: 30_000 },
+        },
+        [STRICT_KEY, PLAIN_KEY],
+        (id) => ran.push(id)
+      )
+
+      const res = await callAs(app, STRICT_KEY.sub)
+
+      // The hold reached a human, and the provider was told which layer asked —
+      // this is the data behind `supportsDistinctRouting`.
+      expect(gate.callCount()).toBe(1)
+      expect(gate.seen()?.layer).toBe('key')
+      expect(gate.seen()?.identity.apiKeyId).toBe(STRICT_KEY.sub)
+      expect(gate.seen()?.permission).toBe('calendar:events:create')
+      // Approved, so the operation ran.
+      expect(res.status).toBe(200)
+      expect(ran).toEqual([STRICT_KEY.sub])
+    })
+
+    it('routes a host-layer hold to the same provider carrying layer "host"', async () => {
+      const { writer } = recordingWriter()
+      const gate = capturingProvider({ state: 'approved' })
+      // A key policy exists and agrees; the host policy is what holds the call,
+      // so the key must not be blamed for it.
+      const keyPolicies = createKeyPolicyResolver({ load: () => policyFor('confirm-first') })
+      const app = makeApp(
+        'calendar:events:create',
+        'write',
+        {
+          policy: policyFor('confirm-first'),
+          writer,
+          keyPolicies,
+          approvals: { provider: gate.provider, timeoutMs: 30_000 },
+        },
+        [STRICT_KEY]
+      )
+
+      await callAs(app, STRICT_KEY.sub)
+
+      expect(gate.seen()?.layer).toBe('host')
+    })
+
+    it('denies a key-layer hold the human rejected, without running the operation', async () => {
+      const { writer, records } = recordingWriter()
+      const gate = capturingProvider({ state: 'rejected', reason: 'not now' })
+      const keyPolicies = createKeyPolicyResolver({ load: () => policyFor('confirm-first') })
+      const ran: string[] = []
+      const app = makeApp(
+        'calendar:events:create',
+        'write',
+        {
+          policy: policyFor('allowed'),
+          writer,
+          keyPolicies,
+          approvals: { provider: gate.provider, timeoutMs: 30_000 },
+        },
+        [STRICT_KEY],
+        (id) => ran.push(id)
+      )
+
+      const res = await callAs(app, STRICT_KEY.sub)
+
+      expect(gate.seen()?.layer).toBe('key')
+      expect(res.status).toBe(403)
+      expect(ran).toEqual([])
+      expect(records.map((r) => r.decision)).toEqual(['pending', 'rejected'])
+    })
+
+    it('never asks the provider when the host policy forbids and the key allows', async () => {
+      const { writer, records } = recordingWriter()
+      const gate = capturingProvider({ state: 'approved' })
+      const keyPolicies = createKeyPolicyResolver({ load: () => policyFor('allowed') })
+      const ran: string[] = []
+      const app = makeApp(
+        'calendar:events:create',
+        'write',
+        {
+          policy: policyFor('forbidden'),
+          writer,
+          keyPolicies,
+          approvals: { provider: gate.provider, timeoutMs: 30_000 },
+        },
+        [STRICT_KEY],
+        (id) => ran.push(id)
+      )
+
+      const res = await callAs(app, STRICT_KEY.sub)
+
+      // The deny-without-escalation invariant, now directly observable: a host
+      // denial is terminal, so no human is ever put in the position of being
+      // able to approve something host policy already refused.
+      expect(gate.callCount()).toBe(0)
+      expect(res.status).toBe(403)
+      const body = (await res.json()) as GovernanceDeniedResponse
+      expect(body.error.code).toBe('GOVERNANCE_DENIED')
+      expect(ran).toEqual([])
+      expect(records.map((r) => r.decision)).toEqual(['denied'])
+    })
+
+    it('does not ask the provider for a key that has no policy and no host hold', async () => {
+      const { writer } = recordingWriter()
+      const gate = capturingProvider({ state: 'approved' })
+      const keyPolicies = createKeyPolicyResolver({ load: () => undefined })
+      const app = makeApp(
+        'calendar:events:create',
+        'write',
+        {
+          policy: policyFor('allowed'),
+          writer,
+          keyPolicies,
+          approvals: { provider: gate.provider, timeoutMs: 30_000 },
+        },
+        [PLAIN_KEY]
+      )
+
+      expect((await callAs(app, PLAIN_KEY.sub)).status).toBe(200)
+      expect(gate.callCount()).toBe(0)
     })
   })
 })

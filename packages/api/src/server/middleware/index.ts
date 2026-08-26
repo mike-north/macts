@@ -22,9 +22,14 @@ export {
   resolveGovernanceForRequest,
   type GovernanceContext,
   type ResolvedGovernanceContext,
+  type GovernanceContextBase,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
+  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
+  type GovernanceApprovalDeniedResponse,
 } from './governance.js'
 
 export { requestLogger } from './request-logger.js'

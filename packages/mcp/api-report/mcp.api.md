@@ -8,6 +8,9 @@ import { ApiKeyPayload } from '@macts/core';
 import { CapabilityRegistry } from '@macts/core';
 import { GovernanceFilter } from '@macts/core';
 import { IncomingMessage } from 'node:http';
+import { JsonSchema } from '@macts/types';
+import { McpPlugin } from '@macts/types';
+import { McpToolDefinition } from '@macts/types';
 import { Server } from 'node:http';
 import { VERSION } from '@macts/core';
 
@@ -85,23 +88,7 @@ export function getSocketPath(): string;
 // @public
 export function invalidateMcpPluginCache(): void;
 
-// @public
-export interface JsonSchema {
-    // (undocumented)
-    readonly [key: string]: unknown;
-    // (undocumented)
-    readonly description?: string;
-    // (undocumented)
-    readonly enum?: readonly unknown[];
-    // (undocumented)
-    readonly items?: JsonSchema;
-    // (undocumented)
-    readonly properties?: Record<string, JsonSchema>;
-    // (undocumented)
-    readonly required?: readonly string[];
-    // (undocumented)
-    readonly type?: string;
-}
+export { JsonSchema }
 
 // @public
 export function loadMcpPlugin(packageName: string): Promise<{
@@ -115,12 +102,7 @@ export function loadMcpPlugin(packageName: string): Promise<{
 // @public
 export type McpAuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
 
-// @public
-export interface McpPlugin {
-    readonly description: string;
-    readonly name: string;
-    readonly tools: readonly McpToolDefinition[];
-}
+export { McpPlugin }
 
 // @public
 export interface McpServerOptions {
@@ -129,14 +111,7 @@ export interface McpServerOptions {
     readonly version?: string;
 }
 
-// @public
-export interface McpToolDefinition {
-    readonly description: string;
-    readonly handler: (args: unknown) => Promise<unknown>;
-    readonly inputSchema: JsonSchema;
-    readonly name: string;
-    readonly outputSchema?: JsonSchema;
-}
+export { McpToolDefinition }
 
 // @public
 export interface PluginDiscoveryResult {

@@ -58,6 +58,26 @@ import {
   type LayeredPolicyEvaluation,
   type ComposedRestrictions,
   type PolicyCandidate,
+  seekApproval,
+  createStaticApprovalProvider,
+  parseApprovalConfig,
+  resolveApprovalConfigPath,
+  recordApprovalDecision,
+  type ApprovalState,
+  type ApprovalDeniedState,
+  type ApprovalFailure,
+  type ApprovalLayer,
+  type ApprovalRequest,
+  type ApprovalRequesterIdentity,
+  type ApprovalDecision,
+  type ApprovalPolicySuggestion,
+  type ApprovalProvider,
+  type ApprovalProviderCapabilities,
+  type ApprovalOutcome,
+  type ApprovalApprovedOutcome,
+  type ApprovalDeniedOutcome,
+  type ApprovalConfig,
+  type ParseApprovalConfigResult,
 } from './index.js'
 
 // =============================================================================
@@ -321,3 +341,209 @@ expectType<boolean>(policyGrantsPermission(policy, candidate))
 
 // PolicyCandidate requires a RiskClass — an arbitrary string risk is not assignable.
 expectNotAssignable<PolicyCandidate>({ permission: 'a:b:c', risk: 'not-a-risk' })
+
+// =============================================================================
+// Approval SPI — closed state unions
+// =============================================================================
+
+expectAssignable<ApprovalState>('approved')
+expectAssignable<ApprovalState>('rejected')
+expectAssignable<ApprovalState>('timeout')
+// The union is closed: a provider cannot introduce its own terminal state.
+expectNotAssignable<ApprovalState>('escalated')
+expectNotAssignable<ApprovalState>('pending')
+
+// A denial can never be an approval.
+expectAssignable<ApprovalDeniedState>('rejected')
+expectAssignable<ApprovalDeniedState>('timeout')
+expectNotAssignable<ApprovalDeniedState>('approved')
+
+expectAssignable<ApprovalFailure>('provider-error')
+expectAssignable<ApprovalFailure>('malformed-response')
+expectNotAssignable<ApprovalFailure>('rejected')
+
+// The routing layer is reserved but closed.
+expectAssignable<ApprovalLayer>('host')
+expectAssignable<ApprovalLayer>('key')
+expectNotAssignable<ApprovalLayer>('org')
+
+// =============================================================================
+// ApprovalRequest — required fields
+// =============================================================================
+
+const approvalRequest: ApprovalRequest = {
+  id: 'req-1',
+  permission: 'calendar:events:create',
+  risk: 'write',
+  identity: { apiKeyId: 'key-1' },
+  argsSummary: 'summary: Standup',
+  rule: { source: 'app', disposition: 'confirm-first' },
+  reason: 'requires confirmation',
+  timeoutMs: 1_000,
+  requestedAt: new Date('2026-06-14T10:42:12.000Z'),
+  layer: 'host',
+}
+
+expectType<string>(approvalRequest.id)
+expectType<MatchedPolicyRule>(approvalRequest.rule)
+expectType<Date>(approvalRequest.requestedAt)
+// The risk class is the shared classifier's union, not a free-form string.
+expectNotAssignable<ApprovalRequest['risk']>('not-a-risk')
+
+// A request missing any required field is not assignable.
+expectNotAssignable<ApprovalRequest>({
+  id: 'req-1',
+  permission: 'calendar:events:create',
+  risk: 'write',
+  identity: { apiKeyId: 'key-1' },
+  argsSummary: 's',
+  rule: { source: 'app', disposition: 'confirm-first' },
+  reason: 'r',
+  timeoutMs: 1_000,
+  requestedAt: new Date('2026-06-14T10:42:12.000Z'),
+})
+
+// The identity's key id is required; the display name is not.
+expectAssignable<ApprovalRequesterIdentity>({ apiKeyId: 'key-1' })
+expectNotAssignable<ApprovalRequesterIdentity>({ apiKeyName: 'assistant' })
+
+// =============================================================================
+// ApprovalDecision / ApprovalPolicySuggestion — shapes
+// =============================================================================
+
+expectAssignable<ApprovalDecision>({ state: 'approved' })
+expectAssignable<ApprovalDecision>({ state: 'rejected', reason: 'no' })
+expectAssignable<ApprovalDecision>({ state: 'approved', evidence: { signature: 'blob' } })
+// A reason is prose, not structured data.
+expectNotAssignable<ApprovalDecision>({ state: 'approved', reason: { text: 'ok' } })
+expectNotAssignable<ApprovalDecision>({ state: 'escalated' })
+expectNotAssignable<ApprovalDecision>({})
+
+expectAssignable<ApprovalPolicySuggestion>({ permission: 'a:b:c', disposition: 'allowed' })
+// The suggested disposition is a policy disposition, not an approval state.
+expectNotAssignable<ApprovalPolicySuggestion>({ permission: 'a:b:c', disposition: 'approved' })
+
+// =============================================================================
+// ApprovalProvider — required members and capability flags
+// =============================================================================
+
+const provider: ApprovalProvider = {
+  name: 'test',
+  capabilities: { supportsPolicySuggestions: false, supportsDistinctRouting: false },
+  requestApproval: () => Promise.resolve({ state: 'approved' }),
+}
+expectType<Promise<ApprovalDecision>>(
+  provider.requestApproval(approvalRequest, { signal: new AbortController().signal })
+)
+
+// Both capability flags must be stated — a provider cannot inherit a default.
+expectNotAssignable<ApprovalProviderCapabilities>({ supportsPolicySuggestions: true })
+expectNotAssignable<ApprovalProviderCapabilities>({})
+// A provider missing `requestApproval` is not a provider.
+expectNotAssignable<ApprovalProvider>({
+  name: 'test',
+  capabilities: { supportsPolicySuggestions: false, supportsDistinctRouting: false },
+})
+
+// =============================================================================
+// ApprovalOutcome — discriminated union
+// =============================================================================
+
+expectAssignable<ApprovalOutcome>({
+  approved: true,
+  state: 'approved',
+  reason: 'r',
+  auditReason: 'r',
+})
+expectAssignable<ApprovalOutcome>({
+  approved: false,
+  state: 'timeout',
+  reason: 'r',
+  auditReason: 'r',
+})
+
+// The invariant is encoded, not just documented: contradictory outcomes do not
+// type-check, so a consumer-supplied value cannot be persisted as approved
+// while carrying a denial.
+expectNotAssignable<ApprovalOutcome>({
+  approved: true,
+  state: 'rejected',
+  reason: 'r',
+  auditReason: 'r',
+})
+expectNotAssignable<ApprovalOutcome>({
+  approved: false,
+  state: 'approved',
+  reason: 'r',
+  auditReason: 'r',
+})
+// An approval has no failure category.
+expectNotAssignable<ApprovalApprovedOutcome>({
+  approved: true,
+  state: 'approved',
+  reason: 'r',
+  auditReason: 'r',
+  failure: 'provider-error',
+})
+// Both explanations are mandatory: dropping the operator-only one would send
+// the client-safe text to the audit trail.
+expectNotAssignable<ApprovalOutcome>({ approved: true, state: 'approved', reason: 'r' })
+expectAssignable<ApprovalDeniedOutcome>({
+  approved: false,
+  state: 'rejected',
+  reason: 'r',
+  auditReason: 'r',
+  failure: 'provider-error',
+})
+
+// =============================================================================
+// seekApproval / recordApprovalDecision — async signatures
+// =============================================================================
+
+expectType<Promise<ApprovalOutcome>>(seekApproval({ provider, request: approvalRequest }))
+
+expectType<Promise<AuditDecision>>(
+  recordApprovalDecision({
+    permission: 'calendar:events:create',
+    outcome: { approved: true, state: 'approved', reason: 'r', auditReason: 'r' },
+    audit: {
+      apiKeyId: 'k',
+      argsSummary: 's',
+      timestamp: new Date('2026-06-14T10:42:12.000Z'),
+    },
+    writer,
+  })
+)
+
+// The writer is required: there is no "decide but do not record" mode.
+expectNotAssignable<Parameters<typeof recordApprovalDecision>[0]>({
+  permission: 'calendar:events:create',
+  outcome: { approved: true, state: 'approved', reason: 'r', auditReason: 'r' },
+  audit: {
+    apiKeyId: 'k',
+    argsSummary: 's',
+    timestamp: new Date('2026-06-14T10:42:12.000Z'),
+  },
+})
+
+expectType<ApprovalProvider>(createStaticApprovalProvider({ state: 'rejected' }))
+// The reference provider still has to name a real terminal state.
+expectNotAssignable<Parameters<typeof createStaticApprovalProvider>[0]>({ state: 'escalated' })
+
+// =============================================================================
+// Approval registration — discriminated parse result
+// =============================================================================
+
+const approvalConfigResult = parseApprovalConfig({ provider: '@example/macts-approval' })
+expectType<ParseApprovalConfigResult>(approvalConfigResult)
+if (approvalConfigResult.success) {
+  expectType<ApprovalConfig>(approvalConfigResult.data)
+  expectType<string>(approvalConfigResult.data.provider)
+  expectType<number>(approvalConfigResult.data.timeoutMs)
+} else {
+  expectType<readonly { readonly path: string; readonly message: string }[]>(
+    approvalConfigResult.issues
+  )
+}
+
+expectType<string>(resolveApprovalConfigPath('/Users/alice/.macts'))

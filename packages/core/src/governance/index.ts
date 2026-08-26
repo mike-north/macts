@@ -21,13 +21,18 @@
  *    with the evaluator.
  * 5. Call-time *enforcement* ({@link ./enforcement.js}) — the audit-writing
  *    wrapper that checks each invocation and records every decision.
- * 6. Layered *composition* ({@link ./composition.js}) — combines the machine-wide
+ * 6. The human-in-the-loop *approval seam* ({@link ./approval.js}) — the
+ *    provider-agnostic interface for asking a human to decide a
+ *    `confirm-first` hold, plus the fail-closed gate that bounds the wait.
+ *    Which provider is used is declared separately
+ *    ({@link ./approval-config.js}).
+ * 7. Layered *composition* ({@link ./composition.js}) — combines the machine-wide
  *    host policy with an optional per-API-key policy, taking the stricter
  *    decision so a key policy can only ever tighten, and reporting which layer
- *    governed (which is what an approval hold routes on).
+ *    governed — which is the layer an approval hold routes on.
  *
- * Approval-gate wiring (issue #54) and discovery filtering (issue #55) consume
- * the evaluator rather than re-implementing the decision. The discovery-time
+ * Approval-gate wiring and discovery filtering (issue #55) consume the
+ * evaluator rather than re-implementing the decision. The discovery-time
  * governance *filter seam* lives in `../capabilities/governance.js`.
  *
  * @packageDocumentation
@@ -132,7 +137,52 @@ export {
   type CallAuditContext,
   type EnforceCallOptions,
   enforceCall,
+  type RecordApprovalDecisionOptions,
+  recordApprovalDecision,
 } from './enforcement.js'
+
+// Human-in-the-loop approval provider interface (the seam macts owns for
+// seeking a human decision on a confirm-first hold) and its fail-closed gate.
+export {
+  APPROVAL_STATES,
+  type ApprovalState,
+  isApprovalState,
+  type ApprovalDeniedState,
+  APPROVAL_FAILURES,
+  type ApprovalFailure,
+  APPROVAL_LAYERS,
+  type ApprovalLayer,
+  type ApprovalRequesterIdentity,
+  type ApprovalRequest,
+  type ApprovalPolicySuggestion,
+  type ApprovalDecision,
+  type ApprovalProviderCapabilities,
+  type ApprovalRequestContext,
+  type ApprovalProvider,
+  DEFAULT_APPROVAL_TIMEOUT_MS,
+  type ApprovalApprovedOutcome,
+  type ApprovalDeniedOutcome,
+  type ApprovalOutcome,
+  type SeekApprovalOptions,
+  seekApproval,
+} from './approval.js'
+
+// Reference approval providers (tests and wiring verification only).
+export {
+  createStaticApprovalProvider,
+  type StaticApprovalProviderOptions,
+} from './approval-providers.js'
+
+// Approval-provider registration declaration: schema, parser, canonical path.
+export {
+  MAX_APPROVAL_TIMEOUT_MS,
+  ApprovalConfigSchema,
+  type ApprovalConfig,
+  type ApprovalConfigIssue,
+  type ParseApprovalConfigResult,
+  parseApprovalConfig,
+  resolveApprovalConfigPath,
+} from './approval-config.js'
 
 // Policy loader: reads and validates a policy declaration from a JSON file.
 export { loadPolicyFromFile, type LoadPolicyResult } from './loader.js'

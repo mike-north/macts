@@ -49,3 +49,10 @@ jobs:
 
       - name: Format check
         run: pnpm format:check
+
+      # macts is intentionally pre-1.0. Changesets can reach a major bump with
+      # no `major` changeset present — a peerDependencies edge is enough, and
+      # fixed versioning then spreads it to every package. Catch that here
+      # rather than in a "Version Packages" PR nobody expected.
+      - name: Release plan stays below 1.0
+        run: pnpm release:plan-check

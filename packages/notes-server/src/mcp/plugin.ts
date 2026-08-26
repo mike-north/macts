@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp'
+import type { McpPlugin } from '@macts/types'
 import { allTools } from './tools/index.js'
 
 /**

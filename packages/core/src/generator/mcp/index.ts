@@ -427,7 +427,7 @@ function generateToolFile(
  * @packageDocumentation
  */
 
-import type { McpToolDefinition } from '@macts/mcp';
+import type { McpToolDefinition } from '@macts/types';
 import { getClient } from '../sdk.js';
 
 ${toolsCode}
@@ -485,7 +485,7 @@ function generatePluginFile(context: McpGeneratorContext): string {
  * @packageDocumentation
  */
 
-import type { McpPlugin } from '@macts/mcp';
+import type { McpPlugin } from '@macts/types';
 import { allTools } from './tools/index.js';
 
 /**
@@ -513,7 +513,7 @@ function generateIndexFile(context: McpGeneratorContext): string {
 
 // Export as 'plugin' to match MCP plugin loader convention
 export { ${toCamelCase(context.appName)}Plugin as plugin, ${toCamelCase(context.appName)}Plugin } from './plugin.js';
-export type { McpPlugin, McpToolDefinition } from '@macts/mcp';
+export type { McpPlugin, McpToolDefinition } from '@macts/types';
 `
 }
 

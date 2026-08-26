@@ -14,6 +14,9 @@ import { ApiKeyValidationSuccess } from '@macts/core';
 import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
+import { ApprovalConfig } from '@macts/core';
+import { ApprovalDeniedState } from '@macts/core';
+import { ApprovalProvider } from '@macts/core';
 import { AuditWriter } from '@macts/core';
 import { booleanCoercer } from '@macts/core';
 import { checkPermission } from '@macts/core';
@@ -86,6 +89,22 @@ export { ApiKeyValidationSuccess }
 export { AppConnection }
 
 export { AppConnectionOptions }
+
+// @public
+export interface ApprovalGateContext {
+    readonly provider: ApprovalProvider;
+    readonly timeoutMs?: number | undefined;
+}
+
+// @public
+export class ApprovalProviderError extends Error {
+    constructor(
+    path: string, message: string);
+    readonly path: string;
+}
+
+// @public
+export type ApprovalProviderFactory = (options: Readonly<Record<string, unknown>>) => ApprovalProvider | Promise<ApprovalProvider>;
 
 // @public
 export type AttributeValue = string | number | boolean;
@@ -254,6 +273,9 @@ export function getActivePolicyPath(): string;
 export { getAppName }
 
 // @public
+export function getApprovalConfigPath(): string;
+
+// @public
 export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
 
 // @public
@@ -269,9 +291,34 @@ export function getSigningSecret(): Promise<string>;
 export function getTracer(_name?: string): Tracer;
 
 // @public
-export interface GovernanceContext {
+export interface GovernanceApprovalDeniedResponse {
+    // (undocumented)
+    error: {
+        code: 'GOVERNANCE_APPROVAL_DENIED';
+        message: string;
+        permission: string;
+        approval: ApprovalDeniedState;
+    };
+}
+
+// @public
+export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals;
+
+// @public
+export interface GovernanceContextBase {
     readonly keyPolicies?: KeyPolicyResolver | undefined;
     readonly policy: GovernancePolicy;
+}
+
+// @public
+export interface GovernanceContextWithApprovals extends GovernanceContextBase {
+    readonly approvals: ApprovalGateContext;
+    readonly writer: AuditWriter;
+}
+
+// @public
+export interface GovernanceContextWithoutApprovals extends GovernanceContextBase {
+    readonly approvals?: undefined;
     readonly writer?: AuditWriter | undefined;
 }
 
@@ -351,6 +398,25 @@ export function loadActivePolicy(options?: LoadActivePolicyOptions): Promise<Gov
 export interface LoadActivePolicyOptions {
     readonly path?: string;
 }
+
+// @public
+export function loadApprovalConfig(options?: LoadApprovalOptions): Promise<ApprovalConfig | undefined>;
+
+// @public
+export function loadApprovalGate(options: LoadApprovalGateOptions): Promise<LoadedApprovalGate | undefined>;
+
+// @public
+export interface LoadApprovalGateOptions extends LoadApprovalOptions {
+    readonly writer: AuditWriter;
+}
+
+// @public
+export interface LoadApprovalOptions {
+    readonly path?: string;
+}
+
+// @public
+export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' | 'approvals'>;
 
 // @public
 export interface LoadedTlsOptions {
