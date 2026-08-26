@@ -155,18 +155,33 @@ export async function loadPlugin(packageName: string): Promise<LoadPluginResult>
 }
 
 /**
- * Dynamically import a module, typed for the shape a plugin entry point
- * is expected to export.
+ * Narrow an unknown value to an indexable object.
+ *
+ * Every shape this module reads comes from outside the type system — a
+ * dynamically imported module, a parsed package.json, an exports map — so it
+ * arrives as `unknown` and has to be narrowed by a guard rather than asserted
+ * with a cast. A cast here would be a claim about untrusted input, which is
+ * exactly what we cannot make.
  */
-async function importModule(specifier: string): Promise<{ plugin?: unknown }> {
-  return (await import(specifier)) as { plugin?: unknown }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+/**
+ * Dynamically import a module.
+ *
+ * The result is deliberately `unknown`: nothing about a third-party plugin's
+ * entry point is known until it has been validated.
+ */
+async function importModule(specifier: string): Promise<unknown> {
+  return await import(specifier)
 }
 
 /**
  * Validate a loaded plugin module's shape.
  */
-function validatePluginModule(packageName: string, module: { plugin?: unknown }): LoadPluginResult {
-  if (!module.plugin) {
+function validatePluginModule(packageName: string, module: unknown): LoadPluginResult {
+  if (!isRecord(module) || !module['plugin']) {
     return {
       success: false,
       reason: 'load-error',
@@ -174,7 +189,9 @@ function validatePluginModule(packageName: string, module: { plugin?: unknown })
     }
   }
 
-  const plugin = module.plugin as CliPlugin
+  // `isValidPlugin` is a type guard, so the narrowed value carries the
+  // CliPlugin type without an assertion.
+  const plugin = module['plugin']
   if (!isValidPlugin(plugin)) {
     return {
       success: false,
@@ -217,9 +234,9 @@ function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryR
   }
 
   const packageJsonPath = join(packageDir, 'package.json')
-  let pkg: { exports?: unknown }
+  let pkg: unknown
   try {
-    pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { exports?: unknown }
+    pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return {
@@ -229,7 +246,7 @@ function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryR
     }
   }
 
-  const cliEntry = resolveExportsSubpath(pkg.exports, './cli')
+  const cliEntry = resolveExportsSubpath(isRecord(pkg) ? pkg['exports'] : undefined, './cli')
   if (!cliEntry) {
     return {
       found: false,
@@ -328,8 +345,8 @@ function validateExportsTarget(
  * conditions-object forms of an exports entry.
  */
 function resolveExportsSubpath(exportsField: unknown, subpath: string): string | null {
-  if (!exportsField || typeof exportsField !== 'object') return null
-  const entry = (exportsField as Record<string, unknown>)[subpath]
+  if (!isRecord(exportsField)) return null
+  const entry = exportsField[subpath]
   return resolveExportsConditions(entry)
 }
 
@@ -340,9 +357,8 @@ function resolveExportsSubpath(exportsField: unknown, subpath: string): string |
 function resolveExportsConditions(entry: unknown): string | null {
   if (typeof entry === 'string') return entry
 
-  if (entry && typeof entry === 'object') {
-    const conditions = entry as Record<string, unknown>
-    const candidate = conditions['import'] ?? conditions['default']
+  if (isRecord(entry)) {
+    const candidate = entry['import'] ?? entry['default']
     if (typeof candidate === 'string') return candidate
     // Conditions may themselves nest further conditions (e.g. `"import": { "default": ... }`).
     return resolveExportsConditions(candidate)
@@ -355,9 +371,9 @@ function resolveExportsConditions(entry: unknown): string | null {
  * Validate that an object is a valid CliPlugin.
  */
 function isValidPlugin(obj: unknown): obj is CliPlugin {
-  if (!obj || typeof obj !== 'object') return false
+  if (!isRecord(obj)) return false
 
-  const plugin = obj as Record<string, unknown>
+  const plugin = obj
 
   return (
     typeof plugin['name'] === 'string' &&
