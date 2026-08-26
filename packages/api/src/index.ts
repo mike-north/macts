@@ -38,9 +38,13 @@ export {
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
   type GovernanceContext,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
+  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
+  type GovernanceApprovalDeniedResponse,
 } from './server/middleware/index.js'
 
 // Active governance policy loading
@@ -51,6 +55,18 @@ export {
   ActivePolicyError,
   type LoadActivePolicyOptions,
 } from './server/governance/active-policy.js'
+
+// Human-in-the-loop approval provider loading
+export {
+  loadApprovalConfig,
+  loadApprovalGate,
+  getApprovalConfigPath,
+  ApprovalProviderError,
+  type ApprovalProviderFactory,
+  type LoadApprovalOptions,
+  type LoadApprovalGateOptions,
+  type LoadedApprovalGate,
+} from './server/governance/approval-provider.js'
 
 // RPC handlers
 export {

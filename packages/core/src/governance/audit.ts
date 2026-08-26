@@ -86,6 +86,16 @@ export interface AuditRecordInput {
    * decisions (issue #7: "blocked with a human-readable reason").
    */
   readonly reason?: string
+  /**
+   * Optional correlation id tying the records of one held call together.
+   *
+   * A `confirm-first` call produces two records — `pending` when it is withheld,
+   * then `approved`/`rejected` when a human resolves it. Both carry the same
+   * `approvalId`, so overlapping calls with identical capability, requester, and
+   * argument summary can still be paired (and their wait time computed).
+   * Absent on records for calls that never raised an approval request.
+   */
+  readonly approvalId?: string
 }
 
 /**
@@ -113,6 +123,11 @@ export interface AuditRecord {
   readonly timestamp: Date
   /** Optional human-readable reason for the decision. */
   readonly reason?: string
+  /**
+   * Optional correlation id tying the `pending` record of a held call to the
+   * `approved`/`rejected` record that resolved it.
+   */
+  readonly approvalId?: string
 }
 
 /**
@@ -138,6 +153,11 @@ export interface SerializedAuditRecord {
   readonly timestamp: string
   /** Optional human-readable reason for the decision (omitted when absent). */
   readonly reason?: string
+  /**
+   * Optional correlation id for the held call this record belongs to (omitted
+   * when absent).
+   */
+  readonly approvalId?: string
 }
 
 /**
@@ -162,7 +182,11 @@ export function createAuditRecord(input: AuditRecordInput): AuditRecord {
     // Defensive copy so the record is not aliased to the caller's mutable Date.
     timestamp: new Date(input.timestamp.getTime()),
   }
-  return input.reason === undefined ? base : { ...base, reason: input.reason }
+  return {
+    ...base,
+    ...(input.reason === undefined ? {} : { reason: input.reason }),
+    ...(input.approvalId === undefined ? {} : { approvalId: input.approvalId }),
+  }
 }
 
 /**
@@ -185,5 +209,9 @@ export function serializeAuditRecord(record: AuditRecord): SerializedAuditRecord
     decision: record.decision,
     timestamp: record.timestamp.toISOString(),
   }
-  return record.reason === undefined ? base : { ...base, reason: record.reason }
+  return {
+    ...base,
+    ...(record.reason === undefined ? {} : { reason: record.reason }),
+    ...(record.approvalId === undefined ? {} : { approvalId: record.approvalId }),
+  }
 }

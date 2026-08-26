@@ -38,9 +38,13 @@ export {
 export {
   requirePolicy,
   type GovernanceContext,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
+  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
+  type GovernanceApprovalDeniedResponse,
 } from './middleware/governance.js'
 export {
   loadActivePolicy,
@@ -49,6 +53,16 @@ export {
   ActivePolicyError,
   type LoadActivePolicyOptions,
 } from './governance/active-policy.js'
+export {
+  loadApprovalConfig,
+  loadApprovalGate,
+  getApprovalConfigPath,
+  ApprovalProviderError,
+  type ApprovalProviderFactory,
+  type LoadApprovalOptions,
+  type LoadApprovalGateOptions,
+  type LoadedApprovalGate,
+} from './governance/approval-provider.js'
 export {
   createRpcRouter,
   createMultiAppRpcRouter,
@@ -90,13 +104,15 @@ export interface ServerOptions {
   /** Rate limiting configuration, or false to disable (default: enabled with 100 req/min) */
   rateLimit?: RateLimitOptions | false
   /**
-   * Governance enforcement context (active policy + optional audit writer).
+   * Governance enforcement context (active policy, optional audit writer, and
+   * optional human-in-the-loop approval gate).
    *
    * When omitted, defaults to the allow-all policy with no audit writer, so
    * call-time policy enforcement is a no-op and pre-governance behavior is
    * preserved. Supply a loaded {@link GovernanceContext} (see
-   * {@link loadActivePolicy} and `createFileAuditWriter`) to enforce a
-   * real policy and record an audit trail.
+   * {@link loadActivePolicy}, {@link loadApprovalGate}, and
+   * `createFileAuditWriter`) to enforce a real policy, seek human approval for
+   * `confirm-first` calls, and record an audit trail.
    */
   governance?: GovernanceContext
 }

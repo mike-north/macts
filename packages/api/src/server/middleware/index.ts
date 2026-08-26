@@ -20,9 +20,13 @@ export {
 export {
   requirePolicy,
   type GovernanceContext,
+  type GovernanceContextWithApprovals,
+  type GovernanceContextWithoutApprovals,
+  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
+  type GovernanceApprovalDeniedResponse,
 } from './governance.js'
 
 export { requestLogger } from './request-logger.js'
