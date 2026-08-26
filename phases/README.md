@@ -4,20 +4,21 @@ This directory contains the implementation roadmap for macts, broken into sequen
 
 ## Phase Overview
 
-| Phase | Name                                             | Dependencies | Description                         |
-| ----- | ------------------------------------------------ | ------------ | ----------------------------------- |
-| 0     | [Foundation](./00-foundation.md)                 | -            | Monorepo setup, tooling, CI/CD      |
-| 1     | [Manifest Schema](./01-manifest-schema.md)       | 0            | Zod schemas for manifest format     |
-| 2     | [SDEF Parser](./02-sdef-parser.md)               | 0, 1         | Parse AppleScript dictionaries      |
-| 3     | [JXA Bridge](./03-jxa-bridge.md)                 | 0, 1         | Runtime JXA execution layer         |
-| 4     | [SDK Generation](./04-sdk-generation.md)         | 0, 1, 3      | Code generation pipeline            |
-| 5     | [Calendar SDK](./05-calendar-sdk.md)             | 0-4          | First complete SDK (vertical slice) |
-| 6     | [CLI Infrastructure](./06-cli-infrastructure.md) | 0, 1, 4, 5   | Core CLI + plugin system            |
-| 7     | [MCP Infrastructure](./07-mcp-infrastructure.md) | 0, 1, 4, 5   | Core MCP server + plugin system     |
-| 8     | [HTTP API](./08-http-api.md)                     | 0, 1, 4, 5   | Core HTTP server + plugin system    |
-| 9     | [Agentic Extraction](./09-agentic-extraction.md) | 0, 1, 2, 3   | Agent-assisted manifest creation    |
-| 10    | [Expansion & Polish](./10-expansion-polish.md)   | 0-9          | More apps, documentation, release   |
-| 11    | [SQL Interface](./11-sql-interface.md)           | 0-8          | Speculative: SQL query interface    |
+| Phase | Name                                                             | Dependencies | Description                                                 |
+| ----- | ---------------------------------------------------------------- | ------------ | ----------------------------------------------------------- |
+| 0     | [Foundation](./00-foundation.md)                                 | -            | Monorepo setup, tooling, CI/CD                              |
+| 1     | [Manifest Schema](./01-manifest-schema.md)                       | 0            | Zod schemas for manifest format                             |
+| 2     | [SDEF Parser](./02-sdef-parser.md)                               | 0, 1         | Parse AppleScript dictionaries                              |
+| 3     | [JXA Bridge](./03-jxa-bridge.md)                                 | 0, 1         | Runtime JXA execution layer                                 |
+| 4     | [SDK Generation](./04-sdk-generation.md)                         | 0, 1, 3      | Code generation pipeline                                    |
+| 5     | [Calendar SDK](./05-calendar-sdk.md)                             | 0-4          | First complete SDK (vertical slice)                         |
+| 6     | [CLI Infrastructure](./06-cli-infrastructure.md)                 | 0, 1, 4, 5   | Core CLI + plugin system                                    |
+| 7     | [MCP Infrastructure](./07-mcp-infrastructure.md)                 | 0, 1, 4, 5   | Core MCP server + plugin system                             |
+| 8     | [HTTP API](./08-http-api.md)                                     | 0, 1, 4, 5   | Core HTTP server + plugin system                            |
+| 9     | [Agentic Extraction](./09-agentic-extraction.md)                 | 0, 1, 2, 3   | Agent-assisted manifest creation                            |
+| 10    | [Expansion & Polish](./10-expansion-polish.md)                   | 0-9          | More apps, documentation, release                           |
+| 11    | [SQL Interface](./11-sql-interface.md)                           | 0-8          | Speculative: SQL query interface                            |
+| 12    | [Zod Schema Source of Truth](./12-zod-schema-source-of-truth.md) | 1, 4, 6, 7   | Collapse zod/JSON Schema/typanion into one generated schema |
 
 ## Dependency Graph
 
