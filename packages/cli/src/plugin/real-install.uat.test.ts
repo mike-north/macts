@@ -306,9 +306,13 @@ export const plugin = { name: 'uat-broken', description: 'broken', commands: [] 
     }
   }, 60_000)
 
+  // TODO(#117): un-skip once the CLI plugin ABI stops relying on clipanion
+  // class identity across install trees. This test is the acceptance
+  // criterion for that issue — it must pass without weakening the assertions.
+  // https://github.com/mike-north/macts/issues/117
   it.skip(
     'accepts a valid --to value and rejects an invalid one ' +
-      '(BLOCKED: duplicate clipanion copies across install trees — bug 2, out of scope here)',
+      '(BLOCKED by #117: duplicate clipanion copies across install trees)',
     () => {
       // This is a standing bug report in test form, not a placeholder: the
       // assertions below describe correct behavior per clipanion's documented
@@ -322,6 +326,11 @@ export const plugin = { name: 'uat-broken', description: 'broken', commands: [] 
       // clipanion is invisible to the host's copy's `Command.isOption` check.
       // The result: clipanion's parser treats `--to` as entirely unknown for
       // both valid and invalid values, so `t.isEnum(...)` never even runs.
+      //
+      // Tracked in https://github.com/mike-north/macts/issues/117, which
+      // records the reproduction, the positive control (symlinking the
+      // plugin's clipanion to the host's copy makes this pass), and the ABI
+      // options under consideration.
       const mactsHome = createMactsHome()
       try {
         installIntoPlugins(mactsHome, goodTarball)
