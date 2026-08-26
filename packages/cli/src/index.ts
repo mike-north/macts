@@ -119,8 +119,10 @@ export { RootCommand } from './commands/root.js'
  */
 export type {
   CliPlugin,
+  LoadPluginResult,
   PluginDiscoveryResult,
   PluginLoadError,
+  PluginLoadFailureReason,
   PluginRegistrationResult,
 } from './plugin/index.js'
 

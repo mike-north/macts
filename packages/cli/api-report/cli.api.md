@@ -105,13 +105,17 @@ export class JsonFormatter implements OutputFormatter {
 }
 
 // @public
-export function loadPlugin(packageName: string): Promise<{
+export function loadPlugin(packageName: string): Promise<LoadPluginResult>;
+
+// @public
+export type LoadPluginResult = {
     success: true;
     plugin: CliPlugin;
 } | {
     success: false;
+    reason: PluginLoadFailureReason;
     error: string;
-}>;
+};
 
 // @public
 export interface OutputFormatter {
@@ -131,7 +135,11 @@ export interface PluginDiscoveryResult {
 export interface PluginLoadError {
     readonly message: string;
     readonly packageName: string;
+    readonly reason: PluginLoadFailureReason;
 }
+
+// @public
+export type PluginLoadFailureReason = 'not-installed' | 'load-error';
 
 // @public
 export interface PluginRegistrationResult {

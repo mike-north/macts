@@ -105,8 +105,8 @@ describe('registerAllPlugins', () => {
 
   it('should include load errors in result', () => {
     const loadErrors: PluginLoadError[] = [
-      { packageName: '@macts/broken', message: 'Module not found' },
-      { packageName: '@macts/invalid', message: 'Invalid plugin export' },
+      { packageName: '@macts/broken', reason: 'load-error', message: 'Module not found' },
+      { packageName: '@macts/invalid', reason: 'load-error', message: 'Invalid plugin export' },
     ]
     const discoveryResult: PluginDiscoveryResult = {
       plugins: [],
@@ -118,10 +118,12 @@ describe('registerAllPlugins', () => {
     expect(result.loadErrors).toHaveLength(2)
     expect(result.loadErrors[0]).toEqual({
       packageName: '@macts/broken',
+      reason: 'load-error',
       message: 'Module not found',
     })
     expect(result.loadErrors[1]).toEqual({
       packageName: '@macts/invalid',
+      reason: 'load-error',
       message: 'Invalid plugin export',
     })
   })
@@ -141,7 +143,7 @@ describe('registerAllPlugins', () => {
 
   it('should handle discovery result with only errors', () => {
     const loadErrors: PluginLoadError[] = [
-      { packageName: '@macts/failed', message: 'Failed to load' },
+      { packageName: '@macts/failed', reason: 'load-error', message: 'Failed to load' },
     ]
     const discoveryResult: PluginDiscoveryResult = {
       plugins: [],
@@ -157,7 +159,9 @@ describe('registerAllPlugins', () => {
 
   it('should handle mixed plugins and errors', () => {
     const plugin = createMockPlugin('working', [TestCommand1 as CommandClass])
-    const loadErrors: PluginLoadError[] = [{ packageName: '@macts/broken', message: 'Load failed' }]
+    const loadErrors: PluginLoadError[] = [
+      { packageName: '@macts/broken', reason: 'load-error', message: 'Load failed' },
+    ]
     const discoveryResult: PluginDiscoveryResult = {
       plugins: [plugin],
       errors: loadErrors,

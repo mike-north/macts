@@ -37,6 +37,7 @@
     "api-extractor:ci": "api-extractor run",
     "lint": "eslint src",
     "test": "vitest run",
+    "test:uat": "RUN_MACTS_UAT=1 vitest run src/plugin/real-install.uat.test.ts --testTimeout=120000",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

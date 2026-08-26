@@ -70,8 +70,10 @@
  */
 export type {
   CliPlugin,
+  LoadPluginResult,
   PluginDiscoveryResult,
   PluginLoadError,
+  PluginLoadFailureReason,
   PluginRegistrationResult,
 } from './types.js'
 
