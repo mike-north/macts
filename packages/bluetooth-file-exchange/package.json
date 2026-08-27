@@ -1,6 +1,6 @@
 {
   "name": "@macts/bluetooth-file-exchange",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK and CLI for macOS bluetooth-file-exchange automation",
   "license": "MIT",
   "repository": {

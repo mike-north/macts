@@ -1,6 +1,6 @@
 {
   "name": "@macts/google-chrome",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK and CLI for macOS google-chrome automation",
   "license": "MIT",
   "repository": {

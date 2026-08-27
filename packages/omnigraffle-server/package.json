@@ -1,6 +1,6 @@
 {
   "name": "@macts/omnigraffle-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Server package for macOS OmniGraffle.app (API + MCP)",
   "license": "MIT",
   "repository": {

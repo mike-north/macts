@@ -1,6 +1,6 @@
 {
   "name": "@macts/types",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared, zero-runtime type definitions for the macts ecosystem",
   "license": "MIT",
   "repository": {
