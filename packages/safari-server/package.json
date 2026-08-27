@@ -1,6 +1,6 @@
 {
   "name": "@macts/safari-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Server package for macOS Safari.app (API + MCP)",
   "license": "MIT",
   "repository": {

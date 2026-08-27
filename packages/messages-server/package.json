@@ -1,6 +1,6 @@
 {
   "name": "@macts/messages-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Server package for macOS Messages.app (API + MCP)",
   "license": "MIT",
   "repository": {

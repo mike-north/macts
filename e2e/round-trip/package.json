@@ -1,6 +1,6 @@
 {
   "name": "@macts-e2e/round-trip",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "E2E round-trip gate: live create→list→delete per app (locally-automatable, attest-it sealed)",
   "license": "MIT",
