@@ -2,11 +2,20 @@
  * Telemetry instrumentation for the macts API.
  *
  * Exposes OpenTelemetry-shaped tracing interfaces ({@link Tracer}, {@link Span},
- * {@link SpanStatusCode}), but tracing is not yet implemented: every function
- * exported from this module ({@link getTracer}, {@link withSpan},
- * {@link configureTelemetry}) is currently a no-op stub. No OpenTelemetry
- * package is required, read, or integrated with. This module exists so
- * callers can code against the eventual tracing API shape ahead of time.
+ * {@link SpanStatusCode}), but no tracing actually happens: no OpenTelemetry
+ * package is required, read, or integrated with, and spans discard everything
+ * recorded on them. What that means differs per export:
+ *
+ * - {@link configureTelemetry} does nothing at all.
+ * - {@link getTracer} returns a tracer whose spans accept every call and
+ *   retain none of it.
+ * - {@link withSpan} is **not** a no-op. It invokes the callback, awaits and
+ *   returns its result, rethrows if it throws, and always ends the span — only
+ *   the span's recording is inert. Real code can be wrapped in it today and
+ *   will behave exactly as it does uninstrumented.
+ *
+ * This module exists so callers can code against the eventual tracing API
+ * shape ahead of time.
  *
  * @packageDocumentation
  */
