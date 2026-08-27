@@ -8,7 +8,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import type { ApiKeyMetadata } from '@macts/core'
+import Database from 'better-sqlite3'
+import type { ApiKeyMetadata, GovernancePolicy, PolicyDisposition } from '@macts/core'
 
 // We need to reset the module state between tests
 let storage: typeof import('./storage.js')
@@ -538,6 +539,200 @@ describe('storage integration', () => {
 
       // Legacy file should be removed
       expect(fs.existsSync(legacyPath)).toBe(false)
+    })
+  })
+
+  describe('per-key governance policy', () => {
+    /** Build a single-app policy pinning `calendar` to `disposition`. */
+    const policyFor = (disposition: PolicyDisposition): GovernancePolicy => ({
+      version: '1',
+      defaultDisposition: 'forbidden',
+      apps: [
+        {
+          app: 'calendar',
+          disposition,
+          operations: [],
+          restrictions: { pathsAllow: [], pathsDeny: [], urlsAllow: [], urlsDeny: [] },
+          tags: [],
+        },
+      ],
+      tags: [],
+    })
+
+    const createTestMetadata = (id: string): ApiKeyMetadata => ({
+      id,
+      name: 'Test Key',
+      permissions: ['calendar:events:create'],
+      originalPermissions: ['calendar:events:create'],
+      createdAt: new Date('2024-01-15T10:00:00Z'),
+      expiresAt: undefined,
+      revoked: false,
+      keyPrefix: 'macts_sk_abcd1234',
+    })
+
+    it('should return undefined for a key with no policy', () => {
+      expect(storage.getKeyPolicy('key_without_policy')).toBeUndefined()
+    })
+
+    it('should round-trip a stored policy', () => {
+      storage.setKeyPolicy('key_a', policyFor('confirm-first'))
+
+      expect(storage.getKeyPolicy('key_a')).toEqual(policyFor('confirm-first'))
+    })
+
+    it('should keep policies distinct per key', () => {
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+      storage.setKeyPolicy('key_b', policyFor('allowed'))
+
+      expect(storage.getKeyPolicy('key_a')?.apps[0]?.disposition).toBe('forbidden')
+      expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('allowed')
+    })
+
+    it('should replace an existing policy for the same key', () => {
+      storage.setKeyPolicy('key_a', policyFor('allowed'))
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+      expect(storage.getKeyPolicy('key_a')?.apps[0]?.disposition).toBe('forbidden')
+      expect(storage.listKeyPolicyIds()).toEqual(['key_a'])
+    })
+
+    it('should encrypt the policy document at rest', () => {
+      storage.setKeyPolicy('key_a', policyFor('confirm-first'))
+      storage.closeDatabase()
+
+      // Read the raw column: the policy must not be readable from the file.
+      const raw = fs.readFileSync(path.join(tempDir, '.macts', 'api-keys.db'), 'utf-8')
+      expect(raw).not.toContain('confirm-first')
+    })
+
+    it('should reject an invalid policy document at write time', () => {
+      const invalid = { version: '1', defaultDisposition: 'sometimes' } as unknown
+
+      expect(() => {
+        storage.setKeyPolicy('key_a', invalid as GovernancePolicy)
+      }).toThrow(storage.KeyPolicyError)
+      expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+    })
+
+    it('should throw rather than silently drop an unreadable stored policy', () => {
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+      // Corrupt the stored blob behind the store's back. Reporting "no policy"
+      // here would widen the key back to the host policy alone.
+      const db = new Database(path.join(tempDir, '.macts', 'api-keys.db'))
+      db.prepare('UPDATE api_key_policies SET policy = ? WHERE key_id = ?').run('garbage', 'key_a')
+      db.close()
+
+      expect(() => storage.getKeyPolicy('key_a')).toThrow(storage.KeyPolicyError)
+    })
+
+    it('should delete a policy without touching the key', () => {
+      storage.addKeyMetadata(createTestMetadata('key_a'))
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+      expect(storage.deleteKeyPolicy('key_a')).toBe(true)
+      expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+      expect(storage.getKeyMetadata('key_a')).toBeDefined()
+    })
+
+    it('should report false when deleting a policy that does not exist', () => {
+      expect(storage.deleteKeyPolicy('key_missing')).toBe(false)
+    })
+
+    it('should delete a key’s policy along with the key', () => {
+      storage.addKeyMetadata(createTestMetadata('key_a'))
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+      expect(storage.deleteKeyMetadata('key_a')).toBe(true)
+      expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+      expect(storage.listKeyPolicyIds()).toEqual([])
+    })
+
+    /**
+     * Regression: replacing the key set left policy rows for the discarded keys
+     * behind. They stayed visible through getKeyPolicy()/listKeyPolicyIds(), and
+     * a later key issued with the same id silently inherited the old policy —
+     * unpredictable in both directions (an unexpected grant, or an unexplained
+     * restriction).
+     */
+    describe('replacing the key set', () => {
+      it('should remove policies belonging to discarded keys', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        // key_a is dropped from the set.
+        storage.saveKeyMetadata([createTestMetadata('key_b')])
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.listKeyPolicyIds()).toEqual(['key_b'])
+      })
+
+      it('should keep the policy of a key that survives the replacement', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        storage.saveKeyMetadata([createTestMetadata('key_b')])
+
+        expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
+      })
+
+      it('should remove every policy when the key set is cleared', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_a')])
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+
+        storage.saveKeyMetadata([])
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.listKeyPolicyIds()).toEqual([])
+      })
+
+      it('should not let a re-issued key id inherit the old key’s policy', () => {
+        storage.saveKeyMetadata([createTestMetadata('key_reused')])
+        storage.setKeyPolicy('key_reused', policyFor('forbidden'))
+
+        // The key is removed, then the same id is issued again later.
+        storage.saveKeyMetadata([])
+        storage.addKeyMetadata(createTestMetadata('key_reused'))
+
+        expect(storage.getKeyPolicy('key_reused')).toBeUndefined()
+      })
+
+      it('should leave other keys’ policies alone on a targeted delete', () => {
+        storage.addKeyMetadata(createTestMetadata('key_a'))
+        storage.addKeyMetadata(createTestMetadata('key_b'))
+        storage.setKeyPolicy('key_a', policyFor('forbidden'))
+        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
+
+        storage.deleteKeyMetadata('key_a')
+
+        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+        expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
+      })
+    })
+
+    it('should list the keys that carry a policy, most recently updated first', () => {
+      storage.setKeyPolicy('key_old', policyFor('allowed'), new Date('2024-01-15T10:00:00Z'))
+      storage.setKeyPolicy('key_new', policyFor('forbidden'), new Date('2024-02-15T10:00:00Z'))
+
+      expect(storage.listKeyPolicyIds()).toEqual(['key_new', 'key_old'])
+    })
+
+    it('should add the policy table to a database created before per-key policies', () => {
+      // Simulate an older database: the key table exists, the policy table does not.
+      storage.addKeyMetadata(createTestMetadata('key_a'))
+      storage.closeDatabase()
+
+      const dbPath = path.join(tempDir, '.macts', 'api-keys.db')
+      const db = new Database(dbPath)
+      db.exec('DROP TABLE api_key_policies')
+      db.close()
+
+      // Reopening creates it again, and existing keys are untouched.
+      expect(storage.getKeyPolicy('key_a')).toBeUndefined()
+      expect(storage.getKeyMetadata('key_a')).toBeDefined()
+      storage.setKeyPolicy('key_a', policyFor('forbidden'))
+      expect(storage.getKeyPolicy('key_a')?.apps[0]?.disposition).toBe('forbidden')
     })
   })
 })

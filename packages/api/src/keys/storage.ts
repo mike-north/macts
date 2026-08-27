@@ -4,6 +4,7 @@
  * Handles:
  * - Signing secret storage and generation (file-based)
  * - Key metadata storage for listing and revocation (SQLite)
+ * - Optional per-key governance policies, keyed by key id (SQLite)
  *
  * Uses SQLite for key metadata to provide:
  * - Atomic transactions
@@ -18,7 +19,8 @@ import * as fsSync from 'node:fs'
 import * as path from 'node:path'
 import * as crypto from 'node:crypto'
 import Database from 'better-sqlite3'
-import type { ApiKeyMetadata } from '@macts/core'
+import type { ApiKeyMetadata, GovernancePolicy } from '@macts/core'
+import { parsePolicy } from '@macts/core'
 import { getLogger } from '../logger.js'
 import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
@@ -118,6 +120,24 @@ function getDb(): Database.Database {
   // Create index for efficient revocation checks
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_api_keys_revoked ON api_keys(id, revoked)
+  `)
+
+  // Per-key governance policies, keyed by the key id (`ApiKeyPayload.sub`) and
+  // stored in the same database as the key metadata they belong to, so a key and
+  // its policy are always written, read, and deleted through one store.
+  //
+  // No `user_version` migration is needed: `CREATE TABLE IF NOT EXISTS` runs on
+  // every open, so a database created before per-key policies existed picks the
+  // table up the next time it is opened. A key's policy is removed with the key
+  // rather than left as an orphan, whether it goes through
+  // {@link deleteKeyMetadata} or through a {@link saveKeyMetadata} replacement.
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS api_key_policies (
+      key_id TEXT PRIMARY KEY,
+      policy TEXT NOT NULL,
+      updated_at INTEGER NOT NULL,
+      encrypted INTEGER NOT NULL DEFAULT 1
+    )
   `)
 
   // Run schema migrations
@@ -445,6 +465,10 @@ export function loadKeyMetadata(): ApiKeyMetadata[] {
 /**
  * Save key metadata to storage (replaces all keys).
  *
+ * Any per-key governance policy belonging to a key that is not in `keys` is
+ * removed in the same transaction, so a discarded key cannot leave a policy
+ * behind for a future key with the same id to inherit.
+ *
  * Note: This is provided for API compatibility but is less efficient than
  * individual operations. Prefer addKeyMetadata, updateKeyMetadata, etc.
  *
@@ -459,6 +483,13 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
     (id, name, permissions, original_permissions, created_at, expires_at, revoked, key_prefix, encrypted)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
   `)
+  // Run after the replacement rows are in place, so "orphan" means "not in the
+  // key set this call just established". The tables carry no foreign keys (this
+  // schema has never enabled them), so referential cleanup is explicit here, as
+  // it is in deleteKeyMetadata.
+  const dropOrphanedPolicies = database.prepare(
+    'DELETE FROM api_key_policies WHERE key_id NOT IN (SELECT id FROM api_keys)'
+  )
 
   const replaceAll = database.transaction((keysToSave: ApiKeyMetadata[]) => {
     deleteAll.run()
@@ -479,6 +510,11 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
         encrypted.keyPrefix
       )
     }
+    // Replacing the key set discards keys; their policies go with them, in the
+    // same transaction. Left behind, a policy would stay visible through
+    // getKeyPolicy()/listKeyPolicyIds() and would be silently inherited by any
+    // later key issued with the same id.
+    dropOrphanedPolicies.run()
   })
 
   replaceAll(keys)
@@ -641,7 +677,13 @@ export function revokeKey(keyId: string): boolean {
  */
 export function deleteKeyMetadata(keyId: string): boolean {
   const database = getDb()
-  const result = database.prepare('DELETE FROM api_keys WHERE id = ?').run(keyId)
+  const deleteBoth = database.transaction((id: string) => {
+    // A key's policy is part of the key; deleting one without the other would
+    // leave a governance document with nothing to govern.
+    database.prepare('DELETE FROM api_key_policies WHERE key_id = ?').run(id)
+    return database.prepare('DELETE FROM api_keys WHERE id = ?').run(id)
+  })
+  const result = deleteBoth(keyId)
   return result.changes > 0
 }
 
@@ -660,6 +702,149 @@ export function isKeyRevoked(keyId: string): boolean {
     | undefined
 
   return row?.revoked === 1
+}
+
+// =============================================================================
+// Per-Key Governance Policy Storage (SQLite)
+// =============================================================================
+
+/**
+ * Database row type for a per-key governance policy.
+ */
+interface KeyPolicyRow {
+  key_id: string
+  policy: string // JSON document, encrypted when `encrypted` is 1
+  updated_at: number // Unix timestamp in milliseconds
+  encrypted: number // 0 or 1
+}
+
+/**
+ * Thrown when a stored per-key policy cannot be read back as a valid policy
+ * document.
+ *
+ * Surfaced rather than swallowed: silently dropping an unreadable key policy
+ * would fall back to the host policy alone, which is *wider* than what the
+ * operator declared for that key. A key policy that cannot be read is a hard
+ * error, and callers fail the request closed.
+ */
+export class KeyPolicyError extends Error {
+  constructor(
+    /** The key id whose policy could not be read. */
+    public readonly keyId: string,
+    message: string
+  ) {
+    super(`Invalid stored governance policy for API key "${keyId}": ${message}`)
+    this.name = 'KeyPolicyError'
+  }
+}
+
+/**
+ * Store (or replace) the governance policy attached to an API key.
+ *
+ * The policy is validated before it is written, so an invalid document can
+ * never reach the database, and is encrypted at rest with the same derived key
+ * as the rest of the key metadata.
+ *
+ * @param keyId - The key id (`ApiKeyPayload.sub`) the policy belongs to.
+ * @param policy - The governance policy document to attach.
+ * @param updatedAt - When the policy was set. Injected so callers (and tests)
+ *   control the clock; defaults to now.
+ * @throws {@link KeyPolicyError} when `policy` is not a valid policy document.
+ */
+export function setKeyPolicy(
+  keyId: string,
+  policy: GovernancePolicy,
+  updatedAt: Date = new Date()
+): void {
+  const validated = parsePolicy(policy)
+  if (!validated.success) {
+    const summary = validated.issues.map((i) => `${i.path}: ${i.message}`).join('; ')
+    throw new KeyPolicyError(keyId, summary)
+  }
+
+  const database = getDb()
+  const encrypted = encrypt(JSON.stringify(validated.data), getEncryptionKey())
+
+  database
+    .prepare(
+      `INSERT INTO api_key_policies (key_id, policy, updated_at, encrypted)
+       VALUES (?, ?, ?, 1)
+       ON CONFLICT(key_id) DO UPDATE SET policy = excluded.policy, updated_at = excluded.updated_at, encrypted = 1`
+    )
+    .run(keyId, encrypted, updatedAt.getTime())
+}
+
+/**
+ * Read the governance policy attached to an API key.
+ *
+ * @param keyId - The key id (`ApiKeyPayload.sub`) to look up.
+ * @returns The stored policy, or `undefined` when the key has none (the common
+ *   case — a per-key policy is opt-in, and its absence means the host policy
+ *   alone governs).
+ * @throws {@link KeyPolicyError} when a policy is stored but cannot be
+ *   decrypted, parsed, or validated.
+ */
+export function getKeyPolicy(keyId: string): GovernancePolicy | undefined {
+  const database = getDb()
+  const row = database.prepare('SELECT * FROM api_key_policies WHERE key_id = ?').get(keyId) as
+    | KeyPolicyRow
+    | undefined
+
+  if (!row) {
+    return undefined
+  }
+
+  let document: string
+  try {
+    document = row.encrypted === 1 ? decrypt(row.policy, getEncryptionKey()) : row.policy
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new KeyPolicyError(keyId, `could not be decrypted: ${message}`)
+  }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(document) as unknown
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new KeyPolicyError(keyId, `not valid JSON: ${message}`)
+  }
+
+  const result = parsePolicy(parsed)
+  if (!result.success) {
+    throw new KeyPolicyError(keyId, result.issues.map((i) => `${i.path}: ${i.message}`).join('; '))
+  }
+  return result.data
+}
+
+/**
+ * Remove the governance policy attached to an API key.
+ *
+ * The key itself is untouched; it simply falls back to the host policy alone.
+ *
+ * @param keyId - The key id (`ApiKeyPayload.sub`) whose policy to remove.
+ * @returns True when a policy was found and removed.
+ */
+export function deleteKeyPolicy(keyId: string): boolean {
+  const database = getDb()
+  const result = database.prepare('DELETE FROM api_key_policies WHERE key_id = ?').run(keyId)
+  return result.changes > 0
+}
+
+/**
+ * List the key ids that currently carry their own governance policy.
+ *
+ * Reads only the ids, so it never has to decrypt policy documents — enough for
+ * management surfaces to show which keys are individually governed.
+ *
+ * @returns Key ids with a stored policy, most recently updated first.
+ */
+export function listKeyPolicyIds(): string[] {
+  const database = getDb()
+  const rows = database
+    .prepare('SELECT key_id FROM api_key_policies ORDER BY updated_at DESC')
+    .all() as { key_id: string }[]
+  return rows.map((row) => row.key_id)
 }
 
 /**

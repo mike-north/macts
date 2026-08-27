@@ -26,6 +26,10 @@
  *    `confirm-first` hold, plus the fail-closed gate that bounds the wait.
  *    Which provider is used is declared separately
  *    ({@link ./approval-config.js}).
+ * 7. Layered *composition* ({@link ./composition.js}) — combines the machine-wide
+ *    host policy with an optional per-API-key policy, taking the stricter
+ *    decision so a key policy can only ever tighten, and reporting which layer
+ *    governed — which is the layer an approval hold routes on.
  *
  * Approval-gate wiring and discovery filtering (issue #55) consume the
  * evaluator rather than re-implementing the decision. The discovery-time
@@ -98,6 +102,26 @@ export {
   type PolicyEvaluation,
   evaluatePolicy,
 } from './evaluator.js'
+
+// Layered composition: host policy × per-API-key policy (key may only tighten).
+export {
+  POLICY_LAYERS,
+  type PolicyLayer,
+  POLICY_DECISIONS_BY_STRICTNESS,
+  comparePolicyDecisionStrictness,
+  strictestPolicyDecision,
+  POLICY_DISPOSITIONS_BY_STRICTNESS,
+  compareDispositionStrictness,
+  type ComposedRestrictions,
+  composeRestrictions,
+  type RestrictionPatternMatcher,
+  type RestrictionKind,
+  composedRestrictionsPermit,
+  type LayeredPolicyEvaluation,
+  composePolicyEvaluations,
+  type EvaluateLayeredPolicyOptions,
+  evaluateLayeredPolicy,
+} from './composition.js'
 
 // Compile a policy to the concrete permissions it grants.
 export {

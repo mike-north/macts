@@ -47,6 +47,7 @@ import { PermissionCheckResult } from '@macts/core';
 import { PermissionHistoryEntry } from '@macts/core';
 import { PermissionsSection } from '@macts/core';
 import pino from 'pino';
+import { PolicyLayer } from '@macts/core';
 import { quitApp } from '@macts/core';
 import { Resource } from '@macts/core';
 import { RiskClass } from '@macts/core';
@@ -191,6 +192,16 @@ export function createFullAccessKey(appName: string, name: string, expires?: Dat
 export function createInFlightTracker(): InFlightTracker;
 
 // @public
+export function createKeyPolicyResolver(options: CreateKeyPolicyResolverOptions): KeyPolicyResolver;
+
+// @public
+export interface CreateKeyPolicyResolverOptions {
+    readonly cacheTtlMs?: number;
+    readonly load: KeyPolicyLoader;
+    readonly now?: () => number;
+}
+
+// @public
 export function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 // @public
@@ -212,6 +223,9 @@ export function createRpcRouter(manifest: AppManifest, governance?: GovernanceCo
 // @public
 export function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
 
+// @public
+export function createStoredKeyPolicyResolver(options?: Omit<CreateKeyPolicyResolverOptions, 'load'>): KeyPolicyResolver;
+
 export { dateCoercer }
 
 // @public
@@ -221,10 +235,16 @@ export function decrypt(ciphertext: string, key: Buffer): string;
 export const DEFAULT_HOST = "localhost";
 
 // @public
+export const DEFAULT_KEY_POLICY_CACHE_TTL_MS = 5000;
+
+// @public
 export const DEFAULT_PORT = 8372;
 
 // @public
 export function deleteKeyMetadata(keyId: string): boolean;
+
+// @public
+export function deleteKeyPolicy(keyId: string): boolean;
 
 // @public
 export function deriveEncryptionKey(signingSecret: string): Buffer;
@@ -259,6 +279,9 @@ export function getApprovalConfigPath(): string;
 export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
 
 // @public
+export function getKeyPolicy(keyId: string): GovernancePolicy | undefined;
+
+// @public
 export function getLogger(): pino.Logger;
 
 // @public
@@ -282,16 +305,20 @@ export interface GovernanceApprovalDeniedResponse {
 export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals;
 
 // @public
-export interface GovernanceContextWithApprovals {
-    readonly approvals: ApprovalGateContext;
+export interface GovernanceContextBase {
+    readonly keyPolicies?: KeyPolicyResolver | undefined;
     readonly policy: GovernancePolicy;
+}
+
+// @public
+export interface GovernanceContextWithApprovals extends GovernanceContextBase {
+    readonly approvals: ApprovalGateContext;
     readonly writer: AuditWriter;
 }
 
 // @public
-export interface GovernanceContextWithoutApprovals {
+export interface GovernanceContextWithoutApprovals extends GovernanceContextBase {
     readonly approvals?: undefined;
-    readonly policy: GovernancePolicy;
     readonly writer?: AuditWriter | undefined;
 }
 
@@ -311,6 +338,7 @@ export interface GovernancePendingResponse {
     pendingApproval: {
         message: string;
         permission: string;
+        layer: PolicyLayer;
     };
 }
 
@@ -339,10 +367,29 @@ export { JxaExecutionError }
 export { JxaExecutorOptions }
 
 // @public
+export class KeyPolicyError extends Error {
+    constructor(
+    keyId: string, message: string);
+    readonly keyId: string;
+}
+
+// @public
+export type KeyPolicyLoader = (apiKeyId: string) => GovernancePolicy | undefined | Promise<GovernancePolicy | undefined>;
+
+// @public
+export interface KeyPolicyResolver {
+    invalidate(apiKeyId?: string): void;
+    resolve(apiKeyId: string): Promise<GovernancePolicy | undefined>;
+}
+
+// @public
 export interface ListApiKeysOptions {
     includeRevoked?: boolean;
     namePattern?: string;
 }
+
+// @public
+export function listKeyPolicyIds(): string[];
 
 // @public
 export function loadActivePolicy(options?: LoadActivePolicyOptions): Promise<GovernancePolicy>;
@@ -438,6 +485,14 @@ export interface RequirePolicyOptions {
 }
 
 // @public
+export type ResolvedGovernanceContext = GovernanceContext & {
+    readonly keyPolicy?: GovernancePolicy | undefined;
+};
+
+// @public
+export function resolveGovernanceForRequest(governance: GovernanceContext, apiKeyId: string): Promise<ResolvedGovernanceContext>;
+
+// @public
 export function revokeKey(keyId: string): boolean;
 
 // @public
@@ -520,6 +575,9 @@ export interface ServerOptions {
     rateLimit?: RateLimitOptions | false;
     tls?: TlsOptions;
 }
+
+// @public
+export function setKeyPolicy(keyId: string, policy: GovernancePolicy, updatedAt?: Date): void;
 
 // @public
 export function setLogger(newLogger: pino.Logger): void;

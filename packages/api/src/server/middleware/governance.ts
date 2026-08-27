@@ -48,6 +48,14 @@
  * {@link GovernanceContext} supplied when the router is built, so a server with
  * no policy configured defaults to allow-all and existing behavior is preserved.
  *
+ * That host policy is machine-wide, but an API key may carry a policy of its own
+ * that only ever *tightens* it. Which key policy applies depends on who
+ * authenticated, so it is resolved **per request** from `apiKeyPayload.sub` via
+ * {@link resolveGovernanceForRequest} and composed with the host policy inside
+ * `enforceCall`: the effective decision is the stricter of the two, and a key
+ * policy can never grant what the host policy withholds. A key with no policy of
+ * its own is governed by the host policy alone, unchanged.
+ *
  * @packageDocumentation
  */
 
@@ -59,6 +67,7 @@ import type {
   ApprovalProvider,
   ApprovalRequest,
   AuditWriter,
+  PolicyLayer,
   RiskClass,
 } from '@macts/core'
 import {
@@ -70,6 +79,7 @@ import {
 } from '@macts/core'
 import { getTracer, SpanStatusCode } from '../../telemetry.js'
 import { getLogger } from '../../logger.js'
+import type { KeyPolicyResolver } from '../governance/key-policy.js'
 import type { AuthVariables } from './auth.js'
 
 /**
@@ -105,6 +115,15 @@ export interface GovernancePendingResponse {
     message: string
     /** The `app:resource:operation` awaiting approval (and withheld). */
     permission: string
+    /**
+     * Which policy layer held the call: the machine-wide `host` policy, or the
+     * narrower policy attached to the authenticated API `key`.
+     *
+     * A host-layer hold and a key-layer hold are different questions and may
+     * belong to different approvers, so the layer travels with the hold rather
+     * than being re-derived downstream.
+     */
+    layer: PolicyLayer
   }
 }
 
@@ -156,6 +175,31 @@ export interface ApprovalGateContext {
 }
 
 /**
+ * Governance state shared by every deployment, whichever approval channel it
+ * does or does not have.
+ *
+ * Both arms of {@link GovernanceContext} extend this, so the machine-wide policy
+ * and the per-key resolver are declared once and the two arms cannot drift.
+ */
+export interface GovernanceContextBase {
+  /** The active machine-wide (host) governance policy to enforce against every call. */
+  readonly policy: GovernancePolicy
+  /**
+   * Optional resolver for the policy attached to the authenticated API key.
+   *
+   * The host policy is machine-wide and can be bound once; *which* key policy
+   * applies depends on who authenticated, so it is resolved per request from
+   * `apiKeyPayload.sub` (see {@link resolveGovernanceForRequest}). When omitted,
+   * or when the key has no policy of its own, the host policy alone governs —
+   * exactly the behavior before per-key policies existed.
+   *
+   * A key policy can only ever tighten the host policy, so this never widens
+   * what a deployment allows — including which calls reach an approval gate.
+   */
+  readonly keyPolicies?: KeyPolicyResolver | undefined
+}
+
+/**
  * Governance state for a deployment with **no** approval channel configured.
  *
  * `confirm-first` calls are withheld and reported as
@@ -163,9 +207,7 @@ export interface ApprovalGateContext {
  * as it has always been: enforcement still runs without one, it just persists
  * nothing.
  */
-export interface GovernanceContextWithoutApprovals {
-  /** The active governance policy to enforce against every call. */
-  readonly policy: GovernancePolicy
+export interface GovernanceContextWithoutApprovals extends GovernanceContextBase {
   /**
    * Optional audit sink. When provided, every decision (allow / deny / pending)
    * is appended to it.
@@ -183,9 +225,7 @@ export interface GovernanceContextWithoutApprovals {
  * execute with no attributable trace of who permitted it — so that combination
  * is made unrepresentable rather than merely discouraged.
  */
-export interface GovernanceContextWithApprovals {
-  /** The active governance policy to enforce against every call. */
-  readonly policy: GovernancePolicy
+export interface GovernanceContextWithApprovals extends GovernanceContextBase {
   /**
    * Audit sink for every decision (allow / deny / pending / approved /
    * rejected). Required whenever an approval gate is present.
@@ -203,6 +243,54 @@ export interface GovernanceContextWithApprovals {
  * middleware is a near-no-op — preserving pre-governance behavior.
  */
 export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals
+
+/**
+ * A {@link GovernanceContext} with the authenticated key's policy resolved for
+ * this request.
+ *
+ * Distributes over the union, so the approvals arm survives resolution: a
+ * resolved context that came in with an approval gate still carries it (and its
+ * required writer) on the way out.
+ */
+export type ResolvedGovernanceContext = GovernanceContext & {
+  /**
+   * The authenticated key's own policy, or `undefined` when it has none. Never
+   * a permissive placeholder: absence means "host policy alone".
+   */
+  readonly keyPolicy?: GovernancePolicy | undefined
+}
+
+/**
+ * Resolve the governance context for a single request from the authenticated
+ * API key.
+ *
+ * This is the per-request half of governance resolution. It exists as a named,
+ * exported seam (rather than inline middleware code) because "which policy
+ * applies to this caller" is a question other surfaces need to answer the same
+ * way.
+ *
+ * The whole context is carried through, not just the policy, so an approval gate
+ * configured on the router reaches the request untouched.
+ *
+ * A resolver failure propagates to the caller, which must fail the request
+ * closed: an unreadable key policy is *not* the same as no key policy, and
+ * treating it as such would silently widen the boundary back to the host policy.
+ *
+ * @param governance - The router-bound governance context (host policy, writer,
+ *   optional approval gate, optional key-policy resolver).
+ * @param apiKeyId - The authenticated key's id (`ApiKeyPayload.sub`).
+ * @returns The context with `keyPolicy` resolved for this request.
+ */
+export async function resolveGovernanceForRequest(
+  governance: GovernanceContext,
+  apiKeyId: string
+): Promise<ResolvedGovernanceContext> {
+  if (governance.keyPolicies === undefined) {
+    return governance
+  }
+  const keyPolicy = await governance.keyPolicies.resolve(apiKeyId)
+  return { ...governance, keyPolicy }
+}
 
 /**
  * Options for {@link requirePolicy}.
@@ -273,10 +361,37 @@ export function requirePolicy(
       attributes: { 'governance.permission': permission, 'governance.risk': risk },
     })
 
+    // Which policy applies depends on who authenticated, so it is resolved here,
+    // per request, rather than bound when the router was built.
+    let resolved
+    try {
+      resolved = await resolveGovernanceForRequest(governance, apiKeyId)
+    } catch (error) {
+      // Fail closed. A key policy we cannot read must never degrade into "this
+      // key has no policy", which would widen the boundary back to the host
+      // policy alone.
+      span.setStatus({ code: SpanStatusCode.ERROR })
+      span.end()
+      getLogger().error(
+        { err: error, permission, apiKeyId },
+        'Could not resolve the per-key governance policy'
+      )
+      return c.json(
+        {
+          error: {
+            code: 'INTERNAL_ERROR',
+            message: 'Governance enforcement failed',
+          },
+        },
+        500
+      )
+    }
+
     let decision
     try {
       decision = await enforceCall({
-        policy: governance.policy,
+        policy: resolved.policy,
+        ...(resolved.keyPolicy === undefined ? {} : { keyPolicy: resolved.keyPolicy }),
         permission,
         risk,
         audit: {
@@ -285,7 +400,7 @@ export function requirePolicy(
           timestamp: new Date(),
           approvalId,
         },
-        ...(governance.writer ? { writer: governance.writer } : {}),
+        ...(resolved.writer ? { writer: resolved.writer } : {}),
       })
     } catch (error) {
       // An audit-writer failure must not silently allow the call through. Treat a
@@ -305,6 +420,7 @@ export function requirePolicy(
     }
 
     span.setAttribute('governance.outcome', decision.outcome)
+    span.setAttribute('governance.layer', decision.evaluation.layer)
     span.setStatus({
       code: decision.outcome === 'denied' ? SpanStatusCode.ERROR : SpanStatusCode.OK,
     })
@@ -335,6 +451,9 @@ export function requirePolicy(
             pendingApproval: {
               message: decision.reason,
               permission,
+              // Names the layer whose rule held the call, so an operator (or a
+              // client retrying later) knows which policy to look at.
+              layer: decision.evaluation.layer,
             },
           },
           202
@@ -367,8 +486,10 @@ export function requirePolicy(
         reason: decision.reason,
         timeoutMs: gate.timeoutMs ?? DEFAULT_APPROVAL_TIMEOUT_MS,
         requestedAt: new Date(),
-        // Only a host-layer policy holds calls today; see ApprovalRequest.layer.
-        layer: 'host',
+        // The layer whose rule held this call — host-wide policy, or the policy
+        // attached to this specific key. A provider that declares
+        // `supportsDistinctRouting` can route the two to different approvers.
+        layer: decision.evaluation.layer,
       }
 
       // seekApproval never rejects and never returns `approved` for a hang, a
@@ -378,6 +499,7 @@ export function requirePolicy(
 
       approvalSpan.setAttribute('governance.approval.state', outcome.state)
       approvalSpan.setAttribute('governance.approval.id', request.id)
+      approvalSpan.setAttribute('governance.approval.layer', request.layer)
       approvalSpan.setStatus({
         code: outcome.approved ? SpanStatusCode.OK : SpanStatusCode.ERROR,
       })
@@ -418,6 +540,7 @@ export function requirePolicy(
             permission,
             approvalId,
             provider: gate.provider.name,
+            layer: request.layer,
             hasEvidence: outcome.evidence !== undefined,
           },
           'Capability call approved by a human'
@@ -430,6 +553,7 @@ export function requirePolicy(
           permission,
           approvalId,
           provider: gate.provider.name,
+          layer: request.layer,
           approvalState: outcome.state,
           ...(outcome.failure === undefined ? {} : { approvalFailure: outcome.failure }),
           // The full detail (including any third-party exception text) belongs

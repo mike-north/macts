@@ -96,4 +96,9 @@ export {
   deleteKeyMetadata,
   isKeyRevoked,
   generateKeyId,
+  setKeyPolicy,
+  getKeyPolicy,
+  deleteKeyPolicy,
+  listKeyPolicyIds,
+  KeyPolicyError,
 } from './storage.js'

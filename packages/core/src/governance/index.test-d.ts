@@ -25,6 +25,13 @@ import {
   operationPatternMatches,
   findMatchingPolicyRule,
   evaluatePolicy,
+  evaluateLayeredPolicy,
+  composePolicyEvaluations,
+  composeRestrictions,
+  composedRestrictionsPermit,
+  comparePolicyDecisionStrictness,
+  strictestPolicyDecision,
+  compareDispositionStrictness,
   enforceCall,
   compilePolicyToPermissions,
   policyGrantsPermission,
@@ -47,6 +54,9 @@ import {
   type MatchedPolicyRule,
   type EnforcementOutcome,
   type EnforcementDecision,
+  type PolicyLayer,
+  type LayeredPolicyEvaluation,
+  type ComposedRestrictions,
   type PolicyCandidate,
   seekApproval,
   createStaticApprovalProvider,
@@ -269,7 +279,57 @@ expectType<Promise<EnforcementDecision>>(
 declare const enforcement: EnforcementDecision
 expectType<EnforcementOutcome>(enforcement.outcome)
 expectType<string>(enforcement.reason)
-expectType<PolicyEvaluation>(enforcement.evaluation)
+// The enforcement decision carries the layered evaluation, which is itself a
+// PolicyEvaluation — so existing consumers keep working and gain layer provenance.
+expectType<LayeredPolicyEvaluation>(enforcement.evaluation)
+expectAssignable<PolicyEvaluation>(enforcement.evaluation)
+
+// =============================================================================
+// Layered composition — host policy x per-key policy
+// =============================================================================
+
+expectAssignable<PolicyLayer>('host')
+expectAssignable<PolicyLayer>('key')
+expectNotAssignable<PolicyLayer>('device')
+
+declare const layered: LayeredPolicyEvaluation
+expectType<PolicyLayer>(layered.layer)
+expectType<PolicyEvaluation>(layered.host)
+expectType<PolicyEvaluation | undefined>(layered.key)
+expectType<ComposedRestrictions>(layered.restrictions)
+// A layered evaluation is usable anywhere a plain evaluation is expected.
+expectAssignable<PolicyEvaluation>(layered)
+
+expectType<LayeredPolicyEvaluation>(
+  evaluateLayeredPolicy({
+    hostPolicy: policy,
+    keyPolicy: policy,
+    permission: 'calendar:events:create',
+    risk: 'write',
+  })
+)
+// The key policy is optional: host-only evaluation is a valid call.
+expectType<LayeredPolicyEvaluation>(
+  evaluateLayeredPolicy({ hostPolicy: policy, permission: 'calendar:events:create', risk: 'write' })
+)
+expectType<LayeredPolicyEvaluation>(composePolicyEvaluations(evaluated, undefined))
+
+expectType<number>(comparePolicyDecisionStrictness('allowed', 'denied'))
+expectType<PolicyDecision>(strictestPolicyDecision('allowed', 'denied'))
+expectType<number>(compareDispositionStrictness('allowed', 'forbidden'))
+// The decision comparator takes decisions, not declared dispositions.
+expectNotAssignable<Parameters<typeof comparePolicyDecisionStrictness>[0]>('read-only')
+
+declare const composedRestrictions: ComposedRestrictions
+expectType<readonly string[]>(composedRestrictions.pathsDeny)
+expectType<readonly (readonly string[])[]>(composedRestrictions.pathsAllowGroups)
+expectType<ComposedRestrictions>(composeRestrictions(undefined, undefined))
+expectType<boolean>(
+  composedRestrictionsPermit(composedRestrictions, 'path', '/tmp/x', (pattern, candidate) =>
+    candidate.startsWith(pattern)
+  )
+)
+expectNotAssignable<Parameters<typeof composedRestrictionsPermit>[1]>('domain')
 
 // =============================================================================
 // compilePolicyToPermissions / policyGrantsPermission — signatures

@@ -78,6 +78,7 @@
 
 import type { RiskClass } from '../capabilities/risk.js'
 import type { MatchedPolicyRule } from './evaluator.js'
+import { POLICY_LAYERS, type PolicyLayer } from './composition.js'
 import { POLICY_DISPOSITIONS, type PolicyDisposition } from './policy.js'
 
 // ---------------------------------------------------------------------------
@@ -145,20 +146,21 @@ export type ApprovalFailure = (typeof APPROVAL_FAILURES)[number]
  * Which policy layer held the call and is asking for approval.
  *
  * - `host` — the machine-wide governance policy held the call.
- * - `key`  — a narrower per-API-key policy held it.
+ * - `key`  — the narrower policy attached to the API key that made the call.
  *
- * **Reserved:** macts composes only a host-layer policy today, so every request
- * carries `'host'`. The value exists now so that providers declaring
- * {@link ApprovalProviderCapabilities.supportsDistinctRouting} have a stable
- * field to route on once a per-key layer exists, without a breaking change to
- * the request shape.
+ * Kept in step with {@link POLICY_LAYERS} — the layer a request carries is the
+ * one the policy evaluation reported, not a separate approval-side notion. A
+ * provider declaring
+ * {@link ApprovalProviderCapabilities.supportsDistinctRouting} routes on it.
  */
-export const APPROVAL_LAYERS = ['host', 'key'] as const
+export const APPROVAL_LAYERS = POLICY_LAYERS
 
 /**
- * A single approval-layer value. See {@link APPROVAL_LAYERS}.
+ * A single approval-layer value — an alias of {@link PolicyLayer}, so the two
+ * seams cannot drift into two spellings of the same idea.
+ * See {@link APPROVAL_LAYERS}.
  */
-export type ApprovalLayer = (typeof APPROVAL_LAYERS)[number]
+export type ApprovalLayer = PolicyLayer
 
 // ---------------------------------------------------------------------------
 // Request
@@ -223,8 +225,8 @@ export interface ApprovalRequest {
    */
   readonly requestedAt: Date
   /**
-   * Which policy layer held the call. Always `'host'` today — see
-   * {@link APPROVAL_LAYERS}.
+   * Which policy layer held the call — the machine-wide host policy, or the
+   * policy attached to this specific API key. See {@link APPROVAL_LAYERS}.
    */
   readonly layer: ApprovalLayer
 }
@@ -296,8 +298,9 @@ export interface ApprovalProviderCapabilities {
   readonly supportsPolicySuggestions: boolean
   /**
    * The provider can route host-layer and key-layer holds to different
-   * accounts/approvers (see {@link ApprovalRequest.layer}). Reserved: macts
-   * sends only host-layer requests today.
+   * accounts/approvers (see {@link ApprovalRequest.layer}). Both layers are
+   * live: a per-API-key policy can hold a call the host policy would have let
+   * through, and such a hold is a question about that one credential.
    */
   readonly supportsDistinctRouting: boolean
 }

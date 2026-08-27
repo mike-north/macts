@@ -19,7 +19,10 @@ export {
 
 export {
   requirePolicy,
+  resolveGovernanceForRequest,
   type GovernanceContext,
+  type ResolvedGovernanceContext,
+  type GovernanceContextBase,
   type GovernanceContextWithApprovals,
   type GovernanceContextWithoutApprovals,
   type ApprovalGateContext,

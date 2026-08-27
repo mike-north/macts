@@ -37,7 +37,10 @@ export {
 } from './middleware/permission.js'
 export {
   requirePolicy,
+  resolveGovernanceForRequest,
   type GovernanceContext,
+  type ResolvedGovernanceContext,
+  type GovernanceContextBase,
   type GovernanceContextWithApprovals,
   type GovernanceContextWithoutApprovals,
   type ApprovalGateContext,
@@ -63,6 +66,14 @@ export {
   type LoadApprovalGateOptions,
   type LoadedApprovalGate,
 } from './governance/approval-provider.js'
+export {
+  createKeyPolicyResolver,
+  createStoredKeyPolicyResolver,
+  DEFAULT_KEY_POLICY_CACHE_TTL_MS,
+  type KeyPolicyResolver,
+  type KeyPolicyLoader,
+  type CreateKeyPolicyResolverOptions,
+} from './governance/key-policy.js'
 export {
   createRpcRouter,
   createMultiAppRpcRouter,
@@ -113,6 +124,11 @@ export interface ServerOptions {
    * {@link loadActivePolicy}, {@link loadApprovalGate}, and
    * `createFileAuditWriter`) to enforce a real policy, seek human approval for
    * `confirm-first` calls, and record an audit trail.
+   *
+   * To also honor the policy attached to an individual API key — which can only
+   * ever tighten the host policy for that key — set the context's `keyPolicies`
+   * to {@link createStoredKeyPolicyResolver}. Keys with no policy of their own
+   * are unaffected.
    */
   governance?: GovernanceContext
 }
