@@ -18,10 +18,12 @@ formats.
 
 ## Problem Statement
 
-A single manifest command (say, `Event.status`, typed `{ enum: EventStatus }`
-in `manifests/calendar/app.yaml:131-134`) currently flows through three
-independent hand-written switch statements, each of which maps manifest
-`PropertyType` to a different target format:
+A single manifest property (say, `Event.status`, declared in
+`manifests/calendar/app.yaml:131-134` as `type: { enum: EventStatus }`, which
+parses into the `PropertyType` value `{ enum: 'EventStatus' }` — an enum
+reference carried as a string) currently flows through three independent
+hand-written switch statements, each of which maps manifest `PropertyType` to a
+different target format:
 
 1. **Zod** — `propertyTypeToZod()` in
    `packages/core/src/generator/sdk/http-client.ts:369-419`. Emits the
@@ -98,9 +100,12 @@ between three files.
 
 There is no shared function anywhere in the codebase that goes "manifest
 `PropertyType` → single canonical representation." Instead there are at
-least four independent switch statements over the same six-case union
-(`string | number/integer | boolean | date | array | enum | resource`), each
-extended or fixed in isolation. Adding a manifest feature (say, a `pattern`
+least four independent switch statements over the same `PropertyType` union —
+`PrimitiveType | { array: PropertyType } | { resource: string } | { enum: string }`
+(`packages/core/src/manifest/schemas/property.ts:29-49`), where `PrimitiveType`
+itself spans eleven members: `string`, `number`, `integer`, `boolean`, `date`,
+`data`, `any`, `file`, `point`, `rect`, `rgb` — each extended or fixed in
+isolation. Adding a manifest feature (say, a `pattern`
 or `min`/`max` constraint) would require updating all of them by hand, with
 no compiler or test forcing the others to follow.
 
@@ -391,8 +396,7 @@ sequence of ordinary PRs rather than one large cutover.
 3. **Switch MCP `inputSchema` generation to derive from the new builder.**
    Replace `generateResourceOperationSchema()` / `generateAppCommandSchema()`
    call sites in `packages/core/src/generator/mcp/tools.ts` with
-   "build zod schema (step 2), then `z.toJSONSchema(schema, { target:
-'draft-7' })`, embed the result" (Decision 1). Regenerate; diff every
+   "build zod schema (step 2), then `z.toJSONSchema(schema, { target: 'draft-7' })`, embed the result" (Decision 1). Regenerate; diff every
    `packages/<app>-server/src/mcp/tools/*.ts` file and confirm the emitted
    JSON Schema is unchanged except where step 1 fixed a real gap (enum
    constraints now present). This is the step that touches all ~35
@@ -589,9 +593,9 @@ packages/api/src/server/handlers/
 - [ ] A per-command zod schema builder exists and is covered by shape-level
       tests (not snapshot tests) for every `PropertyType` variant
 - [ ] Every generated `packages/<app>-server/src/mcp/tools/*.ts` file's
-      `inputSchema` is produced by `z.toJSONSchema(schema, { target:
-'draft-7' })` against the command's zod schema, with no hand-built
-      JSON Schema object remaining in the generator
+      `inputSchema` is produced by `z.toJSONSchema(schema, { target: 'draft-7' })`
+      against the command's zod schema, with no hand-built JSON Schema object
+      remaining in the generator
 - [ ] Every generated CLI enum flag's `validator` is produced by the zod →
       typanion adapter, and a clipanion end-to-end test proves rejected
       values still produce a message naming the allowed values

@@ -38,6 +38,9 @@ Phase 0: Foundation
     │                               ├─► Phase 6: CLI
     │                               │
     │                               ├─► Phase 7: MCP
+    │                               │       │
+    │                               │       └─► Phase 12: Zod Schema Source of Truth
+    │                               │               (also depends on 1, 4, 6)
     │                               │
     │                               └─► Phase 8: HTTP API
     │                                       │
