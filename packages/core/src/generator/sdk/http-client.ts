@@ -1199,7 +1199,7 @@ function generatePackageJson(options: HttpClientGeneratorOptions, appName: strin
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
-      zod: '^4.3.6',
+      zod: 'catalog:',
     },
     devDependencies: {
       tsup: 'catalog:',

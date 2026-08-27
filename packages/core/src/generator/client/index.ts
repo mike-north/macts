@@ -231,12 +231,12 @@ function generatePackageJson(
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
-      zod: '^4.3.6',
+      zod: 'catalog:',
     },
     peerDependencies: {
       '@macts/cli': '*',
-      clipanion: '^4.0.0-rc.4',
-      typanion: '^3.14.0',
+      clipanion: 'catalog:',
+      typanion: 'catalog:',
     },
     peerDependenciesMeta: {
       '@macts/cli': { optional: true },
@@ -245,9 +245,9 @@ function generatePackageJson(
     },
     devDependencies: {
       '@macts/cli': 'workspace:*',
-      clipanion: '^4.0.0-rc.4',
+      clipanion: 'catalog:',
       tsup: 'catalog:',
-      typanion: '^3.14.0',
+      typanion: 'catalog:',
       typescript: 'catalog:',
       vitest: 'catalog:',
     },

@@ -1,9 +1,21 @@
 /**
  * Telemetry instrumentation for the macts API.
  *
- * Provides OpenTelemetry-compatible tracing interfaces. Without an OTel SDK
- * installed, all operations are no-ops. When `@opentelemetry/api` becomes
- * available, swap the internal implementations to use the real API.
+ * Exposes OpenTelemetry-shaped tracing interfaces ({@link Tracer}, {@link Span},
+ * {@link SpanStatusCode}), but no tracing actually happens: no OpenTelemetry
+ * package is required, read, or integrated with, and spans discard everything
+ * recorded on them. What that means differs per export:
+ *
+ * - {@link configureTelemetry} does nothing at all.
+ * - {@link getTracer} returns a tracer whose spans accept every call and
+ *   retain none of it.
+ * - {@link withSpan} is **not** a no-op. It invokes the callback, awaits and
+ *   returns its result, rethrows if it throws, and always ends the span — only
+ *   the span's recording is inert. Real code can be wrapped in it today and
+ *   will behave exactly as it does uninstrumented.
+ *
+ * This module exists so callers can code against the eventual tracing API
+ * shape ahead of time.
  *
  * @packageDocumentation
  */
@@ -84,8 +96,8 @@ const noopTracer = new NoopTracer()
 /**
  * Get a tracer instance.
  *
- * Returns a no-op tracer by default. When an OpenTelemetry SDK is configured
- * via {@link configureTelemetry}, returns an instrumented tracer.
+ * Always returns a no-op tracer. Tracing is not yet implemented, and calling
+ * {@link configureTelemetry} does not change this.
  *
  * @param _name - Tracer name (used as instrumentation scope name)
  * @returns A tracer instance
@@ -173,27 +185,15 @@ export interface TelemetryOptions {
 /**
  * Configure OpenTelemetry tracing.
  *
- * This is a placeholder for future integration with `@opentelemetry/sdk-node`.
- * When the SDK packages are available, this function will initialize the
- * trace provider and configure the OTLP exporter.
+ * This is currently a no-op stub. Tracing is not yet implemented: calling
+ * this function has no effect, does not install or require any
+ * `@opentelemetry/*` package, and does not change what {@link getTracer}
+ * returns. It exists only to reserve the public API shape for a future
+ * tracing implementation.
  *
- * Currently a no-op that logs a message indicating telemetry is not configured.
- *
- * @param _options - Telemetry configuration
- *
- * @example
- * ```typescript
- * import { configureTelemetry } from '@macts/api/telemetry';
- *
- * // When @opentelemetry/sdk-node is installed:
- * await configureTelemetry({
- *   serviceName: 'macts-api',
- *   endpoint: 'http://localhost:4318',
- * });
- * ```
+ * @param _options - Telemetry configuration (currently unused)
  */
 export function configureTelemetry(_options: TelemetryOptions = {}): void {
-  // No-op: @opentelemetry/sdk-node is not available in this environment.
-  // When the SDK packages become available, this will be implemented to
-  // initialize NodeTracerProvider with OTLP exporter.
+  // No-op stub: tracing is not yet implemented. This function intentionally
+  // does nothing. See the module-level doc comment for details.
 }

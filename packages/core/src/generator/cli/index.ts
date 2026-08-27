@@ -239,8 +239,8 @@ function generatePackageJson(ctx: CliGeneratorContext): string {
     dependencies: {
       '@macts/cli': 'workspace:*',
       [ctx.options.sdkPackageName]: 'workspace:*',
-      clipanion: '^4.0.0-rc.4',
-      typanion: '^3.14.0',
+      clipanion: 'catalog:',
+      typanion: 'catalog:',
     },
     devDependencies: {
       tsup: 'catalog:',

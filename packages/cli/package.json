@@ -44,7 +44,7 @@
     "@macts/api": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/mcp": "workspace:*",
-    "clipanion": "^4.0.0-rc.4"
+    "clipanion": "catalog:"
   },
   "devDependencies": {
     "tsup": "catalog:",
