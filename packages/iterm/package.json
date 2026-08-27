@@ -1,6 +1,6 @@
 {
   "name": "@macts/iterm",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "SDK and CLI for macOS iterm automation",
   "license": "MIT",
   "repository": {

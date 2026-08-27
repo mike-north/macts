@@ -1,6 +1,6 @@
 {
   "name": "@macts/quicktime-player-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Server package for macOS QuickTimePlayer.app (API + MCP)",
   "license": "MIT",
   "repository": {

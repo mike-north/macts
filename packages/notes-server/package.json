@@ -1,6 +1,6 @@
 {
   "name": "@macts/notes-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Server package for macOS Notes.app (API + MCP)",
   "license": "MIT",
   "repository": {
