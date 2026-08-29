@@ -115,7 +115,13 @@ drift.
 ## One-time bootstrap runbook
 
 Trusted publishing requires a publisher to already exist on npm before CI can
-use it, so the very first release needs a manual bootstrap:
+use it, so the very first release needs a manual bootstrap.
+
+**This also applies after an unpublish.** Removing a package from npm removes
+its trusted-publisher configuration with it, so every affected package becomes a
+first-timer again and CI's publish step will fail with `ENEEDAUTH` — OIDC is
+detected, but there is nothing to authenticate against. Re-run this runbook in
+that situation.
 
 1. Create (or confirm ownership of) the `macts` org on
    [npmjs.com](https://www.npmjs.com/).
@@ -126,8 +132,24 @@ use it, so the very first release needs a manual bootstrap:
 
    ```bash
    npm login
-   pnpm build && pnpm publish -r --access public --no-git-checks && pnpm changeset tag && git push --follow-tags
+   pnpm build
+   pnpm publish:bootstrap --dry-run   # validate versions and preview the plan
+   pnpm publish:bootstrap             # publish
+   pnpm changeset tag && git push --follow-tags
    ```
+
+   `pnpm publish:bootstrap` (`scripts/publish-bootstrap.mjs`) exists because a
+   raw `pnpm publish -r` is a poor fit for this step. It publishes strictly
+   sequentially so npm's browser-based two-factor prompts arrive one at a time
+   rather than all at once; it skips any version already on the registry, so an
+   interrupted run can simply be re-run rather than unwound; it orders
+   dependencies before dependents; and it **refuses to publish anything whose
+   major version is not 0**, checking every package before publishing any so a
+   stray version aborts the run instead of leaving a partial release. That last
+   check is deliberately not overridable by a flag — see "Staying pre-1.0".
+
+   The dry run needs no npm login, so the version check can be confirmed before
+   authenticating.
 
 4. Bulk-configure trusted publishers (requires npm CLI >= 11.10, and 2FA
    enabled on your npm account — granular access tokens with 2FA bypass are
@@ -175,11 +197,13 @@ from the bootstrap runbook work at any time:
 
 ```bash
 npm login
-pnpm build && pnpm publish -r --access public --no-git-checks && pnpm changeset tag && git push --follow-tags
+pnpm build && pnpm publish:bootstrap && pnpm changeset tag && git push --follow-tags
 ```
 
-`pnpm publish -r` safely skips any package whose current version is already
-published, so it's safe to re-run.
+Both `pnpm publish:bootstrap` and a raw `pnpm publish -r` skip any package whose
+current version is already published, so either is safe to re-run. Prefer the
+script: it enforces the pre-1.0 version policy and reports per-package failures
+at the end instead of stopping at the first one.
 
 ## Token fallback if OIDC fails
 
