@@ -1,6 +1,6 @@
 {
   "name": "@macts/omnigraffle",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK and CLI for macOS omnigraffle automation",
   "license": "MIT",
   "repository": {

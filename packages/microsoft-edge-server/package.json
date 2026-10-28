@@ -1,6 +1,6 @@
 {
   "name": "@macts/microsoft-edge-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Server package for macOS MicrosoftEdge.app (API + MCP)",
   "license": "MIT",
   "repository": {

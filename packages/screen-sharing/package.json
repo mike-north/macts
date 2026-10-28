@@ -1,6 +1,6 @@
 {
   "name": "@macts/screen-sharing",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK and CLI for macOS screen-sharing automation",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "@macts/terminal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SDK and CLI for macOS terminal automation",
   "license": "MIT",
   "repository": {
