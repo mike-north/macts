@@ -131,9 +131,9 @@ that situation.
 3. Locally, on the versioned commit on `main`:
 
    ```bash
-   npm login
    pnpm build
    pnpm publish:bootstrap --dry-run   # validate versions and preview the plan
+   npm login                          # only needed from here on
    pnpm publish:bootstrap             # publish
    pnpm changeset tag && git push --follow-tags
    ```
@@ -148,8 +148,8 @@ that situation.
    stray version aborts the run instead of leaving a partial release. That last
    check is deliberately not overridable by a flag — see "Staying pre-1.0".
 
-   The dry run needs no npm login, so the version check can be confirmed before
-   authenticating.
+   The dry run deliberately comes first: it needs no npm login, so the version
+   gate and the publish plan can both be confirmed before authenticating.
 
 4. Bulk-configure trusted publishers (requires npm CLI >= 11.10, and 2FA
    enabled on your npm account — granular access tokens with 2FA bypass are

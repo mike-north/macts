@@ -45,7 +45,10 @@ const DRY_RUN = has('--dry-run')
 const ASSUME_YES = has('--yes')
 const OTP = valueOf('--otp', null)
 const DIST_TAG = valueOf('--tag', 'latest')
-const DELAY_MS = Number.parseInt(valueOf('--delay', '0'), 10)
+// Distinguish "flag absent" from "flag given a bad value", so an empty or
+// malformed --delay is rejected rather than quietly treated as no delay.
+const DELAY_RAW = has('--delay') ? (args[args.indexOf('--delay') + 1] ?? '') : '0'
+const DELAY_MS = Number(DELAY_RAW)
 const ONLY = valueOf('--only', null)
   ?.split(',')
   .map((s) => s.trim())
@@ -64,6 +67,16 @@ const c = {
 function die(message) {
   console.error(`\n${c.red('ABORT')}  ${message}\n`)
   process.exit(1)
+}
+
+// A mistyped --delay must not silently become "no delay": the operator asked
+// for pacing, usually because npm was rate-limiting them. Match the literal
+// text rather than parsing leniently — Number.parseInt('1.5') is 1, which would
+// honour a request for 1.5ms as 1ms without ever saying so.
+if (!/^\d+$/.test(DELAY_RAW)) {
+  die(
+    `--delay must be a non-negative whole number of milliseconds, got ${JSON.stringify(DELAY_RAW)}.`
+  )
 }
 
 /** Parse a semver version into its numeric parts, or null if unparseable. */
@@ -221,7 +234,9 @@ while (ordered.length < toPublish.length) {
   const ready = toPublish.filter(
     (p) => !placed.has(p.name) && [...depsOf.get(p.name)].every((d) => placed.has(d))
   )
-  // A dependency cycle would stall this loop; fall back to source order.
+  // A dependency cycle would leave nothing "ready" and stall this loop, so
+  // place whatever remains. Like every other batch it goes out in name order —
+  // arbitrary with respect to the cycle, but deterministic between runs.
   const batch = ready.length > 0 ? ready : toPublish.filter((p) => !placed.has(p.name))
   for (const p of batch.sort((a, b) => a.name.localeCompare(b.name))) {
     ordered.push(p)
@@ -269,29 +284,27 @@ for (const [i, pkg] of ordered.entries()) {
     continue
   }
 
-  process.stdout.write(`${label} ... `)
+  console.log(`\n${c.bold(label)}`)
   const publishArgs = ['publish', '--access', 'public', '--no-git-checks', '--tag', DIST_TAG]
   if (OTP) publishArgs.push('--otp', OTP)
 
-  const result = spawnSync('pnpm', publishArgs, {
-    cwd: pkg.path,
-    stdio: ['inherit', 'pipe', 'pipe'],
-    encoding: 'utf8',
-  })
+  // Inherit stdio rather than capturing it. npm's two-factor flow prints the
+  // authorization URL and waits on the operator; piping that output would hide
+  // the prompt behind a silent hang, which defeats the point of a script built
+  // for an interactive, 2FA-gated publish. Success and failure are taken from
+  // the exit status, and npm's own output stands as the failure detail.
+  const result = spawnSync('pnpm', publishArgs, { cwd: pkg.path, stdio: 'inherit' })
 
   if (result.status === 0) {
     succeeded.push(pkg)
-    console.log(c.green('published'))
+    console.log(`  ${c.green('published')} ${pkg.name}@${pkg.version}`)
   } else {
-    const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim()
-    const firstError =
-      output
-        .split('\n')
-        .find((l) => /error|ERR!/i.test(l))
-        ?.trim() ?? output.split('\n').slice(-1)[0]
-    failed.push({ pkg, reason: firstError })
-    console.log(c.red('FAILED'))
-    console.log(c.dim(`      ${firstError}`))
+    const reason =
+      result.error instanceof Error
+        ? result.error.message
+        : `pnpm publish exited ${result.status ?? 'with a signal'} — see its output above`
+    failed.push({ pkg, reason })
+    console.log(`  ${c.red('FAILED')} ${pkg.name}@${pkg.version}`)
   }
 
   if (DELAY_MS > 0 && i < ordered.length - 1) {
