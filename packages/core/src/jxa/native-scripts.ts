@@ -42,7 +42,7 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
-import { resolveCollectionAccessor } from '../manifest/native-accessor.js'
+import { defaultCollectionAccessor, resolveCollectionAccessor } from './collection-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
 
 /**
@@ -250,8 +250,9 @@ interface ParentCollection {
  * A parameter such as `calendarId` refers to the resource whose primary
  * identifier property starts with `calendar`, or whose name or plural is
  * `calendar`/`calendars`, compared without regard to case. With no matching
- * resource, the accessor is derived from the parameter name itself
- * (`calendarId` gives `calendars`, `mediaItemId` gives `mediaItems`).
+ * resource, the accessor is derived from the parameter name itself, by the
+ * same rule as a resource's plural (`calendarId` gives `calendars`,
+ * `mediaItemId` gives `mediaItems`, `URLId` gives `urls`).
  */
 function resolveParentCollection(manifest: AppManifest, parentIdParam: string): ParentCollection {
   const paramStem = parentIdParam.endsWith('Id') ? parentIdParam.slice(0, -2) : parentIdParam
@@ -269,7 +270,7 @@ function resolveParentCollection(manifest: AppManifest, parentIdParam: string): 
       return { resource: res, plural: resolveCollectionAccessor(res) }
     }
   }
-  return { resource: undefined, plural: `${paramStem}s` }
+  return { resource: undefined, plural: defaultCollectionAccessor(`${paramStem}s`) }
 }
 
 /**

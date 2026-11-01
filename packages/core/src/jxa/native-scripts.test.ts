@@ -30,6 +30,9 @@
  * @see ../../../../manifests/notes/app.yaml
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, worker compatibility)
  * @see https://tc39.es/ecma262/2011/#sec-15 (ES5 standard built-in objects)
+ * @see https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
+ *   (how the automation bridge spells dictionary terms: camel case, first word
+ *   lowercased)
  * @see https://github.com/mike-north/macts/issues/89
  */
 
@@ -51,7 +54,7 @@ import {
   buildTargetExpression,
   planNativeInvocation,
 } from './native-scripts.js'
-import { defaultCollectionAccessor } from '../manifest/native-accessor.js'
+import { defaultCollectionAccessor } from './collection-accessor.js'
 
 const MANIFESTS_DIR = fileURLToPath(new URL('../../../../manifests/', import.meta.url))
 
@@ -606,6 +609,17 @@ describe('collection accessors', () => {
       )
       const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
       expect(text).toContain('app["mediaAlbums"].byId(parentId)')
+    })
+
+    it('spells a parent derived from an acronym parameter by the same rule as a resource', () => {
+      const manifest = manifestWith(
+        { BookmarkItem: bookmark },
+        { get: resourceCommand('get', 'BookmarkItem', [param('URLId'), param('id')]) }
+      )
+      const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
+      // "URL" is one word: the plural `URLs` is spelled `urls`, never `URLs`.
+      expect(text).toContain('app["urls"].byId(parentId)')
+      expect(text).not.toContain('app["URLs"]')
     })
   })
 })

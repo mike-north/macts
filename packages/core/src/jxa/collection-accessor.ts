@@ -14,12 +14,13 @@
  * all lowercase, names no collection, and reading it fails.
  */
 
-import { lowerCamel } from './lower-camel.js'
-import type { Resource } from './schemas/resource.js'
+import { lowerCamel } from '../manifest/lower-camel.js'
+import type { Resource } from '../manifest/schemas/resource.js'
 
 /**
- * The bridge's spelling of a collection, derived from a resource's Pascal case
- * plural.
+ * The bridge's spelling of a collection, derived from a plural: a resource's
+ * Pascal case plural, or a plural formed from an identifier parameter's stem
+ * (`mediaItem` + `s`).
  *
  * The bridge's rule, first word lowercased whole and the rest as written, is
  * the manifest's acronym-aware lower camel case ({@link lowerCamel}): a run of
@@ -33,7 +34,8 @@ import type { Resource } from './schemas/resource.js'
  * `AirPlayDevices` gives `airPlayDevices`. Only the dictionary term itself
  * settles that case.
  *
- * @param plural - The resource's Pascal case plural, e.g. `MediaItems`.
+ * @param plural - The plural in Pascal or lower camel case, e.g. `MediaItems`
+ *   or `mediaItems`.
  * @returns The derived accessor, e.g. `mediaItems`.
  *
  * @internal Used within this package only.
