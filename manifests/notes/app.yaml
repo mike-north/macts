@@ -172,7 +172,7 @@ resources:
         code: NTmd
         optional: false
     identifiers:
-      - property: name
+      - property: id
         primary: true
 enums: {}
 hierarchy:
@@ -209,12 +209,22 @@ commands:
       - Account
       - Folder
       - Note
-      - Attachment
     parameters:
       - name: name
         type: string
         description: Item name
         required: true
+  getAttachment:
+    name: get
+    description: Get an attachment by ID
+    scope: resource
+    resourceType: Attachment
+    parameters:
+      - name: id
+        type: string
+        description: Attachment identifier
+        required: true
+    permission: notes:attachments:get
   create:
     name: create
     description: Create a new note

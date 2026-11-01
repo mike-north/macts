@@ -20,8 +20,11 @@ import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { loadManifest } from '../manifest/loader.js'
 import { resolveManifestRoutes } from '../manifest/route.js'
+import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
 import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
+import { generateContract } from './contract/index.js'
+import { findCrudCommand, resolveIdParams, resourceCommandEntries } from './surface.js'
 
 const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
@@ -367,5 +370,81 @@ describe('@macts/calendar events.create regression', () => {
     const body = createInputMatch?.[1] ?? ''
     // Required (no `?`) calendarId of type string.
     expect(body).toContain('calendarId: string;')
+  })
+})
+
+/**
+ * Notes attachments are addressed by `id`, not `name`.
+ *
+ * A read-only probe of Notes 4.13 (macOS 27.2) found the attachment `name`
+ * empty for 10 of 25 attachments, while `id` was set for all 25 and looked
+ * each one up. An identifier that can be empty cannot address the object, and
+ * a non-null identifier field fails decode for every such item, so the
+ * manifest identifies attachments by `id`.
+ *
+ * The identifier PROPERTY (what records carry, `resolvePrimaryIdentifierProperty`)
+ * and the identifier request PARAMETER (what `get` takes, `command.parameters`)
+ * are separate manifest facts. These tests assert both, and that every surface
+ * sends the parameter under the name the server binds.
+ */
+describe('@macts/notes attachments addressed by id', () => {
+  let notes: AppManifest
+
+  beforeAll(async () => {
+    notes = await loadManifest(resolve(MANIFESTS_DIR, 'notes', 'app.yaml'))
+  })
+
+  it('identifies attachments by the id property', () => {
+    expect(resolvePrimaryIdentifierProperty(notes.resources['Attachment'])).toBe('id')
+  })
+
+  it('reads an attachment through a get command whose identifier parameter is id', () => {
+    const get = findCrudCommand(resourceCommandEntries(notes, 'Attachment'), 'get')
+    expect(get?.[0]).toBe('getAttachment')
+    if (!get) throw new Error('Notes declares no get command for Attachment')
+    expect(resolveIdParams(get[1])).toEqual({ parentParam: undefined, childParam: 'id' })
+  })
+
+  it('keeps the shared name-keyed get for the other resources only', () => {
+    const shared = notes.commands['get']
+    expect(shared?.resourceType).toEqual(['Account', 'Folder', 'Note'])
+    expect(shared?.parameters.map((p) => p.name)).toEqual(['name'])
+  })
+
+  it('routes the attachment get to its own key, under the unchanged permission', () => {
+    const route = resolveManifestRoutes(notes).find(
+      (r) => r.resourceType === 'Attachment' && r.commandKey === 'getAttachment'
+    )
+    expect(route?.route).toBe('notes.attachments.getAttachment')
+    expect(route?.permission).toBe('notes:attachments:get')
+    expect(resolveManifestRoutes(notes).map((r) => r.route)).not.toContain('notes.attachments.get')
+  })
+
+  it('the HTTP client sends id to the attachment get route', () => {
+    const sdk = generateHttpClientSdk(notes, { packageName: '@macts/notes' })
+    const file = sdk.files.find((f) => f.path === 'src/resources/attachment.ts')
+    if (!file) throw new Error('generated notes SDK missing attachment resource')
+    expect(file.content).toContain('async get(id: string)')
+    expect(file.content).toContain('${this.#app}.${this.#resource}.getAttachment`')
+    expect(extractClientRoutes(sdk.files)).toContain('notes.attachments.getAttachment')
+  })
+
+  it('the contract takes id and sends it under the parameter name the server binds', () => {
+    const contract = generateContract(notes).files.find((f) => f.path === 'src/contract/index.ts')
+    if (!contract) throw new Error('generated notes contract missing')
+    const text = contract.content
+    // The client method takes the identifier positionally, typed by the id property.
+    expect(text).toMatch(
+      /interface AttachmentResourceClient \{[^}]*get\(id: string, options\?: CallOptions\): Promise<Attachment>/s
+    )
+    // The descriptor's input record is keyed by the request parameter.
+    expect(text).toMatch(
+      /OperationDescriptor<\{ readonly id: string \}, Attachment>\s*=\s*\{\s*id: 'notes\.attachments\.getAttachment',\s*permission: 'notes:attachments:get'/
+    )
+    // The resource table points references at the attachment get.
+    const entryStart = text.indexOf('  Attachment: {\n    name:')
+    const entry = text.slice(entryStart, text.indexOf('\n  },', entryStart))
+    expect(entryStart).toBeGreaterThan(-1)
+    expect(entry).toContain("get: 'notes.attachments.getAttachment'")
   })
 })
