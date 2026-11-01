@@ -158,7 +158,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime;
 export interface CreateRuntimeOptions {
     readonly clock?: () => Date;
     readonly executor: Executor;
-    readonly governance?: GovernanceContext | (() => Promise<GovernanceContext>);
+    readonly governance: GovernanceContext | (() => Promise<GovernanceContext>);
     readonly logger?: RuntimeLogger;
     readonly rateLimiter?: RateLimiter;
     readonly verifier?: CredentialVerifier;

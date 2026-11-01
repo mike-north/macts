@@ -106,7 +106,7 @@ function harness(options: HarnessOptions = {}): Harness {
     verifier,
     clock: fixedClock,
     logger,
-    ...(options.governance === undefined ? {} : { governance: options.governance }),
+    governance: options.governance ?? { policy: ALLOW_ALL_POLICY },
     ...(options.rateLimiter === undefined ? {} : { rateLimiter: options.rateLimiter }),
   })
   runtime.registerManifest(CALENDAR_MANIFEST)
@@ -322,6 +322,7 @@ describe('step 1: credential verification', () => {
     const executor = createRecordingExecutor()
     const runtime = createRuntime({
       executor,
+      governance: { policy: ALLOW_ALL_POLICY },
       logger: createSpyLogger(),
       verifier: { verify: () => Promise.reject(new Error('key database is locked')) },
     })
@@ -339,6 +340,7 @@ describe('step 1: credential verification', () => {
     const logger = createSpyLogger()
     const runtime = createRuntime({
       executor: createRecordingExecutor(),
+      governance: { policy: ALLOW_ALL_POLICY },
       logger,
       verifier: {
         verify: (credential) =>

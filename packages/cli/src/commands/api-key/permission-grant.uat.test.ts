@@ -228,6 +228,7 @@ describe('camelCase grants authorize real calls (UAT)', () => {
           return Promise.resolve({ ok: true })
         },
       },
+      governance: { policy: runtimeModule.ALLOW_ALL_POLICY },
     })
     for (const manifest of manifests) runtime.registerManifest(manifest)
     return {

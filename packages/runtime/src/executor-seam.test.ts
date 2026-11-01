@@ -105,7 +105,11 @@ describe('executor seam', () => {
 
   it('never reaches the executor for a revoked key', async () => {
     const executor = createRecordingExecutor()
-    const runtime = createRuntime({ executor, logger: QUIET })
+    const runtime = createRuntime({
+      executor,
+      governance: { policy: ALLOW_ALL_POLICY },
+      logger: QUIET,
+    })
     runtime.registerManifest(calendar)
     const key = await createApiKey({ name: 'Revoked', permissions: ['calendar:calendars:list'] })
     revokeKey(key.keyId)
@@ -123,8 +127,9 @@ describe('executor seam', () => {
   it('binds each runtime to its own executor', async () => {
     const first = createRecordingExecutor(() => Promise.resolve('first'))
     const second = createRecordingExecutor(() => Promise.resolve('second'))
-    const runtimeA = createRuntime({ executor: first, logger: QUIET })
-    const runtimeB = createRuntime({ executor: second, logger: QUIET })
+    const governance = { policy: ALLOW_ALL_POLICY }
+    const runtimeA = createRuntime({ executor: first, governance, logger: QUIET })
+    const runtimeB = createRuntime({ executor: second, governance, logger: QUIET })
     runtimeA.registerManifest(calendar)
     runtimeB.registerManifest(calendar)
     const key = await createApiKey({ name: 'Both', permissions: ['calendar:calendars:list'] })

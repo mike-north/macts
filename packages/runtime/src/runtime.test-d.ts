@@ -2,7 +2,8 @@
  * Type tests for the runtime's public construction and invocation surface.
  *
  * They complement the runtime tests in runtime.test.ts by pinning what the
- * compiler accepts: a runtime cannot be built without an executor, every
+ * compiler accepts: a runtime cannot be built without an executor and
+ * governance, every
  * invocation requires a credential-bearing context, and results are wire
  * values.
  *
@@ -26,11 +27,15 @@ declare const runtime: MactsRuntime
 // The credential holder is exposed only through the contract type.
 expectType<Credential>(createBearerCredential('macts_sk_x'))
 
-// An executor is required; everything else is optional.
-expectAssignable<CreateRuntimeOptions>({ executor })
+// An executor and governance are required; everything else is optional.
+// Omitting governance never means "no governance".
+expectAssignable<CreateRuntimeOptions>({ executor, governance: { policy: ALLOW_ALL_POLICY } })
+expectNotAssignable<CreateRuntimeOptions>({ executor })
 expectNotAssignable<CreateRuntimeOptions>({})
 expectNotAssignable<CreateRuntimeOptions>({ clock: () => new Date(0) })
-expectType<MactsRuntime>(createRuntime({ executor, clock: () => new Date(0) }))
+expectType<MactsRuntime>(
+  createRuntime({ executor, governance: loadHostGovernance, clock: () => new Date(0) })
+)
 
 // Governance is a context or a loader of one; this Mac's loader is passed as-is.
 expectAssignable<CreateRuntimeOptions>({ executor, governance: { policy: ALLOW_ALL_POLICY } })

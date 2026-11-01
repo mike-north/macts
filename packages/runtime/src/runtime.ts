@@ -55,7 +55,6 @@ import {
   type WireRecord,
   type WireValue,
 } from '@macts/contracts'
-import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { resolveGovernanceForRequest, type GovernanceContext } from './governance/context.js'
 import type { RateLimiter } from './invocation/rate-limiter.js'
 import { createKeyStoreVerifier, type CredentialVerifier } from './invocation/verifier.js'
@@ -96,9 +95,12 @@ export interface CreateRuntimeOptions {
    * approval file) do not fix themselves while the process runs, and a call
    * must never run under governance that could not be established.
    *
-   * @defaultValue allow-all host policy, no audit writer, no approval gate
+   * There is no default: a runtime never runs calls under governance it was
+   * not given. Hosts that act for this Mac pass `loadHostGovernance`; a test
+   * or an embedder that wants no restrictions passes
+   * `{ policy: ALLOW_ALL_POLICY }` and says so.
    */
-  readonly governance?: GovernanceContext | (() => Promise<GovernanceContext>)
+  readonly governance: GovernanceContext | (() => Promise<GovernanceContext>)
   /**
    * Turns credentials into authority.
    *
@@ -185,18 +187,17 @@ function isWireRecord(value: WireValue): value is WireRecord {
  * @remarks
  * The executor is fixed at construction; every invocation dispatches through
  * it. Governance is either a context or a loader that runs on first use (see
- * {@link CreateRuntimeOptions.governance}). It defaults to allow-all, so a
- * runtime built without governance still verifies credentials, checks
- * permissions, and validates input. Hosts that act for this Mac pass
- * `loadHostGovernance` instead.
+ * {@link CreateRuntimeOptions.governance}). It is required: hosts that act for
+ * this Mac pass `loadHostGovernance`, and anything else states the governance it
+ * enforces.
  *
- * @param options - The executor and optional governance, verifier, clock, and
- *   logger.
+ * @param options - The executor and governance, and optionally the verifier,
+ *   clock, and logger.
  * @returns A runtime with no operations registered.
  */
 export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   const executor = options.executor
-  const governanceSource = options.governance ?? { policy: ALLOW_ALL_POLICY }
+  const governanceSource = options.governance
   /** The single load of a governance loader, kept whether it succeeds or fails. */
   let governanceLoad: Promise<GovernanceContext> | undefined
   const verifier = options.verifier ?? createKeyStoreVerifier()

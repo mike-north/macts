@@ -45,22 +45,27 @@ the decision and, for a held call, asking a human), validate the input, then
 hand the request to the executor the runtime was built with. Failures are the
 structured errors from `@macts/contracts`.
 
+A runtime is built from an executor and the governance it enforces. Both are
+required: omitting governance is a compile error, never a silent allow-all.
+Hosts that act for this Mac pass `loadHostGovernance` (below).
+
 Admission only turns calls away (`RateLimitedError`); it never grants
 anything. A limiter that fails denies the call with `InternalError`.
 
 ```ts
-import { createRateLimiter, createRuntime } from '@macts/runtime'
+import { createRateLimiter, createRuntime, loadHostGovernance } from '@macts/runtime'
 
 const runtime = createRuntime({
   executor,
+  governance: loadHostGovernance,
   rateLimiter: createRateLimiter({ max: 100, windowMs: 60_000 }),
 })
 ```
 
 ```ts
-import { createBearerCredential, createRuntime } from '@macts/runtime'
+import { createBearerCredential, createRuntime, loadHostGovernance } from '@macts/runtime'
 
-const runtime = createRuntime({ executor })
+const runtime = createRuntime({ executor, governance: loadHostGovernance })
 runtime.registerManifest(manifest)
 
 const result = await runtime.invoke(
@@ -92,8 +97,14 @@ const runtime = createRuntime({ executor, governance: loadHostGovernance })
   `InternalError`. Nothing falls back to allowing everything.
 - An audit record that cannot be written denies the call it describes.
 
-`createRuntime` without `governance` keeps the allow-all policy with no audit
-log, for tests and embedders that compose governance themselves.
+Tests and embedders that compose governance themselves pass their own context
+instead. To enforce no restrictions, say so explicitly:
+
+```ts
+import { ALLOW_ALL_POLICY, createRuntime } from '@macts/runtime'
+
+const runtime = createRuntime({ executor, governance: { policy: ALLOW_ALL_POLICY } })
+```
 
 ## Storage
 
