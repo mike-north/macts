@@ -1,0 +1,31 @@
+{
+  "name": "@macts-e2e/cli-host",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Subprocess UATs of the macts host commands (macts --serve) against real installed app packages",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src test",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@macts/cli": "workspace:*",
+    "@macts/notes": "workspace:*",
+    "@macts/notes-server": "workspace:*",
+    "@macts/runtime": "workspace:*",
+    "@types/node": "^26.0.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "nx": {
+    "targets": {
+      "test": {
+        "dependsOn": [
+          "^build"
+        ]
+      }
+    }
+  }
+}

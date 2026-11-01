@@ -44,6 +44,8 @@ macts --serve --port 9000  # start on a custom port
 ```
 
 This starts a local HTTP server at `http://localhost:8372` that routes calls to macOS applications.
+It serves every app whose server package is installed (`macts mcp install calendar`), and lists at
+startup any installed app it cannot serve.
 
 ### 3. Create a scoped API key
 

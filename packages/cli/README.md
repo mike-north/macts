@@ -59,16 +59,23 @@ The MCP server:
 
 Start the HTTP API server for remote access to macOS automation.
 
+The server serves every app whose server package is installed in the macts
+plugins directory (`~/.macts/plugins`, install one with
+`macts mcp install <app>`), and validates each call's input against that app's
+contract. At startup it lists the apps it serves, any installed app that failed
+to register (with the reason), and any app installed without its server
+package. With no apps installed it still starts and serves no operations.
+
 **Options:**
 
-- `--port <number>` - Port number (default: 3000)
+- `--port <number>` - Port number (default: 8372)
 - `--tls-cert <path>` - Path to TLS certificate file (enables HTTPS)
 - `--tls-key <path>` - Path to TLS private key file (requires --tls-cert)
 
 **Examples:**
 
 ```bash
-# Start on default port (3000)
+# Start on default port (8372)
 macts --serve
 
 # Start on custom port

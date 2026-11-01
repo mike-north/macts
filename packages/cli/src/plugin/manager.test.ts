@@ -7,6 +7,7 @@ import {
   listInstalledPlugins,
   getPluginResolutionPath,
   findInstalledPluginPackages,
+  findInstalledServerPackages,
   resolveMcpServerPackageName,
   installMcpServerPlugin,
   uninstallMcpServerPlugin,
@@ -679,6 +680,70 @@ describe('findInstalledPluginPackages', () => {
     const result = findInstalledPluginPackages()
 
     expect(result).toEqual([])
+  })
+})
+
+describe('findInstalledServerPackages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should return empty when no node_modules', async () => {
+    const { existsSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(false)
+
+    expect(findInstalledServerPackages()).toEqual([])
+  })
+
+  it('should return only @macts/<app>-server packages, sorted', async () => {
+    const { existsSync, readdirSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readdirSync).mockReturnValue([
+      'notes-server',
+      'calendar',
+      'calendar-server',
+      'contracts',
+    ] as unknown as never[])
+
+    expect(findInstalledServerPackages()).toEqual(['@macts/calendar-server', '@macts/notes-server'])
+  })
+
+  it('should reject a bare -server entry and infrastructure server names', async () => {
+    const { existsSync, readdirSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readdirSync).mockReturnValue([
+      '-server',
+      'mcp-server',
+      'api-server',
+      'notes-server',
+    ] as unknown as never[])
+
+    expect(findInstalledServerPackages()).toEqual(['@macts/notes-server'])
+  })
+
+  it('should scan the node_modules directory it is given', async () => {
+    const { existsSync, readdirSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readdirSync).mockReturnValue(['notes-server'] as unknown as never[])
+
+    findInstalledServerPackages('/tmp/plugins/node_modules')
+
+    expect(readdirSync).toHaveBeenCalledWith('/tmp/plugins/node_modules/@macts')
+  })
+
+  it('should handle readdir errors', async () => {
+    const { existsSync, readdirSync } = await import('node:fs')
+
+    vi.mocked(existsSync).mockReturnValue(true)
+    vi.mocked(readdirSync).mockImplementation(() => {
+      throw new Error('Permission denied')
+    })
+
+    expect(findInstalledServerPackages()).toEqual([])
   })
 })
 

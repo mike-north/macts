@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@macts/api": "workspace:*",
+    "@macts/contracts": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/mcp": "workspace:*",
     "@macts/runtime": "workspace:*",
