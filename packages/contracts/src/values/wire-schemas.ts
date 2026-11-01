@@ -22,6 +22,7 @@ import { INTEGER_LIMITS } from './integer.js'
 import {
   DATE_TEXT_PATTERN,
   checkDateText,
+  DYNAMIC_REFERENCE_OR_FILE_MESSAGE,
   checkDoublePayload,
   wireIntegerSchema,
 } from './wire-checks.js'
@@ -106,17 +107,16 @@ function dateTextMessage(text: string): string {
 }
 
 /**
- * The payload of a control record whose kind is not representable in dynamic
- * content: references and files, which carry meaning only at a typed
- * position. It always fails with a message saying so, and its JSON Schema
- * (`not: {}`) admits nothing, so the derived schema never advertises the kind
- * as accepted.
+ * The payload of a reference or file control record in dynamic content, where
+ * such values are not representable. It always fails with the shared rule's
+ * message, and its JSON Schema (`not: {}`) admits nothing, so the derived
+ * schema never advertises the kind as accepted.
  */
-function unsupportedDynamicPayload(kind: string) {
+function unrepresentableDynamicPayload() {
   return z
     .unknown()
     .refine((_payload: unknown): _payload is never => false, {
-      error: `${kind} cannot be represented in dynamic content; declare them at a typed position.`,
+      error: DYNAMIC_REFERENCE_OR_FILE_MESSAGE,
     })
     .meta({ not: {} })
 }
@@ -145,8 +145,8 @@ export const DynamicWireValueSchema: z.ZodType<DynamicWireValue> = z.lazy(() =>
       WireDoubleSchema,
       WireDateSchema,
       z.strictObject({ record: z.record(z.string(), DynamicWireValueSchema) }),
-      z.strictObject({ reference: unsupportedDynamicPayload('References') }),
-      z.strictObject({ file: unsupportedDynamicPayload('File values') }),
+      z.strictObject({ reference: unrepresentableDynamicPayload() }),
+      z.strictObject({ file: unrepresentableDynamicPayload() }),
     ],
     {
       error:

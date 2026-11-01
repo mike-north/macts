@@ -17,6 +17,15 @@ import { INTEGER_LIMITS, Integer } from './integer.js'
 import type { ValueIssueCode } from './value-issues.js'
 import { SPECIAL_DOUBLE_STATES, type SpecialDoubleState } from './wire.js'
 
+/**
+ * The rule for references and file values inside dynamic content, stated once
+ * so that the wire schema and the codec report it identically: they are not
+ * representable there, and a contract that needs them declares them at a
+ * typed position.
+ */
+export const DYNAMIC_REFERENCE_OR_FILE_MESSAGE =
+  'References and files cannot be represented in dynamic content; declare them at a typed position.'
+
 /** Outcome of checking one payload. */
 export type Check<T> =
   | { readonly ok: true; readonly value: T }
@@ -72,6 +81,18 @@ function utcEpoch(
   date.setUTCHours(hour, minute, second, millisecond)
   return date.getTime()
 }
+
+/**
+ * Earliest instant a wire date can carry when encoded with `Z`:
+ * `0000-01-01T00:00:00.000Z`.
+ */
+export const EARLIEST_DATE_MS = utcEpoch(0, 0, 1, 0, 0, 0, 0)
+
+/**
+ * Latest instant a wire date can carry when encoded with `Z`:
+ * `9999-12-31T23:59:59.999Z`.
+ */
+export const LATEST_DATE_MS = utcEpoch(9999, 11, 31, 23, 59, 59, 999)
 
 function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
@@ -153,6 +174,15 @@ function isSpecialDoubleState(text: string): text is SpecialDoubleState {
   return (SPECIAL_DOUBLE_STATES as readonly string[]).includes(text)
 }
 
+/** The double payload for a number: a JSON number, or a special state. */
+export function doublePayload(value: number): number | SpecialDoubleState {
+  if (Number.isNaN(value)) return 'NaN'
+  if (value === Number.POSITIVE_INFINITY) return 'Infinity'
+  if (value === Number.NEGATIVE_INFINITY) return '-Infinity'
+  if (Object.is(value, -0)) return '-0'
+  return value
+}
+
 /**
  * Check wire date text and return the instant it names, in milliseconds since
  * the epoch, honoring its offset. Components are range-checked here rather
@@ -220,6 +250,27 @@ function calendarProblem(
     return `offset minute ${String(offsetMinute)} does not exist (offset minutes are 00..59)`
   }
   return undefined
+}
+
+/**
+ * Check a `Date` for encoding and return its wire text. The date must hold a
+ * time, and its UTC year must be `0000..9999` so the text fits the wire form.
+ */
+export function checkDateValue(value: Date): Check<string> {
+  const time = value.getTime()
+  if (Number.isNaN(time)) {
+    return { ok: false, code: 'invalid-date', message: 'The Date is invalid (its time is NaN).' }
+  }
+  if (time < EARLIEST_DATE_MS || time > LATEST_DATE_MS) {
+    return {
+      ok: false,
+      code: 'out-of-range',
+      message:
+        'The Date is outside the supported range 0000-01-01T00:00:00.000Z..' +
+        '9999-12-31T23:59:59.999Z, so it has no wire form.',
+    }
+  }
+  return { ok: true, value: value.toISOString() }
 }
 
 /**

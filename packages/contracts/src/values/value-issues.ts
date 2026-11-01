@@ -30,7 +30,8 @@ import type { ValidationIssue } from '../issues.js'
  * - `invalid-control-record`: a wire object is not the control record its
  *   position requires (wrong or extra keys, or a malformed payload).
  * - `unsupported`: the value cannot be represented at its position (for
- *   example a function, or a kind that its position does not admit).
+ *   example a function in dynamic content, `undefined` outside a record
+ *   field, or a kind that its position does not admit).
  */
 export const VALUE_ISSUE_CODES = Object.freeze([
   'invalid-type',
