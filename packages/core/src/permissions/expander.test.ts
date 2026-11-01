@@ -259,23 +259,23 @@ describe('validateCommandPermissions', () => {
 
     it('should reject a command whose operation is a grouping-only coarse alias (read)', () => {
       // Regression guard: a command must not use `read`/`write` as its
-      // operation (the microsoft-word `createRange` -> `word:documents:read`
+      // operation (the microsoft-word `createRange` -> `microsoft-word:documents:read`
       // bug). Such a permission collides with the coarse vocabulary and
       // authorizes nothing on its own.
-      const commandPermissions = new Map([['createRange', 'word:documents:read']])
+      const commandPermissions = new Map([['createRange', 'microsoft-word:documents:read']])
 
       const errors = validateCommandPermissions(commandPermissions, {
-        documents: { read: ['word:documents:list', 'word:documents:get'] },
+        documents: { read: ['microsoft-word:documents:list', 'microsoft-word:documents:get'] },
       })
 
       expect(errors.some((e) => e.includes('grouping-only coarse alias'))).toBe(true)
     })
 
     it('should reject a command whose operation is `write`', () => {
-      const commandPermissions = new Map([['save', 'word:documents:write']])
+      const commandPermissions = new Map([['save', 'microsoft-word:documents:write']])
 
       const errors = validateCommandPermissions(commandPermissions, {
-        documents: { write: ['word:documents:save'] },
+        documents: { write: ['microsoft-word:documents:save'] },
       })
 
       expect(errors.some((e) => e.includes('grouping-only coarse alias'))).toBe(true)

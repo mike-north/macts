@@ -244,11 +244,23 @@ describe('capability permissions of shipped operations (issue #148 regression)',
     )
   })
 
-  it('keeps an explicitly declared permission that differs from the derived one', () => {
-    // Microsoft Edge declares `edge:tabs:get`; the derived default would be
-    // `microsoft-edge:tabs:<route name>`. The explicit declaration wins.
+  it('reports microsoft-edge:tabs:get for microsoft-edge.tabs.get, under the route app segment', () => {
+    // Microsoft Edge used to declare `edge:tabs:get`, an app segment no route
+    // has (issue #166). It now declares no permission, so the capability
+    // reports the derived one: app segment `microsoft-edge` (from the app name
+    // "Microsoft Edge"), resource `tabs`, route name `get`.
     expect(shippedCapability('microsoft-edge', 'microsoft-edge.tabs.get')?.permission).toBe(
-      'edge:tabs:get'
+      'microsoft-edge:tabs:get'
+    )
+  })
+
+  it('keeps an explicitly declared permission that differs from the derived one', () => {
+    // Microsoft Word's saveAs declares `microsoft-word:documents:save`, so
+    // one grant covers save and save-as; the derived default would be
+    // `microsoft-word:documents:saveAs`. The explicit declaration wins, under
+    // the same app segment as the route.
+    expect(shippedCapability('microsoft-word', 'microsoft-word.documents.saveAs')?.permission).toBe(
+      'microsoft-word:documents:save'
     )
   })
 
