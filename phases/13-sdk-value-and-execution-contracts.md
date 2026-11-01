@@ -53,15 +53,15 @@ separate, undecided concerns.
 These starting conditions were confirmed in the source at the time of writing.
 They describe what this phase replaces; they are not part of the contract.
 
-| Area              | Today                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Native boundary   | `runJxa` (`packages/core/src/jxa/executor.ts`) wraps the script in `JSON.stringify(result)` inside `osascript` and parses stdout. NaN, infinities, `-0`, and integer/double classification are lost before any transport runs.                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Command execution | `packages/api/src/server/handlers/rpc.ts` builds JXA at request time from the manifest, interpolating arguments into source text, behind Hono middleware: permission → policy → request validation → execute. Every native failure becomes `EXECUTION_ERROR` (HTTP 500).                                                                                                                                                                                                                                                                                                                                                                   |
-| Authority         | Token verification (`packages/api/src/keys/validator.ts`) needs `jose`, the signing secret on disk, and the SQLite revocation store. It is reachable only through `@macts/api/keys`. Governance (`middleware/governance.ts`) composes `enforceCall`, `seekApproval`, and `recordApprovalDecision` from `@macts/core` inline in a Hono handler.                                                                                                                                                                                                                                                                                             |
-| Generated SDK     | `packages/core/src/generator/sdk/http-client.ts` emits a per-app `HttpClient` that POSTs `JSON.stringify(body)`, casts `.result` without validation, and throws a per-app `<App>Error { code }`. `@macts/sdk` only constructs those HTTP clients and statically imports 35 optional peers ([#118](https://github.com/mike-north/macts/issues/118)).                                                                                                                                                                                                                                                                                        |
-| Value types       | `integer` is a plain `number` on every surface. TS types say `Date` and `{ r, g, b }` while the generated zod in the same file says `string` and `{ red, green, blue }`. `types/standardized.ts` has `Date \| string`, 8-bit RGB, and `{ path, exists? }` files. `jxa/coercion.ts` is re-exported by `@macts/core` and `@macts/api`, but a search of `packages/`, including generated packages, finds no caller outside its own tests.                                                                                                                                                                                                     |
-| MCP               | Both MCP hosts dispatch every tool call through a `MactsRuntime` built with the resolved executor and the host governance, with the installed apps registered through the host registration path: `macts --mcp` (stdio) and the daemon in `packages/mcp/src/daemon/server.ts` (HTTP, started by `macts mcp serve`/`start`). Tools come from `createMcpAdapter`, with D6 results and errors. The token arrives per call over HTTP, as each request's bearer, and from startup over stdio (`MACTS_API_KEY`); the runtime verifies it on every call, and there is no trusted-caller switch. No tool call makes an HTTP hop to the API server. |
-| Binary            | No transfer facility was found in a search of `packages/api/src`, `packages/mcp/src`, `packages/sdk/src`, `packages/core/src/jxa`, and `packages/core/src/types`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Area              | Today                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Native boundary   | `runJxa` (`packages/core/src/jxa/executor.ts`) wraps the script in `JSON.stringify(result)` inside `osascript` and parses stdout. NaN, infinities, `-0`, and integer/double classification are lost before any transport runs.                                                                                                                                                                                                         |
+| Command execution | `packages/api/src/server/handlers/rpc.ts` builds JXA at request time from the manifest, interpolating arguments into source text, behind Hono middleware: permission → policy → request validation → execute. Every native failure becomes `EXECUTION_ERROR` (HTTP 500).                                                                                                                                                               |
+| Authority         | Token verification (`packages/api/src/keys/validator.ts`) needs `jose`, the signing secret on disk, and the SQLite revocation store. It is reachable only through `@macts/api/keys`. Governance (`middleware/governance.ts`) composes `enforceCall`, `seekApproval`, and `recordApprovalDecision` from `@macts/core` inline in a Hono handler.                                                                                         |
+| Generated SDK     | `packages/core/src/generator/sdk/http-client.ts` emits a per-app `HttpClient` that POSTs `JSON.stringify(body)`, casts `.result` without validation, and throws a per-app `<App>Error { code }`. `@macts/sdk` only constructs those HTTP clients and statically imports 35 optional peers ([#118](https://github.com/mike-north/macts/issues/118)).                                                                                    |
+| Value types       | `integer` is a plain `number` on every surface. TS types say `Date` and `{ r, g, b }` while the generated zod in the same file says `string` and `{ red, green, blue }`. `types/standardized.ts` has `Date \| string`, 8-bit RGB, and `{ path, exists? }` files. `jxa/coercion.ts` is re-exported by `@macts/core` and `@macts/api`, but a search of `packages/`, including generated packages, finds no caller outside its own tests. |
+| MCP               | `packages/mcp/src/server.ts` (stdio) and `daemon/server.ts` (HTTP) stringify tool results. The token is checked once at startup (stdio) or per request without propagating identity (HTTP). Generated tools call the HTTP SDK, so a tool call goes MCP → HTTP client → API server.                                                                                                                                                     |
+| Binary            | No transfer facility was found in a search of `packages/api/src`, `packages/mcp/src`, `packages/sdk/src`, `packages/core/src/jxa`, and `packages/core/src/types`.                                                                                                                                                                                                                                                                      |
 
 ---
 
@@ -982,8 +982,11 @@ Defined in `@macts/contracts` (`invocation/`):
   or the remote `Authorization` header.
 - **`InvocationContext`** — `{ credential, signal?, correlationId? }`. One per
   invocation. The client holds the credential from factory options and attaches
-  it to every call. MCP adapters attach the credential configured for the
-  session to every tool call; they no longer rely on a startup-only check.
+  it to every call. MCP adapters attach a credential to every tool call and
+  never rely on a startup-only check. Over stdio (`macts --mcp`) it is the key
+  configured for the session; over HTTP (the MCP server of `macts mcp serve`
+  and `macts mcp start`) it is the bearer token of the request that carried
+  the call, threaded into `invoke`, so each caller is governed by its own key.
 - **`Authority`** — `{ subject, displayName?, permissions, expiresAt? }`. This
   is what verification derives. `subject` is today's `apiKeyPayload.sub` and is
   the sole audit attribution key. An `Authority` never holds the secret.
@@ -1046,17 +1049,18 @@ forgot to supply. Missing and malformed configuration are treated differently:
   fail-closed rule above.
 
 **Registering installed apps.** Every macts host on this Mac (`macts --serve`,
-`macts --mcp`, and the MCP daemon of `macts mcp serve`) registers the installed apps' generated contracts through one
-host registration function, so every surface validates calls against the same
-descriptors. The function finds each installed host package
-(`@macts/<app>-server`) in the plugins directory, resolves the app's contract
-(`@macts/<app>/contract`) from the host package's own location, validates the
-manifest the contract loads, and calls `registerContract(contract, manifest)`.
-An app that fails to load or register is reported with its reason and skipped,
-and the other apps still register. An app installed without its host package
-is reported at startup, with the command that installs it. Manifest
-registration (`registerManifest`) remains for embedders and tests; it runs
-passthrough descriptors, validated by each command's request schema.
+`macts --mcp`, and the MCP server of `macts mcp serve`) registers the installed
+apps' generated contracts through one host registration function, so every
+surface validates calls against the same descriptors. The function finds each
+installed host package (`@macts/<app>-server`) in the plugins directory,
+resolves the app's contract (`@macts/<app>/contract`) from the host package's
+own location, validates the manifest the contract loads, and calls
+`registerContract(contract, manifest)`. An app that fails to load or register is
+reported with its reason and skipped, and the other apps still register. An app
+installed without its host package is reported at startup, with the command that
+installs it. Manifest registration (`registerManifest`) remains for embedders
+and tests; it runs passthrough descriptors, validated by each command's request
+schema.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 

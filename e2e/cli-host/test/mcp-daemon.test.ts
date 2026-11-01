@@ -38,6 +38,7 @@ import {
   type MactsHome,
   type McpDaemonProcess,
   type McpSession,
+  writePolicyFile,
 } from '../src/harness.js'
 
 /** Minting keys and starting the daemon spawns several Node processes. */
@@ -132,4 +133,39 @@ describe('macts mcp serve (UAT): transport authentication', () => {
     expect(res.status).toBe(200)
     expect(await res.json()).toMatchObject({ status: 'ok' })
   })
+})
+
+describe('macts mcp serve (UAT): governance fails closed', () => {
+  it(
+    'answers every call with INTERNAL, never reaching the executor, when the policy file is malformed',
+    async () => {
+      const broken = createMactsHome()
+      let brokenDaemon: McpDaemonProcess | undefined
+      let session: McpSession | undefined
+      try {
+        const token = await createKey(broken, 'notes:notes:list')
+        writePolicyFile(broken, '{ this is not json')
+        brokenDaemon = await startMcpDaemon(broken, await freePort(), {
+          MACTS_TEST_EXECUTOR: 'stub',
+        })
+        session = await connectMcpHttp(brokenDaemon.url, token)
+
+        const result = await callTool(session, LIST_TOOL, {})
+
+        // The same outcome as over stdio: the HTTP transport adds no path that
+        // fails open.
+        expect(result.isError).toBe(true)
+        expect(toolDocument(result)).toEqual({
+          error: { code: 'INTERNAL', message: 'Governance could not be loaded.', details: {} },
+        })
+        // The stub executor's answer never appears: the call stopped at governance.
+        expect(JSON.stringify(result)).not.toContain('test-stub')
+      } finally {
+        await session?.close()
+        await brokenDaemon?.stop()
+        broken.dispose()
+      }
+    },
+    SETUP_TIMEOUT_MS
+  )
 })
