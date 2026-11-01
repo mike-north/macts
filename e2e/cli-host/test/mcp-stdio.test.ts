@@ -178,11 +178,11 @@ describe('macts --mcp (UAT): stdout carries only protocol frames', () => {
           expect(Array.isArray(frame), line).toBe(false)
           expect((frame as { jsonrpc?: unknown }).jsonrpc, line).toBe('2.0')
         }
-        expect(session.stdout()).not.toContain('Serving 1 app(s)')
+        expect(session.stdout()).not.toContain('Serving 2 app(s)')
         expect(session.stdout()).not.toContain('MACTS_TEST_EXECUTOR')
 
         // The startup report and the test-executor warning are produced, on stderr.
-        expect(session.stderr()).toContain('Serving 1 app(s):\n  notes\n')
+        expect(session.stderr()).toContain('Serving 2 app(s):\n  notes\n  reminders\n')
         expect(session.stderr()).toContain('Executor: test-stub\n')
         expect(session.stderr()).toContain('Warning: MACTS_TEST_EXECUTOR=stub is set')
       } finally {
