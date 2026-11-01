@@ -1,7 +1,4 @@
-import { exec } from 'node:child_process'
-import { promisify } from 'node:util'
-
-const execAsync = promisify(exec)
+import { execFile } from 'node:child_process'
 
 export interface JxaExecutorOptions {
   timeout?: number // milliseconds
@@ -40,10 +37,7 @@ export async function runJxa<T>(code: string, options: JxaExecutorOptions = {}):
   `
 
   try {
-    const { stdout, stderr } = await execAsync(
-      `osascript -l JavaScript -e ${escapeShellArg(wrappedCode)}`,
-      { timeout }
-    )
+    const { stdout, stderr } = await runOsascript(wrappedCode, timeout)
 
     if (stderr) {
       if (onStderr) {
@@ -78,8 +72,10 @@ export async function runWithApp<T>(
   fn: string, // Function body as string
   options: JxaExecutorOptions = {}
 ): Promise<T> {
+  // The bundle identifier is embedded as a JSON string literal so it can never
+  // terminate the literal or inject code, whatever characters it contains.
   const code = `
-    var app = Application("${bundleId}");
+    var app = Application(${JSON.stringify(bundleId)});
     app.includeStandardAdditions = true;
     return (function(app) { ${fn} })(app);
   `
@@ -87,9 +83,34 @@ export async function runWithApp<T>(
 }
 
 /**
- * Escape a string for shell argument.
+ * Run a script in the automation host and collect its output.
+ *
+ * The script is written to the process's standard input and the host is
+ * started directly from an argument vector, never through a shell. Script
+ * text, and therefore every value embedded in it, reaches the host byte for
+ * byte: no shell quoting or escape processing applies, so no value can
+ * terminate a string literal and become code.
+ *
+ * Failures reject with the child-process error (carrying `code`, `killed`,
+ * `signal`, and `stderr`), matching what callers already inspect.
  */
-function escapeShellArg(arg: string): string {
-  // Use $'...' syntax for proper escaping
-  return "$'" + arg.replace(/'/g, "\\'").replace(/\n/g, '\\n') + "'"
+function runOsascript(
+  script: string,
+  timeout: number
+): Promise<{ stdout: string; stderr: string }> {
+  return new Promise((resolve, reject) => {
+    const child = execFile(
+      'osascript',
+      ['-l', 'JavaScript'],
+      { timeout, encoding: 'utf8' },
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(Object.assign(error, { stderr }))
+          return
+        }
+        resolve({ stdout, stderr })
+      }
+    )
+    child.stdin?.end(script, 'utf8')
+  })
 }
