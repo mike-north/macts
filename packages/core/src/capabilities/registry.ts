@@ -14,7 +14,7 @@
  */
 
 import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
-import { resolveManifestRoutes } from '../manifest/route.js'
+import { normalizeResourceRouteSegment, resolveManifestRoutes } from '../manifest/route.js'
 import type { ManifestRoute } from '../manifest/route.js'
 import type { JsonSchema } from '../generator/mcp/types.js'
 import { getResources, getResourceCommands, getAppCommands } from '../generator/mcp/context.js'
@@ -217,7 +217,7 @@ function deriveResourceCapability(
   cliPath: ResourceCliPath,
   permission: string
 ): Capability {
-  const resourceName = resource.plural.toLowerCase()
+  const resourceName = normalizeResourceRouteSegment(resource.plural)
   const inputSchema = generateResourceOperationSchema(command, resource)
   const name = `${app}.${resourceName}.${command.name}`
 
@@ -297,9 +297,9 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
   for (const resource of getResources(manifest)) {
     const commands = getResourceCommands(manifest, resource.name)
     // Use the resource's hierarchy CLI path when present; fall back to the
-    // resource plural as a single segment for resources not in the hierarchy.
+    // resource segment for resources not in the hierarchy.
     const cliPath = cliPaths.get(resource.name) ?? {
-      segments: [resource.plural.toLowerCase()],
+      segments: [normalizeResourceRouteSegment(resource.plural)],
       parentFlags: [],
     }
     for (const command of commands) {

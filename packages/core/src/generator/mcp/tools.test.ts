@@ -23,9 +23,53 @@ describe('generateToolName', () => {
     expect(name).toBe('macts__calendar__events_create')
   })
 
-  it('should handle mixed case resource names', () => {
-    const name = generateToolName('mail', 'MessageRules', 'get')
-    expect(name).toBe('macts__mail__messagerules_get')
+  it('keeps the resource segment as given', () => {
+    // The resource part is the resource segment, spelled as in the route
+    // `mail.messageRules.get` (issue #154); it is not lowercased again.
+    const name = generateToolName('mail', 'messageRules', 'get')
+    expect(name).toBe('macts__mail__messageRules_get')
+  })
+})
+
+/**
+ * The operation part of a tool name is snake case with each acronym one word,
+ * the same word split that spells resources in lower camel case (issue #154).
+ * Each expected value is split by hand: acronym runs stay together, the
+ * capital that starts the next word starts a new word, and a lone `s` after
+ * an acronym is its plural.
+ */
+describe('generateToolName operation snake case', () => {
+  const operation = (name: string) =>
+    generateToolName('app', 'app', name).slice('macts__app__app_'.length)
+
+  it('splits a camel case operation at each capital', () => {
+    expect(operation('splitVertically')).toBe('split_vertically')
+    expect(operation('reloadCalendars')).toBe('reload_calendars')
+  })
+
+  it('keeps an acronym inside an operation as one word', () => {
+    // iTerm's `invokeAPIExpression`: invoke / API / Expression.
+    expect(generateToolName('iterm', 'app', 'invokeAPIExpression')).toBe(
+      'macts__iterm__app_invoke_api_expression'
+    )
+  })
+
+  it('keeps an acronym that ends an operation as one word', () => {
+    expect(operation('getURL')).toBe('get_url')
+    expect(operation('exportPDF')).toBe('export_pdf')
+  })
+
+  it('keeps an acronym that starts an operation as one word', () => {
+    expect(operation('URLForName')).toBe('url_for_name')
+    expect(operation('PDFExport')).toBe('pdf_export')
+  })
+
+  it("treats a lone s after an acronym as the acronym's plural", () => {
+    expect(operation('listURLs')).toBe('list_urls')
+  })
+
+  it('keeps digits with the word before them', () => {
+    expect(operation('getID3Tags')).toBe('get_id3_tags')
   })
 })
 
@@ -381,6 +425,18 @@ describe('generateResourceTool', () => {
     expect(tool.isResourceOperation).toBe(true)
     expect(tool.resourceType).toBe('Event')
     expect(tool.inputSchema).toBeDefined()
+  })
+
+  it('names a multi-word resource by its segment', () => {
+    // The tool calls `client.mediaItems` and is named for the route segment
+    // `mediaItems` (MediaItems → mediaItems, issue #154).
+    const tool = generateResourceTool(
+      'photos',
+      { ...mockResource, name: 'MediaItem', plural: 'MediaItems' },
+      mockCommand
+    )
+    expect(tool.resourceName).toBe('mediaItems')
+    expect(tool.name).toBe('macts__photos__mediaItems_list')
   })
 })
 

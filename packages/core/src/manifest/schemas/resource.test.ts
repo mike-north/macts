@@ -182,19 +182,55 @@ describe('IdentifierSchema', () => {
   })
 })
 
+describe('ResourceSchema plural', () => {
+  // A plural is Pascal case letters only, so its lower camel case is always a
+  // valid route and permission segment (design record D2; issue #154).
+  const withPlural = (plural: string) =>
+    ResourceSchema.safeParse({ name: 'Item', plural, description: 'An item', properties: {} })
+
+  it('accepts a multi-word plural', () => {
+    expect(withPlural('MediaItems').success).toBe(true)
+  })
+
+  it('accepts a plural that starts with an acronym', () => {
+    expect(withPlural('URLs').success).toBe(true)
+    expect(withPlural('AIMHandles').success).toBe(true)
+  })
+
+  it('rejects a plural with a space, naming the expected form', () => {
+    // `Bookmark Folders` would give the segment `bookmark Folders`.
+    const result = withPlural('Bookmark Folders')
+    expect(result.success).toBe(false)
+    expect(result.error?.issues[0]?.path).toEqual(['plural'])
+    expect(result.error?.issues[0]?.message).toContain('Pascal case identifier of letters only')
+  })
+
+  it('rejects a plural that starts with a lower-case letter', () => {
+    expect(withPlural('calendars').success).toBe(false)
+  })
+
+  it('rejects a plural with a digit', () => {
+    expect(withPlural('Mp3Files').success).toBe(false)
+  })
+
+  it('rejects an empty plural', () => {
+    expect(withPlural('').success).toBe(false)
+  })
+})
+
 describe('ResourceSchema', () => {
   describe('positive cases', () => {
     it('should accept minimal valid resource', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar container',
         properties: {},
       })
 
       expect(result).toEqual({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar container',
         properties: {},
       })
@@ -203,7 +239,7 @@ describe('ResourceSchema', () => {
     it('should accept complete resource with all optional fields', () => {
       const result = ResourceSchema.parse({
         name: 'Event',
-        plural: 'events',
+        plural: 'Events',
         description: 'A calendar event',
         schema: './schemas/event.json',
         code: 'wrev',
@@ -231,7 +267,7 @@ describe('ResourceSchema', () => {
     it('should accept resource with multiple identifiers', () => {
       const result = ResourceSchema.parse({
         name: 'Event',
-        plural: 'events',
+        plural: 'Events',
         description: 'A calendar event',
         properties: {},
         identifiers: [{ property: 'uid', primary: true }, { property: 'id' }],
@@ -245,7 +281,7 @@ describe('ResourceSchema', () => {
     it('should accept resource with empty properties', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
       })
@@ -258,7 +294,7 @@ describe('ResourceSchema', () => {
     it('should reject resource without name', () => {
       expect(() =>
         ResourceSchema.parse({
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
         })
@@ -279,7 +315,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           properties: {},
         })
       ).toThrow(ZodError)
@@ -289,7 +325,7 @@ describe('ResourceSchema', () => {
       // Properties field uses z.preprocess to default to {} when missing
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
       })
       expect(result.properties).toEqual({})
@@ -300,7 +336,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
           code: '',
@@ -311,7 +347,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
           code: 'abcde',
@@ -323,7 +359,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 123,
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
         })
@@ -334,7 +370,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: 'not-an-object',
         })
@@ -345,7 +381,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
           identifiers: 'not-an-array',
@@ -357,7 +393,7 @@ describe('ResourceSchema', () => {
       expect(() =>
         ResourceSchema.parse({
           name: 'Calendar',
-          plural: 'calendars',
+          plural: 'Calendars',
           description: 'A calendar',
           properties: {},
           identifiers: [
@@ -374,7 +410,7 @@ describe('ResourceSchema', () => {
       // 1 character
       let result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         code: 'a',
@@ -384,7 +420,7 @@ describe('ResourceSchema', () => {
       // 2 characters
       result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         code: 'ab',
@@ -394,7 +430,7 @@ describe('ResourceSchema', () => {
       // 3 characters
       result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         code: 'abc',
@@ -404,7 +440,7 @@ describe('ResourceSchema', () => {
       // 4 characters
       result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         code: 'abcd',
@@ -413,22 +449,23 @@ describe('ResourceSchema', () => {
     })
 
     it('should accept empty string values', () => {
+      // `plural` is the exception: it must be a non-empty Pascal case
+      // identifier (see 'ResourceSchema plural').
       const result = ResourceSchema.parse({
         name: '',
-        plural: '',
+        plural: 'Items',
         description: '',
         properties: {},
       })
 
       expect(result.name).toBe('')
-      expect(result.plural).toBe('')
       expect(result.description).toBe('')
     })
 
     it('should accept empty identifiers array', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         identifiers: [],
@@ -440,7 +477,7 @@ describe('ResourceSchema', () => {
     it('should accept four-character code', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         code: 'wrcl',
@@ -452,7 +489,7 @@ describe('ResourceSchema', () => {
     it('should accept undefined optional fields', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         schema: undefined,
@@ -468,7 +505,7 @@ describe('ResourceSchema', () => {
     it('should accept a resource with probe metadata (probed status)', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         identifiers: [{ property: 'calendarIdentifier', primary: true }],
@@ -487,7 +524,7 @@ describe('ResourceSchema', () => {
     it('should accept a resource with probe metadata (no-items status)', () => {
       const result = ResourceSchema.parse({
         name: 'Event',
-        plural: 'events',
+        plural: 'Events',
         description: 'A calendar event',
         properties: {},
         probe: {
@@ -505,7 +542,7 @@ describe('ResourceSchema', () => {
     it('should accept probe field as undefined', () => {
       const result = ResourceSchema.parse({
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar',
         properties: {},
         probe: undefined,

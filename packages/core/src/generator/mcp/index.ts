@@ -18,7 +18,7 @@ import type {
 } from './types.js'
 import { getResources, getResourceCommands, getAppCommands } from './context.js'
 import { generateResourceTool, generateAppTool } from './tools.js'
-import { safeIdentifier } from '../surface.js'
+import { resourceNamespace, safeIdentifier } from '../surface.js'
 
 /**
  * Convert a hyphenated name to camelCase for use as a JS identifier.
@@ -654,7 +654,7 @@ export function generateMcpPlugin(context: McpGeneratorContext): GeneratedMcpPlu
     }
 
     if (resourceTools.length > 0) {
-      toolFileMap.set(resource.plural.toLowerCase(), resourceTools)
+      toolFileMap.set(resourceNamespace(resource), resourceTools)
     }
   }
 

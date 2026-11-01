@@ -27,7 +27,8 @@ import { generateCliPlugin } from '../cli/index.js'
 import { createCliGeneratorContext } from '../cli/context.js'
 import { generateResourceOperationSchema } from '../mcp/tools.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
-import { createInputFields, resourceCommandEntries } from '../surface.js'
+import { createInputFields, resourceCommandEntries, resourceNamespace } from '../surface.js'
+import { lowerCamel } from '../../manifest/lower-camel.js'
 
 /** The fields one resource has in one place of one generated surface. */
 export interface FieldList {
@@ -115,10 +116,6 @@ function commandParameterNames(manifest: AppManifest, resourceKey: string): Set<
     for (const parameter of command.parameters) names.add(parameter.name)
   }
   return names
-}
-
-function lowerCamel(name: string): string {
-  return name.charAt(0).toLowerCase() + name.slice(1)
 }
 
 /**
@@ -241,7 +238,8 @@ function cliFieldLists(manifest: AppManifest): FieldList[] {
     for (const parent of path.parentParams) otherSources.add(parent.name)
   }
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
-    otherSources.add(`${lowerCamel(resourceKey)}Id`)
+    // The CLI names a resource's id option by lowering only its first letter.
+    otherSources.add(`${resourceKey.charAt(0).toLowerCase()}${resourceKey.slice(1)}Id`)
     const identifier = resolvePrimaryIdentifierProperty(resource)
     if (identifier !== undefined) otherSources.add(identifier)
     for (const name of commandParameterNames(manifest, resourceKey)) otherSources.add(name)
@@ -267,13 +265,14 @@ function cliFieldLists(manifest: AppManifest): FieldList[] {
 }
 
 /**
- * The resource keys behind each SDK client accessor: a resource's plural,
- * lowercased, which is how the SDK, the CLI, and capabilities name it.
+ * The resource keys behind each SDK client accessor: the resource's segment
+ * (`resourceNamespace`), which is how the SDK, the CLI, and capabilities name
+ * it.
  */
 function resourcesByAccessor(manifest: AppManifest): Map<string, string[]> {
   const byAccessor = new Map<string, string[]>()
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
-    const accessor = resource.plural.toLowerCase()
+    const accessor = resourceNamespace(resource)
     byAccessor.set(accessor, [...(byAccessor.get(accessor) ?? []), resourceKey])
   }
   return byAccessor

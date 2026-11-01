@@ -695,7 +695,6 @@ commands:
     resourceType: Calendar
     code: core
     parameters: []
-    permission: calendar:calendars:list
 
   get:
     name: get
@@ -708,7 +707,6 @@ commands:
         type: string
         description: Calendar identifier
         required: true
-    permission: calendar:calendars:get
 
   create:
     name: create
@@ -725,7 +723,6 @@ commands:
         type: rgb
         description: Calendar color
         required: false
-    permission: calendar:calendars:create
 
   # Event-specific CRUD commands
   listEvents:
@@ -916,7 +913,6 @@ commands:
         description: The calendar view to be displayed
         required: true
         code: wre5
-    permission: calendar:app:switchView
 
   viewCalendar:
     name: viewCalendar
@@ -929,7 +925,6 @@ commands:
         description: The date to be displayed
         required: true
         code: wtdt
-    permission: calendar:app:viewCalendar
 
   show:
     name: show
@@ -938,7 +933,6 @@ commands:
     resourceType: Event
     code: aec3
     parameters: []
-    permission: calendar:events:show
 
 # Permissions mapping - defines coarse→fine permission relationships
 permissions:

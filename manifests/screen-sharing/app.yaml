@@ -54,7 +54,6 @@ commands:
     resourceType: Connection
     code: core
     parameters: []
-    permission: screen-sharing:connections:list
 
   get:
     name: get
@@ -67,7 +66,6 @@ commands:
         type: string
         description: Connection identifier
         required: true
-    permission: screen-sharing:connections:get
 
   getURL:
     name: getURL
@@ -79,7 +77,6 @@ commands:
         type: string
         description: The VNC URL to open
         required: true
-    permission: screen-sharing:app:getURL
 
 permissions:
   connections:

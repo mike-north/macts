@@ -28,7 +28,6 @@ import {
   collectContractDiagnostics,
   contractNames,
   generateContract,
-  lowerCamel,
   type GeneratedContract,
 } from './index.js'
 import { jotterManifest } from './test-fixtures.js'
@@ -534,7 +533,7 @@ describe('generateContract: errors', () => {
   })
 })
 
-describe('contractNames and lowerCamel', () => {
+describe('contractNames', () => {
   it('name the client after the app and the contract in lower camel case', () => {
     const named = (name: string) =>
       contractNames({ ...jotterManifest(), app: { name, bundleId: 'x', tccEntitlements: [] } })
@@ -549,14 +548,6 @@ describe('contractNames and lowerCamel', () => {
       client: 'iTermClient',
       contract: 'iTermContract',
     })
-  })
-
-  it('lowercases a leading capital run, keeping the capital that starts the next word', () => {
-    expect(lowerCamel('Notes')).toBe('notes')
-    expect(lowerCamel('OmniFocus')).toBe('omniFocus')
-    expect(lowerCamel('XMLParser')).toBe('xmlParser')
-    expect(lowerCamel('TV')).toBe('tv')
-    expect(lowerCamel('iTerm')).toBe('iTerm')
   })
 })
 

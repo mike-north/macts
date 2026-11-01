@@ -258,7 +258,6 @@ commands:
     resourceType: MediaItem
     code: core
     parameters: []
-    permission: photos:mediaItems:list
 
   getMediaItem:
     name: get
@@ -272,7 +271,6 @@ commands:
         type: string
         description: Media item identifier
         required: true
-    permission: photos:mediaItems:get
 
   listAlbums:
     name: list
@@ -371,7 +369,6 @@ commands:
         type: string
         description: The media item to duplicate
         required: true
-    permission: photos:mediaItems:duplicate
 
   make:
     name: make
@@ -485,7 +482,6 @@ commands:
         type: string
         description: The full path to the image or media item ID
         required: true
-    permission: photos:app:spotlight
 
   search:
     name: search
@@ -497,7 +493,6 @@ commands:
         type: string
         description: The text to search for
         required: true
-    permission: photos:app:search
 
 permissions:
   mediaItems:

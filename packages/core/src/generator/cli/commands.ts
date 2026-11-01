@@ -5,7 +5,7 @@ import type {
 } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
-import { safeIdentifier } from '../surface.js'
+import { identifierWords, resourceNamespace, safeIdentifier } from '../surface.js'
 
 /**
  * Instance members of Clipanion's \`Command\` base class. A generated option whose
@@ -55,17 +55,13 @@ function buildOutputImportPath(depth: number): string {
 }
 
 /**
- * Build the HTTP client resource accessor for a hierarchy path.
- * The HTTP client has flat resource access via `resource.plural.toLowerCase()`.
- * This must match exactly how the SDK names its resource client properties.
+ * The HTTP client accessor a command calls for its resource. The client's
+ * resource access is flat (`client.mediaItems`, whatever the resource's
+ * hierarchy path), and is named by the shared client surface rule, so the CLI
+ * calls exactly the property the SDK declares.
  */
-function buildResourceAccess(hierarchyPath: HierarchyPath, ctx: CliGeneratorContext): string {
-  const resource = ctx.getResource(hierarchyPath.resourceName)
-  if (!resource) {
-    // Fallback to hierarchy path segment lowercased
-    return (hierarchyPath.path[hierarchyPath.path.length - 1] ?? '').toLowerCase()
-  }
-  return resource.plural.toLowerCase()
+function buildResourceAccess(resource: Resource): string {
+  return resourceNamespace(resource)
 }
 
 /**
@@ -83,7 +79,7 @@ export function generateListCommand(
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)
-  const resourceAccess = buildResourceAccess(hierarchyPath, ctx)
+  const resourceAccess = buildResourceAccess(resource)
 
   // Build command path
   const cliPath = [appName, ...hierarchyPath.path, 'list']
@@ -117,13 +113,13 @@ import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * List ${resource.plural.toLowerCase()}.
+ * List ${identifierWords(resource.plural)}.
  */
 export class List${resource.plural}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'List ${resource.plural.toLowerCase()}',
+    description: 'List ${identifierWords(resource.plural)}',
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -175,7 +171,7 @@ export function generateCreateCommand(
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)
-  const resourceAccess = buildResourceAccess(hierarchyPath, ctx)
+  const resourceAccess = buildResourceAccess(resource)
 
   // Build command path
   const cliPath = [appName, ...hierarchyPath.path, 'create']
@@ -195,13 +191,13 @@ import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * Create a new ${resource.name.toLowerCase()}.
+ * Create a new ${identifierWords(resource.name)}.
  */
 export class Create${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Create a new ${resource.name.toLowerCase()}',
+    description: 'Create a new ${identifierWords(resource.name)}',
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -256,7 +252,7 @@ export function generateGetCommand(
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)
-  const resourceAccess = buildResourceAccess(hierarchyPath, ctx)
+  const resourceAccess = buildResourceAccess(resource)
 
   // Build command path with positional ID
   const cliPath = [appName, ...hierarchyPath.path, 'get']
@@ -280,13 +276,13 @@ import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * Get a ${resource.name.toLowerCase()} by ID.
+ * Get a ${identifierWords(resource.name)} by ID.
  */
 export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Get a ${resource.name.toLowerCase()} by ID',
+    description: 'Get a ${identifierWords(resource.name)} by ID',
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
@@ -417,7 +413,7 @@ export function generateResourceCommand(
   const appName = ctx.getAppNameLower()
   const sdkImportPath = buildSdkImportPath(hierarchyPath.path.length)
   const outputImportPath = buildOutputImportPath(hierarchyPath.path.length)
-  const resourceAccess = buildResourceAccess(hierarchyPath, ctx)
+  const resourceAccess = buildResourceAccess(resource)
 
   // Build command path
   const cmdNameKebab = toKebabCase(cmd.name)

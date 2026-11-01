@@ -21,7 +21,11 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { loadManifest } from '../manifest/loader.js'
-import { commandRouteSegment, resolveManifestRoutes } from '../manifest/route.js'
+import {
+  commandRouteSegment,
+  normalizeResourceRouteSegment,
+  resolveManifestRoutes,
+} from '../manifest/route.js'
 import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
 import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
@@ -145,7 +149,7 @@ describe('route coherence across all app manifests', () => {
               : [command.resourceType]
         const appSeg = manifest.app.name.replace(/\s+/g, '-').toLowerCase()
         for (const rt of resourceTypes) {
-          const plural = (manifest.resources[rt]?.plural ?? `${rt}s`).toLowerCase()
+          const plural = normalizeResourceRouteSegment(manifest.resources[rt]?.plural ?? `${rt}s`)
           const nameKeyed = `${appSeg}.${plural}.${command.name}`
           const keyKeyed = `${appSeg}.${plural}.${commandRouteSegment(key, command)}`
           if (clientRoutes.has(nameKeyed) && !clientRoutes.has(keyKeyed)) {

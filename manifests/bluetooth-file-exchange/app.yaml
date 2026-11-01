@@ -47,7 +47,6 @@ commands:
         description: The device to browse
         required: false
         code: bdAd
-    permission: bluetooth-file-exchange:app:browse
 
   send:
     name: send
@@ -66,7 +65,6 @@ commands:
         description: The device to send the file to
         required: false
         code: bdAd
-    permission: bluetooth-file-exchange:app:send
 
 # Permissions mapping
 permissions:

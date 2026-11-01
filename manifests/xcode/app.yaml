@@ -738,7 +738,6 @@ commands:
     resourceType: WorkspaceDocument
     code: core
     parameters: []
-    permission: xcode:workspaceDocuments:list
 
   getWorkspaceDocument:
     name: get
@@ -752,7 +751,6 @@ commands:
         type: string
         description: Workspace document name
         required: true
-    permission: xcode:workspaceDocuments:get
 
   listProjects:
     name: list
@@ -818,7 +816,6 @@ commands:
         type: string
         description: Workspace document name
         required: true
-    permission: xcode:runDestinations:list
 
   getRunDestination:
     name: get
@@ -832,7 +829,6 @@ commands:
         type: string
         description: Run destination name
         required: true
-    permission: xcode:runDestinations:get
 
   build:
     name: build

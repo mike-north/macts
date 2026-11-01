@@ -14,6 +14,7 @@ import type { Command } from './schemas/command.js'
 import { AppManifestSchema } from './schemas/index.js'
 import {
   normalizeAppRouteSegment,
+  normalizeResourceRouteSegment,
   buildAppCommandRoute,
   buildResourceCommandRoute,
   commandRouteSegment,
@@ -88,6 +89,33 @@ describe('normalizeAppRouteSegment', () => {
   })
 })
 
+/**
+ * The resource segment is the acronym-aware lower camel case of the plural
+ * (design record D2; issue #154), so every surface spells a resource one way.
+ */
+describe('normalizeResourceRouteSegment', () => {
+  it('lowercases the first letter of a single-word plural', () => {
+    expect(normalizeResourceRouteSegment('Notes')).toBe('notes')
+  })
+
+  it('keeps the word capitals of a multi-word plural', () => {
+    // Before #154 this was lowercased whole (`mediaitems`), unlike the SDK's and
+    // the explicit permissions' `mediaItems`.
+    expect(normalizeResourceRouteSegment('MediaItems')).toBe('mediaItems')
+    expect(normalizeResourceRouteSegment('OpenFileAlarms')).toBe('openFileAlarms')
+  })
+
+  it('lowercases a leading acronym', () => {
+    expect(normalizeResourceRouteSegment('AIMHandles')).toBe('aimHandles')
+    expect(normalizeResourceRouteSegment('ICQHandles')).toBe('icqHandles')
+    expect(normalizeResourceRouteSegment('URLs')).toBe('urls')
+  })
+
+  it('lowercases an all-capital plural', () => {
+    expect(normalizeResourceRouteSegment('TV')).toBe('tv')
+  })
+})
+
 describe('buildAppCommandRoute', () => {
   it('keys an app command by its command key', () => {
     expect(buildAppCommandRoute('Calendar', 'reloadCalendars')).toBe('calendar.app.reloadCalendars')
@@ -98,6 +126,14 @@ describe('buildResourceCommandRoute', () => {
   it('keys a resource command by app, plural resource, and command key', () => {
     expect(buildResourceCommandRoute('Calendar', 'Events', 'createEvent')).toBe(
       'calendar.events.createEvent'
+    )
+  })
+
+  it('spells a multi-word resource by its segment', () => {
+    // MediaItems → mediaItems, the same spelling as the SDK accessor.
+    expect(buildResourceCommandRoute('Photos', 'MediaItems', 'list')).toBe('photos.mediaItems.list')
+    expect(buildResourceCommandRoute('Contacts', 'AIMHandles', 'get')).toBe(
+      'contacts.aimHandles.get'
     )
   })
 })
@@ -153,7 +189,7 @@ describe('resolveCommandRoutes', () => {
       parameters: [],
     }
     const routes = resolveCommandRoutes(manifest, 'archive', command)
-    // Unknown resource type → `${type}s` fallback, lowercased.
+    // Unknown resource type → `${type}s` fallback, as a resource segment.
     expect(routes[0]?.route).toBe('calendar.widgets.archive')
     expect(routes[0]?.resource).toBeUndefined()
   })
@@ -174,8 +210,9 @@ describe('resolveManifestRoutes', () => {
 /**
  * Permission derivation. The expected strings follow the server's rule: the
  * command's explicit `permission`, else `{app segment}:{scope}:{command key}`,
- * where the scope is `app` for application commands and the resource route
- * segment (lowercased plural, or `{type}s` for an unknown resource) otherwise.
+ * where the scope is `app` for application commands and the resource segment
+ * (the plural's lower camel case, or that of `{type}s` for an unknown
+ * resource) otherwise.
  */
 describe('ManifestRoute.permission', () => {
   function routesFor(app: string, commandKey: string, command: Command) {
@@ -197,6 +234,32 @@ describe('ManifestRoute.permission', () => {
     expect(resolveCommandRoutes(manifest, 'createEvent', command)[0]?.permission).toBe(
       'calendar:events:createEvent'
     )
+  })
+
+  it('derives the scope of a multi-word resource from its segment', () => {
+    // The scope is the route's resource segment, `openFileAlarms`, so a caller
+    // can carry the route's spelling into a grant (issue #154).
+    const fixture: AppManifest = {
+      ...manifest,
+      resources: {
+        OpenFileAlarm: {
+          name: 'OpenFileAlarm',
+          plural: 'OpenFileAlarms',
+          description: 'An alarm that opens a file',
+          properties: {},
+        },
+      },
+    }
+    const command: Command = {
+      name: 'list',
+      description: 'List',
+      scope: 'resource',
+      resourceType: 'OpenFileAlarm',
+      parameters: [],
+    }
+    const [route] = resolveCommandRoutes(fixture, 'list', command)
+    expect(route?.route).toBe('calendar.openFileAlarms.list')
+    expect(route?.permission).toBe('calendar:openFileAlarms:list')
   })
 
   it('uses the hyphenated app segment for multi-word apps', () => {

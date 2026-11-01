@@ -14,7 +14,7 @@ describe('AppManifestSchema', () => {
     resources: {
       Document: {
         name: 'Document',
-        plural: 'documents',
+        plural: 'Documents',
         description: 'A document',
         properties: {
           name: {
@@ -65,7 +65,7 @@ describe('AppManifestSchema', () => {
     resources: {
       Calendar: {
         name: 'Calendar',
-        plural: 'calendars',
+        plural: 'Calendars',
         description: 'A calendar container',
         code: 'cCal',
         properties: {
@@ -96,7 +96,7 @@ describe('AppManifestSchema', () => {
       },
       Event: {
         name: 'Event',
-        plural: 'events',
+        plural: 'Events',
         description: 'A calendar event',
         code: 'cEvt',
         properties: {
@@ -147,7 +147,7 @@ describe('AppManifestSchema', () => {
       },
       Attendee: {
         name: 'Attendee',
-        plural: 'attendees',
+        plural: 'Attendees',
         description: 'An event attendee',
         code: 'cAtt',
         properties: {
@@ -423,7 +423,7 @@ describe('AppManifestSchema', () => {
       const manifest = createMinimalManifest()
       manifest.resources['File'] = {
         name: 'File',
-        plural: 'files',
+        plural: 'Files',
         description: 'A file',
         properties: {
           path: {
@@ -455,7 +455,7 @@ describe('AppManifestSchema', () => {
         resources: {
           Document: {
             name: 'Document',
-            plural: 'documents',
+            plural: 'Documents',
             description: 'A document',
             properties: {
               name: {

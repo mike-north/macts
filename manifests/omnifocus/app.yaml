@@ -837,7 +837,6 @@ commands:
     resourceType: InboxTask
     code: core
     parameters: []
-    permission: omnifocus:inboxTasks:list
 
   getInboxTask:
     name: get
@@ -851,7 +850,6 @@ commands:
         type: string
         description: Inbox task identifier
         required: true
-    permission: omnifocus:inboxTasks:get
 
   createInboxTask:
     name: create
@@ -869,7 +867,6 @@ commands:
         type: string
         description: Task note
         required: false
-    permission: omnifocus:inboxTasks:create
 
   listPerspectives:
     name: list
@@ -903,7 +900,6 @@ commands:
         type: string
         description: Text to complete
         required: true
-    permission: omnifocus:app:complete
 
   markComplete:
     name: markComplete
@@ -915,7 +911,6 @@ commands:
         type: string
         description: Objects to mark complete
         required: true
-    permission: omnifocus:app:markComplete
 
   markIncomplete:
     name: markIncomplete
@@ -927,7 +922,6 @@ commands:
         type: string
         description: Objects to mark incomplete
         required: true
-    permission: omnifocus:app:markIncomplete
 
   markDropped:
     name: markDropped
@@ -939,7 +933,6 @@ commands:
         type: string
         description: Objects to mark dropped
         required: true
-    permission: omnifocus:app:markDropped
 
   parseTasksInto:
     name: parseTasksInto
@@ -955,7 +948,6 @@ commands:
         type: string
         description: Target container
         required: true
-    permission: omnifocus:app:parseTasksInto
 
   archive:
     name: archive
@@ -971,7 +963,6 @@ commands:
         type: boolean
         description: Should the archive be written with data compression enabled
         required: false
-    permission: omnifocus:app:archive
 
   compact:
     name: compact
@@ -979,7 +970,6 @@ commands:
     scope: application
     code: 'FC><'
     parameters: []
-    permission: omnifocus:app:compact
 
   synchronize:
     name: synchronize
@@ -987,7 +977,6 @@ commands:
     scope: application
     code: FCsy
     parameters: []
-    permission: omnifocus:app:synchronize
 
   importInto:
     name: importInto
@@ -999,7 +988,6 @@ commands:
         type: string
         description: File to import
         required: true
-    permission: omnifocus:app:importInto
 
   undo:
     name: undo
@@ -1007,7 +995,6 @@ commands:
     scope: application
     code: FCUd
     parameters: []
-    permission: omnifocus:app:undo
 
   redo:
     name: redo
@@ -1015,7 +1002,6 @@ commands:
     scope: application
     code: FCRd
     parameters: []
-    permission: omnifocus:app:redo
 
 permissions:
   folders:

@@ -57,7 +57,6 @@ commands:
     scope: resource
     resourceType: Document
     parameters: []
-    permission: preview:documents:list
   get:
     name: get
     description: Get a document by name
@@ -68,7 +67,6 @@ commands:
         type: string
         description: Document name
         required: true
-    permission: preview:documents:get
 permissions:
   documents:
     read:

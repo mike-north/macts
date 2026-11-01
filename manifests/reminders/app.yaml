@@ -361,7 +361,6 @@ commands:
     resourceType: List
     code: core
     parameters: []
-    permission: reminders:lists:list
 
   get:
     name: get
@@ -374,7 +373,6 @@ commands:
         type: string
         description: List identifier
         required: true
-    permission: reminders:lists:get
 
   create:
     name: create
@@ -391,7 +389,6 @@ commands:
         type: string
         description: List color
         required: false
-    permission: reminders:lists:create
 
   # Reminder commands
   listReminders:
@@ -490,7 +487,6 @@ commands:
     resourceType: Reminder
     code: '????'
     parameters: []
-    permission: reminders:reminders:show
 
   # Account commands
   listAccounts:

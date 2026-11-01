@@ -16,6 +16,8 @@
  */
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
+import { normalizeResourceRouteSegment } from '../manifest/route.js'
+import { splitIdentifierWords } from '../manifest/lower-camel.js'
 import { usableProperties } from '../manifest/unsupported.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
 
@@ -141,10 +143,29 @@ export function resourceHasOperations(manifest: AppManifest, resourceName: strin
 
 /**
  * The client namespace under which a resource's methods appear (for example
- * `client.calendars`): the resource's plural, lowercased.
+ * `client.calendars`, `client.mediaItems`): the resource's segment, the same
+ * spelling as its routes, tools and derived permissions
+ * ({@link normalizeResourceRouteSegment}).
  */
-export function resourceNamespace(resource: Resource): string {
-  return resource.plural.toLowerCase()
+export function resourceNamespace(resource: Pick<Resource, 'plural'>): string {
+  return normalizeResourceRouteSegment(resource.plural)
+}
+
+/**
+ * An identifier as words for generated prose, such as a resource's plural or
+ * name in a method's documentation: `MediaItems` → `media items`,
+ * `AIMHandles` → `AIM handles`, `URLTrack` → `URL track`. The words are the
+ * shared split ({@link splitIdentifierWords}); acronyms keep their capitals
+ * and every other word is lowercased. It is prose only, never a name a caller
+ * types.
+ *
+ * @param identifier - A Pascal or camel case identifier.
+ * @returns The identifier's words, separated by single spaces.
+ */
+export function identifierWords(identifier: string): string {
+  return splitIdentifierWords(identifier)
+    .map((word) => (/^[A-Z]{2,}/.test(word) ? word : word.toLowerCase()))
+    .join(' ')
 }
 
 /**

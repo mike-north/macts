@@ -12,7 +12,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -52,7 +52,7 @@ suites:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     code: docu
     schema: document.schema.json
@@ -69,7 +69,7 @@ resources:
         primary: true
   Page:
     name: Page
-    plural: pages
+    plural: Pages
     description: A page
     properties:
       content:
@@ -146,7 +146,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -188,7 +188,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -212,7 +212,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -251,7 +251,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -277,7 +277,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
@@ -353,7 +353,7 @@ app:
 resources:
   Document:
     name: Document
-    plural: documents
+    plural: Documents
     description: A document
     properties:
       name:
