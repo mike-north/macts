@@ -2,11 +2,12 @@
  * The one place a macts host on this Mac turns installed app packages into
  * registered operations.
  *
- * `macts --serve` serves the apps installed in the macts plugins directory
- * through this path, registering each one from its **generated contract**,
- * checked against the app's manifest by `registerContract` (phases/13 D5,
- * D11). Per D5, `macts --mcp` adopts the same functions, so that every surface
- * validates calls against the same descriptors. Manifest-only (passthrough)
+ * Every host command (`macts --serve`, `macts --mcp`, and the MCP HTTP server
+ * started by `macts mcp serve` and `macts mcp start`) serves the apps installed
+ * in the macts plugins directory through this path, registering each one from
+ * its **generated contract**, checked against the app's manifest by
+ * `registerContract` (phases/13 D5, D11), so that every surface validates
+ * calls against the same descriptors. Manifest-only (passthrough)
  * registration is not used here: it remains for embedders and tests.
  *
  * Registration happens in two steps, because loading is asynchronous and a

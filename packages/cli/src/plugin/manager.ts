@@ -409,9 +409,9 @@ export function findInstalledPluginPackages(nodeModules = getPluginsNodeModules(
  * The same plugins-directory convention as {@link findInstalledPluginPackages}:
  * one scan of `node_modules/@macts`, told apart by the `-server` suffix. A host
  * package depends on its app package `@macts/<app>`, which carries the app's
- * generated contract. `macts --serve` serves an app only when its host package
- * is installed; per phases/13 D5, `macts --mcp` adopts the same registration
- * path.
+ * generated contract. Every host command (`macts --serve`, `macts --mcp`, and
+ * the MCP HTTP server) serves an app only when its host package is installed
+ * (phases/13 D5).
  *
  * @param nodeModules - The `node_modules` directory to scan; defaults to the
  *   managed plugins directory's.
