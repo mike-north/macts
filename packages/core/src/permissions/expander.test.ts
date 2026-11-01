@@ -292,3 +292,114 @@ describe('validateCommandPermissions', () => {
     })
   })
 })
+
+describe('expandCoarsePermission unmapped policy (issue #168)', () => {
+  // A permission map lists only permissions some route requires, so key
+  // creation must still be able to grant a well-formed fine-grained permission
+  // the map does not list. `keep` returns it as itself; the default `reject`
+  // is unchanged, so `macts permissions expand` still errors on it.
+  const section: PermissionsSection = { events: { read: ['calendar:events:list'] } }
+  const keep = { unmapped: 'keep' } as const
+
+  describe('with unmapped: keep', () => {
+    it('keeps a permission whose resource is not in the map', () => {
+      // Under the default this throws "Resource attendees not found".
+      expect(expandCoarsePermission('calendar:attendees:list', section, keep)).toEqual([
+        'calendar:attendees:list',
+      ])
+    })
+
+    it('keeps a permission whose operation is neither a key nor a listed value', () => {
+      // Under the default this throws "Operation get not found".
+      expect(expandCoarsePermission('calendar:events:get', section, keep)).toEqual([
+        'calendar:events:get',
+      ])
+    })
+
+    it('still expands a coarse key to its list', () => {
+      expect(expandCoarsePermission('calendar:events:read', section, keep)).toEqual([
+        'calendar:events:list',
+      ])
+    })
+
+    it('still returns a listed fine-grained permission as itself', () => {
+      expect(expandCoarsePermission('calendar:events:list', section, keep)).toEqual([
+        'calendar:events:list',
+      ])
+    })
+
+    it('still throws for a grouping-only coarse operation on a resource not in the map', () => {
+      // `read` names no command, so granting it as written authorizes nothing.
+      expect(() => expandCoarsePermission('calendar:attendees:read', section, keep)).toThrow(
+        PermissionExpansionError
+      )
+    })
+
+    it('still throws for a grouping-only coarse operation that is not a key', () => {
+      // `events` has no `write` key, and `write` names no command.
+      expect(() => expandCoarsePermission('calendar:events:write', section, keep)).toThrow(
+        PermissionExpansionError
+      )
+    })
+
+    it('expands a resource wildcard as before', () => {
+      expect(expandCoarsePermission('calendar:events:*', section, keep)).toEqual([
+        'calendar:events:list',
+      ])
+    })
+
+    it('applies to every permission given to expandPermissions', () => {
+      expect(
+        expandPermissions(['calendar:events:read', 'calendar:attendees:list'], section, keep)
+      ).toEqual(['calendar:events:list', 'calendar:attendees:list'])
+    })
+  })
+
+  describe('with the default policy (reject)', () => {
+    it('throws for a permission whose resource is not in the map', () => {
+      expect(() => expandCoarsePermission('calendar:attendees:list', section)).toThrow(
+        'Resource "attendees" not found in permissions mapping'
+      )
+    })
+
+    it('throws for a permission whose operation is neither a key nor a listed value', () => {
+      expect(() => expandCoarsePermission('calendar:events:get', section)).toThrow(
+        'Operation "get" not found in resource "events" mapping'
+      )
+    })
+
+    it('expands a coarse key to its list', () => {
+      expect(expandCoarsePermission('calendar:events:read', section)).toEqual([
+        'calendar:events:list',
+      ])
+    })
+
+    it('returns a listed fine-grained permission as itself', () => {
+      expect(expandCoarsePermission('calendar:events:list', section)).toEqual([
+        'calendar:events:list',
+      ])
+    })
+
+    it('throws for a grouping-only coarse operation on a resource not in the map', () => {
+      expect(() => expandCoarsePermission('calendar:attendees:read', section)).toThrow(
+        PermissionExpansionError
+      )
+    })
+
+    it('throws for a grouping-only coarse operation that is not a key', () => {
+      expect(() => expandCoarsePermission('calendar:events:write', section)).toThrow(
+        PermissionExpansionError
+      )
+    })
+
+    it('expands a resource wildcard', () => {
+      expect(expandCoarsePermission('calendar:events:*', section)).toEqual(['calendar:events:list'])
+    })
+
+    it('throws from expandPermissions for an unmapped permission', () => {
+      expect(() =>
+        expandPermissions(['calendar:events:read', 'calendar:attendees:list'], section)
+      ).toThrow(PermissionExpansionError)
+    })
+  })
+})

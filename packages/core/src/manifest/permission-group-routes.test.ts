@@ -140,7 +140,9 @@ describe('permission groups in the shipped manifests', () => {
     const results = manifests.map(({ dir, manifest }) => orphanEntries(dir, manifest))
     expect(results.flatMap((result) => result.orphans)).toEqual([])
     // Guards against a vacuous pass: the groups list over two hundred route
-    // permissions between them, in about twenty apps.
+    // permissions between them, in about twenty apps. Lower these floors only
+    // in a change that removes group entries or manifests on purpose, to just
+    // below the new totals this test reports.
     expect(results.reduce((sum, result) => sum + result.checked, 0)).toBeGreaterThan(200)
     expect(results.filter((result) => result.checked > 0).length).toBeGreaterThan(15)
   })

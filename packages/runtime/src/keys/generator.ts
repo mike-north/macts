@@ -132,7 +132,9 @@ function findUnexpandableCoarsePermissions(permissions: string[]): string[] {
  * Permissions are expanded at creation time:
  * - Coarse permissions (calendar:events:read) expand to their fine-grained equivalents
  * - Wildcard permissions (calendar:*:read) expand to all matching permissions
- * - Fine-grained permissions are included as-is
+ * - Fine-grained permissions are included as-is, whether or not the mapping
+ *   lists them (expansion runs with `unmapped: 'keep'`), since a mapping lists
+ *   only permissions some route requires and a later app version may add one
  *
  * Every requested permission must satisfy the permission grammar, and when
  * `options.knownPermissions` is given, none may differ from a known permission
@@ -158,7 +160,9 @@ export async function createApiKey(
   // we reject them precisely rather than store a scope that authorizes nothing.
   let expandedPermissions: string[]
   if (permissionsSection) {
-    expandedPermissions = expandPermissions(options.permissions, permissionsSection)
+    expandedPermissions = expandPermissions(options.permissions, permissionsSection, {
+      unmapped: 'keep',
+    })
   } else {
     const coarse = findUnexpandableCoarsePermissions(options.permissions)
     if (coarse.length > 0 && coarse[0] !== undefined) {

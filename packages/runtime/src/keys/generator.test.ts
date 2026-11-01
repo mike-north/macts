@@ -12,7 +12,7 @@ import {
   createReadOnlyKey,
   PermissionCaseMismatchError,
 } from './generator.js'
-import { PermissionParseError } from '@macts/core'
+import { PermissionExpansionError, PermissionParseError } from '@macts/core'
 import type { PermissionsSection } from '@macts/core'
 import * as storage from './storage.js'
 
@@ -247,5 +247,72 @@ describe('createApiKey permission validation (issue #153)', () => {
       knownPermissions: PHOTOS_KNOWN,
     })
     expect(result.metadata.permissions).toEqual(['music:tracks:list'])
+  })
+})
+
+describe('createApiKey with a permissions map that does not list a permission (issue #168)', () => {
+  // A permission map lists only permissions some route requires. A
+  // well-formed fine-grained permission it does not list is still a grant of
+  // exactly itself, while coarse and wildcard permissions still expand.
+  const section: PermissionsSection = {
+    events: { read: ['calendar:events:list'] },
+  }
+  const KNOWN = ['calendar:events:list', 'calendar:events:*', 'calendar:*:*']
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('grants an unlisted fine-grained permission as written, beside an expanded coarse one', async () => {
+    const result = await createApiKey(
+      {
+        name: 'unlisted',
+        permissions: ['calendar:events:read', 'calendar:attendees:list'],
+        knownPermissions: KNOWN,
+      },
+      section
+    )
+    // calendar:events:read expands to the map's read list; calendar:attendees:list
+    // is not in the map and is kept as itself.
+    expect(result.metadata.permissions).toEqual(['calendar:events:list', 'calendar:attendees:list'])
+    expect(result.metadata.originalPermissions).toEqual([
+      'calendar:events:read',
+      'calendar:attendees:list',
+    ])
+  })
+
+  it('still rejects a grouping-only coarse operation the map cannot expand', async () => {
+    // `write` names no command and `events` has no `write` key.
+    await expect(
+      createApiKey({ name: 'dead', permissions: ['calendar:events:write'] }, section)
+    ).rejects.toThrow(PermissionExpansionError)
+  })
+
+  it('still rejects a case-only mismatch with a known permission', async () => {
+    // A case-only variant reaches the case check only when it satisfies the
+    // grammar: photos:mediaitems:list does, unlike calendar:Events:list (next
+    // test). The map lists the canonical spelling, so `keep` is what would
+    // otherwise let the mis-cased one through.
+    const section2: PermissionsSection = { mediaItems: { read: ['photos:mediaItems:list'] } }
+    const error: unknown = await createApiKey(
+      {
+        name: 'miscased',
+        permissions: ['photos:mediaitems:list'],
+        knownPermissions: ['photos:mediaItems:list'],
+      },
+      section2
+    ).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(PermissionCaseMismatchError)
+    expect((error as PermissionCaseMismatchError).canonical).toBe('photos:mediaItems:list')
+  })
+
+  it('still rejects a malformed permission before expansion', async () => {
+    // calendar:Events:list fails the grammar (a resource segment is
+    // lower camelCase), so it never reaches the map.
+    const error: unknown = await createApiKey(
+      { name: 'malformed', permissions: ['calendar:Events:list'], knownPermissions: KNOWN },
+      section
+    ).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(PermissionParseError)
   })
 })

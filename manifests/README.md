@@ -790,7 +790,7 @@ The permissions section is a two-level mapping:
 
 Each fine-grained permission follows the format: `<app>:<resource>:<operation>`
 
-Every fine-grained permission a group lists must be one that some route of the app requires. An operation the app has no command for is left out of the groups, rather than listed ahead of its command; adding the command adds its group entry in the same change. A test over every shipped manifest checks this.
+Every fine-grained permission a group lists must be one that some route of the app requires. An operation the app has no command for is left out of the groups, rather than listed ahead of its command; adding the command adds its group entry in the same change. A test over every shipped manifest, `packages/core/src/manifest/permission-group-routes.test.ts`, checks this. Key creation still grants a well-formed fine-grained permission no group lists, as written, with a warning naming the closest permission a route requires.
 
 #### Coarse Operations
 

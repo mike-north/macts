@@ -1120,10 +1120,15 @@ export interface Executor {
 }
 
 // @public
-export function expandCoarsePermission(permission: string, permissionsSection: PermissionsSection): string[];
+export function expandCoarsePermission(permission: string, permissionsSection: PermissionsSection, options?: ExpandPermissionOptions): string[];
 
 // @public
-export function expandPermissions(permissions: string[], permissionsSection: PermissionsSection): string[];
+export interface ExpandPermissionOptions {
+    readonly unmapped?: UnmappedPermissionPolicy | undefined;
+}
+
+// @public
+export function expandPermissions(permissions: string[], permissionsSection: PermissionsSection, options?: ExpandPermissionOptions): string[];
 
 // @public
 export function explainInvalidPermission(permission: string, known?: readonly string[]): string;
@@ -3276,6 +3281,9 @@ export interface UncheckedKinds {
     readonly declared: string;
     readonly property: string;
 }
+
+// @public
+export type UnmappedPermissionPolicy = 'reject' | 'keep';
 
 // @public (undocumented)
 export type Unsupported = z.infer<typeof UnsupportedSchema>;

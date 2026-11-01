@@ -215,6 +215,71 @@ describe('macts api-key create (UAT): permission grammar and case', () => {
     )
   })
 
+  it('accepts a permission the --manifest permissions map does not list, warning with the closest one (issue #168)', async () => {
+    // manifests/omniplan/app.yaml has no task update command, and its map lists
+    // only route permissions (tasks: read list/get, create create). The closest
+    // known permission is omniplan:tasks:create: "update" -> "create" is three
+    // substitutions, and no other omniplan permission is within three edits.
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-manifest',
+      '--permission',
+      'omniplan:tasks:update',
+      '--manifest',
+      join(repoRoot, 'manifests/omniplan/app.yaml'),
+      '--json',
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "omniplan:tasks:update" is not a permission any known omniplan route requires. Closest: "omniplan:tasks:create".'
+    )
+    const parsed = JSON.parse(result.stdout) as { data: { permissions: string[] } }
+    // Granted as written: the map does not list it, so it is not expanded.
+    expect(parsed.data.permissions).toEqual(['omniplan:tasks:update'])
+  })
+
+  it('accepts a permission on a resource the --manifest permissions map lacks (issue #168)', async () => {
+    // manifests/calendar/app.yaml has no attendee routes, so its map has no
+    // attendees resource. Expansion used to fail here with "Resource
+    // "attendees" not found in permissions mapping".
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-resource',
+      '--permission',
+      'calendar:attendees:list',
+      '--manifest',
+      join(repoRoot, 'manifests/calendar/app.yaml'),
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "calendar:attendees:list" is not a permission any known calendar route requires.'
+    )
+  })
+
+  it('warns for an unrouted create operation found by discovery, with the closest one (issue #168)', async () => {
+    // Without --manifest the shipped manifests are discovered, and nothing is
+    // expanded, so omnigraffle:masters:create is granted as the fine-grained
+    // permission it names. No omnigraffle route requires it; the closest known
+    // permission is omnigraffle:layers:create ("masters" -> "layers" is three
+    // edits), and no other is within three edits.
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-discovered',
+      '--permission',
+      'omnigraffle:masters:create',
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "omnigraffle:masters:create" is not a permission any known omnigraffle route requires. Closest: "omnigraffle:layers:create".'
+    )
+  })
+
   it('accepts a correctly cased permission without warning', async () => {
     const result = await runCli([
       'api-key',
@@ -372,5 +437,33 @@ describe('camelCase grants authorize real calls (UAT)', () => {
     expect(body.error.details.required).toBe(PHOTOS_LIST)
     expect(body.error.details.hint).toContain('Grant "photos:mediaItems:list"')
     expect(http.requests).toHaveLength(0)
+  })
+})
+
+describe('macts permissions expand (UAT): unmapped permissions still fail', () => {
+  // Key creation keeps a fine-grained permission the map does not list, but
+  // asking what such a permission expands to still has no answer.
+  it('rejects an operation the map neither groups nor lists', async () => {
+    const result = await runCli([
+      'permissions',
+      'expand',
+      'omniplan:tasks:update',
+      '--manifest',
+      join(repoRoot, 'manifests/omniplan/app.yaml'),
+    ])
+    expect(result.code).not.toBe(0)
+    expect(result.stderr).toContain('Operation "update" not found in resource "tasks" mapping')
+  })
+
+  it('rejects a resource the map lacks', async () => {
+    const result = await runCli([
+      'permissions',
+      'expand',
+      'calendar:attendees:list',
+      '--manifest',
+      join(repoRoot, 'manifests/calendar/app.yaml'),
+    ])
+    expect(result.code).not.toBe(0)
+    expect(result.stderr).toContain('Resource "attendees" not found in permissions mapping')
   })
 })
