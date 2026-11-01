@@ -1344,9 +1344,13 @@ This refactor adopts these items from `phases/12`:
 - `.describe()` carries descriptions on every field.
 - One schema is built per command, using the existing CRUD and identifier
   field-selection logic.
-- MCP `inputSchema` is derived at generation time with
-  `z.toJSONSchema(wire, { target: 'draft-7' })` and embedded (Option A). It
-  describes **wire** values.
+- An adapter's input schema (MCP `inputSchema`) is
+  `z.toJSONSchema(input.wire, { target: 'draft-7' })` and describes **wire**
+  values. Wire schemas are pure validators, with no defaults or transforms, so
+  input and output forms coincide. A schema JSON Schema can't represent is an
+  error, never an empty schema. An adapter serves the document it derives. A
+  contract may also embed one for consumers that don't run zod, and in this
+  repository a test asserts the two are equal wherever both exist.
 - The independent server `buildCommandSchema` is retired; the runtime validates
   with descriptor schemas.
 
