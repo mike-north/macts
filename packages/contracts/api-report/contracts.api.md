@@ -318,7 +318,7 @@ export interface IndexSelector {
 
 // @public
 export type Integer = number & {
-    readonly [integerBrand]: 'Integer';
+    readonly [integerBrand]: 'Integer: convert with Integer.validate(n), Integer.round(n), or Integer.truncate(n)';
 };
 
 // @public

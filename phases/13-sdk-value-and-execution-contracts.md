@@ -680,6 +680,13 @@ example `{"x":{"double":1},"y":{"double":2}}` and
    `{"record":{"integer":"42"}}` and decodes back to the same record. A bare
    object that is not a known control record is a decode error.
 
+   References and files are part of `DynamicWireValue`, but until the
+   reference and file value types (D7, D8) and their `DecodeContext` binding
+   exist, the dynamic wire schema and codecs reject `{"reference":…}` and
+   `{"file":…}` inside dynamic content as not representable there, and the
+   derived JSON Schema does not advertise them. The follow-up that adds those
+   value types decides whether dynamic content admits them.
+
 ## D4. Native Codec Interface and Executor Consumption
 
 The native codec runs **inside the JXA process**. It converts wire values to

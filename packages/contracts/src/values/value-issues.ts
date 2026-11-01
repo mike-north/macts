@@ -1,9 +1,9 @@
 /**
- * Stable categories for problems that value codecs report.
+ * Stable categories for violations of the value contracts.
  *
- * Every {@link ValidationIssue} a value codec produces carries one of these
- * codes, so callers and agents can branch on the kind of problem without
- * parsing messages. The spellings are part of the public contract: a code is
+ * A {@link ValidationIssue} that reports a value-contract violation carries
+ * one of these codes, so callers and agents can branch on the kind of problem
+ * without parsing messages. The spellings are part of the public contract: a code is
  * never renamed or reused for a different meaning.
  *
  * @packageDocumentation
@@ -12,7 +12,7 @@
 import type { ValidationIssue } from '../issues.js'
 
 /**
- * Every issue code a value codec can report.
+ * Every value-contract issue code.
  *
  * @remarks
  * - `invalid-type`: the value has the wrong JavaScript or JSON type for its
@@ -29,8 +29,8 @@ import type { ValidationIssue } from '../issues.js'
  * - `not-nullable`: `null` appears where the contract does not allow it.
  * - `invalid-control-record`: a wire object is not the control record its
  *   position requires (wrong or extra keys, or a malformed payload).
- * - `unsupported`: the value cannot be represented, or its kind is not
- *   supported at this position yet.
+ * - `unsupported`: the value cannot be represented at its position (for
+ *   example a function, or a kind that its position does not admit).
  */
 export const VALUE_ISSUE_CODES = Object.freeze([
   'invalid-type',

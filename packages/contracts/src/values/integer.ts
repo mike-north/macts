@@ -37,8 +37,15 @@ declare const integerBrand: unique symbol
  * `Integer.truncate(n)` (drops the fraction). Do not cast: a cast does not
  * convert, and the value is still validated, and rejected, at runtime. An
  * integer has no signed zero: `-0` is accepted and encodes as `0`.
+ *
+ * The brand's literal repeats those helper names, so the compiler's own
+ * diagnostic for a plain `number` names the fix even without a hover.
+ *
+ * @see {@link (Integer:variable)} for the conversion helpers.
  */
-export type Integer = number & { readonly [integerBrand]: 'Integer' }
+export type Integer = number & {
+  readonly [integerBrand]: 'Integer: convert with Integer.validate(n), Integer.round(n), or Integer.truncate(n)'
+}
 
 /**
  * Inclusive bounds of the SDK integer domain: the safe integers.

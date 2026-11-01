@@ -221,14 +221,17 @@ describe('DynamicWireValueSchema', () => {
     ],
     ['file', { file: { grant: 'g' } }, ['file']],
     ['reference', { record: { owner: [{ reference: {} }] } }, ['record', 'owner', 0, 'reference']],
-  ] as const)('rejects a %s value as not supported yet, at its path', (_kind, value, path) => {
-    const result = DynamicWireValueSchema.safeParse(value)
-    expect(result.success).toBe(false)
-    const issues = result.error?.issues ?? []
-    expect(issues).toHaveLength(1)
-    expect(issues[0]?.message).toContain('not supported yet')
-    expect(issues[0]?.path).toEqual(path)
-  })
+  ] as const)(
+    'rejects a %s value as not representable in dynamic content, at its path',
+    (_kind, value, path) => {
+      const result = DynamicWireValueSchema.safeParse(value)
+      expect(result.success).toBe(false)
+      const issues = result.error?.issues ?? []
+      expect(issues).toHaveLength(1)
+      expect(issues[0]?.message).toContain('cannot be represented in dynamic content')
+      expect(issues[0]?.path).toEqual(path)
+    }
+  )
 })
 
 describe('JSON Schema derivation', () => {

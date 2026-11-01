@@ -19,7 +19,12 @@
 
 import { z } from 'zod'
 import { INTEGER_LIMITS } from './integer.js'
-import { DATE_TEXT_PATTERN, checkDateText, wireIntegerSchema } from './wire-checks.js'
+import {
+  DATE_TEXT_PATTERN,
+  checkDateText,
+  checkDoublePayload,
+  wireIntegerSchema,
+} from './wire-checks.js'
 import {
   SPECIAL_DOUBLE_STATES,
   type DynamicWireValue,
@@ -52,12 +57,24 @@ export const WireIntegerSchema: z.ZodType<WireInteger> = wireIntegerSchema(
  * `"-0"` state.
  */
 export const WireDoubleSchema: z.ZodType<WireDouble> = z.strictObject({
-  double: z.union([z.number(), z.literal(SPECIAL_DOUBLE_STATES)], {
-    error:
-      'A double payload must be a finite JSON number or one of "NaN", "Infinity", ' +
-      '"-Infinity", or "-0".',
-  }),
+  // The union keeps the payload's shape visible to JSON Schema; the
+  // refinement applies the shared payload rule, so this schema and every
+  // other validator agree on exactly which payloads are doubles.
+  double: z
+    .union([z.number(), z.literal(SPECIAL_DOUBLE_STATES)], {
+      error: (iss) => checkDoubleMessage(iss.input),
+    })
+    .superRefine((payload, ctx) => {
+      const result = checkDoublePayload(payload)
+      if (!result.ok) ctx.addIssue({ code: 'custom', message: result.message })
+    }),
 })
+
+/** The shared rule's message for a payload the union rejected. */
+function checkDoubleMessage(payload: unknown): string {
+  const result = checkDoublePayload(payload)
+  return result.ok ? 'Invalid double payload.' : result.message
+}
 
 /**
  * Schema for a date control record, `{ "date": "<ISO 8601 text>" }`.
@@ -89,16 +106,17 @@ function dateTextMessage(text: string): string {
 }
 
 /**
- * The payload of a control record whose kind this version cannot accept in
- * dynamic content yet. It always fails with a message saying so, and its JSON
- * Schema (`not: {}`) admits nothing, so the derived schema never advertises the
- * kind as accepted.
+ * The payload of a control record whose kind is not representable in dynamic
+ * content: references and files, which carry meaning only at a typed
+ * position. It always fails with a message saying so, and its JSON Schema
+ * (`not: {}`) admits nothing, so the derived schema never advertises the kind
+ * as accepted.
  */
 function unsupportedDynamicPayload(kind: string) {
   return z
     .unknown()
     .refine((_payload: unknown): _payload is never => false, {
-      error: `${kind} in dynamic content are not supported yet.`,
+      error: `${kind} cannot be represented in dynamic content; declare them at a typed position.`,
     })
     .meta({ not: {} })
 }
