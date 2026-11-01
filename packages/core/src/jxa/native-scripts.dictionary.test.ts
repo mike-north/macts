@@ -25,7 +25,15 @@
  *   is not a failure, except for the system apps every Mac has
  *   ({@link REQUIRED_CHECKED}), which must be checked so the suite can never
  *   pass by checking nothing.
- * - An app the check launched anyway is a failure.
+ * - An app the check launched anyway is a failure. A launch is attributed to
+ *   the check only when the app was not running as its check began (asked of
+ *   Launch Services, through `Application(id).running()`) and its process
+ *   started after that instant. An app that was already running, or that
+ *   another test launched before the check began, is never counted, even
+ *   under full-suite load. The AppKit running-application list is not trusted
+ *   for "was it running": in a fresh process it can read empty before the run
+ *   loop has turned. It is consulted only for the launch date, after the run
+ *   loop has turned.
  *
  * Only top-level collections can be checked this way: under an element
  * specifier, the bridge accepts any name without consulting the dictionary.
@@ -159,15 +167,21 @@ function checkScript(bundleId: string, accessors: readonly string[]): string {
     "ObjC.import('AppKit');",
     `var id = ${JSON.stringify(bundleId)};`,
     `var names = ${JSON.stringify(accessors)};`,
-    'function running() {',
-    '  return $.NSRunningApplication.runningApplicationsWithBundleIdentifier(id).count > 0;',
-    '}',
     'function staticDefinition(bundle) {',
     "  var name = bundle.objectForInfoDictionaryKey('OSAScriptingDefinition');",
     '  if (name.isNil()) return false;',
     "  var path = bundle.resourcePath.js + '/' + name.js;",
     '  var files = $.NSFileManager.defaultManager;',
     "  return files.fileExistsAtPath(path) || files.fileExistsAtPath(path + '.sdef');",
+    '}',
+    'function launchedSince(start) {',
+    '  $.NSRunLoop.currentRunLoop.runUntilDate($.NSDate.dateWithTimeIntervalSinceNow(0.2));',
+    '  var apps = $.NSRunningApplication.runningApplicationsWithBundleIdentifier(id);',
+    '  for (var i = 0; i < apps.count; i++) {',
+    '    var launch = apps.objectAtIndex(i).launchDate;',
+    '    if (!launch.isNil() && launch.timeIntervalSinceDate(start) >= 0) return true;',
+    '  }',
+    '  return false;',
     '}',
     'var url = $.NSWorkspace.sharedWorkspace.URLForApplicationWithBundleIdentifier(id);',
     'var out;',
@@ -176,12 +190,15 @@ function checkScript(bundleId: string, accessors: readonly string[]): string {
     '} else if (!staticDefinition($.NSBundle.bundleWithURL(url))) {',
     "  out = { status: 'skipped', reason: 'no static scripting definition; resolving its terms launches it' };",
     '} else {',
-    '  var before = running();',
+    // `running()` asks Launch Services directly and launches nothing.
     '  var app = Application(id);',
+    '  var start = $.NSDate.date;',
+    '  var before = app.running();',
     '  var resolved = {};',
     '  names.forEach(function (name) { resolved[name] = ObjectSpecifier.hasInstance(app[name]); });',
     '  if (!before) delay(0.5);',
-    "  out = { status: 'checked', resolved: resolved, launched: !before && running() };",
+    '  var launched = !before && app.running() && launchedSince(start);',
+    "  out = { status: 'checked', resolved: resolved, launched: launched };",
     '}',
     'JSON.stringify(out);',
   ].join('\n')
