@@ -207,6 +207,12 @@ describe('DynamicWireValueSchema', () => {
     ['an invalid integer payload deep inside', [{ record: { x: { integer: '007' } } }]],
     ['a record envelope holding an array', { record: [] }],
     ['a two-key object', { integer: '1', double: 2 }],
+    // Every object in dynamic content is a single-key control record, so an
+    // empty object matches no kind, even though some kinds' payloads are
+    // schemas that would admit an absent key.
+    ['an empty object', {}],
+    ['an empty object inside an envelope', { record: { x: {} } }],
+    ['an empty object inside an array', [{}]],
     ['undefined', undefined],
     ['a file source, which is not dynamic content', { fileSource: { kind: 'upload' } }],
   ])('rejects %s', (_label, value) => {
