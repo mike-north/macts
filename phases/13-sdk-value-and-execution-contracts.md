@@ -458,13 +458,14 @@ construction.
 @macts/mcp         stdio / HTTP MCP adapter → runtime
 @macts/cli         → sdk, runtime (key administration), api, mcp
 
-@macts/types       plugin registration descriptions (unchanged; no @macts deps)
 @macts/<app>       generated contract + SDK types + CLI plugin → contracts
-@macts/<app>-server  generated adapter registration → api, mcp, @macts/<app>
+@macts/<app>-server  host package: re-exports the app's contract → @macts/<app>
 ```
 
 The graph is acyclic. `@macts/mcp` does not depend on `@macts/api`: key
-verification comes from the runtime's credential verifier.
+verification comes from the runtime's credential verifier. A host package
+depends on neither adapter: adapters are contract-generic, so a host package
+carries no adapter code.
 
 **Who owns what.**
 
@@ -522,10 +523,9 @@ macts, so the remote entry point cannot pull one in.
 **Why a separate contracts package.** Generated app packages, the core native
 provider, the runtime, and the remote client all need the same value types and
 error classes. Putting them in `@macts/sdk` would create the cycle
-sdk → runtime → core → sdk. Putting them in `@macts/types` would turn a
-package defined as zero-runtime type descriptions into a runtime package.
-`@macts/contracts` is an implementation-layer package: application code
-imports from `@macts/sdk`, and generated code imports from `@macts/contracts`.
+sdk → runtime → core → sdk. `@macts/contracts` is an implementation-layer
+package: application code imports from `@macts/sdk`, and generated code
+imports from `@macts/contracts`.
 
 **One identity per error class.**
 

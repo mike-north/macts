@@ -193,10 +193,10 @@ process start.
   depends on `zod`. Zod is already in every `-server` package's dependency
   graph transitively. What Option B actually costs is turning that into a
   **direct** dependency and a **direct import** inside the tool files
-  themselves — which matters because `@macts/types` (where
-  `McpToolDefinition` lives) is explicitly designed so that "packages which
-  need to describe an MCP plugin ... can do so without taking a dependency
-  on the `@macts/mcp` server implementation"
+  themselves — which mattered because `@macts/types` (where
+  `McpToolDefinition` was defined; the package is no longer published) was
+  designed so that "packages which need to describe an MCP plugin ... can do
+  so without taking a dependency on the `@macts/mcp` server implementation"
   (`packages/types/src/index.ts:4-7`). Keeping the generated tool files free
   of a zod import at the point of tool _definition_ (as opposed to tool
   _handler_, which already imports the SDK client) preserves that same
@@ -236,8 +236,9 @@ preserving the currently documented contract.**
   references). The only observable difference in the generated output is the
   `$schema` URI itself. Moving to 2020-12 buys nothing for this manifest
   shape today.
-- `McpToolDefinition.inputSchema` is a public type in `@macts/types`, and its
-  doc comment is a documented contract, not an implementation detail.
+- `McpToolDefinition.inputSchema` was a public type in `@macts/types` when
+  this phase was planned, and its doc comment was a documented contract, not
+  an implementation detail.
   Changing the emitted draft without a compelling reason changes what every
   downstream consumer (including any tool that validates `inputSchema`
   against Draft 7's meta-schema) can assume, for a change with no present

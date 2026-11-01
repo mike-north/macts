@@ -86,12 +86,10 @@ the offending packages.
 
 ### Type-only dependencies
 
-Types alone never justify a peer dependency. `@macts/types` exists for exactly
-this: it holds the shared MCP plugin type definitions and emits no runtime code,
-so generated `@macts/<app>-server` packages can describe an MCP plugin through
-an ordinary `dependencies` entry instead of peer-depending on the `@macts/mcp`
-server implementation. `@macts/mcp` re-exports those types, so importing them
-from `@macts/mcp` still works.
+Types alone never justify a peer dependency. A package that needs only another
+package's types takes it as an ordinary `dependencies` entry when those types
+appear in its own published declarations, and as a `devDependencies` entry when
+they do not.
 
 ### Cutting a real 1.0
 
