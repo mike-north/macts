@@ -21,14 +21,14 @@ export class SettingsSetResourceClient {
   }
 
   /**
-   * List all settingssets.
+   * List all settings sets.
    */
   async list(): Promise<SettingsSet[]> {
     return this.#http.rpc<SettingsSet[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
-   * Get a settingsset by name.
+   * Get a settings set by name.
    */
   async get(name: string): Promise<SettingsSet> {
     return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { name })

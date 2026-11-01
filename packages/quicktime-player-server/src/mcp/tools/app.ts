@@ -11,7 +11,7 @@ import { getClient } from '../sdk.js'
  * Open a URL.
  */
 export const appOpenURLTool: McpToolDefinition = {
-  name: 'macts__quicktime-player__app_open_u_r_l',
+  name: 'macts__quicktime-player__app_open_url',
   description: 'Open a URL.',
   inputSchema: {
     type: 'object',

@@ -403,9 +403,9 @@ export interface WorkspaceDocumentUpdateInput {
 // @public
 export interface XcodeClient {
     readonly projects: ProjectResourceClient;
-    readonly rundestinations: RunDestinationResourceClient;
+    readonly runDestinations: RunDestinationResourceClient;
     readonly schemes: SchemeResourceClient;
-    readonly workspacedocuments: WorkspaceDocumentResourceClient;
+    readonly workspaceDocuments: WorkspaceDocumentResourceClient;
 }
 
 // @public

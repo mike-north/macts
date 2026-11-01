@@ -30,12 +30,12 @@ export class AttachWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.attach(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.attach>[0],
+      await client.workspaceDocuments.attach(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.attach>[0],
         this.toProcessIdentifier as unknown as Parameters<
-          typeof client.workspacedocuments.attach
+          typeof client.workspaceDocuments.attach
         >[1],
-        this.suspended as unknown as Parameters<typeof client.workspacedocuments.attach>[2]
+        this.suspended as unknown as Parameters<typeof client.workspaceDocuments.attach>[2]
       )
 
       const output = formatter.formatSuccess('attach completed successfully')

@@ -888,7 +888,6 @@ export const calendarApiPlugin = {
         resourceType: 'Calendar',
         parameters: [],
         code: 'core',
-        permission: 'calendar:calendars:list',
       },
       get: {
         name: 'get',
@@ -904,7 +903,6 @@ export const calendarApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'calendar:calendars:get',
       },
       create: {
         name: 'create',
@@ -926,7 +924,6 @@ export const calendarApiPlugin = {
           },
         ],
         code: 'crel',
-        permission: 'calendar:calendars:create',
       },
       listEvents: {
         name: 'list',
@@ -1188,7 +1185,6 @@ export const calendarApiPlugin = {
           },
         ],
         code: 'aeca',
-        permission: 'calendar:app:switchView',
       },
       viewCalendar: {
         name: 'viewCalendar',
@@ -1204,7 +1200,6 @@ export const calendarApiPlugin = {
           },
         ],
         code: 'aec9',
-        permission: 'calendar:app:viewCalendar',
       },
       show: {
         name: 'show',
@@ -1213,7 +1208,6 @@ export const calendarApiPlugin = {
         resourceType: 'Event',
         parameters: [],
         code: 'aec3',
-        permission: 'calendar:events:show',
       },
     },
     permissions: {

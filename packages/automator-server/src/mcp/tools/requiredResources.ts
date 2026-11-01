@@ -1,5 +1,5 @@
 /**
- * MCP tools for Automator.app requiredresources operations.
+ * MCP tools for Automator.app requiredResources operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all required resources for an action
  */
-export const requiredresourcesListTool: McpToolDefinition = {
-  name: 'macts__automator__requiredresources_list',
+export const requiredResourcesListTool: McpToolDefinition = {
+  name: 'macts__automator__requiredResources_list',
   description: 'List all required resources for an action',
   inputSchema: {
     type: 'object',
@@ -28,15 +28,15 @@ export const requiredresourcesListTool: McpToolDefinition = {
     const { actionId } = args as { actionId: string }
 
     const client = getClient()
-    return client.requiredresources.list(actionId)
+    return client.requiredResources.list(actionId)
   },
 }
 
 /**
  * Get a required resource by name
  */
-export const requiredresourcesGetTool: McpToolDefinition = {
-  name: 'macts__automator__requiredresources_get',
+export const requiredResourcesGetTool: McpToolDefinition = {
+  name: 'macts__automator__requiredResources_get',
   description: 'Get a required resource by name',
   inputSchema: {
     type: 'object',
@@ -52,8 +52,8 @@ export const requiredresourcesGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.requiredresources.get(
-      name as unknown as Parameters<typeof client.requiredresources.get>[0]
+    return client.requiredResources.get(
+      name as unknown as Parameters<typeof client.requiredResources.get>[0]
     )
   },
 }

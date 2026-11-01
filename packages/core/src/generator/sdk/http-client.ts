@@ -23,6 +23,7 @@ import {
   commandMethodParameters,
   createInputFields,
   findCrudCommand,
+  identifierWords,
   isCrudName,
   listMethodParameters,
   resolveIdParams,
@@ -579,8 +580,8 @@ function generateResourceClient(
   resource: Resource,
   manifest: AppManifest
 ): string {
-  const nameLower = resourceName.toLowerCase()
-  const plural = resource.plural.toLowerCase()
+  const nameWords = identifierWords(resource.name)
+  const pluralWords = identifierWords(resource.plural)
 
   const resourceCommands = resourceCommandEntries(manifest, resourceName)
 
@@ -632,17 +633,17 @@ function generateResourceClient(
 
   const crudMethods = [
     listCmd
-      ? generateListMethod(commandRouteSegment(...listCmd), listCmd[1], resourceName, plural)
+      ? generateListMethod(commandRouteSegment(...listCmd), listCmd[1], resourceName, pluralWords)
       : '',
     getCmd
-      ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameLower)
+      ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameWords)
       : '',
     createCmd
       ? generateCreateMethod(
           commandRouteSegment(...createCmd),
           createCmd[1],
           resourceName,
-          nameLower
+          nameWords
         )
       : '',
     updateCmd
@@ -650,11 +651,11 @@ function generateResourceClient(
           commandRouteSegment(...updateCmd),
           updateCmd[1],
           resourceName,
-          nameLower
+          nameWords
         )
       : '',
     deleteCmd
-      ? generateDeleteMethod(commandRouteSegment(...deleteCmd), deleteCmd[1], nameLower)
+      ? generateDeleteMethod(commandRouteSegment(...deleteCmd), deleteCmd[1], nameWords)
       : '',
   ]
     .filter(Boolean)
@@ -745,14 +746,14 @@ function generateListMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  plural: string
+  pluralWords: string
 ): string {
   const requiredParams = listMethodParameters(command)
 
   if (requiredParams.length === 0) {
     return `
   /**
-   * List all ${plural}.
+   * List all ${pluralWords}.
    */
   async list(): Promise<${resourceName}[]> {
     return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`);
@@ -778,7 +779,7 @@ function generateListMethod(
 
   return `
   /**
-   * List all ${plural}.
+   * List all ${pluralWords}.
    */
   async list(${signature}): Promise<${resourceName}[]> {
     return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
@@ -798,13 +799,13 @@ function generateGetMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  nameLower: string
+  nameWords: string
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
   if (parentParam !== undefined) {
     return `
   /**
-   * Get a ${nameLower} by ${childParam} within a parent scope.
+   * Get a ${nameWords} by ${childParam} within a parent scope.
    */
   async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
@@ -813,7 +814,7 @@ function generateGetMethod(
   }
   return `
   /**
-   * Get a ${nameLower} by ${childParam}.
+   * Get a ${nameWords} by ${childParam}.
    */
   async get(${childParam}: string): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
@@ -834,11 +835,11 @@ function generateCreateMethod(
   routeSegment: string,
   _command: Command,
   resourceName: string,
-  nameLower: string
+  nameWords: string
 ): string {
   return `
   /**
-   * Create a new ${nameLower}.
+   * Create a new ${nameWords}.
    */
   async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
     return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, input);
@@ -859,13 +860,13 @@ function generateUpdateMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
-  nameLower: string
+  nameWords: string
 ): string {
   const { parentParam, childParam } = resolveIdParams(command)
   if (parentParam !== undefined) {
     return `
   /**
-   * Update an existing ${nameLower} within a parent scope.
+   * Update an existing ${nameWords} within a parent scope.
    */
   async update(${parentParam}: string, ${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
@@ -877,7 +878,7 @@ function generateUpdateMethod(
   }
   return `
   /**
-   * Update an existing ${nameLower}.
+   * Update an existing ${nameWords}.
    */
   async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
@@ -893,12 +894,12 @@ function generateUpdateMethod(
  * `deleteEvent`), it is the first argument so the server can scope the JXA
  * query to the correct parent collection.
  */
-function generateDeleteMethod(routeSegment: string, command: Command, nameLower: string): string {
+function generateDeleteMethod(routeSegment: string, command: Command, nameWords: string): string {
   const { parentParam, childParam } = resolveIdParams(command)
   if (parentParam !== undefined) {
     return `
   /**
-   * Delete an ${nameLower} within a parent scope.
+   * Delete an ${nameWords} within a parent scope.
    */
   async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
     await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
@@ -907,7 +908,7 @@ function generateDeleteMethod(routeSegment: string, command: Command, nameLower:
   }
   return `
   /**
-   * Delete an ${nameLower}.
+   * Delete an ${nameWords}.
    */
   async delete(${childParam}: string): Promise<void> {
     await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });

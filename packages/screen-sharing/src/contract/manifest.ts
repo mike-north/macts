@@ -86,7 +86,6 @@ export const manifest: unknown = {
       resourceType: 'Connection',
       parameters: [],
       code: 'core',
-      permission: 'screen-sharing:connections:list',
     },
     get: {
       name: 'get',
@@ -102,7 +101,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'screen-sharing:connections:get',
     },
     getURL: {
       name: 'getURL',
@@ -117,7 +115,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'GURL',
-      permission: 'screen-sharing:app:getURL',
     },
   },
   permissions: {

@@ -12,6 +12,8 @@ import type {
   Resource,
 } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
+import { resourceNamespace } from '../surface.js'
+import { splitIdentifierWords } from '../../manifest/lower-camel.js'
 import type { GeneratedTool, JsonSchema } from './types.js'
 
 /**
@@ -224,23 +226,31 @@ export function generateAppCommandSchema(command: Command): JsonSchema {
 }
 
 /**
- * Convert camelCase to snake_case.
+ * An operation name in snake case: its words ({@link splitIdentifierWords}),
+ * lowercased and joined by `_`. An acronym is one word, so
+ * `invokeAPIExpression` → `invoke_api_expression` and `getURL` → `get_url`,
+ * the same split that spells resources in lower camel case.
  *
- * @param str - CamelCase string
- * @returns snake_case string
+ * @param operationName - A camel case operation name
+ * @returns The operation name in snake case
  */
-function camelToSnakeCase(str: string): string {
-  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
+function operationSnakeCase(operationName: string): string {
+  return splitIdentifierWords(operationName)
+    .map((word) => word.toLowerCase())
+    .join('_')
 }
 
 /**
  * Generate tool name from app, resource, and operation.
  *
  * Format: macts__<app>__<resource>_<operation>
- * Operation names are converted from camelCase to snake_case.
+ * The resource part is the resource's segment as given, the same spelling as
+ * its routes, SDK accessor and derived permissions (`mediaItems`), or `app`
+ * for an application command. The operation is in snake case, with each
+ * acronym one word (`invokeAPIExpression` → `invoke_api_expression`).
  *
  * @param appName - Application name
- * @param resourceName - Resource name (plural, lowercase)
+ * @param resourceName - The resource segment (`normalizeResourceRouteSegment`), or `app`
  * @param operationName - Operation name (will be converted to snake_case)
  * @returns Tool name
  */
@@ -249,8 +259,8 @@ export function generateToolName(
   resourceName: string,
   operationName: string
 ): string {
-  const snakeOperation = camelToSnakeCase(operationName)
-  return `macts__${appName.toLowerCase()}__${resourceName.toLowerCase()}_${snakeOperation}`
+  const snakeOperation = operationSnakeCase(operationName)
+  return `macts__${appName.toLowerCase()}__${resourceName}_${snakeOperation}`
 }
 
 /**
@@ -266,7 +276,9 @@ export function generateResourceTool(
   resource: Resource,
   command: Command
 ): GeneratedTool {
-  const resourceName = resource.plural.toLowerCase()
+  // The tool calls `client.<resourceName>`, so it is the client namespace,
+  // which is also the resource segment its name carries.
+  const resourceName = resourceNamespace(resource)
   const toolName = generateToolName(appName, resourceName, command.name)
   const inputSchema = generateResourceOperationSchema(command, resource)
 

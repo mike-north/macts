@@ -1,5 +1,5 @@
 /**
- * MCP tools for Microsoft-edge.app bookmarkitems operations.
+ * MCP tools for Microsoft-edge.app bookmarkItems operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all bookmark items in a folder
  */
-export const bookmarkitemsListTool: McpToolDefinition = {
-  name: 'macts__microsoft-edge__bookmarkitems_list',
+export const bookmarkItemsListTool: McpToolDefinition = {
+  name: 'macts__microsoft-edge__bookmarkItems_list',
   description: 'List all bookmark items in a folder',
   inputSchema: {
     type: 'object',
@@ -28,15 +28,15 @@ export const bookmarkitemsListTool: McpToolDefinition = {
     const { folderId } = args as { folderId: string }
 
     const client = getClient()
-    return client.bookmarkitems.list(folderId)
+    return client.bookmarkItems.list(folderId)
   },
 }
 
 /**
  * Get a bookmark item by ID
  */
-export const bookmarkitemsGetTool: McpToolDefinition = {
-  name: 'macts__microsoft-edge__bookmarkitems_get',
+export const bookmarkItemsGetTool: McpToolDefinition = {
+  name: 'macts__microsoft-edge__bookmarkItems_get',
   description: 'Get a bookmark item by ID',
   inputSchema: {
     type: 'object',
@@ -52,6 +52,6 @@ export const bookmarkitemsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.bookmarkitems.get(id as unknown as Parameters<typeof client.bookmarkitems.get>[0])
+    return client.bookmarkItems.get(id as unknown as Parameters<typeof client.bookmarkItems.get>[0])
   },
 }

@@ -465,7 +465,6 @@ export const remindersApiPlugin = {
         resourceType: 'List',
         parameters: [],
         code: 'core',
-        permission: 'reminders:lists:list',
       },
       get: {
         name: 'get',
@@ -481,7 +480,6 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'reminders:lists:get',
       },
       create: {
         name: 'create',
@@ -503,7 +501,6 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'crel',
-        permission: 'reminders:lists:create',
       },
       listReminders: {
         name: 'list',
@@ -628,7 +625,6 @@ export const remindersApiPlugin = {
         resourceType: 'Reminder',
         parameters: [],
         code: '????',
-        permission: 'reminders:reminders:show',
       },
       listAccounts: {
         name: 'list',

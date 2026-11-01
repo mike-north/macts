@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a rundestination by ID.
+ * Get a run destination by ID.
  */
 export class GetRunDestinationCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'runDestinations', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a rundestination by ID',
+    description: 'Get a run destination by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +21,7 @@ export class GetRunDestinationCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.rundestinations.get(this.runDestinationId)
+      const item = await client.runDestinations.get(this.runDestinationId)
 
       const output = formatter.format({
         name: item.name,

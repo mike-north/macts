@@ -95,8 +95,8 @@ export class HttpClient {
 // @public
 export class MicrosoftEdgeClient {
     constructor(options: MicrosoftEdgeClientOptions);
-    readonly bookmarkfolders: BookmarkFolderResourceClient;
-    readonly bookmarkitems: BookmarkItemResourceClient;
+    readonly bookmarkFolders: BookmarkFolderResourceClient;
+    readonly bookmarkItems: BookmarkItemResourceClient;
     get http(): HttpClient;
     readonly tabs: TabResourceClient;
     readonly windows: WindowResourceClient;

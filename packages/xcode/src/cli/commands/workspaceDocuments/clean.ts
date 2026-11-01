@@ -23,8 +23,8 @@ export class CleanWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.clean(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.clean>[0]
+      await client.workspaceDocuments.clean(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.clean>[0]
       )
 
       const output = formatter.formatSuccess('clean completed successfully')

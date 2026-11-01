@@ -1,5 +1,5 @@
 /**
- * MCP tools for Xcode.app rundestinations operations.
+ * MCP tools for Xcode.app runDestinations operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all run destinations in a workspace
  */
-export const rundestinationsListTool: McpToolDefinition = {
-  name: 'macts__xcode__rundestinations_list',
+export const runDestinationsListTool: McpToolDefinition = {
+  name: 'macts__xcode__runDestinations_list',
   description: 'List all run destinations in a workspace',
   inputSchema: {
     type: 'object',
@@ -28,15 +28,15 @@ export const rundestinationsListTool: McpToolDefinition = {
     const { workspaceName } = args as { workspaceName: string }
 
     const client = getClient()
-    return client.rundestinations.list(workspaceName)
+    return client.runDestinations.list(workspaceName)
   },
 }
 
 /**
  * Get a run destination by name
  */
-export const rundestinationsGetTool: McpToolDefinition = {
-  name: 'macts__xcode__rundestinations_get',
+export const runDestinationsGetTool: McpToolDefinition = {
+  name: 'macts__xcode__runDestinations_get',
   description: 'Get a run destination by name',
   inputSchema: {
     type: 'object',
@@ -52,8 +52,8 @@ export const rundestinationsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.rundestinations.get(
-      name as unknown as Parameters<typeof client.rundestinations.get>[0]
+    return client.runDestinations.get(
+      name as unknown as Parameters<typeof client.runDestinations.get>[0]
     )
   },
 }

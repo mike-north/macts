@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * List inboxtasks.
+ * List inbox tasks.
  */
 export class ListInboxTasksCommand extends Command {
   static override paths = [['omnifocus', 'inboxTasks', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List inboxtasks',
+    description: 'List inbox tasks',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -19,7 +19,7 @@ export class ListInboxTasksCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.inboxtasks.list()
+      const items = await client.inboxTasks.list()
 
       const output = formatter.formatList(
         items.map((item) => ({

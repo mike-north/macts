@@ -131,7 +131,6 @@ export const manifest: unknown = {
       resourceType: 'Document',
       parameters: [],
       code: 'core',
-      permission: 'system-information:documents:list',
     },
     get: {
       name: 'get',
@@ -147,7 +146,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'system-information:documents:get',
     },
     send: {
       name: 'send',
@@ -155,7 +153,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'spul',
-      permission: 'system-information:app:send',
     },
   },
   permissions: {

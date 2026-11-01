@@ -882,7 +882,6 @@ export const manifest: unknown = {
       resourceType: 'Calendar',
       parameters: [],
       code: 'core',
-      permission: 'calendar:calendars:list',
     },
     get: {
       name: 'get',
@@ -898,7 +897,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'calendar:calendars:get',
     },
     create: {
       name: 'create',
@@ -920,7 +918,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'calendar:calendars:create',
     },
     listEvents: {
       name: 'list',
@@ -1182,7 +1179,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'aeca',
-      permission: 'calendar:app:switchView',
     },
     viewCalendar: {
       name: 'viewCalendar',
@@ -1198,7 +1194,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'aec9',
-      permission: 'calendar:app:viewCalendar',
     },
     show: {
       name: 'show',
@@ -1207,7 +1202,6 @@ export const manifest: unknown = {
       resourceType: 'Event',
       parameters: [],
       code: 'aec3',
-      permission: 'calendar:events:show',
     },
   },
   permissions: {

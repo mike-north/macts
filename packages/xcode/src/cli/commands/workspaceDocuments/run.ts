@@ -31,13 +31,13 @@ export class RunWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.run(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.run>[0],
+      await client.workspaceDocuments.run(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.run>[0],
         this.withCommandLineArguments as unknown as Parameters<
-          typeof client.workspacedocuments.run
+          typeof client.workspaceDocuments.run
         >[1],
         this.withEnvironmentVariables as unknown as Parameters<
-          typeof client.workspacedocuments.run
+          typeof client.workspaceDocuments.run
         >[2]
       )
 

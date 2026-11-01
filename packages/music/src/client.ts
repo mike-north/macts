@@ -86,7 +86,7 @@ export class MusicClient {
   readonly #httpClient: HttpClient
 
   /** a track representing an audio file (MP3, AIFF, etc.) */
-  readonly filetracks: FileTrackResourceClient
+  readonly fileTracks: FileTrackResourceClient
 
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
@@ -94,7 +94,7 @@ export class MusicClient {
   constructor(options: MusicClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.filetracks = new FileTrackResourceClient(this.#httpClient, 'music', 'filetracks')
+    this.fileTracks = new FileTrackResourceClient(this.#httpClient, 'music', 'fileTracks')
     this.playlists = new PlaylistResourceClient(this.#httpClient, 'music', 'playlists')
   }
 

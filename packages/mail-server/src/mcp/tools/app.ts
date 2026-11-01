@@ -147,7 +147,7 @@ export const appExtractAddressFromTool: McpToolDefinition = {
  * Opens a mailto URL.
  */
 export const appGetURLTool: McpToolDefinition = {
-  name: 'macts__mail__app_get_u_r_l',
+  name: 'macts__mail__app_get_url',
   description: 'Opens a mailto URL.',
   inputSchema: {
     type: 'object',

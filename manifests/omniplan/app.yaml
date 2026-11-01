@@ -846,7 +846,6 @@ commands:
         type: string
         description: Export file path
         required: true
-    permission: omniplan:app:export
 
   assign:
     name: assign
@@ -862,7 +861,6 @@ commands:
         type: string
         description: Task to assign to
         required: true
-    permission: omniplan:app:assign
 
   depend:
     name: depend
@@ -878,7 +876,6 @@ commands:
         type: string
         description: Dependent task
         required: true
-    permission: omniplan:app:depend
 
   baseline:
     name: baseline
@@ -886,7 +883,6 @@ commands:
     scope: application
     code: BASE
     parameters: []
-    permission: omniplan:app:baseline
 
   level:
     name: level
@@ -894,7 +890,6 @@ commands:
     scope: application
     code: LEVL
     parameters: []
-    permission: omniplan:app:level
 
   lookup:
     name: lookup
@@ -906,7 +901,6 @@ commands:
         type: string
         description: Custom data key
         required: true
-    permission: omniplan:app:lookup
 
   changeMark:
     name: changeMark
@@ -914,7 +908,6 @@ commands:
     scope: application
     code: MARK
     parameters: []
-    permission: omniplan:app:changeMark
 
   addWorkTime:
     name: addWorkTime
@@ -926,7 +919,6 @@ commands:
         type: string
         description: Target schedule
         required: true
-    permission: omniplan:app:addWorkTime
 
   subtractWorkTime:
     name: subtractWorkTime
@@ -938,7 +930,6 @@ commands:
         type: string
         description: Target schedule
         required: true
-    permission: omniplan:app:subtractWorkTime
 
   fix:
     name: fix
@@ -947,7 +938,6 @@ commands:
     resourceType: Violation
     code: 'FIX '
     parameters: []
-    permission: omniplan:violations:fix
 
   undo:
     name: undo
@@ -955,7 +945,6 @@ commands:
     scope: application
     code: UNDO
     parameters: []
-    permission: omniplan:app:undo
 
   redo:
     name: redo
@@ -963,7 +952,6 @@ commands:
     scope: application
     code: REDO
     parameters: []
-    permission: omniplan:app:redo
 
 permissions:
   projects:

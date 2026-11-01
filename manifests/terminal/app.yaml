@@ -221,10 +221,10 @@ permissions:
       - terminal:windows:get
   settingsSets:
     read:
-      - terminal:settingssets:list
-      - terminal:settingssets:get
+      - terminal:settingsSets:list
+      - terminal:settingsSets:get
     write:
-      - terminal:settingssets:update
+      - terminal:settingsSets:update
   commands:
     execute:
       - terminal:commands:doScript

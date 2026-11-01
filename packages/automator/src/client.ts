@@ -92,7 +92,7 @@ export class AutomatorClient {
   readonly workflows: WorkflowResourceClient
 
   /** A single step in a workflow */
-  readonly automatoractions: AutomatorActionResourceClient
+  readonly automatorActions: AutomatorActionResourceClient
 
   /** A variable used by the workflow */
   readonly variables: VariableResourceClient
@@ -101,23 +101,23 @@ export class AutomatorClient {
   readonly settings: SettingResourceClient
 
   /** A resource required for proper operation of the action */
-  readonly requiredresources: RequiredResourceResourceClient
+  readonly requiredResources: RequiredResourceResourceClient
 
   constructor(options: AutomatorClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.workflows = new WorkflowResourceClient(this.#httpClient, 'automator', 'workflows')
-    this.automatoractions = new AutomatorActionResourceClient(
+    this.automatorActions = new AutomatorActionResourceClient(
       this.#httpClient,
       'automator',
-      'automatoractions'
+      'automatorActions'
     )
     this.variables = new VariableResourceClient(this.#httpClient, 'automator', 'variables')
     this.settings = new SettingResourceClient(this.#httpClient, 'automator', 'settings')
-    this.requiredresources = new RequiredResourceResourceClient(
+    this.requiredResources = new RequiredResourceResourceClient(
       this.#httpClient,
       'automator',
-      'requiredresources'
+      'requiredResources'
     )
   }
 

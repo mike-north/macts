@@ -21,7 +21,7 @@ export class AutomatorActionResourceClient {
   }
 
   /**
-   * List all automatoractions.
+   * List all automator actions.
    */
   async list(workflowName: string): Promise<AutomatorAction[]> {
     return this.#http.rpc<AutomatorAction[]>(`${this.#app}.${this.#resource}.list`, {
@@ -30,7 +30,7 @@ export class AutomatorActionResourceClient {
   }
 
   /**
-   * Get a automatoraction by id.
+   * Get a automator action by id.
    */
   async get(id: string): Promise<AutomatorAction> {
     return this.#http.rpc<AutomatorAction>(`${this.#app}.${this.#resource}.get`, { id })

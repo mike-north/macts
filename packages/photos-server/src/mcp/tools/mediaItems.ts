@@ -1,5 +1,5 @@
 /**
- * MCP tools for Photos.app mediaitems operations.
+ * MCP tools for Photos.app mediaItems operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all media items
  */
-export const mediaitemsListTool: McpToolDefinition = {
-  name: 'macts__photos__mediaitems_list',
+export const mediaItemsListTool: McpToolDefinition = {
+  name: 'macts__photos__mediaItems_list',
   description: 'List all media items',
   inputSchema: {
     type: 'object',
@@ -20,15 +20,15 @@ export const mediaitemsListTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    return client.mediaitems.list()
+    return client.mediaItems.list()
   },
 }
 
 /**
  * Get a media item by ID
  */
-export const mediaitemsGetTool: McpToolDefinition = {
-  name: 'macts__photos__mediaitems_get',
+export const mediaItemsGetTool: McpToolDefinition = {
+  name: 'macts__photos__mediaItems_get',
   description: 'Get a media item by ID',
   inputSchema: {
     type: 'object',
@@ -44,15 +44,15 @@ export const mediaitemsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.mediaitems.get(id as unknown as Parameters<typeof client.mediaitems.get>[0])
+    return client.mediaItems.get(id as unknown as Parameters<typeof client.mediaItems.get>[0])
   },
 }
 
 /**
  * Duplicate a media item
  */
-export const mediaitemsDuplicateTool: McpToolDefinition = {
-  name: 'macts__photos__mediaitems_duplicate',
+export const mediaItemsDuplicateTool: McpToolDefinition = {
+  name: 'macts__photos__mediaItems_duplicate',
   description: 'Duplicate a media item',
   inputSchema: {
     type: 'object',
@@ -68,8 +68,8 @@ export const mediaitemsDuplicateTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.mediaitems.duplicate(
-      id as unknown as Parameters<typeof client.mediaitems.duplicate>[0]
+    await client.mediaItems.duplicate(
+      id as unknown as Parameters<typeof client.mediaItems.duplicate>[0]
     )
     return { success: true }
   },

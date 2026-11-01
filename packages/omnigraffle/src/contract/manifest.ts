@@ -1629,7 +1629,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGCo',
-      permission: 'omnigraffle:app:connect',
     },
     layout: {
       name: 'layout',
@@ -1637,7 +1636,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'OGLA',
-      permission: 'omnigraffle:app:layout',
     },
     export: {
       name: 'export',
@@ -1667,7 +1665,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGEx',
-      permission: 'omnigraffle:app:export',
     },
     flip: {
       name: 'flip',
@@ -1683,7 +1680,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGFl',
-      permission: 'omnigraffle:app:flip',
     },
     slide: {
       name: 'slide',
@@ -1699,7 +1695,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGSl',
-      permission: 'omnigraffle:app:slide',
     },
     assemble: {
       name: 'assemble',
@@ -1715,7 +1710,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGGC',
-      permission: 'omnigraffle:app:assemble',
     },
     pageAdjust: {
       name: 'pageAdjust',
@@ -1723,7 +1717,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'OGPA',
-      permission: 'omnigraffle:app:pageAdjust',
     },
     evaluateJavascript: {
       name: 'evaluateJavascript',
@@ -1738,7 +1731,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'OGEJ',
-      permission: 'omnigraffle:app:evaluateJavascript',
     },
   },
   permissions: {

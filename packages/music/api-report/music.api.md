@@ -363,7 +363,7 @@ export class MusicClient {
     exists(): Promise<void>;
     _export(as?: string, to?: string): Promise<void>;
     fastForward(): Promise<void>;
-    readonly filetracks: FileTrackResourceClient;
+    readonly fileTracks: FileTrackResourceClient;
     get http(): HttpClient;
     make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
     nextTrack(): Promise<void>;

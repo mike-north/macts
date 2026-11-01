@@ -87,20 +87,20 @@ export class SystemEventsClient {
   readonly #httpClient: HttpClient
 
   /** An item stored in the file system */
-  readonly diskitems: DiskItemResourceClient
+  readonly diskItems: DiskItemResourceClient
 
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
 
   /** A piece of the user interface of a process */
-  readonly uielements: UIElementResourceClient
+  readonly uiElements: UIElementResourceClient
 
   constructor(options: SystemEventsClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.diskitems = new DiskItemResourceClient(this.#httpClient, 'system-events', 'diskitems')
+    this.diskItems = new DiskItemResourceClient(this.#httpClient, 'system-events', 'diskItems')
     this.actions = new ActionResourceClient(this.#httpClient, 'system-events', 'actions')
-    this.uielements = new UIElementResourceClient(this.#httpClient, 'system-events', 'uielements')
+    this.uiElements = new UIElementResourceClient(this.#httpClient, 'system-events', 'uiElements')
   }
 
   /**

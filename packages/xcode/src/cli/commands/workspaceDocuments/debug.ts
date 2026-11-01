@@ -40,18 +40,18 @@ export class DebugWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.debug(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.debug>[0],
-        this.scheme as unknown as Parameters<typeof client.workspacedocuments.debug>[1],
+      await client.workspaceDocuments.debug(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.debug>[0],
+        this.scheme as unknown as Parameters<typeof client.workspaceDocuments.debug>[1],
         this.runDestinationSpecifier as unknown as Parameters<
-          typeof client.workspacedocuments.debug
+          typeof client.workspaceDocuments.debug
         >[2],
-        this.skipBuilding as unknown as Parameters<typeof client.workspacedocuments.debug>[3],
+        this.skipBuilding as unknown as Parameters<typeof client.workspaceDocuments.debug>[3],
         this.commandLineArguments as unknown as Parameters<
-          typeof client.workspacedocuments.debug
+          typeof client.workspaceDocuments.debug
         >[4],
         this.environmentVariables as unknown as Parameters<
-          typeof client.workspacedocuments.debug
+          typeof client.workspaceDocuments.debug
         >[5]
       )
 

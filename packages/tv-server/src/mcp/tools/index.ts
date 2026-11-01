@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { filetracksRefreshTool } from './filetracks.js'
+import { fileTracksRefreshTool } from './fileTracks.js'
 import { playlistsMoveTool } from './playlists.js'
 import { playlistsSearchTool } from './playlists.js'
 import { appCloseTool } from './app.js'
@@ -38,7 +38,7 @@ import { appOpenLocationTool } from './app.js'
  * All MCP tools.
  */
 export const allTools = [
-  filetracksRefreshTool,
+  fileTracksRefreshTool,
   playlistsMoveTool,
   playlistsSearchTool,
   appCloseTool,

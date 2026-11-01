@@ -336,13 +336,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'mail.outgoingmessages.send',
+    name: 'mail.outgoingMessages.send',
     app: 'mail',
     appBundleId: 'com.apple.mail',
-    resource: 'outgoingmessages',
+    resource: 'outgoingMessages',
     operation: 'send',
     description: 'Sends a message.',
-    permission: 'mail:outgoingmessages:send',
+    permission: 'mail:outgoingMessages:send',
     risk: 'send',
     inputSchema: {
       type: 'object',

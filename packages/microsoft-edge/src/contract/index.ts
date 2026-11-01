@@ -409,10 +409,10 @@ export interface TabResourceClient {
 
 /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
 export interface BookmarkFolderResourceClient {
-  /** List bookmarkfolders. */
+  /** List bookmark folders. */
   list(options?: CallOptions): Promise<readonly BookmarkFolder[]>
   /**
-   * Read the bookmarkfolder identified by `id`.
+   * Read the bookmark folder identified by `id`.
    *
    * @param id - Bookmark folder identifier. Does not accept null.
    */
@@ -422,13 +422,13 @@ export interface BookmarkFolderResourceClient {
 /** An item consists of an URL and the title of a bookmark */
 export interface BookmarkItemResourceClient {
   /**
-   * List bookmarkitems.
+   * List bookmark items.
    *
    * @param folderId - Bookmark folder identifier. Does not accept null.
    */
   list(folderId: string, options?: CallOptions): Promise<readonly BookmarkItem[]>
   /**
-   * Read the bookmarkitem identified by `id`.
+   * Read the bookmark item identified by `id`.
    *
    * @param id - Bookmark item identifier. Does not accept null.
    */
@@ -445,9 +445,9 @@ export interface MicrosoftEdgeClient {
   /** A tab. */
   readonly tabs: TabResourceClient
   /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
-  readonly bookmarkfolders: BookmarkFolderResourceClient
+  readonly bookmarkFolders: BookmarkFolderResourceClient
   /** An item consists of an URL and the title of a bookmark */
-  readonly bookmarkitems: BookmarkItemResourceClient
+  readonly bookmarkItems: BookmarkItemResourceClient
 }
 
 const windowRecordType: ValueType<Window> = t.record(
@@ -554,15 +554,15 @@ const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
     name: 'BookmarkFolder',
     record: bookmarkFolderRecordType,
     id: t.string({ description: 'Unique ID of the bookmark folder.' }),
-    get: 'microsoft-edge.bookmarkfolders.get',
-    list: 'microsoft-edge.bookmarkfolders.list',
+    get: 'microsoft-edge.bookmarkFolders.get',
+    list: 'microsoft-edge.bookmarkFolders.list',
   },
   BookmarkItem: {
     name: 'BookmarkItem',
     record: bookmarkItemRecordType,
     id: t.string({ description: 'Unique ID of the bookmark item.' }),
-    get: 'microsoft-edge.bookmarkitems.get',
-    list: 'microsoft-edge.bookmarkitems.list',
+    get: 'microsoft-edge.bookmarkItems.get',
+    list: 'microsoft-edge.bookmarkItems.list',
   },
 }
 
@@ -630,7 +630,7 @@ const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
   Record<string, never>,
   readonly BookmarkFolder[]
 > = {
-  id: 'microsoft-edge.bookmarkfolders.list',
+  id: 'microsoft-edge.bookmarkFolders.list',
   permission: 'edge:bookmarkFolders:list',
   target: { command: 'listBookmarkFolders', resource: 'BookmarkFolder' },
   description: 'List all bookmark folders',
@@ -642,7 +642,7 @@ const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
   { readonly id: string },
   BookmarkFolder
 > = {
-  id: 'microsoft-edge.bookmarkfolders.get',
+  id: 'microsoft-edge.bookmarkFolders.get',
   permission: 'edge:bookmarkFolders:get',
   target: { command: 'getBookmarkFolder', resource: 'BookmarkFolder' },
   description: 'Get a bookmark folder by ID',
@@ -656,7 +656,7 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
   { readonly folderId: string },
   readonly BookmarkItem[]
 > = {
-  id: 'microsoft-edge.bookmarkitems.list',
+  id: 'microsoft-edge.bookmarkItems.list',
   permission: 'edge:bookmarkItems:list',
   target: { command: 'listBookmarkItems', resource: 'BookmarkItem' },
   description: 'List all bookmark items in a folder',
@@ -670,7 +670,7 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
   { readonly id: string },
   BookmarkItem
 > = {
-  id: 'microsoft-edge.bookmarkitems.get',
+  id: 'microsoft-edge.bookmarkItems.get',
   permission: 'edge:bookmarkItems:get',
   target: { command: 'getBookmarkItem', resource: 'BookmarkItem' },
   description: 'Get a bookmark item by ID',
@@ -824,10 +824,10 @@ const operations: AppContract<MicrosoftEdgeClient>['operations'] = {
   'microsoft-edge.tabs.list': tabListTabsOperation,
   'microsoft-edge.tabs.get': tabGetTabOperation,
   'microsoft-edge.tabs.create': tabCreateTabOperation,
-  'microsoft-edge.bookmarkfolders.list': bookmarkFolderListBookmarkFoldersOperation,
-  'microsoft-edge.bookmarkfolders.get': bookmarkFolderGetBookmarkFolderOperation,
-  'microsoft-edge.bookmarkitems.list': bookmarkItemListBookmarkItemsOperation,
-  'microsoft-edge.bookmarkitems.get': bookmarkItemGetBookmarkItemOperation,
+  'microsoft-edge.bookmarkFolders.list': bookmarkFolderListBookmarkFoldersOperation,
+  'microsoft-edge.bookmarkFolders.get': bookmarkFolderGetBookmarkFolderOperation,
+  'microsoft-edge.bookmarkItems.list': bookmarkItemListBookmarkItemsOperation,
+  'microsoft-edge.bookmarkItems.get': bookmarkItemGetBookmarkItemOperation,
   'microsoft-edge.tabs.reload': tabReloadOperation,
   'microsoft-edge.tabs.goBack': tabGoBackOperation,
   'microsoft-edge.tabs.goForward': tabGoForwardOperation,
@@ -871,12 +871,12 @@ function bind(runtime: ClientRuntime): MicrosoftEdgeClient {
       execute: (tabId, javascript, options) =>
         runtime.invoke(tabExecuteOperation, { tabId, javascript }, options),
     },
-    bookmarkfolders: {
+    bookmarkFolders: {
       list: (options) => runtime.invoke(bookmarkFolderListBookmarkFoldersOperation, {}, options),
       get: (id, options) =>
         runtime.invoke(bookmarkFolderGetBookmarkFolderOperation, { id }, options),
     },
-    bookmarkitems: {
+    bookmarkItems: {
       list: (folderId, options) =>
         runtime.invoke(bookmarkItemListBookmarkItemsOperation, { folderId }, options),
       get: (id, options) => runtime.invoke(bookmarkItemGetBookmarkItemOperation, { id }, options),

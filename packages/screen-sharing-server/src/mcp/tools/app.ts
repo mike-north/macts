@@ -11,7 +11,7 @@ import { getClient } from '../sdk.js'
  * Open a vnc URL
  */
 export const appGetURLTool: McpToolDefinition = {
-  name: 'macts__screen-sharing__app_get_u_r_l',
+  name: 'macts__screen-sharing__app_get_url',
   description: 'Open a vnc URL',
   inputSchema: {
     type: 'object',

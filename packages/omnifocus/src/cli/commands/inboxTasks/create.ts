@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Create a new inboxtask.
+ * Create a new inbox task.
  */
 export class CreateInboxTaskCommand extends Command {
   static override paths = [['omnifocus', 'inboxTasks', 'create']]
 
   static override usage = Command.Usage({
-    description: 'Create a new inboxtask',
+    description: 'Create a new inbox task',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -38,14 +38,14 @@ export class CreateInboxTaskCommand extends Command {
       // string/boolean primitive, which may not structurally overlap the input's richer
       // member types (e.g. a color object) or exact-optional members, so we assert via
       // `unknown`. The RPC layer coerces/validates the payload at runtime.
-      const item = await client.inboxtasks.create({
+      const item = await client.inboxTasks.create({
         name: this.name,
         note: this.note,
         flagged: this.flagged,
         deferDate: this.deferDate,
         dueDate: this.dueDate,
         creationDate: this.creationDate,
-      } as unknown as Parameters<typeof client.inboxtasks.create>[0])
+      } as unknown as Parameters<typeof client.inboxTasks.create>[0])
 
       const output = formatter.format({
         message: 'InboxTask created successfully',

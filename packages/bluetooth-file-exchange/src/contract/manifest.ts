@@ -73,7 +73,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'toFT',
-      permission: 'bluetooth-file-exchange:app:browse',
     },
     send: {
       name: 'send',
@@ -98,7 +97,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'toOP',
-      permission: 'bluetooth-file-exchange:app:send',
     },
   },
   permissions: {

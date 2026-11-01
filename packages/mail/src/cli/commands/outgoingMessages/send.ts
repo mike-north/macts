@@ -20,7 +20,7 @@ export class SendOutgoingMessageCommand extends Command {
 
     try {
       const client = getClient()
-      await client.outgoingmessages.send()
+      await client.outgoingMessages.send()
 
       const output = formatter.formatSuccess('send completed successfully')
       this.context.stdout.write(output + '\n')

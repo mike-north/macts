@@ -100,7 +100,6 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Document',
       parameters: [],
-      permission: 'textedit:documents:list',
     },
     get: {
       name: 'get',
@@ -115,7 +114,6 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      permission: 'textedit:documents:get',
     },
     create: {
       name: 'create',
@@ -130,7 +128,6 @@ export const manifest: unknown = {
           required: false,
         },
       ],
-      permission: 'textedit:documents:create',
     },
   },
   permissions: {

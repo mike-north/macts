@@ -102,7 +102,7 @@ export class OmniFocusClient {
   readonly tags: TagResourceClient
 
   /** A task that is in the document's inbox */
-  readonly inboxtasks: InboxTaskResourceClient
+  readonly inboxTasks: InboxTaskResourceClient
 
   /** A saved view or filter configuration */
   readonly perspectives: PerspectiveResourceClient
@@ -114,7 +114,7 @@ export class OmniFocusClient {
     this.projects = new ProjectResourceClient(this.#httpClient, 'omnifocus', 'projects')
     this.folders = new FolderResourceClient(this.#httpClient, 'omnifocus', 'folders')
     this.tags = new TagResourceClient(this.#httpClient, 'omnifocus', 'tags')
-    this.inboxtasks = new InboxTaskResourceClient(this.#httpClient, 'omnifocus', 'inboxtasks')
+    this.inboxTasks = new InboxTaskResourceClient(this.#httpClient, 'omnifocus', 'inboxTasks')
     this.perspectives = new PerspectiveResourceClient(this.#httpClient, 'omnifocus', 'perspectives')
   }
 

@@ -1139,7 +1139,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'xprt',
-        permission: 'omniplan:app:export',
       },
       assign: {
         name: 'assign',
@@ -1160,7 +1159,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'ASSN',
-        permission: 'omniplan:app:assign',
       },
       depend: {
         name: 'depend',
@@ -1181,7 +1179,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'SCHD',
-        permission: 'omniplan:app:depend',
       },
       baseline: {
         name: 'baseline',
@@ -1189,7 +1186,6 @@ export const omniPlanApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'BASE',
-        permission: 'omniplan:app:baseline',
       },
       level: {
         name: 'level',
@@ -1197,7 +1193,6 @@ export const omniPlanApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'LEVL',
-        permission: 'omniplan:app:level',
       },
       lookup: {
         name: 'lookup',
@@ -1212,7 +1207,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'LOOK',
-        permission: 'omniplan:app:lookup',
       },
       changeMark: {
         name: 'changeMark',
@@ -1220,7 +1214,6 @@ export const omniPlanApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'MARK',
-        permission: 'omniplan:app:changeMark',
       },
       addWorkTime: {
         name: 'addWorkTime',
@@ -1235,7 +1228,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'ADDS',
-        permission: 'omniplan:app:addWorkTime',
       },
       subtractWorkTime: {
         name: 'subtractWorkTime',
@@ -1250,7 +1242,6 @@ export const omniPlanApiPlugin = {
           },
         ],
         code: 'SUBS',
-        permission: 'omniplan:app:subtractWorkTime',
       },
       fix: {
         name: 'fix',
@@ -1259,7 +1250,6 @@ export const omniPlanApiPlugin = {
         resourceType: 'Violation',
         parameters: [],
         code: 'FIX ',
-        permission: 'omniplan:violations:fix',
       },
       undo: {
         name: 'undo',
@@ -1267,7 +1257,6 @@ export const omniPlanApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'UNDO',
-        permission: 'omniplan:app:undo',
       },
       redo: {
         name: 'redo',
@@ -1275,7 +1264,6 @@ export const omniPlanApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'REDO',
-        permission: 'omniplan:app:redo',
       },
     },
     permissions: {

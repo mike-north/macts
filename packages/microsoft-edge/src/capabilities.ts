@@ -42,10 +42,10 @@ export interface CapabilityMetadata {
  */
 export const capabilities: readonly CapabilityMetadata[] = [
   {
-    name: 'microsoft-edge.bookmarkfolders.get',
+    name: 'microsoft-edge.bookmarkFolders.get',
     app: 'microsoft-edge',
     appBundleId: 'com.microsoft.edgemac',
-    resource: 'bookmarkfolders',
+    resource: 'bookmarkFolders',
     operation: 'get',
     description: 'Get a bookmark folder by ID',
     permission: 'edge:bookmarkFolders:get',
@@ -63,10 +63,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'microsoft-edge.bookmarkfolders.list',
+    name: 'microsoft-edge.bookmarkFolders.list',
     app: 'microsoft-edge',
     appBundleId: 'com.microsoft.edgemac',
-    resource: 'bookmarkfolders',
+    resource: 'bookmarkFolders',
     operation: 'list',
     description: 'List all bookmark folders',
     permission: 'edge:bookmarkFolders:list',
@@ -78,10 +78,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'microsoft-edge.bookmarkitems.get',
+    name: 'microsoft-edge.bookmarkItems.get',
     app: 'microsoft-edge',
     appBundleId: 'com.microsoft.edgemac',
-    resource: 'bookmarkitems',
+    resource: 'bookmarkItems',
     operation: 'get',
     description: 'Get a bookmark item by ID',
     permission: 'edge:bookmarkItems:get',
@@ -99,10 +99,10 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'microsoft-edge.bookmarkitems.list',
+    name: 'microsoft-edge.bookmarkItems.list',
     app: 'microsoft-edge',
     appBundleId: 'com.microsoft.edgemac',
-    resource: 'bookmarkitems',
+    resource: 'bookmarkItems',
     operation: 'list',
     description: 'List all bookmark items in a folder',
     permission: 'edge:bookmarkItems:list',

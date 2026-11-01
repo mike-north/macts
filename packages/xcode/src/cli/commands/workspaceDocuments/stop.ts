@@ -23,8 +23,8 @@ export class StopWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.stop(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.stop>[0]
+      await client.workspaceDocuments.stop(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.stop>[0]
       )
 
       const output = formatter.formatSuccess('stop completed successfully')

@@ -1,5 +1,5 @@
 /**
- * MCP tools for Omnifocus.app inboxtasks operations.
+ * MCP tools for Omnifocus.app inboxTasks operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all inbox tasks
  */
-export const inboxtasksListTool: McpToolDefinition = {
-  name: 'macts__omnifocus__inboxtasks_list',
+export const inboxTasksListTool: McpToolDefinition = {
+  name: 'macts__omnifocus__inboxTasks_list',
   description: 'List all inbox tasks',
   inputSchema: {
     type: 'object',
@@ -20,15 +20,15 @@ export const inboxtasksListTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    return client.inboxtasks.list()
+    return client.inboxTasks.list()
   },
 }
 
 /**
  * Get an inbox task by ID
  */
-export const inboxtasksGetTool: McpToolDefinition = {
-  name: 'macts__omnifocus__inboxtasks_get',
+export const inboxTasksGetTool: McpToolDefinition = {
+  name: 'macts__omnifocus__inboxTasks_get',
   description: 'Get an inbox task by ID',
   inputSchema: {
     type: 'object',
@@ -44,15 +44,15 @@ export const inboxtasksGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.inboxtasks.get(id as unknown as Parameters<typeof client.inboxtasks.get>[0])
+    return client.inboxTasks.get(id as unknown as Parameters<typeof client.inboxTasks.get>[0])
   },
 }
 
 /**
  * Create a new inbox task
  */
-export const inboxtasksCreateTool: McpToolDefinition = {
-  name: 'macts__omnifocus__inboxtasks_create',
+export const inboxTasksCreateTool: McpToolDefinition = {
+  name: 'macts__omnifocus__inboxTasks_create',
   description: 'Create a new inbox task',
   inputSchema: {
     type: 'object',
@@ -87,6 +87,6 @@ export const inboxtasksCreateTool: McpToolDefinition = {
   },
   handler: async (args) => {
     const client = getClient()
-    return client.inboxtasks.create(args as Parameters<typeof client.inboxtasks.create>[0])
+    return client.inboxTasks.create(args as Parameters<typeof client.inboxTasks.create>[0])
   },
 }

@@ -194,7 +194,7 @@ export class PhotosClient {
     get http(): HttpClient;
     _import(files: string[], into?: string, skipCheckDuplicates?: boolean): Promise<void>;
     make(_new: string, named?: string, at?: string): Promise<void>;
-    readonly mediaitems: MediaItemResourceClient;
+    readonly mediaItems: MediaItemResourceClient;
     nextSlide(): Promise<void>;
     pauseSlideshow(): Promise<void>;
     previousSlide(): Promise<void>;

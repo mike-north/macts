@@ -89,7 +89,6 @@ commands:
     resourceType: Document
     code: core
     parameters: []
-    permission: system-information:documents:list
 
   get:
     name: get
@@ -102,7 +101,6 @@ commands:
         type: string
         description: Document name
         required: true
-    permission: system-information:documents:get
 
   # Application-level command
   send:
@@ -111,7 +109,6 @@ commands:
     scope: application
     code: spul
     parameters: []
-    permission: system-information:app:send
 
 # Permissions mapping
 permissions:

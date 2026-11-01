@@ -329,7 +329,7 @@ export class MailClient {
     mailto(): Promise<void>;
     readonly messages: MessageResourceClient;
     move(to: string): Promise<void>;
-    readonly outgoingmessages: OutgoingMessageResourceClient;
+    readonly outgoingMessages: OutgoingMessageResourceClient;
     performMailActionWithMessages(inMailboxes?: Mailbox, forRule?: Rule): Promise<void>;
     synchronize(_with: Account): Promise<void>;
 }

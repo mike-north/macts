@@ -41,12 +41,14 @@ import {
   resolveResettability,
   type ManifestRoute,
 } from '../../manifest/index.js'
+import { lowerCamel } from '../../manifest/lower-camel.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import {
   appCommandEntries,
   commandMethodParameters,
   createInputFields,
   findCrudCommand,
+  identifierWords,
   isCrudName,
   listMethodParameters,
   resolveIdParams,
@@ -146,19 +148,6 @@ export function contractNames(manifest: AppManifest): ContractNames {
     client: `${appName}Client`,
     contract: `${lowerCamel(appName)}Contract`,
   }
-}
-
-/**
- * Lower camel case of a Pascal case name: a leading run of capitals is
- * lowercased, except the last capital when it starts the next word
- * (`TV` → `tv`, `OmniFocus` → `omniFocus`, `XMLParser` → `xmlParser`).
- */
-export function lowerCamel(name: string): string {
-  const run = /^[A-Z]+/.exec(name)?.[0] ?? ''
-  if (run.length === 0) return name
-  if (run.length === name.length) return name.toLowerCase()
-  if (run.length === 1) return name.charAt(0).toLowerCase() + name.slice(1)
-  return run.slice(0, -1).toLowerCase() + name.slice(run.length - 1)
 }
 
 /**
@@ -705,7 +694,7 @@ class ContractBuilder {
     }))
     return {
       name: 'list',
-      doc: `List ${resource.plural.toLowerCase()}.`,
+      doc: `List ${identifierWords(resource.plural)}.`,
       params: this.#positional(fields),
       returnType: `readonly ${resource.name}[]`,
       operation,
@@ -719,7 +708,7 @@ class ContractBuilder {
     const scope = parentParam === undefined ? '' : ` within \`${parentParam}\``
     return {
       fields,
-      phrase: `the ${resource.name.toLowerCase()} identified by \`${childParam}\`${scope}`,
+      phrase: `the ${identifierWords(resource.name)} identified by \`${childParam}\`${scope}`,
     }
   }
 
@@ -738,7 +727,7 @@ class ContractBuilder {
   #createMethod(resourceKey: string, resource: Resource, operation: OperationModel): MethodModel {
     return {
       name: 'create',
-      doc: `Create ${withArticle(resource.name.toLowerCase())}.`,
+      doc: `Create ${withArticle(identifierWords(resource.name))}.`,
       params: [{ binding: 'input', type: `${resourceKey}CreateInput`, optional: false }],
       returnType: resource.name,
       operation,

@@ -31,13 +31,13 @@ export class TestWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.test(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.test>[0],
+      await client.workspaceDocuments.test(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.test>[0],
         this.withCommandLineArguments as unknown as Parameters<
-          typeof client.workspacedocuments.test
+          typeof client.workspaceDocuments.test
         >[1],
         this.withEnvironmentVariables as unknown as Parameters<
-          typeof client.workspacedocuments.test
+          typeof client.workspaceDocuments.test
         >[2]
       )
 

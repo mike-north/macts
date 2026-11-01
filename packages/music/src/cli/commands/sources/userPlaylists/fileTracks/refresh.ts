@@ -25,7 +25,7 @@ export class RefreshFileTrackCommand extends Command {
 
     try {
       const client = getClient()
-      await client.filetracks.refresh()
+      await client.fileTracks.refresh()
 
       const output = formatter.formatSuccess('refresh completed successfully')
       this.context.stdout.write(output + '\n')

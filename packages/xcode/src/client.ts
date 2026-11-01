@@ -88,7 +88,7 @@ export class XcodeClient {
   readonly #httpClient: HttpClient
 
   /** A document that represents a workspace on disk. Workspaces are the top-level container for almost all objects and commands in Xcode */
-  readonly workspacedocuments: WorkspaceDocumentResourceClient
+  readonly workspaceDocuments: WorkspaceDocumentResourceClient
 
   /** An Xcode project. Projects represent project files on disk and are always open in the context of a workspace document */
   readonly projects: ProjectResourceClient
@@ -97,22 +97,22 @@ export class XcodeClient {
   readonly schemes: SchemeResourceClient
 
   /** An object which specifies parameters such as the device and architecture for which to perform a scheme action */
-  readonly rundestinations: RunDestinationResourceClient
+  readonly runDestinations: RunDestinationResourceClient
 
   constructor(options: XcodeClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.workspacedocuments = new WorkspaceDocumentResourceClient(
+    this.workspaceDocuments = new WorkspaceDocumentResourceClient(
       this.#httpClient,
       'xcode',
-      'workspacedocuments'
+      'workspaceDocuments'
     )
     this.projects = new ProjectResourceClient(this.#httpClient, 'xcode', 'projects')
     this.schemes = new SchemeResourceClient(this.#httpClient, 'xcode', 'schemes')
-    this.rundestinations = new RunDestinationResourceClient(
+    this.runDestinations = new RunDestinationResourceClient(
       this.#httpClient,
       'xcode',
-      'rundestinations'
+      'runDestinations'
     )
   }
 

@@ -21,14 +21,14 @@ export class BookmarkFolderResourceClient {
   }
 
   /**
-   * List all bookmarkfolders.
+   * List all bookmark folders.
    */
   async list(): Promise<BookmarkFolder[]> {
     return this.#http.rpc<BookmarkFolder[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
-   * Get a bookmarkfolder by id.
+   * Get a bookmark folder by id.
    */
   async get(id: string): Promise<BookmarkFolder> {
     return this.#http.rpc<BookmarkFolder>(`${this.#app}.${this.#resource}.get`, { id })

@@ -882,15 +882,15 @@ export interface TagResourceClient {
 
 /** A task that is in the document's inbox */
 export interface InboxTaskResourceClient {
-  /** List inboxtasks. */
+  /** List inbox tasks. */
   list(options?: CallOptions): Promise<readonly InboxTask[]>
   /**
-   * Read the inboxtask identified by `id`.
+   * Read the inbox task identified by `id`.
    *
    * @param id - Inbox task identifier. Does not accept null.
    */
   get(id: string, options?: CallOptions): Promise<InboxTask>
-  /** Create an inboxtask. */
+  /** Create an inbox task. */
   create(input: InboxTaskCreateInput, options?: CallOptions): Promise<InboxTask>
 }
 
@@ -920,7 +920,7 @@ export interface OmniFocusClient {
   /** A tag for organizing and filtering tasks */
   readonly tags: TagResourceClient
   /** A task that is in the document's inbox */
-  readonly inboxtasks: InboxTaskResourceClient
+  readonly inboxTasks: InboxTaskResourceClient
   /** A saved view or filter configuration */
   readonly perspectives: PerspectiveResourceClient
   /**
@@ -1310,8 +1310,8 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
     name: 'InboxTask',
     record: inboxTaskRecordType,
     id: t.string({ description: 'The unique identifier of the inbox task' }),
-    get: 'omnifocus.inboxtasks.get',
-    list: 'omnifocus.inboxtasks.list',
+    get: 'omnifocus.inboxTasks.get',
+    list: 'omnifocus.inboxTasks.list',
   },
   Perspective: {
     name: 'Perspective',
@@ -1445,7 +1445,7 @@ const inboxTaskListInboxTasksOperation: OperationDescriptor<
   Record<string, never>,
   readonly InboxTask[]
 > = {
-  id: 'omnifocus.inboxtasks.list',
+  id: 'omnifocus.inboxTasks.list',
   permission: 'omnifocus:inboxTasks:list',
   target: { command: 'listInboxTasks', resource: 'InboxTask' },
   description: 'List all inbox tasks',
@@ -1454,7 +1454,7 @@ const inboxTaskListInboxTasksOperation: OperationDescriptor<
 }
 
 const inboxTaskGetInboxTaskOperation: OperationDescriptor<{ readonly id: string }, InboxTask> = {
-  id: 'omnifocus.inboxtasks.get',
+  id: 'omnifocus.inboxTasks.get',
   permission: 'omnifocus:inboxTasks:get',
   target: { command: 'getInboxTask', resource: 'InboxTask' },
   description: 'Get an inbox task by ID',
@@ -1465,7 +1465,7 @@ const inboxTaskGetInboxTaskOperation: OperationDescriptor<{ readonly id: string 
 }
 
 const inboxTaskCreateInboxTaskOperation: OperationDescriptor<InboxTaskCreateInput, InboxTask> = {
-  id: 'omnifocus.inboxtasks.create',
+  id: 'omnifocus.inboxTasks.create',
   permission: 'omnifocus:inboxTasks:create',
   target: { command: 'createInboxTask', resource: 'InboxTask' },
   description: 'Create a new inbox task',
@@ -1636,9 +1636,9 @@ const operations: AppContract<OmniFocusClient>['operations'] = {
   'omnifocus.tags.list': tagListTagsOperation,
   'omnifocus.tags.get': tagGetTagOperation,
   'omnifocus.tags.create': tagCreateTagOperation,
-  'omnifocus.inboxtasks.list': inboxTaskListInboxTasksOperation,
-  'omnifocus.inboxtasks.get': inboxTaskGetInboxTaskOperation,
-  'omnifocus.inboxtasks.create': inboxTaskCreateInboxTaskOperation,
+  'omnifocus.inboxTasks.list': inboxTaskListInboxTasksOperation,
+  'omnifocus.inboxTasks.get': inboxTaskGetInboxTaskOperation,
+  'omnifocus.inboxTasks.create': inboxTaskCreateInboxTaskOperation,
   'omnifocus.perspectives.list': perspectiveListPerspectivesOperation,
   'omnifocus.perspectives.get': perspectiveGetPerspectiveOperation,
   'omnifocus.app.complete': appCompleteOperation,
@@ -1677,7 +1677,7 @@ function bind(runtime: ClientRuntime): OmniFocusClient {
       get: (id, options) => runtime.invoke(tagGetTagOperation, { id }, options),
       create: (input, options) => runtime.invoke(tagCreateTagOperation, input, options),
     },
-    inboxtasks: {
+    inboxTasks: {
       list: (options) => runtime.invoke(inboxTaskListInboxTasksOperation, {}, options),
       get: (id, options) => runtime.invoke(inboxTaskGetInboxTaskOperation, { id }, options),
       create: (input, options) => runtime.invoke(inboxTaskCreateInboxTaskOperation, input, options),

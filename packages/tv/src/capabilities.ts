@@ -469,13 +469,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'tv.filetracks.refresh',
+    name: 'tv.fileTracks.refresh',
     app: 'tv',
     appBundleId: 'com.apple.TV',
-    resource: 'filetracks',
+    resource: 'fileTracks',
     operation: 'refresh',
     description: 'update file track information from the current information in the track’s file',
-    permission: 'tv:filetracks:refresh',
+    permission: 'tv:fileTracks:refresh',
     risk: 'execute',
     inputSchema: {
       type: 'object',

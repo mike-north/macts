@@ -23,8 +23,8 @@ export class BuildWorkspaceDocumentCommand extends Command {
 
     try {
       const client = getClient()
-      await client.workspacedocuments.build(
-        this.workspaceName as unknown as Parameters<typeof client.workspacedocuments.build>[0]
+      await client.workspaceDocuments.build(
+        this.workspaceName as unknown as Parameters<typeof client.workspaceDocuments.build>[0]
       )
 
       const output = formatter.formatSuccess('build completed successfully')

@@ -85,7 +85,6 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Document',
       parameters: [],
-      permission: 'preview:documents:list',
     },
     get: {
       name: 'get',
@@ -100,7 +99,6 @@ export const manifest: unknown = {
           required: true,
         },
       ],
-      permission: 'preview:documents:get',
     },
   },
   permissions: {

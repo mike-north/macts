@@ -1635,7 +1635,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGCo',
-        permission: 'omnigraffle:app:connect',
       },
       layout: {
         name: 'layout',
@@ -1643,7 +1642,6 @@ export const omniGraffleApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'OGLA',
-        permission: 'omnigraffle:app:layout',
       },
       export: {
         name: 'export',
@@ -1673,7 +1671,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGEx',
-        permission: 'omnigraffle:app:export',
       },
       flip: {
         name: 'flip',
@@ -1689,7 +1686,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGFl',
-        permission: 'omnigraffle:app:flip',
       },
       slide: {
         name: 'slide',
@@ -1705,7 +1701,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGSl',
-        permission: 'omnigraffle:app:slide',
       },
       assemble: {
         name: 'assemble',
@@ -1721,7 +1716,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGGC',
-        permission: 'omnigraffle:app:assemble',
       },
       pageAdjust: {
         name: 'pageAdjust',
@@ -1729,7 +1723,6 @@ export const omniGraffleApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'OGPA',
-        permission: 'omnigraffle:app:pageAdjust',
       },
       evaluateJavascript: {
         name: 'evaluateJavascript',
@@ -1744,7 +1737,6 @@ export const omniGraffleApiPlugin = {
           },
         ],
         code: 'OGEJ',
-        permission: 'omnigraffle:app:evaluateJavascript',
       },
     },
     permissions: {

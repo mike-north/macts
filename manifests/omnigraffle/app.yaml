@@ -1187,7 +1187,6 @@ commands:
         type: string
         description: Destination graphic ID
         required: true
-    permission: omnigraffle:app:connect
 
   layout:
     name: layout
@@ -1195,7 +1194,6 @@ commands:
     scope: application
     code: OGLA
     parameters: []
-    permission: omnigraffle:app:layout
 
   export:
     name: export
@@ -1218,7 +1216,6 @@ commands:
         description: Output file path
         required: true
         code: kfil
-    permission: omnigraffle:app:export
 
   flip:
     name: flip
@@ -1231,7 +1228,6 @@ commands:
         description: Flip orientation
         required: true
         code: OGFo
-    permission: omnigraffle:app:flip
 
   slide:
     name: slide
@@ -1244,7 +1240,6 @@ commands:
         description: Vector to slide by
         required: true
         code: OGSv
-    permission: omnigraffle:app:slide
 
   assemble:
     name: assemble
@@ -1257,7 +1252,6 @@ commands:
         description: Create as subgraph
         required: false
         code: OGsA
-    permission: omnigraffle:app:assemble
 
   pageAdjust:
     name: pageAdjust
@@ -1265,7 +1259,6 @@ commands:
     scope: application
     code: OGPA
     parameters: []
-    permission: omnigraffle:app:pageAdjust
 
   evaluateJavascript:
     name: evaluateJavascript
@@ -1277,7 +1270,6 @@ commands:
         type: string
         description: JavaScript code to evaluate
         required: true
-    permission: omnigraffle:app:evaluateJavascript
 
 # Permissions mapping
 permissions:

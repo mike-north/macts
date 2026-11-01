@@ -1229,13 +1229,13 @@ commands: {}
   })
 
   it('embeds names as JSON literals, never as code', async () => {
-    const hostile = parseManifestYaml(`
+    const parsed = parseManifestYaml(`
 version: '1.0'
 app: { bundleId: com.example.jotter, name: Jotter, tccEntitlements: [] }
 resources:
   Note:
     name: Note
-    plural: "Notes'); throw 1; ('"
+    plural: Notes
     description: A note
     properties:
       "x\\"]; throw 1; //": { access: r, type: string, description: Hostile }
@@ -1243,6 +1243,15 @@ enums: {}
 hierarchy: { children: {} }
 commands: {}
 `)
+    // The schema rejects a plural that is not a Pascal case identifier, so the
+    // hostile plural is set after parsing: the probe must still embed it as
+    // data if a manifest ever reaches it unvalidated.
+    const note = parsed.resources['Note']
+    if (note === undefined) throw new Error('fixture has no Note')
+    const hostile: AppManifest = {
+      ...parsed,
+      resources: { Note: { ...note, plural: "Notes'); throw 1; ('" } },
+    }
     const { runner } = fakeRunner(fakeApp({}))
     const result = await probeNullability(hostile, runner, { environment: environment() })
     expect(result.resources['Note']?.status).toBe('unreachable')

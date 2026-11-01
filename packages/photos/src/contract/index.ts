@@ -276,10 +276,10 @@ export type MomentUpdateInput = Record<string, never>
 
 /** A media item, such as a photo or video */
 export interface MediaItemResourceClient {
-  /** List mediaitems. */
+  /** List media items. */
   list(options?: CallOptions): Promise<readonly MediaItem[]>
   /**
-   * Read the mediaitem identified by `id`.
+   * Read the media item identified by `id`.
    *
    * @param id - Media item identifier. Does not accept null.
    */
@@ -322,7 +322,7 @@ export interface FolderResourceClient {
  */
 export interface PhotosClient {
   /** A media item, such as a photo or video */
-  readonly mediaitems: MediaItemResourceClient
+  readonly mediaItems: MediaItemResourceClient
   /** An album. A container that holds media items */
   readonly albums: AlbumResourceClient
   /** A folder. A container that holds albums and other folders, but not media items */
@@ -485,8 +485,8 @@ const resources: AppContract<PhotosClient>['resources'] = {
     name: 'MediaItem',
     record: mediaItemRecordType,
     id: t.string({ description: 'The unique ID of the media item' }),
-    get: 'photos.mediaitems.get',
-    list: 'photos.mediaitems.list',
+    get: 'photos.mediaItems.get',
+    list: 'photos.mediaItems.list',
   },
   Container: {
     name: 'Container',
@@ -518,7 +518,7 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<
   Record<string, never>,
   readonly MediaItem[]
 > = {
-  id: 'photos.mediaitems.list',
+  id: 'photos.mediaItems.list',
   permission: 'photos:mediaItems:list',
   target: { command: 'listMediaItems', resource: 'MediaItem' },
   description: 'List all media items',
@@ -527,7 +527,7 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<
 }
 
 const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string }, MediaItem> = {
-  id: 'photos.mediaitems.get',
+  id: 'photos.mediaItems.get',
   permission: 'photos:mediaItems:get',
   target: { command: 'getMediaItem', resource: 'MediaItem' },
   description: 'Get a media item by ID',
@@ -624,7 +624,7 @@ const appExportOperation: OperationDescriptor<
 }
 
 const mediaItemDuplicateOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
-  id: 'photos.mediaitems.duplicate',
+  id: 'photos.mediaItems.duplicate',
   permission: 'photos:mediaItems:duplicate',
   target: { command: 'duplicate', resource: 'MediaItem' },
   description: 'Duplicate a media item',
@@ -759,15 +759,15 @@ const appSearchOperation: OperationDescriptor<{ readonly for: string }, undefine
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<PhotosClient>['operations'] = {
-  'photos.mediaitems.list': mediaItemListMediaItemsOperation,
-  'photos.mediaitems.get': mediaItemGetMediaItemOperation,
+  'photos.mediaItems.list': mediaItemListMediaItemsOperation,
+  'photos.mediaItems.get': mediaItemGetMediaItemOperation,
   'photos.albums.list': albumListAlbumsOperation,
   'photos.albums.get': albumGetAlbumOperation,
   'photos.folders.list': folderListFoldersOperation,
   'photos.folders.get': folderGetFolderOperation,
   'photos.app.import': appImportOperation,
   'photos.app.export': appExportOperation,
-  'photos.mediaitems.duplicate': mediaItemDuplicateOperation,
+  'photos.mediaItems.duplicate': mediaItemDuplicateOperation,
   'photos.app.make': appMakeOperation,
   'photos.app.delete': appDeleteOperation,
   'photos.app.add': appAddOperation,
@@ -784,7 +784,7 @@ const operations: AppContract<PhotosClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): PhotosClient {
   return {
-    mediaitems: {
+    mediaItems: {
       list: (options) => runtime.invoke(mediaItemListMediaItemsOperation, {}, options),
       get: (id, options) => runtime.invoke(mediaItemGetMediaItemOperation, { id }, options),
       duplicate: (id, options) => runtime.invoke(mediaItemDuplicateOperation, { id }, options),

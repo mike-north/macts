@@ -20,6 +20,7 @@ import {
   resolveIdParams,
   resourceCommandEntries,
   resourceHasOperations,
+  identifierWords,
   resourceNamespace,
   safeIdentifier,
 } from './surface.js'
@@ -193,9 +194,35 @@ describe('createInputFields', () => {
 })
 
 describe('resourceNamespace', () => {
-  it('is the lowercased plural', () => {
-    expect(
-      resourceNamespace({ name: 'X', plural: 'TextItems', description: '', properties: {} })
-    ).toBe('textitems')
+  it('is the resource segment: the lower camel case of the plural', () => {
+    // The accessor matches the route segment (`app.textItems.list`), issue #154.
+    expect(resourceNamespace({ plural: 'TextItems' })).toBe('textItems')
+    expect(resourceNamespace({ plural: 'AIMHandles' })).toBe('aimHandles')
+    expect(resourceNamespace({ plural: 'Notes' })).toBe('notes')
+  })
+})
+
+describe('identifierWords', () => {
+  it('splits a Pascal case identifier into lowercase words', () => {
+    expect(identifierWords('MediaItems')).toBe('media items')
+    expect(identifierWords('OpenFileAlarm')).toBe('open file alarm')
+    expect(identifierWords('Notes')).toBe('notes')
+  })
+
+  it('keeps acronyms in capitals, with their plural s', () => {
+    expect(identifierWords('AIMHandles')).toBe('AIM handles')
+    expect(identifierWords('URLTrack')).toBe('URL track')
+    expect(identifierWords('AudioCDPlaylists')).toBe('audio CD playlists')
+    // `URLs` is the acronym's plural, not `UR` and a word `Ls`.
+    expect(identifierWords('URLs')).toBe('URLs')
+    expect(identifierWords('TV')).toBe('TV')
+  })
+
+  it('keeps digits with the word they follow', () => {
+    expect(identifierWords('Mp3Files')).toBe('mp3 files')
+  })
+
+  it('reads a camel case identifier the same way', () => {
+    expect(identifierWords('mediaItems')).toBe('media items')
   })
 })

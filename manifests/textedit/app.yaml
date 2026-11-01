@@ -64,7 +64,6 @@ commands:
     scope: resource
     resourceType: Document
     parameters: []
-    permission: textedit:documents:list
 
   get:
     name: get
@@ -76,7 +75,6 @@ commands:
         type: string
         description: Document name
         required: true
-    permission: textedit:documents:get
 
   create:
     name: create
@@ -88,7 +86,6 @@ commands:
         type: string
         description: Initial text content
         required: false
-    permission: textedit:documents:create
 
 permissions:
   documents:

@@ -3,13 +3,13 @@ import { getClient } from '../../../../sdk.js'
 import { createFormatter } from '../../../../output/index.js'
 
 /**
- * Get a requiredresource by ID.
+ * Get a required resource by ID.
  */
 export class GetRequiredResourceCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'requiredResources', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a requiredresource by ID',
+    description: 'Get a required resource by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +21,7 @@ export class GetRequiredResourceCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.requiredresources.get(this.requiredResourceId)
+      const item = await client.requiredResources.get(this.requiredResourceId)
 
       const output = formatter.format({
         kind: item.kind,

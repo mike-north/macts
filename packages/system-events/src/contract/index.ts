@@ -2322,7 +2322,7 @@ export type ScriptingSuiteUpdateInput = Record<string, never>
 /** An item stored in the file system */
 export interface DiskItemResourceClient {
   /**
-   * Delete the diskitem identified by `id`.
+   * Delete the disk item identified by `id`.
    *
    * @param id - The id.
    */
@@ -2354,11 +2354,11 @@ export interface UIElementResourceClient {
  */
 export interface SystemEventsClient {
   /** An item stored in the file system */
-  readonly diskitems: DiskItemResourceClient
+  readonly diskItems: DiskItemResourceClient
   /** An action that can be performed on the UI element */
   readonly actions: ActionResourceClient
   /** A piece of the user interface of a process */
-  readonly uielements: UIElementResourceClient
+  readonly uiElements: UIElementResourceClient
   /** Discard the results of a bounded update session with one or more files. */
   abortTransaction(options?: CallOptions): Promise<void>
   /** Begin a bounded update session with one or more files. */
@@ -3774,8 +3774,8 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
 }
 
 const diskItemDeleteOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
-  id: 'system-events.diskitems.delete',
-  permission: 'system-events:diskitems:delete',
+  id: 'system-events.diskItems.delete',
+  permission: 'system-events:diskItems:delete',
   target: { command: 'delete', resource: 'DiskItem' },
   description: 'Delete disk item(s).',
   input: t.record({
@@ -3858,8 +3858,8 @@ const uiElementClickOperation: OperationDescriptor<
   { readonly at?: string | undefined },
   undefined
 > = {
-  id: 'system-events.uielements.click',
-  permission: 'system-events:uielements:click',
+  id: 'system-events.uiElements.click',
+  permission: 'system-events:uiElements:click',
   target: { command: 'click', resource: 'UIElement' },
   description: 'cause the target process to behave as if the UI element were clicked',
   input: t.record({
@@ -3913,8 +3913,8 @@ const actionPerformOperation: OperationDescriptor<Record<string, never>, undefin
 }
 
 const uiElementSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'system-events.uielements.select',
-  permission: 'system-events:uielements:select',
+  id: 'system-events.uiElements.select',
+  permission: 'system-events:uiElements:select',
   target: { command: 'select', resource: 'UIElement' },
   description: 'set the selected property of the UI element',
   input: t.record({}),
@@ -4079,18 +4079,18 @@ const operations: AppContract<SystemEventsClient>['operations'] = {
   'system-events.app.disconnect': appDisconnectOperation,
   'system-events.app.start': appStartOperation,
   'system-events.app.stop': appStopOperation,
-  'system-events.diskitems.delete': diskItemDeleteOperation,
+  'system-events.diskItems.delete': diskItemDeleteOperation,
   'system-events.app.move': appMoveOperation,
   'system-events.app.open': appOpenOperation,
   'system-events.app.logOut': appLogOutOperation,
   'system-events.app.restart': appRestartOperation,
   'system-events.app.shutDown': appShutDownOperation,
   'system-events.app.sleep': appSleepOperation,
-  'system-events.uielements.click': uiElementClickOperation,
+  'system-events.uiElements.click': uiElementClickOperation,
   'system-events.app.keyCode': appKeyCodeOperation,
   'system-events.app.keystroke': appKeystrokeOperation,
   'system-events.actions.perform': actionPerformOperation,
-  'system-events.uielements.select': uiElementSelectOperation,
+  'system-events.uiElements.select': uiElementSelectOperation,
   'system-events.app.attachActionTo': appAttachActionToOperation,
   'system-events.app.attachedScripts': appAttachedScriptsOperation,
   'system-events.app.cancel': appCancelOperation,
@@ -4108,13 +4108,13 @@ const operations: AppContract<SystemEventsClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): SystemEventsClient {
   return {
-    diskitems: {
+    diskItems: {
       delete: (id, options) => runtime.invoke(diskItemDeleteOperation, { id }, options),
     },
     actions: {
       perform: (options) => runtime.invoke(actionPerformOperation, {}, options),
     },
-    uielements: {
+    uiElements: {
       click: (at, options) => runtime.invoke(uiElementClickOperation, { at }, options),
       select: (options) => runtime.invoke(uiElementSelectOperation, {}, options),
     },

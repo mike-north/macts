@@ -22,10 +22,10 @@ import { tabsRedoTool } from './tabs.js'
 import { tabsStopTool } from './tabs.js'
 import { tabsViewSourceTool } from './tabs.js'
 import { tabsExecuteTool } from './tabs.js'
-import { bookmarkfoldersListTool } from './bookmarkfolders.js'
-import { bookmarkfoldersGetTool } from './bookmarkfolders.js'
-import { bookmarkitemsListTool } from './bookmarkitems.js'
-import { bookmarkitemsGetTool } from './bookmarkitems.js'
+import { bookmarkFoldersListTool } from './bookmarkFolders.js'
+import { bookmarkFoldersGetTool } from './bookmarkFolders.js'
+import { bookmarkItemsListTool } from './bookmarkItems.js'
+import { bookmarkItemsGetTool } from './bookmarkItems.js'
 
 /**
  * All MCP tools.
@@ -49,8 +49,8 @@ export const allTools = [
   tabsStopTool,
   tabsViewSourceTool,
   tabsExecuteTool,
-  bookmarkfoldersListTool,
-  bookmarkfoldersGetTool,
-  bookmarkitemsListTool,
-  bookmarkitemsGetTool,
+  bookmarkFoldersListTool,
+  bookmarkFoldersGetTool,
+  bookmarkItemsListTool,
+  bookmarkItemsGetTool,
 ] as const

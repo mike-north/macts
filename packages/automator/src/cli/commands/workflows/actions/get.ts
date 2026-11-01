@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * Get a automatoraction by ID.
+ * Get a automator action by ID.
  */
 export class GetAutomatorActionCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a automatoraction by ID',
+    description: 'Get a automator action by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +21,7 @@ export class GetAutomatorActionCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.automatoractions.get(this.automatorActionId)
+      const item = await client.automatorActions.get(this.automatorActionId)
 
       const output = formatter.format({
         name: item.name,

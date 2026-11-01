@@ -338,7 +338,6 @@ commands:
     resourceType: Workflow
     code: core
     parameters: []
-    permission: automator:workflows:list
 
   get:
     name: get
@@ -351,7 +350,6 @@ commands:
         type: string
         description: Workflow name
         required: true
-    permission: automator:workflows:get
 
   execute:
     name: execute
@@ -364,7 +362,6 @@ commands:
         type: any
         description: The workflow to execute
         required: true
-    permission: automator:workflows:execute
 
   # AutomatorAction commands
   listActions:
@@ -496,7 +493,6 @@ commands:
         type: string
         description: Action identifier
         required: true
-    permission: automator:requiredResources:list
 
   getRequiredResource:
     name: get
@@ -510,7 +506,6 @@ commands:
         type: string
         description: Resource name
         required: true
-    permission: automator:requiredResources:get
 
 # Permissions mapping
 permissions:

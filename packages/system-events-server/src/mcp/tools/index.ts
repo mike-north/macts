@@ -4,10 +4,10 @@
  * @packageDocumentation
  */
 
-import { diskitemsDeleteTool } from './diskitems.js'
+import { diskItemsDeleteTool } from './diskItems.js'
 import { actionsPerformTool } from './actions.js'
-import { uielementsClickTool } from './uielements.js'
-import { uielementsSelectTool } from './uielements.js'
+import { uiElementsClickTool } from './uiElements.js'
+import { uiElementsSelectTool } from './uiElements.js'
 import { appAbortTransactionTool } from './app.js'
 import { appBeginTransactionTool } from './app.js'
 import { appEndTransactionTool } from './app.js'
@@ -40,10 +40,10 @@ import { appRemoveActionFromTool } from './app.js'
  * All MCP tools.
  */
 export const allTools = [
-  diskitemsDeleteTool,
+  diskItemsDeleteTool,
   actionsPerformTool,
-  uielementsClickTool,
-  uielementsSelectTool,
+  uiElementsClickTool,
+  uiElementsSelectTool,
   appAbortTransactionTool,
   appBeginTransactionTool,
   appEndTransactionTool,

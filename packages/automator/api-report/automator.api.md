@@ -83,10 +83,10 @@ export type AutomatorActionUpdateInput = Partial<AutomatorActionCreateInput>;
 export class AutomatorClient {
     constructor(options: AutomatorClientOptions);
     add(object: unknown, to: unknown, atIndex?: number): Promise<void>;
-    readonly automatoractions: AutomatorActionResourceClient;
+    readonly automatorActions: AutomatorActionResourceClient;
     get http(): HttpClient;
     remove(object: unknown): Promise<void>;
-    readonly requiredresources: RequiredResourceResourceClient;
+    readonly requiredResources: RequiredResourceResourceClient;
     readonly settings: SettingResourceClient;
     readonly variables: VariableResourceClient;
     readonly workflows: WorkflowResourceClient;

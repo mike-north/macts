@@ -121,7 +121,7 @@ export class TerminalClient {
     constructor(options: TerminalClientOptions);
     doScript(command: string, _in?: string): Promise<void>;
     get http(): HttpClient;
-    readonly settingssets: SettingsSetResourceClient;
+    readonly settingsSets: SettingsSetResourceClient;
     readonly tabs: TabResourceClient;
     readonly windows: WindowResourceClient;
 }

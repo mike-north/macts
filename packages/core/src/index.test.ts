@@ -38,7 +38,7 @@ describe('@macts/core', () => {
         resources: {
           Document: {
             name: 'Document',
-            plural: 'documents',
+            plural: 'Documents',
             description: 'A document',
             properties: {
               name: {
@@ -71,7 +71,7 @@ describe('@macts/core', () => {
     it('should export resource type', () => {
       const resource: Resource = {
         name: 'Test',
-        plural: 'tests',
+        plural: 'Tests',
         description: 'A test resource',
         properties: {
           id: {

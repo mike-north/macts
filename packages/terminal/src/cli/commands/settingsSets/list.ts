@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * List settingssets.
+ * List settings sets.
  */
 export class ListSettingsSetsCommand extends Command {
   static override paths = [['terminal', 'settingsSets', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List settingssets',
+    description: 'List settings sets',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -19,7 +19,7 @@ export class ListSettingsSetsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.settingssets.list()
+      const items = await client.settingsSets.list()
 
       const output = formatter.formatList(
         items.map((item) => ({

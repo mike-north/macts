@@ -278,8 +278,8 @@ export const manifest: unknown = {
       read: ['terminal:windows:list', 'terminal:windows:get'],
     },
     settingsSets: {
-      read: ['terminal:settingssets:list', 'terminal:settingssets:get'],
-      write: ['terminal:settingssets:update'],
+      read: ['terminal:settingsSets:list', 'terminal:settingsSets:get'],
+      write: ['terminal:settingsSets:update'],
     },
     commands: {
       execute: ['terminal:commands:doScript'],

@@ -250,15 +250,15 @@ resources:
 
 #### Resource Fields
 
-| Field         | Type   | Required | Description                                                |
-| ------------- | ------ | -------- | ---------------------------------------------------------- |
-| `name`        | string | Yes      | Resource name (singular, PascalCase)                       |
-| `plural`      | string | Yes      | Plural form for collections                                |
-| `description` | string | Yes      | Human-readable description                                 |
-| `code`        | string | No       | AppleScript four-character code                            |
-| `properties`  | object | No       | Property definitions (see [Properties](#properties))       |
-| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers)) |
-| `schema`      | string | No       | Reference to JSON Schema file for full data shape          |
+| Field         | Type   | Required | Description                                                                                                                                                                               |
+| ------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | string | Yes      | Resource name (singular, PascalCase)                                                                                                                                                      |
+| `plural`      | string | Yes      | Plural form for collections, PascalCase letters only (`MediaItems`, `URLs`); its lower camel case (`mediaItems`) spells the resource in routes, SDK accessors, tool names and permissions |
+| `description` | string | Yes      | Human-readable description                                                                                                                                                                |
+| `code`        | string | No       | AppleScript four-character code                                                                                                                                                           |
+| `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                      |
+| `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                |
+| `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                         |
 
 #### Properties
 

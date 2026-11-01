@@ -53,7 +53,6 @@ commands:
         type: string
         description: The search string to populate Alfred with
         required: false
-    permission: alfred:app:search
 
   action:
     name: action
@@ -71,7 +70,6 @@ commands:
         description: An optional type for the items - file, url or text
         required: false
         code: uaty
-    permission: alfred:app:action
 
   browse:
     name: browse
@@ -83,7 +81,6 @@ commands:
         type: string
         description: The path or search string to browse
         required: true
-    permission: alfred:app:browse
 
   runTrigger:
     name: runTrigger
@@ -195,7 +192,6 @@ commands:
         type: string
         description: The name of the theme to switch to
         required: true
-    permission: alfred:app:setTheme
 
 # Permissions mapping
 permissions:

@@ -949,10 +949,10 @@ export interface TestFailureUpdateInput {
  * all objects and commands in Xcode
  */
 export interface WorkspaceDocumentResourceClient {
-  /** List workspacedocuments. */
+  /** List workspace documents. */
   list(options?: CallOptions): Promise<readonly WorkspaceDocument[]>
   /**
-   * Read the workspacedocument identified by `name`.
+   * Read the workspace document identified by `name`.
    *
    * @param name - Workspace document name. Does not accept null.
    */
@@ -1086,13 +1086,13 @@ export interface SchemeResourceClient {
  */
 export interface RunDestinationResourceClient {
   /**
-   * List rundestinations.
+   * List run destinations.
    *
    * @param workspaceName - Workspace document name. Does not accept null.
    */
   list(workspaceName: string, options?: CallOptions): Promise<readonly RunDestination[]>
   /**
-   * Read the rundestination identified by `name`.
+   * Read the run destination identified by `name`.
    *
    * @param name - Run destination name. Does not accept null.
    */
@@ -1108,7 +1108,7 @@ export interface XcodeClient {
    * A document that represents a workspace on disk. Workspaces are the top-level container for
    * almost all objects and commands in Xcode
    */
-  readonly workspacedocuments: WorkspaceDocumentResourceClient
+  readonly workspaceDocuments: WorkspaceDocumentResourceClient
   /**
    * An Xcode project. Projects represent project files on disk and are always open in the context
    * of a workspace document
@@ -1123,7 +1123,7 @@ export interface XcodeClient {
    * An object which specifies parameters such as the device and architecture for which to perform a
    * scheme action
    */
-  readonly rundestinations: RunDestinationResourceClient
+  readonly runDestinations: RunDestinationResourceClient
 }
 
 /** The members of {@link SchemeActionResultStatus}, for its value type. */
@@ -1436,8 +1436,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     name: 'WorkspaceDocument',
     record: workspaceDocumentRecordType,
     id: t.string({ description: 'The name of the workspace' }),
-    get: 'xcode.workspacedocuments.get',
-    list: 'xcode.workspacedocuments.list',
+    get: 'xcode.workspaceDocuments.get',
+    list: 'xcode.workspaceDocuments.list',
   },
   FileDocument: {
     name: 'FileDocument',
@@ -1494,8 +1494,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     id: t.string({
       description: "The name of the run destination, as displayed in Xcode's interface",
     }),
-    get: 'xcode.rundestinations.get',
-    list: 'xcode.rundestinations.list',
+    get: 'xcode.runDestinations.get',
+    list: 'xcode.runDestinations.list',
   },
   Device: {
     name: 'Device',
@@ -1533,7 +1533,7 @@ const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
   Record<string, never>,
   readonly WorkspaceDocument[]
 > = {
-  id: 'xcode.workspacedocuments.list',
+  id: 'xcode.workspaceDocuments.list',
   permission: 'xcode:workspaceDocuments:list',
   target: { command: 'listWorkspaceDocuments', resource: 'WorkspaceDocument' },
   description: 'List all workspace documents',
@@ -1545,7 +1545,7 @@ const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
   { readonly name: string },
   WorkspaceDocument
 > = {
-  id: 'xcode.workspacedocuments.get',
+  id: 'xcode.workspaceDocuments.get',
   permission: 'xcode:workspaceDocuments:get',
   target: { command: 'getWorkspaceDocument', resource: 'WorkspaceDocument' },
   description: 'Get a workspace document by name',
@@ -1609,7 +1609,7 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
   { readonly workspaceName: string },
   readonly RunDestination[]
 > = {
-  id: 'xcode.rundestinations.list',
+  id: 'xcode.runDestinations.list',
   permission: 'xcode:runDestinations:list',
   target: { command: 'listRunDestinations', resource: 'RunDestination' },
   description: 'List all run destinations in a workspace',
@@ -1623,7 +1623,7 @@ const runDestinationGetRunDestinationOperation: OperationDescriptor<
   { readonly name: string },
   RunDestination
 > = {
-  id: 'xcode.rundestinations.get',
+  id: 'xcode.runDestinations.get',
   permission: 'xcode:runDestinations:get',
   target: { command: 'getRunDestination', resource: 'RunDestination' },
   description: 'Get a run destination by name',
@@ -1637,7 +1637,7 @@ const workspaceDocumentBuildOperation: OperationDescriptor<
   { readonly workspaceName: string },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.build',
+  id: 'xcode.workspaceDocuments.build',
   permission: 'xcode:workspace:build',
   target: { command: 'build', resource: 'WorkspaceDocument' },
   description: 'Invoke the "build" scheme action',
@@ -1651,7 +1651,7 @@ const workspaceDocumentCleanOperation: OperationDescriptor<
   { readonly workspaceName: string },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.clean',
+  id: 'xcode.workspaceDocuments.clean',
   permission: 'xcode:workspace:clean',
   target: { command: 'clean', resource: 'WorkspaceDocument' },
   description: 'Invoke the "clean" scheme action',
@@ -1665,7 +1665,7 @@ const workspaceDocumentStopOperation: OperationDescriptor<
   { readonly workspaceName: string },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.stop',
+  id: 'xcode.workspaceDocuments.stop',
   permission: 'xcode:workspace:stop',
   target: { command: 'stop', resource: 'WorkspaceDocument' },
   description: 'Stop the active scheme action, if one is running',
@@ -1683,7 +1683,7 @@ const workspaceDocumentRunOperation: OperationDescriptor<
   },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.run',
+  id: 'xcode.workspaceDocuments.run',
   permission: 'xcode:workspace:run',
   target: { command: 'run', resource: 'WorkspaceDocument' },
   description: 'Invoke the "run" scheme action',
@@ -1707,7 +1707,7 @@ const workspaceDocumentTestOperation: OperationDescriptor<
   },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.test',
+  id: 'xcode.workspaceDocuments.test',
   permission: 'xcode:workspace:test',
   target: { command: 'test', resource: 'WorkspaceDocument' },
   description: 'Invoke the "test" scheme action',
@@ -1731,7 +1731,7 @@ const workspaceDocumentAttachOperation: OperationDescriptor<
   },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.attach',
+  id: 'xcode.workspaceDocuments.attach',
   permission: 'xcode:workspace:attach',
   target: { command: 'attach', resource: 'WorkspaceDocument' },
   description: 'Start a new debugging session in the workspace',
@@ -1756,7 +1756,7 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
   },
   undefined
 > = {
-  id: 'xcode.workspacedocuments.debug',
+  id: 'xcode.workspaceDocuments.debug',
   permission: 'xcode:workspace:debug',
   target: { command: 'debug', resource: 'WorkspaceDocument' },
   description: 'Start a debugging session using the "run" or "run without building" scheme action',
@@ -1781,27 +1781,27 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<XcodeClient>['operations'] = {
-  'xcode.workspacedocuments.list': workspaceDocumentListWorkspaceDocumentsOperation,
-  'xcode.workspacedocuments.get': workspaceDocumentGetWorkspaceDocumentOperation,
+  'xcode.workspaceDocuments.list': workspaceDocumentListWorkspaceDocumentsOperation,
+  'xcode.workspaceDocuments.get': workspaceDocumentGetWorkspaceDocumentOperation,
   'xcode.projects.list': projectListProjectsOperation,
   'xcode.projects.get': projectGetProjectOperation,
   'xcode.schemes.list': schemeListSchemesOperation,
   'xcode.schemes.get': schemeGetSchemeOperation,
-  'xcode.rundestinations.list': runDestinationListRunDestinationsOperation,
-  'xcode.rundestinations.get': runDestinationGetRunDestinationOperation,
-  'xcode.workspacedocuments.build': workspaceDocumentBuildOperation,
-  'xcode.workspacedocuments.clean': workspaceDocumentCleanOperation,
-  'xcode.workspacedocuments.stop': workspaceDocumentStopOperation,
-  'xcode.workspacedocuments.run': workspaceDocumentRunOperation,
-  'xcode.workspacedocuments.test': workspaceDocumentTestOperation,
-  'xcode.workspacedocuments.attach': workspaceDocumentAttachOperation,
-  'xcode.workspacedocuments.debug': workspaceDocumentDebugOperation,
+  'xcode.runDestinations.list': runDestinationListRunDestinationsOperation,
+  'xcode.runDestinations.get': runDestinationGetRunDestinationOperation,
+  'xcode.workspaceDocuments.build': workspaceDocumentBuildOperation,
+  'xcode.workspaceDocuments.clean': workspaceDocumentCleanOperation,
+  'xcode.workspaceDocuments.stop': workspaceDocumentStopOperation,
+  'xcode.workspaceDocuments.run': workspaceDocumentRunOperation,
+  'xcode.workspaceDocuments.test': workspaceDocumentTestOperation,
+  'xcode.workspaceDocuments.attach': workspaceDocumentAttachOperation,
+  'xcode.workspaceDocuments.debug': workspaceDocumentDebugOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): XcodeClient {
   return {
-    workspacedocuments: {
+    workspaceDocuments: {
       list: (options) =>
         runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, {}, options),
       get: (name, options) =>
@@ -1862,7 +1862,7 @@ function bind(runtime: ClientRuntime): XcodeClient {
         runtime.invoke(schemeListSchemesOperation, { workspaceName }, options),
       get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
     },
-    rundestinations: {
+    runDestinations: {
       list: (workspaceName, options) =>
         runtime.invoke(runDestinationListRunDestinationsOperation, { workspaceName }, options),
       get: (name, options) =>

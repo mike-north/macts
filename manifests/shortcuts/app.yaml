@@ -117,7 +117,6 @@ commands:
     resourceType: Shortcut
     code: core
     parameters: []
-    permission: shortcuts:shortcuts:list
 
   get:
     name: get
@@ -130,7 +129,6 @@ commands:
         type: string
         description: Shortcut identifier
         required: true
-    permission: shortcuts:shortcuts:get
 
   run:
     name: run
@@ -148,7 +146,6 @@ commands:
         description: The input to provide to the shortcut
         required: false
         code: inpt
-    permission: shortcuts:shortcuts:run
 
   # Folder commands
   listFolders:

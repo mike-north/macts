@@ -1,5 +1,5 @@
 /**
- * MCP tools for System-events.app diskitems operations.
+ * MCP tools for System-events.app diskItems operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * Delete disk item(s).
  */
-export const diskitemsDeleteTool: McpToolDefinition = {
-  name: 'macts__system-events__diskitems_delete',
+export const diskItemsDeleteTool: McpToolDefinition = {
+  name: 'macts__system-events__diskItems_delete',
   description: 'Delete disk item(s).',
   inputSchema: {
     type: 'object',
@@ -27,7 +27,7 @@ export const diskitemsDeleteTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    await client.diskitems.delete(id as unknown as Parameters<typeof client.diskitems.delete>[0])
+    await client.diskItems.delete(id as unknown as Parameters<typeof client.diskItems.delete>[0])
     return { success: true, message: `Deleted DiskItem ${id}` }
   },
 }

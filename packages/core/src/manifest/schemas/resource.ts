@@ -154,14 +154,37 @@ export const NullabilityProbeSchema = z.object({
 export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>
 
 /**
+ * The form of a resource's `plural`: a Pascal case identifier of ASCII
+ * letters only (`Notes`, `MediaItems`, `URLs`).
+ *
+ * The plural is the source of the resource's segment, the one spelling of the
+ * resource in its routes, SDK accessors, tool names and derived permissions
+ * (its lower camel case: `mediaItems`). Restricting it to letters, starting
+ * with a capital, keeps every such segment a valid route segment and a valid
+ * permission segment (`[a-z][a-zA-Z0-9]*`) by construction: a space, a digit,
+ * punctuation or a leading lower-case letter could otherwise produce a
+ * segment no route or grant can use.
+ */
+const RESOURCE_PLURAL_PATTERN = /^[A-Z][A-Za-z]*$/
+
+/**
  * Schema for a resource type definition.
  */
 export const ResourceSchema = z
   .object({
     /** Resource name (singular, PascalCase) */
     name: z.string(),
-    /** Plural form for collections */
-    plural: z.string(),
+    /**
+     * Plural form for collections, in Pascal case, letters only
+     * (`RESOURCE_PLURAL_PATTERN`); it determines the resource's segment
+     * on every public surface.
+     */
+    plural: z
+      .string()
+      .regex(
+        RESOURCE_PLURAL_PATTERN,
+        'A resource plural must be a Pascal case identifier of letters only, such as "MediaItems" or "URLs"; it spells the resource in every route and permission'
+      ),
     /** Human-readable description */
     description: z.string(),
     /** Reference to JSON Schema file for full data shape */

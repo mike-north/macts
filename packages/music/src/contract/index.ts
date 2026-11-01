@@ -1659,7 +1659,7 @@ export interface PlaylistResourceClient {
  */
 export interface MusicClient {
   /** a track representing an audio file (MP3, AIFF, etc.) */
-  readonly filetracks: FileTrackResourceClient
+  readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
   /**
@@ -2514,8 +2514,8 @@ const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, unde
 }
 
 const fileTrackRefreshOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'music.filetracks.refresh',
-  permission: 'music:filetracks:refresh',
+  id: 'music.fileTracks.refresh',
+  permission: 'music:fileTracks:refresh',
   target: { command: 'refresh', resource: 'FileTrack' },
   description: 'update file track information from the current information in the track’s file',
   input: t.record({}),
@@ -2617,7 +2617,7 @@ const operations: AppContract<MusicClient>['operations'] = {
   'music.app.play': appPlayOperation,
   'music.app.playpause': appPlaypauseOperation,
   'music.app.previousTrack': appPreviousTrackOperation,
-  'music.filetracks.refresh': fileTrackRefreshOperation,
+  'music.fileTracks.refresh': fileTrackRefreshOperation,
   'music.app.resume': appResumeOperation,
   'music.app.reveal': appRevealOperation,
   'music.app.rewind': appRewindOperation,
@@ -2630,7 +2630,7 @@ const operations: AppContract<MusicClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): MusicClient {
   return {
-    filetracks: {
+    fileTracks: {
       refresh: (options) => runtime.invoke(fileTrackRefreshOperation, {}, options),
     },
     playlists: {

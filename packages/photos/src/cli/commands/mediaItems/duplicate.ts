@@ -20,8 +20,8 @@ export class DuplicateMediaItemCommand extends Command {
 
     try {
       const client = getClient()
-      await client.mediaitems.duplicate(
-        this.id as unknown as Parameters<typeof client.mediaitems.duplicate>[0]
+      await client.mediaItems.duplicate(
+        this.id as unknown as Parameters<typeof client.mediaItems.duplicate>[0]
       )
 
       const output = formatter.formatSuccess('duplicate completed successfully')

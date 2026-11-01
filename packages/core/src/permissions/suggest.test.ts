@@ -154,11 +154,12 @@ describe('listKnownPermissions', () => {
 
   it('lists route permissions, then resource wildcards, then the app wildcard', () => {
     // route permission derivation: app:scope:segment (see manifest/route.ts);
-    // the resource scope segment is the lowercased plural.
+    // the resource scope segment is the plural's lower camel case (MediaItems →
+    // mediaItems, design record D2).
     expect(listKnownPermissions(manifest)).toEqual([
-      'photos:mediaitems:list',
+      'photos:mediaItems:list',
       'photos:app:runSlideshow',
-      'photos:mediaitems:*',
+      'photos:mediaItems:*',
       'photos:app:*',
       'photos:*:*',
     ])

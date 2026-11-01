@@ -106,7 +106,6 @@ export const textEditApiPlugin = {
         scope: 'resource',
         resourceType: 'Document',
         parameters: [],
-        permission: 'textedit:documents:list',
       },
       get: {
         name: 'get',
@@ -121,7 +120,6 @@ export const textEditApiPlugin = {
             required: true,
           },
         ],
-        permission: 'textedit:documents:get',
       },
       create: {
         name: 'create',
@@ -136,7 +134,6 @@ export const textEditApiPlugin = {
             required: false,
           },
         ],
-        permission: 'textedit:documents:create',
       },
     },
     permissions: {
