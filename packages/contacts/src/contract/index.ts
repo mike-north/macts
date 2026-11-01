@@ -9,17 +9,9 @@
  * the objects they point to.
  *
  * The contract performs no I/O. A client is created from it by a client
- * factory, local or remote, which supplies the runtime that `bind` turns into
- * a `ContactsClient`; application code changes locality by changing the factory,
- * not the contract.
- *
- * @example
- * ```ts
- * import { createClient } from '@macts/sdk'
- * import { contactsContract } from '@macts/contacts/contract'
- *
- * const client = createClient(contactsContract, { token, url })
- * ```
+ * factory from `@macts/sdk`, local or remote, which supplies the runtime that
+ * `bind` turns into a `ContactsClient`; application code changes locality by
+ * changing the factory, not the contract.
  *
  * Generated from the Contacts manifest; do not edit.
  *

@@ -9,17 +9,9 @@
  * the objects they point to.
  *
  * The contract performs no I/O. A client is created from it by a client
- * factory, local or remote, which supplies the runtime that `bind` turns into
- * a `SystemEventsClient`; application code changes locality by changing the factory,
- * not the contract.
- *
- * @example
- * ```ts
- * import { createClient } from '@macts/sdk'
- * import { systemEventsContract } from '@macts/system-events/contract'
- *
- * const client = createClient(systemEventsContract, { token, url })
- * ```
+ * factory from `@macts/sdk`, local or remote, which supplies the runtime that
+ * `bind` turns into a `SystemEventsClient`; application code changes locality by
+ * changing the factory, not the contract.
  *
  * Generated from the System Events manifest; do not edit.
  *

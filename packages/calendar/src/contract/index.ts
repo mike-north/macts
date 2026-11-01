@@ -9,17 +9,9 @@
  * the objects they point to.
  *
  * The contract performs no I/O. A client is created from it by a client
- * factory, local or remote, which supplies the runtime that `bind` turns into
- * a `CalendarClient`; application code changes locality by changing the factory,
- * not the contract.
- *
- * @example
- * ```ts
- * import { createClient } from '@macts/sdk'
- * import { calendarContract } from '@macts/calendar/contract'
- *
- * const client = createClient(calendarContract, { token, url })
- * ```
+ * factory from `@macts/sdk`, local or remote, which supplies the runtime that
+ * `bind` turns into a `CalendarClient`; application code changes locality by
+ * changing the factory, not the contract.
  *
  * Generated from the Calendar manifest; do not edit.
  *
