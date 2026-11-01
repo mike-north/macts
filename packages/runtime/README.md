@@ -12,6 +12,7 @@ other.
 
 | Area               | Highlights                                                                                                                                                    |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invocation         | `createRuntime`, `MactsRuntime` (`registerManifest`, `registerContract`, `invoke`), `createBearerCredential`, `createKeyStoreVerifier`                        |
 | API keys           | `createApiKey`, `validateApiKey`, `validateAndCheckPermission`, `checkPayloadPermission`, `revokeKey`, `loadKeyMetadata`, `getSigningSecret`, `closeKeyStore` |
 | Per-key policies   | `setKeyPolicy`, `getKeyPolicy`, `deleteKeyPolicy`, `listKeyPolicyIds`, `createStoredKeyPolicyResolver`                                                        |
 | Governance loading | `loadActivePolicy`, `ALLOW_ALL_POLICY`, `loadApprovalGate`, `GovernanceContext`, `resolveGovernanceForRequest`                                                |
@@ -32,6 +33,27 @@ const result = await validateApiKey(token)
 if (result.valid) {
   console.log(result.payload.permissions)
 }
+```
+
+## Invoking operations
+
+Every operation runs through one pipeline, in this order, for every caller:
+verify the credential, check the operation's permission, enforce governance
+policy (auditing the decision and, for a held call, asking a human), validate
+the input, then hand the request to the executor the runtime was built with.
+Failures are the structured errors from `@macts/contracts`.
+
+```ts
+import { createBearerCredential, createRuntime } from '@macts/runtime'
+
+const runtime = createRuntime({ executor })
+runtime.registerManifest(manifest)
+
+const result = await runtime.invoke(
+  'calendar.calendars.list',
+  {},
+  { credential: createBearerCredential(token) }
+)
 ```
 
 ## Storage

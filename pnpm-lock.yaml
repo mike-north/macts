@@ -209,9 +209,6 @@ importers:
       pino:
         specifier: ^10.3.1
         version: 10.3.1
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
     devDependencies:
       tsup:
         specifier: 'catalog:'
@@ -1437,6 +1434,9 @@ importers:
 
   packages/runtime:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@macts/core':
         specifier: workspace:*
         version: link:../core
@@ -1446,6 +1446,9 @@ importers:
       pino:
         specifier: ^10.3.1
         version: 10.3.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       pino-pretty:
         specifier: ^13.1.3

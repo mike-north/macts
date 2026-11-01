@@ -21,12 +21,11 @@ import {
   classifyCommandRisk,
   CANONICAL_IDENTIFIER_KEY,
 } from '@macts/core'
-import { ALLOW_ALL_POLICY, type GovernanceContext } from '@macts/runtime'
+import { ALLOW_ALL_POLICY, buildSchemaRegistry, type GovernanceContext } from '@macts/runtime'
 import { requirePermission } from '../middleware/permission.js'
 import { requirePolicy } from '../middleware/governance.js'
 import type { AuthVariables } from '../middleware/auth.js'
 import { withSpan } from '../../telemetry.js'
-import { buildSchemaRegistry } from './validation.js'
 
 /**
  * RPC request body structure.

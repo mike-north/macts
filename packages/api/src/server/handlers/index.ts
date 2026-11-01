@@ -14,4 +14,4 @@ export {
   type RpcEndpointInfo,
 } from './rpc.js'
 
-export { buildCommandSchema, buildSchemaRegistry } from './validation.js'
+export { buildCommandSchema, buildSchemaRegistry } from '@macts/runtime'
