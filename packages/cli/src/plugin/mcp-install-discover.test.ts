@@ -1,12 +1,12 @@
 /**
- * Install -> discover wiring tests for MCP server plugins.
+ * Install -> discover wiring tests for host packages (`@macts/<app>-server`).
  *
  * These cover the issue's core acceptance criterion: a documented command
  * (`macts mcp install <app>`, backed by `installMcpServerPlugin`) places an
- * `@macts/<app>-server` package exactly where the MCP hosts look for it
+ * `@macts/<app>-server` package exactly where the macts hosts look for it
  * (`findInstalledServerPackages`, the first step of the host registration
- * path), so the app's tools are served once `macts --mcp` or the daemon
- * starts. The only thing mocked is the `npm install` subprocess — we simulate
+ * path), so the app is served once `macts --serve`, `macts --mcp` or the
+ * daemon starts. The only thing mocked is the `npm install` subprocess — we simulate
  * npm by writing the package into the real plugins node_modules on disk, then
  * run the real lookup.
  *
@@ -16,7 +16,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 
 // Mock only the npm subprocess; everything else (fs, paths, discovery) is real.
@@ -28,13 +28,6 @@ vi.mock('node:child_process', async (importOriginal) => {
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
 import { findInstalledServerPackages, installMcpServerPlugin, installPlugin } from './manager.js'
 import { discoverPlugins } from './loader.js'
-
-/**
- * Source for a minimal valid MCP plugin module (the `./mcp` entry point).
- */
-function mcpPluginSource(name: string, description: string, toolName: string): string {
-  return `export const plugin = { name: '${name}', description: '${description}', tools: [{ name: '${toolName}', description: 'A tool', inputSchema: { type: 'object' }, handler: async () => ({ ok: true }) }] };`
-}
 
 /**
  * Source for a minimal valid CLI plugin module (the `./cli` entry point).
@@ -50,30 +43,58 @@ function cliPluginSource(name: string, description: string): string {
 function writeInstalledPackage(
   pluginsDir: string,
   packageName: string,
-  exportSubpath: 'mcp' | 'cli',
-  source: string
+  exports: Record<string, string>,
+  files: Record<string, string>,
+  dependencies: Record<string, string> = {}
 ): void {
   const pkgDir = join(pluginsDir, 'node_modules', packageName)
-  const distDir = join(pkgDir, 'dist', exportSubpath)
-  mkdirSync(distDir, { recursive: true })
-  writeFileSync(join(distDir, 'index.js'), source)
+  for (const [path, source] of Object.entries(files)) {
+    mkdirSync(dirname(join(pkgDir, path)), { recursive: true })
+    writeFileSync(join(pkgDir, path), source)
+  }
   writeFileSync(
     join(pkgDir, 'package.json'),
     JSON.stringify({
       name: packageName,
       version: '1.0.0',
       type: 'module',
-      exports: {
-        [`./${exportSubpath}`]: {
-          import: `./dist/${exportSubpath}/index.js`,
-          default: `./dist/${exportSubpath}/index.js`,
-        },
-      },
+      exports: Object.fromEntries(
+        Object.entries(exports).map(([subpath, target]) => [subpath, { import: target }])
+      ),
+      dependencies,
     })
   )
 }
 
-describe('MCP install -> discover wiring', () => {
+/**
+ * Simulate npm installing the host package `@macts/calendar-server`, in the
+ * shape every generated host package has: only a `.` export, whose module
+ * re-exports the app's contract as `contract`, and a dependency on the app
+ * package alone.
+ */
+function writeCalendarHostPackage(pluginsDir: string): void {
+  writeInstalledPackage(
+    pluginsDir,
+    '@macts/calendar-server',
+    { '.': './dist/index.js' },
+    {
+      'dist/index.js': "export { calendarContract as contract } from '@macts/calendar/contract'\n",
+    },
+    { '@macts/calendar': '1.0.0' }
+  )
+}
+
+/** Simulate npm installing the app package `@macts/calendar` with its CLI plugin. */
+function writeCalendarCliPlugin(pluginsDir: string): void {
+  writeInstalledPackage(
+    pluginsDir,
+    '@macts/calendar',
+    { './cli': './dist/cli/index.js' },
+    { 'dist/cli/index.js': cliPluginSource('calendar', 'Calendar CLI plugin') }
+  )
+}
+
+describe('host package install -> discover wiring', () => {
   let mactsHome: string
   let pluginsDir: string
   let originalMactsHome: string | undefined
@@ -95,16 +116,11 @@ describe('MCP install -> discover wiring', () => {
     rmSync(mactsHome, { recursive: true, force: true })
   })
 
-  it('installs an MCP server package where the MCP hosts find it', () => {
+  it('installs a host package where the hosts find it', () => {
     // Simulate npm: write @macts/calendar-server into the plugins node_modules.
     vi.mocked(spawnSync).mockImplementation(((_cmd: string, args: readonly string[]) => {
       expect(args).toEqual(['install', '--ignore-scripts', '@macts/calendar-server'])
-      writeInstalledPackage(
-        pluginsDir,
-        '@macts/calendar-server',
-        'mcp',
-        mcpPluginSource('calendar', 'Calendar MCP plugin', 'macts__calendar__events_list')
-      )
+      writeCalendarHostPackage(pluginsDir)
       return { status: 0, stdout: '', stderr: '' } as SpawnSyncReturns<string>
     }) as unknown as typeof spawnSync)
 
@@ -112,18 +128,13 @@ describe('MCP install -> discover wiring', () => {
     const installResult = installMcpServerPlugin('calendar')
     expect(installResult.success).toBe(true)
 
-    // The MCP hosts must now find the app's host package.
+    // The hosts must now find the app's host package.
     expect(findInstalledServerPackages()).toEqual(['@macts/calendar-server'])
   })
 
-  it('does not expose an installed MCP server plugin to CLI plugin discovery', async () => {
+  it('does not expose an installed host package to CLI plugin discovery', async () => {
     vi.mocked(spawnSync).mockImplementation(((_cmd: string, _args: readonly string[]) => {
-      writeInstalledPackage(
-        pluginsDir,
-        '@macts/calendar-server',
-        'mcp',
-        mcpPluginSource('calendar', 'Calendar MCP plugin', 'macts__calendar__events_list')
-      )
+      writeCalendarHostPackage(pluginsDir)
       return { status: 0, stdout: '', stderr: '' } as SpawnSyncReturns<string>
     }) as unknown as typeof spawnSync)
 
@@ -134,15 +145,10 @@ describe('MCP install -> discover wiring', () => {
     expect(cliDiscovery.plugins).toEqual([])
   })
 
-  it('routes a CLI plugin to CLI discovery and keeps it out of MCP discovery', async () => {
+  it('routes a CLI plugin to CLI discovery and keeps it out of the host package lookup', async () => {
     vi.mocked(spawnSync).mockImplementation(((_cmd: string, args: readonly string[]) => {
       expect(args).toEqual(['install', '--ignore-scripts', '@macts/calendar'])
-      writeInstalledPackage(
-        pluginsDir,
-        '@macts/calendar',
-        'cli',
-        cliPluginSource('calendar', 'Calendar CLI plugin')
-      )
+      writeCalendarCliPlugin(pluginsDir)
       return { status: 0, stdout: '', stderr: '' } as SpawnSyncReturns<string>
     }) as unknown as typeof spawnSync)
 
@@ -154,27 +160,17 @@ describe('MCP install -> discover wiring', () => {
     expect(cliDiscovery.plugins).toHaveLength(1)
     expect(cliDiscovery.plugins[0]?.name).toBe('calendar')
 
-    // The CLI plugin must not appear as an MCP host package.
+    // The CLI plugin must not appear as a host package.
     expect(findInstalledServerPackages()).toEqual([])
   })
 
-  it('places CLI and MCP plugins for the same app side by side, each discovered by its own system', async () => {
+  it('places an app package and its host package side by side, each found by its own lookup', async () => {
     vi.mocked(spawnSync).mockImplementation(((_cmd: string, args: readonly string[]) => {
       const spec = args[2]
       if (spec === '@macts/calendar') {
-        writeInstalledPackage(
-          pluginsDir,
-          '@macts/calendar',
-          'cli',
-          cliPluginSource('calendar', 'Calendar CLI plugin')
-        )
+        writeCalendarCliPlugin(pluginsDir)
       } else if (spec === '@macts/calendar-server') {
-        writeInstalledPackage(
-          pluginsDir,
-          '@macts/calendar-server',
-          'mcp',
-          mcpPluginSource('calendar', 'Calendar MCP plugin', 'macts__calendar__events_list')
-        )
+        writeCalendarHostPackage(pluginsDir)
       }
       return { status: 0, stdout: '', stderr: '' } as SpawnSyncReturns<string>
     }) as unknown as typeof spawnSync)

@@ -134,7 +134,7 @@ describe('McpDiagnoseCommand', () => {
 
   it('reports the installed apps the MCP servers load, and what fails', async () => {
     writeInstalledApp(plugins.nodeModules, 'widgets')
-    writeInstalledApp(plugins.nodeModules, 'gadgets', { exportsContract: false })
+    writeInstalledApp(plugins.nodeModules, 'gadgets', { hostShape: 'older' })
     writeAppPackage(plugins.nodeModules, 'sprockets')
     const { stdout, stderr, getStdout } = createMockStreams()
 
@@ -150,7 +150,8 @@ describe('McpDiagnoseCommand', () => {
     expect(output.apps.failed).toEqual([
       {
         app: 'gadgets',
-        reason: expect.stringContaining("does not define a './contract' export") as unknown,
+        reason:
+          "@macts/gadgets-server is from an older macts and does not export its app's contract. Reinstall it with `macts mcp install gadgets`.",
       },
     ])
     expect(output.apps.missingHost).toEqual([

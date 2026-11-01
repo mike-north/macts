@@ -2,8 +2,9 @@
  * Cross-system integration tests.
  *
  * Tests that the same @macts/ scoped directory structure serves both CLI
- * plugin discovery and the MCP hosts, which find installed `@macts/*-server`
- * packages through `findInstalledServerPackages` (the host registration path).
+ * plugin discovery and the macts hosts, which find installed host packages
+ * (`@macts/*-server`) through `findInstalledServerPackages`, the first step of
+ * the host registration path.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -50,24 +51,27 @@ function addCliPlugin(pluginsProject: Project, packageName: string, entrySource:
 }
 
 /**
- * Add an MCP plugin to the plugins project.
+ * Add the host package `@macts/<app>-server` to the plugins project, in the
+ * shape every generated host package has: only a `.` export, whose module
+ * re-exports the app's contract as `contract`, and a dependency on the app
+ * package alone.
  */
-function addMcpPlugin(pluginsProject: Project, packageName: string, entrySource: string): Project {
-  const dep = pluginsProject.addDependency(`@macts/${packageName}`, '1.0.0')
+function addHostPackage(pluginsProject: Project, app: string): Project {
+  // The binding an app package's contract module exports: `test-app` → `testAppContract`.
+  const binding = `${app.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())}Contract`
+  const dep = pluginsProject.addDependency(`@macts/${app}-server`, '1.0.0')
   Object.assign(dep.pkg, {
     type: 'module',
     exports: {
-      './mcp': {
-        import: './dist/mcp/index.js',
-        default: './dist/mcp/index.js',
+      '.': {
+        import: './dist/index.js',
       },
     },
+    dependencies: { [`@macts/${app}`]: '1.0.0' },
   })
   dep.files = {
     dist: {
-      mcp: {
-        'index.js': entrySource,
-      },
+      'index.js': `export { ${binding} as contract } from '@macts/${app}/contract'\n`,
     },
   }
   return dep
@@ -103,12 +107,8 @@ describe('cross-system plugin discovery', () => {
       `export const plugin = { name: 'test-app', description: 'Test CLI app', commands: [] };`
     )
 
-    // MCP plugin (should be ignored by CLI discovery)
-    addMcpPlugin(
-      pluginsProject,
-      'test-app-server',
-      `export const plugin = { name: 'test-app', description: 'Test MCP app', tools: [{ name: 'macts__test__tool', description: 'Test tool', inputSchema: { type: 'object' }, handler: async () => ({ ok: true }) }] };`
-    )
+    // Host package (should be ignored by CLI discovery)
+    addHostPackage(pluginsProject, 'test-app')
 
     await pluginsProject.write()
 
@@ -119,27 +119,23 @@ describe('cross-system plugin discovery', () => {
     expect(cliResult.plugins[0]?.description).toBe('Test CLI app')
   })
 
-  it('should find MCP host packages among @macts/*-server packages only', async () => {
-    // CLI plugin (should be ignored by MCP discovery)
+  it('should find host packages among @macts/*-server packages only', async () => {
+    // CLI plugin (should be ignored by the host package lookup)
     addCliPlugin(
       pluginsProject,
       'test-app',
       `export const plugin = { name: 'test-app', description: 'Test CLI app', commands: [] };`
     )
 
-    // MCP plugin
-    addMcpPlugin(
-      pluginsProject,
-      'test-app-server',
-      `export const plugin = { name: 'test-app', description: 'Test MCP app', tools: [{ name: 'macts__test__tool', description: 'Test tool', inputSchema: { type: 'object' }, handler: async () => ({ ok: true }) }] };`
-    )
+    // Host package
+    addHostPackage(pluginsProject, 'test-app')
 
     await pluginsProject.write()
 
     expect(findInstalledServerPackages()).toEqual(['@macts/test-app-server'])
   })
 
-  it('should discover both CLI and MCP plugins from shared plugins directory', async () => {
+  it('should discover CLI plugins and find host packages in a shared plugins directory', async () => {
     // CLI plugins
     addCliPlugin(
       pluginsProject,
@@ -152,17 +148,9 @@ describe('cross-system plugin discovery', () => {
       `export const plugin = { name: 'contacts', description: 'Contacts CLI', commands: [] };`
     )
 
-    // MCP plugins
-    addMcpPlugin(
-      pluginsProject,
-      'calendar-server',
-      `export const plugin = { name: 'calendar', description: 'Calendar MCP', tools: [{ name: 'macts__calendar__events_list', description: 'List events', inputSchema: { type: 'object' }, handler: async () => ({ ok: true }) }] };`
-    )
-    addMcpPlugin(
-      pluginsProject,
-      'contacts-server',
-      `export const plugin = { name: 'contacts', description: 'Contacts MCP', tools: [{ name: 'macts__contacts__people_list', description: 'List people', inputSchema: { type: 'object' }, handler: async () => ({ ok: true }) }] };`
-    )
+    // Host packages
+    addHostPackage(pluginsProject, 'calendar')
+    addHostPackage(pluginsProject, 'contacts')
 
     await pluginsProject.write()
 
@@ -177,7 +165,7 @@ describe('cross-system plugin discovery', () => {
     const cliCalendar = cliResult.plugins.find((p) => p.name === 'calendar')
     expect(cliCalendar?.description).toBe('Calendar CLI')
 
-    // Find the MCP host packages
+    // Find the host packages
     expect(findInstalledServerPackages()).toEqual([
       '@macts/calendar-server',
       '@macts/contacts-server',

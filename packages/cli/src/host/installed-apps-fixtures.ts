@@ -2,8 +2,9 @@
  * Test fixtures for host registration: a temporary plugins directory holding
  * tiny real ESM app packages (`@macts/<app>`, with a contract at `./contract`
  * built from `@macts/contracts` value constructors) and their host packages
- * (`@macts/<app>-server`), written to disk with real package.json files and
- * `exports` maps. Production code never imports this module.
+ * (`@macts/<app>-server`, whose only export `.` re-exports that contract as
+ * `contract`), written to disk with real package.json files and `exports`
+ * maps. Production code never imports this module.
  *
  * Each fixture app has one resource, `Widget` (plural `Widgets`, route segment
  * `widgets`), and one operation derived by hand from the manifest route rules:
@@ -34,8 +35,19 @@ export interface AppPackageOptions {
   readonly contractPermission?: string
   /** The body of `manifest.js`, replacing the valid manifest. */
   readonly manifestSource?: string
-  /** The body of `contract.js`, replacing the valid contract module. */
-  readonly contractSource?: string
+  /**
+   * The shape of the host package `@macts/<app>-server`:
+   * - `current`: exports only `.`, whose module re-exports the app's contract
+   *   as `contract` from `@macts/<app>/contract`.
+   * - `older`: the shape host packages installed by an older macts have. It
+   *   exports `.` (whose module exports `plugin` and no `contract`) and
+   *   `./mcp`.
+   * - `no-exports`: declares no `exports` map at all.
+   * @defaultValue `current`
+   */
+  readonly hostShape?: 'current' | 'older' | 'no-exports'
+  /** The body of the host package's `index.js`, replacing the one `hostShape` implies. */
+  readonly hostSource?: string
   /**
    * Where the app package is installed relative to its host package:
    * `hoisted` beside it, or `nested` in the host package's own `node_modules`.
@@ -160,11 +172,32 @@ export function writeAppPackage(
   writeFileSync(join(dir, 'index.js'), 'export {}\n')
   writeFileSync(
     join(dir, 'contract.js'),
-    options.contractSource ??
-      contractSource(app, options.contractPermission ?? `${app}:widgets:list`)
+    contractSource(app, options.contractPermission ?? `${app}:widgets:list`)
   )
   writeFileSync(join(dir, 'manifest.js'), options.manifestSource ?? validManifestSource(app))
   return dir
+}
+
+/** The `exports` map of a fixture host package of the given shape. */
+function hostExports(shape: NonNullable<AppPackageOptions['hostShape']>): unknown {
+  switch (shape) {
+    case 'current':
+      return { '.': { types: './index.d.ts', import: './index.js' } }
+    case 'older':
+      return {
+        '.': { types: './index.d.ts', import: './index.js' },
+        './mcp': { types: './mcp.d.ts', import: './mcp.js' },
+      }
+    case 'no-exports':
+      return undefined
+  }
+}
+
+/** The `index.js` of a fixture host package of the given shape. */
+function hostIndexSource(app: string, shape: NonNullable<AppPackageOptions['hostShape']>): string {
+  return shape === 'current'
+    ? `export { ${app}Contract as contract } from '@macts/${app}/contract'\n`
+    : `export const plugin = { name: '${app}', routes: [] }\n`
 }
 
 /**
@@ -176,14 +209,18 @@ export function writeInstalledApp(
   app: string,
   options: AppPackageOptions = {}
 ): void {
+  const shape = options.hostShape ?? 'current'
   const hostDir = join(nodeModules, '@macts', `${app}-server`)
   mkdirSync(hostDir, { recursive: true })
   writeJson(join(hostDir, 'package.json'), {
     name: `@macts/${app}-server`,
     version: '0.0.0',
     type: 'module',
+    exports: hostExports(shape),
     dependencies: { [`@macts/${app}`]: '0.0.0' },
   })
+  writeFileSync(join(hostDir, 'index.js'), options.hostSource ?? hostIndexSource(app, shape))
+  if (shape === 'older') writeFileSync(join(hostDir, 'mcp.js'), 'export const plugin = {}\n')
   const appNodeModules =
     options.placement === 'nested' ? join(hostDir, 'node_modules') : nodeModules
   writeAppPackage(appNodeModules, app, options)

@@ -6,8 +6,9 @@
  * `"require"`) can never resolve their subpaths. This module reads the
  * package's `exports` map directly instead, applying the constraints Node
  * itself puts on an export target, so a malformed or malicious target cannot
- * point outside the package that declares it. The CLI plugin loader (`./cli`)
- * and the host registration path (`./contract`) both resolve through it.
+ * point outside the package that declares it. The CLI plugin loader (an app
+ * package's `./cli`) and the host registration path (a host package's `.`)
+ * both resolve through it.
  *
  * @see https://nodejs.org/api/packages.html#subpath-exports
  * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
@@ -46,7 +47,8 @@ export type PackageExportResolution =
  *
  * @param packageDir - Absolute path of the installed package's directory.
  * @param packageName - The package's name, for messages (e.g. `@macts/notes`).
- * @param subpath - The export to resolve, beginning with `./` (e.g. `./contract`).
+ * @param subpath - The export to resolve: `.` or a subpath beginning with `./`
+ *   (e.g. `./cli`).
  * @returns The file URL, or why the export cannot be used.
  */
 export function resolvePackageExport(

@@ -10,16 +10,24 @@
  * calls against the same descriptors. Manifest-only (passthrough)
  * registration is not used here: it remains for embedders and tests.
  *
+ * The host package is the install opt-in: installing `@macts/<app>-server`
+ * (`macts mcp install <app>`) is what asks a host to serve the app, and the
+ * host package exports the one contract it serves. Node resolves the app
+ * package through the host package's own dependencies, so the host never
+ * locates `@macts/<app>` itself, and nested and hoisted installs both work. A
+ * host package that does not export `contract` was installed by an older
+ * macts; it is reported with the command that reinstalls it, never loaded
+ * another way.
+ *
  * Registration happens in two steps, because loading is asynchronous and a
  * host's runtime may only be available synchronously (the HTTP server builds
  * its routes from the operations registered when it is constructed):
  *
  * 1. {@link loadInstalledApps} finds each installed host package
- *    (`@macts/<app>-server`) through the plugins-directory convention, resolves
- *    `@macts/<app>/contract` from the host package's own location (so nested
- *    and hoisted installs both work), imports it, and loads and validates the
- *    app's manifest. It also finds app packages installed without their host
- *    package.
+ *    (`@macts/<app>-server`) through the plugins-directory convention, imports
+ *    the host package's `.` export, reads the app contract it exports as
+ *    `contract`, and loads and validates the app's manifest. It also finds app
+ *    packages installed without their host package.
  * 2. {@link registerInstalledApps} registers every loaded app with a runtime.
  *
  * An app that fails at either step is reported, with a reason that never
@@ -30,7 +38,6 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { AppManifestSchema, type AppManifest } from '@macts/core'
 import type { AppContract } from '@macts/contracts'
@@ -41,6 +48,9 @@ import { declaresExport, isRecord, resolvePackageExport } from '../plugin/packag
 
 /** The subpath at which every app package exports its generated contract. */
 const CONTRACT_SUBPATH = './contract'
+
+/** The export of a host package whose module exports the app's contract as `contract`. */
+const HOST_ENTRY_SUBPATH = '.'
 
 /** An installed app whose contract and manifest are loaded and ready to register. */
 export interface LoadedApp {
@@ -168,37 +178,48 @@ export function registerInstalledApps(
 /** The outcome of loading one app. */
 type LoadResult = { ok: true; app: LoadedApp } | { ok: false; reason: string }
 
-/** Load one app's contract and manifest through its host package. */
+/**
+ * Load one app's contract and manifest through its host package.
+ *
+ * @remarks
+ * The contract is the host package's `contract` export, imported through its
+ * `.` export so that Node resolves `@macts/<app>` from the host package's own
+ * dependencies.
+ */
 async function loadApp(nodeModules: string, app: string, hostPackage: string): Promise<LoadResult> {
   const appPackage = `@macts/${app}`
-  const hostPackageJson = join(nodeModules, hostPackage, 'package.json')
-  if (!existsSync(hostPackageJson)) {
-    return { ok: false, reason: `${hostPackage} is incomplete: it has no package.json.` }
-  }
-
-  const appDir = locateFrom(hostPackageJson, appPackage)
-  if (appDir === undefined) {
+  const hostDir = join(nodeModules, hostPackage)
+  const reinstall = `Reinstall it with \`macts mcp install ${app}\`.`
+  const olderHostPackage = `${hostPackage} is from an older macts and does not export its app's contract. ${reinstall}`
+  if (!existsSync(join(hostDir, 'package.json'))) {
     return {
       ok: false,
-      reason: `${appPackage}, which ${hostPackage} depends on, is not installed. Reinstall it with \`macts mcp install ${app}\`.`,
+      reason: `${hostPackage} is incomplete: it has no package.json. ${reinstall}`,
     }
   }
 
-  const entry = resolvePackageExport(appDir, appPackage, CONTRACT_SUBPATH)
+  const entry = resolvePackageExport(hostDir, hostPackage, HOST_ENTRY_SUBPATH)
   if (!entry.found) {
-    return { ok: false, reason: entry.error }
+    return {
+      ok: false,
+      reason: declaresSubpath(hostDir, HOST_ENTRY_SUBPATH) ? entry.error : olderHostPackage,
+    }
   }
 
   let module: unknown
   try {
     module = await import(entry.url)
   } catch (error) {
-    return { ok: false, reason: `${appPackage}'s contract failed to load: ${messageOf(error)}` }
+    return {
+      ok: false,
+      reason: `${hostPackage} failed to load: ${asSentence(messageOf(error))} ${reinstall}`,
+    }
   }
 
-  const contract = findContract(module, app)
-  if (!contract.ok) {
-    return { ok: false, reason: `${appPackage}'s contract module ${contract.reason}` }
+  const contract = readContractExport(module, app)
+  if (contract.kind === 'absent') return { ok: false, reason: olderHostPackage }
+  if (contract.kind === 'invalid') {
+    return { ok: false, reason: `${hostPackage}'s \`contract\` export ${contract.reason}` }
   }
 
   let rawManifest: unknown
@@ -223,44 +244,27 @@ async function loadApp(nodeModules: string, app: string, hostPackage: string): P
 }
 
 /**
- * The directory of `packageName` as Node would find it from the package whose
- * package.json is `fromPackageJson`: its own nested `node_modules` first, then
- * each ancestor's.
- *
- * @remarks
- * Only the lookup directories come from `createRequire`; the package itself is
- * located by its package.json, because these ESM-only packages export no
- * `require` condition (or `./package.json`) for `require.resolve` to match.
+ * What a host package module's `contract` export holds: the app's contract, no
+ * such export (an install from an older macts), or something that is not the
+ * contract for this app.
  */
-function locateFrom(fromPackageJson: string, packageName: string): string | undefined {
-  const lookupDirs = createRequire(fromPackageJson).resolve.paths(packageName) ?? []
-  for (const dir of lookupDirs) {
-    const candidate = join(dir, packageName)
-    if (existsSync(join(candidate, 'package.json'))) return candidate
-  }
-  return undefined
-}
-
-/** The outcome of finding the contract a module exports. */
-type ContractLookup = { ok: true; value: AppContract<unknown> } | { ok: false; reason: string }
+type ContractExport =
+  | { kind: 'found'; value: AppContract<unknown> }
+  | { kind: 'absent' }
+  | { kind: 'invalid'; reason: string }
 
 /**
- * The one contract for `app` among a module's exports.
- *
- * @remarks
- * Selected by shape and by `contract.app`, not by binding name, so the host
- * never depends on how a generator names the export.
+ * The app contract a host package module exports as `contract`, checked to be
+ * an `AppContract` for `app`.
  */
-function findContract(module: unknown, app: string): ContractLookup {
-  const candidates = isRecord(module)
-    ? Object.values(module).filter(
-        (value): value is AppContract<unknown> => isAppContract(value) && value.app === app
-      )
-    : []
-  const [only, ...rest] = candidates
-  if (only === undefined) return { ok: false, reason: `exports no contract for ${app}.` }
-  if (rest.length > 0) return { ok: false, reason: `exports more than one contract for ${app}.` }
-  return { ok: true, value: only }
+function readContractExport(module: unknown, app: string): ContractExport {
+  const value = isRecord(module) ? module['contract'] : undefined
+  if (value === undefined) return { kind: 'absent' }
+  if (!isAppContract(value)) return { kind: 'invalid', reason: 'is not an app contract.' }
+  if (value.app !== app) {
+    return { kind: 'invalid', reason: `is the contract for ${value.app}, not ${app}.` }
+  }
+  return { kind: 'found', value }
 }
 
 /** Whether `value` has the shape of an `AppContract`. */
@@ -286,7 +290,7 @@ function findAppsMissingHost(
   const hosts = new Set(hostPackages)
   return findInstalledPluginPackages(nodeModules)
     .filter((appPackage) => !hosts.has(`${appPackage}-server`))
-    .filter((appPackage) => exportsContract(join(nodeModules, appPackage)))
+    .filter((appPackage) => declaresSubpath(join(nodeModules, appPackage), CONTRACT_SUBPATH))
     .sort()
     .map((appPackage) => {
       const app = appPackage.slice('@macts/'.length)
@@ -298,11 +302,11 @@ function findAppsMissingHost(
     })
 }
 
-/** Whether the package in `packageDir` declares a `./contract` export. */
-function exportsContract(packageDir: string): boolean {
+/** Whether the package in `packageDir` declares the export `subpath`. */
+function declaresSubpath(packageDir: string, subpath: string): boolean {
   try {
     const pkg: unknown = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8'))
-    return declaresExport(pkg, CONTRACT_SUBPATH)
+    return declaresExport(pkg, subpath)
   } catch {
     return false
   }
@@ -311,6 +315,12 @@ function exportsContract(packageDir: string): boolean {
 /** A thrown value's message, without its stack or any other field. */
 function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : String(error)
+}
+
+/** `text` ending in sentence punctuation, so another sentence can follow it. */
+function asSentence(text: string): string {
+  const trimmed = text.trimEnd()
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`
 }
 
 /** A macts API key, wherever one might appear in third-party error text. */
