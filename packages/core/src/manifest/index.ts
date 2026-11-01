@@ -24,3 +24,7 @@ export * from './route.js'
 // property identifies a resource and the canonical key list output exposes it
 // under, shared by the server list executor and identifier-consuming surfaces)
 export * from './identifier.js'
+
+// Nullability and resettability decisions for manifest fields (single source
+// of truth shared by the contract generator and the nullability probe)
+export * from './nullability.js'

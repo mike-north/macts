@@ -11,6 +11,7 @@
 export * from './app.js'
 
 // Foundational schemas
+export * from './evidence.js'
 export * from './property.js'
 export * from './resource.js'
 export * from './enum.js'
