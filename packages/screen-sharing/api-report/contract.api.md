@@ -8,27 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 
 // @public
-export interface Connection {
-    readonly id: string;
-    readonly name: string | null;
-    readonly url: string | null;
-}
-
-// @public
-export type ConnectionCreateInput = Record<string, never>;
-
-// @public
-export interface ConnectionResourceClient {
-    get(id: string, options?: CallOptions): Promise<Connection>;
-    list(options?: CallOptions): Promise<readonly Connection[]>;
-}
-
-// @public
-export type ConnectionUpdateInput = Record<string, never>;
-
-// @public
 export interface ScreenSharingClient {
-    readonly connections: ConnectionResourceClient;
     getURL(url: string, options?: CallOptions): Promise<void>;
 }
 

@@ -467,6 +467,16 @@ export const automatorApiPlugin = {
             },
           },
         },
+        automatorActions: {
+          resource: 'AutomatorAction',
+          access: 'rw',
+          description: 'Actions in the application, across every workflow',
+        },
+        variables: {
+          resource: 'Variable',
+          access: 'rw',
+          description: 'Variables in the application, across every workflow',
+        },
       },
     },
     relationships: [],
@@ -650,6 +660,17 @@ export const automatorApiPlugin = {
         ],
         code: 'getd',
         routeName: 'get',
+        unsupported: {
+          evidence: {
+            source: 'live',
+            observedAt: '2026-11-01T16:34:20.000Z',
+            bundleId: 'com.apple.Automator',
+            appVersion: '2.10',
+            osVersion: '27.2',
+            expression: 'the settings collection at the application',
+            errorNumber: -1728,
+          },
+        },
       },
       listRequiredResources: {
         name: 'list',
@@ -682,6 +703,17 @@ export const automatorApiPlugin = {
         ],
         code: 'getd',
         routeName: 'get',
+        unsupported: {
+          evidence: {
+            source: 'live',
+            observedAt: '2026-11-01T16:34:20.000Z',
+            bundleId: 'com.apple.Automator',
+            appVersion: '2.10',
+            osVersion: '27.2',
+            expression: 'the requiredResources collection at the application',
+            errorNumber: -1728,
+          },
+        },
       },
     },
     permissions: {
@@ -700,10 +732,10 @@ export const automatorApiPlugin = {
         read: ['automator:variables:list', 'automator:variables:get'],
       },
       settings: {
-        read: ['automator:settings:list', 'automator:settings:get'],
+        read: ['automator:settings:list'],
       },
       requiredResources: {
-        read: ['automator:requiredResources:list', 'automator:requiredResources:get'],
+        read: ['automator:requiredResources:list'],
       },
     },
     extraction: {

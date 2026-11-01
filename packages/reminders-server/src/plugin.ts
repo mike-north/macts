@@ -454,6 +454,11 @@ export const remindersApiPlugin = {
             },
           },
         },
+        reminders: {
+          resource: 'Reminder',
+          access: 'rw',
+          description: 'Reminders in the application, across every list',
+        },
       },
     },
     relationships: [],

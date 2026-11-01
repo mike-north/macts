@@ -385,6 +385,16 @@ export const manifest: unknown = {
           description: 'The aNSIBlackColor property',
           code: 'Co07',
           optional: false,
+          native: {
+            name: 'ansiBlackColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI black color',
+            },
+          },
         },
         aNSIRedColor: {
           access: 'rw',
@@ -392,6 +402,16 @@ export const manifest: unknown = {
           description: 'The aNSIRedColor property',
           code: 'Co08',
           optional: false,
+          native: {
+            name: 'ansiRedColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI red color',
+            },
+          },
         },
         aNSIGreenColor: {
           access: 'rw',
@@ -399,6 +419,16 @@ export const manifest: unknown = {
           description: 'The aNSIGreenColor property',
           code: 'Co09',
           optional: false,
+          native: {
+            name: 'ansiGreenColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI green color',
+            },
+          },
         },
         aNSIYellowColor: {
           access: 'rw',
@@ -406,6 +436,16 @@ export const manifest: unknown = {
           description: 'The aNSIYellowColor property',
           code: 'Co10',
           optional: false,
+          native: {
+            name: 'ansiYellowColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI yellow color',
+            },
+          },
         },
         aNSIBlueColor: {
           access: 'rw',
@@ -413,6 +453,16 @@ export const manifest: unknown = {
           description: 'The aNSIBlueColor property',
           code: 'Co11',
           optional: false,
+          native: {
+            name: 'ansiBlueColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI blue color',
+            },
+          },
         },
         aNSIMagentaColor: {
           access: 'rw',
@@ -420,6 +470,16 @@ export const manifest: unknown = {
           description: 'The aNSIMagentaColor property',
           code: 'Co12',
           optional: false,
+          native: {
+            name: 'ansiMagentaColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI magenta color',
+            },
+          },
         },
         aNSICyanColor: {
           access: 'rw',
@@ -427,6 +487,16 @@ export const manifest: unknown = {
           description: 'The aNSICyanColor property',
           code: 'Co13',
           optional: false,
+          native: {
+            name: 'ansiCyanColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI cyan color',
+            },
+          },
         },
         aNSIWhiteColor: {
           access: 'rw',
@@ -434,6 +504,16 @@ export const manifest: unknown = {
           description: 'The aNSIWhiteColor property',
           code: 'Co14',
           optional: false,
+          native: {
+            name: 'ansiWhiteColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI white color',
+            },
+          },
         },
         aNSIBrightBlackColor: {
           access: 'rw',
@@ -441,6 +521,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightBlackColor property',
           code: 'Co15',
           optional: false,
+          native: {
+            name: 'ansiBrightBlackColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright black color',
+            },
+          },
         },
         aNSIBrightRedColor: {
           access: 'rw',
@@ -448,6 +538,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightRedColor property',
           code: 'Co16',
           optional: false,
+          native: {
+            name: 'ansiBrightRedColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright red color',
+            },
+          },
         },
         aNSIBrightGreenColor: {
           access: 'rw',
@@ -455,6 +555,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightGreenColor property',
           code: 'Co17',
           optional: false,
+          native: {
+            name: 'ansiBrightGreenColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright green color',
+            },
+          },
         },
         aNSIBrightYellowColor: {
           access: 'rw',
@@ -462,6 +572,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightYellowColor property',
           code: 'Co18',
           optional: false,
+          native: {
+            name: 'ansiBrightYellowColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright yellow color',
+            },
+          },
         },
         aNSIBrightBlueColor: {
           access: 'rw',
@@ -469,6 +589,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightBlueColor property',
           code: 'Co19',
           optional: false,
+          native: {
+            name: 'ansiBrightBlueColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright blue color',
+            },
+          },
         },
         aNSIBrightMagentaColor: {
           access: 'rw',
@@ -476,6 +606,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightMagentaColor property',
           code: 'Co20',
           optional: false,
+          native: {
+            name: 'ansiBrightMagentaColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright magenta color',
+            },
+          },
         },
         aNSIBrightCyanColor: {
           access: 'rw',
@@ -483,6 +623,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightCyanColor property',
           code: 'Co21',
           optional: false,
+          native: {
+            name: 'ansiBrightCyanColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright cyan color',
+            },
+          },
         },
         aNSIBrightWhiteColor: {
           access: 'rw',
@@ -490,6 +640,16 @@ export const manifest: unknown = {
           description: 'The aNSIBrightWhiteColor property',
           code: 'Co22',
           optional: false,
+          native: {
+            name: 'ansiBrightWhiteColor',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.googlecode.iterm2',
+              appVersion: '3.7.6',
+              osVersion: '27.2',
+              term: 'ANSI bright white color',
+            },
+          },
         },
         underlineColor: {
           access: 'rw',

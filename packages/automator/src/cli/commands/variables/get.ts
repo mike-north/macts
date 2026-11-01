@@ -1,33 +1,33 @@
 import { Command, Option } from 'clipanion'
-import { getClient } from '../../../../sdk.js'
-import { createFormatter } from '../../../../output/index.js'
+import { getClient } from '../../sdk.js'
+import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a required resource by ID.
+ * Get a variable by ID.
  */
-export class GetRequiredResourceCommand extends Command {
-  static override paths = [['automator', 'workflows', 'actions', 'requiredResources', 'get']]
+export class GetVariableCommand extends Command {
+  static override paths = [['automator', 'variables', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a required resource by ID',
+    description: 'Get a variable by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  requiredResourceId = Option.String({ required: true })
+  variableId = Option.String({ required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const item = await client.requiredResources.get(this.requiredResourceId)
+      const item = await client.variables.get(this.variableId)
 
       const output = formatter.format({
-        kind: item.kind,
         name: item.name,
-        resource: item.resource,
-        version: item.version,
+        value: item.value,
+        settable: item.settable,
+        id: item.id,
       })
 
       this.context.stdout.write(output + '\n')

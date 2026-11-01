@@ -212,6 +212,16 @@ export const manifest: unknown = {
           description: 'The url visible to the user.',
           code: 'URL ',
           optional: false,
+          native: {
+            name: 'url',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.google.Chrome',
+              appVersion: '156.0.8078.74',
+              osVersion: '27.2',
+              term: 'URL',
+            },
+          },
         },
         loading: {
           access: 'r',
@@ -289,6 +299,16 @@ export const manifest: unknown = {
           description: 'The URL of the bookmark.',
           code: 'URL ',
           optional: false,
+          native: {
+            name: 'url',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.google.Chrome',
+              appVersion: '156.0.8078.74',
+              osVersion: '27.2',
+              term: 'URL',
+            },
+          },
         },
         index: {
           access: 'r',

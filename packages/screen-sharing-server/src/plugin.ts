@@ -71,6 +71,16 @@ export const screenSharingApiPlugin = {
             primary: true,
           },
         ],
+        unsupported: {
+          evidence: {
+            source: 'dictionary',
+            bundleId: 'com.apple.ScreenSharing',
+            appVersion: '7.1',
+            osVersion: '27.2',
+            term: 'connection',
+            finding: 'no-class',
+          },
+        },
       },
     },
     enums: {},
@@ -124,9 +134,6 @@ export const screenSharingApiPlugin = {
       },
     },
     permissions: {
-      connections: {
-        read: ['screen-sharing:connections:list', 'screen-sharing:connections:get'],
-      },
       app: {
         read: ['screen-sharing:app:getURL'],
       },

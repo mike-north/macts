@@ -403,12 +403,6 @@ export interface SettingResourceClient {
    * @param actionId - Action identifier. Does not accept null.
    */
   list(actionId: string, options?: CallOptions): Promise<readonly Setting[]>
-  /**
-   * Read the setting identified by `name`.
-   *
-   * @param name - Setting name. Does not accept null.
-   */
-  get(name: string, options?: CallOptions): Promise<Setting>
 }
 
 /** A resource required for proper operation of the action */
@@ -419,12 +413,6 @@ export interface RequiredResourceResourceClient {
    * @param actionId - Action identifier. Does not accept null.
    */
   list(actionId: string, options?: CallOptions): Promise<readonly RequiredResource[]>
-  /**
-   * Read the required resource identified by `name`.
-   *
-   * @param name - Resource name. Does not accept null.
-   */
-  get(name: string, options?: CallOptions): Promise<RequiredResource>
 }
 
 /**
@@ -602,14 +590,12 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     name: 'Setting',
     record: settingRecordType,
     id: t.string({ description: 'The name of the setting' }),
-    get: 'automator.settings.get',
     list: 'automator.settings.list',
   },
   RequiredResource: {
     name: 'RequiredResource',
     record: requiredResourceRecordType,
     id: t.string({ description: 'The name of the required resource' }),
-    get: 'automator.requiredResources.get',
     list: 'automator.requiredResources.list',
   },
 }
@@ -741,17 +727,6 @@ const settingListSettingsOperation: OperationDescriptor<
   output: t.array(settingRecordType),
 }
 
-const settingGetSettingOperation: OperationDescriptor<{ readonly name: string }, Setting> = {
-  id: 'automator.settings.get',
-  permission: 'automator:settings:get',
-  target: { command: 'getSetting', resource: 'Setting' },
-  description: 'Get a setting by name',
-  input: t.record({
-    name: t.string({ description: 'Setting name' }),
-  }),
-  output: settingRecordType,
-}
-
 const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
   { readonly actionId: string },
   readonly RequiredResource[]
@@ -766,20 +741,6 @@ const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
   output: t.array(requiredResourceRecordType),
 }
 
-const requiredResourceGetRequiredResourceOperation: OperationDescriptor<
-  { readonly name: string },
-  RequiredResource
-> = {
-  id: 'automator.requiredResources.get',
-  permission: 'automator:requiredResources:get',
-  target: { command: 'getRequiredResource', resource: 'RequiredResource' },
-  description: 'Get a required resource by name',
-  input: t.record({
-    name: t.string({ description: 'Resource name' }),
-  }),
-  output: requiredResourceRecordType,
-}
-
 /** Every operation, keyed by its identity. */
 const operations: AppContract<AutomatorClient>['operations'] = {
   'automator.workflows.list': workflowListOperation,
@@ -792,9 +753,7 @@ const operations: AppContract<AutomatorClient>['operations'] = {
   'automator.variables.list': variableListVariablesOperation,
   'automator.variables.get': variableGetVariableOperation,
   'automator.settings.list': settingListSettingsOperation,
-  'automator.settings.get': settingGetSettingOperation,
   'automator.requiredResources.list': requiredResourceListRequiredResourcesOperation,
-  'automator.requiredResources.get': requiredResourceGetRequiredResourceOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
@@ -819,13 +778,10 @@ function bind(runtime: ClientRuntime): AutomatorClient {
     settings: {
       list: (actionId, options) =>
         runtime.invoke(settingListSettingsOperation, { actionId }, options),
-      get: (name, options) => runtime.invoke(settingGetSettingOperation, { name }, options),
     },
     requiredResources: {
       list: (actionId, options) =>
         runtime.invoke(requiredResourceListRequiredResourcesOperation, { actionId }, options),
-      get: (name, options) =>
-        runtime.invoke(requiredResourceGetRequiredResourceOperation, { name }, options),
     },
     add: (object, to, atIndex, options) =>
       runtime.invoke(appAddOperation, { object, to, atIndex }, options),

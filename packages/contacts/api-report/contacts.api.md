@@ -210,30 +210,7 @@ export const ICQHandleSchema: z.ZodObject<{
 export type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>;
 
 // @public
-export interface InstantMessage {
-    serviceName: string;
-    serviceType: string;
-    userName: string;
-}
-
-// @public
-export interface InstantMessageCreateInput {
-    serviceType?: string;
-    userName?: string;
-}
-
-// @public (undocumented)
-export const InstantMessageSchema: z.ZodObject<{
-    serviceName: z.ZodString;
-    serviceType: z.ZodString;
-    userName: z.ZodString;
-}, z.core.$strip>;
-
-// @public
 export type InstantMessageServiceType = 'aIM' | 'facebook' | 'gaduGadu' | 'googleTalk' | 'iCQ' | 'jabber' | 'mSN' | 'qQ' | 'skype' | 'yahoo';
-
-// @public
-export type InstantMessageUpdateInput = Partial<InstantMessageCreateInput>;
 
 // @public
 export interface JabberHandle {

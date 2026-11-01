@@ -152,26 +152,7 @@ export interface ICQHandleUpdateInput {
 }
 
 // @public
-export interface InstantMessage {
-    readonly serviceName: string | null;
-    serviceType: string | null;
-    userName: string | null;
-}
-
-// @public
-export interface InstantMessageCreateInput {
-    serviceType?: string;
-    userName?: string;
-}
-
-// @public
 export type InstantMessageServiceType = 'aIM' | 'facebook' | 'gaduGadu' | 'googleTalk' | 'iCQ' | 'jabber' | 'mSN' | 'qQ' | 'skype' | 'yahoo';
-
-// @public
-export interface InstantMessageUpdateInput {
-    serviceType?: string;
-    userName?: string;
-}
 
 // @public
 export interface JabberHandle {

@@ -159,33 +159,6 @@ export type FolderCreateInput = Record<string, never>
 /** Input for updating a Folder */
 export type FolderUpdateInput = Partial<FolderCreateInput>
 
-/** Desktop-object is the class of the "desktop" object */
-export interface DesktopObject {
-  /** Unique identifier for the desktop */
-  id: number
-}
-
-/** Input for creating a DesktopObject */
-export type DesktopObjectCreateInput = Record<string, never>
-
-/** Input for updating a DesktopObject */
-export type DesktopObjectUpdateInput = Partial<DesktopObjectCreateInput>
-
-/** Trash-object is the class of the “trash” object */
-export interface TrashObject {
-  /** Display a dialog when emptying the trash? */
-  warnsBeforeEmptying: boolean
-}
-
-/** Input for creating a TrashObject */
-export interface TrashObjectCreateInput {
-  /** Display a dialog when emptying the trash? */
-  warnsBeforeEmptying?: boolean
-}
-
-/** Input for updating a TrashObject */
-export type TrashObjectUpdateInput = Partial<TrashObjectCreateInput>
-
 /** A file */
 export interface File {
   /** the OSType identifying the type of data contained in the item */
@@ -430,14 +403,6 @@ export const DiskSchema = z.object({
 
 export const FolderSchema = z.object({
   id: z.number(),
-})
-
-export const DesktopObjectSchema = z.object({
-  id: z.number(),
-})
-
-export const TrashObjectSchema = z.object({
-  warnsBeforeEmptying: z.boolean(),
 })
 
 export const FileSchema = z.object({

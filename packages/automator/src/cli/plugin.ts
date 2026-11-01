@@ -5,9 +5,7 @@ import { ExecuteWorkflowCommand } from './commands/workflows/execute.js'
 import { ListAutomatorActionsCommand } from './commands/workflows/actions/list.js'
 import { GetAutomatorActionCommand } from './commands/workflows/actions/get.js'
 import { ListSettingsCommand } from './commands/workflows/actions/settings/list.js'
-import { GetSettingCommand } from './commands/workflows/actions/settings/get.js'
 import { ListRequiredResourcesCommand } from './commands/workflows/actions/requiredResources/list.js'
-import { GetRequiredResourceCommand } from './commands/workflows/actions/requiredResources/get.js'
 import { ListVariablesCommand } from './commands/workflows/variables/list.js'
 import { GetVariableCommand } from './commands/workflows/variables/get.js'
 import { AddCommand } from './commands/add.js'
@@ -26,9 +24,7 @@ export const plugin: CliPlugin = {
     ListAutomatorActionsCommand,
     GetAutomatorActionCommand,
     ListSettingsCommand,
-    GetSettingCommand,
     ListRequiredResourcesCommand,
-    GetRequiredResourceCommand,
     ListVariablesCommand,
     GetVariableCommand,
     AddCommand,

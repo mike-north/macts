@@ -180,25 +180,6 @@ export interface ICQHandle {
   value: string | null
 }
 
-/** Address for instant messaging. */
-export interface InstantMessage {
-  /**
-   * The service name of this instant message address.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly serviceName: string | null
-  /**
-   * The service type of this instant message address.
-   * Nullable. No evidence that the app always sets it.
-   */
-  serviceType: string | null
-  /**
-   * The user name of this instant message address.
-   * Nullable. No evidence that the app always sets it.
-   */
-  userName: string | null
-}
-
 /** User name for Jabber instant messaging. */
 export interface JabberHandle {
   /**
@@ -611,28 +592,6 @@ export interface ICQHandleUpdateInput {
    * Cannot be reset: null is rejected.
    */
   value?: string
-}
-
-/** Input for creating an InstantMessage. */
-export interface InstantMessageCreateInput {
-  /** The service type of this instant message address. */
-  serviceType?: string
-  /** The user name of this instant message address. */
-  userName?: string
-}
-
-/** Input for updating an InstantMessage. Omitted fields are left unchanged. */
-export interface InstantMessageUpdateInput {
-  /**
-   * The service type of this instant message address.
-   * Cannot be reset: null is rejected.
-   */
-  serviceType?: string
-  /**
-   * The user name of this instant message address.
-   * Cannot be reset: null is rejected.
-   */
-  userName?: string
 }
 
 /** Input for creating a JabberHandle. */
@@ -1081,21 +1040,6 @@ const icqHandleRecordType: ValueType<ICQHandle> = t.record(
   { description: 'User name for ICQ instant messaging.' }
 )
 
-const instantMessageRecordType: ValueType<InstantMessage> = t.record(
-  {
-    serviceName: t.nullable(t.string(), {
-      description: 'The service name of this instant message address.',
-    }),
-    serviceType: t.nullable(t.string(), {
-      description: 'The service type of this instant message address.',
-    }),
-    userName: t.nullable(t.string(), {
-      description: 'The user name of this instant message address.',
-    }),
-  },
-  { description: 'Address for instant messaging.' }
-)
-
 const jabberHandleRecordType: ValueType<JabberHandle> = t.record(
   {
     id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
@@ -1237,10 +1181,6 @@ const resources: AppContract<ContactsClient>['resources'] = {
   ICQHandle: {
     name: 'ICQHandle',
     record: icqHandleRecordType,
-  },
-  InstantMessage: {
-    name: 'InstantMessage',
-    record: instantMessageRecordType,
   },
   JabberHandle: {
     name: 'JabberHandle',

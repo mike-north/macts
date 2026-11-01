@@ -31,29 +31,3 @@ export const requiredResourcesListTool: McpToolDefinition = {
     return client.requiredResources.list(actionId)
   },
 }
-
-/**
- * Get a required resource by name
- */
-export const requiredResourcesGetTool: McpToolDefinition = {
-  name: 'macts__automator__requiredResources_get',
-  description: 'Get a required resource by name',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      name: {
-        description: 'Resource name',
-        type: 'string',
-      },
-    },
-    additionalProperties: false,
-    required: ['name'],
-  },
-  handler: async (args) => {
-    const { name } = args as { name: string }
-    const client = getClient()
-    return client.requiredResources.get(
-      name as unknown as Parameters<typeof client.requiredResources.get>[0]
-    )
-  },
-}

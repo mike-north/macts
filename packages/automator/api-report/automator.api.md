@@ -145,7 +145,6 @@ export type RequiredResourceCreateInput = Record<string, never>;
 // @public
 export class RequiredResourceResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<RequiredResource>;
     list(actionId: string): Promise<RequiredResource[]>;
 }
 
@@ -177,7 +176,6 @@ export interface SettingCreateInput {
 // @public
 export class SettingResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Setting>;
     list(actionId: string): Promise<Setting[]>;
 }
 

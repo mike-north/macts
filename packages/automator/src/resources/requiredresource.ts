@@ -26,11 +26,4 @@ export class RequiredResourceResourceClient {
   async list(actionId: string): Promise<RequiredResource[]> {
     return this.#http.rpc<RequiredResource[]>(`${this.#app}.${this.#resource}.list`, { actionId })
   }
-
-  /**
-   * Get a required resource by name.
-   */
-  async get(name: string): Promise<RequiredResource> {
-    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.get`, { name })
-  }
 }

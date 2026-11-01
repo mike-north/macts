@@ -381,6 +381,16 @@ export const manifest: unknown = {
         status: 'no-items',
         skipped: [],
       },
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.finder',
+          appVersion: '27.2',
+          osVersion: '27.2',
+          term: 'desktop-object',
+          finding: 'not-an-element',
+        },
+      },
     },
     TrashObject: {
       name: 'TrashObject',
@@ -406,6 +416,16 @@ export const manifest: unknown = {
         sampledParents: 0,
         status: 'no-items',
         skipped: [],
+      },
+      unsupported: {
+        evidence: {
+          source: 'dictionary',
+          bundleId: 'com.apple.finder',
+          appVersion: '27.2',
+          osVersion: '27.2',
+          term: 'trash-object',
+          finding: 'not-an-element',
+        },
       },
     },
     File: {

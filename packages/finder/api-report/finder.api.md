@@ -145,22 +145,6 @@ export const ContainerSchema: z.ZodObject<{
 export type ContainerUpdateInput = Partial<ContainerCreateInput>;
 
 // @public
-export interface DesktopObject {
-    id: number;
-}
-
-// @public
-export type DesktopObjectCreateInput = Record<string, never>;
-
-// @public (undocumented)
-export const DesktopObjectSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>;
-
-// @public
-export type DesktopObjectUpdateInput = Partial<DesktopObjectCreateInput>;
-
-// @public
 export interface Disk {
     capacity: number;
     ejectable: boolean;
@@ -440,24 +424,6 @@ export type Sodr = 'normal' | 'reversed';
 
 // @public
 export type Sort = 'name' | 'modificationDate' | 'creationDate' | 'size' | 'kind' | 'labelIndex' | 'comment' | 'version';
-
-// @public
-export interface TrashObject {
-    warnsBeforeEmptying: boolean;
-}
-
-// @public
-export interface TrashObjectCreateInput {
-    warnsBeforeEmptying?: boolean;
-}
-
-// @public (undocumented)
-export const TrashObjectSchema: z.ZodObject<{
-    warnsBeforeEmptying: z.ZodBoolean;
-}, z.core.$strip>;
-
-// @public
-export type TrashObjectUpdateInput = Partial<TrashObjectCreateInput>;
 
 // (No @packageDocumentation comment for this package)
 
