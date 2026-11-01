@@ -384,8 +384,8 @@ describe('usable properties: a property marked unsupported is never read', () =>
   })
 
   it('a get copies only usable fields from the property record, in one read', () => {
-    // The record holds every property the app reports, the unsupported ones
-    // included; only entireContents is usable.
+    // The record holds the unsupported properties too; only entireContents is
+    // usable.
     const item = fakeSpecifier(true, {
       properties: () => {
         item.used.push('properties')
@@ -402,6 +402,43 @@ describe('usable properties: a property marked unsupported is never read', () =>
     const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
     expect(callBody(body, app, { id: 'c1' })).toEqual({ entireContents: 'contents' })
     // The one round trip is the record read; no property is read on its own.
+    expect(item.used).toEqual(['properties'])
+  })
+
+  it('a get reads on its own a usable property the app leaves out of its record', () => {
+    // Regression: a get read only the property record, so it dropped
+    // entireContents, which Finder can report but leaves out of a container's
+    // properties(). Live, Finder's record for the home folder has bounds,
+    // class, comment, container, containerWindow, creationDate, … and no
+    // entireContents. The stand-in record is a subset of those keys.
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        item.used.push('properties')
+        return { class: 'folder', containerWindow: 'window', name: 'home', url: 'file:///' }
+      },
+      entireContents: () => {
+        item.used.push('read entireContents')
+        return 'contents'
+      },
+    })
+    const app = { containers: { byId: () => item.specifier } }
+    const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
+    expect(callBody(body, app, { id: 'c1' })).toEqual({ entireContents: 'contents' })
+    expect(item.used).toEqual(['properties', 'read entireContents'])
+  })
+
+  it('a get takes a property the record holds with no value without reading it again', () => {
+    // An app reports a property it has no value for as null in its record:
+    // present, so it is not read on its own.
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        item.used.push('properties')
+        return { entireContents: null }
+      },
+    })
+    const app = { containers: { byId: () => item.specifier } }
+    const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
+    expect(callBody(body, app, { id: 'c1' })).toEqual({ entireContents: null })
     expect(item.used).toEqual(['properties'])
   })
 

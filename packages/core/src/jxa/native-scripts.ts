@@ -252,27 +252,31 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  *
  * The read is batched, as a list's is: one `properties()` call, from whose
  * record each usable property is taken under the app's name for it, and
- * stored under its public key when the record has it. When `properties()`
- * fails (a Calendar calendar's record includes the failing
- * `calendarIdentifier`), each property is read on its own by the app's name,
- * each read guarded, so a property the item cannot report is omitted rather
- * than failing the operation. A body with no resource reads `name`.
+ * stored under its public key. An app's property record need not hold every
+ * property it can report (a Finder container's has no `entireContents`), so a
+ * usable property absent from the record is read on its own; one the app has
+ * no value for is in the record as `null` and costs no extra read. When
+ * `properties()` fails (a Calendar calendar's record includes the failing
+ * `calendarIdentifier`), each property is read on its own. Every read on its
+ * own is by the app's name and guarded, so a property the item cannot report
+ * is omitted rather than failing the operation. A body with no resource reads
+ * `name`.
  */
 function readUsableProperties(resource: Resource | undefined, itemLocal: string): string {
   const keys = resource === undefined ? ['name'] : usableProperties(resource).map(([key]) => key)
   const native = (key: string): string => nativePropertyName(resource, key)
+  const readOnItsOwn = (key: string): string =>
+    `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
   return lines(
     'var obj = {};',
     'try {',
     `var props = ${itemLocal}.properties();`,
     ...keys.map(
       (key) =>
-        `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; }`
+        `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
     ),
     '} catch (e) {',
-    ...keys.map(
-      (key) => `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
-    ),
+    ...keys.map(readOnItsOwn),
     '}'
   )
 }
