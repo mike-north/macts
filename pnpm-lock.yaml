@@ -875,6 +875,9 @@ importers:
 
   packages/mcp:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@macts/core':
         specifier: workspace:*
         version: link:../core
@@ -887,6 +890,9 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.4
         version: 1.26.0(zod@4.3.6)
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       tsup:
         specifier: 'catalog:'
