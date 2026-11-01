@@ -694,7 +694,8 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
     }
     const MATRIX: readonly Row[] = [
       { presence: 'required', isNullable: false, whenNull: 'error', whenUndefined: 'error' },
-      { presence: 'required', isNullable: true, whenNull: 'null', whenUndefined: 'null' },
+      // Absence is never materialized as null (A4): only optional fields express it.
+      { presence: 'required', isNullable: true, whenNull: 'null', whenUndefined: 'error' },
       { presence: 'optional', isNullable: false, whenNull: 'omit', whenUndefined: 'omit' },
       { presence: 'optional', isNullable: true, whenNull: 'null', whenUndefined: 'omit' },
     ]
@@ -826,10 +827,23 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
   })
 
   describe('nullable', () => {
-    it('maps null and undefined to null on encode, and null to null on decode', () => {
+    it('maps null to null in both directions', () => {
       expect(encode(null, nullable(INTEGER))).toBeNull()
-      expect(encode(undefined, nullable(INTEGER))).toBeNull()
       expect(decode(null, nullable(INTEGER))).toBeNull()
+    })
+
+    // A4: absence is never materialized as null, and outside a record field
+    // there is no way to express it.
+    it('rejects undefined on encode instead of turning absence into null', () => {
+      expectCodecError(() => encode(undefined, nullable(INTEGER)), {
+        direction: 'encode',
+        path: [],
+        includes: ['Absent values cannot be represented outside a record field'],
+      })
+      expectCodecError(() => encode([1, undefined], { kind: 'array', items: nullable(INTEGER) }), {
+        direction: 'encode',
+        path: [1],
+      })
     })
 
     it('encodes and decodes other values by the inner plan', () => {
@@ -940,12 +954,28 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
       })
     })
 
-    it('omits undefined record values and maps undefined elsewhere to null', () => {
+    it('omits undefined record values', () => {
       const encoded = encode({ a: undefined, b: 'x' }, UNKNOWN)
       expect(encoded).toEqual({ record: { b: 'x' } })
       expect(Object.hasOwn((encoded as { record: object }).record, 'a')).toBe(false)
-      expect(encode(undefined, UNKNOWN)).toBeNull()
-      expect(encode([undefined, 1], UNKNOWN)).toEqual([null, { double: 1 }])
+    })
+
+    // A4: absence is never materialized as null; outside a record field it
+    // cannot be expressed, so it fails at its location.
+    it('rejects undefined at the root, as a list element, and as a sparse-list hole', () => {
+      const absent = 'Absent values cannot be represented outside a record field'
+      expectCodecError(() => encode(undefined, UNKNOWN), {
+        direction: 'encode',
+        path: [],
+        includes: [absent],
+      })
+      expectCodecError(() => encode({ a: [1, undefined] }, UNKNOWN), {
+        direction: 'encode',
+        path: ['a', 1],
+        includes: [absent],
+      })
+      // eslint-disable-next-line no-sparse-arrays -- the hole is the case under test
+      expectCodecError(() => encode([1, , 3], UNKNOWN), { direction: 'encode', path: [1] })
     })
 
     it('rejects functions and other non-plain objects with their path', () => {
@@ -1055,16 +1085,16 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
       { kind: 'file-source' },
     ]
 
-    it.each(LATER)('rejects $kind in both directions as not supported yet', (plan) => {
+    it.each(LATER)('rejects $kind in both directions as having no conversion', (plan) => {
       expectCodecError(() => encode({}, plan), {
         direction: 'encode',
         path: [],
-        includes: ['not supported yet'],
+        includes: ['have no conversion in this codec'],
       })
       expectCodecError(() => decode({}, plan), {
         direction: 'decode',
         path: [],
-        includes: ['not supported yet'],
+        includes: ['have no conversion in this codec'],
       })
     })
 

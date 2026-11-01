@@ -96,7 +96,7 @@ function buildPrelude(factorySource: string): string {
  * that run inside the automation process are the same code that the
  * package's unit tests exercise in Node. It implements every value plan kind
  * except `reference`, `file`, and `file-source`, which fail with a codec
- * error saying they are not supported yet.
+ * error saying they have no conversion in this codec.
  *
  * Conversions follow the value contracts: integers are canonical decimal
  * text within the safe-integer domain, numbers in dynamic content are always

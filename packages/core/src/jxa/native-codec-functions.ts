@@ -466,12 +466,13 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * Encodes a record's planned fields; native keys outside the plan are
    * dropped. Only ordinary records qualify (see `isPlainObject`), so a host
-   * object cannot pass as a record whose fields are all absent. Native "missing value" arrives as `null` or `undefined`:
+   * object cannot pass as a record whose fields are all absent.
    *
-   * - absent or `undefined`: optional fields are omitted; required nullable
-   *   fields become `null`; required non-nullable fields fail.
-   * - `null`: nullable fields keep `null`; optional non-nullable fields are
-   *   omitted; required non-nullable fields fail.
+   * Native "missing value" arrives as `null` and follows the presence rules:
+   * a nullable field keeps `null`, an optional non-nullable field is omitted,
+   * and a required non-nullable field fails. `undefined` (or a missing key) is
+   * absence, which only an optional field can express: it is omitted there and
+   * fails anywhere else, because absence is never materialized as `null`.
    *
    * No own property ever holds `undefined`.
    */
@@ -486,22 +487,24 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       const fieldPath = path.concat([key])
       const value = ownValue(native, key)
       const isNullable = field.value.kind === 'nullable'
-      if (value === undefined || value === null) {
-        if (value === null && isNullable) {
+      if (value === undefined) {
+        if (field.presence !== 'optional') {
+          fail('encode', fieldPath, 'Missing required field ' + quote(key))
+        }
+        // Omitted: an absent optional field has no key.
+        continue
+      }
+      if (value === null) {
+        if (isNullable) {
           setOwn(out, key, null)
-        } else if (field.presence === 'optional') {
-          // Omitted: an absent optional field has no key.
-        } else if (isNullable) {
-          setOwn(out, key, null)
-        } else if (value === null) {
+        } else if (field.presence !== 'optional') {
           fail(
             'encode',
             fieldPath,
             'Expected a value for required field ' + quote(key) + ', received null'
           )
-        } else {
-          fail('encode', fieldPath, 'Missing required field ' + quote(key))
         }
+        // Otherwise omitted: missing value at an optional non-nullable field.
         continue
       }
       setOwn(out, key, encodeValue(value, field.value, fieldPath))
@@ -512,12 +515,17 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   /**
    * Encodes dynamic content self-descriptively. Numbers are always doubles,
    * because integrality is not evidence of integer provenance. User objects
-   * travel inside a record envelope with `undefined` values omitted. Outside
-   * records, dynamic content has no notion of absence, so `undefined` becomes
-   * `null`, as in JSON.
+   * travel inside a record envelope with `undefined` values omitted, because
+   * an absent record field simply has no key. Outside a record field there is
+   * no way to express absence, and it is never materialized as `null`, so a
+   * root or list-element `undefined` (including a hole in a sparse list)
+   * fails.
    */
   function encodeDynamic(native: unknown, path: Path): unknown {
-    if (native === undefined || native === null) return null
+    if (native === undefined) {
+      return fail('encode', path, 'Absent values cannot be represented outside a record field')
+    }
+    if (native === null) return null
     if (typeof native === 'string' || typeof native === 'boolean') return native
     if (typeof native === 'number') return encodeDouble(native, path)
     if (isDate(native)) return encodeDate(native, path)
@@ -544,8 +552,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     )
   }
 
-  /** User-facing name of a kind that the codec does not convert yet. */
-  function laterKindName(kind: string): string {
+  /** User-facing name of a kind that has no conversion in this codec. */
+  function unconvertedKindName(kind: string): string {
     if (kind === 'reference') return 'Reference'
     if (kind === 'file') return 'File'
     return 'File source'
@@ -596,15 +604,23 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'record':
         return encodeRecord(native, plan.fields, path)
       case 'nullable':
-        return native === null || native === undefined
-          ? null
-          : encodeValue(native, plan.value, path)
+        // Missing value (`null`) is data here; absence (`undefined`) is not
+        // representable outside a record field, so it fails in the inner plan.
+        if (native === null) return null
+        if (native === undefined) {
+          return fail('encode', path, 'Absent values cannot be represented outside a record field')
+        }
+        return encodeValue(native, plan.value, path)
       case 'unknown':
         return encodeDynamic(native, path)
       case 'reference':
       case 'file':
       case 'file-source':
-        return fail('encode', path, laterKindName(kind) + ' values are not supported yet')
+        return fail(
+          'encode',
+          path,
+          unconvertedKindName(kind) + ' values have no conversion in this codec'
+        )
       default:
         return fail('encode', path, 'Unrecognized value plan kind ' + quote(kind))
     }
@@ -929,7 +945,11 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'reference':
       case 'file':
       case 'file-source':
-        return fail('decode', path, laterKindName(kind) + ' values are not supported yet')
+        return fail(
+          'decode',
+          path,
+          unconvertedKindName(kind) + ' values have no conversion in this codec'
+        )
       default:
         return fail('decode', path, 'Unrecognized value plan kind ' + quote(kind))
     }
