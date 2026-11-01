@@ -58,7 +58,16 @@ export {
   extractResourceName,
   extractOperation,
   PermissionParseError,
+  PERMISSION_FORMAT_DESCRIPTION,
 } from './parser.js'
+
+// Suggestions
+export {
+  suggestPermissions,
+  listKnownPermissions,
+  findCaseOnlyMismatch,
+  explainInvalidPermission,
+} from './suggest.js'
 
 // Expander
 export {

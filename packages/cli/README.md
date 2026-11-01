@@ -149,8 +149,13 @@ Create a new API key with specified permissions.
 
 **Permission Format:**
 
-Permissions follow the format: `app:resource:operation`. A grant authorizes a
-call when it matches the call's required permission exactly or via a wildcard:
+Permissions follow the format: `app:resource:operation`. The app segment is
+lowercase (digits, `-` and `_` allowed, e.g. `google-chrome`). The resource and
+operation segments are camelCase (a lowercase first letter, then letters and
+digits only, e.g. `mediaItems`, `splitVertically`) or `*`. **Permissions are
+case-sensitive:** `photos:mediaitems:list` never authorizes
+`photos:mediaItems:list`. A grant authorizes a call when it matches the call's
+required permission exactly or via a wildcard:
 
 - **Fine-grained**: `calendar:events:list` — authorizes exactly that call.
 - **Resource wildcard**: `calendar:events:*` — authorizes every operation on
@@ -164,6 +169,13 @@ call when it matches the call's required permission exactly or via a wildcard:
   `calendar:events:list`, `calendar:events:get`, `calendar:events:show`).
   Creating a key with a coarse permission and **no** `--manifest` is rejected
   with a hint, because an unexpanded coarse scope authorizes nothing.
+
+When the app's manifest is known (`--manifest`, or the manifests directory
+discovered as for `macts capabilities`), a permission that differs from a real
+one only in letter case is rejected and the error names the correct permission.
+A well-formed permission the manifest does not define is accepted with a warning
+on stderr, since a later app version may add it. A malformed permission is
+always rejected, naming the closest valid permission when the manifest is known.
 
 See [Wildcard & coarse semantics](#wildcard--coarse-semantics) for the full
 mental model.

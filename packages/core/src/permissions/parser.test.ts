@@ -1,3 +1,9 @@
+/**
+ * Tests for the permission grammar and parser.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D2)
+ * @see https://github.com/mike-north/macts/issues/153
+ */
 import { describe, it, expect } from 'vitest'
 import {
   parsePermission,
@@ -96,18 +102,18 @@ describe('parsePermission', () => {
       })
     })
 
-    it('should handle underscores in names', () => {
-      const result = parsePermission('my_app:some_resource:do_action')
+    it('should allow underscores in the app segment only', () => {
+      const result = parsePermission('my_app:someResource:doAction')
       expect(result.app).toBe('my_app')
-      expect(result.resource).toBe('some_resource')
-      expect(result.operation).toBe('do_action')
+      expect(result.resource).toBe('someResource')
+      expect(result.operation).toBe('doAction')
     })
 
-    it('should handle dashes in names', () => {
-      const result = parsePermission('my-app:some-resource:do-action')
+    it('should allow dashes in the app segment only', () => {
+      const result = parsePermission('my-app:someResource:doAction')
       expect(result.app).toBe('my-app')
-      expect(result.resource).toBe('some-resource')
-      expect(result.operation).toBe('do-action')
+      expect(result.resource).toBe('someResource')
+      expect(result.operation).toBe('doAction')
     })
 
     it('should handle numbers in names', () => {
@@ -327,6 +333,63 @@ describe('isCoarseOperation', () => {
 
     it('should return false for empty string', () => {
       expect(isCoarseOperation('')).toBe(false)
+    })
+  })
+})
+
+// Grammar decided in issue #153: the app segment is `[a-z][a-z0-9_-]*`; the
+// resource and operation segments are `[a-z][a-zA-Z0-9]*` or `*`.
+describe('permission grammar (camelCase resource and operation)', () => {
+  describe('accepts', () => {
+    it.each([
+      'photos:mediaItems:list',
+      'iterm:sessions:splitVertically',
+      'calendar:events:*',
+      'calendar:*:*',
+      'script-editor:documents:list',
+      'my_app:events:list',
+      'photos:*:list',
+      'app2:resource3:action4',
+    ])('%s', (permission) => {
+      expect(isValidPermission(permission)).toBe(true)
+    })
+
+    it('parses camelCase segments without altering case', () => {
+      expect(parsePermission('iterm:sessions:splitVertically')).toEqual({
+        type: 'fine',
+        app: 'iterm',
+        resource: 'sessions',
+        operation: 'splitVertically',
+      })
+      expect(extractResourceName('photos:mediaItems:list')).toBe('mediaItems')
+    })
+  })
+
+  describe('rejects', () => {
+    it.each([
+      ['an uppercase-first resource', 'photos:MediaItems:list'],
+      ['an uppercase-first operation', 'iterm:sessions:SplitVertically'],
+      ['an uppercase app segment', 'Photos:mediaItems:list'],
+      ['an uppercase letter inside the app segment', 'phOtos:mediaItems:list'],
+      ['a dash in the resource', 'photos:media-items:list'],
+      ['a dash in the operation', 'iterm:sessions:split-vertically'],
+      ['an underscore in the resource', 'photos:media_items:list'],
+      ['an underscore in the operation', 'iterm:sessions:split_vertically'],
+      ['an empty app', ':events:list'],
+      ['an empty resource', 'calendar::list'],
+      ['an empty operation', 'calendar:events:'],
+      ['two segments', 'calendar:events'],
+      ['four segments', 'calendar:events:list:extra'],
+      ['a partial wildcard', 'calendar:ev*:list'],
+      ['a digit-first resource', 'calendar:1events:list'],
+    ])('%s (%s)', (_label, permission) => {
+      expect(isValidPermission(permission)).toBe(false)
+      expect(() => parsePermission(permission)).toThrow(PermissionParseError)
+    })
+
+    it('states the real rule in user terms', () => {
+      expect(() => parsePermission('photos:MediaItems:list')).toThrow(/camelCase/)
+      expect(() => parsePermission('photos:MediaItems:list')).toThrow(/case-sensitive/)
     })
   })
 })
