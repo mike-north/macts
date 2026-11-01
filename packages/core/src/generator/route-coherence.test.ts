@@ -19,7 +19,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { readdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { loadManifest } from '../manifest/loader.js'
-import { resolveManifestRoutes } from '../manifest/route.js'
+import { commandRouteSegment, resolveManifestRoutes } from '../manifest/route.js'
 import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
 import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
@@ -122,7 +122,9 @@ describe('route coherence across all app manifests', () => {
 
   it('emits no name-keyed route for any manifest-named command', () => {
     // For every command whose manifest key differs from its `name`, the client
-    // must NOT emit the name-keyed route (the original bug shape).
+    // must NOT emit the name-keyed route (the original bug shape) in place of
+    // its canonical route, keyed by its route segment (`routeName`, else key).
+    // A `routeName` equal to the name is deliberate and is the canonical route.
     const leaks: string[] = []
 
     for (const { dir, manifest } of apps) {
@@ -143,7 +145,7 @@ describe('route coherence across all app manifests', () => {
         for (const rt of resourceTypes) {
           const plural = (manifest.resources[rt]?.plural ?? `${rt}s`).toLowerCase()
           const nameKeyed = `${appSeg}.${plural}.${command.name}`
-          const keyKeyed = `${appSeg}.${plural}.${key}`
+          const keyKeyed = `${appSeg}.${plural}.${commandRouteSegment(key, command)}`
           if (clientRoutes.has(nameKeyed) && !clientRoutes.has(keyKeyed)) {
             leaks.push(`${dir}: client emits name-keyed "${nameKeyed}" instead of "${keyKeyed}"`)
           }
@@ -411,13 +413,19 @@ describe('@macts/notes attachments addressed by id', () => {
     expect(shared?.parameters.map((p) => p.name)).toEqual(['name'])
   })
 
-  it('routes the attachment get to its own key, under the unchanged permission', () => {
-    const route = resolveManifestRoutes(notes).find(
+  it('publishes the attachment get under the canonical route and derived permission', () => {
+    const command = notes.commands['getAttachment']
+    // The command keeps its own manifest key; routeName gives it the canonical
+    // segment, and the permission is derived, not declared.
+    expect(command?.routeName).toBe('get')
+    expect(command?.permission).toBeUndefined()
+    const routes = resolveManifestRoutes(notes)
+    const route = routes.find(
       (r) => r.resourceType === 'Attachment' && r.commandKey === 'getAttachment'
     )
-    expect(route?.route).toBe('notes.attachments.getAttachment')
+    expect(route?.route).toBe('notes.attachments.get')
     expect(route?.permission).toBe('notes:attachments:get')
-    expect(resolveManifestRoutes(notes).map((r) => r.route)).not.toContain('notes.attachments.get')
+    expect(routes.map((r) => r.route)).not.toContain('notes.attachments.getAttachment')
   })
 
   it('the HTTP client sends id to the attachment get route', () => {
@@ -425,8 +433,9 @@ describe('@macts/notes attachments addressed by id', () => {
     const file = sdk.files.find((f) => f.path === 'src/resources/attachment.ts')
     if (!file) throw new Error('generated notes SDK missing attachment resource')
     expect(file.content).toContain('async get(id: string)')
-    expect(file.content).toContain('${this.#app}.${this.#resource}.getAttachment`')
-    expect(extractClientRoutes(sdk.files)).toContain('notes.attachments.getAttachment')
+    expect(file.content).toContain('${this.#app}.${this.#resource}.get`')
+    expect(extractClientRoutes(sdk.files)).toContain('notes.attachments.get')
+    expect(extractClientRoutes(sdk.files)).not.toContain('notes.attachments.getAttachment')
   })
 
   it('the contract takes id and sends it under the parameter name the server binds', () => {
@@ -439,12 +448,13 @@ describe('@macts/notes attachments addressed by id', () => {
     )
     // The descriptor's input record is keyed by the request parameter.
     expect(text).toMatch(
-      /OperationDescriptor<\{ readonly id: string \}, Attachment>\s*=\s*\{\s*id: 'notes\.attachments\.getAttachment',\s*permission: 'notes:attachments:get'/
+      /OperationDescriptor<\{ readonly id: string \}, Attachment>\s*=\s*\{\s*id: 'notes\.attachments\.get',\s*permission: 'notes:attachments:get'/
     )
     // The resource table points references at the attachment get.
     const entryStart = text.indexOf('  Attachment: {\n    name:')
     const entry = text.slice(entryStart, text.indexOf('\n  },', entryStart))
     expect(entryStart).toBeGreaterThan(-1)
-    expect(entry).toContain("get: 'notes.attachments.getAttachment'")
+    expect(entry).toContain("get: 'notes.attachments.get'")
+    expect(text).not.toContain('notes.attachments.getAttachment')
   })
 })

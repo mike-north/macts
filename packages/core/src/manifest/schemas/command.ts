@@ -96,6 +96,22 @@ export const CommandSchema = z.object({
   /** AppleScript four-character code */
   code: z.string().min(1).max(4).optional(),
   /**
+   * The command's segment in its public route (`app.resource.<routeName>`) and
+   * in its default permission (`app:resource:<routeName>`). Defaults to the
+   * command's key in `manifest.commands`.
+   *
+   * It lets two manifest commands that share a CRUD verb but differ in
+   * signature (a resource whose `get` takes a different identifier than the
+   * shared `get`, say) each publish the canonical operation name, while
+   * keeping distinct manifest keys. Two routes that end up with the same
+   * route string are a manifest error.
+   */
+  routeName: z
+    .string()
+    .min(1)
+    .regex(/^[^.:]+$/, 'routeName must not contain "." or ":"')
+    .optional(),
+  /**
    * Fine-grained permission required to execute this command.
    * Format: `app:resource:operation` (e.g., `calendar:events:list`)
    */

@@ -16,19 +16,8 @@
  * @packageDocumentation
  */
 
-import type {
-  AppManifest,
-  Command,
-  ManifestRoute,
-  PermissionHistoryEntry,
-  RiskClass,
-} from '@macts/core'
-import {
-  classifyCommandRisk,
-  normalizeAppRouteSegment,
-  normalizeResourceRouteSegment,
-  resolveCommandRoutes,
-} from '@macts/core'
+import type { AppManifest, Command, PermissionHistoryEntry, RiskClass } from '@macts/core'
+import { classifyCommandRisk, normalizeAppRouteSegment, resolveCommandRoutes } from '@macts/core'
 import type {
   AnyOperationDescriptor,
   AppContract,
@@ -91,22 +80,6 @@ function isPermissionString(value: string): value is PermissionString {
 }
 
 /**
- * The permission a route requires: the command's declared permission, or
- * `app:<scope>:<commandKey>` where the scope is the resource's route segment,
- * or `app` for application commands. Identical to the RPC router's derivation.
- */
-function derivePermission(manifest: AppManifest, route: ManifestRoute): string {
-  if (route.command.permission !== undefined) {
-    return route.command.permission
-  }
-  const scope =
-    route.resourceType === undefined
-      ? 'app'
-      : normalizeResourceRouteSegment(route.resource?.plural ?? `${route.resourceType}s`)
-  return `${normalizeAppRouteSegment(manifest.app.name)}:${scope}:${route.commandKey}`
-}
-
-/**
  * Derive every operation the manifest exposes, one per RPC route.
  *
  * @throws {@link OperationRegistrationError} when a route or permission does
@@ -122,7 +95,10 @@ function deriveManifestOperations(manifest: AppManifest): ManifestOperation[] {
           `Manifest route "${id}" is not a valid operation id (expected app.resource.command)`
         )
       }
-      const permission = derivePermission(manifest, route)
+      // The resolved route's permission: the command's declared permission, or
+      // derived from its route segment (`routeName`, else the command key),
+      // exactly as the RPC router enforces it.
+      const permission = route.permission
       if (!isPermissionString(permission)) {
         throw new OperationRegistrationError(
           `Operation "${id}" declares permission "${permission}", which is not of the form app:resource:operation`
@@ -159,9 +135,11 @@ function toRegisteredOperation(
  *
  * @remarks
  * Ids, permissions, and targets match the RPC router exactly: the id is the
- * route (`app.resource.commandKey`, or `app.app.commandKey`), the permission
- * is the command's declared permission or `app:<scope>:<commandKey>`, and a
- * command scoped to several resource types yields one operation per type.
+ * resolved route (`ManifestRoute.route`, keyed by the command's `routeName`,
+ * else its key), the permission is the resolved route's permission
+ * (`ManifestRoute.permission`, which honours `routeName`), the target names
+ * the manifest command key, and a command scoped to several resource types
+ * yields one operation per type.
  *
  * The descriptors use passthrough value types: the input is validated against
  * the command's request schema and must be plain JSON, and the output is any

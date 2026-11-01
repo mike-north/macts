@@ -44,41 +44,60 @@ export function normalizeResourceRouteSegment(plural: string): string {
 }
 
 /**
+ * A command's operation segment in its public route and default permission:
+ * its `routeName` when it declares one, else its key in `manifest.commands`.
+ *
+ * Every surface that encodes a route or an operation name (the server router,
+ * the generated clients, the contract) MUST use this segment, never the bare
+ * command key, so a `routeName` override reaches all of them.
+ *
+ * @param commandKey - The command's key in `manifest.commands`.
+ * @param command - The command definition.
+ * @returns The route segment.
+ */
+export function commandRouteSegment(
+  commandKey: string,
+  command: Pick<Command, 'routeName'>
+): string {
+  return command.routeName ?? commandKey
+}
+
+/**
  * Build the canonical route for an application-scoped command.
  *
- * Application commands are addressed as `{app}.app.{commandKey}`.
+ * Application commands are addressed as `{app}.app.{segment}`.
  *
  * @param appName - The raw `manifest.app.name`.
- * @param commandKey - The command's key in `manifest.commands` (NOT
- *   `command.name`). The key is globally unique within the manifest, whereas
- *   `name` is shared across resources (e.g. many commands have `name: list`).
+ * @param segment - The command's route segment ({@link commandRouteSegment}):
+ *   its `routeName`, else its key in `manifest.commands` (NOT `command.name`,
+ *   which is shared across resources, e.g. many commands have `name: list`).
  * @returns The canonical route string.
  */
-export function buildAppCommandRoute(appName: string, commandKey: string): string {
-  return `${normalizeAppRouteSegment(appName)}.app.${commandKey}`
+export function buildAppCommandRoute(appName: string, segment: string): string {
+  return `${normalizeAppRouteSegment(appName)}.app.${segment}`
 }
 
 /**
  * Build the canonical route for a resource-scoped command.
  *
- * Resource commands are addressed as `{app}.{resourcePlural}.{commandKey}`.
+ * Resource commands are addressed as `{app}.{resourcePlural}.{segment}`.
  *
  * @param appName - The raw `manifest.app.name`.
  * @param resourcePlural - The resource's `plural` name from the manifest.
- * @param commandKey - The command's key in `manifest.commands` (NOT
- *   `command.name`). The key is globally unique within the manifest, whereas
- *   `name` is shared across resources, so two distinct operations
- *   (`list` for Calendar, `listEvents` for Event) would otherwise collide.
+ * @param segment - The command's route segment ({@link commandRouteSegment}):
+ *   its `routeName`, else its key in `manifest.commands` (NOT `command.name`,
+ *   which is shared across resources, so two distinct operations — `list` for
+ *   Calendar, `listEvents` for Event — would otherwise collide).
  * @returns The canonical route string.
  */
 export function buildResourceCommandRoute(
   appName: string,
   resourcePlural: string,
-  commandKey: string
+  segment: string
 ): string {
   return `${normalizeAppRouteSegment(appName)}.${normalizeResourceRouteSegment(
     resourcePlural
-  )}.${commandKey}`
+  )}.${segment}`
 }
 
 /**
@@ -90,7 +109,11 @@ export function buildResourceCommandRoute(
 export interface ManifestRoute {
   /** The canonical route string (`app.resource.operation`). */
   route: string
-  /** The command key in `manifest.commands` (the route's operation segment). */
+  /**
+   * The command key in `manifest.commands`, by which executors find the
+   * command. The route's operation segment is the command's `routeName` when
+   * it declares one, else this key.
+   */
   commandKey: string
   /** The command definition. */
   command: Command
@@ -99,12 +122,12 @@ export interface ManifestRoute {
   /** The resource type name this route targets; undefined for app scope. */
   resourceType: string | undefined
   /**
-   * The permission the operation requires (`app:scope:commandKey`).
+   * The permission the operation requires (`app:scope:segment`).
    *
    * The command's explicit `permission` wins. Otherwise it is derived from the
    * app route segment, the scope (`app` for application commands, else the
-   * resource route segment), and the command key, which is the rule the server
-   * enforces. Deriving it here, once, lets every surface that declares or
+   * resource route segment), and the command's route segment
+   * ({@link commandRouteSegment}), which is the rule the server enforces. Deriving it here, once, lets every surface that declares or
    * checks an operation's permission (generated contracts, the runtime's
    * registration check, the server) agree by construction.
    */
@@ -113,15 +136,15 @@ export interface ManifestRoute {
 
 /**
  * The permission a command requires on one route: its explicit `permission`,
- * or `{app}:{scope}:{commandKey}`.
+ * or `{app}:{scope}:{segment}`.
  */
 function routePermission(
   appName: string,
   scopeSegment: string,
-  commandKey: string,
+  segment: string,
   command: Command
 ): string {
-  return command.permission ?? `${normalizeAppRouteSegment(appName)}:${scopeSegment}:${commandKey}`
+  return command.permission ?? `${normalizeAppRouteSegment(appName)}:${scopeSegment}:${segment}`
 }
 
 /**
@@ -154,16 +177,17 @@ export function resolveCommandRoutes(
   command: Command
 ): ManifestRoute[] {
   const appName = manifest.app.name
+  const segment = commandRouteSegment(commandKey, command)
 
   if (command.scope === 'application') {
     return [
       {
-        route: buildAppCommandRoute(appName, commandKey),
+        route: buildAppCommandRoute(appName, segment),
         commandKey,
         command,
         resource: undefined,
         resourceType: undefined,
-        permission: routePermission(appName, 'app', commandKey, command),
+        permission: routePermission(appName, 'app', segment, command),
       },
     ]
   }
@@ -173,7 +197,7 @@ export function resolveCommandRoutes(
     const resource = manifest.resources[resourceType]
     const resourcePlural = resource?.plural ?? `${resourceType}s`
     routes.push({
-      route: buildResourceCommandRoute(appName, resourcePlural, commandKey),
+      route: buildResourceCommandRoute(appName, resourcePlural, segment),
       commandKey,
       command,
       resource,
@@ -181,7 +205,7 @@ export function resolveCommandRoutes(
       permission: routePermission(
         appName,
         normalizeResourceRouteSegment(resourcePlural),
-        commandKey,
+        segment,
         command
       ),
     })
@@ -201,4 +225,26 @@ export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[] {
     routes.push(...resolveCommandRoutes(manifest, commandKey, command))
   }
   return routes
+}
+
+/**
+ * The route strings two or more of a manifest's commands resolve to, each with
+ * the command keys that share it. A route identifies one operation, so any
+ * entry here is a manifest error.
+ *
+ * @param manifest - The app manifest.
+ * @returns One entry per duplicated route, in first-declaration order.
+ */
+export function findDuplicateRoutes(
+  manifest: AppManifest
+): { route: string; commandKeys: string[] }[] {
+  const byRoute = new Map<string, string[]>()
+  for (const route of resolveManifestRoutes(manifest)) {
+    const keys = byRoute.get(route.route) ?? []
+    keys.push(route.commandKey)
+    byRoute.set(route.route, keys)
+  }
+  return [...byRoute]
+    .filter(([, keys]) => keys.length > 1)
+    .map(([route, commandKeys]) => ({ route, commandKeys }))
 }
