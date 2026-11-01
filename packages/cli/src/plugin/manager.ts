@@ -391,11 +391,46 @@ export function getPluginResolutionPath(): string | null {
 /**
  * Find plugin packages in the plugins node_modules.
  *
+ * @param nodeModules - The `node_modules` directory to scan; defaults to the
+ *   managed plugins directory's.
  * @returns Array of package names
  */
-export function findInstalledPluginPackages(): string[] {
-  const nodeModules = getPluginsNodeModules()
+export function findInstalledPluginPackages(nodeModules = getPluginsNodeModules()): string[] {
+  return listMactsScope(nodeModules)
+    .filter((entry) => !entry.endsWith('-server') && !INFRASTRUCTURE_PACKAGES.has(entry))
+    .map((entry) => `@macts/${entry}`)
+}
 
+/**
+ * Find app host packages (`@macts/<app>-server`) in the plugins node_modules.
+ *
+ * @remarks
+ * The same plugins-directory convention as {@link findInstalledPluginPackages}:
+ * one scan of `node_modules/@macts`, told apart by the `-server` suffix. A host
+ * package depends on its app package `@macts/<app>`, which carries the app's
+ * generated contract. `macts --serve` serves an app only when its host package
+ * is installed; per phases/13 D5, `macts --mcp` adopts the same registration
+ * path.
+ *
+ * @param nodeModules - The `node_modules` directory to scan; defaults to the
+ *   managed plugins directory's.
+ * @returns The host package names, sorted.
+ */
+export function findInstalledServerPackages(nodeModules = getPluginsNodeModules()): string[] {
+  return listMactsScope(nodeModules)
+    .filter((entry) => {
+      const app = SERVER_PLUGIN_PACKAGE_PATTERN.exec(`@macts/${entry}`)?.[1]
+      return app !== undefined && !INFRASTRUCTURE_PACKAGES.has(app)
+    })
+    .map((entry) => `@macts/${entry}`)
+    .sort()
+}
+
+/**
+ * The entries of the `@macts` scope in a `node_modules` directory, or none
+ * when the directory or the scope does not exist or cannot be read.
+ */
+function listMactsScope(nodeModules: string): string[] {
   if (!existsSync(nodeModules)) {
     return []
   }
@@ -406,10 +441,7 @@ export function findInstalledPluginPackages(): string[] {
   }
 
   try {
-    const entries = readdirSync(mactsScope)
-    return entries
-      .filter((entry) => !entry.endsWith('-server') && !INFRASTRUCTURE_PACKAGES.has(entry))
-      .map((entry) => `@macts/${entry}`)
+    return readdirSync(mactsScope)
   } catch {
     return []
   }

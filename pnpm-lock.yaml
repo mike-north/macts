@@ -111,6 +111,33 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@types/node@26.2.0)(tsx@4.22.4)(yaml@2.8.2)
 
+  e2e/cli-host:
+    devDependencies:
+      '@macts/cli':
+        specifier: workspace:*
+        version: link:../../packages/cli
+      '@macts/notes':
+        specifier: workspace:*
+        version: link:../../packages/notes
+      '@macts/notes-server':
+        specifier: workspace:*
+        version: link:../../packages/notes-server
+      '@macts/reminders':
+        specifier: workspace:*
+        version: link:../../packages/reminders
+      '@macts/reminders-server':
+        specifier: workspace:*
+        version: link:../../packages/reminders-server
+      '@types/node':
+        specifier: ^26.0.0
+        version: 26.2.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@26.2.0)(tsx@4.22.4)(yaml@2.8.2)
+
   e2e/mcp-contracts:
     devDependencies:
       '@macts/calendar':
@@ -503,6 +530,9 @@ importers:
       '@macts/api':
         specifier: workspace:*
         version: link:../api
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@macts/core':
         specifier: workspace:*
         version: link:../core

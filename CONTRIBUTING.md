@@ -232,6 +232,14 @@ Include both the client and server packages in the changeset.
 - Unit tests go alongside source files (`foo.test.ts` next to `foo.ts`)
 - E2E tests use `fixturify-project` for filesystem fixtures
 - Always include negative test cases (error paths, invalid inputs)
+- Subprocess UATs of the `macts` host commands live in `e2e/cli-host`. They
+  run the built CLI against real installed app packages with
+  `MACTS_TEST_EXECUTOR=stub`, which makes the host run operations on a
+  built-in test executor that automates no app and answers with the target
+  and input it received. The variable selects a built-in executor by name and
+  never loads code; an unknown name fails startup, and an active test executor
+  is announced on stderr. It is for subprocess tests only: in-process tests
+  pass an executor to `createRuntime` instead. Never document it for users.
 - See [`.claude/rules/typescript-testing.md`](.claude/rules/typescript-testing.md) for testing conventions
 
 ## Questions?

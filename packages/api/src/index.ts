@@ -14,6 +14,7 @@ export {
   DEFAULT_HOST,
   DEFAULT_SUBJECT_RATE_LIMIT,
   type AppOptions,
+  type AppRegistrar,
   type RateLimitOptions,
   type ServerOptions,
   type ServerInstance,

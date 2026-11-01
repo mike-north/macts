@@ -1045,6 +1045,19 @@ forgot to supply. Missing and malformed configuration are treated differently:
 - An **audit-write failure** under `MACTS_HOME` denies the call, per the
   fail-closed rule above.
 
+**Registering installed apps.** Every macts host on this Mac (`macts --serve`,
+`macts --mcp`) registers the installed apps' generated contracts through one
+host registration function, so every surface validates calls against the same
+descriptors. The function finds each installed host package
+(`@macts/<app>-server`) in the plugins directory, resolves the app's contract
+(`@macts/<app>/contract`) from the host package's own location, validates the
+manifest the contract loads, and calls `registerContract(contract, manifest)`.
+An app that fails to load or register is reported with its reason and skipped,
+and the other apps still register. An app installed without its host package
+is reported at startup, with the command that installs it. Manifest
+registration (`registerManifest`) remains for embedders and tests; it runs
+passthrough descriptors, validated by each command's request schema.
+
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
 Defined in `@macts/contracts` (`errors/`). Every canonical class extends the
@@ -1329,8 +1342,9 @@ execute(request) }`.
 
 - `execute` resolves to a `WireValue` or throws canonical errors.
 - The native JXA executor is one implementation.
-- The runtime is constructed with an executor (`createRuntime({ executor, … })`),
-  and every adapter dispatches through the runtime.
+- The runtime is constructed with an executor
+  (`createRuntime({ executor, … })`), and every adapter dispatches through the
+  runtime.
 
 This refactor satisfies #101's acceptance criteria:
 
@@ -1368,12 +1382,20 @@ would therefore become wrong the moment the codec honors it. Passthrough is
 consistent with D3 by sitting outside it: it marks the absence of a wire
 encoding, not a third encoding.
 
-The executor is resolved at runtime construction. Per-operation routing is not
-needed until a second provider coexists. #101's dependency on the dictionary
-abstraction ([#100](https://github.com/mike-north/macts/issues/100)) is
-unaffected: `ExecutionRequest` takes the manifest type that core defines.
+The executor is resolved once, at runtime construction. In-process tests pass
+one to `createRuntime`. Subprocess tests can set the test-only
+`MACTS_TEST_EXECUTOR` to the name of a built-in test executor. It never loads
+code, an unknown name fails startup, and an active test executor is announced
+on stderr and named as the executor provider in the startup report. It appears
+in contributor docs, never in user docs or `--help`. The provider is named in
+the startup report only; recording it in audit and approval records is
+[#182](https://github.com/mike-north/macts/issues/182). Per-operation routing
+is not needed until a second provider coexists. #101's dependency on the
+dictionary abstraction ([#100](https://github.com/mike-north/macts/issues/100))
+is unaffected: `ExecutionRequest` takes the manifest type that core defines.
 
-**Zod as the single schema source ([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
+**Zod as the single schema source
+([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
 The value library's constructors produce each `ValueType`'s `sdk` and `wire`
 zod schemas. The serializable `plan` is derived from the same constructor call,
 so there is one composition per field and no independent mapping.

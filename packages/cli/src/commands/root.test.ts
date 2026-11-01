@@ -4,7 +4,13 @@ import { Cli } from 'clipanion'
 import { RootCommand } from './root.js'
 import * as mcp from '@macts/mcp'
 import * as apiServer from '@macts/api/server'
-import * as core from '@macts/core'
+import { dirname } from 'node:path'
+import {
+  createPluginsFixture,
+  writeAppPackage,
+  writeInstalledApp,
+  type PluginsFixture,
+} from '../host/installed-apps-fixtures.js'
 
 function createMockStreams() {
   let stdoutOutput = ''
@@ -207,36 +213,34 @@ describe('RootCommand', () => {
 
   describe('--serve flag', () => {
     let mockServer: { start: ReturnType<typeof vi.fn>; stop: ReturnType<typeof vi.fn>; url: string }
+    let plugins: PluginsFixture
+    /** The registrar the mocked server hands to the `register` option. */
+    let registrar: {
+      registerContract: ReturnType<typeof vi.fn>
+      registerManifest: ReturnType<typeof vi.fn>
+    }
 
     beforeEach(() => {
-      // Create mock server
+      plugins = createPluginsFixture()
+      // MACTS_HOME/plugins/node_modules is the fixture's node_modules.
+      vi.stubEnv('MACTS_HOME', dirname(dirname(plugins.nodeModules)))
+      vi.stubEnv('MACTS_TEST_EXECUTOR', '')
+
       mockServer = {
         start: vi.fn().mockResolvedValue(undefined),
         stop: vi.fn().mockResolvedValue(undefined),
         url: 'http://localhost:8372',
       }
+      registrar = { registerContract: vi.fn(), registerManifest: vi.fn() }
 
-      // Mock createServer to return our mock
-      vi.spyOn(apiServer, 'createServer').mockReturnValue({
-        app: {} as ReturnType<typeof apiServer.createServer>['app'],
-        ...mockServer,
-      })
-
-      // Mock loadManifest
-      vi.spyOn(core, 'loadManifest').mockResolvedValue({
-        version: '1.0' as const,
-        app: {
-          name: 'TestApp',
-          bundleId: 'com.test.app',
-          displayName: 'Test App',
-          tccEntitlements: [],
-        },
-        suites: [],
-        resources: {},
-        commands: {},
-        enums: {},
-        hierarchy: { children: {} },
-        relationships: [],
+      // The mocked server runs the registration callback the way the real one
+      // does while it is constructed.
+      vi.spyOn(apiServer, 'createMultiServer').mockImplementation((_manifests, options) => {
+        options?.register?.(registrar)
+        return {
+          app: {} as ReturnType<typeof apiServer.createMultiServer>['app'],
+          ...mockServer,
+        }
       })
 
       // Emit SIGINT after a short delay to end the server
@@ -255,6 +259,8 @@ describe('RootCommand', () => {
 
     afterEach(() => {
       vi.restoreAllMocks()
+      vi.unstubAllEnvs()
+      plugins.dispose()
     })
 
     it('should start HTTP server when --serve is provided', async () => {
@@ -269,24 +275,90 @@ describe('RootCommand', () => {
     it('should use provided port when --serve --port is provided', async () => {
       const { stdout, stderr } = createMockStreams()
 
-      // Update mock for custom port
       mockServer.url = 'http://localhost:8080'
-      vi.spyOn(apiServer, 'createServer').mockReturnValue({
-        app: {} as ReturnType<typeof apiServer.createServer>['app'],
-        ...mockServer,
-      })
 
       const exitCode = await cli.run(['--serve', '--port', '8080'], { stdout, stderr })
 
       expect(exitCode).toBe(0)
-      expect(apiServer.createServer).toHaveBeenCalledWith(
-        expect.anything(),
+      expect(apiServer.createMultiServer).toHaveBeenCalledWith(
+        [],
         expect.objectContaining({ port: 8080 })
       )
     })
 
-    // Note: Testing "manifest not found" is difficult in ESM due to inability to mock fs.existsSync.
-    // The actual manifest file exists in the repository, so this scenario can't be easily simulated.
-    // Server startup errors are tested via the createServer mock in other tests.
+    it('should start with no apps, say so, and list no operation endpoint', async () => {
+      const { stdout, stderr, getStdout } = createMockStreams()
+
+      const exitCode = await cli.run(['--serve'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      expect(getStdout()).toContain(
+        'No apps are installed, so no operations are served. Use `macts mcp install <app>` to add one.'
+      )
+      expect(getStdout()).not.toContain('/api/v1/rpc/')
+      expect(registrar.registerContract).not.toHaveBeenCalled()
+    })
+
+    it('should register installed apps from their contracts and report them', async () => {
+      writeInstalledApp(plugins.nodeModules, 'widgets')
+      writeInstalledApp(plugins.nodeModules, 'gadgets', { exportsContract: false })
+      writeAppPackage(plugins.nodeModules, 'sprockets')
+      const { stdout, stderr, getStdout } = createMockStreams()
+
+      const exitCode = await cli.run(['--serve'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      expect(registrar.registerContract).toHaveBeenCalledTimes(1)
+      expect(registrar.registerManifest).not.toHaveBeenCalled()
+      const output = getStdout()
+      expect(output).toContain('Serving 1 app(s):\n  widgets\n')
+      expect(output).toContain(
+        "Not serving 1 app(s) that failed to register:\n  gadgets: Package @macts/gadgets does not define a './contract' export"
+      )
+      expect(output).toContain(
+        'Not serving 1 app(s) installed without their server package:\n  sprockets: install @macts/sprockets-server with `macts mcp install sprockets`\n'
+      )
+      expect(output).toContain('POST http://localhost:8372/api/v1/rpc/{app}.{resource}.{operation}')
+      // The native executor is not announced.
+      expect(output).not.toContain('Executor:')
+    })
+
+    it('should say no apps are served when every installed app is reported', async () => {
+      writeAppPackage(plugins.nodeModules, 'sprockets')
+      const { stdout, stderr, getStdout } = createMockStreams()
+
+      const exitCode = await cli.run(['--serve'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      expect(getStdout()).toContain('No apps are served.\n')
+      expect(getStdout()).not.toContain('No apps are installed')
+      expect(getStdout()).toContain('sprockets: install @macts/sprockets-server')
+    })
+
+    it('should run on the stub test executor, announcing it', async () => {
+      vi.stubEnv('MACTS_TEST_EXECUTOR', 'stub')
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
+
+      const exitCode = await cli.run(['--serve'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      expect(getStderr()).toContain('Warning: MACTS_TEST_EXECUTOR=stub is set')
+      expect(getStdout()).toContain('Executor: test-stub\n')
+      const options = vi.mocked(apiServer.createMultiServer).mock.calls[0]?.[1]
+      expect(options?.executor?.provider).toBe('test-stub')
+    })
+
+    it('should fail startup for an unknown test executor name', async () => {
+      vi.stubEnv('MACTS_TEST_EXECUTOR', 'bogus')
+      const { stdout, stderr, getStderr } = createMockStreams()
+
+      const exitCode = await cli.run(['--serve'], { stdout, stderr })
+
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toContain(
+        'Failed to start HTTP server: MACTS_TEST_EXECUTOR is set to "bogus", which is not a built-in test executor.'
+      )
+      expect(apiServer.createMultiServer).not.toHaveBeenCalled()
+    })
   })
 })

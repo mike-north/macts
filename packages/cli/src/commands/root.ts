@@ -1,5 +1,3 @@
-import * as path from 'node:path'
-import * as fs from 'node:fs'
 import { Command, Option } from 'clipanion'
 import {
   createMcpServer,
@@ -7,11 +5,16 @@ import {
   createDiscoveryTool,
   type McpPlugin,
 } from '@macts/mcp'
-import { createServer, DEFAULT_PORT } from '@macts/api/server'
-import { loadManifest, loadCapabilityRegistry } from '@macts/core'
+import { createMultiServer, DEFAULT_PORT } from '@macts/api/server'
+import { loadCapabilityRegistry } from '@macts/core'
 import { resolveManifestsDir } from './capabilities/registry.js'
-import { getMactsHome } from '../plugin/paths.js'
 import { loadActiveGovernanceFilter } from './capabilities/policy.js'
+import { resolveExecutor, type ResolvedExecutor } from '../host/executor.js'
+import {
+  loadInstalledApps,
+  registerInstalledApps,
+  type AppRegistrationReport,
+} from '../host/installed-apps.js'
 
 /**
  * Root command that handles global flags like --mcp and --serve.
@@ -33,7 +36,13 @@ export class RootCommand extends Command {
 
       Special modes:
         --mcp      Start as an MCP server (for AI assistants)
-        --serve    Start HTTP server for remote access
+        --serve    Start HTTP server for remote access to installed apps
+
+      Serve Mode:
+        The HTTP server serves every app whose server package is installed
+        in ~/.macts/plugins/, and reports at startup any app it cannot serve.
+        Install an app's server package with:
+          macts mcp install calendar
 
       MCP Mode:
         The MCP server exposes automation tools for AI assistants via the
@@ -65,7 +74,7 @@ export class RootCommand extends Command {
   })
 
   serve = Option.Boolean('--serve', {
-    description: 'Start HTTP server for remote access',
+    description: 'Start HTTP server for remote access to installed apps',
   })
 
   port = Option.String('--port', {
@@ -171,49 +180,33 @@ export class RootCommand extends Command {
     const port = this.port ? parseInt(this.port, 10) : DEFAULT_PORT
 
     try {
-      // Find manifest - look in common locations
-      const manifestLocations = [
-        // 1. Current working directory
-        path.join(process.cwd(), 'manifests/calendar/app.yaml'),
-        // 2. User's macts config directory (honors MACTS_HOME, falls back to
-        //    os.homedir() — never a cwd-relative path when HOME is unset)
-        path.join(getMactsHome(), 'manifests/calendar/app.yaml'),
-        // 3. Relative to dist/ (when running built CLI from packages/cli/dist/)
-        path.resolve(import.meta.dirname, '../../../manifests/calendar/app.yaml'),
-        // 4. Relative to src/ (when running with tsx from packages/cli/src/)
-        path.resolve(import.meta.dirname, '../../../../manifests/calendar/app.yaml'),
-      ]
-
-      let manifestPath: string | null = null
-      for (const loc of manifestLocations) {
-        if (fs.existsSync(loc)) {
-          manifestPath = loc
-          break
-        }
+      const resolved = resolveExecutor(process.env)
+      const { executor } = resolved
+      if (resolved.warning !== undefined) {
+        this.context.stderr.write(`${resolved.warning}\n`)
       }
 
-      if (!manifestPath) {
-        this.context.stderr.write('Could not find manifest. Searched:\n')
-        for (const loc of manifestLocations) {
-          this.context.stderr.write(`  - ${loc}\n`)
-        }
-        return 1
-      }
-
-      const manifest = await loadManifest(manifestPath)
-
-      this.context.stdout.write(`Loading manifest: ${manifest.app.name}\n`)
+      // Load first (asynchronous), then register on the server's runtime while
+      // it is constructed, so every registered app is routed.
+      const installed = await loadInstalledApps()
+      let report: AppRegistrationReport = { registered: [], failed: [], missingHost: [] }
 
       // Build TLS config if cert and key are provided
       const tls = this.tlsCert && this.tlsKey ? { cert: this.tlsCert, key: this.tlsKey } : undefined
 
       // Create and start the server
-      const server = createServer(manifest, {
+      const server = createMultiServer([], {
         port,
         host: 'localhost',
         logging: true,
+        executor,
+        register: (registrar) => {
+          report = registerInstalledApps(registrar, installed)
+        },
         ...(tls && { tls }),
       })
+
+      this.writeStartupReport(report, resolved)
 
       await server.start()
 
@@ -222,7 +215,9 @@ export class RootCommand extends Command {
       this.context.stdout.write(`\nAvailable endpoints:\n`)
       this.context.stdout.write(`  GET  ${url}/health\n`)
       this.context.stdout.write(`  GET  ${url}/api/v1\n`)
-      this.context.stdout.write(`  POST ${url}/api/v1/rpc/{app}.{resource}.{operation}\n`)
+      if (report.registered.length > 0) {
+        this.context.stdout.write(`  POST ${url}/api/v1/rpc/{app}.{resource}.{operation}\n`)
+      }
       this.context.stdout.write(`\nPress Ctrl+C to stop.\n`)
 
       // Keep the process running until interrupted
@@ -255,6 +250,44 @@ export class RootCommand extends Command {
       const message = error instanceof Error ? error.message : String(error)
       this.context.stderr.write(`Failed to start HTTP server: ${message}\n`)
       return 1
+    }
+  }
+
+  /**
+   * Print which installed apps are served, which are not and why, and which
+   * are installed without their server package. The executor's provider is
+   * printed whenever it is not the native one.
+   */
+  private writeStartupReport(report: AppRegistrationReport, resolved: ResolvedExecutor): void {
+    const out = this.context.stdout
+    if (report.registered.length > 0) {
+      out.write(`Serving ${String(report.registered.length)} app(s):\n`)
+      for (const { app } of report.registered) {
+        out.write(`  ${app}\n`)
+      }
+    } else if (report.failed.length === 0 && report.missingHost.length === 0) {
+      out.write(
+        'No apps are installed, so no operations are served. Use `macts mcp install <app>` to add one.\n'
+      )
+    } else {
+      out.write('No apps are served.\n')
+    }
+    if (report.failed.length > 0) {
+      out.write(`Not serving ${String(report.failed.length)} app(s) that failed to register:\n`)
+      for (const { app, reason } of report.failed) {
+        out.write(`  ${app}: ${reason}\n`)
+      }
+    }
+    if (report.missingHost.length > 0) {
+      out.write(
+        `Not serving ${String(report.missingHost.length)} app(s) installed without their server package:\n`
+      )
+      for (const { app, hostPackage, installCommand } of report.missingHost) {
+        out.write(`  ${app}: install ${hostPackage} with \`${installCommand}\`\n`)
+      }
+    }
+    if (resolved.kind !== 'native') {
+      out.write(`Executor: ${resolved.executor.provider}\n`)
     }
   }
 }

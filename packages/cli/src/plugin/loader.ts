@@ -1,6 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs'
-import { join, resolve, sep } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type {
   CliPlugin,
   LoadPluginResult,
@@ -9,6 +8,7 @@ import type {
 } from './types.js'
 import { readPluginCache, writePluginCache, type CachedPlugin } from './cache.js'
 import { findInstalledPluginPackages, getPluginResolutionPath } from './manager.js'
+import { isRecord, resolvePackageExport, type PackageExportResolution } from './package-exports.js'
 
 /**
  * Pattern for CLI plugin package names.
@@ -155,19 +155,6 @@ export async function loadPlugin(packageName: string): Promise<LoadPluginResult>
 }
 
 /**
- * Narrow an unknown value to an indexable object.
- *
- * Every shape this module reads comes from outside the type system — a
- * dynamically imported module, a parsed package.json, an exports map — so it
- * arrives as `unknown` and has to be narrowed by a guard rather than asserted
- * with a cast. A cast here would be a claim about untrusted input, which is
- * exactly what we cannot make.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-/**
  * Dynamically import a module.
  *
  * The result is deliberately `unknown`: nothing about a third-party plugin's
@@ -204,13 +191,6 @@ function validatePluginModule(packageName: string, module: unknown): LoadPluginR
 }
 
 /**
- * Result of resolving a plugin's `./cli` export to an importable file URL.
- */
-type CliEntryResolution =
-  | { found: true; url: string }
-  | { found: false; reason: 'not-installed' | 'load-error'; error: string }
-
-/**
  * Resolve the `./cli` subpath export of a plugin package to an absolute
  * `file:` URL, reading the package's `exports` map directly rather than
  * going through Node's CJS `require.resolve` (which only matches the
@@ -220,7 +200,7 @@ type CliEntryResolution =
  * @param pluginsPath - Absolute path to the managed plugins `node_modules` directory
  * @param packageName - npm package name (e.g., '@macts/calendar')
  */
-function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryResolution {
+function resolveCliEntryUrl(pluginsPath: string, packageName: string): PackageExportResolution {
   // packageName is always `@macts/<app>`; join() handles the embedded '/'
   // correctly, landing on <pluginsPath>/@macts/<app>.
   const packageDir = join(pluginsPath, packageName)
@@ -233,138 +213,7 @@ function resolveCliEntryUrl(pluginsPath: string, packageName: string): CliEntryR
     }
   }
 
-  const packageJsonPath = join(packageDir, 'package.json')
-  let pkg: unknown
-  try {
-    pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    return {
-      found: false,
-      reason: 'load-error',
-      error: `Failed to read package.json for ${packageName}: ${message}`,
-    }
-  }
-
-  const cliEntry = resolveExportsSubpath(isRecord(pkg) ? pkg['exports'] : undefined, './cli')
-  if (!cliEntry) {
-    return {
-      found: false,
-      reason: 'load-error',
-      error: `Package ${packageName} does not define a './cli' export (or none of its conditions include "import" or "default")`,
-    }
-  }
-
-  const validatedTarget = validateExportsTarget(packageName, packageDir, cliEntry)
-  if (!validatedTarget.ok) {
-    return { found: false, reason: 'load-error', error: validatedTarget.error }
-  }
-
-  const resolvedPath = validatedTarget.path
-  if (!existsSync(resolvedPath)) {
-    return {
-      found: false,
-      reason: 'load-error',
-      error: `Package ${packageName}'s './cli' export points to a missing file: ${cliEntry}`,
-    }
-  }
-
-  return { found: true, url: pathToFileURL(resolvedPath).href }
-}
-
-/**
- * Result of validating an `exports` map target string.
- */
-type ExportsTargetValidation = { ok: true; path: string } | { ok: false; error: string }
-
-/**
- * Validate an `exports` map target string against Node's own constraints on
- * package-target values, then resolve it to an absolute path within
- * `packageDir`.
- *
- * Reading the `exports` map by hand (see {@link resolveCliEntryUrl}) means we
- * bypass Node's built-in resolver entirely — including the validation Node
- * would otherwise perform on the target string before ever touching the
- * filesystem. A malicious or malformed target (a bare specifier, an absolute
- * path, or a `../` escape) must be rejected here for the same reason Node
- * itself rejects it: an `exports` target is only ever supposed to point
- * somewhere inside the package that declares it.
- *
- * @see https://nodejs.org/api/packages.html#exports-sugar
- * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
- */
-function validateExportsTarget(
-  packageName: string,
-  packageDir: string,
-  target: string
-): ExportsTargetValidation {
-  const invalid = (detail: string): ExportsTargetValidation => ({
-    ok: false,
-    error: `Package ${packageName}'s './cli' export target ${JSON.stringify(target)} is invalid: ${detail}`,
-  })
-
-  // Node's PACKAGE_TARGET_RESOLVE requires a target to be a string starting
-  // with "./"; anything else (a bare specifier, an absolute path like
-  // "/abs/path.js", or a "../" escape) is ERR_INVALID_PACKAGE_TARGET.
-  if (!target.startsWith('./')) {
-    return invalid('exports targets must be relative paths beginning with "./"')
-  }
-
-  // Beyond the leading "./", Node also rejects any "." or ".." segment (which
-  // would otherwise let a target escape the package directory) and any
-  // "node_modules" segment.
-  const segments = target.split('/').slice(1)
-  const hasForbiddenSegment = segments.some(
-    (segment) =>
-      segment === '' ||
-      segment === '.' ||
-      segment === '..' ||
-      segment.toLowerCase() === 'node_modules'
-  )
-  if (hasForbiddenSegment) {
-    return invalid('exports targets must not contain "..", ".", or "node_modules" path segments')
-  }
-
-  // Defense in depth: confirm the normalized, resolved path is still inside
-  // packageDir. Comparing against packageDir plus a trailing separator
-  // ensures a sibling directory with a shared prefix (e.g. "packageDir-evil")
-  // can't pass this check.
-  const resolvedPath = resolve(packageDir, target)
-  const packageDirWithSep = packageDir.endsWith(sep) ? packageDir : `${packageDir}${sep}`
-  if (resolvedPath !== packageDir && !resolvedPath.startsWith(packageDirWithSep)) {
-    return invalid('resolves outside the package directory')
-  }
-
-  return { ok: true, path: resolvedPath }
-}
-
-/**
- * Resolve a subpath in a package's `exports` map to a relative file path,
- * preferring the `"import"` condition (these packages are ESM-only) and
- * falling back to `"default"` when present. Handles both the string and
- * conditions-object forms of an exports entry.
- */
-function resolveExportsSubpath(exportsField: unknown, subpath: string): string | null {
-  if (!isRecord(exportsField)) return null
-  const entry = exportsField[subpath]
-  return resolveExportsConditions(entry)
-}
-
-/**
- * Resolve an individual exports entry value (as found at a subpath key) to a
- * relative file path string.
- */
-function resolveExportsConditions(entry: unknown): string | null {
-  if (typeof entry === 'string') return entry
-
-  if (isRecord(entry)) {
-    const candidate = entry['import'] ?? entry['default']
-    if (typeof candidate === 'string') return candidate
-    // Conditions may themselves nest further conditions (e.g. `"import": { "default": ... }`).
-    return resolveExportsConditions(candidate)
-  }
-
-  return null
+  return resolvePackageExport(packageDir, packageName, './cli')
 }
 
 /**
