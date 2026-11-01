@@ -42,6 +42,7 @@ import {
   type ManifestRoute,
 } from '../../manifest/index.js'
 import { lowerCamel } from '../../manifest/lower-camel.js'
+import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import {
   appCommandEntries,
@@ -223,7 +224,7 @@ function generateManifestModule(manifest: AppManifest): string {
  * Mac-side runtime calls it, and it validates the manifest before use, so the
  * value is deliberately typed \`unknown\`. Remote clients never load this module.
  *
- * Generated from the ${manifest.app.name} manifest; do not edit.
+ * ${manifestGeneratedNotice(manifest.app.name)}
  *
  * @packageDocumentation
  */
@@ -822,7 +823,7 @@ class ContractBuilder {
  * \`bind\` turns into a \`${client}\`; application code changes locality by
  * changing the factory, not the contract.
  *
- * Generated from the ${appName} manifest; do not edit.
+ * ${manifestGeneratedNotice(appName)}
  *
  * @packageDocumentation
  */

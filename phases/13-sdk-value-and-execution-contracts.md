@@ -659,6 +659,21 @@ errors fail generation. The shipped manifests produce three: Finder's
 `iconViewOptions` and `columnViewOptions`, and System Events'
 `scriptingResult`.
 
+The generator owns its output. Each generated package carries a committed
+`.macts-generated.json` that lists the sorted package-relative paths the last
+run emitted, computed from the emitter's own output, never from a glob. A
+run deletes every path the previous record lists that it no longer emits,
+and removes a directory only when that deletion empties it. A file that is in
+no record, such as a package's `CHANGELOG.md`, its API reports, or a
+handwritten test, is never touched. A package without a record takes the
+files whose leading doc comment carries the generator's "do not edit" notice
+as its previous set; after that run, the record decides. Removing an
+operation or a resource from a manifest therefore leaves the package as a
+fresh generate would. `pnpm generate:check` regenerates every package and then
+fails on any modified, deleted or untracked file under `packages/`, naming
+each one, so a stale or newly emitted file cannot go unnoticed. The rule is
+recorded in `packages/core/src/generator/owned-output.ts`.
+
 Each operation's permission comes from the manifest route, the same
 derivation the runtime uses, so the registration check holds by construction.
 A command's route segment, and the operation segment of its default permission, is its `routeName`, which defaults to the command key. Two commands can then share a public operation name across resources while differing in signature, for example a `get` whose identifier parameter differs for one resource. No two commands may produce the same route. A CRUD command (`get`, `list`, `create`, `update`, `delete`) always publishes under that operation name, never under its manifest key, and a test over every shipped manifest enforces this.
@@ -1565,7 +1580,7 @@ are listed with a single integration owner.
 | `packages/api/src/server/**` (incl. `handlers/rpc.ts`, `handlers/validation.ts`, middleware)                             | Execution                           | `rpc.ts` JXA builders move into the native executor                                           |
 | `packages/sdk/**`, `packages/mcp/**`, `packages/cli/**` (handwritten)                                                    | Execution                           |                                                                                               |
 | Root `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, package export maps                                        | Execution (integration owner)       | Value contracts requests changes                                                              |
-| Generated packages (`packages/<app>`, `packages/<app>-server`), API reports of generated packages, generated docs        | Value contracts (generation owner)  | Only via `pnpm generate`; never hand-edited                                                   |
+| Generated packages (`packages/<app>`, `packages/<app>-server`), API reports of generated packages, generated docs        | Value contracts (generation owner)  | Only via `pnpm generate`; never hand-edited. `pnpm generate:check` fails on any drift (D2)    |
 | Value vectors and specimen corpus (expected values)                                                                      | Value contracts                     | e.g. `packages/contracts/src/values/vectors/`                                                 |
 | Parity harness, transport, error, authority, and transfer scenarios                                                      | Execution                           | Runs the value vectors through both factories                                                 |
 

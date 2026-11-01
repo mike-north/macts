@@ -112,6 +112,13 @@ generated package's `package.json`** — run the generator instead
 (`pnpm generate`), or the next `generate:check` run (and CI) will flag the
 drift.
 
+The generator also owns which files a generated package contains. Each
+package's `.macts-generated.json` records the files the last run emitted, and
+regenerating deletes any of them the generator no longer emits. Files no
+record lists, such as `CHANGELOG.md` and API reports, are left alone.
+`generate:check` fails on any modified, deleted or untracked file under
+`packages/`.
+
 ## One-time bootstrap runbook
 
 Trusted publishing requires a publisher to already exist on npm before CI can

@@ -1540,6 +1540,14 @@ export interface GeneratedMcpPlugin {
     toolsIndexContent: string;
 }
 
+// @public
+export interface GeneratedPackageWriteResult {
+    readonly emitted: readonly string[];
+    readonly previous: readonly string[];
+    readonly previousSource: OwnedOutputSource;
+    readonly pruned: readonly string[];
+}
+
 // @public (undocumented)
 export interface GeneratedSchema {
     // (undocumented)
@@ -2298,6 +2306,12 @@ export interface OperationVocabulary {
     readonly coarse: readonly CoarseOperation[];
     readonly fine: ReadonlySet<string>;
 }
+
+// @public
+export const OWNED_OUTPUT_RECORD_FILE = ".macts-generated.json";
+
+// @public
+export type OwnedOutputSource = 'record' | 'headers';
 
 // @public
 export function parseApprovalConfig(input: unknown): ParseApprovalConfigResult;
@@ -3694,6 +3708,12 @@ export function writeFiles(files: {
     path: string;
     content: string;
 }[], outDir: string): Promise<void>;
+
+// @public
+export function writeGeneratedPackage(files: {
+    path: string;
+    content: string;
+}[], packageDir: string): Promise<GeneratedPackageWriteResult>;
 
 // @public
 export function writeNullabilityResults(manifestPath: string, merged: NullabilityMergeResult): Promise<NullabilityWriteResult>;
