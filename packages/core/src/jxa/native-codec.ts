@@ -10,14 +10,16 @@
  * converts the wire input into native arguments and `encode` converts the
  * native result into wire form.
  *
- * This module defines only the contract between the codec, which knows value
+ * This module defines the contract between the codec, which knows value
  * conversion, and the executor, which knows process execution and failure
- * classification. Neither re-implements the other.
+ * classification, and it exports the codec implementation,
+ * {@link NATIVE_CODEC}. Neither side re-implements the other.
  *
  * @packageDocumentation
  */
 
 import type { IssuePath, ValuePlan, WireRecord, WireValue } from '@macts/contracts'
+import { createNativeCodecFunctions } from './native-codec-functions.js'
 
 /**
  * Name of the top-level function a {@link NativeCodec} prelude defines to turn
@@ -41,9 +43,10 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  * Source for the in-process value codec.
  *
  * @remarks
- * `prelude` is automation-process JavaScript that defines exactly the two
- * top-level functions {@link NATIVE_DECODE_FUNCTION} and
- * {@link NATIVE_ENCODE_FUNCTION}, and no other globals. Their contract:
+ * `prelude` is automation-process JavaScript that declares exactly two
+ * top-level bindings, {@link NATIVE_DECODE_FUNCTION} and
+ * {@link NATIVE_ENCODE_FUNCTION}, both holding functions, and defines no other
+ * globals. Their contract:
  *
  * - `decode(wire, plan)` returns native values: dates as `Date`, integer text as
  *   numbers, special double states as `NaN`, `±Infinity`, or `-0`, and
@@ -53,6 +56,8 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   `undefined`. Absent optional fields are omitted.
  * - Under a `passthrough` plan, both functions return their argument
  *   unchanged.
+ * - Under a `none` plan, `encode` returns `null` whatever the native result
+ *   was, and `decode` returns `undefined`.
  * - When a value violates the plan, either function throws an object whose
  *   `name` is {@link NATIVE_CODEC_ERROR_NAME} and which also carries
  *   `direction`, `path`, and `message`. Examples are a fractional value at an
@@ -62,6 +67,46 @@ export interface NativeCodec {
   /** In-process JavaScript defining the decode and encode functions. */
   readonly prelude: string
 }
+
+/** Identity tag marking embedded automation-process JavaScript for tooling. */
+const js = String.raw
+
+/**
+ * Builds a prelude around the source text of a self-contained factory that
+ * returns `{ decode, encode }`. The factory runs inside a strict-mode function
+ * scope, so its helpers stay local and only the two declared bindings become
+ * globals.
+ */
+function buildPrelude(factorySource: string): string {
+  return js`var ${NATIVE_DECODE_FUNCTION}, ${NATIVE_ENCODE_FUNCTION};
+(function () {
+  'use strict';
+  var codec = (${factorySource})();
+  ${NATIVE_DECODE_FUNCTION} = codec.decode;
+  ${NATIVE_ENCODE_FUNCTION} = codec.encode;
+})();
+`
+}
+
+/**
+ * The in-process value codec.
+ *
+ * @remarks
+ * Its prelude embeds the codec functions' source text, so the conversions
+ * that run inside the automation process are the same code that the
+ * package's unit tests exercise in Node. It implements every value plan kind
+ * except `reference`, `file`, and `file-source`, which fail with a codec
+ * error saying they have no conversion in this codec.
+ *
+ * Conversions follow the value contracts: integers are canonical decimal
+ * text within the safe-integer domain, numbers in dynamic content are always
+ * doubles, special double states and `-0` are explicit, dates are UTC text
+ * with millisecond precision, and RGB colors decode to the 16-bit channel
+ * list `[r, g, b]`.
+ */
+export const NATIVE_CODEC: NativeCodec = Object.freeze({
+  prelude: buildPrelude(createNativeCodecFunctions.toString()),
+})
 
 /**
  * One native invocation, expressed without interpolating any value into source
