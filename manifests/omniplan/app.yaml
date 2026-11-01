@@ -646,15 +646,16 @@ hierarchy:
 commands:
   listProjects:
     name: list
+    routeName: list
     description: List all projects
     scope: resource
     resourceType: Project
     code: core
     parameters: []
-    permission: omniplan:projects:list
 
   getProject:
     name: get
+    routeName: get
     description: Get a project
     scope: resource
     resourceType: Project
@@ -664,19 +665,19 @@ commands:
         type: string
         description: Project identifier
         required: true
-    permission: omniplan:projects:get
 
   listTasks:
     name: list
+    routeName: list
     description: List all tasks
     scope: resource
     resourceType: Task
     code: core
     parameters: []
-    permission: omniplan:tasks:list
 
   getTask:
     name: get
+    routeName: get
     description: Get a task by ID
     scope: resource
     resourceType: Task
@@ -686,10 +687,10 @@ commands:
         type: integer
         description: Task identifier
         required: true
-    permission: omniplan:tasks:get
 
   createTask:
     name: create
+    routeName: create
     description: Create a new task
     scope: resource
     resourceType: Task
@@ -707,19 +708,19 @@ commands:
         type: number
         description: Duration in seconds
         required: false
-    permission: omniplan:tasks:create
 
   listMilestones:
     name: list
+    routeName: list
     description: List all milestones
     scope: resource
     resourceType: Milestone
     code: core
     parameters: []
-    permission: omniplan:milestones:list
 
   getMilestone:
     name: get
+    routeName: get
     description: Get a milestone by ID
     scope: resource
     resourceType: Milestone
@@ -729,10 +730,10 @@ commands:
         type: integer
         description: Milestone identifier
         required: true
-    permission: omniplan:milestones:get
 
   createMilestone:
     name: create
+    routeName: create
     description: Create a new milestone
     scope: resource
     resourceType: Milestone
@@ -746,19 +747,19 @@ commands:
         type: date
         description: Milestone date
         required: false
-    permission: omniplan:milestones:create
 
   listResources:
     name: list
+    routeName: list
     description: List all resources
     scope: resource
     resourceType: Resource
     code: core
     parameters: []
-    permission: omniplan:resources:list
 
   getResource:
     name: get
+    routeName: get
     description: Get a resource by ID
     scope: resource
     resourceType: Resource
@@ -768,10 +769,10 @@ commands:
         type: integer
         description: Resource identifier
         required: true
-    permission: omniplan:resources:get
 
   createResource:
     name: create
+    routeName: create
     description: Create a new resource
     scope: resource
     resourceType: Resource
@@ -785,46 +786,46 @@ commands:
         type: ResourceType
         description: Resource type
         required: false
-    permission: omniplan:resources:create
 
   listAssignments:
     name: list
+    routeName: list
     description: List all assignments
     scope: resource
     resourceType: Assignment
     code: core
     parameters: []
-    permission: omniplan:assignments:list
 
   listDependencies:
     name: list
+    routeName: list
     description: List all dependencies
     scope: resource
     resourceType: Dependency
     code: core
     parameters: []
-    permission: omniplan:dependencies:list
 
   listViolations:
     name: list
+    routeName: list
     description: List all violations
     scope: resource
     resourceType: Violation
     code: core
     parameters: []
-    permission: omniplan:violations:list
 
   listScenarios:
     name: list
+    routeName: list
     description: List all scenarios
     scope: resource
     resourceType: Scenario
     code: core
     parameters: []
-    permission: omniplan:scenarios:list
 
   getScenario:
     name: get
+    routeName: get
     description: Get a scenario by ID
     scope: resource
     resourceType: Scenario
@@ -834,7 +835,6 @@ commands:
         type: string
         description: Scenario identifier
         required: true
-    permission: omniplan:scenarios:get
 
   export:
     name: export

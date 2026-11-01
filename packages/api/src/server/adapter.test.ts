@@ -267,7 +267,7 @@ describe('request contracts of a shipped manifest (Calendar)', () => {
 
     const res = await post(
       app,
-      'calendar.events.getEvent',
+      'calendar.events.get',
       { calendarId: 'Work', id: 'EVENT-123' },
       WRITER_TOKEN
     )
@@ -280,7 +280,7 @@ describe('request contracts of a shipped manifest (Calendar)', () => {
   it('rejects getEvent keyed by the property name `uid`', async () => {
     const { app, executor } = await calendarServer()
 
-    const res = await post(app, 'calendar.events.getEvent', { uid: 'EVENT-123' }, WRITER_TOKEN)
+    const res = await post(app, 'calendar.events.get', { uid: 'EVENT-123' }, WRITER_TOKEN)
 
     expect(res.status).toBe(400)
     expect((await errorBody(res)).error.code).toBe('VALIDATION_FAILED')

@@ -8,7 +8,9 @@
  * This is the regression guard for the structured-write break where the client
  * SDK posted to `calendar.events.create` while the server exposed
  * `calendar.events.createEvent` (keyed by the manifest command KEY, not its
- * `name`). The canonical route is produced by `resolveManifestRoutes`
+ * `name`). The command's `routeName` now publishes it as
+ * `calendar.events.create` on both sides; what matters here is that both
+ * surfaces derive the same route. The canonical route is produced by `resolveManifestRoutes`
  * (`@macts/core`), which the server router consumes directly; this test proves
  * the client SDK derives the same set.
  *
@@ -232,11 +234,13 @@ describe('@macts/calendar events update and delete', () => {
     expect(endDate?.type).toBe('date')
   })
 
-  it('routes events.update() to calendar.events.updateEvent', () => {
-    // The manifest key for the update command is `updateEvent`; the server
-    // registers the route under that key. The client must use the same key.
+  it('routes events.update() to calendar.events.update', () => {
+    // The update command's manifest key is `updateEvent`, and its routeName
+    // publishes it under the operation name; the server registers that route,
+    // and the client must use the same one.
     const canonical = new Set(resolveManifestRoutes(calendar).map((r) => r.route))
-    expect(canonical).toContain('calendar.events.updateEvent')
+    expect(canonical).toContain('calendar.events.update')
+    expect(canonical.has('calendar.events.updateEvent')).toBe(false)
 
     const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
     const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
@@ -247,19 +251,20 @@ describe('@macts/calendar events update and delete', () => {
     expect(eventFile.content).toContain(
       'async update(calendarId: string, id: string, input: EventUpdateInput)'
     )
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.updateEvent`')
-    // Must NOT emit the name-keyed route `update` — that would 404.
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.update`')
+    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.update`')
+    // Must NOT emit the key-named route, which the server no longer exposes.
+    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.updateEvent`')
 
     const clientRoutes = extractClientRoutes(sdk.files)
-    expect(clientRoutes).toContain('calendar.events.updateEvent')
-    expect(clientRoutes.has('calendar.events.update')).toBe(false)
+    expect(clientRoutes).toContain('calendar.events.update')
+    expect(clientRoutes.has('calendar.events.updateEvent')).toBe(false)
   })
 
-  it('routes events.delete() to calendar.events.deleteEvent', () => {
-    // Same key-coherence contract as update: manifest key is `deleteEvent`.
+  it('routes events.delete() to calendar.events.delete', () => {
+    // Same contract as update: manifest key `deleteEvent`, routeName `delete`.
     const canonical = new Set(resolveManifestRoutes(calendar).map((r) => r.route))
-    expect(canonical).toContain('calendar.events.deleteEvent')
+    expect(canonical).toContain('calendar.events.delete')
+    expect(canonical.has('calendar.events.deleteEvent')).toBe(false)
 
     const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
     const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
@@ -268,12 +273,12 @@ describe('@macts/calendar events update and delete', () => {
     // Events are nested under calendars: the generated method must take both
     // calendarId (parent) and id (child event uid).
     expect(eventFile.content).toContain('async delete(calendarId: string, id: string)')
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.deleteEvent`')
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.delete`')
+    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.delete`')
+    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.deleteEvent`')
 
     const clientRoutes = extractClientRoutes(sdk.files)
-    expect(clientRoutes).toContain('calendar.events.deleteEvent')
-    expect(clientRoutes.has('calendar.events.delete')).toBe(false)
+    expect(clientRoutes).toContain('calendar.events.delete')
+    expect(clientRoutes.has('calendar.events.deleteEvent')).toBe(false)
   })
 
   it('EventUpdateInput carries date-typed optional fields for startDate and endDate', () => {
@@ -336,26 +341,28 @@ describe('@macts/calendar events.create regression', () => {
     calendar = await loadManifest(resolve(MANIFESTS_DIR, 'calendar', 'app.yaml'))
   })
 
-  it('routes events.create() to the same key the server exposes (createEvent)', () => {
+  it('routes events.create() to the route the server exposes (calendar.events.create)', () => {
     // The flagship structured-write path. The Event create command's manifest
-    // KEY is `createEvent`; the server registers `calendar.events.createEvent`.
+    // KEY is `createEvent`; its routeName publishes `calendar.events.create`,
+    // which the server registers.
     const canonical = new Set(resolveManifestRoutes(calendar).map((r) => r.route))
-    expect(canonical).toContain('calendar.events.createEvent')
+    expect(canonical).toContain('calendar.events.create')
+    expect(canonical.has('calendar.events.createEvent')).toBe(false)
 
     const sdk = generateHttpClientSdk(calendar, { packageName: '@macts/calendar' })
     const eventFile = sdk.files.find((f) => f.path === 'src/resources/event.ts')
     if (!eventFile) throw new Error('generated calendar SDK missing event resource')
 
-    // The generated create() method must target the createEvent key, never the
-    // name-keyed `create` that 404'd against the live server.
+    // The generated create() method must target the route the server exposes,
+    // never one it does not (which 404'd against the live server).
     expect(eventFile.content).toContain('async create(input: EventCreateInput)')
-    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.createEvent`')
-    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.create`')
+    expect(eventFile.content).toContain('${this.#app}.${this.#resource}.create`')
+    expect(eventFile.content).not.toContain('${this.#app}.${this.#resource}.createEvent`')
 
     // And the full reconstructed client route matches the server route exactly.
     const clientRoutes = extractClientRoutes(sdk.files)
-    expect(clientRoutes).toContain('calendar.events.createEvent')
-    expect(clientRoutes.has('calendar.events.create')).toBe(false)
+    expect(clientRoutes).toContain('calendar.events.create')
+    expect(clientRoutes.has('calendar.events.createEvent')).toBe(false)
   })
 
   it('surfaces the calendarId the create route requires in EventCreateInput', () => {

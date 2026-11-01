@@ -598,14 +598,14 @@ construct canonical errors. On failure:
 
 **`OperationDescriptor<Input, Output>`** has these fields:
 
-| Field                          | Meaning                                                                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `id: OperationId`              | The existing route string, e.g. `calendar.events.listEvents`. It is the HTTP RPC path segment and the basis for MCP tool names. |
-| `permission: PermissionString` | e.g. `calendar:events:list`                                                                                                     |
-| `target: OperationTarget`      | `{ command, resource? }`: manifest keys the provider uses to locate the command                                                 |
-| `description`                  | Text describing the operation                                                                                                   |
-| `input: ValueType<Input>`      | Always record-shaped                                                                                                            |
-| `output: ValueType<Output>`    | The operation's result                                                                                                          |
+| Field                          | Meaning                                                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `id: OperationId`              | The existing route string, e.g. `calendar.events.list`. It is the HTTP RPC path segment and the basis for MCP tool names. |
+| `permission: PermissionString` | e.g. `calendar:events:list`                                                                                               |
+| `target: OperationTarget`      | `{ command, resource? }`: manifest keys the provider uses to locate the command                                           |
+| `description`                  | Text describing the operation                                                                                             |
+| `input: ValueType<Input>`      | Always record-shaped                                                                                                      |
+| `output: ValueType<Output>`    | The operation's result                                                                                                    |
 
 Every asynchronous client call that reaches the runtime (`invoke`, a
 reference's `resolve`, and a file value's `fetch`) accepts one shared
@@ -656,7 +656,7 @@ errors fail generation. The shipped manifests produce three: Finder's
 
 Each operation's permission comes from the manifest route, the same
 derivation the runtime uses, so the registration check holds by construction.
-A command's route segment, and the operation segment of its default permission, is its `routeName`, which defaults to the command key. Two commands can then share a public operation name across resources while differing in signature, for example a `get` whose identifier parameter differs for one resource. No two commands may produce the same route.
+A command's route segment, and the operation segment of its default permission, is its `routeName`, which defaults to the command key. Two commands can then share a public operation name across resources while differing in signature, for example a `get` whose identifier parameter differs for one resource. No two commands may produce the same route. A CRUD command (`get`, `list`, `create`, `update`, `delete`) always publishes under that operation name, never under its manifest key, and a test over every shipped manifest enforces this.
 A permission is `app:resource:operation`. The app segment is `[a-z][a-z0-9_-]*`. The resource and operation segments are each `[a-z][a-zA-Z0-9]*` or `*`, so a camelCase command key or `routeName` (`splitVertically`) or resource name (`mediaItems`) is a valid segment as written, and `-` and `_` are not allowed in them. Matching is exact and case-sensitive, and wildcards cover only whole segments. The operation segment of a derived permission equals the route's operation segment, so no case folding is needed to relate a route to its permission. A permission that fails the grammar, or a grant that differs from a real permission only in letter case, can never authorize anything, so every surface that rejects or denies one must name the closest valid permission for the app: key creation, `permissions expand`, and the denial hint a caller receives. A test checks that every route permission in every shipped manifest satisfies the grammar and is granted by itself, by its resource wildcard, and by the app wildcard.
 A permission must have exactly three non-empty segments,
 `app:resource:operation`, because governance denies any other shape. A test

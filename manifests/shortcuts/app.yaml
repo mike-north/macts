@@ -153,15 +153,16 @@ commands:
   # Folder commands
   listFolders:
     name: list
+    routeName: list
     description: List all folders
     scope: resource
     resourceType: Folder
     code: core
     parameters: []
-    permission: shortcuts:folders:list
 
   getFolder:
     name: get
+    routeName: get
     description: Get a folder by ID
     scope: resource
     resourceType: Folder
@@ -171,7 +172,6 @@ commands:
         type: string
         description: Folder identifier
         required: true
-    permission: shortcuts:folders:get
 
 # Permissions mapping
 permissions:

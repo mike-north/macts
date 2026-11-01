@@ -48,7 +48,7 @@ expectType<CalendarClient>(calendar.bind(runtime))
 expectAssignable<AnyOperationDescriptor>(listEvents)
 
 // Operation ids and permissions have three segments.
-expectAssignable<OperationId>('calendar.events.listEvents')
+expectAssignable<OperationId>('calendar.events.list')
 expectNotAssignable<OperationId>('calendar')
 expectAssignable<PermissionString>('calendar:events:list')
 expectNotAssignable<PermissionString>('calendar:events')

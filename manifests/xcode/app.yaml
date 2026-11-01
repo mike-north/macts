@@ -732,6 +732,7 @@ hierarchy:
 commands:
   listWorkspaceDocuments:
     name: list
+    routeName: list
     description: List all workspace documents
     scope: resource
     resourceType: WorkspaceDocument
@@ -741,6 +742,7 @@ commands:
 
   getWorkspaceDocument:
     name: get
+    routeName: get
     description: Get a workspace document by name
     scope: resource
     resourceType: WorkspaceDocument
@@ -754,6 +756,7 @@ commands:
 
   listProjects:
     name: list
+    routeName: list
     description: List all projects in a workspace
     scope: resource
     resourceType: Project
@@ -763,10 +766,10 @@ commands:
         type: string
         description: Workspace document name
         required: true
-    permission: xcode:projects:list
 
   getProject:
     name: get
+    routeName: get
     description: Get a project by ID
     scope: resource
     resourceType: Project
@@ -776,10 +779,10 @@ commands:
         type: string
         description: Project identifier
         required: true
-    permission: xcode:projects:get
 
   listSchemes:
     name: list
+    routeName: list
     description: List all schemes in a workspace
     scope: resource
     resourceType: Scheme
@@ -789,10 +792,10 @@ commands:
         type: string
         description: Workspace document name
         required: true
-    permission: xcode:schemes:list
 
   getScheme:
     name: get
+    routeName: get
     description: Get a scheme by ID
     scope: resource
     resourceType: Scheme
@@ -802,10 +805,10 @@ commands:
         type: string
         description: Scheme identifier
         required: true
-    permission: xcode:schemes:get
 
   listRunDestinations:
     name: list
+    routeName: list
     description: List all run destinations in a workspace
     scope: resource
     resourceType: RunDestination
@@ -819,6 +822,7 @@ commands:
 
   getRunDestination:
     name: get
+    routeName: get
     description: Get a run destination by name
     scope: resource
     resourceType: RunDestination

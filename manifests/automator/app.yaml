@@ -369,6 +369,7 @@ commands:
   # AutomatorAction commands
   listActions:
     name: list
+    routeName: list
     description: List all actions in a workflow
     scope: resource
     resourceType: AutomatorAction
@@ -382,6 +383,7 @@ commands:
 
   getAction:
     name: get
+    routeName: get
     description: Get an action by ID
     scope: resource
     resourceType: AutomatorAction
@@ -430,6 +432,7 @@ commands:
   # Variable commands
   listVariables:
     name: list
+    routeName: list
     description: List all variables in a workflow
     scope: resource
     resourceType: Variable
@@ -439,10 +442,10 @@ commands:
         type: string
         description: Workflow name
         required: true
-    permission: automator:variables:list
 
   getVariable:
     name: get
+    routeName: get
     description: Get a variable by ID
     scope: resource
     resourceType: Variable
@@ -452,11 +455,11 @@ commands:
         type: string
         description: Variable identifier
         required: true
-    permission: automator:variables:get
 
   # Setting commands
   listSettings:
     name: list
+    routeName: list
     description: List all settings for an action
     scope: resource
     resourceType: Setting
@@ -466,10 +469,10 @@ commands:
         type: string
         description: Action identifier
         required: true
-    permission: automator:settings:list
 
   getSetting:
     name: get
+    routeName: get
     description: Get a setting by name
     scope: resource
     resourceType: Setting
@@ -479,11 +482,11 @@ commands:
         type: string
         description: Setting name
         required: true
-    permission: automator:settings:get
 
   # RequiredResource commands
   listRequiredResources:
     name: list
+    routeName: list
     description: List all required resources for an action
     scope: resource
     resourceType: RequiredResource
@@ -497,6 +500,7 @@ commands:
 
   getRequiredResource:
     name: get
+    routeName: get
     description: Get a required resource by name
     scope: resource
     resourceType: RequiredResource
