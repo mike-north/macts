@@ -9,6 +9,14 @@ import {
 } from '@macts/core'
 
 /**
+ * The prefix of each generation diagnostic line on stderr. Diagnostics are
+ * tolerated fallbacks (a manifest type the contract describes as `unknown`),
+ * not errors, so they never change the exit status. `scripts/regenerate.mjs`
+ * counts lines with this prefix.
+ */
+export const GENERATION_WARNING_PREFIX = 'warning: '
+
+/**
  * Command to generate packages from manifests.
  *
  * @example
@@ -33,6 +41,9 @@ export class GenerateCommand extends Command {
       With --target server, generates a single server package (API + MCP) into --out-dir.
 
       The manifest should be a YAML file following the macts manifest schema.
+
+      Manifest types the generated contract cannot resolve are described as
+      unknown and reported on stderr as warnings; they do not fail generation.
     `,
     examples: [
       [
@@ -117,6 +128,7 @@ export class GenerateCommand extends Command {
       appName,
       version: this.version,
     })
+    this.reportDiagnostics(result.diagnostics)
 
     if (result.errors.length > 0) {
       this.context.stderr.write('Errors during generation:\n')
@@ -158,6 +170,7 @@ export class GenerateCommand extends Command {
       clientPackageName,
       version: this.version,
     })
+    this.reportDiagnostics(result.diagnostics)
 
     if (result.errors.length > 0) {
       this.context.stderr.write('Errors during generation:\n')
@@ -177,6 +190,17 @@ export class GenerateCommand extends Command {
     this.context.stdout.write(`  pnpm build\n`)
 
     return 0
+  }
+
+  /**
+   * Report each generation diagnostic on stderr as one warning line. Each
+   * diagnostic names the app, the manifest position, and the declared type.
+   * The server package carries no contract, so it has none.
+   */
+  private reportDiagnostics(diagnostics: readonly string[] | undefined): void {
+    for (const diagnostic of diagnostics ?? []) {
+      this.context.stderr.write(`${GENERATION_WARNING_PREFIX}${diagnostic}\n`)
+    }
   }
 
   private async generateServer(

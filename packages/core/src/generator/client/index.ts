@@ -3,7 +3,9 @@
  *
  * Generates a single package that combines the HTTP client SDK and CLI plugin
  * into one published package, `@macts/<app>`, rather than separate per-surface
- * packages.
+ * packages. The package also carries the app's transport-neutral contract,
+ * exported only through the `@macts/<app>/contract` subpath so that loading it
+ * never loads the HTTP client or the CLI.
  *
  * @packageDocumentation
  */
@@ -12,7 +14,9 @@ import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { generateCapabilitiesModule } from '../capabilities/index.js'
+import { generateContract } from '../contract/index.js'
 import { MIT_LICENSE } from '../license.js'
+import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
 /**
  * Options for client package generation.
@@ -36,7 +40,19 @@ export interface GenerateClientPackageResult {
   files: { path: string; content: string }[]
   /** Any errors encountered during generation */
   errors: string[]
+  /**
+   * Non-fatal findings, such as manifest types the contract could not resolve
+   * and describes as `unknown`. Present only when there are any.
+   */
+  diagnostics?: string[]
 }
+
+/**
+ * The API Extractor config for the `./contract` subpath. The package's
+ * `api-extractor.json` reports the root entry; this one reports the contract
+ * entry, so changes to the contract's public surface show in review.
+ */
+const CONTRACT_API_EXTRACTOR_CONFIG = 'api-extractor.contract.json'
 
 /**
  * Config file paths that should be filtered out from the SDK and CLI generators,
@@ -58,7 +74,9 @@ const CONFIG_FILE_PATHS = new Set([
  * Combines the HTTP client SDK and CLI plugin into a single package with:
  * - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts)
  * - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts)
- * - Unified config files (package.json, tsconfig, tsup, api-extractor)
+ * - The app contract under `src/contract/` (index.ts, manifest.ts)
+ * - Unified config files (package.json, tsconfig, tsup, api-extractor), with a
+ *   second API Extractor config that reports the `./contract` subpath
  *
  * @param manifest - The app manifest
  * @param options - Generation options
@@ -145,6 +163,12 @@ export function generateClientPackage(
     }
   }
 
+  // --- Generate the app contract (its own subpath; imports only @macts/contracts) ---
+  const contractResult = generateContract(manifest)
+  files.push(...contractResult.files)
+  errors.push(...contractResult.errors)
+  const diagnostics = contractResult.diagnostics.map((diagnostic) => diagnostic.message)
+
   // --- Generate unified config files ---
   const unscopedName = options.clientPackageName.replace(/^@[^/]+\//, '')
 
@@ -173,6 +197,11 @@ export function generateClientPackage(
     content: generateApiExtractorConfig(),
   })
 
+  files.push({
+    path: CONTRACT_API_EXTRACTOR_CONFIG,
+    content: generateContractApiExtractorConfig(),
+  })
+
   files.push({ path: 'api-report/.gitkeep', content: '' })
 
   files.push({
@@ -184,6 +213,7 @@ export function generateClientPackage(
     dir: appName,
     files,
     errors,
+    ...(diagnostics.length > 0 ? { diagnostics } : {}),
   }
 }
 
@@ -214,23 +244,28 @@ function generatePackageJson(
         types: './dist/cli.d.ts',
         import: './dist/cli/index.js',
       },
+      './contract': {
+        types: './dist/contract/index.d.ts',
+        import: './dist/contract/index.js',
+      },
     },
     main: './dist/index.js',
     types: `./dist/${unscopedName}.d.ts`,
     files: ['dist'],
     engines: {
-      node: '>=22',
+      node: GENERATED_PACKAGE_NODE_ENGINE,
     },
     keywords: ['macts-sdk', 'macts-cli-plugin'],
     scripts: {
       build: 'tsup',
-      'api-extractor': 'api-extractor run --local',
-      'api-extractor:ci': 'api-extractor run',
+      'api-extractor': `api-extractor run --local && api-extractor run --local --config ${CONTRACT_API_EXTRACTOR_CONFIG}`,
+      'api-extractor:ci': `api-extractor run && api-extractor run --config ${CONTRACT_API_EXTRACTOR_CONFIG}`,
       lint: 'eslint src',
       test: 'vitest run',
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
+      '@macts/contracts': 'workspace:*',
       zod: 'catalog:',
     },
     peerDependencies: {
@@ -277,6 +312,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'cli/index': 'src/cli/index.ts',
+    'contract/index': 'src/contract/index.ts',
   },
   format: ['esm'],
   dts: true,
@@ -300,6 +336,37 @@ function generateApiExtractorConfig(): string {
       $schema:
         'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
       extends: '../../api-extractor.base.json',
+    },
+    null,
+    2
+  )
+}
+
+/**
+ * The API Extractor config for the contract entry. It reports the
+ * `./contract` declarations as `api-report/contract.api.md`. It neither rolls
+ * up declarations (the subpath's `types` is tsup's `dist/contract/index.d.ts`)
+ * nor writes a doc model, so the root entry's doc model stays the package's
+ * only one. tsup's declaration output places imports above the module's
+ * `@packageDocumentation` comment, which API Extractor reports as
+ * `ae-misplaced-package-tag`; the report does not use package documentation,
+ * so that message is silenced here.
+ */
+function generateContractApiExtractorConfig(): string {
+  return JSON.stringify(
+    {
+      $schema:
+        'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
+      extends: '../../api-extractor.base.json',
+      mainEntryPointFilePath: '<projectFolder>/dist/contract/index.d.ts',
+      apiReport: { reportFileName: 'contract.api.md' },
+      docModel: { enabled: false },
+      dtsRollup: { enabled: false },
+      messages: {
+        extractorMessageReporting: {
+          'ae-misplaced-package-tag': { logLevel: 'none' },
+        },
+      },
     },
     null,
     2

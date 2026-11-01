@@ -167,3 +167,92 @@ describe('resolveManifestRoutes', () => {
     expect(strings).not.toContain('calendar.events.create')
   })
 })
+
+/**
+ * Permission derivation. The expected strings follow the server's rule: the
+ * command's explicit `permission`, else `{app segment}:{scope}:{command key}`,
+ * where the scope is `app` for application commands and the resource route
+ * segment (lowercased plural, or `{type}s` for an unknown resource) otherwise.
+ */
+describe('ManifestRoute.permission', () => {
+  function routesFor(app: string, commandKey: string, command: Command) {
+    const fixture: AppManifest = { ...manifest, app: { ...manifest.app, name: app } }
+    return resolveCommandRoutes(fixture, commandKey, command)
+  }
+
+  it('derives app:app:commandKey for an application command', () => {
+    const command = manifest.commands['reloadCalendars']
+    if (!command) throw new Error('fixture missing reloadCalendars')
+    expect(resolveCommandRoutes(manifest, 'reloadCalendars', command)[0]?.permission).toBe(
+      'calendar:app:reloadCalendars'
+    )
+  })
+
+  it('derives the scope from the resource route segment and keys by command key, not name', () => {
+    const command = manifest.commands['createEvent']
+    if (!command) throw new Error('fixture missing createEvent')
+    expect(resolveCommandRoutes(manifest, 'createEvent', command)[0]?.permission).toBe(
+      'calendar:events:createEvent'
+    )
+  })
+
+  it('uses the hyphenated app segment for multi-word apps', () => {
+    const command: Command = {
+      name: 'reload',
+      description: 'Reload',
+      scope: 'application',
+      parameters: [],
+    }
+    expect(routesFor('Google Chrome', 'reload', command)[0]?.permission).toBe(
+      'google-chrome:app:reload'
+    )
+  })
+
+  it('derives one permission per targeted resource for a multi-resource command', () => {
+    const command: Command = {
+      name: 'refresh',
+      description: 'Refresh',
+      scope: 'resource',
+      resourceType: ['Calendar', 'Event'],
+      parameters: [],
+    }
+    expect(resolveCommandRoutes(manifest, 'refresh', command).map((r) => r.permission)).toEqual([
+      'calendar:calendars:refresh',
+      'calendar:events:refresh',
+    ])
+  })
+
+  it('falls back to the synthesized plural segment when the resource is unknown', () => {
+    const command: Command = {
+      name: 'archive',
+      description: 'Archive',
+      scope: 'resource',
+      resourceType: 'Widget',
+      parameters: [],
+    }
+    expect(resolveCommandRoutes(manifest, 'archive', command)[0]?.permission).toBe(
+      'calendar:widgets:archive'
+    )
+  })
+
+  it("prefers the command's explicit permission on every route", () => {
+    const command: Command = {
+      name: 'list',
+      description: 'List',
+      scope: 'resource',
+      resourceType: ['Calendar', 'Event'],
+      parameters: [],
+      permission: 'calendar:everything:read',
+    }
+    expect(resolveCommandRoutes(manifest, 'listAll', command).map((r) => r.permission)).toEqual([
+      'calendar:everything:read',
+      'calendar:everything:read',
+    ])
+  })
+
+  it('carries the permission through resolveManifestRoutes', () => {
+    const byRoute = new Map(resolveManifestRoutes(manifest).map((r) => [r.route, r.permission]))
+    expect(byRoute.get('calendar.calendars.list')).toBe('calendar:calendars:list')
+    expect(byRoute.get('calendar.app.reloadCalendars')).toBe('calendar:app:reloadCalendars')
+  })
+})

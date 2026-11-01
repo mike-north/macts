@@ -18,64 +18,7 @@ import type {
 } from './types.js'
 import { getResources, getResourceCommands, getAppCommands } from './context.js'
 import { generateResourceTool, generateAppTool } from './tools.js'
-
-/**
- * Reserved words that cannot be used as JS identifiers.
- */
-const RESERVED_WORDS = new Set([
-  'arguments',
-  'break',
-  'case',
-  'catch',
-  'class',
-  'const',
-  'continue',
-  'debugger',
-  'default',
-  'delete',
-  'do',
-  'else',
-  'enum',
-  'eval',
-  'export',
-  'extends',
-  'false',
-  'finally',
-  'for',
-  'function',
-  'if',
-  'implements',
-  'import',
-  'in',
-  'instanceof',
-  'interface',
-  'let',
-  'new',
-  'null',
-  'of',
-  'package',
-  'private',
-  'protected',
-  'public',
-  'return',
-  'static',
-  'super',
-  'switch',
-  'this',
-  'throw',
-  'true',
-  'try',
-  'typeof',
-  'var',
-  'void',
-  'while',
-  'with',
-  'yield',
-])
-
-function safeIdentifier(name: string): string {
-  return RESERVED_WORDS.has(name) ? `_${name}` : name
-}
+import { safeIdentifier } from '../surface.js'
 
 /**
  * Convert a hyphenated name to camelCase for use as a JS identifier.

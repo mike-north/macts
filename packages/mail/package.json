@@ -20,6 +20,10 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "import": "./dist/cli/index.js"
+    },
+    "./contract": {
+      "types": "./dist/contract/index.d.ts",
+      "import": "./dist/contract/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -28,7 +32,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "keywords": [
     "macts-sdk",
@@ -36,13 +40,14 @@
   ],
   "scripts": {
     "build": "tsup",
-    "api-extractor": "api-extractor run --local",
-    "api-extractor:ci": "api-extractor run",
+    "api-extractor": "api-extractor run --local && api-extractor run --local --config api-extractor.contract.json",
+    "api-extractor:ci": "api-extractor run && api-extractor run --config api-extractor.contract.json",
     "lint": "eslint src",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@macts/contracts": "workspace:*",
     "zod": "catalog:"
   },
   "peerDependencies": {

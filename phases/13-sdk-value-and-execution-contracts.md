@@ -621,6 +621,48 @@ authority.
 | `loadManifest(): Promise<unknown>`     | A lazy dynamic import of the generated manifest module. It is called only by the Mac-side runtime, which validates the result with `AppManifestSchema`, so remote clients never load it.                                |
 | `bind(runtime: ClientRuntime): Client` | A generated, fully type-checked function that maps positional SDK methods onto `runtime.invoke(descriptor, inputRecord)`                                                                                                |
 
+**Generated contract.** Each generated app package exports its contract at
+`@macts/<app>/contract`, alongside the `<PascalApp>Client` interface and the
+record, input, and enum types. The contract itself is named
+`<camelApp>Contract`, for example `notesContract`. The package root keeps the
+existing generated client until that client is retired, and the contract's
+names then move to the root. The contract depends only on `@macts/contracts`,
+and its manifest module is imported only by `loadManifest`.
+
+Manifest types map to value types as follows:
+
+- Resource-typed properties and parameters are references (D7). A `get`
+  returns the record, and a `list` returns an array of records.
+- `file` and `data` are file values in outputs and file sources in inputs
+  (D8).
+- Update inputs are optional at every field and non-nullable until
+  resettability exists (A4, D10).
+- A command with no declared result produces `none`.
+- A type name that matches no resource or enum becomes `unknown`, and the
+  generator reports it as a diagnostic.
+
+Generation diagnostics are warnings, not errors. `macts generate` prints each
+one to stderr as `warning: <app>: <position>: …` and still exits 0, and
+`scripts/regenerate.mjs` reports their total across apps. Only generation
+errors fail generation. The shipped manifests produce three: Finder's
+`iconViewOptions` and `columnViewOptions`, and System Events'
+`scriptingResult`.
+
+Each operation's permission comes from the manifest route, the same
+derivation the runtime uses, so the registration check holds by construction.
+A permission must have exactly three non-empty segments,
+`app:resource:operation`, because governance denies any other shape. A test
+checks, for every shipped manifest, that the routes agree with the HTTP
+router's own guards and introspection on the set of operations and on each
+permission.
+
+Each generated client package reports its `./contract` subpath in
+`api-report/contract.api.md`, using a second API Extractor config,
+`api-extractor.contract.json`, which the package's `api-extractor` scripts run
+after the root report. That config writes no declaration rollup (the
+subpath's types are the bundler's `dist/contract/index.d.ts`) and no doc
+model, so the API documentation still covers only the root entry.
+
 Factories supply the `ClientRuntime`: local backed by `@macts/runtime`, remote
 backed by HTTP. No proxies are used and no untyped path walking occurs.
 

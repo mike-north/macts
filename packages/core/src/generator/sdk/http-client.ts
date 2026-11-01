@@ -11,71 +11,24 @@ import type { AppManifest, Resource, Command } from '../../manifest/index.js'
 import type { PropertyType } from '../../manifest/schemas/property.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
+  normalizeResourceRouteSegment,
   resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
 } from '../../manifest/index.js'
 import { propertyTypeToTs } from '../types.js'
-
-/**
- * Reserved words in JavaScript/TypeScript that cannot be used as identifiers.
- */
-const RESERVED_WORDS = new Set([
-  'arguments',
-  'break',
-  'case',
-  'catch',
-  'class',
-  'const',
-  'continue',
-  'debugger',
-  'default',
-  'delete',
-  'do',
-  'else',
-  'enum',
-  'eval',
-  'export',
-  'extends',
-  'false',
-  'finally',
-  'for',
-  'function',
-  'if',
-  'implements',
-  'import',
-  'in',
-  'instanceof',
-  'interface',
-  'let',
-  'new',
-  'null',
-  'of',
-  'package',
-  'private',
-  'protected',
-  'public',
-  'return',
-  'static',
-  'super',
-  'switch',
-  'this',
-  'throw',
-  'true',
-  'try',
-  'typeof',
-  'var',
-  'void',
-  'while',
-  'with',
-  'yield',
-])
-
-/**
- * Make a name safe to use as a JavaScript identifier by prefixing reserved words.
- */
-function safeIdentifier(name: string): string {
-  return RESERVED_WORDS.has(name) ? `_${name}` : name
-}
+import {
+  appCommandEntries,
+  commandMethodParameters,
+  createInputFields,
+  findCrudCommand,
+  isCrudName,
+  listMethodParameters,
+  resolveIdParams,
+  resourceCommandEntries,
+  resourceHasOperations,
+  resourceNamespace,
+  safeIdentifier,
+} from '../surface.js'
 
 /**
  * Options for HTTP client SDK generation.
@@ -287,41 +240,21 @@ function generateTypesFile(manifest: AppManifest): string {
     }
     lines.push('')
 
-    // Generate create input type. The input is the union of the resource's
-    // writable properties and the backing create command's parameters. The
-    // command parameters are the single source of truth for what the server
-    // actually validates, so identifier parameters that are NOT writable
-    // properties (e.g. an Event's `calendarId`) must appear in the input —
-    // otherwise the create call cannot send the identifier the server requires.
-    const writableProps = Object.entries(resource.properties).filter(
-      ([_, prop]) => prop.access === 'rw'
-    )
-    const createCommand = findResourceCreateCommand(manifest, resourceName)
+    // Generate create input type: the resource's writable properties plus the
+    // backing create command's parameters (see `createInputFields`).
+    //
+    // A parameter's `type` is `string | Record<string, string>` from the schema.
+    // When it is an object it is structurally compatible with `PropertyType`
+    // (e.g. `{ enum: 'EventStatus' }`, `{ array: 'date' }`), so it is cast
+    // directly rather than falling back to 'string', which would widen enum and
+    // array types unnecessarily.
     const createFields = new Map<string, { tsType: string; required: boolean; doc: string }>()
-    for (const [propName, prop] of writableProps) {
-      createFields.set(propName, {
-        tsType: propertyTypeToTs(prop.type),
-        required: false,
-        doc: prop.description,
+    for (const [fieldName, field] of createInputFields(manifest, resourceName)) {
+      createFields.set(fieldName, {
+        tsType: propertyTypeToTs(field.type as PropertyType | undefined),
+        required: field.required,
+        doc: field.description,
       })
-    }
-    if (createCommand) {
-      for (const param of createCommand.parameters) {
-        // Command parameters override/augment writable properties. A required
-        // command parameter (typically an identifier like `calendarId`) is
-        // surfaced as a required field.
-        //
-        // `param.type` is `string | Record<string, string>` from the schema.
-        // When it is an object it is structurally compatible with `PropertyType`
-        // (e.g. `{ enum: 'EventStatus' }`, `{ array: 'date' }`), so we cast
-        // directly rather than falling back to 'string', which would widen
-        // enum and array types unnecessarily.
-        createFields.set(param.name, {
-          tsType: propertyTypeToTs(param.type as PropertyType),
-          required: param.required,
-          doc: param.description,
-        })
-      }
     }
 
     lines.push(`/** Input for creating a ${resourceName} */`)
@@ -481,23 +414,21 @@ function generateClientFile(
 
   const resourceProperties = operationalResources
     .map(([name, resource]) => {
-      const plural = resource.plural.toLowerCase()
       return `
   /** ${resource.description} */
-  readonly ${plural}: ${name}ResourceClient;`
+  readonly ${resourceNamespace(resource)}: ${name}ResourceClient;`
     })
     .join('\n')
 
   const resourceInitializers = operationalResources
     .map(([name, resource]) => {
-      const plural = resource.plural.toLowerCase()
-      return `    this.${plural} = new ${name}ResourceClient(this.#httpClient, '${appNameLower}', '${plural}');`
+      const routeSegment = normalizeResourceRouteSegment(resource.plural)
+      return `    this.${resourceNamespace(resource)} = new ${name}ResourceClient(this.#httpClient, '${appNameLower}', '${routeSegment}');`
     })
     .join('\n')
 
   // Generate app-level command methods
-  const appCommands = Object.entries(manifest.commands)
-    .filter(([_, cmd]) => cmd.scope === 'application')
+  const appCommands = appCommandEntries(manifest)
     .map(([key, cmd]) => generateAppCommandMethod(key, cmd, appNameLower))
     .join('\n\n')
 
@@ -633,77 +564,6 @@ function generateAppCommandMethod(commandKey: string, cmd: Command, appNameLower
 }
 
 /**
- * Standard CRUD operation names. A resource command's `name` field identifies
- * which CRUD shape (if any) it fulfils; the command's *key* in
- * `manifest.commands` is what addresses its route.
- */
-const CRUD_OPERATIONS = ['list', 'get', 'create', 'update', 'delete'] as const
-
-/**
- * Whether a command's `name` corresponds to a standard CRUD operation.
- */
-function isCrudName(name: string): name is (typeof CRUD_OPERATIONS)[number] {
-  return (CRUD_OPERATIONS as readonly string[]).includes(name)
-}
-
-/**
- * Whether a resource command applies to a given resource (matches its
- * `resourceType`, or applies to all resources when `resourceType` is omitted).
- */
-function commandAppliesToResource(cmd: Command, resourceName: string): boolean {
-  if (cmd.scope !== 'resource') return false
-  if (cmd.resourceType === undefined) return true
-  if (Array.isArray(cmd.resourceType)) return cmd.resourceType.includes(resourceName)
-  return cmd.resourceType === resourceName
-}
-
-/**
- * Whether a resource has at least one operation (CRUD or custom command) in the
- * manifest. Resources with no operations are omitted from the generated SDK
- * entirely — there is nothing to call, and an empty resource client would be
- * dead API surface.
- */
-export function resourceHasOperations(manifest: AppManifest, resourceName: string): boolean {
-  return Object.values(manifest.commands).some((cmd) => commandAppliesToResource(cmd, resourceName))
-}
-
-/**
- * Find the backing `create` command for a resource, if any. Used to augment the
- * resource's create-input type with the command's required identifier parameters.
- */
-function findResourceCreateCommand(
-  manifest: AppManifest,
-  resourceName: string
-): Command | undefined {
-  for (const cmd of Object.values(manifest.commands)) {
-    if (cmd.scope !== 'resource') continue
-    if (cmd.name !== 'create') continue
-    if (cmd.resourceType === undefined) return cmd
-    if (Array.isArray(cmd.resourceType)) {
-      if (cmd.resourceType.includes(resourceName)) return cmd
-    } else if (cmd.resourceType === resourceName) {
-      return cmd
-    }
-  }
-  return undefined
-}
-
-/**
- * Find the backing command (key + definition) for a CRUD operation on a
- * resource. The route is keyed by the command's manifest key (e.g.
- * `createEvent`), NOT by its `name` (`create`) — those differ for manifest-named
- * commands, and addressing by `name` is exactly what broke the structured write
- * path. Returns undefined when the manifest declares no such operation, so the
- * SDK omits the method instead of emitting an unreachable one.
- */
-function findCrudCommand(
-  resourceCommands: [string, Command][],
-  operation: (typeof CRUD_OPERATIONS)[number]
-): [string, Command] | undefined {
-  return resourceCommands.find(([, cmd]) => cmd.name === operation)
-}
-
-/**
  * Generate resource client file.
  */
 function generateResourceClient(
@@ -714,15 +574,7 @@ function generateResourceClient(
   const nameLower = resourceName.toLowerCase()
   const plural = resource.plural.toLowerCase()
 
-  // Find commands that apply to this resource
-  const resourceCommands = Object.entries(manifest.commands).filter(([_, cmd]) => {
-    if (cmd.scope !== 'resource') return false
-    if (!cmd.resourceType) return true
-    if (Array.isArray(cmd.resourceType)) {
-      return cmd.resourceType.includes(resourceName)
-    }
-    return cmd.resourceType === resourceName
-  })
+  const resourceCommands = resourceCommandEntries(manifest, resourceName)
 
   // Resolve the backing command for each CRUD shape so routes can be keyed by
   // the command's manifest key (the single source of truth shared with the
@@ -849,35 +701,6 @@ ${methodBody}
 }
 
 /**
- * Resolve the request *parameter* names for a get/update/delete command.
- *
- * Some commands have two required identifiers: a parent scope (e.g. `calendarId`
- * for getEvent/updateEvent/deleteEvent) and the child identifier (e.g. `id`).
- * The parent scope param is the first required param declared; the child id is
- * the last required param. When there is only one required param it is the child
- * identifier and there is no parent scope.
- *
- * The returned names MUST match exactly what the server's request schema (Zod)
- * validates — they are the same `command.parameters` entries the server's
- * `executeResourceCommand` reads to bind JXA lookup variables.
- *
- * @param command - The command definition for the CRUD operation.
- */
-function resolveIdParams(command: Command): {
-  parentParam: string | undefined
-  childParam: string
-} {
-  const requiredParams = command.parameters.filter((p) => p.required)
-  if (requiredParams.length >= 2) {
-    // First required = parent scope; last required = child identifier.
-    const parentParam = requiredParams[0]?.name
-    const childParam = requiredParams[requiredParams.length - 1]?.name ?? 'id'
-    return { parentParam, childParam }
-  }
-  return { parentParam: undefined, childParam: requiredParams[0]?.name ?? 'id' }
-}
-
-/**
  * Generate the `list` method, routed by the backing command's key.
  *
  * When the list command has required parameters (e.g. a parent `calendarId`),
@@ -887,8 +710,8 @@ function resolveIdParams(command: Command): {
  * parent resource.
  *
  * Identifier resolution follows the same unified path as other CRUD branches:
- * required parameters from the manifest command definition, read via
- * `buildParamsAndBody`, so SDK and server always agree on parameter names.
+ * required parameters from the manifest command definition (see
+ * `listMethodParameters`), so SDK and server always agree on parameter names.
  */
 function generateListMethod(
   commandKey: string,
@@ -896,9 +719,7 @@ function generateListMethod(
   resourceName: string,
   plural: string
 ): string {
-  // Collect only required parameters for the list signature (optional ones are
-  // not part of a standard list call and would complicate the API surface).
-  const requiredParams = command.parameters.filter((p) => p.required)
+  const requiredParams = listMethodParameters(command)
 
   if (requiredParams.length === 0) {
     return `
@@ -1067,30 +888,22 @@ function generateDeleteMethod(commandKey: string, command: Command, nameLower: s
 }
 
 /**
- * Build a method signature parameter list and request-body argument from a
- * command's declared parameters. Required parameters are sorted first; reserved
- * identifiers are made safe; the body forwards parameters under their manifest
- * names so the server schema validates them.
+ * Render a command method's signature and request-body argument from the shared
+ * surface derivation (`commandMethodParameters`).
  */
 function buildParamsAndBody(command: Command): { signature: string; bodyArg: string } {
-  const sortedParams = [...command.parameters].sort((a, b) => {
-    if (a.required && !b.required) return -1
-    if (!a.required && b.required) return 1
-    return 0
-  })
-  const signature = sortedParams
-    .map((p) => {
-      const tsType = propertyTypeToTs(p.type as PropertyType)
-      const optional = !p.required ? '?' : ''
-      return `${safeIdentifier(p.name)}${optional}: ${tsType}`
+  const { signature: signatureParams, body } = commandMethodParameters(command)
+  const signature = signatureParams
+    .map(({ parameter, bindingName, optional }) => {
+      const tsType = propertyTypeToTs(parameter.type as PropertyType)
+      return `${bindingName}${optional ? '?' : ''}: ${tsType}`
     })
     .join(', ')
 
-  const bodyProps = command.parameters
-    .map((p) => {
-      const safeName = safeIdentifier(p.name)
-      return safeName === p.name ? safeName : `'${p.name}': ${safeName}`
-    })
+  const bodyProps = body
+    .map(({ fieldName, bindingName }) =>
+      bindingName === fieldName ? bindingName : `'${fieldName}': ${bindingName}`
+    )
     .join(', ')
   const bodyArg = bodyProps ? `{ ${bodyProps} }` : '{}'
 

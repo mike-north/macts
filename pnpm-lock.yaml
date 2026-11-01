@@ -144,6 +144,9 @@ importers:
 
   packages/alfred:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -222,6 +225,9 @@ importers:
 
   packages/arc:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -272,6 +278,9 @@ importers:
 
   packages/automator:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -322,6 +331,9 @@ importers:
 
   packages/bluetooth-file-exchange:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -372,6 +384,9 @@ importers:
 
   packages/calendar:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -450,6 +465,9 @@ importers:
 
   packages/console:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -500,6 +518,9 @@ importers:
 
   packages/contacts:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -609,6 +630,9 @@ importers:
 
   packages/finder:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -659,6 +683,9 @@ importers:
 
   packages/google-chrome:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -709,6 +736,9 @@ importers:
 
   packages/iterm:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -759,6 +789,9 @@ importers:
 
   packages/mail:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -834,6 +867,9 @@ importers:
 
   packages/messages:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -884,6 +920,9 @@ importers:
 
   packages/microsoft-edge:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -934,6 +973,9 @@ importers:
 
   packages/microsoft-word:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -984,6 +1026,9 @@ importers:
 
   packages/music:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1034,6 +1079,9 @@ importers:
 
   packages/notes:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1084,6 +1132,9 @@ importers:
 
   packages/omnifocus:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1134,6 +1185,9 @@ importers:
 
   packages/omnigraffle:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1184,6 +1238,9 @@ importers:
 
   packages/omniplan:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1234,6 +1291,9 @@ importers:
 
   packages/photos:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1284,6 +1344,9 @@ importers:
 
   packages/preview:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1334,6 +1397,9 @@ importers:
 
   packages/quicktime-player:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1384,6 +1450,9 @@ importers:
 
   packages/reminders:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1468,6 +1537,9 @@ importers:
 
   packages/safari:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1518,6 +1590,9 @@ importers:
 
   packages/screen-sharing:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1568,6 +1643,9 @@ importers:
 
   packages/script-editor:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1735,6 +1813,9 @@ importers:
 
   packages/shortcuts:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1785,6 +1866,9 @@ importers:
 
   packages/spotify:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1835,6 +1919,9 @@ importers:
 
   packages/system-events:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1885,6 +1972,9 @@ importers:
 
   packages/system-information:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1935,6 +2025,9 @@ importers:
 
   packages/system-settings:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -1985,6 +2078,9 @@ importers:
 
   packages/terminal:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -2035,6 +2131,9 @@ importers:
 
   packages/textedit:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -2085,6 +2184,9 @@ importers:
 
   packages/tv:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -2147,6 +2249,9 @@ importers:
 
   packages/xcode:
     dependencies:
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       zod:
         specifier: 'catalog:'
         version: 4.3.6
