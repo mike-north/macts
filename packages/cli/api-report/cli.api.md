@@ -8,6 +8,8 @@ import { Cli } from 'clipanion';
 import * as clipanion from 'clipanion';
 import { Command } from 'clipanion';
 import { CommandClass } from 'clipanion';
+import { JxaRunner } from '@macts/core';
+import { NullabilityProbeEnvironment } from '@macts/core';
 import { VERSION } from '@macts/core';
 
 // @public
@@ -151,14 +153,20 @@ export interface PluginRegistrationResult {
 // @public
 export class ProbeCommand extends Command {
     app: string;
+    budgetSeconds: string | undefined;
     dryRun: boolean | undefined;
     // (undocumented)
     execute(): Promise<number>;
     json: boolean | undefined;
     manifestsDir: string | undefined;
+    maxItems: string | undefined;
+    nullability: boolean | undefined;
+    protected nullabilityEnvironment: NullabilityProbeEnvironment;
     // (undocumented)
     static paths: string[][];
     resource: string[] | undefined;
+    protected runner: JxaRunner;
+    skipProperty: string[] | undefined;
     // (undocumented)
     static usage: clipanion.Usage;
 }

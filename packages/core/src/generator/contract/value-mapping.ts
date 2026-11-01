@@ -57,6 +57,20 @@ export type ValueShape =
   | { readonly kind: 'enum'; readonly enumKey: string }
   | { readonly kind: 'array'; readonly item: ValueShape }
   | { readonly kind: 'reference'; readonly resourceKey: string }
+  | { readonly kind: 'nullable'; readonly inner: ValueShape }
+
+/**
+ * `shape`, or `null`. Nullability is decided by the caller from manifest
+ * evidence, never by the declared type, so it wraps an already mapped shape.
+ *
+ * @remarks
+ * An `unknown` value already admits `null`, so it is returned unchanged
+ * rather than wrapped; a shape that is already nullable is not wrapped twice.
+ */
+export function nullableShape(shape: ValueShape): ValueShape {
+  if (shape.kind === 'unknown' || shape.kind === 'nullable') return shape
+  return { kind: 'nullable', inner: shape }
+}
 
 /** The outcome of mapping one declared type. */
 export interface MappedType {
@@ -274,6 +288,8 @@ export class ValueRenderer {
         return `t.enumeration(${withOptions(this.#context.enumMembers(shape.enumKey))})`
       case 'array':
         return `t.array(${withOptions(this.expression(shape.item))})`
+      case 'nullable':
+        return `t.nullable(${withOptions(this.expression(shape.inner))})`
       case 'reference': {
         const typeArgs = this.#referenceTypeArguments(shape.resourceKey)
         const args = `() => ${this.#context.resourcesBinding}, ${stringLiteral(shape.resourceKey)}, 'one'`
@@ -313,8 +329,11 @@ export class ValueRenderer {
         return shape.enumKey
       case 'array': {
         const item = this.#sdkType(shape.item, visiting)
-        return `readonly ${item.startsWith('readonly ') ? `(${item})` : item}[]`
+        const grouped = item.startsWith('readonly ') || item.endsWith(' | null')
+        return `readonly ${grouped ? `(${item})` : item}[]`
       }
+      case 'nullable':
+        return `${this.#sdkType(shape.inner, visiting)} | null`
       case 'reference':
         return `${this.#use('ObjectReferenceVariant')}<${this.#referenceTypeArguments(shape.resourceKey, visiting)}>`
     }

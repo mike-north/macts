@@ -19,6 +19,9 @@
  * @see phases/13-sdk-value-and-execution-contracts.md §D7 (references and the resource table)
  * @see phases/13-sdk-value-and-execution-contracts.md §D8 (file values and file sources)
  * @see phases/13-sdk-value-and-execution-contracts.md §D9 (no passthrough plans in descriptors)
+ * @see phases/13-sdk-value-and-execution-contracts.md §A4 (nulls are data; updates reset with null)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D6 (issues name the field path)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value maps to null at nullable fields)
  */
 
 import { spawnSync } from 'node:child_process'
@@ -43,6 +46,8 @@ import {
   type ReferenceData,
   type ValuePlan,
 } from '@macts/contracts'
+import { NATIVE_CODEC, NATIVE_CODEC_ERROR_NAME } from '../../jxa/index.js'
+import { evaluatePrelude } from '../../jxa/test-support/native-harness.js'
 import { resolveManifestRoutes } from '../../manifest/index.js'
 import { loadManifest } from '../../manifest/loader.js'
 import { generateContract } from './index.js'
@@ -105,7 +110,8 @@ const client: JotterClient = jotterContract.bind(runtime)
 
 export async function usage(): Promise<void> {
   const note: Note = await client.notes.get('N1')
-  const folderId: Integer | undefined = note.folder.form === 'identity' ? note.folder.id : undefined
+  const folderId: Integer | undefined =
+    note.folder !== null && note.folder.form === 'identity' ? note.folder.id : undefined
   void folderId
   const notes: readonly Note[] = await client.notes.list({ signal: new AbortController().signal })
   void notes
@@ -116,9 +122,45 @@ export async function usage(): Promise<void> {
   await client.quit()
   await client.quit(true)
 
-  // @ts-expect-error -- an update field is never nullable, so null is not a reset
+  // Nullability (D10): read fields are nullable without evidence otherwise.
+  const created: Date | null = note.created
+  const noFolder: Note['folder'] = null
+  const noNotes: Folder['notes'] = null
+  const noPriority: Note['priority'] = null
+  void [created, noFolder, noNotes, noPriority]
+  const uid: string = note.uid
+  const title: string = note.title
+  const words: Integer = note.wordCount
+  void [uid, title, words]
+  // @ts-expect-error -- title is curated non-null
+  const untitled: Note['title'] = null
+  // @ts-expect-error -- wordCount was observed set in every item, so it is non-null
+  const noWords: Note['wordCount'] = null
+  // @ts-expect-error -- the primary identifier is never null
+  const noUid: Note['uid'] = null
+  void [untitled, noWords, noUid]
+
+  // Resettable update fields accept null, meaning reset; others do not.
+  await client.notes.update(Integer.validate(7), 'N1', { priority: null })
+  // @ts-expect-error -- rating has no verified reset, so null is not accepted
+  await client.notes.update(Integer.validate(7), 'N1', { rating: null })
+  // @ts-expect-error -- title has no verified reset, so null is not accepted
   const reset: NoteUpdateInput = { title: null }
   void reset
+
+  // Parameters accept null only with a claim.
+  await client.notes.archive('N1', null)
+  // @ts-expect-error -- noteId makes no nullability claim, so it does not accept null
+  await client.notes.archive(null)
+
+  // A command result is nullable by default; get and list results never are.
+  const total: Integer | null = await client.wordTotal()
+  void total
+  // @ts-expect-error -- the command result may be null
+  const sureTotal: Integer = await client.wordTotal()
+  void sureTotal
+  const listed: readonly Note[] = await client.notes.list()
+  void listed
   // @ts-expect-error -- the parent identifier is an Integer, not a plain number
   await client.notes.update(7, 'N1', {})
   // @ts-expect-error -- the identifier parameter is a string
@@ -228,6 +270,7 @@ describe('operations', () => {
     'jotter.folders.listFolders',
     'jotter.tags.listTags',
     'jotter.app.quit',
+    'jotter.app.wordTotal',
   ]
 
   it('are keyed by route string, one per manifest route', () => {
@@ -257,6 +300,7 @@ describe('operations', () => {
       'jotter.folders.listFolders': 'jotter:folders:listFolders',
       'jotter.tags.listTags': 'jotter:tags:listTags',
       'jotter.app.quit': 'jotter:app:quit',
+      'jotter.app.wordTotal': 'jotter:app:wordTotal',
     }
     expect(
       Object.fromEntries(
@@ -352,7 +396,8 @@ describe('resources', () => {
 
   it('reject identity references to a resource without an identifier, and accept selectors', () => {
     const folder = resourceRecord('Folder')
-    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [] }
+    // `color` is required and nullable: it must be present, and null is data (A4).
+    const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
     const byIdentity = {
       ...base,
       owner: { resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x' },
@@ -424,7 +469,13 @@ describe('bind', () => {
 
   it('has one namespace per resource with operations, named by plural', () => {
     const { client } = boundClient()
-    expect(Object.keys(objectAt(client, [])).sort()).toEqual(['folders', 'notes', 'quit', 'tags'])
+    expect(Object.keys(objectAt(client, [])).sort()).toEqual([
+      'folders',
+      'notes',
+      'quit',
+      'tags',
+      'wordTotal',
+    ])
     expect(Object.keys(objectAt(client, ['notes'])).sort()).toEqual([
       'archive',
       'create',
@@ -500,12 +551,44 @@ describe('encoding', () => {
     expect(record.decode({ ...NOTE_WIRE, priority: 'urgent' }, TEST_CONTEXT).ok).toBe(false)
   })
 
-  it('rejects null in an update input, since update fields are never reset by null', () => {
+  it('rejects null at an update field without a verified reset', () => {
     const input = operationAt('jotter.notes.updateNote').input
     expect(input.encode({ folderId: Integer.validate(7), noteId: 'N1', title: 'T' }).ok).toBe(true)
-    const result = input.encode({ folderId: Integer.validate(7), noteId: 'N1', title: null })
-    expect(result.ok).toBe(false)
-    expect(result.ok ? [] : result.issues.map((entry) => entry.path)).toEqual([['title']])
+    for (const field of ['title', 'rating']) {
+      const result = input.encode({ folderId: Integer.validate(7), noteId: 'N1', [field]: null })
+      expect(result.ok).toBe(false)
+      expect(result.ok ? [] : result.issues.map((entry) => entry.path)).toEqual([[field]])
+    }
+  })
+
+  it('sends null at a resettable update field, meaning reset (A4)', () => {
+    const input = operationAt('jotter.notes.updateNote').input
+    expect(input.encode({ folderId: Integer.validate(7), noteId: 'N1', priority: null })).toEqual({
+      ok: true,
+      value: { folderId: { integer: '7' }, noteId: 'N1', priority: null },
+    })
+  })
+
+  it('accepts null at a parameter that claims it, and rejects it elsewhere', () => {
+    const input = operationAt('jotter.notes.archive').input
+    expect(input.encode({ noteId: 'N1', until: null })).toEqual({
+      ok: true,
+      value: { noteId: 'N1', until: null },
+    })
+    expect(input.encode({ noteId: null }).ok).toBe(false)
+  })
+
+  it('decodes a missing value at a nullable read field as null, and rejects it at a non-null one', () => {
+    const record = resourceRecord('Note')
+    const decoded = objectAt(
+      valueOf(record.decode({ ...NOTE_WIRE, created: null }, TEST_CONTEXT)),
+      []
+    )
+    // A4: a present null stays an own property holding null.
+    expect(Object.hasOwn(decoded, 'created')).toBe(true)
+    expect(decoded['created']).toBeNull()
+    const rejected = record.decode({ ...NOTE_WIRE, wordCount: null }, TEST_CONTEXT)
+    expect(rejected.ok ? [] : rejected.issues.map((entry) => entry.path)).toEqual([['wordCount']])
   })
 
   it('omits an optional parameter forwarded as undefined', () => {
@@ -527,11 +610,56 @@ describe('encoding', () => {
       },
     })
     const attachment = fieldPlan(resourceRecord('Note').plan, 'attachment')
-    expect(attachment).toEqual({ presence: 'optional', value: { kind: 'file' } })
+    // A read field without evidence is nullable (D10), inside its optionality.
+    expect(attachment).toEqual({
+      presence: 'optional',
+      value: { kind: 'nullable', value: { kind: 'file' } },
+    })
     expect(fieldPlan(create.plan, 'attachment')).toEqual({
       presence: 'optional',
       value: { kind: 'file-source' },
     })
+  })
+})
+
+describe('the native boundary: a list with a missing value (the motivating case)', () => {
+  // A list read runs the operation's output plan through the native codec in
+  // the automation process (encode), then the client decodes the wire value
+  // against the same output type. A native "missing value" arrives as null.
+  const native = evaluatePrelude(NATIVE_CODEC.prelude)
+  const list = (): AnyOperationDescriptor => operationAt('jotter.tags.listTags')
+
+  it('keeps a null at a default (nullable) field for that item, and every other item intact', () => {
+    const items = [
+      { label: 'Home', name: 'home' },
+      { label: null, name: 'work' },
+      { label: 'Later', name: 'later' },
+    ]
+    // The wire value leaves the automation process as JSON text.
+    const wire: unknown = JSON.parse(JSON.stringify(native.encode(items, list().output.plan)))
+    expect(wire).toEqual(items)
+    expect(valueOf(list().output.decode(wire, TEST_CONTEXT))).toEqual(items)
+  })
+
+  it('fails at a curated non-null field, naming the item and field', () => {
+    const items = [
+      { label: 'Home', name: 'home' },
+      { label: 'Work', name: null },
+    ]
+    let thrown: unknown
+    try {
+      native.encode(items, list().output.plan)
+    } catch (error) {
+      thrown = error
+    }
+    expect(thrown).toMatchObject({
+      name: NATIVE_CODEC_ERROR_NAME,
+      direction: 'encode',
+      path: [1, 'name'],
+    })
+    // The client rejects the same value at the same path, whichever side sees it first.
+    const decoded = list().output.decode(items, TEST_CONTEXT)
+    expect(decoded.ok ? [] : decoded.issues.map((entry) => entry.path)).toEqual([[1, 'name']])
   })
 })
 

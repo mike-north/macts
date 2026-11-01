@@ -13,7 +13,8 @@
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D1 (generated packages depend only on @macts/contracts)
  * @see phases/13-sdk-value-and-execution-contracts.md §D2 (descriptors, AppContract)
- * @see phases/13-sdk-value-and-execution-contracts.md §A4 (presence and updates)
+ * @see phases/13-sdk-value-and-execution-contracts.md §A4 (presence, nullability, and updates)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value; evidence-based nullability)
  */
 
 import { readdir } from 'node:fs/promises'
@@ -119,31 +120,95 @@ describe('generateContract: dependency boundary', () => {
 })
 
 describe('generateContract: records', () => {
-  it('marks read-only properties readonly, and optional properties optional', () => {
+  it('marks read-only properties readonly, optional properties optional, and documents nullability', () => {
+    // Read fields are nullable unless there is evidence otherwise (D10): the
+    // identifier by structure, `title` by curation, `wordCount` by a probe
+    // with no empty value in 40 reads.
     expect(contract).toContain(`export interface Note {
-  /** The note's unique identifier */
+  /**
+   * The note's unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly uid: string
-  /** The note's title */
+  /**
+   * The note's title.
+   * Never null: Jotter refuses to save a note without a title.
+   */
   title: string
-  /** How urgent the note is */
-  priority?: Priority`)
-    expect(contract).toContain('  readonly attachment?: FileValue\n')
-    expect(contract).toContain('  readonly folder: ObjectReferenceVariant<Folder, Integer>\n')
+  /**
+   * How urgent the note is.
+   * Nullable. No evidence that the app always sets it.
+   */
+  priority?: Priority | null
+  /**
+   * The folder holding the note.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly folder: ObjectReferenceVariant<Folder, Integer> | null
+  /**
+   * The note's attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly attachment?: FileValue | null
+  /**
+   * When the note was created.
+   * Nullable. Observed missing in 3 of 40 items (Jotter 2.1, macOS 27.2, 2026-10-31).
+   */
+  readonly created: Date | null
+  /**
+   * How many words the note has.
+   * Never null: observed in all 40 items (Jotter 2.1, macOS 27.2, 2026-10-31).
+   */
+  readonly wordCount: Integer
+  /**
+   * The note's rating.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rating?: number | null
+}`)
   })
 
-  it('composes each record from the property value types, wrapping optional ones', () => {
+  it('types a nullable list and a dictionary-declared nullable field', () => {
+    expect(contract).toContain(`  /**
+   * The notes in the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly notes: readonly ObjectReferenceVariant<Note, string>[] | null
+`)
+    expect(contract).toContain(`  /**
+   * The folder's color.
+   * Nullable: declared by the app's scripting dictionary.
+   */
+  readonly color: string | null
+`)
+  })
+
+  it('composes each record from the property value types: nullable inside optional', () => {
     expect(contract).toContain('const noteRecordType: ValueType<Note> = t.record({')
     expect(contract).toContain(
-      "  priority: t.optional(t.enumeration(priorityMembers, { description: 'How urgent the note is' })),"
+      "  uid: t.string({ description: 'The note\\'s unique identifier' }),"
+    )
+    expect(contract).toContain("  title: t.string({ description: 'The note\\'s title' }),")
+    expect(contract).toContain(
+      "  priority: t.optional(t.nullable(t.enumeration(priorityMembers), { description: 'How urgent the note is' })),"
     )
     expect(contract).toContain(
-      "  folder: t.reference<Folder, Integer>(() => resources, 'Folder', 'one', { description: 'The folder holding the note' }),"
+      "  folder: t.nullable(t.reference<Folder, Integer>(() => resources, 'Folder', 'one'), { description: 'The folder holding the note' }),"
     )
     expect(contract).toContain(
-      "  notes: t.array(t.reference<Note, string>(() => resources, 'Note', 'one'), { description: 'The notes in the folder' }),"
+      "  notes: t.nullable(t.array(t.reference<Note, string>(() => resources, 'Note', 'one')), { description: 'The notes in the folder' }),"
     )
     expect(contract).toContain(
-      "  attachment: t.optional(t.file({ description: 'The note\\'s attachment' })),"
+      "  attachment: t.optional(t.nullable(t.file(), { description: 'The note\\'s attachment' })),"
+    )
+    expect(contract).toContain(
+      "  created: t.nullable(t.date(), { description: 'When the note was created' }),"
+    )
+    expect(contract).toContain(
+      "  wordCount: t.integer({ description: 'How many words the note has' }),"
+    )
+    expect(contract).toContain(
+      "  color: t.nullable(t.string(), { description: 'The folder\\'s color' }),"
     )
     expect(contract).toContain("}, { description: 'A note' })")
   })
@@ -152,18 +217,17 @@ describe('generateContract: records', () => {
     expect(contract).toContain("export type Priority = 'low' | 'high'\n")
     expect(contract).toContain("const priorityMembers = ['low', 'high'] as const\n")
   })
-
-  it('has no nullable values: nullability is not part of this contract', () => {
-    expect(contract).not.toContain('t.nullable(')
-    expect(contract).not.toContain('| null')
-  })
 })
 
 describe('generateContract: inputs', () => {
-  it('builds the create input from writable properties then create parameters', () => {
+  it('builds the create input from writable properties then create parameters, never nullable', () => {
     // title (rw), priority (rw), rating (rw), then createNote's folderId
     // (required), title (required; overrides the property), attachment (a file
-    // source, optional).
+    // source, optional). Create inputs are never nullable in this slice
+    // (phases/13 §D10): a property's `nullable` claim describes what reads
+    // return, not what a create accepts, and no claim kind for create inputs
+    // exists yet. So even `priority`, nullable on read and resettable on
+    // update, takes no null here.
     expect(contract).toContain(`export interface NoteCreateInput {
   /** The new note's title */
   title: string
@@ -176,23 +240,80 @@ describe('generateContract: inputs', () => {
   /** A file to attach */
   attachment?: FileSource
 }`)
+    expect(contract).toContain(
+      "  priority: t.optional(t.enumeration(priorityMembers, { description: 'How urgent the note is' })),"
+    )
   })
 
-  it('makes every update field optional and non-nullable, without the positional identifiers', () => {
+  it('makes every update field optional, nullable only where a reset is verified', () => {
     expect(contract).toContain(`export interface NoteUpdateInput {
-  /** The new note's title */
+  /**
+   * The new note's title.
+   * Cannot be reset: null is rejected.
+   */
   title?: string
-  /** How urgent the note is */
-  priority?: Priority
-  /** The note's rating */
+  /**
+   * How urgent the note is.
+   * Set to null to reset: jotter-reset.test.ts clears the priority of a scratch note (Jotter 2.1).
+   */
+  priority?: Priority | null
+  /**
+   * The note's rating.
+   * Cannot be reset: null is rejected.
+   */
   rating?: number
-  /** A file to attach */
+  /**
+   * A file to attach.
+   * Cannot be reset: null is rejected.
+   */
   attachment?: FileSource
 }`)
   })
 
+  it('composes a resettable update field as optional of nullable', () => {
+    expect(contract).toMatch(
+      /const noteUpdateNoteOperation: OperationDescriptor<\{ readonly folderId: Integer; readonly noteId: string; readonly title\?: string \| undefined; readonly priority\?: Priority \| null \| undefined; readonly rating\?: number \| undefined; readonly attachment\?: FileSource \| undefined \}, Note> = \{/
+    )
+    expect(contract).toContain(
+      "    priority: t.optional(t.nullable(t.enumeration(priorityMembers), { description: 'How urgent the note is' })),"
+    )
+    expect(contract).toContain(
+      "    rating: t.optional(t.double({ description: 'The note\\'s rating' })),"
+    )
+  })
+
   it('declares an input with no fields as an empty record', () => {
     expect(contract).toContain('export type TagCreateInput = Record<string, never>\n')
+  })
+})
+
+describe('generateContract: parameters', () => {
+  it('accepts null only at a parameter that claims it, composed inside optional', () => {
+    expect(contract).toContain(
+      'const noteArchiveOperation: OperationDescriptor<{ readonly noteId: string; readonly until?: Date | null | undefined }, undefined> = {'
+    )
+    expect(contract).toContain("    noteId: t.string({ description: 'The note to archive' }),")
+    expect(contract).toContain(
+      "    until: t.optional(t.nullable(t.date(), { description: 'When to unarchive it' })),"
+    )
+  })
+
+  it('documents each parameter with its nullability', () => {
+    expect(contract).toContain(`  /**
+   * Archive a note
+   *
+   * @param noteId - The note to archive. Does not accept null.
+   * @param until - When to unarchive it. Accepts null: null keeps the note archived indefinitely.
+   */
+  archive(noteId: string, until?: Date | null, options?: CallOptions): Promise<void>
+`)
+    expect(contract).toContain(`  /**
+   * Read the note identified by \`noteId\`.
+   *
+   * @param noteId - The note to read. Does not accept null.
+   */
+  get(noteId: string, options?: CallOptions): Promise<Note>
+`)
   })
 })
 
@@ -234,6 +355,30 @@ describe('generateContract: operations', () => {
     expect(contract).toMatch(/noteArchiveOperation: OperationDescriptor<[^\n]*, undefined> = \{/)
   })
 
+  it('never makes a get or list result nullable: a missing target fails, and a list is an array', () => {
+    // D7 / A4: get returns the record and list an array of records.
+    expect(contract).toMatch(/noteGetNoteOperation: OperationDescriptor<[^\n]*, Note> = \{/)
+    expect(contract).toMatch(
+      /noteListNotesOperation: OperationDescriptor<[^\n]*, readonly Note\[\]> = \{/
+    )
+    expect(contract).not.toMatch(/output: t\.nullable\(t\.array\(/)
+    expect(contract).not.toMatch(/output: t\.nullable\(\w+RecordType/)
+  })
+
+  it('makes a command result nullable by default, and says so', () => {
+    expect(contract).toContain(
+      'const appWordTotalOperation: OperationDescriptor<Record<string, never>, Integer | null> = {'
+    )
+    expect(contract).toContain('  output: t.nullable(t.integer()),')
+    expect(contract).toContain(`  /**
+   * Count the words in every note
+   *
+   * @returns Nullable. No evidence that the app always returns a value.
+   */
+  wordTotal(options?: CallOptions): Promise<Integer | null>
+`)
+  })
+
   it('tables every operation by route', () => {
     expect(contract).toContain("  'jotter.notes.getNote': noteGetNoteOperation,")
     expect(contract).toContain("  'jotter.app.quit': appQuitOperation,")
@@ -270,7 +415,7 @@ describe('generateContract: client', () => {
     )
     expect(contract).toContain('  delete(noteId: string, options?: CallOptions): Promise<void>\n')
     expect(contract).toContain(
-      '  archive(noteId: string, until?: Date, options?: CallOptions): Promise<void>\n'
+      '  archive(noteId: string, until?: Date | null, options?: CallOptions): Promise<void>\n'
     )
     expect(contract).toContain('  quit(saving?: boolean, options?: CallOptions): Promise<void>\n')
   })
@@ -285,6 +430,49 @@ describe('generateContract: client', () => {
     expect(contract).toContain(
       '    quit: (saving, options) => runtime.invoke(appQuitOperation, { saving }, options),'
     )
+  })
+})
+
+describe('generateContract: identifier nullability', () => {
+  it('keeps the primary identifier non-null and reports a contrary claim', () => {
+    const manifest = jotterManifest()
+    const uid = manifest.resources['Note']?.properties['uid']
+    if (uid === undefined) throw new Error('fixture has no Note.uid')
+    uid.nullable = true
+    uid.evidence = {
+      nullable: {
+        source: 'probe',
+        observedAt: '2026-10-31T12:00:00.000Z',
+        bundleId: 'com.example.jotter',
+        appVersion: '2.1',
+        osVersion: '27.2',
+        sampleSize: 40,
+        nullCount: 1,
+        failedReads: 0,
+      },
+    }
+    const generated = generateContract(manifest)
+    const text = moduleText(generated, CONTRACT_MODULE_PATH)
+    expect(text).toContain(`  /**
+   * The note's unique identifier.
+   * Never null: the primary identifier.
+   */
+  readonly uid: string
+`)
+    expect(generated.diagnostics).toEqual([
+      {
+        kind: 'identifier-nullability-ignored',
+        app: 'jotter',
+        position: 'resources.Note.properties.uid',
+        evidence: uid.evidence.nullable,
+        message:
+          'jotter: resources.Note.properties.uid: the primary identifier is never null, so its nullability claim (probe evidence) is ignored; if the identifier can be empty, choose a different identifier.',
+      },
+    ])
+  })
+
+  it('reports nothing for the unmodified fixture', () => {
+    expect(jotter.diagnostics).toEqual([])
   })
 })
 
@@ -397,19 +585,29 @@ describe('real app manifests', () => {
     // uses an unresolvable bare type name.
     const found = apps
       .flatMap(({ manifest }) => collectContractDiagnostics(manifest))
-      .map(({ app, position, type }) => ({ app, position, type }))
+      .map((diagnostic) => ({
+        kind: diagnostic.kind,
+        app: diagnostic.app,
+        position: diagnostic.position,
+        type: diagnostic.kind === 'unresolved-type' ? diagnostic.type : undefined,
+      }))
+    // No shipped manifest makes a nullability claim yet, so the only
+    // diagnostics are unresolved types.
     expect(found).toEqual([
       {
+        kind: 'unresolved-type',
         app: 'finder',
         position: 'resources.FinderWindow.properties.iconViewOptions',
         type: { resource: 'icon view options' },
       },
       {
+        kind: 'unresolved-type',
         app: 'finder',
         position: 'resources.FinderWindow.properties.columnViewOptions',
         type: { resource: 'column view options' },
       },
       {
+        kind: 'unresolved-type',
         app: 'system-events',
         position: 'resources.ScriptingCommand.properties.scriptingResult',
         type: { resource: 'scripting result object' },

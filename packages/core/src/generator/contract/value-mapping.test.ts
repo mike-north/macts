@@ -10,6 +10,7 @@
  * @see phases/13-sdk-value-and-execution-contracts.md §D2 (SDK types)
  * @see phases/13-sdk-value-and-execution-contracts.md §D7 (reference value types, ReferenceList)
  * @see phases/13-sdk-value-and-execution-contracts.md §D8 (file values at outputs, file sources at inputs)
+ * @see phases/13-sdk-value-and-execution-contracts.md §A4, §D10 (nullability: `null` as data)
  */
 
 import { describe, expect, it } from 'vitest'
@@ -20,6 +21,7 @@ import {
   createNameResolver,
   mapDeclaredType,
   normalizeTypeName,
+  nullableShape,
   stringLiteral,
   type ValuePosition,
   type ValueShape,
@@ -254,6 +256,54 @@ describe('arrays', () => {
       't.array(t.array(t.string()))',
       'readonly (readonly string[])[]'
     )
+  })
+})
+
+describe('nullable shapes', () => {
+  it('render as t.nullable(…) and T | null, with the description on the nullable', () => {
+    const r = renderer()
+    const shape = nullableShape({ kind: 'date' })
+    expect(r.expression(shape)).toBe('t.nullable(t.date())')
+    expect(r.expression(shape, 'When')).toBe("t.nullable(t.date(), { description: 'When' })")
+    expect(r.sdkType(shape)).toBe('Date | null')
+  })
+
+  it('wrap lists and references whole: a nullable list is not a list of nullables', () => {
+    const r = renderer()
+    const list = nullableShape({
+      kind: 'array',
+      item: { kind: 'reference', resourceKey: 'Window' },
+    })
+    expect(r.expression(list)).toBe(
+      "t.nullable(t.array(t.reference<Window, Integer>(() => resources, 'Window', 'one')))"
+    )
+    expect(r.sdkType(list)).toBe('readonly ObjectReferenceVariant<Window, Integer>[] | null')
+    const reference = nullableShape({ kind: 'reference', resourceKey: 'Tag' })
+    expect(r.sdkType(reference)).toBe('ObjectReferenceVariant<Tag, never> | null')
+  })
+
+  it('parenthesize a nullable array item in the SDK type', () => {
+    const r = renderer()
+    const shape: ValueShape = { kind: 'array', item: nullableShape({ kind: 'string' }) }
+    expect(r.sdkType(shape)).toBe('readonly (string | null)[]')
+  })
+
+  it('apply to enums, booleans, and numbers alike', () => {
+    const r = renderer()
+    expect(r.sdkType(nullableShape({ kind: 'enum', enumKey: 'SaveOption' }))).toBe(
+      'SaveOption | null'
+    )
+    expect(r.sdkType(nullableShape({ kind: 'boolean' }))).toBe('boolean | null')
+    expect(r.sdkType(nullableShape({ kind: 'integer' }))).toBe('Integer | null')
+  })
+
+  it('leave unknown unwrapped, since unknown already admits null', () => {
+    expect(nullableShape({ kind: 'unknown' })).toEqual({ kind: 'unknown' })
+  })
+
+  it('never wrap twice', () => {
+    const once = nullableShape({ kind: 'string' })
+    expect(nullableShape(once)).toBe(once)
   })
 })
 

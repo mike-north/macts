@@ -22,11 +22,23 @@
  * @packageDocumentation
  */
 
-import type { AppManifest, Command, CommandParameter, Resource } from '../../manifest/index.js'
+import type {
+  AppManifest,
+  Command,
+  CommandParameter,
+  NullabilityEvidence,
+  NullabilityResolution,
+  Property,
+  Resource,
+} from '../../manifest/index.js'
 import {
+  ignoredIdentifierNullability,
   normalizeAppRouteSegment,
   resolveManifestRoutes,
+  resolveParameterNullability,
   resolvePrimaryIdentifierProperty,
+  resolveReadNullability,
+  resolveResettability,
   type ManifestRoute,
 } from '../../manifest/index.js'
 import {
@@ -48,6 +60,7 @@ import {
   ValueRenderer,
   createNameResolver,
   mapDeclaredType,
+  nullableShape,
   stringLiteral,
   type ContractTypeName,
   type NameResolver,
@@ -61,24 +74,41 @@ export const CONTRACT_MODULE_PATH = 'src/contract/index.ts'
 /** The package-relative path of the generated manifest data module. */
 export const CONTRACT_MANIFEST_MODULE_PATH = 'src/contract/manifest.ts'
 
-/**
- * A manifest type the contract could not resolve, so it is `unknown` in the
- * contract.
- */
-export interface ContractDiagnostic {
+/** What every contract diagnostic carries. */
+interface ContractDiagnosticBase {
   /** The app's route segment. */
   readonly app: string
   /**
-   * Where the type is declared, as a manifest path, e.g.
+   * Where the finding is, as a manifest path, e.g.
    * `resources.FinderWindow.properties.iconViewOptions` or
    * `commands.open.parameters.target`.
    */
   readonly position: string
-  /** The declared type, as the manifest states it. */
-  readonly type: unknown
   /** A one-line description of the finding. */
   readonly message: string
 }
+
+/**
+ * Something generation tolerated but a manifest author should fix:
+ *
+ * - `unresolved-type`: a manifest type names no resource or enum, so the
+ *   contract describes it as `unknown`.
+ * - `identifier-nullability-ignored`: the manifest claims nullability for a
+ *   resource's primary identifier property. The contract keeps the identifier
+ *   non-null, since a reference cannot exist without it; evidence that it is
+ *   sometimes empty means the identifier choice is wrong.
+ */
+export type ContractDiagnostic =
+  | (ContractDiagnosticBase & {
+      readonly kind: 'unresolved-type'
+      /** The declared type, as the manifest states it. */
+      readonly type: unknown
+    })
+  | (ContractDiagnosticBase & {
+      readonly kind: 'identifier-nullability-ignored'
+      /** The ignored claim's evidence. */
+      readonly evidence: NullabilityEvidence
+    })
 
 /** The generated contract modules and what generation found. */
 export interface GeneratedContract {
@@ -132,7 +162,9 @@ export function lowerCamel(name: string): string {
 
 /**
  * Report every manifest type that does not resolve, once per declaration
- * site: resource properties, command parameters, and command results.
+ * site (resource properties, command parameters, and command results), and
+ * every nullability claim on a primary identifier property, which the
+ * contract ignores.
  */
 export function collectContractDiagnostics(manifest: AppManifest): ContractDiagnostic[] {
   const app = normalizeAppRouteSegment(manifest.app.name)
@@ -141,6 +173,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
   const check = (type: DeclaredType, position: string): void => {
     if (mapDeclaredType(type, 'output', names).resolved) return
     diagnostics.push({
+      kind: 'unresolved-type',
       app,
       position,
       type,
@@ -149,7 +182,18 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
   }
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
     for (const [propName, prop] of Object.entries(resource.properties)) {
-      check(prop.type, `resources.${resourceKey}.properties.${propName}`)
+      const position = `resources.${resourceKey}.properties.${propName}`
+      check(prop.type, position)
+      const evidence = ignoredIdentifierNullability(resource, propName, prop)
+      if (evidence !== undefined) {
+        diagnostics.push({
+          kind: 'identifier-nullability-ignored',
+          app,
+          position,
+          evidence,
+          message: `${app}: ${position}: the primary identifier is never null, so its nullability claim (${evidence.source} evidence) is ignored; if the identifier can be empty, choose a different identifier.`,
+        })
+      }
     }
   }
   for (const [commandKey, command] of Object.entries(manifest.commands)) {
@@ -206,9 +250,16 @@ export const manifest: unknown = ${JSON.stringify(manifest, null, 2)}
 /** One field of a generated record type (a record, an input, or a request). */
 interface FieldModel {
   readonly name: string
+  /** The field's value composition, nullability included. */
   readonly shape: ValueShape
   readonly optional: boolean
+  /** The manifest's description, which the value type also carries. */
   readonly description: string
+  /**
+   * The field's nullability and its basis, in user-facing words, for the
+   * field's doc comment only (after the description).
+   */
+  readonly nullabilityNote?: string
 }
 
 /** How an operation's input is typed in its descriptor. */
@@ -248,7 +299,11 @@ interface MethodModel {
     readonly binding: string
     readonly type: string
     readonly optional: boolean
+    /** The `@param` text, for a parameter the manifest declares. */
+    readonly doc?: string
   }[]
+  /** The `@returns` text, for a result that needs explaining. */
+  readonly returnsDoc?: string
   readonly returnType: string
   readonly operation: OperationModel
   /** How the method builds the input record from its arguments. */
@@ -463,13 +518,40 @@ class ContractBuilder {
     return { kind: 'fields', fields: [...fields.values()] }
   }
 
+  /**
+   * A request field for a command parameter. It accepts `null` only when the
+   * manifest claims so, with evidence (inputs default to non-null).
+   */
   #parameterField(param: CommandParameter): FieldModel {
+    const resolution = resolveParameterNullability(param)
+    const shape = this.#map(param.type, 'input')
     return {
       name: param.name,
-      shape: this.#map(param.type, 'input'),
+      shape: resolution.nullable ? nullableShape(shape) : shape,
       optional: !param.required,
       description: param.description,
+      nullabilityNote: parameterNullabilityNote(resolution, this.#manifest.app.name),
     }
+  }
+
+  /**
+   * The fields of a resource's record, the read position: each property is
+   * nullable unless there is evidence that the app always sets it (see
+   * `resolveReadNullability`), and optional when the manifest says so.
+   */
+  #recordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
+    return Object.entries(resource.properties).map(([name, prop]) => {
+      const resolution = resolveReadNullability(resource, name, prop)
+      const shape = this.#map(prop.type, 'output')
+      return {
+        name,
+        shape: resolution.nullable ? nullableShape(shape) : shape,
+        optional: prop.optional,
+        description: prop.description,
+        nullabilityNote: readNullabilityNote(resolution, this.#manifest.app.name),
+        readOnly: prop.access === 'r',
+      }
+    })
   }
 
   /**
@@ -489,7 +571,11 @@ class ContractBuilder {
     return parentParam === undefined ? [field(childParam)] : [field(parentParam), field(childParam)]
   }
 
-  /** The create input fields of a resource. */
+  /**
+   * The create input fields of a resource. They are never nullable (D10): a
+   * property's `nullable` claim describes reads, not what a create accepts,
+   * and there is no claim kind for create inputs.
+   */
   #createInputFields(resourceKey: string): FieldModel[] {
     return [...createInputFields(this.#manifest, resourceKey)].map(([name, field]) => ({
       name,
@@ -501,8 +587,10 @@ class ContractBuilder {
 
   /**
    * The update input fields of a resource: every create input field except the
-   * identifiers the update command takes positionally, all optional and never
-   * nullable, so an omitted field is unchanged and `null` is not a reset.
+   * identifiers the update command takes positionally, all optional, so an
+   * omitted field is unchanged. A field accepts `null`, meaning "reset", only
+   * when the property of that name is verified resettable; elsewhere `null` is
+   * rejected rather than attempted.
    */
   #updateInputFields(resourceKey: string): FieldModel[] {
     const update = findCrudCommand(resourceCommandEntries(this.#manifest, resourceKey), 'update')
@@ -512,9 +600,22 @@ class ContractBuilder {
       positional.add(childParam)
       if (parentParam !== undefined) positional.add(parentParam)
     }
+    const properties: Readonly<Record<string, Property>> =
+      this.#manifest.resources[resourceKey]?.properties ?? {}
     return this.#createInputFields(resourceKey)
       .filter((field) => !positional.has(field.name))
-      .map((field) => ({ ...field, optional: true }))
+      .map((field) => {
+        const property = Object.hasOwn(properties, field.name) ? properties[field.name] : undefined
+        const reset = property === undefined ? undefined : resolveResettability(property)
+        return reset === undefined
+          ? { ...field, optional: true, nullabilityNote: 'Cannot be reset: null is rejected.' }
+          : {
+              ...field,
+              shape: nullableShape(field.shape),
+              optional: true,
+              nullabilityNote: `Set to null to reset: ${curatedBasis(this.#manifest.app.name, reset)}`,
+            }
+      })
   }
 
   #outputModel(route: ManifestRoute): OutputModel {
@@ -536,10 +637,14 @@ class ContractBuilder {
           return { kind: 'none' }
       }
     }
+    // A command's result is an output, so it is nullable by default, like a
+    // read field: a manifest has no evidence that a command always returns a
+    // value. (CRUD results above are never nullable: a missing target fails
+    // the operation, and a list is an array, possibly empty.)
     const returns = route.command.returns
     return returns === undefined
       ? { kind: 'none' }
-      : { kind: 'value', shape: this.#map(returns, 'output') }
+      : { kind: 'value', shape: nullableShape(this.#map(returns, 'output')) }
   }
 
   #deriveNamespaces(): NamespaceModel[] {
@@ -584,6 +689,7 @@ class ContractBuilder {
       binding: safeIdentifier(field.name),
       type: this.#renderer.sdkType(field.shape),
       optional: false,
+      doc: fieldDoc(field, ' '),
     }))
   }
 
@@ -677,12 +783,19 @@ class ContractBuilder {
     return {
       name: safeIdentifier(command.name),
       doc: command.description,
-      params: signature.map(({ parameter, bindingName, optional }) => ({
-        binding: bindingName,
-        type: this.#renderer.sdkType(this.#map(parameter.type, 'input')),
-        optional,
-      })),
+      params: signature.map(({ parameter, bindingName, optional }) => {
+        const field = this.#parameterField(parameter)
+        return {
+          binding: bindingName,
+          type: this.#renderer.sdkType(field.shape),
+          optional,
+          doc: fieldDoc(field, ' '),
+        }
+      }),
       returnType: output.kind === 'none' ? 'void' : this.#outputType(output),
+      ...(output.kind === 'value' && output.shape.kind === 'nullable'
+        ? { returnsDoc: RESULT_NULLABILITY_NOTE }
+        : {}),
       operation,
       body: {
         kind: 'fields',
@@ -752,14 +865,14 @@ class ContractBuilder {
 
   #renderRecordInterfaces(): string[] {
     return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
-      const props = Object.entries(resource.properties)
+      const fields = this.#recordFields(resource)
       const doc = docComment(resource.description, '')
-      if (props.length === 0) return `${doc}export type ${resourceKey} = Record<string, never>\n`
-      const lines = props.map(([propName, prop]) => {
-        const readonly = prop.access === 'r' ? 'readonly ' : ''
-        const optional = prop.optional ? '?' : ''
-        const type = this.#renderer.sdkType(this.#map(prop.type, 'output'))
-        return `${docComment(prop.description, '  ')}  ${readonly}${propertyKey(propName)}${optional}: ${type}`
+      if (fields.length === 0) return `${doc}export type ${resourceKey} = Record<string, never>\n`
+      const lines = fields.map((field) => {
+        const readonly = field.readOnly ? 'readonly ' : ''
+        const optional = field.optional ? '?' : ''
+        const type = this.#renderer.sdkType(field.shape)
+        return `${docComment(fieldDoc(field), '  ')}  ${readonly}${propertyKey(field.name)}${optional}: ${type}`
       })
       return `${doc}export interface ${resourceKey} {\n${lines.join('\n')}\n}\n`
     })
@@ -785,7 +898,7 @@ class ContractBuilder {
     if (fields.length === 0) return `${doc}export type ${name} = Record<string, never>\n`
     const lines = fields.map(
       (field) =>
-        `${docComment(field.description, '  ')}  ${propertyKey(field.name)}${field.optional ? '?' : ''}: ${this.#renderer.sdkType(field.shape)}`
+        `${docComment(fieldDoc(field), '  ')}  ${propertyKey(field.name)}${field.optional ? '?' : ''}: ${this.#renderer.sdkType(field.shape)}`
     )
     return `${doc}export interface ${name} {\n${lines.join('\n')}\n}\n`
   }
@@ -827,7 +940,14 @@ class ContractBuilder {
       ...method.params.map((p) => `${p.binding}${p.optional ? '?' : ''}: ${p.type}`),
       `${options}?: CallOptions`,
     ].join(', ')
-    return `${docComment(method.doc, '  ')}  ${method.name}(${params}): Promise<${method.returnType}>`
+    const tags = [
+      ...method.params.flatMap((p) =>
+        p.doc === undefined ? [] : [`@param ${p.binding} - ${p.doc}`]
+      ),
+      ...(method.returnsDoc === undefined ? [] : [`@returns ${method.returnsDoc}`]),
+    ]
+    const doc = tags.length === 0 ? method.doc : `${method.doc}\n\n${tags.join('\n')}`
+    return `${docComment(doc, '  ')}  ${method.name}(${params}): Promise<${method.returnType}>`
   }
 
   // --- Rendering: values --------------------------------------------------
@@ -854,12 +974,7 @@ class ContractBuilder {
     return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
       const binding = this.#recordBinding(resourceKey)
       this.#privateBindings.add(binding)
-      const fields = Object.entries(resource.properties).map(([name, prop]) => ({
-        name,
-        shape: this.#map(prop.type, 'output'),
-        optional: prop.optional,
-        description: prop.description,
-      }))
+      const fields = this.#recordFields(resource)
       return `const ${binding}: ValueType<${resourceKey}> = t.record(${this.#renderRecordFields(fields)}, { description: ${stringLiteral(resource.description)} })\n`
     })
   }
@@ -1087,6 +1202,95 @@ export const ${contract}: AppContract<${client}> = {
 // ---------------------------------------------------------------------------
 // Rendering helpers
 // ---------------------------------------------------------------------------
+
+/** The `@returns` text of a command result, which is nullable by default. */
+const RESULT_NULLABILITY_NOTE = 'Nullable. No evidence that the app always returns a value.'
+
+/**
+ * A field's documentation: its description, then its nullability note, on
+ * the next line (`separator`, for a field's own comment) or the same one (for
+ * a `@param` tag).
+ */
+function fieldDoc(field: FieldModel, separator = '\n'): string {
+  return field.nullabilityNote === undefined
+    ? field.description
+    : `${sentence(field.description)}${separator}${field.nullabilityNote}`
+}
+
+/** `text` as a sentence: trimmed, ending in a period unless it ends in punctuation. */
+function sentence(text: string): string {
+  const trimmed = text.trim()
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`
+}
+
+/**
+ * The version and date an observation holds for, e.g.
+ * `Notes 4.11, macOS 27.2, 2026-10-31`. It names where the evidence came
+ * from, never an observed value.
+ */
+function observationProvenance(
+  appName: string,
+  evidence: { readonly appVersion: string; readonly osVersion: string; readonly observedAt: string }
+): string {
+  const date = /^\d{4}-\d{2}-\d{2}/.exec(evidence.observedAt)?.[0] ?? evidence.observedAt
+  return `${appName} ${evidence.appVersion}, macOS ${evidence.osVersion}, ${date}`
+}
+
+/** A curated claim's note, with the app version it was confirmed against when recorded. */
+function curatedBasis(
+  appName: string,
+  evidence: { readonly note: string; readonly appVersion?: string | undefined }
+): string {
+  const note = evidence.note.trim().replace(/[.!?]$/, '')
+  return evidence.appVersion === undefined
+    ? `${note}.`
+    : `${note} (${appName} ${evidence.appVersion}).`
+}
+
+/**
+ * The doc line for a read field: whether it can be null, and why, in words
+ * for callers. It never states an observed value.
+ */
+export function readNullabilityNote(resolution: NullabilityResolution, appName: string): string {
+  const { nullable, basis } = resolution
+  if (basis === 'identifier') return 'Never null: the primary identifier.'
+  if (basis === 'default') {
+    return nullable ? 'Nullable. No evidence that the app always sets it.' : 'Never null.'
+  }
+  switch (basis.source) {
+    case 'probe': {
+      const provenance = observationProvenance(appName, basis)
+      return nullable
+        ? `Nullable. Observed missing in ${String(basis.nullCount)} of ${String(basis.sampleSize)} items (${provenance}).`
+        : `Never null: observed in all ${String(basis.sampleSize)} items (${provenance}).`
+    }
+    case 'curated':
+      return `${nullable ? 'Nullable' : 'Never null'}: ${curatedBasis(appName, basis)}`
+    case 'sdef':
+      return "Nullable: declared by the app's scripting dictionary."
+  }
+}
+
+/**
+ * The doc line for a parameter: whether it accepts `null`, and why. Without a
+ * claim it does not.
+ */
+export function parameterNullabilityNote(
+  resolution: NullabilityResolution,
+  appName: string
+): string {
+  const { nullable, basis } = resolution
+  const verdict = nullable ? 'Accepts null' : 'Does not accept null'
+  if (basis === 'default' || basis === 'identifier') return `${verdict}.`
+  switch (basis.source) {
+    case 'probe':
+      return `${verdict}.`
+    case 'curated':
+      return `${verdict}: ${curatedBasis(appName, basis)}`
+    case 'sdef':
+      return `${verdict}: declared by the app's scripting dictionary.`
+  }
+}
 
 /** The string members of an enum: each value, as text. */
 function enumMembers(values: readonly { readonly value: string | number }[]): string[] {
