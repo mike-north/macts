@@ -37,6 +37,7 @@
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { notesContract } from '@macts/notes/contract'
+import { remindersContract } from '@macts/reminders/contract'
 import {
   callTool,
   connectMcpStdio,
@@ -92,18 +93,21 @@ describe('macts --mcp (UAT): startup', () => {
 })
 
 describe('macts --mcp (UAT): tools', () => {
-  it('lists the derived Notes tools and the capabilities tool', async () => {
+  it('lists the derived tools of every installed app and the capabilities tool', async () => {
     const { tools } = await granted.client.listTools()
     const names = tools.map((tool) => tool.name)
+    const notesCount = Object.keys(notesContract.operations).length
+    const remindersCount = Object.keys(remindersContract.operations).length
 
     expect(names).toContain(DISCOVERY_TOOL)
     expect(names).toContain(LIST_TOOL)
     expect(names).toContain('macts__notes__attachments_get')
-    // One tool per Notes operation, beside the discovery tool.
-    expect(names.filter((name) => name.startsWith('macts__notes__'))).toHaveLength(
-      Object.keys(notesContract.operations).length
+    // One tool per operation of each installed app, beside the discovery tool.
+    expect(names.filter((name) => name.startsWith('macts__notes__'))).toHaveLength(notesCount)
+    expect(names.filter((name) => name.startsWith('macts__reminders__'))).toHaveLength(
+      remindersCount
     )
-    expect(names).toHaveLength(Object.keys(notesContract.operations).length + 1)
+    expect(names).toHaveLength(notesCount + remindersCount + 1)
   })
 
   it('dispatches a granted call to the executor and answers { result }', async () => {
