@@ -61,6 +61,7 @@ export {
   createFullAccessKey,
   createReadOnlyKey,
   UnexpandableCoarsePermissionError,
+  PermissionCaseMismatchError,
 } from './generator.js'
 
 // Validator

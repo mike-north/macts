@@ -1,5 +1,11 @@
 import { Command, Option } from 'clipanion'
-import { loadManifest, expandCoarsePermission, parsePermission } from '@macts/core'
+import {
+  loadManifest,
+  expandCoarsePermission,
+  isValidPermission,
+  explainInvalidPermission,
+  listKnownPermissions,
+} from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
@@ -35,14 +41,6 @@ export class PermissionsExpandCommand extends Command {
     const formatter = createFormatter(this.json ?? false)
 
     try {
-      // Validate permission format
-      try {
-        parsePermission(this.permission)
-      } catch (err) {
-        this.context.stderr.write(formatter.formatError((err as Error).message) + '\n')
-        return 1
-      }
-
       const manifestPath = path.resolve(this.manifest)
       if (!fs.existsSync(manifestPath)) {
         this.context.stderr.write(
@@ -52,6 +50,15 @@ export class PermissionsExpandCommand extends Command {
       }
 
       const manifest = await loadManifest(manifestPath)
+
+      // Validate the permission format, naming the closest real permissions.
+      if (!isValidPermission(this.permission)) {
+        const reason = explainInvalidPermission(this.permission, listKnownPermissions(manifest))
+        this.context.stderr.write(
+          formatter.formatError(`Invalid permission "${this.permission}": ${reason}`) + '\n'
+        )
+        return 1
+      }
 
       if (!manifest.permissions) {
         this.context.stderr.write(

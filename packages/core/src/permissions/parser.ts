@@ -9,10 +9,33 @@ import { isCoarseOperation } from './vocabulary.js'
 
 /**
  * Permission string validation regex.
- * Format: `app:resource:operation` where each part is alphanumeric with dashes/underscores.
- * Special case: `*` is allowed for wildcard matching.
+ *
+ * Format: `app:resource:operation`.
+ * - The app segment is the normalized app name: lowercase, starting with a
+ *   letter, with digits, `-` and `_` allowed (`google-chrome`).
+ * - The resource and operation segments are camelCase identifiers: a lowercase
+ *   first letter followed by letters and digits (`mediaItems`,
+ *   `splitVertically`), because they are the manifest's own resource and
+ *   command names. `-` and `_` are not allowed in them.
+ * - A resource or operation may instead be `*`, a wildcard.
+ *
+ * The grammar only decides what is well-formed. Matching against grants stays
+ * exact and case-sensitive, so `photos:mediaitems:list` never authorizes
+ * `photos:mediaItems:list`.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D2)
  */
-const PERMISSION_REGEX = /^([a-z][a-z0-9_-]*):((?:[a-z][a-z0-9_-]*)|\*):((?:[a-z][a-z0-9_-]*)|\*)$/
+const PERMISSION_REGEX =
+  /^([a-z][a-z0-9_-]*):((?:[a-z][a-zA-Z0-9]*)|\*):((?:[a-z][a-zA-Z0-9]*)|\*)$/
+
+/**
+ * The permission format in user terms, for error messages and CLI help.
+ * Kept next to the regex it describes.
+ */
+export const PERMISSION_FORMAT_DESCRIPTION =
+  'Must be in format "app:resource:operation". The app is lowercase (digits, "-" and "_" allowed); ' +
+  'the resource and operation are camelCase (start lowercase, then letters and digits only) or "*". ' +
+  'Permissions are case-sensitive. Examples: "calendar:events:list", "photos:mediaItems:list", "calendar:*:*"'
 
 /**
  * Error thrown when a permission string is invalid.
@@ -47,10 +70,7 @@ export function parsePermission(permission: string): ParsedPermission {
   const match = PERMISSION_REGEX.exec(permission)
 
   if (!match) {
-    throw new PermissionParseError(
-      permission,
-      'Must be in format "app:resource:operation" with lowercase alphanumeric parts (dashes/underscores allowed)'
-    )
+    throw new PermissionParseError(permission, PERMISSION_FORMAT_DESCRIPTION)
   }
 
   // TypeScript knows match is non-null here but array elements could be undefined

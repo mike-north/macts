@@ -1093,6 +1093,9 @@ export function expandCoarsePermission(permission: string, permissionsSection: P
 export function expandPermissions(permissions: string[], permissionsSection: PermissionsSection): string[];
 
 // @public
+export function explainInvalidPermission(permission: string, known?: readonly string[]): string;
+
+// @public
 export function extractAppName(permission: string): string | undefined;
 
 // @public (undocumented)
@@ -1132,6 +1135,9 @@ export const FileTypeSchema: z.ZodObject<{
 
 // @public
 export function filterPermissionsByApp(permissions: string[], app: string): string[];
+
+// @public
+export function findCaseOnlyMismatch(permission: string, known: readonly string[]): string | undefined;
 
 // @public
 export function findCoarseCategory(finePermission: string, permissionsSection: PermissionsSection): string | undefined;
@@ -1786,6 +1792,9 @@ export interface LayeredPolicyEvaluation extends PolicyEvaluation {
 }
 
 // @public
+export function listKnownPermissions(manifest: AppManifest): string[];
+
+// @public
 export function loadCapabilityRegistry(manifestsDir: string): Promise<{
     registry: CapabilityRegistry;
     errors: {
@@ -2149,6 +2158,9 @@ export const PathTypeSchema: z.ZodString;
 
 // @public
 export const PatternRestrictionSchema: z.ZodString;
+
+// @public
+export const PERMISSION_FORMAT_DESCRIPTION: string;
 
 // @public
 export interface PermissionCheckResult {
@@ -3069,6 +3081,9 @@ export function strictestPolicyDecision(a: PolicyDecision, b: PolicyDecision): P
 
 // @public
 export const stringCoercer: TypeCoercer<string>;
+
+// @public
+export function suggestPermissions(requested: string, known: readonly string[]): string[];
 
 // @public (undocumented)
 export type Suite = z.infer<typeof SuiteSchema>;

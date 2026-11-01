@@ -1,3 +1,9 @@
+/**
+ * Tests for permission matching and denial hints.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D2)
+ * @see https://github.com/mike-north/macts/issues/153
+ */
 import { describe, it, expect } from 'vitest'
 import {
   hasPermission,
@@ -268,5 +274,91 @@ describe('describePermissions', () => {
   it('should handle empty array', () => {
     const result = describePermissions([])
     expect(result).toBe('No permissions')
+  })
+})
+
+describe('hasPermission with camelCase permissions (issue #153)', () => {
+  describe('grants', () => {
+    it('matches a camelCase grant exactly', () => {
+      const result = hasPermission(['photos:mediaItems:list'], 'photos:mediaItems:list')
+      expect(result).toEqual({
+        granted: true,
+        required: 'photos:mediaItems:list',
+        matchedBy: 'photos:mediaItems:list',
+      })
+    })
+
+    it('grants a camelCase requirement via the app wildcard', () => {
+      const result = hasPermission(['photos:*:*'], 'photos:mediaItems:list')
+      expect(result.granted).toBe(true)
+      expect(result.matchedBy).toBe('photos:*:*')
+    })
+
+    it('grants a camelCase operation via the resource wildcard', () => {
+      const result = hasPermission(['iterm:sessions:*'], 'iterm:sessions:splitVertically')
+      expect(result.granted).toBe(true)
+      expect(result.matchedBy).toBe('iterm:sessions:*')
+    })
+
+    it('grants a camelCase resource via the operation wildcard', () => {
+      expect(hasPermission(['photos:*:list'], 'photos:mediaItems:list').granted).toBe(true)
+    })
+  })
+
+  describe('case-only mismatches are denied, never matched', () => {
+    it('denies a grant that differs only in case, and says so', () => {
+      const result = hasPermission(['photos:mediaitems:list'], 'photos:mediaItems:list')
+      expect(result.granted).toBe(false)
+      expect(result.matchedBy).toBeUndefined()
+      expect(result.hint).toBe(
+        'This key holds "photos:mediaitems:list", which differs from the required ' +
+          '"photos:mediaItems:list" only in letter case; permissions are case-sensitive. ' +
+          'Grant "photos:mediaItems:list".'
+      )
+    })
+
+    it('denies a differently cased wildcard grant, and says so', () => {
+      const result = hasPermission(['photos:mediaitems:*'], 'photos:mediaItems:list')
+      expect(result.granted).toBe(false)
+      expect(result.hint).toBe(
+        'This key holds "photos:mediaitems:*", which would cover the required ' +
+          '"photos:mediaItems:list" if letter case were ignored; permissions are ' +
+          'case-sensitive. Grant "photos:mediaItems:list".'
+      )
+    })
+
+    it('denies a mis-cased operation', () => {
+      const result = hasPermission(
+        ['iterm:sessions:splitvertically'],
+        'iterm:sessions:splitVertically'
+      )
+      expect(result.granted).toBe(false)
+      expect(result.hint).toContain('Grant "iterm:sessions:splitVertically"')
+    })
+
+    it('does not add a case hint when the difference is more than case', () => {
+      const result = hasPermission(['photos:mediaitems:get'], 'photos:mediaItems:list')
+      expect(result.granted).toBe(false)
+      expect(result.hint).toContain('Missing required permission')
+      expect(result.hint).not.toContain('letter case')
+    })
+
+    it('does not add a case hint for another app', () => {
+      const result = hasPermission(['music:mediaitems:list'], 'photos:mediaItems:list')
+      expect(result.hint).not.toContain('letter case')
+    })
+
+    it('keeps a rename hint and appends the case explanation when both apply', () => {
+      const history: PermissionHistoryEntry[] = [
+        { version: '1.2.0', permission: 'photos:mediaitems:list', changed: '2024-02-01' },
+      ]
+      const result = hasPermission(['photos:mediaitems:list'], 'photos:mediaItems:list', history)
+      expect(result.granted).toBe(false)
+      expect(result.changelog?.previousPermission).toBe('photos:mediaitems:list')
+      expect(result.hint).toMatch(/^Permission changed in v1\.2\.0 /)
+      expect(result.hint).toContain(
+        'differs from the required "photos:mediaItems:list" only in letter case'
+      )
+    })
   })
 })

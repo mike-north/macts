@@ -108,6 +108,7 @@ export function createApiKey(options: CreateApiKeyOptions, permissionsSection?: 
 // @public
 export interface CreateApiKeyOptions {
     expires?: Date | number | string | undefined;
+    knownPermissions?: readonly string[] | undefined;
     name: string;
     permissions: string[];
 }
@@ -324,6 +325,13 @@ export function operationsFromManifest(manifest: AppManifest): RegisteredOperati
 
 // @public
 export function parseDuration(duration: string): number;
+
+// @public
+export class PermissionCaseMismatchError extends Error {
+    constructor(permission: string, canonical: string);
+    readonly canonical: string;
+    readonly permission: string;
+}
 
 export { PermissionCheckResult }
 

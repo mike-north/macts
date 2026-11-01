@@ -69,13 +69,59 @@ export function hasPermission(
     }
   }
 
-  // Default hint if no changelog applies. Name the exact fine-grained
+  // A grant that would match if letter case were ignored explains the denial
+  // better than any other cause: matching is case-sensitive, so it can never
+  // authorize this call. Name it and the exact permission to grant. When a
+  // rename hint also applies it stays first (it carries the structured
+  // changelog) and the case explanation is appended, so neither is lost.
+  const caseVariant = findCaseOnlyGrant(grantedPermissions, parsed)
+  if (caseVariant !== undefined) {
+    const caseHint = buildCaseMismatchHint(caseVariant, requiredPermission)
+    result.hint = result.hint === undefined ? caseHint : `${result.hint} ${caseHint}`
+  }
+
+  // Default hint if no changelog or case explanation applies. Name the exact fine-grained
   // permission to add so the caller can fix the denial in one step. We also
   // suggest the resource wildcard, which authorizes every operation on the
   // resource (see the matcher's wildcard rule below).
   result.hint ??= buildMissingPermissionHint(parsed, requiredPermission)
 
   return result
+}
+
+/**
+ * The first granted permission that would authorize the required one if letter
+ * case were ignored, wildcard grants included, or `undefined` when none would.
+ * Used only to explain a denial; it never grants anything.
+ */
+function findCaseOnlyGrant(
+  grantedPermissions: string[],
+  required: ReturnType<typeof parsePermission>
+): string | undefined {
+  const [app, resource, operation] = [required.app, required.resource, required.operation].map(
+    (segment) => segment.toLowerCase()
+  )
+  return grantedPermissions.find((granted) => {
+    const parts = granted.toLowerCase().split(':')
+    return (
+      parts.length === 3 &&
+      parts[0] === app &&
+      (parts[1] === '*' || parts[1] === resource) &&
+      (parts[2] === '*' || parts[2] === operation)
+    )
+  })
+}
+
+/** Explain a case-only mismatch between a held grant and the required permission. */
+function buildCaseMismatchHint(granted: string, requiredPermission: string): string {
+  const identicalIgnoringCase = granted.toLowerCase() === requiredPermission.toLowerCase()
+  const relation = identicalIgnoringCase
+    ? `differs from the required "${requiredPermission}" only in letter case`
+    : `would cover the required "${requiredPermission}" if letter case were ignored`
+  return (
+    `This key holds "${granted}", which ${relation}; ` +
+    `permissions are case-sensitive. Grant "${requiredPermission}".`
+  )
 }
 
 /**

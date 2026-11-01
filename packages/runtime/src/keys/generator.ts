@@ -9,7 +9,15 @@
 
 import * as jose from 'jose'
 import type { ApiKeyPayload, ApiKeyMetadata, PermissionsSection } from '@macts/core'
-import { expandPermissions, parsePermission, isPureCoarseOperation } from '@macts/core'
+import {
+  expandPermissions,
+  parsePermission,
+  isPureCoarseOperation,
+  isValidPermission,
+  explainInvalidPermission,
+  findCaseOnlyMismatch,
+  PermissionParseError,
+} from '@macts/core'
 import type { CreateApiKeyOptions, CreateApiKeyResult } from './types.js'
 import { calculateExpiration } from './types.js'
 import { getSigningSecret, addKeyMetadata, generateKeyId } from './storage.js'
@@ -34,6 +42,53 @@ export class UnexpandableCoarsePermissionError extends Error {
         `or grant fine-grained permissions directly (e.g. "${asFineExample(permission)}").`
     )
     this.name = 'UnexpandableCoarsePermissionError'
+  }
+}
+
+/**
+ * Error thrown when a requested permission is well-formed but differs only in
+ * letter case from a permission the app defines. Matching is case-sensitive,
+ * so such a grant could never authorize the call it was meant for; rejecting it
+ * at creation names the permission to use instead of minting a dead key.
+ */
+export class PermissionCaseMismatchError extends Error {
+  /** The permission as requested, which the app does not define in this letter case. */
+  readonly permission: string
+
+  /**
+   * The permission the app defines that differs from {@link PermissionCaseMismatchError.permission}
+   * only in letter case: the one to grant instead.
+   */
+  readonly canonical: string
+
+  constructor(permission: string, canonical: string) {
+    super(
+      `Permission "${permission}" differs from "${canonical}" only in letter case. ` +
+        `Permissions are case-sensitive, so "${permission}" would never authorize anything. ` +
+        `Use "${canonical}".`
+    )
+    this.name = 'PermissionCaseMismatchError'
+    this.permission = permission
+    this.canonical = canonical
+  }
+}
+
+/**
+ * Reject requested permissions that could never authorize anything: those that
+ * fail the grammar, and (when the app's permissions are known) those that
+ * differ from a known permission only in letter case. A permission that is
+ * well-formed but matches nothing known is accepted, since a later app version
+ * may add that route.
+ */
+function assertGrantablePermissions(permissions: string[], known: readonly string[]): void {
+  for (const permission of permissions) {
+    if (!isValidPermission(permission)) {
+      throw new PermissionParseError(permission, explainInvalidPermission(permission, known))
+    }
+    const canonical = findCaseOnlyMismatch(permission, known)
+    if (canonical !== undefined) {
+      throw new PermissionCaseMismatchError(permission, canonical)
+    }
   }
 }
 
@@ -79,14 +134,22 @@ function findUnexpandableCoarsePermissions(permissions: string[]): string[] {
  * - Wildcard permissions (calendar:*:read) expand to all matching permissions
  * - Fine-grained permissions are included as-is
  *
+ * Every requested permission must satisfy the permission grammar, and when
+ * `options.knownPermissions` is given, none may differ from a known permission
+ * only in letter case.
+ *
  * @param options - Key creation options
  * @param permissionsSection - Permissions mapping from manifest (for expansion)
  * @returns Created key token and metadata
+ * @throws PermissionParseError if a permission is malformed
+ * @throws PermissionCaseMismatchError if a permission is mis-cased against a known one
  */
 export async function createApiKey(
   options: CreateApiKeyOptions,
   permissionsSection?: PermissionsSection
 ): Promise<CreateApiKeyResult> {
+  assertGrantablePermissions(options.permissions, options.knownPermissions ?? [])
+
   const keyId = generateKeyId()
   const now = Math.floor(Date.now() / 1000)
 

@@ -1,10 +1,18 @@
+/**
+ * Tests for API key creation.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D2)
+ * @see https://github.com/mike-north/macts/issues/153
+ */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   createApiKey,
   createApiKeySimple,
   createFullAccessKey,
   createReadOnlyKey,
+  PermissionCaseMismatchError,
 } from './generator.js'
+import { PermissionParseError } from '@macts/core'
 import type { PermissionsSection } from '@macts/core'
 import * as storage from './storage.js'
 
@@ -165,5 +173,79 @@ describe('createReadOnlyKey', () => {
     for (const perm of result.metadata.permissions) {
       expect(perm.includes(':list') || perm.includes(':get') || perm.includes(':read')).toBe(true)
     }
+  })
+})
+
+describe('createApiKey permission validation (issue #153)', () => {
+  const PHOTOS_KNOWN = ['photos:mediaItems:list', 'photos:mediaItems:get', 'photos:albums:list']
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('accepts camelCase resource and operation permissions', async () => {
+    const result = await createApiKey({
+      name: 'camel',
+      permissions: ['photos:mediaItems:list', 'iterm:sessions:splitVertically'],
+    })
+    expect(result.metadata.permissions).toEqual([
+      'photos:mediaItems:list',
+      'iterm:sessions:splitVertically',
+    ])
+  })
+
+  it('rejects a malformed permission without a manifest, stating the rule and an example', async () => {
+    const error: unknown = await createApiKey({
+      name: 'bad',
+      permissions: ['photos:MediaItems:list'],
+    }).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(PermissionParseError)
+    expect((error as Error).message).toContain('camelCase')
+    expect((error as Error).message).toContain('"photos:mediaItems:list"')
+    expect((error as Error).message).not.toContain('Did you mean')
+  })
+
+  it('names the closest valid permission for a malformed one when known permissions are given', async () => {
+    const error: unknown = await createApiKey({
+      name: 'bad',
+      permissions: ['photos:MediaItems:list'],
+      knownPermissions: PHOTOS_KNOWN,
+    }).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(PermissionParseError)
+    expect((error as Error).message).toContain('Did you mean "photos:mediaItems:list"')
+  })
+
+  it('rejects a valid permission that differs from a known one only in case', async () => {
+    const error: unknown = await createApiKey({
+      name: 'miscased',
+      permissions: ['photos:mediaitems:list'],
+      knownPermissions: PHOTOS_KNOWN,
+    }).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(PermissionCaseMismatchError)
+    expect((error as PermissionCaseMismatchError).canonical).toBe('photos:mediaItems:list')
+    expect((error as Error).message).toContain('Use "photos:mediaItems:list"')
+  })
+
+  it('mints a mis-cased permission when no known permissions are supplied (older keys)', async () => {
+    const result = await createApiKey({ name: 'older', permissions: ['photos:mediaitems:list'] })
+    expect(result.metadata.permissions).toEqual(['photos:mediaitems:list'])
+  })
+
+  it('accepts a well-formed permission that matches nothing known', async () => {
+    const result = await createApiKey({
+      name: 'future',
+      permissions: ['photos:memories:list'],
+      knownPermissions: PHOTOS_KNOWN,
+    })
+    expect(result.metadata.permissions).toEqual(['photos:memories:list'])
+  })
+
+  it("does not apply another app's known permissions to a permission of an unrelated app", async () => {
+    const result = await createApiKey({
+      name: 'other-app',
+      permissions: ['music:tracks:list'],
+      knownPermissions: PHOTOS_KNOWN,
+    })
+    expect(result.metadata.permissions).toEqual(['music:tracks:list'])
   })
 })

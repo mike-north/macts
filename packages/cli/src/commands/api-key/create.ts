@@ -1,6 +1,19 @@
 import { Command, Option } from 'clipanion'
 import { createApiKey, type CreateApiKeyResult } from '@macts/runtime'
-import { loadManifest, type PermissionsSection, isValidPermission } from '@macts/core'
+import {
+  loadManifest,
+  loadManifestsFromDir,
+  listKnownPermissions,
+  suggestPermissions,
+  explainInvalidPermission,
+  findCaseOnlyMismatch,
+  isCoarseOperation,
+  isValidPermission,
+  parsePermission,
+  type AppManifest,
+  type PermissionsSection,
+} from '@macts/core'
+import { resolveManifestsDir } from '../capabilities/registry.js'
 import { createFormatter } from '../../output/index.js'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
@@ -16,8 +29,11 @@ export class ApiKeyCreateCommand extends Command {
     details: `
       Creates a signed API key with the specified permissions.
 
-      Permission format is "app:resource:operation". A grant authorizes a call
-      when it matches exactly or via a wildcard:
+      Permission format is "app:resource:operation". The app is lowercase; the
+      resource and operation are camelCase (calendar:events:list,
+      photos:mediaItems:list, iterm:sessions:splitVertically) or "*".
+      Permissions are case-sensitive. A grant authorizes a call when it
+      matches exactly or via a wildcard:
 
         - Fine-grained (calendar:events:list) authorizes exactly that call.
         - Resource wildcard (calendar:events:*) authorizes every operation on
@@ -28,6 +44,12 @@ export class ApiKeyCreateCommand extends Command {
       fine-grained operations they cover at creation time. A coarse permission
       without --manifest is rejected (it would authorize nothing), with a hint
       naming the wildcard or fine-grained permissions to use instead.
+
+      When the app's manifest is known (--manifest, or the manifests directory
+      discovered as for "macts capabilities"), a permission that differs from a
+      real one only in letter case is rejected naming the correct one, and a
+      well-formed permission the manifest does not define is accepted with a
+      warning on stderr, since later app versions may add it.
 
       The key is displayed once and cannot be retrieved later.
     `,
@@ -53,7 +75,7 @@ export class ApiKeyCreateCommand extends Command {
 
   name = Option.String('--name', { required: true, description: 'Human-readable name for the key' })
   permission = Option.Array('--permission', {
-    description: 'Permission to grant (can be repeated)',
+    description: 'Permission to grant, app:resource:operation (can be repeated)',
   })
   expires = Option.String('--expires', { description: 'Expiration (e.g., 30d, 1h, 2w)' })
   manifest = Option.String('--manifest', {
@@ -72,21 +94,11 @@ export class ApiKeyCreateCommand extends Command {
       return 1
     }
 
-    // Validate permission format
-    const invalidPermissions = permissions.filter((p) => !isValidPermission(p))
-    if (invalidPermissions.length > 0) {
-      this.context.stderr.write(
-        formatter.formatError(
-          `Invalid permission format: ${invalidPermissions.join(', ')}\n` +
-            'Permissions must be in format "app:resource:operation" (e.g., "calendar:events:list" or "calendar:*:*")'
-        ) + '\n'
-      )
-      return 1
-    }
-
     try {
-      // Load permissions section from manifest if provided
+      // Load the manifest(s) that tell us which permissions really exist:
+      // the explicit --manifest, else whatever the shared discovery finds.
       let permissionsSection: PermissionsSection | undefined
+      let manifests: AppManifest[] = []
       if (this.manifest) {
         const manifestPath = path.resolve(this.manifest)
         if (!fs.existsSync(manifestPath)) {
@@ -97,6 +109,41 @@ export class ApiKeyCreateCommand extends Command {
         }
         const manifest = await loadManifest(manifestPath)
         permissionsSection = manifest.permissions
+        manifests = [manifest]
+      } else {
+        manifests = await discoverManifests()
+      }
+      const known = manifests.flatMap((manifest) => listKnownPermissions(manifest))
+
+      // Reject permissions that could never authorize anything.
+      const invalid = permissions.filter((p) => !isValidPermission(p))
+      if (invalid.length > 0) {
+        const lines = invalid.map((p) => `"${p}": ${explainInvalidPermission(p, known)}`)
+        this.context.stderr.write(
+          formatter.formatError(`Invalid permission format:\n${lines.join('\n')}`) + '\n'
+        )
+        return 1
+      }
+      const mismatches = permissions.flatMap((p) => {
+        const canonical = findCaseOnlyMismatch(p, known)
+        return canonical === undefined
+          ? []
+          : [`"${p}" differs from "${canonical}" only in letter case`]
+      })
+      if (mismatches.length > 0) {
+        this.context.stderr.write(
+          formatter.formatError(
+            `${mismatches.join('; ')}. Permissions are case-sensitive, so a mis-cased permission ` +
+              'would never authorize anything. Use the correctly cased permission.'
+          ) + '\n'
+        )
+        return 1
+      }
+      const declaredOnly = manifests.flatMap((manifest) =>
+        Object.values(manifest.permissions ?? {}).flatMap((coarse) => Object.values(coarse).flat())
+      )
+      for (const warning of unknownPermissionWarnings(permissions, known, declaredOnly)) {
+        this.context.stderr.write(`warning: ${warning}\n`)
       }
 
       const result = await createApiKey(
@@ -104,6 +151,7 @@ export class ApiKeyCreateCommand extends Command {
           name: this.name,
           permissions,
           expires: this.expires,
+          knownPermissions: known,
         },
         permissionsSection
       )
@@ -142,4 +190,54 @@ function formatResult(result: CreateApiKeyResult): object {
     createdAt: result.metadata.createdAt.toISOString(),
     expiresAt: result.metadata.expiresAt?.toISOString(),
   }
+}
+
+/**
+ * Load the manifests the CLI can already find without `--manifest`, using the
+ * same discovery as `macts capabilities`. Discovery is best-effort: when no
+ * manifests directory exists or it cannot be read, no manifests are known and
+ * key creation proceeds on the grammar alone.
+ */
+async function discoverManifests(): Promise<AppManifest[]> {
+  const manifestsDir = resolveManifestsDir()
+  if (manifestsDir === null) {
+    return []
+  }
+  return (await loadManifestsFromDir(manifestsDir)).manifests
+}
+
+/**
+ * Warnings for well-formed permissions of a known app that name no permission
+ * the app defines. They are not errors: a later app version may add the route.
+ * Wildcards and coarse operations (expanded against the manifest) are not
+ * checked here, and apps without a known manifest cannot be judged.
+ */
+function unknownPermissionWarnings(
+  permissions: string[],
+  known: string[],
+  declaredInPermissionsMap: string[]
+): string[] {
+  const knownApps = new Set(known.map((p) => p.split(':')[0]))
+  return permissions.flatMap((permission) => {
+    const parsed = parsePermission(permission)
+    if (
+      !knownApps.has(parsed.app) ||
+      known.includes(permission) ||
+      parsed.resource === '*' ||
+      parsed.operation === '*' ||
+      isCoarseOperation(parsed.operation)
+    ) {
+      return []
+    }
+    if (declaredInPermissionsMap.includes(permission)) {
+      return [
+        `"${permission}" is listed in the ${parsed.app} manifest's permissions map, but no ` +
+          `${parsed.app} route requires it yet, so it authorizes nothing today.`,
+      ]
+    }
+    const suggestions = suggestPermissions(permission, known)
+    const hint =
+      suggestions.length > 0 ? ` Closest: ${suggestions.map((s) => `"${s}"`).join(', ')}.` : ''
+    return [`"${permission}" is not a permission any known ${parsed.app} route requires.${hint}`]
+  })
 }

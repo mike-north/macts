@@ -34,6 +34,14 @@ export interface CreateApiKeyOptions {
    * Can be a Date, Unix timestamp, or duration string (e.g., "30d", "1h").
    */
   expires?: Date | number | string | undefined
+  /**
+   * The permissions the target app(s) define, when the caller knows them
+   * (for example from a manifest). Used only to reject a requested permission
+   * that differs from a known one in letter case alone, and to name the closest
+   * valid permissions when a requested one is malformed. Permissions that match
+   * nothing known are still accepted, since later app versions may add routes.
+   */
+  knownPermissions?: readonly string[] | undefined
 }
 
 /**
