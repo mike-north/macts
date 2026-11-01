@@ -62,7 +62,7 @@ export * from './keys/index.js'
 export { getMactsHome } from './paths.js'
 
 // Process-wide structured logging
-export { createLogger, getLogger, setLogger } from './logger.js'
+export { createLogger, getLogger, setLogger, type LogDestination } from './logger.js'
 
 // Governance context and per-caller resolution
 export {

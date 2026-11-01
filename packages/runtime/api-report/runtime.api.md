@@ -143,7 +143,7 @@ export interface CreateKeyPolicyResolverOptions {
 export function createKeyStoreVerifier(): CredentialVerifier;
 
 // @public
-export function createLogger(options?: pino.LoggerOptions): pino.Logger;
+export function createLogger(options?: pino.LoggerOptions, destination?: LogDestination): pino.Logger;
 
 // @public
 export function createRateLimiter(options?: RateLimiterOptions): RateLimiter;
@@ -319,6 +319,9 @@ export interface LoadHostGovernanceOptions {
 
 // @public
 export function loadKeyMetadata(): ApiKeyMetadata[];
+
+// @public
+export type LogDestination = 'stdout' | 'stderr';
 
 // @public
 export interface MactsRuntime {
