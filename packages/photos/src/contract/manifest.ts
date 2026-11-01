@@ -656,19 +656,16 @@ export const manifest: unknown = {
     mediaItems: {
       read: ['photos:mediaItems:list', 'photos:mediaItems:get'],
       create: ['photos:import:files'],
-      write: ['photos:mediaItems:update'],
-      delete: ['photos:mediaItems:delete'],
     },
     albums: {
       read: ['photos:albums:list', 'photos:albums:get'],
       create: ['photos:containers:create'],
-      write: ['photos:albums:update', 'photos:albums:add'],
+      write: ['photos:albums:add'],
       delete: ['photos:containers:delete'],
     },
     folders: {
       read: ['photos:folders:list', 'photos:folders:get'],
       create: ['photos:containers:create'],
-      write: ['photos:folders:update'],
       delete: ['photos:containers:delete'],
     },
     slideshow: {

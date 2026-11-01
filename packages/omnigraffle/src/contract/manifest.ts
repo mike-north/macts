@@ -1737,50 +1737,20 @@ export const manifest: unknown = {
     canvases: {
       read: ['omnigraffle:canvases:list', 'omnigraffle:canvases:get'],
       create: ['omnigraffle:canvases:create'],
-      write: ['omnigraffle:canvases:update'],
-      delete: ['omnigraffle:canvases:delete'],
     },
     graphics: {
       read: ['omnigraffle:graphics:list', 'omnigraffle:graphics:get'],
-      create: ['omnigraffle:graphics:create'],
-      write: ['omnigraffle:graphics:update'],
-      delete: ['omnigraffle:graphics:delete'],
     },
     shapes: {
       read: ['omnigraffle:shapes:list', 'omnigraffle:shapes:get'],
       create: ['omnigraffle:shapes:create'],
-      write: ['omnigraffle:shapes:update'],
-      delete: ['omnigraffle:shapes:delete'],
     },
     lines: {
       read: ['omnigraffle:lines:list', 'omnigraffle:lines:get'],
-      create: ['omnigraffle:lines:create'],
-      write: ['omnigraffle:lines:update'],
-      delete: ['omnigraffle:lines:delete'],
-    },
-    groups: {
-      read: ['omnigraffle:groups:list', 'omnigraffle:groups:get'],
-      create: ['omnigraffle:groups:create'],
-      write: ['omnigraffle:groups:update'],
-      delete: ['omnigraffle:groups:delete'],
     },
     layers: {
       read: ['omnigraffle:layers:list', 'omnigraffle:layers:get'],
       create: ['omnigraffle:layers:create'],
-      write: ['omnigraffle:layers:update'],
-      delete: ['omnigraffle:layers:delete'],
-    },
-    subgraphs: {
-      read: ['omnigraffle:subgraphs:list', 'omnigraffle:subgraphs:get'],
-      create: ['omnigraffle:subgraphs:create'],
-      write: ['omnigraffle:subgraphs:update'],
-      delete: ['omnigraffle:subgraphs:delete'],
-    },
-    masters: {
-      read: ['omnigraffle:masters:list', 'omnigraffle:masters:get'],
-      create: ['omnigraffle:masters:create'],
-      write: ['omnigraffle:masters:update'],
-      delete: ['omnigraffle:masters:delete'],
     },
     app: {
       execute: [

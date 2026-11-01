@@ -466,12 +466,10 @@ export const notesApiPlugin = {
       },
       folders: {
         read: ['notes:folders:list', 'notes:folders:get'],
-        create: ['notes:folders:create'],
       },
       notes: {
         read: ['notes:notes:list', 'notes:notes:get'],
         create: ['notes:notes:create'],
-        write: ['notes:notes:update'],
       },
     },
   } as AppManifest,

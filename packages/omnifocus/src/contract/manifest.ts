@@ -1352,32 +1352,22 @@ export const manifest: unknown = {
     folders: {
       read: ['omnifocus:folders:list', 'omnifocus:folders:get'],
       create: ['omnifocus:folders:create'],
-      write: ['omnifocus:folders:update'],
-      delete: ['omnifocus:folders:delete'],
     },
     projects: {
       read: ['omnifocus:projects:list', 'omnifocus:projects:get'],
       create: ['omnifocus:projects:create'],
-      write: ['omnifocus:projects:update'],
-      delete: ['omnifocus:projects:delete'],
     },
     tasks: {
       read: ['omnifocus:tasks:list', 'omnifocus:tasks:get'],
       create: ['omnifocus:tasks:create'],
-      write: ['omnifocus:tasks:update'],
-      delete: ['omnifocus:tasks:delete'],
     },
     tags: {
       read: ['omnifocus:tags:list', 'omnifocus:tags:get'],
       create: ['omnifocus:tags:create'],
-      write: ['omnifocus:tags:update'],
-      delete: ['omnifocus:tags:delete'],
     },
     inboxTasks: {
       read: ['omnifocus:inboxTasks:list', 'omnifocus:inboxTasks:get'],
       create: ['omnifocus:inboxTasks:create'],
-      write: ['omnifocus:inboxTasks:update'],
-      delete: ['omnifocus:inboxTasks:delete'],
     },
     perspectives: {
       read: ['omnifocus:perspectives:list', 'omnifocus:perspectives:get'],
