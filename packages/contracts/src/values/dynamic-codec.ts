@@ -43,7 +43,7 @@ const REPRESENTABLE =
 /** Codec for dynamic content. */
 export const DYNAMIC_CODEC: Codec<unknown> = {
   encode: (value, path, issues) => encodeDynamic(value, path, issues, new Set()),
-  decode: (wire, path, context, issues) => decodeDynamic(wire, path, issues, context),
+  decode: (wire, path, context, issues) => decodeDynamic(wire, path, context, issues),
 }
 
 /**
@@ -154,8 +154,8 @@ function encodeDynamicObject(
 function decodeDynamic(
   wire: unknown,
   path: IssuePath,
-  issues: Issues,
-  context: DecodeContext
+  context: DecodeContext,
+  issues: Issues
 ): unknown {
   if (typeof wire === 'string' || typeof wire === 'boolean' || wire === null) return wire
   if (typeof wire === 'number') {
@@ -174,7 +174,7 @@ function decodeDynamic(
     const decoded: unknown[] = []
     let valid = true
     for (const [index, item] of items.entries()) {
-      const value = decodeDynamic(item, [...path, index], issues, context)
+      const value = decodeDynamic(item, [...path, index], context, issues)
       if (value === INVALID) valid = false
       else decoded.push(value)
     }
@@ -204,7 +204,7 @@ function decodeDynamic(
       return DATE_CODEC.decode(wire, path, context, issues)
     case 'record':
       // The envelope is wire structure, not user data, so it adds no path segment.
-      return decodeEnvelope(wire[key], path, issues, context)
+      return decodeEnvelope(wire[key], path, context, issues)
     case 'reference':
     case 'file':
       issues.push(issue(path, 'unsupported', DYNAMIC_REFERENCE_OR_FILE_MESSAGE))
@@ -226,8 +226,8 @@ function decodeDynamic(
 function decodeEnvelope(
   payload: unknown,
   path: IssuePath,
-  issues: Issues,
-  context: DecodeContext
+  context: DecodeContext,
+  issues: Issues
 ): unknown {
   if (!isPlainObject(payload)) {
     issues.push(
@@ -242,7 +242,7 @@ function decodeEnvelope(
   const record = {}
   let valid = true
   for (const key of Object.keys(payload)) {
-    const value = decodeDynamic(payload[key], [...path, key], issues, context)
+    const value = decodeDynamic(payload[key], [...path, key], context, issues)
     if (value === INVALID) valid = false
     else defineField(record, key, value)
   }
