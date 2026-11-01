@@ -965,10 +965,6 @@ permissions:
       - omniplan:tasks:get
     create:
       - omniplan:tasks:create
-    write:
-      - omniplan:tasks:update
-    delete:
-      - omniplan:tasks:delete
 
   milestones:
     read:
@@ -976,10 +972,6 @@ permissions:
       - omniplan:milestones:get
     create:
       - omniplan:milestones:create
-    write:
-      - omniplan:milestones:update
-    delete:
-      - omniplan:milestones:delete
 
   resources:
     read:
@@ -987,10 +979,6 @@ permissions:
       - omniplan:resources:get
     create:
       - omniplan:resources:create
-    write:
-      - omniplan:resources:update
-    delete:
-      - omniplan:resources:delete
 
   assignments:
     read:

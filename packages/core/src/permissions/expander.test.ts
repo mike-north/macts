@@ -9,7 +9,10 @@ import {
 } from './expander.js'
 import type { PermissionsSection } from './index.js'
 
-// Test fixture - permissions section from a calendar manifest
+// Test fixture: a permissions section shaped like the calendar manifest's, with
+// write and delete groups on both resources so every coarse operation has
+// something to expand. It is not the shipped manifest's section, which lists
+// only permissions some calendar route requires.
 const calendarPermissions: PermissionsSection = {
   events: {
     read: ['calendar:events:list', 'calendar:events:get', 'calendar:events:show'],

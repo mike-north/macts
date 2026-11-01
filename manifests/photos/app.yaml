@@ -501,10 +501,6 @@ permissions:
       - photos:mediaItems:get
     create:
       - photos:import:files
-    write:
-      - photos:mediaItems:update
-    delete:
-      - photos:mediaItems:delete
 
   albums:
     read:
@@ -513,7 +509,6 @@ permissions:
     create:
       - photos:containers:create
     write:
-      - photos:albums:update
       - photos:albums:add
     delete:
       - photos:containers:delete
@@ -524,8 +519,6 @@ permissions:
       - photos:folders:get
     create:
       - photos:containers:create
-    write:
-      - photos:folders:update
     delete:
       - photos:containers:delete
 

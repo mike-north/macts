@@ -944,10 +944,6 @@ permissions:
       - calendar:calendars:reload
     create:
       - calendar:calendars:create
-    write:
-      - calendar:calendars:update
-    delete:
-      - calendar:calendars:delete
 
   events:
     read:
@@ -960,55 +956,6 @@ permissions:
       - calendar:events:update
     delete:
       - calendar:events:delete
-
-  attendees:
-    read:
-      - calendar:attendees:list
-      - calendar:attendees:get
-
-  displayAlarms:
-    read:
-      - calendar:displayAlarms:list
-      - calendar:displayAlarms:get
-    create:
-      - calendar:displayAlarms:create
-    write:
-      - calendar:displayAlarms:update
-    delete:
-      - calendar:displayAlarms:delete
-
-  mailAlarms:
-    read:
-      - calendar:mailAlarms:list
-      - calendar:mailAlarms:get
-    create:
-      - calendar:mailAlarms:create
-    write:
-      - calendar:mailAlarms:update
-    delete:
-      - calendar:mailAlarms:delete
-
-  soundAlarms:
-    read:
-      - calendar:soundAlarms:list
-      - calendar:soundAlarms:get
-    create:
-      - calendar:soundAlarms:create
-    write:
-      - calendar:soundAlarms:update
-    delete:
-      - calendar:soundAlarms:delete
-
-  openFileAlarms:
-    read:
-      - calendar:openFileAlarms:list
-      - calendar:openFileAlarms:get
-    create:
-      - calendar:openFileAlarms:create
-    write:
-      - calendar:openFileAlarms:update
-    delete:
-      - calendar:openFileAlarms:delete
 
   # Application-level permissions
   app:

@@ -25,7 +25,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { existsSync, mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,6 +42,41 @@ const PHOTOS_LIST = 'photos:mediaItems:list'
 const ITERM_SPLIT = 'iterm:app:splitVertically'
 const PHOTOS_LIST_ROUTE = 'photos.mediaItems.list'
 const ITERM_SPLIT_ROUTE = 'iterm.app.splitVertically'
+
+/**
+ * A user manifest whose permissions map lists a permission no route requires:
+ * `jotter:notes:update`, beside the one route permission `jotter:notes:list`.
+ */
+const DECLARED_ONLY_MANIFEST = `version: '1.0'
+app:
+  bundleId: com.example.jotter
+  name: Jotter
+  tccEntitlements: []
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    properties:
+      title: { access: r, type: string, description: Title }
+enums: {}
+hierarchy:
+  children:
+    notes: { resource: Note, access: r }
+commands:
+  list:
+    name: list
+    description: List notes
+    scope: resource
+    resourceType: Note
+    parameters: []
+permissions:
+  notes:
+    read:
+      - jotter:notes:list
+    write:
+      - jotter:notes:update
+`
 
 /** An operation id in the `app.resource.operation` form the runtime requires. */
 type OperationId = `${string}.${string}.${string}`
@@ -157,19 +192,26 @@ describe('macts api-key create (UAT): permission grammar and case', () => {
   })
 
   it('names the permissions map when a permission is declared there but no route requires it', async () => {
-    // manifests/photos/app.yaml lists photos:mediaItems:update under the
-    // mediaItems `write` mapping, and no Photos route requires it.
+    // No shipped manifest lists such a permission (a guard over every shipped
+    // manifest enforces it), but a user manifest can. This one's only route
+    // is jotter.notes.list (app "Jotter", resource Notes, command list),
+    // requiring jotter:notes:list; its permissions map also lists
+    // jotter:notes:update, which no route requires.
+    const manifestPath = join(mactsHome, 'jotter.yaml')
+    writeFileSync(manifestPath, DECLARED_ONLY_MANIFEST)
     const result = await runCli([
       'api-key',
       'create',
       '--name',
       'declared-only',
       '--permission',
-      'photos:mediaItems:update',
+      'jotter:notes:update',
+      '--manifest',
+      manifestPath,
     ])
     expect(result.code, result.stderr).toBe(0)
     expect(result.stderr).toContain(
-      'warning: "photos:mediaItems:update" is listed in the photos manifest\'s permissions map, but no photos route requires it yet'
+      'warning: "jotter:notes:update" is listed in the jotter manifest\'s permissions map, but no jotter route requires it yet'
     )
   })
 

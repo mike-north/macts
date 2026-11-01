@@ -762,10 +762,6 @@ permissions:
       - calendar:calendars:reload
     create:
       - calendar:calendars:create
-    write:
-      - calendar:calendars:update
-    delete:
-      - calendar:calendars:delete
 
   events:
     read:
@@ -793,6 +789,8 @@ The permissions section is a two-level mapping:
 2. **Operation level** - Maps coarse operation names to arrays of fine-grained permissions
 
 Each fine-grained permission follows the format: `<app>:<resource>:<operation>`
+
+Every fine-grained permission a group lists must be one that some route of the app requires. An operation the app has no command for is left out of the groups, rather than listed ahead of its command; adding the command adds its group entry in the same change. A test over every shipped manifest checks this.
 
 #### Coarse Operations
 
@@ -935,7 +933,7 @@ Coarse permissions are **CRUD-style groups** that expand to multiple fine-graine
 ```
 calendar:events:read       → calendar:events:list, calendar:events:get, calendar:events:show
 calendar:events:create     → calendar:events:create
-calendar:calendars:write   → calendar:calendars:update
+calendar:events:write      → calendar:events:update
 ```
 
 The expansion is defined in the manifest's `permissions` section:
