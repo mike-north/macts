@@ -30,6 +30,11 @@ import { ERROR_CLASSES } from './registry.js'
 /** Longest `receivedCode` kept on a protocol-mismatch, so hostile input cannot bloat an error. */
 const MAX_RECEIVED_CODE_LENGTH = 64
 
+/**
+ * Wire schema of one `ValidationIssue` (declared in `issues.ts`): the path into
+ * the offending value, a human-readable message, and an optional stable code.
+ * Shared by the two codes whose details carry issues.
+ */
 const validationIssueSchema = z.object({
   path: z.array(z.union([z.string(), z.number()])),
   message: z.string(),
@@ -157,6 +162,13 @@ export interface FromWireErrorOptions {
   readonly status?: number
 }
 
+/**
+ * Build the client-side failure for a body that is not a well-formed envelope
+ * for a known code. The message is a fixed description chosen by the caller and
+ * never echoes received text; the received code, when it was a string, is kept
+ * only in the bounded `receivedCode` field, and the advisory HTTP status only
+ * in `status`.
+ */
 function protocolMismatch(
   message: string,
   options: FromWireErrorOptions | undefined,
@@ -171,10 +183,21 @@ function protocolMismatch(
   })
 }
 
+/**
+ * Whether an untrusted value is a non-null, non-array object whose own keys can
+ * be read. Used only to walk the envelope; field values are validated
+ * separately.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+/**
+ * Construct the canonical class for `code` from validated details.
+ *
+ * @returns The reconstructed error, or `undefined` exactly when `details` fail
+ *   the code's schema; the caller turns that into a protocol mismatch.
+ */
 function reconstruct<C extends WireErrorCode>(
   code: C,
   message: string,
@@ -217,7 +240,7 @@ export function fromWireErrorEnvelope(
   }
   const message = Object.hasOwn(wire, 'message') ? wire['message'] : undefined
   if (typeof message !== 'string') {
-    return protocolMismatch('Response error has no message', options, code)
+    return protocolMismatch('Response error message is missing or not a string', options, code)
   }
   const details = Object.hasOwn(wire, 'details') ? wire['details'] : undefined
   return (

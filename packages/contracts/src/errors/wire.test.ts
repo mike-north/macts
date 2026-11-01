@@ -61,7 +61,7 @@ const SAMPLES: Record<WireErrorCode, () => MactsError<WireErrorCode>> = {
     new ApprovalRejectedError('rejected', { permission: 'p:r:o', layer: 'key', state: 'timeout' }),
   TARGET_NOT_FOUND: () => new TargetNotFoundError('missing', { resource: 'note' }),
   FILE_NOT_FOUND: () => new FileNotFoundError('no file', { path: 'a/b.txt' }),
-  INVALID_SELECTION: () => new InvalidSelectionError('bad range', {}),
+  INVALID_SELECTION: () => new InvalidSelectionError('bad range', { resource: 'notes' }),
   APP_UNAVAILABLE: () =>
     new AppUnavailableError('gone', { app: 'Notes', reason: 'not-responding' }),
   APP_AUTHORIZATION_REQUIRED: () => new AppAuthorizationRequiredError('tcc', { app: 'Notes' }),
@@ -90,6 +90,163 @@ function expectMismatch(result: AnyMactsError): TransportError {
   expect(result.details.reason).toBe('protocol-mismatch')
   return result
 }
+
+/**
+ * Hand-written decode table: one wire envelope per code, written as raw JSON
+ * text the way a service would send it, with the class the D6 table assigns
+ * to that code named explicitly. Neither the JSON nor the expected class is
+ * derived from a constructed sample.
+ */
+const DECODE_TABLE: readonly {
+  readonly json: string
+  readonly expectedClass: new (...args: never[]) => MactsError
+  readonly expectedName: string
+  readonly expectedDetails: unknown
+}[] = [
+  {
+    json: '{"error":{"code":"VALIDATION_FAILED","message":"m","details":{"issues":[{"path":["start",0],"message":"Expected a date","code":"not-date"}]}}}',
+    expectedClass: ValidationError,
+    expectedName: 'ValidationError',
+    expectedDetails: {
+      issues: [{ path: ['start', 0], message: 'Expected a date', code: 'not-date' }],
+    },
+  },
+  {
+    json: '{"error":{"code":"UNEXPECTED_VALUE","message":"m","details":{"issues":[{"path":["status"],"message":"Unknown member"}]}}}',
+    expectedClass: UnexpectedValueError,
+    expectedName: 'UnexpectedValueError',
+    expectedDetails: { issues: [{ path: ['status'], message: 'Unknown member' }] },
+  },
+  {
+    json: '{"error":{"code":"UNAUTHENTICATED","message":"m","details":{"reason":"revoked"}}}',
+    expectedClass: AuthenticationError,
+    expectedName: 'AuthenticationError',
+    expectedDetails: { reason: 'revoked' },
+  },
+  {
+    json: '{"error":{"code":"PERMISSION_DENIED","message":"m","details":{"required":"calendar:events:create"}}}',
+    expectedClass: PermissionDeniedError,
+    expectedName: 'PermissionDeniedError',
+    expectedDetails: { required: 'calendar:events:create' },
+  },
+  {
+    json: '{"error":{"code":"POLICY_DENIED","message":"m","details":{"permission":"mail:messages:send","layer":"key"}}}',
+    expectedClass: PolicyDeniedError,
+    expectedName: 'PolicyDeniedError',
+    expectedDetails: { permission: 'mail:messages:send', layer: 'key' },
+  },
+  {
+    json: '{"error":{"code":"APPROVAL_PENDING","message":"m","details":{"permission":"mail:messages:send","layer":"host"}}}',
+    expectedClass: ApprovalPendingError,
+    expectedName: 'ApprovalPendingError',
+    expectedDetails: { permission: 'mail:messages:send', layer: 'host' },
+  },
+  {
+    json: '{"error":{"code":"APPROVAL_REJECTED","message":"m","details":{"permission":"mail:messages:send","layer":"host","state":"rejected"}}}',
+    expectedClass: ApprovalRejectedError,
+    expectedName: 'ApprovalRejectedError',
+    expectedDetails: { permission: 'mail:messages:send', layer: 'host', state: 'rejected' },
+  },
+  {
+    json: '{"error":{"code":"TARGET_NOT_FOUND","message":"m","details":{"resource":"events"}}}',
+    expectedClass: TargetNotFoundError,
+    expectedName: 'TargetNotFoundError',
+    expectedDetails: { resource: 'events' },
+  },
+  {
+    json: '{"error":{"code":"FILE_NOT_FOUND","message":"m","details":{"path":"/Users/me/a.pdf"}}}',
+    expectedClass: FileNotFoundError,
+    expectedName: 'FileNotFoundError',
+    expectedDetails: { path: '/Users/me/a.pdf' },
+  },
+  {
+    json: '{"error":{"code":"INVALID_SELECTION","message":"m","details":{"resource":"notes"}}}',
+    expectedClass: InvalidSelectionError,
+    expectedName: 'InvalidSelectionError',
+    expectedDetails: { resource: 'notes' },
+  },
+  {
+    json: '{"error":{"code":"APP_UNAVAILABLE","message":"m","details":{"app":"Calendar","reason":"not-installed"}}}',
+    expectedClass: AppUnavailableError,
+    expectedName: 'AppUnavailableError',
+    expectedDetails: { app: 'Calendar', reason: 'not-installed' },
+  },
+  {
+    json: '{"error":{"code":"APP_AUTHORIZATION_REQUIRED","message":"m","details":{"app":"Calendar"}}}',
+    expectedClass: AppAuthorizationRequiredError,
+    expectedName: 'AppAuthorizationRequiredError',
+    expectedDetails: { app: 'Calendar' },
+  },
+  {
+    json: '{"error":{"code":"APP_OPERATION_FAILED","message":"m","details":{"app":"Calendar"}}}',
+    expectedClass: AppOperationError,
+    expectedName: 'AppOperationError',
+    expectedDetails: { app: 'Calendar' },
+  },
+  {
+    json: '{"error":{"code":"TIMEOUT","message":"m","details":{"timeoutMs":5000}}}',
+    expectedClass: OperationTimeoutError,
+    expectedName: 'OperationTimeoutError',
+    expectedDetails: { timeoutMs: 5000 },
+  },
+  {
+    json: '{"error":{"code":"CANCELLED","message":"m","details":{}}}',
+    expectedClass: OperationCancelledError,
+    expectedName: 'OperationCancelledError',
+    expectedDetails: {},
+  },
+  {
+    json: '{"error":{"code":"TRANSFER_FAILED","message":"m","details":{"reason":"unknown-transfer"}}}',
+    expectedClass: TransferError,
+    expectedName: 'TransferError',
+    expectedDetails: { reason: 'unknown-transfer' },
+  },
+  {
+    json: '{"error":{"code":"INTERNAL","message":"m","details":{}}}',
+    expectedClass: InternalError,
+    expectedName: 'InternalError',
+    expectedDetails: {},
+  },
+]
+
+describe('hand-written decode table', () => {
+  it('covers every wire code exactly once', () => {
+    const codes = DECODE_TABLE.map(
+      (row) => (JSON.parse(row.json) as { error: { code: string } }).error.code
+    ).sort()
+    // Every wire code from the D6 table, written out by hand.
+    expect(codes).toEqual(
+      [
+        'APPROVAL_PENDING',
+        'APPROVAL_REJECTED',
+        'APP_AUTHORIZATION_REQUIRED',
+        'APP_OPERATION_FAILED',
+        'APP_UNAVAILABLE',
+        'CANCELLED',
+        'FILE_NOT_FOUND',
+        'INTERNAL',
+        'INVALID_SELECTION',
+        'PERMISSION_DENIED',
+        'POLICY_DENIED',
+        'TARGET_NOT_FOUND',
+        'TIMEOUT',
+        'TRANSFER_FAILED',
+        'UNAUTHENTICATED',
+        'UNEXPECTED_VALUE',
+        'VALIDATION_FAILED',
+      ].sort()
+    )
+  })
+
+  it.each(DECODE_TABLE)('$expectedName decodes from hand-written JSON', (row) => {
+    const decoded = fromWireErrorEnvelope(JSON.parse(row.json))
+    expect(decoded).toBeInstanceOf(row.expectedClass)
+    expect(decoded).toBeInstanceOf(MactsError)
+    expect(decoded.name).toBe(row.expectedName)
+    expect(decoded.message).toBe('m')
+    expect(decoded.details).toEqual(row.expectedDetails)
+  })
+})
 
 describe('round trip', () => {
   it.each(CODES)('%s survives encode, JSON, decode as the same class', (code) => {
