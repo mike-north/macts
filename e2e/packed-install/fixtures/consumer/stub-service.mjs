@@ -2,7 +2,8 @@
  * A stub macts service on an ephemeral local port, answering the widgets
  * app's operations the way the real HTTP adapter does: `list` succeeds with
  * one widget in wire form, and `get` fails with a `TARGET_NOT_FOUND` error
- * envelope. It records the Authorization header of every request.
+ * envelope. The Notes app's `notes.attachments.get` also fails with a
+ * `TARGET_NOT_FOUND` envelope. It records the Authorization header of every request.
  */
 
 import { createServer } from 'node:http'
@@ -27,6 +28,19 @@ export async function startStubService() {
               code: 'TARGET_NOT_FOUND',
               message: 'No such widget.',
               details: { resource: 'Widget' },
+            },
+          })
+        )
+        return
+      }
+      if (request.method === 'POST' && request.url === '/api/v1/rpc/notes.attachments.get') {
+        response.statusCode = 404
+        response.end(
+          JSON.stringify({
+            error: {
+              code: 'TARGET_NOT_FOUND',
+              message: 'No such attachment.',
+              details: { resource: 'Attachment' },
             },
           })
         )

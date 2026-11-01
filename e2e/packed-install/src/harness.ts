@@ -3,11 +3,12 @@
  * user's would be, from packed tarballs rather than workspace links.
  *
  * It packs the built `@macts/contracts`, `@macts/core`, `@macts/runtime`, and
- * `@macts/sdk` with `pnpm pack` (which rewrites `workspace:` ranges to real
- * versions, as publishing does), packs a small hand-written app package that
- * exposes its contract at the `/contract` subpath, installs all of them into
- * a fresh temporary project with npm, and offers helpers to inspect the
- * installed tree and run consumer programs against it.
+ * `@macts/sdk`, plus the real `@macts/notes` app package, with `pnpm pack`
+ * (which rewrites `workspace:` and `catalog:` ranges to real versions, as
+ * publishing does), packs a small hand-written app package that exposes its
+ * contract at the `/contract` subpath, installs all of them into a fresh
+ * temporary project with npm, and offers helpers to inspect the installed
+ * tree and run consumer programs against it.
  *
  * Third-party dependencies come from the npm registry; every `@macts/*`
  * package comes from its tarball.
@@ -41,6 +42,16 @@ export const PACKED_PACKAGES = ['contracts', 'core', 'runtime', 'sdk'] as const
 
 /** One of {@link PACKED_PACKAGES}. */
 export type PackedPackage = (typeof PACKED_PACKAGES)[number]
+
+/**
+ * The real generated app packages installed next to the SDK. Their
+ * `@macts/cli`, `clipanion`, and `typanion` peers are optional, so an install
+ * that wants only the SDK client never receives them.
+ */
+export const APP_PACKAGES = ['notes'] as const
+
+/** One of {@link APP_PACKAGES}. */
+export type AppPackage = (typeof APP_PACKAGES)[number]
 
 /** The fixture app package's name, as consumer programs import it. */
 export const FIXTURE_APP = '@macts-fixture/widgets'
@@ -120,10 +131,10 @@ function onlyTarball(dir: string): string {
 }
 
 /** Paths to the packed tarballs, by package. */
-export type Tarballs = Readonly<Record<PackedPackage | 'app', string>>
+export type Tarballs = Readonly<Record<PackedPackage | AppPackage | 'app', string>>
 
 /**
- * Pack every workspace package and the fixture app into `<root>/tarballs`.
+ * Pack every workspace package, the real app packages, and the fixture app into `<root>/tarballs`.
  *
  * Each tarball is packed into its own staging directory and renamed to a
  * stable name, so nothing depends on the version in pnpm's file name.
@@ -132,8 +143,8 @@ export async function packAll(root: string): Promise<Tarballs> {
   const tarballDir = join(root, 'tarballs')
   mkdirSync(tarballDir, { recursive: true })
 
-  const packed: Partial<Record<PackedPackage | 'app', string>> = {}
-  for (const name of PACKED_PACKAGES) {
+  const packed: Partial<Record<PackedPackage | AppPackage | 'app', string>> = {}
+  for (const name of [...PACKED_PACKAGES, ...APP_PACKAGES]) {
     const staging = join(root, 'staging', name)
     mkdirSync(staging, { recursive: true })
     await run('pnpm', ['pack', '--pack-destination', staging], join(REPO_ROOT, 'packages', name))
@@ -178,6 +189,7 @@ export async function installConsumer(dir: string, tarballs: Tarballs): Promise<
       '@macts/core': `file:${tarballs.core}`,
       '@macts/runtime': `file:${tarballs.runtime}`,
       '@macts/sdk': `file:${tarballs.sdk}`,
+      '@macts/notes': `file:${tarballs.notes}`,
       [FIXTURE_APP]: `file:${tarballs.app}`,
     },
   }
@@ -200,6 +212,18 @@ export function findNativeAddons(projectDir: string): string[] {
   return walk(join(projectDir, 'node_modules')).filter(
     (path) => path.endsWith('.node') || basename(path) === 'binding.gyp'
   )
+}
+
+/** The names of every installed `@macts/*` package, sorted. */
+export function installedMactsPackages(projectDir: string): string[] {
+  return readdirSync(join(projectDir, 'node_modules', '@macts'))
+    .map((name) => `@macts/${name}`)
+    .sort()
+}
+
+/** Whether `packageName` is installed in the project. */
+export function isInstalled(projectDir: string, packageName: string): boolean {
+  return existsSync(join(projectDir, 'node_modules', ...packageName.split('/'), 'package.json'))
 }
 
 /** Every installed copy of `packageName`, as directories relative to the project. */

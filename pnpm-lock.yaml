@@ -119,6 +119,9 @@ importers:
       '@macts/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@macts/notes':
+        specifier: workspace:*
+        version: link:../../packages/notes
       '@macts/runtime':
         specifier: workspace:*
         version: link:../../packages/runtime
@@ -1739,6 +1742,12 @@ importers:
       '@macts/api':
         specifier: workspace:*
         version: link:../api
+      '@macts/calendar':
+        specifier: workspace:*
+        version: link:../calendar
+      '@macts/notes':
+        specifier: workspace:*
+        version: link:../notes
       tsd:
         specifier: 'catalog:'
         version: 0.31.2

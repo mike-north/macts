@@ -1,13 +1,22 @@
 /**
  * Packed-install UAT for `@macts/sdk`.
  *
- * Installs the packed SDK, its macts dependencies, and a hand-written app
- * package into a fresh project, then drives it as a user's program would.
- * Expected outcomes are hand-written from phases/13 D1:
+ * Installs the packed SDK, its macts dependencies, the real `@macts/notes`
+ * app package, and a hand-written app package into a fresh project, then
+ * drives it as a user's program would. Expected outcomes are hand-written from
+ * phases/13 D1:
  *
- * - the install graph contains no native addon;
+ * - the install graph contains no native addon, and the `@macts/*` packages
+ *   installed are exactly the SDK's dependency closure (contracts, core,
+ *   runtime) plus the SDK and the app packages, so installing `@macts/sdk`
+ *   alone brings no native addon;
+ * - the app package's optional peers (`@macts/cli`, `clipanion`, `typanion`)
+ *   stay uninstalled;
  * - exactly one copy of `@macts/contracts` is installed, which is what error
  *   identity and integer brands rely on;
+ * - an error thrown through the real Notes contract's remote client is
+ *   `instanceof` `TargetNotFoundError` and `MactsError` from `@macts/sdk` and
+ *   from `@macts/sdk/local`;
  * - an error thrown through the app's remote client is `instanceof` the class
  *   imported from `@macts/sdk` and from `@macts/sdk/local`, and of
  *   `MactsError` from both;
@@ -27,6 +36,8 @@ import {
   findInstalledCopies,
   findNativeAddons,
   installConsumer,
+  installedMactsPackages,
+  isInstalled,
   packAll,
   runConsumer,
   typecheckBrandCheck,
@@ -52,6 +63,25 @@ afterAll(() => {
 describe('packed install: installed tree', () => {
   it('contains no native addon', () => {
     expect(findNativeAddons(consumer)).toEqual([])
+  })
+
+  it("contains exactly the SDK's dependency closure plus the app packages", () => {
+    // Together with the absence of native addons above, this is the check that
+    // installing `@macts/sdk` alone brings no native addon: the SDK's closure
+    // is contracts, core, and runtime, and nothing else from macts is present.
+    expect(installedMactsPackages(consumer)).toEqual([
+      '@macts/contracts',
+      '@macts/core',
+      '@macts/notes',
+      '@macts/runtime',
+      '@macts/sdk',
+    ])
+  })
+
+  it('leaves the app package optional peers uninstalled', () => {
+    for (const peer of ['@macts/cli', 'clipanion', 'typanion']) {
+      expect(isInstalled(consumer, peer), peer).toBe(false)
+    }
   })
 
   it('contains exactly one copy of @macts/contracts', () => {
@@ -80,6 +110,26 @@ describe('packed install: identity across entry points', () => {
       },
       sameBindings: { errorClass: true, errorClassFromContracts: true, integerLimits: true },
       localFactory: 'function',
+    })
+  })
+
+  it('reconstructs a remote error from the real Notes contract as the shared classes', async () => {
+    const report = await runConsumer(consumer, 'notes-install.mjs')
+
+    expect(report).toEqual({
+      app: 'notes',
+      error: {
+        name: 'TargetNotFoundError',
+        code: 'TARGET_NOT_FOUND',
+        message: 'No such attachment.',
+        details: { resource: 'Attachment' },
+      },
+      instanceOf: {
+        sdkTargetNotFound: true,
+        localTargetNotFound: true,
+        sdkMactsError: true,
+        localMactsError: true,
+      },
     })
   })
 

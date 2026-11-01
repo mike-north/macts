@@ -54,6 +54,8 @@
   },
   "devDependencies": {
     "@macts/api": "workspace:*",
+    "@macts/calendar": "workspace:*",
+    "@macts/notes": "workspace:*",
     "tsd": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

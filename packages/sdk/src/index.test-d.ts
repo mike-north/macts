@@ -10,10 +10,15 @@
  * Invalid usage is expressed with `expectNotAssignable` rather than
  * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
  *
+ * Update inputs of a generated contract accept a value or omission but never
+ * `null`: no property is resettable (phases/13 D10), so a reset is not
+ * expressible.
+ *
  * @see phases/13-sdk-value-and-execution-contracts.md (D1, D2)
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
+import type { EventUpdateInput } from '@macts/calendar/contract'
 import type { AppContract, ClientFactory } from '@macts/contracts'
 import * as remote from './index.js'
 import * as local from './local.js'
@@ -46,3 +51,7 @@ expectType<typeof remote.MactsError>(local.MactsError)
 declare const integer: remote.Integer
 expectType<local.Integer>(integer)
 expectNotAssignable<local.Integer>(7)
+
+// Update fields are never nullable while no property is resettable (D10).
+expectAssignable<EventUpdateInput>({ summary: 'Standup' })
+expectNotAssignable<EventUpdateInput>({ summary: null })
