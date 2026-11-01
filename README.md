@@ -208,12 +208,13 @@ structured path to grow the available toolset.
 
 ### Infrastructure Packages
 
-| Package       | Description                                   |
-| ------------- | --------------------------------------------- |
-| `@macts/cli`  | Command-line interface                        |
-| `@macts/api`  | Local HTTP API server                         |
-| `@macts/core` | Manifest schemas, code generators, app bridge |
-| `@macts/mcp`  | MCP server framework and plugin loader        |
+| Package          | Description                                              |
+| ---------------- | -------------------------------------------------------- |
+| `@macts/cli`     | Command-line interface                                   |
+| `@macts/api`     | Local HTTP API server                                    |
+| `@macts/core`    | Manifest schemas, code generators, app bridge            |
+| `@macts/mcp`     | MCP server framework and plugin loader                   |
+| `@macts/runtime` | Shared Mac-side runtime: API keys and governance loading |
 
 ### Which package should I use?
 
@@ -308,7 +309,7 @@ access without granting write or delete access, or grant create without granting
 ## Requirements
 
 - **macOS** -- macts automates native macOS applications, which are only available on macOS
-- **Node.js 22+** -- Required for the API server and SDK
+- **Node.js 22.13+** -- Required for the API server and SDK (the first release whose built-in SQLite, used by the key store, loads without a flag)
 - **Target apps** -- Must be installed and have granted automation permissions when first prompted
 
 ## Contributing

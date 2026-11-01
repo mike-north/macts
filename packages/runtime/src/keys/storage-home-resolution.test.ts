@@ -93,7 +93,7 @@ describe('storage directory resolution (issue #44)', () => {
       expect(path.isAbsolute(secretFile)).toBe(true)
       expect(secretFile.split(path.sep)).not.toContain('~')
     } finally {
-      storage.closeDatabase()
+      storage.closeKeyStore()
     }
   })
 
@@ -113,7 +113,7 @@ describe('storage directory resolution (issue #44)', () => {
       // Nothing must leak into HOME/.macts.
       expect(fs.existsSync(path.join(homeDir, '.macts'))).toBe(false)
     } finally {
-      storage.closeDatabase()
+      storage.closeKeyStore()
     }
   })
 
@@ -132,7 +132,7 @@ describe('storage directory resolution (issue #44)', () => {
       const secretFile = path.join(expectedDir, 'secrets', 'api-key-secret')
       expect(fs.existsSync(secretFile)).toBe(true)
     } finally {
-      storage.closeDatabase()
+      storage.closeKeyStore()
     }
   })
 
@@ -156,7 +156,7 @@ describe('storage directory resolution (issue #44)', () => {
       // And there must be no literal "~" entry created in cwd.
       expect(fs.existsSync(path.join(process.cwd(), '~'))).toBe(false)
     } finally {
-      storage.closeDatabase()
+      storage.closeKeyStore()
     }
   })
 
@@ -177,7 +177,7 @@ describe('storage directory resolution (issue #44)', () => {
       expect(fs.statSync(secretsDir).mode & 0o777).toBe(0o700)
       expect(fs.statSync(secretFile).mode & 0o777).toBe(0o600)
     } finally {
-      storage.closeDatabase()
+      storage.closeKeyStore()
     }
   })
 })

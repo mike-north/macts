@@ -1,5 +1,5 @@
 /**
- * Active governance policy loading for the API server.
+ * Active governance policy loading for every surface that enforces governance.
  *
  * The call-time enforcement layer (issue #53) checks every capability call
  * against an *active* `GovernancePolicy`. This module resolves where that
@@ -8,7 +8,7 @@
  *
  * ## Where the active policy lives
  *
- * The policy file is resolved by {@link resolveActivePolicyPath} (from
+ * The policy file is resolved by `resolveActivePolicyPath` (from
  * `@macts/core`) to `<macts-home>/governance/policy.json`. The same shared
  * resolver is used by the CLI and MCP discovery layers so that enforcement and
  * discovery always read the same file (issue #79). The path can be overridden
@@ -34,7 +34,7 @@
 import { readFile } from 'node:fs/promises'
 import type { GovernancePolicy } from '@macts/core'
 import { parsePolicy, resolveActivePolicyPath } from '@macts/core'
-import { getMactsHome } from '../../paths.js'
+import { getMactsHome } from '../paths.js'
 
 /**
  * Recursively freeze a value and all of its nested arrays/objects.
@@ -73,7 +73,7 @@ export const ALLOW_ALL_POLICY: GovernancePolicy = deepFreeze({
 /**
  * Resolve the absolute path to the active governance policy file.
  *
- * Delegates to the canonical {@link resolveActivePolicyPath} helper in
+ * Delegates to the canonical `resolveActivePolicyPath` helper in
  * `@macts/core` so that enforcement and discovery always read from the same
  * location (`<macts-home>/governance/policy.json`).
  *

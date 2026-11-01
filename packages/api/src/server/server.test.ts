@@ -12,8 +12,9 @@ interface ErrorResponse {
   }
 }
 
-// Mock the validator module
-vi.mock('../keys/validator.js', () => ({
+// Mock key verification; everything else in the runtime stays real
+vi.mock('@macts/runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@macts/runtime')>()),
   validateApiKey: vi.fn(),
   checkPayloadPermission: vi.fn(),
 }))
@@ -175,7 +176,7 @@ describe('RPC endpoints', () => {
   })
 
   it('exposes introspection endpoint', async () => {
-    const { validateApiKey } = await import('../keys/validator.js')
+    const { validateApiKey } = await import('@macts/runtime')
     vi.mocked(validateApiKey).mockResolvedValue({
       valid: true,
       payload: {
@@ -224,7 +225,7 @@ describe('auth middleware integration', () => {
   })
 
   it('allows requests with valid API key', async () => {
-    const { validateApiKey, checkPayloadPermission } = await import('../keys/validator.js')
+    const { validateApiKey, checkPayloadPermission } = await import('@macts/runtime')
 
     vi.mocked(validateApiKey).mockResolvedValue({
       valid: true,
@@ -260,7 +261,7 @@ describe('auth middleware integration', () => {
   })
 
   it('rejects requests with invalid API key', async () => {
-    const { validateApiKey } = await import('../keys/validator.js')
+    const { validateApiKey } = await import('@macts/runtime')
 
     vi.mocked(validateApiKey).mockResolvedValue({
       valid: false,
@@ -284,7 +285,7 @@ describe('auth middleware integration', () => {
   })
 
   it('rejects requests without required permission', async () => {
-    const { validateApiKey, checkPayloadPermission } = await import('../keys/validator.js')
+    const { validateApiKey, checkPayloadPermission } = await import('@macts/runtime')
 
     vi.mocked(validateApiKey).mockResolvedValue({
       valid: true,

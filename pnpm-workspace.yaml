@@ -16,7 +16,6 @@ catalog:
 
 onlyBuiltDependencies:
   - '@withgraphite/graphite-cli'
-  - better-sqlite3
   - esbuild
   - nx
 

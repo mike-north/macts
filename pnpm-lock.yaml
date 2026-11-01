@@ -200,15 +200,12 @@ importers:
       '@macts/core':
         specifier: workspace:*
         version: link:../core
-      better-sqlite3:
-        specifier: ^13.0.3
-        version: 13.0.3
+      '@macts/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       hono:
         specifier: ^4.7.0
         version: 4.11.9
-      jose:
-        specifier: ^5.10.0
-        version: 5.10.0
       pino:
         specifier: ^10.3.1
         version: 10.3.1
@@ -216,15 +213,6 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
-      '@types/better-sqlite3':
-        specifier: ^9.6.0
-        version: 9.6.0
-      pino-pretty:
-        specifier: ^13.1.3
-        version: 13.1.3
-      tsd:
-        specifier: 'catalog:'
-        version: 0.31.2
       tsup:
         specifier: 'catalog:'
         version: 8.5.1(@microsoft/api-extractor@7.56.3(@types/node@26.2.0))(postcss@8.5.6)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.2)
@@ -446,6 +434,9 @@ importers:
       '@macts/mcp':
         specifier: workspace:*
         version: link:../mcp
+      '@macts/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       clipanion:
         specifier: 'catalog:'
         version: 4.0.0-rc.4(typanion@3.14.0)
@@ -821,12 +812,12 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@macts/api':
-        specifier: workspace:*
-        version: link:../api
       '@macts/core':
         specifier: workspace:*
         version: link:../core
+      '@macts/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       '@macts/types':
         specifier: workspace:*
         version: link:../types
@@ -1434,6 +1425,34 @@ importers:
         specifier: workspace:*
         version: link:../types
     devDependencies:
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(@microsoft/api-extractor@7.56.3(@types/node@26.2.0))(postcss@8.5.6)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/node@26.2.0)(tsx@4.22.4)(yaml@2.8.2)
+
+  packages/runtime:
+    dependencies:
+      '@macts/core':
+        specifier: workspace:*
+        version: link:../core
+      jose:
+        specifier: ^5.10.0
+        version: 5.10.0
+      pino:
+        specifier: ^10.3.1
+        version: 10.3.1
+    devDependencies:
+      pino-pretty:
+        specifier: ^13.1.3
+        version: 13.1.3
+      tsd:
+        specifier: 'catalog:'
+        version: 0.31.2
       tsup:
         specifier: 'catalog:'
         version: 8.5.1(@microsoft/api-extractor@7.56.3(@types/node@26.2.0))(postcss@8.5.6)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.8.2)
@@ -3140,9 +3159,6 @@ packages:
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
-  '@types/better-sqlite3@9.6.0':
-    resolution: {integrity: sha512-ZEEwBSgMu7GYJOynoagg5X9JbxfL6dTJDsgViJIqh67jV44kyOr9RXfmFjLK5rzC4MWssP06t9hu/JwGDnUbCg==}
-
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
@@ -3433,10 +3449,6 @@ packages:
   better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
-
-  better-sqlite3@13.0.3:
-    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
-    engines: {node: '>=22'}
 
   bin-links@3.0.3:
     resolution: {integrity: sha512-zKdnMPWEdh4F5INR07/eBrodC7QrF5JKvqskjz/ZZRXg5YSAZIbn8zGhbhUrElzHBZ2fvEQdOU59RHcTG3GiwA==}
@@ -4568,10 +4580,6 @@ packages:
   negotiator@1.0.0:
     resolution: {integrity: sha512-8Ofs/AUQh8MaEcrlq5xOX0CQ9ypTF5dl78mjlMNfOK08fzpgTHQRQPBxcPlEtIw0yRpws+Zo/3r+5WRby7u3Gg==}
     engines: {node: '>= 0.6'}
-
-  node-addon-api@8.9.2:
-    resolution: {integrity: sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==}
-    engines: {node: ^18 || ^20 || >= 21}
 
   node-machine-id@1.1.12:
     resolution: {integrity: sha512-QNABxbrPa3qEIfrE6GOJ7BYIuignnJw7iQ2YPbc3Nla1HzRJjXzZOiikfF8m7eAMfichLt3M4VgLOetqgDmgGQ==}
@@ -6566,10 +6574,6 @@ snapshots:
 
   '@types/argparse@1.0.38': {}
 
-  '@types/better-sqlite3@9.6.0':
-    dependencies:
-      '@types/node': 26.2.0
-
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -6894,10 +6898,6 @@ snapshots:
   better-path-resolve@1.0.0:
     dependencies:
       is-windows: 1.0.2
-
-  better-sqlite3@13.0.3:
-    dependencies:
-      node-addon-api: 8.9.2
 
   bin-links@3.0.3:
     dependencies:
@@ -8051,8 +8051,6 @@ snapshots:
       through2: 4.0.2
 
   negotiator@1.0.0: {}
-
-  node-addon-api@8.9.2: {}
 
   node-machine-id@1.1.12: {}
 

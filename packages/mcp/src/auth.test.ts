@@ -1,11 +1,11 @@
 /**
  * Tests for MCP API key authentication.
  *
- * `@macts/api/keys` resolves its storage directory (signing secret,
+ * `@macts/runtime` resolves its storage directory (signing secret,
  * revocation database) from `MACTS_HOME` at module-load time, so each test
  * points `MACTS_HOME` at a fresh temp directory and re-imports both
- * `@macts/api/keys` and `./auth.js` via `vi.resetModules()` before use. This
- * mirrors the pattern in `packages/api/src/keys/storage-home-resolution.test.ts`.
+ * `@macts/runtime` and `./auth.js` via `vi.resetModules()` before use. This
+ * mirrors the pattern in `packages/runtime/src/keys/storage-home-resolution.test.ts`.
  *
  * @see packages/api/src/server/middleware/auth.ts for the error-code/response
  *   semantics this module mirrors.
@@ -27,13 +27,13 @@ function makeTempDir(): string {
   return dir
 }
 
-/** Load fresh copies of `@macts/api/keys` and `./auth.js` under the current env. */
+/** Load fresh copies of `@macts/runtime` and `./auth.js` under the current env. */
 async function loadModules(): Promise<{
-  keys: typeof import('@macts/api/keys')
+  keys: typeof import('@macts/runtime')
   auth: typeof import('./auth.js')
 }> {
   vi.resetModules()
-  const keys = await import('@macts/api/keys')
+  const keys = await import('@macts/runtime')
   const auth = await import('./auth.js')
   return { keys, auth }
 }

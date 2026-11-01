@@ -1,5 +1,5 @@
 import { Command, Option } from 'clipanion'
-import { validateApiKey, extractPermissionsFromToken, extractKeyIdFromToken } from '@macts/api'
+import { validateApiKey, extractPermissionsFromToken, extractKeyIdFromToken } from '@macts/runtime'
 import { createFormatter } from '../../output/index.js'
 
 /**

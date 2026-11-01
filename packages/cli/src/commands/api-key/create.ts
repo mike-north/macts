@@ -1,5 +1,5 @@
 import { Command, Option } from 'clipanion'
-import { createApiKey, type CreateApiKeyResult } from '@macts/api'
+import { createApiKey, type CreateApiKeyResult } from '@macts/runtime'
 import { loadManifest, type PermissionsSection, isValidPermission } from '@macts/core'
 import { createFormatter } from '../../output/index.js'
 import * as path from 'node:path'

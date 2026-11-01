@@ -476,7 +476,7 @@ only `validateApiKey` today, which moves to the runtime.
 | `@macts/sdk`       | Public factories and re-exports                                                                                                                                                                                                                                                   | Execution             |
 
 **Why a separate runtime package.** Token verification needs the signing
-secret on disk and the SQLite revocation store (`better-sqlite3`). The local
+secret on disk and the SQLite revocation store. The local
 SDK and the HTTP adapter both need it. If it lived in `@macts/api`, local
 execution would depend on the HTTP server. If it lived in `@macts/sdk`, the
 key store would sit in the public client package and the HTTP adapter would
@@ -507,6 +507,13 @@ resolves this in its first packaging pull request, the one that creates
 
 Either way, the packed-install UAT below also installs `@macts/sdk` alone and
 asserts that the installed tree contains no native addon.
+
+**Resolution.** Option 1 was taken. The revocation and key store runs on
+`node:sqlite`. `engines.node` is `>=22.13.0`, the first release that loads
+`node:sqlite` without a flag. Node 22 and 24 print an `ExperimentalWarning` the
+first time the module loads; the runtime filters that one warning at its single
+load site and suppresses no other warning. No native addon exists anywhere in
+macts, so the remote entry point cannot pull one in.
 
 **Why a separate contracts package.** Generated app packages, the core native
 provider, the runtime, and the remote client all need the same value types and

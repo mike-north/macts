@@ -10,7 +10,7 @@
  * ## Canonical path
  *
  * The active-policy path is resolved by {@link resolveActivePolicyPath} from
- * `@macts/core`. The enforcement layer (`@macts/api`) uses the same resolver,
+ * `@macts/core`. The enforcement layer (`@macts/runtime`) uses the same resolver,
  * so both always read the same file (issue #79).
  *
  * ## Errors

@@ -5,12 +5,6 @@
 
 export { VERSION } from '@macts/core'
 
-// Structured logging
-export { createLogger, getLogger, setLogger } from './logger.js'
-
-// API key management
-export * from './keys/index.js'
-
 // HTTP server
 export {
   createServer,
@@ -31,55 +25,17 @@ export {
   requirePermission,
   rpcPathToPermission,
   requirePolicy,
-  resolveGovernanceForRequest,
   type AuthVariables,
   type AuthErrorCode,
   type AuthErrorResponse,
   type InFlightTracker,
   type PermissionErrorResponse,
   type PermissionMiddlewareOptions,
-  type GovernanceContext,
-  type ResolvedGovernanceContext,
-  type GovernanceContextBase,
-  type GovernanceContextWithApprovals,
-  type GovernanceContextWithoutApprovals,
-  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
   type GovernanceApprovalDeniedResponse,
 } from './server/middleware/index.js'
-
-// Active governance policy loading
-export {
-  loadActivePolicy,
-  getActivePolicyPath,
-  ALLOW_ALL_POLICY,
-  ActivePolicyError,
-  type LoadActivePolicyOptions,
-} from './server/governance/active-policy.js'
-
-// Human-in-the-loop approval provider loading
-export {
-  loadApprovalConfig,
-  loadApprovalGate,
-  getApprovalConfigPath,
-  ApprovalProviderError,
-  type ApprovalProviderFactory,
-  type LoadApprovalOptions,
-  type LoadApprovalGateOptions,
-  type LoadedApprovalGate,
-} from './server/governance/approval-provider.js'
-
-// Per-request resolution of the policy attached to an API key
-export {
-  createKeyPolicyResolver,
-  createStoredKeyPolicyResolver,
-  DEFAULT_KEY_POLICY_CACHE_TTL_MS,
-  type KeyPolicyResolver,
-  type KeyPolicyLoader,
-  type CreateKeyPolicyResolverOptions,
-} from './server/governance/key-policy.js'
 
 // RPC handlers
 export {

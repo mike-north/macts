@@ -61,15 +61,7 @@
 
 import { randomUUID } from 'node:crypto'
 import type { MiddlewareHandler } from 'hono'
-import type {
-  GovernancePolicy,
-  ApprovalDeniedState,
-  ApprovalProvider,
-  ApprovalRequest,
-  AuditWriter,
-  PolicyLayer,
-  RiskClass,
-} from '@macts/core'
+import type { ApprovalDeniedState, ApprovalRequest, PolicyLayer, RiskClass } from '@macts/core'
 import {
   DEFAULT_APPROVAL_TIMEOUT_MS,
   enforceCall,
@@ -77,9 +69,8 @@ import {
   redactArgs,
   seekApproval,
 } from '@macts/core'
+import { getLogger, resolveGovernanceForRequest, type GovernanceContext } from '@macts/runtime'
 import { getTracer, SpanStatusCode } from '../../telemetry.js'
-import { getLogger } from '../../logger.js'
-import type { KeyPolicyResolver } from '../governance/key-policy.js'
 import type { AuthVariables } from './auth.js'
 
 /**
@@ -106,7 +97,7 @@ export interface GovernanceDeniedResponse {
  * receive the gating rule and exact permission so they can surface "approval
  * required" to the user.
  *
- * Configure an approval provider (see {@link ApprovalGateContext}) to have the
+ * Configure an approval provider (see `ApprovalGateContext` in `@macts/runtime`) to have the
  * middleware seek a human decision in-request instead.
  */
 export interface GovernancePendingResponse {
@@ -154,142 +145,6 @@ export interface GovernanceApprovalDeniedResponse {
      */
     approval: ApprovalDeniedState
   }
-}
-
-/**
- * The configured human-in-the-loop approval gate.
- *
- * Supplying one turns a `confirm-first` hold from "return 202, call withheld"
- * into "ask a human now, within a bounded wait".
- */
-export interface ApprovalGateContext {
-  /** The provider asked to obtain a human decision. */
-  readonly provider: ApprovalProvider
-  /**
-   * Bound, in milliseconds, on how long a request waits for a human. Past it
-   * the call is denied (fail-closed).
-   *
-   * @defaultValue `DEFAULT_APPROVAL_TIMEOUT_MS` (two minutes)
-   */
-  readonly timeoutMs?: number | undefined
-}
-
-/**
- * Governance state shared by every deployment, whichever approval channel it
- * does or does not have.
- *
- * Both arms of {@link GovernanceContext} extend this, so the machine-wide policy
- * and the per-key resolver are declared once and the two arms cannot drift.
- */
-export interface GovernanceContextBase {
-  /** The active machine-wide (host) governance policy to enforce against every call. */
-  readonly policy: GovernancePolicy
-  /**
-   * Optional resolver for the policy attached to the authenticated API key.
-   *
-   * The host policy is machine-wide and can be bound once; *which* key policy
-   * applies depends on who authenticated, so it is resolved per request from
-   * `apiKeyPayload.sub` (see {@link resolveGovernanceForRequest}). When omitted,
-   * or when the key has no policy of its own, the host policy alone governs —
-   * exactly the behavior before per-key policies existed.
-   *
-   * A key policy can only ever tighten the host policy, so this never widens
-   * what a deployment allows — including which calls reach an approval gate.
-   */
-  readonly keyPolicies?: KeyPolicyResolver | undefined
-}
-
-/**
- * Governance state for a deployment with **no** approval channel configured.
- *
- * `confirm-first` calls are withheld and reported as
- * {@link GovernancePendingResponse} (202). The audit writer is optional here,
- * as it has always been: enforcement still runs without one, it just persists
- * nothing.
- */
-export interface GovernanceContextWithoutApprovals extends GovernanceContextBase {
-  /**
-   * Optional audit sink. When provided, every decision (allow / deny / pending)
-   * is appended to it.
-   */
-  readonly writer?: AuditWriter | undefined
-  /** No approval gate. */
-  readonly approvals?: undefined
-}
-
-/**
- * Governance state for a deployment that seeks human approval.
- *
- * The audit writer is **required** on this arm. Seeking a human decision and
- * then having nowhere to record it would let a `confirm-first` operation
- * execute with no attributable trace of who permitted it — so that combination
- * is made unrepresentable rather than merely discouraged.
- */
-export interface GovernanceContextWithApprovals extends GovernanceContextBase {
-  /**
-   * Audit sink for every decision (allow / deny / pending / approved /
-   * rejected). Required whenever an approval gate is present.
-   */
-  readonly writer: AuditWriter
-  /** The approval gate consulted on a `confirm-first` hold. */
-  readonly approvals: ApprovalGateContext
-}
-
-/**
- * Shared governance state for an RPC router: the active policy to enforce, an
- * audit writer to record decisions, and — optionally — an approval gate.
- *
- * When `policy` permits everything (allow-all) and `writer` is omitted, the
- * middleware is a near-no-op — preserving pre-governance behavior.
- */
-export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals
-
-/**
- * A {@link GovernanceContext} with the authenticated key's policy resolved for
- * this request.
- *
- * Distributes over the union, so the approvals arm survives resolution: a
- * resolved context that came in with an approval gate still carries it (and its
- * required writer) on the way out.
- */
-export type ResolvedGovernanceContext = GovernanceContext & {
-  /**
-   * The authenticated key's own policy, or `undefined` when it has none. Never
-   * a permissive placeholder: absence means "host policy alone".
-   */
-  readonly keyPolicy?: GovernancePolicy | undefined
-}
-
-/**
- * Resolve the governance context for a single request from the authenticated
- * API key.
- *
- * This is the per-request half of governance resolution. It exists as a named,
- * exported seam (rather than inline middleware code) because "which policy
- * applies to this caller" is a question other surfaces need to answer the same
- * way.
- *
- * The whole context is carried through, not just the policy, so an approval gate
- * configured on the router reaches the request untouched.
- *
- * A resolver failure propagates to the caller, which must fail the request
- * closed: an unreadable key policy is *not* the same as no key policy, and
- * treating it as such would silently widen the boundary back to the host policy.
- *
- * @param governance - The router-bound governance context (host policy, writer,
- *   optional approval gate, optional key-policy resolver).
- * @param apiKeyId - The authenticated key's id (`ApiKeyPayload.sub`).
- * @returns The context with `keyPolicy` resolved for this request.
- */
-export async function resolveGovernanceForRequest(
-  governance: GovernanceContext,
-  apiKeyId: string
-): Promise<ResolvedGovernanceContext> {
-  if (governance.keyPolicies === undefined) {
-    return governance
-  }
-  const keyPolicy = await governance.keyPolicies.resolve(apiKeyId)
-  return { ...governance, keyPolicy }
 }
 
 /**

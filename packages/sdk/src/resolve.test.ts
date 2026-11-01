@@ -2,7 +2,7 @@
  * Tests for API key and base-URL resolution.
  *
  * Resolution strategy mirrors `@macts/<app>/cli` SDK helpers and
- * `getMactsHome()` in `@macts/api/paths`.
+ * `getMactsHome()` in `@macts/runtime`.
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'

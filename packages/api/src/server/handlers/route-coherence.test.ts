@@ -22,7 +22,8 @@ import { loadManifest, resolveManifestRoutes } from '@macts/core'
 import { createApp } from '../index.js'
 
 // The introspect endpoint is auth-gated; mock the key validator to grant access.
-vi.mock('../../keys/validator.js', () => ({
+vi.mock('@macts/runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@macts/runtime')>()),
   validateApiKey: vi.fn().mockResolvedValue({
     valid: true,
     payload: {

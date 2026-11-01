@@ -401,7 +401,7 @@ describe('createStoredKeyPolicyResolver (real key store)', () => {
   let tempDir: string
   let originalHome: string | undefined
   let originalEnvSecret: string | undefined
-  let storage: typeof import('../../keys/storage.js')
+  let storage: typeof import('../keys/storage.js')
   let keyPolicy: typeof import('./key-policy.js')
 
   beforeEach(async () => {
@@ -413,12 +413,12 @@ describe('createStoredKeyPolicyResolver (real key store)', () => {
 
     // Reset modules so the storage singleton picks up the temp HOME.
     vi.resetModules()
-    storage = await import('../../keys/storage.js')
+    storage = await import('../keys/storage.js')
     keyPolicy = await import('./key-policy.js')
   })
 
   afterEach(() => {
-    storage.closeDatabase()
+    storage.closeKeyStore()
     process.env['HOME'] = originalHome
     if (originalEnvSecret) {
       process.env['MACTS_API_KEY_SECRET'] = originalEnvSecret

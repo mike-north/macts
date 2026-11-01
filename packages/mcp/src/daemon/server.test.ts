@@ -2,9 +2,9 @@
  * Tests for the MCP daemon HTTP server.
  *
  * The auth-enforcement and transport-round-trip tests below need real API
- * keys, which `@macts/api/keys` resolves against `MACTS_HOME` at
+ * keys, which `@macts/runtime` resolves against `MACTS_HOME` at
  * module-load time. So — mirroring `../auth.test.ts` — each such test points
- * `MACTS_HOME` at a fresh temp directory and re-imports `@macts/api/keys`
+ * `MACTS_HOME` at a fresh temp directory and re-imports `@macts/runtime`
  * and `./server.js` via `vi.resetModules()` before use.
  *
  * @see https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http
@@ -226,13 +226,13 @@ describe('createDaemon HTTP routes', () => {
     return dir
   }
 
-  /** Load fresh copies of `@macts/api/keys` and `./server.js` under the current env. */
+  /** Load fresh copies of `@macts/runtime` and `./server.js` under the current env. */
   async function loadModules(): Promise<{
-    keys: typeof import('@macts/api/keys')
+    keys: typeof import('@macts/runtime')
     createDaemon: (options: DaemonOptions) => DaemonServer
   }> {
     vi.resetModules()
-    const keys = await import('@macts/api/keys')
+    const keys = await import('@macts/runtime')
     const serverModule = await import('./server.js')
     return { keys, createDaemon: serverModule.createDaemon }
   }

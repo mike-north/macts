@@ -20,7 +20,7 @@ vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
 }))
 
 // Mock startup API key validation so these tests don't depend on real
-// @macts/api key storage; the auth module itself is covered by auth.test.ts.
+// @macts/runtime key storage; the auth module itself is covered by auth.test.ts.
 vi.mock('./auth.js', () => ({
   requireStartupApiKey: vi.fn().mockResolvedValue(undefined),
 }))

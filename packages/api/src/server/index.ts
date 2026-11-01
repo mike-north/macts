@@ -12,14 +12,12 @@ import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
 import type pino from 'pino'
 import type { AppManifest } from '@macts/core'
-import { getLogger, setLogger } from '../logger.js'
+import { ALLOW_ALL_POLICY, getLogger, setLogger, type GovernanceContext } from '@macts/runtime'
 import { authMiddleware, type AuthVariables } from './middleware/auth.js'
 import { createInFlightTracker } from './middleware/in-flight.js'
 import { createRateLimiter, type RateLimitOptions } from './middleware/rate-limit.js'
 import { requestLogger } from './middleware/request-logger.js'
 import { createRpcRouter, createMultiAppRpcRouter } from './handlers/rpc.js'
-import type { GovernanceContext } from './middleware/governance.js'
-import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { loadTlsOptions, type TlsOptions } from './tls.js'
 
 // Re-export middleware and handlers
@@ -37,43 +35,11 @@ export {
 } from './middleware/permission.js'
 export {
   requirePolicy,
-  resolveGovernanceForRequest,
-  type GovernanceContext,
-  type ResolvedGovernanceContext,
-  type GovernanceContextBase,
-  type GovernanceContextWithApprovals,
-  type GovernanceContextWithoutApprovals,
-  type ApprovalGateContext,
   type RequirePolicyOptions,
   type GovernanceDeniedResponse,
   type GovernancePendingResponse,
   type GovernanceApprovalDeniedResponse,
 } from './middleware/governance.js'
-export {
-  loadActivePolicy,
-  getActivePolicyPath,
-  ALLOW_ALL_POLICY,
-  ActivePolicyError,
-  type LoadActivePolicyOptions,
-} from './governance/active-policy.js'
-export {
-  loadApprovalConfig,
-  loadApprovalGate,
-  getApprovalConfigPath,
-  ApprovalProviderError,
-  type ApprovalProviderFactory,
-  type LoadApprovalOptions,
-  type LoadApprovalGateOptions,
-  type LoadedApprovalGate,
-} from './governance/approval-provider.js'
-export {
-  createKeyPolicyResolver,
-  createStoredKeyPolicyResolver,
-  DEFAULT_KEY_POLICY_CACHE_TTL_MS,
-  type KeyPolicyResolver,
-  type KeyPolicyLoader,
-  type CreateKeyPolicyResolverOptions,
-} from './governance/key-policy.js'
 export {
   createRpcRouter,
   createMultiAppRpcRouter,
@@ -120,15 +86,15 @@ export interface ServerOptions {
    *
    * When omitted, defaults to the allow-all policy with no audit writer, so
    * call-time policy enforcement is a no-op and pre-governance behavior is
-   * preserved. Supply a loaded {@link GovernanceContext} (see
-   * {@link loadActivePolicy}, {@link loadApprovalGate}, and
-   * `createFileAuditWriter`) to enforce a real policy, seek human approval for
+   * preserved. Supply a loaded `GovernanceContext` (see `loadActivePolicy` and
+   * `loadApprovalGate` in `@macts/runtime`, and `createFileAuditWriter` in
+   * `@macts/core`) to enforce a real policy, seek human approval for
    * `confirm-first` calls, and record an audit trail.
    *
    * To also honor the policy attached to an individual API key — which can only
    * ever tighten the host policy for that key — set the context's `keyPolicies`
-   * to {@link createStoredKeyPolicyResolver}. Keys with no policy of their own
-   * are unaffected.
+   * to `createStoredKeyPolicyResolver()` from `@macts/runtime`. Keys with no
+   * policy of their own are unaffected.
    */
   governance?: GovernanceContext
 }

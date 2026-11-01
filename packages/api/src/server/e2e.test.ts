@@ -18,8 +18,7 @@ import type { AppManifest } from '@macts/core'
  * Dynamically imported modules that depend on HOME environment.
  * These are re-imported for each test to reset singleton state.
  */
-let storage: typeof import('../keys/storage.js')
-let generator: typeof import('../keys/generator.js')
+let runtime: typeof import('@macts/runtime')
 let serverModule: typeof import('./index.js')
 
 /** Type aliases for responses */
@@ -110,14 +109,13 @@ describe('E2E: API Server', () => {
     vi.resetModules()
 
     // Re-import modules to pick up new HOME / secret
-    storage = await import('../keys/storage.js')
-    generator = await import('../keys/generator.js')
+    runtime = await import('@macts/runtime')
     serverModule = await import('./index.js')
   })
 
   afterEach(() => {
     // Close database before restoring env
-    storage.closeDatabase()
+    runtime.closeKeyStore()
 
     // Restore environment
     process.env['HOME'] = originalHome
@@ -137,7 +135,7 @@ describe('E2E: API Server', () => {
 
   describe('authentication flow', () => {
     it('should authenticate with a valid API key and reach the endpoint', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-auth-test',
         permissions: ['testapp:items:list'],
       })
@@ -199,7 +197,7 @@ describe('E2E: API Server', () => {
   describe('permission denied', () => {
     it('should return 403 when key lacks required permission', async () => {
       // Create key with only list permission
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-limited-key',
         permissions: ['testapp:items:list'],
       })
@@ -226,7 +224,7 @@ describe('E2E: API Server', () => {
     })
 
     it('should allow access when key has the required permission', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-full-key',
         permissions: ['testapp:app:quit'],
       })
@@ -253,7 +251,7 @@ describe('E2E: API Server', () => {
 
   describe('rate limiting', () => {
     it('should return 429 when rate limit is exceeded', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-rate-limit-key',
         permissions: ['testapp:items:list'],
       })
@@ -292,7 +290,7 @@ describe('E2E: API Server', () => {
     })
 
     it('should allow requests when rate limiting is disabled', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-no-rate-limit-key',
         permissions: ['testapp:items:list'],
       })
@@ -323,14 +321,14 @@ describe('E2E: API Server', () => {
 
   describe('key revocation', () => {
     it('should reject requests with a revoked key', async () => {
-      const { token, metadata } = await generator.createApiKey({
+      const { token, metadata } = await runtime.createApiKey({
         name: 'e2e-revoke-key',
         permissions: ['testapp:items:list'],
       })
 
       // Revoke the key before making any requests
       // (avoids revocation cache interference)
-      const revoked = storage.revokeKey(metadata.id)
+      const revoked = runtime.revokeKey(metadata.id)
       expect(revoked).toBe(true)
 
       const app = serverModule.createApp([testManifest], {
@@ -353,7 +351,7 @@ describe('E2E: API Server', () => {
     })
 
     it('should allow requests with a non-revoked key', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-active-key',
         permissions: ['testapp:items:list'],
       })
@@ -379,7 +377,7 @@ describe('E2E: API Server', () => {
 
   describe('request validation', () => {
     it('should return 400 for invalid JSON body', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-validation-key',
         permissions: ['testapp:items:get'],
       })
@@ -404,7 +402,7 @@ describe('E2E: API Server', () => {
     })
 
     it('should return 400 VALIDATION_ERROR for missing required parameter', async () => {
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-missing-param-key',
         permissions: ['testapp:items:get'],
       })
@@ -464,7 +462,7 @@ describe('E2E: API Server', () => {
   describe('key expiration', () => {
     it('should reject expired keys', async () => {
       // Create key that expires in 1 second
-      const { token } = await generator.createApiKey({
+      const { token } = await runtime.createApiKey({
         name: 'e2e-expiring-key',
         permissions: ['testapp:items:list'],
         expires: '1s',

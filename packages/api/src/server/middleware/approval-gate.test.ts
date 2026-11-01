@@ -30,7 +30,8 @@ import type {
   GovernancePolicy,
 } from '@macts/core'
 import { createFileAuditWriter, createStaticApprovalProvider } from '@macts/core'
-import { requirePolicy, type GovernanceContext } from './governance.js'
+import type { GovernanceContext } from '@macts/runtime'
+import { requirePolicy } from './governance.js'
 import type { GovernanceApprovalDeniedResponse, GovernancePendingResponse } from './governance.js'
 import type { AuthVariables } from './auth.js'
 

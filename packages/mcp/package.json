@@ -27,7 +27,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "build": "tsup",
@@ -38,8 +38,8 @@
     "api-extractor:ci": "api-extractor run"
   },
   "dependencies": {
-    "@macts/api": "workspace:*",
     "@macts/core": "workspace:*",
+    "@macts/runtime": "workspace:*",
     "@macts/types": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.0.4"
   },

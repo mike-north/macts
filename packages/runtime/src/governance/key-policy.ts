@@ -8,7 +8,7 @@
  *
  * This module owns that seam:
  *
- * - {@link KeyPolicyResolver} — the interface the governance middleware calls
+ * - {@link KeyPolicyResolver} — the interface governance enforcement calls
  *   once per request.
  * - {@link createKeyPolicyResolver} — a resolver over any loader, with a small
  *   per-key TTL cache so a busy key does not hit the store on every call.
@@ -42,7 +42,7 @@
  */
 
 import type { GovernancePolicy } from '@macts/core'
-import { getKeyPolicy } from '../../keys/storage.js'
+import { getKeyPolicy } from '../keys/storage.js'
 
 /**
  * Resolves the governance policy attached to an API key, per request.

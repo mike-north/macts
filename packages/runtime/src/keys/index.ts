@@ -10,7 +10,7 @@
  *   createApiKey,
  *   validateApiKey,
  *   validateAndCheckPermission
- * } from '@macts/api/keys';
+ * } from '@macts/runtime';
  *
  * // Create a key with coarse permissions (expanded at creation)
  * const result = await createApiKey({
@@ -84,6 +84,7 @@ export { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
 
 // Storage
 export {
+  closeKeyStore,
   getSigningSecret,
   setSigningSecret,
   generateSecret,

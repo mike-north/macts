@@ -9,7 +9,7 @@ Provides a Hono-based HTTP server that exposes RPC endpoints for macOS app autom
 - **HTTP Server**: Hono-based server with automatic RPC endpoint generation from manifests
 - **Authentication**: JWT-based API key validation with Bearer token support
 - **Permission System**: Fine-grained permission checking with wildcard and coarse permission expansion
-- **API Key Management**: Generate, validate, list, and revoke API keys
+- **API Key Enforcement**: Every RPC call is authenticated and authorized with API keys managed by [`@macts/runtime`](../runtime/README.md)
 - **JXA Bridge**: Execute AppleScript operations via JavaScript for Automation
 - **Multi-App Support**: Serve multiple macOS apps from a single server instance
 
@@ -59,8 +59,11 @@ await start()
 
 ### Creating API Keys
 
+API keys are minted, verified, and stored by `@macts/runtime`, which every macts
+surface (this server, the MCP server, the CLI, and the local SDK) shares.
+
 ```typescript
-import { createApiKey, createFullAccessKey, createReadOnlyKey } from '@macts/api/keys'
+import { createApiKey, createFullAccessKey, createReadOnlyKey } from '@macts/runtime'
 import { loadManifest } from '@macts/core'
 
 // Create a key with specific permissions
@@ -141,6 +144,8 @@ const app = createApp([manifest], { cors: true, logging: false })
 ```
 
 ### API Key Management
+
+The functions in this section and the next are exported by `@macts/runtime`.
 
 #### `createApiKey(options, permissionsSection?)`
 
@@ -1382,14 +1387,14 @@ And your `tsconfig.json` should include:
 The package provides three entry points:
 
 ```typescript
-// Main export (includes everything)
-import { createServer, createApiKey, runJxa } from '@macts/api'
+// Main export
+import { createServer, runJxa } from '@macts/api'
 
 // Server-only export
 import { createServer, authMiddleware, requirePermission } from '@macts/api/server'
 
-// Keys-only export
-import { createApiKey, validateApiKey, revokeApiKey } from '@macts/api/keys'
+// Telemetry export
+import { configureTelemetry, withSpan } from '@macts/api/telemetry'
 ```
 
 ## Error Handling

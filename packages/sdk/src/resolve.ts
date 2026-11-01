@@ -14,7 +14,7 @@
  *   Read from `process.env['MACTS_API_URL']`. Falls back to the well-known
  *   local-daemon address `http://localhost:8372` when unset. An empty or
  *   whitespace-only value is treated as unset (same principle as `getMactsHome`
- *   in `@macts/api/paths`).
+ *   in `@macts/runtime`).
  *
  * @packageDocumentation
  */
