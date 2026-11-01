@@ -140,6 +140,14 @@ resources:
         type: integer
         description: the output volume for the device (0 = minimum, 100 = maximum)
         code: pVol
+    native:
+      collection: airplayDevices
+      evidence:
+        source: dictionary
+        bundleId: com.apple.Music
+        appVersion: 1.7.2
+        osVersion: '27.2'
+        term: AirPlay devices
   Artwork:
     name: Artwork
     plural: Artworks
@@ -662,6 +670,14 @@ resources:
         type: string
         description: the name of the EQ preset of the track
         code: pEQp
+        native:
+          name: eq
+          evidence:
+            source: dictionary
+            bundleId: com.apple.Music
+            appVersion: 1.7.2
+            osVersion: '27.2'
+            term: EQ
       finish:
         access: rw
         type: number

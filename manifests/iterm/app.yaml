@@ -280,81 +280,209 @@ resources:
         type: rgb
         description: The aNSIBlackColor property
         code: Co07
+        native:
+          name: ansiBlackColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI black color
       aNSIRedColor:
         access: rw
         type: rgb
         description: The aNSIRedColor property
         code: Co08
+        native:
+          name: ansiRedColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI red color
       aNSIGreenColor:
         access: rw
         type: rgb
         description: The aNSIGreenColor property
         code: Co09
+        native:
+          name: ansiGreenColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI green color
       aNSIYellowColor:
         access: rw
         type: rgb
         description: The aNSIYellowColor property
         code: Co10
+        native:
+          name: ansiYellowColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI yellow color
       aNSIBlueColor:
         access: rw
         type: rgb
         description: The aNSIBlueColor property
         code: Co11
+        native:
+          name: ansiBlueColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI blue color
       aNSIMagentaColor:
         access: rw
         type: rgb
         description: The aNSIMagentaColor property
         code: Co12
+        native:
+          name: ansiMagentaColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI magenta color
       aNSICyanColor:
         access: rw
         type: rgb
         description: The aNSICyanColor property
         code: Co13
+        native:
+          name: ansiCyanColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI cyan color
       aNSIWhiteColor:
         access: rw
         type: rgb
         description: The aNSIWhiteColor property
         code: Co14
+        native:
+          name: ansiWhiteColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI white color
       aNSIBrightBlackColor:
         access: rw
         type: rgb
         description: The aNSIBrightBlackColor property
         code: Co15
+        native:
+          name: ansiBrightBlackColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright black color
       aNSIBrightRedColor:
         access: rw
         type: rgb
         description: The aNSIBrightRedColor property
         code: Co16
+        native:
+          name: ansiBrightRedColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright red color
       aNSIBrightGreenColor:
         access: rw
         type: rgb
         description: The aNSIBrightGreenColor property
         code: Co17
+        native:
+          name: ansiBrightGreenColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright green color
       aNSIBrightYellowColor:
         access: rw
         type: rgb
         description: The aNSIBrightYellowColor property
         code: Co18
+        native:
+          name: ansiBrightYellowColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright yellow color
       aNSIBrightBlueColor:
         access: rw
         type: rgb
         description: The aNSIBrightBlueColor property
         code: Co19
+        native:
+          name: ansiBrightBlueColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright blue color
       aNSIBrightMagentaColor:
         access: rw
         type: rgb
         description: The aNSIBrightMagentaColor property
         code: Co20
+        native:
+          name: ansiBrightMagentaColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright magenta color
       aNSIBrightCyanColor:
         access: rw
         type: rgb
         description: The aNSIBrightCyanColor property
         code: Co21
+        native:
+          name: ansiBrightCyanColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright cyan color
       aNSIBrightWhiteColor:
         access: rw
         type: rgb
         description: The aNSIBrightWhiteColor property
         code: Co22
+        native:
+          name: ansiBrightWhiteColor
+          evidence:
+            source: dictionary
+            bundleId: com.googlecode.iterm2
+            appVersion: 3.7.6
+            osVersion: '27.2'
+            term: ANSI bright white color
       underlineColor:
         access: rw
         type: rgb

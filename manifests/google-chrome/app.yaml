@@ -151,6 +151,14 @@ resources:
         type: string
         description: The url visible to the user.
         code: 'URL '
+        native:
+          name: url
+          evidence:
+            source: dictionary
+            bundleId: com.google.Chrome
+            appVersion: 156.0.8078.74
+            osVersion: '27.2'
+            term: URL
       loading:
         access: r
         type: boolean
@@ -204,6 +212,14 @@ resources:
         type: string
         description: The URL of the bookmark.
         code: 'URL '
+        native:
+          name: url
+          evidence:
+            source: dictionary
+            bundleId: com.google.Chrome
+            appVersion: 156.0.8078.74
+            osVersion: '27.2'
+            term: URL
       index:
         access: r
         type: number
