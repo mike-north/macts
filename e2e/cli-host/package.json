@@ -14,7 +14,6 @@
     "@macts/cli": "workspace:*",
     "@macts/notes": "workspace:*",
     "@macts/notes-server": "workspace:*",
-    "@macts/runtime": "workspace:*",
     "@types/node": "^26.0.0",
     "typescript": "catalog:",
     "vitest": "catalog:"

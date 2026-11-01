@@ -1384,8 +1384,8 @@ The executor is resolved once, at runtime construction. In-process tests pass
 one to `createRuntime`. Subprocess tests can set the test-only
 `MACTS_TEST_EXECUTOR` to the name of a built-in test executor. It never loads
 code, an unknown name fails startup, and an active test executor is announced
-on stderr and recorded as the provider. It appears in contributor docs, never
-in user docs or `--help`. Per-operation routing is not needed until a second
+on stderr and named as the executor provider in the startup report. It appears
+in contributor docs, never in user docs or `--help`. Per-operation routing is not needed until a second
 provider coexists. #101's dependency on the dictionary abstraction
 ([#100](https://github.com/mike-north/macts/issues/100)) is unaffected:
 `ExecutionRequest` takes the manifest type that core defines.
