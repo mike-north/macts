@@ -38,14 +38,16 @@
     "api-extractor:ci": "api-extractor run"
   },
   "dependencies": {
+    "@macts/contracts": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/runtime": "workspace:*",
     "@macts/types": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.0.4"
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "tsup": "catalog:",
-    "vitest": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

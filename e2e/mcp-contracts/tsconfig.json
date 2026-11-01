@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "composite": false,
+    // The MCP SDK's declarations use DOM fetch types (`HeadersInit`) without
+    // declaring them, so they need the DOM library to type-check.
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": ["src", "test"]
+}

@@ -8,6 +8,20 @@ export { VERSION } from '@macts/core'
 // Core server
 export { createMcpServer } from './server.js'
 
+// Tools derived from operation contracts, dispatched through the runtime
+export {
+  createMcpAdapter,
+  attachMcpAdapter,
+  toolNameFor,
+  McpToolDerivationError,
+  type McpAdapter,
+  type McpAdapterOptions,
+  type McpToolInputSchema,
+  type McpToolListing,
+  type McpCredentialResolver,
+  type McpRequestExtra,
+} from './adapter/index.js'
+
 // Types
 export type { McpPlugin, McpToolDefinition, McpServerOptions, JsonSchema } from './types.js'
 

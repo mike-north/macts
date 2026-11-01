@@ -3213,6 +3213,9 @@ export interface SpecifierStep {
 }
 
 // @public
+export function splitIdentifierWords(identifier: string): string[];
+
+// @public
 export interface StaticApprovalProviderOptions {
     readonly capabilities?: ApprovalProviderCapabilities;
     readonly evidence?: unknown;

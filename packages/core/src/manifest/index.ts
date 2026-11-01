@@ -35,3 +35,8 @@ export * from './nullability.js'
 // which properties marked unsupported leave every generated surface and the
 // probe), are internal to this package and imported from their modules.
 export { VALUE_KINDS, type ValueKind, type ValueKindCounts } from './value-kinds.js'
+
+// The one word split of Pascal and camel case identifiers, shared by every
+// surface that respells a manifest name (accessors, generated names, MCP tool
+// names), so all of them agree on acronyms and their plurals
+export { splitIdentifierWords } from './lower-camel.js'

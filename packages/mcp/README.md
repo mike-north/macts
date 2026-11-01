@@ -343,6 +343,76 @@ handler: async (args) => {
 }
 ```
 
+## Contract-Derived Tools
+
+`createMcpAdapter(runtime)` serves every operation registered on a
+`MactsRuntime` (from `@macts/runtime`) as one MCP tool, and runs every tool
+call as one `runtime.invoke`. The adapter is a transport only: the runtime
+verifies the credential, checks the permission, enforces governance, and
+validates the input, exactly as it does for the HTTP API and the SDK.
+
+```typescript
+import { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { attachMcpAdapter, createMcpAdapter } from '@macts/mcp'
+import { createBearerCredential, createRuntime, loadHostGovernance } from '@macts/runtime'
+
+const runtime = createRuntime({ executor, governance: loadHostGovernance })
+runtime.registerContract(notesContract, notesManifest)
+
+const server = new Server({ name: 'macts', version }, { capabilities: {} })
+attachMcpAdapter(server, createMcpAdapter(runtime), () => createBearerCredential(apiKey))
+```
+
+The third argument of `attachMcpAdapter` locates each call's credential in the
+MCP request context. A stdio host returns the key it was started with; an HTTP
+host returns the bearer token its transport attached as `extra.authInfo`. Each
+request's abort signal cancels the operation.
+
+**Names.** A tool's name is derived from its operation id
+`<app>.<resource>.<operation>` as `macts__<app>__<resource>_<operation>`. The
+app and resource are kept as they are; the operation becomes snake case, with
+runs of capitals kept as one word:
+
+- `calendar.app.reloadCalendars` → `macts__calendar__app_reload_calendars`
+- `mail.app.getURL` → `macts__mail__app_get_url`
+- `automator.automatorActions.list` → `macts__automator__automatorActions_list`
+
+There are no per-tool overrides. If two operations derive the same name, the
+adapter refuses to build and names both.
+
+**Input schemas.** Each tool's `inputSchema` is
+`z.toJSONSchema(input.wire, { target: 'draft-7' })` of the operation's wire
+contract, so it describes values as they travel in JSON (for example, a date
+is `{ "date": "<ISO 8601>" }`). Every schema is an object schema. A contract
+that JSON Schema cannot represent, or that does not describe an object, makes
+the adapter refuse to build; it never falls back to an empty schema.
+
+**Results.** A successful call returns one text content item holding
+`{ "result": <wire value> }`. File results are metadata and fetch handles,
+never inlined bytes.
+
+**Errors.** A failed call is a tool result with `isError: true` and one text
+content item holding the same envelope the HTTP API sends:
+
+```json
+{
+  "error": {
+    "code": "PERMISSION_DENIED",
+    "message": "Missing required permission \"notes:attachments:get\". ...",
+    "details": { "required": "notes:attachments:get", "hint": "..." }
+  }
+}
+```
+
+`code` is one of the structured error codes (`VALIDATION_FAILED`,
+`UNAUTHENTICATED`, `PERMISSION_DENIED`, `POLICY_DENIED`, `TARGET_NOT_FOUND`,
+`INTERNAL`, and so on), and `details` is typed per code. An unexpected failure
+is reported as `INTERNAL` with the message `Internal server error`; its
+original text is logged on the host and never returned. A call to a tool the
+adapter does not serve is an MCP protocol error (`InvalidParams`), not a tool
+result. See `phases/13-sdk-value-and-execution-contracts.md` (D6, D9) for the
+full error table and schema rules.
+
 ## API Reference
 
 ### Server Creation
