@@ -630,7 +630,7 @@ export function buildCapabilityRegistry(manifests: readonly AppManifest[]): Capa
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
-export function buildNativeBody(manifest: AppManifest, target: OperationTarget): string;
+export function buildNativeBody(manifest: AppManifest, target: OperationTarget, options?: NativeBodyOptions): string;
 
 // @public
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, segment: string): string;
@@ -1936,6 +1936,11 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 
 // @public
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
+
+// @public
+export interface NativeBodyOptions {
+    readonly identifierAliases?: boolean;
+}
 
 // @public
 export interface NativeCodec {

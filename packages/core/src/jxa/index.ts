@@ -30,7 +30,7 @@ export {
   type NativeRunOptions,
   type NativeTransport,
 } from './native-executor.js'
-export { buildNativeBody } from './native-scripts.js'
+export { buildNativeBody, type NativeBodyOptions } from './native-scripts.js'
 
 // Connection
 export {

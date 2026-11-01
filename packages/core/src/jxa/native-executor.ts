@@ -151,7 +151,11 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const { manifest, target, input, inputPlan, outputPlan, signal } = request
       throwIfAborted(signal)
 
-      const plan = planNativeInvocation(manifest, target)
+      // Legacy identifier aliases belong only to results that pass through
+      // unconverted; a typed result contract receives exactly its fields.
+      const plan = planNativeInvocation(manifest, target, {
+        identifierAliases: outputPlan.kind === 'passthrough',
+      })
       assertRequiredArguments(plan.requiredArguments, input)
       const script: NativeScript = {
         bundleId: manifest.app.bundleId,

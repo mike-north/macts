@@ -165,6 +165,20 @@ describe('createNativeExecutor', () => {
       )
     })
 
+    it('adds the legacy identifier aliases to list items only for passthrough output', async () => {
+      const run = mockRun().mockResolvedValue({ ok: true, value: [] })
+      const executor = createNativeExecutor({ transport: { run } })
+      const typedOutput: ValuePlan = { kind: 'array', items: { kind: 'unknown' } }
+
+      await executor.execute(request({ target: LIST_ACCOUNTS, input: {} }))
+      await executor.execute(request({ target: LIST_ACCOUNTS, input: {}, outputPlan: typedOutput }))
+
+      const [passthrough, typed] = run.mock.calls.map(([script]) => script.body)
+      expect(passthrough).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: true }))
+      expect(typed).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: false }))
+      expect(passthrough).not.toBe(typed)
+    })
+
     it('executes operations whose plans are not passthrough, passing the plans through', async () => {
       const inputPlan: ValuePlan = {
         kind: 'record',

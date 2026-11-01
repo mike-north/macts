@@ -202,14 +202,19 @@ function freeIdentifiers(bodies: readonly string[]): string[][] {
 }
 
 /** Build the list body for `resource` through a plain `list` command. */
-function listBody(resource: Resource): string {
+/** A list body for `resource`, shaped for passthrough output unless `typed`. */
+function listBody(resource: Resource, typed = false): string {
   const manifest = manifestWith(
     { [resource.name]: resource },
     {
       list: resourceCommand('list', resource.name),
     }
   )
-  return buildNativeBody(manifest, { command: 'list', resource: resource.name })
+  return buildNativeBody(
+    manifest,
+    { command: 'list', resource: resource.name },
+    { identifierAliases: !typed }
+  )
 }
 
 /** The Calendar Event resource: 13 properties plus the `uid` identifier. */
@@ -336,6 +341,23 @@ describe('list bodies: batched reads (issue #89)', () => {
 
   it('lists the top-level collection when there is no parent parameter', () => {
     expect(listBody(eventResource)).toContain('var items = app["events"]();')
+  })
+})
+
+describe('list bodies: typed output returns only declared fields', () => {
+  // A typed record contract rejects undeclared keys and derives references from
+  // the record itself, so the legacy aliases must not reach it.
+  it('omits the id alias for a byId resource', () => {
+    const body = listBody(calendarById, true)
+    expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')
+    expect(body).not.toContain('obj["id"]')
+  })
+
+  it('leaves the declared identifier absent instead of mirroring the working property', () => {
+    const body = listBody(calendarByRuntimeProperty, true)
+    expect(body).toContain('obj["name"] = props["name"];')
+    expect(body).not.toContain('obj["id"]')
+    expect(body).not.toContain('obj["calendarIdentifier"] =')
   })
 })
 
