@@ -13,7 +13,7 @@ import { Rgb } from '@macts/contracts';
 // @public
 export interface Folder {
     readonly id: string;
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -34,14 +34,14 @@ export interface FolderUpdateInput {
 
 // @public
 export interface Shortcut {
-    readonly acceptsInput: boolean;
-    readonly actionCount: Integer;
-    readonly color: Rgb;
-    folder: string;
-    readonly icon: FileValue;
+    readonly acceptsInput: boolean | null;
+    readonly actionCount: Integer | null;
+    readonly color: Rgb | null;
+    folder: string | null;
+    readonly icon: FileValue | null;
     readonly id: string;
-    readonly name: string;
-    readonly subtitle: string;
+    readonly name: string | null;
+    readonly subtitle: string | null;
 }
 
 // @public

@@ -10,29 +10,29 @@ import { Integer } from '@macts/contracts';
 
 // @public
 export interface AutomatorAction {
-    readonly bundleId: string;
-    readonly category: readonly string[];
-    comment: string;
-    enabled: boolean;
-    readonly executionErrorMessage: string;
-    readonly executionErrorNumber: Integer;
+    readonly bundleId: string | null;
+    readonly category: readonly string[] | null;
+    comment: string | null;
+    enabled: boolean | null;
+    readonly executionErrorMessage: string | null;
+    readonly executionErrorNumber: Integer | null;
     readonly executionResult: unknown;
-    readonly iconName: string;
+    readonly iconName: string | null;
     readonly id: string;
-    ignoresInput: boolean;
-    index: Integer;
-    readonly inputTypes: readonly string[];
-    readonly keywords: readonly string[];
-    readonly name: string;
-    readonly outputTypes: readonly string[];
+    ignoresInput: boolean | null;
+    index: Integer | null;
+    readonly inputTypes: readonly string[] | null;
+    readonly keywords: readonly string[] | null;
+    readonly name: string | null;
+    readonly outputTypes: readonly string[] | null;
     readonly parentWorkflow: unknown;
-    readonly path: string;
-    showActionWhenRun: boolean;
-    readonly targetApplication: readonly string[];
-    readonly version: string;
-    readonly warningAction: string;
-    readonly warningLevel: WarningLevel;
-    readonly warningMessage: string;
+    readonly path: string | null;
+    showActionWhenRun: boolean | null;
+    readonly targetApplication: readonly string[] | null;
+    readonly version: string | null;
+    readonly warningAction: string | null;
+    readonly warningLevel: WarningLevel | null;
+    readonly warningMessage: string | null;
 }
 
 // @public
@@ -75,10 +75,10 @@ export const automatorContract: AppContract<AutomatorClient>;
 
 // @public
 export interface RequiredResource {
-    readonly kind: string;
+    readonly kind: string | null;
     readonly name: string;
-    readonly resource: string;
-    readonly version: Integer;
+    readonly resource: string | null;
+    readonly version: Integer | null;
 }
 
 // @public
@@ -119,8 +119,8 @@ export interface SettingUpdateInput {
 // @public
 export interface Variable {
     readonly id: string;
-    name: string;
-    readonly settable: boolean;
+    name: string | null;
+    readonly settable: boolean | null;
     value: unknown;
 }
 
@@ -148,9 +148,9 @@ export type WarningLevel = 'none' | 'reversible' | 'irreversible';
 // @public
 export interface Workflow {
     readonly currentAction: unknown;
-    readonly executionErrorMessage: string;
-    readonly executionErrorNumber: Integer;
-    readonly executionId: string;
+    readonly executionErrorMessage: string | null;
+    readonly executionErrorNumber: Integer | null;
+    readonly executionId: string | null;
     readonly executionResult: unknown;
     readonly name: string;
 }

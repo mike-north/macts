@@ -14,28 +14,28 @@ import { Rgb } from '@macts/contracts';
 
 // @public
 export interface Account {
-    readonly accountDirectory: FileValue;
-    readonly accountType: string;
-    authentication: string;
-    deliveryAccount: string;
-    emailAddresses: string;
-    emptyJunkMessagesFrequency: Integer;
-    emptyJunkMessagesOnQuit: boolean;
-    emptySentMessagesFrequency: Integer;
-    emptySentMessagesOnQuit: boolean;
-    emptyTrashFrequency: Integer;
-    emptyTrashOnQuit: boolean;
-    enabled: boolean;
-    fullName: string;
+    readonly accountDirectory: FileValue | null;
+    readonly accountType: string | null;
+    authentication: string | null;
+    deliveryAccount: string | null;
+    emailAddresses: string | null;
+    emptyJunkMessagesFrequency: Integer | null;
+    emptyJunkMessagesOnQuit: boolean | null;
+    emptySentMessagesFrequency: Integer | null;
+    emptySentMessagesOnQuit: boolean | null;
+    emptyTrashFrequency: Integer | null;
+    emptyTrashOnQuit: boolean | null;
+    enabled: boolean | null;
+    fullName: string | null;
     readonly id: string;
-    includeWhenGettingNewMail: boolean;
-    moveDeletedMessagesToTrash: boolean;
-    name: string;
-    password: string;
-    port: Integer;
-    serverName: string;
-    userName: string;
-    usesSsl: boolean;
+    includeWhenGettingNewMail: boolean | null;
+    moveDeletedMessagesToTrash: boolean | null;
+    name: string | null;
+    password: string | null;
+    port: Integer | null;
+    serverName: string | null;
+    userName: string | null;
+    usesSsl: boolean | null;
 }
 
 // @public
@@ -86,7 +86,7 @@ export interface AccountUpdateInput {
 
 // @public
 export interface Attachment {
-    fileName: FileValue;
+    fileName: FileValue | null;
 }
 
 // @public
@@ -101,9 +101,9 @@ export interface AttachmentUpdateInput {
 
 // @public
 export interface AttributeRun {
-    color: Rgb;
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
@@ -125,7 +125,7 @@ export type Authentication = 'password' | 'apop' | 'kerberos5' | 'ntlm' | 'md5' 
 
 // @public
 export interface BccRecipient {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -136,7 +136,7 @@ export type BccRecipientUpdateInput = Record<string, never>;
 
 // @public
 export interface CcRecipient {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -147,9 +147,9 @@ export type CcRecipientUpdateInput = Record<string, never>;
 
 // @public
 export interface Character {
-    color: Rgb;
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
@@ -171,8 +171,8 @@ export type DefaultMessageFormat = 'plainFormat' | 'richFormat';
 
 // @public
 export interface Header {
-    content: string;
-    name: string;
+    content: string | null;
+    name: string | null;
 }
 
 // @public
@@ -198,11 +198,11 @@ export type LdapScope = 'base' | 'oneLevel' | 'subtree';
 
 // @public
 export interface MailAttachment {
-    readonly downloaded: boolean;
-    readonly fileSize: Integer;
+    readonly downloaded: boolean | null;
+    readonly fileSize: Integer | null;
     readonly id: string;
-    readonly mIMEType: string;
-    readonly name: string;
+    readonly mIMEType: string | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -213,10 +213,10 @@ export type MailAttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Mailbox {
-    readonly account: ObjectReferenceVariant<Account, string>;
-    readonly container: ObjectReferenceVariant<Mailbox, never>;
-    name: string;
-    readonly unreadCount: Integer;
+    readonly account: ObjectReferenceVariant<Account, string> | null;
+    readonly container: ObjectReferenceVariant<Mailbox, never> | null;
+    name: string | null;
+    readonly unreadCount: Integer | null;
 }
 
 // @public
@@ -251,27 +251,27 @@ export const mailContract: AppContract<MailClient>;
 
 // @public
 export interface Message {
-    readonly allHeaders: string;
-    backgroundColor: string;
-    readonly content: ObjectReferenceVariant<RichText, never>;
-    readonly dateReceived: Date;
-    readonly dateSent: Date;
-    deletedStatus: boolean;
-    flaggedStatus: boolean;
-    flagIndex: Integer;
+    readonly allHeaders: string | null;
+    backgroundColor: string | null;
+    readonly content: ObjectReferenceVariant<RichText, never> | null;
+    readonly dateReceived: Date | null;
+    readonly dateSent: Date | null;
+    deletedStatus: boolean | null;
+    flaggedStatus: boolean | null;
+    flagIndex: Integer | null;
     readonly id: Integer;
-    junkMailStatus: boolean;
-    mailbox: ObjectReferenceVariant<Mailbox, never>;
-    readonly messageId: string;
-    readonly messageSize: Integer;
-    readStatus: boolean;
-    readonly replyTo: string;
-    readonly sender: string;
-    readonly source: string;
-    readonly subject: string;
-    readonly wasForwarded: boolean;
-    readonly wasRedirected: boolean;
-    readonly wasRepliedTo: boolean;
+    junkMailStatus: boolean | null;
+    mailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly messageId: string | null;
+    readonly messageSize: Integer | null;
+    readStatus: boolean | null;
+    readonly replyTo: string | null;
+    readonly sender: string | null;
+    readonly source: string | null;
+    readonly subject: string | null;
+    readonly wasForwarded: boolean | null;
+    readonly wasRedirected: boolean | null;
+    readonly wasRepliedTo: boolean | null;
 }
 
 // @public
@@ -309,21 +309,21 @@ export interface MessageUpdateInput {
 
 // @public
 export interface MessageViewer {
-    readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never>;
+    readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never> | null;
     readonly id: Integer;
-    readonly inbox: ObjectReferenceVariant<Mailbox, never>;
-    readonly junkMailbox: ObjectReferenceVariant<Mailbox, never>;
-    mailboxListVisible: boolean;
-    readonly outbox: ObjectReferenceVariant<Mailbox, never>;
-    previewPaneIsVisible: boolean;
-    selectedMailboxes: string;
-    selectedMessages: string;
-    readonly sentMailbox: ObjectReferenceVariant<Mailbox, never>;
-    sortColumn: string;
-    sortedAscending: boolean;
-    readonly trashMailbox: ObjectReferenceVariant<Mailbox, never>;
-    visibleColumns: string;
-    visibleMessages: string;
+    readonly inbox: ObjectReferenceVariant<Mailbox, never> | null;
+    readonly junkMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    mailboxListVisible: boolean | null;
+    readonly outbox: ObjectReferenceVariant<Mailbox, never> | null;
+    previewPaneIsVisible: boolean | null;
+    selectedMailboxes: string | null;
+    selectedMessages: string | null;
+    readonly sentMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    sortColumn: string | null;
+    sortedAscending: boolean | null;
+    readonly trashMailbox: ObjectReferenceVariant<Mailbox, never> | null;
+    visibleColumns: string | null;
+    visibleMessages: string | null;
 }
 
 // @public
@@ -352,13 +352,13 @@ export interface MessageViewerUpdateInput {
 
 // @public
 export interface OutgoingMessage {
-    htmlContent: string;
+    htmlContent: string | null;
     readonly id: Integer;
-    messageSignature: string;
-    sender: string;
-    subject: string;
-    vcardPath: FileValue;
-    visible: boolean;
+    messageSignature: string | null;
+    sender: string | null;
+    subject: string | null;
+    vcardPath: FileValue | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -388,9 +388,9 @@ export interface OutgoingMessageUpdateInput {
 
 // @public
 export interface Paragraph {
-    color: Rgb;
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
@@ -412,8 +412,8 @@ export type QuotingColor = 'blue' | 'green' | 'orange' | 'other' | 'purple' | 'r
 
 // @public
 export interface Recipient {
-    address: string;
-    name: string;
+    address: string | null;
+    name: string | null;
 }
 
 // @public
@@ -430,9 +430,9 @@ export interface RecipientUpdateInput {
 
 // @public
 export interface RichText {
-    color: Rgb;
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public
@@ -451,34 +451,34 @@ export interface RichTextUpdateInput {
 
 // @public
 export interface Rule {
-    allConditionsMustBeMet: boolean;
-    colorMessage: string;
-    copyMessage: ObjectReferenceVariant<Mailbox, never>;
-    deleteMessage: boolean;
-    enabled: boolean;
-    forwardMessage: string;
-    forwardText: string;
-    highlightTextUsingColor: boolean;
-    markFlagged: boolean;
-    markFlagIndex: Integer;
-    markRead: boolean;
-    moveMessage: ObjectReferenceVariant<Mailbox, never>;
-    name: string;
-    playSound: string;
-    redirectMessage: string;
-    replyText: string;
-    runScript: string;
-    shouldCopyMessage: boolean;
-    shouldMoveMessage: boolean;
-    stopEvaluatingRules: boolean;
+    allConditionsMustBeMet: boolean | null;
+    colorMessage: string | null;
+    copyMessage: ObjectReferenceVariant<Mailbox, never> | null;
+    deleteMessage: boolean | null;
+    enabled: boolean | null;
+    forwardMessage: string | null;
+    forwardText: string | null;
+    highlightTextUsingColor: boolean | null;
+    markFlagged: boolean | null;
+    markFlagIndex: Integer | null;
+    markRead: boolean | null;
+    moveMessage: ObjectReferenceVariant<Mailbox, never> | null;
+    name: string | null;
+    playSound: string | null;
+    redirectMessage: string | null;
+    replyText: string | null;
+    runScript: string | null;
+    shouldCopyMessage: boolean | null;
+    shouldMoveMessage: boolean | null;
+    stopEvaluatingRules: boolean | null;
 }
 
 // @public
 export interface RuleCondition {
-    expression: string;
-    header: string;
-    qualifier: string;
-    ruleType: string;
+    expression: string | null;
+    header: string | null;
+    qualifier: string | null;
+    ruleType: string | null;
 }
 
 // @public
@@ -556,7 +556,7 @@ export type SaveableFileFormat = 'nativeFormat';
 
 // @public
 export interface ToRecipient {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -573,9 +573,9 @@ export type ViewerColumns = 'attachmentsColumn' | 'messageColor' | 'dateReceived
 
 // @public
 export interface Word {
-    color: Rgb;
-    font: string;
-    size: number;
+    color: Rgb | null;
+    font: string | null;
+    size: number | null;
 }
 
 // @public

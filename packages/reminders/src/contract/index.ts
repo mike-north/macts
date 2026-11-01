@@ -36,50 +36,107 @@ export type ReminderPriority = '0' | '9' | '5' | '1'
 
 /** An account in the Reminders application */
 export interface Account {
-  /** The name of the account */
-  readonly name: string
-  /** The unique identifier of the account */
+  /**
+   * The name of the account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the account.
+   * Never null: the primary identifier.
+   */
   readonly id: string
 }
 
 /** A list of reminders */
 export interface List {
-  /** The name of the list */
-  name: string
-  /** The unique identifier of the list */
+  /**
+   * The name of the list.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The unique identifier of the list.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The color of the list */
-  color: Rgb
-  /** The emblem icon name of the list */
-  emblem: string
+  /**
+   * The color of the list.
+   * Nullable. Observed missing in 2 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
+  color: Rgb | null
+  /**
+   * The emblem icon name of the list.
+   * Nullable. Observed missing in 3 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
+  emblem: string | null
 }
 
 /** A reminder item */
 export interface Reminder {
-  /** The name of the reminder */
+  /**
+   * The name of the reminder.
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   name: string
-  /** The unique identifier of the reminder */
+  /**
+   * The unique identifier of the reminder.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The notes attached to the reminder */
-  body: string
-  /** Whether the reminder is completed */
+  /**
+   * The notes attached to the reminder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  body: string | null
+  /**
+   * Whether the reminder is completed.
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   completed: boolean
-  /** The completion date of the reminder */
-  readonly completionDate: Date
-  /** The due date of the reminder */
-  dueDate: Date
-  /** The remind date of the reminder */
-  remindMeDate: Date
-  /** The priority of the reminder (0=none, 1=high, 5=medium, 9=low) */
+  /**
+   * The completion date of the reminder.
+   * Nullable: Set only when a reminder is completed; an open reminder has no completion date. Not
+   * observable on the probed library, where all 412 reminders were completed (Reminders 7.0).
+   */
+  readonly completionDate: Date | null
+  /**
+   * The due date of the reminder.
+   * Nullable: A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no due date
+   * on 15; the app reports a missing date as null (Reminders 7.0).
+   */
+  dueDate: Date | null
+  /**
+   * The remind date of the reminder.
+   * Nullable: A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no remind
+   * date on 15; the app reports a missing date as null (Reminders 7.0).
+   */
+  remindMeDate: Date | null
+  /**
+   * The priority of the reminder (0=none, 1=high, 5=medium, 9=low).
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   priority: Integer
-  /** Whether the reminder is flagged */
+  /**
+   * Whether the reminder is flagged.
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   flagged: boolean
-  /** The creation date of the reminder */
+  /**
+   * The creation date of the reminder.
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   readonly creationDate: Date
-  /** The modification date of the reminder */
+  /**
+   * The modification date of the reminder.
+   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   */
   readonly modificationDate: Date
-  /** The all-day due date of the reminder */
-  allDayDueDate: Date
+  /**
+   * The all-day due date of the reminder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  allDayDueDate: Date | null
 }
 
 /** Input for creating an Account. */
@@ -100,11 +157,20 @@ export interface ListCreateInput {
 
 /** Input for updating a List. Omitted fields are left unchanged. */
 export interface ListUpdateInput {
-  /** List name */
+  /**
+   * List name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** List color */
+  /**
+   * List color.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The emblem icon name of the list */
+  /**
+   * The emblem icon name of the list.
+   * Cannot be reset: null is rejected.
+   */
   emblem?: string
 }
 
@@ -132,23 +198,50 @@ export interface ReminderCreateInput {
 
 /** Input for updating a Reminder. Omitted fields are left unchanged. */
 export interface ReminderUpdateInput {
-  /** Reminder name */
+  /**
+   * Reminder name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Reminder notes */
+  /**
+   * Reminder notes.
+   * Cannot be reset: null is rejected.
+   */
   body?: string
-  /** Whether the reminder is completed */
+  /**
+   * Whether the reminder is completed.
+   * Cannot be reset: null is rejected.
+   */
   completed?: boolean
-  /** Due date */
+  /**
+   * Due date.
+   * Cannot be reset: null is rejected.
+   */
   dueDate?: Date
-  /** Remind me date */
+  /**
+   * Remind me date.
+   * Cannot be reset: null is rejected.
+   */
   remindMeDate?: Date
-  /** Priority (0=none, 1=high, 5=medium, 9=low) */
+  /**
+   * Priority (0=none, 1=high, 5=medium, 9=low).
+   * Cannot be reset: null is rejected.
+   */
   priority?: Integer
-  /** Whether to flag the reminder */
+  /**
+   * Whether to flag the reminder.
+   * Cannot be reset: null is rejected.
+   */
   flagged?: boolean
-  /** The all-day due date of the reminder */
+  /**
+   * The all-day due date of the reminder.
+   * Cannot be reset: null is rejected.
+   */
   allDayDueDate?: Date
-  /** List identifier for the reminder */
+  /**
+   * List identifier for the reminder.
+   * Cannot be reset: null is rejected.
+   */
   listId?: string
 }
 
@@ -162,7 +255,11 @@ export interface AccountResourceClient {
 export interface ListResourceClient {
   /** List lists. */
   list(options?: CallOptions): Promise<readonly List[]>
-  /** Read the list identified by `id`. */
+  /**
+   * Read the list identified by `id`.
+   *
+   * @param id - List identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<List>
   /** Create a list. */
   create(input: ListCreateInput, options?: CallOptions): Promise<List>
@@ -170,15 +267,31 @@ export interface ListResourceClient {
 
 /** A reminder item */
 export interface ReminderResourceClient {
-  /** List reminders. */
+  /**
+   * List reminders.
+   *
+   * @param listId - List identifier. Does not accept null.
+   */
   list(listId: string, options?: CallOptions): Promise<readonly Reminder[]>
-  /** Read the reminder identified by `id`. */
+  /**
+   * Read the reminder identified by `id`.
+   *
+   * @param id - Reminder identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Reminder>
   /** Create a reminder. */
   create(input: ReminderCreateInput, options?: CallOptions): Promise<Reminder>
-  /** Delete the reminder identified by `id`. */
+  /**
+   * Delete the reminder identified by `id`.
+   *
+   * @param id - Reminder identifier. Does not accept null.
+   */
   delete(id: string, options?: CallOptions): Promise<void>
-  /** Mark a reminder as complete */
+  /**
+   * Mark a reminder as complete
+   *
+   * @param id - Reminder identifier. Does not accept null.
+   */
   complete(id: string, options?: CallOptions): Promise<void>
   /** Show the reminder in Reminders.app UI */
   show(options?: CallOptions): Promise<void>
@@ -199,7 +312,7 @@ export interface RemindersClient {
 
 const accountRecordType: ValueType<Account> = t.record(
   {
-    name: t.string({ description: 'The name of the account' }),
+    name: t.nullable(t.string(), { description: 'The name of the account' }),
     id: t.string({ description: 'The unique identifier of the account' }),
   },
   { description: 'An account in the Reminders application' }
@@ -207,10 +320,10 @@ const accountRecordType: ValueType<Account> = t.record(
 
 const listRecordType: ValueType<List> = t.record(
   {
-    name: t.string({ description: 'The name of the list' }),
+    name: t.nullable(t.string(), { description: 'The name of the list' }),
     id: t.string({ description: 'The unique identifier of the list' }),
-    color: t.rgb({ description: 'The color of the list' }),
-    emblem: t.string({ description: 'The emblem icon name of the list' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the list' }),
+    emblem: t.nullable(t.string(), { description: 'The emblem icon name of the list' }),
   },
   { description: 'A list of reminders' }
 )
@@ -219,18 +332,18 @@ const reminderRecordType: ValueType<Reminder> = t.record(
   {
     name: t.string({ description: 'The name of the reminder' }),
     id: t.string({ description: 'The unique identifier of the reminder' }),
-    body: t.string({ description: 'The notes attached to the reminder' }),
+    body: t.nullable(t.string(), { description: 'The notes attached to the reminder' }),
     completed: t.boolean({ description: 'Whether the reminder is completed' }),
-    completionDate: t.date({ description: 'The completion date of the reminder' }),
-    dueDate: t.date({ description: 'The due date of the reminder' }),
-    remindMeDate: t.date({ description: 'The remind date of the reminder' }),
+    completionDate: t.nullable(t.date(), { description: 'The completion date of the reminder' }),
+    dueDate: t.nullable(t.date(), { description: 'The due date of the reminder' }),
+    remindMeDate: t.nullable(t.date(), { description: 'The remind date of the reminder' }),
     priority: t.integer({
       description: 'The priority of the reminder (0=none, 1=high, 5=medium, 9=low)',
     }),
     flagged: t.boolean({ description: 'Whether the reminder is flagged' }),
     creationDate: t.date({ description: 'The creation date of the reminder' }),
     modificationDate: t.date({ description: 'The modification date of the reminder' }),
-    allDayDueDate: t.date({ description: 'The all-day due date of the reminder' }),
+    allDayDueDate: t.nullable(t.date(), { description: 'The all-day due date of the reminder' }),
   },
   { description: 'A reminder item' }
 )

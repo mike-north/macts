@@ -65,6 +65,17 @@ export const manifest: unknown = {
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-01T06:05:24.948Z',
+        bundleId: 'com.apple.Notes',
+        appVersion: '4.13',
+        osVersion: '27.2',
+        accessPath: 'accounts',
+        itemsRead: 1,
+        sampledParents: 1,
+        status: 'probed',
+        skipped: [],
+      },
     },
     Folder: {
       name: 'Folder',
@@ -107,6 +118,17 @@ export const manifest: unknown = {
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-01T06:05:24.948Z',
+        bundleId: 'com.apple.Notes',
+        appVersion: '4.13',
+        osVersion: '27.2',
+        accessPath: 'folders',
+        itemsRead: 1,
+        sampledParents: 1,
+        status: 'probed',
+        skipped: [],
+      },
     },
     Note: {
       name: 'Note',
@@ -127,6 +149,19 @@ export const manifest: unknown = {
           description: 'The unique identifier of the note',
           code: 'ID  ',
           optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 60,
+              nullCount: 0,
+              failedReads: 0,
+            },
+          },
         },
         body: {
           access: 'rw',
@@ -148,6 +183,19 @@ export const manifest: unknown = {
           description: 'The creation date of the note',
           code: 'NTcd',
           optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 60,
+              nullCount: 0,
+              failedReads: 0,
+            },
+          },
         },
         modificationDate: {
           access: 'r',
@@ -155,6 +203,19 @@ export const manifest: unknown = {
           description: 'The modification date of the note',
           code: 'NTmd',
           optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 60,
+              nullCount: 0,
+              failedReads: 0,
+            },
+          },
         },
         shared: {
           access: 'r',
@@ -162,6 +223,19 @@ export const manifest: unknown = {
           description: 'Whether the note is shared',
           code: 'NTsh',
           optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 60,
+              nullCount: 0,
+              failedReads: 0,
+            },
+          },
         },
         passwordProtected: {
           access: 'r',
@@ -169,6 +243,19 @@ export const manifest: unknown = {
           description: 'Whether the note is password protected',
           code: 'NTpp',
           optional: false,
+          nullable: false,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 60,
+              nullCount: 0,
+              failedReads: 0,
+            },
+          },
         },
       },
       identifiers: [
@@ -177,6 +264,17 @@ export const manifest: unknown = {
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-01T06:05:24.948Z',
+        bundleId: 'com.apple.Notes',
+        appVersion: '4.13',
+        osVersion: '27.2',
+        accessPath: 'notes',
+        itemsRead: 60,
+        sampledParents: 1,
+        status: 'probed',
+        skipped: ['body', 'plaintext'],
+      },
     },
     Attachment: {
       name: 'Attachment',
@@ -190,6 +288,19 @@ export const manifest: unknown = {
           description: 'The name of the attachment',
           code: 'pnam',
           optional: false,
+          nullable: true,
+          evidence: {
+            nullable: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:24.948Z',
+              bundleId: 'com.apple.Notes',
+              appVersion: '4.13',
+              osVersion: '27.2',
+              sampleSize: 25,
+              nullCount: 10,
+              failedReads: 0,
+            },
+          },
         },
         id: {
           access: 'r',
@@ -222,10 +333,21 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-01T06:05:24.948Z',
+        bundleId: 'com.apple.Notes',
+        appVersion: '4.13',
+        osVersion: '27.2',
+        accessPath: 'attachments',
+        itemsRead: 25,
+        sampledParents: 1,
+        status: 'probed',
+        skipped: [],
+      },
     },
   },
   enums: {},
@@ -261,7 +383,7 @@ export const manifest: unknown = {
       name: 'get',
       description: 'Get an item by name',
       scope: 'resource',
-      resourceType: ['Account', 'Folder', 'Note', 'Attachment'],
+      resourceType: ['Account', 'Folder', 'Note'],
       parameters: [
         {
           name: 'name',
@@ -270,6 +392,21 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+    },
+    getAttachment: {
+      name: 'get',
+      description: 'Get an attachment by ID',
+      scope: 'resource',
+      resourceType: 'Attachment',
+      parameters: [
+        {
+          name: 'id',
+          type: 'string',
+          description: 'Attachment identifier',
+          required: true,
+        },
+      ],
+      routeName: 'get',
     },
     create: {
       name: 'create',

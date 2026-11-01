@@ -28,9 +28,9 @@ export class AttachmentResourceClient {
   }
 
   /**
-   * Get a attachment by name.
+   * Get a attachment by id.
    */
-  async get(name: string): Promise<Attachment> {
-    return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string): Promise<Attachment> {
+    return this.#http.rpc<Attachment>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

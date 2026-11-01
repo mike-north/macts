@@ -31,54 +31,114 @@ const t = ValueTypes
 
 /** A Terminal window */
 export interface Window {
-  /** The title of the window */
+  /**
+   * The title of the window.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** The unique identifier of the window */
-  readonly id: number
-  /** The position of the window */
-  position: string
-  /** Whether the window is visible */
-  visible: boolean
-  /** Whether the window is the frontmost window */
-  readonly frontmost: boolean
+  /**
+   * The unique identifier of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: number | null
+  /**
+   * The position of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  position: string | null
+  /**
+   * Whether the window is visible.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Whether the window is the frontmost window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly frontmost: boolean | null
 }
 
 /** A Terminal tab */
 export interface Tab {
-  /** The visible contents of the tab */
-  readonly contents: string
-  /** The complete history contents of the tab */
-  readonly history: string
-  /** Whether the tab is busy running a process */
-  readonly busy: boolean
-  /** The currently running processes in the tab */
-  readonly processes: string
-  /** Whether the tab is selected */
-  selected: boolean
-  /** Whether the title displays a custom title */
-  titleDisplaysCustomTitle: boolean
-  /** The custom title of the tab */
-  customTitle: string
-  /** The tty device of the tab */
+  /**
+   * The visible contents of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly contents: string | null
+  /**
+   * The complete history contents of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly history: string | null
+  /**
+   * Whether the tab is busy running a process.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly busy: boolean | null
+  /**
+   * The currently running processes in the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly processes: string | null
+  /**
+   * Whether the tab is selected.
+   * Nullable. No evidence that the app always sets it.
+   */
+  selected: boolean | null
+  /**
+   * Whether the title displays a custom title.
+   * Nullable. No evidence that the app always sets it.
+   */
+  titleDisplaysCustomTitle: boolean | null
+  /**
+   * The custom title of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  customTitle: string | null
+  /**
+   * The tty device of the tab.
+   * Never null: the primary identifier.
+   */
   readonly tty: string
-  /** The name of the current settings set */
-  currentSettings: string
+  /**
+   * The name of the current settings set.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentSettings: string | null
 }
 
 /** A Terminal settings set (profile) */
 export interface SettingsSet {
-  /** The name of the settings set */
+  /**
+   * The name of the settings set.
+   * Never null: the primary identifier.
+   */
   name: string
-  /** The unique identifier of the settings set */
-  readonly id: number
-  /** The number of rows */
-  numberOfRows: number
-  /** The number of columns */
-  numberOfColumns: number
-  /** The name of the font */
-  fontName: string
-  /** The size of the font */
-  fontSize: number
+  /**
+   * The unique identifier of the settings set.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: number | null
+  /**
+   * The number of rows.
+   * Nullable. No evidence that the app always sets it.
+   */
+  numberOfRows: number | null
+  /**
+   * The number of columns.
+   * Nullable. No evidence that the app always sets it.
+   */
+  numberOfColumns: number | null
+  /**
+   * The name of the font.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontName: string | null
+  /**
+   * The size of the font.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontSize: number | null
 }
 
 /** Input for creating a Window. */
@@ -91,9 +151,15 @@ export interface WindowCreateInput {
 
 /** Input for updating a Window. Omitted fields are left unchanged. */
 export interface WindowUpdateInput {
-  /** The position of the window */
+  /**
+   * The position of the window.
+   * Cannot be reset: null is rejected.
+   */
   position?: string
-  /** Whether the window is visible */
+  /**
+   * Whether the window is visible.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
 }
 
@@ -111,13 +177,25 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /** Whether the tab is selected */
+  /**
+   * Whether the tab is selected.
+   * Cannot be reset: null is rejected.
+   */
   selected?: boolean
-  /** Whether the title displays a custom title */
+  /**
+   * Whether the title displays a custom title.
+   * Cannot be reset: null is rejected.
+   */
   titleDisplaysCustomTitle?: boolean
-  /** The custom title of the tab */
+  /**
+   * The custom title of the tab.
+   * Cannot be reset: null is rejected.
+   */
   customTitle?: string
-  /** The name of the current settings set */
+  /**
+   * The name of the current settings set.
+   * Cannot be reset: null is rejected.
+   */
   currentSettings?: string
 }
 
@@ -137,15 +215,30 @@ export interface SettingsSetCreateInput {
 
 /** Input for updating a SettingsSet. Omitted fields are left unchanged. */
 export interface SettingsSetUpdateInput {
-  /** The name of the settings set */
+  /**
+   * The name of the settings set.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The number of rows */
+  /**
+   * The number of rows.
+   * Cannot be reset: null is rejected.
+   */
   numberOfRows?: number
-  /** The number of columns */
+  /**
+   * The number of columns.
+   * Cannot be reset: null is rejected.
+   */
   numberOfColumns?: number
-  /** The name of the font */
+  /**
+   * The name of the font.
+   * Cannot be reset: null is rejected.
+   */
   fontName?: string
-  /** The size of the font */
+  /**
+   * The size of the font.
+   * Cannot be reset: null is rejected.
+   */
   fontSize?: number
 }
 
@@ -153,7 +246,11 @@ export interface SettingsSetUpdateInput {
 export interface WindowResourceClient {
   /** List windows. */
   list(options?: CallOptions): Promise<readonly Window[]>
-  /** Read the window identified by `name`. */
+  /**
+   * Read the window identified by `name`.
+   *
+   * @param name - Item identifier. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Window>
 }
 
@@ -161,7 +258,11 @@ export interface WindowResourceClient {
 export interface TabResourceClient {
   /** List tabs. */
   list(options?: CallOptions): Promise<readonly Tab[]>
-  /** Read the tab identified by `name`. */
+  /**
+   * Read the tab identified by `name`.
+   *
+   * @param name - Item identifier. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Tab>
 }
 
@@ -169,7 +270,11 @@ export interface TabResourceClient {
 export interface SettingsSetResourceClient {
   /** List settingssets. */
   list(options?: CallOptions): Promise<readonly SettingsSet[]>
-  /** Read the settingsset identified by `name`. */
+  /**
+   * Read the settingsset identified by `name`.
+   *
+   * @param name - Item identifier. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<SettingsSet>
 }
 
@@ -184,34 +289,45 @@ export interface TerminalClient {
   readonly tabs: TabResourceClient
   /** A Terminal settings set (profile) */
   readonly settingssets: SettingsSetResourceClient
-  /** Execute a shell command in a Terminal window or tab */
+  /**
+   * Execute a shell command in a Terminal window or tab
+   *
+   * @param command - The command to execute. Does not accept null.
+   * @param _in - The window or tab to run the command in. Does not accept null.
+   */
   doScript(command: string, _in?: string, options?: CallOptions): Promise<void>
 }
 
 const windowRecordType: ValueType<Window> = t.record(
   {
     name: t.string({ description: 'The title of the window' }),
-    id: t.double({ description: 'The unique identifier of the window' }),
-    position: t.string({ description: 'The position of the window' }),
-    visible: t.boolean({ description: 'Whether the window is visible' }),
-    frontmost: t.boolean({ description: 'Whether the window is the frontmost window' }),
+    id: t.nullable(t.double(), { description: 'The unique identifier of the window' }),
+    position: t.nullable(t.string(), { description: 'The position of the window' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is visible' }),
+    frontmost: t.nullable(t.boolean(), {
+      description: 'Whether the window is the frontmost window',
+    }),
   },
   { description: 'A Terminal window' }
 )
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
-    contents: t.string({ description: 'The visible contents of the tab' }),
-    history: t.string({ description: 'The complete history contents of the tab' }),
-    busy: t.boolean({ description: 'Whether the tab is busy running a process' }),
-    processes: t.string({ description: 'The currently running processes in the tab' }),
-    selected: t.boolean({ description: 'Whether the tab is selected' }),
-    titleDisplaysCustomTitle: t.boolean({
+    contents: t.nullable(t.string(), { description: 'The visible contents of the tab' }),
+    history: t.nullable(t.string(), { description: 'The complete history contents of the tab' }),
+    busy: t.nullable(t.boolean(), { description: 'Whether the tab is busy running a process' }),
+    processes: t.nullable(t.string(), {
+      description: 'The currently running processes in the tab',
+    }),
+    selected: t.nullable(t.boolean(), { description: 'Whether the tab is selected' }),
+    titleDisplaysCustomTitle: t.nullable(t.boolean(), {
       description: 'Whether the title displays a custom title',
     }),
-    customTitle: t.string({ description: 'The custom title of the tab' }),
+    customTitle: t.nullable(t.string(), { description: 'The custom title of the tab' }),
     tty: t.string({ description: 'The tty device of the tab' }),
-    currentSettings: t.string({ description: 'The name of the current settings set' }),
+    currentSettings: t.nullable(t.string(), {
+      description: 'The name of the current settings set',
+    }),
   },
   { description: 'A Terminal tab' }
 )
@@ -219,11 +335,11 @@ const tabRecordType: ValueType<Tab> = t.record(
 const settingsSetRecordType: ValueType<SettingsSet> = t.record(
   {
     name: t.string({ description: 'The name of the settings set' }),
-    id: t.double({ description: 'The unique identifier of the settings set' }),
-    numberOfRows: t.double({ description: 'The number of rows' }),
-    numberOfColumns: t.double({ description: 'The number of columns' }),
-    fontName: t.string({ description: 'The name of the font' }),
-    fontSize: t.double({ description: 'The size of the font' }),
+    id: t.nullable(t.double(), { description: 'The unique identifier of the settings set' }),
+    numberOfRows: t.nullable(t.double(), { description: 'The number of rows' }),
+    numberOfColumns: t.nullable(t.double(), { description: 'The number of columns' }),
+    fontName: t.nullable(t.string(), { description: 'The name of the font' }),
+    fontSize: t.nullable(t.double(), { description: 'The size of the font' }),
   },
   { description: 'A Terminal settings set (profile)' }
 )

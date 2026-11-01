@@ -9,9 +9,9 @@ import { CallOptions } from '@macts/contracts';
 
 // @public
 export interface Account {
-    readonly id: string;
+    readonly id: string | null;
     readonly name: string;
-    readonly upgraded: boolean;
+    readonly upgraded: boolean | null;
 }
 
 // @public
@@ -28,11 +28,11 @@ export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export interface Attachment {
-    readonly contentIdentifier?: string;
-    readonly creationDate: string;
+    readonly contentIdentifier?: string | null;
+    readonly creationDate: string | null;
     readonly id: string;
-    readonly modificationDate: string;
-    readonly name: string;
+    readonly modificationDate: string | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -40,7 +40,7 @@ export type AttachmentCreateInput = Record<string, never>;
 
 // @public
 export interface AttachmentResourceClient {
-    get(name: string, options?: CallOptions): Promise<Attachment>;
+    get(id: string, options?: CallOptions): Promise<Attachment>;
     list(options?: CallOptions): Promise<readonly Attachment[]>;
 }
 
@@ -49,10 +49,10 @@ export type AttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Folder {
-    readonly container?: string;
-    readonly id: string;
+    readonly container?: string | null;
+    readonly id: string | null;
     name: string;
-    readonly shared: boolean;
+    readonly shared: boolean | null;
 }
 
 // @public
@@ -73,13 +73,13 @@ export interface FolderUpdateInput {
 
 // @public
 export interface Note {
-    body: string;
+    body: string | null;
     readonly creationDate: string;
     readonly id: string;
     readonly modificationDate: string;
     name: string;
     readonly passwordProtected: boolean;
-    readonly plaintext: string;
+    readonly plaintext: string | null;
     readonly shared: boolean;
 }
 

@@ -11,7 +11,7 @@ import { Rgb } from '@macts/contracts';
 
 // @public
 export interface Attendee {
-    readonly displayName: string;
+    readonly displayName: string | null;
     readonly email: string;
     readonly participationStatus: ParticipationStatus;
 }
@@ -24,12 +24,12 @@ export type AttendeeUpdateInput = Record<string, never>;
 
 // @public
 export interface Calendar {
-    readonly calendarIdentifier: string;
-    color: Rgb;
-    description: string;
+    readonly calendarIdentifier: string | null;
+    color: Rgb | null;
+    description: string | null;
     name: string;
-    title: string;
-    readonly writable: boolean;
+    title: string | null;
+    readonly writable: boolean | null;
 }
 
 // @public
@@ -72,8 +72,8 @@ export interface CalendarUpdateInput {
 
 // @public
 export interface DisplayAlarm {
-    triggerDate: Date;
-    triggerInterval: Integer;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
 
 // @public
@@ -91,18 +91,18 @@ export interface DisplayAlarmUpdateInput {
 // @public
 interface Event_2 {
     alldayEvent: boolean;
-    description: string;
+    description: string | null;
     endDate: Date;
     excludedDates: readonly Date[];
-    location: string;
-    recurrence: string;
+    location: string | null;
+    recurrence: string | null;
     readonly sequence: Integer;
     stampDate: Date;
     startDate: Date;
     status: EventStatus;
     summary: string;
     readonly uid: string;
-    url: string;
+    url: string | null;
 }
 export { Event_2 as Event }
 
@@ -152,8 +152,8 @@ export interface EventUpdateInput {
 
 // @public
 export interface MailAlarm {
-    triggerDate: Date;
-    triggerInterval: Integer;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
 
 // @public
@@ -170,9 +170,9 @@ export interface MailAlarmUpdateInput {
 
 // @public
 export interface OpenFileAlarm {
-    filepath: string;
-    triggerDate: Date;
-    triggerInterval: Integer;
+    filepath: string | null;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
 
 // @public
@@ -194,10 +194,10 @@ export type ParticipationStatus = 'unknown' | 'accepted' | 'declined' | 'tentati
 
 // @public
 export interface SoundAlarm {
-    soundFile: string;
-    soundName: string;
-    triggerDate: Date;
-    triggerInterval: Integer;
+    soundFile: string | null;
+    soundName: string | null;
+    triggerDate: Date | null;
+    triggerInterval: Integer | null;
 }
 
 // @public

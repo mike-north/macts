@@ -31,26 +31,50 @@ const t = ValueTypes
 
 /** A Safari document (window) */
 export interface Document {
-  /** The document name */
-  readonly name: string
-  /** The unique identifier of the document */
+  /**
+   * The document name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the document.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The current URL */
-  url: string
+  /**
+   * The current URL.
+   * Nullable. No evidence that the app always sets it.
+   */
+  url: string | null
 }
 
 /** A Safari tab */
 export interface Tab {
-  /** The tab name */
-  readonly name: string
-  /** The unique identifier of the tab */
+  /**
+   * The tab name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the tab.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The tab URL */
-  url: string
-  /** The HTML source of the web page currently loaded in the tab */
-  readonly source: string
-  /** The text of the web page currently loaded in the tab */
-  readonly text: string
+  /**
+   * The tab URL.
+   * Nullable. No evidence that the app always sets it.
+   */
+  url: string | null
+  /**
+   * The HTML source of the web page currently loaded in the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly source: string | null
+  /**
+   * The text of the web page currently loaded in the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly text: string | null
 }
 
 /** Input for creating a Document. */
@@ -61,7 +85,10 @@ export interface DocumentCreateInput {
 
 /** Input for updating a Document. Omitted fields are left unchanged. */
 export interface DocumentUpdateInput {
-  /** The current URL */
+  /**
+   * The current URL.
+   * Cannot be reset: null is rejected.
+   */
   url?: string
 }
 
@@ -73,7 +100,10 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /** The tab URL */
+  /**
+   * The tab URL.
+   * Cannot be reset: null is rejected.
+   */
   url?: string
 }
 
@@ -85,17 +115,34 @@ export interface SafariClient {
   /**
    * Add a new Reading List item with the given URL. Allows a custom title and preview text to be
    * specified.
+   *
+   * @param andPreviewText - Preview text for the Reading List item, usually the first few sentences
+   * of the article. Does not accept null.
+   * @param withTitle - Title of the Reading List item. Does not accept null.
    */
   addReadingListItem(
     andPreviewText?: string,
     withTitle?: string,
     options?: CallOptions
   ): Promise<void>
-  /** Applies a string of JavaScript code to a document. */
+  /**
+   * Applies a string of JavaScript code to a document.
+   *
+   * @param _in - The tab that the JavaScript should be evaluated in. Does not accept null.
+   */
   doJavaScript(_in?: string, options?: CallOptions): Promise<void>
-  /** Emails the contents of a tab. */
+  /**
+   * Emails the contents of a tab.
+   *
+   * @param _of - The tab to send. Does not accept null.
+   */
   emailContents(_of?: string, options?: CallOptions): Promise<void>
-  /** Searches the web using Safari's current search provider. */
+  /**
+   * Searches the web using Safari's current search provider.
+   *
+   * @param _for - The query to search for. Does not accept null.
+   * @param _in - The tab that the search results should shown in. Does not accept null.
+   */
   searchTheWeb(_for: string, _in?: string, options?: CallOptions): Promise<void>
   /** Shows Safari's bookmarks. */
   showBookmarks(options?: CallOptions): Promise<void>
@@ -113,22 +160,24 @@ export interface SafariClient {
 
 const documentRecordType: ValueType<Document> = t.record(
   {
-    name: t.string({ description: 'The document name' }),
+    name: t.nullable(t.string(), { description: 'The document name' }),
     id: t.string({ description: 'The unique identifier of the document' }),
-    url: t.string({ description: 'The current URL' }),
+    url: t.nullable(t.string(), { description: 'The current URL' }),
   },
   { description: 'A Safari document (window)' }
 )
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
-    name: t.string({ description: 'The tab name' }),
+    name: t.nullable(t.string(), { description: 'The tab name' }),
     id: t.string({ description: 'The unique identifier of the tab' }),
-    url: t.string({ description: 'The tab URL' }),
-    source: t.string({
+    url: t.nullable(t.string(), { description: 'The tab URL' }),
+    source: t.nullable(t.string(), {
       description: 'The HTML source of the web page currently loaded in the tab',
     }),
-    text: t.string({ description: 'The text of the web page currently loaded in the tab' }),
+    text: t.nullable(t.string(), {
+      description: 'The text of the web page currently loaded in the tab',
+    }),
   },
   { description: 'A Safari tab' }
 )

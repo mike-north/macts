@@ -48,198 +48,402 @@ export type InstantMessageServiceType =
 
 /** Address for the given record. */
 export interface Address {
-  /** City part of the address. */
-  city: string
-  /** properly formatted string for this address. */
-  readonly formattedAddress: string
-  /** Street part of the address, multiple lines separated by carriage returns. */
-  street: string
-  /** unique identifier for this address. */
+  /**
+   * City part of the address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  city: string | null
+  /**
+   * properly formatted string for this address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly formattedAddress: string | null
+  /**
+   * Street part of the address, multiple lines separated by carriage returns.
+   * Nullable. No evidence that the app always sets it.
+   */
+  street: string | null
+  /**
+   * unique identifier for this address.
+   * Never null: the primary identifier.
+   */
   id: string
-  /** Zip or postal code of the address. */
-  zip: string
-  /** Country part of the address. */
-  country: string
-  /** Label. */
-  label: string
-  /** Country code part of the address (should be a two character iso country code). */
-  countryCode: string
-  /** State, Province, or Region part of the address. */
-  state: string
+  /**
+   * Zip or postal code of the address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  zip: string | null
+  /**
+   * Country part of the address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  country: string | null
+  /**
+   * Label.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * Country code part of the address (should be a two character iso country code).
+   * Nullable. No evidence that the app always sets it.
+   */
+  countryCode: string | null
+  /**
+   * State, Province, or Region part of the address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  state: string | null
 }
 
 /** User name for America Online (AOL) instant messaging. */
 export interface AIMHandle {
-  /** Unique identifier for this handle */
-  readonly id: string
-  /** Label for this handle */
-  label: string
-  /** The AIM handle value */
-  value: string
+  /**
+   * Unique identifier for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The AIM handle value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Arbitrary date associated with this person. */
 export interface CustomDate {
-  /** Unique identifier for this date */
-  readonly id: string
-  /** Label for this date */
-  label: string
-  /** The date value */
-  value: Date
+  /**
+   * Unique identifier for this date.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this date.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The date value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: Date | null
 }
 
 /** Email address for a person. */
 export interface Email {
-  /** Unique identifier for this email */
-  readonly id: string
-  /** Label for this email */
-  label: string
-  /** The email address */
-  value: string
+  /**
+   * Unique identifier for this email.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this email.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The email address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A Group Record in the address book database */
 export interface Group {
-  /** The name of this group. */
-  name: string
+  /**
+   * The name of this group.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** User name for ICQ instant messaging. */
 export interface ICQHandle {
-  /** Unique identifier for this handle */
-  readonly id: string
-  /** Label for this handle */
-  label: string
-  /** The ICQ handle value */
-  value: string
+  /**
+   * Unique identifier for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The ICQ handle value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Address for instant messaging. */
 export interface InstantMessage {
-  /** The service name of this instant message address. */
-  readonly serviceName: string
-  /** The service type of this instant message address. */
-  serviceType: string
-  /** The user name of this instant message address. */
-  userName: string
+  /**
+   * The service name of this instant message address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly serviceName: string | null
+  /**
+   * The service type of this instant message address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  serviceType: string | null
+  /**
+   * The user name of this instant message address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  userName: string | null
 }
 
 /** User name for Jabber instant messaging. */
 export interface JabberHandle {
-  /** Unique identifier for this handle */
-  readonly id: string
-  /** Label for this handle */
-  label: string
-  /** The Jabber handle value */
-  value: string
+  /**
+   * Unique identifier for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The Jabber handle value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** User name for Microsoft Network (MSN) instant messaging. */
 export interface MSNHandle {
-  /** Unique identifier for this handle */
-  readonly id: string
-  /** Label for this handle */
-  label: string
-  /** The MSN handle value */
-  value: string
+  /**
+   * Unique identifier for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The MSN handle value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A person in the address book database. */
 export interface Person {
-  /** The Nickname of this person. */
-  nickname: string
-  /** Organization that employs this person. */
-  organization: string
-  /** The Maiden name of this person. */
-  maidenName: string
-  /** The Suffix of this person. */
-  suffix: string
-  /** Person information in vCard format, this always returns a card in version 3.0 format. */
-  readonly vcard: string
-  /** The home page of this person. */
-  homePage: string
-  /** The birth date of this person. */
-  birthDate: string
-  /** The phonetic version of the Last name of this person. */
-  phoneticLastName: string
-  /** The title of this person. */
-  title: string
-  /** The Phonetic version of the Middle name of this person. */
-  phoneticMiddleName: string
-  /** Department that this person works for. */
-  department: string
-  /** Image for person. */
-  image: string
-  /** First/Last name of the person, uses the name display order preference setting in Contacts. */
-  readonly name: string
-  /** Notes for this person. */
-  note: string
-  /** Is the current record a company or a person. */
-  company: boolean
-  /** The Middle name of this person. */
-  middleName: string
-  /** The phonetic version of the First name of this person. */
-  phoneticFirstName: string
-  /** The job title of this person. */
-  jobTitle: string
-  /** The Last name of this person. */
-  lastName: string
-  /** The First name of this person. */
-  firstName: string
+  /**
+   * The Nickname of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  nickname: string | null
+  /**
+   * Organization that employs this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  organization: string | null
+  /**
+   * The Maiden name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  maidenName: string | null
+  /**
+   * The Suffix of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  suffix: string | null
+  /**
+   * Person information in vCard format, this always returns a card in version 3.0 format.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly vcard: string | null
+  /**
+   * The home page of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  homePage: string | null
+  /**
+   * The birth date of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  birthDate: string | null
+  /**
+   * The phonetic version of the Last name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  phoneticLastName: string | null
+  /**
+   * The title of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  title: string | null
+  /**
+   * The Phonetic version of the Middle name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  phoneticMiddleName: string | null
+  /**
+   * Department that this person works for.
+   * Nullable. No evidence that the app always sets it.
+   */
+  department: string | null
+  /**
+   * Image for person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  image: string | null
+  /**
+   * First/Last name of the person, uses the name display order preference setting in Contacts.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * Notes for this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * Is the current record a company or a person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  company: boolean | null
+  /**
+   * The Middle name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  middleName: string | null
+  /**
+   * The phonetic version of the First name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  phoneticFirstName: string | null
+  /**
+   * The job title of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  jobTitle: string | null
+  /**
+   * The Last name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  lastName: string | null
+  /**
+   * The First name of this person.
+   * Nullable. No evidence that the app always sets it.
+   */
+  firstName: string | null
 }
 
 /** Phone number for a person. */
 export interface Phone {
-  /** Unique identifier for this phone */
-  readonly id: string
-  /** Label for this phone */
-  label: string
-  /** The phone number */
-  value: string
+  /**
+   * Unique identifier for this phone.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this phone.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The phone number.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Other names related to this person. */
 export interface RelatedName {
-  /** Unique identifier for this name */
-  readonly id: string
-  /** Label for this name */
-  label: string
-  /** The related name value */
-  value: string
+  /**
+   * Unique identifier for this name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The related name value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Profile for social networks. */
 export interface SocialProfile {
-  /** The persistent unique identifier for this profile. */
+  /**
+   * The persistent unique identifier for this profile.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The service name of this social profile. */
-  serviceName: string
-  /** The username used with this social profile. */
-  userName: string
-  /** A service-specific identifier used with this social profile. */
-  userIdentifier: string
-  /** The URL of this social profile. */
-  url: string
+  /**
+   * The service name of this social profile.
+   * Nullable. No evidence that the app always sets it.
+   */
+  serviceName: string | null
+  /**
+   * The username used with this social profile.
+   * Nullable. No evidence that the app always sets it.
+   */
+  userName: string | null
+  /**
+   * A service-specific identifier used with this social profile.
+   * Nullable. No evidence that the app always sets it.
+   */
+  userIdentifier: string | null
+  /**
+   * The URL of this social profile.
+   * Nullable. No evidence that the app always sets it.
+   */
+  url: string | null
 }
 
 /** URLs for this person. */
 export interface Url {
-  /** Unique identifier for this URL */
-  readonly id: string
-  /** Label for this URL */
-  label: string
-  /** The URL value */
-  value: string
+  /**
+   * Unique identifier for this URL.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this URL.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The URL value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** User name for Yahoo instant messaging. */
 export interface YahooHandle {
-  /** Unique identifier for this handle */
-  readonly id: string
-  /** Label for this handle */
-  label: string
-  /** The Yahoo handle value */
-  value: string
+  /**
+   * Unique identifier for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Label for this handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  label: string | null
+  /**
+   * The Yahoo handle value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Input for creating an Address. */
@@ -264,21 +468,45 @@ export interface AddressCreateInput {
 
 /** Input for updating an Address. Omitted fields are left unchanged. */
 export interface AddressUpdateInput {
-  /** City part of the address. */
+  /**
+   * City part of the address.
+   * Cannot be reset: null is rejected.
+   */
   city?: string
-  /** Street part of the address, multiple lines separated by carriage returns. */
+  /**
+   * Street part of the address, multiple lines separated by carriage returns.
+   * Cannot be reset: null is rejected.
+   */
   street?: string
-  /** unique identifier for this address. */
+  /**
+   * unique identifier for this address.
+   * Cannot be reset: null is rejected.
+   */
   id?: string
-  /** Zip or postal code of the address. */
+  /**
+   * Zip or postal code of the address.
+   * Cannot be reset: null is rejected.
+   */
   zip?: string
-  /** Country part of the address. */
+  /**
+   * Country part of the address.
+   * Cannot be reset: null is rejected.
+   */
   country?: string
-  /** Label. */
+  /**
+   * Label.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** Country code part of the address (should be a two character iso country code). */
+  /**
+   * Country code part of the address (should be a two character iso country code).
+   * Cannot be reset: null is rejected.
+   */
   countryCode?: string
-  /** State, Province, or Region part of the address. */
+  /**
+   * State, Province, or Region part of the address.
+   * Cannot be reset: null is rejected.
+   */
   state?: string
 }
 
@@ -292,9 +520,15 @@ export interface AIMHandleCreateInput {
 
 /** Input for updating an AIMHandle. Omitted fields are left unchanged. */
 export interface AIMHandleUpdateInput {
-  /** Label for this handle */
+  /**
+   * Label for this handle.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The AIM handle value */
+  /**
+   * The AIM handle value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -308,9 +542,15 @@ export interface CustomDateCreateInput {
 
 /** Input for updating a CustomDate. Omitted fields are left unchanged. */
 export interface CustomDateUpdateInput {
-  /** Label for this date */
+  /**
+   * Label for this date.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The date value */
+  /**
+   * The date value.
+   * Cannot be reset: null is rejected.
+   */
   value?: Date
 }
 
@@ -324,9 +564,15 @@ export interface EmailCreateInput {
 
 /** Input for updating an Email. Omitted fields are left unchanged. */
 export interface EmailUpdateInput {
-  /** Label for this email */
+  /**
+   * Label for this email.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The email address */
+  /**
+   * The email address.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -338,7 +584,10 @@ export interface GroupCreateInput {
 
 /** Input for updating a Group. Omitted fields are left unchanged. */
 export interface GroupUpdateInput {
-  /** The name of this group. */
+  /**
+   * The name of this group.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -352,9 +601,15 @@ export interface ICQHandleCreateInput {
 
 /** Input for updating an ICQHandle. Omitted fields are left unchanged. */
 export interface ICQHandleUpdateInput {
-  /** Label for this handle */
+  /**
+   * Label for this handle.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The ICQ handle value */
+  /**
+   * The ICQ handle value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -368,9 +623,15 @@ export interface InstantMessageCreateInput {
 
 /** Input for updating an InstantMessage. Omitted fields are left unchanged. */
 export interface InstantMessageUpdateInput {
-  /** The service type of this instant message address. */
+  /**
+   * The service type of this instant message address.
+   * Cannot be reset: null is rejected.
+   */
   serviceType?: string
-  /** The user name of this instant message address. */
+  /**
+   * The user name of this instant message address.
+   * Cannot be reset: null is rejected.
+   */
   userName?: string
 }
 
@@ -384,9 +645,15 @@ export interface JabberHandleCreateInput {
 
 /** Input for updating a JabberHandle. Omitted fields are left unchanged. */
 export interface JabberHandleUpdateInput {
-  /** Label for this handle */
+  /**
+   * Label for this handle.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The Jabber handle value */
+  /**
+   * The Jabber handle value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -400,9 +667,15 @@ export interface MSNHandleCreateInput {
 
 /** Input for updating a MSNHandle. Omitted fields are left unchanged. */
 export interface MSNHandleUpdateInput {
-  /** Label for this handle */
+  /**
+   * Label for this handle.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The MSN handle value */
+  /**
+   * The MSN handle value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -448,41 +721,95 @@ export interface PersonCreateInput {
 
 /** Input for updating a Person. Omitted fields are left unchanged. */
 export interface PersonUpdateInput {
-  /** The Nickname of this person. */
+  /**
+   * The Nickname of this person.
+   * Cannot be reset: null is rejected.
+   */
   nickname?: string
-  /** Organization that employs this person. */
+  /**
+   * Organization that employs this person.
+   * Cannot be reset: null is rejected.
+   */
   organization?: string
-  /** The Maiden name of this person. */
+  /**
+   * The Maiden name of this person.
+   * Cannot be reset: null is rejected.
+   */
   maidenName?: string
-  /** The Suffix of this person. */
+  /**
+   * The Suffix of this person.
+   * Cannot be reset: null is rejected.
+   */
   suffix?: string
-  /** The home page of this person. */
+  /**
+   * The home page of this person.
+   * Cannot be reset: null is rejected.
+   */
   homePage?: string
-  /** The birth date of this person. */
+  /**
+   * The birth date of this person.
+   * Cannot be reset: null is rejected.
+   */
   birthDate?: string
-  /** The phonetic version of the Last name of this person. */
+  /**
+   * The phonetic version of the Last name of this person.
+   * Cannot be reset: null is rejected.
+   */
   phoneticLastName?: string
-  /** The title of this person. */
+  /**
+   * The title of this person.
+   * Cannot be reset: null is rejected.
+   */
   title?: string
-  /** The Phonetic version of the Middle name of this person. */
+  /**
+   * The Phonetic version of the Middle name of this person.
+   * Cannot be reset: null is rejected.
+   */
   phoneticMiddleName?: string
-  /** Department that this person works for. */
+  /**
+   * Department that this person works for.
+   * Cannot be reset: null is rejected.
+   */
   department?: string
-  /** Image for person. */
+  /**
+   * Image for person.
+   * Cannot be reset: null is rejected.
+   */
   image?: string
-  /** Notes for this person. */
+  /**
+   * Notes for this person.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
-  /** Is the current record a company or a person. */
+  /**
+   * Is the current record a company or a person.
+   * Cannot be reset: null is rejected.
+   */
   company?: boolean
-  /** The Middle name of this person. */
+  /**
+   * The Middle name of this person.
+   * Cannot be reset: null is rejected.
+   */
   middleName?: string
-  /** The phonetic version of the First name of this person. */
+  /**
+   * The phonetic version of the First name of this person.
+   * Cannot be reset: null is rejected.
+   */
   phoneticFirstName?: string
-  /** The job title of this person. */
+  /**
+   * The job title of this person.
+   * Cannot be reset: null is rejected.
+   */
   jobTitle?: string
-  /** The Last name of this person. */
+  /**
+   * The Last name of this person.
+   * Cannot be reset: null is rejected.
+   */
   lastName?: string
-  /** The First name of this person. */
+  /**
+   * The First name of this person.
+   * Cannot be reset: null is rejected.
+   */
   firstName?: string
 }
 
@@ -496,9 +823,15 @@ export interface PhoneCreateInput {
 
 /** Input for updating a Phone. Omitted fields are left unchanged. */
 export interface PhoneUpdateInput {
-  /** Label for this phone */
+  /**
+   * Label for this phone.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The phone number */
+  /**
+   * The phone number.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -512,9 +845,15 @@ export interface RelatedNameCreateInput {
 
 /** Input for updating a RelatedName. Omitted fields are left unchanged. */
 export interface RelatedNameUpdateInput {
-  /** Label for this name */
+  /**
+   * Label for this name.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The related name value */
+  /**
+   * The related name value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -532,13 +871,25 @@ export interface SocialProfileCreateInput {
 
 /** Input for updating a SocialProfile. Omitted fields are left unchanged. */
 export interface SocialProfileUpdateInput {
-  /** The service name of this social profile. */
+  /**
+   * The service name of this social profile.
+   * Cannot be reset: null is rejected.
+   */
   serviceName?: string
-  /** The username used with this social profile. */
+  /**
+   * The username used with this social profile.
+   * Cannot be reset: null is rejected.
+   */
   userName?: string
-  /** A service-specific identifier used with this social profile. */
+  /**
+   * A service-specific identifier used with this social profile.
+   * Cannot be reset: null is rejected.
+   */
   userIdentifier?: string
-  /** The URL of this social profile. */
+  /**
+   * The URL of this social profile.
+   * Cannot be reset: null is rejected.
+   */
   url?: string
 }
 
@@ -552,9 +903,15 @@ export interface UrlCreateInput {
 
 /** Input for updating an Url. Omitted fields are left unchanged. */
 export interface UrlUpdateInput {
-  /** Label for this URL */
+  /**
+   * Label for this URL.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The URL value */
+  /**
+   * The URL value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -568,9 +925,15 @@ export interface YahooHandleCreateInput {
 
 /** Input for updating a YahooHandle. Omitted fields are left unchanged. */
 export interface YahooHandleUpdateInput {
-  /** Label for this handle */
+  /**
+   * Label for this handle.
+   * Cannot be reset: null is rejected.
+   */
   label?: string
-  /** The Yahoo handle value */
+  /**
+   * The Yahoo handle value.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -579,7 +942,14 @@ export interface YahooHandleUpdateInput {
  * A client factory creates one from {@link contactsContract}.
  */
 export interface ContactsClient {
-  /** Create a new object. */
+  /**
+   * Create a new object.
+   *
+   * @param _new - The class of the new object. Does not accept null.
+   * @param at - The location at which to insert the object. Does not accept null.
+   * @param withData - The initial contents of the object. Does not accept null.
+   * @param withProperties - The initial values for properties of the object. Does not accept null.
+   */
   make(
     _new: string,
     at?: string,
@@ -587,9 +957,17 @@ export interface ContactsClient {
     withProperties?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Add a child object. */
+  /**
+   * Add a child object.
+   *
+   * @param to - where to add this child to. Does not accept null.
+   */
   add(to: string, options?: CallOptions): Promise<void>
-  /** Remove a child object. */
+  /**
+   * Remove a child object.
+   *
+   * @param from - where to remove this child from. Does not accept null.
+   */
   remove(from: string, options?: CallOptions): Promise<void>
   /** Save all Contacts changes. Also see the unsaved property for the application class. */
   save(options?: CallOptions): Promise<void>
@@ -599,13 +977,25 @@ export interface ContactsClient {
    * address.)
    */
   actionProperty(options?: CallOptions): Promise<void>
-  /** RollOver - Returns the title that will be placed in the menu for this roll over */
+  /**
+   * RollOver - Returns the title that will be placed in the menu for this roll over
+   *
+   * @param _with - property that that was returned from the "action property" handler. Does not
+   * accept null.
+   * @param _for - Currently selected person. Does not accept null.
+   */
   actionTitle(
     _with: unknown,
     _for: ObjectReferenceVariant<Person, never>,
     options?: CallOptions
   ): Promise<void>
-  /** RollOver - Performs the action on the given person and value */
+  /**
+   * RollOver - Performs the action on the given person and value
+   *
+   * @param _with - property that that was returned from the "action property" handler. Does not
+   * accept null.
+   * @param _for - Currently selected person. Does not accept null.
+   */
   performAction(
     _with: unknown,
     _for: ObjectReferenceVariant<Person, never>,
@@ -613,6 +1003,10 @@ export interface ContactsClient {
   ): Promise<void>
   /**
    * RollOver - Determines if the rollover action should be enabled for the given person and value
+   *
+   * @param _with - property that that was returned from the "action property" handler. Does not
+   * accept null.
+   * @param _for - Currently selected person. Does not accept null.
    */
   shouldEnableAction(
     _with: unknown,
@@ -623,145 +1017,157 @@ export interface ContactsClient {
 
 const addressRecordType: ValueType<Address> = t.record(
   {
-    city: t.string({ description: 'City part of the address.' }),
-    formattedAddress: t.string({ description: 'properly formatted string for this address.' }),
-    street: t.string({
+    city: t.nullable(t.string(), { description: 'City part of the address.' }),
+    formattedAddress: t.nullable(t.string(), {
+      description: 'properly formatted string for this address.',
+    }),
+    street: t.nullable(t.string(), {
       description: 'Street part of the address, multiple lines separated by carriage returns.',
     }),
     id: t.string({ description: 'unique identifier for this address.' }),
-    zip: t.string({ description: 'Zip or postal code of the address.' }),
-    country: t.string({ description: 'Country part of the address.' }),
-    label: t.string({ description: 'Label.' }),
-    countryCode: t.string({
+    zip: t.nullable(t.string(), { description: 'Zip or postal code of the address.' }),
+    country: t.nullable(t.string(), { description: 'Country part of the address.' }),
+    label: t.nullable(t.string(), { description: 'Label.' }),
+    countryCode: t.nullable(t.string(), {
       description: 'Country code part of the address (should be a two character iso country code).',
     }),
-    state: t.string({ description: 'State, Province, or Region part of the address.' }),
+    state: t.nullable(t.string(), {
+      description: 'State, Province, or Region part of the address.',
+    }),
   },
   { description: 'Address for the given record.' }
 )
 
 const aimHandleRecordType: ValueType<AIMHandle> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this handle' }),
-    label: t.string({ description: 'Label for this handle' }),
-    value: t.string({ description: 'The AIM handle value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
+    label: t.nullable(t.string(), { description: 'Label for this handle' }),
+    value: t.nullable(t.string(), { description: 'The AIM handle value' }),
   },
   { description: 'User name for America Online (AOL) instant messaging.' }
 )
 
 const customDateRecordType: ValueType<CustomDate> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this date' }),
-    label: t.string({ description: 'Label for this date' }),
-    value: t.date({ description: 'The date value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this date' }),
+    label: t.nullable(t.string(), { description: 'Label for this date' }),
+    value: t.nullable(t.date(), { description: 'The date value' }),
   },
   { description: 'Arbitrary date associated with this person.' }
 )
 
 const emailRecordType: ValueType<Email> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this email' }),
-    label: t.string({ description: 'Label for this email' }),
-    value: t.string({ description: 'The email address' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this email' }),
+    label: t.nullable(t.string(), { description: 'Label for this email' }),
+    value: t.nullable(t.string(), { description: 'The email address' }),
   },
   { description: 'Email address for a person.' }
 )
 
 const groupRecordType: ValueType<Group> = t.record(
   {
-    name: t.string({ description: 'The name of this group.' }),
+    name: t.nullable(t.string(), { description: 'The name of this group.' }),
   },
   { description: 'A Group Record in the address book database' }
 )
 
 const icqHandleRecordType: ValueType<ICQHandle> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this handle' }),
-    label: t.string({ description: 'Label for this handle' }),
-    value: t.string({ description: 'The ICQ handle value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
+    label: t.nullable(t.string(), { description: 'Label for this handle' }),
+    value: t.nullable(t.string(), { description: 'The ICQ handle value' }),
   },
   { description: 'User name for ICQ instant messaging.' }
 )
 
 const instantMessageRecordType: ValueType<InstantMessage> = t.record(
   {
-    serviceName: t.string({ description: 'The service name of this instant message address.' }),
-    serviceType: t.string({ description: 'The service type of this instant message address.' }),
-    userName: t.string({ description: 'The user name of this instant message address.' }),
+    serviceName: t.nullable(t.string(), {
+      description: 'The service name of this instant message address.',
+    }),
+    serviceType: t.nullable(t.string(), {
+      description: 'The service type of this instant message address.',
+    }),
+    userName: t.nullable(t.string(), {
+      description: 'The user name of this instant message address.',
+    }),
   },
   { description: 'Address for instant messaging.' }
 )
 
 const jabberHandleRecordType: ValueType<JabberHandle> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this handle' }),
-    label: t.string({ description: 'Label for this handle' }),
-    value: t.string({ description: 'The Jabber handle value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
+    label: t.nullable(t.string(), { description: 'Label for this handle' }),
+    value: t.nullable(t.string(), { description: 'The Jabber handle value' }),
   },
   { description: 'User name for Jabber instant messaging.' }
 )
 
 const msnHandleRecordType: ValueType<MSNHandle> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this handle' }),
-    label: t.string({ description: 'Label for this handle' }),
-    value: t.string({ description: 'The MSN handle value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
+    label: t.nullable(t.string(), { description: 'Label for this handle' }),
+    value: t.nullable(t.string(), { description: 'The MSN handle value' }),
   },
   { description: 'User name for Microsoft Network (MSN) instant messaging.' }
 )
 
 const personRecordType: ValueType<Person> = t.record(
   {
-    nickname: t.string({ description: 'The Nickname of this person.' }),
-    organization: t.string({ description: 'Organization that employs this person.' }),
-    maidenName: t.string({ description: 'The Maiden name of this person.' }),
-    suffix: t.string({ description: 'The Suffix of this person.' }),
-    vcard: t.string({
+    nickname: t.nullable(t.string(), { description: 'The Nickname of this person.' }),
+    organization: t.nullable(t.string(), { description: 'Organization that employs this person.' }),
+    maidenName: t.nullable(t.string(), { description: 'The Maiden name of this person.' }),
+    suffix: t.nullable(t.string(), { description: 'The Suffix of this person.' }),
+    vcard: t.nullable(t.string(), {
       description:
         'Person information in vCard format, this always returns a card in version 3.0 format.',
     }),
-    homePage: t.string({ description: 'The home page of this person.' }),
-    birthDate: t.string({ description: 'The birth date of this person.' }),
-    phoneticLastName: t.string({
+    homePage: t.nullable(t.string(), { description: 'The home page of this person.' }),
+    birthDate: t.nullable(t.string(), { description: 'The birth date of this person.' }),
+    phoneticLastName: t.nullable(t.string(), {
       description: 'The phonetic version of the Last name of this person.',
     }),
-    title: t.string({ description: 'The title of this person.' }),
-    phoneticMiddleName: t.string({
+    title: t.nullable(t.string(), { description: 'The title of this person.' }),
+    phoneticMiddleName: t.nullable(t.string(), {
       description: 'The Phonetic version of the Middle name of this person.',
     }),
-    department: t.string({ description: 'Department that this person works for.' }),
-    image: t.string({ description: 'Image for person.' }),
-    name: t.string({
+    department: t.nullable(t.string(), { description: 'Department that this person works for.' }),
+    image: t.nullable(t.string(), { description: 'Image for person.' }),
+    name: t.nullable(t.string(), {
       description:
         'First/Last name of the person, uses the name display order preference setting in Contacts.',
     }),
-    note: t.string({ description: 'Notes for this person.' }),
-    company: t.boolean({ description: 'Is the current record a company or a person.' }),
-    middleName: t.string({ description: 'The Middle name of this person.' }),
-    phoneticFirstName: t.string({
+    note: t.nullable(t.string(), { description: 'Notes for this person.' }),
+    company: t.nullable(t.boolean(), {
+      description: 'Is the current record a company or a person.',
+    }),
+    middleName: t.nullable(t.string(), { description: 'The Middle name of this person.' }),
+    phoneticFirstName: t.nullable(t.string(), {
       description: 'The phonetic version of the First name of this person.',
     }),
-    jobTitle: t.string({ description: 'The job title of this person.' }),
-    lastName: t.string({ description: 'The Last name of this person.' }),
-    firstName: t.string({ description: 'The First name of this person.' }),
+    jobTitle: t.nullable(t.string(), { description: 'The job title of this person.' }),
+    lastName: t.nullable(t.string(), { description: 'The Last name of this person.' }),
+    firstName: t.nullable(t.string(), { description: 'The First name of this person.' }),
   },
   { description: 'A person in the address book database.' }
 )
 
 const phoneRecordType: ValueType<Phone> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this phone' }),
-    label: t.string({ description: 'Label for this phone' }),
-    value: t.string({ description: 'The phone number' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this phone' }),
+    label: t.nullable(t.string(), { description: 'Label for this phone' }),
+    value: t.nullable(t.string(), { description: 'The phone number' }),
   },
   { description: 'Phone number for a person.' }
 )
 
 const relatedNameRecordType: ValueType<RelatedName> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this name' }),
-    label: t.string({ description: 'Label for this name' }),
-    value: t.string({ description: 'The related name value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this name' }),
+    label: t.nullable(t.string(), { description: 'Label for this name' }),
+    value: t.nullable(t.string(), { description: 'The related name value' }),
   },
   { description: 'Other names related to this person.' }
 )
@@ -769,30 +1175,34 @@ const relatedNameRecordType: ValueType<RelatedName> = t.record(
 const socialProfileRecordType: ValueType<SocialProfile> = t.record(
   {
     id: t.string({ description: 'The persistent unique identifier for this profile.' }),
-    serviceName: t.string({ description: 'The service name of this social profile.' }),
-    userName: t.string({ description: 'The username used with this social profile.' }),
-    userIdentifier: t.string({
+    serviceName: t.nullable(t.string(), {
+      description: 'The service name of this social profile.',
+    }),
+    userName: t.nullable(t.string(), {
+      description: 'The username used with this social profile.',
+    }),
+    userIdentifier: t.nullable(t.string(), {
       description: 'A service-specific identifier used with this social profile.',
     }),
-    url: t.string({ description: 'The URL of this social profile.' }),
+    url: t.nullable(t.string(), { description: 'The URL of this social profile.' }),
   },
   { description: 'Profile for social networks.' }
 )
 
 const urlRecordType: ValueType<Url> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this URL' }),
-    label: t.string({ description: 'Label for this URL' }),
-    value: t.string({ description: 'The URL value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this URL' }),
+    label: t.nullable(t.string(), { description: 'Label for this URL' }),
+    value: t.nullable(t.string(), { description: 'The URL value' }),
   },
   { description: 'URLs for this person.' }
 )
 
 const yahooHandleRecordType: ValueType<YahooHandle> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this handle' }),
-    label: t.string({ description: 'Label for this handle' }),
-    value: t.string({ description: 'The Yahoo handle value' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this handle' }),
+    label: t.nullable(t.string(), { description: 'Label for this handle' }),
+    value: t.nullable(t.string(), { description: 'The Yahoo handle value' }),
   },
   { description: 'User name for Yahoo instant messaging.' }
 )

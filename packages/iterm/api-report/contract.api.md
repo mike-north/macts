@@ -53,46 +53,46 @@ export type SaveOptions = 'yes' | 'no' | 'ask';
 
 // @public
 export interface Session {
-    aNSIBlackColor: Rgb;
-    aNSIBlueColor: Rgb;
-    aNSIBrightBlackColor: Rgb;
-    aNSIBrightBlueColor: Rgb;
-    aNSIBrightCyanColor: Rgb;
-    aNSIBrightGreenColor: Rgb;
-    aNSIBrightMagentaColor: Rgb;
-    aNSIBrightRedColor: Rgb;
-    aNSIBrightWhiteColor: Rgb;
-    aNSIBrightYellowColor: Rgb;
-    aNSICyanColor: Rgb;
-    aNSIGreenColor: Rgb;
-    aNSIMagentaColor: Rgb;
-    aNSIRedColor: Rgb;
-    aNSIWhiteColor: Rgb;
-    aNSIYellowColor: Rgb;
-    answerbackString: string;
-    backgroundColor: Rgb;
-    backgroundImage: string;
-    boldColor: Rgb;
-    colorPreset: string;
-    columns: Integer;
-    contents: string;
-    cursorColor: Rgb;
-    cursorTextColor: Rgb;
-    foregroundColor: Rgb;
+    aNSIBlackColor: Rgb | null;
+    aNSIBlueColor: Rgb | null;
+    aNSIBrightBlackColor: Rgb | null;
+    aNSIBrightBlueColor: Rgb | null;
+    aNSIBrightCyanColor: Rgb | null;
+    aNSIBrightGreenColor: Rgb | null;
+    aNSIBrightMagentaColor: Rgb | null;
+    aNSIBrightRedColor: Rgb | null;
+    aNSIBrightWhiteColor: Rgb | null;
+    aNSIBrightYellowColor: Rgb | null;
+    aNSICyanColor: Rgb | null;
+    aNSIGreenColor: Rgb | null;
+    aNSIMagentaColor: Rgb | null;
+    aNSIRedColor: Rgb | null;
+    aNSIWhiteColor: Rgb | null;
+    aNSIYellowColor: Rgb | null;
+    answerbackString: string | null;
+    backgroundColor: Rgb | null;
+    backgroundImage: string | null;
+    boldColor: Rgb | null;
+    colorPreset: string | null;
+    columns: Integer | null;
+    contents: string | null;
+    cursorColor: Rgb | null;
+    cursorTextColor: Rgb | null;
+    foregroundColor: Rgb | null;
     readonly id: string;
-    isAtShellPrompt: boolean;
-    isProcessing: boolean;
-    name: string;
-    readonly profileName: string;
-    rows: Integer;
-    selectedTextColor: Rgb;
-    selectionColor: Rgb;
-    readonly text: string;
-    transparency: number;
-    readonly tty: string;
-    underlineColor: Rgb;
-    readonly uniqueID: string;
-    useUnderlineColor: boolean;
+    isAtShellPrompt: boolean | null;
+    isProcessing: boolean | null;
+    name: string | null;
+    readonly profileName: string | null;
+    rows: Integer | null;
+    selectedTextColor: Rgb | null;
+    selectionColor: Rgb | null;
+    readonly text: string | null;
+    transparency: number | null;
+    readonly tty: string | null;
+    underlineColor: Rgb | null;
+    readonly uniqueID: string | null;
+    useUnderlineColor: boolean | null;
 }
 
 // @public
@@ -175,9 +175,9 @@ export interface SessionUpdateInput {
 
 // @public
 export interface Tab {
-    currentSession: ObjectReferenceVariant<Session, string>;
-    index: Integer;
-    title: string;
+    currentSession: ObjectReferenceVariant<Session, string> | null;
+    index: Integer | null;
+    title: string | null;
 }
 
 // @public
@@ -196,27 +196,27 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly alternateIdentifier: string;
-    bounds: Rectangle;
-    readonly closeable: boolean;
-    currentSession: ObjectReferenceVariant<Session, string>;
-    currentTab: ObjectReferenceVariant<Tab, never>;
-    frame: Rectangle;
-    frontmost: boolean;
-    hotkeyWindowProfile: string;
+    readonly alternateIdentifier: string | null;
+    bounds: Rectangle | null;
+    readonly closeable: boolean | null;
+    currentSession: ObjectReferenceVariant<Session, string> | null;
+    currentTab: ObjectReferenceVariant<Tab, never> | null;
+    frame: Rectangle | null;
+    frontmost: boolean | null;
+    hotkeyWindowProfile: string | null;
     readonly id: Integer;
-    index: Integer;
-    isHotkeyWindow: boolean;
-    readonly miniaturizable: boolean;
-    miniaturized: boolean;
-    readonly name: string;
-    origin: Point;
-    position: Point;
-    readonly resizable: boolean;
-    size: Point;
-    visible: boolean;
-    readonly zoomable: boolean;
-    zoomed: boolean;
+    index: Integer | null;
+    isHotkeyWindow: boolean | null;
+    readonly miniaturizable: boolean | null;
+    miniaturized: boolean | null;
+    readonly name: string | null;
+    origin: Point | null;
+    position: Point | null;
+    readonly resizable: boolean | null;
+    size: Point | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
 
 // @public

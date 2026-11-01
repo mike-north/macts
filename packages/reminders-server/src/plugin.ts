@@ -72,6 +72,17 @@ export const remindersApiPlugin = {
             primary: true,
           },
         ],
+        nullabilityProbe: {
+          observedAt: '2026-11-01T06:04:58.718Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          accessPath: 'accounts',
+          itemsRead: 1,
+          sampledParents: 1,
+          status: 'probed',
+          skipped: [],
+        },
       },
       List: {
         name: 'List',
@@ -99,6 +110,19 @@ export const remindersApiPlugin = {
             description: 'The color of the list',
             code: 'colr',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 3,
+                nullCount: 2,
+                failedReads: 0,
+              },
+            },
           },
           emblem: {
             access: 'rw',
@@ -106,6 +130,19 @@ export const remindersApiPlugin = {
             description: 'The emblem icon name of the list',
             code: '????',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 3,
+                nullCount: 3,
+                failedReads: 0,
+              },
+            },
           },
         },
         identifiers: [
@@ -114,6 +151,17 @@ export const remindersApiPlugin = {
             primary: true,
           },
         ],
+        nullabilityProbe: {
+          observedAt: '2026-11-01T06:04:58.718Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          accessPath: 'lists',
+          itemsRead: 3,
+          sampledParents: 1,
+          status: 'probed',
+          skipped: [],
+        },
       },
       Reminder: {
         name: 'Reminder',
@@ -127,6 +175,19 @@ export const remindersApiPlugin = {
             description: 'The name of the reminder',
             code: 'pnam',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           id: {
             access: 'r',
@@ -148,6 +209,19 @@ export const remindersApiPlugin = {
             description: 'Whether the reminder is completed',
             code: '????',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           completionDate: {
             access: 'r',
@@ -155,6 +229,15 @@ export const remindersApiPlugin = {
             description: 'The completion date of the reminder',
             code: '????',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'curated',
+                note: 'Set only when a reminder is completed; an open reminder has no completion date. Not observable on the probed library, where all 412 reminders were completed.',
+                observedAt: '2026-11-01T05:45:00.000Z',
+                appVersion: '7.0',
+              },
+            },
           },
           dueDate: {
             access: 'rw',
@@ -162,6 +245,15 @@ export const remindersApiPlugin = {
             description: 'The due date of the reminder',
             code: '????',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'curated',
+                note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no due date on 15; the app reports a missing date as null.',
+                observedAt: '2026-11-01T05:45:00.000Z',
+                appVersion: '7.0',
+              },
+            },
           },
           remindMeDate: {
             access: 'rw',
@@ -169,6 +261,15 @@ export const remindersApiPlugin = {
             description: 'The remind date of the reminder',
             code: '????',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'curated',
+                note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no remind date on 15; the app reports a missing date as null.',
+                observedAt: '2026-11-01T05:45:00.000Z',
+                appVersion: '7.0',
+              },
+            },
           },
           priority: {
             access: 'rw',
@@ -176,6 +277,19 @@ export const remindersApiPlugin = {
             description: 'The priority of the reminder (0=none, 1=high, 5=medium, 9=low)',
             code: '????',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           flagged: {
             access: 'rw',
@@ -183,6 +297,19 @@ export const remindersApiPlugin = {
             description: 'Whether the reminder is flagged',
             code: '????',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           creationDate: {
             access: 'r',
@@ -190,6 +317,19 @@ export const remindersApiPlugin = {
             description: 'The creation date of the reminder',
             code: '????',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           modificationDate: {
             access: 'r',
@@ -197,6 +337,19 @@ export const remindersApiPlugin = {
             description: 'The modification date of the reminder',
             code: '????',
             optional: false,
+            nullable: false,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T06:04:58.718Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 35,
+                nullCount: 0,
+                failedReads: 0,
+              },
+            },
           },
           allDayDueDate: {
             access: 'rw',
@@ -212,6 +365,18 @@ export const remindersApiPlugin = {
             primary: true,
           },
         ],
+        nullabilityProbe: {
+          observedAt: '2026-11-01T06:04:58.718Z',
+          bundleId: 'com.apple.reminders',
+          appVersion: '7.0',
+          osVersion: '27.2',
+          accessPath: 'lists/reminders',
+          itemsRead: 35,
+          sampledParents: 2,
+          status: 'probed',
+          skipped: ['body'],
+          note: 'stopped at the time limit after 35 items',
+        },
       },
     },
     enums: {

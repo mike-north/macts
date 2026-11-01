@@ -12,10 +12,10 @@ export type DetailLevel = 'mini' | 'basic' | 'full';
 
 // @public
 export interface Document {
-    detailLevel: DetailLevel;
+    detailLevel: DetailLevel | null;
     readonly name: string;
-    readonly plainText: string;
-    readonly xmlText: string;
+    readonly plainText: string | null;
+    readonly xmlText: string | null;
 }
 
 // @public

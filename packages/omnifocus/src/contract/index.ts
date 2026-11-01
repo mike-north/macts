@@ -47,195 +47,437 @@ export type RepetitionBasedOn = 'basedOnDue' | 'basedOnPlanned' | 'basedOnDefer'
 
 /** A task within OmniFocus */
 export interface Task {
-  /** The unique identifier of the task */
-  readonly id: string
-  /** The name of the task */
-  name: string
-  /** The note of the task */
-  note: string
-  /** True if flagged */
-  flagged: boolean
-  /** True if the task is completed */
-  readonly completed: boolean
-  /** When the task should become available for action */
-  deferDate: Date
-  /** The date at which work for this task is intended */
-  plannedDate: Date
-  /** When the task must be finished */
-  dueDate: Date
-  /** The task's date of completion */
-  completionDate: Date
-  /** The date the task was dropped */
-  droppedDate: Date
-  /** When the task was created */
-  creationDate: Date
-  /** When the task was last modified */
-  readonly modificationDate: Date
-  /** The estimated time, in whole minutes, that this task will take to finish */
-  estimatedMinutes: Integer
-  /** If true, any children are sequentially dependent */
-  sequential: boolean
-  /** If true, complete when children are completed */
-  completedByChildren: boolean
   /**
-   * Returns true if the task itself is an inbox task or if the task is contained by an inbox task
+   * The unique identifier of the task.
+   * Never null: the primary identifier.
    */
-  readonly inInbox: boolean
-  /** If the task is the next task of its containing project, next is true */
-  readonly next: boolean
-  /** True if the task has a task that must be completed prior to it being actionable */
-  readonly blocked: boolean
-  /** When the task should become available for action (including inherited) */
-  readonly effectiveDeferDate: Date
-  /** The date at which work for this task is intended (including inherited) */
-  readonly effectivePlannedDate: Date
-  /** When the task must be finished (including inherited) */
-  readonly effectiveDueDate: Date
-  /** True if the task is completed, or any of its containing tasks or project are completed */
-  readonly effectivelyCompleted: boolean
-  /** True if the task is dropped, or any of its containing tasks or project are dropped */
-  readonly effectivelyDropped: boolean
-  /** True if the task is dropped */
-  readonly dropped: boolean
-  /** The number of direct children of this task */
-  readonly numberOfTasks: Integer
-  /** The number of available direct children of this task */
-  readonly numberOfAvailableTasks: Integer
-  /** The number of completed direct children of this task */
-  readonly numberOfCompletedTasks: Integer
+  readonly id: string
+  /**
+   * The name of the task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The note of the task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * True if flagged.
+   * Nullable. No evidence that the app always sets it.
+   */
+  flagged: boolean | null
+  /**
+   * True if the task is completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly completed: boolean | null
+  /**
+   * When the task should become available for action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deferDate: Date | null
+  /**
+   * The date at which work for this task is intended.
+   * Nullable. No evidence that the app always sets it.
+   */
+  plannedDate: Date | null
+  /**
+   * When the task must be finished.
+   * Nullable. No evidence that the app always sets it.
+   */
+  dueDate: Date | null
+  /**
+   * The task's date of completion.
+   * Nullable. No evidence that the app always sets it.
+   */
+  completionDate: Date | null
+  /**
+   * The date the task was dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  droppedDate: Date | null
+  /**
+   * When the task was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  creationDate: Date | null
+  /**
+   * When the task was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
+  /**
+   * The estimated time, in whole minutes, that this task will take to finish.
+   * Nullable. No evidence that the app always sets it.
+   */
+  estimatedMinutes: Integer | null
+  /**
+   * If true, any children are sequentially dependent.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sequential: boolean | null
+  /**
+   * If true, complete when children are completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  completedByChildren: boolean | null
+  /**
+   * Returns true if the task itself is an inbox task or if the task is contained by an inbox task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly inInbox: boolean | null
+  /**
+   * If the task is the next task of its containing project, next is true.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly next: boolean | null
+  /**
+   * True if the task has a task that must be completed prior to it being actionable.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly blocked: boolean | null
+  /**
+   * When the task should become available for action (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectiveDeferDate: Date | null
+  /**
+   * The date at which work for this task is intended (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivePlannedDate: Date | null
+  /**
+   * When the task must be finished (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectiveDueDate: Date | null
+  /**
+   * True if the task is completed, or any of its containing tasks or project are completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyCompleted: boolean | null
+  /**
+   * True if the task is dropped, or any of its containing tasks or project are dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyDropped: boolean | null
+  /**
+   * True if the task is dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly dropped: boolean | null
+  /**
+   * The number of direct children of this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfTasks: Integer | null
+  /**
+   * The number of available direct children of this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfAvailableTasks: Integer | null
+  /**
+   * The number of completed direct children of this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfCompletedTasks: Integer | null
 }
 
 /** A project in OmniFocus */
 export interface Project {
-  /** The unique identifier of the project */
+  /**
+   * The unique identifier of the project.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the project */
-  name: string
-  /** The note of the project */
-  note: string
-  /** The status of the project */
-  status: ProjectStatus
-  /** The effective status of the project */
-  readonly effectiveStatus: ProjectStatus
-  /** True if flagged */
-  flagged: boolean
-  /** True if the project is completed */
-  readonly completed: boolean
-  /** When the project should become available for action */
-  deferDate: Date
-  /** The date at which work for this project is intended */
-  plannedDate: Date
-  /** When the project must be finished */
-  dueDate: Date
-  /** The project's date of completion */
-  completionDate: Date
-  /** The date the project was dropped */
-  droppedDate: Date
-  /** When the project was created */
-  creationDate: Date
-  /** When the project was last modified */
-  readonly modificationDate: Date
-  /** When the project was last reviewed */
-  lastReviewDate: Date
-  /** When the project should next be reviewed */
-  nextReviewDate: Date
-  /** The estimated time, in whole minutes, that this project will take to finish */
-  estimatedMinutes: Integer
-  /** If true, any children are sequentially dependent */
-  sequential: boolean
-  /** If true, complete when children are completed */
-  completedByChildren: boolean
-  /** True if the project contains singleton actions */
-  singletonActionHolder: boolean
-  /** True if the project is the default holder of singleton actions */
-  defaultSingletonActionHolder: boolean
-  /** True if the project has a project that must be completed prior to it being actionable */
-  readonly blocked: boolean
-  /** When the project should become available for action (including inherited) */
-  readonly effectiveDeferDate: Date
-  /** The date at which work for this project is intended (including inherited) */
-  readonly effectivePlannedDate: Date
-  /** When the project must be finished (including inherited) */
-  readonly effectiveDueDate: Date
-  /** True if the project is completed */
-  readonly effectivelyCompleted: boolean
-  /** True if the project is dropped */
-  readonly effectivelyDropped: boolean
-  /** True if the project is dropped */
-  readonly dropped: boolean
-  /** The number of direct children of this project */
-  readonly numberOfTasks: Integer
-  /** The number of available direct children of this project */
-  readonly numberOfAvailableTasks: Integer
-  /** The number of completed direct children of this project */
-  readonly numberOfCompletedTasks: Integer
+  /**
+   * The name of the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The note of the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * The status of the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  status: ProjectStatus | null
+  /**
+   * The effective status of the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectiveStatus: ProjectStatus | null
+  /**
+   * True if flagged.
+   * Nullable. No evidence that the app always sets it.
+   */
+  flagged: boolean | null
+  /**
+   * True if the project is completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly completed: boolean | null
+  /**
+   * When the project should become available for action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deferDate: Date | null
+  /**
+   * The date at which work for this project is intended.
+   * Nullable. No evidence that the app always sets it.
+   */
+  plannedDate: Date | null
+  /**
+   * When the project must be finished.
+   * Nullable. No evidence that the app always sets it.
+   */
+  dueDate: Date | null
+  /**
+   * The project's date of completion.
+   * Nullable. No evidence that the app always sets it.
+   */
+  completionDate: Date | null
+  /**
+   * The date the project was dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  droppedDate: Date | null
+  /**
+   * When the project was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  creationDate: Date | null
+  /**
+   * When the project was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
+  /**
+   * When the project was last reviewed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  lastReviewDate: Date | null
+  /**
+   * When the project should next be reviewed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  nextReviewDate: Date | null
+  /**
+   * The estimated time, in whole minutes, that this project will take to finish.
+   * Nullable. No evidence that the app always sets it.
+   */
+  estimatedMinutes: Integer | null
+  /**
+   * If true, any children are sequentially dependent.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sequential: boolean | null
+  /**
+   * If true, complete when children are completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  completedByChildren: boolean | null
+  /**
+   * True if the project contains singleton actions.
+   * Nullable. No evidence that the app always sets it.
+   */
+  singletonActionHolder: boolean | null
+  /**
+   * True if the project is the default holder of singleton actions.
+   * Nullable. No evidence that the app always sets it.
+   */
+  defaultSingletonActionHolder: boolean | null
+  /**
+   * True if the project has a project that must be completed prior to it being actionable.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly blocked: boolean | null
+  /**
+   * When the project should become available for action (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectiveDeferDate: Date | null
+  /**
+   * The date at which work for this project is intended (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivePlannedDate: Date | null
+  /**
+   * When the project must be finished (including inherited).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectiveDueDate: Date | null
+  /**
+   * True if the project is completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyCompleted: boolean | null
+  /**
+   * True if the project is dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyDropped: boolean | null
+  /**
+   * True if the project is dropped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly dropped: boolean | null
+  /**
+   * The number of direct children of this project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfTasks: Integer | null
+  /**
+   * The number of available direct children of this project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfAvailableTasks: Integer | null
+  /**
+   * The number of completed direct children of this project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly numberOfCompletedTasks: Integer | null
 }
 
 /** A group of projects and sub-folders representing an area of responsibility */
 export interface Folder {
-  /** The unique identifier of the folder */
+  /**
+   * The unique identifier of the folder.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the folder */
-  name: string
-  /** The note of the folder */
-  note: string
-  /** Set if the folder is currently hidden */
-  hidden: boolean
-  /** Set if the folder is currently hidden or any of its container folders are hidden */
-  readonly effectivelyHidden: boolean
-  /** When the folder was created */
-  readonly creationDate: Date
-  /** When the folder was last modified */
-  readonly modificationDate: Date
+  /**
+   * The name of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The note of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * Set if the folder is currently hidden.
+   * Nullable. No evidence that the app always sets it.
+   */
+  hidden: boolean | null
+  /**
+   * Set if the folder is currently hidden or any of its container folders are hidden.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyHidden: boolean | null
+  /**
+   * When the folder was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: Date | null
+  /**
+   * When the folder was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
 }
 
 /** A tag for organizing and filtering tasks */
 export interface Tag {
-  /** The unique identifier of the tag */
+  /**
+   * The unique identifier of the tag.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the tag */
-  name: string
-  /** The note of the tag */
-  note: string
+  /**
+   * The name of the tag.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The note of the tag.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
   /**
    * If false, tasks associated with this tag will be skipped when determining the next action for a
-   * project
+   * project.
+   * Nullable. No evidence that the app always sets it.
    */
-  allowsNextAction: boolean
-  /** Set if the tag is currently hidden */
-  hidden: boolean
-  /** Set if the tag is currently hidden or any of its container tags are hidden */
-  readonly effectivelyHidden: boolean
-  /** The number of available tasks */
-  readonly availableTaskCount: Integer
-  /** The number of remaining tasks */
-  readonly remainingTaskCount: Integer
+  allowsNextAction: boolean | null
+  /**
+   * Set if the tag is currently hidden.
+   * Nullable. No evidence that the app always sets it.
+   */
+  hidden: boolean | null
+  /**
+   * Set if the tag is currently hidden or any of its container tags are hidden.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effectivelyHidden: boolean | null
+  /**
+   * The number of available tasks.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly availableTaskCount: Integer | null
+  /**
+   * The number of remaining tasks.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly remainingTaskCount: Integer | null
 }
 
 /** A task that is in the document's inbox */
 export interface InboxTask {
-  /** The unique identifier of the inbox task */
+  /**
+   * The unique identifier of the inbox task.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the inbox task */
-  name: string
-  /** The note of the inbox task */
-  note: string
-  /** True if flagged */
-  flagged: boolean
-  /** When the task should become available for action */
-  deferDate: Date
-  /** When the task must be finished */
-  dueDate: Date
-  /** When the task was created */
-  creationDate: Date
+  /**
+   * The name of the inbox task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The note of the inbox task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * True if flagged.
+   * Nullable. No evidence that the app always sets it.
+   */
+  flagged: boolean | null
+  /**
+   * When the task should become available for action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deferDate: Date | null
+  /**
+   * When the task must be finished.
+   * Nullable. No evidence that the app always sets it.
+   */
+  dueDate: Date | null
+  /**
+   * When the task was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  creationDate: Date | null
 }
 
 /** A saved view or filter configuration */
 export interface Perspective {
-  /** The unique identifier of the perspective */
+  /**
+   * The unique identifier of the perspective.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the perspective */
-  readonly name: string
+  /**
+   * The name of the perspective.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** Input for creating a Task. */
@@ -268,29 +510,65 @@ export interface TaskCreateInput {
 
 /** Input for updating a Task. Omitted fields are left unchanged. */
 export interface TaskUpdateInput {
-  /** Task name */
+  /**
+   * Task name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Task note */
+  /**
+   * Task note.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
-  /** True if flagged */
+  /**
+   * True if flagged.
+   * Cannot be reset: null is rejected.
+   */
   flagged?: boolean
-  /** Defer date */
+  /**
+   * Defer date.
+   * Cannot be reset: null is rejected.
+   */
   deferDate?: Date
-  /** The date at which work for this task is intended */
+  /**
+   * The date at which work for this task is intended.
+   * Cannot be reset: null is rejected.
+   */
   plannedDate?: Date
-  /** Due date */
+  /**
+   * Due date.
+   * Cannot be reset: null is rejected.
+   */
   dueDate?: Date
-  /** The task's date of completion */
+  /**
+   * The task's date of completion.
+   * Cannot be reset: null is rejected.
+   */
   completionDate?: Date
-  /** The date the task was dropped */
+  /**
+   * The date the task was dropped.
+   * Cannot be reset: null is rejected.
+   */
   droppedDate?: Date
-  /** When the task was created */
+  /**
+   * When the task was created.
+   * Cannot be reset: null is rejected.
+   */
   creationDate?: Date
-  /** The estimated time, in whole minutes, that this task will take to finish */
+  /**
+   * The estimated time, in whole minutes, that this task will take to finish.
+   * Cannot be reset: null is rejected.
+   */
   estimatedMinutes?: Integer
-  /** If true, any children are sequentially dependent */
+  /**
+   * If true, any children are sequentially dependent.
+   * Cannot be reset: null is rejected.
+   */
   sequential?: boolean
-  /** If true, complete when children are completed */
+  /**
+   * If true, complete when children are completed.
+   * Cannot be reset: null is rejected.
+   */
   completedByChildren?: boolean
 }
 
@@ -334,39 +612,90 @@ export interface ProjectCreateInput {
 
 /** Input for updating a Project. Omitted fields are left unchanged. */
 export interface ProjectUpdateInput {
-  /** Project name */
+  /**
+   * Project name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Project note */
+  /**
+   * Project note.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
-  /** Project status */
+  /**
+   * Project status.
+   * Cannot be reset: null is rejected.
+   */
   status?: ProjectStatus
-  /** True if flagged */
+  /**
+   * True if flagged.
+   * Cannot be reset: null is rejected.
+   */
   flagged?: boolean
-  /** When the project should become available for action */
+  /**
+   * When the project should become available for action.
+   * Cannot be reset: null is rejected.
+   */
   deferDate?: Date
-  /** The date at which work for this project is intended */
+  /**
+   * The date at which work for this project is intended.
+   * Cannot be reset: null is rejected.
+   */
   plannedDate?: Date
-  /** When the project must be finished */
+  /**
+   * When the project must be finished.
+   * Cannot be reset: null is rejected.
+   */
   dueDate?: Date
-  /** The project's date of completion */
+  /**
+   * The project's date of completion.
+   * Cannot be reset: null is rejected.
+   */
   completionDate?: Date
-  /** The date the project was dropped */
+  /**
+   * The date the project was dropped.
+   * Cannot be reset: null is rejected.
+   */
   droppedDate?: Date
-  /** When the project was created */
+  /**
+   * When the project was created.
+   * Cannot be reset: null is rejected.
+   */
   creationDate?: Date
-  /** When the project was last reviewed */
+  /**
+   * When the project was last reviewed.
+   * Cannot be reset: null is rejected.
+   */
   lastReviewDate?: Date
-  /** When the project should next be reviewed */
+  /**
+   * When the project should next be reviewed.
+   * Cannot be reset: null is rejected.
+   */
   nextReviewDate?: Date
-  /** The estimated time, in whole minutes, that this project will take to finish */
+  /**
+   * The estimated time, in whole minutes, that this project will take to finish.
+   * Cannot be reset: null is rejected.
+   */
   estimatedMinutes?: Integer
-  /** If true, any children are sequentially dependent */
+  /**
+   * If true, any children are sequentially dependent.
+   * Cannot be reset: null is rejected.
+   */
   sequential?: boolean
-  /** If true, complete when children are completed */
+  /**
+   * If true, complete when children are completed.
+   * Cannot be reset: null is rejected.
+   */
   completedByChildren?: boolean
-  /** True if the project contains singleton actions */
+  /**
+   * True if the project contains singleton actions.
+   * Cannot be reset: null is rejected.
+   */
   singletonActionHolder?: boolean
-  /** True if the project is the default holder of singleton actions */
+  /**
+   * True if the project is the default holder of singleton actions.
+   * Cannot be reset: null is rejected.
+   */
   defaultSingletonActionHolder?: boolean
 }
 
@@ -382,11 +711,20 @@ export interface FolderCreateInput {
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
 export interface FolderUpdateInput {
-  /** Folder name */
+  /**
+   * Folder name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Folder note */
+  /**
+   * Folder note.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
-  /** Set if the folder is currently hidden */
+  /**
+   * Set if the folder is currently hidden.
+   * Cannot be reset: null is rejected.
+   */
   hidden?: boolean
 }
 
@@ -407,16 +745,26 @@ export interface TagCreateInput {
 
 /** Input for updating a Tag. Omitted fields are left unchanged. */
 export interface TagUpdateInput {
-  /** Tag name */
+  /**
+   * Tag name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The note of the tag */
+  /**
+   * The note of the tag.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
   /**
    * If false, tasks associated with this tag will be skipped when determining the next action for a
-   * project
+   * project.
+   * Cannot be reset: null is rejected.
    */
   allowsNextAction?: boolean
-  /** Set if the tag is currently hidden */
+  /**
+   * Set if the tag is currently hidden.
+   * Cannot be reset: null is rejected.
+   */
   hidden?: boolean
 }
 
@@ -438,17 +786,35 @@ export interface InboxTaskCreateInput {
 
 /** Input for updating an InboxTask. Omitted fields are left unchanged. */
 export interface InboxTaskUpdateInput {
-  /** Task name */
+  /**
+   * Task name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Task note */
+  /**
+   * Task note.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
-  /** True if flagged */
+  /**
+   * True if flagged.
+   * Cannot be reset: null is rejected.
+   */
   flagged?: boolean
-  /** When the task should become available for action */
+  /**
+   * When the task should become available for action.
+   * Cannot be reset: null is rejected.
+   */
   deferDate?: Date
-  /** When the task must be finished */
+  /**
+   * When the task must be finished.
+   * Cannot be reset: null is rejected.
+   */
   dueDate?: Date
-  /** When the task was created */
+  /**
+   * When the task was created.
+   * Cannot be reset: null is rejected.
+   */
   creationDate?: Date
 }
 
@@ -462,7 +828,11 @@ export type PerspectiveUpdateInput = Record<string, never>
 export interface TaskResourceClient {
   /** List tasks. */
   list(options?: CallOptions): Promise<readonly Task[]>
-  /** Read the task identified by `id`. */
+  /**
+   * Read the task identified by `id`.
+   *
+   * @param id - Task identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Task>
   /** Create a task. */
   create(input: TaskCreateInput, options?: CallOptions): Promise<Task>
@@ -472,7 +842,11 @@ export interface TaskResourceClient {
 export interface ProjectResourceClient {
   /** List projects. */
   list(options?: CallOptions): Promise<readonly Project[]>
-  /** Read the project identified by `id`. */
+  /**
+   * Read the project identified by `id`.
+   *
+   * @param id - Project identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Project>
   /** Create a project. */
   create(input: ProjectCreateInput, options?: CallOptions): Promise<Project>
@@ -482,7 +856,11 @@ export interface ProjectResourceClient {
 export interface FolderResourceClient {
   /** List folders. */
   list(options?: CallOptions): Promise<readonly Folder[]>
-  /** Read the folder identified by `id`. */
+  /**
+   * Read the folder identified by `id`.
+   *
+   * @param id - Folder identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Folder>
   /** Create a folder. */
   create(input: FolderCreateInput, options?: CallOptions): Promise<Folder>
@@ -492,7 +870,11 @@ export interface FolderResourceClient {
 export interface TagResourceClient {
   /** List tags. */
   list(options?: CallOptions): Promise<readonly Tag[]>
-  /** Read the tag identified by `id`. */
+  /**
+   * Read the tag identified by `id`.
+   *
+   * @param id - Tag identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Tag>
   /** Create a tag. */
   create(input: TagCreateInput, options?: CallOptions): Promise<Tag>
@@ -502,7 +884,11 @@ export interface TagResourceClient {
 export interface InboxTaskResourceClient {
   /** List inboxtasks. */
   list(options?: CallOptions): Promise<readonly InboxTask[]>
-  /** Read the inboxtask identified by `id`. */
+  /**
+   * Read the inboxtask identified by `id`.
+   *
+   * @param id - Inbox task identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<InboxTask>
   /** Create an inboxtask. */
   create(input: InboxTaskCreateInput, options?: CallOptions): Promise<InboxTask>
@@ -512,7 +898,11 @@ export interface InboxTaskResourceClient {
 export interface PerspectiveResourceClient {
   /** List perspectives. */
   list(options?: CallOptions): Promise<readonly Perspective[]>
-  /** Read the perspective identified by `id`. */
+  /**
+   * Read the perspective identified by `id`.
+   *
+   * @param id - Perspective identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Perspective>
 }
 
@@ -533,23 +923,54 @@ export interface OmniFocusClient {
   readonly inboxtasks: InboxTaskResourceClient
   /** A saved view or filter configuration */
   readonly perspectives: PerspectiveResourceClient
-  /** Generate a list of completions given a string */
+  /**
+   * Generate a list of completions given a string
+   *
+   * @param text - Text to complete. Does not accept null.
+   */
   complete(text: string, options?: CallOptions): Promise<void>
-  /** Mark one or more projects or tasks complete */
+  /**
+   * Mark one or more projects or tasks complete
+   *
+   * @param targets - Objects to mark complete. Does not accept null.
+   */
   markComplete(targets: string, options?: CallOptions): Promise<void>
-  /** Mark one or more projects or tasks incomplete */
+  /**
+   * Mark one or more projects or tasks incomplete
+   *
+   * @param targets - Objects to mark incomplete. Does not accept null.
+   */
   markIncomplete(targets: string, options?: CallOptions): Promise<void>
-  /** Mark one or more projects or tasks as dropped */
+  /**
+   * Mark one or more projects or tasks as dropped
+   *
+   * @param targets - Objects to mark dropped. Does not accept null.
+   */
   markDropped(targets: string, options?: CallOptions): Promise<void>
-  /** Converts a textual representation of tasks into tasks */
+  /**
+   * Converts a textual representation of tasks into tasks
+   *
+   * @param text - Text to parse. Does not accept null.
+   * @param into - Target container. Does not accept null.
+   */
   parseTasksInto(text: string, into: string, options?: CallOptions): Promise<void>
-  /** Write a backup archive of the document */
+  /**
+   * Write a backup archive of the document
+   *
+   * @param _in - The file in which to archive the document. Does not accept null.
+   * @param compression - Should the archive be written with data compression enabled. Does not
+   * accept null.
+   */
   archive(_in: string, compression?: boolean, options?: CallOptions): Promise<void>
   /** Hides completed tasks and processes any inbox items */
   compact(options?: CallOptions): Promise<void>
   /** Synchronizes with the shared OmniFocus sync database */
   synchronize(options?: CallOptions): Promise<void>
-  /** Imports a file into an existing OmniFocus document */
+  /**
+   * Imports a file into an existing OmniFocus document
+   *
+   * @param file - File to import. Does not accept null.
+   */
   importInto(file: string, options?: CallOptions): Promise<void>
   /** Undo the last command */
   undo(options?: CallOptions): Promise<void>
@@ -563,58 +984,66 @@ const projectStatusMembers = ['active', 'onHold', 'done', 'dropped'] as const
 const taskRecordType: ValueType<Task> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the task' }),
-    name: t.string({ description: 'The name of the task' }),
-    note: t.string({ description: 'The note of the task' }),
-    flagged: t.boolean({ description: 'True if flagged' }),
-    completed: t.boolean({ description: 'True if the task is completed' }),
-    deferDate: t.date({ description: 'When the task should become available for action' }),
-    plannedDate: t.date({ description: 'The date at which work for this task is intended' }),
-    dueDate: t.date({ description: 'When the task must be finished' }),
-    completionDate: t.date({ description: "The task's date of completion" }),
-    droppedDate: t.date({ description: 'The date the task was dropped' }),
-    creationDate: t.date({ description: 'When the task was created' }),
-    modificationDate: t.date({ description: 'When the task was last modified' }),
-    estimatedMinutes: t.integer({
+    name: t.nullable(t.string(), { description: 'The name of the task' }),
+    note: t.nullable(t.string(), { description: 'The note of the task' }),
+    flagged: t.nullable(t.boolean(), { description: 'True if flagged' }),
+    completed: t.nullable(t.boolean(), { description: 'True if the task is completed' }),
+    deferDate: t.nullable(t.date(), {
+      description: 'When the task should become available for action',
+    }),
+    plannedDate: t.nullable(t.date(), {
+      description: 'The date at which work for this task is intended',
+    }),
+    dueDate: t.nullable(t.date(), { description: 'When the task must be finished' }),
+    completionDate: t.nullable(t.date(), { description: "The task's date of completion" }),
+    droppedDate: t.nullable(t.date(), { description: 'The date the task was dropped' }),
+    creationDate: t.nullable(t.date(), { description: 'When the task was created' }),
+    modificationDate: t.nullable(t.date(), { description: 'When the task was last modified' }),
+    estimatedMinutes: t.nullable(t.integer(), {
       description: 'The estimated time, in whole minutes, that this task will take to finish',
     }),
-    sequential: t.boolean({ description: 'If true, any children are sequentially dependent' }),
-    completedByChildren: t.boolean({
+    sequential: t.nullable(t.boolean(), {
+      description: 'If true, any children are sequentially dependent',
+    }),
+    completedByChildren: t.nullable(t.boolean(), {
       description: 'If true, complete when children are completed',
     }),
-    inInbox: t.boolean({
+    inInbox: t.nullable(t.boolean(), {
       description:
         'Returns true if the task itself is an inbox task or if the task is contained by an inbox task',
     }),
-    next: t.boolean({
+    next: t.nullable(t.boolean(), {
       description: 'If the task is the next task of its containing project, next is true',
     }),
-    blocked: t.boolean({
+    blocked: t.nullable(t.boolean(), {
       description:
         'True if the task has a task that must be completed prior to it being actionable',
     }),
-    effectiveDeferDate: t.date({
+    effectiveDeferDate: t.nullable(t.date(), {
       description: 'When the task should become available for action (including inherited)',
     }),
-    effectivePlannedDate: t.date({
+    effectivePlannedDate: t.nullable(t.date(), {
       description: 'The date at which work for this task is intended (including inherited)',
     }),
-    effectiveDueDate: t.date({
+    effectiveDueDate: t.nullable(t.date(), {
       description: 'When the task must be finished (including inherited)',
     }),
-    effectivelyCompleted: t.boolean({
+    effectivelyCompleted: t.nullable(t.boolean(), {
       description:
         'True if the task is completed, or any of its containing tasks or project are completed',
     }),
-    effectivelyDropped: t.boolean({
+    effectivelyDropped: t.nullable(t.boolean(), {
       description:
         'True if the task is dropped, or any of its containing tasks or project are dropped',
     }),
-    dropped: t.boolean({ description: 'True if the task is dropped' }),
-    numberOfTasks: t.integer({ description: 'The number of direct children of this task' }),
-    numberOfAvailableTasks: t.integer({
+    dropped: t.nullable(t.boolean(), { description: 'True if the task is dropped' }),
+    numberOfTasks: t.nullable(t.integer(), {
+      description: 'The number of direct children of this task',
+    }),
+    numberOfAvailableTasks: t.nullable(t.integer(), {
       description: 'The number of available direct children of this task',
     }),
-    numberOfCompletedTasks: t.integer({
+    numberOfCompletedTasks: t.nullable(t.integer(), {
       description: 'The number of completed direct children of this task',
     }),
   },
@@ -624,57 +1053,71 @@ const taskRecordType: ValueType<Task> = t.record(
 const projectRecordType: ValueType<Project> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the project' }),
-    name: t.string({ description: 'The name of the project' }),
-    note: t.string({ description: 'The note of the project' }),
-    status: t.enumeration(projectStatusMembers, { description: 'The status of the project' }),
-    effectiveStatus: t.enumeration(projectStatusMembers, {
+    name: t.nullable(t.string(), { description: 'The name of the project' }),
+    note: t.nullable(t.string(), { description: 'The note of the project' }),
+    status: t.nullable(t.enumeration(projectStatusMembers), {
+      description: 'The status of the project',
+    }),
+    effectiveStatus: t.nullable(t.enumeration(projectStatusMembers), {
       description: 'The effective status of the project',
     }),
-    flagged: t.boolean({ description: 'True if flagged' }),
-    completed: t.boolean({ description: 'True if the project is completed' }),
-    deferDate: t.date({ description: 'When the project should become available for action' }),
-    plannedDate: t.date({ description: 'The date at which work for this project is intended' }),
-    dueDate: t.date({ description: 'When the project must be finished' }),
-    completionDate: t.date({ description: "The project's date of completion" }),
-    droppedDate: t.date({ description: 'The date the project was dropped' }),
-    creationDate: t.date({ description: 'When the project was created' }),
-    modificationDate: t.date({ description: 'When the project was last modified' }),
-    lastReviewDate: t.date({ description: 'When the project was last reviewed' }),
-    nextReviewDate: t.date({ description: 'When the project should next be reviewed' }),
-    estimatedMinutes: t.integer({
+    flagged: t.nullable(t.boolean(), { description: 'True if flagged' }),
+    completed: t.nullable(t.boolean(), { description: 'True if the project is completed' }),
+    deferDate: t.nullable(t.date(), {
+      description: 'When the project should become available for action',
+    }),
+    plannedDate: t.nullable(t.date(), {
+      description: 'The date at which work for this project is intended',
+    }),
+    dueDate: t.nullable(t.date(), { description: 'When the project must be finished' }),
+    completionDate: t.nullable(t.date(), { description: "The project's date of completion" }),
+    droppedDate: t.nullable(t.date(), { description: 'The date the project was dropped' }),
+    creationDate: t.nullable(t.date(), { description: 'When the project was created' }),
+    modificationDate: t.nullable(t.date(), { description: 'When the project was last modified' }),
+    lastReviewDate: t.nullable(t.date(), { description: 'When the project was last reviewed' }),
+    nextReviewDate: t.nullable(t.date(), {
+      description: 'When the project should next be reviewed',
+    }),
+    estimatedMinutes: t.nullable(t.integer(), {
       description: 'The estimated time, in whole minutes, that this project will take to finish',
     }),
-    sequential: t.boolean({ description: 'If true, any children are sequentially dependent' }),
-    completedByChildren: t.boolean({
+    sequential: t.nullable(t.boolean(), {
+      description: 'If true, any children are sequentially dependent',
+    }),
+    completedByChildren: t.nullable(t.boolean(), {
       description: 'If true, complete when children are completed',
     }),
-    singletonActionHolder: t.boolean({
+    singletonActionHolder: t.nullable(t.boolean(), {
       description: 'True if the project contains singleton actions',
     }),
-    defaultSingletonActionHolder: t.boolean({
+    defaultSingletonActionHolder: t.nullable(t.boolean(), {
       description: 'True if the project is the default holder of singleton actions',
     }),
-    blocked: t.boolean({
+    blocked: t.nullable(t.boolean(), {
       description:
         'True if the project has a project that must be completed prior to it being actionable',
     }),
-    effectiveDeferDate: t.date({
+    effectiveDeferDate: t.nullable(t.date(), {
       description: 'When the project should become available for action (including inherited)',
     }),
-    effectivePlannedDate: t.date({
+    effectivePlannedDate: t.nullable(t.date(), {
       description: 'The date at which work for this project is intended (including inherited)',
     }),
-    effectiveDueDate: t.date({
+    effectiveDueDate: t.nullable(t.date(), {
       description: 'When the project must be finished (including inherited)',
     }),
-    effectivelyCompleted: t.boolean({ description: 'True if the project is completed' }),
-    effectivelyDropped: t.boolean({ description: 'True if the project is dropped' }),
-    dropped: t.boolean({ description: 'True if the project is dropped' }),
-    numberOfTasks: t.integer({ description: 'The number of direct children of this project' }),
-    numberOfAvailableTasks: t.integer({
+    effectivelyCompleted: t.nullable(t.boolean(), {
+      description: 'True if the project is completed',
+    }),
+    effectivelyDropped: t.nullable(t.boolean(), { description: 'True if the project is dropped' }),
+    dropped: t.nullable(t.boolean(), { description: 'True if the project is dropped' }),
+    numberOfTasks: t.nullable(t.integer(), {
+      description: 'The number of direct children of this project',
+    }),
+    numberOfAvailableTasks: t.nullable(t.integer(), {
       description: 'The number of available direct children of this project',
     }),
-    numberOfCompletedTasks: t.integer({
+    numberOfCompletedTasks: t.nullable(t.integer(), {
       description: 'The number of completed direct children of this project',
     }),
   },
@@ -684,15 +1127,15 @@ const projectRecordType: ValueType<Project> = t.record(
 const folderRecordType: ValueType<Folder> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the folder' }),
-    name: t.string({ description: 'The name of the folder' }),
-    note: t.string({ description: 'The note of the folder' }),
-    hidden: t.boolean({ description: 'Set if the folder is currently hidden' }),
-    effectivelyHidden: t.boolean({
+    name: t.nullable(t.string(), { description: 'The name of the folder' }),
+    note: t.nullable(t.string(), { description: 'The note of the folder' }),
+    hidden: t.nullable(t.boolean(), { description: 'Set if the folder is currently hidden' }),
+    effectivelyHidden: t.nullable(t.boolean(), {
       description:
         'Set if the folder is currently hidden or any of its container folders are hidden',
     }),
-    creationDate: t.date({ description: 'When the folder was created' }),
-    modificationDate: t.date({ description: 'When the folder was last modified' }),
+    creationDate: t.nullable(t.date(), { description: 'When the folder was created' }),
+    modificationDate: t.nullable(t.date(), { description: 'When the folder was last modified' }),
   },
   { description: 'A group of projects and sub-folders representing an area of responsibility' }
 )
@@ -700,18 +1143,18 @@ const folderRecordType: ValueType<Folder> = t.record(
 const tagRecordType: ValueType<Tag> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the tag' }),
-    name: t.string({ description: 'The name of the tag' }),
-    note: t.string({ description: 'The note of the tag' }),
-    allowsNextAction: t.boolean({
+    name: t.nullable(t.string(), { description: 'The name of the tag' }),
+    note: t.nullable(t.string(), { description: 'The note of the tag' }),
+    allowsNextAction: t.nullable(t.boolean(), {
       description:
         'If false, tasks associated with this tag will be skipped when determining the next action for a project',
     }),
-    hidden: t.boolean({ description: 'Set if the tag is currently hidden' }),
-    effectivelyHidden: t.boolean({
+    hidden: t.nullable(t.boolean(), { description: 'Set if the tag is currently hidden' }),
+    effectivelyHidden: t.nullable(t.boolean(), {
       description: 'Set if the tag is currently hidden or any of its container tags are hidden',
     }),
-    availableTaskCount: t.integer({ description: 'The number of available tasks' }),
-    remainingTaskCount: t.integer({ description: 'The number of remaining tasks' }),
+    availableTaskCount: t.nullable(t.integer(), { description: 'The number of available tasks' }),
+    remainingTaskCount: t.nullable(t.integer(), { description: 'The number of remaining tasks' }),
   },
   { description: 'A tag for organizing and filtering tasks' }
 )
@@ -719,12 +1162,14 @@ const tagRecordType: ValueType<Tag> = t.record(
 const inboxTaskRecordType: ValueType<InboxTask> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the inbox task' }),
-    name: t.string({ description: 'The name of the inbox task' }),
-    note: t.string({ description: 'The note of the inbox task' }),
-    flagged: t.boolean({ description: 'True if flagged' }),
-    deferDate: t.date({ description: 'When the task should become available for action' }),
-    dueDate: t.date({ description: 'When the task must be finished' }),
-    creationDate: t.date({ description: 'When the task was created' }),
+    name: t.nullable(t.string(), { description: 'The name of the inbox task' }),
+    note: t.nullable(t.string(), { description: 'The note of the inbox task' }),
+    flagged: t.nullable(t.boolean(), { description: 'True if flagged' }),
+    deferDate: t.nullable(t.date(), {
+      description: 'When the task should become available for action',
+    }),
+    dueDate: t.nullable(t.date(), { description: 'When the task must be finished' }),
+    creationDate: t.nullable(t.date(), { description: 'When the task was created' }),
   },
   { description: "A task that is in the document's inbox" }
 )
@@ -732,7 +1177,7 @@ const inboxTaskRecordType: ValueType<InboxTask> = t.record(
 const perspectiveRecordType: ValueType<Perspective> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the perspective' }),
-    name: t.string({ description: 'The name of the perspective' }),
+    name: t.nullable(t.string(), { description: 'The name of the perspective' }),
   },
   { description: 'A saved view or filter configuration' }
 )

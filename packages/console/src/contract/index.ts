@@ -31,9 +31,15 @@ const t = ValueTypes
 
 /** A device in Console */
 export interface Device {
-  /** The device name */
-  readonly name: string
-  /** The unique identifier of the device */
+  /**
+   * The device name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the device.
+   * Never null: the primary identifier.
+   */
   readonly id: string
 }
 
@@ -54,7 +60,7 @@ export interface ConsoleClient {
 
 const deviceRecordType: ValueType<Device> = t.record(
   {
-    name: t.string({ description: 'The device name' }),
+    name: t.nullable(t.string(), { description: 'The device name' }),
     id: t.string({ description: 'The unique identifier of the device' }),
   },
   { description: 'A device in Console' }

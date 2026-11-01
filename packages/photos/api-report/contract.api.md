@@ -12,8 +12,8 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 // @public
 export interface Album {
     readonly id: string;
-    name: string;
-    readonly parent: ObjectReferenceVariant<Folder, string>;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string> | null;
 }
 
 // @public
@@ -35,8 +35,8 @@ export interface AlbumUpdateInput {
 // @public
 export interface Container {
     readonly id: string;
-    name: string;
-    readonly parent: ObjectReferenceVariant<Folder, string>;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string> | null;
 }
 
 // @public
@@ -52,8 +52,8 @@ export interface ContainerUpdateInput {
 // @public
 export interface Folder {
     readonly id: string;
-    name: string;
-    readonly parent: ObjectReferenceVariant<Folder, string>;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Folder, string> | null;
 }
 
 // @public
@@ -74,18 +74,18 @@ export interface FolderUpdateInput {
 
 // @public
 export interface MediaItem {
-    readonly altitude: number;
-    date: Date;
-    description: string;
-    favorite: boolean;
-    readonly filename: string;
-    readonly height: Integer;
+    readonly altitude: number | null;
+    date: Date | null;
+    description: string | null;
+    favorite: boolean | null;
+    readonly filename: string | null;
+    readonly height: Integer | null;
     readonly id: string;
-    keywords: readonly string[];
+    keywords: readonly string[] | null;
     location: unknown;
-    name: string;
-    size: Integer;
-    readonly width: Integer;
+    name: string | null;
+    size: Integer | null;
+    readonly width: Integer | null;
 }
 
 // @public
@@ -120,7 +120,7 @@ export interface MediaItemUpdateInput {
 // @public
 export interface Moment {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public

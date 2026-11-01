@@ -9,12 +9,12 @@ import { CallOptions } from '@macts/contracts';
 
 // @public
 export interface SettingsSet {
-    fontName: string;
-    fontSize: number;
-    readonly id: number;
+    fontName: string | null;
+    fontSize: number | null;
+    readonly id: number | null;
     name: string;
-    numberOfColumns: number;
-    numberOfRows: number;
+    numberOfColumns: number | null;
+    numberOfRows: number | null;
 }
 
 // @public
@@ -43,14 +43,14 @@ export interface SettingsSetUpdateInput {
 
 // @public
 export interface Tab {
-    readonly busy: boolean;
-    readonly contents: string;
-    currentSettings: string;
-    customTitle: string;
-    readonly history: string;
-    readonly processes: string;
-    selected: boolean;
-    titleDisplaysCustomTitle: boolean;
+    readonly busy: boolean | null;
+    readonly contents: string | null;
+    currentSettings: string | null;
+    customTitle: string | null;
+    readonly history: string | null;
+    readonly processes: string | null;
+    selected: boolean | null;
+    titleDisplaysCustomTitle: boolean | null;
     readonly tty: string;
 }
 
@@ -89,11 +89,11 @@ export const terminalContract: AppContract<TerminalClient>;
 
 // @public
 export interface Window {
-    readonly frontmost: boolean;
-    readonly id: number;
+    readonly frontmost: boolean | null;
+    readonly id: number | null;
     readonly name: string;
-    position: string;
-    visible: boolean;
+    position: string | null;
+    visible: boolean | null;
 }
 
 // @public

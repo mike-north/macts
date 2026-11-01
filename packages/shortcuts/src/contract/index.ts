@@ -34,29 +34,59 @@ const t = ValueTypes
 
 /** A shortcut in the Shortcuts application */
 export interface Shortcut {
-  /** The name of the shortcut */
-  readonly name: string
-  /** The shortcut's subtitle */
-  readonly subtitle: string
-  /** The unique identifier of the shortcut */
+  /**
+   * The name of the shortcut.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The shortcut's subtitle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly subtitle: string | null
+  /**
+   * The unique identifier of the shortcut.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The folder containing this shortcut (folder ID) */
-  folder: string
-  /** The shortcut's color */
-  readonly color: Rgb
-  /** The shortcut's icon (TIFF image data) */
-  readonly icon: FileValue
-  /** Indicates whether or not the shortcut accepts input data */
-  readonly acceptsInput: boolean
-  /** The number of actions in the shortcut */
-  readonly actionCount: Integer
+  /**
+   * The folder containing this shortcut (folder ID).
+   * Nullable. No evidence that the app always sets it.
+   */
+  folder: string | null
+  /**
+   * The shortcut's color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly color: Rgb | null
+  /**
+   * The shortcut's icon (TIFF image data).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly icon: FileValue | null
+  /**
+   * Indicates whether or not the shortcut accepts input data.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly acceptsInput: boolean | null
+  /**
+   * The number of actions in the shortcut.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly actionCount: Integer | null
 }
 
 /** A folder containing shortcuts */
 export interface Folder {
-  /** The name of the folder */
-  name: string
-  /** The unique identifier of the folder */
+  /**
+   * The name of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The unique identifier of the folder.
+   * Never null: the primary identifier.
+   */
   readonly id: string
 }
 
@@ -68,7 +98,10 @@ export interface ShortcutCreateInput {
 
 /** Input for updating a Shortcut. Omitted fields are left unchanged. */
 export interface ShortcutUpdateInput {
-  /** The folder containing this shortcut (folder ID) */
+  /**
+   * The folder containing this shortcut (folder ID).
+   * Cannot be reset: null is rejected.
+   */
   folder?: string
 }
 
@@ -80,7 +113,10 @@ export interface FolderCreateInput {
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
 export interface FolderUpdateInput {
-  /** The name of the folder */
+  /**
+   * The name of the folder.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -88,11 +124,18 @@ export interface FolderUpdateInput {
 export interface ShortcutResourceClient {
   /** List shortcuts. */
   list(options?: CallOptions): Promise<readonly Shortcut[]>
-  /** Read the shortcut identified by `id`. */
+  /**
+   * Read the shortcut identified by `id`.
+   *
+   * @param id - Shortcut identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Shortcut>
   /**
    * Run a shortcut. To run a shortcut in the background, without opening the Shortcuts app, tell
    * 'Shortcuts Events' instead of 'Shortcuts'.
+   *
+   * @param id - The shortcut to run. Does not accept null.
+   * @param withInput - The input to provide to the shortcut. Does not accept null.
    */
   run(id: string, withInput?: unknown, options?: CallOptions): Promise<void>
 }
@@ -101,7 +144,11 @@ export interface ShortcutResourceClient {
 export interface FolderResourceClient {
   /** List folders. */
   list(options?: CallOptions): Promise<readonly Folder[]>
-  /** Read the folder identified by `id`. */
+  /**
+   * Read the folder identified by `id`.
+   *
+   * @param id - Folder identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Folder>
 }
 
@@ -118,23 +165,25 @@ export interface ShortcutsClient {
 
 const shortcutRecordType: ValueType<Shortcut> = t.record(
   {
-    name: t.string({ description: 'The name of the shortcut' }),
-    subtitle: t.string({ description: "The shortcut's subtitle" }),
+    name: t.nullable(t.string(), { description: 'The name of the shortcut' }),
+    subtitle: t.nullable(t.string(), { description: "The shortcut's subtitle" }),
     id: t.string({ description: 'The unique identifier of the shortcut' }),
-    folder: t.string({ description: 'The folder containing this shortcut (folder ID)' }),
-    color: t.rgb({ description: "The shortcut's color" }),
-    icon: t.file({ description: "The shortcut's icon (TIFF image data)" }),
-    acceptsInput: t.boolean({
+    folder: t.nullable(t.string(), {
+      description: 'The folder containing this shortcut (folder ID)',
+    }),
+    color: t.nullable(t.rgb(), { description: "The shortcut's color" }),
+    icon: t.nullable(t.file(), { description: "The shortcut's icon (TIFF image data)" }),
+    acceptsInput: t.nullable(t.boolean(), {
       description: 'Indicates whether or not the shortcut accepts input data',
     }),
-    actionCount: t.integer({ description: 'The number of actions in the shortcut' }),
+    actionCount: t.nullable(t.integer(), { description: 'The number of actions in the shortcut' }),
   },
   { description: 'A shortcut in the Shortcuts application' }
 )
 
 const folderRecordType: ValueType<Folder> = t.record(
   {
-    name: t.string({ description: 'The name of the folder' }),
+    name: t.nullable(t.string(), { description: 'The name of the folder' }),
     id: t.string({ description: 'The unique identifier of the folder' }),
   },
   { description: 'A folder containing shortcuts' }

@@ -25,25 +25,25 @@ export const attachmentsListTool: McpToolDefinition = {
 }
 
 /**
- * Get an item by name
+ * Get an attachment by ID
  */
 export const attachmentsGetTool: McpToolDefinition = {
   name: 'macts__notes__attachments_get',
-  description: 'Get an item by name',
+  description: 'Get an attachment by ID',
   inputSchema: {
     type: 'object',
     properties: {
-      name: {
-        description: 'Item name',
+      id: {
+        description: 'Attachment identifier',
         type: 'string',
       },
     },
     additionalProperties: false,
-    required: ['name'],
+    required: ['id'],
   },
   handler: async (args) => {
-    const { name } = args as { name: string }
+    const { id } = args as { id: string }
     const client = getClient()
-    return client.attachments.get(name as unknown as Parameters<typeof client.attachments.get>[0])
+    return client.attachments.get(id as unknown as Parameters<typeof client.attachments.get>[0])
   },
 }

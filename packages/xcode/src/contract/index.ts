@@ -46,76 +46,158 @@ export type SchemeActionResultStatus =
  * all objects and commands in Xcode
  */
 export interface WorkspaceDocument {
-  /** The name of the workspace */
-  readonly name: string
-  /** Has it been modified since the last save? */
-  readonly modified: boolean
-  /** Its location on disk, if it has one */
-  readonly file: FileValue
-  /** The document's path */
-  readonly path: string
-  /** Whether the workspace document has finished loading after being opened */
-  readonly loaded: boolean
-  /** The workspace's scheme that will be used for scheme actions */
-  activeScheme: ObjectReferenceVariant<Scheme, string>
-  /** The workspace's run destination that will be used for scheme actions */
-  activeRunDestination: ObjectReferenceVariant<RunDestination, string>
   /**
-   * The scheme action result for the last scheme action command issued to the workspace document
+   * The name of the workspace.
+   * Never null: the primary identifier.
    */
-  readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string>
+  readonly name: string
+  /**
+   * Has it been modified since the last save?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modified: boolean | null
+  /**
+   * Its location on disk, if it has one.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly file: FileValue | null
+  /**
+   * The document's path.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * Whether the workspace document has finished loading after being opened.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly loaded: boolean | null
+  /**
+   * The workspace's scheme that will be used for scheme actions.
+   * Nullable. No evidence that the app always sets it.
+   */
+  activeScheme: ObjectReferenceVariant<Scheme, string> | null
+  /**
+   * The workspace's run destination that will be used for scheme actions.
+   * Nullable. No evidence that the app always sets it.
+   */
+  activeRunDestination: ObjectReferenceVariant<RunDestination, string> | null
+  /**
+   * The scheme action result for the last scheme action command issued to the workspace document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string> | null
 }
 
 /** A document that represents a file on disk */
 export interface FileDocument {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** Has it been modified since the last save? */
-  readonly modified: boolean
-  /** Its location on disk, if it has one */
-  readonly file: FileValue
-  /** The document's path */
-  readonly path: string
+  /**
+   * Has it been modified since the last save?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modified: boolean | null
+  /**
+   * Its location on disk, if it has one.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly file: FileValue | null
+  /**
+   * The document's path.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
 }
 
 /** A document that represents a text file on disk */
 export interface TextDocument {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** Has it been modified since the last save? */
-  readonly modified: boolean
-  /** Its location on disk, if it has one */
-  readonly file: FileValue
-  /** The document's path */
-  readonly path: string
-  /** The first and last character positions in the selection */
+  /**
+   * Has it been modified since the last save?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modified: boolean | null
+  /**
+   * Its location on disk, if it has one.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly file: FileValue | null
+  /**
+   * The document's path.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * The first and last character positions in the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
   selectedCharacterRange: unknown
-  /** The first and last paragraph positions that contain the selection */
+  /**
+   * The first and last paragraph positions that contain the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
   selectedParagraphRange: unknown
-  /** The text of the text file referenced */
-  text: string
-  /** Should Xcode notify other apps when this document is closed? */
-  notifiesWhenClosing: boolean
+  /**
+   * The text of the text file referenced.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
+  /**
+   * Should Xcode notify other apps when this document is closed?
+   * Nullable. No evidence that the app always sets it.
+   */
+  notifiesWhenClosing: boolean | null
 }
 
 /** A document that represents a source file on disk */
 export interface SourceDocument {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** Has it been modified since the last save? */
-  readonly modified: boolean
-  /** Its location on disk, if it has one */
-  readonly file: FileValue
-  /** The document's path */
-  readonly path: string
-  /** The first and last character positions in the selection */
+  /**
+   * Has it been modified since the last save?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modified: boolean | null
+  /**
+   * Its location on disk, if it has one.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly file: FileValue | null
+  /**
+   * The document's path.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * The first and last character positions in the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
   selectedCharacterRange: unknown
-  /** The first and last paragraph positions that contain the selection */
+  /**
+   * The first and last paragraph positions that contain the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
   selectedParagraphRange: unknown
-  /** The text of the text file referenced */
-  text: string
-  /** Should Xcode notify other apps when this document is closed? */
-  notifiesWhenClosing: boolean
+  /**
+   * The text of the text file referenced.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
+  /**
+   * Should Xcode notify other apps when this document is closed?
+   * Nullable. No evidence that the app always sets it.
+   */
+  notifiesWhenClosing: boolean | null
 }
 
 /**
@@ -123,10 +205,16 @@ export interface SourceDocument {
  * a workspace document
  */
 export interface Project {
-  /** The unique identifier for the project */
+  /**
+   * The unique identifier for the project.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the project */
-  readonly name: string
+  /**
+   * The name of the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /**
@@ -134,12 +222,21 @@ export interface Project {
  * if not overridden in the target
  */
 export interface Target {
-  /** The unique identifier for the target */
+  /**
+   * The unique identifier for the target.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of this target */
-  name: string
-  /** The project that contains this target */
-  readonly project: ObjectReferenceVariant<Project, string>
+  /**
+   * The name of this target.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The project that contains this target.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly project: ObjectReferenceVariant<Project, string> | null
 }
 
 /**
@@ -147,36 +244,60 @@ export interface Target {
  * build configurations as the project
  */
 export interface BuildConfiguration {
-  /** The unique identifier for the build configuration */
+  /**
+   * The unique identifier for the build configuration.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the build configuration */
-  readonly name: string
+  /**
+   * The name of the build configuration.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** A setting that controls how products are built */
 export interface BuildSetting {
-  /** The unlocalized build setting name (e.g. DSTROOT) */
+  /**
+   * The unlocalized build setting name (e.g. DSTROOT).
+   * Never null: the primary identifier.
+   */
   name: string
-  /** A string value for the build setting */
-  value: string
+  /**
+   * A string value for the build setting.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** An object that represents a resolved value for a build setting */
 export interface ResolvedBuildSetting {
-  /** The unlocalized build setting name (e.g. DSTROOT) */
+  /**
+   * The unlocalized build setting name (e.g. DSTROOT).
+   * Never null: the primary identifier.
+   */
   name: string
-  /** A string value for the build setting */
-  value: string
+  /**
+   * A string value for the build setting.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /**
  * A set of parameters for building, testing, launching or distributing the products of a workspace
  */
 export interface Scheme {
-  /** The unique identifier for the scheme */
+  /**
+   * The unique identifier for the scheme.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the scheme */
-  readonly name: string
+  /**
+   * The name of the scheme.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /**
@@ -184,108 +305,225 @@ export interface Scheme {
  * scheme action
  */
 export interface RunDestination {
-  /** The name of the run destination, as displayed in Xcode's interface */
+  /**
+   * The name of the run destination, as displayed in Xcode's interface.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** The architecture for which this run destination results in execution */
-  readonly architecture: string
-  /** The identifier of the platform which this run destination targets */
-  readonly platform: string
-  /** The physical or virtual device which this run destination targets */
-  readonly device: ObjectReferenceVariant<Device, string>
-  /** If the run destination's device has a companion, this is that device */
-  readonly companionDevice: ObjectReferenceVariant<Device, string>
+  /**
+   * The architecture for which this run destination results in execution.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly architecture: string | null
+  /**
+   * The identifier of the platform which this run destination targets.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly platform: string | null
+  /**
+   * The physical or virtual device which this run destination targets.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly device: ObjectReferenceVariant<Device, string> | null
+  /**
+   * If the run destination's device has a companion, this is that device.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly companionDevice: ObjectReferenceVariant<Device, string> | null
 }
 
 /** A device which can be used as the target for a scheme action, as part of a run destination */
 export interface Device {
-  /** The name of the device */
-  readonly name: string
-  /** A stable identifier for the device */
+  /**
+   * The name of the device.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * A stable identifier for the device.
+   * Never null: the primary identifier.
+   */
   readonly deviceIdentifier: string
-  /** The version of the operating system installed on the device */
-  readonly operatingSystemVersion: string
-  /** The model of device */
-  readonly deviceModel: string
-  /** Whether this run destination is generic instead of representing a specific device */
-  readonly generic: boolean
+  /**
+   * The version of the operating system installed on the device.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly operatingSystemVersion: string | null
+  /**
+   * The model of device.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly deviceModel: string | null
+  /**
+   * Whether this run destination is generic instead of representing a specific device.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly generic: boolean | null
 }
 
 /** An object describing the result of performing a scheme action command */
 export interface SchemeActionResult {
-  /** The unique identifier for the scheme action result */
+  /**
+   * The unique identifier for the scheme action result.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Whether this scheme action has completed (successfully or otherwise) or not */
-  readonly completed: boolean
-  /** Indicates the status of the scheme action */
-  status: SchemeActionResultStatus
-  /** If the result's status is "error occurred", this will be the error message */
-  errorMessage: string
-  /** If this scheme action performed a build, this will be the text of the build log */
-  buildLog: string
+  /**
+   * Whether this scheme action has completed (successfully or otherwise) or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly completed: boolean | null
+  /**
+   * Indicates the status of the scheme action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  status: SchemeActionResultStatus | null
+  /**
+   * If the result's status is "error occurred", this will be the error message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  errorMessage: string | null
+  /**
+   * If this scheme action performed a build, this will be the text of the build log.
+   * Nullable. No evidence that the app always sets it.
+   */
+  buildLog: string | null
 }
 
 /** An error generated by a build */
 export interface BuildError {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Never null: the primary identifier.
+   */
   message: string
-  /** The file path where the issue occurred */
-  filePath: string
-  /** The starting line number in the file where the issue occurred */
-  startingLineNumber: Integer
-  /** The ending line number in the file where the issue occurred */
-  endingLineNumber: Integer
-  /** The starting column number in the file where the issue occurred */
-  startingColumnNumber: Integer
-  /** The ending column number in the file where the issue occurred */
-  endingColumnNumber: Integer
+  /**
+   * The file path where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  filePath: string | null
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingLineNumber: Integer | null
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingLineNumber: Integer | null
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingColumnNumber: Integer | null
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingColumnNumber: Integer | null
 }
 
 /** A warning generated by a build */
 export interface BuildWarning {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Never null: the primary identifier.
+   */
   message: string
-  /** The file path where the issue occurred */
-  filePath: string
-  /** The starting line number in the file where the issue occurred */
-  startingLineNumber: Integer
-  /** The ending line number in the file where the issue occurred */
-  endingLineNumber: Integer
-  /** The starting column number in the file where the issue occurred */
-  startingColumnNumber: Integer
-  /** The ending column number in the file where the issue occurred */
-  endingColumnNumber: Integer
+  /**
+   * The file path where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  filePath: string | null
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingLineNumber: Integer | null
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingLineNumber: Integer | null
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingColumnNumber: Integer | null
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingColumnNumber: Integer | null
 }
 
 /** A warning generated by the static analyzer */
 export interface AnalyzerIssue {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Never null: the primary identifier.
+   */
   message: string
-  /** The file path where the issue occurred */
-  filePath: string
-  /** The starting line number in the file where the issue occurred */
-  startingLineNumber: Integer
-  /** The ending line number in the file where the issue occurred */
-  endingLineNumber: Integer
-  /** The starting column number in the file where the issue occurred */
-  startingColumnNumber: Integer
-  /** The ending column number in the file where the issue occurred */
-  endingColumnNumber: Integer
+  /**
+   * The file path where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  filePath: string | null
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingLineNumber: Integer | null
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingLineNumber: Integer | null
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingColumnNumber: Integer | null
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingColumnNumber: Integer | null
 }
 
 /** A failure from a test */
 export interface TestFailure {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Never null: the primary identifier.
+   */
   message: string
-  /** The file path where the issue occurred */
-  filePath: string
-  /** The starting line number in the file where the issue occurred */
-  startingLineNumber: Integer
-  /** The ending line number in the file where the issue occurred */
-  endingLineNumber: Integer
-  /** The starting column number in the file where the issue occurred */
-  startingColumnNumber: Integer
-  /** The ending column number in the file where the issue occurred */
-  endingColumnNumber: Integer
+  /**
+   * The file path where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  filePath: string | null
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingLineNumber: Integer | null
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingLineNumber: Integer | null
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingColumnNumber: Integer | null
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingColumnNumber: Integer | null
 }
 
 /** Input for creating a WorkspaceDocument. */
@@ -298,9 +536,15 @@ export interface WorkspaceDocumentCreateInput {
 
 /** Input for updating a WorkspaceDocument. Omitted fields are left unchanged. */
 export interface WorkspaceDocumentUpdateInput {
-  /** The workspace's scheme that will be used for scheme actions */
+  /**
+   * The workspace's scheme that will be used for scheme actions.
+   * Cannot be reset: null is rejected.
+   */
   activeScheme?: ObjectReferenceVariant<Scheme, string>
-  /** The workspace's run destination that will be used for scheme actions */
+  /**
+   * The workspace's run destination that will be used for scheme actions.
+   * Cannot be reset: null is rejected.
+   */
   activeRunDestination?: ObjectReferenceVariant<RunDestination, string>
 }
 
@@ -324,13 +568,25 @@ export interface TextDocumentCreateInput {
 
 /** Input for updating a TextDocument. Omitted fields are left unchanged. */
 export interface TextDocumentUpdateInput {
-  /** The first and last character positions in the selection */
+  /**
+   * The first and last character positions in the selection.
+   * Cannot be reset: null is rejected.
+   */
   selectedCharacterRange?: unknown
-  /** The first and last paragraph positions that contain the selection */
+  /**
+   * The first and last paragraph positions that contain the selection.
+   * Cannot be reset: null is rejected.
+   */
   selectedParagraphRange?: unknown
-  /** The text of the text file referenced */
+  /**
+   * The text of the text file referenced.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
-  /** Should Xcode notify other apps when this document is closed? */
+  /**
+   * Should Xcode notify other apps when this document is closed?
+   * Cannot be reset: null is rejected.
+   */
   notifiesWhenClosing?: boolean
 }
 
@@ -348,13 +604,25 @@ export interface SourceDocumentCreateInput {
 
 /** Input for updating a SourceDocument. Omitted fields are left unchanged. */
 export interface SourceDocumentUpdateInput {
-  /** The first and last character positions in the selection */
+  /**
+   * The first and last character positions in the selection.
+   * Cannot be reset: null is rejected.
+   */
   selectedCharacterRange?: unknown
-  /** The first and last paragraph positions that contain the selection */
+  /**
+   * The first and last paragraph positions that contain the selection.
+   * Cannot be reset: null is rejected.
+   */
   selectedParagraphRange?: unknown
-  /** The text of the text file referenced */
+  /**
+   * The text of the text file referenced.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
-  /** Should Xcode notify other apps when this document is closed? */
+  /**
+   * Should Xcode notify other apps when this document is closed?
+   * Cannot be reset: null is rejected.
+   */
   notifiesWhenClosing?: boolean
 }
 
@@ -372,7 +640,10 @@ export interface TargetCreateInput {
 
 /** Input for updating a Target. Omitted fields are left unchanged. */
 export interface TargetUpdateInput {
-  /** The name of this target */
+  /**
+   * The name of this target.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -392,9 +663,15 @@ export interface BuildSettingCreateInput {
 
 /** Input for updating a BuildSetting. Omitted fields are left unchanged. */
 export interface BuildSettingUpdateInput {
-  /** The unlocalized build setting name (e.g. DSTROOT) */
+  /**
+   * The unlocalized build setting name (e.g. DSTROOT).
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** A string value for the build setting */
+  /**
+   * A string value for the build setting.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -408,9 +685,15 @@ export interface ResolvedBuildSettingCreateInput {
 
 /** Input for updating a ResolvedBuildSetting. Omitted fields are left unchanged. */
 export interface ResolvedBuildSettingUpdateInput {
-  /** The unlocalized build setting name (e.g. DSTROOT) */
+  /**
+   * The unlocalized build setting name (e.g. DSTROOT).
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** A string value for the build setting */
+  /**
+   * A string value for the build setting.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -444,11 +727,20 @@ export interface SchemeActionResultCreateInput {
 
 /** Input for updating a SchemeActionResult. Omitted fields are left unchanged. */
 export interface SchemeActionResultUpdateInput {
-  /** Indicates the status of the scheme action */
+  /**
+   * Indicates the status of the scheme action.
+   * Cannot be reset: null is rejected.
+   */
   status?: SchemeActionResultStatus
-  /** If the result's status is "error occurred", this will be the error message */
+  /**
+   * If the result's status is "error occurred", this will be the error message.
+   * Cannot be reset: null is rejected.
+   */
   errorMessage?: string
-  /** If this scheme action performed a build, this will be the text of the build log */
+  /**
+   * If this scheme action performed a build, this will be the text of the build log.
+   * Cannot be reset: null is rejected.
+   */
   buildLog?: string
 }
 
@@ -470,17 +762,35 @@ export interface BuildErrorCreateInput {
 
 /** Input for updating a BuildError. Omitted fields are left unchanged. */
 export interface BuildErrorUpdateInput {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Cannot be reset: null is rejected.
+   */
   message?: string
-  /** The file path where the issue occurred */
+  /**
+   * The file path where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   filePath?: string
-  /** The starting line number in the file where the issue occurred */
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingLineNumber?: Integer
-  /** The ending line number in the file where the issue occurred */
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingLineNumber?: Integer
-  /** The starting column number in the file where the issue occurred */
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingColumnNumber?: Integer
-  /** The ending column number in the file where the issue occurred */
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingColumnNumber?: Integer
 }
 
@@ -502,17 +812,35 @@ export interface BuildWarningCreateInput {
 
 /** Input for updating a BuildWarning. Omitted fields are left unchanged. */
 export interface BuildWarningUpdateInput {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Cannot be reset: null is rejected.
+   */
   message?: string
-  /** The file path where the issue occurred */
+  /**
+   * The file path where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   filePath?: string
-  /** The starting line number in the file where the issue occurred */
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingLineNumber?: Integer
-  /** The ending line number in the file where the issue occurred */
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingLineNumber?: Integer
-  /** The starting column number in the file where the issue occurred */
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingColumnNumber?: Integer
-  /** The ending column number in the file where the issue occurred */
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingColumnNumber?: Integer
 }
 
@@ -534,17 +862,35 @@ export interface AnalyzerIssueCreateInput {
 
 /** Input for updating an AnalyzerIssue. Omitted fields are left unchanged. */
 export interface AnalyzerIssueUpdateInput {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Cannot be reset: null is rejected.
+   */
   message?: string
-  /** The file path where the issue occurred */
+  /**
+   * The file path where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   filePath?: string
-  /** The starting line number in the file where the issue occurred */
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingLineNumber?: Integer
-  /** The ending line number in the file where the issue occurred */
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingLineNumber?: Integer
-  /** The starting column number in the file where the issue occurred */
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingColumnNumber?: Integer
-  /** The ending column number in the file where the issue occurred */
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingColumnNumber?: Integer
 }
 
@@ -566,17 +912,35 @@ export interface TestFailureCreateInput {
 
 /** Input for updating a TestFailure. Omitted fields are left unchanged. */
 export interface TestFailureUpdateInput {
-  /** The text of the issue */
+  /**
+   * The text of the issue.
+   * Cannot be reset: null is rejected.
+   */
   message?: string
-  /** The file path where the issue occurred */
+  /**
+   * The file path where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   filePath?: string
-  /** The starting line number in the file where the issue occurred */
+  /**
+   * The starting line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingLineNumber?: Integer
-  /** The ending line number in the file where the issue occurred */
+  /**
+   * The ending line number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingLineNumber?: Integer
-  /** The starting column number in the file where the issue occurred */
+  /**
+   * The starting column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   startingColumnNumber?: Integer
-  /** The ending column number in the file where the issue occurred */
+  /**
+   * The ending column number in the file where the issue occurred.
+   * Cannot be reset: null is rejected.
+   */
   endingColumnNumber?: Integer
 }
 
@@ -587,36 +951,87 @@ export interface TestFailureUpdateInput {
 export interface WorkspaceDocumentResourceClient {
   /** List workspacedocuments. */
   list(options?: CallOptions): Promise<readonly WorkspaceDocument[]>
-  /** Read the workspacedocument identified by `name`. */
+  /**
+   * Read the workspacedocument identified by `name`.
+   *
+   * @param name - Workspace document name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<WorkspaceDocument>
-  /** Invoke the "build" scheme action */
+  /**
+   * Invoke the "build" scheme action
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   build(workspaceName: string, options?: CallOptions): Promise<void>
-  /** Invoke the "clean" scheme action */
+  /**
+   * Invoke the "clean" scheme action
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   clean(workspaceName: string, options?: CallOptions): Promise<void>
-  /** Stop the active scheme action, if one is running */
+  /**
+   * Stop the active scheme action, if one is running
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   stop(workspaceName: string, options?: CallOptions): Promise<void>
-  /** Invoke the "run" scheme action */
+  /**
+   * Invoke the "run" scheme action
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param withCommandLineArguments - Additional command line arguments to pass to the action. Does
+   * not accept null.
+   * @param withEnvironmentVariables - Additional environment variables to set for the action. Does
+   * not accept null.
+   */
   run(
     workspaceName: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Invoke the "test" scheme action */
+  /**
+   * Invoke the "test" scheme action
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param withCommandLineArguments - Additional command line arguments to pass to the action. Does
+   * not accept null.
+   * @param withEnvironmentVariables - Additional environment variables to set for the action. Does
+   * not accept null.
+   */
   test(
     workspaceName: string,
     withCommandLineArguments?: unknown,
     withEnvironmentVariables?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Start a new debugging session in the workspace */
+  /**
+   * Start a new debugging session in the workspace
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param toProcessIdentifier - The process identifier (pid) to which to attach. Does not accept
+   * null.
+   * @param suspended - Whether to start debugging in a suspended state. Does not accept null.
+   */
   attach(
     workspaceName: string,
     toProcessIdentifier: Integer,
     suspended: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Start a debugging session using the "run" or "run without building" scheme action */
+  /**
+   * Start a debugging session using the "run" or "run without building" scheme action
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   * @param scheme - Scheme name. Does not accept null.
+   * @param runDestinationSpecifier - Run destination specifier string. Does not accept null.
+   * @param skipBuilding - Whether to perform "run without building" rather than "run". Does not
+   * accept null.
+   * @param commandLineArguments - Additional command line arguments to pass to the action. Does not
+   * accept null.
+   * @param environmentVariables - Additional environment variables to set for the action. Does not
+   * accept null.
+   */
   debug(
     workspaceName: string,
     scheme?: string,
@@ -633,9 +1048,17 @@ export interface WorkspaceDocumentResourceClient {
  * a workspace document
  */
 export interface ProjectResourceClient {
-  /** List projects. */
+  /**
+   * List projects.
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   list(workspaceName: string, options?: CallOptions): Promise<readonly Project[]>
-  /** Read the project identified by `id`. */
+  /**
+   * Read the project identified by `id`.
+   *
+   * @param id - Project identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Project>
 }
 
@@ -643,9 +1066,17 @@ export interface ProjectResourceClient {
  * A set of parameters for building, testing, launching or distributing the products of a workspace
  */
 export interface SchemeResourceClient {
-  /** List schemes. */
+  /**
+   * List schemes.
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   list(workspaceName: string, options?: CallOptions): Promise<readonly Scheme[]>
-  /** Read the scheme identified by `id`. */
+  /**
+   * Read the scheme identified by `id`.
+   *
+   * @param id - Scheme identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Scheme>
 }
 
@@ -654,9 +1085,17 @@ export interface SchemeResourceClient {
  * scheme action
  */
 export interface RunDestinationResourceClient {
-  /** List rundestinations. */
+  /**
+   * List rundestinations.
+   *
+   * @param workspaceName - Workspace document name. Does not accept null.
+   */
   list(workspaceName: string, options?: CallOptions): Promise<readonly RunDestination[]>
-  /** Read the rundestination identified by `name`. */
+  /**
+   * Read the rundestination identified by `name`.
+   *
+   * @param name - Run destination name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<RunDestination>
 }
 
@@ -700,25 +1139,22 @@ const schemeActionResultStatusMembers = [
 const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
   {
     name: t.string({ description: 'The name of the workspace' }),
-    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
-    file: t.file({ description: 'Its location on disk, if it has one' }),
-    path: t.string({ description: "The document's path" }),
-    loaded: t.boolean({
+    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
+    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
+    path: t.nullable(t.string(), { description: "The document's path" }),
+    loaded: t.nullable(t.boolean(), {
       description: 'Whether the workspace document has finished loading after being opened',
     }),
-    activeScheme: t.reference<Scheme, string>(() => resources, 'Scheme', 'one', {
-      description: "The workspace's scheme that will be used for scheme actions",
-    }),
-    activeRunDestination: t.reference<RunDestination, string>(
-      () => resources,
-      'RunDestination',
-      'one',
+    activeScheme: t.nullable(
+      t.reference<Scheme, string>(() => resources, 'Scheme', 'one'),
+      { description: "The workspace's scheme that will be used for scheme actions" }
+    ),
+    activeRunDestination: t.nullable(
+      t.reference<RunDestination, string>(() => resources, 'RunDestination', 'one'),
       { description: "The workspace's run destination that will be used for scheme actions" }
     ),
-    lastSchemeActionResult: t.reference<SchemeActionResult, string>(
-      () => resources,
-      'SchemeActionResult',
-      'one',
+    lastSchemeActionResult: t.nullable(
+      t.reference<SchemeActionResult, string>(() => resources, 'SchemeActionResult', 'one'),
       {
         description:
           'The scheme action result for the last scheme action command issued to the workspace document',
@@ -734,9 +1170,9 @@ const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
 const fileDocumentRecordType: ValueType<FileDocument> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
-    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
-    file: t.file({ description: 'Its location on disk, if it has one' }),
-    path: t.string({ description: "The document's path" }),
+    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
+    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
+    path: t.nullable(t.string(), { description: "The document's path" }),
   },
   { description: 'A document that represents a file on disk' }
 )
@@ -744,17 +1180,17 @@ const fileDocumentRecordType: ValueType<FileDocument> = t.record(
 const textDocumentRecordType: ValueType<TextDocument> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
-    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
-    file: t.file({ description: 'Its location on disk, if it has one' }),
-    path: t.string({ description: "The document's path" }),
+    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
+    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
+    path: t.nullable(t.string(), { description: "The document's path" }),
     selectedCharacterRange: t.unknown({
       description: 'The first and last character positions in the selection',
     }),
     selectedParagraphRange: t.unknown({
       description: 'The first and last paragraph positions that contain the selection',
     }),
-    text: t.string({ description: 'The text of the text file referenced' }),
-    notifiesWhenClosing: t.boolean({
+    text: t.nullable(t.string(), { description: 'The text of the text file referenced' }),
+    notifiesWhenClosing: t.nullable(t.boolean(), {
       description: 'Should Xcode notify other apps when this document is closed?',
     }),
   },
@@ -764,17 +1200,17 @@ const textDocumentRecordType: ValueType<TextDocument> = t.record(
 const sourceDocumentRecordType: ValueType<SourceDocument> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
-    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
-    file: t.file({ description: 'Its location on disk, if it has one' }),
-    path: t.string({ description: "The document's path" }),
+    modified: t.nullable(t.boolean(), { description: 'Has it been modified since the last save?' }),
+    file: t.nullable(t.file(), { description: 'Its location on disk, if it has one' }),
+    path: t.nullable(t.string(), { description: "The document's path" }),
     selectedCharacterRange: t.unknown({
       description: 'The first and last character positions in the selection',
     }),
     selectedParagraphRange: t.unknown({
       description: 'The first and last paragraph positions that contain the selection',
     }),
-    text: t.string({ description: 'The text of the text file referenced' }),
-    notifiesWhenClosing: t.boolean({
+    text: t.nullable(t.string(), { description: 'The text of the text file referenced' }),
+    notifiesWhenClosing: t.nullable(t.boolean(), {
       description: 'Should Xcode notify other apps when this document is closed?',
     }),
   },
@@ -784,7 +1220,7 @@ const sourceDocumentRecordType: ValueType<SourceDocument> = t.record(
 const projectRecordType: ValueType<Project> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the project' }),
-    name: t.string({ description: 'The name of the project' }),
+    name: t.nullable(t.string(), { description: 'The name of the project' }),
   },
   {
     description:
@@ -795,10 +1231,11 @@ const projectRecordType: ValueType<Project> = t.record(
 const targetRecordType: ValueType<Target> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the target' }),
-    name: t.string({ description: 'The name of this target' }),
-    project: t.reference<Project, string>(() => resources, 'Project', 'one', {
-      description: 'The project that contains this target',
-    }),
+    name: t.nullable(t.string(), { description: 'The name of this target' }),
+    project: t.nullable(
+      t.reference<Project, string>(() => resources, 'Project', 'one'),
+      { description: 'The project that contains this target' }
+    ),
   },
   {
     description:
@@ -809,7 +1246,7 @@ const targetRecordType: ValueType<Target> = t.record(
 const buildConfigurationRecordType: ValueType<BuildConfiguration> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the build configuration' }),
-    name: t.string({ description: 'The name of the build configuration' }),
+    name: t.nullable(t.string(), { description: 'The name of the build configuration' }),
   },
   {
     description:
@@ -820,7 +1257,7 @@ const buildConfigurationRecordType: ValueType<BuildConfiguration> = t.record(
 const buildSettingRecordType: ValueType<BuildSetting> = t.record(
   {
     name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
-    value: t.string({ description: 'A string value for the build setting' }),
+    value: t.nullable(t.string(), { description: 'A string value for the build setting' }),
   },
   { description: 'A setting that controls how products are built' }
 )
@@ -828,7 +1265,7 @@ const buildSettingRecordType: ValueType<BuildSetting> = t.record(
 const resolvedBuildSettingRecordType: ValueType<ResolvedBuildSetting> = t.record(
   {
     name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
-    value: t.string({ description: 'A string value for the build setting' }),
+    value: t.nullable(t.string(), { description: 'A string value for the build setting' }),
   },
   { description: 'An object that represents a resolved value for a build setting' }
 )
@@ -836,7 +1273,7 @@ const resolvedBuildSettingRecordType: ValueType<ResolvedBuildSetting> = t.record
 const schemeRecordType: ValueType<Scheme> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the scheme' }),
-    name: t.string({ description: 'The name of the scheme' }),
+    name: t.nullable(t.string(), { description: 'The name of the scheme' }),
   },
   {
     description:
@@ -849,18 +1286,20 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
     name: t.string({
       description: "The name of the run destination, as displayed in Xcode's interface",
     }),
-    architecture: t.string({
+    architecture: t.nullable(t.string(), {
       description: 'The architecture for which this run destination results in execution',
     }),
-    platform: t.string({
+    platform: t.nullable(t.string(), {
       description: 'The identifier of the platform which this run destination targets',
     }),
-    device: t.reference<Device, string>(() => resources, 'Device', 'one', {
-      description: 'The physical or virtual device which this run destination targets',
-    }),
-    companionDevice: t.reference<Device, string>(() => resources, 'Device', 'one', {
-      description: "If the run destination's device has a companion, this is that device",
-    }),
+    device: t.nullable(
+      t.reference<Device, string>(() => resources, 'Device', 'one'),
+      { description: 'The physical or virtual device which this run destination targets' }
+    ),
+    companionDevice: t.nullable(
+      t.reference<Device, string>(() => resources, 'Device', 'one'),
+      { description: "If the run destination's device has a companion, this is that device" }
+    ),
   },
   {
     description:
@@ -870,13 +1309,13 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
 
 const deviceRecordType: ValueType<Device> = t.record(
   {
-    name: t.string({ description: 'The name of the device' }),
+    name: t.nullable(t.string(), { description: 'The name of the device' }),
     deviceIdentifier: t.string({ description: 'A stable identifier for the device' }),
-    operatingSystemVersion: t.string({
+    operatingSystemVersion: t.nullable(t.string(), {
       description: 'The version of the operating system installed on the device',
     }),
-    deviceModel: t.string({ description: 'The model of device' }),
-    generic: t.boolean({
+    deviceModel: t.nullable(t.string(), { description: 'The model of device' }),
+    generic: t.nullable(t.boolean(), {
       description:
         'Whether this run destination is generic instead of representing a specific device',
     }),
@@ -890,16 +1329,16 @@ const deviceRecordType: ValueType<Device> = t.record(
 const schemeActionResultRecordType: ValueType<SchemeActionResult> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the scheme action result' }),
-    completed: t.boolean({
+    completed: t.nullable(t.boolean(), {
       description: 'Whether this scheme action has completed (successfully or otherwise) or not',
     }),
-    status: t.enumeration(schemeActionResultStatusMembers, {
+    status: t.nullable(t.enumeration(schemeActionResultStatusMembers), {
       description: 'Indicates the status of the scheme action',
     }),
-    errorMessage: t.string({
+    errorMessage: t.nullable(t.string(), {
       description: 'If the result\'s status is "error occurred", this will be the error message',
     }),
-    buildLog: t.string({
+    buildLog: t.nullable(t.string(), {
       description:
         'If this scheme action performed a build, this will be the text of the build log',
     }),
@@ -910,17 +1349,17 @@ const schemeActionResultRecordType: ValueType<SchemeActionResult> = t.record(
 const buildErrorRecordType: ValueType<BuildError> = t.record(
   {
     message: t.string({ description: 'The text of the issue' }),
-    filePath: t.string({ description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.integer({
+    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.nullable(t.integer(), {
       description: 'The starting line number in the file where the issue occurred',
     }),
-    endingLineNumber: t.integer({
+    endingLineNumber: t.nullable(t.integer(), {
       description: 'The ending line number in the file where the issue occurred',
     }),
-    startingColumnNumber: t.integer({
+    startingColumnNumber: t.nullable(t.integer(), {
       description: 'The starting column number in the file where the issue occurred',
     }),
-    endingColumnNumber: t.integer({
+    endingColumnNumber: t.nullable(t.integer(), {
       description: 'The ending column number in the file where the issue occurred',
     }),
   },
@@ -930,17 +1369,17 @@ const buildErrorRecordType: ValueType<BuildError> = t.record(
 const buildWarningRecordType: ValueType<BuildWarning> = t.record(
   {
     message: t.string({ description: 'The text of the issue' }),
-    filePath: t.string({ description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.integer({
+    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.nullable(t.integer(), {
       description: 'The starting line number in the file where the issue occurred',
     }),
-    endingLineNumber: t.integer({
+    endingLineNumber: t.nullable(t.integer(), {
       description: 'The ending line number in the file where the issue occurred',
     }),
-    startingColumnNumber: t.integer({
+    startingColumnNumber: t.nullable(t.integer(), {
       description: 'The starting column number in the file where the issue occurred',
     }),
-    endingColumnNumber: t.integer({
+    endingColumnNumber: t.nullable(t.integer(), {
       description: 'The ending column number in the file where the issue occurred',
     }),
   },
@@ -950,17 +1389,17 @@ const buildWarningRecordType: ValueType<BuildWarning> = t.record(
 const analyzerIssueRecordType: ValueType<AnalyzerIssue> = t.record(
   {
     message: t.string({ description: 'The text of the issue' }),
-    filePath: t.string({ description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.integer({
+    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.nullable(t.integer(), {
       description: 'The starting line number in the file where the issue occurred',
     }),
-    endingLineNumber: t.integer({
+    endingLineNumber: t.nullable(t.integer(), {
       description: 'The ending line number in the file where the issue occurred',
     }),
-    startingColumnNumber: t.integer({
+    startingColumnNumber: t.nullable(t.integer(), {
       description: 'The starting column number in the file where the issue occurred',
     }),
-    endingColumnNumber: t.integer({
+    endingColumnNumber: t.nullable(t.integer(), {
       description: 'The ending column number in the file where the issue occurred',
     }),
   },
@@ -970,17 +1409,17 @@ const analyzerIssueRecordType: ValueType<AnalyzerIssue> = t.record(
 const testFailureRecordType: ValueType<TestFailure> = t.record(
   {
     message: t.string({ description: 'The text of the issue' }),
-    filePath: t.string({ description: 'The file path where the issue occurred' }),
-    startingLineNumber: t.integer({
+    filePath: t.nullable(t.string(), { description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.nullable(t.integer(), {
       description: 'The starting line number in the file where the issue occurred',
     }),
-    endingLineNumber: t.integer({
+    endingLineNumber: t.nullable(t.integer(), {
       description: 'The ending line number in the file where the issue occurred',
     }),
-    startingColumnNumber: t.integer({
+    startingColumnNumber: t.nullable(t.integer(), {
       description: 'The starting column number in the file where the issue occurred',
     }),
-    endingColumnNumber: t.integer({
+    endingColumnNumber: t.nullable(t.integer(), {
       description: 'The ending column number in the file where the issue occurred',
     }),
   },

@@ -10,13 +10,13 @@ import { Integer } from '@macts/contracts';
 
 // @public
 export interface Folder {
-    readonly creationDate: Date;
-    readonly effectivelyHidden: boolean;
-    hidden: boolean;
+    readonly creationDate: Date | null;
+    readonly effectivelyHidden: boolean | null;
+    hidden: boolean | null;
     readonly id: string;
-    readonly modificationDate: Date;
-    name: string;
-    note: string;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    note: string | null;
 }
 
 // @public
@@ -42,13 +42,13 @@ export interface FolderUpdateInput {
 
 // @public
 export interface InboxTask {
-    creationDate: Date;
-    deferDate: Date;
-    dueDate: Date;
-    flagged: boolean;
+    creationDate: Date | null;
+    deferDate: Date | null;
+    dueDate: Date | null;
+    flagged: boolean | null;
     readonly id: string;
-    name: string;
-    note: string;
+    name: string | null;
+    note: string | null;
 }
 
 // @public
@@ -108,7 +108,7 @@ export const omniFocusContract: AppContract<OmniFocusClient>;
 // @public
 export interface Perspective {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -125,37 +125,37 @@ export type PerspectiveUpdateInput = Record<string, never>;
 
 // @public
 export interface Project {
-    readonly blocked: boolean;
-    readonly completed: boolean;
-    completedByChildren: boolean;
-    completionDate: Date;
-    creationDate: Date;
-    defaultSingletonActionHolder: boolean;
-    deferDate: Date;
-    readonly dropped: boolean;
-    droppedDate: Date;
-    dueDate: Date;
-    readonly effectiveDeferDate: Date;
-    readonly effectiveDueDate: Date;
-    readonly effectivelyCompleted: boolean;
-    readonly effectivelyDropped: boolean;
-    readonly effectivePlannedDate: Date;
-    readonly effectiveStatus: ProjectStatus;
-    estimatedMinutes: Integer;
-    flagged: boolean;
+    readonly blocked: boolean | null;
+    readonly completed: boolean | null;
+    completedByChildren: boolean | null;
+    completionDate: Date | null;
+    creationDate: Date | null;
+    defaultSingletonActionHolder: boolean | null;
+    deferDate: Date | null;
+    readonly dropped: boolean | null;
+    droppedDate: Date | null;
+    dueDate: Date | null;
+    readonly effectiveDeferDate: Date | null;
+    readonly effectiveDueDate: Date | null;
+    readonly effectivelyCompleted: boolean | null;
+    readonly effectivelyDropped: boolean | null;
+    readonly effectivePlannedDate: Date | null;
+    readonly effectiveStatus: ProjectStatus | null;
+    estimatedMinutes: Integer | null;
+    flagged: boolean | null;
     readonly id: string;
-    lastReviewDate: Date;
-    readonly modificationDate: Date;
-    name: string;
-    nextReviewDate: Date;
-    note: string;
-    readonly numberOfAvailableTasks: Integer;
-    readonly numberOfCompletedTasks: Integer;
-    readonly numberOfTasks: Integer;
-    plannedDate: Date;
-    sequential: boolean;
-    singletonActionHolder: boolean;
-    status: ProjectStatus;
+    lastReviewDate: Date | null;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    nextReviewDate: Date | null;
+    note: string | null;
+    readonly numberOfAvailableTasks: Integer | null;
+    readonly numberOfCompletedTasks: Integer | null;
+    readonly numberOfTasks: Integer | null;
+    plannedDate: Date | null;
+    sequential: boolean | null;
+    singletonActionHolder: boolean | null;
+    status: ProjectStatus | null;
 }
 
 // @public
@@ -221,14 +221,14 @@ export type RepetitionSchedule = 'regularly' | 'fromCompletion';
 
 // @public
 export interface Tag {
-    allowsNextAction: boolean;
-    readonly availableTaskCount: Integer;
-    readonly effectivelyHidden: boolean;
-    hidden: boolean;
+    allowsNextAction: boolean | null;
+    readonly availableTaskCount: Integer | null;
+    readonly effectivelyHidden: boolean | null;
+    hidden: boolean | null;
     readonly id: string;
-    name: string;
-    note: string;
-    readonly remainingTaskCount: Integer;
+    name: string | null;
+    note: string | null;
+    readonly remainingTaskCount: Integer | null;
 }
 
 // @public
@@ -256,33 +256,33 @@ export interface TagUpdateInput {
 
 // @public
 export interface Task {
-    readonly blocked: boolean;
-    readonly completed: boolean;
-    completedByChildren: boolean;
-    completionDate: Date;
-    creationDate: Date;
-    deferDate: Date;
-    readonly dropped: boolean;
-    droppedDate: Date;
-    dueDate: Date;
-    readonly effectiveDeferDate: Date;
-    readonly effectiveDueDate: Date;
-    readonly effectivelyCompleted: boolean;
-    readonly effectivelyDropped: boolean;
-    readonly effectivePlannedDate: Date;
-    estimatedMinutes: Integer;
-    flagged: boolean;
+    readonly blocked: boolean | null;
+    readonly completed: boolean | null;
+    completedByChildren: boolean | null;
+    completionDate: Date | null;
+    creationDate: Date | null;
+    deferDate: Date | null;
+    readonly dropped: boolean | null;
+    droppedDate: Date | null;
+    dueDate: Date | null;
+    readonly effectiveDeferDate: Date | null;
+    readonly effectiveDueDate: Date | null;
+    readonly effectivelyCompleted: boolean | null;
+    readonly effectivelyDropped: boolean | null;
+    readonly effectivePlannedDate: Date | null;
+    estimatedMinutes: Integer | null;
+    flagged: boolean | null;
     readonly id: string;
-    readonly inInbox: boolean;
-    readonly modificationDate: Date;
-    name: string;
-    readonly next: boolean;
-    note: string;
-    readonly numberOfAvailableTasks: Integer;
-    readonly numberOfCompletedTasks: Integer;
-    readonly numberOfTasks: Integer;
-    plannedDate: Date;
-    sequential: boolean;
+    readonly inInbox: boolean | null;
+    readonly modificationDate: Date | null;
+    name: string | null;
+    readonly next: boolean | null;
+    note: string | null;
+    readonly numberOfAvailableTasks: Integer | null;
+    readonly numberOfCompletedTasks: Integer | null;
+    readonly numberOfTasks: Integer | null;
+    plannedDate: Date | null;
+    sequential: boolean | null;
 }
 
 // @public

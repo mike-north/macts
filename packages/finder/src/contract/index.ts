@@ -132,193 +132,356 @@ export type Sort =
 
 /** An item that contains other items */
 export interface Container {
-  /** the entire contents of the container, including the contents of its children */
-  readonly entireContents: string
-  /** (NOT AVAILABLE YET) Is the container capable of being expanded as an outline? */
-  readonly expandable: boolean
+  /**
+   * the entire contents of the container, including the contents of its children.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly entireContents: string | null
+  /**
+   * (NOT AVAILABLE YET) Is the container capable of being expanded as an outline?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly expandable: boolean | null
   /**
    * (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers
-   * viewed as lists)
+   * viewed as lists).
+   * Nullable. No evidence that the app always sets it.
    */
-  expanded: boolean
+  expanded: boolean | null
   /**
    * (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be
-   * set for containers viewed as lists)
+   * set for containers viewed as lists).
+   * Nullable. No evidence that the app always sets it.
    */
-  completelyExpanded: boolean
-  /** the container window for this folder */
-  readonly containerWindow: string
+  completelyExpanded: boolean | null
+  /**
+   * the container window for this folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly containerWindow: string | null
 }
 
 /** A disk */
 export interface Disk {
   /**
-   * the unique id for this disk (unchanged while disk remains connected and Finder remains running)
+   * the unique id for this disk (unchanged while disk remains connected and Finder remains
+   * running).
+   * Never null: the primary identifier.
    */
   readonly id: Integer
-  /** the total number of bytes (free or used) on the disk */
-  readonly capacity: number
-  /** the number of free bytes left on the disk */
-  readonly freeSpace: number
-  /** Can the media be ejected (floppies, CDs, and so on)? */
-  readonly ejectable: boolean
-  /** Is the media a local volume (as opposed to a file server)? */
-  readonly localVolume: boolean
-  /** Is this disk the boot disk? */
-  readonly startup: boolean
-  /** the filesystem format of this disk */
-  readonly format: string
-  /** Does this disk do file system journaling? */
-  readonly journalingEnabled: boolean
-  /** Ignore permissions on this disk? */
-  ignorePrivileges: boolean
+  /**
+   * the total number of bytes (free or used) on the disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly capacity: number | null
+  /**
+   * the number of free bytes left on the disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly freeSpace: number | null
+  /**
+   * Can the media be ejected (floppies, CDs, and so on)?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly ejectable: boolean | null
+  /**
+   * Is the media a local volume (as opposed to a file server)?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly localVolume: boolean | null
+  /**
+   * Is this disk the boot disk?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly startup: boolean | null
+  /**
+   * the filesystem format of this disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly format: string | null
+  /**
+   * Does this disk do file system journaling?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly journalingEnabled: boolean | null
+  /**
+   * Ignore permissions on this disk?
+   * Nullable. No evidence that the app always sets it.
+   */
+  ignorePrivileges: boolean | null
 }
 
 /** A folder */
 export interface Folder {
-  /** Unique identifier for this folder */
-  readonly id: Integer
+  /**
+   * Unique identifier for this folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** Desktop-object is the class of the "desktop" object */
 export interface DesktopObject {
-  /** Unique identifier for the desktop */
-  readonly id: Integer
+  /**
+   * Unique identifier for the desktop.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** Trash-object is the class of the “trash” object */
 export interface TrashObject {
-  /** Display a dialog when emptying the trash? */
-  warnsBeforeEmptying: boolean
+  /**
+   * Display a dialog when emptying the trash?
+   * Nullable. No evidence that the app always sets it.
+   */
+  warnsBeforeEmptying: boolean | null
 }
 
 /** A file */
 export interface File {
-  /** the OSType identifying the type of data contained in the item */
-  fileType: string
-  /** the OSType identifying the application that created the item */
-  creatorType: string
-  /** Is the file a stationery pad? */
+  /**
+   * the OSType identifying the type of data contained in the item.
+   * Nullable. Observed missing in 58 of 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
+   */
+  fileType: string | null
+  /**
+   * the OSType identifying the application that created the item.
+   * Nullable. Observed missing in 58 of 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
+   */
+  creatorType: string | null
+  /**
+   * Is the file a stationery pad?
+   * Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
+   */
   stationery: boolean
-  /** the version of the product (visible at the top of the “Get Info” window) */
+  /**
+   * the version of the product (visible at the top of the “Get Info” window).
+   * Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
+   */
   readonly productVersion: string
-  /** the version of the file (visible at the bottom of the “Get Info” window) */
+  /**
+   * the version of the file (visible at the bottom of the “Get Info” window).
+   * Never null: observed in all 60 items (Finder 27.2, macOS 27.2, 2026-11-01).
+   */
   readonly version: string
 }
 
 /** An alias file (created with “Make Alias”) */
 export interface AliasFile {
-  /** the original item pointed to by the alias */
-  originalItem: string
+  /**
+   * the original item pointed to by the alias.
+   * Nullable. No evidence that the app always sets it.
+   */
+  originalItem: string | null
 }
 
 /** An application's file on disk */
 export interface ApplicationFile {
-  /** the bundle identifier or creator type of the application */
+  /**
+   * the bundle identifier or creator type of the application.
+   * Never null: the primary identifier.
+   */
   readonly id: string
   /**
    * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application
-   * be launched
+   * be launched.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly suggestedSize: Integer
+  readonly suggestedSize: Integer | null
   /**
-   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
+   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be
+   * launched.
+   * Nullable. No evidence that the app always sets it.
    */
-  minimumSize: Integer
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched */
-  preferredSize: Integer
-  /** Is the application high-level event aware? (OBSOLETE: always returns true) */
-  readonly acceptsHighLevelEvents: boolean
-  /** Does the process have a scripting terminology, i.e., can it be scripted? */
-  readonly hasScriptingTerminology: boolean
-  /** (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment? */
-  opensInClassic: boolean
+  minimumSize: Integer | null
+  /**
+   * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched.
+   * Nullable. No evidence that the app always sets it.
+   */
+  preferredSize: Integer | null
+  /**
+   * Is the application high-level event aware? (OBSOLETE: always returns true).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly acceptsHighLevelEvents: boolean | null
+  /**
+   * Does the process have a scripting terminology, i.e., can it be scripted?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hasScriptingTerminology: boolean | null
+  /**
+   * (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
+   * Nullable. No evidence that the app always sets it.
+   */
+  opensInClassic: boolean | null
 }
 
 /** A document file */
 export interface DocumentFile {
-  /** Unique identifier for this document */
-  readonly id: Integer
+  /**
+   * Unique identifier for this document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** A file containing an internet location */
 export interface InternetLocationFile {
-  /** the internet location */
-  readonly location: string
+  /**
+   * the internet location.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly location: string | null
 }
 
 /** A clipping */
 export interface Clipping {
-  /** (NOT AVAILABLE YET) the clipping window for this clipping */
-  readonly clippingWindow: string
+  /**
+   * (NOT AVAILABLE YET) the clipping window for this clipping.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly clippingWindow: string | null
 }
 
 /** A package */
 export interface Package {
-  /** Unique identifier for this package */
-  readonly id: Integer
+  /**
+   * Unique identifier for this package.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** A file viewer window */
 export interface FinderWindow {
-  /** the container at which this file viewer is targeted */
-  target: string
-  /** the current view for the container window */
-  currentView: string
-  /** the icon view options for the container window */
+  /**
+   * the container at which this file viewer is targeted.
+   * Nullable. No evidence that the app always sets it.
+   */
+  target: string | null
+  /**
+   * the current view for the container window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentView: string | null
+  /**
+   * the icon view options for the container window.
+   * Nullable. No evidence that the app always sets it.
+   */
   readonly iconViewOptions: unknown
-  /** the list view options for the container window */
-  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never>
-  /** the column view options for the container window */
+  /**
+   * the list view options for the container window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never> | null
+  /**
+   * the column view options for the container window.
+   * Nullable. No evidence that the app always sets it.
+   */
   readonly columnViewOptions: unknown
-  /** Is the window's toolbar visible? */
-  toolbarVisible: boolean
-  /** Is the window's status bar visible? */
-  statusbarVisible: boolean
-  /** Is the window's path bar visible? */
-  pathbarVisible: boolean
-  /** the width of the sidebar for the container window */
-  sidebarWidth: Integer
+  /**
+   * Is the window's toolbar visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  toolbarVisible: boolean | null
+  /**
+   * Is the window's status bar visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  statusbarVisible: boolean | null
+  /**
+   * Is the window's path bar visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  pathbarVisible: boolean | null
+  /**
+   * the width of the sidebar for the container window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sidebarWidth: Integer | null
 }
 
 /** The window containing a clipping */
 export interface ClippingWindow {
-  /** Unique identifier for this window */
-  readonly id: Integer
+  /**
+   * Unique identifier for this window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** the list view options */
 export interface ListViewOptions {
-  /** Are folder sizes calculated and displayed in the window? */
-  calculatesFolderSizes: boolean
-  /** displays a preview of the item in list view */
-  showsIconPreview: boolean
-  /** the size of icons displayed in the list view */
-  iconSize: string
-  /** the size of the text displayed in the list view */
-  textSize: Integer
-  /** the column that the list view is sorted on */
-  sortColumn: ObjectReferenceVariant<Column, never>
-  /** Are relative dates (e.g., today, yesterday) shown in the list view? */
-  usesRelativeDates: boolean
+  /**
+   * Are folder sizes calculated and displayed in the window?
+   * Nullable. No evidence that the app always sets it.
+   */
+  calculatesFolderSizes: boolean | null
+  /**
+   * displays a preview of the item in list view.
+   * Nullable. No evidence that the app always sets it.
+   */
+  showsIconPreview: boolean | null
+  /**
+   * the size of icons displayed in the list view.
+   * Nullable. No evidence that the app always sets it.
+   */
+  iconSize: string | null
+  /**
+   * the size of the text displayed in the list view.
+   * Nullable. No evidence that the app always sets it.
+   */
+  textSize: Integer | null
+  /**
+   * the column that the list view is sorted on.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortColumn: ObjectReferenceVariant<Column, never> | null
+  /**
+   * Are relative dates (e.g., today, yesterday) shown in the list view?
+   * Nullable. No evidence that the app always sets it.
+   */
+  usesRelativeDates: boolean | null
 }
 
 /** a column of a list view */
 export interface Column {
-  /** the index in the front-to-back ordering within its container */
-  index: Integer
-  /** the column name */
-  readonly name: string
-  /** The direction in which the window is sorted */
-  sortDirection: string
-  /** the width of this column */
-  width: Integer
-  /** the minimum allowed width of this column */
-  readonly minimumWidth: Integer
-  /** the maximum allowed width of this column */
-  readonly maximumWidth: Integer
-  /** is this column visible */
-  visible: boolean
+  /**
+   * the index in the front-to-back ordering within its container.
+   * Nullable. No evidence that the app always sets it.
+   */
+  index: Integer | null
+  /**
+   * the column name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The direction in which the window is sorted.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortDirection: string | null
+  /**
+   * the width of this column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  width: Integer | null
+  /**
+   * the minimum allowed width of this column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly minimumWidth: Integer | null
+  /**
+   * the maximum allowed width of this column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly maximumWidth: Integer | null
+  /**
+   * is this column visible.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
 }
 
 /** Input for creating a Container. */
@@ -339,12 +502,14 @@ export interface ContainerCreateInput {
 export interface ContainerUpdateInput {
   /**
    * (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers
-   * viewed as lists)
+   * viewed as lists).
+   * Cannot be reset: null is rejected.
    */
   expanded?: boolean
   /**
    * (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be
-   * set for containers viewed as lists)
+   * set for containers viewed as lists).
+   * Cannot be reset: null is rejected.
    */
   completelyExpanded?: boolean
 }
@@ -357,7 +522,10 @@ export interface DiskCreateInput {
 
 /** Input for updating a Disk. Omitted fields are left unchanged. */
 export interface DiskUpdateInput {
-  /** Ignore permissions on this disk? */
+  /**
+   * Ignore permissions on this disk?
+   * Cannot be reset: null is rejected.
+   */
   ignorePrivileges?: boolean
 }
 
@@ -381,7 +549,10 @@ export interface TrashObjectCreateInput {
 
 /** Input for updating a TrashObject. Omitted fields are left unchanged. */
 export interface TrashObjectUpdateInput {
-  /** Display a dialog when emptying the trash? */
+  /**
+   * Display a dialog when emptying the trash?
+   * Cannot be reset: null is rejected.
+   */
   warnsBeforeEmptying?: boolean
 }
 
@@ -397,11 +568,20 @@ export interface FileCreateInput {
 
 /** Input for updating a File. Omitted fields are left unchanged. */
 export interface FileUpdateInput {
-  /** the OSType identifying the type of data contained in the item */
+  /**
+   * the OSType identifying the type of data contained in the item.
+   * Cannot be reset: null is rejected.
+   */
   fileType?: string
-  /** the OSType identifying the application that created the item */
+  /**
+   * the OSType identifying the application that created the item.
+   * Cannot be reset: null is rejected.
+   */
   creatorType?: string
-  /** Is the file a stationery pad? */
+  /**
+   * Is the file a stationery pad?
+   * Cannot be reset: null is rejected.
+   */
   stationery?: boolean
 }
 
@@ -413,7 +593,10 @@ export interface AliasFileCreateInput {
 
 /** Input for updating an AliasFile. Omitted fields are left unchanged. */
 export interface AliasFileUpdateInput {
-  /** the original item pointed to by the alias */
+  /**
+   * the original item pointed to by the alias.
+   * Cannot be reset: null is rejected.
+   */
   originalItem?: string
 }
 
@@ -432,12 +615,20 @@ export interface ApplicationFileCreateInput {
 /** Input for updating an ApplicationFile. Omitted fields are left unchanged. */
 export interface ApplicationFileUpdateInput {
   /**
-   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
+   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be
+   * launched.
+   * Cannot be reset: null is rejected.
    */
   minimumSize?: Integer
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched */
+  /**
+   * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched.
+   * Cannot be reset: null is rejected.
+   */
   preferredSize?: Integer
-  /** (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment? */
+  /**
+   * (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
+   * Cannot be reset: null is rejected.
+   */
   opensInClassic?: boolean
 }
 
@@ -483,17 +674,35 @@ export interface FinderWindowCreateInput {
 
 /** Input for updating a FinderWindow. Omitted fields are left unchanged. */
 export interface FinderWindowUpdateInput {
-  /** the container at which this file viewer is targeted */
+  /**
+   * the container at which this file viewer is targeted.
+   * Cannot be reset: null is rejected.
+   */
   target?: string
-  /** the current view for the container window */
+  /**
+   * the current view for the container window.
+   * Cannot be reset: null is rejected.
+   */
   currentView?: string
-  /** Is the window's toolbar visible? */
+  /**
+   * Is the window's toolbar visible?
+   * Cannot be reset: null is rejected.
+   */
   toolbarVisible?: boolean
-  /** Is the window's status bar visible? */
+  /**
+   * Is the window's status bar visible?
+   * Cannot be reset: null is rejected.
+   */
   statusbarVisible?: boolean
-  /** Is the window's path bar visible? */
+  /**
+   * Is the window's path bar visible?
+   * Cannot be reset: null is rejected.
+   */
   pathbarVisible?: boolean
-  /** the width of the sidebar for the container window */
+  /**
+   * the width of the sidebar for the container window.
+   * Cannot be reset: null is rejected.
+   */
   sidebarWidth?: Integer
 }
 
@@ -521,17 +730,35 @@ export interface ListViewOptionsCreateInput {
 
 /** Input for updating a ListViewOptions. Omitted fields are left unchanged. */
 export interface ListViewOptionsUpdateInput {
-  /** Are folder sizes calculated and displayed in the window? */
+  /**
+   * Are folder sizes calculated and displayed in the window?
+   * Cannot be reset: null is rejected.
+   */
   calculatesFolderSizes?: boolean
-  /** displays a preview of the item in list view */
+  /**
+   * displays a preview of the item in list view.
+   * Cannot be reset: null is rejected.
+   */
   showsIconPreview?: boolean
-  /** the size of icons displayed in the list view */
+  /**
+   * the size of icons displayed in the list view.
+   * Cannot be reset: null is rejected.
+   */
   iconSize?: string
-  /** the size of the text displayed in the list view */
+  /**
+   * the size of the text displayed in the list view.
+   * Cannot be reset: null is rejected.
+   */
   textSize?: Integer
-  /** the column that the list view is sorted on */
+  /**
+   * the column that the list view is sorted on.
+   * Cannot be reset: null is rejected.
+   */
   sortColumn?: ObjectReferenceVariant<Column, never>
-  /** Are relative dates (e.g., today, yesterday) shown in the list view? */
+  /**
+   * Are relative dates (e.g., today, yesterday) shown in the list view?
+   * Cannot be reset: null is rejected.
+   */
   usesRelativeDates?: boolean
 }
 
@@ -549,13 +776,25 @@ export interface ColumnCreateInput {
 
 /** Input for updating a Column. Omitted fields are left unchanged. */
 export interface ColumnUpdateInput {
-  /** the index in the front-to-back ordering within its container */
+  /**
+   * the index in the front-to-back ordering within its container.
+   * Cannot be reset: null is rejected.
+   */
   index?: Integer
-  /** The direction in which the window is sorted */
+  /**
+   * The direction in which the window is sorted.
+   * Cannot be reset: null is rejected.
+   */
   sortDirection?: string
-  /** the width of this column */
+  /**
+   * the width of this column.
+   * Cannot be reset: null is rejected.
+   */
   width?: Integer
-  /** is this column visible */
+  /**
+   * is this column visible.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
 }
 
@@ -564,9 +803,20 @@ export interface ColumnUpdateInput {
  * client factory creates one from {@link finderContract}.
  */
 export interface FinderClient {
-  /** Open the specified object(s) */
+  /**
+   * Open the specified object(s)
+   *
+   * @param using - the application file to open the object with. Does not accept null.
+   * @param withProperties - the initial values for the properties, to be included with the open
+   * command sent to the application that opens the direct object. Does not accept null.
+   */
   open(using?: string, withProperties?: unknown, options?: CallOptions): Promise<void>
-  /** Print the specified object(s) */
+  /**
+   * Print the specified object(s)
+   *
+   * @param withProperties - optional properties to be included with the print command sent to the
+   * application that prints the direct object. Does not accept null.
+   */
   print(withProperties?: unknown, options?: CallOptions): Promise<void>
   /** Quit the Finder */
   quit(options?: CallOptions): Promise<void>
@@ -574,13 +824,31 @@ export interface FinderClient {
   activate(options?: CallOptions): Promise<void>
   /** Close an object */
   close(options?: CallOptions): Promise<void>
-  /** Return the number of elements of a particular class within an object */
+  /**
+   * Return the number of elements of a particular class within an object
+   *
+   * @param each - the class of the elements to be counted. Does not accept null.
+   */
   count(each: string, options?: CallOptions): Promise<void>
-  /** Return the size in bytes of an object */
+  /**
+   * Return the size in bytes of an object
+   *
+   * @param as - the data type for which the size is calculated. Does not accept null.
+   */
   dataSize(as?: string, options?: CallOptions): Promise<void>
   /** Move an item from its container to the trash */
   _delete(options?: CallOptions): Promise<void>
-  /** Duplicate one or more object(s) */
+  /**
+   * Duplicate one or more object(s)
+   *
+   * @param to - the new location for the object(s). Does not accept null.
+   * @param replacing - Specifies whether or not to replace items in the destination that have the
+   * same name as items being duplicated. Does not accept null.
+   * @param routingSuppressed - Specifies whether or not to autoroute items (default is false). Only
+   * applies when copying to the system folder. Does not accept null.
+   * @param exactCopy - Specifies whether or not to copy permissions/ownership as is. Does not
+   * accept null.
+   */
   duplicate(
     to?: string,
     replacing?: boolean,
@@ -590,7 +858,16 @@ export interface FinderClient {
   ): Promise<void>
   /** Verify if an object exists */
   exists(options?: CallOptions): Promise<void>
-  /** Make a new element */
+  /**
+   * Make a new element
+   *
+   * @param _new - the class of the new element. Does not accept null.
+   * @param at - the location at which to insert the element. Does not accept null.
+   * @param to - when creating an alias file, the original item to create an alias to or when
+   * creating a file viewer window, the target of the window. Does not accept null.
+   * @param withProperties - the initial values for the properties of the element. Does not accept
+   * null.
+   */
   make(
     _new: string,
     at: string,
@@ -598,7 +875,17 @@ export interface FinderClient {
     withProperties?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Move object(s) to a new location */
+  /**
+   * Move object(s) to a new location
+   *
+   * @param to - the new location for the object(s). Does not accept null.
+   * @param replacing - Specifies whether or not to replace items in the destination that have the
+   * same name as items being moved. Does not accept null.
+   * @param positionedAt - Gives a list (in local window coordinates) of positions for the
+   * destination items. Does not accept null.
+   * @param routingSuppressed - Specifies whether or not to autoroute items (default is false). Only
+   * applies when moving to the system folder. Does not accept null.
+   */
   move(
     to: string,
     replacing?: boolean,
@@ -615,22 +902,39 @@ export interface FinderClient {
    * application)
    */
   copy(options?: CallOptions): Promise<void>
-  /** Return the specified object(s) in a sorted list */
+  /**
+   * Return the specified object(s) in a sorted list
+   *
+   * @param by - the property to sort the items by (name, index, date, etc.). Does not accept null.
+   */
   sort(by: string, options?: CallOptions): Promise<void>
   /**
    * Arrange items in window nicely (only applies to open windows in icon view that are not kept
    * arranged)
+   *
+   * @param by - the order in which to clean up the objects (name, index, date, etc.). Does not
+   * accept null.
    */
   cleanUp(by?: string, options?: CallOptions): Promise<void>
   /** Eject the specified disk(s) */
   eject(options?: CallOptions): Promise<void>
-  /** Empty the trash */
+  /**
+   * Empty the trash
+   *
+   * @param security - (obsolete). Does not accept null.
+   */
   empty(security?: boolean, options?: CallOptions): Promise<void>
   /** (NOT AVAILABLE) Erase the specified disk(s) */
   erase(options?: CallOptions): Promise<void>
   /** Bring the specified object(s) into view */
   reveal(options?: CallOptions): Promise<void>
-  /** Update the display of the specified object(s) to match their on-disk representation */
+  /**
+   * Update the display of the specified object(s) to match their on-disk representation
+   *
+   * @param necessity - only update if necessary (i.e. a finder window is open). default is false.
+   * Does not accept null.
+   * @param registeringApplications - register applications. default is true. Does not accept null.
+   */
   update(
     necessity?: boolean,
     registeringApplications?: boolean,
@@ -646,21 +950,23 @@ export interface FinderClient {
 
 const containerRecordType: ValueType<Container> = t.record(
   {
-    entireContents: t.string({
+    entireContents: t.nullable(t.string(), {
       description: 'the entire contents of the container, including the contents of its children',
     }),
-    expandable: t.boolean({
+    expandable: t.nullable(t.boolean(), {
       description: '(NOT AVAILABLE YET) Is the container capable of being expanded as an outline?',
     }),
-    expanded: t.boolean({
+    expanded: t.nullable(t.boolean(), {
       description:
         '(NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists)',
     }),
-    completelyExpanded: t.boolean({
+    completelyExpanded: t.nullable(t.boolean(), {
       description:
         '(NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists)',
     }),
-    containerWindow: t.string({ description: 'the container window for this folder' }),
+    containerWindow: t.nullable(t.string(), {
+      description: 'the container window for this folder',
+    }),
   },
   { description: 'An item that contains other items' }
 )
@@ -671,47 +977,55 @@ const diskRecordType: ValueType<Disk> = t.record(
       description:
         'the unique id for this disk (unchanged while disk remains connected and Finder remains running)',
     }),
-    capacity: t.double({ description: 'the total number of bytes (free or used) on the disk' }),
-    freeSpace: t.double({ description: 'the number of free bytes left on the disk' }),
-    ejectable: t.boolean({ description: 'Can the media be ejected (floppies, CDs, and so on)?' }),
-    localVolume: t.boolean({
+    capacity: t.nullable(t.double(), {
+      description: 'the total number of bytes (free or used) on the disk',
+    }),
+    freeSpace: t.nullable(t.double(), { description: 'the number of free bytes left on the disk' }),
+    ejectable: t.nullable(t.boolean(), {
+      description: 'Can the media be ejected (floppies, CDs, and so on)?',
+    }),
+    localVolume: t.nullable(t.boolean(), {
       description: 'Is the media a local volume (as opposed to a file server)?',
     }),
-    startup: t.boolean({ description: 'Is this disk the boot disk?' }),
-    format: t.string({ description: 'the filesystem format of this disk' }),
-    journalingEnabled: t.boolean({ description: 'Does this disk do file system journaling?' }),
-    ignorePrivileges: t.boolean({ description: 'Ignore permissions on this disk?' }),
+    startup: t.nullable(t.boolean(), { description: 'Is this disk the boot disk?' }),
+    format: t.nullable(t.string(), { description: 'the filesystem format of this disk' }),
+    journalingEnabled: t.nullable(t.boolean(), {
+      description: 'Does this disk do file system journaling?',
+    }),
+    ignorePrivileges: t.nullable(t.boolean(), { description: 'Ignore permissions on this disk?' }),
   },
   { description: 'A disk' }
 )
 
 const folderRecordType: ValueType<Folder> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this folder' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this folder' }),
   },
   { description: 'A folder' }
 )
 
 const desktopObjectRecordType: ValueType<DesktopObject> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for the desktop' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for the desktop' }),
   },
   { description: 'Desktop-object is the class of the "desktop" object' }
 )
 
 const trashObjectRecordType: ValueType<TrashObject> = t.record(
   {
-    warnsBeforeEmptying: t.boolean({ description: 'Display a dialog when emptying the trash?' }),
+    warnsBeforeEmptying: t.nullable(t.boolean(), {
+      description: 'Display a dialog when emptying the trash?',
+    }),
   },
   { description: 'Trash-object is the class of the “trash” object' }
 )
 
 const fileRecordType: ValueType<File> = t.record(
   {
-    fileType: t.string({
+    fileType: t.nullable(t.string(), {
       description: 'the OSType identifying the type of data contained in the item',
     }),
-    creatorType: t.string({
+    creatorType: t.nullable(t.string(), {
       description: 'the OSType identifying the application that created the item',
     }),
     stationery: t.boolean({ description: 'Is the file a stationery pad?' }),
@@ -727,7 +1041,9 @@ const fileRecordType: ValueType<File> = t.record(
 
 const aliasFileRecordType: ValueType<AliasFile> = t.record(
   {
-    originalItem: t.string({ description: 'the original item pointed to by the alias' }),
+    originalItem: t.nullable(t.string(), {
+      description: 'the original item pointed to by the alias',
+    }),
   },
   { description: 'An alias file (created with “Make Alias”)' }
 )
@@ -735,25 +1051,25 @@ const aliasFileRecordType: ValueType<AliasFile> = t.record(
 const applicationFileRecordType: ValueType<ApplicationFile> = t.record(
   {
     id: t.string({ description: 'the bundle identifier or creator type of the application' }),
-    suggestedSize: t.integer({
+    suggestedSize: t.nullable(t.integer(), {
       description:
         '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched',
     }),
-    minimumSize: t.integer({
+    minimumSize: t.nullable(t.integer(), {
       description:
         '(AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched',
     }),
-    preferredSize: t.integer({
+    preferredSize: t.nullable(t.integer(), {
       description:
         '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched',
     }),
-    acceptsHighLevelEvents: t.boolean({
+    acceptsHighLevelEvents: t.nullable(t.boolean(), {
       description: 'Is the application high-level event aware? (OBSOLETE: always returns true)',
     }),
-    hasScriptingTerminology: t.boolean({
+    hasScriptingTerminology: t.nullable(t.boolean(), {
       description: 'Does the process have a scripting terminology, i.e., can it be scripted?',
     }),
-    opensInClassic: t.boolean({
+    opensInClassic: t.nullable(t.boolean(), {
       description:
         '(AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?',
     }),
@@ -763,21 +1079,21 @@ const applicationFileRecordType: ValueType<ApplicationFile> = t.record(
 
 const documentFileRecordType: ValueType<DocumentFile> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this document' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this document' }),
   },
   { description: 'A document file' }
 )
 
 const internetLocationFileRecordType: ValueType<InternetLocationFile> = t.record(
   {
-    location: t.string({ description: 'the internet location' }),
+    location: t.nullable(t.string(), { description: 'the internet location' }),
   },
   { description: 'A file containing an internet location' }
 )
 
 const clippingRecordType: ValueType<Clipping> = t.record(
   {
-    clippingWindow: t.string({
+    clippingWindow: t.nullable(t.string(), {
       description: '(NOT AVAILABLE YET) the clipping window for this clipping',
     }),
   },
@@ -786,52 +1102,65 @@ const clippingRecordType: ValueType<Clipping> = t.record(
 
 const packageRecordType: ValueType<Package> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this package' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this package' }),
   },
   { description: 'A package' }
 )
 
 const finderWindowRecordType: ValueType<FinderWindow> = t.record(
   {
-    target: t.string({ description: 'the container at which this file viewer is targeted' }),
-    currentView: t.string({ description: 'the current view for the container window' }),
+    target: t.nullable(t.string(), {
+      description: 'the container at which this file viewer is targeted',
+    }),
+    currentView: t.nullable(t.string(), {
+      description: 'the current view for the container window',
+    }),
     iconViewOptions: t.unknown({ description: 'the icon view options for the container window' }),
-    listViewOptions: t.reference<ListViewOptions, never>(
-      () => resources,
-      'ListViewOptions',
-      'one',
+    listViewOptions: t.nullable(
+      t.reference<ListViewOptions, never>(() => resources, 'ListViewOptions', 'one'),
       { description: 'the list view options for the container window' }
     ),
     columnViewOptions: t.unknown({
       description: 'the column view options for the container window',
     }),
-    toolbarVisible: t.boolean({ description: "Is the window's toolbar visible?" }),
-    statusbarVisible: t.boolean({ description: "Is the window's status bar visible?" }),
-    pathbarVisible: t.boolean({ description: "Is the window's path bar visible?" }),
-    sidebarWidth: t.integer({ description: 'the width of the sidebar for the container window' }),
+    toolbarVisible: t.nullable(t.boolean(), { description: "Is the window's toolbar visible?" }),
+    statusbarVisible: t.nullable(t.boolean(), {
+      description: "Is the window's status bar visible?",
+    }),
+    pathbarVisible: t.nullable(t.boolean(), { description: "Is the window's path bar visible?" }),
+    sidebarWidth: t.nullable(t.integer(), {
+      description: 'the width of the sidebar for the container window',
+    }),
   },
   { description: 'A file viewer window' }
 )
 
 const clippingWindowRecordType: ValueType<ClippingWindow> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this window' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
   },
   { description: 'The window containing a clipping' }
 )
 
 const listViewOptionsRecordType: ValueType<ListViewOptions> = t.record(
   {
-    calculatesFolderSizes: t.boolean({
+    calculatesFolderSizes: t.nullable(t.boolean(), {
       description: 'Are folder sizes calculated and displayed in the window?',
     }),
-    showsIconPreview: t.boolean({ description: 'displays a preview of the item in list view' }),
-    iconSize: t.string({ description: 'the size of icons displayed in the list view' }),
-    textSize: t.integer({ description: 'the size of the text displayed in the list view' }),
-    sortColumn: t.reference<Column, never>(() => resources, 'Column', 'one', {
-      description: 'the column that the list view is sorted on',
+    showsIconPreview: t.nullable(t.boolean(), {
+      description: 'displays a preview of the item in list view',
     }),
-    usesRelativeDates: t.boolean({
+    iconSize: t.nullable(t.string(), {
+      description: 'the size of icons displayed in the list view',
+    }),
+    textSize: t.nullable(t.integer(), {
+      description: 'the size of the text displayed in the list view',
+    }),
+    sortColumn: t.nullable(
+      t.reference<Column, never>(() => resources, 'Column', 'one'),
+      { description: 'the column that the list view is sorted on' }
+    ),
+    usesRelativeDates: t.nullable(t.boolean(), {
       description: 'Are relative dates (e.g., today, yesterday) shown in the list view?',
     }),
   },
@@ -840,15 +1169,21 @@ const listViewOptionsRecordType: ValueType<ListViewOptions> = t.record(
 
 const columnRecordType: ValueType<Column> = t.record(
   {
-    index: t.integer({
+    index: t.nullable(t.integer(), {
       description: 'the index in the front-to-back ordering within its container',
     }),
-    name: t.string({ description: 'the column name' }),
-    sortDirection: t.string({ description: 'The direction in which the window is sorted' }),
-    width: t.integer({ description: 'the width of this column' }),
-    minimumWidth: t.integer({ description: 'the minimum allowed width of this column' }),
-    maximumWidth: t.integer({ description: 'the maximum allowed width of this column' }),
-    visible: t.boolean({ description: 'is this column visible' }),
+    name: t.nullable(t.string(), { description: 'the column name' }),
+    sortDirection: t.nullable(t.string(), {
+      description: 'The direction in which the window is sorted',
+    }),
+    width: t.nullable(t.integer(), { description: 'the width of this column' }),
+    minimumWidth: t.nullable(t.integer(), {
+      description: 'the minimum allowed width of this column',
+    }),
+    maximumWidth: t.nullable(t.integer(), {
+      description: 'the maximum allowed width of this column',
+    }),
+    visible: t.nullable(t.boolean(), { description: 'is this column visible' }),
   },
   { description: 'a column of a list view' }
 )

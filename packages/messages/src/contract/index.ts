@@ -52,45 +52,88 @@ export type ConnectionStatus = 'disconnecting' | 'connected' | 'connecting' | 'd
 export interface Participant {
   /**
    * The participant's unique identifier. For example:
-   * 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890
+   * 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890.
+   * Never null: the primary identifier.
    */
   readonly id: string
-  /** The account for this participant. */
-  readonly account: ObjectReferenceVariant<Account, string>
-  /** The participant's name as it appears in the participant list. */
-  readonly name: string
-  /** The participant's handle. */
-  readonly handle: string
-  /** The first name from this participan's Contacts card, if available */
-  readonly firstName: string
-  /** The last name from this participant's Contacts card, if available */
-  readonly lastName: string
-  /** The full name from this participant's Contacts card, if available */
-  readonly fullName: string
+  /**
+   * The account for this participant.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly account: ObjectReferenceVariant<Account, string> | null
+  /**
+   * The participant's name as it appears in the participant list.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The participant's handle.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly handle: string | null
+  /**
+   * The first name from this participan's Contacts card, if available.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly firstName: string | null
+  /**
+   * The last name from this participant's Contacts card, if available.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly lastName: string | null
+  /**
+   * The full name from this participant's Contacts card, if available.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fullName: string | null
 }
 
 /** An account that can be logged in to from this system */
 export interface Account {
-  /** A unique identifier for this account. */
+  /**
+   * A unique identifier for this account.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of this account as defined in Account preferences description field */
-  readonly description: string
-  /** Is the account enabled? */
-  enabled: boolean
-  /** The connection status for this account. */
-  readonly connectionStatus: string
-  /** The type of service for this account */
-  readonly serviceType: string
+  /**
+   * The name of this account as defined in Account preferences description field.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the account enabled?
+   * Nullable. No evidence that the app always sets it.
+   */
+  enabled: boolean | null
+  /**
+   * The connection status for this account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly connectionStatus: string | null
+  /**
+   * The type of service for this account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly serviceType: string | null
 }
 
 /** An SMS or iMessage chat. */
 export interface Chat {
-  /** A guid identifier for this chat. */
+  /**
+   * A guid identifier for this chat.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The chat's name as it appears in the chat list. */
-  readonly name: string
-  /** The account which is participating in this chat. */
-  readonly account: ObjectReferenceVariant<Account, string>
+  /**
+   * The chat's name as it appears in the chat list.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The account which is participating in this chat.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly account: ObjectReferenceVariant<Account, string> | null
 }
 
 /** Input for creating a Participant. */
@@ -107,7 +150,10 @@ export interface AccountCreateInput {
 
 /** Input for updating an Account. Omitted fields are left unchanged. */
 export interface AccountUpdateInput {
-  /** Is the account enabled? */
+  /**
+   * Is the account enabled?
+   * Cannot be reset: null is rejected.
+   */
   enabled?: boolean
 }
 
@@ -122,7 +168,11 @@ export type ChatUpdateInput = Record<string, never>
  * A client factory creates one from {@link messagesContract}.
  */
 export interface MessagesClient {
-  /** Sends a message to a participant or to a chat. */
+  /**
+   * Sends a message to a participant or to a chat.
+   *
+   * @param to - The to parameter. Does not accept null.
+   */
   send(to: string, options?: CallOptions): Promise<void>
   /** Login to all accounts. */
   login(options?: CallOptions): Promise<void>
@@ -136,20 +186,21 @@ const participantRecordType: ValueType<Participant> = t.record(
       description:
         "The participant's unique identifier. For example: 01234567-89AB-CDEF-0123-456789ABCDEF:+11234567890",
     }),
-    account: t.reference<Account, string>(() => resources, 'Account', 'one', {
-      description: 'The account for this participant.',
-    }),
-    name: t.string({
+    account: t.nullable(
+      t.reference<Account, string>(() => resources, 'Account', 'one'),
+      { description: 'The account for this participant.' }
+    ),
+    name: t.nullable(t.string(), {
       description: "The participant's name as it appears in the participant list.",
     }),
-    handle: t.string({ description: "The participant's handle." }),
-    firstName: t.string({
+    handle: t.nullable(t.string(), { description: "The participant's handle." }),
+    firstName: t.nullable(t.string(), {
       description: "The first name from this participan's Contacts card, if available",
     }),
-    lastName: t.string({
+    lastName: t.nullable(t.string(), {
       description: "The last name from this participant's Contacts card, if available",
     }),
-    fullName: t.string({
+    fullName: t.nullable(t.string(), {
       description: "The full name from this participant's Contacts card, if available",
     }),
   },
@@ -159,12 +210,14 @@ const participantRecordType: ValueType<Participant> = t.record(
 const accountRecordType: ValueType<Account> = t.record(
   {
     id: t.string({ description: 'A unique identifier for this account.' }),
-    description: t.string({
+    description: t.nullable(t.string(), {
       description: 'The name of this account as defined in Account preferences description field',
     }),
-    enabled: t.boolean({ description: 'Is the account enabled?' }),
-    connectionStatus: t.string({ description: 'The connection status for this account.' }),
-    serviceType: t.string({ description: 'The type of service for this account' }),
+    enabled: t.nullable(t.boolean(), { description: 'Is the account enabled?' }),
+    connectionStatus: t.nullable(t.string(), {
+      description: 'The connection status for this account.',
+    }),
+    serviceType: t.nullable(t.string(), { description: 'The type of service for this account' }),
   },
   { description: 'An account that can be logged in to from this system' }
 )
@@ -172,10 +225,13 @@ const accountRecordType: ValueType<Account> = t.record(
 const chatRecordType: ValueType<Chat> = t.record(
   {
     id: t.string({ description: 'A guid identifier for this chat.' }),
-    name: t.string({ description: "The chat's name as it appears in the chat list." }),
-    account: t.reference<Account, string>(() => resources, 'Account', 'one', {
-      description: 'The account which is participating in this chat.',
+    name: t.nullable(t.string(), {
+      description: "The chat's name as it appears in the chat list.",
     }),
+    account: t.nullable(
+      t.reference<Account, string>(() => resources, 'Account', 'one'),
+      { description: 'The account which is participating in this chat.' }
+    ),
   },
   { description: 'An SMS or iMessage chat.' }
 )

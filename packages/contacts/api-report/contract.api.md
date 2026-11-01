@@ -10,15 +10,15 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface Address {
-    city: string;
-    country: string;
-    countryCode: string;
-    readonly formattedAddress: string;
+    city: string | null;
+    country: string | null;
+    countryCode: string | null;
+    readonly formattedAddress: string | null;
     id: string;
-    label: string;
-    state: string;
-    street: string;
-    zip: string;
+    label: string | null;
+    state: string | null;
+    street: string | null;
+    zip: string | null;
 }
 
 // @public
@@ -47,9 +47,9 @@ export interface AddressUpdateInput {
 
 // @public
 export interface AIMHandle {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -81,9 +81,9 @@ export const contactsContract: AppContract<ContactsClient>;
 
 // @public
 export interface CustomDate {
-    readonly id: string;
-    label: string;
-    value: Date;
+    readonly id: string | null;
+    label: string | null;
+    value: Date | null;
 }
 
 // @public
@@ -100,9 +100,9 @@ export interface CustomDateUpdateInput {
 
 // @public
 export interface Email {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -119,7 +119,7 @@ export interface EmailUpdateInput {
 
 // @public
 export interface Group {
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -134,9 +134,9 @@ export interface GroupUpdateInput {
 
 // @public
 export interface ICQHandle {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -153,9 +153,9 @@ export interface ICQHandleUpdateInput {
 
 // @public
 export interface InstantMessage {
-    readonly serviceName: string;
-    serviceType: string;
-    userName: string;
+    readonly serviceName: string | null;
+    serviceType: string | null;
+    userName: string | null;
 }
 
 // @public
@@ -175,9 +175,9 @@ export interface InstantMessageUpdateInput {
 
 // @public
 export interface JabberHandle {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -194,9 +194,9 @@ export interface JabberHandleUpdateInput {
 
 // @public
 export interface MSNHandle {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -213,26 +213,26 @@ export interface MSNHandleUpdateInput {
 
 // @public
 export interface Person {
-    birthDate: string;
-    company: boolean;
-    department: string;
-    firstName: string;
-    homePage: string;
-    image: string;
-    jobTitle: string;
-    lastName: string;
-    maidenName: string;
-    middleName: string;
-    readonly name: string;
-    nickname: string;
-    note: string;
-    organization: string;
-    phoneticFirstName: string;
-    phoneticLastName: string;
-    phoneticMiddleName: string;
-    suffix: string;
-    title: string;
-    readonly vcard: string;
+    birthDate: string | null;
+    company: boolean | null;
+    department: string | null;
+    firstName: string | null;
+    homePage: string | null;
+    image: string | null;
+    jobTitle: string | null;
+    lastName: string | null;
+    maidenName: string | null;
+    middleName: string | null;
+    readonly name: string | null;
+    nickname: string | null;
+    note: string | null;
+    organization: string | null;
+    phoneticFirstName: string | null;
+    phoneticLastName: string | null;
+    phoneticMiddleName: string | null;
+    suffix: string | null;
+    title: string | null;
+    readonly vcard: string | null;
 }
 
 // @public
@@ -281,9 +281,9 @@ export interface PersonUpdateInput {
 
 // @public
 export interface Phone {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -300,9 +300,9 @@ export interface PhoneUpdateInput {
 
 // @public
 export interface RelatedName {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -323,10 +323,10 @@ export type SaveableFileFormat = 'archive';
 // @public
 export interface SocialProfile {
     readonly id: string;
-    serviceName: string;
-    url: string;
-    userIdentifier: string;
-    userName: string;
+    serviceName: string | null;
+    url: string | null;
+    userIdentifier: string | null;
+    userName: string | null;
 }
 
 // @public
@@ -347,9 +347,9 @@ export interface SocialProfileUpdateInput {
 
 // @public
 export interface Url {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public
@@ -366,9 +366,9 @@ export interface UrlUpdateInput {
 
 // @public
 export interface YahooHandle {
-    readonly id: string;
-    label: string;
-    value: string;
+    readonly id: string | null;
+    label: string | null;
+    value: string | null;
 }
 
 // @public

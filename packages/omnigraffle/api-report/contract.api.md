@@ -12,18 +12,18 @@ import { Rgb } from '@macts/contracts';
 
 // @public
 export interface Canvas {
-    adjustsPages: boolean;
-    canvasSize: Point;
-    canvasSizeIsMeasuredInPages: boolean;
-    columnAlignment: HorizontalAlignment;
-    columnSpacing: number;
-    horizontalPages: Integer;
+    adjustsPages: boolean | null;
+    canvasSize: Point | null;
+    canvasSizeIsMeasuredInPages: boolean | null;
+    columnAlignment: HorizontalAlignment | null;
+    columnSpacing: number | null;
+    horizontalPages: Integer | null;
     id: string;
-    name: string;
-    readonly pageSize: Point;
-    rowAlignment: VerticalAlignment;
-    rowSpacing: number;
-    verticalPages: Integer;
+    name: string | null;
+    readonly pageSize: Point | null;
+    rowAlignment: VerticalAlignment | null;
+    rowSpacing: number | null;
+    verticalPages: Integer | null;
 }
 
 // @public
@@ -68,14 +68,14 @@ export type ExportAreaType = 'selectedGraphics' | 'allGraphics' | 'currentCanvas
 
 // @public
 export interface ExportSettings {
-    areaType: ExportAreaType;
-    borderAmount: number;
-    drawsBackground: boolean;
-    exportScale: number;
-    includeBorder: boolean;
-    includeNonprintingLayers: boolean;
-    resolution: number;
-    useArtboards: boolean;
+    areaType: ExportAreaType | null;
+    borderAmount: number | null;
+    drawsBackground: boolean | null;
+    exportScale: number | null;
+    includeBorder: boolean | null;
+    includeNonprintingLayers: boolean | null;
+    resolution: number | null;
+    useArtboards: boolean | null;
 }
 
 // @public
@@ -107,33 +107,33 @@ export type FillType = 'noFill' | 'solidFill' | 'linearFill' | 'radialFill';
 
 // @public
 export interface Graphic {
-    alignsEdgesToGrid: boolean;
-    allowsConnections: boolean;
-    cornerRadius: number;
-    doubleStroke: boolean;
-    drawsShadow: boolean;
-    drawsStroke: boolean;
-    flippedHorizontally: boolean;
-    flippedVertically: boolean;
+    alignsEdgesToGrid: boolean | null;
+    allowsConnections: boolean | null;
+    cornerRadius: number | null;
+    doubleStroke: boolean | null;
+    drawsShadow: boolean | null;
+    drawsStroke: boolean | null;
+    flippedHorizontally: boolean | null;
+    flippedVertically: boolean | null;
     readonly id: string;
-    locked: boolean;
-    notes: string;
-    origin: Point;
-    rankGroup: Integer;
-    script: string;
-    shadowBeneath: boolean;
-    shadowColor: Rgb;
-    shadowFuzziness: number;
-    shadowVector: Point;
-    size: Point;
-    strokeCap: StrokeCap;
-    strokeColor: Rgb;
-    strokeJoin: StrokeJoin;
-    strokePattern: Integer;
-    tag: string;
-    thickness: number;
-    url: string;
-    userName: string;
+    locked: boolean | null;
+    notes: string | null;
+    origin: Point | null;
+    rankGroup: Integer | null;
+    script: string | null;
+    shadowBeneath: boolean | null;
+    shadowColor: Rgb | null;
+    shadowFuzziness: number | null;
+    shadowVector: Point | null;
+    size: Point | null;
+    strokeCap: StrokeCap | null;
+    strokeColor: Rgb | null;
+    strokeJoin: StrokeJoin | null;
+    strokePattern: Integer | null;
+    tag: string | null;
+    thickness: number | null;
+    url: string | null;
+    userName: string | null;
 }
 
 // @public
@@ -204,14 +204,14 @@ export interface GraphicUpdateInput {
 
 // @public
 export interface Grid {
-    drawsInFront: boolean;
-    major: boolean;
-    majorSpacing: Integer;
-    scriptGridColor: Rgb;
-    scriptMajorGridColor: Rgb;
-    snaps: boolean;
-    spacing: number;
-    visible: boolean;
+    drawsInFront: boolean | null;
+    major: boolean | null;
+    majorSpacing: Integer | null;
+    scriptGridColor: Rgb | null;
+    scriptMajorGridColor: Rgb | null;
+    snaps: boolean | null;
+    spacing: number | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -240,9 +240,9 @@ export interface GridUpdateInput {
 
 // @public
 export interface Group {
-    connectToGroupOnly: boolean;
+    connectToGroupOnly: boolean | null;
     readonly id: string;
-    rotation: number;
+    rotation: number | null;
 }
 
 // @public
@@ -269,10 +269,10 @@ export type ImageSizing = 'manual' | 'stretched' | 'tiled';
 // @public
 export interface Label {
     readonly id: string;
-    labelOffset: number;
-    labelPosition: number;
-    labelRotation: LabelOrientation;
-    text: string;
+    labelOffset: number | null;
+    labelPosition: number | null;
+    labelRotation: LabelOrientation | null;
+    text: string | null;
 }
 
 // @public
@@ -296,10 +296,10 @@ export interface LabelUpdateInput {
 
 // @public
 export interface Layer {
-    locked: boolean;
+    locked: boolean | null;
     name: string;
-    prints: boolean;
-    visible: boolean;
+    prints: boolean | null;
+    visible: boolean | null;
 }
 
 // @public
@@ -335,15 +335,15 @@ export type LayoutType = 'hierarchical' | 'forceDirected' | 'radial' | 'circular
 
 // @public
 export interface Line {
-    headMagnet: Integer;
-    headScale: number;
-    headType: string;
-    hopType: HopType;
+    headMagnet: Integer | null;
+    headScale: number | null;
+    headType: string | null;
+    hopType: HopType | null;
     readonly id: string;
-    lineType: LineType;
-    tailMagnet: Integer;
-    tailScale: number;
-    tailType: string;
+    lineType: LineType | null;
+    tailMagnet: Integer | null;
+    tailScale: number | null;
+    tailType: string | null;
 }
 
 // @public
@@ -382,7 +382,7 @@ export interface LineUpdateInput {
 // @public
 export interface Master {
     id: string;
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -422,18 +422,18 @@ export type Orientation = 'horizontally' | 'vertically';
 
 // @public
 export interface Shape {
-    autosizing: TextAutosizing;
-    fill: FillType;
-    fillColor: Rgb;
-    gradientAngle: number;
-    gradientColor: Rgb;
+    autosizing: TextAutosizing | null;
+    fill: FillType | null;
+    fillColor: Rgb | null;
+    gradientAngle: number | null;
+    gradientColor: Rgb | null;
     readonly id: string;
-    name: string;
-    rotation: number;
-    sidePadding: Integer;
-    text: string;
-    textPlacement: VerticalAlignment;
-    verticalPadding: Integer;
+    name: string | null;
+    rotation: number | null;
+    sidePadding: Integer | null;
+    text: string | null;
+    textPlacement: VerticalAlignment | null;
+    verticalPadding: Integer | null;
 }
 
 // @public
@@ -487,12 +487,12 @@ export type StrokeJoin = 'miter' | 'round' | 'bevel';
 
 // @public
 export interface Subgraph {
-    bottomMargin: number;
-    collapsed: boolean;
+    bottomMargin: number | null;
+    collapsed: boolean | null;
     readonly id: string;
-    leftMargin: number;
-    rightMargin: number;
-    topMargin: number;
+    leftMargin: number | null;
+    rightMargin: number | null;
+    topMargin: number | null;
 }
 
 // @public

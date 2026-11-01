@@ -12,12 +12,12 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface AnalyzerIssue {
-    endingColumnNumber: Integer;
-    endingLineNumber: Integer;
-    filePath: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: Integer;
-    startingLineNumber: Integer;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
 
 // @public
@@ -43,7 +43,7 @@ export interface AnalyzerIssueUpdateInput {
 // @public
 export interface BuildConfiguration {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -54,12 +54,12 @@ export type BuildConfigurationUpdateInput = Record<string, never>;
 
 // @public
 export interface BuildError {
-    endingColumnNumber: Integer;
-    endingLineNumber: Integer;
-    filePath: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: Integer;
-    startingLineNumber: Integer;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
 
 // @public
@@ -85,7 +85,7 @@ export interface BuildErrorUpdateInput {
 // @public
 export interface BuildSetting {
     name: string;
-    value: string;
+    value: string | null;
 }
 
 // @public
@@ -102,12 +102,12 @@ export interface BuildSettingUpdateInput {
 
 // @public
 export interface BuildWarning {
-    endingColumnNumber: Integer;
-    endingLineNumber: Integer;
-    filePath: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: Integer;
-    startingLineNumber: Integer;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
 
 // @public
@@ -133,10 +133,10 @@ export interface BuildWarningUpdateInput {
 // @public
 export interface Device {
     readonly deviceIdentifier: string;
-    readonly deviceModel: string;
-    readonly generic: boolean;
-    readonly name: string;
-    readonly operatingSystemVersion: string;
+    readonly deviceModel: string | null;
+    readonly generic: boolean | null;
+    readonly name: string | null;
+    readonly operatingSystemVersion: string | null;
 }
 
 // @public
@@ -147,10 +147,10 @@ export type DeviceUpdateInput = Record<string, never>;
 
 // @public
 export interface FileDocument {
-    readonly file: FileValue;
-    readonly modified: boolean;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
     readonly name: string;
-    readonly path: string;
+    readonly path: string | null;
 }
 
 // @public
@@ -162,7 +162,7 @@ export type FileDocumentUpdateInput = Record<string, never>;
 // @public
 export interface Project {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -180,7 +180,7 @@ export type ProjectUpdateInput = Record<string, never>;
 // @public
 export interface ResolvedBuildSetting {
     name: string;
-    value: string;
+    value: string | null;
 }
 
 // @public
@@ -197,11 +197,11 @@ export interface ResolvedBuildSettingUpdateInput {
 
 // @public
 export interface RunDestination {
-    readonly architecture: string;
-    readonly companionDevice: ObjectReferenceVariant<Device, string>;
-    readonly device: ObjectReferenceVariant<Device, string>;
+    readonly architecture: string | null;
+    readonly companionDevice: ObjectReferenceVariant<Device, string> | null;
+    readonly device: ObjectReferenceVariant<Device, string> | null;
     readonly name: string;
-    readonly platform: string;
+    readonly platform: string | null;
 }
 
 // @public
@@ -219,16 +219,16 @@ export type RunDestinationUpdateInput = Record<string, never>;
 // @public
 export interface Scheme {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
 export interface SchemeActionResult {
-    buildLog: string;
-    readonly completed: boolean;
-    errorMessage: string;
+    buildLog: string | null;
+    readonly completed: boolean | null;
+    errorMessage: string | null;
     readonly id: string;
-    status: SchemeActionResultStatus;
+    status: SchemeActionResultStatus | null;
 }
 
 // @public
@@ -262,14 +262,14 @@ export type SchemeUpdateInput = Record<string, never>;
 
 // @public
 export interface SourceDocument {
-    readonly file: FileValue;
-    readonly modified: boolean;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
     readonly name: string;
-    notifiesWhenClosing: boolean;
-    readonly path: string;
+    notifiesWhenClosing: boolean | null;
+    readonly path: string | null;
     selectedCharacterRange: unknown;
     selectedParagraphRange: unknown;
-    text: string;
+    text: string | null;
 }
 
 // @public
@@ -291,8 +291,8 @@ export interface SourceDocumentUpdateInput {
 // @public
 export interface Target {
     readonly id: string;
-    name: string;
-    readonly project: ObjectReferenceVariant<Project, string>;
+    name: string | null;
+    readonly project: ObjectReferenceVariant<Project, string> | null;
 }
 
 // @public
@@ -307,12 +307,12 @@ export interface TargetUpdateInput {
 
 // @public
 export interface TestFailure {
-    endingColumnNumber: Integer;
-    endingLineNumber: Integer;
-    filePath: string;
+    endingColumnNumber: Integer | null;
+    endingLineNumber: Integer | null;
+    filePath: string | null;
     message: string;
-    startingColumnNumber: Integer;
-    startingLineNumber: Integer;
+    startingColumnNumber: Integer | null;
+    startingLineNumber: Integer | null;
 }
 
 // @public
@@ -337,14 +337,14 @@ export interface TestFailureUpdateInput {
 
 // @public
 export interface TextDocument {
-    readonly file: FileValue;
-    readonly modified: boolean;
+    readonly file: FileValue | null;
+    readonly modified: boolean | null;
     readonly name: string;
-    notifiesWhenClosing: boolean;
-    readonly path: string;
+    notifiesWhenClosing: boolean | null;
+    readonly path: string | null;
     selectedCharacterRange: unknown;
     selectedParagraphRange: unknown;
-    text: string;
+    text: string | null;
 }
 
 // @public
@@ -365,14 +365,14 @@ export interface TextDocumentUpdateInput {
 
 // @public
 export interface WorkspaceDocument {
-    activeRunDestination: ObjectReferenceVariant<RunDestination, string>;
-    activeScheme: ObjectReferenceVariant<Scheme, string>;
-    readonly file: FileValue;
-    readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string>;
-    readonly loaded: boolean;
-    readonly modified: boolean;
+    activeRunDestination: ObjectReferenceVariant<RunDestination, string> | null;
+    activeScheme: ObjectReferenceVariant<Scheme, string> | null;
+    readonly file: FileValue | null;
+    readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string> | null;
+    readonly loaded: boolean | null;
+    readonly modified: boolean | null;
     readonly name: string;
-    readonly path: string;
+    readonly path: string | null;
 }
 
 // @public
