@@ -14,11 +14,14 @@
  * - D9: a tool's input schema is `z.toJSONSchema(input.wire, { target:
  *   'draft-7' })`, and a contract JSON Schema cannot represent is an error,
  *   never an empty schema.
+ * - D8: a file result is grant-bearing metadata in wire form, served exactly
+ *   as received; bytes never appear in a tool result.
  * - MCP: tool input schemas are object schemas; failures of the tool itself
  *   are tool results with `isError`, while a call to an unknown tool is a
  *   protocol error.
  *
- * @see phases/13-sdk-value-and-execution-contracts.md (D6, D9)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D6, D8, D9)
+ * @see https://github.com/mike-north/macts/issues/101
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#tool
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#error-handling
  */
@@ -229,6 +232,29 @@ describe('callTool success', () => {
     expect(runtime.calls).toEqual([
       { id: 'notes.notes.get', input: { name: 'Groceries' }, context: CONTEXT },
     ])
+  })
+
+  it('returns a file result as its wire metadata and grant only, never bytes or a URL (D8)', async () => {
+    // A `file` control record: path, existence observation, and an opaque
+    // fetch grant. Content moves outside model context, through the grant.
+    const fileRecord = {
+      file: {
+        path: '/Users/example/Documents/report.pdf',
+        exists: true,
+        observedAt: { date: '2026-01-15T10:30:00.000Z' },
+        grant: 'grant-opaque-1',
+      },
+    }
+    const { adapter } = adapterAnswering(() => Promise.resolve(fileRecord))
+
+    const result = await adapter.callTool('macts__notes__notes_get', { name: 'Report' }, CONTEXT)
+
+    expect(result.isError).toBeUndefined()
+    expect(result.content).toHaveLength(1)
+    expect(result.content[0]?.type).toBe('text')
+    // Exactly the wire record, with nothing added: no inline content, no
+    // base64, no download URL.
+    expect(documentOf(result)).toStrictEqual({ result: fileRecord })
   })
 
   it('passes a null result through as { result: null }', async () => {

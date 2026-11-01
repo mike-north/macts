@@ -20,6 +20,9 @@ describe('toolNameFor', () => {
     ['automator.app.launchAPIScriptNamed', 'macts__automator__app_launch_api_script_named'],
     ['calendar.app.reloadCalendars', 'macts__calendar__app_reload_calendars'],
     ['calendar.events.list', 'macts__calendar__events_list'],
+    // An acronym's plural stays with the acronym.
+    ['safari.app.listURLs', 'macts__safari__app_list_urls'],
+    ['preview.documents.exportPDFs', 'macts__preview__documents_export_pdfs'],
   ] as const)('derives %s as %s', (id, expected) => {
     expect(toolNameFor(id)).toBe(expected)
   })

@@ -10,6 +10,7 @@
  * @packageDocumentation
  */
 
+import { splitIdentifierWords } from '@macts/core'
 import type { OperationId } from '@macts/contracts'
 import { McpToolDerivationError } from './errors.js'
 
@@ -19,19 +20,17 @@ const TOOL_NAME_PREFIX = 'macts'
 /** Separator between the prefix, the app, and the resource-plus-operation part. */
 const SEGMENT_SEPARATOR = '__'
 
-/** An acronym run followed by a capitalized word, as in `APIExpression`. */
-const ACRONYM_BOUNDARY = /([A-Z]+)([A-Z][a-z])/g
-
-/** A lowercase letter or digit followed by an uppercase letter, as in `getURL`. */
-const WORD_BOUNDARY = /([a-z0-9])([A-Z])/g
-
 /**
- * The snake-case form of an operation segment, with acronyms kept whole:
- * `getURL` becomes `get_url`, and `invokeAPIExpression` becomes
- * `invoke_api_expression`.
+ * The snake-case form of an operation segment: its words, split by the shared
+ * identifier split ({@link splitIdentifierWords}), lowercased and joined by
+ * `_`. An acronym and its plural stay one word, so `getURL` becomes `get_url`,
+ * `invokeAPIExpression` becomes `invoke_api_expression`, and `listURLs`
+ * becomes `list_urls`, exactly as every other generated surface spells them.
  */
 function snakeCaseOperation(operation: string): string {
-  return operation.replace(ACRONYM_BOUNDARY, '$1_$2').replace(WORD_BOUNDARY, '$1_$2').toLowerCase()
+  return splitIdentifierWords(operation)
+    .map((word) => word.toLowerCase())
+    .join('_')
 }
 
 /**

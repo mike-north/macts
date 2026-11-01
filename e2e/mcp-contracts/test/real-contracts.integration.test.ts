@@ -28,7 +28,8 @@
  * - D9: tool input schemas are derived from wire contracts, which are pure
  *   validators, so their input and output JSON Schemas coincide.
  *
- * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6, D9, D11)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6, D8, D9, D11)
+ * @see https://github.com/mike-north/macts/issues/101
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#listing-tools
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#calling-tools
  * @see https://modelcontextprotocol.io/specification/2025-11-25/server/tools#error-handling
