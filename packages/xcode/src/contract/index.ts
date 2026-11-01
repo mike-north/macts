@@ -1,0 +1,1454 @@
+/**
+ * The Xcode contract: the transport-neutral description of every
+ * Xcode operation.
+ *
+ * It declares the types callers work with (records, create and update inputs,
+ * enums, and the `XcodeClient` interface) and one descriptor per operation:
+ * its identity, the permission it requires, and the value types of its input
+ * and result. Its resource table tells references how to identify and resolve
+ * the objects they point to.
+ *
+ * The contract performs no I/O. A client is created from it by a client
+ * factory, local or remote, which supplies the runtime that `bind` turns into
+ * a `XcodeClient`; application code changes locality by changing the factory,
+ * not the contract.
+ *
+ * @example
+ * ```ts
+ * import { createClient } from '@macts/sdk'
+ * import { xcodeContract } from '@macts/xcode/contract'
+ *
+ * const client = createClient(xcodeContract, { token, url })
+ * ```
+ *
+ * Generated from the Xcode manifest; do not edit.
+ *
+ * @packageDocumentation
+ */
+
+import {
+  ValueTypes,
+  type AppContract,
+  type CallOptions,
+  type ClientRuntime,
+  type FileValue,
+  type Integer,
+  type ObjectReferenceVariant,
+  type OperationDescriptor,
+  type ValueType,
+} from '@macts/contracts'
+
+const t = ValueTypes
+
+/** The status of a scheme action result object */
+export type SchemeActionResultStatus =
+  | 'notYetStarted'
+  | 'running'
+  | 'cancelled'
+  | 'failed'
+  | 'errorOccurred'
+  | 'succeeded'
+
+/**
+ * A document that represents a workspace on disk. Workspaces are the top-level container for almost
+ * all objects and commands in Xcode
+ */
+export interface WorkspaceDocument {
+  /** The name of the workspace */
+  readonly name: string
+  /** Has it been modified since the last save? */
+  readonly modified: boolean
+  /** Its location on disk, if it has one */
+  readonly file: FileValue
+  /** The document's path */
+  readonly path: string
+  /** Whether the workspace document has finished loading after being opened */
+  readonly loaded: boolean
+  /** The workspace's scheme that will be used for scheme actions */
+  activeScheme: ObjectReferenceVariant<Scheme, string>
+  /** The workspace's run destination that will be used for scheme actions */
+  activeRunDestination: ObjectReferenceVariant<RunDestination, string>
+  /**
+   * The scheme action result for the last scheme action command issued to the workspace document
+   */
+  readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string>
+}
+
+/** A document that represents a file on disk */
+export interface FileDocument {
+  /** The name of the document */
+  readonly name: string
+  /** Has it been modified since the last save? */
+  readonly modified: boolean
+  /** Its location on disk, if it has one */
+  readonly file: FileValue
+  /** The document's path */
+  readonly path: string
+}
+
+/** A document that represents a text file on disk */
+export interface TextDocument {
+  /** The name of the document */
+  readonly name: string
+  /** Has it been modified since the last save? */
+  readonly modified: boolean
+  /** Its location on disk, if it has one */
+  readonly file: FileValue
+  /** The document's path */
+  readonly path: string
+  /** The first and last character positions in the selection */
+  selectedCharacterRange: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange: unknown
+  /** The text of the text file referenced */
+  text: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing: boolean
+}
+
+/** A document that represents a source file on disk */
+export interface SourceDocument {
+  /** The name of the document */
+  readonly name: string
+  /** Has it been modified since the last save? */
+  readonly modified: boolean
+  /** Its location on disk, if it has one */
+  readonly file: FileValue
+  /** The document's path */
+  readonly path: string
+  /** The first and last character positions in the selection */
+  selectedCharacterRange: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange: unknown
+  /** The text of the text file referenced */
+  text: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing: boolean
+}
+
+/**
+ * An Xcode project. Projects represent project files on disk and are always open in the context of
+ * a workspace document
+ */
+export interface Project {
+  /** The unique identifier for the project */
+  readonly id: string
+  /** The name of the project */
+  readonly name: string
+}
+
+/**
+ * A target is a blueprint for building a product. Targets inherit build settings from their project
+ * if not overridden in the target
+ */
+export interface Target {
+  /** The unique identifier for the target */
+  readonly id: string
+  /** The name of this target */
+  name: string
+  /** The project that contains this target */
+  readonly project: ObjectReferenceVariant<Project, string>
+}
+
+/**
+ * A set of build settings for a target or project. Each target in a project has the same named
+ * build configurations as the project
+ */
+export interface BuildConfiguration {
+  /** The unique identifier for the build configuration */
+  readonly id: string
+  /** The name of the build configuration */
+  readonly name: string
+}
+
+/** A setting that controls how products are built */
+export interface BuildSetting {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name: string
+  /** A string value for the build setting */
+  value: string
+}
+
+/** An object that represents a resolved value for a build setting */
+export interface ResolvedBuildSetting {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name: string
+  /** A string value for the build setting */
+  value: string
+}
+
+/**
+ * A set of parameters for building, testing, launching or distributing the products of a workspace
+ */
+export interface Scheme {
+  /** The unique identifier for the scheme */
+  readonly id: string
+  /** The name of the scheme */
+  readonly name: string
+}
+
+/**
+ * An object which specifies parameters such as the device and architecture for which to perform a
+ * scheme action
+ */
+export interface RunDestination {
+  /** The name of the run destination, as displayed in Xcode's interface */
+  readonly name: string
+  /** The architecture for which this run destination results in execution */
+  readonly architecture: string
+  /** The identifier of the platform which this run destination targets */
+  readonly platform: string
+  /** The physical or virtual device which this run destination targets */
+  readonly device: ObjectReferenceVariant<Device, string>
+  /** If the run destination's device has a companion, this is that device */
+  readonly companionDevice: ObjectReferenceVariant<Device, string>
+}
+
+/** A device which can be used as the target for a scheme action, as part of a run destination */
+export interface Device {
+  /** The name of the device */
+  readonly name: string
+  /** A stable identifier for the device */
+  readonly deviceIdentifier: string
+  /** The version of the operating system installed on the device */
+  readonly operatingSystemVersion: string
+  /** The model of device */
+  readonly deviceModel: string
+  /** Whether this run destination is generic instead of representing a specific device */
+  readonly generic: boolean
+}
+
+/** An object describing the result of performing a scheme action command */
+export interface SchemeActionResult {
+  /** The unique identifier for the scheme action result */
+  readonly id: string
+  /** Whether this scheme action has completed (successfully or otherwise) or not */
+  readonly completed: boolean
+  /** Indicates the status of the scheme action */
+  status: SchemeActionResultStatus
+  /** If the result's status is "error occurred", this will be the error message */
+  errorMessage: string
+  /** If this scheme action performed a build, this will be the text of the build log */
+  buildLog: string
+}
+
+/** An error generated by a build */
+export interface BuildError {
+  /** The text of the issue */
+  message: string
+  /** The file path where the issue occurred */
+  filePath: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber: Integer
+}
+
+/** A warning generated by a build */
+export interface BuildWarning {
+  /** The text of the issue */
+  message: string
+  /** The file path where the issue occurred */
+  filePath: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber: Integer
+}
+
+/** A warning generated by the static analyzer */
+export interface AnalyzerIssue {
+  /** The text of the issue */
+  message: string
+  /** The file path where the issue occurred */
+  filePath: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber: Integer
+}
+
+/** A failure from a test */
+export interface TestFailure {
+  /** The text of the issue */
+  message: string
+  /** The file path where the issue occurred */
+  filePath: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber: Integer
+}
+
+/** Input for creating a WorkspaceDocument. */
+export interface WorkspaceDocumentCreateInput {
+  /** The workspace's scheme that will be used for scheme actions */
+  activeScheme?: ObjectReferenceVariant<Scheme, string>
+  /** The workspace's run destination that will be used for scheme actions */
+  activeRunDestination?: ObjectReferenceVariant<RunDestination, string>
+}
+
+/** Input for updating a WorkspaceDocument. Omitted fields are left unchanged. */
+export interface WorkspaceDocumentUpdateInput {
+  /** The workspace's scheme that will be used for scheme actions */
+  activeScheme?: ObjectReferenceVariant<Scheme, string>
+  /** The workspace's run destination that will be used for scheme actions */
+  activeRunDestination?: ObjectReferenceVariant<RunDestination, string>
+}
+
+/** Input for creating a FileDocument. */
+export type FileDocumentCreateInput = Record<string, never>
+
+/** Input for updating a FileDocument. Omitted fields are left unchanged. */
+export type FileDocumentUpdateInput = Record<string, never>
+
+/** Input for creating a TextDocument. */
+export interface TextDocumentCreateInput {
+  /** The first and last character positions in the selection */
+  selectedCharacterRange?: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange?: unknown
+  /** The text of the text file referenced */
+  text?: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing?: boolean
+}
+
+/** Input for updating a TextDocument. Omitted fields are left unchanged. */
+export interface TextDocumentUpdateInput {
+  /** The first and last character positions in the selection */
+  selectedCharacterRange?: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange?: unknown
+  /** The text of the text file referenced */
+  text?: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing?: boolean
+}
+
+/** Input for creating a SourceDocument. */
+export interface SourceDocumentCreateInput {
+  /** The first and last character positions in the selection */
+  selectedCharacterRange?: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange?: unknown
+  /** The text of the text file referenced */
+  text?: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing?: boolean
+}
+
+/** Input for updating a SourceDocument. Omitted fields are left unchanged. */
+export interface SourceDocumentUpdateInput {
+  /** The first and last character positions in the selection */
+  selectedCharacterRange?: unknown
+  /** The first and last paragraph positions that contain the selection */
+  selectedParagraphRange?: unknown
+  /** The text of the text file referenced */
+  text?: string
+  /** Should Xcode notify other apps when this document is closed? */
+  notifiesWhenClosing?: boolean
+}
+
+/** Input for creating a Project. */
+export type ProjectCreateInput = Record<string, never>
+
+/** Input for updating a Project. Omitted fields are left unchanged. */
+export type ProjectUpdateInput = Record<string, never>
+
+/** Input for creating a Target. */
+export interface TargetCreateInput {
+  /** The name of this target */
+  name?: string
+}
+
+/** Input for updating a Target. Omitted fields are left unchanged. */
+export interface TargetUpdateInput {
+  /** The name of this target */
+  name?: string
+}
+
+/** Input for creating a BuildConfiguration. */
+export type BuildConfigurationCreateInput = Record<string, never>
+
+/** Input for updating a BuildConfiguration. Omitted fields are left unchanged. */
+export type BuildConfigurationUpdateInput = Record<string, never>
+
+/** Input for creating a BuildSetting. */
+export interface BuildSettingCreateInput {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name?: string
+  /** A string value for the build setting */
+  value?: string
+}
+
+/** Input for updating a BuildSetting. Omitted fields are left unchanged. */
+export interface BuildSettingUpdateInput {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name?: string
+  /** A string value for the build setting */
+  value?: string
+}
+
+/** Input for creating a ResolvedBuildSetting. */
+export interface ResolvedBuildSettingCreateInput {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name?: string
+  /** A string value for the build setting */
+  value?: string
+}
+
+/** Input for updating a ResolvedBuildSetting. Omitted fields are left unchanged. */
+export interface ResolvedBuildSettingUpdateInput {
+  /** The unlocalized build setting name (e.g. DSTROOT) */
+  name?: string
+  /** A string value for the build setting */
+  value?: string
+}
+
+/** Input for creating a Scheme. */
+export type SchemeCreateInput = Record<string, never>
+
+/** Input for updating a Scheme. Omitted fields are left unchanged. */
+export type SchemeUpdateInput = Record<string, never>
+
+/** Input for creating a RunDestination. */
+export type RunDestinationCreateInput = Record<string, never>
+
+/** Input for updating a RunDestination. Omitted fields are left unchanged. */
+export type RunDestinationUpdateInput = Record<string, never>
+
+/** Input for creating a Device. */
+export type DeviceCreateInput = Record<string, never>
+
+/** Input for updating a Device. Omitted fields are left unchanged. */
+export type DeviceUpdateInput = Record<string, never>
+
+/** Input for creating a SchemeActionResult. */
+export interface SchemeActionResultCreateInput {
+  /** Indicates the status of the scheme action */
+  status?: SchemeActionResultStatus
+  /** If the result's status is "error occurred", this will be the error message */
+  errorMessage?: string
+  /** If this scheme action performed a build, this will be the text of the build log */
+  buildLog?: string
+}
+
+/** Input for updating a SchemeActionResult. Omitted fields are left unchanged. */
+export interface SchemeActionResultUpdateInput {
+  /** Indicates the status of the scheme action */
+  status?: SchemeActionResultStatus
+  /** If the result's status is "error occurred", this will be the error message */
+  errorMessage?: string
+  /** If this scheme action performed a build, this will be the text of the build log */
+  buildLog?: string
+}
+
+/** Input for creating a BuildError. */
+export interface BuildErrorCreateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for updating a BuildError. Omitted fields are left unchanged. */
+export interface BuildErrorUpdateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for creating a BuildWarning. */
+export interface BuildWarningCreateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for updating a BuildWarning. Omitted fields are left unchanged. */
+export interface BuildWarningUpdateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for creating an AnalyzerIssue. */
+export interface AnalyzerIssueCreateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for updating an AnalyzerIssue. Omitted fields are left unchanged. */
+export interface AnalyzerIssueUpdateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for creating a TestFailure. */
+export interface TestFailureCreateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/** Input for updating a TestFailure. Omitted fields are left unchanged. */
+export interface TestFailureUpdateInput {
+  /** The text of the issue */
+  message?: string
+  /** The file path where the issue occurred */
+  filePath?: string
+  /** The starting line number in the file where the issue occurred */
+  startingLineNumber?: Integer
+  /** The ending line number in the file where the issue occurred */
+  endingLineNumber?: Integer
+  /** The starting column number in the file where the issue occurred */
+  startingColumnNumber?: Integer
+  /** The ending column number in the file where the issue occurred */
+  endingColumnNumber?: Integer
+}
+
+/**
+ * A document that represents a workspace on disk. Workspaces are the top-level container for almost
+ * all objects and commands in Xcode
+ */
+export interface WorkspaceDocumentResourceClient {
+  /** List workspacedocuments. */
+  list(options?: CallOptions): Promise<readonly WorkspaceDocument[]>
+  /** Read the workspacedocument identified by `name`. */
+  get(name: string, options?: CallOptions): Promise<WorkspaceDocument>
+  /** Invoke the "build" scheme action */
+  build(workspaceName: string, options?: CallOptions): Promise<void>
+  /** Invoke the "clean" scheme action */
+  clean(workspaceName: string, options?: CallOptions): Promise<void>
+  /** Stop the active scheme action, if one is running */
+  stop(workspaceName: string, options?: CallOptions): Promise<void>
+  /** Invoke the "run" scheme action */
+  run(
+    workspaceName: string,
+    withCommandLineArguments?: unknown,
+    withEnvironmentVariables?: unknown,
+    options?: CallOptions
+  ): Promise<void>
+  /** Invoke the "test" scheme action */
+  test(
+    workspaceName: string,
+    withCommandLineArguments?: unknown,
+    withEnvironmentVariables?: unknown,
+    options?: CallOptions
+  ): Promise<void>
+  /** Start a new debugging session in the workspace */
+  attach(
+    workspaceName: string,
+    toProcessIdentifier: Integer,
+    suspended: boolean,
+    options?: CallOptions
+  ): Promise<void>
+  /** Start a debugging session using the "run" or "run without building" scheme action */
+  debug(
+    workspaceName: string,
+    scheme?: string,
+    runDestinationSpecifier?: string,
+    skipBuilding?: boolean,
+    commandLineArguments?: unknown,
+    environmentVariables?: unknown,
+    options?: CallOptions
+  ): Promise<void>
+}
+
+/**
+ * An Xcode project. Projects represent project files on disk and are always open in the context of
+ * a workspace document
+ */
+export interface ProjectResourceClient {
+  /** List projects. */
+  list(workspaceName: string, options?: CallOptions): Promise<readonly Project[]>
+  /** Read the project identified by `id`. */
+  get(id: string, options?: CallOptions): Promise<Project>
+}
+
+/**
+ * A set of parameters for building, testing, launching or distributing the products of a workspace
+ */
+export interface SchemeResourceClient {
+  /** List schemes. */
+  list(workspaceName: string, options?: CallOptions): Promise<readonly Scheme[]>
+  /** Read the scheme identified by `id`. */
+  get(id: string, options?: CallOptions): Promise<Scheme>
+}
+
+/**
+ * An object which specifies parameters such as the device and architecture for which to perform a
+ * scheme action
+ */
+export interface RunDestinationResourceClient {
+  /** List rundestinations. */
+  list(workspaceName: string, options?: CallOptions): Promise<readonly RunDestination[]>
+  /** Read the rundestination identified by `name`. */
+  get(name: string, options?: CallOptions): Promise<RunDestination>
+}
+
+/**
+ * The Xcode client: one namespace per resource that has operations, plus the app's own commands. A
+ * client factory creates one from {@link xcodeContract}.
+ */
+export interface XcodeClient {
+  /**
+   * A document that represents a workspace on disk. Workspaces are the top-level container for
+   * almost all objects and commands in Xcode
+   */
+  readonly workspacedocuments: WorkspaceDocumentResourceClient
+  /**
+   * An Xcode project. Projects represent project files on disk and are always open in the context
+   * of a workspace document
+   */
+  readonly projects: ProjectResourceClient
+  /**
+   * A set of parameters for building, testing, launching or distributing the products of a
+   * workspace
+   */
+  readonly schemes: SchemeResourceClient
+  /**
+   * An object which specifies parameters such as the device and architecture for which to perform a
+   * scheme action
+   */
+  readonly rundestinations: RunDestinationResourceClient
+}
+
+/** The members of {@link SchemeActionResultStatus}, for its value type. */
+const schemeActionResultStatusMembers = [
+  'notYetStarted',
+  'running',
+  'cancelled',
+  'failed',
+  'errorOccurred',
+  'succeeded',
+] as const
+
+const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
+  {
+    name: t.string({ description: 'The name of the workspace' }),
+    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
+    file: t.file({ description: 'Its location on disk, if it has one' }),
+    path: t.string({ description: "The document's path" }),
+    loaded: t.boolean({
+      description: 'Whether the workspace document has finished loading after being opened',
+    }),
+    activeScheme: t.reference<Scheme, string>(() => resources, 'Scheme', 'one', {
+      description: "The workspace's scheme that will be used for scheme actions",
+    }),
+    activeRunDestination: t.reference<RunDestination, string>(
+      () => resources,
+      'RunDestination',
+      'one',
+      { description: "The workspace's run destination that will be used for scheme actions" }
+    ),
+    lastSchemeActionResult: t.reference<SchemeActionResult, string>(
+      () => resources,
+      'SchemeActionResult',
+      'one',
+      {
+        description:
+          'The scheme action result for the last scheme action command issued to the workspace document',
+      }
+    ),
+  },
+  {
+    description:
+      'A document that represents a workspace on disk. Workspaces are the top-level container for almost all objects and commands in Xcode',
+  }
+)
+
+const fileDocumentRecordType: ValueType<FileDocument> = t.record(
+  {
+    name: t.string({ description: 'The name of the document' }),
+    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
+    file: t.file({ description: 'Its location on disk, if it has one' }),
+    path: t.string({ description: "The document's path" }),
+  },
+  { description: 'A document that represents a file on disk' }
+)
+
+const textDocumentRecordType: ValueType<TextDocument> = t.record(
+  {
+    name: t.string({ description: 'The name of the document' }),
+    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
+    file: t.file({ description: 'Its location on disk, if it has one' }),
+    path: t.string({ description: "The document's path" }),
+    selectedCharacterRange: t.unknown({
+      description: 'The first and last character positions in the selection',
+    }),
+    selectedParagraphRange: t.unknown({
+      description: 'The first and last paragraph positions that contain the selection',
+    }),
+    text: t.string({ description: 'The text of the text file referenced' }),
+    notifiesWhenClosing: t.boolean({
+      description: 'Should Xcode notify other apps when this document is closed?',
+    }),
+  },
+  { description: 'A document that represents a text file on disk' }
+)
+
+const sourceDocumentRecordType: ValueType<SourceDocument> = t.record(
+  {
+    name: t.string({ description: 'The name of the document' }),
+    modified: t.boolean({ description: 'Has it been modified since the last save?' }),
+    file: t.file({ description: 'Its location on disk, if it has one' }),
+    path: t.string({ description: "The document's path" }),
+    selectedCharacterRange: t.unknown({
+      description: 'The first and last character positions in the selection',
+    }),
+    selectedParagraphRange: t.unknown({
+      description: 'The first and last paragraph positions that contain the selection',
+    }),
+    text: t.string({ description: 'The text of the text file referenced' }),
+    notifiesWhenClosing: t.boolean({
+      description: 'Should Xcode notify other apps when this document is closed?',
+    }),
+  },
+  { description: 'A document that represents a source file on disk' }
+)
+
+const projectRecordType: ValueType<Project> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the project' }),
+    name: t.string({ description: 'The name of the project' }),
+  },
+  {
+    description:
+      'An Xcode project. Projects represent project files on disk and are always open in the context of a workspace document',
+  }
+)
+
+const targetRecordType: ValueType<Target> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the target' }),
+    name: t.string({ description: 'The name of this target' }),
+    project: t.reference<Project, string>(() => resources, 'Project', 'one', {
+      description: 'The project that contains this target',
+    }),
+  },
+  {
+    description:
+      'A target is a blueprint for building a product. Targets inherit build settings from their project if not overridden in the target',
+  }
+)
+
+const buildConfigurationRecordType: ValueType<BuildConfiguration> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the build configuration' }),
+    name: t.string({ description: 'The name of the build configuration' }),
+  },
+  {
+    description:
+      'A set of build settings for a target or project. Each target in a project has the same named build configurations as the project',
+  }
+)
+
+const buildSettingRecordType: ValueType<BuildSetting> = t.record(
+  {
+    name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
+    value: t.string({ description: 'A string value for the build setting' }),
+  },
+  { description: 'A setting that controls how products are built' }
+)
+
+const resolvedBuildSettingRecordType: ValueType<ResolvedBuildSetting> = t.record(
+  {
+    name: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
+    value: t.string({ description: 'A string value for the build setting' }),
+  },
+  { description: 'An object that represents a resolved value for a build setting' }
+)
+
+const schemeRecordType: ValueType<Scheme> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the scheme' }),
+    name: t.string({ description: 'The name of the scheme' }),
+  },
+  {
+    description:
+      'A set of parameters for building, testing, launching or distributing the products of a workspace',
+  }
+)
+
+const runDestinationRecordType: ValueType<RunDestination> = t.record(
+  {
+    name: t.string({
+      description: "The name of the run destination, as displayed in Xcode's interface",
+    }),
+    architecture: t.string({
+      description: 'The architecture for which this run destination results in execution',
+    }),
+    platform: t.string({
+      description: 'The identifier of the platform which this run destination targets',
+    }),
+    device: t.reference<Device, string>(() => resources, 'Device', 'one', {
+      description: 'The physical or virtual device which this run destination targets',
+    }),
+    companionDevice: t.reference<Device, string>(() => resources, 'Device', 'one', {
+      description: "If the run destination's device has a companion, this is that device",
+    }),
+  },
+  {
+    description:
+      'An object which specifies parameters such as the device and architecture for which to perform a scheme action',
+  }
+)
+
+const deviceRecordType: ValueType<Device> = t.record(
+  {
+    name: t.string({ description: 'The name of the device' }),
+    deviceIdentifier: t.string({ description: 'A stable identifier for the device' }),
+    operatingSystemVersion: t.string({
+      description: 'The version of the operating system installed on the device',
+    }),
+    deviceModel: t.string({ description: 'The model of device' }),
+    generic: t.boolean({
+      description:
+        'Whether this run destination is generic instead of representing a specific device',
+    }),
+  },
+  {
+    description:
+      'A device which can be used as the target for a scheme action, as part of a run destination',
+  }
+)
+
+const schemeActionResultRecordType: ValueType<SchemeActionResult> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the scheme action result' }),
+    completed: t.boolean({
+      description: 'Whether this scheme action has completed (successfully or otherwise) or not',
+    }),
+    status: t.enumeration(schemeActionResultStatusMembers, {
+      description: 'Indicates the status of the scheme action',
+    }),
+    errorMessage: t.string({
+      description: 'If the result\'s status is "error occurred", this will be the error message',
+    }),
+    buildLog: t.string({
+      description:
+        'If this scheme action performed a build, this will be the text of the build log',
+    }),
+  },
+  { description: 'An object describing the result of performing a scheme action command' }
+)
+
+const buildErrorRecordType: ValueType<BuildError> = t.record(
+  {
+    message: t.string({ description: 'The text of the issue' }),
+    filePath: t.string({ description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.integer({
+      description: 'The starting line number in the file where the issue occurred',
+    }),
+    endingLineNumber: t.integer({
+      description: 'The ending line number in the file where the issue occurred',
+    }),
+    startingColumnNumber: t.integer({
+      description: 'The starting column number in the file where the issue occurred',
+    }),
+    endingColumnNumber: t.integer({
+      description: 'The ending column number in the file where the issue occurred',
+    }),
+  },
+  { description: 'An error generated by a build' }
+)
+
+const buildWarningRecordType: ValueType<BuildWarning> = t.record(
+  {
+    message: t.string({ description: 'The text of the issue' }),
+    filePath: t.string({ description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.integer({
+      description: 'The starting line number in the file where the issue occurred',
+    }),
+    endingLineNumber: t.integer({
+      description: 'The ending line number in the file where the issue occurred',
+    }),
+    startingColumnNumber: t.integer({
+      description: 'The starting column number in the file where the issue occurred',
+    }),
+    endingColumnNumber: t.integer({
+      description: 'The ending column number in the file where the issue occurred',
+    }),
+  },
+  { description: 'A warning generated by a build' }
+)
+
+const analyzerIssueRecordType: ValueType<AnalyzerIssue> = t.record(
+  {
+    message: t.string({ description: 'The text of the issue' }),
+    filePath: t.string({ description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.integer({
+      description: 'The starting line number in the file where the issue occurred',
+    }),
+    endingLineNumber: t.integer({
+      description: 'The ending line number in the file where the issue occurred',
+    }),
+    startingColumnNumber: t.integer({
+      description: 'The starting column number in the file where the issue occurred',
+    }),
+    endingColumnNumber: t.integer({
+      description: 'The ending column number in the file where the issue occurred',
+    }),
+  },
+  { description: 'A warning generated by the static analyzer' }
+)
+
+const testFailureRecordType: ValueType<TestFailure> = t.record(
+  {
+    message: t.string({ description: 'The text of the issue' }),
+    filePath: t.string({ description: 'The file path where the issue occurred' }),
+    startingLineNumber: t.integer({
+      description: 'The starting line number in the file where the issue occurred',
+    }),
+    endingLineNumber: t.integer({
+      description: 'The ending line number in the file where the issue occurred',
+    }),
+    startingColumnNumber: t.integer({
+      description: 'The starting column number in the file where the issue occurred',
+    }),
+    endingColumnNumber: t.integer({
+      description: 'The ending column number in the file where the issue occurred',
+    }),
+  },
+  { description: 'A failure from a test' }
+)
+
+/**
+ * Every resource, keyed by manifest resource key: its record, its identifier
+ * (when it has one), and the operations that resolve references to it. This
+ * table is also the registry that reference value types read, lazily.
+ */
+const resources: AppContract<XcodeClient>['resources'] = {
+  WorkspaceDocument: {
+    name: 'WorkspaceDocument',
+    record: workspaceDocumentRecordType,
+    id: t.string({ description: 'The name of the workspace' }),
+    get: 'xcode.workspacedocuments.getWorkspaceDocument',
+    list: 'xcode.workspacedocuments.listWorkspaceDocuments',
+  },
+  FileDocument: {
+    name: 'FileDocument',
+    record: fileDocumentRecordType,
+    id: t.string({ description: 'The name of the document' }),
+  },
+  TextDocument: {
+    name: 'TextDocument',
+    record: textDocumentRecordType,
+    id: t.string({ description: 'The name of the document' }),
+  },
+  SourceDocument: {
+    name: 'SourceDocument',
+    record: sourceDocumentRecordType,
+    id: t.string({ description: 'The name of the document' }),
+  },
+  Project: {
+    name: 'Project',
+    record: projectRecordType,
+    id: t.string({ description: 'The unique identifier for the project' }),
+    get: 'xcode.projects.getProject',
+    list: 'xcode.projects.listProjects',
+  },
+  Target: {
+    name: 'Target',
+    record: targetRecordType,
+    id: t.string({ description: 'The unique identifier for the target' }),
+  },
+  BuildConfiguration: {
+    name: 'BuildConfiguration',
+    record: buildConfigurationRecordType,
+    id: t.string({ description: 'The unique identifier for the build configuration' }),
+  },
+  BuildSetting: {
+    name: 'BuildSetting',
+    record: buildSettingRecordType,
+    id: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
+  },
+  ResolvedBuildSetting: {
+    name: 'ResolvedBuildSetting',
+    record: resolvedBuildSettingRecordType,
+    id: t.string({ description: 'The unlocalized build setting name (e.g. DSTROOT)' }),
+  },
+  Scheme: {
+    name: 'Scheme',
+    record: schemeRecordType,
+    id: t.string({ description: 'The unique identifier for the scheme' }),
+    get: 'xcode.schemes.getScheme',
+    list: 'xcode.schemes.listSchemes',
+  },
+  RunDestination: {
+    name: 'RunDestination',
+    record: runDestinationRecordType,
+    id: t.string({
+      description: "The name of the run destination, as displayed in Xcode's interface",
+    }),
+    get: 'xcode.rundestinations.getRunDestination',
+    list: 'xcode.rundestinations.listRunDestinations',
+  },
+  Device: {
+    name: 'Device',
+    record: deviceRecordType,
+    id: t.string({ description: 'A stable identifier for the device' }),
+  },
+  SchemeActionResult: {
+    name: 'SchemeActionResult',
+    record: schemeActionResultRecordType,
+    id: t.string({ description: 'The unique identifier for the scheme action result' }),
+  },
+  BuildError: {
+    name: 'BuildError',
+    record: buildErrorRecordType,
+    id: t.string({ description: 'The text of the issue' }),
+  },
+  BuildWarning: {
+    name: 'BuildWarning',
+    record: buildWarningRecordType,
+    id: t.string({ description: 'The text of the issue' }),
+  },
+  AnalyzerIssue: {
+    name: 'AnalyzerIssue',
+    record: analyzerIssueRecordType,
+    id: t.string({ description: 'The text of the issue' }),
+  },
+  TestFailure: {
+    name: 'TestFailure',
+    record: testFailureRecordType,
+    id: t.string({ description: 'The text of the issue' }),
+  },
+}
+
+const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly WorkspaceDocument[]
+> = {
+  id: 'xcode.workspacedocuments.listWorkspaceDocuments',
+  permission: 'xcode:workspaceDocuments:list',
+  target: { command: 'listWorkspaceDocuments', resource: 'WorkspaceDocument' },
+  description: 'List all workspace documents',
+  input: t.record({}),
+  output: t.array(workspaceDocumentRecordType),
+}
+
+const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
+  { readonly name: string },
+  WorkspaceDocument
+> = {
+  id: 'xcode.workspacedocuments.getWorkspaceDocument',
+  permission: 'xcode:workspaceDocuments:get',
+  target: { command: 'getWorkspaceDocument', resource: 'WorkspaceDocument' },
+  description: 'Get a workspace document by name',
+  input: t.record({
+    name: t.string({ description: 'Workspace document name' }),
+  }),
+  output: workspaceDocumentRecordType,
+}
+
+const projectListProjectsOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  readonly Project[]
+> = {
+  id: 'xcode.projects.listProjects',
+  permission: 'xcode:projects:list',
+  target: { command: 'listProjects', resource: 'Project' },
+  description: 'List all projects in a workspace',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.array(projectRecordType),
+}
+
+const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
+  id: 'xcode.projects.getProject',
+  permission: 'xcode:projects:get',
+  target: { command: 'getProject', resource: 'Project' },
+  description: 'Get a project by ID',
+  input: t.record({
+    id: t.string({ description: 'Project identifier' }),
+  }),
+  output: projectRecordType,
+}
+
+const schemeListSchemesOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  readonly Scheme[]
+> = {
+  id: 'xcode.schemes.listSchemes',
+  permission: 'xcode:schemes:list',
+  target: { command: 'listSchemes', resource: 'Scheme' },
+  description: 'List all schemes in a workspace',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.array(schemeRecordType),
+}
+
+const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Scheme> = {
+  id: 'xcode.schemes.getScheme',
+  permission: 'xcode:schemes:get',
+  target: { command: 'getScheme', resource: 'Scheme' },
+  description: 'Get a scheme by ID',
+  input: t.record({
+    id: t.string({ description: 'Scheme identifier' }),
+  }),
+  output: schemeRecordType,
+}
+
+const runDestinationListRunDestinationsOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  readonly RunDestination[]
+> = {
+  id: 'xcode.rundestinations.listRunDestinations',
+  permission: 'xcode:runDestinations:list',
+  target: { command: 'listRunDestinations', resource: 'RunDestination' },
+  description: 'List all run destinations in a workspace',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.array(runDestinationRecordType),
+}
+
+const runDestinationGetRunDestinationOperation: OperationDescriptor<
+  { readonly name: string },
+  RunDestination
+> = {
+  id: 'xcode.rundestinations.getRunDestination',
+  permission: 'xcode:runDestinations:get',
+  target: { command: 'getRunDestination', resource: 'RunDestination' },
+  description: 'Get a run destination by name',
+  input: t.record({
+    name: t.string({ description: 'Run destination name' }),
+  }),
+  output: runDestinationRecordType,
+}
+
+const workspaceDocumentBuildOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.build',
+  permission: 'xcode:workspace:build',
+  target: { command: 'build', resource: 'WorkspaceDocument' },
+  description: 'Invoke the "build" scheme action',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentCleanOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.clean',
+  permission: 'xcode:workspace:clean',
+  target: { command: 'clean', resource: 'WorkspaceDocument' },
+  description: 'Invoke the "clean" scheme action',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentStopOperation: OperationDescriptor<
+  { readonly workspaceName: string },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.stop',
+  permission: 'xcode:workspace:stop',
+  target: { command: 'stop', resource: 'WorkspaceDocument' },
+  description: 'Stop the active scheme action, if one is running',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentRunOperation: OperationDescriptor<
+  {
+    readonly workspaceName: string
+    readonly withCommandLineArguments?: unknown
+    readonly withEnvironmentVariables?: unknown
+  },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.run',
+  permission: 'xcode:workspace:run',
+  target: { command: 'run', resource: 'WorkspaceDocument' },
+  description: 'Invoke the "run" scheme action',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+    withCommandLineArguments: t.optional(
+      t.unknown({ description: 'Additional command line arguments to pass to the action' })
+    ),
+    withEnvironmentVariables: t.optional(
+      t.unknown({ description: 'Additional environment variables to set for the action' })
+    ),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentTestOperation: OperationDescriptor<
+  {
+    readonly workspaceName: string
+    readonly withCommandLineArguments?: unknown
+    readonly withEnvironmentVariables?: unknown
+  },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.test',
+  permission: 'xcode:workspace:test',
+  target: { command: 'test', resource: 'WorkspaceDocument' },
+  description: 'Invoke the "test" scheme action',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+    withCommandLineArguments: t.optional(
+      t.unknown({ description: 'Additional command line arguments to pass to the action' })
+    ),
+    withEnvironmentVariables: t.optional(
+      t.unknown({ description: 'Additional environment variables to set for the action' })
+    ),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentAttachOperation: OperationDescriptor<
+  {
+    readonly workspaceName: string
+    readonly toProcessIdentifier: Integer
+    readonly suspended: boolean
+  },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.attach',
+  permission: 'xcode:workspace:attach',
+  target: { command: 'attach', resource: 'WorkspaceDocument' },
+  description: 'Start a new debugging session in the workspace',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+    toProcessIdentifier: t.integer({
+      description: 'The process identifier (pid) to which to attach',
+    }),
+    suspended: t.boolean({ description: 'Whether to start debugging in a suspended state' }),
+  }),
+  output: t.none(),
+}
+
+const workspaceDocumentDebugOperation: OperationDescriptor<
+  {
+    readonly workspaceName: string
+    readonly scheme?: string | undefined
+    readonly runDestinationSpecifier?: string | undefined
+    readonly skipBuilding?: boolean | undefined
+    readonly commandLineArguments?: unknown
+    readonly environmentVariables?: unknown
+  },
+  undefined
+> = {
+  id: 'xcode.workspacedocuments.debug',
+  permission: 'xcode:workspace:debug',
+  target: { command: 'debug', resource: 'WorkspaceDocument' },
+  description: 'Start a debugging session using the "run" or "run without building" scheme action',
+  input: t.record({
+    workspaceName: t.string({ description: 'Workspace document name' }),
+    scheme: t.optional(t.string({ description: 'Scheme name' })),
+    runDestinationSpecifier: t.optional(
+      t.string({ description: 'Run destination specifier string' })
+    ),
+    skipBuilding: t.optional(
+      t.boolean({ description: 'Whether to perform "run without building" rather than "run"' })
+    ),
+    commandLineArguments: t.optional(
+      t.unknown({ description: 'Additional command line arguments to pass to the action' })
+    ),
+    environmentVariables: t.optional(
+      t.unknown({ description: 'Additional environment variables to set for the action' })
+    ),
+  }),
+  output: t.none(),
+}
+
+/** Every operation, keyed by its identity. */
+const operations: AppContract<XcodeClient>['operations'] = {
+  'xcode.workspacedocuments.listWorkspaceDocuments':
+    workspaceDocumentListWorkspaceDocumentsOperation,
+  'xcode.workspacedocuments.getWorkspaceDocument': workspaceDocumentGetWorkspaceDocumentOperation,
+  'xcode.projects.listProjects': projectListProjectsOperation,
+  'xcode.projects.getProject': projectGetProjectOperation,
+  'xcode.schemes.listSchemes': schemeListSchemesOperation,
+  'xcode.schemes.getScheme': schemeGetSchemeOperation,
+  'xcode.rundestinations.listRunDestinations': runDestinationListRunDestinationsOperation,
+  'xcode.rundestinations.getRunDestination': runDestinationGetRunDestinationOperation,
+  'xcode.workspacedocuments.build': workspaceDocumentBuildOperation,
+  'xcode.workspacedocuments.clean': workspaceDocumentCleanOperation,
+  'xcode.workspacedocuments.stop': workspaceDocumentStopOperation,
+  'xcode.workspacedocuments.run': workspaceDocumentRunOperation,
+  'xcode.workspacedocuments.test': workspaceDocumentTestOperation,
+  'xcode.workspacedocuments.attach': workspaceDocumentAttachOperation,
+  'xcode.workspacedocuments.debug': workspaceDocumentDebugOperation,
+}
+
+/** Build the client on top of a factory-supplied runtime. */
+function bind(runtime: ClientRuntime): XcodeClient {
+  return {
+    workspacedocuments: {
+      list: (options) =>
+        runtime.invoke(workspaceDocumentListWorkspaceDocumentsOperation, {}, options),
+      get: (name, options) =>
+        runtime.invoke(workspaceDocumentGetWorkspaceDocumentOperation, { name }, options),
+      build: (workspaceName, options) =>
+        runtime.invoke(workspaceDocumentBuildOperation, { workspaceName }, options),
+      clean: (workspaceName, options) =>
+        runtime.invoke(workspaceDocumentCleanOperation, { workspaceName }, options),
+      stop: (workspaceName, options) =>
+        runtime.invoke(workspaceDocumentStopOperation, { workspaceName }, options),
+      run: (workspaceName, withCommandLineArguments, withEnvironmentVariables, options) =>
+        runtime.invoke(
+          workspaceDocumentRunOperation,
+          { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+          options
+        ),
+      test: (workspaceName, withCommandLineArguments, withEnvironmentVariables, options) =>
+        runtime.invoke(
+          workspaceDocumentTestOperation,
+          { workspaceName, withCommandLineArguments, withEnvironmentVariables },
+          options
+        ),
+      attach: (workspaceName, toProcessIdentifier, suspended, options) =>
+        runtime.invoke(
+          workspaceDocumentAttachOperation,
+          { workspaceName, toProcessIdentifier, suspended },
+          options
+        ),
+      debug: (
+        workspaceName,
+        scheme,
+        runDestinationSpecifier,
+        skipBuilding,
+        commandLineArguments,
+        environmentVariables,
+        options
+      ) =>
+        runtime.invoke(
+          workspaceDocumentDebugOperation,
+          {
+            workspaceName,
+            scheme,
+            runDestinationSpecifier,
+            skipBuilding,
+            commandLineArguments,
+            environmentVariables,
+          },
+          options
+        ),
+    },
+    projects: {
+      list: (workspaceName, options) =>
+        runtime.invoke(projectListProjectsOperation, { workspaceName }, options),
+      get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
+    },
+    schemes: {
+      list: (workspaceName, options) =>
+        runtime.invoke(schemeListSchemesOperation, { workspaceName }, options),
+      get: (id, options) => runtime.invoke(schemeGetSchemeOperation, { id }, options),
+    },
+    rundestinations: {
+      list: (workspaceName, options) =>
+        runtime.invoke(runDestinationListRunDestinationsOperation, { workspaceName }, options),
+      get: (name, options) =>
+        runtime.invoke(runDestinationGetRunDestinationOperation, { name }, options),
+    },
+  }
+}
+
+/**
+ * The Xcode contract. Pass it to a client factory to obtain a
+ * {@link XcodeClient}.
+ */
+export const xcodeContract: AppContract<XcodeClient> = {
+  app: 'xcode',
+  operations,
+  resources,
+  loadManifest: async () => (await import('./manifest.js')).manifest,
+  bind,
+}

@@ -20,6 +20,10 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "import": "./dist/cli/index.js"
+    },
+    "./contract": {
+      "types": "./dist/contract/index.d.ts",
+      "import": "./dist/contract/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -28,7 +32,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "keywords": [
     "macts-sdk",
@@ -43,6 +47,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@macts/contracts": "workspace:*",
     "zod": "catalog:"
   },
   "peerDependencies": {

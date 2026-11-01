@@ -1,0 +1,1228 @@
+/**
+ * The OmniPlan contract: the transport-neutral description of every
+ * OmniPlan operation.
+ *
+ * It declares the types callers work with (records, create and update inputs,
+ * enums, and the `OmniPlanClient` interface) and one descriptor per operation:
+ * its identity, the permission it requires, and the value types of its input
+ * and result. Its resource table tells references how to identify and resolve
+ * the objects they point to.
+ *
+ * The contract performs no I/O. A client is created from it by a client
+ * factory, local or remote, which supplies the runtime that `bind` turns into
+ * a `OmniPlanClient`; application code changes locality by changing the factory,
+ * not the contract.
+ *
+ * @example
+ * ```ts
+ * import { createClient } from '@macts/sdk'
+ * import { omniPlanContract } from '@macts/omniplan/contract'
+ *
+ * const client = createClient(omniPlanContract, { token, url })
+ * ```
+ *
+ * Generated from the OmniPlan manifest; do not edit.
+ *
+ * @packageDocumentation
+ */
+
+import {
+  ValueTypes,
+  type AppContract,
+  type CallOptions,
+  type ClientRuntime,
+  type Integer,
+  type OperationDescriptor,
+  type ValueType,
+} from '@macts/contracts'
+
+const t = ValueTypes
+
+/** Type of task */
+export type TaskType = 'standardTask' | 'milestoneTask' | 'groupTask' | 'hammockTask'
+
+/** Status of a task */
+export type TaskStatus = 'ok' | 'closeToDueDate' | 'dueNow' | 'pastDue' | 'finished'
+
+/** Type of resource */
+export type ResourceType = 'person' | 'equipment' | 'material' | 'resourceGroup'
+
+/** Type of dependency between tasks */
+export type DependencyType = 'startstart' | 'startfinish' | 'finishstart' | 'finishfinish'
+
+/** Granularity for task scheduling */
+export type SchedulingGranularity = 'exactScheduling' | 'hourlyScheduling' | 'dailyScheduling'
+
+/** An OmniPlan project */
+export interface Project {
+  /** The unique identifier for the project */
+  readonly id: string
+  /** The project's name */
+  readonly name: string
+  /** The date on which work can begin */
+  startingDate: Date
+  /** The date on which work is complete */
+  readonly endingDate: Date
+  /** The cost of the entire project */
+  readonly totalCost: number
+  /** The percentage of the project which is complete (1.0 = 100%) */
+  readonly completed: number
+  /** The total duration of the project in seconds */
+  readonly duration: number
+  /** The number of person-seconds required to complete the project */
+  readonly effort: number
+}
+
+/** A task within an OmniPlan project */
+export interface Task {
+  /** Internal identifier for this task */
+  readonly id: Integer
+  /** The name of the task */
+  name: string
+  /** The date on which work begins */
+  startingDate: Date
+  /** The date on which work ends */
+  endingDate: Date
+  /** The number of working seconds occupied by task */
+  duration: number
+  /** The number of person-seconds required to perform the task */
+  effort: number
+  /** The percentage of the task which is complete (1.0 = 100%) */
+  completed: number
+  /** The person-seconds completed */
+  completedEffort: number
+  /** The person-seconds remaining */
+  readonly remainingEffort: number
+  /** Priority of this task */
+  priority: Integer
+  /** The status of the current task */
+  readonly taskStatus: TaskStatus
+  /** Whether this task is a standard task, milestone, group, or hammock */
+  taskType: TaskType
+  /** Cost for this task itself */
+  staticCost: number
+  /** Cost for paying resources assigned to this task */
+  readonly resourceCost: number
+  /** Total cost for this task */
+  readonly totalCost: number
+  /** The depth or level of this task in the project hierarchy */
+  readonly outlineDepth: Integer
+  /** The hierarchical or WBS number of this task */
+  readonly outlineNumber: string
+  /** The earliest date this task may start */
+  startingConstraintDate: Date
+  /** The latest date this task may end */
+  endingConstraintDate: Date
+  /** Whether the start date is locked or not */
+  startingDateLocked: boolean
+  /** Whether the end date is locked or not */
+  endingDateLocked: boolean
+  /** Notes */
+  note: string
+}
+
+/** A milestone (zero-duration marker task) */
+export interface Milestone {
+  /** Internal identifier for this milestone */
+  readonly id: Integer
+  /** The name of the milestone */
+  name: string
+  /** The date of the milestone */
+  startingDate: Date
+  /** Notes */
+  note: string
+}
+
+/** A resource (person, equipment, or material) */
+export interface Resource {
+  /** Internal identifier for this resource */
+  readonly id: Integer
+  /** The name of the resource */
+  name: string
+  /** Type of the resource */
+  resourceType: ResourceType
+  /** The total number of units for this resource (1.0 = 100%) */
+  number: number
+  /** Email address for this resource */
+  emailAddress: string
+  /** The fixed cost per use of this resource */
+  costPerUse: number
+  /** The cost per hour of this resource */
+  costPerHour: number
+  /** Resource efficiency (1.0 = 100%) */
+  efficiency: number
+  /** Total number of uses of this resource */
+  readonly totalUses: Integer
+  /** Total seconds worked by this resource */
+  readonly totalSeconds: number
+  /** Total cost of all assignments for this resource */
+  readonly totalCost: number
+  /** Notes */
+  note: string
+  /** The depth or level of this resource in the hierarchy */
+  readonly outlineDepth: Integer
+}
+
+/** An assignment of a resource to a task */
+export interface Assignment {
+  /** Units of the resource required for this task (1.0 = 100%) */
+  units: number
+}
+
+/** A dependency of one task upon another task */
+export interface Dependency {
+  /** Type of dependency */
+  dependencyType: DependencyType
+  /** The number of seconds of lead time required between the tasks */
+  leadTime: number
+  /** The lead time, in percentage of the length of the prerequisite */
+  leadPercentage: number
+}
+
+/** A scheduling conflict or issue */
+export interface Violation {
+  /** The type of violation */
+  readonly violationType: string
+  /** The short description of this violation */
+  readonly shortDescription: string
+  /** The long description HTML for this violation */
+  readonly html: string
+}
+
+/** An alternative project plan */
+export interface Scenario {
+  /** The unique identifier for the scenario */
+  readonly id: string
+  /** The name of the scenario */
+  name: string
+  /** The date on which work can begin */
+  startingDate: Date
+  /** The date on which work is complete */
+  readonly endingDate: Date
+  /** The cost of the entire project */
+  readonly totalCost: number
+  /** The percentage complete (1.0 = 100%) */
+  readonly completed: number
+  /** The total duration in seconds */
+  readonly duration: number
+  /** The number of person-seconds required */
+  readonly effort: number
+  /** Number of violations in the scenario */
+  readonly violationCount: Integer
+  /** Scheduling granularity for this scenario */
+  schedulingGranularity: SchedulingGranularity
+}
+
+/** A schedule of working time */
+export type Schedule = Record<string, never>
+
+/** A locale based currency object */
+export interface Currency {
+  /** Locale code for this currency */
+  readonly code: string
+  /** Name for this currency */
+  readonly name: string
+  /** Symbol for this currency */
+  readonly symbol: string
+}
+
+/** Input for creating a Project. */
+export interface ProjectCreateInput {
+  /** The date on which work can begin */
+  startingDate?: Date
+}
+
+/** Input for updating a Project. Omitted fields are left unchanged. */
+export interface ProjectUpdateInput {
+  /** The date on which work can begin */
+  startingDate?: Date
+}
+
+/** Input for creating a Task. */
+export interface TaskCreateInput {
+  /** Task name */
+  name: string
+  /** Start date */
+  startingDate?: Date
+  /** The date on which work ends */
+  endingDate?: Date
+  /** Duration in seconds */
+  duration?: number
+  /** The number of person-seconds required to perform the task */
+  effort?: number
+  /** The percentage of the task which is complete (1.0 = 100%) */
+  completed?: number
+  /** The person-seconds completed */
+  completedEffort?: number
+  /** Priority of this task */
+  priority?: Integer
+  /** Whether this task is a standard task, milestone, group, or hammock */
+  taskType?: TaskType
+  /** Cost for this task itself */
+  staticCost?: number
+  /** The earliest date this task may start */
+  startingConstraintDate?: Date
+  /** The latest date this task may end */
+  endingConstraintDate?: Date
+  /** Whether the start date is locked or not */
+  startingDateLocked?: boolean
+  /** Whether the end date is locked or not */
+  endingDateLocked?: boolean
+  /** Notes */
+  note?: string
+}
+
+/** Input for updating a Task. Omitted fields are left unchanged. */
+export interface TaskUpdateInput {
+  /** Task name */
+  name?: string
+  /** Start date */
+  startingDate?: Date
+  /** The date on which work ends */
+  endingDate?: Date
+  /** Duration in seconds */
+  duration?: number
+  /** The number of person-seconds required to perform the task */
+  effort?: number
+  /** The percentage of the task which is complete (1.0 = 100%) */
+  completed?: number
+  /** The person-seconds completed */
+  completedEffort?: number
+  /** Priority of this task */
+  priority?: Integer
+  /** Whether this task is a standard task, milestone, group, or hammock */
+  taskType?: TaskType
+  /** Cost for this task itself */
+  staticCost?: number
+  /** The earliest date this task may start */
+  startingConstraintDate?: Date
+  /** The latest date this task may end */
+  endingConstraintDate?: Date
+  /** Whether the start date is locked or not */
+  startingDateLocked?: boolean
+  /** Whether the end date is locked or not */
+  endingDateLocked?: boolean
+  /** Notes */
+  note?: string
+}
+
+/** Input for creating a Milestone. */
+export interface MilestoneCreateInput {
+  /** Milestone name */
+  name: string
+  /** Milestone date */
+  startingDate?: Date
+  /** Notes */
+  note?: string
+}
+
+/** Input for updating a Milestone. Omitted fields are left unchanged. */
+export interface MilestoneUpdateInput {
+  /** Milestone name */
+  name?: string
+  /** Milestone date */
+  startingDate?: Date
+  /** Notes */
+  note?: string
+}
+
+/** Input for creating a Resource. */
+export interface ResourceCreateInput {
+  /** Resource name */
+  name: string
+  /** Resource type */
+  resourceType?: ResourceType
+  /** The total number of units for this resource (1.0 = 100%) */
+  number?: number
+  /** Email address for this resource */
+  emailAddress?: string
+  /** The fixed cost per use of this resource */
+  costPerUse?: number
+  /** The cost per hour of this resource */
+  costPerHour?: number
+  /** Resource efficiency (1.0 = 100%) */
+  efficiency?: number
+  /** Notes */
+  note?: string
+}
+
+/** Input for updating a Resource. Omitted fields are left unchanged. */
+export interface ResourceUpdateInput {
+  /** Resource name */
+  name?: string
+  /** Resource type */
+  resourceType?: ResourceType
+  /** The total number of units for this resource (1.0 = 100%) */
+  number?: number
+  /** Email address for this resource */
+  emailAddress?: string
+  /** The fixed cost per use of this resource */
+  costPerUse?: number
+  /** The cost per hour of this resource */
+  costPerHour?: number
+  /** Resource efficiency (1.0 = 100%) */
+  efficiency?: number
+  /** Notes */
+  note?: string
+}
+
+/** Input for creating an Assignment. */
+export interface AssignmentCreateInput {
+  /** Units of the resource required for this task (1.0 = 100%) */
+  units?: number
+}
+
+/** Input for updating an Assignment. Omitted fields are left unchanged. */
+export interface AssignmentUpdateInput {
+  /** Units of the resource required for this task (1.0 = 100%) */
+  units?: number
+}
+
+/** Input for creating a Dependency. */
+export interface DependencyCreateInput {
+  /** Type of dependency */
+  dependencyType?: DependencyType
+  /** The number of seconds of lead time required between the tasks */
+  leadTime?: number
+  /** The lead time, in percentage of the length of the prerequisite */
+  leadPercentage?: number
+}
+
+/** Input for updating a Dependency. Omitted fields are left unchanged. */
+export interface DependencyUpdateInput {
+  /** Type of dependency */
+  dependencyType?: DependencyType
+  /** The number of seconds of lead time required between the tasks */
+  leadTime?: number
+  /** The lead time, in percentage of the length of the prerequisite */
+  leadPercentage?: number
+}
+
+/** Input for creating a Violation. */
+export type ViolationCreateInput = Record<string, never>
+
+/** Input for updating a Violation. Omitted fields are left unchanged. */
+export type ViolationUpdateInput = Record<string, never>
+
+/** Input for creating a Scenario. */
+export interface ScenarioCreateInput {
+  /** The name of the scenario */
+  name?: string
+  /** The date on which work can begin */
+  startingDate?: Date
+  /** Scheduling granularity for this scenario */
+  schedulingGranularity?: SchedulingGranularity
+}
+
+/** Input for updating a Scenario. Omitted fields are left unchanged. */
+export interface ScenarioUpdateInput {
+  /** The name of the scenario */
+  name?: string
+  /** The date on which work can begin */
+  startingDate?: Date
+  /** Scheduling granularity for this scenario */
+  schedulingGranularity?: SchedulingGranularity
+}
+
+/** Input for creating a Schedule. */
+export type ScheduleCreateInput = Record<string, never>
+
+/** Input for updating a Schedule. Omitted fields are left unchanged. */
+export type ScheduleUpdateInput = Record<string, never>
+
+/** Input for creating a Currency. */
+export type CurrencyCreateInput = Record<string, never>
+
+/** Input for updating a Currency. Omitted fields are left unchanged. */
+export type CurrencyUpdateInput = Record<string, never>
+
+/** An OmniPlan project */
+export interface ProjectResourceClient {
+  /** List projects. */
+  list(options?: CallOptions): Promise<readonly Project[]>
+  /** Read the project identified by `id`. */
+  get(id: string, options?: CallOptions): Promise<Project>
+}
+
+/** A task within an OmniPlan project */
+export interface TaskResourceClient {
+  /** List tasks. */
+  list(options?: CallOptions): Promise<readonly Task[]>
+  /** Read the task identified by `id`. */
+  get(id: Integer, options?: CallOptions): Promise<Task>
+  /** Create a task. */
+  create(input: TaskCreateInput, options?: CallOptions): Promise<Task>
+}
+
+/** A milestone (zero-duration marker task) */
+export interface MilestoneResourceClient {
+  /** List milestones. */
+  list(options?: CallOptions): Promise<readonly Milestone[]>
+  /** Read the milestone identified by `id`. */
+  get(id: Integer, options?: CallOptions): Promise<Milestone>
+  /** Create a milestone. */
+  create(input: MilestoneCreateInput, options?: CallOptions): Promise<Milestone>
+}
+
+/** A resource (person, equipment, or material) */
+export interface ResourceResourceClient {
+  /** List resources. */
+  list(options?: CallOptions): Promise<readonly Resource[]>
+  /** Read the resource identified by `id`. */
+  get(id: Integer, options?: CallOptions): Promise<Resource>
+  /** Create a resource. */
+  create(input: ResourceCreateInput, options?: CallOptions): Promise<Resource>
+}
+
+/** An assignment of a resource to a task */
+export interface AssignmentResourceClient {
+  /** List assignments. */
+  list(options?: CallOptions): Promise<readonly Assignment[]>
+}
+
+/** A dependency of one task upon another task */
+export interface DependencyResourceClient {
+  /** List dependencies. */
+  list(options?: CallOptions): Promise<readonly Dependency[]>
+}
+
+/** A scheduling conflict or issue */
+export interface ViolationResourceClient {
+  /** List violations. */
+  list(options?: CallOptions): Promise<readonly Violation[]>
+  /** Fix a violation */
+  fix(options?: CallOptions): Promise<void>
+}
+
+/** An alternative project plan */
+export interface ScenarioResourceClient {
+  /** List scenarios. */
+  list(options?: CallOptions): Promise<readonly Scenario[]>
+  /** Read the scenario identified by `id`. */
+  get(id: string, options?: CallOptions): Promise<Scenario>
+}
+
+/**
+ * The OmniPlan client: one namespace per resource that has operations, plus the app's own commands.
+ * A client factory creates one from {@link omniPlanContract}.
+ */
+export interface OmniPlanClient {
+  /** An OmniPlan project */
+  readonly projects: ProjectResourceClient
+  /** A task within an OmniPlan project */
+  readonly tasks: TaskResourceClient
+  /** A milestone (zero-duration marker task) */
+  readonly milestones: MilestoneResourceClient
+  /** A resource (person, equipment, or material) */
+  readonly resources: ResourceResourceClient
+  /** An assignment of a resource to a task */
+  readonly assignments: AssignmentResourceClient
+  /** A dependency of one task upon another task */
+  readonly dependencies: DependencyResourceClient
+  /** A scheduling conflict or issue */
+  readonly violations: ViolationResourceClient
+  /** An alternative project plan */
+  readonly scenarios: ScenarioResourceClient
+  /** Export a document */
+  _export(to: string, options?: CallOptions): Promise<void>
+  /** Assign resources to tasks */
+  assign(resource: string, task: string, options?: CallOptions): Promise<void>
+  /** Create a dependency between tasks */
+  depend(prerequisite: string, dependent: string, options?: CallOptions): Promise<void>
+  /** Commit the current schedule as the baseline schedule */
+  baseline(options?: CallOptions): Promise<void>
+  /** Level resources on project */
+  level(options?: CallOptions): Promise<void>
+  /** Look up a task via a custom data key */
+  lookup(key: string, options?: CallOptions): Promise<void>
+  /** Make a change tracking mark on project */
+  changeMark(options?: CallOptions): Promise<void>
+  /** Add working hours to a schedule */
+  addWorkTime(schedule: string, options?: CallOptions): Promise<void>
+  /** Remove working hours from a schedule */
+  subtractWorkTime(schedule: string, options?: CallOptions): Promise<void>
+  /** Undo the last command */
+  undo(options?: CallOptions): Promise<void>
+  /** Redo the last undone command */
+  redo(options?: CallOptions): Promise<void>
+}
+
+/** The members of {@link TaskType}, for its value type. */
+const taskTypeMembers = ['standardTask', 'milestoneTask', 'groupTask', 'hammockTask'] as const
+
+/** The members of {@link TaskStatus}, for its value type. */
+const taskStatusMembers = ['ok', 'closeToDueDate', 'dueNow', 'pastDue', 'finished'] as const
+
+/** The members of {@link ResourceType}, for its value type. */
+const resourceTypeMembers = ['person', 'equipment', 'material', 'resourceGroup'] as const
+
+/** The members of {@link DependencyType}, for its value type. */
+const dependencyTypeMembers = ['startstart', 'startfinish', 'finishstart', 'finishfinish'] as const
+
+/** The members of {@link SchedulingGranularity}, for its value type. */
+const schedulingGranularityMembers = [
+  'exactScheduling',
+  'hourlyScheduling',
+  'dailyScheduling',
+] as const
+
+const projectRecordType: ValueType<Project> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the project' }),
+    name: t.string({ description: "The project's name" }),
+    startingDate: t.date({ description: 'The date on which work can begin' }),
+    endingDate: t.date({ description: 'The date on which work is complete' }),
+    totalCost: t.double({ description: 'The cost of the entire project' }),
+    completed: t.double({
+      description: 'The percentage of the project which is complete (1.0 = 100%)',
+    }),
+    duration: t.double({ description: 'The total duration of the project in seconds' }),
+    effort: t.double({
+      description: 'The number of person-seconds required to complete the project',
+    }),
+  },
+  { description: 'An OmniPlan project' }
+)
+
+const taskRecordType: ValueType<Task> = t.record(
+  {
+    id: t.integer({ description: 'Internal identifier for this task' }),
+    name: t.string({ description: 'The name of the task' }),
+    startingDate: t.date({ description: 'The date on which work begins' }),
+    endingDate: t.date({ description: 'The date on which work ends' }),
+    duration: t.double({ description: 'The number of working seconds occupied by task' }),
+    effort: t.double({ description: 'The number of person-seconds required to perform the task' }),
+    completed: t.double({
+      description: 'The percentage of the task which is complete (1.0 = 100%)',
+    }),
+    completedEffort: t.double({ description: 'The person-seconds completed' }),
+    remainingEffort: t.double({ description: 'The person-seconds remaining' }),
+    priority: t.integer({ description: 'Priority of this task' }),
+    taskStatus: t.enumeration(taskStatusMembers, { description: 'The status of the current task' }),
+    taskType: t.enumeration(taskTypeMembers, {
+      description: 'Whether this task is a standard task, milestone, group, or hammock',
+    }),
+    staticCost: t.double({ description: 'Cost for this task itself' }),
+    resourceCost: t.double({ description: 'Cost for paying resources assigned to this task' }),
+    totalCost: t.double({ description: 'Total cost for this task' }),
+    outlineDepth: t.integer({
+      description: 'The depth or level of this task in the project hierarchy',
+    }),
+    outlineNumber: t.string({ description: 'The hierarchical or WBS number of this task' }),
+    startingConstraintDate: t.date({ description: 'The earliest date this task may start' }),
+    endingConstraintDate: t.date({ description: 'The latest date this task may end' }),
+    startingDateLocked: t.boolean({ description: 'Whether the start date is locked or not' }),
+    endingDateLocked: t.boolean({ description: 'Whether the end date is locked or not' }),
+    note: t.string({ description: 'Notes' }),
+  },
+  { description: 'A task within an OmniPlan project' }
+)
+
+const milestoneRecordType: ValueType<Milestone> = t.record(
+  {
+    id: t.integer({ description: 'Internal identifier for this milestone' }),
+    name: t.string({ description: 'The name of the milestone' }),
+    startingDate: t.date({ description: 'The date of the milestone' }),
+    note: t.string({ description: 'Notes' }),
+  },
+  { description: 'A milestone (zero-duration marker task)' }
+)
+
+const resourceRecordType: ValueType<Resource> = t.record(
+  {
+    id: t.integer({ description: 'Internal identifier for this resource' }),
+    name: t.string({ description: 'The name of the resource' }),
+    resourceType: t.enumeration(resourceTypeMembers, { description: 'Type of the resource' }),
+    number: t.double({ description: 'The total number of units for this resource (1.0 = 100%)' }),
+    emailAddress: t.string({ description: 'Email address for this resource' }),
+    costPerUse: t.double({ description: 'The fixed cost per use of this resource' }),
+    costPerHour: t.double({ description: 'The cost per hour of this resource' }),
+    efficiency: t.double({ description: 'Resource efficiency (1.0 = 100%)' }),
+    totalUses: t.integer({ description: 'Total number of uses of this resource' }),
+    totalSeconds: t.double({ description: 'Total seconds worked by this resource' }),
+    totalCost: t.double({ description: 'Total cost of all assignments for this resource' }),
+    note: t.string({ description: 'Notes' }),
+    outlineDepth: t.integer({
+      description: 'The depth or level of this resource in the hierarchy',
+    }),
+  },
+  { description: 'A resource (person, equipment, or material)' }
+)
+
+const assignmentRecordType: ValueType<Assignment> = t.record(
+  {
+    units: t.double({ description: 'Units of the resource required for this task (1.0 = 100%)' }),
+  },
+  { description: 'An assignment of a resource to a task' }
+)
+
+const dependencyRecordType: ValueType<Dependency> = t.record(
+  {
+    dependencyType: t.enumeration(dependencyTypeMembers, { description: 'Type of dependency' }),
+    leadTime: t.double({
+      description: 'The number of seconds of lead time required between the tasks',
+    }),
+    leadPercentage: t.double({
+      description: 'The lead time, in percentage of the length of the prerequisite',
+    }),
+  },
+  { description: 'A dependency of one task upon another task' }
+)
+
+const violationRecordType: ValueType<Violation> = t.record(
+  {
+    violationType: t.string({ description: 'The type of violation' }),
+    shortDescription: t.string({ description: 'The short description of this violation' }),
+    html: t.string({ description: 'The long description HTML for this violation' }),
+  },
+  { description: 'A scheduling conflict or issue' }
+)
+
+const scenarioRecordType: ValueType<Scenario> = t.record(
+  {
+    id: t.string({ description: 'The unique identifier for the scenario' }),
+    name: t.string({ description: 'The name of the scenario' }),
+    startingDate: t.date({ description: 'The date on which work can begin' }),
+    endingDate: t.date({ description: 'The date on which work is complete' }),
+    totalCost: t.double({ description: 'The cost of the entire project' }),
+    completed: t.double({ description: 'The percentage complete (1.0 = 100%)' }),
+    duration: t.double({ description: 'The total duration in seconds' }),
+    effort: t.double({ description: 'The number of person-seconds required' }),
+    violationCount: t.integer({ description: 'Number of violations in the scenario' }),
+    schedulingGranularity: t.enumeration(schedulingGranularityMembers, {
+      description: 'Scheduling granularity for this scenario',
+    }),
+  },
+  { description: 'An alternative project plan' }
+)
+
+const scheduleRecordType: ValueType<Schedule> = t.record(
+  {},
+  { description: 'A schedule of working time' }
+)
+
+const currencyRecordType: ValueType<Currency> = t.record(
+  {
+    code: t.string({ description: 'Locale code for this currency' }),
+    name: t.string({ description: 'Name for this currency' }),
+    symbol: t.string({ description: 'Symbol for this currency' }),
+  },
+  { description: 'A locale based currency object' }
+)
+
+const taskCreateInputType: ValueType<TaskCreateInput> = t.record({
+  name: t.string({ description: 'Task name' }),
+  startingDate: t.optional(t.date({ description: 'Start date' })),
+  endingDate: t.optional(t.date({ description: 'The date on which work ends' })),
+  duration: t.optional(t.double({ description: 'Duration in seconds' })),
+  effort: t.optional(
+    t.double({ description: 'The number of person-seconds required to perform the task' })
+  ),
+  completed: t.optional(
+    t.double({ description: 'The percentage of the task which is complete (1.0 = 100%)' })
+  ),
+  completedEffort: t.optional(t.double({ description: 'The person-seconds completed' })),
+  priority: t.optional(t.integer({ description: 'Priority of this task' })),
+  taskType: t.optional(
+    t.enumeration(taskTypeMembers, {
+      description: 'Whether this task is a standard task, milestone, group, or hammock',
+    })
+  ),
+  staticCost: t.optional(t.double({ description: 'Cost for this task itself' })),
+  startingConstraintDate: t.optional(
+    t.date({ description: 'The earliest date this task may start' })
+  ),
+  endingConstraintDate: t.optional(t.date({ description: 'The latest date this task may end' })),
+  startingDateLocked: t.optional(
+    t.boolean({ description: 'Whether the start date is locked or not' })
+  ),
+  endingDateLocked: t.optional(t.boolean({ description: 'Whether the end date is locked or not' })),
+  note: t.optional(t.string({ description: 'Notes' })),
+})
+
+const milestoneCreateInputType: ValueType<MilestoneCreateInput> = t.record({
+  name: t.string({ description: 'Milestone name' }),
+  startingDate: t.optional(t.date({ description: 'Milestone date' })),
+  note: t.optional(t.string({ description: 'Notes' })),
+})
+
+const resourceCreateInputType: ValueType<ResourceCreateInput> = t.record({
+  name: t.string({ description: 'Resource name' }),
+  resourceType: t.optional(t.enumeration(resourceTypeMembers, { description: 'Resource type' })),
+  number: t.optional(
+    t.double({ description: 'The total number of units for this resource (1.0 = 100%)' })
+  ),
+  emailAddress: t.optional(t.string({ description: 'Email address for this resource' })),
+  costPerUse: t.optional(t.double({ description: 'The fixed cost per use of this resource' })),
+  costPerHour: t.optional(t.double({ description: 'The cost per hour of this resource' })),
+  efficiency: t.optional(t.double({ description: 'Resource efficiency (1.0 = 100%)' })),
+  note: t.optional(t.string({ description: 'Notes' })),
+})
+
+/**
+ * Every resource, keyed by manifest resource key: its record, its identifier
+ * (when it has one), and the operations that resolve references to it. This
+ * table is also the registry that reference value types read, lazily.
+ */
+const resources: AppContract<OmniPlanClient>['resources'] = {
+  Project: {
+    name: 'Project',
+    record: projectRecordType,
+    id: t.string({ description: 'The unique identifier for the project' }),
+    get: 'omniplan.projects.getProject',
+    list: 'omniplan.projects.listProjects',
+  },
+  Task: {
+    name: 'Task',
+    record: taskRecordType,
+    id: t.integer({ description: 'Internal identifier for this task' }),
+    get: 'omniplan.tasks.getTask',
+    list: 'omniplan.tasks.listTasks',
+  },
+  Milestone: {
+    name: 'Milestone',
+    record: milestoneRecordType,
+    id: t.integer({ description: 'Internal identifier for this milestone' }),
+    get: 'omniplan.milestones.getMilestone',
+    list: 'omniplan.milestones.listMilestones',
+  },
+  Resource: {
+    name: 'Resource',
+    record: resourceRecordType,
+    id: t.integer({ description: 'Internal identifier for this resource' }),
+    get: 'omniplan.resources.getResource',
+    list: 'omniplan.resources.listResources',
+  },
+  Assignment: {
+    name: 'Assignment',
+    record: assignmentRecordType,
+    list: 'omniplan.assignments.listAssignments',
+  },
+  Dependency: {
+    name: 'Dependency',
+    record: dependencyRecordType,
+    list: 'omniplan.dependencies.listDependencies',
+  },
+  Violation: {
+    name: 'Violation',
+    record: violationRecordType,
+    list: 'omniplan.violations.listViolations',
+  },
+  Scenario: {
+    name: 'Scenario',
+    record: scenarioRecordType,
+    id: t.string({ description: 'The unique identifier for the scenario' }),
+    get: 'omniplan.scenarios.getScenario',
+    list: 'omniplan.scenarios.listScenarios',
+  },
+  Schedule: {
+    name: 'Schedule',
+    record: scheduleRecordType,
+  },
+  Currency: {
+    name: 'Currency',
+    record: currencyRecordType,
+  },
+}
+
+const projectListProjectsOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Project[]
+> = {
+  id: 'omniplan.projects.listProjects',
+  permission: 'omniplan:projects:list',
+  target: { command: 'listProjects', resource: 'Project' },
+  description: 'List all projects',
+  input: t.record({}),
+  output: t.array(projectRecordType),
+}
+
+const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
+  id: 'omniplan.projects.getProject',
+  permission: 'omniplan:projects:get',
+  target: { command: 'getProject', resource: 'Project' },
+  description: 'Get a project',
+  input: t.record({
+    id: t.string({ description: 'Project identifier' }),
+  }),
+  output: projectRecordType,
+}
+
+const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
+  id: 'omniplan.tasks.listTasks',
+  permission: 'omniplan:tasks:list',
+  target: { command: 'listTasks', resource: 'Task' },
+  description: 'List all tasks',
+  input: t.record({}),
+  output: t.array(taskRecordType),
+}
+
+const taskGetTaskOperation: OperationDescriptor<{ readonly id: Integer }, Task> = {
+  id: 'omniplan.tasks.getTask',
+  permission: 'omniplan:tasks:get',
+  target: { command: 'getTask', resource: 'Task' },
+  description: 'Get a task by ID',
+  input: t.record({
+    id: t.integer({ description: 'Task identifier' }),
+  }),
+  output: taskRecordType,
+}
+
+const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
+  id: 'omniplan.tasks.createTask',
+  permission: 'omniplan:tasks:create',
+  target: { command: 'createTask', resource: 'Task' },
+  description: 'Create a new task',
+  input: taskCreateInputType,
+  output: taskRecordType,
+}
+
+const milestoneListMilestonesOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Milestone[]
+> = {
+  id: 'omniplan.milestones.listMilestones',
+  permission: 'omniplan:milestones:list',
+  target: { command: 'listMilestones', resource: 'Milestone' },
+  description: 'List all milestones',
+  input: t.record({}),
+  output: t.array(milestoneRecordType),
+}
+
+const milestoneGetMilestoneOperation: OperationDescriptor<{ readonly id: Integer }, Milestone> = {
+  id: 'omniplan.milestones.getMilestone',
+  permission: 'omniplan:milestones:get',
+  target: { command: 'getMilestone', resource: 'Milestone' },
+  description: 'Get a milestone by ID',
+  input: t.record({
+    id: t.integer({ description: 'Milestone identifier' }),
+  }),
+  output: milestoneRecordType,
+}
+
+const milestoneCreateMilestoneOperation: OperationDescriptor<MilestoneCreateInput, Milestone> = {
+  id: 'omniplan.milestones.createMilestone',
+  permission: 'omniplan:milestones:create',
+  target: { command: 'createMilestone', resource: 'Milestone' },
+  description: 'Create a new milestone',
+  input: milestoneCreateInputType,
+  output: milestoneRecordType,
+}
+
+const resourceListResourcesOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Resource[]
+> = {
+  id: 'omniplan.resources.listResources',
+  permission: 'omniplan:resources:list',
+  target: { command: 'listResources', resource: 'Resource' },
+  description: 'List all resources',
+  input: t.record({}),
+  output: t.array(resourceRecordType),
+}
+
+const resourceGetResourceOperation: OperationDescriptor<{ readonly id: Integer }, Resource> = {
+  id: 'omniplan.resources.getResource',
+  permission: 'omniplan:resources:get',
+  target: { command: 'getResource', resource: 'Resource' },
+  description: 'Get a resource by ID',
+  input: t.record({
+    id: t.integer({ description: 'Resource identifier' }),
+  }),
+  output: resourceRecordType,
+}
+
+const resourceCreateResourceOperation: OperationDescriptor<ResourceCreateInput, Resource> = {
+  id: 'omniplan.resources.createResource',
+  permission: 'omniplan:resources:create',
+  target: { command: 'createResource', resource: 'Resource' },
+  description: 'Create a new resource',
+  input: resourceCreateInputType,
+  output: resourceRecordType,
+}
+
+const assignmentListAssignmentsOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Assignment[]
+> = {
+  id: 'omniplan.assignments.listAssignments',
+  permission: 'omniplan:assignments:list',
+  target: { command: 'listAssignments', resource: 'Assignment' },
+  description: 'List all assignments',
+  input: t.record({}),
+  output: t.array(assignmentRecordType),
+}
+
+const dependencyListDependenciesOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Dependency[]
+> = {
+  id: 'omniplan.dependencies.listDependencies',
+  permission: 'omniplan:dependencies:list',
+  target: { command: 'listDependencies', resource: 'Dependency' },
+  description: 'List all dependencies',
+  input: t.record({}),
+  output: t.array(dependencyRecordType),
+}
+
+const violationListViolationsOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Violation[]
+> = {
+  id: 'omniplan.violations.listViolations',
+  permission: 'omniplan:violations:list',
+  target: { command: 'listViolations', resource: 'Violation' },
+  description: 'List all violations',
+  input: t.record({}),
+  output: t.array(violationRecordType),
+}
+
+const scenarioListScenariosOperation: OperationDescriptor<
+  Record<string, never>,
+  readonly Scenario[]
+> = {
+  id: 'omniplan.scenarios.listScenarios',
+  permission: 'omniplan:scenarios:list',
+  target: { command: 'listScenarios', resource: 'Scenario' },
+  description: 'List all scenarios',
+  input: t.record({}),
+  output: t.array(scenarioRecordType),
+}
+
+const scenarioGetScenarioOperation: OperationDescriptor<{ readonly id: string }, Scenario> = {
+  id: 'omniplan.scenarios.getScenario',
+  permission: 'omniplan:scenarios:get',
+  target: { command: 'getScenario', resource: 'Scenario' },
+  description: 'Get a scenario by ID',
+  input: t.record({
+    id: t.string({ description: 'Scenario identifier' }),
+  }),
+  output: scenarioRecordType,
+}
+
+const appExportOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
+  id: 'omniplan.app.export',
+  permission: 'omniplan:app:export',
+  target: { command: 'export' },
+  description: 'Export a document',
+  input: t.record({
+    to: t.string({ description: 'Export file path' }),
+  }),
+  output: t.none(),
+}
+
+const appAssignOperation: OperationDescriptor<
+  { readonly resource: string; readonly task: string },
+  undefined
+> = {
+  id: 'omniplan.app.assign',
+  permission: 'omniplan:app:assign',
+  target: { command: 'assign' },
+  description: 'Assign resources to tasks',
+  input: t.record({
+    resource: t.string({ description: 'Resource to assign' }),
+    task: t.string({ description: 'Task to assign to' }),
+  }),
+  output: t.none(),
+}
+
+const appDependOperation: OperationDescriptor<
+  { readonly prerequisite: string; readonly dependent: string },
+  undefined
+> = {
+  id: 'omniplan.app.depend',
+  permission: 'omniplan:app:depend',
+  target: { command: 'depend' },
+  description: 'Create a dependency between tasks',
+  input: t.record({
+    prerequisite: t.string({ description: 'Prerequisite task' }),
+    dependent: t.string({ description: 'Dependent task' }),
+  }),
+  output: t.none(),
+}
+
+const appBaselineOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.app.baseline',
+  permission: 'omniplan:app:baseline',
+  target: { command: 'baseline' },
+  description: 'Commit the current schedule as the baseline schedule',
+  input: t.record({}),
+  output: t.none(),
+}
+
+const appLevelOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.app.level',
+  permission: 'omniplan:app:level',
+  target: { command: 'level' },
+  description: 'Level resources on project',
+  input: t.record({}),
+  output: t.none(),
+}
+
+const appLookupOperation: OperationDescriptor<{ readonly key: string }, undefined> = {
+  id: 'omniplan.app.lookup',
+  permission: 'omniplan:app:lookup',
+  target: { command: 'lookup' },
+  description: 'Look up a task via a custom data key',
+  input: t.record({
+    key: t.string({ description: 'Custom data key' }),
+  }),
+  output: t.none(),
+}
+
+const appChangeMarkOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.app.changeMark',
+  permission: 'omniplan:app:changeMark',
+  target: { command: 'changeMark' },
+  description: 'Make a change tracking mark on project',
+  input: t.record({}),
+  output: t.none(),
+}
+
+const appAddWorkTimeOperation: OperationDescriptor<{ readonly schedule: string }, undefined> = {
+  id: 'omniplan.app.addWorkTime',
+  permission: 'omniplan:app:addWorkTime',
+  target: { command: 'addWorkTime' },
+  description: 'Add working hours to a schedule',
+  input: t.record({
+    schedule: t.string({ description: 'Target schedule' }),
+  }),
+  output: t.none(),
+}
+
+const appSubtractWorkTimeOperation: OperationDescriptor<{ readonly schedule: string }, undefined> =
+  {
+    id: 'omniplan.app.subtractWorkTime',
+    permission: 'omniplan:app:subtractWorkTime',
+    target: { command: 'subtractWorkTime' },
+    description: 'Remove working hours from a schedule',
+    input: t.record({
+      schedule: t.string({ description: 'Target schedule' }),
+    }),
+    output: t.none(),
+  }
+
+const violationFixOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.violations.fix',
+  permission: 'omniplan:violations:fix',
+  target: { command: 'fix', resource: 'Violation' },
+  description: 'Fix a violation',
+  input: t.record({}),
+  output: t.none(),
+}
+
+const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.app.undo',
+  permission: 'omniplan:app:undo',
+  target: { command: 'undo' },
+  description: 'Undo the last command',
+  input: t.record({}),
+  output: t.none(),
+}
+
+const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = {
+  id: 'omniplan.app.redo',
+  permission: 'omniplan:app:redo',
+  target: { command: 'redo' },
+  description: 'Redo the last undone command',
+  input: t.record({}),
+  output: t.none(),
+}
+
+/** Every operation, keyed by its identity. */
+const operations: AppContract<OmniPlanClient>['operations'] = {
+  'omniplan.projects.listProjects': projectListProjectsOperation,
+  'omniplan.projects.getProject': projectGetProjectOperation,
+  'omniplan.tasks.listTasks': taskListTasksOperation,
+  'omniplan.tasks.getTask': taskGetTaskOperation,
+  'omniplan.tasks.createTask': taskCreateTaskOperation,
+  'omniplan.milestones.listMilestones': milestoneListMilestonesOperation,
+  'omniplan.milestones.getMilestone': milestoneGetMilestoneOperation,
+  'omniplan.milestones.createMilestone': milestoneCreateMilestoneOperation,
+  'omniplan.resources.listResources': resourceListResourcesOperation,
+  'omniplan.resources.getResource': resourceGetResourceOperation,
+  'omniplan.resources.createResource': resourceCreateResourceOperation,
+  'omniplan.assignments.listAssignments': assignmentListAssignmentsOperation,
+  'omniplan.dependencies.listDependencies': dependencyListDependenciesOperation,
+  'omniplan.violations.listViolations': violationListViolationsOperation,
+  'omniplan.scenarios.listScenarios': scenarioListScenariosOperation,
+  'omniplan.scenarios.getScenario': scenarioGetScenarioOperation,
+  'omniplan.app.export': appExportOperation,
+  'omniplan.app.assign': appAssignOperation,
+  'omniplan.app.depend': appDependOperation,
+  'omniplan.app.baseline': appBaselineOperation,
+  'omniplan.app.level': appLevelOperation,
+  'omniplan.app.lookup': appLookupOperation,
+  'omniplan.app.changeMark': appChangeMarkOperation,
+  'omniplan.app.addWorkTime': appAddWorkTimeOperation,
+  'omniplan.app.subtractWorkTime': appSubtractWorkTimeOperation,
+  'omniplan.violations.fix': violationFixOperation,
+  'omniplan.app.undo': appUndoOperation,
+  'omniplan.app.redo': appRedoOperation,
+}
+
+/** Build the client on top of a factory-supplied runtime. */
+function bind(runtime: ClientRuntime): OmniPlanClient {
+  return {
+    projects: {
+      list: (options) => runtime.invoke(projectListProjectsOperation, {}, options),
+      get: (id, options) => runtime.invoke(projectGetProjectOperation, { id }, options),
+    },
+    tasks: {
+      list: (options) => runtime.invoke(taskListTasksOperation, {}, options),
+      get: (id, options) => runtime.invoke(taskGetTaskOperation, { id }, options),
+      create: (input, options) => runtime.invoke(taskCreateTaskOperation, input, options),
+    },
+    milestones: {
+      list: (options) => runtime.invoke(milestoneListMilestonesOperation, {}, options),
+      get: (id, options) => runtime.invoke(milestoneGetMilestoneOperation, { id }, options),
+      create: (input, options) => runtime.invoke(milestoneCreateMilestoneOperation, input, options),
+    },
+    resources: {
+      list: (options) => runtime.invoke(resourceListResourcesOperation, {}, options),
+      get: (id, options) => runtime.invoke(resourceGetResourceOperation, { id }, options),
+      create: (input, options) => runtime.invoke(resourceCreateResourceOperation, input, options),
+    },
+    assignments: {
+      list: (options) => runtime.invoke(assignmentListAssignmentsOperation, {}, options),
+    },
+    dependencies: {
+      list: (options) => runtime.invoke(dependencyListDependenciesOperation, {}, options),
+    },
+    violations: {
+      list: (options) => runtime.invoke(violationListViolationsOperation, {}, options),
+      fix: (options) => runtime.invoke(violationFixOperation, {}, options),
+    },
+    scenarios: {
+      list: (options) => runtime.invoke(scenarioListScenariosOperation, {}, options),
+      get: (id, options) => runtime.invoke(scenarioGetScenarioOperation, { id }, options),
+    },
+    _export: (to, options) => runtime.invoke(appExportOperation, { to }, options),
+    assign: (resource, task, options) =>
+      runtime.invoke(appAssignOperation, { resource, task }, options),
+    depend: (prerequisite, dependent, options) =>
+      runtime.invoke(appDependOperation, { prerequisite, dependent }, options),
+    baseline: (options) => runtime.invoke(appBaselineOperation, {}, options),
+    level: (options) => runtime.invoke(appLevelOperation, {}, options),
+    lookup: (key, options) => runtime.invoke(appLookupOperation, { key }, options),
+    changeMark: (options) => runtime.invoke(appChangeMarkOperation, {}, options),
+    addWorkTime: (schedule, options) =>
+      runtime.invoke(appAddWorkTimeOperation, { schedule }, options),
+    subtractWorkTime: (schedule, options) =>
+      runtime.invoke(appSubtractWorkTimeOperation, { schedule }, options),
+    undo: (options) => runtime.invoke(appUndoOperation, {}, options),
+    redo: (options) => runtime.invoke(appRedoOperation, {}, options),
+  }
+}
+
+/**
+ * The OmniPlan contract. Pass it to a client factory to obtain a
+ * {@link OmniPlanClient}.
+ */
+export const omniPlanContract: AppContract<OmniPlanClient> = {
+  app: 'omniplan',
+  operations,
+  resources,
+  loadManifest: async () => (await import('./manifest.js')).manifest,
+  bind,
+}
