@@ -27,7 +27,7 @@ import type { DatabaseSync } from 'node:sqlite'
 export type SqliteModule = typeof import('node:sqlite')
 
 /** First Node.js release that loads `node:sqlite` without a command-line flag. */
-const MINIMUM_NODE_FOR_SQLITE = '22.13.0'
+export const MINIMUM_NODE_FOR_SQLITE = '22.13.0'
 
 /** The loaded module, memoized so the warning filter is installed at most once. */
 let sqliteModule: SqliteModule | undefined

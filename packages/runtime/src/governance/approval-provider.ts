@@ -204,7 +204,7 @@ export async function loadApprovalConfig(
  * @example
  * ```typescript
  * import { createMultiServer } from '@macts/api/server';
- * import { loadActivePolicy, loadApprovalGate } from '@macts/api/server';
+ * import { loadActivePolicy, loadApprovalGate } from '@macts/runtime';
  * import { createFileAuditWriter } from '@macts/core';
  *
  * const policy = await loadActivePolicy();

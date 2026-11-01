@@ -12,7 +12,9 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        node-version: [22, 24, 26]
+        # 22.13.0 pins the supported floor (engines.node): the first release that
+        # loads node:sqlite without a flag. The others track current majors.
+        node-version: ['22.13.0', 22, 24, 26]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -21,3 +21,5 @@ The HTTP server, the MCP server, and the CLI's `api-key` commands now all use it
 
 - The `@macts/api/keys` entry point is removed. Import key management from `@macts/runtime` instead.
 - `@macts/api` and `@macts/api/server` no longer re-export key management, the logger, governance policy and approval loading, or the governance context types. Import them from `@macts/runtime`. `requirePolicy` and the HTTP response types stay in `@macts/api`.
+
+**Logging no longer requires `pino-pretty`.** Outside production the logger pretty-prints only when `pino-pretty` is installed, and otherwise falls back to structured JSON. Before, the first log line crashed any installed CLI or MCP server.

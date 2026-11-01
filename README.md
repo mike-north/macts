@@ -309,7 +309,7 @@ access without granting write or delete access, or grant create without granting
 ## Requirements
 
 - **macOS** -- macts automates native macOS applications, which are only available on macOS
-- **Node.js 22+** -- Required for the API server and SDK
+- **Node.js 22.13+** -- Required for the API server and SDK (the first release whose built-in SQLite, used by the key store, loads without a flag)
 - **Target apps** -- Must be installed and have granted automation permissions when first prompted
 
 ## Contributing

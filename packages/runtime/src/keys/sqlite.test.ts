@@ -9,7 +9,13 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DatabaseSync } from 'node:sqlite'
-import { isSqliteExperimentalWarning, loadSqlite, runInTransaction } from './sqlite.js'
+import { readFileSync } from 'node:fs'
+import {
+  isSqliteExperimentalWarning,
+  loadSqlite,
+  MINIMUM_NODE_FOR_SQLITE,
+  runInTransaction,
+} from './sqlite.js'
 
 /** The exact notice Node 22 and 24 emit the first time `node:sqlite` loads. */
 const SQLITE_NOTICE = 'SQLite is an experimental feature and might change at any time'
@@ -156,5 +162,15 @@ describe('runInTransaction', () => {
     })
 
     expect(storedValues()).toEqual(['existing', 'second'])
+  })
+})
+
+describe('MINIMUM_NODE_FOR_SQLITE', () => {
+  it('equals the minimum Node.js version the package declares in engines.node', () => {
+    const manifest = JSON.parse(
+      readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+    ) as { engines: { node: string } }
+    // engines.node is a single lower bound of the form ">=X.Y.Z".
+    expect(manifest.engines.node).toBe(`>=${MINIMUM_NODE_FOR_SQLITE}`)
   })
 })

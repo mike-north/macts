@@ -476,7 +476,7 @@ only `validateApiKey` today, which moves to the runtime.
 | `@macts/sdk`       | Public factories and re-exports                                                                                                                                                                                                                                                   | Execution             |
 
 **Why a separate runtime package.** Token verification needs the signing
-secret on disk and the SQLite revocation store (`better-sqlite3`). The local
+secret on disk and the SQLite revocation store. The local
 SDK and the HTTP adapter both need it. If it lived in `@macts/api`, local
 execution would depend on the HTTP server. If it lived in `@macts/sdk`, the
 key store would sit in the public client package and the HTTP adapter would

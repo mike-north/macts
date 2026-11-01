@@ -1270,7 +1270,7 @@ Check version compatibility:
 
 ```bash
 macts --version
-node --version  # Requires Node.js >= 20
+node --version  # Requires Node.js >= 22.13 (built-in SQLite for the key store)
 ```
 
 ## Programmatic API
