@@ -641,8 +641,27 @@ Manifest types map to value types as follows:
 - A type name that matches no resource or enum becomes `unknown`, and the
   generator reports it as a diagnostic.
 
+Generation diagnostics are warnings, not errors. `macts generate` prints each
+one to stderr as `warning: <app>: <position>: …` and still exits 0, and
+`scripts/regenerate.mjs` reports their total across apps. Only generation
+errors fail generation. The shipped manifests produce three: Finder's
+`iconViewOptions` and `columnViewOptions`, and System Events'
+`scriptingResult`.
+
 Each operation's permission comes from the manifest route, the same
 derivation the runtime uses, so the registration check holds by construction.
+A permission must have exactly three non-empty segments,
+`app:resource:operation`, because governance denies any other shape. A test
+checks, for every shipped manifest, that the routes agree with the HTTP
+router's own guards and introspection on the set of operations and on each
+permission.
+
+Each generated client package reports its `./contract` subpath in
+`api-report/contract.api.md`, using a second API Extractor config,
+`api-extractor.contract.json`, which the package's `api-extractor` scripts run
+after the root report. That config writes no declaration rollup (the
+subpath's types are the bundler's `dist/contract/index.d.ts`) and no doc
+model, so the API documentation still covers only the root entry.
 
 Factories supply the `ClientRuntime`: local backed by `@macts/runtime`, remote
 backed by HTTP. No proxies are used and no untyped path walking occurs.
