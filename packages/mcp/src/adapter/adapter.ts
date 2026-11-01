@@ -31,7 +31,6 @@
 import { McpError, ErrorCode, type CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 import { z } from 'zod'
 import {
-  InternalError,
   MactsError,
   toWireErrorEnvelope,
   type AnyMactsError,
@@ -46,6 +45,7 @@ import {
   type RuntimeLogger,
 } from '@macts/runtime'
 import { McpToolDerivationError } from './errors.js'
+import { errorLogFields, internalErrorResult, logSafely, textResult } from './results.js'
 import { toolNameFor } from './tool-name.js'
 
 /**
@@ -127,9 +127,6 @@ export interface McpAdapter {
   ): Promise<CallToolResult>
 }
 
-/** The message every unexpected failure is reported with; never the original text. */
-const INTERNAL_ERROR_MESSAGE = 'Internal server error'
-
 /**
  * The message of the protocol error for a call to a tool this adapter does not
  * serve. Fixed, so a caller's tool name is never reflected back.
@@ -198,51 +195,9 @@ function deriveTools(operations: readonly RegisteredOperation[]): Map<string, Se
   return tools
 }
 
-/**
- * Fields that describe an unexpected failure in an operator log line.
- *
- * @remarks
- * Name, message, and stack only, the same fields the HTTP adapter logs. Other
- * own properties of an error (such as a child process's captured standard
- * error) are deliberately not logged.
- */
-function errorLogFields(error: unknown): Record<string, string | undefined> {
-  if (error instanceof Error) {
-    return { name: error.name, message: error.message, stack: error.stack }
-  }
-  return { type: typeof error }
-}
-
-/**
- * Run one diagnostic log call, ignoring any failure of the logger itself: a
- * tool result must still be produced when logging is what broke.
- */
-function logSafely(write: () => void): void {
-  try {
-    write()
-  } catch {
-    // Nothing more can be reported.
-  }
-}
-
 /** Whether `error` is one of the canonical structured errors. */
 function isMactsError(error: unknown): error is AnyMactsError {
   return error instanceof MactsError
-}
-
-/** A tool result carrying one JSON document as its only text content. */
-function textResult(document: unknown, isError: boolean): CallToolResult {
-  const content: CallToolResult['content'] = [{ type: 'text', text: JSON.stringify(document) }]
-  return isError ? { isError: true, content } : { content }
-}
-
-/** The generic failure result, carrying only the correlation id when there is one. */
-function internalErrorResult(correlationId: string | undefined): CallToolResult {
-  const error = new InternalError(
-    INTERNAL_ERROR_MESSAGE,
-    correlationId === undefined ? {} : { correlationId }
-  )
-  return textResult(toWireErrorEnvelope(error), true)
 }
 
 /** What the adapter needs to turn a failure into a tool result. */

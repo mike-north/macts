@@ -3,11 +3,12 @@
  *
  * These cover the issue's core acceptance criterion: a documented command
  * (`macts mcp install <app>`, backed by `installMcpServerPlugin`) places an
- * `@macts/<app>-server` package exactly where the MCP daemon's discovery
- * (`discoverMcpPlugins` in `@macts/mcp`) looks for it, so the app's tools become
- * visible once the daemon starts. The only thing mocked is the `npm install`
- * subprocess — we simulate npm by writing the package into the real plugins
- * node_modules on disk, then run the real discovery path.
+ * `@macts/<app>-server` package exactly where the MCP hosts look for it
+ * (`findInstalledServerPackages`, the first step of the host registration
+ * path), so the app's tools are served once `macts --mcp` or the daemon
+ * starts. The only thing mocked is the `npm install` subprocess — we simulate
+ * npm by writing the package into the real plugins node_modules on disk, then
+ * run the real lookup.
  *
  * @see https://github.com/mike-north/macts/issues/25
  * @see https://github.com/mike-north/macts/issues/27
@@ -25,9 +26,8 @@ vi.mock('node:child_process', async (importOriginal) => {
 })
 
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
-import { installMcpServerPlugin, installPlugin } from './manager.js'
+import { findInstalledServerPackages, installMcpServerPlugin, installPlugin } from './manager.js'
 import { discoverPlugins } from './loader.js'
-import { discoverMcpPlugins } from '@macts/mcp'
 
 /**
  * Source for a minimal valid MCP plugin module (the `./mcp` entry point).
@@ -95,7 +95,7 @@ describe('MCP install -> discover wiring', () => {
     rmSync(mactsHome, { recursive: true, force: true })
   })
 
-  it('installs an MCP server plugin where the daemon discovers it (tools become visible)', async () => {
+  it('installs an MCP server package where the MCP hosts find it', () => {
     // Simulate npm: write @macts/calendar-server into the plugins node_modules.
     vi.mocked(spawnSync).mockImplementation(((_cmd: string, args: readonly string[]) => {
       expect(args).toEqual(['install', '--ignore-scripts', '@macts/calendar-server'])
@@ -112,12 +112,8 @@ describe('MCP install -> discover wiring', () => {
     const installResult = installMcpServerPlugin('calendar')
     expect(installResult.success).toBe(true)
 
-    // The daemon's discovery must now find the app's tools.
-    const discovery = await discoverMcpPlugins()
-    expect(discovery.errors).toEqual([])
-    expect(discovery.plugins).toHaveLength(1)
-    expect(discovery.plugins[0]?.name).toBe('calendar')
-    expect(discovery.plugins[0]?.tools[0]?.name).toBe('macts__calendar__events_list')
+    // The MCP hosts must now find the app's host package.
+    expect(findInstalledServerPackages()).toEqual(['@macts/calendar-server'])
   })
 
   it('does not expose an installed MCP server plugin to CLI plugin discovery', async () => {
@@ -158,9 +154,8 @@ describe('MCP install -> discover wiring', () => {
     expect(cliDiscovery.plugins).toHaveLength(1)
     expect(cliDiscovery.plugins[0]?.name).toBe('calendar')
 
-    // The CLI plugin must not appear as an MCP server plugin.
-    const mcpDiscovery = await discoverMcpPlugins()
-    expect(mcpDiscovery.plugins).toEqual([])
+    // The CLI plugin must not appear as an MCP host package.
+    expect(findInstalledServerPackages()).toEqual([])
   })
 
   it('places CLI and MCP plugins for the same app side by side, each discovered by its own system', async () => {
@@ -190,8 +185,6 @@ describe('MCP install -> discover wiring', () => {
     const cliDiscovery = await discoverPlugins()
     expect(cliDiscovery.plugins.map((p) => p.name)).toEqual(['calendar'])
 
-    const mcpDiscovery = await discoverMcpPlugins()
-    expect(mcpDiscovery.plugins.map((p) => p.name)).toEqual(['calendar'])
-    expect(mcpDiscovery.plugins[0]?.tools[0]?.name).toBe('macts__calendar__events_list')
+    expect(findInstalledServerPackages()).toEqual(['@macts/calendar-server'])
   })
 })

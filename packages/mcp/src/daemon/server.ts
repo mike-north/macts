@@ -1,8 +1,8 @@
 /**
  * HTTP daemon server for MCP.
  *
- * Provides an HTTP server that can listen on a Unix socket or TCP port,
- * multiplexing MCP plugin tools over two transports:
+ * Provides an HTTP server that can listen on a Unix socket or TCP port and
+ * serves one {@link McpAdapter}'s tools over two transports:
  *
  * - **Streamable HTTP** (`/mcp`) - the current MCP transport, per the
  *   {@link https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http | spec}.
@@ -10,8 +10,20 @@
  *   {@link https://modelcontextprotocol.io/specification/2024-11-05/basic/transports#http-with-sse | HTTP+SSE}
  *   transport, kept for older clients.
  *
- * Every route other than `/health` requires a valid `macts_sk_` API key
- * (Bearer token) unless {@link DaemonOptions.disableApiKeyValidation} is set.
+ * The daemon is a transport only. Every tool call is answered by the adapter
+ * it is given, which a host builds over a `MactsRuntime`, so each call is
+ * verified, authorized, governed, and validated by the runtime (phases/13 D5).
+ * What the daemon owns is carrying each request's credential to the calls that
+ * request makes:
+ *
+ * - every route other than `GET /health` requires an `Authorization: Bearer`
+ *   API key, verified before any session is created or reached, and refused
+ *   with the structured `UNAUTHENTICATED` envelope (see `./auth.ts`);
+ * - the verified bearer is attached to the request as the MCP SDK's
+ *   `AuthInfo`, which the SDK passes to the handler of every message in that
+ *   request, and the tool call's credential is read from there. A call is
+ *   therefore governed by the key of the request that carried it, never by
+ *   another client's key or by a key held by the daemon.
  *
  * @packageDocumentation
  */
@@ -32,23 +44,49 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  isInitializeRequest,
-  type CallToolResult,
-} from '@modelcontextprotocol/sdk/types.js'
-import type { McpPlugin } from '../types.js'
+import type { AuthInfo } from '@modelcontextprotocol/sdk/server/auth/types.js'
+import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js'
 import { VERSION } from '@macts/core'
-import { authenticateHttpRequest } from '../auth.js'
+import {
+  createBearerCredential,
+  createKeyStoreVerifier,
+  getLogger,
+  type CredentialVerifier,
+  type RuntimeLogger,
+} from '@macts/runtime'
+import type { McpAdapter } from '../adapter/adapter.js'
+import { attachMcpAdapter, type McpCredentialResolver } from '../adapter/attach.js'
+import { authenticateDaemonRequest } from './auth.js'
 import { getSocketPath, getPidFile } from './paths.js'
 
 /**
  * Configuration options for the daemon server.
  */
 export interface DaemonOptions {
-  /** Array of MCP plugins to multiplex */
-  readonly plugins: readonly McpPlugin[]
+  /**
+   * The tools every session serves.
+   *
+   * @remarks
+   * Built by the host over the runtime that runs every call (with any host
+   * tools composed beside the operation tools). The daemon only carries each
+   * request's credential to it.
+   */
+  readonly adapter: McpAdapter
+
+  /**
+   * Verifies each request's bearer before any MCP handling.
+   *
+   * @defaultValue the API-key verifier over the key store under `MACTS_HOME`,
+   *   the same verification the runtime applies to each call
+   */
+  readonly verifier?: CredentialVerifier
+
+  /**
+   * Destination for operator-side diagnostics about failed requests.
+   *
+   * @defaultValue the process-wide logger from `getLogger()`
+   */
+  readonly logger?: RuntimeLogger
 
   /** Optional TCP port to listen on (in addition to Unix socket) */
   readonly port?: number
@@ -61,16 +99,6 @@ export interface DaemonOptions {
 
   /** Server version for MCP protocol */
   readonly version?: string
-
-  /**
-   * Skip API key validation on every daemon route (other than `/health`,
-   * which never requires one).
-   *
-   * Defaults to `false` — a valid `macts_sk_` API key (as a `Bearer` token)
-   * is required on every request. Only set this for local development or
-   * trusted embedding scenarios.
-   */
-  readonly disableApiKeyValidation?: boolean
 }
 
 /**
@@ -116,6 +144,12 @@ export interface DaemonServer {
    */
   readonly httpServer: HttpServer | null
 }
+
+/**
+ * A request whose bearer verified, carrying it as the MCP SDK's `AuthInfo`,
+ * where the SDK's transports look for it.
+ */
+type AuthenticatedRequest = IncomingMessage & { auth: AuthInfo }
 
 /**
  * Read and JSON-parse the full body of an incoming HTTP request.
@@ -164,18 +198,20 @@ function sendJsonRpcError(res: ServerResponse, status: number, message: string):
 /**
  * Create a new daemon server instance.
  *
- * The server will multiplex all provided plugins over HTTP, allowing
- * multiple clients to connect via either the Streamable HTTP transport
- * (`/mcp`) or the legacy SSE transport (`/sse` + `/message`) and invoke
- * tools from any plugin.
+ * The server serves the adapter's tools over HTTP, allowing multiple clients
+ * to connect via either the Streamable HTTP transport (`/mcp`) or the legacy
+ * SSE transport (`/sse` + `/message`). Each client's tool calls run under the
+ * bearer token of the request that carried them.
  *
  * @param options - Daemon configuration
  * @returns DaemonServer instance for lifecycle management
  *
  * @example
  * ```typescript
+ * const runtime = createRuntime({ executor, governance: loadHostGovernance });
+ * // ...register apps on the runtime...
  * const daemon = createDaemon({
- *   plugins: [calendarPlugin, mailPlugin],
+ *   adapter: createMcpAdapter(runtime),
  *   port: 3000,
  * });
  *
@@ -204,26 +240,20 @@ export function createDaemon(options: DaemonOptions): DaemonServer {
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   const sseTransports = new Map<string, SSEServerTransport>()
 
-  // Build tool registry from all plugins
-  const toolHandlers = new Map<string, (args: unknown) => Promise<unknown>>()
-  const toolSchemas = new Map<string, { name: string; description: string; inputSchema: unknown }>()
-
-  for (const plugin of options.plugins) {
-    for (const tool of plugin.tools) {
-      if (toolHandlers.has(tool.name)) {
-        throw new Error(`Duplicate tool name: ${tool.name}`)
-      }
-      toolHandlers.set(tool.name, tool.handler)
-      toolSchemas.set(tool.name, {
-        name: tool.name,
-        description: tool.description,
-        inputSchema: tool.inputSchema,
-      })
-    }
-  }
+  const verifier = options.verifier ?? createKeyStoreVerifier()
+  const logger = (): RuntimeLogger => options.logger ?? getLogger()
 
   /**
-   * Create an MCP server instance for a single client connection.
+   * Each tool call's credential: the bearer the transport attached to the
+   * request that carried the call, or an empty credential (which the runtime
+   * reports as missing) when there is none.
+   */
+  const resolveCredential: McpCredentialResolver = (extra) =>
+    createBearerCredential(extra.authInfo?.token ?? '')
+
+  /**
+   * Create an MCP server instance for a single client session, serving the
+   * adapter's tools.
    */
   // eslint-disable-next-line @typescript-eslint/no-deprecated
   function createServerInstance(): Server {
@@ -233,63 +263,10 @@ export function createDaemon(options: DaemonOptions): DaemonServer {
         name: options.name ?? 'macts-mcp-daemon',
         version: options.version ?? VERSION,
       },
-      {
-        capabilities: {
-          tools: {},
-        },
-      }
+      { capabilities: {} }
     )
-
-    // Register handlers
-    server.setRequestHandler(ListToolsRequestSchema, () => {
-      return {
-        tools: Array.from(toolSchemas.values()),
-      }
-    })
-
-    server.setRequestHandler(CallToolRequestSchema, async (request): Promise<CallToolResult> => {
-      const { name, arguments: args } = request.params
-
-      const handler = toolHandlers.get(name)
-      if (!handler) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Unknown tool: ${name}`,
-            },
-          ],
-          isError: true,
-        }
-      }
-
-      try {
-        const result = await handler(args ?? {})
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(result, null, 2),
-            },
-          ],
-        }
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Error executing tool ${name}: ${message}`,
-            },
-          ],
-          isError: true,
-        }
-      }
-    })
-
+    attachMcpAdapter(server, options.adapter, resolveCredential)
     activeServers.add(server)
-
     return server
   }
 
@@ -302,7 +279,7 @@ export function createDaemon(options: DaemonOptions): DaemonServer {
    * confirms the session (via `onsessioninitialized`).
    */
   async function handleStreamableHttpRequest(
-    req: IncomingMessage,
+    req: AuthenticatedRequest,
     res: ServerResponse
   ): Promise<void> {
     const sessionIdHeader = req.headers['mcp-session-id']
@@ -377,26 +354,29 @@ export function createDaemon(options: DaemonOptions): DaemonServer {
     // Health check endpoint - always open, no authentication required.
     if (req.method === 'GET' && url.pathname === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify({ status: 'ok', plugins: options.plugins.length }))
+      res.end(JSON.stringify({ status: 'ok', tools: options.adapter.listTools().length }))
       return
     }
 
-    // Every other route requires a valid API key unless explicitly disabled.
-    if (!options.disableApiKeyValidation) {
-      const authResult = await authenticateHttpRequest(req)
-      if (!authResult.ok) {
-        res.writeHead(authResult.status, {
-          'Content-Type': 'application/json',
-          'WWW-Authenticate': 'Bearer',
-        })
-        res.end(JSON.stringify(authResult.body))
-        return
-      }
+    // Every other route requires a verified bearer before any MCP handling.
+    const authentication = await authenticateDaemonRequest(req, verifier, logger())
+    if (!authentication.ok) {
+      res.writeHead(authentication.status, {
+        'Content-Type': 'application/json',
+        ...(authentication.status === 401 ? { 'WWW-Authenticate': 'Bearer' } : {}),
+      })
+      res.end(JSON.stringify(authentication.body))
+      return
     }
+    // The SDK transports read `req.auth` and pass it to the handler of every
+    // message in this request, so each tool call runs under this request's key.
+    const authenticated: AuthenticatedRequest = Object.assign(req, {
+      auth: authentication.authInfo,
+    })
 
     // Streamable HTTP transport (current MCP spec)
     if (url.pathname === '/mcp') {
-      await handleStreamableHttpRequest(req, res)
+      await handleStreamableHttpRequest(authenticated, res)
       return
     }
 
@@ -449,7 +429,7 @@ export function createDaemon(options: DaemonOptions): DaemonServer {
         return
       }
 
-      await transport.handlePostMessage(req, res)
+      await transport.handlePostMessage(authenticated, res)
       return
     }
 

@@ -5,7 +5,7 @@
  */
 
 import { join } from 'node:path'
-import { getMactsHome } from '../plugin/paths.js'
+import { getMactsHome } from '@macts/runtime'
 
 /**
  * Get the Unix socket path for the daemon.

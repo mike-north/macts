@@ -20,9 +20,6 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/mcp.d.ts",
-  "bin": {
-    "macts-mcp": "./dist/bin.js"
-  },
   "files": [
     "dist"
   ],
@@ -41,7 +38,6 @@
     "@macts/contracts": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/runtime": "workspace:*",
-    "@macts/types": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.0.4",
     "zod": "catalog:"
   },

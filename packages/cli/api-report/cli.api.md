@@ -180,8 +180,6 @@ export function registerPlugin(cli: Cli, plugin: CliPlugin): void;
 // @public
 export class RootCommand extends Command {
     // (undocumented)
-    disableApiKeyValidation: boolean;
-    // (undocumented)
     execute(): Promise<number>;
     // (undocumented)
     mcp: boolean | undefined;

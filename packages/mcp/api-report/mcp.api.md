@@ -4,18 +4,15 @@
 
 ```ts
 
-import { ApiKeyPayload } from '@macts/core';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { CapabilityRegistry } from '@macts/core';
 import { Credential } from '@macts/contracts';
+import { CredentialVerifier } from '@macts/runtime';
 import { GovernanceFilter } from '@macts/core';
-import { IncomingMessage } from 'node:http';
 import { InvocationContext } from '@macts/contracts';
-import { JsonSchema } from '@macts/types';
 import { MactsRuntime } from '@macts/runtime';
-import { McpPlugin } from '@macts/types';
-import { McpToolDefinition } from '@macts/types';
 import { OperationId } from '@macts/contracts';
+import { Readable } from 'node:stream';
 import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import { RuntimeLogger } from '@macts/runtime';
 import { Server } from 'node:http';
@@ -23,54 +20,28 @@ import { Server as Server_2 } from '@modelcontextprotocol/sdk/server/index.js';
 import { ServerNotification } from '@modelcontextprotocol/sdk/types.js';
 import { ServerRequest } from '@modelcontextprotocol/sdk/types.js';
 import { VERSION } from '@macts/core';
+import { Writable } from 'node:stream';
 
 // @public
 export function attachMcpAdapter(server: Server_2, adapter: McpAdapter, resolveCredential: McpCredentialResolver): void;
 
 // @public
-export function authenticateHttpRequest(req: IncomingMessage): Promise<AuthResult>;
-
-// @public
-export type AuthResult = {
-    readonly ok: true;
-    readonly payload: ApiKeyPayload;
-} | {
-    readonly ok: false;
-    readonly status: 401;
-    readonly body: {
-        readonly error: {
-            readonly code: McpAuthErrorCode;
-            readonly message: string;
-        };
-    };
-};
-
-// @public
-export interface CachedPlugin {
-    readonly description: string;
-    readonly name: string;
-    readonly packageName: string;
-}
-
-// @public
 export function createDaemon(options: DaemonOptions): DaemonServer;
 
 // @public
-export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefinition;
+export function createDiscoveryTool(options: DiscoveryToolOptions): McpHostTool;
 
 // @public
 export function createMcpAdapter(runtime: MactsRuntime, options?: McpAdapterOptions): McpAdapter;
 
 // @public
-export function createMcpServer(plugins: readonly McpPlugin[], options?: McpServerOptions): Promise<void>;
-
-// @public
 export interface DaemonOptions {
-    readonly disableApiKeyValidation?: boolean;
+    readonly adapter: McpAdapter;
+    readonly logger?: RuntimeLogger;
     readonly name?: string;
-    readonly plugins: readonly McpPlugin[];
     readonly port?: number;
     readonly socketPath?: string;
+    readonly verifier?: CredentialVerifier;
     readonly version?: string;
 }
 
@@ -82,9 +53,6 @@ export interface DaemonServer {
     start(): Promise<void>;
     stop(): Promise<void>;
 }
-
-// @public
-export function discoverMcpPlugins(): Promise<PluginDiscoveryResult>;
 
 // @public
 export const DISCOVERY_TOOL_NAME = "macts__capabilities__discover";
@@ -102,20 +70,6 @@ export function getPidFile(): string;
 export function getSocketPath(): string;
 
 // @public
-export function invalidateMcpPluginCache(): void;
-
-export { JsonSchema }
-
-// @public
-export function loadMcpPlugin(packageName: string): Promise<{
-    success: true;
-    plugin: McpPlugin;
-} | {
-    success: false;
-    error: string;
-}>;
-
-// @public
 export interface McpAdapter {
     callTool(name: string, args: unknown, context: InvocationContext | (() => InvocationContext)): Promise<CallToolResult>;
     listTools(): readonly McpToolListing[];
@@ -127,24 +81,28 @@ export interface McpAdapterOptions {
 }
 
 // @public
-export type McpAuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
-
-// @public
 export type McpCredentialResolver = (extra: McpRequestExtra) => Credential;
 
-export { McpPlugin }
+// @public
+export interface McpHostTool {
+    readonly description: string;
+    handler(args: unknown): Promise<unknown>;
+    readonly inputSchema: McpToolInputSchema;
+    readonly name: string;
+}
+
+// @public
+export interface McpHostToolsOptions {
+    readonly logger?: RuntimeLogger;
+}
 
 // @public
 export type McpRequestExtra = RequestHandlerExtra<ServerRequest, ServerNotification>;
 
 // @public
-export interface McpServerOptions {
-    readonly disableApiKeyValidation?: boolean;
-    readonly name?: string;
-    readonly version?: string;
+export class McpToolCompositionError extends Error {
+    readonly name = "McpToolCompositionError";
 }
-
-export { McpToolDefinition }
 
 // @public
 export class McpToolDerivationError extends Error {
@@ -165,22 +123,22 @@ export interface McpToolListing {
 }
 
 // @public
-export interface PluginDiscoveryResult {
-    readonly errors: readonly PluginLoadError[];
-    readonly plugins: readonly McpPlugin[];
+export function startStdioServer(options: StdioServerOptions): Promise<StdioServer>;
+
+// @public
+export interface StdioServer {
+    close(): Promise<void>;
 }
 
 // @public
-export interface PluginLoadError {
-    readonly message: string;
-    readonly packageName: string;
+export interface StdioServerOptions {
+    readonly adapter: McpAdapter;
+    readonly credential: Credential;
+    readonly input?: Readable;
+    readonly name?: string;
+    readonly output?: Writable;
+    readonly version?: string;
 }
-
-// @public
-export function readMcpPluginCache(): readonly CachedPlugin[] | null;
-
-// @public
-export function requireStartupApiKey(): Promise<void>;
 
 // @public
 export function toolNameFor(id: OperationId): string;
@@ -188,7 +146,7 @@ export function toolNameFor(id: OperationId): string;
 export { VERSION }
 
 // @public
-export function writeMcpPluginCache(plugins: readonly CachedPlugin[]): void;
+export function withHostTools(adapter: McpAdapter, hostTools: readonly McpHostTool[], options?: McpHostToolsOptions): McpAdapter;
 
 // (No @packageDocumentation comment for this package)
 

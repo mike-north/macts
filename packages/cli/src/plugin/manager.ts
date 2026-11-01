@@ -200,9 +200,10 @@ export function installPlugin(packageName: string, version = 'latest'): InstallR
  * Install an MCP server plugin.
  *
  * Installs an `@macts/<app>-server` package (HTTP API + MCP plugin) into the same
- * managed `~/.macts/plugins` directory that CLI plugins use. The MCP daemon
- * discovers server packages there (via `discoverMcpPlugins` in `@macts/mcp`), so
- * after installing, `macts mcp start` exposes that app's tools to MCP clients.
+ * managed `~/.macts/plugins` directory that CLI plugins use. Every macts host
+ * finds server packages there (via {@link findInstalledServerPackages}) and
+ * registers the app's contract, so after installing, `macts --mcp`,
+ * `macts mcp start`, and `macts --serve` serve that app's operations.
  *
  * Accepts either a bare app name (`calendar`) or the full package name
  * (`@macts/calendar-server`); see {@link resolveMcpServerPackageName}.

@@ -1,47 +1,42 @@
 /**
- * @macts/mcp - MCP server for macts
+ * @macts/mcp - macts operations served as Model Context Protocol tools.
+ *
+ * Every tool call is one `MactsRuntime` invocation, verified, authorized,
+ * governed, and validated by the runtime exactly as an HTTP API call is
+ * (phases/13 D5). This package owns the MCP side only: deriving tools from
+ * registered operations, serving host tools such as capability discovery
+ * beside them, wiring both into an MCP SDK server, and the HTTP daemon that
+ * carries each request's bearer token to the calls it makes. A host chooses
+ * the transport and where each call's credential comes from.
+ *
  * @packageDocumentation
  */
 
 export { VERSION } from '@macts/core'
 
-// Core server
-export { createMcpServer } from './server.js'
-
 // Tools derived from operation contracts, dispatched through the runtime
 export {
   createMcpAdapter,
   attachMcpAdapter,
+  withHostTools,
   toolNameFor,
+  McpToolCompositionError,
   McpToolDerivationError,
   type McpAdapter,
   type McpAdapterOptions,
+  type McpHostTool,
+  type McpHostToolsOptions,
   type McpToolInputSchema,
   type McpToolListing,
   type McpCredentialResolver,
   type McpRequestExtra,
 } from './adapter/index.js'
 
-// Types
-export type { McpPlugin, McpToolDefinition, McpServerOptions, JsonSchema } from './types.js'
-
-// API key authentication
-export { requireStartupApiKey, authenticateHttpRequest } from './auth.js'
-export type { McpAuthErrorCode, AuthResult } from './auth.js'
+// The stdio transport, with the credential configured for the session
+export { startStdioServer, type StdioServer, type StdioServerOptions } from './stdio.js'
 
 // Built-in capability-discovery tool
 export { createDiscoveryTool, DISCOVERY_TOOL_NAME, type DiscoveryToolOptions } from './discovery.js'
-
-// Plugin utilities
-export {
-  discoverMcpPlugins,
-  loadMcpPlugin,
-  readMcpPluginCache,
-  writeMcpPluginCache,
-  invalidateMcpPluginCache,
-} from './plugin/index.js'
-
-export type { PluginDiscoveryResult, PluginLoadError, CachedPlugin } from './plugin/index.js'
 
 // Daemon server
 export { createDaemon, getSocketPath, getPidFile } from './daemon/index.js'

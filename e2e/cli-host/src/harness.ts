@@ -1,21 +1,37 @@
 /**
  * Harness for subprocess UATs of the `macts` host commands.
  *
- * Each test gets a fresh macts home whose plugins directory has two real,
- * built app pairs, {@link INSTALLED_APPS} (`@macts/<app>-server` and
- * `@macts/<app>`), linked into `plugins/node_modules/@macts`, the way
- * `macts mcp install <app>` lays out a hoisted install. The built CLI runs as a child process under a minimal
+ * Each test gets a fresh macts home whose plugins directory has real, built
+ * app packages linked into `plugins/node_modules/@macts`, the way
+ * `macts mcp install <app>` lays out a hoisted install: by default the two app
+ * pairs in {@link INSTALLED_APPS} (`@macts/<app>-server` and `@macts/<app>`),
+ * or every `@macts/<app>-server` package in the workspace with its app
+ * package. The built CLI runs as a child process under a minimal
  * environment (no inherited `MACTS_*` variables, and `HOME` pointing into the
  * temporary directory), so nothing reads or writes the real `~/.macts`.
  */
 
 import { execFile, spawn, type ChildProcess } from 'node:child_process'
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  realpathSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
+import { CallToolResultSchema, type CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 
 const execFileAsync = promisify(execFile)
 
@@ -33,7 +49,7 @@ function dependencyDir(name: string): string {
 /** The built CLI entry point. */
 export const CLI_BIN = join(dependencyDir('@macts/cli'), 'dist', 'bin.js')
 
-/** The apps whose server and app packages every macts home has installed, sorted. */
+/** The apps whose server and app packages a default macts home has installed, sorted. */
 export const INSTALLED_APPS = ['notes', 'reminders'] as const
 
 /** The repository root's shipped user docs, for checks on what they mention. */
@@ -42,37 +58,77 @@ export const SHIPPED_READMES = [
   join(REPO_ROOT, 'packages', 'cli', 'README.md'),
 ] as const
 
-/** A temporary macts home with {@link INSTALLED_APPS} installed; dispose it after the test. */
+/** A temporary macts home with apps installed; dispose it after the test. */
 export interface MactsHome {
   /** The directory `MACTS_HOME` points at. */
   readonly path: string
+  /** The apps whose packages are installed, sorted. */
+  readonly apps: readonly string[]
   /** Remove the directory. */
   dispose(): void
 }
 
-/** Create a macts home whose plugins directory holds the built packages of {@link INSTALLED_APPS}. */
-export function createMactsHome(): MactsHome {
+/** The workspace's packages directory. */
+const WORKSPACE_PACKAGES = join(REPO_ROOT, 'packages')
+
+/**
+ * Every app with a host package in the workspace, sorted: each
+ * `packages/<app>-server` directory.
+ */
+export function workspaceServerApps(): string[] {
+  return readdirSync(WORKSPACE_PACKAGES)
+    .filter((entry) => entry.endsWith('-server'))
+    .map((entry) => entry.slice(0, -'-server'.length))
+    .sort()
+}
+
+/** Which apps a macts home installs. */
+export type InstalledAppSet = 'default' | 'all-workspace-apps'
+
+/**
+ * Create a macts home whose plugins directory holds built app packages.
+ *
+ * @param apps - `default` links the packages of {@link INSTALLED_APPS}
+ *   through this package's dependencies; `all-workspace-apps`
+ *   links every workspace `@macts/<app>-server` package and its
+ *   `@macts/<app>` package, from the host package's own dependencies.
+ */
+export function createMactsHome(apps: InstalledAppSet = 'default'): MactsHome {
   const root = mkdtempSync(join(tmpdir(), 'macts-cli-host-'))
   const path = join(root, 'macts-home')
   const plugins = join(path, 'plugins')
   const scope = join(plugins, 'node_modules', '@macts')
   mkdirSync(scope, { recursive: true })
+
+  const installed: readonly string[] =
+    apps === 'default' ? INSTALLED_APPS : workspaceServerApps()
   writeFileSync(
     join(plugins, 'package.json'),
     JSON.stringify({
       name: 'macts-plugins',
       version: '1.0.0',
       private: true,
-      dependencies: Object.fromEntries(INSTALLED_APPS.map((app) => [`@macts/${app}-server`, '*'])),
+      dependencies: Object.fromEntries(installed.map((app) => [`@macts/${app}-server`, '*'])),
     })
   )
-  for (const app of INSTALLED_APPS) {
-    for (const name of [app, `${app}-server`]) {
-      symlinkSync(dependencyDir(`@macts/${name}`), join(scope, name), 'dir')
+  for (const app of installed) {
+    const hostDir =
+      apps === 'default'
+        ? dependencyDir(`@macts/${app}-server`)
+        : join(WORKSPACE_PACKAGES, `${app}-server`)
+    const appDir =
+      apps === 'default'
+        ? dependencyDir(`@macts/${app}`)
+        : realpathSync(join(hostDir, 'node_modules', '@macts', app))
+    if (!existsSync(join(hostDir, 'dist'))) {
+      throw new Error(`@macts/${app}-server is not built; run the build first`)
     }
+    symlinkSync(hostDir, join(scope, `${app}-server`), 'dir')
+    symlinkSync(appDir, join(scope, app), 'dir')
   }
   return {
     path,
+    apps: installed,
     dispose() {
       rmSync(root, { recursive: true, force: true })
     },
@@ -86,7 +142,10 @@ export function createMactsHome(): MactsHome {
  * Node is run by its absolute path (`process.execPath`), so a version
  * manager's shim on `PATH` is never involved.
  */
-function minimalEnv(home: MactsHome, extra: Readonly<Record<string, string>>): NodeJS.ProcessEnv {
+function minimalEnv(
+  home: MactsHome,
+  extra: Readonly<Record<string, string>>
+): Record<string, string> {
   return {
     PATH: `${dirname(process.execPath)}:/usr/bin:/bin`,
     HOME: dirname(home.path),
@@ -256,4 +315,148 @@ async function stopProcess(child: ChildProcess): Promise<void> {
     })
     child.kill('SIGTERM')
   })
+}
+
+/** Write `<macts home>/governance/policy.json` with exactly `contents`. */
+export function writePolicyFile(home: MactsHome, contents: string): void {
+  const dir = join(home.path, 'governance')
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, 'policy.json'), contents)
+}
+
+/**
+ * `StreamableHTTPClientTransport` declares `sessionId`/`onclose`/`onerror` as
+ * accessor pairs typed to allow `undefined`, where `Transport` declares plain
+ * optional fields. Under `exactOptionalPropertyTypes` the two are
+ * structurally incompatible although the class implements `Transport` at
+ * runtime; this is an upstream SDK typing gap.
+ */
+function asTransport(transport: StreamableHTTPClientTransport): Transport {
+  return transport as unknown as Transport
+}
+
+/** A connected MCP client, and the server process's stderr so far. */
+export interface McpSession {
+  readonly client: Client
+  /** Everything the server wrote to stderr so far (stdio sessions only). */
+  stderr(): string
+  /** Disconnect, stopping the server process for a stdio session. */
+  close(): Promise<void>
+}
+
+/**
+ * Start the built `macts --mcp` as an MCP client would, over stdio, and
+ * connect a real MCP client to it.
+ *
+ * @param home - The macts home the server runs in.
+ * @param extraEnv - Added to the minimal environment, e.g. `MACTS_API_KEY`.
+ */
+export async function connectMcpStdio(
+  home: MactsHome,
+  extraEnv: Readonly<Record<string, string>> = {}
+): Promise<McpSession> {
+  const transport = new StdioClientTransport({
+    command: process.execPath,
+    args: [CLI_BIN, '--mcp'],
+    cwd: REPO_ROOT,
+    env: minimalEnv(home, extraEnv),
+    stderr: 'pipe',
+  })
+  let stderr = ''
+  transport.stderr?.on('data', (chunk: Buffer | string) => (stderr += chunk.toString()))
+  const client = new Client({ name: 'cli-host-uat', version: '1.0.0' })
+  try {
+    await client.connect(transport)
+  } catch (error) {
+    throw new Error(`macts --mcp did not start: ${String(error)}\nstderr:\n${stderr}`)
+  }
+  return { client, stderr: () => stderr, close: () => client.close() }
+}
+
+/**
+ * Connect a real MCP client to a running daemon over Streamable HTTP,
+ * presenting `token` as the bearer on every request.
+ */
+export async function connectMcpHttp(url: string, token: string): Promise<McpSession> {
+  const transport = new StreamableHTTPClientTransport(new URL(`${url}/mcp`), {
+    requestInit: { headers: { Authorization: `Bearer ${token}` } },
+  })
+  const client = new Client({ name: 'cli-host-uat-http', version: '1.0.0' })
+  await client.connect(asTransport(transport))
+  return { client, stderr: () => '', close: () => client.close() }
+}
+
+/** Call a tool and return its result, validated as a tool result. */
+export async function callTool(
+  session: McpSession,
+  name: string,
+  args: Record<string, unknown>
+): Promise<CallToolResult> {
+  return CallToolResultSchema.parse(await session.client.callTool({ name, arguments: args }))
+}
+
+/** The JSON document in a tool result's only text content. */
+export function toolDocument(result: CallToolResult): unknown {
+  const [first, ...rest] = result.content
+  if (first?.type !== 'text' || rest.length > 0) {
+    throw new Error(`Expected exactly one text content item, got ${JSON.stringify(result)}`)
+  }
+  return JSON.parse(first.text)
+}
+
+/** A running `macts mcp serve` daemon. */
+export interface McpDaemonProcess {
+  /** The daemon's base URL. */
+  readonly url: string
+  /** Everything written to stderr so far. */
+  stderr(): string
+  /** Stop the daemon and wait for the process to exit. */
+  stop(): Promise<void>
+}
+
+/** The line `macts mcp serve` prints once it is listening. */
+const DAEMON_READY_LINE = /MCP server running at (\S+)/
+
+/**
+ * Start `macts mcp serve --port <port>` and resolve once it reports that it
+ * is listening. Rejects with its output if it exits first.
+ */
+export async function startMcpDaemon(
+  home: MactsHome,
+  port: number,
+  extraEnv: Readonly<Record<string, string>> = {}
+): Promise<McpDaemonProcess> {
+  const child = spawn(process.execPath, [CLI_BIN, 'mcp', 'serve', '--port', String(port)], {
+    cwd: REPO_ROOT,
+    env: minimalEnv(home, extraEnv),
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+  let stdout = ''
+  let stderr = ''
+  child.stdout.setEncoding('utf-8').on('data', (chunk: string) => (stdout += chunk))
+  child.stderr.setEncoding('utf-8').on('data', (chunk: string) => (stderr += chunk))
+
+  const url = await new Promise<string>((resolveUrl, reject) => {
+    const timer = setTimeout(() => {
+      child.kill('SIGKILL')
+      reject(new Error(`macts mcp serve did not start.\nstdout:\n${stdout}\nstderr:\n${stderr}`))
+    }, READY_TIMEOUT_MS)
+    child.stderr.on('data', () => {
+      const match = DAEMON_READY_LINE.exec(stderr)
+      if (match?.[1] !== undefined) {
+        clearTimeout(timer)
+        resolveUrl(match[1])
+      }
+    })
+    child.once('exit', (code) => {
+      clearTimeout(timer)
+      reject(
+        new Error(
+          `macts mcp serve exited with ${String(code)} before starting.\nstdout:\n${stdout}\nstderr:\n${stderr}`
+        )
+      )
+    })
+  })
+
+  return { url, stderr: () => stderr, stop: () => stopProcess(child) }
 }

@@ -11,6 +11,10 @@
  * {@link GovernanceFilter}, with no macOS-specific assumptions, so a future
  * non-macOS provider's registry plugs in unchanged.
  *
+ * Discovery runs no operation, so it is a host tool ({@link McpHostTool}),
+ * served beside the operation tools with `withHostTools`, and never passes
+ * through `runtime.invoke`. Calling a capability it returns does.
+ *
  * @packageDocumentation
  */
 
@@ -22,7 +26,8 @@ import {
   type CapabilityRegistry,
   type GovernanceFilter,
 } from '@macts/core'
-import type { McpToolDefinition, JsonSchema } from './types.js'
+import type { McpHostTool } from './adapter/host-tools.js'
+import type { McpToolInputSchema } from './adapter/adapter.js'
 
 /** Name of the built-in discovery tool. */
 export const DISCOVERY_TOOL_NAME = 'macts__capabilities__discover'
@@ -31,7 +36,7 @@ export const DISCOVERY_TOOL_NAME = 'macts__capabilities__discover'
 const DEFAULT_DISCOVERY_LIMIT = 8
 
 /** Input schema for the discovery tool. */
-const DISCOVERY_INPUT_SCHEMA: JsonSchema = {
+const DISCOVERY_INPUT_SCHEMA: McpToolInputSchema = {
   type: 'object',
   properties: {
     intent: {
@@ -71,7 +76,8 @@ interface DiscoveryArgs {
 }
 
 /**
- * Create the built-in capability-discovery MCP tool over a registry.
+ * Create the built-in capability-discovery MCP tool over a registry, as a host
+ * tool to serve beside the operation tools.
  *
  * Behavior:
  * - With `capability`: returns the full descriptor for that exact capability,
@@ -81,9 +87,9 @@ interface DiscoveryArgs {
  *   capability" next-move hint (never a UI/pixel fallback).
  *
  * @param options - Registry + optional governance filter
- * @returns The discovery tool definition
+ * @returns The discovery tool
  */
-export function createDiscoveryTool(options: DiscoveryToolOptions): McpToolDefinition {
+export function createDiscoveryTool(options: DiscoveryToolOptions): McpHostTool {
   const { registry } = options
   const governance = options.governance ?? ALLOW_ALL_GOVERNANCE
 

@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach, type MockInstance } from 'vitest'
 import { Writable } from 'node:stream'
 import { Cli } from 'clipanion'
-import { RootCommand } from './root.js'
+import { MISSING_MCP_API_KEY_MESSAGE, RootCommand } from './root.js'
+import { REMOVED_TRUST_SWITCH_ENV, REMOVED_TRUST_SWITCH_ENV_WARNING } from '../removed-options.js'
 import * as mcp from '@macts/mcp'
 import * as apiServer from '@macts/api/server'
 import { dirname } from 'node:path'
@@ -11,6 +12,9 @@ import {
   writeInstalledApp,
   type PluginsFixture,
 } from '../host/installed-apps-fixtures.js'
+
+/** The key `macts --mcp` is started with in these tests; never verified here. */
+const SESSION_KEY = 'macts_sk_root-command-test'
 
 function createMockStreams() {
   let stdoutOutput = ''
@@ -58,157 +62,145 @@ describe('RootCommand', () => {
     expect(getStdout()).toContain('Use --help to see available commands')
   })
 
-  it('should start MCP server with only the built-in discovery plugin when no plugins are installed', async () => {
-    const { stdout, stderr, getStderr } = createMockStreams()
+  describe('--mcp flag', () => {
+    let plugins: PluginsFixture
+    let startStdio: MockInstance<typeof mcp.startStdioServer>
 
-    // Mock plugin discovery to return no installed plugins
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [],
+    beforeEach(() => {
+      plugins = createPluginsFixture()
+      // MACTS_HOME/plugins/node_modules is the fixture's node_modules.
+      vi.stubEnv('MACTS_HOME', dirname(dirname(plugins.nodeModules)))
+      vi.stubEnv('MACTS_TEST_EXECUTOR', '')
+      vi.stubEnv('MACTS_API_KEY', SESSION_KEY)
+      vi.stubEnv(REMOVED_TRUST_SWITCH_ENV, undefined)
+      startStdio = vi
+        .spyOn(mcp, 'startStdioServer')
+        .mockResolvedValue({ close: () => Promise.resolve() })
     })
 
-    // Mock server creation to resolve immediately
-    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+    afterEach(() => {
+      vi.restoreAllMocks()
+      vi.unstubAllEnvs()
+      plugins.dispose()
+    })
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
-
-    expect(exitCode).toBe(0)
-    // The built-in capability-discovery plugin is always prepended, so the
-    // server starts with exactly one plugin exposing the discovery tool.
-    const plugins = createServerSpy.mock.calls[0]?.[0] as mcp.McpPlugin[]
-    expect(plugins).toHaveLength(1)
-    expect(plugins[0]?.name).toBe('capabilities')
-    expect(plugins[0]?.tools.map((t) => t.name)).toContain('macts__capabilities__discover')
-    expect(getStderr()).toContain('Starting MCP server with 1 plugin(s)')
-  })
-
-  it('should start MCP server with the discovery plugin plus discovered plugins', async () => {
-    const { stdout, stderr, getStderr } = createMockStreams()
-
-    const mockPlugin = {
-      name: 'test-plugin',
-      description: 'Test plugin',
-      tools: [],
+    /** The options `macts --mcp` started the stdio server with. */
+    function stdioOptions(): mcp.StdioServerOptions {
+      const options = startStdio.mock.calls[0]?.[0]
+      if (options === undefined) throw new Error('startStdioServer was not called')
+      return options
     }
 
-    // Mock plugin discovery to return a plugin
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [mockPlugin],
-      errors: [],
+    it('serves the installed apps’ operation tools and the discovery tool, under the session key', async () => {
+      writeInstalledApp(plugins.nodeModules, 'widgets')
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
+
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+
+      expect(exitCode).toBe(0)
+      const { adapter, credential } = stdioOptions()
+      expect(adapter.listTools().map((tool) => tool.name)).toEqual([
+        'macts__capabilities__discover',
+        'macts__widgets__widgets_list',
+      ])
+      expect(credential.reveal()).toBe(SESSION_KEY)
+      expect(getStderr()).toContain('Serving 1 app(s):\n  widgets\n')
+      expect(getStderr()).toContain('MCP server running on stdio with 2 tool(s)\n')
+      // Stdout is the MCP channel: nothing else may be written to it.
+      expect(getStdout()).toBe('')
     })
 
-    // Mock server creation
-    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+    it('reports apps it cannot serve on stderr, never stdout', async () => {
+      writeInstalledApp(plugins.nodeModules, 'gadgets', { exportsContract: false })
+      writeAppPackage(plugins.nodeModules, 'sprockets')
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(0)
-    // Discovery plugin is prepended ahead of the discovered plugin.
-    const plugins = createServerSpy.mock.calls[0]?.[0] as mcp.McpPlugin[]
-    expect(plugins).toHaveLength(2)
-    expect(plugins[0]?.name).toBe('capabilities')
-    expect(plugins[1]).toEqual(mockPlugin)
-    expect(getStderr()).toContain('Starting MCP server with 2 plugin(s)')
-  })
-
-  it('should log plugin errors to stderr when --mcp is provided', async () => {
-    const { stdout, stderr, getStderr } = createMockStreams()
-
-    // Mock plugin discovery to return an error
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [
-        {
-          packageName: '@macts/broken-server',
-          message: 'Failed to load plugin',
-        },
-      ],
+      expect(exitCode).toBe(0)
+      expect(getStderr()).toContain(
+        "Not serving 1 app(s) that failed to register:\n  gadgets: Package @macts/gadgets does not define a './contract' export"
+      )
+      expect(getStderr()).toContain(
+        'sprockets: install @macts/sprockets-server with `macts mcp install sprockets`'
+      )
+      expect(getStdout()).toBe('')
     })
 
-    // Mock server creation
-    vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+    it('fails startup without MACTS_API_KEY, naming how to create a key', async () => {
+      vi.stubEnv('MACTS_API_KEY', undefined)
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(0)
-    expect(getStderr()).toContain('Plugin load error: @macts/broken-server: Failed to load plugin')
-  })
-
-  it('should handle MCP server creation failure', async () => {
-    const { stdout, stderr, getStderr } = createMockStreams()
-
-    // Mock plugin discovery
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [],
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toBe(`Failed to start MCP server: ${MISSING_MCP_API_KEY_MESSAGE}\n`)
+      expect(getStderr()).toContain('macts api-key create')
+      expect(getStdout()).toBe('')
+      expect(startStdio).not.toHaveBeenCalled()
     })
 
-    // Mock server creation to fail
-    vi.spyOn(mcp, 'createMcpServer').mockRejectedValue(new Error('Server start failed'))
+    it('treats a blank MACTS_API_KEY as missing', async () => {
+      vi.stubEnv('MACTS_API_KEY', '   ')
+      const { stdout, stderr, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(1)
-    expect(getStderr()).toContain('Failed to start MCP server: Server start failed')
-  })
-
-  it('should forward disableApiKeyValidation: false to createMcpServer by default', async () => {
-    const { stdout, stderr } = createMockStreams()
-
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [],
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toContain('MACTS_API_KEY is not set.')
+      expect(startStdio).not.toHaveBeenCalled()
     })
 
-    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+    it('runs on the stub test executor, announcing it on stderr', async () => {
+      vi.stubEnv('MACTS_TEST_EXECUTOR', 'stub')
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(0)
-    expect(createServerSpy).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ disableApiKeyValidation: false })
-    )
-  })
-
-  it('should forward disableApiKeyValidation: true to createMcpServer when flag is set', async () => {
-    const { stdout, stderr } = createMockStreams()
-
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [],
+      expect(exitCode).toBe(0)
+      expect(getStderr()).toContain('Warning: MACTS_TEST_EXECUTOR=stub is set')
+      expect(getStderr()).toContain('Executor: test-stub\n')
+      expect(getStdout()).toBe('')
     })
 
-    const createServerSpy = vi.spyOn(mcp, 'createMcpServer').mockResolvedValue(undefined)
+    it('fails startup for an unknown test executor name', async () => {
+      vi.stubEnv('MACTS_TEST_EXECUTOR', 'bogus')
+      const { stdout, stderr, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp', '--disable-api-key-validation'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(0)
-    expect(createServerSpy).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ disableApiKeyValidation: true })
-    )
-  })
-
-  it('should exit 1 and print only the error message (no stack) when startup API key validation fails', async () => {
-    const { stdout, stderr, getStderr } = createMockStreams()
-
-    vi.spyOn(mcp, 'discoverMcpPlugins').mockResolvedValue({
-      plugins: [],
-      errors: [],
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toContain(
+        'Failed to start MCP server: MACTS_TEST_EXECUTOR is set to "bogus", which is not a built-in test executor.'
+      )
+      expect(startStdio).not.toHaveBeenCalled()
     })
 
-    const authError = new Error(
-      'MACTS_API_KEY environment variable is not set.\nCreate an API key with:'
-    )
-    vi.spyOn(mcp, 'createMcpServer').mockRejectedValue(authError)
+    it('prints only the message, with no stack, when the stdio server fails to start', async () => {
+      const failure = new Error('stdin is closed')
+      startStdio.mockRejectedValue(failure)
+      const { stdout, stderr, getStderr } = createMockStreams()
 
-    const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
 
-    expect(exitCode).toBe(1)
-    expect(getStderr()).toContain('MACTS_API_KEY environment variable is not set.')
-    expect(getStderr()).not.toContain(authError.stack ?? '__unused__')
-    expect(getStderr()).not.toMatch(/at .*:\d+:\d+/)
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toContain('Failed to start MCP server: stdin is closed\n')
+      expect(getStderr()).not.toMatch(/at .*:\d+:\d+/)
+    })
+
+    it(`warns on stderr when ${REMOVED_TRUST_SWITCH_ENV} is set, and still requires a key`, async () => {
+      vi.stubEnv(REMOVED_TRUST_SWITCH_ENV, '1')
+      vi.stubEnv('MACTS_API_KEY', undefined)
+      const { stdout, stderr, getStdout, getStderr } = createMockStreams()
+
+      const exitCode = await cli.run(['--mcp'], { stdout, stderr })
+
+      expect(exitCode).toBe(1)
+      expect(getStderr()).toContain(`${REMOVED_TRUST_SWITCH_ENV_WARNING}\n`)
+      expect(getStderr().split(REMOVED_TRUST_SWITCH_ENV_WARNING)).toHaveLength(2)
+      expect(getStderr()).toContain('MACTS_API_KEY is not set.')
+      expect(getStdout()).toBe('')
+    })
   })
 
   describe('--serve flag', () => {

@@ -113,21 +113,126 @@ importers:
 
   e2e/cli-host:
     devDependencies:
+      '@macts/alfred-server':
+        specifier: workspace:*
+        version: link:../../packages/alfred-server
+      '@macts/arc-server':
+        specifier: workspace:*
+        version: link:../../packages/arc-server
+      '@macts/automator-server':
+        specifier: workspace:*
+        version: link:../../packages/automator-server
+      '@macts/bluetooth-file-exchange-server':
+        specifier: workspace:*
+        version: link:../../packages/bluetooth-file-exchange-server
+      '@macts/calendar-server':
+        specifier: workspace:*
+        version: link:../../packages/calendar-server
       '@macts/cli':
         specifier: workspace:*
         version: link:../../packages/cli
+      '@macts/console-server':
+        specifier: workspace:*
+        version: link:../../packages/console-server
+      '@macts/contacts-server':
+        specifier: workspace:*
+        version: link:../../packages/contacts-server
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@macts/finder-server':
+        specifier: workspace:*
+        version: link:../../packages/finder-server
+      '@macts/google-chrome-server':
+        specifier: workspace:*
+        version: link:../../packages/google-chrome-server
+      '@macts/iterm-server':
+        specifier: workspace:*
+        version: link:../../packages/iterm-server
+      '@macts/mail-server':
+        specifier: workspace:*
+        version: link:../../packages/mail-server
+      '@macts/messages-server':
+        specifier: workspace:*
+        version: link:../../packages/messages-server
+      '@macts/microsoft-edge-server':
+        specifier: workspace:*
+        version: link:../../packages/microsoft-edge-server
+      '@macts/microsoft-word-server':
+        specifier: workspace:*
+        version: link:../../packages/microsoft-word-server
+      '@macts/music-server':
+        specifier: workspace:*
+        version: link:../../packages/music-server
       '@macts/notes':
         specifier: workspace:*
         version: link:../../packages/notes
       '@macts/notes-server':
         specifier: workspace:*
         version: link:../../packages/notes-server
+      '@macts/omnifocus-server':
+        specifier: workspace:*
+        version: link:../../packages/omnifocus-server
+      '@macts/omnigraffle-server':
+        specifier: workspace:*
+        version: link:../../packages/omnigraffle-server
+      '@macts/omniplan-server':
+        specifier: workspace:*
+        version: link:../../packages/omniplan-server
+      '@macts/photos-server':
+        specifier: workspace:*
+        version: link:../../packages/photos-server
+      '@macts/preview-server':
+        specifier: workspace:*
+        version: link:../../packages/preview-server
+      '@macts/quicktime-player-server':
+        specifier: workspace:*
+        version: link:../../packages/quicktime-player-server
       '@macts/reminders':
         specifier: workspace:*
         version: link:../../packages/reminders
       '@macts/reminders-server':
         specifier: workspace:*
         version: link:../../packages/reminders-server
+      '@macts/safari-server':
+        specifier: workspace:*
+        version: link:../../packages/safari-server
+      '@macts/screen-sharing-server':
+        specifier: workspace:*
+        version: link:../../packages/screen-sharing-server
+      '@macts/script-editor-server':
+        specifier: workspace:*
+        version: link:../../packages/script-editor-server
+      '@macts/shortcuts-server':
+        specifier: workspace:*
+        version: link:../../packages/shortcuts-server
+      '@macts/spotify-server':
+        specifier: workspace:*
+        version: link:../../packages/spotify-server
+      '@macts/system-events-server':
+        specifier: workspace:*
+        version: link:../../packages/system-events-server
+      '@macts/system-information-server':
+        specifier: workspace:*
+        version: link:../../packages/system-information-server
+      '@macts/system-settings-server':
+        specifier: workspace:*
+        version: link:../../packages/system-settings-server
+      '@macts/terminal-server':
+        specifier: workspace:*
+        version: link:../../packages/terminal-server
+      '@macts/textedit-server':
+        specifier: workspace:*
+        version: link:../../packages/textedit-server
+      '@macts/tv-server':
+        specifier: workspace:*
+        version: link:../../packages/tv-server
+      '@macts/xcode-server':
+        specifier: workspace:*
+        version: link:../../packages/xcode-server
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.0.4
+        version: 1.26.0(zod@4.3.6)
       '@types/node':
         specifier: ^26.0.0
         version: 26.2.0
@@ -947,9 +1052,6 @@ importers:
       '@macts/runtime':
         specifier: workspace:*
         version: link:../runtime
-      '@macts/types':
-        specifier: workspace:*
-        version: link:../types
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.4
         version: 1.26.0(zod@4.3.6)
