@@ -597,6 +597,9 @@ export function buildCapabilityRegistry(manifests: readonly AppManifest[]): Capa
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
+export function buildNativeBody(manifest: AppManifest, target: OperationTarget): string;
+
+// @public
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, segment: string): string;
 
 // @public
@@ -914,6 +917,9 @@ export interface CreateMcpContextOptions {
 
 // @public
 export function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext;
+
+// @public
+export function createNativeExecutor(options?: NativeExecutorOptions): Executor;
 
 // @public
 export function createPolicyGovernanceFilter(policy: GovernancePolicy): GovernanceFilter;
@@ -1743,21 +1749,30 @@ export interface JxaEnumValue {
     name: string;
 }
 
-// @public (undocumented)
+// @public
 export class JxaExecutionError extends Error {
-    constructor(message: string, code: string, stderr: string, cause?: unknown);
-    // (undocumented)
+    constructor(message: string, code: string, stderr: string, cause?: unknown, options?: JxaExecutionErrorOptions);
     readonly code: string;
-    // (undocumented)
+    readonly kind: JxaFailureKind;
     readonly stderr: string;
+    readonly timedOut: boolean;
 }
 
-// @public (undocumented)
+// @public
+export interface JxaExecutionErrorOptions {
+    readonly kind?: JxaFailureKind;
+}
+
+// @public
 export interface JxaExecutorOptions {
+    maxOutputBytes?: number;
     onStderr?: (msg: string) => void;
-    // (undocumented)
+    signal?: AbortSignal | undefined;
     timeout?: number;
 }
+
+// @public
+export type JxaFailureKind = 'timed-out' | 'cancelled' | 'output-too-large' | 'not-started' | 'signalled' | 'exited' | 'unreadable-output';
 
 // @public
 export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>;
@@ -1843,6 +1858,9 @@ export const MAX_CALL_MS = 25000;
 export const MAX_ITEMS_PER_COLLECTION = 60;
 
 // @public
+export const MAX_OUTPUT_BYTES: number;
+
+// @public
 export interface McpGeneratorContext {
     appName: string;
     manifest: AppManifest;
@@ -1872,6 +1890,12 @@ export interface NativeCodec {
 }
 
 // @public
+export interface NativeExecutorOptions {
+    readonly timeoutMs?: number;
+    readonly transport?: NativeTransport;
+}
+
+// @public
 export type NativeFailure = {
     readonly source: 'app';
     readonly message: string;
@@ -1893,12 +1917,23 @@ export type NativeOutcome = {
 };
 
 // @public
+export interface NativeRunOptions {
+    readonly signal?: AbortSignal | undefined;
+    readonly timeoutMs: number;
+}
+
+// @public
 export interface NativeScript {
     readonly body: string;
     readonly bundleId: string;
     readonly input: WireRecord;
     readonly inputPlan: ValuePlan;
     readonly outputPlan: ValuePlan;
+}
+
+// @public
+export interface NativeTransport {
+    run(script: string, options: NativeRunOptions): Promise<unknown>;
 }
 
 // @public
