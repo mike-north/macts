@@ -1652,6 +1652,9 @@ export interface McpGeneratorContext {
 }
 
 // @public
+export const NATIVE_CODEC: NativeCodec;
+
+// @public
 export const NATIVE_CODEC_ERROR_NAME = "MactsCodecError";
 
 // @public

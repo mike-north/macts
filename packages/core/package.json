@@ -58,5 +58,14 @@
   "tsd": {
     "directory": "src",
     "testFilePattern": "**/*.test-d.ts"
+  },
+  "nx": {
+    "targets": {
+      "test": {
+        "dependsOn": [
+          "build"
+        ]
+      }
+    }
   }
 }
