@@ -8,6 +8,17 @@
  * tracking, TLS, and graceful shutdown. Every operation request is handled by
  * the adapter and runs through the runtime's invocation pipeline.
  *
+ * A server serves the apps registered on its runtime when it is constructed,
+ * in either of two ways:
+ *
+ * - **From generated contracts**, through the `register` option: each app's
+ *   contract is checked against its manifest and its operations validate
+ *   inputs against the contract's wire schemas (phases/13 D5, D11). This is
+ *   how the macts hosts on this Mac (`macts --serve`) serve installed apps.
+ * - **From manifests alone**, through the `manifests` parameter: passthrough
+ *   registration for embedders and tests. Operations carry no contract value
+ *   types, and inputs are validated by each command's request schema.
+ *
  * @packageDocumentation
  */
 
@@ -16,6 +27,7 @@ import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
 import type pino from 'pino'
 import { createNativeExecutor, type AppManifest, type Executor } from '@macts/core'
+import type { AppContract } from '@macts/contracts'
 import {
   createRateLimiter,
   createRuntime,
@@ -79,6 +91,36 @@ export interface RateLimitOptions extends RateLimiterOptions {
    * @defaultValue 300 requests per minute per address
    */
   readonly perAddress?: RateLimiterOptions
+}
+
+/**
+ * Registers apps on the runtime a server is constructed with.
+ *
+ * @remarks
+ * The registration half of the server's runtime, handed to
+ * {@link ServerOptions.register}. Each call is atomic: an app it refuses
+ * (`OperationRegistrationError` from `@macts/runtime`) adds no operations.
+ */
+export interface AppRegistrar {
+  /**
+   * Register an app from its generated contract, after checking every
+   * descriptor against the manifest. The operations validate inputs against
+   * the contract's wire schemas.
+   *
+   * @throws `OperationRegistrationError` when a descriptor's permission or
+   *   target disagrees with the manifest, names an operation the manifest does
+   *   not expose, or an operation id is already registered.
+   */
+  registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
+  /**
+   * Register every operation an app manifest exposes, as passthrough: no
+   * contract value types, with inputs validated by each command's request
+   * schema.
+   *
+   * @throws `OperationRegistrationError` when an operation id is already
+   *   registered or the manifest yields a malformed id or permission.
+   */
+  registerManifest(manifest: AppManifest): void
 }
 
 /**
@@ -151,6 +193,34 @@ export interface ServerOptions {
    * @defaultValue the connection's remote address
    */
   clientAddress?: ClientAddressResolver
+  /**
+   * Registers apps from their generated contracts on the server's runtime.
+   *
+   * @remarks
+   * Called once, synchronously, while the server is constructed: after any
+   * manifests passed as the first parameter are registered, and before the
+   * operation routes are built, so every app it registers is served. Register
+   * an app with `registrar.registerContract(contract, manifest)`.
+   *
+   * A throw from the callback propagates out of the server factory. A caller
+   * that wants to serve the apps that do register when another is refused
+   * catches per app; each registration is atomic.
+   *
+   * @example
+   * ```typescript
+   * import { createMultiServer } from '@macts/api/server'
+   * import { AppManifestSchema } from '@macts/core'
+   * import { notesContract } from '@macts/notes/contract'
+   *
+   * const manifest = AppManifestSchema.parse(await notesContract.loadManifest())
+   * const server = createMultiServer([], {
+   *   register: (registrar) => registrar.registerContract(notesContract, manifest),
+   * })
+   * ```
+   *
+   * @defaultValue no contract registrations
+   */
+  register?: (registrar: AppRegistrar) => void
 }
 
 /**
@@ -178,9 +248,15 @@ export const DEFAULT_PORT = 8372
 export const DEFAULT_HOST = 'localhost'
 
 /**
- * Create a macts API server for a single app.
+ * Create a macts API server for a single app, registered from its manifest.
  *
- * @param manifest - App manifest to serve
+ * @remarks
+ * The manifest is registered as passthrough: its operations carry no contract
+ * value types, and inputs are validated by each command's request schema. To
+ * serve an app from its generated contract instead, use
+ * {@link ServerOptions.register}.
+ *
+ * @param manifest - App manifest to serve, as passthrough
  * @param options - Server configuration
  * @returns Hono app configured with routes
  *
@@ -203,9 +279,20 @@ export function createServer(manifest: AppManifest, options: ServerOptions = {})
 /**
  * Create a macts API server for multiple apps.
  *
- * @param manifests - Array of app manifests
- * @param options - Server configuration
+ * @remarks
+ * The server serves every app registered when it is constructed: the
+ * `manifests`, registered as passthrough (no contract value types; inputs are
+ * validated by each command's request schema), and any apps the
+ * {@link ServerOptions.register} callback registers from their generated
+ * contracts (inputs are validated against each contract's wire schemas).
+ * Either may be empty. `/health` and `/api/v1` list every registered app.
+ *
+ * @param manifests - App manifests to serve as passthrough; `[]` when every
+ *   app is registered from its contract
+ * @param options - Server configuration, including contract registration
  * @returns Hono app configured with routes for all apps
+ * @throws `OperationRegistrationError` from `@macts/runtime` when a manifest,
+ *   or a registration the `register` callback does not catch, is refused
  *
  * @example
  * ```typescript
@@ -237,6 +324,7 @@ export function createMultiServer(
     executor,
     verifier,
     clientAddress,
+    register,
   } = options
 
   if (customLogger) {
@@ -258,9 +346,23 @@ export function createMultiServer(
           }),
         }),
   })
-  for (const manifest of manifests) {
-    runtime.registerManifest(manifest)
+  // Every app the server serves, in registration order, for the unauthenticated
+  // listings below.
+  const served: AppManifest[] = []
+  const registrar: AppRegistrar = {
+    registerContract(contract, manifest) {
+      runtime.registerContract(contract, manifest)
+      served.push(manifest)
+    },
+    registerManifest(manifest) {
+      runtime.registerManifest(manifest)
+      served.push(manifest)
+    },
   }
+  for (const manifest of manifests) {
+    registrar.registerManifest(manifest)
+  }
+  register?.(registrar)
 
   const adapter = createHttpAdapter(runtime, {
     ...(customLogger === undefined ? {} : { logger: customLogger }),
@@ -302,7 +404,7 @@ export function createMultiServer(
     return c.json({
       status: 'ok',
       version,
-      apps: manifests.map((m) => m.app.name),
+      apps: served.map((m) => m.app.name),
     })
   })
 
@@ -312,7 +414,7 @@ export function createMultiServer(
       name: 'macts API',
       version: 'v1',
       documentation: 'https://github.com/macts/macts',
-      apps: manifests.map((m) => ({
+      apps: served.map((m) => ({
         name: m.app.name,
         bundleId: m.app.bundleId,
       })),
@@ -417,9 +519,10 @@ export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'graceful
  * Create just the Hono app without server lifecycle.
  *
  * Useful for testing (with an injected `executor` and `verifier`) or custom
- * server setups.
+ * server setups. Apps are registered as for {@link createMultiServer}: the
+ * `manifests` as passthrough, and contracts through `options.register`.
  *
- * @param manifests - Array of app manifests
+ * @param manifests - App manifests to serve as passthrough
  * @param options - Server configuration, excluding listener options
  * @returns Configured Hono app
  */

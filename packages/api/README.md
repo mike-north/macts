@@ -63,6 +63,31 @@ const { start } = createMultiServer([calendar, reminders], {
 await start()
 ```
 
+### Serving Apps From Their Contracts
+
+The `register` option registers apps from their generated contracts on the
+server's runtime, before the routes are built. Each contract is checked
+against its manifest, and its operations validate inputs against the
+contract's wire schemas. This is how `macts --serve` serves installed apps.
+
+```typescript
+import { createMultiServer } from '@macts/api/server'
+import { AppManifestSchema } from '@macts/core'
+import { notesContract } from '@macts/notes/contract'
+
+const manifest = AppManifestSchema.parse(await notesContract.loadManifest())
+
+const { start } = createMultiServer([], {
+  register: (registrar) => registrar.registerContract(notesContract, manifest),
+})
+
+await start()
+```
+
+Manifests passed as the first parameter (as in the examples above) are
+registered as passthrough: their operations carry no contract value types,
+and inputs are validated by each command's request schema.
+
 ### Creating API Keys
 
 API keys are minted, verified, and stored by `@macts/runtime`, which every macts
@@ -113,6 +138,7 @@ interface ServerOptions {
   executor?: Executor // Default: createNativeExecutor() from @macts/core
   verifier?: CredentialVerifier // Default: the @macts/runtime key-store verifier
   clientAddress?: (c: Context) => string | undefined // Default: the socket's remote address
+  register?: (registrar: AppRegistrar) => void // Register apps from their contracts. Default: none
 }
 
 interface RateLimitOptions {

@@ -5,6 +5,7 @@
 ```ts
 
 import { AnyMactsError } from '@macts/contracts';
+import { AppContract } from '@macts/contracts';
 import { AppManifest } from '@macts/core';
 import { Context } from 'hono';
 import { CredentialVerifier } from '@macts/runtime';
@@ -22,6 +23,12 @@ import { WireErrorEnvelope } from '@macts/contracts';
 
 // @public
 export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'gracefulShutdownTimeout'>;
+
+// @public
+export interface AppRegistrar {
+    registerContract(contract: AppContract<unknown>, manifest: AppManifest): void;
+    registerManifest(manifest: AppManifest): void;
+}
 
 // @public
 export type AttributeValue = string | number | boolean;
@@ -125,6 +132,7 @@ export interface ServerOptions {
     port?: number;
     prettyJson?: boolean;
     rateLimit?: RateLimitOptions | false;
+    register?: (registrar: AppRegistrar) => void;
     tls?: TlsOptions;
     verifier?: CredentialVerifier;
 }
