@@ -24,6 +24,7 @@
  * @see ../../../../../phases/13-sdk-value-and-execution-contracts.md
  * @see https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
  *   (how the automation bridge spells dictionary terms)
+ * @see https://github.com/mike-north/macts/issues/165
  */
 
 import { describe, expect, it } from 'vitest'

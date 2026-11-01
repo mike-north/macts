@@ -10,6 +10,7 @@
  * unsupported and `listSettings` and `openURL` are not.
  *
  * @see ./schemas/resource.ts (ResourceUnsupportedSchema)
+ * @see https://github.com/mike-north/macts/issues/165
  */
 
 import { describe, expect, it } from 'vitest'

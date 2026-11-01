@@ -21,6 +21,7 @@
  * @see ../manifest/unsupported.ts
  * @see ../manifest/schemas/command.ts (CommandUnsupportedSchema)
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D10)
+ * @see https://github.com/mike-north/macts/issues/165
  */
 
 import { describe, expect, it } from 'vitest'

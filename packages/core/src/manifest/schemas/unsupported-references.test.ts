@@ -12,6 +12,7 @@
  * and Connection is marked unsupported in the marked variant only.
  *
  * @see ../../../../../phases/13-sdk-value-and-execution-contracts.md
+ * @see https://github.com/mike-north/macts/issues/165
  */
 
 import { describe, expect, it } from 'vitest'
