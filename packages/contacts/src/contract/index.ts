@@ -70,12 +70,12 @@ export interface Address {
   id: string
   /**
    * Zip or postal code of the address.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 1 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   zip: string | null
   /**
    * Country part of the address.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 4 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   country: string | null
   /**
@@ -85,7 +85,7 @@ export interface Address {
   label: string | null
   /**
    * Country code part of the address (should be a two character iso country code).
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 6 of 12 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   countryCode: string | null
   /**
@@ -137,19 +137,19 @@ export interface CustomDate {
 export interface Email {
   /**
    * Unique identifier for this email.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  readonly id: string | null
+  readonly id: string
   /**
    * Label for this email.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  label: string | null
+  label: string
   /**
    * The email address.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  value: string | null
+  value: string
 }
 
 /** A Group Record in the address book database */
@@ -241,22 +241,22 @@ export interface MSNHandle {
 export interface Person {
   /**
    * The Nickname of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 22 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   nickname: string | null
   /**
    * Organization that employs this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 17 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   organization: string | null
   /**
    * The Maiden name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   maidenName: string | null
   /**
    * The Suffix of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   suffix: string | null
   /**
@@ -266,32 +266,32 @@ export interface Person {
   readonly vcard: string | null
   /**
    * The home page of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   homePage: string | null
   /**
    * The birth date of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   birthDate: string | null
   /**
    * The phonetic version of the Last name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   phoneticLastName: string | null
   /**
    * The title of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   title: string | null
   /**
    * The Phonetic version of the Middle name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   phoneticMiddleName: string | null
   /**
    * Department that this person works for.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   department: string | null
   /**
@@ -306,7 +306,7 @@ export interface Person {
   readonly name: string | null
   /**
    * Notes for this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   note: string | null
   /**
@@ -316,27 +316,27 @@ export interface Person {
   company: boolean | null
   /**
    * The Middle name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   middleName: string | null
   /**
    * The phonetic version of the First name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   phoneticFirstName: string | null
   /**
    * The job title of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   jobTitle: string | null
   /**
    * The Last name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 6 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   lastName: string | null
   /**
    * The First name of this person.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 1 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   firstName: string | null
 }
@@ -345,19 +345,19 @@ export interface Person {
 export interface Phone {
   /**
    * Unique identifier for this phone.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 48 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  readonly id: string | null
+  readonly id: string
   /**
    * Label for this phone.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 48 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  label: string | null
+  label: string
   /**
    * The phone number.
-   * Nullable. No evidence that the app always sets it.
+   * Never null: observed in all 48 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  value: string | null
+  value: string
 }
 
 /** Other names related to this person. */
@@ -1058,9 +1058,9 @@ const customDateRecordType: ValueType<CustomDate> = t.record(
 
 const emailRecordType: ValueType<Email> = t.record(
   {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this email' }),
-    label: t.nullable(t.string(), { description: 'Label for this email' }),
-    value: t.nullable(t.string(), { description: 'The email address' }),
+    id: t.string({ description: 'Unique identifier for this email' }),
+    label: t.string({ description: 'Label for this email' }),
+    value: t.string({ description: 'The email address' }),
   },
   { description: 'Email address for a person.' }
 )
@@ -1156,9 +1156,9 @@ const personRecordType: ValueType<Person> = t.record(
 
 const phoneRecordType: ValueType<Phone> = t.record(
   {
-    id: t.nullable(t.string(), { description: 'Unique identifier for this phone' }),
-    label: t.nullable(t.string(), { description: 'Label for this phone' }),
-    value: t.nullable(t.string(), { description: 'The phone number' }),
+    id: t.string({ description: 'Unique identifier for this phone' }),
+    label: t.string({ description: 'Label for this phone' }),
+    value: t.string({ description: 'The phone number' }),
   },
   { description: 'Phone number for a person.' }
 )
