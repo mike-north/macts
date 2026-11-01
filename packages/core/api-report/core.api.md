@@ -4,7 +4,12 @@
 
 ```ts
 
+import { IssuePath } from '@macts/contracts';
 import { JsonSchema7Type } from 'zod-to-json-schema';
+import { OperationTarget } from '@macts/contracts';
+import { ValuePlan } from '@macts/contracts';
+import { WireRecord } from '@macts/contracts';
+import { WireValue } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -893,6 +898,22 @@ export interface EvaluateLayeredPolicyOptions {
 export function evaluatePolicy(policy: GovernancePolicy, permission: string, risk: RiskClass): PolicyEvaluation;
 
 // @public
+export interface ExecutionRequest {
+    readonly input: WireRecord;
+    readonly inputPlan: ValuePlan;
+    readonly manifest: AppManifest;
+    readonly outputPlan: ValuePlan;
+    readonly signal?: AbortSignal;
+    readonly target: OperationTarget;
+}
+
+// @public
+export interface Executor {
+    execute(request: ExecutionRequest): Promise<WireValue>;
+    readonly provider: string;
+}
+
+// @public
 export function expandCoarsePermission(permission: string, permissionsSection: PermissionsSection): string[];
 
 // @public
@@ -1628,6 +1649,50 @@ export interface McpGeneratorContext {
     packageName: string;
     sdkPackageName: string;
     version?: string | undefined;
+}
+
+// @public
+export const NATIVE_CODEC_ERROR_NAME = "MactsCodecError";
+
+// @public
+export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
+
+// @public
+export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
+
+// @public
+export interface NativeCodec {
+    readonly prelude: string;
+}
+
+// @public
+export type NativeFailure = {
+    readonly source: 'app';
+    readonly message: string;
+    readonly errorNumber?: number;
+} | {
+    readonly source: 'codec';
+    readonly direction: 'decode' | 'encode';
+    readonly path: IssuePath;
+    readonly message: string;
+};
+
+// @public
+export type NativeOutcome = {
+    readonly ok: true;
+    readonly value: WireValue;
+} | {
+    readonly ok: false;
+    readonly failure: NativeFailure;
+};
+
+// @public
+export interface NativeScript {
+    readonly body: string;
+    readonly bundleId: string;
+    readonly input: WireRecord;
+    readonly inputPlan: ValuePlan;
+    readonly outputPlan: ValuePlan;
 }
 
 // @public

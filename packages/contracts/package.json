@@ -1,0 +1,51 @@
+{
+  "name": "@macts/contracts",
+  "version": "0.2.0",
+  "description": "Platform-neutral value, error, reference, transfer, and operation contracts shared by macts clients and runtimes",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/macts.git",
+    "directory": "packages/contracts"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/contracts.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/contracts.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:types": "tsd",
+    "typecheck": "tsc --noEmit",
+    "api-extractor": "api-extractor run --local",
+    "api-extractor:ci": "api-extractor run"
+  },
+  "tsd": {
+    "directory": "src",
+    "testFilePattern": "**/*.test-d.ts"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsd": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

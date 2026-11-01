@@ -40,6 +40,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@macts/contracts": "workspace:*",
     "fast-xml-parser": "^5.0.9",
     "js-yaml": "^4.1.1",
     "pluralize": "^8.0.0",

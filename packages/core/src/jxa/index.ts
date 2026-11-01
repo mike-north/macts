@@ -1,6 +1,17 @@
 // Executor
 export { runJxa, runWithApp, JxaExecutionError, type JxaExecutorOptions } from './executor.js'
 
+// Native value codec contract (in-process wire <-> native conversion)
+export {
+  NATIVE_DECODE_FUNCTION,
+  NATIVE_ENCODE_FUNCTION,
+  NATIVE_CODEC_ERROR_NAME,
+  type NativeCodec,
+  type NativeScript,
+  type NativeFailure,
+  type NativeOutcome,
+} from './native-codec.js'
+
 // Connection
 export {
   connect,
