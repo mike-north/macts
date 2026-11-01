@@ -134,27 +134,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'automator.requiredResources.get',
-    app: 'automator',
-    appBundleId: 'com.apple.Automator',
-    resource: 'requiredResources',
-    operation: 'get',
-    description: 'Get a required resource by name',
-    permission: 'automator:requiredResources:get',
-    risk: 'read',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: {
-          description: 'Resource name',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['name'],
-    },
-  },
-  {
     name: 'automator.requiredResources.list',
     app: 'automator',
     appBundleId: 'com.apple.Automator',
@@ -173,27 +152,6 @@ export const capabilities: readonly CapabilityMetadata[] = [
       },
       additionalProperties: false,
       required: ['actionId'],
-    },
-  },
-  {
-    name: 'automator.settings.get',
-    app: 'automator',
-    appBundleId: 'com.apple.Automator',
-    resource: 'settings',
-    operation: 'get',
-    description: 'Get a setting by name',
-    permission: 'automator:settings:get',
-    risk: 'read',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        name: {
-          description: 'Setting name',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['name'],
     },
   },
   {

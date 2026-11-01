@@ -808,6 +808,14 @@ resources:
         type: string
         description: MIME type of the attachment E.g. text/plain.
         code: attp
+        native:
+          name: mimeType
+          evidence:
+            source: dictionary
+            bundleId: com.apple.mail
+            appVersion: '16.0'
+            osVersion: '27.2'
+            term: MIME type
       fileSize:
         access: r
         type: integer

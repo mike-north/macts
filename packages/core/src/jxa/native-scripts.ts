@@ -15,7 +15,11 @@
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
  * - the request parameter that carries an identifier is distinct from the
- *   resource property that holds it.
+ *   resource property that holds it;
+ * - the app is addressed by its own spelling of each collection and property
+ *   (`../manifest/native-accessor.ts`), while every record a body returns is
+ *   keyed by the manifest's public property names, so no app spelling reaches
+ *   the caller.
  *
  * No input value is ever written into a body. Every argument is read at run
  * time as `args["<name>"]`, so the source text depends only on the manifest and
@@ -42,7 +46,11 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
-import { defaultCollectionAccessor, resolveCollectionAccessor } from './collection-accessor.js'
+import {
+  defaultCollectionAccessor,
+  resolveCollectionAccessor,
+  resolvePropertyAccessor,
+} from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
 
 /**
@@ -204,13 +212,72 @@ function lines(...parts: readonly string[]): string {
 /**
  * Statements that fill the local record `name` with each of `parameters` the
  * input supplies, as native values. Absent optional parameters stay absent.
+ *
+ * @param fieldName - The record key each parameter is stored under: by
+ *   default its own name; the app's spelling of the property it names when
+ *   the record is handed to the app as an item's properties.
  */
-function collectSuppliedParameters(name: string, parameters: readonly CommandParameter[]): string {
+function collectSuppliedParameters(
+  name: string,
+  parameters: readonly CommandParameter[],
+  fieldName: (parameterName: string) => string = (parameterName) => parameterName
+): string {
   return lines(
     `var ${name} = {};`,
     ...parameters.map(
-      (p) => `if (${supplied(p.name)}) { ${member(name, p.name)} = ${argumentValue(p.name, p)}; }`
+      (p) =>
+        `if (${supplied(p.name)}) { ${member(name, fieldName(p.name))} = ${argumentValue(p.name, p)}; }`
     )
+  )
+}
+
+/**
+ * The app's name for a resource's property, from its manifest key (see
+ * `resolvePropertyAccessor`): the recorded native spelling, else the key. A
+ * name the resource does not declare as a property is addressed as written.
+ */
+function nativePropertyName(resource: Resource | undefined, key: string): string {
+  const property =
+    resource !== undefined && Object.hasOwn(resource.properties, key)
+      ? resource.properties[key]
+      : undefined
+  return resolvePropertyAccessor(key, property)
+}
+
+/**
+ * Statements that build the local record `obj` from one item's usable
+ * properties (those declared and not marked unsupported), keyed by their
+ * public names. get, create and update all return a record built here, so
+ * the three cannot drift.
+ *
+ * The read is batched, as a list's is: one `properties()` call, from whose
+ * record each usable property is taken under the app's name for it, and
+ * stored under its public key. An app's property record need not hold every
+ * property it can report (a Finder container's has no `entireContents`), so a
+ * usable property absent from the record is read on its own; one the app has
+ * no value for is in the record as `null` and costs no extra read. When
+ * `properties()` fails (a Calendar calendar's record includes the failing
+ * `calendarIdentifier`), each property is read on its own. Every read on its
+ * own is by the app's name and guarded, so a property the item cannot report
+ * is omitted rather than failing the operation. A body with no resource reads
+ * `name`.
+ */
+function readUsableProperties(resource: Resource | undefined, itemLocal: string): string {
+  const keys = resource === undefined ? ['name'] : usableProperties(resource).map(([key]) => key)
+  const native = (key: string): string => nativePropertyName(resource, key)
+  const readOnItsOwn = (key: string): string =>
+    `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
+  return lines(
+    'var obj = {};',
+    'try {',
+    `var props = ${itemLocal}.properties();`,
+    ...keys.map(
+      (key) =>
+        `if (${member('props', native(key))} !== undefined) { ${member('obj', key)} = ${member('props', native(key))}; } else { ${readOnItsOwn(key)} }`
+    ),
+    '} catch (e) {',
+    ...keys.map(readOnItsOwn),
+    '}'
   )
 }
 
@@ -283,7 +350,7 @@ function resolveParentCollection(manifest: AppManifest, parentIdParam: string): 
  * - `byProperty`: `app["<plural>"].whose({ "<property>": <value> })[0]`, because
  *   the declared identifier fails at run time (Calendar's
  *   `calendarIdentifier`), so the item is matched on a working property such as
- *   `name`.
+ *   `name`. The property is named by the app's spelling of it.
  *
  * @param resourcePlural - The collection's accessor in the app (see
  *   `resolveCollectionAccessor`).
@@ -298,7 +365,8 @@ export function buildTargetExpression(
   const collection = member('app', resourcePlural)
   const targeting = resolveIdentifierTargeting(resource)
   if (targeting?.strategy === 'byProperty') {
-    return `${collection}.whose({ ${literal(targeting.property)}: ${valueExpression} })[0]`
+    const property = nativePropertyName(resource, targeting.property)
+    return `${collection}.whose({ ${literal(property)}: ${valueExpression} })[0]`
   }
   return `${collection}.byId(${valueExpression})`
 }
@@ -504,6 +572,9 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
  * The runtime identifier read is never guarded, in either path: a misconfigured
  * identifier must fail the list with a real error rather than return items with
  * no usable id.
+ *
+ * Every read, from the record or per field, uses the app's name for the
+ * property; every item is keyed by the public names.
  */
 function buildListBody(
   command: Command,
@@ -531,20 +602,21 @@ function buildListBody(
     (p) => p !== runtimeIdProperty && p !== skipPropertyRead
   )
 
+  const native = (p: string): string => nativePropertyName(resource, p)
   const fastPathPropReads = bestEffortProps.map(
     (p) =>
-      `if (${member('props', p)} !== undefined) { ${member('obj', p)} = ${member('props', p)}; }`
+      `if (${member('props', native(p))} !== undefined) { ${member('obj', p)} = ${member('props', native(p))}; }`
   )
   const fallbackPropReads = bestEffortProps.map(
-    (p) => `try { ${member('obj', p)} = ${member('item', p)}(); } catch (e) {}`
+    (p) => `try { ${member('obj', p)} = ${member('item', native(p))}(); } catch (e) {}`
   )
   const idReadFast =
     runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('props', runtimeIdProperty)};`
+      ? `${member('obj', runtimeIdProperty)} = ${member('props', native(runtimeIdProperty))};`
       : ''
   const idReadFallback =
     runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('item', runtimeIdProperty)}();`
+      ? `${member('obj', runtimeIdProperty)} = ${member('item', native(runtimeIdProperty))}();`
       : ''
   const idAlias =
     identifierAliases && runtimeIdProperty !== undefined
@@ -601,12 +673,10 @@ function buildListBody(
 }
 
 /**
- * Read one item's usable properties: those declared and not marked
- * unsupported, since reading a property the app cannot provide only costs a
- * failed round trip. A nested resource is addressed through its parent; a
- * top-level one directly. The item must exist (see {@link failIfMissing});
- * each property read is then guarded, so a property the item cannot report is
- * omitted.
+ * Read one item's usable properties into a record keyed by their public names
+ * (see {@link readUsableProperties}). A nested resource is addressed through
+ * its parent; a top-level one directly. The item must exist (see
+ * {@link failIfMissing}) before any property is read.
  */
 function buildGetBody(
   command: Command,
@@ -616,15 +686,8 @@ function buildGetBody(
 ): ResourceBody {
   const parentScope = resolveParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
-  const propNames =
-    resource === undefined ? ['name'] : usableProperties(resource).map(([name]) => name)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
-  const body = lines(
-    bindItem,
-    'var obj = {};',
-    ...propNames.map((p) => `try { ${member('obj', p)} = ${member('item', p)}(); } catch (e) {}`),
-    'return obj;'
-  )
+  const body = lines(bindItem, readUsableProperties(resource, 'item'), 'return obj;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
 }
 
@@ -652,14 +715,16 @@ function buildDeleteBody(
 }
 
 /**
- * Create an item from the supplied parameters and return its properties.
+ * Create an item from the supplied parameters and return its usable
+ * properties, keyed by their public names, as a get does.
  *
  * When the command has a required parent identifier (the first required
  * parameter that is not one of the resource's own properties, such as
  * `calendarId`), the new item is appended to the parent's collection:
  * `make({ at: ... })` fails with "can't make or move that element into that
  * container", and appending to the parent's collection is the working form.
- * Every other supplied parameter becomes a property of the new item.
+ * Every other supplied parameter becomes a property of the new item, keyed by
+ * the app's name for the property it names.
  */
 function buildCreateBody(
   command: Command,
@@ -672,6 +737,7 @@ function buildCreateBody(
     (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
   )
 
+  const native = (name: string): string => nativePropertyName(resource, name)
   if (parentParam !== undefined) {
     const parent = resolveParentCollection(manifest, parentParam.name)
     const parentTarget = buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL)
@@ -680,11 +746,13 @@ function buildCreateBody(
       bindParent(parentTarget),
       collectSuppliedParameters(
         'props',
-        command.parameters.filter((p) => p.name !== parentParam.name)
+        command.parameters.filter((p) => p.name !== parentParam.name),
+        native
       ),
       `var item = ${itemClass}(props);`,
       `${member(PARENT_LOCAL, resourcePlural)}.push(item);`,
-      'return item.properties();'
+      readUsableProperties(resource, 'item'),
+      'return obj;'
     )
     return { body, identifierArguments: [parentParam.name] }
   }
@@ -694,20 +762,23 @@ function buildCreateBody(
   // appending to `app["<plural>"]` is the likely working form. Verify live before
   // relying on it.
   const body = lines(
-    collectSuppliedParameters('props', command.parameters),
+    collectSuppliedParameters('props', command.parameters, native),
     `var item = ${itemClass}(props);`,
     'item.make();',
-    'return item.properties();'
+    readUsableProperties(resource, 'item'),
+    'return obj;'
   )
   return { body, identifierArguments: [] }
 }
 
 /**
  * Set the supplied writable fields on one item, addressed like a get, and
- * return its properties. Each assignment is guarded, so a field the app refuses
- * does not prevent the others. The parent-scoped form matters for Calendar
- * events: `app.events.byId(uid)` is not settable, while the event addressed
- * through its calendar is.
+ * return its usable properties, keyed by their public names, as a get does.
+ * Each field is assigned by the app's name for the property it names, and
+ * each assignment is guarded, so a field the app refuses does not prevent the
+ * others. The parent-scoped form matters for Calendar events:
+ * `app.events.byId(uid)` is not settable, while the event addressed through
+ * its calendar is.
  */
 function buildUpdateBody(
   command: Command,
@@ -724,9 +795,10 @@ function buildUpdateBody(
     bindItem,
     ...writableFields.map(
       (p) =>
-        `if (${supplied(p.name)}) { try { ${member('item', p.name)} = ${argumentValue(p.name, p)}; } catch (e) {} }`
+        `if (${supplied(p.name)}) { try { ${member('item', nativePropertyName(resource, p.name))} = ${argumentValue(p.name, p)}; } catch (e) {} }`
     ),
-    'return item.properties();'
+    readUsableProperties(resource, 'item'),
+    'return obj;'
   )
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
 }

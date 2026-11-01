@@ -5,8 +5,6 @@
  * @packageDocumentation
  */
 
-import { ConnectionResourceClient } from './resources/connection.js'
-
 /**
  * Client configuration options.
  */
@@ -84,17 +82,9 @@ export class ScreenSharingError extends Error {
 export class ScreenSharingClient {
   readonly #httpClient: HttpClient
 
-  /** A screen sharing connection */
-  readonly connections: ConnectionResourceClient
-
   constructor(options: ScreenSharingClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.connections = new ConnectionResourceClient(
-      this.#httpClient,
-      'screen-sharing',
-      'connections'
-    )
   }
 
   /**

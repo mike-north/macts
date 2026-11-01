@@ -18,8 +18,10 @@
  * @packageDocumentation
  */
 
+import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { RuntimeProbe } from '../manifest/schemas/resource.js'
+import { isResourceUnsupported } from '../manifest/unsupported.js'
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -102,25 +104,6 @@ export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>
 const COMMON_FALLBACK_PROPERTIES = ['name', 'id'] as const
 
 // ---------------------------------------------------------------------------
-// JXA name helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Convert a PascalCase or otherwise capitalised plural to lowerCamelCase so
- * it matches the JXA collection accessor.
- *
- * Manifest `plural` values come from the sdef and are PascalCase
- * (e.g. `Calendars`, `DisplayAlarms`).  JXA exposes collections in
- * lowerCamelCase (`calendars()`, `displayAlarms()`).  Without this
- * conversion every `app[plural]()` call returns undefined and the probe
- * silently reports `no-items` for every resource.
- */
-export function toLowerCamelCase(s: string): string {
-  if (s.length === 0) return s
-  return s.charAt(0).toLowerCase() + s.slice(1)
-}
-
-// ---------------------------------------------------------------------------
 // Core probe logic
 // ---------------------------------------------------------------------------
 
@@ -141,18 +124,22 @@ export function toLowerCamelCase(s: string): string {
  *
  * @param runner - Injectable JXA executor
  * @param bundleId - App bundle ID
- * @param collectionAccessor - lowerCamelCase accessor for the collection
- * @param property - Property name to probe
+ * @param collectionAccessor - The app's accessor for the collection
+ * @param property - Property name to probe, as its manifest key; the outcome
+ *   is reported under it
+ * @param accessor - The app's name for the property (see
+ *   `resolvePropertyAccessor`), which the body reads
  * @returns Probe outcome for this property
  */
 async function probeProperty(
   runner: JxaRunner,
   bundleId: string,
   collectionAccessor: string,
-  property: string
+  property: string,
+  accessor: string
 ): Promise<IdentifierProbeResult> {
   const safeCollection = JSON.stringify(collectionAccessor)
-  const safeProp = JSON.stringify(property)
+  const safeProp = JSON.stringify(accessor)
 
   // Build the JXA body using bracket notation only — no interpolation of
   // user-supplied strings into JS syntax positions.
@@ -223,9 +210,9 @@ async function probeResource(
   resourceDef: AppManifest['resources'][string],
   now: string
 ): Promise<ResourceProbeResult> {
-  // Manifest plural is PascalCase (e.g. "Calendars"); JXA accessors are
-  // lowerCamelCase ("calendars").  Convert before building any JXA body.
-  const collectionAccessor = toLowerCamelCase(resourceDef.plural)
+  // The app's spelling of the collection: the recorded native spelling, else
+  // the derivation from the manifest plural (`Calendars` -> `calendars`).
+  const collectionAccessor = resolveCollectionAccessor(resourceDef)
 
   // Check if the collection is non-empty
   const length = await probeCollectionLength(runner, bundleId, collectionAccessor)
@@ -275,7 +262,15 @@ async function probeResource(
 
   // Probe each candidate
   const results: IdentifierProbeResult[] = await Promise.all(
-    candidates.map((prop) => probeProperty(runner, bundleId, collectionAccessor, prop))
+    candidates.map((prop) =>
+      probeProperty(
+        runner,
+        bundleId,
+        collectionAccessor,
+        prop,
+        resolvePropertyAccessor(prop, resourceDef.properties[prop])
+      )
+    )
   )
 
   const firstSuccess = results.find((r) => r.succeeded)
@@ -327,6 +322,10 @@ export interface ProbeManifestOptions {
 
 /**
  * Probe all (or selected) resources in a manifest against the live app.
+ * Collections and properties are addressed by the app's names for them (see
+ * `manifest/native-accessor.ts`) and reported under their manifest keys. A
+ * resource the manifest marks unsupported is never probed, even when
+ * requested.
  *
  * @param manifest - The parsed app manifest
  * @param runner - Injectable JXA executor (use `runWithApp` from `@macts/core`)
@@ -349,7 +348,8 @@ export async function probeManifest(
   const resourceResults = await Promise.all(
     resourceNames.flatMap((name) => {
       const resourceDef = manifest.resources[name]
-      if (!resourceDef) return []
+      // The app has none of a resource marked unsupported: nothing to probe.
+      if (!resourceDef || isResourceUnsupported(resourceDef)) return []
       return [probeResource(runner, bundleId, name, resourceDef, now)]
     })
   )

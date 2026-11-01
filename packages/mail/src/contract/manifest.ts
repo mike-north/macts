@@ -1136,6 +1136,16 @@ export const manifest: unknown = {
           description: 'MIME type of the attachment E.g. text/plain.',
           code: 'attp',
           optional: false,
+          native: {
+            name: 'mimeType',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.mail',
+              appVersion: '16.0',
+              osVersion: '27.2',
+              term: 'MIME type',
+            },
+          },
         },
         fileSize: {
           access: 'r',

@@ -24,30 +24,9 @@ import {
   type CallOptions,
   type ClientRuntime,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
-
-/** A device in Console */
-export interface Device {
-  /**
-   * The device name.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly name: string | null
-  /**
-   * The unique identifier of the device.
-   * Never null: the primary identifier.
-   */
-  readonly id: string
-}
-
-/** Input for creating a Device. */
-export type DeviceCreateInput = Record<string, never>
-
-/** Input for updating a Device. Omitted fields are left unchanged. */
-export type DeviceUpdateInput = Record<string, never>
 
 /**
  * The Console client: one namespace per resource that has operations, plus the app's own commands.
@@ -58,26 +37,12 @@ export interface ConsoleClient {
   selectDevice(options?: CallOptions): Promise<void>
 }
 
-const deviceRecordType: ValueType<Device> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The device name' }),
-    id: t.string({ description: 'The unique identifier of the device' }),
-  },
-  { description: 'A device in Console' }
-)
-
 /**
  * Every resource, keyed by manifest resource key: its record, its identifier
  * (when it has one), and the operations that resolve references to it. This
  * table is also the registry that reference value types read, lazily.
  */
-const resources: AppContract<ConsoleClient>['resources'] = {
-  Device: {
-    name: 'Device',
-    record: deviceRecordType,
-    id: t.string({ description: 'The unique identifier of the device' }),
-  },
-}
+const resources: AppContract<ConsoleClient>['resources'] = {}
 
 const appSelectDeviceOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'console.app.selectDevice',

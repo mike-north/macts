@@ -62,40 +62,4 @@ export const capabilities: readonly CapabilityMetadata[] = [
       required: ['url'],
     },
   },
-  {
-    name: 'screen-sharing.connections.get',
-    app: 'screen-sharing',
-    appBundleId: 'com.apple.ScreenSharing',
-    resource: 'connections',
-    operation: 'get',
-    description: 'Get a connection by ID',
-    permission: 'screen-sharing:connections:get',
-    risk: 'read',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: {
-          description: 'Connection identifier',
-          type: 'string',
-        },
-      },
-      additionalProperties: false,
-      required: ['id'],
-    },
-  },
-  {
-    name: 'screen-sharing.connections.list',
-    app: 'screen-sharing',
-    appBundleId: 'com.apple.ScreenSharing',
-    resource: 'connections',
-    operation: 'list',
-    description: 'List all screen sharing connections',
-    permission: 'screen-sharing:connections:list',
-    risk: 'read',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      additionalProperties: false,
-    },
-  },
 ]

@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { NullabilityEvidenceSchema, checkNullabilityClaim } from './evidence.js'
+import {
+  LiveAbsenceEvidenceSchema,
+  NullabilityEvidenceSchema,
+  checkNullabilityClaim,
+} from './evidence.js'
 
 /**
  * Command scope - whether command operates on application or specific resource.
@@ -78,6 +82,26 @@ export const PermissionHistoryEntrySchema = z.object({
 export type PermissionHistoryEntry = z.infer<typeof PermissionHistoryEntrySchema>
 
 /**
+ * The marker on a command the running app cannot carry out: addressing what
+ * the command reads failed in a live, read-only observation (a collection a
+ * get command looks an item up in, say, that the app does not have at the
+ * application).
+ *
+ * The manifest keeps such a command, so the record of what macts expected
+ * stays complete and the omission stays auditable; the command has no route,
+ * and every generated surface (the operations behind routes, the contract,
+ * SDKs, tools, the CLI, capabilities and derived permissions) leaves it out.
+ * The marker is curated from the observation: no probe writes or changes it.
+ */
+export const CommandUnsupportedSchema = z
+  .object({
+    /** What the running app showed when the command's target was addressed. */
+    evidence: LiveAbsenceEvidenceSchema,
+  })
+  .strict()
+export type CommandUnsupported = z.infer<typeof CommandUnsupportedSchema>
+
+/**
  * Schema for a command definition.
  */
 export const CommandSchema = z.object({
@@ -129,5 +153,11 @@ export const CommandSchema = z.object({
    * Sorted newest-first.
    */
   permissionHistory: z.array(PermissionHistoryEntrySchema).optional(),
+  /**
+   * Set when the running app cannot carry out the command, with the
+   * evidence. A command marked unsupported has no route, and generated
+   * surfaces omit it.
+   */
+  unsupported: CommandUnsupportedSchema.optional(),
 })
 export type Command = z.infer<typeof CommandSchema>

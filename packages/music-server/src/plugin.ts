@@ -190,6 +190,16 @@ export const musicApiPlugin = {
             optional: false,
           },
         },
+        native: {
+          collection: 'airplayDevices',
+          evidence: {
+            source: 'dictionary',
+            bundleId: 'com.apple.Music',
+            appVersion: '1.7.2',
+            osVersion: '27.2',
+            term: 'AirPlay devices',
+          },
+        },
       },
       Artwork: {
         name: 'Artwork',
@@ -899,6 +909,16 @@ export const musicApiPlugin = {
             description: 'the name of the EQ preset of the track',
             code: 'pEQp',
             optional: false,
+            native: {
+              name: 'eq',
+              evidence: {
+                source: 'dictionary',
+                bundleId: 'com.apple.Music',
+                appVersion: '1.7.2',
+                osVersion: '27.2',
+                term: 'EQ',
+              },
+            },
           },
           finish: {
             access: 'rw',

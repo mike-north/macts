@@ -1,5 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { PropertyType } from '../manifest/index.js'
+import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { propertyTypeToTs } from './types.js'
 
 export interface GeneratedApplication {
@@ -21,8 +22,9 @@ export function generateApplicationClass(ctx: GeneratorContext): GeneratedApplic
     "import type { JxaExecutor, AppConnection } from '@macts/core';",
   ]
 
-  // Generate top-level collection accessors from hierarchy
-  const topLevelCollections = Object.entries(ctx.manifest.hierarchy.children)
+  // Generate top-level collection accessors from hierarchy, except for
+  // resources marked unsupported
+  const topLevelCollections = usableHierarchyChildren(ctx.manifest, ctx.manifest.hierarchy.children)
   const collectionAccessors = topLevelCollections.map(([key, child]) => {
     const collectionClass = `${child.resource}Collection`
     return `  /** Access ${key} */

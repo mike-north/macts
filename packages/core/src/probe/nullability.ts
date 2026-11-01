@@ -35,7 +35,12 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import type { HierarchyChild } from '../manifest/schemas/hierarchy.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
 import type { NullabilityProbeStatus, Resource } from '../manifest/schemas/resource.js'
-import { isUnsupportedProperty } from '../manifest/unsupported.js'
+import {
+  defaultCollectionAccessor,
+  resolveCollectionAccessor,
+  resolvePropertyAccessor,
+} from '../manifest/native-accessor.js'
+import { isResourceUnsupported, isUnsupportedProperty } from '../manifest/unsupported.js'
 import {
   VALUE_KINDS,
   isValueKind,
@@ -48,7 +53,6 @@ import {
   type NameResolver,
 } from '../generator/contract/value-mapping.js'
 import type { JxaRunner } from './probe.js'
-import { toLowerCamelCase } from './probe.js'
 
 // ---------------------------------------------------------------------------
 // Limits and skipped properties
@@ -375,22 +379,29 @@ const js = String.raw
  * `../manifest/value-kinds.ts`), and whether the collection was reachable, never a
  * value.
  *
- * @param accessors - lowerCamelCase collection accessors from the app down to
- *   the resource, e.g. `["calendars", "events"]`.
- * @param properties - The property names to read.
+ * @param accessors - The app's collection accessors from the app down to
+ *   the resource, e.g. `["calendars", "events"]` (see
+ *   `resolveCollectionAccessor`).
+ * @param properties - The property names to read, as manifest keys; the counts
+ *   are keyed by them.
  * @param maxItems - The most items to read.
  * @param timeLimitMs - Stop reading new items after this many milliseconds.
  *   The pre-scan stops after `PARENT_SCAN_TIME_SHARE` of it.
+ * @param nativeNames - The app's name for each property whose name in the app
+ *   differs from its key (see `resolvePropertyAccessor`); a property not listed
+ *   is read by its key.
  */
 export function nullabilityProbeBody(
   accessors: readonly string[],
   properties: readonly string[],
   maxItems: number,
-  timeLimitMs: number
+  timeLimitMs: number,
+  nativeNames: Readonly<Record<string, string>> = {}
 ): string {
   return js`
     var accessors = ${JSON.stringify(accessors)};
     var props = ${JSON.stringify(properties)};
+    var names = ${JSON.stringify(nativeNames)};
     var maxItems = ${JSON.stringify(maxItems)};
     var spreadBase = ${JSON.stringify(PARENT_SPREAD)};
     var maxVisits = ${JSON.stringify(MAX_PARENT_VISITS)};
@@ -435,10 +446,11 @@ export function nullabilityProbeBody(
     function readItem(item) {
       for (var p = 0; p < props.length; p++) {
         var prop = props[p];
+        var name = Object.prototype.hasOwnProperty.call(names, prop) ? names[prop] : prop;
         try {
-          var val = item[prop];
-          // Invoke the accessor as item[prop]() — re-binding it breaks the reference.
-          if (typeof val === 'function') { val = item[prop](); }
+          var val = item[name];
+          // Invoke the accessor as item[name]() — re-binding it breaks the reference.
+          if (typeof val === 'function') { val = item[name](); }
           if (val === null || val === undefined) {
             counts[prop].nulls++;
           } else {
@@ -795,7 +807,10 @@ function failureNote(error: unknown): string {
  * `options.resources`), each in a single automation call. Once the budget is
  * spent, the remaining resources are reported with status `budget` and are
  * not read. A resource the probe cannot reach, or whose call fails, is
- * reported and the probe moves on; neither is fatal.
+ * reported and the probe moves on; neither is fatal. A resource the manifest
+ * marks unsupported is never probed, even when requested: the app has none.
+ * Collections and properties are addressed by the app's names for them (see
+ * `manifest/native-accessor.ts`), and reported under their manifest keys.
  *
  * @param manifest - The parsed app manifest.
  * @param runner - Runs a function body inside the app's automation process.
@@ -836,15 +851,22 @@ export async function probeNullability(
     options.resources !== undefined && options.resources.length > 0
       ? options.resources.filter((key) => Object.hasOwn(manifest.resources, key))
       : Object.keys(manifest.resources)
+  const probed = requested.filter((key) => {
+    const resource = manifest.resources[key]
+    return resource !== undefined && !isResourceUnsupported(resource)
+  })
 
   const resources: Record<string, ResourceNullabilityResult> = {}
-  for (const resourceKey of requested) {
+  for (const resourceKey of probed) {
     const resource = manifest.resources[resourceKey]
     if (resource === undefined) continue
     const chain = resolveAccessChain(manifest, resourceKey)
-    const accessors = chain.map((key) =>
-      toLowerCamelCase(manifest.resources[key]?.plural ?? `${key}s`)
-    )
+    const accessors = chain.map((key) => {
+      const link = manifest.resources[key]
+      return link === undefined
+        ? defaultCollectionAccessor(`${key}s`)
+        : resolveCollectionAccessor(link)
+    })
     const accessPath = accessors.join('/')
     const { read, skipped } = selectProbedProperties(manifest, resource, skipProperties)
     const base = {
@@ -870,7 +892,18 @@ export async function probeNullability(
 
     let call: ProbeCallResult
     try {
-      const body = nullabilityProbeBody(accessors, read, maxItems, Math.min(remaining, MAX_CALL_MS))
+      const nativeNames: Record<string, string> = {}
+      for (const key of read) {
+        const name = resolvePropertyAccessor(key, resource.properties[key])
+        if (name !== key) nativeNames[key] = name
+      }
+      const body = nullabilityProbeBody(
+        accessors,
+        read,
+        maxItems,
+        Math.min(remaining, MAX_CALL_MS),
+        nativeNames
+      )
       call = parseProbeCall(await runner(bundleId, body), read)
     } catch (error) {
       resources[resourceKey] = { ...base, status: 'error', note: failureNote(error) }

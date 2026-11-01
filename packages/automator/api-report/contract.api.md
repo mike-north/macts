@@ -86,7 +86,6 @@ export type RequiredResourceCreateInput = Record<string, never>;
 
 // @public
 export interface RequiredResourceResourceClient {
-    get(name: string, options?: CallOptions): Promise<RequiredResource>;
     list(actionId: string, options?: CallOptions): Promise<readonly RequiredResource[]>;
 }
 
@@ -107,7 +106,6 @@ export interface SettingCreateInput {
 
 // @public
 export interface SettingResourceClient {
-    get(name: string, options?: CallOptions): Promise<Setting>;
     list(actionId: string, options?: CallOptions): Promise<readonly Setting[]>;
 }
 

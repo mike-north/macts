@@ -3,29 +3,31 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * List connections.
+ * List variables.
  */
-export class ListConnectionsCommand extends Command {
-  static override paths = [['screen-sharing', 'connections', 'list']]
+export class ListVariablesCommand extends Command {
+  static override paths = [['automator', 'variables', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List connections',
+    description: 'List variables',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
+  workflowName = Option.String('--workflow-name', { required: true, description: 'Workflow name' })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const items = await client.connections.list()
+      const items = await client.variables.list(this.workflowName)
 
       const output = formatter.formatList(
         items.map((item) => ({
           name: item.name,
+          value: item.value,
+          settable: item.settable,
           id: item.id,
-          url: item.url,
         }))
       )
 

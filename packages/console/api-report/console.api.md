@@ -4,8 +4,6 @@
 
 ```ts
 
-import { z } from 'zod';
-
 // @public
 export const capabilities: readonly CapabilityMetadata[];
 
@@ -46,29 +44,9 @@ export class ConsoleError extends Error {
 }
 
 // @public
-export interface Device {
-    id: string;
-    name: string;
-}
-
-// @public
-export type DeviceCreateInput = Record<string, never>;
-
-// @public (undocumented)
-export const DeviceSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-}, z.core.$strip>;
-
-// @public
-export type DeviceUpdateInput = Partial<DeviceCreateInput>;
-
-// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     rpc<T>(path: string, body?: object): Promise<T>;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```

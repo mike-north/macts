@@ -12,9 +12,12 @@
  *   - Common fallback properties (`name`, `id`) when no declared identifier works
  *
  * @see https://github.com/mike-north/macts/issues/82
+ * @see https://github.com/mike-north/macts/issues/165 (the app's own spelling; unsupported markers)
  */
 
+import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
+import { loadManifest } from '../manifest/loader.js'
 import { probeManifest } from './probe.js'
 import type { JxaRunner } from './probe.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
@@ -414,5 +417,46 @@ describe('probeManifest', () => {
     // `name` appears exactly once even though it's declared AND a fallback
     expect(nameCount).toBe(1)
     expect(result.resources['Tag']?.runtimeIdentifier).toBe('name')
+  })
+})
+
+describe("probeManifest: the app's own spelling (issue #165)", () => {
+  const manifestAt = (app: string): Promise<AppManifest> =>
+    loadManifest(fileURLToPath(new URL(`../../../../manifests/${app}/app.yaml`, import.meta.url)))
+
+  /** A runner that records every body and answers nothing. */
+  function recordingRunner(bodies: string[]): JxaRunner {
+    return (_bundleId, jsBody) => {
+      bodies.push(jsBody)
+      return Promise.resolve(null)
+    }
+  }
+
+  it('reads a collection by the spelling the manifest records', async () => {
+    // Music's manifest records `airplayDevices`; the derivation from the
+    // plural `AirPlayDevices` would give `airPlayDevices`, which Music lacks.
+    const bodies: string[] = []
+    await probeManifest(await manifestAt('music'), recordingRunner(bodies), {
+      resources: ['AirPlayDevice'],
+      now: PROBE_TIME,
+    })
+    expect(bodies.length).toBeGreaterThan(0)
+    expect(bodies.every((body) => body.includes('"airplayDevices"'))).toBe(true)
+    expect(bodies.some((body) => body.includes('"airPlayDevices"'))).toBe(false)
+  })
+
+  it('never probes a resource the manifest marks unsupported, even when asked to', async () => {
+    // Screen Sharing's dictionary has no connection class.
+    const bodies: string[] = []
+    const result = await probeManifest(
+      await manifestAt('screen-sharing'),
+      recordingRunner(bodies),
+      {
+        resources: ['Connection'],
+        now: PROBE_TIME,
+      }
+    )
+    expect(result.resources).toEqual({})
+    expect(bodies).toEqual([])
   })
 })

@@ -12,9 +12,7 @@ import { automatorActionsGetTool } from './automatorActions.js'
 import { variablesListTool } from './variables.js'
 import { variablesGetTool } from './variables.js'
 import { settingsListTool } from './settings.js'
-import { settingsGetTool } from './settings.js'
 import { requiredResourcesListTool } from './requiredResources.js'
-import { requiredResourcesGetTool } from './requiredResources.js'
 import { appAddTool } from './app.js'
 import { appRemoveTool } from './app.js'
 
@@ -30,9 +28,7 @@ export const allTools = [
   variablesListTool,
   variablesGetTool,
   settingsListTool,
-  settingsGetTool,
   requiredResourcesListTool,
-  requiredResourcesGetTool,
   appAddTool,
   appRemoveTool,
 ] as const

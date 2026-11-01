@@ -1,4 +1,10 @@
 import type { AppManifest, Resource, Command, Enum, HierarchyChild } from '../../manifest/index.js'
+import {
+  isUnsupportedResourceKey,
+  usableCommands,
+  usableHierarchyChildren,
+  usableResources,
+} from '../../manifest/unsupported.js'
 
 export interface CliGeneratorOptions {
   /** Package name (e.g., @macts/calendar) */
@@ -13,7 +19,7 @@ export interface CliGeneratorContext {
   manifest: AppManifest
   options: CliGeneratorOptions
 
-  /** Get a resource by name */
+  /** Get a usable resource (one not marked unsupported) by name */
   getResource(name: string): Resource | undefined
 
   /** Get an enum by name */
@@ -65,17 +71,19 @@ export function createCliGeneratorContext(
   manifest: AppManifest,
   options: CliGeneratorOptions
 ): CliGeneratorContext {
-  const resourceMap = new Map(
-    Object.entries(manifest.resources).map(([name, resource]) => [name, resource])
-  )
+  // A resource marked unsupported has no CLI commands: it is left out of the
+  // resources, and its hierarchy entries (with everything under them) out of
+  // the paths.
+  const resourceMap = new Map(usableResources(manifest))
 
   const enumMap = new Map(Object.entries(manifest.enums).map(([name, enumDef]) => [name, enumDef]))
 
-  const commandMap = new Map(Object.entries(manifest.commands).map(([name, cmd]) => [name, cmd]))
+  // A command marked unsupported has no CLI command.
+  const commandMap = new Map(usableCommands(manifest))
 
   // Build hierarchy paths
   const hierarchyPaths: HierarchyPath[] = []
-  buildHierarchyPaths(manifest.hierarchy.children, [], [], hierarchyPaths)
+  buildHierarchyPaths(manifest, manifest.hierarchy.children, [], [], hierarchyPaths)
 
   return {
     manifest,
@@ -98,6 +106,7 @@ export function createCliGeneratorContext(
     },
 
     getResourceCommands(resourceName: string): Command[] {
+      if (isUnsupportedResourceKey(manifest, resourceName)) return []
       return Array.from(commandMap.values()).filter((cmd) => {
         if (cmd.scope !== 'resource') return false
         if (!cmd.resourceType) return true
@@ -127,15 +136,17 @@ export function createCliGeneratorContext(
 }
 
 /**
- * Build a flat list of hierarchy paths from the tree.
+ * Build a flat list of hierarchy paths from the tree, leaving out the entries
+ * of resources marked unsupported and everything nested under them.
  */
 function buildHierarchyPaths(
+  manifest: AppManifest,
   children: Record<string, HierarchyChild>,
   currentPath: string[],
   parentParams: ParentParam[],
   result: HierarchyPath[]
 ): void {
-  for (const [key, child] of Object.entries(children)) {
+  for (const [key, child] of usableHierarchyChildren(manifest, children)) {
     const newPath = [...currentPath, key]
     const canCreate = child.access === 'rw'
 
@@ -156,7 +167,7 @@ function buildHierarchyPaths(
           paramPath: newPath.join('/'),
         },
       ]
-      buildHierarchyPaths(child.children, newPath, newParentParams, result)
+      buildHierarchyPaths(manifest, child.children, newPath, newParentParams, result)
     }
   }
 }

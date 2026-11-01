@@ -15,18 +15,6 @@ export interface ConsoleClient {
 // @public
 export const consoleContract: AppContract<ConsoleClient>;
 
-// @public
-export interface Device {
-    readonly id: string;
-    readonly name: string | null;
-}
-
-// @public
-export type DeviceCreateInput = Record<string, never>;
-
-// @public
-export type DeviceUpdateInput = Record<string, never>;
-
 // (No @packageDocumentation comment for this package)
 
 ```

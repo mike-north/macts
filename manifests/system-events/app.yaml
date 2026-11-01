@@ -265,6 +265,14 @@ resources:
         type: string
         description: the MAC address for the interface
         code: maca
+        native:
+          name: macAddress
+          evidence:
+            source: dictionary
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            term: MAC address
       mtu:
         access: rw
         type: integer
@@ -596,6 +604,14 @@ resources:
         type: string
         description: the POSIX file system path of the disk item
         code: posx
+        native:
+          name: posixPath
+          evidence:
+            source: dictionary
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            term: POSIX path
       size:
         access: r
         type: integer
@@ -606,6 +622,14 @@ resources:
         type: string
         description: the URL of the disk item
         code: url
+        native:
+          name: url
+          evidence:
+            source: dictionary
+            bundleId: com.apple.systemevents
+            appVersion: 1.3.6
+            osVersion: '27.2'
+            term: URL
       visible:
         access: rw
         type: boolean

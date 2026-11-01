@@ -198,24 +198,6 @@ export interface Folder {
   readonly id: Integer | null
 }
 
-/** Desktop-object is the class of the "desktop" object */
-export interface DesktopObject {
-  /**
-   * Unique identifier for the desktop.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly id: Integer | null
-}
-
-/** Trash-object is the class of the “trash” object */
-export interface TrashObject {
-  /**
-   * Display a dialog when emptying the trash?
-   * Nullable. No evidence that the app always sets it.
-   */
-  warnsBeforeEmptying: boolean | null
-}
-
 /** A file */
 export interface File {
   /**
@@ -460,27 +442,6 @@ export type FolderCreateInput = Record<string, never>
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
 export type FolderUpdateInput = Record<string, never>
-
-/** Input for creating a DesktopObject. */
-export type DesktopObjectCreateInput = Record<string, never>
-
-/** Input for updating a DesktopObject. Omitted fields are left unchanged. */
-export type DesktopObjectUpdateInput = Record<string, never>
-
-/** Input for creating a TrashObject. */
-export interface TrashObjectCreateInput {
-  /** Display a dialog when emptying the trash? */
-  warnsBeforeEmptying?: boolean
-}
-
-/** Input for updating a TrashObject. Omitted fields are left unchanged. */
-export interface TrashObjectUpdateInput {
-  /**
-   * Display a dialog when emptying the trash?
-   * Cannot be reset: null is rejected.
-   */
-  warnsBeforeEmptying?: boolean
-}
 
 /** Input for creating a File. */
 export interface FileCreateInput {
@@ -890,22 +851,6 @@ const folderRecordType: ValueType<Folder> = t.record(
   { description: 'A folder' }
 )
 
-const desktopObjectRecordType: ValueType<DesktopObject> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for the desktop' }),
-  },
-  { description: 'Desktop-object is the class of the "desktop" object' }
-)
-
-const trashObjectRecordType: ValueType<TrashObject> = t.record(
-  {
-    warnsBeforeEmptying: t.nullable(t.boolean(), {
-      description: 'Display a dialog when emptying the trash?',
-    }),
-  },
-  { description: 'Trash-object is the class of the “trash” object' }
-)
-
 const fileRecordType: ValueType<File> = t.record(
   {
     fileType: t.nullable(t.string(), {
@@ -1077,14 +1022,6 @@ const resources: AppContract<FinderClient>['resources'] = {
   Folder: {
     name: 'Folder',
     record: folderRecordType,
-  },
-  DesktopObject: {
-    name: 'DesktopObject',
-    record: desktopObjectRecordType,
-  },
-  TrashObject: {
-    name: 'TrashObject',
-    record: trashObjectRecordType,
   },
   File: {
     name: 'File',

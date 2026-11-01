@@ -5,6 +5,11 @@
  */
 
 import type { AppManifest, Resource, Command } from '../../manifest/index.js'
+import {
+  isUnsupportedResourceKey,
+  usableCommands,
+  usableResources,
+} from '../../manifest/unsupported.js'
 import type { McpGeneratorContext } from './types.js'
 
 /**
@@ -44,39 +49,47 @@ export function createMcpGeneratorContext(options: CreateMcpContextOptions): Mcp
 }
 
 /**
- * Get all resources from manifest.
+ * Get the usable resources from a manifest: every resource except those marked
+ * unsupported, which have no tools or capabilities.
  *
  * @param manifest - App manifest
  * @returns Array of resources
  */
 export function getResources(manifest: AppManifest): Resource[] {
-  return Object.values(manifest.resources)
+  return usableResources(manifest).map(([, resource]) => resource)
 }
 
 /**
- * Get all application-level commands from manifest.
+ * Get all application-level commands from manifest, except those marked
+ * unsupported.
  *
  * @param manifest - App manifest
  * @returns Array of application commands
  */
 export function getAppCommands(manifest: AppManifest): Command[] {
-  return Object.values(manifest.commands).filter((cmd) => cmd.scope === 'application')
+  return usableCommands(manifest)
+    .map(([, cmd]) => cmd)
+    .filter((cmd) => cmd.scope === 'application')
 }
 
 /**
- * Get resource-scoped commands that apply to a specific resource.
+ * Get resource-scoped commands that apply to a specific resource: none for a
+ * resource marked unsupported, and none marked unsupported itself.
  *
  * @param manifest - App manifest
  * @param resourceName - Resource name
  * @returns Array of commands for this resource
  */
 export function getResourceCommands(manifest: AppManifest, resourceName: string): Command[] {
-  return Object.values(manifest.commands).filter((cmd) => {
-    if (cmd.scope !== 'resource') return false
-    if (!cmd.resourceType) return true // Applies to all resources
-    if (Array.isArray(cmd.resourceType)) {
-      return cmd.resourceType.includes(resourceName)
-    }
-    return cmd.resourceType === resourceName
-  })
+  if (isUnsupportedResourceKey(manifest, resourceName)) return []
+  return usableCommands(manifest)
+    .map(([, cmd]) => cmd)
+    .filter((cmd) => {
+      if (cmd.scope !== 'resource') return false
+      if (!cmd.resourceType) return true // Applies to all resources
+      if (Array.isArray(cmd.resourceType)) {
+        return cmd.resourceType.includes(resourceName)
+      }
+      return cmd.resourceType === resourceName
+    })
 }

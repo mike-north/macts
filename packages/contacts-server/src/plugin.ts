@@ -474,6 +474,18 @@ export const contactsApiPlugin = {
           skipped: [],
           note: 'the parent scan stopped at the time limit after 106 parents',
         },
+        unsupported: {
+          evidence: {
+            source: 'live',
+            observedAt: '2026-11-01T16:40:48.000Z',
+            bundleId: 'com.apple.AddressBook',
+            appVersion: '14.0',
+            osVersion: '27.2',
+            expression:
+              'every property of the instant messages of a person, and the item property record',
+            errorNumber: -1700,
+          },
+        },
       },
       JabberHandle: {
         name: 'JabberHandle',

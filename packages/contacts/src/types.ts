@@ -165,27 +165,6 @@ export interface ICQHandleCreateInput {
 /** Input for updating a ICQHandle */
 export type ICQHandleUpdateInput = Partial<ICQHandleCreateInput>
 
-/** Address for instant messaging. */
-export interface InstantMessage {
-  /** The service name of this instant message address. */
-  serviceName: string
-  /** The service type of this instant message address. */
-  serviceType: string
-  /** The user name of this instant message address. */
-  userName: string
-}
-
-/** Input for creating a InstantMessage */
-export interface InstantMessageCreateInput {
-  /** The service type of this instant message address. */
-  serviceType?: string
-  /** The user name of this instant message address. */
-  userName?: string
-}
-
-/** Input for updating a InstantMessage */
-export type InstantMessageUpdateInput = Partial<InstantMessageCreateInput>
-
 /** User name for Jabber instant messaging. */
 export interface JabberHandle {
   /** Unique identifier for this handle */
@@ -468,12 +447,6 @@ export const ICQHandleSchema = z.object({
   id: z.string(),
   label: z.string(),
   value: z.string(),
-})
-
-export const InstantMessageSchema = z.object({
-  serviceName: z.string(),
-  serviceType: z.string(),
-  userName: z.string(),
 })
 
 export const JabberHandleSchema = z.object({

@@ -329,6 +329,16 @@ export const manifest: unknown = {
           description: 'the MAC address for the interface',
           code: 'maca',
           optional: false,
+          native: {
+            name: 'macAddress',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              term: 'MAC address',
+            },
+          },
         },
         mtu: {
           access: 'rw',
@@ -805,6 +815,16 @@ export const manifest: unknown = {
           description: 'the POSIX file system path of the disk item',
           code: 'posx',
           optional: false,
+          native: {
+            name: 'posixPath',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              term: 'POSIX path',
+            },
+          },
         },
         size: {
           access: 'r',
@@ -819,6 +839,16 @@ export const manifest: unknown = {
           description: 'the URL of the disk item',
           code: 'url',
           optional: false,
+          native: {
+            name: 'url',
+            evidence: {
+              source: 'dictionary',
+              bundleId: 'com.apple.systemevents',
+              appVersion: '1.3.6',
+              osVersion: '27.2',
+              term: 'URL',
+            },
+          },
         },
         visible: {
           access: 'rw',

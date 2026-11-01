@@ -4,8 +4,6 @@
 
 ```ts
 
-import { z } from 'zod';
-
 // @public
 export const capabilities: readonly CapabilityMetadata[];
 
@@ -26,33 +24,6 @@ export interface CapabilityMetadata {
 export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 'system-change';
 
 // @public
-export interface Connection {
-    id: string;
-    name: string;
-    url: string;
-}
-
-// @public
-export type ConnectionCreateInput = Record<string, never>;
-
-// @public
-export class ConnectionResourceClient {
-    constructor(http: HttpClient, app: string, resource: string);
-    get(id: string): Promise<Connection>;
-    list(): Promise<Connection[]>;
-}
-
-// @public (undocumented)
-export const ConnectionSchema: z.ZodObject<{
-    name: z.ZodString;
-    id: z.ZodString;
-    url: z.ZodString;
-}, z.core.$strip>;
-
-// @public
-export type ConnectionUpdateInput = Partial<ConnectionCreateInput>;
-
-// @public
 export class HttpClient {
     constructor(baseUrl: string, apiKey: string);
     rpc<T>(path: string, body?: object): Promise<T>;
@@ -61,7 +32,6 @@ export class HttpClient {
 // @public
 export class ScreenSharingClient {
     constructor(options: ScreenSharingClientOptions);
-    readonly connections: ConnectionResourceClient;
     getURL(url: string): Promise<void>;
     get http(): HttpClient;
 }
@@ -78,7 +48,5 @@ export class ScreenSharingError extends Error {
     // (undocumented)
     readonly code: string;
 }
-
-// (No @packageDocumentation comment for this package)
 
 ```

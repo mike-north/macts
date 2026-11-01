@@ -98,17 +98,6 @@ export type ContainerCreateInput = Record<string, never>;
 export type ContainerUpdateInput = Record<string, never>;
 
 // @public
-export interface DesktopObject {
-    readonly id: Integer | null;
-}
-
-// @public
-export type DesktopObjectCreateInput = Record<string, never>;
-
-// @public
-export type DesktopObjectUpdateInput = Record<string, never>;
-
-// @public
 export interface Disk {
     readonly capacity: number | null;
     readonly ejectable: boolean | null;
@@ -327,21 +316,6 @@ export type Sodr = 'normal' | 'reversed';
 
 // @public
 export type Sort = 'name' | 'modificationDate' | 'creationDate' | 'size' | 'kind' | 'labelIndex' | 'comment' | 'version';
-
-// @public
-export interface TrashObject {
-    warnsBeforeEmptying: boolean | null;
-}
-
-// @public
-export interface TrashObjectCreateInput {
-    warnsBeforeEmptying?: boolean;
-}
-
-// @public
-export interface TrashObjectUpdateInput {
-    warnsBeforeEmptying?: boolean;
-}
 
 // (No @packageDocumentation comment for this package)
 

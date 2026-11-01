@@ -898,17 +898,18 @@ dictionary term, never by the public resource segment. The automation bridge
 resolves only that spelling: the first word lowercased whole and each later
 word capitalized ("media items" is `mediaItems`, "URL tracks" is `urlTracks`).
 Any other spelling, including all lowercase, names no collection. One function,
-`resolveCollectionAccessor` in `jxa/collection-accessor.ts`, gives every
+`resolveCollectionAccessor` in `manifest/native-accessor.ts`, gives every
 accessor a body uses: the resource's own collection, and the collection a
 nested resource's parent is reached through. Its default applies the bridge's
 rule to the plural with the same acronym-aware word split as the public
 segment (`manifest/lower-camel.ts`), so `URLTracks` gives `urlTracks` and
 `URLs` gives `urls`. A parent known only from an identifier parameter is
 spelled by the same rule from the parameter's stem (`mediaItemId` gives
-`mediaItems`). The default coincides with the public segment today, but the
-two answer different questions. Where the app's term cannot be derived from
-the plural ("AirPlay devices" is `airplayDevices`, not `airPlayDevices`), a
-spelling recorded in the manifest takes precedence over the default (#165). A
+`mediaItems`). The default coincides with the public segment, but the two
+answer different questions. Where the app's term cannot be derived from the
+plural ("AirPlay devices" is `airplayDevices`, not `airPlayDevices`), the
+spelling recorded in the manifest takes precedence over the default, and
+properties are addressed the same way (D10, native spellings). A
 macOS test resolves every top-level accessor of every body built from every
 shipped manifest against the installed app's dictionary with
 `ObjectSpecifier.hasInstance`. The check never launches an app. The rule:
@@ -1461,6 +1462,42 @@ A marked property carries no nullability or resettability claim, and a resource'
   - `other`.
 
   These labels are not values, and the values-free check rejects anything else. Each declared type maps to the kinds its decoder accepts. A declared type with no mapping is reported as unchecked, never guessed. Mixed results are reported with both counts. A wrong type affects only decoding, not whether a value is present, so the property keeps its nullability claim.
+
+### Native spellings
+
+**A manifest's public spelling is derived; the app's spelling is recorded only where it differs.** Every public name (routes, SDK accessors, tool names, permissions, and the keys of every record returned to a caller) is derived from the manifest's own names by the shared functions: a resource's segment from its plural (D2, `manifest/route.ts`), a property's name from its key. The app's spelling of a collection or a property is a fact about the app, read from its scripting dictionary, so it is not derived from the public name. Its default is the bridge's spelling of the derived name: the plural's lower camel case for a collection, the key for a property. A manifest records the app's spelling only where the app's term differs from that default:
+
+- `resource.native.collection`, the accessor of the resource's collection ("AirPlay devices" is `airplayDevices`);
+- `property.native.name`, the property's name in the app ("ANSI black color" is `ansiBlackColor`, "URL" is `url`).
+
+Each record carries dictionary evidence: the source (`dictionary`), the app's bundle identifier, app version and macOS version, and the term exactly as the dictionary writes it. Recording the default is redundant and rejected, as is a native name on a property marked unsupported or a native collection on a resource marked unsupported.
+
+Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read, as a list does. A list's record read takes properties only from the record, and omits one the record leaves out.
+
+The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
+
+### Unsupported resources
+
+**A manifest never drops a resource it declares; a resource the app cannot provide is marked `unsupported`.** The marker records absence evidence in one of two forms. Dictionary evidence, for a collection the app's dictionary does not have, records the source (`dictionary`), the app's bundle identifier, app version and macOS version, the term the manifest expected, and a finding:
+
+- `no-class`: the dictionary declares no class with the resource's code or name;
+- `not-an-element`: the class exists, but no class has it as an element, so the app reaches it some other way.
+
+Live evidence, for a resource the dictionary declares but the running app fails every read of, records a read-only observation: the source (`live`), when it was made (an ISO 8601 UTC timestamp), the app's bundle identifier, app version and macOS version, what was addressed (`expression`, in words and never a value), and the error number the app raised. Contacts 14.0 fails every read of an instant message, its identifier included, with `-1700`, so the whole resource is unreadable and marked.
+
+**Generated surfaces omit a marked resource**, with its hierarchy entries and every entry nested under them. Route resolution returns no route for it, whether a command names it, names it among other types, or applies to every resource, so the server router, the runtime's operation registry, the contract's operations, the capabilities and the derived permissions all omit it. The contract's records and inputs, the SDK types and resource clients, the CLI commands and the MCP tools take a manifest's resources and hierarchy from the shared helpers in `manifest/unsupported.ts`. A resource nested only under a marked one keeps its own routes and SDK client, and loses only the hierarchy entries under the marked one. The embedded manifest keeps the marker, so the omission stays auditable. Permission-group entries that only a marked resource's routes required are removed with the marker. The marker is curated, from the dictionary or a live observation: no probe writes or changes it.
+
+**No usable declaration's type names a marked resource.** No generated surface declares a marked resource, so a usable property of a usable resource, or a parameter or the result of a usable command, whose type names one would refer to nothing. The manifest schema rejects it, naming the declaration and the resource; the fix is to change the type, or to mark the property or the command too. A type names a resource as the contract matches type names (`manifest/type-names.ts`: the resource's key, name or plural, in any case, without spaces, dashes or underscores); a bare name or an `{ enum }` that names an enum names the enum, and a name a usable resource also has names the usable one.
+
+### Unsupported commands
+
+**A manifest never drops a command it declares; a command the running app cannot carry out is marked `unsupported`.** The marker records live absence evidence, in the form above: a dictionary cannot show that a command fails, only an observation can. Automator 2.10 has settings and required resources under each action but none at the application, so addressing either collection there raises `-1728` (no such object), and `getSetting` and `getRequiredResource`, which look an item up at the application, are marked.
+
+**A marked command has no route**, and generated surfaces omit it. Route resolution returns no route for it, so the server router, the runtime's operation registry, the contract's operations, the capabilities and the derived permissions all omit it. The SDK clients, the CLI commands and the MCP tools take a manifest's commands from `usableCommands` in `manifest/unsupported.ts`. The embedded manifest keeps the marker, so the omission stays auditable. Permission-group entries that only a marked command's routes required are removed with the marker. The marker is curated from the observation: no probe writes or changes it.
+
+### Top-level hierarchy entries
+
+**A resource that is also an element of the application is a top-level child of the hierarchy**, in addition to any nested entry. The entry is keyed by the resource's public spelling (the lower camel case of its plural), and has the access of its nested entry. Reminders' reminders are elements of both the application and each list, so the hierarchy lists `reminders` at the top level and under `lists`; Automator's actions and variables are elements of both the application and each workflow, so the hierarchy lists `automatorActions` and `variables` at the top level and under `workflows`.
 
 ## D11. Validation Placement
 

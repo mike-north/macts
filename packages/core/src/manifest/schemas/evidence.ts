@@ -267,6 +267,117 @@ export const UnsupportedSchema = z.object({
 })
 export type Unsupported = z.infer<typeof UnsupportedSchema>
 
+/**
+ * Evidence that an app spells a collection or a property differently from the
+ * spelling macts derives: the term as the app's scripting dictionary writes
+ * it, for one app build on one macOS version.
+ *
+ * The bridge's spelling of a term follows from the term itself (its first word
+ * lowercased whole, each later word capitalized), so the term is the evidence:
+ * "AirPlay devices" is `airplayDevices`, "ANSI black color" is
+ * `ansiBlackColor`. The provenance fields say which build the dictionary was
+ * read from, because a later release can rename a term.
+ */
+export const DictionarySpellingEvidenceSchema = z
+  .object({
+    source: z.literal('dictionary'),
+    /** The bundle identifier of the app whose dictionary was read. */
+    bundleId: z.string().min(1),
+    /** The version of the app whose dictionary was read. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app was installed on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /**
+     * The dictionary term exactly as the dictionary writes it, e.g.
+     * `AirPlay devices` or `URL`: a class's plural for a collection, a
+     * property's name for a property.
+     */
+    term: z.string().min(1),
+  })
+  .strict()
+export type DictionarySpellingEvidence = z.infer<typeof DictionarySpellingEvidenceSchema>
+
+/**
+ * How an app's dictionary lacks a collection the manifest declares.
+ *
+ * - `no-class`: the dictionary declares no class with the resource's code or
+ *   name, so the app has no such object at all.
+ * - `not-an-element`: the class exists, but no class has it as an element, so
+ *   there is no collection of it; the app reaches it some other way (Finder's
+ *   desktop is the application's `desktop` property).
+ */
+export const DictionaryAbsenceFindingSchema = z.enum(['no-class', 'not-an-element'])
+export type DictionaryAbsenceFinding = z.infer<typeof DictionaryAbsenceFindingSchema>
+
+/**
+ * Evidence that an app's scripting dictionary has no collection for a
+ * resource the manifest declares: what was looked for, what the dictionary
+ * showed, and which app build on which macOS version it holds for.
+ */
+export const DictionaryAbsenceEvidenceSchema = z
+  .object({
+    source: z.literal('dictionary'),
+    /** The bundle identifier of the app whose dictionary was read. */
+    bundleId: z.string().min(1),
+    /** The version of the app whose dictionary was read. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app was installed on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /**
+     * The term the manifest expected the dictionary to declare, as the
+     * dictionary would write it, e.g. `connection` or `desktop-object`.
+     */
+    term: z.string().min(1),
+    /** How the dictionary lacks the collection. */
+    finding: DictionaryAbsenceFindingSchema,
+  })
+  .strict()
+export type DictionaryAbsenceEvidence = z.infer<typeof DictionaryAbsenceEvidenceSchema>
+
+/**
+ * Evidence that something a manifest declares is absent from the running app:
+ * a live, read-only observation in which addressing it failed, for one app
+ * build on one macOS version.
+ *
+ * It records what was addressed, in words, and the error number the app
+ * raised, never a value. The error number tells a missing collection
+ * (`-1728`, no such object) from an unreadable one (`-1700`, a value that
+ * cannot be converted) or a permission problem.
+ */
+export const LiveAbsenceEvidenceSchema = z
+  .object({
+    source: z.literal('live'),
+    /** When the observation was made: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** The bundle identifier of the observed app. */
+    bundleId: z.string().min(1),
+    /** The observed app's version. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app ran on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /**
+     * What was addressed, described in words and never as a value, e.g.
+     * `the settings collection at the application`.
+     */
+    expression: z.string().min(1),
+    /** The error number the app raised when it was addressed, e.g. `-1728`. */
+    errorNumber: z.number().int(),
+  })
+  .strict()
+export type LiveAbsenceEvidence = z.infer<typeof LiveAbsenceEvidenceSchema>
+
+/**
+ * The evidence behind a resource's `unsupported` marker, in one of two forms:
+ * the app's dictionary has no collection for it
+ * ({@link DictionaryAbsenceEvidenceSchema}), or the running app fails every
+ * read of it ({@link LiveAbsenceEvidenceSchema}).
+ */
+export const ResourceAbsenceEvidenceSchema = z.discriminatedUnion('source', [
+  DictionaryAbsenceEvidenceSchema,
+  LiveAbsenceEvidenceSchema,
+])
+export type ResourceAbsenceEvidence = z.infer<typeof ResourceAbsenceEvidenceSchema>
+
 /** The parts of a field that make or support a nullability claim. */
 interface NullabilityClaim {
   readonly nullable?: boolean | undefined

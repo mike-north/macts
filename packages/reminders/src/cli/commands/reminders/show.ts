@@ -3,32 +3,26 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a connection by ID.
+ * Show the reminder in Reminders.app UI
  */
-export class GetConnectionCommand extends Command {
-  static override paths = [['screen-sharing', 'connections', 'get']]
+export class ShowReminderCommand extends Command {
+  static override paths = [['reminders', 'reminders', 'show']]
 
   static override usage = Command.Usage({
-    description: 'Get a connection by ID',
+    description: 'Show the reminder in Reminders.app UI',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-
-  connectionId = Option.String({ required: true })
+  reminderId = Option.String({ required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      const item = await client.connections.get(this.connectionId)
+      await client.reminders.show()
 
-      const output = formatter.format({
-        name: item.name,
-        id: item.id,
-        url: item.url,
-      })
-
+      const output = formatter.formatSuccess('show completed successfully')
       this.context.stdout.write(output + '\n')
       return 0
     } catch (error) {

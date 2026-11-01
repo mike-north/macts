@@ -64,6 +64,16 @@ export const consoleApiPlugin = {
             primary: true,
           },
         ],
+        unsupported: {
+          evidence: {
+            source: 'dictionary',
+            bundleId: 'com.apple.Console',
+            appVersion: '1.1',
+            osVersion: '27.2',
+            term: 'device',
+            finding: 'no-class',
+          },
+        },
       },
     },
     enums: {},
