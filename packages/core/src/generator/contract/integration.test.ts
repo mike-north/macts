@@ -145,7 +145,7 @@ let tscOutput = ''
 let tscStatus: number | null = null
 
 beforeAll(async () => {
-  const generated = generateContract(jotterManifest(), { packageName: '@macts/jotter' })
+  const generated = generateContract(jotterManifest())
   expect(generated.errors).toEqual([])
 
   workDir = await mkdtemp(join(tmpdir(), 'macts-contract-'))
@@ -196,7 +196,7 @@ describe('every real app manifest', () => {
     expect(apps.length).toBeGreaterThan(0)
     for (const app of apps) {
       const manifest = await loadManifest(join(MANIFESTS_DIR, app, 'app.yaml'))
-      const generated = generateContract(manifest, { packageName: `@macts/${app}` })
+      const generated = generateContract(manifest)
       expect(generated.errors).toEqual([])
       for (const file of generated.files) {
         const path = join(dir, app, file.path)
@@ -242,15 +242,27 @@ describe('operations', () => {
     }
   })
 
-  it("carry each route's permission, explicit or derived", () => {
-    const routes = resolveManifestRoutes(jotterManifest())
-    for (const route of routes) {
-      expect(operationAt(route.route).permission).toBe(route.permission)
+  it("carry each route's permission, explicit or derived by the server's rule", () => {
+    // Hand-derived from the fixture by the rule the HTTP server applies: the
+    // command's explicit permission, else `{app}:{scope}:{commandKey}`, where
+    // the scope is `app` for app commands and the lowercased resource plural
+    // otherwise. Only `archive` declares its own.
+    const expected: Record<string, string> = {
+      'jotter.notes.listNotes': 'jotter:notes:listNotes',
+      'jotter.notes.getNote': 'jotter:notes:getNote',
+      'jotter.notes.createNote': 'jotter:notes:createNote',
+      'jotter.notes.updateNote': 'jotter:notes:updateNote',
+      'jotter.notes.deleteNote': 'jotter:notes:deleteNote',
+      'jotter.notes.archive': 'jotter:notes:write',
+      'jotter.folders.listFolders': 'jotter:folders:listFolders',
+      'jotter.tags.listTags': 'jotter:tags:listTags',
+      'jotter.app.quit': 'jotter:app:quit',
     }
-    // Hand-derived: `{app}:{scope}:{commandKey}`, unless the command declares one.
-    expect(operationAt('jotter.notes.getNote').permission).toBe('jotter:notes:getNote')
-    expect(operationAt('jotter.app.quit').permission).toBe('jotter:app:quit')
-    expect(operationAt('jotter.notes.archive').permission).toBe('jotter:notes:write')
+    expect(
+      Object.fromEntries(
+        Object.entries(contract.operations).map(([id, operation]) => [id, operation.permission])
+      )
+    ).toEqual(expected)
   })
 
   it('target the manifest command and resource keys', () => {

@@ -51,7 +51,7 @@ function importSpecifiers(text: string): string[] {
   return [...new Set(specifiers)].sort()
 }
 
-const jotter = generateContract(jotterManifest(), { packageName: '@macts/jotter' })
+const jotter = generateContract(jotterManifest())
 const contract = moduleText(jotter, CONTRACT_MODULE_PATH)
 
 describe('generateContract: files', () => {
@@ -93,13 +93,22 @@ describe('generateContract: dependency boundary', () => {
 
   it('never reaches node built-ins, @macts/core, @macts/runtime, or the legacy client files', () => {
     for (const file of jotter.files) {
-      // Doc comments may show application code (a factory from @macts/sdk);
-      // only the module's code matters here.
+      // Doc comments may name application packages (a factory from
+      // @macts/sdk); only the module's code matters here.
       const code = file.content.replace(/\/\*[\s\S]*?\*\//g, '')
       expect(code).not.toMatch(/from 'node:|import\('node:/)
       expect(code).not.toMatch(/'@macts\/(core|runtime|sdk|api)/)
       expect(code).not.toMatch(/'\.\.\/(client|types|index|cli)/)
     }
+  })
+
+  it('has no code example in its header', () => {
+    // No client factory exists in @macts/sdk yet, so any example would show
+    // code that does not compile. The header names the factory in prose only.
+    expect(contract).not.toContain('@example')
+    expect(contract).toContain(
+      'A client is created from it by a client\n * factory from `@macts/sdk`'
+    )
   })
 
   it('uses no platform automation terms in its own text', () => {
@@ -283,7 +292,7 @@ describe('generateContract: errors', () => {
   function withChanges(change: (manifest: AppManifest) => void): GeneratedContract {
     const manifest = jotterManifest()
     change(manifest)
-    return generateContract(manifest, { packageName: '@macts/jotter' })
+    return generateContract(manifest)
   }
 
   it('reports a manifest name that collides with a contract import', () => {
@@ -313,14 +322,27 @@ describe('generateContract: errors', () => {
     ])
   })
 
-  it('reports a permission that is not app:resource:operation', () => {
+  // Governance accepts exactly three non-empty segments and denies anything
+  // else, so each of these could never be granted.
+  it.each(['quit', '::x', 'a::c', 'a:b:', ':b:c', 'a:b', 'a:b:c:d'])(
+    'reports the permission %j, which is not app:resource:operation',
+    (permission) => {
+      const result = withChanges((manifest) => {
+        const quit = manifest.commands['quit']
+        if (quit) quit.permission = permission
+      })
+      expect(result.errors).toEqual([
+        `jotter.app.quit: the permission ${JSON.stringify(permission)} is not of the form app:resource:operation.`,
+      ])
+    }
+  )
+
+  it('accepts a permission of three non-empty segments', () => {
     const result = withChanges((manifest) => {
       const quit = manifest.commands['quit']
-      if (quit) quit.permission = 'quit'
+      if (quit) quit.permission = 'jotter:app:shutdown'
     })
-    expect(result.errors).toEqual([
-      'jotter.app.quit: the permission "quit" is not of the form app:resource:operation.',
-    ])
+    expect(result.errors).toEqual([])
   })
 })
 
@@ -396,18 +418,13 @@ describe('real app manifests', () => {
   })
 
   it('generate without errors', () => {
-    const errors = apps.flatMap(
-      ({ dir, manifest }) => generateContract(manifest, { packageName: `@macts/${dir}` }).errors
-    )
+    const errors = apps.flatMap(({ manifest }) => generateContract(manifest).errors)
     expect(errors).toEqual([])
   })
 
   it('embed a manifest that validates back to the same manifest', () => {
     for (const { manifest } of apps) {
-      const text = moduleText(
-        generateContract(manifest, { packageName: '@macts/app' }),
-        CONTRACT_MANIFEST_MODULE_PATH
-      )
+      const text = moduleText(generateContract(manifest), CONTRACT_MANIFEST_MODULE_PATH)
       const json = text.slice(text.indexOf('export const manifest: unknown = ') + 33)
       expect(AppManifestSchema.parse(JSON.parse(json))).toEqual(manifest)
     }

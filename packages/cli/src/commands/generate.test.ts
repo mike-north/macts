@@ -275,6 +275,72 @@ describe('GenerateCommand', () => {
     })
   })
 
+  describe('generation diagnostics', () => {
+    const diagnostic =
+      'calendar: resources.Event.properties.layout: the type {"resource":"layout"} names no resource or enum, so the contract describes it as unknown.'
+
+    it('prints each diagnostic of all-target generation to stderr as a warning, and succeeds', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateConsolidatedPackages).mockReturnValue({
+        client: { dir: 'calendar', files: [] },
+        server: { dir: 'calendar-server', files: [] },
+        errors: [],
+        diagnostics: [diagnostic, 'second finding'],
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages'
+      command.target = 'all'
+      command.context = createTestContext()
+
+      expect(await command.execute()).toBe(0)
+      expect(stderr.join('')).toBe(`warning: ${diagnostic}\nwarning: second finding\n`)
+      expect(stdout.join('')).not.toContain('warning')
+      expect(core.writeFiles).toHaveBeenCalledTimes(2)
+    })
+
+    it('prints the diagnostics of client generation', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateClientPackage).mockReturnValue({
+        dir: 'calendar',
+        files: [],
+        errors: [],
+        diagnostics: [diagnostic],
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'client'
+      command.context = createTestContext()
+
+      expect(await command.execute()).toBe(0)
+      expect(stderr.join('')).toBe(`warning: ${diagnostic}\n`)
+    })
+
+    it('prints nothing to stderr when there are no diagnostics', async () => {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateClientPackage).mockReturnValue({
+        dir: 'calendar',
+        files: [],
+        errors: [],
+      })
+      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = 'packages/calendar'
+      command.target = 'client'
+      command.context = createTestContext()
+
+      expect(await command.execute()).toBe(0)
+      expect(stderr.join('')).toBe('')
+    })
+  })
+
   describe('error handling', () => {
     it('should handle manifest load errors', async () => {
       vi.mocked(core.loadManifest).mockRejectedValue(

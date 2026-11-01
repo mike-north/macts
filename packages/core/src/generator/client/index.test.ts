@@ -154,6 +154,7 @@ describe('generateClientPackage: contract subpath', () => {
     exports: Record<string, { types: string; import: string }>
     engines: Record<string, string>
     dependencies: Record<string, string>
+    scripts: Record<string, string>
   } {
     const file = result.files.find((f) => f.path === 'package.json')
     if (!file) throw new Error('package.json not found')
@@ -187,6 +188,37 @@ describe('generateClientPackage: contract subpath', () => {
     'cli/index': 'src/cli/index.ts',
     'contract/index': 'src/contract/index.ts',
   },`)
+  })
+
+  it('reports the contract entry with its own API Extractor config', () => {
+    const files = generate().files
+    const config = files.find((f) => f.path === 'api-extractor.contract.json')
+    if (!config) throw new Error('api-extractor.contract.json not found')
+    // Extends the shared base like the root config; reports dist/contract's
+    // declarations under api-report/ as contract.api.md; writes no rollup or
+    // doc model of its own; silences only the package-tag placement message
+    // that tsup's declaration output triggers.
+    expect(JSON.parse(config.content)).toEqual({
+      $schema:
+        'https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json',
+      extends: '../../api-extractor.base.json',
+      mainEntryPointFilePath: '<projectFolder>/dist/contract/index.d.ts',
+      apiReport: { reportFileName: 'contract.api.md' },
+      docModel: { enabled: false },
+      dtsRollup: { enabled: false },
+      messages: {
+        extractorMessageReporting: {
+          'ae-misplaced-package-tag': { logLevel: 'none' },
+        },
+      },
+    })
+    expect(files.filter((f) => f.path === 'api-extractor.json')).toHaveLength(1)
+    expect(packageJson(generate()).scripts).toMatchObject({
+      'api-extractor':
+        'api-extractor run --local && api-extractor run --local --config api-extractor.contract.json',
+      'api-extractor:ci':
+        'api-extractor run && api-extractor run --config api-extractor.contract.json',
+    })
   })
 
   it('depends on @macts/contracts from the workspace', () => {

@@ -161,23 +161,13 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
   return diagnostics
 }
 
-/** Options for {@link generateContract}. */
-export interface GenerateContractOptions {
-  /** The client package the contract ships in, e.g. `@macts/calendar`. */
-  readonly packageName: string
-}
-
 /**
  * Generate the contract and manifest modules for an app.
  *
  * @param manifest - The validated app manifest.
- * @param options - Where the contract is published.
  */
-export function generateContract(
-  manifest: AppManifest,
-  options: GenerateContractOptions
-): GeneratedContract {
-  const builder = new ContractBuilder(manifest, options.packageName)
+export function generateContract(manifest: AppManifest): GeneratedContract {
+  const builder = new ContractBuilder(manifest)
   const contract = builder.build()
   return {
     files: [
@@ -295,11 +285,19 @@ const CONTRACT_BASE_TYPE_IMPORTS = [
   'ValueType',
 ] as const
 
+/**
+ * The shape of a capability permission: exactly three non-empty,
+ * colon-separated segments, `app:resource:operation`. Governance evaluates
+ * only this shape and denies any other (fail closed), so a descriptor with
+ * another shape could never be allowed; every shipped manifest's permissions
+ * have exactly three segments.
+ */
+const PERMISSION_SHAPE = /^[^:]+:[^:]+:[^:]+$/
+
 /** Builds the text of one app's contract module. */
 class ContractBuilder {
   readonly errors: string[] = []
   readonly #manifest: AppManifest
-  readonly #packageName: string
   readonly #names: ContractNames
   readonly #resolver: NameResolver
   readonly #renderer: ValueRenderer
@@ -308,9 +306,8 @@ class ContractBuilder {
   readonly #operationsByRoute = new Map<string, OperationModel>()
   readonly #privateBindings = new Set<string>(['t', 'resources', 'operations', 'bind'])
 
-  constructor(manifest: AppManifest, packageName: string) {
+  constructor(manifest: AppManifest) {
     this.#manifest = manifest
-    this.#packageName = packageName
     this.#names = contractNames(manifest)
     this.#resolver = createNameResolver(manifest)
     for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
@@ -401,7 +398,7 @@ class ContractBuilder {
         used
       )
       this.#privateBindings.add(binding)
-      if (!/^[^:]*:[^:]*:/.test(route.permission)) {
+      if (!PERMISSION_SHAPE.test(route.permission)) {
         this.errors.push(
           `${route.route}: the permission ${JSON.stringify(route.permission)} is not of the form app:resource:operation.`
         )
@@ -700,7 +697,7 @@ class ContractBuilder {
   // --- Rendering: types ---------------------------------------------------
 
   #renderHeader(): string {
-    const { client, contract } = this.#names
+    const { client } = this.#names
     const appName = this.#manifest.app.name
     return `/**
  * The ${appName} contract: the transport-neutral description of every
@@ -713,17 +710,9 @@ class ContractBuilder {
  * the objects they point to.
  *
  * The contract performs no I/O. A client is created from it by a client
- * factory, local or remote, which supplies the runtime that \`bind\` turns into
- * a \`${client}\`; application code changes locality by changing the factory,
- * not the contract.
- *
- * @example
- * \`\`\`ts
- * import { createClient } from '@macts/sdk'
- * import { ${contract} } from '${this.#packageName}/contract'
- *
- * const client = createClient(${contract}, { token, url })
- * \`\`\`
+ * factory from \`@macts/sdk\`, local or remote, which supplies the runtime that
+ * \`bind\` turns into a \`${client}\`; application code changes locality by
+ * changing the factory, not the contract.
  *
  * Generated from the ${appName} manifest; do not edit.
  *

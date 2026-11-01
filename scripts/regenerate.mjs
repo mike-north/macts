@@ -12,9 +12,13 @@
  *
  * The CLI must be built first (`pnpm build`) — this script invokes the compiled
  * binary at `packages/cli/dist/bin.js`.
+ *
+ * Generation diagnostics (manifest types the contract describes as `unknown`)
+ * are passed through on stderr as the CLI prints them, and the script ends
+ * with their total across apps. They do not fail regeneration.
  */
 
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { readdirSync, existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -61,13 +65,22 @@ function discoverManifestApps() {
     .sort()
 }
 
+/**
+ * The prefix of each diagnostic line the CLI writes to stderr; see
+ * `GENERATION_WARNING_PREFIX` in `packages/cli/src/commands/generate.ts`.
+ */
+const WARNING_PREFIX = 'warning: '
+
 const apps = discoverManifestApps()
 console.log(`Regenerating ${String(apps.length)} app(s) from manifests...`)
 
+let diagnosticCount = 0
 for (const app of apps) {
   const manifestPath = join(manifestsDir, app, 'app.yaml')
   console.log(`  - ${app}`)
-  execFileSync(
+  // stderr is captured, then passed through unchanged, so its warnings can be
+  // counted; stdout stays quiet.
+  const run = spawnSync(
     process.execPath,
     [
       cliBin,
@@ -80,8 +93,15 @@ for (const app of apps) {
       '--version',
       version,
     ],
-    { stdio: ['ignore', 'ignore', 'inherit'] }
+    { stdio: ['ignore', 'ignore', 'pipe'], encoding: 'utf-8' }
   )
+  if (run.error !== undefined) throw run.error
+  process.stderr.write(run.stderr)
+  if (run.status !== 0) {
+    console.error(`Generating ${app} failed (exit status ${String(run.status)}).`)
+    process.exit(run.status ?? 1)
+  }
+  diagnosticCount += run.stderr.split('\n').filter((line) => line.startsWith(WARNING_PREFIX)).length
 }
 
 console.log('Formatting generated output with Prettier...')
@@ -90,4 +110,6 @@ execFileSync('pnpm', ['exec', 'prettier', '--write', '--log-level', 'warn', 'pac
   stdio: 'inherit',
 })
 
-console.log('Regeneration complete.')
+console.log(
+  `Regeneration complete: ${String(diagnosticCount)} generation diagnostic(s) across apps.`
+)
