@@ -52,7 +52,7 @@ export class ReminderResourceClient {
    * Mark a reminder as complete
    */
   async complete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.completeReminder`, { id })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.complete`, { id })
   }
 
   /**

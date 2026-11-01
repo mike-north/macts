@@ -615,6 +615,7 @@ export const manifest: unknown = {
         },
       ],
       code: '????',
+      routeName: 'complete',
       permission: 'reminders:reminders:update',
     },
     show: {

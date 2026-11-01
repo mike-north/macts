@@ -466,7 +466,7 @@ const reminderDeleteReminderOperation: OperationDescriptor<{ readonly id: string
 }
 
 const reminderCompleteReminderOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
-  id: 'reminders.reminders.completeReminder',
+  id: 'reminders.reminders.complete',
   permission: 'reminders:reminders:update',
   target: { command: 'completeReminder', resource: 'Reminder' },
   description: 'Mark a reminder as complete',
@@ -506,7 +506,7 @@ const operations: AppContract<RemindersClient>['operations'] = {
   'reminders.reminders.get': reminderGetReminderOperation,
   'reminders.reminders.create': reminderCreateReminderOperation,
   'reminders.reminders.delete': reminderDeleteReminderOperation,
-  'reminders.reminders.completeReminder': reminderCompleteReminderOperation,
+  'reminders.reminders.complete': reminderCompleteReminderOperation,
   'reminders.reminders.show': reminderShowOperation,
   'reminders.accounts.list': accountListAccountsOperation,
 }

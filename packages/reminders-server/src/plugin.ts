@@ -621,6 +621,7 @@ export const remindersApiPlugin = {
           },
         ],
         code: '????',
+        routeName: 'complete',
         permission: 'reminders:reminders:update',
       },
       show: {
