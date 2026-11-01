@@ -1,5 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { Resource, PropertyType, Enum } from '../manifest/index.js'
+import { usableProperties } from '../manifest/unsupported.js'
 
 export interface GeneratedSchema {
   name: string
@@ -82,7 +83,7 @@ export function generateResourceSchema(
   resource: Resource,
   _ctx: GeneratorContext
 ): GeneratedSchema {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports = ["import { z } from 'zod';"]
 
   const propLines = properties.map(([name, prop]) => {
@@ -105,7 +106,7 @@ export function generateCreateInputSchema(
   resource: Resource,
   _ctx: GeneratorContext
 ): GeneratedSchema {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports = ["import { z } from 'zod';"]
 
   // Only writable properties
@@ -134,7 +135,7 @@ export function generateUpdateInputSchema(
   resource: Resource,
   _ctx: GeneratorContext
 ): GeneratedSchema {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports = ["import { z } from 'zod';"]
 
   // Only writable properties, all optional

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { PropertySchema } from './property.js'
 import { ObservedAtSchema } from './evidence.js'
+import { resolvePrimaryIdentifierProperty } from '../identifier.js'
 
 /**
  * How the structured/runtime layer addresses a resource by its identifier.
@@ -128,12 +129,19 @@ export const NullabilityProbeSchema = z.object({
    * Absent on blocks written before the probe spread its sample.
    */
   sampledParents: z.number().int().nonnegative().optional(),
+  /**
+   * How many parents the probe looked in for items, empty or not: 1 for a
+   * top-level collection. For a nested resource the probe looks in evenly
+   * spaced parents up to a limit, so this can be fewer than all of them.
+   * Absent on blocks written before the probe recorded it.
+   */
+  parentsScanned: z.number().int().nonnegative().optional(),
   /** The outcome of the probe. */
   status: NullabilityProbeStatusSchema,
   /**
    * Properties the probe did not read, by name: file and data properties,
-   * lists of references, properties that hold large content, and any the
-   * caller excluded.
+   * lists of references, properties that hold large content, properties
+   * marked unsupported, and any the caller excluded.
    */
   skipped: z.array(z.string()),
   /**
@@ -148,34 +156,51 @@ export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>
 /**
  * Schema for a resource type definition.
  */
-export const ResourceSchema = z.object({
-  /** Resource name (singular, PascalCase) */
-  name: z.string(),
-  /** Plural form for collections */
-  plural: z.string(),
-  /** Human-readable description */
-  description: z.string(),
-  /** Reference to JSON Schema file for full data shape */
-  schema: z.string().optional(),
-  /** AppleScript four-character code */
-  code: z.string().min(1).max(4).optional(),
-  /** Property definitions */
-  properties: z.preprocess((val) => val ?? {}, z.record(z.string(), PropertySchema)),
-  /** Identifier configuration (sdef-declared, kept for provenance) */
-  identifiers: z.array(IdentifierSchema).optional(),
-  /**
-   * Runtime-probe metadata written by `macts probe`.
-   *
-   * Absent until the probe has been run against the live app.  When present,
-   * `runtimeIdentifier` is the property that actually works at runtime —
-   * consumers (executor, code generator) SHOULD prefer it over the sdef-declared
-   * primary identifier.
-   */
-  probe: RuntimeProbeSchema.optional(),
-  /**
-   * Record of the last nullability probe, written by
-   * `macts probe --nullability`. Absent until that probe has run.
-   */
-  nullabilityProbe: NullabilityProbeSchema.optional(),
-})
+export const ResourceSchema = z
+  .object({
+    /** Resource name (singular, PascalCase) */
+    name: z.string(),
+    /** Plural form for collections */
+    plural: z.string(),
+    /** Human-readable description */
+    description: z.string(),
+    /** Reference to JSON Schema file for full data shape */
+    schema: z.string().optional(),
+    /** AppleScript four-character code */
+    code: z.string().min(1).max(4).optional(),
+    /** Property definitions */
+    properties: z.preprocess((val) => val ?? {}, z.record(z.string(), PropertySchema)),
+    /** Identifier configuration (sdef-declared, kept for provenance) */
+    identifiers: z.array(IdentifierSchema).optional(),
+    /**
+     * Runtime-probe metadata written by `macts probe`.
+     *
+     * Absent until the probe has been run against the live app.  When present,
+     * `runtimeIdentifier` is the property that actually works at runtime —
+     * consumers (executor, code generator) SHOULD prefer it over the sdef-declared
+     * primary identifier.
+     */
+    probe: RuntimeProbeSchema.optional(),
+    /**
+     * Record of the last nullability probe, written by
+     * `macts probe --nullability`. Absent until that probe has run.
+     */
+    nullabilityProbe: NullabilityProbeSchema.optional(),
+  })
+  .superRefine((resource, ctx) => {
+    // A resource is addressed by its primary identifier, so the identifier
+    // must be readable: it cannot be marked unsupported.
+    const identifier = resolvePrimaryIdentifierProperty(resource)
+    if (identifier === undefined) return
+    const property = Object.hasOwn(resource.properties, identifier)
+      ? resource.properties[identifier]
+      : undefined
+    if (property?.unsupported !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The primary identifier "${identifier}" cannot be marked unsupported: choose a different identifier.`,
+        path: ['properties', identifier, 'unsupported'],
+      })
+    }
+  })
 export type Resource = z.infer<typeof ResourceSchema>

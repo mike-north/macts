@@ -25,14 +25,24 @@ import { ProbeCommand } from './probe.js'
 /** A value that must never reach any output. */
 const SECRET = 'SECRET-VALUE'
 
+/** How the fixture app's notes behave, beyond the defaults. */
+interface FakeAppOptions {
+  /** Note 5 has no uid, and reading note 6's uid throws. */
+  readonly brokenIds?: boolean
+  /** Reading any note's uid throws. */
+  readonly idsAlwaysFail?: boolean
+  /** How many notes the app has; 40 by default. */
+  readonly count?: number
+}
+
 /**
- * The fixture app's notes: 40 of them, each property behaving as the fixture
- * says. With `brokenIds`, note 5 has no uid and reading note 6's uid throws.
+ * The fixture app's notes: 40 of them by default, each property behaving as
+ * the fixture says. See {@link FakeAppOptions} for the variations.
  */
-function fakeApp(brokenIds = false): object {
-  const notes = Array.from({ length: 40 }, (_, i) => ({
+function fakeApp({ brokenIds = false, idsAlwaysFail = false, count = 40 }: FakeAppOptions): object {
+  const notes = Array.from({ length: count }, (_, i) => ({
     uid: () => {
-      if (brokenIds && i === 6) throw new Error('AppleEvent handler failed.')
+      if (idsAlwaysFail || (brokenIds && i === 6)) throw new Error('AppleEvent handler failed.')
       return brokenIds && i === 5 ? null : `${SECRET}-uid-${String(i)}`
     },
     // Curated non-null, but 3 notes have none: a contradiction.
@@ -44,11 +54,18 @@ function fakeApp(brokenIds = false): object {
       if (i % 2 === 0) throw new Error('AppleEvent handler failed.')
       return SECRET
     },
-    // Always throws.
+    // Always throws: a property whose every read fails, a manifest defect.
     locked: () => {
       throw new Error('AppleEvent handler failed.')
     },
     body: () => SECRET,
+    // Read only under KINDS_MANIFEST, which declares them.
+    // Dates, where that manifest declares text.
+    created: () => new Date(Date.UTC(2026, 0, i + 1)),
+    // 30 numbers and 10 strings, where it declares an integer.
+    rank: () => (i < 30 ? i : `${SECRET}-rank`),
+    // A record, where it declares no checkable type (any).
+    extra: () => ({ secret: SECRET }),
   }))
   // Shaped like the bridge's element specifier: the nullability probe reads
   // its length and indexes into it; the identifier probe calls it.
@@ -120,13 +137,13 @@ commands: {}
  * process would. With `msPerTick`, the app process's clock advances that much
  * on every `Date.now()`, so a body hits its time limit after a few items.
  */
-function fakeRunner(msPerTick?: number, brokenIds = false): JxaRunner {
+function fakeRunner(msPerTick?: number, options: FakeAppOptions = {}): JxaRunner {
   return (_bundleId, body) => {
     if (body === APP_VERSION_BODY) return Promise.resolve('2.1')
     let now = 0
     const clock = msPerTick === undefined ? Date : { now: () => (now += msPerTick) }
     const value: unknown = runInNewContext(`(function (app) {${body}})(app)`, {
-      app: fakeApp(brokenIds),
+      app: fakeApp(options),
       Date: clock,
     })
     return Promise.resolve(JSON.parse(JSON.stringify(value)) as unknown)
@@ -186,7 +203,7 @@ class SlowProbeCommand extends ProbeCommand {
 
 /** The probe command against an app whose notes' identifiers are not always present. */
 class BrokenIdProbeCommand extends ProbeCommand {
-  protected override runner = fakeRunner(undefined, true)
+  protected override runner = fakeRunner(undefined, { brokenIds: true })
   protected override nullabilityEnvironment = environment
 }
 
@@ -237,6 +254,43 @@ class NestedProbeCommand extends ProbeCommand {
   protected override nullabilityEnvironment = environment
 }
 
+/**
+ * The probe command against an app of 1,000 empty shelves, where looking in a
+ * shelf (reading its cards) takes 1 s on the app's clock.
+ */
+class SlowEmptyShelvesProbeCommand extends ProbeCommand {
+  protected override runner: JxaRunner = (_bundleId, body) => {
+    if (body === APP_VERSION_BODY) return Promise.resolve('2.1')
+    let now = 0
+    const shelf = {
+      label: () => SECRET,
+      get cards() {
+        now += 1_000
+        return []
+      },
+    }
+    const app = { shelves: Array.from({ length: 1_000 }, () => shelf) }
+    const value: unknown = runInNewContext(`(function (app) {${body}})(app)`, {
+      app,
+      Date: { now: () => now },
+    })
+    return Promise.resolve(JSON.parse(JSON.stringify(value)) as unknown)
+  }
+  protected override nullabilityEnvironment = environment
+}
+
+/** The probe command against an app whose notes' identifiers can never be read. */
+class FailingIdProbeCommand extends ProbeCommand {
+  protected override runner = fakeRunner(undefined, { idsAlwaysFail: true })
+  protected override nullabilityEnvironment = environment
+}
+
+/** The probe command against an app with no notes. */
+class EmptyProbeCommand extends ProbeCommand {
+  protected override runner = fakeRunner(undefined, { count: 0 })
+  protected override nullabilityEnvironment = environment
+}
+
 /** The probe command against an app so slow the time limit hits before any item. */
 class StalledProbeCommand extends ProbeCommand {
   // 30 s per clock read against a 25 s call limit: the first check stops it.
@@ -272,6 +326,7 @@ describe('macts probe --nullability --dry-run --json', () => {
           status: 'probed',
           itemsRead: 40,
           sampledParents: 1,
+          parentsScanned: 1,
           truncated: false,
           properties: [
             // The identifier never gets a claim.
@@ -282,6 +337,8 @@ describe('macts probe --nullability --dry-run --json', () => {
               failures: 0,
               observation: 'non-null',
               change: 'unchanged',
+              // Each value found, counted by kind label: the uids are text.
+              kinds: { string: 40 },
             },
             {
               property: 'title',
@@ -291,6 +348,7 @@ describe('macts probe --nullability --dry-run --json', () => {
               observation: 'nullable',
               change: 'set',
               contradicted: 'curated',
+              kinds: { string: 37 },
             },
             {
               property: 'wordCount',
@@ -299,6 +357,7 @@ describe('macts probe --nullability --dry-run --json', () => {
               failures: 0,
               observation: 'non-null',
               change: 'set',
+              kinds: { number: 40 },
             },
             {
               property: 'mood',
@@ -307,6 +366,7 @@ describe('macts probe --nullability --dry-run --json', () => {
               failures: 20,
               observation: 'insufficient-sample',
               change: 'unchanged',
+              kinds: { string: 20 },
             },
             {
               property: 'locked',
@@ -318,6 +378,8 @@ describe('macts probe --nullability --dry-run --json', () => {
             },
           ],
           skipped: [{ property: 'body', reason: 'heavy' }],
+          // Every one of the 40 reads of `locked` threw.
+          readFailureDefects: [{ property: 'locked', itemsRead: 40, failed: 40 }],
         },
       ],
     })
@@ -339,7 +401,9 @@ describe('macts probe --nullability (human output)', () => {
     )
     expect(stdout).toContain('  wordCount  non-null             (0 of 40 empty)\n')
     expect(stdout).toContain('  mood       insufficient sample  (0 of 20 empty, 20 reads failed)\n')
-    expect(stdout).toContain('  locked     read failed          (40 reads failed)\n')
+    expect(stdout).toContain(
+      '  locked     read failed          (40 reads failed)  [manifest defect: every read failed]\n'
+    )
     expect(stdout).toContain('  body       skipped (large content)\n')
     expect(stdout).toContain('Contradictions: Note.title (curated non-null claim replaced)\n')
     expect(stdout).not.toContain(SECRET)
@@ -376,6 +440,7 @@ describe('macts probe --nullability (time limit)', () => {
       accessPath: notes
       itemsRead: 2
       sampledParents: 1
+      parentsScanned: 1
       status: probed
       skipped:
         - body
@@ -423,6 +488,7 @@ describe('macts probe --nullability (time budget spent before any item)', () => 
     const written = await readFile(manifestPath, 'utf-8')
     expect(written).toContain(`      itemsRead: 0
       sampledParents: 0
+      parentsScanned: 1
       status: budget
       skipped:
         - body
@@ -466,8 +532,246 @@ describe('macts probe --nullability (identifier defects)', () => {
 
   it('reports no defect when the identifier is present in every item', async () => {
     const { stdout } = await run(['--nullability', '--dry-run'])
-    expect(stdout).not.toContain('manifest defect')
+    expect(stdout).not.toContain('identifier not always present')
     expect(stdout).not.toContain('Manifest defects')
+  })
+})
+
+describe('macts probe --nullability (properties whose every read fails)', () => {
+  const LOCKED_DEFECT =
+    'Manifest defect: every read of Note.locked failed (40 of 40); the property name may not match the app. ' +
+    'If the app cannot provide it, mark it unsupported with sampleSize 40 and failedReads 40.\n'
+
+  it('reports the defect in the human output, with counts and no value, and exits 0', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run'])
+    expect(exitCode).toBe(0)
+    expect(stdout).toContain(
+      '  locked     read failed          (40 reads failed)  [manifest defect: every read failed]\n'
+    )
+    expect(stdout).toContain(LOCKED_DEFECT)
+    // `mood` failed on 20 of 40 items, not all: not this defect.
+    expect(stdout).toContain('  mood       insufficient sample  (0 of 20 empty, 20 reads failed)\n')
+    expect(stdout).not.toContain('Note.mood')
+    expect(stdout).not.toMatch(/applescript|jxa|osascript/i)
+    expect(stdout).not.toContain(SECRET)
+  })
+
+  it('reports the defect in the JSON, and only for the property that always failed', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run', '--json'])
+    expect(exitCode).toBe(0)
+    const report = JSON.parse(stdout) as { resources: { readFailureDefects?: unknown }[] }
+    expect(report.resources[0]?.readFailureDefects).toEqual([
+      { property: 'locked', itemsRead: 40, failed: 40 },
+    ])
+  })
+
+  it('writes no claim for the property', async () => {
+    expect((await run(['--nullability'])).exitCode).toBe(0)
+    const written = await readFile(manifestPath, 'utf-8')
+    expect(written).toContain(`      locked:
+        access: r
+        type: boolean
+        description: Locked
+      body:`)
+  })
+
+  it('reports an identifier whose every read fails once, as the identifier defect', async () => {
+    const human = await run(['--nullability', '--dry-run'], FailingIdProbeCommand)
+    expect(human.exitCode).toBe(0)
+    expect(human.stdout).toContain(
+      '  uid        read failed          (40 reads failed)  [manifest defect: identifier not always present]\n'
+    )
+    expect(human.stdout).toContain(
+      'Manifest defects: the primary identifier is not always present for Note.uid (empty 0, failed 40 of 40 items); choose a different identifier.\n'
+    )
+    expect(human.stdout).not.toContain('every read of Note.uid')
+    expect(human.stdout).toContain(LOCKED_DEFECT)
+
+    const json = await run(['--nullability', '--dry-run', '--json'], FailingIdProbeCommand)
+    expect(JSON.parse(json.stdout)).toMatchObject({
+      resources: [
+        {
+          identifierDefect: { property: 'uid', itemsRead: 40, empty: 0, failed: 40, probed: true },
+          readFailureDefects: [{ property: 'locked', itemsRead: 40, failed: 40 }],
+        },
+      ],
+    })
+  })
+
+  it('reports nothing for a resource that yielded no items', async () => {
+    const human = await run(['--nullability', '--dry-run'], EmptyProbeCommand)
+    expect(human.exitCode).toBe(0)
+    expect(human.stdout).toContain('Note  (notes) — no items\n')
+    expect(human.stdout).not.toContain('Manifest defect')
+
+    const json = await run(['--nullability', '--dry-run', '--json'], EmptyProbeCommand)
+    const report = JSON.parse(json.stdout) as { resources: Record<string, unknown>[] }
+    expect(report.resources[0]).not.toHaveProperty('readFailureDefects')
+    expect(report.resources[0]).not.toHaveProperty('identifierDefect')
+  })
+})
+
+/** `MANIFEST` with three more properties: `created` (string), `rank` (integer), `extra` (any). */
+const KINDS_MANIFEST = MANIFEST.replace(
+  `        description: Body
+`,
+  `        description: Body
+      created:
+        access: r
+        type: string
+        description: Created
+      rank:
+        access: r
+        type: integer
+        description: Rank
+      extra:
+        access: r
+        type: any
+        description: Extra
+`
+)
+
+describe('macts probe --nullability (value kinds against the declared type)', () => {
+  beforeEach(async () => {
+    expect(KINDS_MANIFEST).not.toBe(MANIFEST)
+    await writeFile(manifestPath, KINDS_MANIFEST)
+  })
+
+  it('reports contradicting kinds in the human output, with counts and no value, and exits 0', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run'])
+    expect(exitCode).toBe(0)
+    expect(stdout).toContain(
+      '  created    non-null             (0 of 40 empty)  [manifest defect: declared string, returned date]\n'
+    )
+    expect(stdout).toContain(
+      '  rank       non-null             (0 of 40 empty)  [manifest defect: declared integer, returned string]\n'
+    )
+    // Matching kinds: no tag.
+    expect(stdout).toContain('  wordCount  non-null             (0 of 40 empty)\n')
+    expect(stdout).toContain('  extra      non-null             (0 of 40 empty)\n')
+    expect(stdout).toContain(
+      'Manifest defect: Note.created is declared string but the app returned date for 40 of 40 values. ' +
+        'If the generated code cannot decode these values yet, mark it unsupported with sampleSize 40 and observedKinds { date: 40 }.\n'
+    )
+    expect(stdout).toContain(
+      'Manifest defect: Note.rank is declared integer but the app returned string for 10 of 40 values (30 matched).\n'
+    )
+    expect(stdout).toContain(
+      'Not checked against the declared type (no expected kinds): Note.extra (any).\n'
+    )
+    expect(stdout).not.toContain(SECRET)
+    expect(stdout).not.toContain('2026-01-')
+  })
+
+  it('reports them in the JSON, with kind labels only', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run', '--json'])
+    expect(exitCode).toBe(0)
+    const [note] = (JSON.parse(stdout) as { resources: Record<string, unknown>[] }).resources
+    expect(note?.['kindDefects']).toEqual([
+      {
+        property: 'created',
+        declared: 'string',
+        expected: ['string'],
+        values: 40,
+        matched: 0,
+        unexpected: { date: 40 },
+        markable: true,
+      },
+      {
+        property: 'rank',
+        declared: 'integer',
+        expected: ['number'],
+        values: 40,
+        matched: 30,
+        unexpected: { string: 10 },
+        markable: false,
+      },
+    ])
+    expect(note?.['kindsUnchecked']).toEqual([{ property: 'extra', declared: 'any' }])
+    const kinds = (note?.['properties'] as { property: string; kinds?: object }[]).map((p) => [
+      p.property,
+      p.kinds,
+    ])
+    expect(kinds).toEqual([
+      ['uid', { string: 40 }],
+      ['title', { string: 37 }],
+      ['wordCount', { number: 40 }],
+      ['mood', { string: 20 }],
+      ['locked', undefined],
+      ['created', { date: 40 }],
+      ['rank', { number: 30, string: 10 }],
+      ['extra', { record: 40 }],
+    ])
+    expect(stdout).not.toContain(SECRET)
+    expect(stdout).not.toContain('2026-01-')
+  })
+})
+
+/** `MANIFEST` with `locked`, the property whose every read fails, marked unsupported. */
+const MARKED_MANIFEST = MANIFEST.replace(
+  `        description: Locked
+`,
+  `        description: Locked
+        unsupported:
+          reason: Jotter does not implement locking.
+          evidence:
+            source: probe
+            observedAt: '2026-10-30T12:00:00.000Z'
+            bundleId: com.example.jotter
+            appVersion: '2.1'
+            osVersion: '27.2'
+            sampleSize: 40
+            failedReads: 40
+            errorNumbers:
+              - -1728
+`
+)
+
+describe('macts probe --nullability (properties marked unsupported)', () => {
+  beforeEach(async () => {
+    expect(MARKED_MANIFEST).not.toBe(MANIFEST)
+    await writeFile(manifestPath, MARKED_MANIFEST)
+  })
+
+  it('skips them as unsupported in the human output, with no defect', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run'])
+    expect(exitCode).toBe(0)
+    expect(stdout).toContain('  locked     skipped (unsupported)\n')
+    expect(stdout).toContain('  body       skipped (large content)\n')
+    expect(stdout).not.toContain('Manifest defect')
+    expect(stdout).not.toContain('read failed          (40 reads failed)')
+  })
+
+  it('skips them as unsupported in the JSON, with no defect', async () => {
+    const { exitCode, stdout } = await run(['--nullability', '--dry-run', '--json'])
+    expect(exitCode).toBe(0)
+    const [note] = (JSON.parse(stdout) as { resources: Record<string, unknown>[] }).resources
+    // Declaration order: `locked` comes before `body`.
+    expect(note?.['skipped']).toEqual([
+      { property: 'locked', reason: 'unsupported' },
+      { property: 'body', reason: 'heavy' },
+    ])
+    expect(note).not.toHaveProperty('readFailureDefects')
+    expect((note?.['properties'] as { property: string }[]).map((p) => p.property)).toEqual([
+      'uid',
+      'title',
+      'wordCount',
+      'mood',
+    ])
+  })
+
+  it('keeps the marker as it was when writing', async () => {
+    expect((await run(['--nullability'])).exitCode).toBe(0)
+    const written = await readFile(manifestPath, 'utf-8')
+    const marker = MARKED_MANIFEST.slice(
+      MARKED_MANIFEST.indexOf('        unsupported:'),
+      MARKED_MANIFEST.indexOf('      body:')
+    )
+    expect(written).toContain(marker)
+    expect(written).toContain(`      skipped:
+        - locked
+        - body
+`)
   })
 })
 
@@ -480,17 +784,83 @@ describe('macts probe --nullability (nested resources)', () => {
     )
     expect(human.exitCode).toBe(0)
     // Two non-empty shelves share the 60-item cap, 30 each: 30 of the 50
-    // cards from the first, all 20 from the second.
-    expect(human.stdout).toContain('Card  (shelves/cards) — 50 items read from 2 parents\n')
+    // cards from the first, all 20 from the second. The empty third shelf
+    // was looked in too.
+    expect(human.stdout).toContain(
+      'Card  (shelves/cards) — 50 items read from 2 parents (3 scanned)\n'
+    )
 
     const json = await run(
       ['--nullability', '--dry-run', '--json', '--resource', 'Card'],
       NestedProbeCommand
     )
     expect(JSON.parse(json.stdout)).toMatchObject({
-      resources: [{ resource: 'Card', itemsRead: 50, sampledParents: 2 }],
+      resources: [{ resource: 'Card', itemsRead: 50, sampledParents: 2, parentsScanned: 3 }],
     })
     expect(human.stdout).not.toContain(SECRET)
+  })
+  // Regression: a nested resource whose pre-scan ran out of time before it
+  // found an item was printed as 'skipped (time budget spent)', though it ran.
+  it('says how many parents a scan looked in when the time ran out before any item', async () => {
+    await writeFile(manifestPath, NESTED_MANIFEST)
+    // The call limit is 25 s and the scan may use half: 12.5 s. Looking in a
+    // shelf takes 1 s, and the check before shelf v runs at (v - 1) s, so
+    // shelves 1 to 13 are looked in (the 13th check is at 12 s) and the 14th
+    // check, at 13 s, stops the scan. 13 is under the 20 shelves of the first
+    // round, all empty, so no item is read.
+    const human = await run(
+      ['--nullability', '--dry-run', '--resource', 'Card'],
+      SlowEmptyShelvesProbeCommand
+    )
+    expect(human.exitCode).toBe(0)
+    expect(human.stdout).toContain(
+      'Card  (shelves/cards) — no items found in the 13 parents scanned before the time limit\n'
+    )
+    expect(human.stdout).not.toContain('skipped')
+
+    const json = await run(
+      ['--nullability', '--dry-run', '--json', '--resource', 'Card'],
+      SlowEmptyShelvesProbeCommand
+    )
+    expect(JSON.parse(json.stdout)).toMatchObject({
+      resources: [
+        {
+          resource: 'Card',
+          status: 'budget',
+          itemsRead: 0,
+          sampledParents: 0,
+          parentsScanned: 13,
+          // The pre-scan ran out of time; no sample was read, so none was cut short.
+          truncated: false,
+        },
+      ],
+    })
+  })
+
+  it('records the parents scanned in the manifest block, with the same wording', async () => {
+    await writeFile(manifestPath, NESTED_MANIFEST)
+    // As above: 13 parents, no items. Card has only a text label, so nothing
+    // is skipped.
+    const { exitCode } = await run(
+      ['--nullability', '--resource', 'Card'],
+      SlowEmptyShelvesProbeCommand
+    )
+    expect(exitCode).toBe(0)
+    const written = await readFile(manifestPath, 'utf-8')
+    expect(written).toContain(`    nullabilityProbe:
+      observedAt: '2026-10-31T12:00:00.000Z'
+      bundleId: com.example.jotter
+      appVersion: '2.1'
+      osVersion: '27.2'
+      accessPath: shelves/cards
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 13
+      status: budget
+      skipped: []
+      note: no items found in the 13 parents scanned before the time limit
+`)
+    expect(written).not.toContain('not probed')
   })
 })
 

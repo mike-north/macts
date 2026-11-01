@@ -291,15 +291,16 @@ properties:
 
 ##### Property Fields
 
-| Field         | Type    | Required | Description                                        |
-| ------------- | ------- | -------- | -------------------------------------------------- |
-| `access`      | enum    | Yes      | Access mode: `r` (read-only) or `rw` (read-write)  |
-| `type`        | type    | No       | Property type (defaults to `string` if omitted)    |
-| `description` | string  | Yes      | Human-readable description                         |
-| `code`        | string  | No       | AppleScript four-character code                    |
-| `default`     | any     | No       | Default value                                      |
-| `optional`    | boolean | No       | Whether property is optional (defaults to `false`) |
-| `deprecated`  | object  | No       | Deprecation information                            |
+| Field         | Type    | Required | Description                                                                                                             |
+| ------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `access`      | enum    | Yes      | Access mode: `r` (read-only) or `rw` (read-write)                                                                       |
+| `type`        | type    | No       | Property type (defaults to `string` if omitted)                                                                         |
+| `description` | string  | Yes      | Human-readable description                                                                                              |
+| `code`        | string  | No       | AppleScript four-character code                                                                                         |
+| `default`     | any     | No       | Default value                                                                                                           |
+| `optional`    | boolean | No       | Whether property is optional (defaults to `false`)                                                                      |
+| `deprecated`  | object  | No       | Deprecation information                                                                                                 |
+| `unsupported` | object  | No       | Marks a declared property the app cannot provide, with evidence (see [Unsupported properties](#unsupported-properties)) |
 
 ##### Property Types
 
@@ -362,6 +363,83 @@ title:
     message: Use 'name' instead
     since: '10.0'
 ```
+
+##### Unsupported properties
+
+A manifest never drops a property the app's dictionary declares. When a
+property cannot be used at runtime, it is marked `unsupported`, with the
+evidence. The evidence takes one of two forms.
+
+**Every read failed:** the app cannot provide the property (it is
+unimplemented, obsolete, or otherwise unreadable).
+
+```yaml
+locked:
+  access: r
+  type: boolean
+  description: Whether the note is locked
+  unsupported:
+    reason: The app does not implement this property.
+    dictionaryNote: NOT AVAILABLE YET # optional: the dictionary's own note
+    evidence:
+      source: probe # a live, read-only observation
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.example.jotter
+      appVersion: '2.1'
+      osVersion: '27.2'
+      sampleSize: 40 # items whose read was attempted (at least 1)
+      failedReads: 40 # must equal sampleSize: every read failed
+      errorNumbers: # the distinct error numbers seen (at least 1)
+        - -1728
+```
+
+**Every value had a kind the declared type cannot decode:** the reads succeed,
+but the generated code cannot decode the values yet, so without the marker
+every read of the resource would fail. The kinds are the probe's labels
+(`date`, `number`, `boolean`, `string`, `record`, `list`, `reference`,
+`other`), counted, never values.
+
+```yaml
+containerWindow:
+  access: r
+  type: string
+  description: The container window for this folder
+  unsupported:
+    reason: Values are object references, which the generated code cannot decode yet.
+    trackingIssue: 155 # optional: the issue whose fix will remove the marker
+    evidence:
+      source: probe
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      sampleSize: 18 # values whose kind was observed (at least 1)
+      observedKinds: { reference: 18 } # counts by kind, summing to sampleSize
+```
+
+None of the observed kinds may be one the declared type expects: `string` is
+read as strings, `integer` and `number` as numbers, `boolean` as booleans,
+`date` as dates, `point` and `rgb` as lists or records, `rect` as records, a
+list type as lists, and a resource or enum type as references or strings. Kind
+evidence cannot mark a type that is not checked (`file`, `data`, `any`).
+
+`trackingIssue`, on either form, names the issue whose fix will remove the
+marker, such as the one that adds a conversion for the returned kind.
+
+Every generated surface (the contract, the SDKs, the MCP tools, capabilities,
+and the CLI) leaves a marked property out, for input and output alike, and the
+nullability probe skips it (`skipped (unsupported)`). The manifest keeps it so
+the record of what the dictionary declares stays complete and the omission
+stays auditable.
+
+The marker is curated: `macts probe --nullability` reports a property whose
+every read failed, or whose every value had an unexpected kind, with the counts
+to mark it, but never writes or changes a marker. A partial failure, or a mix
+of matching and unexpected kinds, is not unsupported. A marked property carries
+no `nullable` or `resettable` claim, and a resource's primary identifier cannot
+be marked.
+
+**Schema:** [`UnsupportedSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
 #### Identifiers
 

@@ -16,6 +16,7 @@
  */
 
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
+import { usableProperties } from '../manifest/unsupported.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
 
 /**
@@ -275,8 +276,9 @@ export interface CreateInputField {
 
 /**
  * The fields of a resource's create input, keyed by request field name, in
- * order: the resource's writable properties (all optional), then the backing
- * create command's parameters.
+ * order: the resource's writable usable properties (all optional; a property
+ * marked unsupported is never an input), then the backing create command's
+ * parameters.
  *
  * Command parameters are what the server validates, so a parameter overrides a
  * writable property of the same name, and identifier parameters that are not
@@ -290,7 +292,7 @@ export function createInputFields(
   const fields = new Map<string, CreateInputField>()
   const resource = manifest.resources[resourceName]
   if (resource !== undefined) {
-    for (const [propName, prop] of Object.entries(resource.properties)) {
+    for (const [propName, prop] of usableProperties(resource)) {
       if (prop.access !== 'rw') continue
       fields.set(propName, {
         type: prop.type,

@@ -28,3 +28,10 @@ export * from './identifier.js'
 // Nullability and resettability decisions for manifest fields (single source
 // of truth shared by the contract generator and the nullability probe)
 export * from './nullability.js'
+
+// Value kinds: the labels for what kind of value an app returned, as the
+// nullability probe reports them. The kinds each declared type expects, and
+// the usable properties of a resource (./unsupported.ts, the single point at
+// which properties marked unsupported leave every generated surface and the
+// probe), are internal to this package and imported from their modules.
+export { VALUE_KINDS, type ValueKind, type ValueKindCounts } from './value-kinds.js'

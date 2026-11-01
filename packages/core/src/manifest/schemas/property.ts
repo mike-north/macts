@@ -1,8 +1,11 @@
 import { z } from 'zod'
+import { possibleValueKinds } from '../value-kinds.js'
 import {
   NullabilityEvidenceSchema,
   ResettabilityEvidenceSchema,
+  UnsupportedSchema,
   checkNullabilityClaim,
+  type Unsupported,
 } from './evidence.js'
 
 /**
@@ -74,7 +77,11 @@ export type PropertyEvidence = z.infer<typeof PropertyEvidenceSchema>
  * property may hold no value. `resettable` says whether an update can clear
  * the property by setting it to `null`. A nullability or resettability claim
  * must carry its evidence (see `./evidence.ts`); without a claim, generators
- * apply their defaults.
+ * apply their defaults. `unsupported` marks a declared property that cannot
+ * be used at runtime (the app cannot provide it, or returns values the
+ * generated code cannot decode yet): generated surfaces omit it, and it
+ * carries no nullability or resettability claim. Kind evidence must show only
+ * kinds the declared type does not expect.
  */
 export const PropertySchema = z
   .object({
@@ -109,8 +116,25 @@ export const PropertySchema = z
     resettable: z.boolean().optional(),
     /** The evidence for `nullable` and `resettable`. */
     evidence: PropertyEvidenceSchema.optional(),
+    /**
+     * Set when the property cannot be used at runtime, with the evidence.
+     * Generated surfaces omit a property marked unsupported.
+     */
+    unsupported: UnsupportedSchema.optional(),
   })
   .superRefine((property, ctx) => {
+    if (
+      property.unsupported !== undefined &&
+      (property.nullable !== undefined || property.resettable !== undefined)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'An unsupported property cannot carry a nullable or resettable claim: every surface leaves it out.',
+        path: ['unsupported'],
+      })
+    }
+    checkUnsupportedKinds(property, ctx)
     checkNullabilityClaim(property, ctx)
     const evidence = property.evidence?.resettable
     if (property.resettable === true && evidence === undefined) {
@@ -129,3 +153,41 @@ export const PropertySchema = z
     }
   })
 export type Property = z.infer<typeof PropertySchema>
+
+/**
+ * An `unsupported` marker's kind evidence must contradict the declared type:
+ * the type must have expected kinds, and no observed kind may be one of them.
+ * The property's schema cannot see the manifest's resources and enums, so a
+ * named type counts as expecting both a reference and a string
+ * (`possibleValueKinds`); the check never accepts a kind the resolved type
+ * would expect.
+ */
+function checkUnsupportedKinds(
+  property: {
+    readonly type?: PropertyType | undefined
+    readonly unsupported?: Unsupported | undefined
+  },
+  ctx: z.RefinementCtx
+): void {
+  const evidence = property.unsupported?.evidence
+  if (evidence === undefined || !('observedKinds' in evidence)) return
+  const expected = possibleValueKinds(property.type)
+  if (expected === undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      message:
+        'Kind evidence needs a declared type with expected kinds; this type is not checked, so no kind contradicts it.',
+      path: ['unsupported', 'evidence', 'observedKinds'],
+    })
+    return
+  }
+  for (const kind of expected) {
+    if (evidence.observedKinds[kind] !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The declared type expects ${kind} values, so observing them is no evidence the property cannot be decoded.`,
+        path: ['unsupported', 'evidence', 'observedKinds', kind],
+      })
+    }
+  }
+}

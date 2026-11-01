@@ -14,11 +14,19 @@
  * - Below the threshold, or no successful read: unchanged.
  * - The primary identifier: never given a claim; in a resource whose items
  *   were read, one empty, failed, or unread in any item is a defect.
+ * - A property whose every read failed, in a resource whose items were read
+ *   (`reads == 0 && failures == itemsRead > 0`): a defect, with no claim. An
+ *   identifier that always fails is reported once, as the identifier defect.
+ * - Value kinds that contradict the declared type (see value-kinds.ts): a
+ *   defect with the matching and contradicting counts, and no claim; a
+ *   declared type with no expected kinds is reported as unchecked.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value; per-field evidence)
  */
 
 import { describe, expect, it } from 'vitest'
+import { parseManifestYaml } from '../manifest/loader.js'
+import { PropertySchema } from '../manifest/schemas/property.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { NullabilityEvidence } from '../manifest/schemas/evidence.js'
 import type { Property } from '../manifest/schemas/property.js'
@@ -26,6 +34,7 @@ import type { AppNullabilityResult, PropertyPresence } from './nullability.js'
 import {
   classifyPresence,
   mergeNullabilityObservations,
+  scanExhaustedNote,
   type PropertyMergeOutcome,
 } from './nullability-merge.js'
 
@@ -57,7 +66,7 @@ const FAILED: PropertyPresence = { reads: 0, nulls: 0, failures: 5 }
 const NOT_READ: PropertyPresence = { reads: 0, nulls: 0, failures: 0 }
 const NULLS_FREE_40: PropertyPresence = { reads: 40, nulls: 0, failures: 0 }
 
-type Claim = Pick<Property, 'nullable' | 'evidence'>
+type Claim = Pick<Property, 'nullable' | 'evidence' | 'unsupported'>
 
 /** A one-resource manifest whose `field` property carries `claim`. */
 function manifestWith(claim: Claim = {}): AppManifest {
@@ -104,6 +113,7 @@ function observed(presence: Record<string, PropertyPresence>): AppNullabilityRes
         status: 'probed',
         itemsRead: 40,
         sampledParents: 1,
+        parentsScanned: 1,
         truncated: false,
         presence,
         skipped: [{ property: 'body', reason: 'heavy' }],
@@ -349,6 +359,294 @@ describe('mergeNullabilityObservations: the primary identifier', () => {
   })
 })
 
+describe('mergeNullabilityObservations: a property whose every read failed', () => {
+  /** The merge of `presence` observations over `itemsRead` items of Note. */
+  function mergeRead(presence: Record<string, PropertyPresence>, itemsRead = 40) {
+    const result = observed(presence)
+    const note = result.resources['Note'] ?? never()
+    return mergeNullabilityObservations(manifestWith(), {
+      ...result,
+      resources: { Note: { ...note, itemsRead } },
+    }).resources[0]
+  }
+
+  const ALWAYS_FAILS: PropertyPresence = { reads: 0, nulls: 0, failures: 40 }
+
+  it('reports it as a defect with its counts, and writes no claim for it', () => {
+    const merged = mergeRead({ uid: NULLS_FREE_40, field: ALWAYS_FAILS })
+    expect(merged?.readFailureDefects).toEqual([{ property: 'field', itemsRead: 40, failed: 40 }])
+    expect(merged?.identifierDefect).toBeUndefined()
+    expect(merged?.properties.find((entry) => entry.property === 'field')).toEqual({
+      property: 'field',
+      presence: ALWAYS_FAILS,
+      observation: 'read-failed',
+      change: 'unchanged',
+    })
+  })
+
+  it('reports nothing for a property that failed on some items but not all', () => {
+    const merged = mergeRead({ uid: NULLS_FREE_40, field: { reads: 1, nulls: 0, failures: 39 } })
+    expect(merged?.readFailureDefects).toBeUndefined()
+  })
+
+  it('reports nothing for a resource that yielded no items', () => {
+    const merged = mergeRead({ uid: NOT_READ, field: NOT_READ }, 0)
+    expect(merged?.readFailureDefects).toBeUndefined()
+    expect(merged?.identifierDefect).toBeUndefined()
+  })
+
+  it('reports an identifier whose every read failed once, as the identifier defect', () => {
+    const merged = mergeRead({ uid: ALWAYS_FAILS, field: NULLS_FREE_40 })
+    expect(merged?.identifierDefect).toEqual({
+      property: 'uid',
+      itemsRead: 40,
+      empty: 0,
+      failed: 40,
+      probed: true,
+    })
+    expect(merged?.readFailureDefects).toBeUndefined()
+  })
+})
+
+describe('mergeNullabilityObservations: a property marked unsupported', () => {
+  const MARKED: Claim = {
+    unsupported: {
+      reason: 'The app does not implement this property.',
+      evidence: {
+        source: 'probe',
+        observedAt: OBSERVED_AT,
+        bundleId: 'com.example.jotter',
+        appVersion: '2.1',
+        osVersion: '27.2',
+        sampleSize: 40,
+        failedReads: 40,
+        errorNumbers: [-1728],
+      },
+    },
+  }
+
+  it('gives it no claim, even when observed with empty values or a clean sample', () => {
+    // The probe skips a marked property; observations of one (from a run
+    // before the marker was added, say) still never claim on it.
+    for (const presence of [NULLS, CLEAN, NULLS_FREE_40]) {
+      expect(outcome(presence, MARKED)).toEqual({
+        property: 'field',
+        presence,
+        observation: classifyPresence(presence),
+        change: 'unchanged',
+      })
+    }
+  })
+
+  it('does not report it as a defect when every read failed: the marker records that', () => {
+    const merged = mergeNullabilityObservations(
+      manifestWith(MARKED),
+      observed({ uid: NULLS_FREE_40, field: { reads: 0, nulls: 0, failures: 40 } })
+    ).resources[0]
+    expect(merged?.readFailureDefects).toBeUndefined()
+  })
+})
+
+describe('mergeNullabilityObservations: value kinds against the declared type', () => {
+  const KINDS_MANIFEST = parseManifestYaml(`
+version: '1.0'
+app: { bundleId: com.example.jotter, name: Jotter, tccEntitlements: [] }
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    identifiers:
+      - property: uid
+        primary: true
+    properties:
+      uid: { access: r, type: string, description: Id }
+      created: { access: r, type: string, description: Declared text }
+      size: { access: r, type: integer, description: A number }
+      priority: { access: r, type: { enum: Priority }, description: An enum }
+      color: { access: r, type: rgb, description: A color }
+      mood: { access: r, type: any, description: Untyped }
+      locked:
+        access: r
+        type: boolean
+        description: Marked
+        unsupported:
+          reason: Not implemented.
+          evidence:
+            source: probe
+            observedAt: '2026-10-30T12:00:00.000Z'
+            bundleId: com.example.jotter
+            appVersion: '2.1'
+            osVersion: '27.2'
+            sampleSize: 25
+            failedReads: 25
+            errorNumbers: [-1728]
+enums:
+  Priority:
+    name: Priority
+    description: How urgent
+    values:
+      - { name: low, value: low }
+hierarchy: { children: {} }
+commands: {}
+`)
+
+  /** The merge of 25 items of Note whose properties were observed as `presence`. */
+  function mergeKinds(presence: Record<string, PropertyPresence>) {
+    const result = observed(presence)
+    const note = result.resources['Note'] ?? never()
+    return mergeNullabilityObservations(KINDS_MANIFEST, {
+      ...result,
+      resources: { Note: { ...note, itemsRead: 25 } },
+    }).resources[0]
+  }
+
+  const STRINGS: PropertyPresence = { reads: 25, nulls: 0, failures: 0, kinds: { string: 25 } }
+
+  it('reports a declared string whose every value is a date, with its counts', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      created: { reads: 25, nulls: 0, failures: 0, kinds: { date: 25 } },
+    })
+    expect(merged?.kindDefects).toEqual([
+      {
+        property: 'created',
+        declared: 'string',
+        expected: ['string'],
+        values: 25,
+        matched: 0,
+        unexpected: { date: 25 },
+        // No value matched: these counts are valid kind evidence for a marker.
+        markable: true,
+      },
+    ])
+  })
+
+  it('changes no claim itself: the nullability decision is the same as without the defect', () => {
+    const created: PropertyPresence = { reads: 25, nulls: 2, failures: 0, kinds: { date: 23 } }
+    const merged = mergeKinds({ uid: STRINGS, created })
+    expect(merged?.kindDefects?.map((d) => d.property)).toEqual(['created'])
+    // Empty values seen: nullable, exactly as for a property of matching kind.
+    const asText = mergeKinds({ uid: STRINGS, created: { ...created, kinds: { string: 23 } } })
+    const outcome = (m: typeof merged) => m?.properties.find((p) => p.property === 'created')
+    expect(outcome(merged)).toEqual({ ...outcome(asText), presence: created })
+    expect(outcome(merged)?.change).toBe('set')
+  })
+
+  it('reports nothing when every kind matches, enums and colors included', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      created: STRINGS,
+      size: { reads: 25, nulls: 5, failures: 0, kinds: { number: 20 } },
+      // An enum value is read as its name.
+      priority: STRINGS,
+      // A color decodes from a list of channels or a keyed record.
+      color: { reads: 25, nulls: 0, failures: 0, kinds: { list: 20, record: 5 } },
+    })
+    expect(merged?.kindDefects).toBeUndefined()
+  })
+
+  it('reports a mix with both counts', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      size: { reads: 25, nulls: 0, failures: 0, kinds: { number: 20, string: 4, other: 1 } },
+    })
+    expect(merged?.kindDefects).toEqual([
+      {
+        property: 'size',
+        declared: 'integer',
+        expected: ['number'],
+        values: 25,
+        matched: 20,
+        unexpected: { string: 4, other: 1 },
+        // Some values matched: not evidence that the property cannot be decoded.
+        markable: false,
+      },
+    ])
+  })
+
+  it('calls counts markable only when they make a marker the manifest schema accepts', () => {
+    const property = KINDS_MANIFEST.resources['Note']?.properties['created'] ?? never()
+    const merged = mergeKinds({
+      uid: STRINGS,
+      created: { reads: 25, nulls: 0, failures: 0, kinds: { reference: 25 } },
+    })
+    const defect = merged?.kindDefects?.[0] ?? never()
+    expect(defect.markable).toBe(true)
+    const marked = PropertySchema.safeParse({
+      ...property,
+      unsupported: {
+        reason: 'Values are object references.',
+        evidence: {
+          source: 'probe',
+          observedAt: OBSERVED_AT,
+          bundleId: 'com.example.jotter',
+          appVersion: '2.1',
+          osVersion: '27.2',
+          sampleSize: defect.values,
+          observedKinds: defect.unexpected,
+        },
+      },
+    })
+    expect(marked.success).toBe(true)
+  })
+
+  it('does not call counts markable that a named type could expect', () => {
+    // An enum is read as a string, but without the manifest's names the
+    // marker's schema takes a named type as possibly a reference too, so
+    // reference counts would not be valid kind evidence for it.
+    const merged = mergeKinds({
+      uid: STRINGS,
+      priority: { reads: 25, nulls: 0, failures: 0, kinds: { reference: 25 } },
+    })
+    expect(merged?.kindDefects).toEqual([
+      {
+        property: 'priority',
+        declared: 'Priority',
+        expected: ['string'],
+        values: 25,
+        matched: 0,
+        unexpected: { reference: 25 },
+        markable: false,
+      },
+    ])
+  })
+
+  it('reports nothing for a property whose every read found no value, or failed', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      created: { reads: 25, nulls: 25, failures: 0 },
+      size: { reads: 0, nulls: 0, failures: 25 },
+    })
+    expect(merged?.kindDefects).toBeUndefined()
+  })
+
+  it('checks the primary identifier like any other property', () => {
+    const merged = mergeKinds({
+      uid: { reads: 25, nulls: 0, failures: 0, kinds: { number: 25 } },
+    })
+    expect(merged?.kindDefects?.map((d) => d.property)).toEqual(['uid'])
+  })
+
+  it('reports a declared type with no expected kinds as unchecked, not as a defect', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      mood: { reads: 25, nulls: 0, failures: 0, kinds: { date: 25 } },
+    })
+    expect(merged?.kindsUnchecked).toEqual([{ property: 'mood', declared: 'any' }])
+    expect(merged?.kindDefects).toBeUndefined()
+  })
+
+  it('leaves out a property marked unsupported', () => {
+    const merged = mergeKinds({
+      uid: STRINGS,
+      locked: { reads: 25, nulls: 0, failures: 0, kinds: { string: 25 } },
+    })
+    expect(merged?.kindDefects).toBeUndefined()
+    expect(merged?.kindsUnchecked).toBeUndefined()
+  })
+})
+
 describe('mergeNullabilityObservations: the probe block', () => {
   it('records how each resource was probed, naming skipped properties only', () => {
     const merged = mergeNullabilityObservations(manifestWith(), observed({ uid: NULLS_FREE_40 }))
@@ -366,6 +664,7 @@ describe('mergeNullabilityObservations: the probe block', () => {
             accessPath: 'notes',
             itemsRead: 40,
             sampledParents: 1,
+            parentsScanned: 1,
             status: 'probed',
             skipped: ['body'],
           },
@@ -407,7 +706,14 @@ describe('mergeNullabilityObservations: the probe block', () => {
       const unread: AppNullabilityResult = {
         ...result,
         resources: {
-          Note: { ...note, status: 'budget', itemsRead: 0, sampledParents: 0, truncated },
+          Note: {
+            ...note,
+            status: 'budget',
+            itemsRead: 0,
+            sampledParents: 0,
+            parentsScanned: 0,
+            truncated,
+          },
         },
       }
       expect(mergeNullabilityObservations(manifestWith(), unread).resources[0]?.block).toEqual({
@@ -418,10 +724,67 @@ describe('mergeNullabilityObservations: the probe block', () => {
         accessPath: 'notes',
         itemsRead: 0,
         sampledParents: 0,
+        parentsScanned: 0,
         status: 'budget',
         skipped: ['body'],
         note: 'not probed: the time budget was spent',
       })
+    }
+  })
+
+  // Regression: a nested resource whose parent scan ran out of time before it
+  // found an item was noted as 'not probed', though it ran.
+  it('notes how many parents a nested scan looked in when the time ran out before any item', () => {
+    const result = observed({})
+    const note = result.resources['Note'] ?? never()
+    const cases = [
+      // Nested and scanned: the parents looked in.
+      [
+        'calendars/events/mailAlarms',
+        151,
+        'no items found in the 151 parents scanned before the time limit',
+      ],
+      [
+        'calendars/events/mailAlarms',
+        1,
+        'no items found in the 1 parent scanned before the time limit',
+      ],
+      // Nested, but no parent looked in: the budget left it unread.
+      ['calendars/events/mailAlarms', 0, 'not probed: the time budget was spent'],
+      // Top level: the one parent (the app) is always looked in, so the count says nothing.
+      ['notes', 1, 'not probed: the time budget was spent'],
+    ] as const
+    for (const [accessPath, parentsScanned, text] of cases) {
+      const scanned: AppNullabilityResult = {
+        ...result,
+        resources: {
+          Note: {
+            ...note,
+            accessPath,
+            status: 'budget',
+            itemsRead: 0,
+            sampledParents: 0,
+            parentsScanned,
+            truncated: true,
+          },
+        },
+      }
+      expect(
+        mergeNullabilityObservations(manifestWith(), scanned).resources[0]?.block
+      ).toMatchObject({
+        accessPath,
+        status: 'budget',
+        parentsScanned,
+        note: text,
+      })
+    }
+  })
+
+  it('has no scan-exhausted note for a resource that read items or found none', () => {
+    for (const status of ['probed', 'no-items', 'unreachable', 'error'] as const) {
+      expect(
+        scanExhaustedNote({ status, accessPath: 'calendars/events', parentsScanned: 12 })
+      ).toBeUndefined()
     }
   })
 
