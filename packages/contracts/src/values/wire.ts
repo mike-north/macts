@@ -78,6 +78,15 @@ export type WireValue = JsonValue
  */
 export type WireRecord = Readonly<Record<string, WireValue>>
 
+/*
+ * The control records below are type aliases rather than interfaces on
+ * purpose: an object type alias is assignable to an index-signature type, so
+ * each control record is assignable to `WireValue` (`JsonValue`) and encoded
+ * values can be handled generically. An interface has no implicit index
+ * signature and would not be.
+ */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- see the comment above */
+
 /**
  * An integer, carried as canonical decimal text.
  *
@@ -85,7 +94,7 @@ export type WireRecord = Readonly<Record<string, WireValue>>
  * The payload matches `^(0|-?[1-9][0-9]*)$`: no sign on zero, no leading zeros,
  * no `+`. Its magnitude must lie within the SDK integer domain.
  */
-export interface WireInteger {
+export type WireInteger = {
   /** Canonical decimal text of the integer. */
   readonly integer: string
 }
@@ -98,7 +107,7 @@ export interface WireInteger {
  * infinities, and `-0` are explicit {@link SpecialDoubleState} strings. A double
  * whose value happens to be integral (for example `3`) is still a double.
  */
-export interface WireDouble {
+export type WireDouble = {
   /** Finite JSON number, or a special state. */
   readonly double: number | SpecialDoubleState
 }
@@ -114,25 +123,25 @@ export type WireNumber = WireInteger | WireDouble
  * offset (`Z` or `±HH:MM`), for example `2026-10-31T17:04:05.120Z`. Encoders
  * emit `Z`.
  */
-export interface WireDate {
+export type WireDate = {
   /** ISO 8601 date-time text. */
   readonly date: string
 }
 
 /** A reference to app objects; see the references module for the payload. */
-export interface WireReference {
+export type WireReference = {
   /** The reference payload. */
   readonly reference: ReferenceWire
 }
 
 /** A file or binary content returned by an operation. */
-export interface WireFile {
+export type WireFile = {
   /** The file metadata payload. */
   readonly file: FileWire
 }
 
 /** A source of bytes supplied to an operation that writes a file. */
-export interface WireFileSource {
+export type WireFileSource = {
   /** The source payload. */
   readonly fileSource: FileSourceWire
 }
@@ -145,10 +154,12 @@ export interface WireFileSource {
  * each value is itself a {@link DynamicWireValue}. The envelope is what keeps a
  * user record shaped like a control record from being decoded as one.
  */
-export interface DynamicRecordWire {
+export type DynamicRecordWire = {
   /** The user's record, with every value encoded recursively. */
   readonly record: Readonly<Record<string, DynamicWireValue>>
 }
+
+/* eslint-enable @typescript-eslint/consistent-type-definitions */
 
 /**
  * A value in dynamic content, where no schema describes the shape.

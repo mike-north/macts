@@ -149,7 +149,8 @@ export interface UploadTarget {
  * returned the file. It is bound to the authority that received it and is
  * exchanged, together with the caller's credential, to fetch the content.
  */
-export interface FileWire {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- a type alias, so `WireFile` is assignable to `WireValue`
+export type FileWire = {
   /** The original path on the executing Mac, when there is one. */
   readonly path?: string
   /** Whether the file existed when observed. */

@@ -9,7 +9,7 @@
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
-import type { Integer, Rgb } from '../index.js'
+import { Rgb, type Integer, type Rgb8Bit } from '../index.js'
 
 declare const channel: Integer
 
@@ -26,3 +26,15 @@ expectNotAssignable<Rgb>({ r: channel, g: channel, b: 0 })
 // Negative: `{ red, green, blue }` is not the SDK shape, and there is no alpha.
 expectNotAssignable<Rgb>({ red: channel, green: channel, blue: channel })
 expectNotAssignable<Rgb>({ r: channel, g: channel, b: channel, a: channel })
+
+// The helpers share the type's name: constructors return `Rgb`, and the lossy
+// 8-bit conversion returns plain numbers rather than branded channels.
+expectType<Rgb>(Rgb.create(0, 0, 0))
+expectType<Rgb>(Rgb.from8Bit(255, 128, 0))
+expectType<Rgb>(Rgb.fromHex('#ff8000'))
+expectType<Rgb8Bit>(Rgb.to8Bit(color))
+expectType<number>(Rgb.to8Bit(color).r)
+expectType<string>(Rgb.toHex(color))
+
+// Negative: 8-bit channels are not 16-bit channels.
+expectNotAssignable<Rgb>(Rgb.to8Bit(color))

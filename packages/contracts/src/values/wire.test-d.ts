@@ -14,6 +14,7 @@ import type {
   WireDate,
   WireDouble,
   WireFile,
+  WireFileSource,
   WireInteger,
   WireNumber,
   WireRecord,
@@ -106,3 +107,22 @@ expectAssignable<WireRecord>({})
 expectNotAssignable<WireRecord>('Home')
 expectNotAssignable<WireRecord>([{ integer: '1' }])
 expectAssignable<WireValue>({ calendar: 'Home' })
+
+// Every control record is a JSON value, so encoded values can be handled
+// generically as `WireValue` without conversion.
+declare const wireInteger: WireInteger
+declare const wireDouble: WireDouble
+declare const wireDate: WireDate
+declare const wireReference: WireReference
+declare const wireFile: WireFile
+declare const wireFileSource: WireFileSource
+declare const dynamicRecord: DynamicRecordWire
+declare const dynamicValue: DynamicWireValue
+expectAssignable<WireValue>(wireInteger)
+expectAssignable<WireValue>(wireDouble)
+expectAssignable<WireValue>(wireDate)
+expectAssignable<WireValue>(wireReference)
+expectAssignable<WireValue>(wireFile)
+expectAssignable<WireValue>(wireFileSource)
+expectAssignable<WireValue>(dynamicRecord)
+expectAssignable<WireValue>(dynamicValue)
