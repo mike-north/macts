@@ -19,7 +19,9 @@
  *   falls back to the native executor or to anything else.
  * - When it is active the host announces it with a one-line warning on stderr
  *   ({@link ResolvedExecutor.warning}) and reports the executor's provider in
- *   its startup report.
+ *   its startup report. The provider is named in the startup report only;
+ *   recording it in audit and approval records is
+ *   https://github.com/mike-north/macts/issues/182.
  * - It is a contributor tool: it is documented in contributor docs and here,
  *   never in user docs, READMEs, or `--help`.
  *

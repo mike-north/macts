@@ -1341,8 +1341,9 @@ execute(request) }`.
 
 - `execute` resolves to a `WireValue` or throws canonical errors.
 - The native JXA executor is one implementation.
-- The runtime is constructed with an executor (`createRuntime({ executor, … })`),
-  and every adapter dispatches through the runtime.
+- The runtime is constructed with an executor
+  (`createRuntime({ executor, … })`), and every adapter dispatches through the
+  runtime.
 
 This refactor satisfies #101's acceptance criteria:
 
@@ -1385,12 +1386,15 @@ one to `createRuntime`. Subprocess tests can set the test-only
 `MACTS_TEST_EXECUTOR` to the name of a built-in test executor. It never loads
 code, an unknown name fails startup, and an active test executor is announced
 on stderr and named as the executor provider in the startup report. It appears
-in contributor docs, never in user docs or `--help`. Per-operation routing is not needed until a second
-provider coexists. #101's dependency on the dictionary abstraction
-([#100](https://github.com/mike-north/macts/issues/100)) is unaffected:
-`ExecutionRequest` takes the manifest type that core defines.
+in contributor docs, never in user docs or `--help`. The provider is named in
+the startup report only; recording it in audit and approval records is
+[#182](https://github.com/mike-north/macts/issues/182). Per-operation routing
+is not needed until a second provider coexists. #101's dependency on the
+dictionary abstraction ([#100](https://github.com/mike-north/macts/issues/100))
+is unaffected: `ExecutionRequest` takes the manifest type that core defines.
 
-**Zod as the single schema source ([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
+**Zod as the single schema source
+([#121](https://github.com/mike-north/macts/issues/121), `phases/12`).**
 The value library's constructors produce each `ValueType`'s `sdk` and `wire`
 zod schemas. The serializable `plan` is derived from the same constructor call,
 so there is one composition per field and no independent mapping.

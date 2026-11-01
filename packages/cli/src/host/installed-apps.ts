@@ -2,11 +2,11 @@
  * The one place a macts host on this Mac turns installed app packages into
  * registered operations.
  *
- * Every host the CLI starts (`macts --serve`, and `macts --mcp`) serves the
- * apps installed in the macts plugins directory, and registers each one from
- * its **generated contract**, checked against the app's manifest by
- * `registerContract` (phases/13 D5, D11). Every surface therefore validates
- * calls against the same descriptors. Manifest-only (passthrough)
+ * `macts --serve` serves the apps installed in the macts plugins directory
+ * through this path, registering each one from its **generated contract**,
+ * checked against the app's manifest by `registerContract` (phases/13 D5,
+ * D11). Per D5, `macts --mcp` adopts the same functions, so that every surface
+ * validates calls against the same descriptors. Manifest-only (passthrough)
  * registration is not used here: it remains for embedders and tests.
  *
  * Registration happens in two steps, because loading is asynchronous and a
@@ -316,9 +316,15 @@ function messageOf(error: unknown): string {
 const CREDENTIAL_PATTERN = /macts_sk_[A-Za-z0-9._~+/=-]*/g
 
 /**
- * A failure reason fit to print: one line, with anything shaped like a macts
- * API key replaced. Package code is third-party, and its error text could
- * echo a credential from the environment.
+ * A failure reason fit to print in a host's startup report: anything shaped
+ * like a macts API key is replaced, and newlines and other runs of whitespace
+ * collapse to one space, so the reason fits on one line. Package code is
+ * third-party, and its error text could echo a credential from the
+ * environment.
+ *
+ * Nothing else is redacted. Local file paths in module-load errors are kept,
+ * because they say which file failed; the report reaches only this Mac's own
+ * stdout, never a remote caller.
  */
 function scrubReason(reason: string): string {
   return reason.replace(CREDENTIAL_PATTERN, '[redacted credential]').replace(/\s+/g, ' ').trim()
