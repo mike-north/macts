@@ -224,12 +224,62 @@ export interface ServerOptions {
 }
 
 /**
+ * Start a Node listener and wait until it is accepting connections.
+ *
+ * @remarks
+ * `@hono/node-server`'s `serve` returns before the socket is bound, so a
+ * caller that announced the server as soon as `serve` returned would announce
+ * a port that still refuses connections. This resolves only once the listener
+ * reports that it is listening, and rejects with the listener's own error
+ * (such as `EADDRINUSE`) when binding fails, so `start()` never reports a
+ * server that is not reachable.
+ *
+ * @param begin - Starts the listener, calling the given callback once it is
+ *   listening.
+ * @returns The listening server.
+ */
+function listening<S extends NodeListener>(begin: (onListening: () => void) => S): Promise<S> {
+  return new Promise((resolve, reject) => {
+    let settled = false
+    const fail = (error: unknown): void => {
+      if (!settled) {
+        settled = true
+        reject(error instanceof Error ? error : new Error(String(error)))
+      }
+    }
+    // The callback runs once the listener binds, which is always after
+    // `begin` has returned, so `started` is initialized by then.
+    const started: S = begin(() => {
+      if (!settled) {
+        settled = true
+        started.off('error', fail)
+        resolve(started)
+      }
+    })
+    started.once('error', fail)
+  })
+}
+
+/** The part of a Node listener {@link listening} uses. */
+interface NodeListener {
+  once(event: 'error', listener: (error: unknown) => void): unknown
+  off(event: 'error', listener: (error: unknown) => void): unknown
+}
+
+/**
  * Server instance with lifecycle methods.
  */
 export interface ServerInstance {
   /** The Hono app */
   app: Hono
-  /** Start the server */
+  /**
+   * Start the server.
+   *
+   * @remarks
+   * Resolves once the listener is accepting connections, so `url` is
+   * reachable when it resolves. Rejects when the listener cannot bind (for
+   * example, when the port is in use).
+   */
   start(): Promise<void>
   /** Stop the server */
   stop(): Promise<void>
@@ -464,24 +514,27 @@ export function createMultiServer(
         if (tls) {
           const https = await import('node:https')
           const tlsOpts = loadTlsOptions(tls)
-          server = serve({
-            fetch: app.fetch,
-            port,
-            hostname: host,
-            createServer: https.createServer,
-            serverOptions: {
-              cert: tlsOpts.cert,
-              key: tlsOpts.key,
-              ca: tlsOpts.ca,
-            },
-          })
+          server = await listening((onListening) =>
+            serve(
+              {
+                fetch: app.fetch,
+                port,
+                hostname: host,
+                createServer: https.createServer,
+                serverOptions: {
+                  cert: tlsOpts.cert,
+                  key: tlsOpts.key,
+                  ca: tlsOpts.ca,
+                },
+              },
+              onListening
+            )
+          )
           serverUrl = `https://${host}:${String(port)}`
         } else {
-          server = serve({
-            fetch: app.fetch,
-            port,
-            hostname: host,
-          })
+          server = await listening((onListening) =>
+            serve({ fetch: app.fetch, port, hostname: host }, onListening)
+          )
           serverUrl = `http://${host}:${String(port)}`
         }
       }

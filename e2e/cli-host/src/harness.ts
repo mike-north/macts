@@ -175,7 +175,9 @@ const READY_LINE = /macts API server running at (\S+)/
 
 /**
  * Start `macts --serve` on `port` and resolve once it reports that it is
- * listening. Rejects with its output if it exits first.
+ * listening and its health endpoint accepts a connection. Rejects with its
+ * output and exit status if it exits first, never reports, or reports a URL
+ * that refuses connections.
  */
 export async function startServe(
   home: MactsHome,
@@ -214,12 +216,33 @@ export async function startServe(
     })
   })
 
+  // The ready line is a promise that the port accepts connections. Check it
+  // once, with no retry: a retry would hide a server that announces itself
+  // before it is listening. On failure, report the process's own output and
+  // exit status rather than leaving each test to fail with a bare refusal.
+  try {
+    await fetch(`${url}/health`)
+  } catch (error) {
+    const exit = child.exitCode ?? child.signalCode ?? 'still running'
+    child.kill('SIGKILL')
+    const cause = error instanceof Error ? describeFetchFailure(error) : String(error)
+    throw new Error(
+      `macts --serve reported ${url} but did not accept a connection (${cause}; process: ${String(exit)}).\nstdout:\n${stdout}\nstderr:\n${stderr}`
+    )
+  }
+
   return {
     url,
     stdout: () => stdout,
     stderr: () => stderr,
     stop: () => stopProcess(child),
   }
+}
+
+/** A fetch failure's message with its underlying network cause, when there is one. */
+function describeFetchFailure(error: Error): string {
+  const cause: unknown = error.cause
+  return cause instanceof Error ? `${error.message}: ${cause.message}` : error.message
 }
 
 /** Send SIGTERM and wait for exit, escalating to SIGKILL if it does not come. */
