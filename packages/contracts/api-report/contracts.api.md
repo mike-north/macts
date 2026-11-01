@@ -317,6 +317,9 @@ export interface IndexSelector {
 }
 
 // @public
+export type InferSdk<T extends ValueType<unknown>> = T extends ValueType<infer Sdk> ? Sdk : never;
+
+// @public
 export type Integer = number & {
     readonly [integerBrand]: 'Integer: convert with Integer.validate(n), Integer.round(n), or Integer.truncate(n)';
 };
@@ -483,6 +486,17 @@ export class OperationTimeoutError extends MactsError<'TIMEOUT'> {
 }
 
 // @public
+export interface OptionalField<Sdk> {
+    readonly presence: 'optional';
+    readonly type: ValueType<Sdk>;
+}
+
+// @public
+export type OptionalFieldNames<Fields extends RecordFields> = {
+    [K in keyof Fields]: Fields[K] extends OptionalField<unknown> ? K : never;
+}[keyof Fields];
+
+// @public
 export const PASSTHROUGH_PLAN: Extract<ValuePlan, {
     readonly kind: 'passthrough';
 }>;
@@ -528,6 +542,24 @@ export interface RangeSelector {
     readonly end: Integer;
     readonly start: Integer;
 }
+
+// @public
+export type RecordField = ValueType<unknown> | OptionalField<unknown>;
+
+// @public
+export type RecordFields = Readonly<Record<string, RecordField>>;
+
+// @public
+export type RecordFieldSdk<Field> = Field extends OptionalField<infer Sdk> ? Sdk : Field extends ValueType<infer Sdk> ? Sdk : never;
+
+// @public
+export type RecordSdk<Fields extends RecordFields> = {
+    readonly [K in Exclude<keyof Fields, OptionalFieldNames<Fields>>]: RecordFieldSdk<Fields[K]>;
+} & {
+    readonly [K in OptionalFieldNames<Fields>]?: RecordFieldSdk<Fields[K]>;
+} extends infer Shape ? {
+    [K in keyof Shape]: Shape[K];
+} : never;
 
 // @public
 export interface Rectangle {
@@ -793,6 +825,33 @@ export interface ValueType<Sdk> {
     readonly sdk: ZodType<Sdk>;
     readonly wire: ZodType<WireValue>;
 }
+
+// @public
+export interface ValueTypeConstructors {
+    array<Sdk>(item: ValueType<Sdk>, options?: ValueTypeOptions): ValueType<readonly Sdk[]>;
+    boolean(options?: ValueTypeOptions): ValueType<boolean>;
+    date(options?: ValueTypeOptions): ValueType<Date>;
+    double(options?: ValueTypeOptions): ValueType<number>;
+    enumeration<const Members extends readonly [string, ...string[]]>(members: Members, options?: ValueTypeOptions): ValueType<Members[number]>;
+    integer(options?: ValueTypeOptions): ValueType<Integer>;
+    none(options?: ValueTypeOptions): ValueType<undefined>;
+    nullable<Sdk>(inner: ValueType<Sdk>, options?: ValueTypeOptions): ValueType<Sdk | null>;
+    optional<Sdk>(inner: ValueType<Sdk>): OptionalField<Sdk>;
+    point(options?: ValueTypeOptions): ValueType<Point>;
+    record<const Fields extends RecordFields>(fields: Fields, options?: ValueTypeOptions): ValueType<RecordSdk<Fields>>;
+    rectangle(options?: ValueTypeOptions): ValueType<Rectangle>;
+    rgb(options?: ValueTypeOptions): ValueType<Rgb>;
+    string(options?: ValueTypeOptions): ValueType<string>;
+    unknown(options?: ValueTypeOptions): ValueType<unknown>;
+}
+
+// @public
+export interface ValueTypeOptions {
+    readonly description?: string;
+}
+
+// @public
+export const ValueTypes: ValueTypeConstructors;
 
 // @public
 export const WIRE_ERROR_DETAILS_SCHEMAS: {

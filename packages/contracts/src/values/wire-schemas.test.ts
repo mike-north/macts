@@ -234,7 +234,9 @@ describe('DynamicWireValueSchema', () => {
       expect(result.success).toBe(false)
       const issues = result.error?.issues ?? []
       expect(issues).toHaveLength(1)
-      expect(issues[0]?.message).toContain('cannot be represented in dynamic content')
+      expect(issues[0]?.message).toBe(
+        'References and files cannot be represented in dynamic content; declare them at a typed position.'
+      )
       expect(issues[0]?.path).toEqual(path)
     }
   )
