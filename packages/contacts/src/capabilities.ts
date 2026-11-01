@@ -49,7 +49,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'actionProperty',
     description:
       'RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)',
-    permission: null,
+    permission: 'contacts:app:actionProperty',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -64,7 +64,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'actionTitle',
     description: 'RollOver - Returns the title that will be placed in the menu for this roll over',
-    permission: null,
+    permission: 'contacts:app:actionTitle',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -89,7 +89,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'add',
     description: 'Add a child object.',
-    permission: null,
+    permission: 'contacts:app:add',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -110,7 +110,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Create a new object.',
-    permission: null,
+    permission: 'contacts:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -143,7 +143,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'performAction',
     description: 'RollOver - Performs the action on the given person and value',
-    permission: null,
+    permission: 'contacts:app:performAction',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -168,7 +168,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'remove',
     description: 'Remove a child object.',
-    permission: null,
+    permission: 'contacts:app:remove',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -190,7 +190,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'save',
     description:
       'Save all Contacts changes. Also see the unsaved property for the application class.',
-    permission: null,
+    permission: 'contacts:app:save',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -206,7 +206,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'shouldEnableAction',
     description:
       'RollOver - Determines if the rollover action should be enabled for the given person and value',
-    permission: null,
+    permission: 'contacts:app:shouldEnableAction',
     risk: 'read',
     inputSchema: {
       type: 'object',

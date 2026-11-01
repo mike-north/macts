@@ -49,7 +49,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'perform',
     description:
       'cause the target process to behave as if the action were applied to its UI element',
-    permission: null,
+    permission: 'system-events:actions:perform',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -64,7 +64,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'abortTransaction',
     description: 'Discard the results of a bounded update session with one or more files.',
-    permission: null,
+    permission: 'system-events:app:abortTransaction',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -79,7 +79,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'attachActionTo',
     description: 'Attach an action to a folder',
-    permission: null,
+    permission: 'system-events:app:attachActionTo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -100,7 +100,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'attachedScripts',
     description: 'List the actions attached to a folder',
-    permission: null,
+    permission: 'system-events:app:attachedScripts',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -115,7 +115,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'beginTransaction',
     description: 'Begin a bounded update session with one or more files.',
-    permission: null,
+    permission: 'system-events:app:beginTransaction',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -130,7 +130,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'cancel',
     description: 'cause the target process to behave as if the UI element were cancelled',
-    permission: null,
+    permission: 'system-events:app:cancel',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -145,7 +145,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'confirm',
     description: 'cause the target process to behave as if the UI element were confirmed',
-    permission: null,
+    permission: 'system-events:app:confirm',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -160,7 +160,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'connect',
     description: 'connect a configuration or service',
-    permission: null,
+    permission: 'system-events:app:connect',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -175,7 +175,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'decrement',
     description: 'cause the target process to behave as if the UI element were decremented',
-    permission: null,
+    permission: 'system-events:app:decrement',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -190,7 +190,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'disconnect',
     description: 'disconnect a configuration or service',
-    permission: null,
+    permission: 'system-events:app:disconnect',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -205,7 +205,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'doFolderAction',
     description: 'Send a folder action code to a folder action script',
-    permission: null,
+    permission: 'system-events:app:doFolderAction',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -234,7 +234,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'editActionOf',
     description: 'Edit an action of a folder',
-    permission: null,
+    permission: 'system-events:app:editActionOf',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -258,7 +258,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'endTransaction',
     description: 'Apply the results of a bounded update session with one or more files.',
-    permission: null,
+    permission: 'system-events:app:endTransaction',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -273,7 +273,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'increment',
     description: 'cause the target process to behave as if the UI element were incremented',
-    permission: null,
+    permission: 'system-events:app:increment',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -288,7 +288,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'keyCode',
     description: 'cause the target process to behave as if key codes were entered',
-    permission: null,
+    permission: 'system-events:app:keyCode',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -308,7 +308,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'keyDown',
     description: 'cause the target process to behave as if keys were held down',
-    permission: null,
+    permission: 'system-events:app:keyDown',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -323,7 +323,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'keyUp',
     description: 'cause the target process to behave as if keys were released',
-    permission: null,
+    permission: 'system-events:app:keyUp',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -338,7 +338,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'keystroke',
     description: 'cause the target process to behave as if keystrokes were entered',
-    permission: null,
+    permission: 'system-events:app:keystroke',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -358,7 +358,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'logOut',
     description: 'Log out the current user',
-    permission: null,
+    permission: 'system-events:app:logOut',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -373,7 +373,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'move',
     description: 'Move disk item(s) to a new location.',
-    permission: null,
+    permission: 'system-events:app:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -394,7 +394,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'open',
     description: 'Open disk item(s) with the appropriate application.',
-    permission: null,
+    permission: 'system-events:app:open',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -409,7 +409,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pick',
     description: 'cause the target process to behave as if the UI element were picked',
-    permission: null,
+    permission: 'system-events:app:pick',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -424,7 +424,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'removeActionFrom',
     description: 'Remove a folder action from a folder',
-    permission: null,
+    permission: 'system-events:app:removeActionFrom',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -448,7 +448,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'restart',
     description: 'Restart the computer',
-    permission: null,
+    permission: 'system-events:app:restart',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -468,7 +468,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'shutDown',
     description: 'Shut Down the computer',
-    permission: null,
+    permission: 'system-events:app:shutDown',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -488,7 +488,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'sleep',
     description: 'Put the computer to sleep',
-    permission: null,
+    permission: 'system-events:app:sleep',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -503,7 +503,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'start',
     description: 'start the screen saver',
-    permission: null,
+    permission: 'system-events:app:start',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -518,7 +518,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stop',
     description: 'stop the screen saver',
-    permission: null,
+    permission: 'system-events:app:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -533,7 +533,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'diskitems',
     operation: 'delete',
     description: 'Delete disk item(s).',
-    permission: null,
+    permission: 'system-events:diskitems:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -554,7 +554,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'uielements',
     operation: 'click',
     description: 'cause the target process to behave as if the UI element were clicked',
-    permission: null,
+    permission: 'system-events:uielements:click',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -575,7 +575,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'uielements',
     operation: 'select',
     description: 'set the selected property of the UI element',
-    permission: null,
+    permission: 'system-events:uielements:select',
     risk: 'read',
     inputSchema: {
       type: 'object',

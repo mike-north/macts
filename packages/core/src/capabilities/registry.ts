@@ -14,6 +14,8 @@
  */
 
 import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
+import { resolveManifestRoutes } from '../manifest/route.js'
+import type { ManifestRoute } from '../manifest/route.js'
 import type { JsonSchema } from '../generator/mcp/types.js'
 import { getResources, getResourceCommands, getAppCommands } from '../generator/mcp/context.js'
 import {
@@ -160,6 +162,51 @@ function buildAppCliSnippet(app: string, operation: string, inputSchema: JsonSch
 }
 
 /**
+ * Looks up the permission one command requires on one resource. The resource
+ * is `undefined` for an application-scoped command.
+ */
+type RoutePermissionLookup = (command: Command, resource: Resource | undefined) => string
+
+/**
+ * Index the permission each of the manifest's resolved routes requires, by
+ * command and targeted resource.
+ *
+ * A capability reports the permission the server router and the runtime
+ * operation registry enforce for the same operation, so it takes it from the
+ * resolved route ({@link ManifestRoute.permission}): the command's explicit
+ * `permission`, else the one derived from its route. Reading the command's
+ * declared `permission` alone would report no permission for every command
+ * whose permission is derived.
+ *
+ * Routes are matched to capabilities by the command and resource objects
+ * themselves, which `resolveManifestRoutes` and the capability traversal share.
+ * The lookup throws if a capability has no route: that would mean discovery and
+ * the router disagree on which operations the manifest exposes.
+ *
+ * @param manifest - The app manifest
+ * @returns The permission lookup
+ */
+function indexRoutePermissions(manifest: AppManifest): RoutePermissionLookup {
+  const byCommand = new Map<Command, ManifestRoute[]>()
+  for (const route of resolveManifestRoutes(manifest)) {
+    const routes = byCommand.get(route.command) ?? []
+    routes.push(route)
+    byCommand.set(route.command, routes)
+  }
+  return (command, resource) => {
+    const route = byCommand.get(command)?.find((candidate) => candidate.resource === resource)
+    if (route === undefined) {
+      throw new Error(
+        `Manifest "${manifest.app.name}": command "${command.name}" on ${
+          resource === undefined ? 'the application' : `resource "${resource.name}"`
+        } has no resolved route, so its capability has no permission`
+      )
+    }
+    return route.permission
+  }
+}
+
+/**
  * Derive a single capability from a resource-scoped command.
  */
 function deriveResourceCapability(
@@ -167,7 +214,8 @@ function deriveResourceCapability(
   bundleId: string,
   resource: Resource,
   command: Command,
-  cliPath: ResourceCliPath
+  cliPath: ResourceCliPath,
+  permission: string
 ): Capability {
   const resourceName = resource.plural.toLowerCase()
   const inputSchema = generateResourceOperationSchema(command, resource)
@@ -180,7 +228,7 @@ function deriveResourceCapability(
     resource: resourceName,
     operation: command.name,
     description: command.description,
-    permission: command.permission,
+    permission,
     risk: classifyCommandRisk(command),
     inputSchema,
     outputSchema: undefined,
@@ -198,7 +246,12 @@ function deriveResourceCapability(
 /**
  * Derive a single capability from an application-scoped command.
  */
-function deriveAppCapability(app: string, bundleId: string, command: Command): Capability {
+function deriveAppCapability(
+  app: string,
+  bundleId: string,
+  command: Command,
+  permission: string
+): Capability {
   const inputSchema = generateAppCommandSchema(command)
   const name = `${app}.app.${command.name}`
 
@@ -209,7 +262,7 @@ function deriveAppCapability(app: string, bundleId: string, command: Command): C
     resource: 'app',
     operation: command.name,
     description: command.description,
-    permission: command.permission,
+    permission,
     risk: classifyCommandRisk(command),
     inputSchema,
     outputSchema: undefined,
@@ -238,6 +291,7 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
   const app = manifest.app.name.replace(/\s+/g, '-').toLowerCase()
   const bundleId = manifest.app.bundleId
   const cliPaths = buildResourceCliPaths(manifest)
+  const permissionOf = indexRoutePermissions(manifest)
   const capabilities: Capability[] = []
 
   for (const resource of getResources(manifest)) {
@@ -249,12 +303,21 @@ export function deriveCapabilities(manifest: AppManifest): Capability[] {
       parentFlags: [],
     }
     for (const command of commands) {
-      capabilities.push(deriveResourceCapability(app, bundleId, resource, command, cliPath))
+      capabilities.push(
+        deriveResourceCapability(
+          app,
+          bundleId,
+          resource,
+          command,
+          cliPath,
+          permissionOf(command, resource)
+        )
+      )
     }
   }
 
   for (const command of getAppCommands(manifest)) {
-    capabilities.push(deriveAppCapability(app, bundleId, command))
+    capabilities.push(deriveAppCapability(app, bundleId, command, permissionOf(command, undefined)))
   }
 
   return capabilities.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))

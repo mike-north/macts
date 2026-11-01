@@ -11,8 +11,9 @@ import { describe, expect, it } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { deriveCapabilities, buildCapabilityRegistry } from './registry.js'
-import { loadManifest } from '../manifest/loader.js'
-import { notebookManifest } from './test-fixtures.js'
+import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
+import { NOTEBOOK_MANIFEST_YAML, notebookManifest } from './test-fixtures.js'
+import type { AppManifest } from '../manifest/index.js'
 
 /** Repo-root-relative path to the calendar manifest (a real nested hierarchy). */
 const CALENDAR_MANIFEST = resolve(
@@ -53,9 +54,11 @@ describe('deriveCapabilities', () => {
     expect(byName.get('notebook.app.doScript')?.permission).toBe('notebook:app:doScript')
   })
 
-  it('reports undefined permission for a command that declares none', () => {
-    // The fixture's `quit` command intentionally omits `permission`.
-    expect(byName.get('notebook.app.quit')?.permission).toBeUndefined()
+  it('derives the route permission for a command that declares none (issue #148)', () => {
+    // The fixture's `quit` command omits `permission`. The server enforces the
+    // permission derived from its route, `notebook.app.quit`, so discovery
+    // reports `notebook:app:quit` (app : `app` scope : route segment) too.
+    expect(byName.get('notebook.app.quit')?.permission).toBe('notebook:app:quit')
   })
 
   it('classifies risk deterministically from each operation', () => {
@@ -104,6 +107,66 @@ describe('deriveCapabilities', () => {
   it('derives discovery keywords from name, resource, operation, and description', () => {
     const create = byName.get('notebook.notes.create')
     expect(create?.keywords).toEqual(expect.arrayContaining(['create', 'note', 'notebook']))
+  })
+})
+
+/**
+ * The Notebook fixture plus three Note commands that exercise each source of a
+ * capability's permission. `commands` is the fixture's last section, so these
+ * entries extend it.
+ */
+const ROUTE_PERMISSION_MANIFEST_YAML = `${NOTEBOOK_MANIFEST_YAML}
+  getNote:
+    name: get
+    description: Get a note (no routeName, no permission)
+    scope: resource
+    resourceType: Note
+    parameters: []
+  findNote:
+    name: find
+    routeName: lookup
+    description: Find a note (routeName, no permission)
+    scope: resource
+    resourceType: Note
+    parameters: []
+  archiveNote:
+    name: archive
+    description: Archive a note (an explicit permission unlike the derived one)
+    scope: resource
+    resourceType: Note
+    parameters: []
+    permission: notebook:notes:write
+`
+
+describe('deriveCapabilities — permission from the resolved route (issue #148)', () => {
+  const caps = deriveCapabilities(parseManifestYaml(ROUTE_PERMISSION_MANIFEST_YAML))
+  const byName = new Map(caps.map((c) => [c.name, c]))
+
+  it('derives the permission from the command key when there is no routeName', () => {
+    // The route is `notebook.notes.getNote`, so the server enforces
+    // `notebook:notes:getNote`, not `notebook:notes:get`.
+    expect(byName.get('notebook.notes.get')?.permission).toBe('notebook:notes:getNote')
+  })
+
+  it('derives the permission from the routeName when there is one', () => {
+    expect(byName.get('notebook.notes.find')?.permission).toBe('notebook:notes:lookup')
+  })
+
+  it('keeps an explicit permission that differs from the derived one', () => {
+    expect(byName.get('notebook.notes.archive')?.permission).toBe('notebook:notes:write')
+  })
+
+  it('fails loudly when a capability has no resolved route', () => {
+    // A resource whose key differs from its `name`: the capability traversal
+    // matches commands by `name`, the route resolver by key, so they disagree
+    // on the operation. The schema does not check this, so build it directly.
+    const base = notebookManifest()
+    const note = base.resources['Note']
+    if (note === undefined) throw new Error('the fixture has no Note resource')
+    const disagreeing: AppManifest = { ...base, resources: { NoteKey: note } }
+    expect(() => deriveCapabilities(disagreeing)).toThrow(
+      'Manifest "Notebook": command "list" on resource "Note" has no resolved route'
+    )
   })
 })
 

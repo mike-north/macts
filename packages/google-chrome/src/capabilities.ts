@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'close',
     description: 'Close a window.',
-    permission: null,
+    permission: 'google-chrome:app:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'copySelection',
     description: 'Copy text.',
-    permission: null,
+    permission: 'google-chrome:app:copySelection',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -78,7 +78,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'count',
     description: 'Return the number of elements of a particular class within an object.',
-    permission: null,
+    permission: 'google-chrome:app:count',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -98,7 +98,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'cutSelection',
     description: 'Cut selected text (If Possible).',
-    permission: null,
+    permission: 'google-chrome:app:cutSelection',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -113,7 +113,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'delete',
     description: 'Delete an object.',
-    permission: null,
+    permission: 'google-chrome:app:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -128,7 +128,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'duplicate',
     description: 'Copy object(s) and put the copies at a new location.',
-    permission: null,
+    permission: 'google-chrome:app:duplicate',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -152,7 +152,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'execute',
     description: 'Execute a piece of javascript.',
-    permission: null,
+    permission: 'google-chrome:app:execute',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -173,7 +173,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'exists',
     description: 'Verify if an object exists.',
-    permission: null,
+    permission: 'google-chrome:app:exists',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -188,7 +188,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'goBack',
     description: 'Go Back (If Possible).',
-    permission: null,
+    permission: 'google-chrome:app:goBack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -203,7 +203,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'goForward',
     description: 'Go Forward (If Possible).',
-    permission: null,
+    permission: 'google-chrome:app:goForward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -218,7 +218,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Make a new object.',
-    permission: null,
+    permission: 'google-chrome:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -251,7 +251,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'move',
     description: 'Move object(s) to a new location.',
-    permission: null,
+    permission: 'google-chrome:app:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -272,7 +272,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'open',
     description: 'Open a document.',
-    permission: null,
+    permission: 'google-chrome:app:open',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -287,7 +287,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pasteSelection',
     description: 'Paste text (If Possible).',
-    permission: null,
+    permission: 'google-chrome:app:pasteSelection',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -302,7 +302,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'print',
     description: 'Print an object.',
-    permission: null,
+    permission: 'google-chrome:app:print',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -317,7 +317,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'quit',
     description: 'Quit the application.',
-    permission: null,
+    permission: 'google-chrome:app:quit',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -332,7 +332,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'redo',
     description: 'Redo the last change.',
-    permission: null,
+    permission: 'google-chrome:app:redo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -347,7 +347,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'reload',
     description: 'Reload a tab.',
-    permission: null,
+    permission: 'google-chrome:app:reload',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -362,7 +362,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'save',
     description: 'Save an object.',
-    permission: null,
+    permission: 'google-chrome:app:save',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -387,7 +387,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'selectAll',
     description: 'Select all.',
-    permission: null,
+    permission: 'google-chrome:app:selectAll',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -402,7 +402,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stop',
     description: 'Stop the current tab from loading.',
-    permission: null,
+    permission: 'google-chrome:app:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -417,7 +417,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'undo',
     description: 'Undo the last change.',
-    permission: null,
+    permission: 'google-chrome:app:undo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -432,7 +432,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'viewSource',
     description: 'View the HTML source of the tab.',
-    permission: null,
+    permission: 'google-chrome:app:viewSource',
     risk: 'read',
     inputSchema: {
       type: 'object',

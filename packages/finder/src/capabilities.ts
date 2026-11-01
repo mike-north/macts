@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'activate',
     description: 'Activate the specified window (or the Finder)',
-    permission: null,
+    permission: 'finder:app:activate',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -64,7 +64,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'cleanUp',
     description:
       'Arrange items in window nicely (only applies to open windows in icon view that are not kept arranged)',
-    permission: null,
+    permission: 'finder:app:cleanUp',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -84,7 +84,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'close',
     description: 'Close an object',
-    permission: null,
+    permission: 'finder:app:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -100,7 +100,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'copy',
     description:
       '(NOT AVAILABLE YET) Copy the selected items to the clipboard (the Finder must be the front application)',
-    permission: null,
+    permission: 'finder:app:copy',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -115,7 +115,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'count',
     description: 'Return the number of elements of a particular class within an object',
-    permission: null,
+    permission: 'finder:app:count',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -136,7 +136,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'dataSize',
     description: 'Return the size in bytes of an object',
-    permission: null,
+    permission: 'finder:app:dataSize',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -156,7 +156,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'delete',
     description: 'Move an item from its container to the trash',
-    permission: null,
+    permission: 'finder:app:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -171,7 +171,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'duplicate',
     description: 'Duplicate one or more object(s)',
-    permission: null,
+    permission: 'finder:app:duplicate',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -205,7 +205,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'eject',
     description: 'Eject the specified disk(s)',
-    permission: null,
+    permission: 'finder:app:eject',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -220,7 +220,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'empty',
     description: 'Empty the trash',
-    permission: null,
+    permission: 'finder:app:empty',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -240,7 +240,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'erase',
     description: '(NOT AVAILABLE) Erase the specified disk(s)',
-    permission: null,
+    permission: 'finder:app:erase',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -255,7 +255,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'exists',
     description: 'Verify if an object exists',
-    permission: null,
+    permission: 'finder:app:exists',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -270,7 +270,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Make a new element',
-    permission: null,
+    permission: 'finder:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -304,7 +304,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'move',
     description: 'Move object(s) to a new location',
-    permission: null,
+    permission: 'finder:app:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -340,7 +340,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'open',
     description: 'Open the specified object(s)',
-    permission: null,
+    permission: 'finder:app:open',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -365,7 +365,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'openVirtualLocation',
     description: 'Private event to open a virtual location',
-    permission: null,
+    permission: 'finder:app:openVirtualLocation',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -380,7 +380,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'print',
     description: 'Print the specified object(s)',
-    permission: null,
+    permission: 'finder:app:print',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -401,7 +401,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'quit',
     description: 'Quit the Finder',
-    permission: null,
+    permission: 'finder:app:quit',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -416,7 +416,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'restart',
     description: 'Restart the computer',
-    permission: null,
+    permission: 'finder:app:restart',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -431,7 +431,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'reveal',
     description: 'Bring the specified object(s) into view',
-    permission: null,
+    permission: 'finder:app:reveal',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -446,7 +446,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'select',
     description: 'Select the specified object(s)',
-    permission: null,
+    permission: 'finder:app:select',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -461,7 +461,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'shutDown',
     description: 'Shut Down the computer',
-    permission: null,
+    permission: 'finder:app:shutDown',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -476,7 +476,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'sleep',
     description: 'Put the computer to sleep',
-    permission: null,
+    permission: 'finder:app:sleep',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -491,7 +491,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'sort',
     description: 'Return the specified object(s) in a sorted list',
-    permission: null,
+    permission: 'finder:app:sort',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -513,7 +513,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'update',
     description:
       'Update the display of the specified object(s) to match their on-disk representation',
-    permission: null,
+    permission: 'finder:app:update',
     risk: 'write',
     inputSchema: {
       type: 'object',

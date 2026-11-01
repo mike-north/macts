@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'login',
     description: 'Login to all accounts.',
-    permission: null,
+    permission: 'messages:app:login',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'logout',
     description: 'Logout of all accounts.',
-    permission: null,
+    permission: 'messages:app:logout',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -78,7 +78,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'send',
     description: 'Sends a message to a participant or to a chat.',
-    permission: null,
+    permission: 'messages:app:send',
     risk: 'send',
     inputSchema: {
       type: 'object',

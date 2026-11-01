@@ -29,12 +29,13 @@ describe('generateCapabilitiesModule', () => {
     expect(byName.get('notebook.app.quit')?.risk).toBe('system-change')
   })
 
-  it('embeds the required permission, or null when none is declared', () => {
+  it('embeds the required permission, derived from the route when none is declared', () => {
     const data = extractCapabilitiesData(source)
     const byName = new Map(data.map((c) => [c.name, c]))
     expect(byName.get('notebook.notes.create')?.permission).toBe('notebook:notes:create')
-    // The fixture's `quit` declares no permission → serialized as null.
-    expect(byName.get('notebook.app.quit')?.permission).toBeNull()
+    // The fixture's `quit` declares no permission; its route `notebook.app.quit`
+    // requires `notebook:app:quit` (issue #148: this was serialized as null).
+    expect(byName.get('notebook.app.quit')?.permission).toBe('notebook:app:quit')
   })
 
   it('embeds the app dependency on every entry', () => {

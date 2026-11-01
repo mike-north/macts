@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'doScript',
     description: 'Execute a shell command in a Terminal window or tab',
-    permission: null,
+    permission: 'terminal:app:doScript',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -73,7 +73,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'settingssets',
     operation: 'get',
     description: 'Get an item by identifier',
-    permission: null,
+    permission: 'terminal:settingssets:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -94,7 +94,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'settingssets',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'terminal:settingssets:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -109,7 +109,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'get',
     description: 'Get an item by identifier',
-    permission: null,
+    permission: 'terminal:tabs:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -134,7 +134,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'terminal:tabs:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -149,7 +149,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'windows',
     operation: 'get',
     description: 'Get an item by identifier',
-    permission: null,
+    permission: 'terminal:windows:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -170,7 +170,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'windows',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'terminal:windows:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
