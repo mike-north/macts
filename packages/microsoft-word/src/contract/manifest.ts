@@ -1270,33 +1270,8 @@ export const manifest: unknown = {
     documents: {
       read: ['microsoft-word:documents:list', 'microsoft-word:documents:get'],
       create: ['microsoft-word:documents:create', 'microsoft-word:documents:createRange'],
-      write: [
-        'microsoft-word:documents:save',
-        'microsoft-word:documents:insert',
-        'microsoft-word:documents:update',
-      ],
-      delete: ['microsoft-word:documents:close', 'microsoft-word:documents:delete'],
-    },
-    paragraphs: {
-      read: ['microsoft-word:paragraphs:list', 'microsoft-word:paragraphs:get'],
-      write: ['microsoft-word:paragraphs:update'],
-    },
-    tables: {
-      read: ['microsoft-word:tables:list', 'microsoft-word:tables:get'],
-      create: ['microsoft-word:tables:create'],
-      write: ['microsoft-word:tables:update'],
-      delete: ['microsoft-word:tables:delete'],
-    },
-    bookmarks: {
-      read: ['microsoft-word:bookmarks:list', 'microsoft-word:bookmarks:get'],
-      create: ['microsoft-word:bookmarks:create'],
-      delete: ['microsoft-word:bookmarks:delete'],
-    },
-    fields: {
-      read: ['microsoft-word:fields:list', 'microsoft-word:fields:get'],
-      create: ['microsoft-word:fields:create'],
-      write: ['microsoft-word:fields:update'],
-      delete: ['microsoft-word:fields:delete'],
+      write: ['microsoft-word:documents:save', 'microsoft-word:documents:insert'],
+      delete: ['microsoft-word:documents:close'],
     },
     app: {
       read: ['microsoft-word:app:find', 'microsoft-word:app:selectAll'],

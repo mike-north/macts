@@ -77,7 +77,9 @@ export {
   generatePermissionMap,
   validateCommandPermissions,
   PermissionExpansionError,
+  type ExpandPermissionOptions,
   type PermissionMap,
+  type UnmappedPermissionPolicy,
 } from './expander.js'
 
 // Matcher

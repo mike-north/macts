@@ -1348,12 +1348,6 @@ export const xcodeApiPlugin = {
       projects: {
         read: ['xcode:projects:list', 'xcode:projects:get'],
       },
-      targets: {
-        read: ['xcode:targets:list', 'xcode:targets:get'],
-      },
-      buildConfigurations: {
-        read: ['xcode:buildConfigurations:list', 'xcode:buildConfigurations:get'],
-      },
       schemes: {
         read: ['xcode:schemes:list', 'xcode:schemes:get'],
       },

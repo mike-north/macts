@@ -409,8 +409,9 @@ describe('resource spelling across surfaces', () => {
       }
     }
     expect(found).toEqual([])
-    // Guards against a vacuous pass: the manifests declare hundreds of explicit permissions.
-    expect(checked).toBeGreaterThan(300)
+    // Guards against a vacuous pass: the manifests declare over two hundred
+    // explicit permissions (command permissions and permission-group entries).
+    expect(checked).toBeGreaterThan(200)
   })
 
   it('detects a resource two surfaces spell differently', () => {

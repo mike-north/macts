@@ -1261,20 +1261,14 @@ export const manifest: unknown = {
     tasks: {
       read: ['omniplan:tasks:list', 'omniplan:tasks:get'],
       create: ['omniplan:tasks:create'],
-      write: ['omniplan:tasks:update'],
-      delete: ['omniplan:tasks:delete'],
     },
     milestones: {
       read: ['omniplan:milestones:list', 'omniplan:milestones:get'],
       create: ['omniplan:milestones:create'],
-      write: ['omniplan:milestones:update'],
-      delete: ['omniplan:milestones:delete'],
     },
     resources: {
       read: ['omniplan:resources:list', 'omniplan:resources:get'],
       create: ['omniplan:resources:create'],
-      write: ['omniplan:resources:update'],
-      delete: ['omniplan:resources:delete'],
     },
     assignments: {
       read: ['omniplan:assignments:list'],

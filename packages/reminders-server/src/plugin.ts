@@ -640,8 +640,6 @@ export const remindersApiPlugin = {
       lists: {
         read: ['reminders:lists:list', 'reminders:lists:get'],
         create: ['reminders:lists:create'],
-        write: ['reminders:lists:update'],
-        delete: ['reminders:lists:delete'],
       },
       reminders: {
         read: ['reminders:reminders:list', 'reminders:reminders:get', 'reminders:reminders:show'],
@@ -650,7 +648,7 @@ export const remindersApiPlugin = {
         delete: ['reminders:reminders:delete'],
       },
       accounts: {
-        read: ['reminders:accounts:list', 'reminders:accounts:get'],
+        read: ['reminders:accounts:list'],
       },
     },
     extraction: {

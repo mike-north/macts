@@ -687,30 +687,20 @@ export const automatorApiPlugin = {
     permissions: {
       workflows: {
         read: ['automator:workflows:list', 'automator:workflows:get'],
-        create: ['automator:workflows:create'],
         write: [
-          'automator:workflows:update',
           'automator:workflows:execute',
           'automator:workflows:add',
           'automator:workflows:remove',
         ],
-        delete: ['automator:workflows:delete'],
       },
       actions: {
         read: ['automator:actions:list', 'automator:actions:get'],
-        create: ['automator:actions:create'],
-        write: ['automator:actions:update'],
-        delete: ['automator:actions:delete'],
       },
       variables: {
         read: ['automator:variables:list', 'automator:variables:get'],
-        create: ['automator:variables:create'],
-        write: ['automator:variables:update'],
-        delete: ['automator:variables:delete'],
       },
       settings: {
         read: ['automator:settings:list', 'automator:settings:get'],
-        write: ['automator:settings:update'],
       },
       requiredResources: {
         read: ['automator:requiredResources:list', 'automator:requiredResources:get'],

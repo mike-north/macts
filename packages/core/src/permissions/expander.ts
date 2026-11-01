@@ -16,16 +16,52 @@ export class PermissionExpansionError extends Error {
 }
 
 /**
+ * How expansion treats a non-wildcard permission that the permissions map
+ * neither groups under an operation key nor lists as a value.
+ *
+ * - `reject` (the default) throws {@link PermissionExpansionError}. It suits
+ *   callers that are asking what a permission expands to, where an
+ *   unmapped permission is a question with no answer.
+ * - `keep` returns the permission unchanged, as the one fine-grained
+ *   permission it already is. It suits key creation: a permission map lists
+ *   only permissions some route requires, so a well-formed fine-grained
+ *   permission it does not list is still a grant of exactly itself.
+ *
+ * Either way a grouping-only coarse operation (`read`, `write`) that is not a
+ * key of its resource throws, because granting it as written would authorize
+ * nothing, and wildcard expansion is the same.
+ */
+export type UnmappedPermissionPolicy = 'reject' | 'keep'
+
+/**
+ * Options for {@link expandCoarsePermission} and {@link expandPermissions}.
+ */
+export interface ExpandPermissionOptions {
+  /**
+   * How to treat a non-wildcard permission the map neither groups nor lists.
+   * Defaults to `reject`.
+   */
+  readonly unmapped?: UnmappedPermissionPolicy | undefined
+}
+
+/**
  * Expand a coarse permission to its constituent fine-grained permissions.
+ *
+ * A permission whose operation is a key of its resource's mapping expands to
+ * that key's list. A fine-grained permission the mapping lists expands to
+ * itself; one the mapping does not list throws, unless `options.unmapped` is
+ * `keep`, in which case it too expands to itself.
  *
  * @param permission - Coarse permission string (e.g., "calendar:events:read")
  * @param permissionsSection - The permissions mapping from the manifest
+ * @param options - How to treat a permission the mapping does not contain
  * @returns Array of fine-grained permission strings
  * @throws PermissionExpansionError if the permission cannot be expanded
  */
 export function expandCoarsePermission(
   permission: string,
-  permissionsSection: PermissionsSection
+  permissionsSection: PermissionsSection,
+  options: ExpandPermissionOptions = {}
 ): string[] {
   const parsed = parsePermission(permission)
 
@@ -34,9 +70,16 @@ export function expandCoarsePermission(
     return expandWildcardPermission(permission, parsed, permissionsSection)
   }
 
+  // A permission granted as written is kept when the caller asks, unless it is
+  // a grouping-only coarse operation, which as written authorizes nothing.
+  const keepUnmapped = options.unmapped === 'keep' && !isPureCoarseOperation(parsed.operation)
+
   // For non-wildcard permissions, look up in the mapping
   const resourceMapping = permissionsSection[parsed.resource]
   if (!resourceMapping) {
+    if (keepUnmapped) {
+      return [permission]
+    }
     throw new PermissionExpansionError(
       permission,
       `Resource "${parsed.resource}" not found in permissions mapping`
@@ -57,7 +100,10 @@ export function expandCoarsePermission(
     }
   }
 
-  // Neither a coarse key nor a fine-grained value - invalid
+  // Neither a coarse key nor a fine-grained value
+  if (keepUnmapped) {
+    return [permission]
+  }
   throw new PermissionExpansionError(
     permission,
     `Operation "${parsed.operation}" not found in resource "${parsed.resource}" mapping`
@@ -120,18 +166,26 @@ function expandWildcardPermission(
 /**
  * Expand multiple permissions, handling coarse and wildcard permissions.
  *
+ * Each permission expands as {@link expandCoarsePermission} describes. A
+ * fine-grained permission the mapping lists is included as-is; one it does not
+ * list is included as-is only when `options.unmapped` is `keep`, and otherwise
+ * throws.
+ *
  * @param permissions - Array of permission strings (fine, coarse, or wildcard)
  * @param permissionsSection - The permissions mapping from the manifest
+ * @param options - How to treat a permission the mapping does not contain
  * @returns Array of unique fine-grained permission strings
+ * @throws PermissionExpansionError if a permission cannot be expanded
  */
 export function expandPermissions(
   permissions: string[],
-  permissionsSection: PermissionsSection
+  permissionsSection: PermissionsSection,
+  options: ExpandPermissionOptions = {}
 ): string[] {
   const result = new Set<string>()
 
   for (const permission of permissions) {
-    const expanded = expandCoarsePermission(permission, permissionsSection)
+    const expanded = expandCoarsePermission(permission, permissionsSection, options)
     for (const perm of expanded) {
       result.add(perm)
     }

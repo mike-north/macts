@@ -237,15 +237,9 @@ export const manifest: unknown = {
   permissions: {
     shortcuts: {
       read: ['shortcuts:shortcuts:list', 'shortcuts:shortcuts:get', 'shortcuts:shortcuts:run'],
-      create: ['shortcuts:shortcuts:create'],
-      write: ['shortcuts:shortcuts:update'],
-      delete: ['shortcuts:shortcuts:delete'],
     },
     folders: {
       read: ['shortcuts:folders:list', 'shortcuts:folders:get'],
-      create: ['shortcuts:folders:create'],
-      write: ['shortcuts:folders:update'],
-      delete: ['shortcuts:folders:delete'],
     },
   },
   extraction: {

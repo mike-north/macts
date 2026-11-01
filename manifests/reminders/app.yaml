@@ -507,10 +507,6 @@ permissions:
       - reminders:lists:get
     create:
       - reminders:lists:create
-    write:
-      - reminders:lists:update
-    delete:
-      - reminders:lists:delete
 
   reminders:
     read:
@@ -527,7 +523,6 @@ permissions:
   accounts:
     read:
       - reminders:accounts:list
-      - reminders:accounts:get
 
 extraction:
   sourceFile: source.sdef

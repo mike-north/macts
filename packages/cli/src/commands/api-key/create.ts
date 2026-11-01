@@ -7,7 +7,7 @@ import {
   suggestPermissions,
   explainInvalidPermission,
   findCaseOnlyMismatch,
-  isCoarseOperation,
+  isPureCoarseOperation,
   isValidPermission,
   parsePermission,
   type AppManifest,
@@ -142,7 +142,12 @@ export class ApiKeyCreateCommand extends Command {
       const declaredOnly = manifests.flatMap((manifest) =>
         Object.values(manifest.permissions ?? {}).flatMap((coarse) => Object.values(coarse).flat())
       )
-      for (const warning of unknownPermissionWarnings(permissions, known, declaredOnly)) {
+      for (const warning of unknownPermissionWarnings(
+        permissions,
+        known,
+        declaredOnly,
+        permissionsSection
+      )) {
         this.context.stderr.write(`warning: ${warning}\n`)
       }
 
@@ -207,15 +212,23 @@ async function discoverManifests(): Promise<AppManifest[]> {
 }
 
 /**
- * Warnings for well-formed permissions of a known app that name no permission
- * the app defines. They are not errors: a later app version may add the route.
- * Wildcards and coarse operations (expanded against the manifest) are not
- * checked here, and apps without a known manifest cannot be judged.
+ * Warnings for well-formed permissions of a known app that no route of that
+ * app requires. They are not errors: a later app version may add the route.
+ * Each warning names the permission and, when one is close, the nearest
+ * permission a route does require.
+ *
+ * Wildcards are not checked, and neither are permissions that are expanded
+ * rather than granted as written: the grouping-only coarse operations
+ * (`read`, `write`), and any operation that is a key of the `--manifest`
+ * permissions map for its resource. `create` and `delete` are coarse names but
+ * also real command operations, so without such a key they are checked like
+ * any other operation. Apps without a known manifest cannot be judged.
  */
 function unknownPermissionWarnings(
   permissions: string[],
   known: string[],
-  declaredInPermissionsMap: string[]
+  declaredInPermissionsMap: string[],
+  permissionsSection: PermissionsSection | undefined
 ): string[] {
   const knownApps = new Set(known.map((p) => p.split(':')[0]))
   return permissions.flatMap((permission) => {
@@ -225,19 +238,20 @@ function unknownPermissionWarnings(
       known.includes(permission) ||
       parsed.resource === '*' ||
       parsed.operation === '*' ||
-      isCoarseOperation(parsed.operation)
+      isPureCoarseOperation(parsed.operation) ||
+      permissionsSection?.[parsed.resource]?.[parsed.operation] !== undefined
     ) {
       return []
-    }
-    if (declaredInPermissionsMap.includes(permission)) {
-      return [
-        `"${permission}" is listed in the ${parsed.app} manifest's permissions map, but no ` +
-          `${parsed.app} route requires it yet, so it authorizes nothing today.`,
-      ]
     }
     const suggestions = suggestPermissions(permission, known)
     const hint =
       suggestions.length > 0 ? ` Closest: ${suggestions.map((s) => `"${s}"`).join(', ')}.` : ''
+    if (declaredInPermissionsMap.includes(permission)) {
+      return [
+        `"${permission}" is listed in the ${parsed.app} manifest's permissions map, but no ` +
+          `${parsed.app} route requires it yet, so it authorizes nothing today.${hint}`,
+      ]
+    }
     return [`"${permission}" is not a permission any known ${parsed.app} route requires.${hint}`]
   })
 }

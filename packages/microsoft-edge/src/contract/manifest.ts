@@ -685,14 +685,11 @@ export const manifest: unknown = {
     windows: {
       read: ['microsoft-edge:windows:list', 'microsoft-edge:windows:get'],
       create: ['microsoft-edge:windows:create'],
-      write: ['microsoft-edge:windows:update'],
-      delete: ['microsoft-edge:windows:delete'],
     },
     tabs: {
       read: ['microsoft-edge:tabs:list', 'microsoft-edge:tabs:get'],
       create: ['microsoft-edge:tabs:create'],
       write: [
-        'microsoft-edge:tabs:update',
         'microsoft-edge:tabs:reload',
         'microsoft-edge:tabs:goBack',
         'microsoft-edge:tabs:goForward',
@@ -706,7 +703,6 @@ export const manifest: unknown = {
         'microsoft-edge:tabs:viewSource',
         'microsoft-edge:tabs:execute',
       ],
-      delete: ['microsoft-edge:tabs:delete'],
     },
     bookmarkFolders: {
       read: ['microsoft-edge:bookmarkFolders:list', 'microsoft-edge:bookmarkFolders:get'],

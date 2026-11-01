@@ -140,7 +140,6 @@ export const textEditApiPlugin = {
       documents: {
         read: ['textedit:documents:list', 'textedit:documents:get'],
         create: ['textedit:documents:create'],
-        write: ['textedit:documents:update'],
       },
     },
   } as AppManifest,

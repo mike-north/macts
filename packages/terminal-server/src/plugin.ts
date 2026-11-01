@@ -285,10 +285,6 @@ export const terminalApiPlugin = {
       },
       settingsSets: {
         read: ['terminal:settingsSets:list', 'terminal:settingsSets:get'],
-        write: ['terminal:settingsSets:update'],
-      },
-      commands: {
-        execute: ['terminal:commands:doScript'],
       },
     },
   } as AppManifest,

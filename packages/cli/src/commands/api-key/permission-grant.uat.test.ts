@@ -25,7 +25,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
-import { existsSync, mkdtempSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,6 +42,41 @@ const PHOTOS_LIST = 'photos:mediaItems:list'
 const ITERM_SPLIT = 'iterm:app:splitVertically'
 const PHOTOS_LIST_ROUTE = 'photos.mediaItems.list'
 const ITERM_SPLIT_ROUTE = 'iterm.app.splitVertically'
+
+/**
+ * A user manifest whose permissions map lists a permission no route requires:
+ * `jotter:notes:update`, beside the one route permission `jotter:notes:list`.
+ */
+const DECLARED_ONLY_MANIFEST = `version: '1.0'
+app:
+  bundleId: com.example.jotter
+  name: Jotter
+  tccEntitlements: []
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    properties:
+      title: { access: r, type: string, description: Title }
+enums: {}
+hierarchy:
+  children:
+    notes: { resource: Note, access: r }
+commands:
+  list:
+    name: list
+    description: List notes
+    scope: resource
+    resourceType: Note
+    parameters: []
+permissions:
+  notes:
+    read:
+      - jotter:notes:list
+    write:
+      - jotter:notes:update
+`
 
 /** An operation id in the `app.resource.operation` form the runtime requires. */
 type OperationId = `${string}.${string}.${string}`
@@ -157,19 +192,91 @@ describe('macts api-key create (UAT): permission grammar and case', () => {
   })
 
   it('names the permissions map when a permission is declared there but no route requires it', async () => {
-    // manifests/photos/app.yaml lists photos:mediaItems:update under the
-    // mediaItems `write` mapping, and no Photos route requires it.
+    // No shipped manifest lists such a permission (a guard over every shipped
+    // manifest enforces it), but a user manifest can. This one's only route
+    // is jotter.notes.list (app "Jotter", resource Notes, command list),
+    // requiring jotter:notes:list; its permissions map also lists
+    // jotter:notes:update, which no route requires.
+    const manifestPath = join(mactsHome, 'jotter.yaml')
+    writeFileSync(manifestPath, DECLARED_ONLY_MANIFEST)
     const result = await runCli([
       'api-key',
       'create',
       '--name',
       'declared-only',
       '--permission',
-      'photos:mediaItems:update',
+      'jotter:notes:update',
+      '--manifest',
+      manifestPath,
     ])
     expect(result.code, result.stderr).toBe(0)
     expect(result.stderr).toContain(
-      'warning: "photos:mediaItems:update" is listed in the photos manifest\'s permissions map, but no photos route requires it yet'
+      'warning: "jotter:notes:update" is listed in the jotter manifest\'s permissions map, but no jotter route requires it yet'
+    )
+  })
+
+  it('accepts a permission the --manifest permissions map does not list, warning with the closest one (issue #168)', async () => {
+    // manifests/omniplan/app.yaml has no task update command, and its map lists
+    // only route permissions (tasks: read list/get, create create). The closest
+    // known permission is omniplan:tasks:create: "update" -> "create" is three
+    // substitutions, and no other omniplan permission is within three edits.
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-manifest',
+      '--permission',
+      'omniplan:tasks:update',
+      '--manifest',
+      join(repoRoot, 'manifests/omniplan/app.yaml'),
+      '--json',
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "omniplan:tasks:update" is not a permission any known omniplan route requires. Closest: "omniplan:tasks:create".'
+    )
+    const parsed = JSON.parse(result.stdout) as { data: { permissions: string[] } }
+    // Granted as written: the map does not list it, so it is not expanded.
+    expect(parsed.data.permissions).toEqual(['omniplan:tasks:update'])
+  })
+
+  it('accepts a permission on a resource the --manifest permissions map lacks (issue #168)', async () => {
+    // manifests/calendar/app.yaml has no attendee routes, so its map has no
+    // attendees resource. Expansion used to fail here with "Resource
+    // "attendees" not found in permissions mapping".
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-resource',
+      '--permission',
+      'calendar:attendees:list',
+      '--manifest',
+      join(repoRoot, 'manifests/calendar/app.yaml'),
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "calendar:attendees:list" is not a permission any known calendar route requires.'
+    )
+  })
+
+  it('warns for an unrouted create operation found by discovery, with the closest one (issue #168)', async () => {
+    // Without --manifest the shipped manifests are discovered, and nothing is
+    // expanded, so omnigraffle:masters:create is granted as the fine-grained
+    // permission it names. No omnigraffle route requires it; the closest known
+    // permission is omnigraffle:layers:create ("masters" -> "layers" is three
+    // edits), and no other is within three edits.
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'unrouted-discovered',
+      '--permission',
+      'omnigraffle:masters:create',
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "omnigraffle:masters:create" is not a permission any known omnigraffle route requires. Closest: "omnigraffle:layers:create".'
     )
   })
 
@@ -330,5 +437,33 @@ describe('camelCase grants authorize real calls (UAT)', () => {
     expect(body.error.details.required).toBe(PHOTOS_LIST)
     expect(body.error.details.hint).toContain('Grant "photos:mediaItems:list"')
     expect(http.requests).toHaveLength(0)
+  })
+})
+
+describe('macts permissions expand (UAT): unmapped permissions still fail', () => {
+  // Key creation keeps a fine-grained permission the map does not list, but
+  // asking what such a permission expands to still has no answer.
+  it('rejects an operation the map neither groups nor lists', async () => {
+    const result = await runCli([
+      'permissions',
+      'expand',
+      'omniplan:tasks:update',
+      '--manifest',
+      join(repoRoot, 'manifests/omniplan/app.yaml'),
+    ])
+    expect(result.code).not.toBe(0)
+    expect(result.stderr).toContain('Operation "update" not found in resource "tasks" mapping')
+  })
+
+  it('rejects a resource the map lacks', async () => {
+    const result = await runCli([
+      'permissions',
+      'expand',
+      'calendar:attendees:list',
+      '--manifest',
+      join(repoRoot, 'manifests/calendar/app.yaml'),
+    ])
+    expect(result.code).not.toBe(0)
+    expect(result.stderr).toContain('Resource "attendees" not found in permissions mapping')
   })
 })

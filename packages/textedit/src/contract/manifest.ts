@@ -134,7 +134,6 @@ export const manifest: unknown = {
     documents: {
       read: ['textedit:documents:list', 'textedit:documents:get'],
       create: ['textedit:documents:create'],
-      write: ['textedit:documents:update'],
     },
   },
 }
