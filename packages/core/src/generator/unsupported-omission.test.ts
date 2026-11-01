@@ -257,12 +257,16 @@ async function shippedManifests(): Promise<[string, AppManifest][]> {
   )
 }
 
-/** A property marked unsupported, with any nullability claim removed. */
+/**
+ * A property marked unsupported, with any nullability claim and native
+ * spelling removed: a marked property carries neither.
+ */
 function marked(property: Property): Property {
   const {
     nullable: _nullable,
     resettable: _resettable,
     evidence: _evidence,
+    native: _native,
     ...unclaimed
   } = property
   return { ...unclaimed, unsupported: MARK }

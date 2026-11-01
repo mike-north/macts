@@ -1,6 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js'
-import { usableProperties } from '../manifest/unsupported.js'
+import { usableHierarchyChildren, usableProperties } from '../manifest/unsupported.js'
 import { propertyTypeToTs } from './types.js'
 
 export interface GeneratedClass {
@@ -10,7 +10,8 @@ export interface GeneratedClass {
 }
 
 /**
- * Get child collections for a resource from hierarchy.
+ * Get child collections for a resource from hierarchy, skipping the entries of
+ * resources marked unsupported and everything nested under them.
  */
 function getChildCollections(
   resourceName: string,
@@ -20,9 +21,12 @@ function getChildCollections(
   const result: { key: string; child: HierarchyChild }[] = []
 
   function findChildren(children: Record<string, HierarchyChild>): void {
-    for (const [_key, child] of Object.entries(children)) {
+    for (const [_key, child] of usableHierarchyChildren(ctx.manifest, children)) {
       if (child.resource === resourceName && child.children) {
-        for (const [childKey, childChild] of Object.entries(child.children)) {
+        for (const [childKey, childChild] of usableHierarchyChildren(
+          ctx.manifest,
+          child.children
+        )) {
           result.push({ key: childKey, child: childChild })
         }
       }

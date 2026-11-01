@@ -66,8 +66,6 @@ const MANIFESTS_DIR = fileURLToPath(new URL('../../../../manifests/', import.met
  * addresses any more, must be removed here.
  */
 const KNOWN_UNRESOLVED: Readonly<Record<string, string>> = {
-  // Screen Sharing publishes no scripting dictionary at all.
-  'screen-sharing: app["connections"]': 'https://github.com/mike-north/macts/issues/165',
   // Parents spelled from an identifier parameter that names no resource of
   // the manifest. The manifest must name the parent collection explicitly.
   // Automator ships no static scripting definition, so the check skips it and
@@ -131,15 +129,14 @@ async function collectAccessors(): Promise<AppAccessors[]> {
  * static scripting definition and whose bodies address at least one top-level
  * collection. Each must be checked wherever the suite runs: one that cannot be
  * checked fails the suite rather than shrinking it. (Other system apps with
- * manifests either address no top-level collection, such as Finder and Mail,
- * or ship no static definition, such as TextEdit.)
+ * manifests either address no top-level collection, such as Finder, Mail and
+ * Screen Sharing, or ship no static definition, such as TextEdit.)
  */
 const REQUIRED_CHECKED: readonly string[] = [
   'calendar',
   'notes',
   'photos',
   'reminders',
-  'screen-sharing',
   'shortcuts',
   'terminal',
 ]
@@ -252,6 +249,29 @@ describe('collecting the top-level accessors bodies address', () => {
 
   it('collects accessors for every app that must be checked on macOS', () => {
     for (const app of REQUIRED_CHECKED) expect(accessorsOf(app), app).not.toEqual([])
+  })
+
+  it('addresses no resource marked unsupported', () => {
+    // Screen Sharing's connections and Console's devices have no class in
+    // their apps' dictionaries, and Finder's desktop and trash objects are
+    // elements of nothing; each manifest marks the resource unsupported, so
+    // no route, and no body, reaches it.
+    expect(accessorsOf('screen-sharing')).not.toContain('connections')
+    expect(accessorsOf('console')).not.toContain('devices')
+    expect(accessorsOf('finder')).not.toContain('desktopObjects')
+    expect(accessorsOf('finder')).not.toContain('trashObjects')
+  })
+
+  it('addresses nothing only a command marked unsupported reaches', () => {
+    // Automator's getSetting and getRequiredResource look an item up at the
+    // application, so their bodies address app["settings"] and
+    // app["requiredResources"]; Automator has neither there (a live read
+    // raises -1728), so the manifest marks both commands, and no route, and
+    // no body, reaches either collection. Settings and required resources stay
+    // reachable through an action (app["actions"]).
+    expect(accessorsOf('automator')).not.toContain('settings')
+    expect(accessorsOf('automator')).not.toContain('requiredResources')
+    expect(accessorsOf('automator')).toEqual(expect.arrayContaining(['actions']))
   })
 
   it('skips command calls and class constructors', () => {

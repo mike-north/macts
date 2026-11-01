@@ -23,6 +23,7 @@ import {
   generateAppCommandSchema,
   generateToolName,
 } from '../generator/mcp/tools.js'
+import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { classifyCommandRisk } from './risk.js'
 import type { Capability, CapabilityRegistry } from './types.js'
 
@@ -52,7 +53,9 @@ interface ResourceCliPath {
  * match the generated CLI exactly.
  *
  * A resource appearing at multiple hierarchy paths keeps its first (depth-first,
- * insertion-order) path, which is deterministic.
+ * insertion-order) path, which is deterministic. The entries of a resource
+ * marked unsupported, and everything nested under them, are skipped, as the CLI
+ * generator skips them.
  */
 function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPath> {
   const paths = new Map<string, ResourceCliPath>()
@@ -62,7 +65,7 @@ function buildResourceCliPaths(manifest: AppManifest): Map<string, ResourceCliPa
     segments: readonly string[],
     parentFlags: readonly string[]
   ): void => {
-    for (const [key, child] of Object.entries(children)) {
+    for (const [key, child] of usableHierarchyChildren(manifest, children)) {
       const nextSegments = [...segments, key]
       if (!paths.has(child.resource)) {
         paths.set(child.resource, { segments: nextSegments, parentFlags })

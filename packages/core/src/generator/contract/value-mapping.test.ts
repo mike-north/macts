@@ -20,7 +20,6 @@ import {
   ValueRenderer,
   createNameResolver,
   mapDeclaredType,
-  normalizeTypeName,
   nullableShape,
   stringLiteral,
   type ValuePosition,
@@ -364,14 +363,6 @@ describe('usage tracking', () => {
     r.sdkType({ kind: 'string' })
     expect([...r.usedTypes].sort()).toEqual(['Integer', 'ObjectReferenceVariant'])
     expect([...r.usedEnums]).toEqual(['SaveOption'])
-  })
-})
-
-describe('normalizeTypeName', () => {
-  it('lowercases and drops spaces, dashes, and underscores', () => {
-    expect(normalizeTypeName('Text Item')).toBe('textitem')
-    expect(normalizeTypeName('text-item')).toBe('textitem')
-    expect(normalizeTypeName('TEXT_ITEM')).toBe('textitem')
   })
 })
 

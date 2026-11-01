@@ -18,6 +18,7 @@ import type { AppManifest } from './schemas/index.js'
 import type { Command } from './schemas/command.js'
 import type { Resource } from './schemas/resource.js'
 import { lowerCamel } from './lower-camel.js'
+import { isCommandUnsupported, isUnsupportedResourceKey } from './unsupported.js'
 
 /**
  * Normalize an application name into the canonical route segment.
@@ -161,32 +162,40 @@ function routePermission(
 /**
  * Resolve the resource type names a resource-scoped command applies to.
  *
- * An omitted `resourceType` means the command applies to every resource.
+ * An omitted `resourceType` means the command applies to every resource. A
+ * resource marked unsupported has no collection in the app, so no command
+ * applies to it and it has no route.
  */
 function resolveResourceTypes(command: Command, manifest: AppManifest): string[] {
-  if (command.resourceType === undefined) {
-    return Object.keys(manifest.resources)
-  }
-  if (Array.isArray(command.resourceType)) {
-    return command.resourceType
-  }
-  return [command.resourceType]
+  const declared =
+    command.resourceType === undefined
+      ? Object.keys(manifest.resources)
+      : Array.isArray(command.resourceType)
+        ? command.resourceType
+        : [command.resourceType]
+  return declared.filter((resourceType) => !isUnsupportedResourceKey(manifest, resourceType))
 }
 
 /**
  * Resolve every canonical RPC route for a single manifest command.
  *
+ * A command marked unsupported has no route, and a resource marked
+ * unsupported contributes none, so every surface built from these routes (the
+ * server router, the runtime's operation registry, the contract,
+ * capabilities, derived permissions) omits them.
+ *
  * @param manifest - The app manifest.
  * @param commandKey - The command's key in `manifest.commands`.
  * @param command - The command definition.
  * @returns One route for application commands; one route per targeted resource
- *   type for resource commands.
+ *   type for resource commands; none for a command marked unsupported.
  */
 export function resolveCommandRoutes(
   manifest: AppManifest,
   commandKey: string,
   command: Command
 ): ManifestRoute[] {
+  if (isCommandUnsupported(command)) return []
   const appName = manifest.app.name
   const segment = commandRouteSegment(commandKey, command)
 
@@ -228,7 +237,8 @@ export function resolveCommandRoutes(
  * Resolve every canonical RPC route for an entire manifest, across all commands.
  *
  * @param manifest - The app manifest.
- * @returns Every route the manifest exposes, in command-declaration order.
+ * @returns Every route the manifest exposes, in command-declaration order;
+ *   none for a command or a resource marked unsupported.
  */
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[] {
   const routes: ManifestRoute[] = []

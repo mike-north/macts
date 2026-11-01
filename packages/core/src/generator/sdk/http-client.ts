@@ -16,7 +16,12 @@ import {
   resolvePrimaryIdentifierProperty,
   commandRouteSegment,
 } from '../../manifest/index.js'
-import { hasUsableProperty, usableProperties } from '../../manifest/unsupported.js'
+import {
+  hasUsableProperty,
+  usableCommands,
+  usableProperties,
+  usableResources,
+} from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
 import {
   appCommandEntries,
@@ -90,7 +95,7 @@ export function generateHttpClientSdk(
     })
 
     // Generate resource clients (only for resources that expose operations)
-    for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+    for (const [resourceName, resource] of usableResources(manifest)) {
       if (!resourceHasOperations(manifest, resourceName)) continue
       files.push({
         path: `src/resources/${resourceName.toLowerCase()}.ts`,
@@ -180,14 +185,17 @@ node_modules/
  * Generate TypeScript types file.
  */
 function generateTypesFile(manifest: AppManifest): string {
+  // The Zod schemas below are the only use of `z`; a manifest whose every
+  // resource is marked unsupported has none, and an unused import fails the
+  // generated package's type check.
+  const resources = usableResources(manifest)
   const lines: string[] = [
     '/**',
     ' * Type definitions for the SDK.',
     ' * Auto-generated - do not edit.',
     ' */',
     '',
-    'import { z } from "zod";',
-    '',
+    ...(resources.length > 0 ? ['import { z } from "zod";', ''] : []),
   ]
 
   // Generate enum types
@@ -199,7 +207,7 @@ function generateTypesFile(manifest: AppManifest): string {
   }
 
   // Generate resource types
-  for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+  for (const [resourceName, resource] of resources) {
     const props = usableProperties(resource)
 
     // List output surfaces the resource's primary identifier under the canonical
@@ -283,9 +291,11 @@ function generateTypesFile(manifest: AppManifest): string {
   }
 
   // Generate Zod schemas for runtime validation
-  lines.push('// Zod schemas for runtime validation')
-  lines.push('')
-  for (const [resourceName, resource] of Object.entries(manifest.resources)) {
+  if (resources.length > 0) {
+    lines.push('// Zod schemas for runtime validation')
+    lines.push('')
+  }
+  for (const [resourceName, resource] of resources) {
     // Mirror the canonical `id` field added to the read type, so runtime
     // validation accepts the identifier the list output surfaces. Uses the same
     // runtime-targeting-aware resolution as the read type above.
@@ -379,7 +389,7 @@ function generateClientFile(
   port: number
 ): string {
   // Only resources that expose operations get a generated client.
-  const operationalResources = Object.entries(manifest.resources).filter(([name]) =>
+  const operationalResources = usableResources(manifest).filter(([name]) =>
     resourceHasOperations(manifest, name)
   )
 
@@ -390,7 +400,7 @@ function generateClientFile(
   // Find enum and resource types used in app-level commands that must be
   // imported from './types.js' in the generated client file.
   const typesUsedInAppCommands = new Set<string>()
-  for (const cmd of Object.values(manifest.commands)) {
+  for (const [, cmd] of usableCommands(manifest)) {
     if (cmd.scope === 'application') {
       for (const param of cmd.parameters) {
         const paramType = param.type as PropertyType | undefined
@@ -977,7 +987,8 @@ function generateResourceCommandMethod(routeSegment: string, cmd: Command): stri
  * Generate index file.
  */
 function generateIndexFile(manifest: AppManifest, appName: string): string {
-  const resourceExports = Object.keys(manifest.resources)
+  const resourceExports = usableResources(manifest)
+    .map(([r]) => r)
     .filter((r) => resourceHasOperations(manifest, r))
     .map((r) => `export { ${r}ResourceClient } from './resources/${r.toLowerCase()}.js';`)
     .join('\n')

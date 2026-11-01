@@ -42,7 +42,7 @@ import {
   type ManifestRoute,
 } from '../../manifest/index.js'
 import { lowerCamel } from '../../manifest/lower-camel.js'
-import { usableProperties } from '../../manifest/unsupported.js'
+import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -170,7 +170,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
       message: `${app}: ${position}: the type ${JSON.stringify(type)} names no resource or enum, so the contract describes it as unknown.`,
     })
   }
-  for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
+  for (const [resourceKey, resource] of usableResources(manifest)) {
     for (const [propName, prop] of usableProperties(resource)) {
       const position = `resources.${resourceKey}.properties.${propName}`
       check(prop.type, position)
@@ -186,7 +186,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
       }
     }
   }
-  for (const [commandKey, command] of Object.entries(manifest.commands)) {
+  for (const [commandKey, command] of usableCommands(manifest)) {
     for (const param of command.parameters) {
       check(param.type, `commands.${commandKey}.parameters.${param.name}`)
     }
@@ -321,7 +321,10 @@ interface NamespaceModel {
 /** The `@macts/contracts` value exports the contract module uses. */
 const CONTRACT_VALUE_IMPORTS = ['ValueTypes'] as const
 
-/** The `@macts/contracts` types every contract module uses. */
+/**
+ * The `@macts/contracts` types every contract module uses; `ValueType` only
+ * when the module declares a record or create input value type.
+ */
 const CONTRACT_BASE_TYPE_IMPORTS = [
   'AppContract',
   'CallOptions',
@@ -355,7 +358,7 @@ class ContractBuilder {
     this.#manifest = manifest
     this.#names = contractNames(manifest)
     this.#resolver = createNameResolver(manifest)
-    for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
+    for (const [resourceKey, resource] of usableResources(manifest)) {
       const identifier = this.#identifierProperty(resource)
       if (identifier !== undefined) {
         this.#identifiers.set(resourceKey, this.#map(identifier.type, 'output'))
@@ -396,7 +399,9 @@ class ContractBuilder {
 
     return [
       this.#renderHeader(),
-      this.#renderImports(),
+      // ValueType annotates the record and create input value types, which a
+      // manifest whose every resource is marked unsupported has none of.
+      this.#renderImports(recordValues.length + createValues.length > 0),
       'const t = ValueTypes\n',
       ...enumTypes,
       ...records,
@@ -639,7 +644,7 @@ class ContractBuilder {
 
   #deriveNamespaces(): NamespaceModel[] {
     const namespaces: NamespaceModel[] = []
-    for (const [resourceKey, resource] of Object.entries(this.#manifest.resources)) {
+    for (const [resourceKey, resource] of usableResources(this.#manifest)) {
       if (!resourceHasOperations(this.#manifest, resourceKey)) continue
       const commands = resourceCommandEntries(this.#manifest, resourceKey)
       const methods: MethodModel[] = []
@@ -824,8 +829,10 @@ class ContractBuilder {
 `
   }
 
-  #renderImports(): string {
-    const types: string[] = [...CONTRACT_BASE_TYPE_IMPORTS]
+  #renderImports(usesValueType: boolean): string {
+    const types: string[] = CONTRACT_BASE_TYPE_IMPORTS.filter(
+      (name) => usesValueType || name !== 'ValueType'
+    )
     const used: readonly ContractTypeName[] = [...this.#renderer.usedTypes]
     types.push(...used)
     const specifiers = [
@@ -854,7 +861,7 @@ class ContractBuilder {
   }
 
   #renderRecordInterfaces(): string[] {
-    return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+    return usableResources(this.#manifest).map(([resourceKey, resource]) => {
       const fields = this.#recordFields(resource)
       const doc = docComment(resource.description, '')
       if (fields.length === 0) return `${doc}export type ${resourceKey} = Record<string, never>\n`
@@ -869,7 +876,7 @@ class ContractBuilder {
   }
 
   #renderInputInterfaces(): string[] {
-    return Object.entries(this.#manifest.resources).flatMap(([resourceKey, resource]) => [
+    return usableResources(this.#manifest).flatMap(([resourceKey, resource]) => [
       this.#renderInputInterface(
         `${resourceKey}CreateInput`,
         `Input for creating ${withArticle(resource.name)}.`,
@@ -961,7 +968,7 @@ class ContractBuilder {
   }
 
   #renderRecordValueTypes(): string[] {
-    return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+    return usableResources(this.#manifest).map(([resourceKey, resource]) => {
       const binding = this.#recordBinding(resourceKey)
       this.#privateBindings.add(binding)
       const fields = this.#recordFields(resource)
@@ -984,7 +991,7 @@ class ContractBuilder {
   }
 
   #renderResourceTable(): string {
-    const entries = Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+    const entries = usableResources(this.#manifest).map(([resourceKey, resource]) => {
       const members = [
         `name: ${stringLiteral(resourceKey)}`,
         `record: ${this.#recordBinding(resourceKey)}`,
@@ -1152,7 +1159,7 @@ export const ${contract}: AppContract<${client}> = {
   #checkNames(namespaces: readonly NamespaceModel[], appMethods: readonly MethodModel[]): void {
     const exported = [
       ...Object.keys(this.#manifest.enums),
-      ...Object.keys(this.#manifest.resources).flatMap((key) => [
+      ...usableResources(this.#manifest).flatMap(([key]) => [
         key,
         `${key}CreateInput`,
         `${key}UpdateInput`,

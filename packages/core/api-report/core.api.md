@@ -221,6 +221,16 @@ export const AppManifestSchema: z.ZodObject<{
                     }> & z.core.$partial, z.ZodNumber>;
                 }, z.core.$strict>]>;
             }, z.core.$strip>>;
+            native: z.ZodOptional<z.ZodObject<{
+                name: z.ZodString;
+                evidence: z.ZodObject<{
+                    source: z.ZodLiteral<"dictionary">;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    term: z.ZodString;
+                }, z.core.$strict>;
+            }, z.core.$strict>>;
         }, z.core.$strip>>>;
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
             property: z.ZodString;
@@ -261,6 +271,37 @@ export const AppManifestSchema: z.ZodObject<{
             skipped: z.ZodArray<z.ZodString>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>;
+        native: z.ZodOptional<z.ZodObject<{
+            collection: z.ZodString;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
+        unsupported: z.ZodOptional<z.ZodObject<{
+            evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+                finding: z.ZodEnum<{
+                    "no-class": "no-class";
+                    "not-an-element": "not-an-element";
+                }>;
+            }, z.core.$strict>, z.ZodObject<{
+                source: z.ZodLiteral<"live">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                expression: z.ZodString;
+                errorNumber: z.ZodNumber;
+            }, z.core.$strict>], "source">;
+        }, z.core.$strict>>;
     }, z.core.$strip>>;
     enums: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodObject<{
         name: z.ZodString;
@@ -355,6 +396,17 @@ export const AppManifestSchema: z.ZodObject<{
             changed: z.ZodString;
             reason: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>>;
+        unsupported: z.ZodOptional<z.ZodObject<{
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"live">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                expression: z.ZodString;
+                errorNumber: z.ZodNumber;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
     }, z.core.$strip>>>;
     permissions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString>>>>;
     extraction: z.ZodOptional<z.ZodObject<{
@@ -872,6 +924,17 @@ export const CommandSchema: z.ZodObject<{
         changed: z.ZodString;
         reason: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>>;
+    unsupported: z.ZodOptional<z.ZodObject<{
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"live">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            expression: z.ZodString;
+            errorNumber: z.ZodNumber;
+        }, z.core.$strict>;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public (undocumented)
@@ -882,6 +945,22 @@ export const CommandScopeSchema: z.ZodEnum<{
     resource: "resource";
     application: "application";
 }>;
+
+// @public (undocumented)
+export type CommandUnsupported = z.infer<typeof CommandUnsupportedSchema>;
+
+// @public
+export const CommandUnsupportedSchema: z.ZodObject<{
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"live">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        expression: z.ZodString;
+        errorNumber: z.ZodNumber;
+    }, z.core.$strict>;
+}, z.core.$strict>;
 
 // @public
 export function compareDispositionStrictness(a: PolicyDisposition, b: PolicyDisposition): number;
@@ -1011,6 +1090,43 @@ export function deriveCapabilities(manifest: AppManifest): Capability[];
 
 // @public
 export function describePermissions(permissions: string[]): string;
+
+// @public (undocumented)
+export type DictionaryAbsenceEvidence = z.infer<typeof DictionaryAbsenceEvidenceSchema>;
+
+// @public
+export const DictionaryAbsenceEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+    finding: z.ZodEnum<{
+        "no-class": "no-class";
+        "not-an-element": "not-an-element";
+    }>;
+}, z.core.$strict>;
+
+// @public (undocumented)
+export type DictionaryAbsenceFinding = z.infer<typeof DictionaryAbsenceFindingSchema>;
+
+// @public
+export const DictionaryAbsenceFindingSchema: z.ZodEnum<{
+    "no-class": "no-class";
+    "not-an-element": "not-an-element";
+}>;
+
+// @public (undocumented)
+export type DictionarySpellingEvidence = z.infer<typeof DictionarySpellingEvidenceSchema>;
+
+// @public
+export const DictionarySpellingEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+}, z.core.$strict>;
 
 // @public
 export type DiscoverySearchOutcome = {
@@ -1843,6 +1959,20 @@ export interface LayeredPolicyEvaluation extends PolicyEvaluation {
 // @public
 export function listKnownPermissions(manifest: AppManifest): string[];
 
+// @public (undocumented)
+export type LiveAbsenceEvidence = z.infer<typeof LiveAbsenceEvidenceSchema>;
+
+// @public
+export const LiveAbsenceEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"live">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    expression: z.ZodString;
+    errorNumber: z.ZodNumber;
+}, z.core.$strict>;
+
 // @public
 export function loadCapabilityRegistry(manifestsDir: string): Promise<{
     registry: CapabilityRegistry;
@@ -2513,6 +2643,21 @@ export interface PropertyMergeOutcome {
     readonly property: string;
 }
 
+// @public (undocumented)
+export type PropertyNativeSpelling = z.infer<typeof PropertyNativeSpellingSchema>;
+
+// @public
+export const PropertyNativeSpellingSchema: z.ZodObject<{
+    name: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+
 // @public
 export type PropertyObservation = 'nullable' | 'non-null' | 'insufficient-sample' | 'read-failed' | 'not-read';
 
@@ -2612,6 +2757,16 @@ export const PropertySchema: z.ZodObject<{
             }> & z.core.$partial, z.ZodNumber>;
         }, z.core.$strict>]>;
     }, z.core.$strip>>;
+    native: z.ZodOptional<z.ZodObject<{
+        name: z.ZodString;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+        }, z.core.$strict>;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
 
 // @public (undocumented)
@@ -2847,6 +3002,30 @@ export function resolveResettability(property: Property): ResettabilityEvidence 
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;
 
+// @public (undocumented)
+export type ResourceAbsenceEvidence = z.infer<typeof ResourceAbsenceEvidenceSchema>;
+
+// @public
+export const ResourceAbsenceEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    source: z.ZodLiteral<"dictionary">;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    term: z.ZodString;
+    finding: z.ZodEnum<{
+        "no-class": "no-class";
+        "not-an-element": "not-an-element";
+    }>;
+}, z.core.$strict>, z.ZodObject<{
+    source: z.ZodLiteral<"live">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    expression: z.ZodString;
+    errorNumber: z.ZodNumber;
+}, z.core.$strict>], "source">;
+
 // @public
 export interface ResourceMergeOutcome {
     readonly block: NullabilityProbe;
@@ -2858,6 +3037,21 @@ export interface ResourceMergeOutcome {
     // (undocumented)
     readonly resource: string;
 }
+
+// @public (undocumented)
+export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>;
+
+// @public
+export const ResourceNativeSpellingSchema: z.ZodObject<{
+    collection: z.ZodString;
+    evidence: z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+    }, z.core.$strict>;
+}, z.core.$strict>;
 
 // @public
 export interface ResourceNullabilityResult {
@@ -2975,6 +3169,16 @@ export const ResourceSchema: z.ZodObject<{
                 }> & z.core.$partial, z.ZodNumber>;
             }, z.core.$strict>]>;
         }, z.core.$strip>>;
+        native: z.ZodOptional<z.ZodObject<{
+            name: z.ZodString;
+            evidence: z.ZodObject<{
+                source: z.ZodLiteral<"dictionary">;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                term: z.ZodString;
+            }, z.core.$strict>;
+        }, z.core.$strict>>;
     }, z.core.$strip>>>;
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         property: z.ZodString;
@@ -3015,7 +3219,64 @@ export const ResourceSchema: z.ZodObject<{
         skipped: z.ZodArray<z.ZodString>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>;
+    native: z.ZodOptional<z.ZodObject<{
+        collection: z.ZodString;
+        evidence: z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+        }, z.core.$strict>;
+    }, z.core.$strict>>;
+    unsupported: z.ZodOptional<z.ZodObject<{
+        evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
+            source: z.ZodLiteral<"dictionary">;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            term: z.ZodString;
+            finding: z.ZodEnum<{
+                "no-class": "no-class";
+                "not-an-element": "not-an-element";
+            }>;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodLiteral<"live">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            expression: z.ZodString;
+            errorNumber: z.ZodNumber;
+        }, z.core.$strict>], "source">;
+    }, z.core.$strict>>;
 }, z.core.$strip>;
+
+// @public (undocumented)
+export type ResourceUnsupported = z.infer<typeof ResourceUnsupportedSchema>;
+
+// @public
+export const ResourceUnsupportedSchema: z.ZodObject<{
+    evidence: z.ZodDiscriminatedUnion<[z.ZodObject<{
+        source: z.ZodLiteral<"dictionary">;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        term: z.ZodString;
+        finding: z.ZodEnum<{
+            "no-class": "no-class";
+            "not-an-element": "not-an-element";
+        }>;
+    }, z.core.$strict>, z.ZodObject<{
+        source: z.ZodLiteral<"live">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        expression: z.ZodString;
+        errorNumber: z.ZodNumber;
+    }, z.core.$strict>], "source">;
+}, z.core.$strict>;
 
 // @public
 export type RestrictionKind = 'path' | 'url';

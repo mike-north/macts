@@ -23,6 +23,8 @@
  */
 
 import type { AppManifest } from '../../manifest/index.js'
+import { normalizeTypeName } from '../../manifest/type-names.js'
+import { usableResources } from '../../manifest/unsupported.js'
 import type { DeclaredType } from '../surface.js'
 
 /**
@@ -89,26 +91,19 @@ export interface MappedType {
  */
 export interface NameResolver {
   /**
-   * The resource key a name refers to: matched against each resource's key,
-   * `name`, and `plural`.
+   * The resource key a name refers to: matched against each usable resource's
+   * key, `name`, and `plural`. A resource marked unsupported is on no
+   * generated surface, so a name that refers to it resolves to none.
    */
   resource(name: string): string | undefined
   /** The enum key a name refers to: matched against each enum's key. */
   enumeration(name: string): string | undefined
 }
 
-/**
- * Normalize a type name for matching: lowercased, with spaces, dashes, and
- * underscores removed, so `"text item"`, `"TextItem"`, and `"text-item"` match.
- */
-export function normalizeTypeName(name: string): string {
-  return name.toLowerCase().replace(/[\s_-]/g, '')
-}
-
 /** Build the name resolver for a manifest. */
 export function createNameResolver(manifest: AppManifest): NameResolver {
   const resources = new Map<string, string>()
-  for (const [key, resource] of Object.entries(manifest.resources)) {
+  for (const [key, resource] of usableResources(manifest)) {
     for (const alias of [key, resource.name, resource.plural]) {
       const normalized = normalizeTypeName(alias)
       // The first declared resource wins an alias two resources share.

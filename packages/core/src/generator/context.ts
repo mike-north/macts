@@ -1,4 +1,9 @@
 import type { AppManifest, Resource, Command, Enum } from '../manifest/index.js'
+import {
+  isUnsupportedResourceKey,
+  usableCommands,
+  usableResources,
+} from '../manifest/unsupported.js'
 
 export interface GeneratorOptions {
   /** Output directory for generated code */
@@ -40,13 +45,13 @@ export function createGeneratorContext(
   manifest: AppManifest,
   options: GeneratorOptions
 ): GeneratorContext {
-  const resourceMap = new Map(
-    Object.entries(manifest.resources).map(([name, resource]) => [name, resource])
-  )
+  // A resource or command marked unsupported generates nothing: each is left
+  // out of its map, and no command applies to a marked resource.
+  const resourceMap = new Map(usableResources(manifest))
 
   const enumMap = new Map(Object.entries(manifest.enums).map(([name, enumDef]) => [name, enumDef]))
 
-  const commandMap = new Map(Object.entries(manifest.commands).map(([name, cmd]) => [name, cmd]))
+  const commandMap = new Map(usableCommands(manifest))
 
   return {
     manifest,
@@ -69,6 +74,7 @@ export function createGeneratorContext(
     },
 
     getResourceCommands(resourceName: string): Command[] {
+      if (isUnsupportedResourceKey(manifest, resourceName)) return []
       return Array.from(commandMap.values()).filter((cmd) => {
         if (cmd.scope !== 'resource') return false
         if (!cmd.resourceType) return true // Applies to all resources

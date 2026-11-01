@@ -599,3 +599,61 @@ describe('CommandSchema', () => {
     })
   })
 })
+
+/**
+ * The command-level `unsupported` marker. Expected outcomes are derived by
+ * hand from phases/13 D10 (unsupported commands): the marker carries live
+ * absence evidence only, strict, and nothing else.
+ */
+describe('CommandSchema unsupported marker', () => {
+  const GET_SETTING = {
+    name: 'get',
+    description: 'Get a setting',
+    scope: 'resource',
+    resourceType: 'Setting',
+    parameters: [{ name: 'name', type: 'string', description: 'Setting name' }],
+  }
+  /** Automator 2.10 on macOS 27.2, which has no settings at the application. */
+  const LIVE = {
+    source: 'live',
+    observedAt: '2026-11-01T16:34:20.000Z',
+    bundleId: 'com.apple.Automator',
+    appVersion: '2.10',
+    osVersion: '27.2',
+    expression: 'the settings collection at the application',
+    errorNumber: -1728,
+  }
+
+  it('accepts live absence evidence', () => {
+    const parsed = CommandSchema.parse({ ...GET_SETTING, unsupported: { evidence: LIVE } })
+    expect(parsed.unsupported).toEqual({ evidence: LIVE })
+  })
+
+  it('is absent from an unmarked command', () => {
+    expect(CommandSchema.parse(GET_SETTING).unsupported).toBeUndefined()
+  })
+
+  it('rejects dictionary evidence: a command is shown unsupported only by observation', () => {
+    const dictionary = {
+      source: 'dictionary',
+      bundleId: 'com.apple.Automator',
+      appVersion: '2.10',
+      osVersion: '27.2',
+      term: 'setting',
+      finding: 'not-an-element',
+    }
+    expect(
+      CommandSchema.safeParse({ ...GET_SETTING, unsupported: { evidence: dictionary } }).success
+    ).toBe(false)
+  })
+
+  it('rejects a marker without evidence, or with an unknown field', () => {
+    expect(CommandSchema.safeParse({ ...GET_SETTING, unsupported: {} }).success).toBe(false)
+    expect(
+      CommandSchema.safeParse({
+        ...GET_SETTING,
+        unsupported: { evidence: LIVE, reason: 'x' },
+      }).success
+    ).toBe(false)
+  })
+})

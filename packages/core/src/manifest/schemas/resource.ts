@@ -1,7 +1,12 @@
 import { z } from 'zod'
 import { PropertySchema } from './property.js'
-import { ObservedAtSchema } from './evidence.js'
+import {
+  DictionarySpellingEvidenceSchema,
+  ObservedAtSchema,
+  ResourceAbsenceEvidenceSchema,
+} from './evidence.js'
 import { resolvePrimaryIdentifierProperty } from '../identifier.js'
+import { defaultCollectionAccessor } from '../native-accessor.js'
 
 /**
  * How the structured/runtime layer addresses a resource by its identifier.
@@ -168,6 +173,46 @@ export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>
 const RESOURCE_PLURAL_PATTERN = /^[A-Z][A-Za-z]*$/
 
 /**
+ * The app's own spelling of a resource's collection, recorded where it
+ * differs from the spelling derived from the plural
+ * (`defaultCollectionAccessor` in `../native-accessor.ts`), with the
+ * dictionary term that shows it.
+ *
+ * The plural stays the source of the resource's public segment on every
+ * surface; native bodies address the collection in the app by this accessor
+ * instead. Recording the derived spelling is redundant and rejected.
+ */
+export const ResourceNativeSpellingSchema = z
+  .object({
+    /** The accessor the automation bridge resolves for the collection, e.g. `airplayDevices`. */
+    collection: z.string().min(1),
+    /** The dictionary term the accessor is the bridge's spelling of. */
+    evidence: DictionarySpellingEvidenceSchema,
+  })
+  .strict()
+export type ResourceNativeSpelling = z.infer<typeof ResourceNativeSpellingSchema>
+
+/**
+ * The marker on a resource the app cannot provide: its dictionary has no
+ * collection for it, or the running app fails every read of it.
+ *
+ * The manifest keeps such a resource, so the record of what macts expected
+ * stays complete and the omission stays auditable; every generated surface
+ * (routes and the operations behind them, the contract, SDKs, tools, the CLI,
+ * capabilities and derived permissions) leaves out the resource, its
+ * hierarchy entries, and every entry nested under them. The marker is
+ * curated, from the dictionary or a live read-only observation: no probe
+ * writes or changes it.
+ */
+export const ResourceUnsupportedSchema = z
+  .object({
+    /** What the dictionary or the running app shows about the resource. */
+    evidence: ResourceAbsenceEvidenceSchema,
+  })
+  .strict()
+export type ResourceUnsupported = z.infer<typeof ResourceUnsupportedSchema>
+
+/**
  * Schema for a resource type definition.
  */
 export const ResourceSchema = z
@@ -209,8 +254,21 @@ export const ResourceSchema = z
      * `macts probe --nullability`. Absent until that probe has run.
      */
     nullabilityProbe: NullabilityProbeSchema.optional(),
+    /**
+     * The app's own spelling of the resource's collection, where it differs
+     * from the spelling derived from the plural. Absent means the derived
+     * spelling is the app's.
+     */
+    native: ResourceNativeSpellingSchema.optional(),
+    /**
+     * Set when the app cannot provide the resource (its dictionary has no
+     * collection for it, or every read of it fails), with the evidence.
+     * Generated surfaces omit a resource marked unsupported.
+     */
+    unsupported: ResourceUnsupportedSchema.optional(),
   })
   .superRefine((resource, ctx) => {
+    checkNativeSpellings(resource, ctx)
     // A resource is addressed by its primary identifier, so the identifier
     // must be readable: it cannot be marked unsupported.
     const identifier = resolvePrimaryIdentifierProperty(resource)
@@ -227,3 +285,47 @@ export const ResourceSchema = z
     }
   })
 export type Resource = z.infer<typeof ResourceSchema>
+
+/**
+ * A recorded native spelling must differ from the spelling it replaces: a
+ * collection's from the one derived from the plural, a property's from its
+ * key. A resource marked unsupported is never addressed, so it records no
+ * collection spelling.
+ */
+function checkNativeSpellings(
+  resource: {
+    readonly plural: string
+    readonly properties: Readonly<
+      Record<string, { readonly native?: { name: string } | undefined }>
+    >
+    readonly native?: { readonly collection: string } | undefined
+    readonly unsupported?: unknown
+  },
+  ctx: z.RefinementCtx
+): void {
+  const collection = resource.native?.collection
+  if (collection !== undefined && collection === defaultCollectionAccessor(resource.plural)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `The native collection "${collection}" is the spelling derived from the plural, so recording it is redundant: remove native.`,
+      path: ['native', 'collection'],
+    })
+  }
+  if (resource.native !== undefined && resource.unsupported !== undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      message:
+        'A resource marked unsupported is not addressed in the app, so it cannot record a native collection spelling.',
+      path: ['native'],
+    })
+  }
+  for (const [key, property] of Object.entries(resource.properties)) {
+    if (property.native?.name === key) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `The native name "${key}" is the property's key, so recording it is redundant: remove native.`,
+        path: ['properties', key, 'native', 'name'],
+      })
+    }
+  }
+}

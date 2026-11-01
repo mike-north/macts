@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { possibleValueKinds } from '../value-kinds.js'
 import {
+  DictionarySpellingEvidenceSchema,
   NullabilityEvidenceSchema,
   ResettabilityEvidenceSchema,
   UnsupportedSchema,
@@ -69,6 +70,26 @@ export const PropertyEvidenceSchema = z.object({
 export type PropertyEvidence = z.infer<typeof PropertyEvidenceSchema>
 
 /**
+ * The app's own spelling of a property, recorded where it differs from the
+ * property's manifest key, with the dictionary term that shows it.
+ *
+ * The key stays the property's public name in every generated surface and in
+ * every record returned to a caller; native bodies address the property in the
+ * app by this name instead (see `../native-accessor.ts`). Recording a name
+ * equal to the key is redundant and rejected, in `ResourceSchema`, which knows
+ * the key.
+ */
+export const PropertyNativeSpellingSchema = z
+  .object({
+    /** The name the automation bridge resolves for the property, e.g. `ansiBlackColor`. */
+    name: z.string().min(1),
+    /** The dictionary term the name is the bridge's spelling of. */
+    evidence: DictionarySpellingEvidenceSchema,
+  })
+  .strict()
+export type PropertyNativeSpelling = z.infer<typeof PropertyNativeSpellingSchema>
+
+/**
  * Schema for a single property definition.
  *
  * @remarks
@@ -80,8 +101,9 @@ export type PropertyEvidence = z.infer<typeof PropertyEvidenceSchema>
  * apply their defaults. `unsupported` marks a declared property that cannot
  * be used at runtime (the app cannot provide it, or returns values the
  * generated code cannot decode yet): generated surfaces omit it, and it
- * carries no nullability or resettability claim. Kind evidence must show only
- * kinds the declared type does not expect.
+ * carries no nullability or resettability claim and no native spelling. Kind
+ * evidence must show only kinds the declared type does not expect. `native`
+ * records the app's own spelling of the property where it differs from the key.
  */
 export const PropertySchema = z
   .object({
@@ -121,8 +143,21 @@ export const PropertySchema = z
      * Generated surfaces omit a property marked unsupported.
      */
     unsupported: UnsupportedSchema.optional(),
+    /**
+     * The app's own spelling of the property, where it differs from the key.
+     * Absent means the app spells it as the key.
+     */
+    native: PropertyNativeSpellingSchema.optional(),
   })
   .superRefine((property, ctx) => {
+    if (property.unsupported !== undefined && property.native !== undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'An unsupported property cannot record a native spelling: no body addresses it in the app.',
+        path: ['native'],
+      })
+    }
     if (
       property.unsupported !== undefined &&
       (property.nullable !== undefined || property.resettable !== undefined)

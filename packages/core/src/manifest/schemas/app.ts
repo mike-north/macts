@@ -6,6 +6,7 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
+import { findUnsupportedTypeReferences } from '../unsupported.js'
 
 /**
  * Coarse category to fine-grained permissions mapping.
@@ -72,6 +73,16 @@ export const AppManifestSchema = z
         code: 'custom',
         message: `Commands ${commandKeys.map((key) => `"${key}"`).join(', ')} all resolve to the route "${route}"; give each a distinct key or routeName.`,
         path: ['commands', commandKeys[1] ?? commandKeys[0] ?? ''],
+      })
+    }
+    // No generated surface declares a resource marked unsupported, so a usable
+    // declaration whose type names one would refer to nothing.
+    for (const { site, path, resourceKey } of findUnsupportedTypeReferences(data)) {
+      const declaration = path[0] === 'resources' ? 'the property' : 'the command'
+      ctx.addIssue({
+        code: 'custom',
+        message: `${site}: its type names the resource "${resourceKey}", which is marked unsupported, so no generated surface declares it; change the type, or mark ${declaration} unsupported too.`,
+        path: [...path],
       })
     }
   })

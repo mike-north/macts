@@ -42,7 +42,7 @@ import { Script } from 'node:vm'
 import * as ts from 'typescript'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
-import { loadManifest } from '../manifest/loader.js'
+import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import { resolveManifestRoutes } from '../manifest/route.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import type { Command } from '../manifest/schemas/command.js'
@@ -54,7 +54,11 @@ import {
   buildTargetExpression,
   planNativeInvocation,
 } from './native-scripts.js'
-import { defaultCollectionAccessor } from './collection-accessor.js'
+import {
+  defaultCollectionAccessor,
+  resolveCollectionAccessor,
+  resolvePropertyAccessor,
+} from '../manifest/native-accessor.js'
 
 const MANIFESTS_DIR = fileURLToPath(new URL('../../../../manifests/', import.meta.url))
 
@@ -379,11 +383,38 @@ describe('usable properties: a property marked unsupported is never read', () =>
     )
   })
 
-  it('a get reads every usable property and no unsupported one', () => {
-    const item = fakeSpecifier(true)
+  it('a get copies only usable fields from the property record, in one read', () => {
+    // The record holds every property the app reports, the unsupported ones
+    // included; only entireContents is usable.
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        item.used.push('properties')
+        return {
+          entireContents: 'contents',
+          expandable: true,
+          expanded: false,
+          completelyExpanded: false,
+          containerWindow: 'window',
+        }
+      },
+    })
     const app = { containers: { byId: () => item.specifier } }
     const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
-    expect(runBody(body, app, { id: 'c1' })).toBeUndefined()
+    expect(callBody(body, app, { id: 'c1' })).toEqual({ entireContents: 'contents' })
+    // The one round trip is the record read; no property is read on its own.
+    expect(item.used).toEqual(['properties'])
+  })
+
+  it('a get falling back to per-field reads reads only usable properties', () => {
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        throw new Error('the property record cannot be read')
+      },
+    })
+    const app = { containers: { byId: () => item.specifier } }
+    const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
+    // The stand-in has no entireContents, so its guarded read is omitted.
+    expect(callBody(body, app, { id: 'c1' })).toEqual({})
     expect(item.used).toEqual(['read entireContents'])
   })
 
@@ -624,6 +655,433 @@ describe('collection accessors', () => {
   })
 })
 
+// ---------------------------------------------------------------------------
+// Native spellings (issue #165)
+// ---------------------------------------------------------------------------
+
+/**
+ * A fixture app whose dictionary spells a collection and several properties
+ * differently from the manifest's public names, as Music spells "AirPlay
+ * devices" `airplayDevices` and System Events spells "MAC address"
+ * `macAddress`. Its manifest records each app spelling under `native`.
+ *
+ * - `AirPlayDevice` (public segment `airPlayDevices`, app collection
+ *   `airplayDevices`) is matched by its `mACAddress` (app `macAddress`), and
+ *   declares a writable `uRL` (app `url`) and a writable `name`, which the app
+ *   spells as the key.
+ * - `Stream`, nested under a device, is addressed by id; its identifier `uRL`
+ *   (app `url`) and its writable `eQ` (app `eq`) are recorded too.
+ */
+const SPEAKERS_YAML = `
+version: '1.0'
+app:
+  name: Speakers
+  bundleId: com.example.speakers
+resources:
+  AirPlayDevice:
+    name: AirPlayDevice
+    plural: AirPlayDevices
+    description: A speaker
+    native:
+      collection: airplayDevices
+      evidence: { source: dictionary, bundleId: com.example.speakers, appVersion: '1.0', osVersion: '27.2', term: AirPlay devices }
+    properties:
+      mACAddress:
+        access: r
+        description: The address
+        native:
+          name: macAddress
+          evidence: { source: dictionary, bundleId: com.example.speakers, appVersion: '1.0', osVersion: '27.2', term: MAC address }
+      uRL:
+        access: rw
+        description: The stream URL
+        native:
+          name: url
+          evidence: { source: dictionary, bundleId: com.example.speakers, appVersion: '1.0', osVersion: '27.2', term: URL }
+      name:
+        access: rw
+        description: The name
+    identifiers:
+      - { property: mACAddress, primary: true, targeting: byProperty }
+  Stream:
+    name: Stream
+    plural: Streams
+    description: A stream
+    properties:
+      uRL:
+        access: r
+        description: The stream URL
+        native:
+          name: url
+          evidence: { source: dictionary, bundleId: com.example.speakers, appVersion: '1.0', osVersion: '27.2', term: URL }
+      eQ:
+        access: rw
+        description: The equalizer
+        native:
+          name: eq
+          evidence: { source: dictionary, bundleId: com.example.speakers, appVersion: '1.0', osVersion: '27.2', term: EQ }
+    identifiers:
+      - { property: uRL, primary: true }
+hierarchy:
+  children: {}
+commands:
+  list: { name: list, description: list, scope: resource, resourceType: AirPlayDevice, parameters: [] }
+  get:
+    name: get
+    description: get
+    scope: resource
+    resourceType: AirPlayDevice
+    parameters: [{ name: id, type: string, description: id, required: true }]
+  create:
+    name: create
+    description: create
+    scope: resource
+    resourceType: AirPlayDevice
+    parameters:
+      - { name: name, type: string, description: name, required: true }
+      - { name: uRL, type: string, description: url, required: false }
+  update:
+    name: update
+    description: update
+    scope: resource
+    resourceType: AirPlayDevice
+    parameters:
+      - { name: id, type: string, description: id, required: true }
+      - { name: uRL, type: string, description: url, required: false }
+      - { name: name, type: string, description: name, required: false }
+  listStreams:
+    name: list
+    description: list streams
+    scope: resource
+    resourceType: Stream
+    parameters: [{ name: airPlayDeviceId, type: string, description: device, required: true }]
+  createStream:
+    name: create
+    description: create a stream
+    scope: resource
+    resourceType: Stream
+    parameters:
+      - { name: airPlayDeviceId, type: string, description: device, required: true }
+      - { name: eQ, type: string, description: eq, required: false }
+  updateStream:
+    name: update
+    description: update a stream
+    scope: resource
+    resourceType: Stream
+    parameters:
+      - { name: airPlayDeviceId, type: string, description: device, required: true }
+      - { name: id, type: string, description: id, required: true }
+      - { name: eQ, type: string, description: eq, required: false }
+`
+
+describe('native spellings: the app is addressed by its own names (issue #165)', () => {
+  const speakers = parseManifestYaml(SPEAKERS_YAML)
+  const body = (command: string, resource: string, typed = true): string =>
+    buildNativeBody(speakers, { command, resource }, { identifierAliases: !typed })
+
+  /** A resource of the fixture, by key. */
+  function resourceOf(key: string): Resource {
+    const resource = speakers.resources[key]
+    if (resource === undefined) throw new Error(`the fixture has no ${key}`)
+    return resource
+  }
+
+  /**
+   * A stand-in device that answers only to the app's spellings: reading a
+   * public key that differs (`mACAddress`, `uRL`) finds no function, so a
+   * body that used one would throw (or, guarded, omit the field) instead of
+   * reading a value. Assignments are recorded by name and not applied, so a
+   * read after an update still answers the original value. With
+   * `recordFails`, the whole-record read fails, as some apps' does. Every
+   * read, of the record or of one property, is recorded in `reads` by the
+   * app's name.
+   */
+  function fakeDevice(recordFails = false): {
+    device: object
+    writes: string[]
+    reads: string[]
+  } {
+    const writes: string[] = []
+    const reads: string[] = []
+    const values = { macAddress: 'a1', url: 'http://u', name: 'Den' }
+    const read = (name: keyof typeof values) => (): string => {
+      reads.push(name)
+      return values[name]
+    }
+    const device = new Proxy(
+      {
+        exists: () => true,
+        make: () => undefined,
+        properties: () => {
+          reads.push('properties')
+          if (recordFails) throw new Error('the property record cannot be read')
+          return { ...values }
+        },
+        macAddress: read('macAddress'),
+        url: read('url'),
+        name: read('name'),
+      },
+      {
+        set(_target, key) {
+          writes.push(String(key))
+          return true
+        },
+      }
+    )
+    return { device, writes, reads }
+  }
+
+  it('resolves the recorded collection, and the default where none is recorded', () => {
+    // "AirPlay devices": the first word lowercased whole gives airplayDevices;
+    // the plural's lower camel case would be airPlayDevices.
+    expect(resolveCollectionAccessor(resourceOf('AirPlayDevice'))).toBe('airplayDevices')
+    expect(resolveCollectionAccessor(resourceOf('Stream'))).toBe('streams')
+  })
+
+  it('resolves a recorded property name, and the key where none is recorded', () => {
+    const device = resourceOf('AirPlayDevice')
+    expect(resolvePropertyAccessor('uRL', device.properties['uRL'])).toBe('url')
+    expect(resolvePropertyAccessor('name', device.properties['name'])).toBe('name')
+    // A name that is not a declared property is addressed as written.
+    expect(resolvePropertyAccessor('calendarIdentifier', undefined)).toBe('calendarIdentifier')
+  })
+
+  it('a list addresses the recorded collection', () => {
+    expect(body('list', 'AirPlayDevice')).toContain('var items = app["airplayDevices"]();')
+    expect(body('list', 'AirPlayDevice')).not.toContain('app["airPlayDevices"]')
+  })
+
+  it('a list fast path copies each field from the app key into the public key', () => {
+    const text = body('list', 'AirPlayDevice')
+    expect(text).toContain('if (props["url"] !== undefined) { obj["uRL"] = props["url"]; }')
+    expect(text).not.toContain('props["uRL"]')
+  })
+
+  it('a list fallback reads each field by the app name', () => {
+    const text = body('list', 'AirPlayDevice')
+    expect(text).toContain('try { obj["uRL"] = item["url"](); } catch (e) {}')
+    expect(text).not.toContain('item["uRL"]')
+  })
+
+  it('a list reads the runtime identifier by the app name, in both paths', () => {
+    const text = body('list', 'AirPlayDevice')
+    expect(text).toContain('obj["mACAddress"] = props["macAddress"];')
+    expect(text).toContain('obj["mACAddress"] = item["macAddress"]();')
+    expect(text).not.toContain('props["mACAddress"]')
+    expect(text).not.toContain('item["mACAddress"]')
+  })
+
+  it('a list with identifier aliases mirrors the public identifier key', () => {
+    // The alias copies within the returned record, which is keyed publicly.
+    const text = body('list', 'AirPlayDevice', false)
+    expect(text).toContain('obj["mACAddress"] = item["macAddress"]();')
+    expect(text).toContain('obj["id"] = obj["mACAddress"];')
+  })
+
+  it('a list returns records keyed by the public names, in both paths', () => {
+    const fast = fakeDevice()
+    const app = { airplayDevices: () => [fast.device] }
+    expect(callBody(body('list', 'AirPlayDevice'), app, {})).toEqual([
+      { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
+    ])
+    const slow = fakeDevice(true)
+    const fallbackApp = { airplayDevices: () => [slow.device] }
+    expect(callBody(body('list', 'AirPlayDevice'), fallbackApp, {})).toEqual([
+      { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
+    ])
+  })
+
+  it('a property-matched lookup matches on the app name of the identifier', () => {
+    const text = body('get', 'AirPlayDevice')
+    expect(text).toContain('var item = app["airplayDevices"].whose({ "macAddress": itemId })[0];')
+    expect(text).not.toContain('"mACAddress":')
+    expect(buildTargetExpression(resourceOf('AirPlayDevice'), 'airplayDevices', 'v')).toBe(
+      'app["airplayDevices"].whose({ "macAddress": v })[0]'
+    )
+  })
+
+  it('a parent matched on its identifier is matched by the app name, through its collection', () => {
+    // listStreams' parent parameter `airPlayDeviceId` names AirPlayDevice.
+    const text = body('listStreams', 'Stream')
+    expect(text).toContain(
+      'var parent = app["airplayDevices"].whose({ "macAddress": parentId })[0];'
+    )
+    expect(text).toContain('var items = parent["streams"]();')
+  })
+
+  it('a get takes each property from the record by the app name into its public key', () => {
+    const text = body('get', 'AirPlayDevice')
+    expect(text).toContain('var props = item.properties();')
+    expect(text).toContain('if (props["url"] !== undefined) { obj["uRL"] = props["url"]; }')
+    expect(text).toContain(
+      'if (props["macAddress"] !== undefined) { obj["mACAddress"] = props["macAddress"]; }'
+    )
+    expect(text).toContain('if (props["name"] !== undefined) { obj["name"] = props["name"]; }')
+    expect(text).not.toContain('props["uRL"]')
+    expect(text).not.toContain('props["mACAddress"]')
+  })
+
+  it('a get fallback reads each property by the app name into its public key', () => {
+    const text = body('get', 'AirPlayDevice')
+    expect(text).toContain('try { obj["uRL"] = item["url"](); } catch (e) {}')
+    expect(text).toContain('try { obj["mACAddress"] = item["macAddress"](); } catch (e) {}')
+    expect(text).toContain('try { obj["name"] = item["name"](); } catch (e) {}')
+    expect(text).not.toContain('item["uRL"]')
+  })
+
+  /**
+   * get, create and update return the same record, built by one shared read.
+   * Each runs against a device that answers only to the app's spellings, so a
+   * public key read from the record or the item finds nothing. Expected, by
+   * hand: the device's values under the public keys mACAddress, uRL and name.
+   * The batched path reads the record once; the fallback reads the record,
+   * which fails, then each usable property by its app name in declaration
+   * order (macAddress, url, name).
+   */
+  const RECORD_OPERATIONS = [
+    {
+      command: 'get',
+      app: (device: object) => ({ airplayDevices: { whose: () => [device] } }),
+      args: { id: 'a1' },
+    },
+    {
+      command: 'create',
+      app: (device: object) => ({ AirPlayDevice: () => device }),
+      args: { name: 'Den', uRL: 'http://u' },
+    },
+    {
+      command: 'update',
+      app: (device: object) => ({ airplayDevices: { whose: () => [device] } }),
+      // The stand-in does not apply writes, so the record still holds http://u.
+      args: { id: 'a1', uRL: 'http://v' },
+    },
+  ] as const
+
+  it.each(RECORD_OPERATIONS)(
+    'a $command reads the record once and returns public keys',
+    ({ command, app, args }) => {
+      const { device, reads } = fakeDevice()
+      expect(callBody(body(command, 'AirPlayDevice'), app(device), args)).toEqual({
+        mACAddress: 'a1',
+        uRL: 'http://u',
+        name: 'Den',
+      })
+      expect(reads).toEqual(['properties'])
+    }
+  )
+
+  it.each(RECORD_OPERATIONS)(
+    'a $command falls back to per-property reads by the app names when the record fails',
+    ({ command, app, args }) => {
+      const { device, reads } = fakeDevice(true)
+      expect(callBody(body(command, 'AirPlayDevice'), app(device), args)).toEqual({
+        mACAddress: 'a1',
+        uRL: 'http://u',
+        name: 'Den',
+      })
+      expect(reads).toEqual(['properties', 'macAddress', 'url', 'name'])
+    }
+  )
+
+  it('a get finds the item by the app spelling and returns public keys', () => {
+    const { device } = fakeDevice()
+    const queries: unknown[] = []
+    const app = {
+      airplayDevices: {
+        whose: (query: unknown) => {
+          queries.push(query)
+          return [device]
+        },
+      },
+    }
+    expect(callBody(body('get', 'AirPlayDevice'), app, { id: 'a1' })).toEqual({
+      mACAddress: 'a1',
+      uRL: 'http://u',
+      name: 'Den',
+    })
+    expect(queries).toEqual([{ macAddress: 'a1' }])
+  })
+
+  it('a create keys the new item’s properties by the app names of the parameters', () => {
+    const text = body('create', 'AirPlayDevice')
+    expect(text).toContain(
+      'if (Object.prototype.hasOwnProperty.call(args, "uRL")) { props["url"] = args["uRL"]; }'
+    )
+    expect(text).toContain(
+      'if (Object.prototype.hasOwnProperty.call(args, "name")) { props["name"] = args["name"]; }'
+    )
+    expect(text).not.toContain('props["uRL"]')
+  })
+
+  it('a create returns the new item’s usable properties keyed by the public names', () => {
+    const text = body('create', 'AirPlayDevice')
+    expect(text).toContain('if (props["url"] !== undefined) { obj["uRL"] = props["url"]; }')
+    expect(text).toContain('try { obj["uRL"] = item["url"](); } catch (e) {}')
+    expect(text).toContain('return obj;')
+    const { device } = fakeDevice()
+    const constructed: unknown[] = []
+    const app = {
+      AirPlayDevice: (props: unknown) => {
+        constructed.push(props)
+        return device
+      },
+    }
+    expect(callBody(text, app, { name: 'Den', uRL: 'http://u' })).toEqual({
+      mACAddress: 'a1',
+      uRL: 'http://u',
+      name: 'Den',
+    })
+    expect(constructed).toEqual([{ name: 'Den', url: 'http://u' }])
+  })
+
+  it('a nested create keys its properties by the app names and appends to the parent', () => {
+    const text = body('createStream', 'Stream')
+    expect(text).toContain(
+      'var parent = app["airplayDevices"].whose({ "macAddress": parentId })[0];'
+    )
+    expect(text).toContain(
+      'if (Object.prototype.hasOwnProperty.call(args, "eQ")) { props["eq"] = args["eQ"]; }'
+    )
+    expect(text).toContain('parent["streams"].push(item);')
+    expect(text).toContain('try { obj["eQ"] = item["eq"](); } catch (e) {}')
+    expect(text).toContain('try { obj["uRL"] = item["url"](); } catch (e) {}')
+    expect(text).not.toContain('props["eQ"]')
+  })
+
+  it('an update assigns each field by the app name and returns public keys', () => {
+    const text = body('update', 'AirPlayDevice')
+    expect(text).toContain(
+      'if (Object.prototype.hasOwnProperty.call(args, "uRL")) { try { item["url"] = args["uRL"]; } catch (e) {} }'
+    )
+    expect(text).not.toContain('item["uRL"] =')
+    expect(text).toContain('if (props["url"] !== undefined) { obj["uRL"] = props["url"]; }')
+    expect(text).toContain('return obj;')
+    const { device, writes } = fakeDevice()
+    const app = { airplayDevices: { whose: () => [device] } }
+    expect(callBody(text, app, { id: 'a1', uRL: 'http://v' })).toEqual({
+      mACAddress: 'a1',
+      uRL: 'http://u',
+      name: 'Den',
+    })
+    expect(writes).toEqual(['url'])
+  })
+
+  it('a nested update addresses the child by id and assigns by the app name', () => {
+    const text = body('updateStream', 'Stream')
+    expect(text).toContain('var item = parent["streams"].byId(itemId);')
+    expect(text).toContain(
+      'if (Object.prototype.hasOwnProperty.call(args, "eQ")) { try { item["eq"] = args["eQ"]; } catch (e) {} }'
+    )
+  })
+
+  it('a byId list reads its identifier by the app name', () => {
+    // Stream is addressed by id, so its identifier `uRL` is read, never matched.
+    const text = body('listStreams', 'Stream')
+    expect(text).toContain('obj["uRL"] = props["url"];')
+    expect(text).toContain('obj["uRL"] = item["url"]();')
+  })
+})
+
 describe('Calendar bodies (shipped manifest)', () => {
   const body = (command: string, resource: string): string =>
     buildNativeBody(calendar, { command, resource })
@@ -680,7 +1138,16 @@ describe('Calendar bodies (shipped manifest)', () => {
     expect(text).toContain('var item = app["Event"](props);')
     expect(text).toContain('parent["events"].push(item);')
     expect(text).not.toContain('make({ at')
-    expect(text).toContain('return item.properties();')
+    // The result is built like a get's: each usable property taken from one
+    // record read, or read with its own guard when the record fails, keyed by
+    // its public name; the app's raw record is never returned.
+    expect(text).toContain('var props = item.properties();')
+    expect(text).toContain(
+      'if (props["summary"] !== undefined) { obj["summary"] = props["summary"]; }'
+    )
+    expect(text).toContain('try { obj["summary"] = item["summary"](); } catch (e) {}')
+    expect(text).toContain('return obj;')
+    expect(text).not.toContain('return props;')
   })
 
   it('createEvent rehydrates date parameters as Date objects', () => {
@@ -708,7 +1175,15 @@ describe('Calendar bodies (shipped manifest)', () => {
     )
     expect(text).not.toContain('item["id"] =')
     expect(text).not.toContain('item["calendarId"] =')
-    expect(text).toContain('return item.properties();')
+    // Like a create, the result is the item's usable properties read as a get
+    // reads them, from one record read with a guarded per-property fallback.
+    expect(text).toContain('var props = item.properties();')
+    expect(text).toContain(
+      'if (props["summary"] !== undefined) { obj["summary"] = props["summary"]; }'
+    )
+    expect(text).toContain('try { obj["summary"] = item["summary"](); } catch (e) {}')
+    expect(text).toContain('return obj;')
+    expect(text).not.toContain('return props;')
   })
 
   it('deleteEvent deletes the parent-scoped event', () => {

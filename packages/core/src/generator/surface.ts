@@ -18,7 +18,11 @@
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
-import { usableProperties } from '../manifest/unsupported.js'
+import {
+  isUnsupportedResourceKey,
+  usableCommands,
+  usableProperties,
+} from '../manifest/unsupported.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
 
 /**
@@ -113,32 +117,34 @@ export function commandAppliesToResource(cmd: Command, resourceName: string): bo
 
 /**
  * The commands that apply to a resource, as `[commandKey, command]` pairs in
- * manifest declaration order.
+ * manifest declaration order. None apply to a resource marked unsupported,
+ * which has no routes, and none is marked unsupported itself.
  */
 export function resourceCommandEntries(
   manifest: AppManifest,
   resourceName: string
 ): [string, Command][] {
-  return Object.entries(manifest.commands).filter(([, cmd]) =>
-    commandAppliesToResource(cmd, resourceName)
-  )
+  if (isUnsupportedResourceKey(manifest, resourceName)) return []
+  return usableCommands(manifest).filter(([, cmd]) => commandAppliesToResource(cmd, resourceName))
 }
 
 /**
  * The application-scoped commands, as `[commandKey, command]` pairs in manifest
- * declaration order. They become methods on the client root.
+ * declaration order, except those marked unsupported. They become methods on
+ * the client root.
  */
 export function appCommandEntries(manifest: AppManifest): [string, Command][] {
-  return Object.entries(manifest.commands).filter(([, cmd]) => cmd.scope === 'application')
+  return usableCommands(manifest).filter(([, cmd]) => cmd.scope === 'application')
 }
 
 /**
  * Whether a resource has at least one operation (CRUD or custom command).
  * Resources without operations get no client namespace: there is nothing to
- * call, and an empty namespace would be dead API surface.
+ * call, and an empty namespace would be dead API surface. A resource marked
+ * unsupported has none.
  */
 export function resourceHasOperations(manifest: AppManifest, resourceName: string): boolean {
-  return Object.values(manifest.commands).some((cmd) => commandAppliesToResource(cmd, resourceName))
+  return resourceCommandEntries(manifest, resourceName).length > 0
 }
 
 /**
@@ -304,13 +310,15 @@ export interface CreateInputField {
  * Command parameters are what the server validates, so a parameter overrides a
  * writable property of the same name, and identifier parameters that are not
  * properties (an Event's `calendarId`) are part of the input; without them a
- * create call could not send the identifier the server requires.
+ * create call could not send the identifier the server requires. A resource
+ * marked unsupported has no create input.
  */
 export function createInputFields(
   manifest: AppManifest,
   resourceName: string
 ): Map<string, CreateInputField> {
   const fields = new Map<string, CreateInputField>()
+  if (isUnsupportedResourceKey(manifest, resourceName)) return fields
   const resource = manifest.resources[resourceName]
   if (resource !== undefined) {
     for (const [propName, prop] of usableProperties(resource)) {

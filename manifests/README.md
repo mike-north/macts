@@ -259,6 +259,8 @@ resources:
 | `properties`  | object | No       | Property definitions (see [Properties](#properties))                                                                                                                                      |
 | `identifiers` | array  | No       | Identifier configuration (see [Identifiers](#identifiers))                                                                                                                                |
 | `schema`      | string | No       | Reference to JSON Schema file for full data shape                                                                                                                                         |
+| `native`      | object | No       | The app's own spelling of the collection, where it differs from the plural's lower camel case, with dictionary evidence (see [Native spellings](#native-spellings))                       |
+| `unsupported` | object | No       | Marks a resource the app cannot provide (no collection in its dictionary, or every read fails), with evidence (see [Unsupported resources](#unsupported-resources))                       |
 
 #### Properties
 
@@ -291,16 +293,17 @@ properties:
 
 ##### Property Fields
 
-| Field         | Type    | Required | Description                                                                                                             |
-| ------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `access`      | enum    | Yes      | Access mode: `r` (read-only) or `rw` (read-write)                                                                       |
-| `type`        | type    | No       | Property type (defaults to `string` if omitted)                                                                         |
-| `description` | string  | Yes      | Human-readable description                                                                                              |
-| `code`        | string  | No       | AppleScript four-character code                                                                                         |
-| `default`     | any     | No       | Default value                                                                                                           |
-| `optional`    | boolean | No       | Whether property is optional (defaults to `false`)                                                                      |
-| `deprecated`  | object  | No       | Deprecation information                                                                                                 |
-| `unsupported` | object  | No       | Marks a declared property the app cannot provide, with evidence (see [Unsupported properties](#unsupported-properties)) |
+| Field         | Type    | Required | Description                                                                                                                              |
+| ------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `access`      | enum    | Yes      | Access mode: `r` (read-only) or `rw` (read-write)                                                                                        |
+| `type`        | type    | No       | Property type (defaults to `string` if omitted)                                                                                          |
+| `description` | string  | Yes      | Human-readable description                                                                                                               |
+| `code`        | string  | No       | AppleScript four-character code                                                                                                          |
+| `default`     | any     | No       | Default value                                                                                                                            |
+| `optional`    | boolean | No       | Whether property is optional (defaults to `false`)                                                                                       |
+| `deprecated`  | object  | No       | Deprecation information                                                                                                                  |
+| `unsupported` | object  | No       | Marks a declared property the app cannot provide, with evidence (see [Unsupported properties](#unsupported-properties))                  |
+| `native`      | object  | No       | The app's own name for the property, where it differs from the key, with dictionary evidence (see [Native spellings](#native-spellings)) |
 
 ##### Property Types
 
@@ -441,6 +444,109 @@ be marked.
 
 **Schema:** [`UnsupportedSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
+##### Native spellings
+
+Every public name (routes, SDK accessors, tool names, permissions, and the keys
+of every record returned to a caller) is derived from the manifest: a
+resource's from the lower camel case of its plural, a property's from its key.
+The app addresses a collection or a property by its own spelling of the
+dictionary term, its first word lowercased whole and each later word
+capitalized. Where that spelling differs from the derived one, the manifest
+records it under `native`, with the dictionary term as evidence:
+
+```yaml
+AirPlayDevice:
+  name: AirPlayDevice
+  plural: AirPlayDevices # public segment: airPlayDevices
+  native:
+    collection: airplayDevices # "AirPlay devices"
+    evidence:
+      source: dictionary
+      bundleId: com.apple.Music
+      appVersion: 1.7.2
+      osVersion: '27.2'
+      term: AirPlay devices # exactly as the dictionary writes it
+```
+
+```yaml
+mACAddress: # public name
+  access: r
+  type: string
+  description: the MAC address for the interface
+  native:
+    name: macAddress # "MAC address"
+    evidence:
+      source: dictionary
+      bundleId: com.apple.systemevents
+      appVersion: 1.3.6
+      osVersion: '27.2'
+      term: MAC address
+```
+
+Recording the derived spelling is rejected as redundant. A property marked
+unsupported records no native name, and a resource marked unsupported no native
+collection. The native executor addresses the app by the recorded spelling, and
+returns records keyed by the public names.
+
+**Schemas:** [`ResourceNativeSpellingSchema`](../packages/core/src/manifest/schemas/resource.ts), [`PropertyNativeSpellingSchema`](../packages/core/src/manifest/schemas/property.ts), [`DictionarySpellingEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+
+##### Unsupported resources
+
+A manifest never drops a resource it declares. When the app's dictionary has
+no collection for it, the resource is marked `unsupported`, with the dictionary
+evidence:
+
+```yaml
+Connection:
+  name: Connection
+  plural: Connections
+  description: A screen sharing connection
+  unsupported:
+    evidence:
+      source: dictionary
+      bundleId: com.apple.ScreenSharing
+      appVersion: '7.1'
+      osVersion: '27.2'
+      term: connection # the term the manifest expected
+      finding: no-class # or not-an-element
+```
+
+The finding says how the dictionary lacks the collection: `no-class`, it
+declares no class with the resource's code or name; `not-an-element`, the class
+exists but no class has it as an element, so the app reaches it some other way
+(Finder's desktop is the application's `desktop` property).
+
+When the dictionary declares the resource but the running app fails every read
+of it, the marker carries live evidence instead, from a read-only observation:
+
+```yaml
+InstantMessage:
+  name: InstantMessage
+  plural: InstantMessages
+  description: Address for instant messaging.
+  unsupported:
+    evidence:
+      source: live
+      observedAt: '2026-11-01T16:40:48.000Z' # ISO 8601 UTC
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      expression: every property of the instant messages of a person, and the item property record
+      errorNumber: -1700 # the error the app raised
+```
+
+`expression` says in words what was addressed, never a value.
+
+Every generated surface leaves a marked resource out: it has no routes, so no
+operations, tools, capabilities or derived permissions, and the contract, the
+SDKs and the CLI omit it with its hierarchy entries and every entry nested
+under them. The manifest keeps it, so the omission stays auditable. A usable
+property, command parameter or command result whose type names a marked
+resource is rejected, since it would refer to nothing: change the type, or mark
+the property or command unsupported too.
+
+**Schemas:** [`ResourceUnsupportedSchema`](../packages/core/src/manifest/schemas/resource.ts), [`DictionaryAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
+
 #### Identifiers
 
 Identifiers define which properties uniquely identify a resource instance.
@@ -574,6 +680,12 @@ The `access` mode determines what operations are permitted:
 - `r` - Can read/list child resources only
 - `rw` - Can read, create, update, and delete child resources
 
+A resource that is also an element of the application is a top-level child as
+well as a nested one, keyed by the lower camel case of its plural, with the
+access of its nested entry. Reminders lists `reminders` both at the top level
+and under `lists`, and Automator lists `automatorActions` and `variables` both
+at the top level and under `workflows`.
+
 ---
 
 ### Relationships
@@ -680,6 +792,37 @@ commands:
 | `code`              | string          | No       | AppleScript four-character code                                      |
 | `permission`        | string          | No       | Fine-grained permission required (format: `app:resource:operation`)  |
 | `permissionHistory` | array           | No       | History of permission changes for upgrade messages                   |
+| `unsupported`       | object          | No       | Marks a command the running app cannot carry out, with live evidence |
+
+#### Unsupported commands
+
+A manifest never drops a command it declares. When a live, read-only
+observation shows the running app cannot carry it out, the command is marked
+`unsupported`, with live evidence in the form shown in
+[Unsupported resources](#unsupported-resources):
+
+```yaml
+getSetting:
+  name: get
+  routeName: get
+  scope: resource
+  resourceType: Setting
+  unsupported:
+    evidence:
+      source: live
+      observedAt: '2026-11-01T16:34:20.000Z'
+      bundleId: com.apple.Automator
+      appVersion: '2.10'
+      osVersion: '27.2'
+      expression: the settings collection at the application
+      errorNumber: -1728
+```
+
+A marked command has no route, so no operation, tool, capability or derived
+permission, and the SDKs and the CLI omit it. The manifest keeps it, so the
+omission stays auditable.
+
+**Schemas:** [`CommandUnsupportedSchema`](../packages/core/src/manifest/schemas/command.ts), [`LiveAbsenceEvidenceSchema`](../packages/core/src/manifest/schemas/evidence.ts)
 
 #### Command Scope
 
