@@ -1,7 +1,8 @@
 /**
  * Runtime probes of live apps: the identifier probe, which finds the property
  * that identifies each resource at runtime, and the nullability probe, which
- * observes (read-only, counts only) which properties an app leaves empty.
+ * observes (read-only, counts and kind labels only) which properties an app
+ * leaves empty and what kinds of values it returns.
  *
  * @packageDocumentation
  */
@@ -38,12 +39,16 @@ export {
 export {
   classifyPresence,
   mergeNullabilityObservations,
+  scanExhaustedNote,
   type ClaimChange,
   type IdentifierDefect,
+  type KindMismatchDefect,
   type NullabilityMergeResult,
   type PropertyMergeOutcome,
   type PropertyObservation,
+  type ReadFailureDefect,
   type ResourceMergeOutcome,
+  type UncheckedKinds,
 } from './nullability-merge.js'
 
 export {

@@ -61,11 +61,6 @@ export interface Calendar {
    */
   color: Rgb | null
   /**
-   * A unique calendar key.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly calendarIdentifier: string | null
-  /**
    * Whether the calendar can be modified.
    * Nullable. No evidence that the app always sets it.
    */
@@ -81,57 +76,57 @@ export interface Calendar {
 export interface Event {
   /**
    * The event summary/title.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   summary: string
   /**
    * The event notes.
-   * Nullable. Observed missing in 13 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 31 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   description: string | null
   /**
    * The event location.
-   * Nullable. Observed missing in 14 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 35 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   location: string | null
   /**
    * The event start date.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   startDate: Date
   /**
    * The event end date.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   endDate: Date
   /**
    * True if the event is an all-day event.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   alldayEvent: boolean
   /**
    * The iCalendar (RFC 2445) string describing the event recurrence, if defined.
-   * Nullable. Observed missing in 13 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 27 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   recurrence: string | null
   /**
    * The event status.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   status: EventStatus
   /**
    * The event version.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   readonly sequence: Integer
   /**
    * The event modification date.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 4 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
-  stampDate: Date
+  stampDate: Date | null
   /**
    * The exception dates for recurring events.
-   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   excludedDates: readonly Date[]
   /**
@@ -141,7 +136,7 @@ export interface Event {
   readonly uid: string
   /**
    * The URL associated with the event.
-   * Nullable. Observed missing in 14 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 32 of 44 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   url: string | null
 }
@@ -150,17 +145,17 @@ export interface Event {
 export interface Attendee {
   /**
    * The first and last name of the attendee.
-   * Nullable. Observed missing in 45 of 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 32 of 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   readonly displayName: string | null
   /**
    * Email address of the attendee.
-   * Never null: observed in all 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   readonly email: string
   /**
    * The invitation status for the attendee.
-   * Never null: observed in all 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 41 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   readonly participationStatus: ParticipationStatus
 }
@@ -177,7 +172,7 @@ export interface DisplayAlarm {
   triggerInterval: Integer | null
   /**
    * An absolute alarm date.
-   * Nullable. Observed missing in 52 of 52 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   * Nullable. Observed missing in 40 of 40 items (Calendar 27.0, macOS 27.2, 2026-11-01).
    */
   triggerDate: Date | null
 }
@@ -592,7 +587,6 @@ const calendarRecordType: ValueType<Calendar> = t.record(
     name: t.string({ description: 'The calendar title' }),
     title: t.nullable(t.string(), { description: 'The calendar title (synonym for name)' }),
     color: t.nullable(t.rgb(), { description: 'The calendar color' }),
-    calendarIdentifier: t.nullable(t.string(), { description: 'A unique calendar key' }),
     writable: t.nullable(t.boolean(), { description: 'Whether the calendar can be modified' }),
     description: t.nullable(t.string(), { description: 'The calendar description' }),
   },
@@ -612,7 +606,7 @@ const eventRecordType: ValueType<Event> = t.record(
     }),
     status: t.enumeration(eventStatusMembers, { description: 'The event status' }),
     sequence: t.integer({ description: 'The event version' }),
-    stampDate: t.date({ description: 'The event modification date' }),
+    stampDate: t.nullable(t.date(), { description: 'The event modification date' }),
     excludedDates: t.array(t.date(), { description: 'The exception dates for recurring events' }),
     uid: t.string({ description: 'A unique event key' }),
     url: t.nullable(t.string(), { description: 'The URL associated with the event' }),

@@ -16,6 +16,7 @@ import {
   resolvePrimaryIdentifierProperty,
   commandRouteSegment,
 } from '../../manifest/index.js'
+import { hasUsableProperty, usableProperties } from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
 import {
   appCommandEntries,
@@ -198,14 +199,15 @@ function generateTypesFile(manifest: AppManifest): string {
 
   // Generate resource types
   for (const [resourceName, resource] of Object.entries(manifest.resources)) {
-    const props = Object.entries(resource.properties)
+    const props = usableProperties(resource)
 
     // List output surfaces the resource's primary identifier under the canonical
     // `id` key (see the server list executor) so a consumer can always read
     // `item.id` to obtain the value sibling get/delete/write operations require,
     // regardless of the app-specific identifier property name. Surface that field
     // on the read type so it is type-visible — unless the manifest already
-    // declares a property literally named `id` (then `id` is a regular property).
+    // declares a usable property literally named `id` (then `id` is a regular
+    // property; one marked unsupported is not a field, so the alias is emitted).
     //
     // The value mirrors the RUNTIME targeting property, not necessarily the
     // declared identifier: a `byProperty` resource (e.g. Calendar, whose declared
@@ -214,7 +216,7 @@ function generateTypesFile(manifest: AppManifest): string {
     const targeting = resolveIdentifierTargeting(resource)
     const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
     const emitCanonicalId =
-      idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
+      idProperty !== undefined && !hasUsableProperty(resource, CANONICAL_IDENTIFIER_KEY)
 
     lines.push(`/** ${resource.description} */`)
     if (props.length === 0 && !emitCanonicalId) {
@@ -289,13 +291,13 @@ function generateTypesFile(manifest: AppManifest): string {
     const targeting = resolveIdentifierTargeting(resource)
     const idProperty = targeting?.property ?? resolvePrimaryIdentifierProperty(resource)
     const emitCanonicalId =
-      idProperty !== undefined && !Object.hasOwn(resource.properties, CANONICAL_IDENTIFIER_KEY)
+      idProperty !== undefined && !hasUsableProperty(resource, CANONICAL_IDENTIFIER_KEY)
 
     lines.push(`export const ${resourceName}Schema = z.object({`)
     if (emitCanonicalId) {
       lines.push(`  ${CANONICAL_IDENTIFIER_KEY}: z.string().optional(),`)
     }
-    for (const [propName, prop] of Object.entries(resource.properties)) {
+    for (const [propName, prop] of usableProperties(resource)) {
       const zodType = propertyTypeToZod(prop.type, prop.optional)
       lines.push(`  ${propName}: ${zodType},`)
     }

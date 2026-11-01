@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod'
+import { VALUE_KINDS } from '../value-kinds.js'
 
 /**
  * The fewest successful reads a probe must make, all of them non-null, before
@@ -126,6 +127,145 @@ export const ResettabilityEvidenceSchema = z.object({
   appVersion: z.string().min(1).optional(),
 })
 export type ResettabilityEvidence = z.infer<typeof ResettabilityEvidenceSchema>
+
+/**
+ * Evidence that a property the app declares cannot be read at runtime: a live,
+ * read-only observation in which every read of it failed.
+ *
+ * Like nullability evidence it records the app build and macOS version it
+ * holds for, and counts only, never a value. It adds the distinct error
+ * numbers the failed reads raised, which tell a missing implementation from a
+ * misnamed property or a permission problem.
+ */
+export const UnsupportedReadFailureEvidenceSchema = z
+  .object({
+    source: z.literal('probe'),
+    /** When the observation was made: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** The bundle identifier of the observed app. */
+    bundleId: z.string().min(1),
+    /** The observed app's version. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app ran on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /** Items whose read of the property was attempted: at least one. */
+    sampleSize: z.number().int().min(1),
+    /** Reads that failed: every one, so equal to `sampleSize`. */
+    failedReads: CountSchema,
+    /** The distinct error numbers the failed reads raised: at least one. */
+    errorNumbers: z.array(z.number().int()).min(1),
+  })
+  .strict()
+  .superRefine((evidence, ctx) => {
+    if (evidence.failedReads !== evidence.sampleSize) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'A property is unsupported only when every read failed: failedReads must equal sampleSize.',
+        path: ['failedReads'],
+      })
+    }
+    if (new Set(evidence.errorNumbers).size !== evidence.errorNumbers.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'errorNumbers lists each distinct error number once.',
+        path: ['errorNumbers'],
+      })
+    }
+  })
+export type UnsupportedReadFailureEvidence = z.infer<typeof UnsupportedReadFailureEvidenceSchema>
+
+/**
+ * Evidence that the values of a property the app declares cannot be decoded
+ * yet: a live, read-only observation in which the reads succeeded but every
+ * value had a kind its declared type does not expect (a property declared
+ * `string` whose values are object references, say). Without the marker,
+ * every read of the resource would fail to decode.
+ *
+ * It records the app build and macOS version, and the values counted by kind
+ * label (see `../value-kinds.ts`), never a value. That no observed kind is one
+ * the declared type expects is checked against the property's type, in
+ * `PropertySchema`.
+ */
+export const UnsupportedKindEvidenceSchema = z
+  .object({
+    source: z.literal('probe'),
+    /** When the observation was made: an ISO 8601 UTC timestamp. */
+    observedAt: ObservedAtSchema,
+    /** The bundle identifier of the observed app. */
+    bundleId: z.string().min(1),
+    /** The observed app's version. */
+    appVersion: z.string().min(1),
+    /** The macOS product version the app ran on, e.g. `27.2`. */
+    osVersion: z.string().min(1),
+    /** Values whose kind was observed: at least one. */
+    sampleSize: z.number().int().min(1),
+    /**
+     * The observed values counted by kind label, e.g. `{ reference: 18 }`:
+     * labels from `VALUE_KINDS` only, each count at least one, summing to
+     * `sampleSize`.
+     */
+    observedKinds: z.partialRecord(z.enum(VALUE_KINDS), z.number().int().min(1)),
+  })
+  .strict()
+  .superRefine((evidence, ctx) => {
+    const total = Object.values(evidence.observedKinds).reduce<number>(
+      (sum, count) => sum + count,
+      0
+    )
+    if (total !== evidence.sampleSize) {
+      ctx.addIssue({
+        code: 'custom',
+        message:
+          'The observedKinds counts must sum to sampleSize: every value observed has one kind.',
+        path: ['observedKinds'],
+      })
+    }
+  })
+export type UnsupportedKindEvidence = z.infer<typeof UnsupportedKindEvidenceSchema>
+
+/**
+ * The evidence behind an `unsupported` marker, in one of two forms: every
+ * read failed ({@link UnsupportedReadFailureEvidenceSchema}), or every value
+ * had a kind the declared type does not expect
+ * ({@link UnsupportedKindEvidenceSchema}).
+ */
+export const UnsupportedEvidenceSchema = z.union([
+  UnsupportedReadFailureEvidenceSchema,
+  UnsupportedKindEvidenceSchema,
+])
+export type UnsupportedEvidence = z.infer<typeof UnsupportedEvidenceSchema>
+
+/**
+ * The marker on a property the app's dictionary declares but that cannot be
+ * used at runtime, as its evidence shows: the app cannot provide it
+ * (unimplemented, obsolete, or otherwise unreadable), or it returns values of
+ * a kind the generated code cannot decode yet.
+ *
+ * The manifest keeps such a property, so the record of what the dictionary
+ * declares stays complete and the omission stays auditable; every generated
+ * surface (the contract, SDKs, tool schemas, the CLI) leaves it out, and the
+ * nullability probe does not read it. The marker is curated: no probe writes
+ * or changes it. A property marked unsupported carries no nullability or
+ * resettability claim, and a resource's primary identifier cannot be marked.
+ */
+export const UnsupportedSchema = z.object({
+  /** Why the property cannot be used, in prose. */
+  reason: z.string().min(1),
+  /**
+   * The dictionary's own availability note for the property, when it has one,
+   * e.g. `NOT AVAILABLE YET` or `AVAILABLE IN 10.1 TO 10.4`.
+   */
+  dictionaryNote: z.string().min(1).optional(),
+  /**
+   * The issue whose fix will remove the marker, by number, e.g. the issue
+   * that adds a conversion for the value kind the app returns.
+   */
+  trackingIssue: z.number().int().positive().optional(),
+  /** The observation that shows the property cannot be used. */
+  evidence: UnsupportedEvidenceSchema,
+})
+export type Unsupported = z.infer<typeof UnsupportedSchema>
 
 /** The parts of a field that make or support a nullability claim. */
 interface NullabilityClaim {

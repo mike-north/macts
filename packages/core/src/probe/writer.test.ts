@@ -23,7 +23,12 @@ import { isNode, parseDocument } from 'yaml'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { parseManifestYaml } from '../manifest/loader.js'
 import type { NullabilityProbe } from '../manifest/schemas/resource.js'
-import type { NullabilityMergeResult, PropertyMergeOutcome } from './nullability-merge.js'
+import type { AppNullabilityResult } from './nullability.js'
+import {
+  mergeNullabilityObservations,
+  type NullabilityMergeResult,
+  type PropertyMergeOutcome,
+} from './nullability-merge.js'
 import type { AppProbeResult } from './probe.js'
 import { writeNullabilityResults, writeProbeResults } from './writer.js'
 
@@ -425,6 +430,160 @@ commands: {}
   })
 })
 
+describe('writeNullabilityResults: a property whose every read failed', () => {
+  it('writes no claim for it, and the usual probe block', async () => {
+    const path = join(dir, 'app.yaml')
+    await writeFile(path, CLAIMS_MANIFEST)
+    // Through the real merge: every one of 40 reads of `created` failed, a
+    // read-failure defect; the identifier and the rest read cleanly.
+    const observed: AppNullabilityResult = {
+      bundleId: 'com.example.jotter',
+      appName: 'Jotter',
+      appVersion: '2.1',
+      osVersion: '27.2',
+      observedAt: PROBED_AT,
+      resources: {
+        Note: {
+          resource: 'Note',
+          accessPath: 'notes',
+          status: 'probed',
+          itemsRead: 40,
+          sampledParents: 1,
+          parentsScanned: 1,
+          truncated: false,
+          presence: {
+            uid: { reads: 40, nulls: 0, failures: 0 },
+            created: { reads: 0, nulls: 0, failures: 40 },
+          },
+          skipped: [],
+        },
+      },
+    }
+    const decisions = mergeNullabilityObservations(parseManifestYaml(CLAIMS_MANIFEST), observed)
+    expect(decisions.resources[0]?.readFailureDefects).toEqual([
+      { property: 'created', itemsRead: 40, failed: 40 },
+    ])
+    await writeNullabilityResults(path, decisions)
+
+    const runs = insertedRuns(CLAIMS_MANIFEST, await readFile(path, 'utf-8'))
+    // Only the probe block is inserted: nothing under `created` (or `uid`).
+    expect(runs).toHaveLength(1)
+    expect(parseBlock(runs[0] ?? [])).toEqual({
+      nullabilityProbe: {
+        observedAt: PROBED_AT,
+        bundleId: 'com.example.jotter',
+        appVersion: '2.1',
+        osVersion: '27.2',
+        accessPath: 'notes',
+        itemsRead: 40,
+        sampledParents: 1,
+        parentsScanned: 1,
+        status: 'probed',
+        skipped: [],
+      },
+    })
+    const created = parseManifestYaml(await readFile(path, 'utf-8')).resources['Note']?.properties[
+      'created'
+    ]
+    expect(created?.nullable).toBeUndefined()
+    expect(created?.evidence).toBeUndefined()
+  })
+})
+
+/**
+ * `CLAIMS_MANIFEST` with `created` marked unsupported. The error numbers are a
+ * block list: the writer re-serializes a flow list with inner padding
+ * (`[ -1728 ]`), which would hide whether it touched the marker.
+ */
+const MARKED_MANIFEST = CLAIMS_MANIFEST.replace(
+  `        description: Created
+`,
+  `        description: Created
+        unsupported:
+          reason: Jotter does not record creation dates.
+          dictionaryNote: NOT AVAILABLE YET
+          evidence:
+            source: probe
+            observedAt: '2026-10-30T12:00:00.000Z'
+            bundleId: com.example.jotter
+            appVersion: '2.1'
+            osVersion: '27.2'
+            sampleSize: 40
+            failedReads: 40
+            errorNumbers:
+              - -1728
+`
+)
+
+describe('writeNullabilityResults: a property marked unsupported', () => {
+  it('never adds, changes, or removes the marker, and writes no claim beside it', async () => {
+    expect(MARKED_MANIFEST).not.toBe(CLAIMS_MANIFEST)
+    const path = join(dir, 'app.yaml')
+    await writeFile(path, MARKED_MANIFEST)
+    // Through the real merge, with observations of `created` that would set a
+    // nullable claim on an unmarked property (empty values seen) and of
+    // `label` whose every read failed (a defect, not a marker).
+    const observed: AppNullabilityResult = {
+      bundleId: 'com.example.jotter',
+      appName: 'Jotter',
+      appVersion: '2.1',
+      osVersion: '27.2',
+      observedAt: PROBED_AT,
+      resources: {
+        Note: {
+          resource: 'Note',
+          accessPath: 'notes',
+          status: 'probed',
+          itemsRead: 40,
+          sampledParents: 1,
+          parentsScanned: 1,
+          truncated: false,
+          presence: {
+            uid: { reads: 40, nulls: 0, failures: 0 },
+            created: { reads: 40, nulls: 3, failures: 0 },
+            label: { reads: 0, nulls: 0, failures: 40 },
+          },
+          skipped: [],
+        },
+      },
+    }
+    const decisions = mergeNullabilityObservations(parseManifestYaml(MARKED_MANIFEST), observed)
+    expect(decisions.resources[0]?.readFailureDefects).toEqual([
+      { property: 'label', itemsRead: 40, failed: 40 },
+    ])
+    await writeNullabilityResults(path, decisions)
+
+    const after = await readFile(path, 'utf-8')
+    // Only the probe block is inserted: `created` keeps its marker byte for
+    // byte and gains no claim, and `label` gains no marker.
+    const runs = insertedRuns(MARKED_MANIFEST, after)
+    expect(runs).toHaveLength(1)
+    expect(Object.keys(parseBlock(runs[0] ?? []) as object)).toEqual(['nullabilityProbe'])
+    const note = parseManifestYaml(after).resources['Note']
+    expect(note?.properties['created']).toEqual({
+      access: 'r',
+      type: 'date',
+      description: 'Created',
+      optional: false,
+      unsupported: {
+        reason: 'Jotter does not record creation dates.',
+        dictionaryNote: 'NOT AVAILABLE YET',
+        evidence: {
+          source: 'probe',
+          observedAt: '2026-10-30T12:00:00.000Z',
+          bundleId: 'com.example.jotter',
+          appVersion: '2.1',
+          osVersion: '27.2',
+          sampleSize: 40,
+          failedReads: 40,
+          errorNumbers: [-1728],
+        },
+      },
+    })
+    expect(note?.properties['label']?.unsupported).toBeUndefined()
+  })
+})
+
 /** A probe block for `merged()`'s Note resource, read with `itemsRead` items. */
 function noteBlock(status: NullabilityProbe['status'], itemsRead: number): NullabilityProbe {
   return {
@@ -686,9 +845,11 @@ describe('writeNullabilityResults on committed manifests (regression)', () => {
     const before = await readFile(path, 'utf-8')
     const reminder = parseManifestYaml(before).resources['Reminder']
     // The fixture's premises: priority has a probe non-null claim to refresh,
-    // allDayDueDate has no claim yet, and some claims are curated.
+    // body is declared with no claim (the probe skips it as large content, so
+    // no probe run gives it one), and some claims are curated.
     expect(reminder?.properties['priority']?.evidence?.nullable?.source).toBe('probe')
-    expect(reminder?.properties['allDayDueDate']?.nullable).toBeUndefined()
+    expect(reminder?.properties['body']).toBeDefined()
+    expect(reminder?.properties['body']?.nullable).toBeUndefined()
     const curated = curatedClaimTexts(before)
     expect(curated.size).toBeGreaterThan(0)
 
@@ -714,7 +875,7 @@ describe('writeNullabilityResults on committed manifests (regression)', () => {
           block,
           properties: [
             claimOutcome('priority', 'refreshed', refreshed),
-            claimOutcome('allDayDueDate', 'set', inserted),
+            claimOutcome('body', 'set', inserted),
           ],
         },
       ],
@@ -743,7 +904,7 @@ describe('writeNullabilityResults on committed manifests (regression)', () => {
       nullable: false,
       evidence: { nullable: refreshed },
     })
-    expect(written?.properties['allDayDueDate']).toMatchObject({
+    expect(written?.properties['body']).toMatchObject({
       nullable: true,
       evidence: { nullable: inserted },
     })

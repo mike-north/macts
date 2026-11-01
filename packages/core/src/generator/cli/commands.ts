@@ -3,6 +3,7 @@ import type {
   Command as ManifestCommand,
   CommandParameter,
 } from '../../manifest/index.js'
+import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
 import { safeIdentifier } from '../surface.js'
 
@@ -551,7 +552,7 @@ function generateListParamOptions(params: CommandParameter[]): string {
 function generatePropertyFlags(resource: Resource, ctx: CliGeneratorContext): string {
   const flags: string[] = []
 
-  for (const [propName, prop] of Object.entries(resource.properties)) {
+  for (const [propName, prop] of usableProperties(resource)) {
     if (prop.access !== 'rw') continue
 
     const flagName = toKebabCase(propName)
@@ -609,7 +610,7 @@ function generateParameterFlag(
 function generateListFieldMapping(resource: Resource, indent = '        '): string {
   const fields: string[] = []
 
-  for (const [propName] of Object.entries(resource.properties)) {
+  for (const [propName] of usableProperties(resource)) {
     fields.push(`${indent}${propName}: item.${propName},`)
   }
 
@@ -619,7 +620,7 @@ function generateListFieldMapping(resource: Resource, indent = '        '): stri
 function generateCreateInput(resource: Resource): string {
   const fields: string[] = []
 
-  for (const [propName, prop] of Object.entries(resource.properties)) {
+  for (const [propName, prop] of usableProperties(resource)) {
     if (prop.access === 'rw') {
       fields.push(`        ${propName}: this.${propName},`)
     }

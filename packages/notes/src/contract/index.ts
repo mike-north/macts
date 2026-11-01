@@ -61,11 +61,6 @@ export interface Folder {
    */
   readonly id: string | null
   /**
-   * The container of the folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly container?: string | null
-  /**
    * Whether the folder is shared.
    * Nullable. No evidence that the app always sets it.
    */
@@ -278,7 +273,6 @@ const folderRecordType: ValueType<Folder> = t.record(
   {
     name: t.string({ description: 'The name of the folder' }),
     id: t.nullable(t.string(), { description: 'The unique identifier of the folder' }),
-    container: t.optional(t.nullable(t.string(), { description: 'The container of the folder' })),
     shared: t.nullable(t.boolean(), { description: 'Whether the folder is shared' }),
   },
   { description: 'A Notes folder' }

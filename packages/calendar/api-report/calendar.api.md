@@ -28,7 +28,6 @@ export type AttendeeUpdateInput = Partial<AttendeeCreateInput>;
 
 // @public
 export interface Calendar {
-    calendarIdentifier: string;
     color: {
         r: number;
         g: number;
@@ -98,7 +97,6 @@ export const CalendarSchema: z.ZodObject<{
         green: z.ZodNumber;
         blue: z.ZodNumber;
     }, z.core.$strip>;
-    calendarIdentifier: z.ZodString;
     writable: z.ZodBoolean;
     description: z.ZodString;
 }, z.core.$strip>;

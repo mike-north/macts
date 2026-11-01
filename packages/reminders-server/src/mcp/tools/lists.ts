@@ -63,7 +63,7 @@ export const listsCreateTool: McpToolDefinition = {
       },
       color: {
         description: 'List color',
-        type: 'object',
+        type: 'string',
       },
       emblem: {
         description: 'The emblem icon name of the list',

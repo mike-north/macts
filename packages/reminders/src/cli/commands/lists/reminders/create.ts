@@ -33,7 +33,7 @@ export class CreateReminderCommand extends Command {
     description: 'The priority of the reminder (0=none, 1=high, 5=medium, 9=low)',
   })
   flagged = Option.Boolean('--flagged', { description: 'Whether the reminder is flagged' })
-  allDayDueDate = Option.String('--all-day-due-date', {
+  alldayDueDate = Option.String('--allday-due-date', {
     required: true,
     description: 'The all-day due date of the reminder',
   })
@@ -55,7 +55,7 @@ export class CreateReminderCommand extends Command {
         remindMeDate: this.remindMeDate,
         priority: this.priority,
         flagged: this.flagged,
-        allDayDueDate: this.allDayDueDate,
+        alldayDueDate: this.alldayDueDate,
       } as unknown as Parameters<typeof client.reminders.create>[0])
 
       const output = formatter.format({
@@ -71,7 +71,7 @@ export class CreateReminderCommand extends Command {
         flagged: item.flagged,
         creationDate: item.creationDate,
         modificationDate: item.modificationDate,
-        allDayDueDate: item.allDayDueDate,
+        alldayDueDate: item.alldayDueDate,
       })
 
       this.context.stdout.write(output + '\n')

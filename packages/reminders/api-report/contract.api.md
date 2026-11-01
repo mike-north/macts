@@ -7,7 +7,6 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
-import { Rgb } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -28,7 +27,7 @@ export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export interface List {
-    color: Rgb | null;
+    color: string | null;
     emblem: string | null;
     readonly id: string;
     name: string | null;
@@ -36,7 +35,7 @@ export interface List {
 
 // @public
 export interface ListCreateInput {
-    color?: Rgb;
+    color?: string;
     emblem?: string;
     name: string;
 }
@@ -50,14 +49,14 @@ export interface ListResourceClient {
 
 // @public
 export interface ListUpdateInput {
-    color?: Rgb;
+    color?: string;
     emblem?: string;
     name?: string;
 }
 
 // @public
 export interface Reminder {
-    allDayDueDate: Date | null;
+    alldayDueDate: Date | null;
     body: string | null;
     completed: boolean;
     readonly completionDate: Date | null;
@@ -73,7 +72,7 @@ export interface Reminder {
 
 // @public
 export interface ReminderCreateInput {
-    allDayDueDate?: Date;
+    alldayDueDate?: Date;
     body?: string;
     completed?: boolean;
     dueDate?: Date;
@@ -109,7 +108,7 @@ export const remindersContract: AppContract<RemindersClient>;
 
 // @public
 export interface ReminderUpdateInput {
-    allDayDueDate?: Date;
+    alldayDueDate?: Date;
     body?: string;
     completed?: boolean;
     dueDate?: Date;

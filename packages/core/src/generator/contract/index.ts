@@ -41,6 +41,7 @@ import {
   resolveResettability,
   type ManifestRoute,
 } from '../../manifest/index.js'
+import { usableProperties } from '../../manifest/unsupported.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -181,7 +182,7 @@ export function collectContractDiagnostics(manifest: AppManifest): ContractDiagn
     })
   }
   for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
-    for (const [propName, prop] of Object.entries(resource.properties)) {
+    for (const [propName, prop] of usableProperties(resource)) {
       const position = `resources.${resourceKey}.properties.${propName}`
       check(prop.type, position)
       const evidence = ignoredIdentifierNullability(resource, propName, prop)
@@ -540,7 +541,7 @@ class ContractBuilder {
    * `resolveReadNullability`), and optional when the manifest says so.
    */
   #recordFields(resource: Resource): (FieldModel & { readonly readOnly: boolean })[] {
-    return Object.entries(resource.properties).map(([name, prop]) => {
+    return usableProperties(resource).map(([name, prop]) => {
       const resolution = resolveReadNullability(resource, name, prop)
       const shape = this.#map(prop.type, 'output')
       return {

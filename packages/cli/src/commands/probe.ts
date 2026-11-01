@@ -42,6 +42,17 @@
  * by the rules in `mergeNullabilityObservations`, plus a `nullabilityProbe`
  * block per resource.
  *
+ * Three kinds of manifest defect are reported, in the output and the JSON,
+ * and none changes the exit status: a primary identifier that is not present
+ * in every item read; a property whose every read failed (most likely a name
+ * the app does not recognize, or one the app cannot provide); and a property
+ * whose values have a kind its declared type does not expect (declared
+ * `string`, returned dates), from the value kinds the probe counts. None gets
+ * a claim. A property whose declared type has no expected kinds is listed as
+ * not checked. For the second, the report suggests the manifest's curated
+ * `unsupported` marker with the counts observed; the probe never writes that
+ * marker, and it skips a property that already carries it.
+ *
  * @packageDocumentation
  */
 
@@ -52,11 +63,13 @@ import {
   DEFAULT_NULLABILITY_BUDGET_MS,
   DEFAULT_NULLABILITY_ENVIRONMENT,
   MAX_ITEMS_PER_COLLECTION,
+  VALUE_KINDS,
   loadManifest,
   mergeNullabilityObservations,
   probeManifest,
   probeNullability,
   runWithApp,
+  scanExhaustedNote,
   writeNullabilityResults,
   writeProbeResults,
 } from '@macts/core'
@@ -66,10 +79,14 @@ import type {
   AppProbeResult,
   IdentifierDefect,
   JxaRunner,
+  KindMismatchDefect,
   NullabilityMergeResult,
   NullabilityProbeEnvironment,
   PropertyMergeOutcome,
+  ReadFailureDefect,
   SkipReason,
+  UncheckedKinds,
+  ValueKindCounts,
 } from '@macts/core'
 import { resolveManifestsDir } from './capabilities/registry.js'
 
@@ -135,6 +152,18 @@ export class ProbeCommand extends Command {
         empty value replaces a curated non-null claim (reported as a
         contradiction), while a clean sample never narrows a nullable claim
         or overrides a curated one.
+
+        The probe also counts each value's kind (date, number, boolean,
+        string, record, list, reference, or other; never the value). A
+        property whose values have a kind its declared type does not expect
+        is reported as a manifest defect, with both counts; one whose type
+        has no expected kinds (such as any) is listed as not checked.
+
+        A property whose every read failed is reported as a manifest defect:
+        its name most likely does not match the app, or the app cannot
+        provide it. It gets no claim. If the app cannot provide it, the report
+        gives the counts with which to mark it unsupported in the manifest;
+        a property marked unsupported is skipped.
     `,
     examples: [
       ['Probe all Calendar resources', '$0 probe calendar'],
@@ -337,7 +366,7 @@ export class ProbeCommand extends Command {
       const reach =
         resource.status === 'probed'
           ? `${String(resource.itemsRead)} items read${parentsText(resource)}`
-          : STATUS_TEXT[resource.status]
+          : (scanExhaustedNote(resource) ?? STATUS_TEXT[resource.status])
       const read = resource.status === 'probed'
       const truncated = read && resource.truncated ? ', stopped early (time limit)' : ''
       out.write(`${resource.resource}  (${resource.accessPath}) — ${reach}${truncated}\n`)
@@ -349,12 +378,19 @@ export class ProbeCommand extends Command {
           ...resource.properties.map((p) => p.property.length),
           ...resource.skipped.map((p) => p.property.length)
         )
+        const readFailures = new Set(resource.readFailureDefects?.map((d) => d.property))
+        const kindDefects = new Map(resource.kindDefects?.map((d) => [d.property, d]))
         for (const p of resource.properties) {
-          const defect =
-            resource.identifierDefect?.property === p.property
-              ? '  [manifest defect: identifier not always present]'
-              : ''
-          out.write(`  ${p.property.padEnd(width)}  ${propertyLine(p)}${defect}\n`)
+          const tags: string[] = []
+          if (resource.identifierDefect?.property === p.property) {
+            tags.push('[manifest defect: identifier not always present]')
+          } else if (readFailures.has(p.property)) {
+            tags.push('[manifest defect: every read failed]')
+          }
+          const kindDefect = kindDefects.get(p.property)
+          if (kindDefect !== undefined) tags.push(kindDefectTag(kindDefect))
+          const suffix = tags.map((tag) => `  ${tag}`).join('')
+          out.write(`  ${p.property.padEnd(width)}  ${propertyLine(p)}${suffix}\n`)
         }
         for (const p of resource.skipped) {
           out.write(`  ${p.property.padEnd(width)}  skipped (${SKIP_TEXT[p.reason]})\n`)
@@ -386,6 +422,24 @@ export class ProbeCommand extends Command {
     if (defects.length > 0) {
       out.write(
         `Manifest defects: the primary identifier is not always present for ${defects.join(', ')}; choose a different identifier.\n`
+      )
+    }
+    for (const r of report.resources) {
+      for (const defect of r.readFailureDefects ?? []) {
+        out.write(`Manifest defect: ${readFailureDefectMessage(r.resource, defect)}.\n`)
+      }
+    }
+    for (const r of report.resources) {
+      for (const defect of r.kindDefects ?? []) {
+        out.write(`Manifest defect: ${kindDefectMessage(r.resource, defect)}.\n`)
+      }
+    }
+    const unchecked = report.resources.flatMap((r) =>
+      (r.kindsUnchecked ?? []).map((u) => `${r.resource}.${u.property} (${u.declared})`)
+    )
+    if (unchecked.length > 0) {
+      out.write(
+        `Not checked against the declared type (no expected kinds): ${unchecked.join(', ')}.\n`
       )
     }
   }
@@ -449,6 +503,8 @@ interface NullabilityReportProperty {
   readonly observation: PropertyMergeOutcome['observation']
   readonly change: PropertyMergeOutcome['change']
   readonly contradicted?: string
+  /** The values found, counted by kind label; absent when none was found. */
+  readonly kinds?: ValueKindCounts
 }
 
 /** One resource in the nullability report. */
@@ -459,11 +515,19 @@ interface NullabilityReportResource {
   readonly itemsRead: number
   /** How many collections the items came from (the parents of a nested resource). */
   readonly sampledParents: number
+  /** How many parents were looked in for items, empty or not. */
+  readonly parentsScanned: number
   readonly truncated: boolean
   readonly properties: readonly NullabilityReportProperty[]
   readonly skipped: readonly { readonly property: string; readonly reason: SkipReason }[]
   /** The primary identifier was not present in every item read: a manifest defect. */
   readonly identifierDefect?: IdentifierDefect
+  /** Properties whose every read failed: manifest defects. Absent when there are none. */
+  readonly readFailureDefects?: readonly ReadFailureDefect[]
+  /** Properties whose value kinds contradict their declared type: manifest defects. */
+  readonly kindDefects?: readonly KindMismatchDefect[]
+  /** Properties whose declared type has no expected kinds, so were not checked. */
+  readonly kindsUnchecked?: readonly UncheckedKinds[]
   readonly note?: string
 }
 
@@ -499,6 +563,7 @@ function nullabilityReport(
         status: resource.status,
         itemsRead: resource.itemsRead,
         sampledParents: resource.sampledParents,
+        parentsScanned: resource.parentsScanned,
         truncated: resource.truncated,
         properties: (decision?.properties ?? []).map((outcome) => ({
           property: outcome.property,
@@ -508,11 +573,19 @@ function nullabilityReport(
           observation: outcome.observation,
           change: outcome.change,
           ...(outcome.contradicted === undefined ? {} : { contradicted: outcome.contradicted }),
+          ...(outcome.presence.kinds === undefined ? {} : { kinds: outcome.presence.kinds }),
         })),
         skipped: resource.skipped,
         ...(decision?.identifierDefect === undefined
           ? {}
           : { identifierDefect: decision.identifierDefect }),
+        ...(decision?.readFailureDefects === undefined
+          ? {}
+          : { readFailureDefects: decision.readFailureDefects }),
+        ...(decision?.kindDefects === undefined ? {} : { kindDefects: decision.kindDefects }),
+        ...(decision?.kindsUnchecked === undefined
+          ? {}
+          : { kindsUnchecked: decision.kindsUnchecked }),
         ...(note === undefined ? {} : { note }),
       }
     }),
@@ -532,19 +605,84 @@ const SKIP_TEXT: Readonly<Record<SkipReason, string>> = {
   references: 'list of references',
   heavy: 'large content',
   excluded: '--skip-property',
+  unsupported: 'unsupported',
 }
 
-/** ` from N parents`, for a nested resource (one read through a parent collection). */
+/**
+ * ` from N parents`, for a nested resource (one read through a parent
+ * collection), with ` (M scanned)` when the probe looked in more parents than
+ * yielded items.
+ */
 function parentsText(resource: NullabilityReportResource): string {
   if (!resource.accessPath.includes('/')) return ''
   const parents = resource.sampledParents === 1 ? 'parent' : 'parents'
-  return ` from ${String(resource.sampledParents)} ${parents}`
+  const scanned =
+    resource.parentsScanned > resource.sampledParents
+      ? ` (${String(resource.parentsScanned)} scanned)`
+      : ''
+  return ` from ${String(resource.sampledParents)} ${parents}${scanned}`
 }
 
 /** The counts behind an identifier defect, e.g. `empty 10, failed 0 of 25 items`. */
 function identifierDefectText(defect: IdentifierDefect): string {
   if (!defect.probed) return 'not a declared property, so not read'
   return `empty ${String(defect.empty)}, failed ${String(defect.failed)} of ${String(defect.itemsRead)} items`
+}
+
+/**
+ * The explanation of a property whose every read failed, e.g. `every read of
+ * Reminder.allDayDueDate failed (58 of 58); the property name may not match
+ * the app. If the app cannot provide it, mark it unsupported with sampleSize
+ * 58 and failedReads 58`. It suggests the curated `unsupported` marker and its
+ * counts; the probe writes nothing of the kind.
+ */
+function readFailureDefectMessage(resource: string, defect: ReadFailureDefect): string {
+  const failed = String(defect.failed)
+  const itemsRead = String(defect.itemsRead)
+  return `every read of ${resource}.${defect.property} failed (${failed} of ${itemsRead}); the property name may not match the app. If the app cannot provide it, mark it unsupported with sampleSize ${itemsRead} and failedReads ${failed}`
+}
+
+/** The unexpected kinds of a kind defect, in label order: `date for 20 and string for 5`. */
+function unexpectedKindsText(defect: KindMismatchDefect): string {
+  const parts = VALUE_KINDS.flatMap((kind) => {
+    const count = defect.unexpected[kind]
+    return count === undefined ? [] : [`${kind} for ${String(count)}`]
+  })
+  const last = parts.pop()
+  if (last === undefined) return ''
+  return parts.length === 0 ? last : `${parts.join(', ')} and ${last}`
+}
+
+/** Kind counts as the YAML flow map a marker's `observedKinds` takes: `{ reference: 18 }`. */
+function observedKindsText(kinds: ValueKindCounts): string {
+  const entries = VALUE_KINDS.flatMap((kind) => {
+    const count = kinds[kind]
+    return count === undefined ? [] : [`${kind}: ${String(count)}`]
+  })
+  return `{ ${entries.join(', ')} }`
+}
+
+/**
+ * The explanation of a kind defect, e.g. `Note.created is declared string but
+ * the app returned date for 25 of 25 values`, with the matching count when
+ * some values matched: `… of 25 values (20 matched)`. When no value matched
+ * and the counts are valid kind evidence, it suggests the `unsupported`
+ * marker with them, as the read-failure diagnostic does; the probe writes
+ * nothing of the kind.
+ */
+function kindDefectMessage(resource: string, defect: KindMismatchDefect): string {
+  const matched = defect.matched > 0 ? ` (${String(defect.matched)} matched)` : ''
+  const values = String(defect.values)
+  const marker = defect.markable
+    ? `. If the generated code cannot decode these values yet, mark it unsupported with sampleSize ${values} and observedKinds ${observedKindsText(defect.unexpected)}`
+    : ''
+  return `${resource}.${defect.property} is declared ${defect.declared} but the app returned ${unexpectedKindsText(defect)} of ${values} values${matched}${marker}`
+}
+
+/** The property-line tag of a kind defect, e.g. `[manifest defect: declared string, returned date]`. */
+function kindDefectTag(defect: KindMismatchDefect): string {
+  const returned = VALUE_KINDS.filter((kind) => defect.unexpected[kind] !== undefined)
+  return `[manifest defect: declared ${defect.declared}, returned ${returned.join(', ')}]`
 }
 
 /** The report line for one property: its verdict and counts, never a value. */

@@ -1,5 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js'
+import { usableProperties } from '../manifest/unsupported.js'
 import { propertyTypeToTs } from './types.js'
 
 export interface GeneratedClass {
@@ -46,7 +47,7 @@ export function generateResourceClass(resource: Resource, ctx: GeneratorContext)
   ]
 
   // Generate property getters
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const propertyGetters = properties.map(([name, prop]) => {
     const tsType = propertyTypeToTs(prop.type)
     const readonly = prop.access === 'r' ? ' (read-only)' : ''

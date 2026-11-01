@@ -49,7 +49,6 @@ export type AttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Folder {
-    readonly container?: string | null;
     readonly id: string | null;
     name: string;
     readonly shared: boolean | null;

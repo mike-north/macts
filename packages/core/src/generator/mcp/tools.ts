@@ -11,6 +11,7 @@ import type {
   PropertyType,
   Resource,
 } from '../../manifest/index.js'
+import { usableProperties } from '../../manifest/unsupported.js'
 import type { GeneratedTool, JsonSchema } from './types.js'
 
 /**
@@ -166,7 +167,7 @@ export function generateResourceOperationSchema(command: Command, resource: Reso
 
   // For create/update operations, include writable properties
   if (['create', 'update'].includes(command.name)) {
-    for (const [propName, prop] of Object.entries(resource.properties)) {
+    for (const [propName, prop] of usableProperties(resource)) {
       // Skip if already added as identifier
       if (properties[propName]) continue
 

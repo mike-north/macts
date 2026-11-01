@@ -29,25 +29,13 @@ export interface ApplicationFile {
     readonly acceptsHighLevelEvents: boolean | null;
     readonly hasScriptingTerminology: boolean | null;
     readonly id: string;
-    minimumSize: Integer | null;
-    opensInClassic: boolean | null;
-    preferredSize: Integer | null;
-    readonly suggestedSize: Integer | null;
 }
 
 // @public
-export interface ApplicationFileCreateInput {
-    minimumSize?: Integer;
-    opensInClassic?: boolean;
-    preferredSize?: Integer;
-}
+export type ApplicationFileCreateInput = Record<string, never>;
 
 // @public
-export interface ApplicationFileUpdateInput {
-    minimumSize?: Integer;
-    opensInClassic?: boolean;
-    preferredSize?: Integer;
-}
+export type ApplicationFileUpdateInput = Record<string, never>;
 
 // @public
 export interface Clipping {
@@ -100,24 +88,14 @@ export interface ColumnUpdateInput {
 
 // @public
 export interface Container {
-    completelyExpanded: boolean | null;
-    readonly containerWindow: string | null;
     readonly entireContents: string | null;
-    readonly expandable: boolean | null;
-    expanded: boolean | null;
 }
 
 // @public
-export interface ContainerCreateInput {
-    completelyExpanded?: boolean;
-    expanded?: boolean;
-}
+export type ContainerCreateInput = Record<string, never>;
 
 // @public
-export interface ContainerUpdateInput {
-    completelyExpanded?: boolean;
-    expanded?: boolean;
-}
+export type ContainerUpdateInput = Record<string, never>;
 
 // @public
 export interface DesktopObject {
@@ -154,9 +132,7 @@ export interface DiskUpdateInput {
 }
 
 // @public
-export interface DocumentFile {
-    readonly id: Integer | null;
-}
+export type DocumentFile = Record<string, never>;
 
 // @public
 export type DocumentFileCreateInput = Record<string, never>;
@@ -331,7 +307,7 @@ export type Lvic = 'smallIcon' | 'largeIcon';
 
 // @public
 export interface Package {
-    readonly id: Integer | null;
+    readonly id: string | null;
 }
 
 // @public

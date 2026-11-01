@@ -139,13 +139,13 @@ export const AppManifestSchema: z.ZodObject<{
                 r: "r";
                 rw: "rw";
             }>;
-            type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+            type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
                 array: PropertyType;
             } | {
                 resource: string;
             } | {
                 enum: string;
-            }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+            }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
                 array: PropertyType;
             } | {
                 resource: string;
@@ -189,6 +189,38 @@ export const AppManifestSchema: z.ZodObject<{
                     appVersion: z.ZodOptional<z.ZodString>;
                 }, z.core.$strip>>;
             }, z.core.$strip>>;
+            unsupported: z.ZodOptional<z.ZodObject<{
+                reason: z.ZodString;
+                dictionaryNote: z.ZodOptional<z.ZodString>;
+                trackingIssue: z.ZodOptional<z.ZodNumber>;
+                evidence: z.ZodUnion<readonly [z.ZodObject<{
+                    source: z.ZodLiteral<"probe">;
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    sampleSize: z.ZodNumber;
+                    failedReads: z.ZodNumber;
+                    errorNumbers: z.ZodArray<z.ZodNumber>;
+                }, z.core.$strict>, z.ZodObject<{
+                    source: z.ZodLiteral<"probe">;
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    sampleSize: z.ZodNumber;
+                    observedKinds: z.ZodRecord<z.ZodEnum<{
+                        string: "string";
+                        number: "number";
+                        boolean: "boolean";
+                        date: "date";
+                        record: "record";
+                        list: "list";
+                        reference: "reference";
+                        other: "other";
+                    }> & z.core.$partial, z.ZodNumber>;
+                }, z.core.$strict>]>;
+            }, z.core.$strip>>;
         }, z.core.$strip>>>;
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
             property: z.ZodString;
@@ -218,6 +250,7 @@ export const AppManifestSchema: z.ZodObject<{
             accessPath: z.ZodString;
             itemsRead: z.ZodNumber;
             sampledParents: z.ZodOptional<z.ZodNumber>;
+            parentsScanned: z.ZodOptional<z.ZodNumber>;
             status: z.ZodEnum<{
                 error: "error";
                 probed: "probed";
@@ -1784,6 +1817,17 @@ export type JxaFailureKind = 'timed-out' | 'cancelled' | 'output-too-large' | 'n
 export type JxaRunner = (bundleId: string, jsBody: string) => Promise<unknown>;
 
 // @public
+export interface KindMismatchDefect {
+    readonly declared: string;
+    readonly expected: readonly ValueKind[];
+    readonly markable: boolean;
+    readonly matched: number;
+    readonly property: string;
+    readonly unexpected: ValueKindCounts;
+    readonly values: number;
+}
+
+// @public
 export interface LayeredPolicyEvaluation extends PolicyEvaluation {
     readonly host: PolicyEvaluation;
     readonly key?: PolicyEvaluation | undefined;
@@ -2013,6 +2057,7 @@ export const NullabilityProbeSchema: z.ZodObject<{
     accessPath: z.ZodString;
     itemsRead: z.ZodNumber;
     sampledParents: z.ZodOptional<z.ZodNumber>;
+    parentsScanned: z.ZodOptional<z.ZodNumber>;
     status: z.ZodEnum<{
         error: "error";
         probed: "probed";
@@ -2339,11 +2384,11 @@ export const PrimitiveTypeSchema: z.ZodEnum<{
     string: "string";
     number: "number";
     boolean: "boolean";
-    any: "any";
     date: "date";
-    file: "file";
     integer: "integer";
     data: "data";
+    any: "any";
+    file: "file";
     point: "point";
     rect: "rect";
     rgb: "rgb";
@@ -2464,6 +2509,7 @@ export type PropertyObservation = 'nullable' | 'non-null' | 'insufficient-sample
 // @public
 export interface PropertyPresence {
     readonly failures: number;
+    readonly kinds?: ValueKindCounts;
     readonly nulls: number;
     readonly reads: number;
 }
@@ -2474,13 +2520,13 @@ export const PropertySchema: z.ZodObject<{
         r: "r";
         rw: "rw";
     }>;
-    type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+    type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
         array: PropertyType;
     } | {
         resource: string;
     } | {
         enum: string;
-    }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+    }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
         array: PropertyType;
     } | {
         resource: string;
@@ -2523,6 +2569,38 @@ export const PropertySchema: z.ZodObject<{
             observedAt: z.ZodOptional<z.ZodISODateTime>;
             appVersion: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>;
+    }, z.core.$strip>>;
+    unsupported: z.ZodOptional<z.ZodObject<{
+        reason: z.ZodString;
+        dictionaryNote: z.ZodOptional<z.ZodString>;
+        trackingIssue: z.ZodOptional<z.ZodNumber>;
+        evidence: z.ZodUnion<readonly [z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            sampleSize: z.ZodNumber;
+            failedReads: z.ZodNumber;
+            errorNumbers: z.ZodArray<z.ZodNumber>;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            sampleSize: z.ZodNumber;
+            observedKinds: z.ZodRecord<z.ZodEnum<{
+                string: "string";
+                number: "number";
+                boolean: "boolean";
+                date: "date";
+                record: "record";
+                list: "list";
+                reference: "reference";
+                other: "other";
+            }> & z.core.$partial, z.ZodNumber>;
+        }, z.core.$strict>]>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 
@@ -2635,6 +2713,13 @@ export interface RawSuite {
     description?: string;
     enumerations: RawEnumeration[];
     name: string;
+}
+
+// @public
+export interface ReadFailureDefect {
+    readonly failed: number;
+    readonly itemsRead: number;
+    readonly property: string;
 }
 
 // @public
@@ -2756,7 +2841,10 @@ export type Resource = z.infer<typeof ResourceSchema>;
 export interface ResourceMergeOutcome {
     readonly block: NullabilityProbe;
     readonly identifierDefect?: IdentifierDefect;
+    readonly kindDefects?: readonly KindMismatchDefect[];
+    readonly kindsUnchecked?: readonly UncheckedKinds[];
     readonly properties: readonly PropertyMergeOutcome[];
+    readonly readFailureDefects?: readonly ReadFailureDefect[];
     // (undocumented)
     readonly resource: string;
 }
@@ -2766,6 +2854,7 @@ export interface ResourceNullabilityResult {
     readonly accessPath: string;
     readonly itemsRead: number;
     readonly note?: string;
+    readonly parentsScanned: number;
     readonly presence: Readonly<Record<string, PropertyPresence>>;
     readonly resource: string;
     readonly sampledParents: number;
@@ -2794,13 +2883,13 @@ export const ResourceSchema: z.ZodObject<{
             r: "r";
             rw: "rw";
         }>;
-        type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+        type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
             array: PropertyType;
         } | {
             resource: string;
         } | {
             enum: string;
-        }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
+        }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "date" | "integer" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
             array: PropertyType;
         } | {
             resource: string;
@@ -2844,6 +2933,38 @@ export const ResourceSchema: z.ZodObject<{
                 appVersion: z.ZodOptional<z.ZodString>;
             }, z.core.$strip>>;
         }, z.core.$strip>>;
+        unsupported: z.ZodOptional<z.ZodObject<{
+            reason: z.ZodString;
+            dictionaryNote: z.ZodOptional<z.ZodString>;
+            trackingIssue: z.ZodOptional<z.ZodNumber>;
+            evidence: z.ZodUnion<readonly [z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                sampleSize: z.ZodNumber;
+                failedReads: z.ZodNumber;
+                errorNumbers: z.ZodArray<z.ZodNumber>;
+            }, z.core.$strict>, z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                sampleSize: z.ZodNumber;
+                observedKinds: z.ZodRecord<z.ZodEnum<{
+                    string: "string";
+                    number: "number";
+                    boolean: "boolean";
+                    date: "date";
+                    record: "record";
+                    list: "list";
+                    reference: "reference";
+                    other: "other";
+                }> & z.core.$partial, z.ZodNumber>;
+            }, z.core.$strict>]>;
+        }, z.core.$strip>>;
     }, z.core.$strip>>>;
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         property: z.ZodString;
@@ -2873,6 +2994,7 @@ export const ResourceSchema: z.ZodObject<{
         accessPath: z.ZodString;
         itemsRead: z.ZodNumber;
         sampledParents: z.ZodOptional<z.ZodNumber>;
+        parentsScanned: z.ZodOptional<z.ZodNumber>;
         status: z.ZodEnum<{
             error: "error";
             probed: "probed";
@@ -2953,6 +3075,9 @@ export const RuntimeProbeSchema: z.ZodObject<{
 // @public
 export function runWithApp<T>(bundleId: string, fn: string, // Function body as string
 options?: JxaExecutorOptions): Promise<T>;
+
+// @public
+export function scanExhaustedNote(result: Pick<ResourceNullabilityResult, 'status' | 'accessPath' | 'parentsScanned'>): string | undefined;
 
 // @public
 export function scoreCapability(capability: Capability, terms: readonly string[]): number;
@@ -3052,7 +3177,7 @@ export interface SkippedProperty {
 }
 
 // @public
-export type SkipReason = 'file' | 'references' | 'heavy' | 'excluded';
+export type SkipReason = 'file' | 'references' | 'heavy' | 'excluded' | 'unsupported';
 
 // @public
 export type SpecialOperation = string;
@@ -3132,7 +3257,129 @@ export interface TypeCoercer<T> {
 }
 
 // @public
+export interface UncheckedKinds {
+    readonly declared: string;
+    readonly property: string;
+}
+
+// @public (undocumented)
+export type Unsupported = z.infer<typeof UnsupportedSchema>;
+
+// @public (undocumented)
+export type UnsupportedEvidence = z.infer<typeof UnsupportedEvidenceSchema>;
+
+// @public
+export const UnsupportedEvidenceSchema: z.ZodUnion<readonly [z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    failedReads: z.ZodNumber;
+    errorNumbers: z.ZodArray<z.ZodNumber>;
+}, z.core.$strict>, z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    observedKinds: z.ZodRecord<z.ZodEnum<{
+        string: "string";
+        number: "number";
+        boolean: "boolean";
+        date: "date";
+        record: "record";
+        list: "list";
+        reference: "reference";
+        other: "other";
+    }> & z.core.$partial, z.ZodNumber>;
+}, z.core.$strict>]>;
+
+// @public (undocumented)
+export type UnsupportedKindEvidence = z.infer<typeof UnsupportedKindEvidenceSchema>;
+
+// @public
+export const UnsupportedKindEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    observedKinds: z.ZodRecord<z.ZodEnum<{
+        string: "string";
+        number: "number";
+        boolean: "boolean";
+        date: "date";
+        record: "record";
+        list: "list";
+        reference: "reference";
+        other: "other";
+    }> & z.core.$partial, z.ZodNumber>;
+}, z.core.$strict>;
+
+// @public (undocumented)
+export type UnsupportedReadFailureEvidence = z.infer<typeof UnsupportedReadFailureEvidenceSchema>;
+
+// @public
+export const UnsupportedReadFailureEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    failedReads: z.ZodNumber;
+    errorNumbers: z.ZodArray<z.ZodNumber>;
+}, z.core.$strict>;
+
+// @public
+export const UnsupportedSchema: z.ZodObject<{
+    reason: z.ZodString;
+    dictionaryNote: z.ZodOptional<z.ZodString>;
+    trackingIssue: z.ZodOptional<z.ZodNumber>;
+    evidence: z.ZodUnion<readonly [z.ZodObject<{
+        source: z.ZodLiteral<"probe">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        sampleSize: z.ZodNumber;
+        failedReads: z.ZodNumber;
+        errorNumbers: z.ZodArray<z.ZodNumber>;
+    }, z.core.$strict>, z.ZodObject<{
+        source: z.ZodLiteral<"probe">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        sampleSize: z.ZodNumber;
+        observedKinds: z.ZodRecord<z.ZodEnum<{
+            string: "string";
+            number: "number";
+            boolean: "boolean";
+            date: "date";
+            record: "record";
+            list: "list";
+            reference: "reference";
+            other: "other";
+        }> & z.core.$partial, z.ZodNumber>;
+    }, z.core.$strict>]>;
+}, z.core.$strip>;
+
+// @public
 export function validateCommandPermissions(commandPermissions: Map<string, string>, permissionsSection: PermissionsSection): string[];
+
+// @public
+export const VALUE_KINDS: readonly ["date", "number", "boolean", "string", "record", "list", "reference", "other"];
+
+// @public
+export type ValueKind = (typeof VALUE_KINDS)[number];
+
+// @public
+export type ValueKindCounts = Readonly<Partial<Record<ValueKind, number>>>;
 
 // @public
 export const VERSION = "0.0.0";

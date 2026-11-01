@@ -1,5 +1,6 @@
 import type { GeneratorContext } from './context.js'
 import type { Resource, PropertyType, Enum } from '../manifest/index.js'
+import { usableProperties } from '../manifest/unsupported.js'
 
 export interface GeneratedType {
   name: string
@@ -96,7 +97,7 @@ export function propertyTypeToTs(type: PropertyType | undefined): string {
  * ```
  */
 export function generateReadType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports: string[] = []
 
   const propLines = properties.map(([name, prop]) => {
@@ -132,7 +133,7 @@ export function generateReadType(resource: Resource, _ctx: GeneratorContext): Ge
  * ```
  */
 export function generateCreateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports: string[] = []
 
   // Only include writable properties
@@ -172,7 +173,7 @@ export function generateCreateInputType(resource: Resource, _ctx: GeneratorConte
  * ```
  */
 export function generateUpdateInputType(resource: Resource, _ctx: GeneratorContext): GeneratedType {
-  const properties = Object.entries(resource.properties)
+  const properties = usableProperties(resource)
   const imports: string[] = []
 
   // Only include writable properties, all optional

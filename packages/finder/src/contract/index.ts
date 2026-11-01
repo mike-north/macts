@@ -137,28 +137,6 @@ export interface Container {
    * Nullable. No evidence that the app always sets it.
    */
   readonly entireContents: string | null
-  /**
-   * (NOT AVAILABLE YET) Is the container capable of being expanded as an outline?
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly expandable: boolean | null
-  /**
-   * (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers
-   * viewed as lists).
-   * Nullable. No evidence that the app always sets it.
-   */
-  expanded: boolean | null
-  /**
-   * (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be
-   * set for containers viewed as lists).
-   * Nullable. No evidence that the app always sets it.
-   */
-  completelyExpanded: boolean | null
-  /**
-   * the container window for this folder.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly containerWindow: string | null
 }
 
 /** A disk */
@@ -284,23 +262,6 @@ export interface ApplicationFile {
    */
   readonly id: string
   /**
-   * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application
-   * be launched.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly suggestedSize: Integer | null
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be
-   * launched.
-   * Nullable. No evidence that the app always sets it.
-   */
-  minimumSize: Integer | null
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched.
-   * Nullable. No evidence that the app always sets it.
-   */
-  preferredSize: Integer | null
-  /**
    * Is the application high-level event aware? (OBSOLETE: always returns true).
    * Nullable. No evidence that the app always sets it.
    */
@@ -310,21 +271,10 @@ export interface ApplicationFile {
    * Nullable. No evidence that the app always sets it.
    */
   readonly hasScriptingTerminology: boolean | null
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
-   * Nullable. No evidence that the app always sets it.
-   */
-  opensInClassic: boolean | null
 }
 
 /** A document file */
-export interface DocumentFile {
-  /**
-   * Unique identifier for this document.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly id: Integer | null
-}
+export type DocumentFile = Record<string, never>
 
 /** A file containing an internet location */
 export interface InternetLocationFile {
@@ -350,7 +300,7 @@ export interface Package {
    * Unique identifier for this package.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: Integer | null
+  readonly id: string | null
 }
 
 /** A file viewer window */
@@ -485,34 +435,10 @@ export interface Column {
 }
 
 /** Input for creating a Container. */
-export interface ContainerCreateInput {
-  /**
-   * (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers
-   * viewed as lists)
-   */
-  expanded?: boolean
-  /**
-   * (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be
-   * set for containers viewed as lists)
-   */
-  completelyExpanded?: boolean
-}
+export type ContainerCreateInput = Record<string, never>
 
 /** Input for updating a Container. Omitted fields are left unchanged. */
-export interface ContainerUpdateInput {
-  /**
-   * (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers
-   * viewed as lists).
-   * Cannot be reset: null is rejected.
-   */
-  expanded?: boolean
-  /**
-   * (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be
-   * set for containers viewed as lists).
-   * Cannot be reset: null is rejected.
-   */
-  completelyExpanded?: boolean
-}
+export type ContainerUpdateInput = Record<string, never>
 
 /** Input for creating a Disk. */
 export interface DiskCreateInput {
@@ -601,36 +527,10 @@ export interface AliasFileUpdateInput {
 }
 
 /** Input for creating an ApplicationFile. */
-export interface ApplicationFileCreateInput {
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched
-   */
-  minimumSize?: Integer
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched */
-  preferredSize?: Integer
-  /** (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment? */
-  opensInClassic?: boolean
-}
+export type ApplicationFileCreateInput = Record<string, never>
 
 /** Input for updating an ApplicationFile. Omitted fields are left unchanged. */
-export interface ApplicationFileUpdateInput {
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be
-   * launched.
-   * Cannot be reset: null is rejected.
-   */
-  minimumSize?: Integer
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched.
-   * Cannot be reset: null is rejected.
-   */
-  preferredSize?: Integer
-  /**
-   * (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?
-   * Cannot be reset: null is rejected.
-   */
-  opensInClassic?: boolean
-}
+export type ApplicationFileUpdateInput = Record<string, never>
 
 /** Input for creating a DocumentFile. */
 export type DocumentFileCreateInput = Record<string, never>
@@ -953,20 +853,6 @@ const containerRecordType: ValueType<Container> = t.record(
     entireContents: t.nullable(t.string(), {
       description: 'the entire contents of the container, including the contents of its children',
     }),
-    expandable: t.nullable(t.boolean(), {
-      description: '(NOT AVAILABLE YET) Is the container capable of being expanded as an outline?',
-    }),
-    expanded: t.nullable(t.boolean(), {
-      description:
-        '(NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists)',
-    }),
-    completelyExpanded: t.nullable(t.boolean(), {
-      description:
-        '(NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists)',
-    }),
-    containerWindow: t.nullable(t.string(), {
-      description: 'the container window for this folder',
-    }),
   },
   { description: 'An item that contains other items' }
 )
@@ -1051,36 +937,18 @@ const aliasFileRecordType: ValueType<AliasFile> = t.record(
 const applicationFileRecordType: ValueType<ApplicationFile> = t.record(
   {
     id: t.string({ description: 'the bundle identifier or creator type of the application' }),
-    suggestedSize: t.nullable(t.integer(), {
-      description:
-        '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched',
-    }),
-    minimumSize: t.nullable(t.integer(), {
-      description:
-        '(AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched',
-    }),
-    preferredSize: t.nullable(t.integer(), {
-      description:
-        '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched',
-    }),
     acceptsHighLevelEvents: t.nullable(t.boolean(), {
       description: 'Is the application high-level event aware? (OBSOLETE: always returns true)',
     }),
     hasScriptingTerminology: t.nullable(t.boolean(), {
       description: 'Does the process have a scripting terminology, i.e., can it be scripted?',
     }),
-    opensInClassic: t.nullable(t.boolean(), {
-      description:
-        '(AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?',
-    }),
   },
   { description: "An application's file on disk" }
 )
 
 const documentFileRecordType: ValueType<DocumentFile> = t.record(
-  {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this document' }),
-  },
+  {},
   { description: 'A document file' }
 )
 
@@ -1102,7 +970,7 @@ const clippingRecordType: ValueType<Clipping> = t.record(
 
 const packageRecordType: ValueType<Package> = t.record(
   {
-    id: t.nullable(t.integer(), { description: 'Unique identifier for this package' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this package' }),
   },
   { description: 'A package' }
 )

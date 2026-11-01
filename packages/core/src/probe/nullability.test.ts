@@ -21,12 +21,18 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import {
   APP_VERSION_BODY,
   HEAVY_PROPERTY_NAMES,
+  MAX_CALL_MS,
   MAX_ITEMS_PER_COLLECTION,
+  MAX_PARENT_VISITS,
+  PARENT_SCAN_TIME_SHARE,
+  PARENT_SPREAD,
   probeNullability,
   resolveAccessChain,
   type NullabilityProbeEnvironment,
 } from './nullability.js'
 import type { JxaRunner } from './probe.js'
+import { mergeNullabilityObservations } from './nullability-merge.js'
+import { isValueKind } from '../manifest/value-kinds.js'
 
 // ---------------------------------------------------------------------------
 // Fake app objects
@@ -35,13 +41,20 @@ import type { JxaRunner } from './probe.js'
 /** Thrown by a fake property read, as the bridge throws for an app error. */
 const THROWS = Symbol('throws')
 
-type FakeValue = string | number | boolean | null | typeof THROWS
+/**
+ * What a fake property read returns: a value (an object specifier is a
+ * function, as in the bridge), null for the app's "missing value", or
+ * {@link THROWS}.
+ */
+type FakeValue = string | number | boolean | null | object | typeof THROWS
 
-/** Counts how many elements a fake collection handed out. */
+/** Counts how many elements a fake collection handed out, and its length reads. */
 interface IndexLog {
   indexed: number
   /** The indices handed out, in order. */
   readonly indices: number[]
+  /** How many times the collection's `length` was read. */
+  lengthReads: number
 }
 
 /**
@@ -52,18 +65,26 @@ interface IndexLog {
  * @param length - The element count, or a function standing in for a
  *   `length` that misbehaves (throws, or is not a number).
  * @param at - The element at an index, made on demand.
+ * @param onAccess - Called on every `length` read and element access, e.g. to
+ *   advance a fake clock as a slow app would.
  */
 function fakeCollection(
   length: number | (() => unknown),
   at: (index: number) => object,
-  log: IndexLog = indexLog()
+  log: IndexLog = indexLog(),
+  onAccess: (access: 'length' | 'index') => void = () => undefined
 ): object {
   return new Proxy(
     {},
     {
       get(_target, key) {
-        if (key === 'length') return typeof length === 'number' ? length : length()
+        if (key === 'length') {
+          log.lengthReads++
+          onAccess('length')
+          return typeof length === 'number' ? length : length()
+        }
         if (typeof key === 'string' && /^\d+$/.test(key)) {
+          onAccess('index')
           log.indexed++
           log.indices.push(Number(key))
           return at(Number(key))
@@ -75,7 +96,7 @@ function fakeCollection(
 }
 
 function indexLog(): IndexLog {
-  return { indexed: 0, indices: [] }
+  return { indexed: 0, indices: [], lengthReads: 0 }
 }
 
 /**
@@ -130,6 +151,11 @@ interface FakeRunnerOptions {
   readonly failOn?: string
   /** Called after each probe call, e.g. to advance the outer clock. */
   readonly afterCall?: () => void
+  /**
+   * A clock the fake app advances itself, read by the body's `Date.now()`
+   * (with `msPerTick` added per call). Shared across calls when given.
+   */
+  readonly appClock?: { now: number }
 }
 
 interface FakeRunner {
@@ -155,9 +181,9 @@ function fakeRunner(app: object, options: FakeRunnerOptions = {}): FakeRunner {
     if (options.failOn !== undefined && body.includes(JSON.stringify(options.failOn))) {
       return Promise.reject(Object.assign(new Error('timed out'), { killed: true }))
     }
-    let now = 1_000_000
+    const appClock = options.appClock ?? { now: 1_000_000 }
     const tick = options.msPerTick ?? 0
-    const clock = { now: () => (now += tick) }
+    const clock = { now: () => (appClock.now += tick) }
     const value: unknown = runInNewContext(`(function (app) {${body}})(app)`, {
       app,
       Date: clock,
@@ -292,12 +318,14 @@ describe('probeNullability: the presence matrix', () => {
       status: 'probed',
       itemsRead: 3,
       sampledParents: 1,
+      parentsScanned: 1,
       truncated: false,
       presence: {
-        uid: { reads: 3, nulls: 0, failures: 0 },
+        // Each value found is counted by kind: every fake value is text.
+        uid: { reads: 3, nulls: 0, failures: 0, kinds: { string: 3 } },
         // A throwing read is a failure, not an empty value (rule 4).
-        title: { reads: 2, nulls: 1, failures: 1 },
-        folder: { reads: 3, nulls: 0, failures: 0 },
+        title: { reads: 2, nulls: 1, failures: 1, kinds: { string: 1 } },
+        folder: { reads: 3, nulls: 0, failures: 0, kinds: { string: 3 } },
       },
       skipped: [
         { property: 'body', reason: 'heavy' },
@@ -384,6 +412,7 @@ describe('probeNullability: limits', () => {
         reads: 60,
         nulls: 0,
         failures: 0,
+        kinds: { string: 60 },
       })
     }
   })
@@ -536,6 +565,7 @@ describe('probeNullability: index access', () => {
       reads: 60,
       nulls: 41,
       failures: 0,
+      kinds: { string: 19 },
     })
   })
 
@@ -611,6 +641,431 @@ describe('probeNullability: index access', () => {
       itemsRead: 2,
       presence: { location: { reads: 2, nulls: 1, failures: 0 } },
     })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// The parent pre-scan
+// ---------------------------------------------------------------------------
+
+/** Calendars hold events, events hold alarms: a resource two levels down. */
+const DEEP_MANIFEST: AppManifest = parseManifestYaml(`
+version: '1.0'
+app:
+  bundleId: com.example.jotter
+  name: Jotter
+  tccEntitlements: []
+resources:
+  Calendar:
+    name: Calendar
+    plural: Calendars
+    description: A calendar
+    properties:
+      name: { access: r, type: string, description: Name }
+  Event:
+    name: Event
+    plural: Events
+    description: An event
+    properties:
+      summary: { access: rw, type: string, description: Summary }
+  Alarm:
+    name: Alarm
+    plural: Alarms
+    description: An alarm
+    properties:
+      trigger: { access: r, type: string, description: Trigger }
+enums: {}
+hierarchy:
+  children:
+    calendars:
+      resource: Calendar
+      access: rw
+      children:
+        events:
+          resource: Event
+          access: rw
+          children:
+            alarms: { resource: Alarm, access: rw }
+commands: {}
+`)
+
+/** What a deep fake app's collections handed out, level by level. */
+interface DeepLogs {
+  readonly calendars: IndexLog
+  /** Every calendar's events collection, together. */
+  readonly events: IndexLog
+  /** Every event's alarms collection, together. */
+  readonly alarms: IndexLog
+}
+
+interface DeepAppOptions {
+  readonly calendars: number
+  readonly eventsPerCalendar: number
+  /** Whether the event at an index (within its calendar) has one alarm. */
+  readonly hasAlarm: (eventIndex: number) => boolean
+  /** Advances a fake clock on each collection access or alarm property read. */
+  readonly onAccess?: (access: 'length' | 'index' | 'read') => void
+}
+
+/** A fake app of calendars, their events, and the events' alarms, made on demand. */
+function deepApp(options: DeepAppOptions): { app: object; logs: DeepLogs } {
+  const logs: DeepLogs = { calendars: indexLog(), events: indexLog(), alarms: indexLog() }
+  const onAccess = options.onAccess ?? (() => undefined)
+  const alarm = (): object => ({
+    trigger: () => {
+      onAccess('read')
+      return SECRET
+    },
+  })
+  const eventAt = (index: number): object =>
+    item(
+      { summary: SECRET },
+      { alarms: fakeCollection(options.hasAlarm(index) ? 1 : 0, alarm, logs.alarms, onAccess) }
+    )
+  const calendarAt = (): object =>
+    item(
+      { name: SECRET },
+      { events: fakeCollection(options.eventsPerCalendar, eventAt, logs.events, onAccess) }
+    )
+  const app = fakeApp({
+    calendars: fakeCollection(options.calendars, calendarAt, logs.calendars, onAccess),
+  })
+  return { app, logs }
+}
+
+describe('probeNullability: the parent pre-scan', () => {
+  it('has the limits the derivations below assume', () => {
+    expect(PARENT_SPREAD).toBe(20)
+    expect(MAX_PARENT_VISITS).toBe(1_000)
+    expect(PARENT_SCAN_TIME_SHARE).toBe(0.5)
+    expect(MAX_CALL_MS).toBe(25_000)
+  })
+
+  it('looks in evenly spaced parents only, not every parent', async () => {
+    // 1,000 calendars of 5 events. The first round visits floor(k * 1000 / 20)
+    // = every 50th calendar; their 20 * 5 = 100 events fill the cap of 60, so
+    // the scan stops there. Each gets a quota of ceil(60 / 20) = 3 events.
+    const parents = indexLog()
+    const children = indexLog()
+    const calendarOf = (): object =>
+      item({ name: SECRET }, { events: fakeCollection(5, () => event('x'), children) })
+    const { runner } = fakeRunner(
+      fakeApp({ calendars: fakeCollection(1_000, calendarOf, parents) })
+    )
+    const result = await probeNullability(MANIFEST, runner, {
+      resources: ['Event'],
+      environment: environment(),
+    })
+    expect(result.resources['Event']).toMatchObject({
+      status: 'probed',
+      itemsRead: 60,
+      sampledParents: 20,
+      parentsScanned: 20,
+      truncated: false,
+    })
+    expect(parents.indices).toEqual(Array.from({ length: 20 }, (_, k) => k * 50))
+    expect(children.lengthReads).toBe(20)
+    // floor(k * 5 / 3) = 0, 1, 3 in each.
+    expect(children.indices).toEqual(Array.from({ length: 20 }, () => [0, 1, 3]).flat())
+  })
+
+  it('looks in further parents, round by round, until it finds items, visiting each once', async () => {
+    // 100 calendars; only calendar 1 has events (10). Round 1 (m = 20) visits
+    // the multiples of 5; round 2 (m = 40) adds floor(2.5k), still not 1;
+    // round 3 (m = 80) adds floor(1.25k), which includes 1 (k = 1). Its 10
+    // events are fewer than 60, so round 4 (m = 160 >= 100) visits the rest.
+    const parents = indexLog()
+    const calendarAt = (index: number): object =>
+      calendar(index === 1 ? Array.from({ length: 10 }, () => event(null)) : [])
+    const app = fakeApp({ calendars: fakeCollection(100, calendarAt, parents) })
+    const first = fakeRunner(app)
+    const result = await probeNullability(MANIFEST, first.runner, {
+      resources: ['Event'],
+      environment: environment(),
+    })
+    expect(result.resources['Event']).toMatchObject({
+      status: 'probed',
+      itemsRead: 10,
+      sampledParents: 1,
+      parentsScanned: 100,
+      presence: { location: { reads: 10, nulls: 10, failures: 0 } },
+    })
+    // Every calendar exactly once, though the rounds overlap.
+    expect([...parents.indices].sort((a, b) => a - b)).toEqual(
+      Array.from({ length: 100 }, (_, k) => k)
+    )
+    // Round 1 first: floor(k * 100 / 20) = 0, 5, ..., 95.
+    expect(parents.indices.slice(0, 20)).toEqual(Array.from({ length: 20 }, (_, k) => k * 5))
+
+    // The same app state picks the same parents and items.
+    const again = indexLog()
+    const second = fakeRunner(fakeApp({ calendars: fakeCollection(100, calendarAt, again) }))
+    await probeNullability(MANIFEST, second.runner, {
+      resources: ['Event'],
+      environment: environment(),
+    })
+    expect(again.indices).toEqual(parents.indices)
+  })
+
+  it('spreads over the parents found in index order, whichever round found them', async () => {
+    // 40 calendars; calendar 38 and every odd calendar hold one event. A cap
+    // of 3. Round 1 (m = 20) visits the even calendars and finds only 38;
+    // one event is short of 3, so round 2 (m = 40) visits the odd ones: 21
+    // parents in all, more than the cap. In index order they are 1, 3, ...,
+    // 37, 38, 39; floor(k * 21 / 3) = 0, 7, 14 picks calendars 1, 15, 29.
+    const sampled: number[] = []
+    const calendarAt = (index: number): object =>
+      item(
+        { name: SECRET },
+        {
+          events: fakeCollection(index === 38 || index % 2 === 1 ? 1 : 0, () => {
+            sampled.push(index)
+            return event('x')
+          }),
+        }
+      )
+    const { runner } = fakeRunner(fakeApp({ calendars: fakeCollection(40, calendarAt) }))
+    const result = await probeNullability(MANIFEST, runner, {
+      resources: ['Event'],
+      maxItems: 3,
+      environment: environment(),
+    })
+    expect(result.resources['Event']).toMatchObject({
+      itemsRead: 3,
+      sampledParents: 3,
+      parentsScanned: 40,
+    })
+    expect(sampled).toEqual([1, 15, 29])
+  })
+
+  // Regression: the pre-scan read the length of every event's alarms in
+  // every calendar before reading any item, so on a large calendar store the
+  // call's time ran out with nothing read.
+  it('finds sparse items two levels down within the visit limit', async () => {
+    // 50 calendars of 400 events; an event has an alarm when index % 37 = 36.
+    //
+    // Round 1 (m = 20): calendars floor(2.5k) = 0, 2, 5, 7, 10, 12, ...; in
+    // each, events 20k. 20k = 36 (mod 37) needs k = 24, so none has an alarm.
+    // Visits: 20 events lengths + 400 alarms lengths = 420.
+    //
+    // Round 2 (m = 40): calendars floor(1.25k), 4 in each block of 5 (5j to
+    // 5j + 3), of which 5j and 5j + 2 were in round 1. Events 10k; 10k = 36
+    // (mod 37) needs k = 11, so event 110 has the alarm in every calendar
+    // visited. A round-1 calendar adds its 20 odd multiples of 10 (20 visits);
+    // a new one, its events length and 40 alarms lengths (41). A block of 5
+    // costs 20 + 41 + 20 + 41 = 122 visits, for 4 alarms.
+    //
+    // 420 + 4 blocks (488) = 908. Then calendar 20 (20, to 928), calendar 21
+    // (41, to 969), calendar 22 (20, to 989): 3 more alarms. Calendar 23 gets
+    // its events length and 10 alarms lengths (events 0 to 90) before the
+    // 1,000th visit stops the scan, short of event 110.
+    //
+    // So 16 + 3 = 19 alarms, one per parent.
+    const { app, logs } = deepApp({
+      calendars: 50,
+      eventsPerCalendar: 400,
+      hasAlarm: (index) => index % 37 === 36,
+    })
+    const { runner } = fakeRunner(app)
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      accessPath: 'calendars/events/alarms',
+      status: 'probed',
+      itemsRead: 19,
+      sampledParents: 19,
+      parentsScanned: 400 + 4 * 120 + 20 + 40 + 20 + 10,
+      truncated: false,
+      presence: { trigger: { reads: 19, nulls: 0, failures: 0, kinds: { string: 19 } } },
+    })
+    expect(result.resources['Alarm']?.note).toBeUndefined()
+    // The calendars' length once; the events lengths of the 20 + 10
+    // calendars visited; the alarms lengths of the 970 events visited.
+    expect(logs.calendars.lengthReads).toBe(1)
+    expect(logs.events.lengthReads).toBe(30)
+    expect(logs.alarms.lengthReads).toBe(970)
+    expect(logs.events.lengthReads + logs.alarms.lengthReads).toBe(MAX_PARENT_VISITS)
+    // Each alarm found is read once, at index 0.
+    expect(logs.alarms.indices).toEqual(Array.from({ length: 19 }, () => 0))
+  })
+
+  it('says a scan that stopped at its limit found no items in the parents it looked in', async () => {
+    // As above, with no alarms at all: the same 1,000 visits, 970 of them
+    // to alarms collections.
+    const { app } = deepApp({ calendars: 50, eventsPerCalendar: 400, hasAlarm: () => false })
+    const { runner } = fakeRunner(app)
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      status: 'no-items',
+      itemsRead: 0,
+      parentsScanned: 970,
+      truncated: false,
+      note: 'no items in the 970 parents scanned; the scan stops after 1000 collections',
+    })
+    const merged = mergeNullabilityObservations(DEEP_MANIFEST, result)
+    expect(merged.resources[0]?.block).toMatchObject({
+      status: 'no-items',
+      parentsScanned: 970,
+      note: 'no items in the 970 parents scanned; the scan stops after 1000 collections',
+    })
+  })
+
+  it('says nothing more when a scan that looked in every parent found no items', async () => {
+    const { runner } = fakeRunner(fakeApp({ calendars: [calendar([]), calendar([])] }))
+    const result = await probeNullability(MANIFEST, runner, {
+      resources: ['Event'],
+      environment: environment(),
+    })
+    expect(result.resources['Event']).toMatchObject({ status: 'no-items', parentsScanned: 2 })
+    expect(result.resources['Event']?.note).toBeUndefined()
+  })
+
+  it('samples what it found when the time for the pre-scan runs out: not truncated, with a note', async () => {
+    // Each length read takes 100 ms; the scan may use half of the 25 s limit.
+    // The calendars' length takes the clock to 100; visit v starts while
+    // 100 + (v - 1) * 100 < 12,500, so 124 visits run. Round 1 costs 21 per
+    // calendar (events length, 20 alarms lengths): calendars 0, 2, 5, 7, 10
+    // (105) and calendar 12's events length and its first 18 events
+    // (0 to 340). Alarms on every 40th event: 10 in each full calendar (0 to
+    // 360), 9 in calendar 12 (0 to 320). The sample costs no time and reads
+    // all 59, so it is complete: only the scan was cut short, which the note
+    // records.
+    const appClock = { now: 0 }
+    const { app } = deepApp({
+      calendars: 50,
+      eventsPerCalendar: 400,
+      hasAlarm: (index) => index % 40 === 0,
+      onAccess: (access) => {
+        if (access === 'length') appClock.now += 100
+      },
+    })
+    const { runner } = fakeRunner(app, { appClock })
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      status: 'probed',
+      itemsRead: 59,
+      sampledParents: 59,
+      parentsScanned: 5 * 20 + 18,
+      truncated: false,
+      note: 'the parent scan stopped at the time limit after 118 parents',
+    })
+    expect(appClock.now).toBe(12_500)
+    const merged = mergeNullabilityObservations(DEEP_MANIFEST, result)
+    expect(merged.resources[0]?.block).toMatchObject({
+      status: 'probed',
+      itemsRead: 59,
+      note: 'the parent scan stopped at the time limit after 118 parents',
+    })
+  })
+
+  it('notes both cuts when the time runs out in the pre-scan and again in the sample', async () => {
+    // As above (59 alarms in 118 parents, the scan ending at 12,500 ms), but
+    // reading an alarm's trigger takes 500 ms. Item k (from 0) starts while
+    // 12,500 + 500k < 25,000, so items 0 to 24 are read: 25 items.
+    const appClock = { now: 0 }
+    const { app } = deepApp({
+      calendars: 50,
+      eventsPerCalendar: 400,
+      hasAlarm: (index) => index % 40 === 0,
+      onAccess: (access) => {
+        if (access === 'length') appClock.now += 100
+        if (access === 'read') appClock.now += 500
+      },
+    })
+    const { runner } = fakeRunner(app, { appClock })
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      status: 'probed',
+      itemsRead: 25,
+      sampledParents: 25,
+      parentsScanned: 118,
+      truncated: true,
+      note: 'the parent scan stopped at the time limit after 118 parents',
+    })
+    expect(appClock.now).toBe(25_000)
+    const merged = mergeNullabilityObservations(DEEP_MANIFEST, result)
+    expect(merged.resources[0]?.block.note).toBe(
+      'the parent scan stopped at the time limit after 118 parents; the sample stopped at the time limit after 25 items'
+    )
+  })
+
+  it('reports a pre-scan that ran out of time before any item as budget, not truncated', async () => {
+    // As above with no alarms: the same 124 visits, 118 of them to alarms
+    // collections, all empty. No item was read, so whether there are any is
+    // unknown.
+    const appClock = { now: 0 }
+    const { app } = deepApp({
+      calendars: 50,
+      eventsPerCalendar: 400,
+      hasAlarm: () => false,
+      onAccess: (access) => {
+        if (access === 'length') appClock.now += 100
+      },
+    })
+    const { runner } = fakeRunner(app, { appClock })
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      status: 'budget',
+      itemsRead: 0,
+      parentsScanned: 118,
+      truncated: false,
+    })
+    expect(result.resources['Alarm']?.note).toBeUndefined()
+    const merged = mergeNullabilityObservations(DEEP_MANIFEST, result)
+    expect(merged.resources[0]?.block).toMatchObject({
+      status: 'budget',
+      note: 'no items found in the 118 parents scanned before the time limit',
+    })
+  })
+
+  it('returns well inside the call limit when every access to the app is slow', async () => {
+    // Every length read, element access and property read takes 50 ms, and
+    // every event has an alarm. The calendars' length takes the clock to 50;
+    // a visit costs 100 (an element and its child's length), so visit v
+    // starts while 50 + (v - 1) * 100 < 12,500: 125 visits, to 12,550. That
+    // is calendars 0, 2, 5, 7, 10 (105) and calendar 12's events length and
+    // 19 alarms lengths: 119 parents, each with an alarm. Spread over 60 of
+    // them, one alarm each, at 100 ms (the element and its trigger): 60
+    // items, to 12,550 + 6,000 = 18,550. The sample is complete; the scan
+    // was cut short.
+    const appClock = { now: 0 }
+    const { app } = deepApp({
+      calendars: 50,
+      eventsPerCalendar: 400,
+      hasAlarm: () => true,
+      onAccess: () => {
+        appClock.now += 50
+      },
+    })
+    const { runner } = fakeRunner(app, { appClock })
+    const result = await probeNullability(DEEP_MANIFEST, runner, {
+      resources: ['Alarm'],
+      environment: environment(),
+    })
+    expect(result.resources['Alarm']).toMatchObject({
+      status: 'probed',
+      itemsRead: 60,
+      sampledParents: 60,
+      parentsScanned: 119,
+      truncated: false,
+      note: 'the parent scan stopped at the time limit after 119 parents',
+    })
+    expect(appClock.now).toBe(18_550)
+    expect(appClock.now).toBeLessThan(MAX_CALL_MS)
   })
 })
 
@@ -693,7 +1148,60 @@ commands: {}
     }
   })
 
-  it('returns counts only: no observed value leaves the app process or reaches the result', async () => {
+  it('skips a property marked unsupported, and never puts it in any script', async () => {
+    const manifest = parseManifestYaml(`
+version: '1.0'
+app: { bundleId: com.example.jotter, name: Jotter, tccEntitlements: [] }
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    identifiers:
+      - property: uid
+        primary: true
+    properties:
+      uid: { access: r, type: string, description: Id }
+      title: { access: rw, type: string, description: Title }
+      locked:
+        access: r
+        type: boolean
+        description: Whether the note is locked
+        unsupported:
+          reason: Jotter does not implement locking.
+          evidence:
+            source: probe
+            observedAt: '2026-10-30T12:00:00.000Z'
+            bundleId: com.example.jotter
+            appVersion: '2.1'
+            osVersion: '27.2'
+            sampleSize: 40
+            failedReads: 40
+            errorNumbers: [-1728]
+enums: {}
+hierarchy: { children: {} }
+commands: {}
+`)
+    const { runner, scripts } = fakeRunner(
+      fakeApp({ notes: [item({ uid: 'n-0', title: SECRET, locked: true })] })
+    )
+    const result = await probeNullability(manifest, runner, { environment: environment() })
+    expect(result.resources['Note']).toMatchObject({
+      status: 'probed',
+      itemsRead: 1,
+      presence: {
+        uid: { reads: 1, nulls: 0, failures: 0 },
+        title: { reads: 1, nulls: 0, failures: 0 },
+      },
+      skipped: [{ property: 'locked', reason: 'unsupported' }],
+    })
+    expect(result.resources['Note']?.presence).not.toHaveProperty('locked')
+    for (const script of scripts) {
+      expect(script).not.toContain(JSON.stringify('locked'))
+    }
+  })
+
+  it('returns counts and kind labels only: no observed value leaves the app process or reaches the result', async () => {
     const { runner, returned } = fakeRunner(
       fakeApp({ notes: [note(0), note(1, null)], calendars: [calendar([event(SECRET)])] })
     )
@@ -704,7 +1212,12 @@ commands: {}
       expect(
         leaves(value).every((leaf) => typeof leaf === 'number' || typeof leaf === 'boolean')
       ).toBe(true)
+      // The only text is in keys, and the only keys under `kinds` are labels.
+      for (const kinds of kindsRecords(value)) {
+        expect(Object.keys(kinds).every((label) => isValueKind(label))).toBe(true)
+      }
     }
+    expect(returned.some((value) => kindsRecords(value).length > 0)).toBe(true)
   })
 
   it('reads no app command and writes nothing: every script only reads', async () => {
@@ -736,6 +1249,159 @@ commands: {}
   })
 })
 
+describe('probeNullability: value kinds', () => {
+  const KINDS_MANIFEST = parseManifestYaml(`
+version: '1.0'
+app: { bundleId: com.example.jotter, name: Jotter, tccEntitlements: [] }
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    properties:
+      when: { access: r, type: string, description: Declared text, holds dates }
+      size: { access: r, type: integer, description: A number }
+      done: { access: r, type: boolean, description: A flag }
+      title: { access: r, type: string, description: Text }
+      bounds: { access: r, type: rect, description: A record }
+      tags: { access: r, type: { array: string }, description: A list }
+      folder: { access: r, type: { resource: Note }, description: A reference }
+      odd: { access: r, type: any, description: A host object }
+      mixed: { access: r, type: string, description: Text or a date }
+      blank: { access: r, type: string, description: Never set }
+enums: {}
+hierarchy: { children: {} }
+commands: {}
+`)
+
+  /** A host object: tagged \`Object\` but with its own prototype, like a path object. */
+  class HostObject {
+    readonly secret = SECRET
+  }
+
+  /** A note whose values have every kind; dates and records come from this realm, not the probe's. */
+  function kindsNote(index: number): object {
+    return item({
+      when: new Date(Date.UTC(2026, 9, index + 1)),
+      size: index,
+      done: index % 2 === 0,
+      title: SECRET,
+      bounds: { x: 0, y: 0, width: index, height: index },
+      tags: [SECRET],
+      // An object specifier is callable.
+      folder: () => SECRET,
+      odd: new HostObject(),
+      mixed: index === 0 ? new Date(Date.UTC(2026, 0, 1)) : SECRET,
+      blank: null,
+    })
+  }
+
+  it('counts each value found by kind, and returns only labels and counts', async () => {
+    const { runner, returned } = fakeRunner(fakeApp({ notes: [0, 1, 2].map(kindsNote) }))
+    const result = await probeNullability(KINDS_MANIFEST, runner, { environment: environment() })
+    const presence = result.resources['Note']?.presence
+    expect(presence).toEqual({
+      when: { reads: 3, nulls: 0, failures: 0, kinds: { date: 3 } },
+      size: { reads: 3, nulls: 0, failures: 0, kinds: { number: 3 } },
+      done: { reads: 3, nulls: 0, failures: 0, kinds: { boolean: 3 } },
+      title: { reads: 3, nulls: 0, failures: 0, kinds: { string: 3 } },
+      bounds: { reads: 3, nulls: 0, failures: 0, kinds: { record: 3 } },
+      tags: { reads: 3, nulls: 0, failures: 0, kinds: { list: 3 } },
+      folder: { reads: 3, nulls: 0, failures: 0, kinds: { reference: 3 } },
+      odd: { reads: 3, nulls: 0, failures: 0, kinds: { other: 3 } },
+      mixed: { reads: 3, nulls: 0, failures: 0, kinds: { date: 1, string: 2 } },
+      // No value found: no kind data.
+      blank: { reads: 3, nulls: 3, failures: 0 },
+    })
+    expect(JSON.stringify(returned)).not.toContain(SECRET)
+    expect(JSON.stringify(returned)).not.toContain('2026')
+    expect(JSON.stringify(result)).not.toContain(SECRET)
+  })
+})
+
+describe('probeNullability: the values-free guard on what the body returns', () => {
+  /** A runner whose probe call returns `counts` for one property, `title`, of one item. */
+  function returning(entry: unknown): JxaRunner {
+    return (_bundleId, body) =>
+      Promise.resolve(
+        body === APP_VERSION_BODY
+          ? '2.1'
+          : {
+              reachable: true,
+              itemsRead: 1,
+              sampledParents: 1,
+              parentsScanned: 1,
+              scanLimited: false,
+              scanTimedOut: false,
+              truncated: false,
+              counts: { title: entry },
+            }
+      )
+  }
+  const TITLE_MANIFEST = parseManifestYaml(`
+version: '1.0'
+app: { bundleId: com.example.jotter, name: Jotter, tccEntitlements: [] }
+resources:
+  Note:
+    name: Note
+    plural: Notes
+    description: A note
+    properties:
+      title: { access: r, type: string, description: Title }
+enums: {}
+hierarchy: { children: {} }
+commands: {}
+`)
+
+  async function probeWith(entry: unknown) {
+    const result = await probeNullability(TITLE_MANIFEST, returning(entry), {
+      environment: environment(),
+    })
+    return result.resources['Note']
+  }
+
+  it('accepts every kind label, with counts that sum to the values found', async () => {
+    const kinds = {
+      date: 1,
+      number: 1,
+      boolean: 1,
+      string: 1,
+      record: 1,
+      list: 1,
+      reference: 1,
+      other: 1,
+    }
+    const note = await probeWith({ reads: 9, nulls: 1, failures: 0, kinds })
+    expect(note?.status).toBe('probed')
+    expect(note?.presence['title']).toEqual({ reads: 9, nulls: 1, failures: 0, kinds })
+  })
+
+  it('accepts no kinds when every read found no value', async () => {
+    const note = await probeWith({ reads: 1, nulls: 1, failures: 0, kinds: {} })
+    expect(note?.presence['title']).toEqual({ reads: 1, nulls: 1, failures: 0 })
+  })
+
+  it.each([
+    ['a value in place of a label', { [SECRET]: 1 }],
+    ['an unknown label', { text: 1 }],
+    ['a value in place of a count', { string: SECRET }],
+    ['a zero count', { string: 1, date: 0 }],
+    ['a fractional count', { string: 0.5, date: 0.5 }],
+    ['counts that do not sum to the values found', { string: 2 }],
+    ['a list of labels', ['string']],
+  ])('rejects %s, reporting an error and no value', async (_case, kinds) => {
+    const note = await probeWith({ reads: 1, nulls: 0, failures: 0, kinds })
+    expect(note?.status).toBe('error')
+    expect(note?.presence).toEqual({})
+    expect(JSON.stringify(note)).not.toContain(SECRET)
+  })
+
+  it('rejects counts with no kinds at all, and more empty reads than reads', async () => {
+    expect((await probeWith({ reads: 1, nulls: 0, failures: 0 }))?.status).toBe('error')
+    expect((await probeWith({ reads: 1, nulls: 2, failures: 0, kinds: {} }))?.status).toBe('error')
+  })
+})
+
 describe('probeNullability: provenance', () => {
   it("records the app's version, the macOS version, the bundle id, and the timestamp", async () => {
     const { runner } = fakeRunner(fakeApp({ notes: [] }), { version: '4.11' })
@@ -761,6 +1427,17 @@ describe('probeNullability: provenance', () => {
 })
 
 /** Every primitive leaf of a JSON value. */
+/** Every `kinds` record in a value returned by the probe body. */
+function kindsRecords(value: unknown): object[] {
+  if (typeof value !== 'object' || value === null) return []
+  const entries: [string, unknown][] = Object.entries(value)
+  return entries.flatMap(([key, inner]): object[] =>
+    key === 'kinds' && typeof inner === 'object' && inner !== null
+      ? [inner, ...kindsRecords(inner)]
+      : kindsRecords(inner)
+  )
+}
+
 function leaves(value: unknown): unknown[] {
   if (Array.isArray(value)) return value.flatMap(leaves)
   if (typeof value === 'object' && value !== null) return Object.values(value).flatMap(leaves)

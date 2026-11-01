@@ -73,6 +73,18 @@ resources:
         type: string
         description: A unique calendar key
         code: 'ID  '
+        unsupported:
+          reason: Calendar does not provide this key at runtime; every read fails, so calendars are targeted by name.
+          evidence:
+            source: probe
+            observedAt: '2026-11-01T06:05:52.689Z'
+            bundleId: com.apple.iCal
+            appVersion: '27.0'
+            osVersion: '27.2'
+            sampleSize: 16
+            failedReads: 16
+            errorNumbers:
+              - -1700
       writable:
         access: r
         type: boolean
@@ -84,7 +96,7 @@ resources:
         description: The calendar description
         code: wr12
     nullabilityProbe:
-      observedAt: '2026-11-01T06:05:52.689Z'
+      observedAt: '2026-11-01T08:34:11.357Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
@@ -92,7 +104,8 @@ resources:
       itemsRead: 16
       sampledParents: 1
       status: probed
-      skipped: []
+      skipped:
+        - calendarIdentifier
 
   Event:
     name: Event
@@ -112,11 +125,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       description:
@@ -128,12 +141,12 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:05:52.689Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 22
-            nullCount: 13
+            sampleSize: 44
+            nullCount: 31
             failedReads: 0
       location:
         access: rw
@@ -144,12 +157,12 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:05:52.689Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 22
-            nullCount: 14
+            sampleSize: 44
+            nullCount: 35
             failedReads: 0
       startDate:
         access: rw
@@ -160,11 +173,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       endDate:
@@ -176,11 +189,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       alldayEvent:
@@ -192,11 +205,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       recurrence:
@@ -208,12 +221,12 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:05:52.689Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 22
-            nullCount: 13
+            sampleSize: 44
+            nullCount: 27
             failedReads: 0
       status:
         access: rw
@@ -225,11 +238,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       sequence:
@@ -241,11 +254,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       stampDate:
@@ -253,16 +266,16 @@ resources:
         type: date
         description: The event modification date
         code: wr4s
-        nullable: false
+        nullable: true
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
-            nullCount: 0
+            sampleSize: 44
+            nullCount: 4
             failedReads: 0
       excludedDates:
         access: rw
@@ -274,11 +287,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 37
+            sampleSize: 44
             nullCount: 0
             failedReads: 0
       uid:
@@ -295,24 +308,25 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:05:52.689Z'
+            observedAt: '2026-11-01T09:37:06.012Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 22
-            nullCount: 14
+            sampleSize: 44
+            nullCount: 32
             failedReads: 0
     nullabilityProbe:
-      observedAt: '2026-11-01T06:05:52.689Z'
+      observedAt: '2026-11-01T09:37:06.012Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events
-      itemsRead: 22
-      sampledParents: 5
+      itemsRead: 44
+      sampledParents: 10
+      parentsScanned: 16
       status: probed
       skipped: []
-      note: stopped at the time limit after 22 items
+      note: stopped at the time limit after 44 items
 
   Attendee:
     name: Attendee
@@ -329,12 +343,12 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:31.777Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 60
-            nullCount: 45
+            sampleSize: 41
+            nullCount: 32
             failedReads: 0
       email:
         access: r
@@ -345,11 +359,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:31.777Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 60
+            sampleSize: 41
             nullCount: 0
             failedReads: 0
       participationStatus:
@@ -362,22 +376,25 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:31.777Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 60
+            sampleSize: 41
             nullCount: 0
             failedReads: 0
     nullabilityProbe:
-      observedAt: '2026-11-01T05:25:19.537Z'
+      observedAt: '2026-11-01T09:37:31.777Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events/attendees
-      itemsRead: 60
+      itemsRead: 41
+      sampledParents: 19
+      parentsScanned: 121
       status: probed
       skipped: []
+      note: the parent scan stopped at the time limit after 121 parents
 
   DisplayAlarm:
     name: DisplayAlarm
@@ -406,23 +423,25 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:37:49.363Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
-            sampleSize: 52
-            nullCount: 52
+            sampleSize: 40
+            nullCount: 40
             failedReads: 0
     nullabilityProbe:
-      observedAt: '2026-11-01T05:25:19.537Z'
+      observedAt: '2026-11-01T09:37:49.363Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events/displayAlarms
-      itemsRead: 52
+      itemsRead: 40
+      sampledParents: 30
+      parentsScanned: 128
       status: probed
       skipped: []
-      note: stopped at the time limit after 52 items
+      note: the parent scan stopped at the time limit after 128 parents
 
   MailAlarm:
     name: MailAlarm
@@ -441,16 +460,17 @@ resources:
         description: An absolute alarm date
         code: wale
     nullabilityProbe:
-      observedAt: '2026-11-01T06:05:52.689Z'
+      observedAt: '2026-11-01T09:38:04.806Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events/mailAlarms
       itemsRead: 0
       sampledParents: 0
+      parentsScanned: 125
       status: budget
       skipped: []
-      note: 'not probed: the time budget was spent'
+      note: no items found in the 125 parents scanned before the time limit
 
   SoundAlarm:
     name: SoundAlarm
@@ -472,7 +492,7 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T05:25:19.537Z'
+            observedAt: '2026-11-01T09:38:17.685Z'
             bundleId: com.apple.iCal
             appVersion: '27.0'
             osVersion: '27.2'
@@ -490,15 +510,17 @@ resources:
         description: The (POSIX) path to the sound file to be used for the alarm
         code: walf
     nullabilityProbe:
-      observedAt: '2026-11-01T05:25:19.537Z'
+      observedAt: '2026-11-01T09:38:17.685Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events/soundAlarms
       itemsRead: 9
+      sampledParents: 9
+      parentsScanned: 123
       status: probed
       skipped: []
-      note: stopped at the time limit after 9 items
+      note: the parent scan stopped at the time limit after 123 parents
 
   OpenFileAlarm:
     name: OpenFileAlarm
@@ -534,16 +556,17 @@ resources:
           since: '10.14'
           upstream: true
     nullabilityProbe:
-      observedAt: '2026-11-01T06:05:52.689Z'
+      observedAt: '2026-11-01T09:38:31.701Z'
       bundleId: com.apple.iCal
       appVersion: '27.0'
       osVersion: '27.2'
       accessPath: calendars/events/openFileAlarms
       itemsRead: 0
       sampledParents: 0
+      parentsScanned: 122
       status: budget
       skipped: []
-      note: 'not probed: the time budget was spent'
+      note: no items found in the 122 parents scanned before the time limit
 
 enums:
   ParticipationStatus:

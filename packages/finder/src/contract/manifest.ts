@@ -139,6 +139,20 @@ export const manifest: unknown = {
             '(NOT AVAILABLE YET) Is the container capable of being expanded as an outline?',
           code: 'pexa',
           optional: false,
+          unsupported: {
+            reason: 'Finder does not implement this property; every read fails.',
+            dictionaryNote: 'NOT AVAILABLE YET',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 18,
+              failedReads: 18,
+              errorNumbers: [-1728],
+            },
+          },
         },
         expanded: {
           access: 'rw',
@@ -147,6 +161,20 @@ export const manifest: unknown = {
             '(NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists)',
           code: 'pexp',
           optional: false,
+          unsupported: {
+            reason: 'Finder does not implement this property; every read fails.',
+            dictionaryNote: 'NOT AVAILABLE YET',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 18,
+              failedReads: 18,
+              errorNumbers: [-1728],
+            },
+          },
         },
         completelyExpanded: {
           access: 'rw',
@@ -155,6 +183,20 @@ export const manifest: unknown = {
             '(NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists)',
           code: 'pexc',
           optional: false,
+          unsupported: {
+            reason: 'Finder does not implement this property; every read fails.',
+            dictionaryNote: 'NOT AVAILABLE YET',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 18,
+              failedReads: 18,
+              errorNumbers: [-1728],
+            },
+          },
         },
         containerWindow: {
           access: 'r',
@@ -162,18 +204,41 @@ export const manifest: unknown = {
           description: 'the container window for this folder',
           code: 'cwnd',
           optional: false,
+          unsupported: {
+            reason:
+              'The app returns an object reference, which the generated code cannot decode until reference conversions land.',
+            trackingIssue: 155,
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T08:33:55.893Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 18,
+              observedKinds: {
+                reference: 18,
+              },
+            },
+          },
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T09:28:10.841Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
         accessPath: 'containers',
         itemsRead: 18,
         sampledParents: 1,
+        parentsScanned: 1,
         status: 'probed',
-        skipped: ['entireContents'],
+        skipped: [
+          'entireContents',
+          'expandable',
+          'expanded',
+          'completelyExpanded',
+          'containerWindow',
+        ],
       },
     },
     Disk: {
@@ -254,7 +319,7 @@ export const manifest: unknown = {
         },
       ],
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -280,7 +345,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -306,7 +371,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -332,7 +397,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -359,7 +424,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T06:05:32.244Z',
+              observedAt: '2026-11-01T08:33:55.893Z',
               bundleId: 'com.apple.finder',
               appVersion: '27.2',
               osVersion: '27.2',
@@ -379,7 +444,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T06:05:32.244Z',
+              observedAt: '2026-11-01T08:33:55.893Z',
               bundleId: 'com.apple.finder',
               appVersion: '27.2',
               osVersion: '27.2',
@@ -399,7 +464,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T06:05:32.244Z',
+              observedAt: '2026-11-01T08:33:55.893Z',
               bundleId: 'com.apple.finder',
               appVersion: '27.2',
               osVersion: '27.2',
@@ -419,7 +484,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T06:05:32.244Z',
+              observedAt: '2026-11-01T08:33:55.893Z',
               bundleId: 'com.apple.finder',
               appVersion: '27.2',
               osVersion: '27.2',
@@ -439,7 +504,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T06:05:32.244Z',
+              observedAt: '2026-11-01T08:33:55.893Z',
               bundleId: 'com.apple.finder',
               appVersion: '27.2',
               osVersion: '27.2',
@@ -451,7 +516,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -477,7 +542,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -508,6 +573,21 @@ export const manifest: unknown = {
             '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched',
           code: 'sprt',
           optional: false,
+          unsupported: {
+            reason:
+              'The property applies only to macOS 10.1 to 10.4; every read fails on current macOS.',
+            dictionaryNote: 'AVAILABLE IN 10.1 TO 10.4',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 5,
+              failedReads: 5,
+              errorNumbers: [-10000],
+            },
+          },
         },
         minimumSize: {
           access: 'rw',
@@ -516,6 +596,21 @@ export const manifest: unknown = {
             '(AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched',
           code: 'mprt',
           optional: false,
+          unsupported: {
+            reason:
+              'The property applies only to macOS 10.1 to 10.4; every read fails on current macOS.',
+            dictionaryNote: 'AVAILABLE IN 10.1 TO 10.4',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 5,
+              failedReads: 5,
+              errorNumbers: [-10000],
+            },
+          },
         },
         preferredSize: {
           access: 'rw',
@@ -524,6 +619,21 @@ export const manifest: unknown = {
             '(AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched',
           code: 'appt',
           optional: false,
+          unsupported: {
+            reason:
+              'The property applies only to macOS 10.1 to 10.4; every read fails on current macOS.',
+            dictionaryNote: 'AVAILABLE IN 10.1 TO 10.4',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 5,
+              failedReads: 5,
+              errorNumbers: [-10000],
+            },
+          },
         },
         acceptsHighLevelEvents: {
           access: 'r',
@@ -546,6 +656,21 @@ export const manifest: unknown = {
             '(AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment?',
           code: 'Clsc',
           optional: false,
+          unsupported: {
+            reason:
+              'The property applies only to macOS 10.1 to 10.4; every read fails on current macOS.',
+            dictionaryNote: 'AVAILABLE IN 10.1 TO 10.4',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 5,
+              failedReads: 5,
+              errorNumbers: [-10000],
+            },
+          },
         },
       },
       identifiers: [
@@ -555,7 +680,7 @@ export const manifest: unknown = {
         },
       ],
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -563,7 +688,7 @@ export const manifest: unknown = {
         itemsRead: 5,
         sampledParents: 1,
         status: 'probed',
-        skipped: [],
+        skipped: ['suggestedSize', 'minimumSize', 'preferredSize', 'opensInClassic'],
       },
     },
     DocumentFile: {
@@ -578,10 +703,23 @@ export const manifest: unknown = {
           description: 'Unique identifier for this document',
           code: 'ID  ',
           optional: false,
+          unsupported: {
+            reason: 'Finder document files have no id; every read fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.apple.finder',
+              appVersion: '27.2',
+              osVersion: '27.2',
+              sampleSize: 60,
+              failedReads: 60,
+              errorNumbers: [-1731],
+            },
+          },
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -589,7 +727,7 @@ export const manifest: unknown = {
         itemsRead: 60,
         sampledParents: 1,
         status: 'probed',
-        skipped: [],
+        skipped: ['id'],
       },
     },
     InternetLocationFile: {
@@ -607,7 +745,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -633,7 +771,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -652,14 +790,14 @@ export const manifest: unknown = {
       properties: {
         id: {
           access: 'r',
-          type: 'integer',
+          type: 'string',
           description: 'Unique identifier for this package',
           code: 'ID  ',
           optional: false,
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -747,7 +885,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -773,7 +911,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -836,7 +974,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',
@@ -904,7 +1042,7 @@ export const manifest: unknown = {
         },
       },
       nullabilityProbe: {
-        observedAt: '2026-11-01T06:05:32.244Z',
+        observedAt: '2026-11-01T08:33:55.893Z',
         bundleId: 'com.apple.finder',
         appVersion: '27.2',
         osVersion: '27.2',

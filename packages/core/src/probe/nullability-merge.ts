@@ -28,24 +28,56 @@
  * manifest defect (the identifier choice is wrong), reported per resource
  * with its counts.
  *
+ * In a resource whose items were read, a property whose every read failed
+ * (no successful read, and one failure per item read) is also a manifest
+ * defect: the property most likely does not exist under that name in the
+ * app. It gets no claim, like any property without a successful read. The
+ * primary identifier is the exception: an identifier whose every read failed
+ * is reported once, as the identifier defect, which already carries its
+ * counts and asks for a different identifier.
+ *
+ * A property the manifest marks `unsupported` (one the app cannot provide)
+ * is never given a claim, since a marked property carries none, and is not
+ * reported as a defect, since the marker already records that it cannot be
+ * read. The probe does not read such a property; this holds as well for
+ * observations of one, say from a run before the marker was added. Neither
+ * the merge nor the writer ever adds, changes, or removes the marker: it is
+ * curated.
+ *
+ * Each read property's value kinds are compared with the kinds its declared
+ * type expects (see `../manifest/value-kinds.ts`). Values of a kind the type does not
+ * expect are a manifest defect, reported with the counts of matching and
+ * contradicting values; a declared type with no expected kinds is reported
+ * as unchecked. Neither changes a claim.
+ *
  * Resettability is never touched: only curation can establish it.
  *
  * @packageDocumentation
  */
 
 import { resolvePrimaryIdentifierProperty } from '../manifest/identifier.js'
+import { isUnsupportedProperty } from '../manifest/unsupported.js'
 import {
   NON_NULL_SAMPLE_THRESHOLD,
   type NullabilityEvidence,
   type ProbeNullabilityEvidence,
 } from '../manifest/schemas/evidence.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
-import type { NullabilityProbe } from '../manifest/schemas/resource.js'
+import type { NullabilityProbe, Resource } from '../manifest/schemas/resource.js'
 import type {
   AppNullabilityResult,
   PropertyPresence,
   ResourceNullabilityResult,
 } from './nullability.js'
+import { createNameResolver, type NameResolver } from '../generator/contract/value-mapping.js'
+import {
+  VALUE_KINDS,
+  describeDeclaredType,
+  possibleValueKinds,
+  type ValueKind,
+  type ValueKindCounts,
+} from '../manifest/value-kinds.js'
+import { expectedValueKindsIn } from './value-kinds.js'
 
 /**
  * What the counts for one property show, independent of any claim:
@@ -110,6 +142,62 @@ export interface IdentifierDefect {
   readonly probed: boolean
 }
 
+/**
+ * A manifest defect: every read of a (non-identifier) property failed, in a
+ * resource whose items were read. A property that always fails is most likely
+ * misnamed in the manifest, unsupported by the app, or obsolete. Counts only,
+ * never a value.
+ */
+export interface ReadFailureDefect {
+  /** The property whose every read failed. */
+  readonly property: string
+  /** How many items were read; every one of them failed to read the property. */
+  readonly itemsRead: number
+  /** How many reads failed: equal to `itemsRead`. */
+  readonly failed: number
+}
+
+/**
+ * A manifest defect: the kinds of a property's values contradict its declared
+ * type (a property declared `string` whose values are dates, say), so every
+ * generated decoder of it fails. Reported when at least one value has a kind
+ * the declared type does not expect; a mix reports both counts. Labels and
+ * counts only, never a value.
+ */
+export interface KindMismatchDefect {
+  /** The property. */
+  readonly property: string
+  /** The declared type, as reports show it, e.g. `string` or `list of date`. */
+  readonly declared: string
+  /** The kinds the declared type expects (see `expectedValueKinds`). */
+  readonly expected: readonly ValueKind[]
+  /** How many values were found: the reads that found one. */
+  readonly values: number
+  /** How many of them had an expected kind. */
+  readonly matched: number
+  /** The values of an unexpected kind, counted by kind. */
+  readonly unexpected: ValueKindCounts
+  /**
+   * Whether these counts are valid kind evidence for an `unsupported` marker:
+   * no value matched, and no observed kind is one the declared type could
+   * expect under any resolution of its type names (`possibleValueKinds`).
+   * The probe only reports this; it never writes a marker.
+   */
+  readonly markable: boolean
+}
+
+/**
+ * A property whose value kinds were not compared with its declared type,
+ * because the type has no expected kinds (`any`, files, or a type that names
+ * no resource or enum).
+ */
+export interface UncheckedKinds {
+  /** The property. */
+  readonly property: string
+  /** The declared type, as reports show it. */
+  readonly declared: string
+}
+
 /** The merge's decisions for one resource. */
 export interface ResourceMergeOutcome {
   readonly resource: string
@@ -119,6 +207,22 @@ export interface ResourceMergeOutcome {
   readonly properties: readonly PropertyMergeOutcome[]
   /** Set when the primary identifier was not present in every item read. */
   readonly identifierDefect?: IdentifierDefect
+  /**
+   * The properties whose every read failed, in probe order. Set only when
+   * there is at least one. Never includes the primary identifier, which
+   * `identifierDefect` reports instead.
+   */
+  readonly readFailureDefects?: readonly ReadFailureDefect[]
+  /**
+   * Properties whose value kinds contradict their declared type: manifest
+   * defects. Absent when there are none.
+   */
+  readonly kindDefects?: readonly KindMismatchDefect[]
+  /**
+   * Properties read whose declared type has no expected kinds, so their kinds
+   * were not checked. Absent when there are none.
+   */
+  readonly kindsUnchecked?: readonly UncheckedKinds[]
 }
 
 /** The merge's decisions for one app, ready for the writer and the CLI. */
@@ -201,14 +305,54 @@ function decideProperty(
 const BUDGET_SPENT_NOTE = 'not probed: the time budget was spent'
 
 /**
+ * The note on a nested resource whose parent scan ran out of time before it
+ * found an item, or `undefined` for any other result. Such a resource was
+ * probed, not skipped, and whether it has items is unknown: only the parents
+ * counted here were looked in. A top-level resource, or one the budget left
+ * unread (no parent looked in), gets no such note.
+ *
+ * It keys on the `budget` status, which a call that looked in parents gets
+ * when the time ran out before any item was read. That is the pre-scan's
+ * deadline, which falls at `PARENT_SCAN_TIME_SHARE` of the call's time
+ * limit, so the sample always has the rest: only a single app round trip
+ * longer than that share could instead spend the sample's time first.
+ *
+ * Shared by the manifest's probe block and the CLI's report, so the two say
+ * the same thing.
+ *
+ * @param result - The resource's status, access path, and parents scanned.
+ *
+ * @public
+ */
+export function scanExhaustedNote(
+  result: Pick<ResourceNullabilityResult, 'status' | 'accessPath' | 'parentsScanned'>
+): string | undefined {
+  if (result.status !== 'budget' || !result.accessPath.includes('/')) return undefined
+  if (result.parentsScanned === 0) return undefined
+  const parents = result.parentsScanned === 1 ? 'parent' : 'parents'
+  return `no items found in the ${String(result.parentsScanned)} ${parents} scanned before the time limit`
+}
+
+/**
  * The value-free note on a resource's probe block: why the call failed, that
- * the time budget left the resource unread, or that the time limit cut a
- * sample of at least one item short (which explains a sample below
- * `NON_NULL_SAMPLE_THRESHOLD`).
+ * a nested resource's parent scan ran out of time before any item (see
+ * {@link scanExhaustedNote}), that the time budget left the resource unread,
+ * or that the time limit cut a sample of at least one item short (which
+ * explains a sample below `NON_NULL_SAMPLE_THRESHOLD`).
  */
 function probeBlockNote(result: ResourceNullabilityResult): string | undefined {
-  if (result.note !== undefined) return result.note
-  if (result.status === 'budget') return BUDGET_SPENT_NOTE
+  const cut = sampleCutText(result)
+  // A note from the probe (a parent scan the time cut short) keeps the
+  // sample's own cut, when both happened.
+  if (result.note !== undefined) {
+    return cut === undefined ? result.note : `${result.note}; the sample ${cut}`
+  }
+  if (result.status === 'budget') return scanExhaustedNote(result) ?? BUDGET_SPENT_NOTE
+  return cut
+}
+
+/** `stopped at the time limit after N items`, for a sample of at least one item the time cut short. */
+function sampleCutText(result: ResourceNullabilityResult): string | undefined {
   if (result.status !== 'probed' || !result.truncated || result.itemsRead === 0) return undefined
   const items = result.itemsRead === 1 ? 'item' : 'items'
   return `stopped at the time limit after ${String(result.itemsRead)} ${items}`
@@ -238,6 +382,81 @@ function identifierDefect(
   }
 }
 
+/**
+ * The properties whose every read failed in a resource whose items were read:
+ * no successful read, and as many failures as items (`reads == 0 &&
+ * failures == itemsRead > 0`). The primary identifier is left to
+ * {@link identifierDefect}, so it is reported once.
+ */
+function readFailureDefects(
+  identifier: string | undefined,
+  marked: ReadonlySet<string>,
+  result: ResourceNullabilityResult
+): ReadFailureDefect[] {
+  if (result.itemsRead === 0) return []
+  return Object.entries(result.presence).flatMap(([property, presence]): ReadFailureDefect[] =>
+    property !== identifier &&
+    !marked.has(property) &&
+    presence.reads === 0 &&
+    presence.failures === result.itemsRead
+      ? [{ property, itemsRead: result.itemsRead, failed: presence.failures }]
+      : []
+  )
+}
+
+/**
+ * The comparison of each read property's value kinds with its declared type:
+ * the properties whose kinds contradict it, and those whose type has no
+ * expected kinds. The primary identifier is checked like any other property;
+ * a property marked unsupported, or not declared, is not.
+ */
+function kindFindings(
+  resource: Resource,
+  marked: ReadonlySet<string>,
+  result: ResourceNullabilityResult,
+  names: NameResolver
+): { defects: KindMismatchDefect[]; unchecked: UncheckedKinds[] } {
+  const defects: KindMismatchDefect[] = []
+  const unchecked: UncheckedKinds[] = []
+  for (const [property, presence] of Object.entries(result.presence)) {
+    if (marked.has(property) || !Object.hasOwn(resource.properties, property)) continue
+    const type = resource.properties[property]?.type
+    const declared = describeDeclaredType(type)
+    const expected = expectedValueKindsIn(type, names)
+    if (expected === undefined) {
+      unchecked.push({ property, declared })
+      continue
+    }
+    const kinds = presence.kinds ?? {}
+    let matched = 0
+    const unexpected: Partial<Record<ValueKind, number>> = {}
+    for (const kind of VALUE_KINDS) {
+      const count = kinds[kind] ?? 0
+      if (count === 0) continue
+      if (expected.includes(kind)) matched += count
+      else unexpected[kind] = count
+    }
+    if (Object.keys(unexpected).length > 0) {
+      const values = presence.reads - presence.nulls
+      const possible = possibleValueKinds(type) ?? []
+      const markable =
+        matched === 0 &&
+        VALUE_KINDS.every((kind) => !(kind in unexpected) || !possible.includes(kind))
+      defects.push({ property, declared, expected, values, matched, unexpected, markable })
+    }
+  }
+  return { defects, unchecked }
+}
+
+/** The properties a resource marks unsupported. */
+function unsupportedNames(resource: Resource): Set<string> {
+  return new Set(
+    Object.entries(resource.properties)
+      .filter(([, definition]) => isUnsupportedProperty(definition))
+      .map(([name]) => name)
+  )
+}
+
 /** The `nullabilityProbe` block recording how a resource was probed. */
 function probeBlock(
   app: AppNullabilityResult,
@@ -252,6 +471,7 @@ function probeBlock(
     accessPath: result.accessPath,
     itemsRead: result.itemsRead,
     sampledParents: result.sampledParents,
+    parentsScanned: result.parentsScanned,
     status: result.status,
     skipped: result.skipped.map((entry) => entry.property),
     ...(note === undefined ? {} : { note }),
@@ -277,12 +497,14 @@ export function mergeNullabilityObservations(
     appVersion: observed.appVersion,
     osVersion: observed.osVersion,
   }
+  const names = createNameResolver(manifest)
   const resources = Object.values(observed.resources).flatMap((result): ResourceMergeOutcome[] => {
     const resource = manifest.resources[result.resource]
     if (resource === undefined) return []
     const identifier = resolvePrimaryIdentifierProperty(resource)
+    const marked = unsupportedNames(resource)
     const properties = Object.entries(result.presence).map(([property, presence]) => {
-      if (property === identifier) {
+      if (property === identifier || marked.has(property)) {
         return {
           property,
           presence,
@@ -298,12 +520,17 @@ export function mergeNullabilityObservations(
       )
     })
     const defect = identifierDefect(identifier, result)
+    const readFailures = readFailureDefects(identifier, marked, result)
+    const kinds = kindFindings(resource, marked, result, names)
     return [
       {
         resource: result.resource,
         block: probeBlock(observed, result),
         properties,
         ...(defect === undefined ? {} : { identifierDefect: defect }),
+        ...(readFailures.length === 0 ? {} : { readFailureDefects: readFailures }),
+        ...(kinds.defects.length === 0 ? {} : { kindDefects: kinds.defects }),
+        ...(kinds.unchecked.length === 0 ? {} : { kindsUnchecked: kinds.unchecked }),
       },
     ]
   })

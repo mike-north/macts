@@ -25,7 +25,6 @@ import {
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
-  type Rgb,
   type ValueType,
 } from '@macts/contracts'
 
@@ -64,7 +63,7 @@ export interface List {
    * The color of the list.
    * Nullable. Observed missing in 2 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
-  color: Rgb | null
+  color: string | null
   /**
    * The emblem icon name of the list.
    * Nullable. Observed missing in 3 of 3 items (Reminders 7.0, macOS 27.2, 2026-11-01).
@@ -76,7 +75,7 @@ export interface List {
 export interface Reminder {
   /**
    * The name of the reminder.
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   name: string
   /**
@@ -91,7 +90,7 @@ export interface Reminder {
   body: string | null
   /**
    * Whether the reminder is completed.
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   completed: boolean
   /**
@@ -102,41 +101,39 @@ export interface Reminder {
   readonly completionDate: Date | null
   /**
    * The due date of the reminder.
-   * Nullable: A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no due date
-   * on 15; the app reports a missing date as null (Reminders 7.0).
+   * Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   dueDate: Date | null
   /**
    * The remind date of the reminder.
-   * Nullable: A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no remind
-   * date on 15; the app reports a missing date as null (Reminders 7.0).
+   * Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   remindMeDate: Date | null
   /**
    * The priority of the reminder (0=none, 1=high, 5=medium, 9=low).
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   priority: Integer
   /**
    * Whether the reminder is flagged.
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   flagged: boolean
   /**
    * The creation date of the reminder.
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   readonly creationDate: Date
   /**
    * The modification date of the reminder.
-   * Never null: observed in all 35 items (Reminders 7.0, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
   readonly modificationDate: Date
   /**
    * The all-day due date of the reminder.
-   * Nullable. No evidence that the app always sets it.
+   * Nullable. Observed missing in 15 of 412 items (Reminders 7.0, macOS 27.2, 2026-11-01).
    */
-  allDayDueDate: Date | null
+  alldayDueDate: Date | null
 }
 
 /** Input for creating an Account. */
@@ -150,7 +147,7 @@ export interface ListCreateInput {
   /** List name */
   name: string
   /** List color */
-  color?: Rgb
+  color?: string
   /** The emblem icon name of the list */
   emblem?: string
 }
@@ -166,7 +163,7 @@ export interface ListUpdateInput {
    * List color.
    * Cannot be reset: null is rejected.
    */
-  color?: Rgb
+  color?: string
   /**
    * The emblem icon name of the list.
    * Cannot be reset: null is rejected.
@@ -191,7 +188,7 @@ export interface ReminderCreateInput {
   /** Whether to flag the reminder */
   flagged?: boolean
   /** The all-day due date of the reminder */
-  allDayDueDate?: Date
+  alldayDueDate?: Date
   /** List identifier for the reminder */
   listId: string
 }
@@ -237,7 +234,7 @@ export interface ReminderUpdateInput {
    * The all-day due date of the reminder.
    * Cannot be reset: null is rejected.
    */
-  allDayDueDate?: Date
+  alldayDueDate?: Date
   /**
    * List identifier for the reminder.
    * Cannot be reset: null is rejected.
@@ -322,7 +319,7 @@ const listRecordType: ValueType<List> = t.record(
   {
     name: t.nullable(t.string(), { description: 'The name of the list' }),
     id: t.string({ description: 'The unique identifier of the list' }),
-    color: t.nullable(t.rgb(), { description: 'The color of the list' }),
+    color: t.nullable(t.string(), { description: 'The color of the list' }),
     emblem: t.nullable(t.string(), { description: 'The emblem icon name of the list' }),
   },
   { description: 'A list of reminders' }
@@ -343,14 +340,14 @@ const reminderRecordType: ValueType<Reminder> = t.record(
     flagged: t.boolean({ description: 'Whether the reminder is flagged' }),
     creationDate: t.date({ description: 'The creation date of the reminder' }),
     modificationDate: t.date({ description: 'The modification date of the reminder' }),
-    allDayDueDate: t.nullable(t.date(), { description: 'The all-day due date of the reminder' }),
+    alldayDueDate: t.nullable(t.date(), { description: 'The all-day due date of the reminder' }),
   },
   { description: 'A reminder item' }
 )
 
 const listCreateInputType: ValueType<ListCreateInput> = t.record({
   name: t.string({ description: 'List name' }),
-  color: t.optional(t.rgb({ description: 'List color' })),
+  color: t.optional(t.string({ description: 'List color' })),
   emblem: t.optional(t.string({ description: 'The emblem icon name of the list' })),
 })
 
@@ -362,7 +359,7 @@ const reminderCreateInputType: ValueType<ReminderCreateInput> = t.record({
   remindMeDate: t.optional(t.date({ description: 'Remind me date' })),
   priority: t.optional(t.integer({ description: 'Priority (0=none, 1=high, 5=medium, 9=low)' })),
   flagged: t.optional(t.boolean({ description: 'Whether to flag the reminder' })),
-  allDayDueDate: t.optional(t.date({ description: 'The all-day due date of the reminder' })),
+  alldayDueDate: t.optional(t.date({ description: 'The all-day due date of the reminder' })),
   listId: t.string({ description: 'List identifier for the reminder' }),
 })
 
