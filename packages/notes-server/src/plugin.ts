@@ -72,7 +72,7 @@ export const notesApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:05:24.948Z',
+          observedAt: '2026-11-01T08:33:35.626Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',
@@ -109,6 +109,22 @@ export const notesApiPlugin = {
             description: 'The container of the folder',
             code: 'NTcr',
             optional: true,
+            unsupported: {
+              reason:
+                'The app returns an object reference (an account or a folder), which the generated code cannot decode until reference conversions land.',
+              trackingIssue: 155,
+              evidence: {
+                source: 'probe',
+                observedAt: '2026-11-01T08:33:35.626Z',
+                bundleId: 'com.apple.Notes',
+                appVersion: '4.13',
+                osVersion: '27.2',
+                sampleSize: 1,
+                observedKinds: {
+                  reference: 1,
+                },
+              },
+            },
           },
           shared: {
             access: 'r',
@@ -125,15 +141,16 @@ export const notesApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:05:24.948Z',
+          observedAt: '2026-11-01T09:28:11.279Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',
           accessPath: 'folders',
           itemsRead: 1,
           sampledParents: 1,
+          parentsScanned: 1,
           status: 'probed',
-          skipped: [],
+          skipped: ['container'],
         },
       },
       Note: {
@@ -159,7 +176,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -193,7 +210,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -213,7 +230,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -233,7 +250,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -253,7 +270,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -271,7 +288,7 @@ export const notesApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:05:24.948Z',
+          observedAt: '2026-11-01T08:33:35.626Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',
@@ -298,7 +315,7 @@ export const notesApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:05:24.948Z',
+                observedAt: '2026-11-01T08:33:35.626Z',
                 bundleId: 'com.apple.Notes',
                 appVersion: '4.13',
                 osVersion: '27.2',
@@ -344,7 +361,7 @@ export const notesApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:05:24.948Z',
+          observedAt: '2026-11-01T08:33:35.626Z',
           bundleId: 'com.apple.Notes',
           appVersion: '4.13',
           osVersion: '27.2',

@@ -25,7 +25,6 @@ export class ListFoldersCommand extends Command {
         items.map((item) => ({
           name: item.name,
           id: item.id,
-          container: item.container,
           shared: item.shared,
         }))
       )

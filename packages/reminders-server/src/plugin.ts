@@ -73,7 +73,7 @@ export const remindersApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:04:58.718Z',
+          observedAt: '2026-11-01T08:33:42.817Z',
           bundleId: 'com.apple.reminders',
           appVersion: '7.0',
           osVersion: '27.2',
@@ -106,7 +106,7 @@ export const remindersApiPlugin = {
           },
           color: {
             access: 'rw',
-            type: 'rgb',
+            type: 'string',
             description: 'The color of the list',
             code: 'colr',
             optional: false,
@@ -114,7 +114,7 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
@@ -134,7 +134,7 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
@@ -152,7 +152,7 @@ export const remindersApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:04:58.718Z',
+          observedAt: '2026-11-01T08:33:42.817Z',
           bundleId: 'com.apple.reminders',
           appVersion: '7.0',
           osVersion: '27.2',
@@ -179,11 +179,11 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
@@ -213,11 +213,11 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
@@ -248,10 +248,15 @@ export const remindersApiPlugin = {
             nullable: true,
             evidence: {
               nullable: {
-                source: 'curated',
-                note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no due date on 15; the app reports a missing date as null.',
-                observedAt: '2026-11-01T05:45:00.000Z',
+                source: 'probe',
+                observedAt: '2026-11-01T05:45:40.107Z',
+                bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 412,
+                nullCount: 15,
+                failedReads: 0,
+                note: 'Replaced a curated claim. A read-only scan of every reminder, not a sample.',
               },
             },
           },
@@ -264,10 +269,15 @@ export const remindersApiPlugin = {
             nullable: true,
             evidence: {
               nullable: {
-                source: 'curated',
-                note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no remind date on 15; the app reports a missing date as null.',
-                observedAt: '2026-11-01T05:45:00.000Z',
+                source: 'probe',
+                observedAt: '2026-11-01T05:45:40.107Z',
+                bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 412,
+                nullCount: 15,
+                failedReads: 0,
+                note: 'Replaced a curated claim. A read-only scan of every reminder, not a sample.',
               },
             },
           },
@@ -281,11 +291,11 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
@@ -301,11 +311,11 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
@@ -321,11 +331,11 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
@@ -341,22 +351,36 @@ export const remindersApiPlugin = {
             evidence: {
               nullable: {
                 source: 'probe',
-                observedAt: '2026-11-01T06:04:58.718Z',
+                observedAt: '2026-11-01T08:33:42.817Z',
                 bundleId: 'com.apple.reminders',
                 appVersion: '7.0',
                 osVersion: '27.2',
-                sampleSize: 35,
+                sampleSize: 60,
                 nullCount: 0,
                 failedReads: 0,
               },
             },
           },
-          allDayDueDate: {
+          alldayDueDate: {
             access: 'rw',
             type: 'date',
             description: 'The all-day due date of the reminder',
-            code: '????',
+            code: 'adue',
             optional: false,
+            nullable: true,
+            evidence: {
+              nullable: {
+                source: 'probe',
+                observedAt: '2026-11-01T05:45:40.107Z',
+                bundleId: 'com.apple.reminders',
+                appVersion: '7.0',
+                osVersion: '27.2',
+                sampleSize: 412,
+                nullCount: 15,
+                failedReads: 0,
+                note: 'Replaced a curated claim. A read-only scan of every reminder; a 60-item sample saw none of the 15.',
+              },
+            },
           },
         },
         identifiers: [
@@ -366,16 +390,15 @@ export const remindersApiPlugin = {
           },
         ],
         nullabilityProbe: {
-          observedAt: '2026-11-01T06:04:58.718Z',
+          observedAt: '2026-11-01T08:33:42.817Z',
           bundleId: 'com.apple.reminders',
           appVersion: '7.0',
           osVersion: '27.2',
           accessPath: 'lists/reminders',
-          itemsRead: 35,
+          itemsRead: 60,
           sampledParents: 2,
           status: 'probed',
           skipped: ['body'],
-          note: 'stopped at the time limit after 35 items',
         },
       },
     },
@@ -474,7 +497,7 @@ export const remindersApiPlugin = {
           },
           {
             name: 'color',
-            type: 'rgb',
+            type: 'string',
             description: 'List color',
             required: false,
           },

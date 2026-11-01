@@ -108,23 +108,10 @@ export type Sort =
 export interface Container {
   /** the entire contents of the container, including the contents of its children */
   entireContents: string
-  /** (NOT AVAILABLE YET) Is the container capable of being expanded as an outline? */
-  expandable: boolean
-  /** (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists) */
-  expanded: boolean
-  /** (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists) */
-  completelyExpanded: boolean
-  /** the container window for this folder */
-  containerWindow: string
 }
 
 /** Input for creating a Container */
-export interface ContainerCreateInput {
-  /** (NOT AVAILABLE YET) Is the container opened as an outline? (can only be set for containers viewed as lists) */
-  expanded?: boolean
-  /** (NOT AVAILABLE YET) Are the container and all of its children opened as outlines? (can only be set for containers viewed as lists) */
-  completelyExpanded?: boolean
-}
+export type ContainerCreateInput = Record<string, never>
 
 /** Input for updating a Container */
 export type ContainerUpdateInput = Partial<ContainerCreateInput>
@@ -245,38 +232,20 @@ export type AliasFileUpdateInput = Partial<AliasFileCreateInput>
 export interface ApplicationFile {
   /** the bundle identifier or creator type of the application */
   id: string
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the developer recommends the application be launched */
-  suggestedSize: number
-  /** (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched */
-  minimumSize: number
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched */
-  preferredSize: number
   /** Is the application high-level event aware? (OBSOLETE: always returns true) */
   acceptsHighLevelEvents: boolean
   /** Does the process have a scripting terminology, i.e., can it be scripted? */
   hasScriptingTerminology: boolean
-  /** (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment? */
-  opensInClassic: boolean
 }
 
 /** Input for creating a ApplicationFile */
-export interface ApplicationFileCreateInput {
-  /** (AVAILABLE IN 10.1 TO 10.4) the smallest memory size with which the application can be launched */
-  minimumSize?: number
-  /** (AVAILABLE IN 10.1 TO 10.4) the memory size with which the application will be launched */
-  preferredSize?: number
-  /** (AVAILABLE IN 10.1 TO 10.4) Should the application launch in the Classic environment? */
-  opensInClassic?: boolean
-}
+export type ApplicationFileCreateInput = Record<string, never>
 
 /** Input for updating a ApplicationFile */
 export type ApplicationFileUpdateInput = Partial<ApplicationFileCreateInput>
 
 /** A document file */
-export interface DocumentFile {
-  /** Unique identifier for this document */
-  id: number
-}
+export type DocumentFile = Record<string, never>
 
 /** Input for creating a DocumentFile */
 export type DocumentFileCreateInput = Record<string, never>
@@ -311,7 +280,7 @@ export type ClippingUpdateInput = Partial<ClippingCreateInput>
 /** A package */
 export interface Package {
   /** Unique identifier for this package */
-  id: number
+  id: string
 }
 
 /** Input for creating a Package */
@@ -445,10 +414,6 @@ export type ColumnUpdateInput = Partial<ColumnCreateInput>
 
 export const ContainerSchema = z.object({
   entireContents: z.string(),
-  expandable: z.boolean(),
-  expanded: z.boolean(),
-  completelyExpanded: z.boolean(),
-  containerWindow: z.string(),
 })
 
 export const DiskSchema = z.object({
@@ -489,17 +454,11 @@ export const AliasFileSchema = z.object({
 
 export const ApplicationFileSchema = z.object({
   id: z.string(),
-  suggestedSize: z.number(),
-  minimumSize: z.number(),
-  preferredSize: z.number(),
   acceptsHighLevelEvents: z.boolean(),
   hasScriptingTerminology: z.boolean(),
-  opensInClassic: z.boolean(),
 })
 
-export const DocumentFileSchema = z.object({
-  id: z.number(),
-})
+export const DocumentFileSchema = z.object({})
 
 export const InternetLocationFileSchema = z.object({
   location: z.string(),
@@ -510,7 +469,7 @@ export const ClippingSchema = z.object({
 })
 
 export const PackageSchema = z.object({
-  id: z.number(),
+  id: z.string(),
 })
 
 export const FinderWindowSchema = z.object({

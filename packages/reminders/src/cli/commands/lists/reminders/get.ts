@@ -35,7 +35,7 @@ export class GetReminderCommand extends Command {
         flagged: item.flagged,
         creationDate: item.creationDate,
         modificationDate: item.modificationDate,
-        allDayDueDate: item.allDayDueDate,
+        alldayDueDate: item.alldayDueDate,
       })
 
       this.context.stdout.write(output + '\n')

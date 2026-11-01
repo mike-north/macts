@@ -57,11 +57,7 @@ export class HttpClient {
 
 // @public
 export interface List {
-    color: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color: string;
     emblem: string;
     id: string;
     name: string;
@@ -69,11 +65,7 @@ export interface List {
 
 // @public
 export interface ListCreateInput {
-    color?: {
-        r: number;
-        g: number;
-        b: number;
-    };
+    color?: string;
     emblem?: string;
     name: string;
 }
@@ -90,11 +82,7 @@ export class ListResourceClient {
 export const ListSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
-    color: z.ZodObject<{
-        red: z.ZodNumber;
-        green: z.ZodNumber;
-        blue: z.ZodNumber;
-    }, z.core.$strip>;
+    color: z.ZodString;
     emblem: z.ZodString;
 }, z.core.$strip>;
 
@@ -103,7 +91,7 @@ export type ListUpdateInput = Partial<ListCreateInput>;
 
 // @public
 export interface Reminder {
-    allDayDueDate: Date;
+    alldayDueDate: Date;
     body: string;
     completed: boolean;
     completionDate: Date;
@@ -119,7 +107,7 @@ export interface Reminder {
 
 // @public
 export interface ReminderCreateInput {
-    allDayDueDate?: Date;
+    alldayDueDate?: Date;
     body?: string;
     completed?: boolean;
     dueDate?: Date;
@@ -157,7 +145,7 @@ export const ReminderSchema: z.ZodObject<{
     flagged: z.ZodBoolean;
     creationDate: z.ZodString;
     modificationDate: z.ZodString;
-    allDayDueDate: z.ZodString;
+    alldayDueDate: z.ZodString;
 }, z.core.$strip>;
 
 // @public

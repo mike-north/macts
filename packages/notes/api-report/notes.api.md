@@ -85,7 +85,6 @@ export type CapabilityRisk = 'read' | 'write' | 'delete' | 'send' | 'execute' | 
 
 // @public
 export interface Folder {
-    container?: string;
     id: string;
     name: string;
     shared: boolean;
@@ -107,7 +106,6 @@ export class FolderResourceClient {
 export const FolderSchema: z.ZodObject<{
     name: z.ZodString;
     id: z.ZodString;
-    container: z.ZodOptional<z.ZodString>;
     shared: z.ZodBoolean;
 }, z.core.$strip>;
 

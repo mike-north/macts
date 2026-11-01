@@ -29,28 +29,16 @@ export interface ApplicationFile {
     acceptsHighLevelEvents: boolean;
     hasScriptingTerminology: boolean;
     id: string;
-    minimumSize: number;
-    opensInClassic: boolean;
-    preferredSize: number;
-    suggestedSize: number;
 }
 
 // @public
-export interface ApplicationFileCreateInput {
-    minimumSize?: number;
-    opensInClassic?: boolean;
-    preferredSize?: number;
-}
+export type ApplicationFileCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const ApplicationFileSchema: z.ZodObject<{
     id: z.ZodString;
-    suggestedSize: z.ZodNumber;
-    minimumSize: z.ZodNumber;
-    preferredSize: z.ZodNumber;
     acceptsHighLevelEvents: z.ZodBoolean;
     hasScriptingTerminology: z.ZodBoolean;
-    opensInClassic: z.ZodBoolean;
 }, z.core.$strip>;
 
 // @public
@@ -142,26 +130,15 @@ export type ColumnUpdateInput = Partial<ColumnCreateInput>;
 
 // @public
 export interface Container {
-    completelyExpanded: boolean;
-    containerWindow: string;
     entireContents: string;
-    expandable: boolean;
-    expanded: boolean;
 }
 
 // @public
-export interface ContainerCreateInput {
-    completelyExpanded?: boolean;
-    expanded?: boolean;
-}
+export type ContainerCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const ContainerSchema: z.ZodObject<{
     entireContents: z.ZodString;
-    expandable: z.ZodBoolean;
-    expanded: z.ZodBoolean;
-    completelyExpanded: z.ZodBoolean;
-    containerWindow: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -218,17 +195,13 @@ export const DiskSchema: z.ZodObject<{
 export type DiskUpdateInput = Partial<DiskCreateInput>;
 
 // @public
-export interface DocumentFile {
-    id: number;
-}
+export type DocumentFile = Record<string, never>;
 
 // @public
 export type DocumentFileCreateInput = Record<string, never>;
 
 // @public (undocumented)
-export const DocumentFileSchema: z.ZodObject<{
-    id: z.ZodNumber;
-}, z.core.$strip>;
+export const DocumentFileSchema: z.ZodObject<{}, z.core.$strip>;
 
 // @public
 export type DocumentFileUpdateInput = Partial<DocumentFileCreateInput>;
@@ -442,7 +415,7 @@ export type Lvic = 'smallIcon' | 'largeIcon';
 
 // @public
 export interface Package {
-    id: number;
+    id: string;
 }
 
 // @public
@@ -450,7 +423,7 @@ export type PackageCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const PackageSchema: z.ZodObject<{
-    id: z.ZodNumber;
+    id: z.ZodString;
 }, z.core.$strip>;
 
 // @public

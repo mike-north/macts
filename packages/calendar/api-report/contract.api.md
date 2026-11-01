@@ -24,7 +24,6 @@ export type AttendeeUpdateInput = Record<string, never>;
 
 // @public
 export interface Calendar {
-    readonly calendarIdentifier: string | null;
     color: Rgb | null;
     description: string | null;
     name: string;
@@ -97,7 +96,7 @@ interface Event_2 {
     location: string | null;
     recurrence: string | null;
     readonly sequence: Integer;
-    stampDate: Date;
+    stampDate: Date | null;
     startDate: Date;
     status: EventStatus;
     summary: string;

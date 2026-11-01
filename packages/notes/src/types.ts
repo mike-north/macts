@@ -27,8 +27,6 @@ export interface Folder {
   name: string
   /** The unique identifier of the folder */
   id: string
-  /** The container of the folder */
-  container?: string
   /** Whether the folder is shared */
   shared: boolean
 }
@@ -104,7 +102,6 @@ export const AccountSchema = z.object({
 export const FolderSchema = z.object({
   name: z.string(),
   id: z.string(),
-  container: z.string().optional(),
   shared: z.boolean(),
 })
 

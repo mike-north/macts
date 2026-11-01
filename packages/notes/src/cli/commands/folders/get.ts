@@ -26,7 +26,6 @@ export class GetFolderCommand extends Command {
       const output = formatter.format({
         name: item.name,
         id: item.id,
-        container: item.container,
         shared: item.shared,
       })
 

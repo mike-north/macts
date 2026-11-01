@@ -35,7 +35,7 @@ export class ListRemindersCommand extends Command {
           flagged: item.flagged,
           creationDate: item.creationDate,
           modificationDate: item.modificationDate,
-          allDayDueDate: item.allDayDueDate,
+          alldayDueDate: item.alldayDueDate,
         }))
       )
 

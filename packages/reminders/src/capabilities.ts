@@ -74,7 +74,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
         },
         color: {
           description: 'List color',
-          type: 'object',
+          type: 'string',
         },
         emblem: {
           description: 'The emblem icon name of the list',
@@ -186,13 +186,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
           description: 'Whether the reminder is completed',
           type: 'boolean',
         },
-        allDayDueDate: {
+        alldayDueDate: {
           description: 'The all-day due date of the reminder',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['listId', 'name', 'completed', 'allDayDueDate'],
+      required: ['listId', 'name', 'completed', 'alldayDueDate'],
     },
   },
   {

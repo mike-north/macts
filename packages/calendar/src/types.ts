@@ -27,8 +27,6 @@ export interface Calendar {
   title: string
   /** The calendar color */
   color: { r: number; g: number; b: number }
-  /** A unique calendar key */
-  calendarIdentifier: string
   /** Whether the calendar can be modified */
   writable: boolean
   /** The calendar description */
@@ -224,7 +222,6 @@ export const CalendarSchema = z.object({
   name: z.string(),
   title: z.string(),
   color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
-  calendarIdentifier: z.string(),
   writable: z.boolean(),
   description: z.string(),
 })

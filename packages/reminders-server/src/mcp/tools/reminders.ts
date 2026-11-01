@@ -97,13 +97,13 @@ export const remindersCreateTool: McpToolDefinition = {
         description: 'Whether the reminder is completed',
         type: 'boolean',
       },
-      allDayDueDate: {
+      alldayDueDate: {
         description: 'The all-day due date of the reminder',
         type: 'string',
       },
     },
     additionalProperties: false,
-    required: ['listId', 'name', 'completed', 'allDayDueDate'],
+    required: ['listId', 'name', 'completed', 'alldayDueDate'],
   },
   handler: async (args) => {
     const client = getClient()

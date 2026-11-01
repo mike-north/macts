@@ -29,7 +29,7 @@ export interface List {
   /** The unique identifier of the list */
   id: string
   /** The color of the list */
-  color: { r: number; g: number; b: number }
+  color: string
   /** The emblem icon name of the list */
   emblem: string
 }
@@ -39,7 +39,7 @@ export interface ListCreateInput {
   /** List name */
   name: string
   /** List color */
-  color?: { r: number; g: number; b: number }
+  color?: string
   /** The emblem icon name of the list */
   emblem?: string
 }
@@ -72,7 +72,7 @@ export interface Reminder {
   /** The modification date of the reminder */
   modificationDate: Date
   /** The all-day due date of the reminder */
-  allDayDueDate: Date
+  alldayDueDate: Date
 }
 
 /** Input for creating a Reminder */
@@ -92,7 +92,7 @@ export interface ReminderCreateInput {
   /** Whether to flag the reminder */
   flagged?: boolean
   /** The all-day due date of the reminder */
-  allDayDueDate?: Date
+  alldayDueDate?: Date
   /** List identifier for the reminder */
   listId: string
 }
@@ -110,7 +110,7 @@ export const AccountSchema = z.object({
 export const ListSchema = z.object({
   name: z.string(),
   id: z.string(),
-  color: z.object({ red: z.number(), green: z.number(), blue: z.number() }),
+  color: z.string(),
   emblem: z.string(),
 })
 
@@ -126,5 +126,5 @@ export const ReminderSchema = z.object({
   flagged: z.boolean(),
   creationDate: z.string(),
   modificationDate: z.string(),
-  allDayDueDate: z.string(),
+  alldayDueDate: z.string(),
 })

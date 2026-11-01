@@ -46,7 +46,7 @@ resources:
         description: The unique identifier of the account
         code: 'ID  '
     nullabilityProbe:
-      observedAt: '2026-11-01T06:04:58.718Z'
+      observedAt: '2026-11-01T08:33:42.817Z'
       bundleId: com.apple.reminders
       appVersion: '7.0'
       osVersion: '27.2'
@@ -75,16 +75,18 @@ resources:
         type: string
         description: The unique identifier of the list
         code: 'ID  '
+      # The dictionary declares the list color as text, and the app returns a
+      # string (Reminders 7.0, macOS 27.2), not an RGB value.
       color:
         access: rw
-        type: rgb
+        type: string
         description: The color of the list
         code: colr
         nullable: true
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
@@ -100,7 +102,7 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
@@ -108,7 +110,7 @@ resources:
             nullCount: 3
             failedReads: 0
     nullabilityProbe:
-      observedAt: '2026-11-01T06:04:58.718Z'
+      observedAt: '2026-11-01T08:33:42.817Z'
       bundleId: com.apple.reminders
       appVersion: '7.0'
       osVersion: '27.2'
@@ -136,11 +138,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
       id:
@@ -162,11 +164,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
       completionDate:
@@ -189,10 +191,15 @@ resources:
         nullable: true
         evidence:
           nullable:
-            source: curated
-            note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no due date on 15; the app reports a missing date as null.'
-            observedAt: '2026-11-01T05:45:00.000Z'
+            source: probe
+            observedAt: '2026-11-01T05:45:40.107Z'
+            bundleId: com.apple.reminders
             appVersion: '7.0'
+            osVersion: '27.2'
+            sampleSize: 412
+            nullCount: 15
+            failedReads: 0
+            note: 'Replaced a curated claim. A read-only scan of every reminder, not a sample.'
       remindMeDate:
         access: rw
         type: date
@@ -201,10 +208,15 @@ resources:
         nullable: true
         evidence:
           nullable:
-            source: curated
-            note: 'A read-only scan of all 412 reminders (Reminders 7.0, macOS 27.2) found no remind date on 15; the app reports a missing date as null.'
-            observedAt: '2026-11-01T05:45:00.000Z'
+            source: probe
+            observedAt: '2026-11-01T05:45:40.107Z'
+            bundleId: com.apple.reminders
             appVersion: '7.0'
+            osVersion: '27.2'
+            sampleSize: 412
+            nullCount: 15
+            failedReads: 0
+            note: 'Replaced a curated claim. A read-only scan of every reminder, not a sample.'
       priority:
         access: rw
         type: integer
@@ -214,11 +226,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
       flagged:
@@ -230,11 +242,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
       creationDate:
@@ -246,11 +258,11 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
       modificationDate:
@@ -262,30 +274,44 @@ resources:
         evidence:
           nullable:
             source: probe
-            observedAt: '2026-11-01T06:04:58.718Z'
+            observedAt: '2026-11-01T08:33:42.817Z'
             bundleId: com.apple.reminders
             appVersion: '7.0'
             osVersion: '27.2'
-            sampleSize: 35
+            sampleSize: 60
             nullCount: 0
             failedReads: 0
-      allDayDueDate:
+      # The app's property is `alldayDueDate`. The earlier key `allDayDueDate`
+      # failed on every read (58 of 58, Reminders 7.0, macOS 27.2), and a
+      # read-only scan of all 412 reminders read `alldayDueDate` without error.
+      alldayDueDate:
         access: rw
         type: date
         description: The all-day due date of the reminder
-        code: '????'
+        code: adue
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T05:45:40.107Z'
+            bundleId: com.apple.reminders
+            appVersion: '7.0'
+            osVersion: '27.2'
+            sampleSize: 412
+            nullCount: 15
+            failedReads: 0
+            note: 'Replaced a curated claim. A read-only scan of every reminder; a 60-item sample saw none of the 15.'
     nullabilityProbe:
-      observedAt: '2026-11-01T06:04:58.718Z'
+      observedAt: '2026-11-01T08:33:42.817Z'
       bundleId: com.apple.reminders
       appVersion: '7.0'
       osVersion: '27.2'
       accessPath: lists/reminders
-      itemsRead: 35
+      itemsRead: 60
       sampledParents: 2
       status: probed
       skipped:
         - body
-      note: stopped at the time limit after 35 items
 
 enums:
   ReminderPriority:
@@ -362,7 +388,7 @@ commands:
         description: List name
         required: true
       - name: color
-        type: rgb
+        type: string
         description: List color
         required: false
     permission: reminders:lists:create

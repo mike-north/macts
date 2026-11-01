@@ -26,7 +26,6 @@ export class ListCalendarsCommand extends Command {
           name: item.name,
           title: item.title,
           color: item.color,
-          calendarIdentifier: item.calendarIdentifier,
           writable: item.writable,
           description: item.description,
         }))
