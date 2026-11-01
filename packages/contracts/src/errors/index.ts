@@ -7,3 +7,4 @@
 export * from './details.js'
 export * from './classes.js'
 export * from './registry.js'
+export * from './wire.js'
