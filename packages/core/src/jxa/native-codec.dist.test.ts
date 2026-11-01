@@ -7,7 +7,8 @@
  * helpers, renaming) ships inside the automation process. These tests load
  * `dist/index.js` in a plain Node process, exactly as a consumer would, and run
  * its prelude both in an isolated `node:vm` context and, on macOS, in the real
- * automation process.
+ * automation process. On macOS they also run the built `runNativeScript`, so
+ * the shipped script composition and the shipped prelude are proven together.
  *
  * The build output must exist. A missing `dist` fails the suite with an
  * instruction to build; it is never skipped silently.
@@ -156,3 +157,77 @@ describe('built NATIVE_CODEC prelude', () => {
     30000
   )
 })
+
+/**
+ * Runs one native script with the built package's own `runNativeScript` and
+ * `NATIVE_CODEC`, in a separate Node process, and returns the outcome it
+ * resolves to. This exercises the shipped composition and the shipped prelude
+ * together, as a consumer of `dist` runs them.
+ */
+function runWithDist(script: Record<string, unknown>): unknown {
+  if (!existsSync(DIST_ENTRY)) {
+    throw new Error(
+      `The built package is missing (${DIST_ENTRY}). Run \`pnpm --filter @macts/core build\` before this test.`
+    )
+  }
+  const program = [
+    `import { NATIVE_CODEC, runNativeScript } from ${JSON.stringify(pathToFileURL(DIST_ENTRY).href)};`,
+    `const outcome = await runNativeScript(${JSON.stringify(script)}, NATIVE_CODEC, { timeout: 30000 });`,
+    'process.stdout.write(JSON.stringify(outcome));',
+  ].join('\n')
+  const stdout = execFileSync(process.execPath, ['--input-type=module', '-e', program], {
+    encoding: 'utf8',
+  })
+  return JSON.parse(stdout)
+}
+
+describe.skipIf(process.platform !== 'darwin')(
+  'built runNativeScript with the built prelude',
+  () => {
+    // Application() for Finder sends no event, so no automation permission is needed.
+    const FINDER = 'com.apple.finder'
+    const plan: ValuePlan = {
+      kind: 'record',
+      fields: {
+        count: { presence: 'required', value: INTEGER },
+        at: { presence: 'required', value: DATE },
+      },
+    }
+
+    it('converts input and result through the contract inside the automation process', () => {
+      const outcome = runWithDist({
+        bundleId: FINDER,
+        body: 'return { count: args.count + 1, at: new Date(args.at.getTime() + 1000) };',
+        input: { count: { integer: '41' }, at: { date: '2026-10-31T17:04:05.120+02:30' } },
+        inputPlan: plan,
+        outputPlan: plan,
+      })
+      // D3: integers travel as canonical decimal strings; dates as UTC ISO text
+      // with milliseconds. 14:34:05.120Z plus one second.
+      expect(outcome).toEqual({
+        ok: true,
+        value: { count: { integer: '42' }, at: { date: '2026-10-31T14:34:06.120Z' } },
+      })
+    }, 30000)
+
+    it('reports a result that violates the output plan as a codec encode failure', () => {
+      const outcome = runWithDist({
+        bundleId: FINDER,
+        body: 'return { count: 1.5, at: args.at };',
+        input: { count: { integer: '1' }, at: { date: '2026-10-31T14:34:05.120Z' } },
+        inputPlan: plan,
+        outputPlan: plan,
+      })
+      // D4: the codec's own error object becomes a `codec` failure with its path.
+      expect(outcome).toEqual({
+        ok: false,
+        failure: {
+          source: 'codec',
+          direction: 'encode',
+          path: ['count'],
+          message: 'Expected an integer, received 1.5',
+        },
+      })
+    }, 30000)
+  }
+)

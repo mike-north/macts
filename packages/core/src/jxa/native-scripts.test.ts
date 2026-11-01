@@ -345,8 +345,10 @@ describe('list bodies: batched reads (issue #89)', () => {
 })
 
 describe('list bodies: typed output returns only declared fields', () => {
-  // A typed record contract rejects undeclared keys and derives references from
-  // the record itself, so the legacy aliases must not reach it.
+  // A typed record contract derives references from the record itself. Its
+  // encode drops an undeclared `id` alias silently, and would accept a mirrored
+  // identifier field holding another property's value, so the body must not
+  // produce the legacy aliases at all.
   it('omits the id alias for a byId resource', () => {
     const body = listBody(calendarById, true)
     expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')

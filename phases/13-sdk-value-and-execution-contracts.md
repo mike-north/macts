@@ -796,8 +796,11 @@ native values for arguments, and native results to wire values, before
   - `{ source: 'codec', direction, path, message }`: raised by the codec.
 
 **How `executor.ts` consumes it.** The executor gains a function,
-`runNativeScript(script, codec, { timeout })`, that runs a `NativeScript` with a
-`NativeCodec` and resolves to a `NativeOutcome`. It replaces the inline
+`runNativeScript(script, codec, { timeout, signal, maxOutputBytes })`, that runs
+a `NativeScript` with a `NativeCodec` and resolves to a `NativeOutcome`. The
+time limit stops the process, the caller's abort signal kills it, and output
+past `maxOutputBytes` on either stream stops it; any transport, including a
+long-lived worker, must honor all three. It replaces the inline
 `JSON.stringify(result)` wrapper with this composition:
 
 ```js
@@ -835,13 +838,26 @@ not a well-formed outcome rejects as a process failure.
 
 The native `Executor` maps a `NativeOutcome` failure to canonical errors:
 
-- App and bridge failures map to the D6 table, using `errorNumber`. With no
-  number, the failure is `AppOperationError`.
+- App and bridge failures map by `errorNumber` through the table below. With
+  no number, the failure is `AppOperationError`.
 - A codec `encode` failure maps to `UnexpectedValueError` with
   `issues: [{ path, message }]`.
 - A codec `decode` failure maps to `ValidationError` with
   `issues: [{ path, message }]`. Input was already validated against `wire`,
   so this indicates a bridge-form defect.
+
+Native error numbers map to D6 classes as follows:
+
+| `errorNumber`                            | Meaning                                          | Error                                    |
+| ---------------------------------------- | ------------------------------------------------ | ---------------------------------------- |
+| -1728                                    | The addressed object does not exist              | `TargetNotFoundError`                    |
+| -1719                                    | The index or range is invalid for its collection | `InvalidSelectionError`                  |
+| -1743                                    | This Mac has not authorized automating the app   | `AppAuthorizationRequiredError`          |
+| -600, -609                               | The app is not running, or its connection ended  | `AppUnavailableError` (`not-responding`) |
+| -1712                                    | The app did not reply within its event timeout   | `AppUnavailableError` (`not-responding`) |
+| -10814                                   | The app cannot be found                          | `AppUnavailableError` (`not-installed`)  |
+| -2700 with "Application can't be found." | The app is not installed                         | `AppUnavailableError` (`not-installed`)  |
+| any other number                         | The app reported a failure                       | `AppOperationError` with `appErrorCode`  |
 
 When the process itself fails there is no outcome. The transport rejects
 with a `JxaExecutionError` whose `kind` says what happened, and
@@ -863,7 +879,7 @@ classification reads that field, never Node's child-process error shape:
   `InternalError` with a sanitized message. Either one is a macts defect, not
   an app failure.
 - **Trailing error number.** An `exited` failure whose standard error ends in
-  an error number falls back to the D6 table. With no number, it maps to
+  an error number maps through the table above. With no number, it maps to
   `InternalError`.
 
 App-supplied text never reaches a message or `details`. This covers an app

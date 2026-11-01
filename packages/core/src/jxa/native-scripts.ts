@@ -70,9 +70,11 @@ export interface NativeBodyOptions {
    *
    * Only operations whose output passes through unconverted want these: their
    * callers pass `item.id` back as the `id` request parameter. A typed output
-   * contract declares its record fields exactly, rejects undeclared keys, and
-   * derives references from the record itself, so it must receive only the
-   * declared fields, each holding its own value. Defaults to `false`.
+   * contract declares its record fields exactly and derives references from
+   * the record itself. Its encode silently drops undeclared keys such as `id`,
+   * but a mirrored identifier field is declared, so encode would accept it
+   * holding another property's value. A typed body must therefore produce only
+   * the declared fields, each holding its own value. Defaults to `false`.
    */
   readonly identifierAliases?: boolean
 }
