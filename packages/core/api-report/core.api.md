@@ -1986,7 +1986,7 @@ export interface NativeScript {
 
 // @public
 export interface NativeTransport {
-    run(script: string, options: NativeRunOptions): Promise<unknown>;
+    run(script: NativeScript, options: NativeRunOptions): Promise<NativeOutcome>;
 }
 
 // @public
@@ -3055,6 +3055,16 @@ export type RiskClassValue = z.infer<typeof RiskClassSchema>;
 
 // @public
 export function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>;
+
+// @public
+export function runNativeScript(script: NativeScript, codec: NativeCodec, options?: RunNativeScriptOptions): Promise<NativeOutcome>;
+
+// @public
+export interface RunNativeScriptOptions {
+    readonly maxOutputBytes?: number;
+    readonly signal?: AbortSignal | undefined;
+    readonly timeout?: number;
+}
 
 // @public (undocumented)
 export type RuntimeProbe = z.infer<typeof RuntimeProbeSchema>;

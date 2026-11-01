@@ -18,14 +18,21 @@
  * - The request parameter carrying an identifier (`id`, `name`) is distinct
  *   from the resource property that holds it (`uid`, `calendarIdentifier`).
  *
+ * Every body must also reference no free identifier other than `app`, `args`,
+ * and the standard ECMAScript built-ins, so it can be compiled once and invoked
+ * many times by a long-lived automation process.
+ *
  * @see ../../../../manifests/calendar/app.yaml
  * @see ../../../../manifests/notes/app.yaml
+ * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, worker compatibility)
+ * @see https://tc39.es/ecma262/2011/#sec-15 (ES5 standard built-in objects)
  * @see https://github.com/mike-north/macts/issues/89
  */
 
 import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Script } from 'node:vm'
+import * as ts from 'typescript'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import { loadManifest } from '../manifest/loader.js'
@@ -133,6 +140,65 @@ function fakeSpecifier(present: boolean, children: Record<string, unknown> = {})
       },
     }),
   }
+}
+
+/**
+ * The free identifiers of each body: names it references but neither declares
+ * nor receives as `app` or `args`, and that are not standard ECMAScript (ES5)
+ * built-ins.
+ *
+ * Each body is type-checked as the JavaScript function `(app, args)` in its
+ * own module, against the ES5 standard library only (no host or Node types),
+ * so every unresolved name is reported as "Cannot find name". Module scope
+ * keeps bodies from resolving names in one another. A body that does not parse
+ * fails here too.
+ */
+function freeIdentifiers(bodies: readonly string[]): string[][] {
+  const options: ts.CompilerOptions = {
+    allowJs: true,
+    checkJs: true,
+    noEmit: true,
+    target: ts.ScriptTarget.ES5,
+    module: ts.ModuleKind.ESNext,
+    lib: ['lib.es5.d.ts'],
+    types: [],
+  }
+  const files = new Map(
+    bodies.map((body, index) => [
+      `/native-body-${String(index)}.js`,
+      `function nativeBody(app, args) {\n${body}\n}\nexport {};\n`,
+    ])
+  )
+  const host = ts.createCompilerHost(options)
+  const getSourceFile = host.getSourceFile.bind(host)
+  host.getSourceFile = (fileName, languageVersion, ...rest) => {
+    const text = files.get(fileName)
+    return text === undefined
+      ? getSourceFile(fileName, languageVersion, ...rest)
+      : ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.JS)
+  }
+  const fileExists = host.fileExists.bind(host)
+  host.fileExists = (fileName) => files.has(fileName) || fileExists(fileName)
+  const program = ts.createProgram([...files.keys()], options, host)
+
+  return [...files.keys()].map((fileName) => {
+    const sourceFile = program.getSourceFile(fileName)
+    if (sourceFile === undefined) throw new Error(`Missing source file ${fileName}`)
+    const syntax = program.getSyntacticDiagnostics(sourceFile)
+    if (syntax.length > 0) {
+      throw new Error(
+        `A body does not parse: ${ts.flattenDiagnosticMessageText(syntax[0]?.messageText, '\n')}`
+      )
+    }
+    return program
+      .getSemanticDiagnostics(sourceFile)
+      .filter((diagnostic) =>
+        ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n').startsWith('Cannot find name')
+      )
+      .map((diagnostic) =>
+        sourceFile.text.slice(diagnostic.start, (diagnostic.start ?? 0) + (diagnostic.length ?? 0))
+      )
+  })
 }
 
 /** Build the list body for `resource` through a plain `list` command. */
@@ -698,6 +764,55 @@ describe('source safety', () => {
       }
     }
   })
+})
+
+describe('free identifiers', () => {
+  it('detects names a body neither declares nor receives', () => {
+    const [free] = freeIdentifiers([
+      [
+        'var local = args.x;',
+        'leaked = local;',
+        'delay(1);',
+        'var other = Application("com.apple.finder");',
+        'return value + __mactsDecode(local, null);',
+      ].join('\n'),
+    ])
+    expect(free?.sort()).toEqual(['Application', '__mactsDecode', 'delay', 'leaked', 'value'])
+  })
+
+  it('accepts app, args, locals, and standard built-ins', () => {
+    const body = [
+      'var missing = new Error(JSON.stringify(Object.keys(args)));',
+      'var when = new Date(args.at);',
+      'try { app.windows(); } catch (e) { throw missing; }',
+      'return [when, Math.max(1, 2), String(app)];',
+    ].join('\n')
+    expect(freeIdentifiers([body])).toEqual([[]])
+  })
+
+  it('finds none in any body of any shipped manifest', async () => {
+    const apps = readdirSync(MANIFESTS_DIR, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+    const routes: string[] = []
+    const bodies: string[] = []
+    for (const app of apps) {
+      const manifest = await loadManifest(manifestPath(app))
+      for (const route of resolveManifestRoutes(manifest)) {
+        const target: OperationTarget =
+          route.resourceType === undefined
+            ? { command: route.commandKey }
+            : { command: route.commandKey, resource: route.resourceType }
+        routes.push(route.route)
+        bodies.push(buildNativeBody(manifest, target))
+      }
+    }
+    expect(bodies.length).toBeGreaterThan(0)
+    const offenders = freeIdentifiers(bodies)
+      .map((free, index) => ({ route: routes[index], free }))
+      .filter(({ free }) => free.length > 0)
+    expect(offenders).toEqual([])
+  }, 60000)
 })
 
 describe('required arguments', () => {

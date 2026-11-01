@@ -24,6 +24,11 @@
  * emitted as JSON string literals in bracket form wherever the syntax allows, so
  * an unusual manifest key cannot change the meaning of the script.
  *
+ * A body references only `app`, `args`, its own locals, and standard ECMAScript
+ * built-ins: no host globals, no codec bindings, and no per-call state. That
+ * keeps a body independent of how it is run, so a long-lived automation
+ * process can compile it once and invoke it for many calls.
+ *
  * @packageDocumentation
  */
 

@@ -2,11 +2,13 @@
 export {
   runJxa,
   runWithApp,
+  runNativeScript,
   JxaExecutionError,
   MAX_OUTPUT_BYTES,
   type JxaExecutionErrorOptions,
   type JxaExecutorOptions,
   type JxaFailureKind,
+  type RunNativeScriptOptions,
 } from './executor.js'
 
 // Native value codec (in-process wire <-> native conversion)

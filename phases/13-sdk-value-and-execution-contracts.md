@@ -795,18 +795,19 @@ native values for arguments, and native results to wire values, before
   - `{ source: 'app', message, errorNumber? }`: raised by the app or the bridge.
   - `{ source: 'codec', direction, path, message }`: raised by the codec.
 
-**How `executor.ts` consumes it.** The executor gains a function that runs a
-`NativeScript` with a `NativeCodec` and resolves to a `NativeOutcome`. It
-replaces the inline `JSON.stringify(result)` wrapper with this composition:
+**How `executor.ts` consumes it.** The executor gains a function,
+`runNativeScript(script, codec, { timeout })`, that runs a `NativeScript` with a
+`NativeCodec` and resolves to a `NativeOutcome`. It replaces the inline
+`JSON.stringify(result)` wrapper with this composition:
 
 ```js
 ObjC.import('stdlib');
 /* codec.prelude */
 var __mactsOutcome = (function () {
   try {
-    var args = __mactsDecode(/* JSON input */, /* JSON inputPlan */);
-    var value = (function (app, args) { /* body */ })(Application(/* bundleId */), args);
-    return { ok: true, value: __mactsEncode(value, /* JSON outputPlan */) };
+    var args = __mactsDecode(JSON.parse("<input as JSON text>"), JSON.parse("<inputPlan as JSON text>"));
+    var value = (function (app, args) { /* body */ })(Application("<bundleId>"), args);
+    return { ok: true, value: __mactsEncode(value, JSON.parse("<outputPlan as JSON text>")) };
   } catch (e) {
     return { ok: false, failure: /* describe(e): codec marker → codec, else app with e.errorNumber */ };
   }
@@ -814,16 +815,88 @@ var __mactsOutcome = (function () {
 JSON.stringify(__mactsOutcome);
 ```
 
-The embedded input, plans, and bundle ID are JSON text, which is valid
-JavaScript. The script is passed to `osascript` without shell interpolation
-(`execFile` with an argument vector, or stdin), so values never cross a shell.
+The input and both plans are embedded as JSON string literals passed to
+`JSON.parse`, never as object literals: a `__proto__` key in an object literal
+sets the prototype instead of creating a field. The bundle ID is a JSON string
+literal, and the application object has `includeStandardAdditions` set before
+the body runs, as the bridge has always set it. The script is passed to `osascript` without shell interpolation
+(`execFile` with an argument vector, script on stdin), so values never cross a
+shell.
+
+In the catch block, a thrown object whose `name` is the codec marker becomes a
+`codec` failure with its `direction`, `path`, and `message`. Anything else
+becomes an `app` failure whose `message` is `String(e && e.message || e)`, with
+`errorNumber` only when `e.errorNumber` is a number. An app error caught in
+the process carries its native number (a missing object gives -1728), and
+`Application()` for an uninstalled bundle ID throws inside the try with -2700
+and "Application can't be found.". A success whose value serialization drops
+(a passthrough body returning `undefined`) is read as `null`. Output that is
+not a well-formed outcome rejects as a process failure.
 
 The native `Executor` maps a `NativeOutcome` failure to canonical errors:
 
-- App and bridge failures map to the D6 table, using `errorNumber`.
-- A codec `encode` failure maps to `UnexpectedValueError`.
-- A codec `decode` failure maps to `ValidationError`. Input was already
-  validated against `wire`, so this indicates a bridge-form defect.
+- App and bridge failures map to the D6 table, using `errorNumber`. With no
+  number, the failure is `AppOperationError`.
+- A codec `encode` failure maps to `UnexpectedValueError` with
+  `issues: [{ path, message }]`.
+- A codec `decode` failure maps to `ValidationError` with
+  `issues: [{ path, message }]`. Input was already validated against `wire`,
+  so this indicates a bridge-form defect.
+
+When the process itself fails there is no outcome. The transport rejects
+with a `JxaExecutionError` whose `kind` says what happened, and
+classification reads that field, never Node's child-process error shape:
+
+- **Time limit.** `OperationTimeoutError` applies only to `timed-out`: the
+  transport's own time limit stopped the process (`timedOut` is `true` for
+  exactly this kind). A process killed by any other signal is not a timeout;
+  this includes an out-of-memory kill, an external `kill`, and the output
+  limit.
+- **Cancellation.** `cancelled`, the caller's signal stopped the process,
+  maps to `OperationCancelledError`.
+- **Host failures.** `output-too-large` (output past the per-stream limit),
+  `not-started` (the host could not be started), and `signalled` (killed by a
+  signal macts did not send) map to `InternalError`. A missing host is not
+  `AppUnavailableError`: the target app may be installed.
+- **Compile failure or malformed output.** A script that fails to compile, or
+  whose output is not a well-formed outcome (`unreadable-output`), maps to
+  `InternalError` with a sanitized message. Either one is a macts defect, not
+  an app failure.
+- **Trailing error number.** An `exited` failure whose standard error ends in
+  an error number falls back to the D6 table. With no number, it maps to
+  `InternalError`.
+
+App-supplied text never reaches a message or `details`. This covers an app
+failure's `message` and the process's standard error, which stay only in
+`cause`. Codec `path` and `message` are written by macts and describe the
+contract, so they may appear in `issues`.
+
+**Worker compatibility.** A later executor may run a long-lived automation
+worker (one process per target app, pooled and restartable) instead of one
+`osascript` process per call. The contracts above do not preclude it, because
+they hold these invariants:
+
+- The codec prelude is pure. It only defines the two bindings, holds no
+  per-call state, and is idempotent, so a worker can install it once.
+- A `NativeScript` body references only `app`, `args`, its own locals, and
+  standard ECMAScript built-ins. It uses no other globals and no per-call
+  state, so a worker can compile each body once (for example, cached by body
+  text) and invoke it many times. A test checks every body built from every
+  shipped manifest for free identifiers.
+- Inputs and plans are data. The `JSON.parse` string-literal embedding exists
+  only because the `osascript` transport sends source text. A worker receives
+  them over its channel and never embeds them.
+- The composed script (`ObjC.import`, the prelude, the IIFE, and
+  `JSON.stringify`) is the per-call form for the `osascript` transport only.
+  It calls the codec only through the exported binding names.
+- `NativeOutcome` and its failure description are the transport-independent
+  result.
+- The `Executor` interface (`execute(request)`) assumes nothing about process
+  lifetime.
+- Only the process-failure classification is transport-specific: a kill by
+  the transport's own timer is a timeout, and any other death is
+  `InternalError`. A worker maps a worker crash or restart the same way. A
+  per-call timeout on a worker may require restarting that worker.
 
 **Sequencing.**
 
@@ -1199,9 +1272,9 @@ through `Executor` first, without waiting. `@macts/contracts` therefore exports
   codec's decode and encode return their argument unchanged, and plain
   `JSON.stringify` semantics apply. Today's dispatch therefore runs through
   the seam with no behavior change, and without the A2 and A3 guarantees.
-- Until the codec lands, the native executor accepts only `PASSTHROUGH_PLAN`
-  and fails with `InternalError` for any other plan, so a derived plan is
-  never silently ignored.
+- The native executor runs every plan through the codec (D4), passthrough
+  included, so a derived plan is never silently ignored. Under passthrough
+  the codec converts nothing.
 - Generated descriptors never use it. Value contracts replaces each
   passthrough use with derived plans as descriptors land, and removes the
   `passthrough` kind once none remain. A9 acceptance is not met for any

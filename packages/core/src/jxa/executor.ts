@@ -2,20 +2,52 @@
  * The process boundary to the macOS automation host (`osascript -l
  * JavaScript`).
  *
+ * Two entry points share one transport:
+ *
+ * - {@link runJxa} and {@link runWithApp} run a raw script body and parse its
+ *   return value with plain JSON semantics. They serve the low-level bridge
+ *   (connections, object specifiers, and the generated RPC layer).
+ * - {@link runNativeScript} runs one {@link NativeScript} with a
+ *   {@link NativeCodec}: the wire input is decoded inside the process, the body
+ *   runs against the target app, and its result is encoded to wire form before
+ *   serialization, so numeric classification, special doubles, and dates
+ *   survive. The process reports a {@link NativeOutcome}, which this module
+ *   validates structurally before handing it on.
+ *
  * The transport starts the host from an argument vector and writes the script
  * to its standard input, so no script text ever crosses a shell. It owns the
  * time limit, the caller's abort signal, and the output limit, and it reports
  * every process failure as a {@link JxaExecutionError} whose `kind` says what
  * happened. Only this module knows how child processes fail; callers classify
- * failures by `kind` and never by Node's child-process error shape.
+ * failures by `kind` and never by Node's child-process error shape. A process
+ * the transport stops because the time limit elapsed is the only timeout; a
+ * process that dies from any other cause, including a signal sent by someone
+ * else, is not one.
  *
- * It knows process execution, not canonical error classification (the native
- * executor's concern).
+ * The composed native script is the per-call form for this one-process-per-call
+ * transport. The codec prelude, the native bodies, and `NativeOutcome` do not
+ * depend on it: the script reaches the codec only through its exported binding
+ * names, and embeds input and plans as text only because this transport sends
+ * source text.
+ *
+ * This module knows process execution and script composition, not value
+ * conversion (the codec's concern) or canonical error classification (the
+ * native executor's concern).
  *
  * @packageDocumentation
  */
 
 import { execFile } from 'node:child_process'
+import type { IssuePath, WireValue } from '@macts/contracts'
+import {
+  NATIVE_CODEC_ERROR_NAME,
+  NATIVE_DECODE_FUNCTION,
+  NATIVE_ENCODE_FUNCTION,
+  type NativeCodec,
+  type NativeFailure,
+  type NativeOutcome,
+  type NativeScript,
+} from './native-codec.js'
 
 /** Time limit for one script when none is given, in milliseconds. */
 const DEFAULT_TIMEOUT_MS = 30000
@@ -67,7 +99,7 @@ export interface JxaExecutorOptions {
  * - `exited`: the process exited with a failure status. `stderr` describes the
  *   failure, normally ending in the native error number.
  * - `unreadable-output`: the process exited normally, but its output is not the
- *   JSON document the caller expected.
+ *   document the caller expected (JSON, or a well-formed native outcome).
  */
 export type JxaFailureKind =
   | 'timed-out'
@@ -190,6 +222,221 @@ export async function runWithApp<T>(
   `
   return runJxa<T>(code, options)
 }
+
+/** Options for {@link runNativeScript}. */
+export interface RunNativeScriptOptions {
+  /** Time limit in milliseconds. Defaults to 30000; `0` disables the limit. */
+  readonly timeout?: number
+  /** Stops the automation process when it aborts; see {@link JxaExecutorOptions.signal}. */
+  readonly signal?: AbortSignal | undefined
+  /** Output limit in bytes per stream. Defaults to {@link MAX_OUTPUT_BYTES}. */
+  readonly maxOutputBytes?: number
+}
+
+/**
+ * Run one native invocation in the automation host, converting values through
+ * `codec` inside the process.
+ *
+ * @remarks
+ * The script decodes `script.input` against `script.inputPlan`, invokes
+ * `script.body` as `(app, args)` with the target application, encodes the
+ * result against `script.outputPlan`, and reports a {@link NativeOutcome}.
+ * Everything the app or the codec raises inside the process resolves as a
+ * failed outcome; it is not a rejection. A success whose value was dropped by
+ * serialization (a passthrough body returning `undefined`) resolves with
+ * `value: null`. Standard error output of a successful run is not reported.
+ *
+ * Rejections are always a {@link JxaExecutionError}, whose `kind` says what
+ * happened (see {@link JxaFailureKind}). A script that did not compile exits
+ * with a failure (`kind: 'exited'`); output that is not a well-formed outcome
+ * is `kind: 'unreadable-output'`.
+ *
+ * @param script - The invocation. No value in it is ever written into source
+ *   text as code.
+ * @param codec - The in-process value codec.
+ * @param options - Time limit, abort signal, and output limit.
+ * @returns What the automation process reported.
+ */
+export async function runNativeScript(
+  script: NativeScript,
+  codec: NativeCodec,
+  options: RunNativeScriptOptions = {}
+): Promise<NativeOutcome> {
+  const { stdout, stderr } = await runAutomationProcess(composeNativeScript(script, codec), {
+    timeout: options.timeout ?? DEFAULT_TIMEOUT_MS,
+    signal: options.signal,
+    maxOutputBytes: options.maxOutputBytes ?? MAX_OUTPUT_BYTES,
+  })
+  const outcome = parseNativeOutcome(stdout)
+  if (typeof outcome === 'string') {
+    throw new JxaExecutionError(
+      `The automation process produced a malformed outcome: ${outcome}`,
+      'UNKNOWN',
+      stderr,
+      undefined,
+      { kind: 'unreadable-output' }
+    )
+  }
+  return outcome
+}
+
+// ---------------------------------------------------------------------------
+// Native script composition
+// ---------------------------------------------------------------------------
+
+/**
+ * A value embedded as data: a JSON string literal parsed inside the process.
+ * It is never an object literal, because a `__proto__` key in an object literal
+ * sets the prototype instead of creating a field, while `JSON.parse` always
+ * creates an own property.
+ */
+function embedJson(value: unknown): string {
+  return `JSON.parse(${JSON.stringify(JSON.stringify(value))})`
+}
+
+/**
+ * The catch clause of a native script: describes what was thrown as a
+ * {@link NativeFailure}. A codec error, recognized by its marker name, keeps its
+ * direction, path, and message; anything else is an app or bridge failure that
+ * keeps its message and, when it carries one, its numeric error code.
+ */
+const DESCRIBE_THROWN = [
+  `    if (e !== null && typeof e === 'object' && e.name === ${JSON.stringify(NATIVE_CODEC_ERROR_NAME)}) {`,
+  "      return { ok: false, failure: { source: 'codec', direction: e.direction, path: e.path, message: e.message } };",
+  '    }',
+  "    var failure = { source: 'app', message: String(e && e.message || e) };",
+  "    if (e !== null && e !== undefined && typeof e.errorNumber === 'number') {",
+  '      failure.errorNumber = e.errorNumber;',
+  '    }',
+  '    return { ok: false, failure: failure };',
+].join('\n')
+
+/**
+ * Compose the automation-process script for one native invocation.
+ *
+ * The script imports the C standard library bridge, declares the codec's
+ * functions, and evaluates one try/catch that yields a {@link NativeOutcome};
+ * its final expression is that outcome serialized as JSON, which the host
+ * prints. The input and both plans are embedded with {@link embedJson}, the
+ * bundle identifier as a JSON string literal, and the body inside its own
+ * `(function (app, args) { ... })`.
+ */
+export function composeNativeScript(script: NativeScript, codec: NativeCodec): string {
+  return [
+    "ObjC.import('stdlib');",
+    codec.prelude,
+    'var __mactsOutcome = (function () {',
+    '  try {',
+    `    var args = ${NATIVE_DECODE_FUNCTION}(${embedJson(script.input)}, ${embedJson(script.inputPlan)});`,
+    `    var app = Application(${JSON.stringify(script.bundleId)});`,
+    '    app.includeStandardAdditions = true;',
+    '    var value = (function (app, args) {',
+    script.body,
+    '    })(app, args);',
+    `    return { ok: true, value: ${NATIVE_ENCODE_FUNCTION}(value, ${embedJson(script.outputPlan)}) };`,
+    '  } catch (e) {',
+    DESCRIBE_THROWN,
+    '  }',
+    '})();',
+    'JSON.stringify(__mactsOutcome);',
+    '',
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// Outcome parsing
+// ---------------------------------------------------------------------------
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isIssuePath(value: unknown): value is IssuePath {
+  return (
+    Array.isArray(value) &&
+    value.every((step) => typeof step === 'string' || typeof step === 'number')
+  )
+}
+
+/**
+ * Whether `value` is a JSON value, and therefore structurally a wire value:
+ * finite numbers only, and plain objects only.
+ */
+export function isWireValue(value: unknown): value is WireValue {
+  if (value === null) return true
+  switch (typeof value) {
+    case 'string':
+    case 'boolean':
+      return true
+    case 'number':
+      return Number.isFinite(value)
+    case 'object': {
+      if (Array.isArray(value)) return value.every(isWireValue)
+      const prototype: unknown = Object.getPrototypeOf(value)
+      if (prototype !== Object.prototype && prototype !== null) return false
+      return Object.values(value).every(isWireValue)
+    }
+    default:
+      return false
+  }
+}
+
+/** The failure half of an outcome, or a description of why it is malformed. */
+function parseNativeFailure(value: unknown): NativeFailure | string {
+  if (!isRecord(value) || typeof value['message'] !== 'string') {
+    return 'the failure has no message'
+  }
+  const message = value['message']
+  switch (value['source']) {
+    case 'app': {
+      const errorNumber = value['errorNumber']
+      if (errorNumber === undefined) return { source: 'app', message }
+      if (typeof errorNumber !== 'number') return 'the app failure has a non-numeric error number'
+      return { source: 'app', message, errorNumber }
+    }
+    case 'codec': {
+      const direction = value['direction']
+      const path = value['path']
+      if (direction !== 'decode' && direction !== 'encode') {
+        return 'the codec failure has no direction'
+      }
+      if (!isIssuePath(path)) return 'the codec failure has no path'
+      return { source: 'codec', direction, path, message }
+    }
+    default:
+      return 'the failure has an unknown source'
+  }
+}
+
+/**
+ * The outcome the process printed, or a description of why it is malformed.
+ * The description never quotes the output, which may hold app data.
+ */
+function parseNativeOutcome(stdout: string): NativeOutcome | string {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(stdout.trim())
+  } catch {
+    return 'the output is not JSON'
+  }
+  if (!isRecord(parsed)) return 'the output is not an object'
+  if (parsed['ok'] === true) {
+    // A success whose value is `undefined` (a passthrough body returning
+    // nothing) loses the key in serialization; it stands for no value.
+    const value = parsed['value'] ?? null
+    if (!isWireValue(value)) return 'the value is not JSON'
+    return { ok: true, value }
+  }
+  if (parsed['ok'] === false) {
+    const failure = parseNativeFailure(parsed['failure'])
+    return typeof failure === 'string' ? failure : { ok: false, failure }
+  }
+  return 'the output has no ok flag'
+}
+
+// ---------------------------------------------------------------------------
+// Transport
+// ---------------------------------------------------------------------------
 
 /** Limits and cancellation for one {@link runAutomationProcess} call. */
 interface AutomationProcessOptions {
