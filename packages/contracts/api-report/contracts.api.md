@@ -147,12 +147,15 @@ export interface DecodeContext {
 }
 
 // @public
-export interface DynamicRecordWire {
+export type DynamicRecordWire = {
     readonly record: Readonly<Record<string, DynamicWireValue>>;
-}
+};
 
 // @public
 export type DynamicWireValue = string | boolean | null | WireInteger | WireDouble | WireDate | WireReference | WireFile | DynamicRecordWire | readonly DynamicWireValue[];
+
+// @public
+export const DynamicWireValueSchema: z.ZodType<DynamicWireValue>;
 
 // @public
 export const ERROR_CLASSES: {
@@ -279,12 +282,12 @@ export interface FileValue {
 }
 
 // @public
-export interface FileWire {
-    readonly exists: boolean;
-    readonly grant: string;
-    readonly observedAt: WireDate;
+export type FileWire = {
     readonly path?: string;
-}
+    readonly exists: boolean;
+    readonly observedAt: WireDate;
+    readonly grant: string;
+};
 
 // @public
 export function fromWireErrorEnvelope(body: unknown, options?: FromWireErrorOptions): AnyMactsError;
@@ -315,14 +318,25 @@ export interface IndexSelector {
 
 // @public
 export type Integer = number & {
-    readonly [integerBrand]: 'Integer';
+    readonly [integerBrand]: 'Integer: convert with Integer.validate(n), Integer.round(n), or Integer.truncate(n)';
 };
+
+// @public
+export const Integer: IntegerHelpers;
 
 // @public
 export const INTEGER_LIMITS: Readonly<{
     min: number;
     max: number;
 }>;
+
+// @public
+export interface IntegerHelpers {
+    is(value: unknown): value is Integer;
+    round(value: number): Integer;
+    truncate(value: number): Integer;
+    validate(value: number): Integer;
+}
 
 // @public
 export class InternalError extends MactsError<'INTERNAL'> {
@@ -579,10 +593,29 @@ export interface Rgb {
 }
 
 // @public
+export const Rgb: RgbHelpers;
+
+// @public
+export interface Rgb8Bit {
+    readonly b: number;
+    readonly g: number;
+    readonly r: number;
+}
+
+// @public
 export const RGB_8BIT_SCALE = 257;
 
 // @public
 export const RGB_CHANNEL_MAX = 65535;
+
+// @public
+export interface RgbHelpers {
+    create(r: number, g: number, b: number): Rgb;
+    from8Bit(r: number, g: number, b: number): Rgb;
+    fromHex(hex: string): Rgb;
+    to8Bit(rgb: Rgb): Rgb8Bit;
+    toHex(rgb: Rgb): string;
+}
 
 // @public
 export interface SelectorCollectionReference<T> extends CollectionReference<T> {
@@ -694,6 +727,17 @@ export interface ValidationIssue {
 }
 
 // @public
+export const VALUE_ISSUE_CODES: readonly ["invalid-type", "not-integer", "out-of-range", "invalid-date", "unknown-enum-member", "missing-field", "unknown-field", "not-nullable", "invalid-control-record", "unsupported"];
+
+// @public
+export interface ValueIssue extends ValidationIssue {
+    readonly code: ValueIssueCode;
+}
+
+// @public
+export type ValueIssueCode = (typeof VALUE_ISSUE_CODES)[number];
+
+// @public
 export type ValuePlan = {
     readonly kind: 'string';
 } | {
@@ -767,14 +811,20 @@ export const WIRE_KEYS: Readonly<{
 }>;
 
 // @public
-export interface WireDate {
+export type WireDate = {
     readonly date: string;
-}
+};
 
 // @public
-export interface WireDouble {
+export const WireDateSchema: z.ZodType<WireDate>;
+
+// @public
+export type WireDouble = {
     readonly double: number | SpecialDoubleState;
-}
+};
+
+// @public
+export const WireDoubleSchema: z.ZodType<WireDouble>;
 
 // @public
 export type WireError = {
@@ -794,19 +844,22 @@ export interface WireErrorEnvelope {
 }
 
 // @public
-export interface WireFile {
+export type WireFile = {
     readonly file: FileWire;
-}
+};
 
 // @public
-export interface WireFileSource {
+export type WireFileSource = {
     readonly fileSource: FileSourceWire;
-}
+};
 
 // @public
-export interface WireInteger {
+export type WireInteger = {
     readonly integer: string;
-}
+};
+
+// @public
+export const WireIntegerSchema: z.ZodType<WireInteger>;
 
 // @public
 export type WireNumber = WireInteger | WireDouble;
@@ -815,9 +868,9 @@ export type WireNumber = WireInteger | WireDouble;
 export type WireRecord = Readonly<Record<string, WireValue>>;
 
 // @public
-export interface WireReference {
+export type WireReference = {
     readonly reference: ReferenceWire;
-}
+};
 
 // @public
 export type WireValue = JsonValue;
