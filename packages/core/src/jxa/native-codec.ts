@@ -56,6 +56,8 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   `undefined`. Absent optional fields are omitted.
  * - Under a `passthrough` plan, both functions return their argument
  *   unchanged.
+ * - Under a `none` plan, `encode` returns `null` whatever the native result
+ *   was, and `decode` returns `undefined`.
  * - When a value violates the plan, either function throws an object whose
  *   `name` is {@link NATIVE_CODEC_ERROR_NAME} and which also carries
  *   `direction`, `path`, and `message`. Examples are a fractional value at an

@@ -155,12 +155,25 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Whether a value is an ordinary object as dynamic content may hold: keyed
-   * and tagged `Object`, which excludes maps, sets, regular expressions, and
-   * other built-in or host objects.
+   * Whether a value is an ordinary record: keyed, tagged `Object`, and either
+   * prototype-less or directly inheriting from a root prototype (one whose own
+   * prototype is `null`).
+   *
+   * The tag alone is not enough. Host objects of the automation bridge, such
+   * as path objects, are tagged `Object` but inherit from their own
+   * prototypes; accepting them would encode them silently as empty records.
+   * Records that apps return and object literals that script bodies build do
+   * inherit directly from `Object.prototype`. The prototype test is written
+   * without naming `Object.prototype` so that records from another realm
+   * qualify too. Maps, sets, regular expressions, and class instances are
+   * excluded as well.
    */
   function isPlainObject(value: unknown): value is Readonly<Record<string, unknown>> {
-    return isKeyed(value) && Object.prototype.toString.call(value) === '[object Object]'
+    if (!isKeyed(value) || Object.prototype.toString.call(value) !== '[object Object]') {
+      return false
+    }
+    const proto: unknown = Object.getPrototypeOf(value)
+    return proto === null || Object.getPrototypeOf(proto) === null
   }
 
   /** The own value of `key`, or `undefined` when it is absent or inherited. */
@@ -452,7 +465,8 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
 
   /**
    * Encodes a record's planned fields; native keys outside the plan are
-   * dropped. Native "missing value" arrives as `null` or `undefined`:
+   * dropped. Only ordinary records qualify (see `isPlainObject`), so a host
+   * object cannot pass as a record whose fields are all absent. Native "missing value" arrives as `null` or `undefined`:
    *
    * - absent or `undefined`: optional fields are omitted; required nullable
    *   fields become `null`; required non-nullable fields fail.
@@ -462,7 +476,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * No own property ever holds `undefined`.
    */
   function encodeRecord(native: unknown, fields: Fields, path: Path): Record<string, unknown> {
-    if (!isKeyed(native)) {
+    if (!isPlainObject(native)) {
       fail('encode', path, 'Expected an object, received ' + describeValue(native))
     }
     const out: Record<string, unknown> = {}

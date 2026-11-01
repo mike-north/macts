@@ -209,6 +209,45 @@ describe.skipIf(process.platform !== 'darwin')('native codec in the automation p
     TIMEOUT_MS
   )
 
+  // Bridge host objects must never be encoded as data. A path object is tagged
+  // like an ordinary object but has its own prototype, and an application
+  // object is a function; both are obtainable without automating another app.
+  it(
+    'rejects bridge host objects in dynamic content instead of encoding them as records',
+    async () => {
+      const pathObject = await runNativeScript(NATIVE_CODEC, {
+        body: "return { where: Path('/tmp') };",
+        input: {},
+        inputPlan: EMPTY_RECORD,
+        outputPlan: { kind: 'unknown' },
+      })
+      expectCodecFailure(pathObject, 'encode', ['where'], 'Unsupported value in dynamic content')
+
+      const applicationObject = await runNativeScript(NATIVE_CODEC, {
+        body: 'return [Application.currentApplication()];',
+        input: {},
+        inputPlan: EMPTY_RECORD,
+        outputPlan: { kind: 'unknown' },
+      })
+      expectCodecFailure(applicationObject, 'encode', [0], 'Unsupported value in dynamic content')
+    },
+    TIMEOUT_MS
+  )
+
+  it(
+    'rejects a bridge host object at a record position whose fields are all optional',
+    async () => {
+      const outcome = await runNativeScript(NATIVE_CODEC, {
+        body: "return Path('/tmp');",
+        input: {},
+        inputPlan: EMPTY_RECORD,
+        outputPlan: recordOf({ name: optional(STRING) }),
+      })
+      expectCodecFailure(outcome, 'encode', [], 'Expected an object')
+    },
+    TIMEOUT_MS
+  )
+
   it(
     'leaves errors raised by the body classified as app failures',
     async () => {

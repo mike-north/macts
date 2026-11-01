@@ -963,6 +963,33 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         path: [],
       })
     })
+
+    // Host objects such as path objects are tagged like ordinary objects but
+    // inherit from their own prototype; they must fail, not encode as `{}`.
+    it('rejects objects tagged Object whose prototype is not a root prototype', () => {
+      class HostLike {
+        readonly kind = 'host'
+      }
+      const derived: unknown = Object.create({ inherited: true })
+      expectCodecError(() => encode({ where: new HostLike() }, UNKNOWN), {
+        direction: 'encode',
+        path: ['where'],
+        includes: ['nsupported value in dynamic content'],
+      })
+      expectCodecError(() => encode(derived, UNKNOWN), { direction: 'encode', path: [] })
+      expectCodecError(() => encode(new HostLike(), recordOf({ name: optional(STRING) })), {
+        direction: 'encode',
+        path: [],
+        includes: ['Expected an object'],
+      })
+    })
+
+    it('accepts prototype-less records as ordinary records', () => {
+      const bare = Object.create(null) as Record<string, unknown>
+      bare['a'] = 1
+      expect(encode(bare, UNKNOWN)).toEqual({ record: { a: { double: 1 } } })
+      expect(encode(bare, recordOf({ a: required(DOUBLE) }))).toEqual({ a: { double: 1 } })
+    })
   })
 
   describe('dynamic decode', () => {

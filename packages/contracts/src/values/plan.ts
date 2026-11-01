@@ -47,7 +47,9 @@ export interface FieldPlan {
  *   bytes an operation consumes.
  * - `unknown` is dynamic content whose shape no contract describes; it is
  *   encoded self-descriptively.
- * - `none` is the result of an operation that produces no value.
+ * - `none` is the result of an operation that produces no value. Its wire
+ *   form is `null`, whatever the native result was, and it decodes to
+ *   `undefined`.
  * - `passthrough` marks a value that carries no wire encoding at all; see
  *   {@link PASSTHROUGH_PLAN}.
  */
