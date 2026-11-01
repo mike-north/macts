@@ -17,6 +17,10 @@
  *   `make({ at: ... })`.
  * - The request parameter carrying an identifier (`id`, `name`) is distinct
  *   from the resource property that holds it (`uid`, `calendarIdentifier`).
+ * - A collection is addressed by the app's own spelling of its dictionary
+ *   term: the first word lowercased whole, each later word capitalized
+ *   ("media items" is `mediaItems`, "URL tracks" is `urlTracks`). Calendar's
+ *   `events[0].displayAlarms` resolves while `displayalarms` does not.
  *
  * Every body must also reference no free identifier other than `app`, `args`,
  * and the standard ECMAScript built-ins, so it can be compiled once and invoked
@@ -47,6 +51,7 @@ import {
   buildTargetExpression,
   planNativeInvocation,
 } from './native-scripts.js'
+import { defaultCollectionAccessor } from '../manifest/native-accessor.js'
 
 const MANIFESTS_DIR = fileURLToPath(new URL('../../../../manifests/', import.meta.url))
 
@@ -525,6 +530,83 @@ describe('target expressions', () => {
     expect(buildNestedTargetExpression('parent', 'events', 'itemId')).toBe(
       'parent["events"].byId(itemId)'
     )
+  })
+})
+
+describe('collection accessors', () => {
+  // Each expected accessor is the app's spelling of the sdef plural term,
+  // lowercasing the first word whole: Photos "media items", Calendar "display
+  // alarms", Music/TV "URL tracks" and "EQ presets", System Events "UI
+  // elements" and "XML data".
+  it.each([
+    ['Calendars', 'calendars'],
+    ['MediaItems', 'mediaItems'],
+    ['DisplayAlarms', 'displayAlarms'],
+    ['WorkspaceDocuments', 'workspaceDocuments'],
+    ['URLTracks', 'urlTracks'],
+    ['EQPresets', 'eqPresets'],
+    ['UIElements', 'uiElements'],
+    ['XMLDatas', 'xmlDatas'],
+  ])('spells %s as %s', (plural, accessor) => {
+    expect(defaultCollectionAccessor(plural)).toBe(accessor)
+  })
+
+  it('lowercases a plural that is a single acronym, with or without its plural s', () => {
+    expect(defaultCollectionAccessor('URLS')).toBe('urls')
+    expect(defaultCollectionAccessor('URLs')).toBe('urls')
+  })
+
+  describe('Photos media items (shipped manifest)', () => {
+    let photos: AppManifest
+    beforeAll(async () => {
+      photos = await loadManifest(manifestPath('photos'))
+    })
+
+    it('lists the mediaItems collection, never the lowercased name', () => {
+      const text = buildNativeBody(photos, { command: 'listMediaItems', resource: 'MediaItem' })
+      expect(text).toContain('var items = app["mediaItems"]();')
+      expect(text).not.toContain('mediaitems')
+    })
+
+    it('gets a media item from the mediaItems collection by id', () => {
+      const text = buildNativeBody(photos, { command: 'getMediaItem', resource: 'MediaItem' })
+      expect(text).toContain('var item = app["mediaItems"].byId(itemId);')
+      expect(text).not.toContain('mediaitems')
+    })
+  })
+
+  describe('multi-word parents', () => {
+    const folder: Resource = {
+      name: 'BookmarkFolder',
+      plural: 'BookmarkFolders',
+      description: 'f',
+      properties: {},
+    }
+    const bookmark: Resource = {
+      name: 'BookmarkItem',
+      plural: 'BookmarkItems',
+      description: 'b',
+      properties: {},
+    }
+
+    it('addresses a resolved parent and its child by their camel-case accessors', () => {
+      const manifest = manifestWith(
+        { BookmarkFolder: folder, BookmarkItem: bookmark },
+        { get: resourceCommand('get', 'BookmarkItem', [param('bookmarkFolderId'), param('id')]) }
+      )
+      const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
+      expect(text).toContain('app["bookmarkFolders"].byId(parentId)')
+      expect(text).toContain('parent["bookmarkItems"].byId(itemId)')
+    })
+
+    it('derives an unmatched parent accessor from the parameter, keeping its case', () => {
+      const manifest = manifestWith(
+        { BookmarkItem: bookmark },
+        { get: resourceCommand('get', 'BookmarkItem', [param('mediaAlbumId'), param('id')]) }
+      )
+      const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
+      expect(text).toContain('app["mediaAlbums"].byId(parentId)')
+    })
   })
 })
 

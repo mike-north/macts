@@ -42,6 +42,7 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
+import { resolveCollectionAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
 
 /**
@@ -239,7 +240,7 @@ function buildCommandCallBody(command: Command, resultLocal = false): string {
 /** The parent collection a nested resource lives in. */
 interface ParentCollection {
   readonly resource: Resource | undefined
-  /** Lowercased plural collection name of the parent. */
+  /** Accessor of the parent's collection in the app (see `resolveCollectionAccessor`). */
   readonly plural: string
 }
 
@@ -248,13 +249,13 @@ interface ParentCollection {
  *
  * A parameter such as `calendarId` refers to the resource whose primary
  * identifier property starts with `calendar`, or whose name or plural is
- * `calendar`/`calendars`. With no matching resource, the plural is derived from
- * the parameter name itself (`calendarId` gives `calendars`).
+ * `calendar`/`calendars`, compared without regard to case. With no matching
+ * resource, the accessor is derived from the parameter name itself
+ * (`calendarId` gives `calendars`, `mediaItemId` gives `mediaItems`).
  */
 function resolveParentCollection(manifest: AppManifest, parentIdParam: string): ParentCollection {
-  const paramBase = parentIdParam.endsWith('Id')
-    ? parentIdParam.slice(0, -2).toLowerCase()
-    : parentIdParam.toLowerCase()
+  const paramStem = parentIdParam.endsWith('Id') ? parentIdParam.slice(0, -2) : parentIdParam
+  const paramBase = paramStem.toLowerCase()
   for (const res of Object.values(manifest.resources)) {
     const primaryId = resolvePrimaryIdentifierProperty(res)
     const resNameLower = res.name.toLowerCase()
@@ -265,10 +266,10 @@ function resolveParentCollection(manifest: AppManifest, parentIdParam: string): 
       resPluralLower === paramBase + 's' ||
       resPluralLower === paramBase
     ) {
-      return { resource: res, plural: resPluralLower }
+      return { resource: res, plural: resolveCollectionAccessor(res) }
     }
   }
-  return { resource: undefined, plural: `${paramBase}s` }
+  return { resource: undefined, plural: `${paramStem}s` }
 }
 
 /**
@@ -283,6 +284,8 @@ function resolveParentCollection(manifest: AppManifest, parentIdParam: string): 
  *   `calendarIdentifier`), so the item is matched on a working property such as
  *   `name`.
  *
+ * @param resourcePlural - The collection's accessor in the app (see
+ *   `resolveCollectionAccessor`).
  * @param valueExpression - Expression holding the lookup value: the request
  *   parameter's value, never the resource's identifier property.
  */
@@ -450,7 +453,7 @@ function buildResourceBody(
   manifest: AppManifest,
   identifierAliases: boolean
 ): ResourceBody {
-  const resourcePlural = resource?.plural.toLowerCase() ?? 'items'
+  const resourcePlural = resource === undefined ? 'items' : resolveCollectionAccessor(resource)
   switch (command.name) {
     case 'list':
       return buildListBody(command, resource, resourcePlural, manifest, identifierAliases)
