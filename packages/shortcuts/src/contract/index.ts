@@ -206,8 +206,8 @@ const resources: AppContract<ShortcutsClient>['resources'] = {
     name: 'Folder',
     record: folderRecordType,
     id: t.string({ description: 'The unique identifier of the folder' }),
-    get: 'shortcuts.folders.getFolder',
-    list: 'shortcuts.folders.listFolders',
+    get: 'shortcuts.folders.get',
+    list: 'shortcuts.folders.list',
   },
 }
 
@@ -248,7 +248,7 @@ const shortcutRunOperation: OperationDescriptor<
 }
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
-  id: 'shortcuts.folders.listFolders',
+  id: 'shortcuts.folders.list',
   permission: 'shortcuts:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
@@ -257,7 +257,7 @@ const folderListFoldersOperation: OperationDescriptor<Record<string, never>, rea
 }
 
 const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
-  id: 'shortcuts.folders.getFolder',
+  id: 'shortcuts.folders.get',
   permission: 'shortcuts:folders:get',
   target: { command: 'getFolder', resource: 'Folder' },
   description: 'Get a folder by ID',
@@ -272,8 +272,8 @@ const operations: AppContract<ShortcutsClient>['operations'] = {
   'shortcuts.shortcuts.list': shortcutListOperation,
   'shortcuts.shortcuts.get': shortcutGetOperation,
   'shortcuts.shortcuts.run': shortcutRunOperation,
-  'shortcuts.folders.listFolders': folderListFoldersOperation,
-  'shortcuts.folders.getFolder': folderGetFolderOperation,
+  'shortcuts.folders.list': folderListFoldersOperation,
+  'shortcuts.folders.get': folderGetFolderOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */

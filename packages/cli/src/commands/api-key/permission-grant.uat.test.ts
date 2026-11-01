@@ -10,7 +10,8 @@
  *
  * Permissions are hand-derived from the shipped manifests:
  * `manifests/photos/app.yaml` declares `photos:mediaItems:list` for command
- * `listMediaItems` (route `photos.mediaitems.listMediaItems`), and
+ * `listMediaItems`, which publishes under its operation name (route
+ * `photos.mediaitems.list`), and
  * `manifests/iterm/app.yaml` has application command `splitVertically`, whose
  * derived permission is `iterm:app:splitVertically` (route
  * `iterm.app.splitVertically`).
@@ -37,7 +38,7 @@ const binPath = resolve(here, '../../../dist/bin.js')
 
 const PHOTOS_LIST = 'photos:mediaItems:list'
 const ITERM_SPLIT = 'iterm:app:splitVertically'
-const PHOTOS_LIST_ROUTE = 'photos.mediaitems.listMediaItems'
+const PHOTOS_LIST_ROUTE = 'photos.mediaitems.list'
 const ITERM_SPLIT_ROUTE = 'iterm.app.splitVertically'
 
 /** An operation id in the `app.resource.operation` form the runtime requires. */

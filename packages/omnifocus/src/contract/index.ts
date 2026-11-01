@@ -1282,48 +1282,48 @@ const resources: AppContract<OmniFocusClient>['resources'] = {
     name: 'Task',
     record: taskRecordType,
     id: t.string({ description: 'The unique identifier of the task' }),
-    get: 'omnifocus.tasks.getTask',
-    list: 'omnifocus.tasks.listTasks',
+    get: 'omnifocus.tasks.get',
+    list: 'omnifocus.tasks.list',
   },
   Project: {
     name: 'Project',
     record: projectRecordType,
     id: t.string({ description: 'The unique identifier of the project' }),
-    get: 'omnifocus.projects.getProject',
-    list: 'omnifocus.projects.listProjects',
+    get: 'omnifocus.projects.get',
+    list: 'omnifocus.projects.list',
   },
   Folder: {
     name: 'Folder',
     record: folderRecordType,
     id: t.string({ description: 'The unique identifier of the folder' }),
-    get: 'omnifocus.folders.getFolder',
-    list: 'omnifocus.folders.listFolders',
+    get: 'omnifocus.folders.get',
+    list: 'omnifocus.folders.list',
   },
   Tag: {
     name: 'Tag',
     record: tagRecordType,
     id: t.string({ description: 'The unique identifier of the tag' }),
-    get: 'omnifocus.tags.getTag',
-    list: 'omnifocus.tags.listTags',
+    get: 'omnifocus.tags.get',
+    list: 'omnifocus.tags.list',
   },
   InboxTask: {
     name: 'InboxTask',
     record: inboxTaskRecordType,
     id: t.string({ description: 'The unique identifier of the inbox task' }),
-    get: 'omnifocus.inboxtasks.getInboxTask',
-    list: 'omnifocus.inboxtasks.listInboxTasks',
+    get: 'omnifocus.inboxtasks.get',
+    list: 'omnifocus.inboxtasks.list',
   },
   Perspective: {
     name: 'Perspective',
     record: perspectiveRecordType,
     id: t.string({ description: 'The unique identifier of the perspective' }),
-    get: 'omnifocus.perspectives.getPerspective',
-    list: 'omnifocus.perspectives.listPerspectives',
+    get: 'omnifocus.perspectives.get',
+    list: 'omnifocus.perspectives.list',
   },
 }
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
-  id: 'omnifocus.folders.listFolders',
+  id: 'omnifocus.folders.list',
   permission: 'omnifocus:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
@@ -1332,7 +1332,7 @@ const folderListFoldersOperation: OperationDescriptor<Record<string, never>, rea
 }
 
 const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
-  id: 'omnifocus.folders.getFolder',
+  id: 'omnifocus.folders.get',
   permission: 'omnifocus:folders:get',
   target: { command: 'getFolder', resource: 'Folder' },
   description: 'Get a folder by ID',
@@ -1343,7 +1343,7 @@ const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Fol
 }
 
 const folderCreateFolderOperation: OperationDescriptor<FolderCreateInput, Folder> = {
-  id: 'omnifocus.folders.createFolder',
+  id: 'omnifocus.folders.create',
   permission: 'omnifocus:folders:create',
   target: { command: 'createFolder', resource: 'Folder' },
   description: 'Create a new folder',
@@ -1355,7 +1355,7 @@ const projectListProjectsOperation: OperationDescriptor<
   Record<string, never>,
   readonly Project[]
 > = {
-  id: 'omnifocus.projects.listProjects',
+  id: 'omnifocus.projects.list',
   permission: 'omnifocus:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects',
@@ -1364,7 +1364,7 @@ const projectListProjectsOperation: OperationDescriptor<
 }
 
 const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
-  id: 'omnifocus.projects.getProject',
+  id: 'omnifocus.projects.get',
   permission: 'omnifocus:projects:get',
   target: { command: 'getProject', resource: 'Project' },
   description: 'Get a project by ID',
@@ -1375,7 +1375,7 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
 }
 
 const projectCreateProjectOperation: OperationDescriptor<ProjectCreateInput, Project> = {
-  id: 'omnifocus.projects.createProject',
+  id: 'omnifocus.projects.create',
   permission: 'omnifocus:projects:create',
   target: { command: 'createProject', resource: 'Project' },
   description: 'Create a new project',
@@ -1384,7 +1384,7 @@ const projectCreateProjectOperation: OperationDescriptor<ProjectCreateInput, Pro
 }
 
 const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
-  id: 'omnifocus.tasks.listTasks',
+  id: 'omnifocus.tasks.list',
   permission: 'omnifocus:tasks:list',
   target: { command: 'listTasks', resource: 'Task' },
   description: 'List all tasks',
@@ -1393,7 +1393,7 @@ const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonl
 }
 
 const taskGetTaskOperation: OperationDescriptor<{ readonly id: string }, Task> = {
-  id: 'omnifocus.tasks.getTask',
+  id: 'omnifocus.tasks.get',
   permission: 'omnifocus:tasks:get',
   target: { command: 'getTask', resource: 'Task' },
   description: 'Get a task by ID',
@@ -1404,7 +1404,7 @@ const taskGetTaskOperation: OperationDescriptor<{ readonly id: string }, Task> =
 }
 
 const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
-  id: 'omnifocus.tasks.createTask',
+  id: 'omnifocus.tasks.create',
   permission: 'omnifocus:tasks:create',
   target: { command: 'createTask', resource: 'Task' },
   description: 'Create a new task',
@@ -1413,7 +1413,7 @@ const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
 }
 
 const tagListTagsOperation: OperationDescriptor<Record<string, never>, readonly Tag[]> = {
-  id: 'omnifocus.tags.listTags',
+  id: 'omnifocus.tags.list',
   permission: 'omnifocus:tags:list',
   target: { command: 'listTags', resource: 'Tag' },
   description: 'List all tags',
@@ -1422,7 +1422,7 @@ const tagListTagsOperation: OperationDescriptor<Record<string, never>, readonly 
 }
 
 const tagGetTagOperation: OperationDescriptor<{ readonly id: string }, Tag> = {
-  id: 'omnifocus.tags.getTag',
+  id: 'omnifocus.tags.get',
   permission: 'omnifocus:tags:get',
   target: { command: 'getTag', resource: 'Tag' },
   description: 'Get a tag by ID',
@@ -1433,7 +1433,7 @@ const tagGetTagOperation: OperationDescriptor<{ readonly id: string }, Tag> = {
 }
 
 const tagCreateTagOperation: OperationDescriptor<TagCreateInput, Tag> = {
-  id: 'omnifocus.tags.createTag',
+  id: 'omnifocus.tags.create',
   permission: 'omnifocus:tags:create',
   target: { command: 'createTag', resource: 'Tag' },
   description: 'Create a new tag',
@@ -1445,7 +1445,7 @@ const inboxTaskListInboxTasksOperation: OperationDescriptor<
   Record<string, never>,
   readonly InboxTask[]
 > = {
-  id: 'omnifocus.inboxtasks.listInboxTasks',
+  id: 'omnifocus.inboxtasks.list',
   permission: 'omnifocus:inboxTasks:list',
   target: { command: 'listInboxTasks', resource: 'InboxTask' },
   description: 'List all inbox tasks',
@@ -1454,7 +1454,7 @@ const inboxTaskListInboxTasksOperation: OperationDescriptor<
 }
 
 const inboxTaskGetInboxTaskOperation: OperationDescriptor<{ readonly id: string }, InboxTask> = {
-  id: 'omnifocus.inboxtasks.getInboxTask',
+  id: 'omnifocus.inboxtasks.get',
   permission: 'omnifocus:inboxTasks:get',
   target: { command: 'getInboxTask', resource: 'InboxTask' },
   description: 'Get an inbox task by ID',
@@ -1465,7 +1465,7 @@ const inboxTaskGetInboxTaskOperation: OperationDescriptor<{ readonly id: string 
 }
 
 const inboxTaskCreateInboxTaskOperation: OperationDescriptor<InboxTaskCreateInput, InboxTask> = {
-  id: 'omnifocus.inboxtasks.createInboxTask',
+  id: 'omnifocus.inboxtasks.create',
   permission: 'omnifocus:inboxTasks:create',
   target: { command: 'createInboxTask', resource: 'InboxTask' },
   description: 'Create a new inbox task',
@@ -1477,7 +1477,7 @@ const perspectiveListPerspectivesOperation: OperationDescriptor<
   Record<string, never>,
   readonly Perspective[]
 > = {
-  id: 'omnifocus.perspectives.listPerspectives',
+  id: 'omnifocus.perspectives.list',
   permission: 'omnifocus:perspectives:list',
   target: { command: 'listPerspectives', resource: 'Perspective' },
   description: 'List all perspectives',
@@ -1489,7 +1489,7 @@ const perspectiveGetPerspectiveOperation: OperationDescriptor<
   { readonly id: string },
   Perspective
 > = {
-  id: 'omnifocus.perspectives.getPerspective',
+  id: 'omnifocus.perspectives.get',
   permission: 'omnifocus:perspectives:get',
   target: { command: 'getPerspective', resource: 'Perspective' },
   description: 'Get a perspective by ID',
@@ -1624,23 +1624,23 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<OmniFocusClient>['operations'] = {
-  'omnifocus.folders.listFolders': folderListFoldersOperation,
-  'omnifocus.folders.getFolder': folderGetFolderOperation,
-  'omnifocus.folders.createFolder': folderCreateFolderOperation,
-  'omnifocus.projects.listProjects': projectListProjectsOperation,
-  'omnifocus.projects.getProject': projectGetProjectOperation,
-  'omnifocus.projects.createProject': projectCreateProjectOperation,
-  'omnifocus.tasks.listTasks': taskListTasksOperation,
-  'omnifocus.tasks.getTask': taskGetTaskOperation,
-  'omnifocus.tasks.createTask': taskCreateTaskOperation,
-  'omnifocus.tags.listTags': tagListTagsOperation,
-  'omnifocus.tags.getTag': tagGetTagOperation,
-  'omnifocus.tags.createTag': tagCreateTagOperation,
-  'omnifocus.inboxtasks.listInboxTasks': inboxTaskListInboxTasksOperation,
-  'omnifocus.inboxtasks.getInboxTask': inboxTaskGetInboxTaskOperation,
-  'omnifocus.inboxtasks.createInboxTask': inboxTaskCreateInboxTaskOperation,
-  'omnifocus.perspectives.listPerspectives': perspectiveListPerspectivesOperation,
-  'omnifocus.perspectives.getPerspective': perspectiveGetPerspectiveOperation,
+  'omnifocus.folders.list': folderListFoldersOperation,
+  'omnifocus.folders.get': folderGetFolderOperation,
+  'omnifocus.folders.create': folderCreateFolderOperation,
+  'omnifocus.projects.list': projectListProjectsOperation,
+  'omnifocus.projects.get': projectGetProjectOperation,
+  'omnifocus.projects.create': projectCreateProjectOperation,
+  'omnifocus.tasks.list': taskListTasksOperation,
+  'omnifocus.tasks.get': taskGetTaskOperation,
+  'omnifocus.tasks.create': taskCreateTaskOperation,
+  'omnifocus.tags.list': tagListTagsOperation,
+  'omnifocus.tags.get': tagGetTagOperation,
+  'omnifocus.tags.create': tagCreateTagOperation,
+  'omnifocus.inboxtasks.list': inboxTaskListInboxTasksOperation,
+  'omnifocus.inboxtasks.get': inboxTaskGetInboxTaskOperation,
+  'omnifocus.inboxtasks.create': inboxTaskCreateInboxTaskOperation,
+  'omnifocus.perspectives.list': perspectiveListPerspectivesOperation,
+  'omnifocus.perspectives.get': perspectiveGetPerspectiveOperation,
   'omnifocus.app.complete': appCompleteOperation,
   'omnifocus.app.markComplete': appMarkCompleteOperation,
   'omnifocus.app.markIncomplete': appMarkIncompleteOperation,

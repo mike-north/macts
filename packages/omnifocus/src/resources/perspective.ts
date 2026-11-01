@@ -24,13 +24,13 @@ export class PerspectiveResourceClient {
    * List all perspectives.
    */
   async list(): Promise<Perspective[]> {
-    return this.#http.rpc<Perspective[]>(`${this.#app}.${this.#resource}.listPerspectives`)
+    return this.#http.rpc<Perspective[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a perspective by id.
    */
   async get(id: string): Promise<Perspective> {
-    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.getPerspective`, { id })
+    return this.#http.rpc<Perspective>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

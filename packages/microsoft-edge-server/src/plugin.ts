@@ -355,6 +355,7 @@ export const microsoftEdgeApiPlugin = {
         resourceType: 'Window',
         parameters: [],
         code: 'core',
+        routeName: 'list',
         permission: 'edge:windows:list',
       },
       getWindow: {
@@ -371,6 +372,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'edge:windows:get',
       },
       createWindow: {
@@ -387,6 +389,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'crel',
+        routeName: 'create',
         permission: 'edge:windows:create',
       },
       listTabs: {
@@ -403,6 +406,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'core',
+        routeName: 'list',
         permission: 'edge:tabs:list',
       },
       getTab: {
@@ -419,6 +423,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'edge:tabs:get',
       },
       createTab: {
@@ -441,6 +446,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'crel',
+        routeName: 'create',
         permission: 'edge:tabs:create',
       },
       listBookmarkFolders: {
@@ -450,6 +456,7 @@ export const microsoftEdgeApiPlugin = {
         resourceType: 'BookmarkFolder',
         parameters: [],
         code: 'core',
+        routeName: 'list',
         permission: 'edge:bookmarkFolders:list',
       },
       getBookmarkFolder: {
@@ -466,6 +473,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'edge:bookmarkFolders:get',
       },
       listBookmarkItems: {
@@ -482,6 +490,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'core',
+        routeName: 'list',
         permission: 'edge:bookmarkItems:list',
       },
       getBookmarkItem: {
@@ -498,6 +507,7 @@ export const microsoftEdgeApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'edge:bookmarkItems:get',
       },
       reload: {

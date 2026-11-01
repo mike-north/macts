@@ -24,15 +24,13 @@ export class BookmarkItemResourceClient {
    * List all bookmarkitems.
    */
   async list(folderId: string): Promise<BookmarkItem[]> {
-    return this.#http.rpc<BookmarkItem[]>(`${this.#app}.${this.#resource}.listBookmarkItems`, {
-      folderId,
-    })
+    return this.#http.rpc<BookmarkItem[]>(`${this.#app}.${this.#resource}.list`, { folderId })
   }
 
   /**
    * Get a bookmarkitem by id.
    */
   async get(id: string): Promise<BookmarkItem> {
-    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.getBookmarkItem`, { id })
+    return this.#http.rpc<BookmarkItem>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

@@ -144,9 +144,10 @@ describe('the HTTP server enforces the canonical permission of every operation',
   })
 
   // Written by hand from the manifests: a declared `permission` wins, otherwise
-  // the permission is `<app>:<resource plural>:<command key>`.
+  // the permission is `<app>:<resource plural>:<route name>`, and the route name
+  // defaults to the command key.
   it.each([
-    ['calendar', 'calendar.events.createEvent', 'calendar:events:create'],
+    ['calendar', 'calendar.events.create', 'calendar:events:create'],
     ['notes', 'notes.notes.get', 'notes:notes:get'],
     ['notes', 'notes.attachments.list', 'notes:attachments:list'],
     ['notes', 'notes.attachments.get', 'notes:attachments:get'],

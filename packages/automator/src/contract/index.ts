@@ -588,29 +588,29 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     name: 'AutomatorAction',
     record: automatorActionRecordType,
     id: t.string({ description: 'The unique identifier for the action' }),
-    get: 'automator.automatoractions.getAction',
-    list: 'automator.automatoractions.listActions',
+    get: 'automator.automatoractions.get',
+    list: 'automator.automatoractions.list',
   },
   Variable: {
     name: 'Variable',
     record: variableRecordType,
     id: t.string({ description: 'The unique identifier for the variable' }),
-    get: 'automator.variables.getVariable',
-    list: 'automator.variables.listVariables',
+    get: 'automator.variables.get',
+    list: 'automator.variables.list',
   },
   Setting: {
     name: 'Setting',
     record: settingRecordType,
     id: t.string({ description: 'The name of the setting' }),
-    get: 'automator.settings.getSetting',
-    list: 'automator.settings.listSettings',
+    get: 'automator.settings.get',
+    list: 'automator.settings.list',
   },
   RequiredResource: {
     name: 'RequiredResource',
     record: requiredResourceRecordType,
     id: t.string({ description: 'The name of the required resource' }),
-    get: 'automator.requiredresources.getRequiredResource',
-    list: 'automator.requiredresources.listRequiredResources',
+    get: 'automator.requiredresources.get',
+    list: 'automator.requiredresources.list',
   },
 }
 
@@ -649,7 +649,7 @@ const automatorActionListActionsOperation: OperationDescriptor<
   { readonly workflowName: string },
   readonly AutomatorAction[]
 > = {
-  id: 'automator.automatoractions.listActions',
+  id: 'automator.automatoractions.list',
   permission: 'automator:actions:list',
   target: { command: 'listActions', resource: 'AutomatorAction' },
   description: 'List all actions in a workflow',
@@ -663,7 +663,7 @@ const automatorActionGetActionOperation: OperationDescriptor<
   { readonly id: string },
   AutomatorAction
 > = {
-  id: 'automator.automatoractions.getAction',
+  id: 'automator.automatoractions.get',
   permission: 'automator:actions:get',
   target: { command: 'getAction', resource: 'AutomatorAction' },
   description: 'Get an action by ID',
@@ -706,7 +706,7 @@ const variableListVariablesOperation: OperationDescriptor<
   { readonly workflowName: string },
   readonly Variable[]
 > = {
-  id: 'automator.variables.listVariables',
+  id: 'automator.variables.list',
   permission: 'automator:variables:list',
   target: { command: 'listVariables', resource: 'Variable' },
   description: 'List all variables in a workflow',
@@ -717,7 +717,7 @@ const variableListVariablesOperation: OperationDescriptor<
 }
 
 const variableGetVariableOperation: OperationDescriptor<{ readonly id: string }, Variable> = {
-  id: 'automator.variables.getVariable',
+  id: 'automator.variables.get',
   permission: 'automator:variables:get',
   target: { command: 'getVariable', resource: 'Variable' },
   description: 'Get a variable by ID',
@@ -731,7 +731,7 @@ const settingListSettingsOperation: OperationDescriptor<
   { readonly actionId: string },
   readonly Setting[]
 > = {
-  id: 'automator.settings.listSettings',
+  id: 'automator.settings.list',
   permission: 'automator:settings:list',
   target: { command: 'listSettings', resource: 'Setting' },
   description: 'List all settings for an action',
@@ -742,7 +742,7 @@ const settingListSettingsOperation: OperationDescriptor<
 }
 
 const settingGetSettingOperation: OperationDescriptor<{ readonly name: string }, Setting> = {
-  id: 'automator.settings.getSetting',
+  id: 'automator.settings.get',
   permission: 'automator:settings:get',
   target: { command: 'getSetting', resource: 'Setting' },
   description: 'Get a setting by name',
@@ -756,7 +756,7 @@ const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
   { readonly actionId: string },
   readonly RequiredResource[]
 > = {
-  id: 'automator.requiredresources.listRequiredResources',
+  id: 'automator.requiredresources.list',
   permission: 'automator:requiredResources:list',
   target: { command: 'listRequiredResources', resource: 'RequiredResource' },
   description: 'List all required resources for an action',
@@ -770,7 +770,7 @@ const requiredResourceGetRequiredResourceOperation: OperationDescriptor<
   { readonly name: string },
   RequiredResource
 > = {
-  id: 'automator.requiredresources.getRequiredResource',
+  id: 'automator.requiredresources.get',
   permission: 'automator:requiredResources:get',
   target: { command: 'getRequiredResource', resource: 'RequiredResource' },
   description: 'Get a required resource by name',
@@ -785,17 +785,16 @@ const operations: AppContract<AutomatorClient>['operations'] = {
   'automator.workflows.list': workflowListOperation,
   'automator.workflows.get': workflowGetOperation,
   'automator.workflows.execute': workflowExecuteOperation,
-  'automator.automatoractions.listActions': automatorActionListActionsOperation,
-  'automator.automatoractions.getAction': automatorActionGetActionOperation,
+  'automator.automatoractions.list': automatorActionListActionsOperation,
+  'automator.automatoractions.get': automatorActionGetActionOperation,
   'automator.app.add': appAddOperation,
   'automator.app.remove': appRemoveOperation,
-  'automator.variables.listVariables': variableListVariablesOperation,
-  'automator.variables.getVariable': variableGetVariableOperation,
-  'automator.settings.listSettings': settingListSettingsOperation,
-  'automator.settings.getSetting': settingGetSettingOperation,
-  'automator.requiredresources.listRequiredResources':
-    requiredResourceListRequiredResourcesOperation,
-  'automator.requiredresources.getRequiredResource': requiredResourceGetRequiredResourceOperation,
+  'automator.variables.list': variableListVariablesOperation,
+  'automator.variables.get': variableGetVariableOperation,
+  'automator.settings.list': settingListSettingsOperation,
+  'automator.settings.get': settingGetSettingOperation,
+  'automator.requiredresources.list': requiredResourceListRequiredResourcesOperation,
+  'automator.requiredresources.get': requiredResourceGetRequiredResourceOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */

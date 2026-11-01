@@ -376,7 +376,7 @@ const resources: AppContract<RemindersClient>['resources'] = {
     name: 'Account',
     record: accountRecordType,
     id: t.string({ description: 'The unique identifier of the account' }),
-    list: 'reminders.accounts.listAccounts',
+    list: 'reminders.accounts.list',
   },
   List: {
     name: 'List',
@@ -389,8 +389,8 @@ const resources: AppContract<RemindersClient>['resources'] = {
     name: 'Reminder',
     record: reminderRecordType,
     id: t.string({ description: 'The unique identifier of the reminder' }),
-    get: 'reminders.reminders.getReminder',
-    list: 'reminders.reminders.listReminders',
+    get: 'reminders.reminders.get',
+    list: 'reminders.reminders.list',
   },
 }
 
@@ -427,7 +427,7 @@ const reminderListRemindersOperation: OperationDescriptor<
   { readonly listId: string },
   readonly Reminder[]
 > = {
-  id: 'reminders.reminders.listReminders',
+  id: 'reminders.reminders.list',
   permission: 'reminders:reminders:list',
   target: { command: 'listReminders', resource: 'Reminder' },
   description: 'List all reminders in a list',
@@ -438,7 +438,7 @@ const reminderListRemindersOperation: OperationDescriptor<
 }
 
 const reminderGetReminderOperation: OperationDescriptor<{ readonly id: string }, Reminder> = {
-  id: 'reminders.reminders.getReminder',
+  id: 'reminders.reminders.get',
   permission: 'reminders:reminders:get',
   target: { command: 'getReminder', resource: 'Reminder' },
   description: 'Get a reminder by ID',
@@ -449,7 +449,7 @@ const reminderGetReminderOperation: OperationDescriptor<{ readonly id: string },
 }
 
 const reminderCreateReminderOperation: OperationDescriptor<ReminderCreateInput, Reminder> = {
-  id: 'reminders.reminders.createReminder',
+  id: 'reminders.reminders.create',
   permission: 'reminders:reminders:create',
   target: { command: 'createReminder', resource: 'Reminder' },
   description: 'Create a new reminder',
@@ -458,7 +458,7 @@ const reminderCreateReminderOperation: OperationDescriptor<ReminderCreateInput, 
 }
 
 const reminderDeleteReminderOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
-  id: 'reminders.reminders.deleteReminder',
+  id: 'reminders.reminders.delete',
   permission: 'reminders:reminders:delete',
   target: { command: 'deleteReminder', resource: 'Reminder' },
   description: 'Delete a reminder',
@@ -492,7 +492,7 @@ const accountListAccountsOperation: OperationDescriptor<
   Record<string, never>,
   readonly Account[]
 > = {
-  id: 'reminders.accounts.listAccounts',
+  id: 'reminders.accounts.list',
   permission: 'reminders:accounts:list',
   target: { command: 'listAccounts', resource: 'Account' },
   description: 'List all accounts',
@@ -505,13 +505,13 @@ const operations: AppContract<RemindersClient>['operations'] = {
   'reminders.lists.list': listListOperation,
   'reminders.lists.get': listGetOperation,
   'reminders.lists.create': listCreateOperation,
-  'reminders.reminders.listReminders': reminderListRemindersOperation,
-  'reminders.reminders.getReminder': reminderGetReminderOperation,
-  'reminders.reminders.createReminder': reminderCreateReminderOperation,
-  'reminders.reminders.deleteReminder': reminderDeleteReminderOperation,
+  'reminders.reminders.list': reminderListRemindersOperation,
+  'reminders.reminders.get': reminderGetReminderOperation,
+  'reminders.reminders.create': reminderCreateReminderOperation,
+  'reminders.reminders.delete': reminderDeleteReminderOperation,
   'reminders.reminders.completeReminder': reminderCompleteReminderOperation,
   'reminders.reminders.show': reminderShowOperation,
-  'reminders.accounts.listAccounts': accountListAccountsOperation,
+  'reminders.accounts.list': accountListAccountsOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */

@@ -989,15 +989,16 @@ commands:
   # Canvas CRUD commands
   listCanvases:
     name: list
+    routeName: list
     description: List all canvases
     scope: resource
     resourceType: Canvas
     code: core
     parameters: []
-    permission: omnigraffle:canvases:list
 
   getCanvas:
     name: get
+    routeName: get
     description: Get a canvas by ID
     scope: resource
     resourceType: Canvas
@@ -1007,10 +1008,10 @@ commands:
         type: string
         description: Canvas identifier
         required: true
-    permission: omnigraffle:canvases:get
 
   createCanvas:
     name: create
+    routeName: create
     description: Create a new canvas
     scope: resource
     resourceType: Canvas
@@ -1020,11 +1021,11 @@ commands:
         type: string
         description: Canvas name
         required: true
-    permission: omnigraffle:canvases:create
 
   # Graphic CRUD commands
   listGraphics:
     name: list
+    routeName: list
     description: List all graphics on a canvas
     scope: resource
     resourceType: Graphic
@@ -1034,10 +1035,10 @@ commands:
         type: string
         description: Canvas identifier
         required: true
-    permission: omnigraffle:graphics:list
 
   getGraphic:
     name: get
+    routeName: get
     description: Get a graphic by ID
     scope: resource
     resourceType: Graphic
@@ -1047,11 +1048,11 @@ commands:
         type: string
         description: Graphic identifier
         required: true
-    permission: omnigraffle:graphics:get
 
   # Shape CRUD commands
   listShapes:
     name: list
+    routeName: list
     description: List all shapes on a canvas
     scope: resource
     resourceType: Shape
@@ -1061,10 +1062,10 @@ commands:
         type: string
         description: Canvas identifier
         required: true
-    permission: omnigraffle:shapes:list
 
   getShape:
     name: get
+    routeName: get
     description: Get a shape by ID
     scope: resource
     resourceType: Shape
@@ -1074,10 +1075,10 @@ commands:
         type: string
         description: Shape identifier
         required: true
-    permission: omnigraffle:shapes:get
 
   createShape:
     name: create
+    routeName: create
     description: Create a new shape
     scope: resource
     resourceType: Shape
@@ -1099,11 +1100,11 @@ commands:
         type: string
         description: Text content
         required: false
-    permission: omnigraffle:shapes:create
 
   # Line CRUD commands
   listLines:
     name: list
+    routeName: list
     description: List all lines on a canvas
     scope: resource
     resourceType: Line
@@ -1113,10 +1114,10 @@ commands:
         type: string
         description: Canvas identifier
         required: true
-    permission: omnigraffle:lines:list
 
   getLine:
     name: get
+    routeName: get
     description: Get a line by ID
     scope: resource
     resourceType: Line
@@ -1126,11 +1127,11 @@ commands:
         type: string
         description: Line identifier
         required: true
-    permission: omnigraffle:lines:get
 
   # Layer CRUD commands
   listLayers:
     name: list
+    routeName: list
     description: List all layers on a canvas
     scope: resource
     resourceType: Layer
@@ -1140,10 +1141,10 @@ commands:
         type: string
         description: Canvas identifier
         required: true
-    permission: omnigraffle:layers:list
 
   getLayer:
     name: get
+    routeName: get
     description: Get a layer by name
     scope: resource
     resourceType: Layer
@@ -1153,10 +1154,10 @@ commands:
         type: string
         description: Layer name
         required: true
-    permission: omnigraffle:layers:get
 
   createLayer:
     name: create
+    routeName: create
     description: Create a new layer
     scope: resource
     resourceType: Layer
@@ -1170,7 +1171,6 @@ commands:
         type: string
         description: Layer name
         required: true
-    permission: omnigraffle:layers:create
 
   # Application-level commands
   connect:

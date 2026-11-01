@@ -24,13 +24,13 @@ export class LineResourceClient {
    * List all lines.
    */
   async list(canvasId: string): Promise<Line[]> {
-    return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.listLines`, { canvasId })
+    return this.#http.rpc<Line[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**
    * Get a line by id.
    */
   async get(id: string): Promise<Line> {
-    return this.#http.rpc<Line>(`${this.#app}.${this.#resource}.getLine`, { id })
+    return this.#http.rpc<Line>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

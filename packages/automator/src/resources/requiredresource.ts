@@ -24,18 +24,13 @@ export class RequiredResourceResourceClient {
    * List all requiredresources.
    */
   async list(actionId: string): Promise<RequiredResource[]> {
-    return this.#http.rpc<RequiredResource[]>(
-      `${this.#app}.${this.#resource}.listRequiredResources`,
-      { actionId }
-    )
+    return this.#http.rpc<RequiredResource[]>(`${this.#app}.${this.#resource}.list`, { actionId })
   }
 
   /**
    * Get a requiredresource by name.
    */
   async get(name: string): Promise<RequiredResource> {
-    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.getRequiredResource`, {
-      name,
-    })
+    return this.#http.rpc<RequiredResource>(`${this.#app}.${this.#resource}.get`, { name })
   }
 }

@@ -526,6 +526,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'core',
+        routeName: 'list',
         permission: 'automator:actions:list',
       },
       getAction: {
@@ -542,6 +543,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'automator:actions:get',
       },
       add: {
@@ -602,7 +604,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'core',
-        permission: 'automator:variables:list',
+        routeName: 'list',
       },
       getVariable: {
         name: 'get',
@@ -618,7 +620,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'automator:variables:get',
+        routeName: 'get',
       },
       listSettings: {
         name: 'list',
@@ -634,7 +636,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'core',
-        permission: 'automator:settings:list',
+        routeName: 'list',
       },
       getSetting: {
         name: 'get',
@@ -650,7 +652,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'automator:settings:get',
+        routeName: 'get',
       },
       listRequiredResources: {
         name: 'list',
@@ -666,6 +668,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'core',
+        routeName: 'list',
         permission: 'automator:requiredResources:list',
       },
       getRequiredResource: {
@@ -682,6 +685,7 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'automator:requiredResources:get',
       },
     },

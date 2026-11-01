@@ -897,7 +897,7 @@ export const manifest: unknown = {
       resourceType: 'Project',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:projects:list',
+      routeName: 'list',
     },
     getProject: {
       name: 'get',
@@ -913,7 +913,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omniplan:projects:get',
+      routeName: 'get',
     },
     listTasks: {
       name: 'list',
@@ -922,7 +922,7 @@ export const manifest: unknown = {
       resourceType: 'Task',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:tasks:list',
+      routeName: 'list',
     },
     getTask: {
       name: 'get',
@@ -938,7 +938,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omniplan:tasks:get',
+      routeName: 'get',
     },
     createTask: {
       name: 'create',
@@ -966,7 +966,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omniplan:tasks:create',
+      routeName: 'create',
     },
     listMilestones: {
       name: 'list',
@@ -975,7 +975,7 @@ export const manifest: unknown = {
       resourceType: 'Milestone',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:milestones:list',
+      routeName: 'list',
     },
     getMilestone: {
       name: 'get',
@@ -991,7 +991,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omniplan:milestones:get',
+      routeName: 'get',
     },
     createMilestone: {
       name: 'create',
@@ -1013,7 +1013,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omniplan:milestones:create',
+      routeName: 'create',
     },
     listResources: {
       name: 'list',
@@ -1022,7 +1022,7 @@ export const manifest: unknown = {
       resourceType: 'Resource',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:resources:list',
+      routeName: 'list',
     },
     getResource: {
       name: 'get',
@@ -1038,7 +1038,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omniplan:resources:get',
+      routeName: 'get',
     },
     createResource: {
       name: 'create',
@@ -1060,7 +1060,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omniplan:resources:create',
+      routeName: 'create',
     },
     listAssignments: {
       name: 'list',
@@ -1069,7 +1069,7 @@ export const manifest: unknown = {
       resourceType: 'Assignment',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:assignments:list',
+      routeName: 'list',
     },
     listDependencies: {
       name: 'list',
@@ -1078,7 +1078,7 @@ export const manifest: unknown = {
       resourceType: 'Dependency',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:dependencies:list',
+      routeName: 'list',
     },
     listViolations: {
       name: 'list',
@@ -1087,7 +1087,7 @@ export const manifest: unknown = {
       resourceType: 'Violation',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:violations:list',
+      routeName: 'list',
     },
     listScenarios: {
       name: 'list',
@@ -1096,7 +1096,7 @@ export const manifest: unknown = {
       resourceType: 'Scenario',
       parameters: [],
       code: 'core',
-      permission: 'omniplan:scenarios:list',
+      routeName: 'list',
     },
     getScenario: {
       name: 'get',
@@ -1112,7 +1112,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omniplan:scenarios:get',
+      routeName: 'get',
     },
     export: {
       name: 'export',

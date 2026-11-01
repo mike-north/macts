@@ -224,7 +224,7 @@ export const shortcutsApiPlugin = {
         resourceType: 'Folder',
         parameters: [],
         code: 'core',
-        permission: 'shortcuts:folders:list',
+        routeName: 'list',
       },
       getFolder: {
         name: 'get',
@@ -240,7 +240,7 @@ export const shortcutsApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'shortcuts:folders:get',
+        routeName: 'get',
       },
     },
     permissions: {

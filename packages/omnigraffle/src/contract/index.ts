@@ -1856,29 +1856,29 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
     name: 'Canvas',
     record: canvasRecordType,
     id: t.string({ description: 'Unique identifier' }),
-    get: 'omnigraffle.canvases.getCanvas',
-    list: 'omnigraffle.canvases.listCanvases',
+    get: 'omnigraffle.canvases.get',
+    list: 'omnigraffle.canvases.list',
   },
   Graphic: {
     name: 'Graphic',
     record: graphicRecordType,
     id: t.string({ description: 'Unique identifier' }),
-    get: 'omnigraffle.graphics.getGraphic',
-    list: 'omnigraffle.graphics.listGraphics',
+    get: 'omnigraffle.graphics.get',
+    list: 'omnigraffle.graphics.list',
   },
   Shape: {
     name: 'Shape',
     record: shapeRecordType,
     id: t.string({ description: 'Unique identifier' }),
-    get: 'omnigraffle.shapes.getShape',
-    list: 'omnigraffle.shapes.listShapes',
+    get: 'omnigraffle.shapes.get',
+    list: 'omnigraffle.shapes.list',
   },
   Line: {
     name: 'Line',
     record: lineRecordType,
     id: t.string({ description: 'Unique identifier' }),
-    get: 'omnigraffle.lines.getLine',
-    list: 'omnigraffle.lines.listLines',
+    get: 'omnigraffle.lines.get',
+    list: 'omnigraffle.lines.list',
   },
   Group: {
     name: 'Group',
@@ -1889,8 +1889,8 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
     name: 'Layer',
     record: layerRecordType,
     id: t.string({ description: 'Name of the layer' }),
-    get: 'omnigraffle.layers.getLayer',
-    list: 'omnigraffle.layers.listLayers',
+    get: 'omnigraffle.layers.get',
+    list: 'omnigraffle.layers.list',
   },
   Subgraph: {
     name: 'Subgraph',
@@ -1918,7 +1918,7 @@ const resources: AppContract<OmniGraffleClient>['resources'] = {
 }
 
 const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, readonly Canvas[]> = {
-  id: 'omnigraffle.canvases.listCanvases',
+  id: 'omnigraffle.canvases.list',
   permission: 'omnigraffle:canvases:list',
   target: { command: 'listCanvases', resource: 'Canvas' },
   description: 'List all canvases',
@@ -1927,7 +1927,7 @@ const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, re
 }
 
 const canvasGetCanvasOperation: OperationDescriptor<{ readonly id: string }, Canvas> = {
-  id: 'omnigraffle.canvases.getCanvas',
+  id: 'omnigraffle.canvases.get',
   permission: 'omnigraffle:canvases:get',
   target: { command: 'getCanvas', resource: 'Canvas' },
   description: 'Get a canvas by ID',
@@ -1938,7 +1938,7 @@ const canvasGetCanvasOperation: OperationDescriptor<{ readonly id: string }, Can
 }
 
 const canvasCreateCanvasOperation: OperationDescriptor<CanvasCreateInput, Canvas> = {
-  id: 'omnigraffle.canvases.createCanvas',
+  id: 'omnigraffle.canvases.create',
   permission: 'omnigraffle:canvases:create',
   target: { command: 'createCanvas', resource: 'Canvas' },
   description: 'Create a new canvas',
@@ -1950,7 +1950,7 @@ const graphicListGraphicsOperation: OperationDescriptor<
   { readonly canvasId: string },
   readonly Graphic[]
 > = {
-  id: 'omnigraffle.graphics.listGraphics',
+  id: 'omnigraffle.graphics.list',
   permission: 'omnigraffle:graphics:list',
   target: { command: 'listGraphics', resource: 'Graphic' },
   description: 'List all graphics on a canvas',
@@ -1961,7 +1961,7 @@ const graphicListGraphicsOperation: OperationDescriptor<
 }
 
 const graphicGetGraphicOperation: OperationDescriptor<{ readonly id: string }, Graphic> = {
-  id: 'omnigraffle.graphics.getGraphic',
+  id: 'omnigraffle.graphics.get',
   permission: 'omnigraffle:graphics:get',
   target: { command: 'getGraphic', resource: 'Graphic' },
   description: 'Get a graphic by ID',
@@ -1975,7 +1975,7 @@ const shapeListShapesOperation: OperationDescriptor<
   { readonly canvasId: string },
   readonly Shape[]
 > = {
-  id: 'omnigraffle.shapes.listShapes',
+  id: 'omnigraffle.shapes.list',
   permission: 'omnigraffle:shapes:list',
   target: { command: 'listShapes', resource: 'Shape' },
   description: 'List all shapes on a canvas',
@@ -1986,7 +1986,7 @@ const shapeListShapesOperation: OperationDescriptor<
 }
 
 const shapeGetShapeOperation: OperationDescriptor<{ readonly id: string }, Shape> = {
-  id: 'omnigraffle.shapes.getShape',
+  id: 'omnigraffle.shapes.get',
   permission: 'omnigraffle:shapes:get',
   target: { command: 'getShape', resource: 'Shape' },
   description: 'Get a shape by ID',
@@ -1997,7 +1997,7 @@ const shapeGetShapeOperation: OperationDescriptor<{ readonly id: string }, Shape
 }
 
 const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = {
-  id: 'omnigraffle.shapes.createShape',
+  id: 'omnigraffle.shapes.create',
   permission: 'omnigraffle:shapes:create',
   target: { command: 'createShape', resource: 'Shape' },
   description: 'Create a new shape',
@@ -2007,7 +2007,7 @@ const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = 
 
 const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string }, readonly Line[]> =
   {
-    id: 'omnigraffle.lines.listLines',
+    id: 'omnigraffle.lines.list',
     permission: 'omnigraffle:lines:list',
     target: { command: 'listLines', resource: 'Line' },
     description: 'List all lines on a canvas',
@@ -2018,7 +2018,7 @@ const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string },
   }
 
 const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> = {
-  id: 'omnigraffle.lines.getLine',
+  id: 'omnigraffle.lines.get',
   permission: 'omnigraffle:lines:get',
   target: { command: 'getLine', resource: 'Line' },
   description: 'Get a line by ID',
@@ -2032,7 +2032,7 @@ const layerListLayersOperation: OperationDescriptor<
   { readonly canvasId: string },
   readonly Layer[]
 > = {
-  id: 'omnigraffle.layers.listLayers',
+  id: 'omnigraffle.layers.list',
   permission: 'omnigraffle:layers:list',
   target: { command: 'listLayers', resource: 'Layer' },
   description: 'List all layers on a canvas',
@@ -2043,7 +2043,7 @@ const layerListLayersOperation: OperationDescriptor<
 }
 
 const layerGetLayerOperation: OperationDescriptor<{ readonly name: string }, Layer> = {
-  id: 'omnigraffle.layers.getLayer',
+  id: 'omnigraffle.layers.get',
   permission: 'omnigraffle:layers:get',
   target: { command: 'getLayer', resource: 'Layer' },
   description: 'Get a layer by name',
@@ -2054,7 +2054,7 @@ const layerGetLayerOperation: OperationDescriptor<{ readonly name: string }, Lay
 }
 
 const layerCreateLayerOperation: OperationDescriptor<LayerCreateInput, Layer> = {
-  id: 'omnigraffle.layers.createLayer',
+  id: 'omnigraffle.layers.create',
   permission: 'omnigraffle:layers:create',
   target: { command: 'createLayer', resource: 'Layer' },
   description: 'Create a new layer',
@@ -2161,19 +2161,19 @@ const appEvaluateJavascriptOperation: OperationDescriptor<{ readonly script: str
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<OmniGraffleClient>['operations'] = {
-  'omnigraffle.canvases.listCanvases': canvasListCanvasesOperation,
-  'omnigraffle.canvases.getCanvas': canvasGetCanvasOperation,
-  'omnigraffle.canvases.createCanvas': canvasCreateCanvasOperation,
-  'omnigraffle.graphics.listGraphics': graphicListGraphicsOperation,
-  'omnigraffle.graphics.getGraphic': graphicGetGraphicOperation,
-  'omnigraffle.shapes.listShapes': shapeListShapesOperation,
-  'omnigraffle.shapes.getShape': shapeGetShapeOperation,
-  'omnigraffle.shapes.createShape': shapeCreateShapeOperation,
-  'omnigraffle.lines.listLines': lineListLinesOperation,
-  'omnigraffle.lines.getLine': lineGetLineOperation,
-  'omnigraffle.layers.listLayers': layerListLayersOperation,
-  'omnigraffle.layers.getLayer': layerGetLayerOperation,
-  'omnigraffle.layers.createLayer': layerCreateLayerOperation,
+  'omnigraffle.canvases.list': canvasListCanvasesOperation,
+  'omnigraffle.canvases.get': canvasGetCanvasOperation,
+  'omnigraffle.canvases.create': canvasCreateCanvasOperation,
+  'omnigraffle.graphics.list': graphicListGraphicsOperation,
+  'omnigraffle.graphics.get': graphicGetGraphicOperation,
+  'omnigraffle.shapes.list': shapeListShapesOperation,
+  'omnigraffle.shapes.get': shapeGetShapeOperation,
+  'omnigraffle.shapes.create': shapeCreateShapeOperation,
+  'omnigraffle.lines.list': lineListLinesOperation,
+  'omnigraffle.lines.get': lineGetLineOperation,
+  'omnigraffle.layers.list': layerListLayersOperation,
+  'omnigraffle.layers.get': layerGetLayerOperation,
+  'omnigraffle.layers.create': layerCreateLayerOperation,
   'omnigraffle.app.connect': appConnectOperation,
   'omnigraffle.app.layout': appLayoutOperation,
   'omnigraffle.app.export': appExportOperation,

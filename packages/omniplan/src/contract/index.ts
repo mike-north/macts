@@ -1144,51 +1144,51 @@ const resources: AppContract<OmniPlanClient>['resources'] = {
     name: 'Project',
     record: projectRecordType,
     id: t.string({ description: 'The unique identifier for the project' }),
-    get: 'omniplan.projects.getProject',
-    list: 'omniplan.projects.listProjects',
+    get: 'omniplan.projects.get',
+    list: 'omniplan.projects.list',
   },
   Task: {
     name: 'Task',
     record: taskRecordType,
     id: t.integer({ description: 'Internal identifier for this task' }),
-    get: 'omniplan.tasks.getTask',
-    list: 'omniplan.tasks.listTasks',
+    get: 'omniplan.tasks.get',
+    list: 'omniplan.tasks.list',
   },
   Milestone: {
     name: 'Milestone',
     record: milestoneRecordType,
     id: t.integer({ description: 'Internal identifier for this milestone' }),
-    get: 'omniplan.milestones.getMilestone',
-    list: 'omniplan.milestones.listMilestones',
+    get: 'omniplan.milestones.get',
+    list: 'omniplan.milestones.list',
   },
   Resource: {
     name: 'Resource',
     record: resourceRecordType,
     id: t.integer({ description: 'Internal identifier for this resource' }),
-    get: 'omniplan.resources.getResource',
-    list: 'omniplan.resources.listResources',
+    get: 'omniplan.resources.get',
+    list: 'omniplan.resources.list',
   },
   Assignment: {
     name: 'Assignment',
     record: assignmentRecordType,
-    list: 'omniplan.assignments.listAssignments',
+    list: 'omniplan.assignments.list',
   },
   Dependency: {
     name: 'Dependency',
     record: dependencyRecordType,
-    list: 'omniplan.dependencies.listDependencies',
+    list: 'omniplan.dependencies.list',
   },
   Violation: {
     name: 'Violation',
     record: violationRecordType,
-    list: 'omniplan.violations.listViolations',
+    list: 'omniplan.violations.list',
   },
   Scenario: {
     name: 'Scenario',
     record: scenarioRecordType,
     id: t.string({ description: 'The unique identifier for the scenario' }),
-    get: 'omniplan.scenarios.getScenario',
-    list: 'omniplan.scenarios.listScenarios',
+    get: 'omniplan.scenarios.get',
+    list: 'omniplan.scenarios.list',
   },
   Schedule: {
     name: 'Schedule',
@@ -1204,7 +1204,7 @@ const projectListProjectsOperation: OperationDescriptor<
   Record<string, never>,
   readonly Project[]
 > = {
-  id: 'omniplan.projects.listProjects',
+  id: 'omniplan.projects.list',
   permission: 'omniplan:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects',
@@ -1213,7 +1213,7 @@ const projectListProjectsOperation: OperationDescriptor<
 }
 
 const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
-  id: 'omniplan.projects.getProject',
+  id: 'omniplan.projects.get',
   permission: 'omniplan:projects:get',
   target: { command: 'getProject', resource: 'Project' },
   description: 'Get a project',
@@ -1224,7 +1224,7 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
 }
 
 const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
-  id: 'omniplan.tasks.listTasks',
+  id: 'omniplan.tasks.list',
   permission: 'omniplan:tasks:list',
   target: { command: 'listTasks', resource: 'Task' },
   description: 'List all tasks',
@@ -1233,7 +1233,7 @@ const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonl
 }
 
 const taskGetTaskOperation: OperationDescriptor<{ readonly id: Integer }, Task> = {
-  id: 'omniplan.tasks.getTask',
+  id: 'omniplan.tasks.get',
   permission: 'omniplan:tasks:get',
   target: { command: 'getTask', resource: 'Task' },
   description: 'Get a task by ID',
@@ -1244,7 +1244,7 @@ const taskGetTaskOperation: OperationDescriptor<{ readonly id: Integer }, Task> 
 }
 
 const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
-  id: 'omniplan.tasks.createTask',
+  id: 'omniplan.tasks.create',
   permission: 'omniplan:tasks:create',
   target: { command: 'createTask', resource: 'Task' },
   description: 'Create a new task',
@@ -1256,7 +1256,7 @@ const milestoneListMilestonesOperation: OperationDescriptor<
   Record<string, never>,
   readonly Milestone[]
 > = {
-  id: 'omniplan.milestones.listMilestones',
+  id: 'omniplan.milestones.list',
   permission: 'omniplan:milestones:list',
   target: { command: 'listMilestones', resource: 'Milestone' },
   description: 'List all milestones',
@@ -1265,7 +1265,7 @@ const milestoneListMilestonesOperation: OperationDescriptor<
 }
 
 const milestoneGetMilestoneOperation: OperationDescriptor<{ readonly id: Integer }, Milestone> = {
-  id: 'omniplan.milestones.getMilestone',
+  id: 'omniplan.milestones.get',
   permission: 'omniplan:milestones:get',
   target: { command: 'getMilestone', resource: 'Milestone' },
   description: 'Get a milestone by ID',
@@ -1276,7 +1276,7 @@ const milestoneGetMilestoneOperation: OperationDescriptor<{ readonly id: Integer
 }
 
 const milestoneCreateMilestoneOperation: OperationDescriptor<MilestoneCreateInput, Milestone> = {
-  id: 'omniplan.milestones.createMilestone',
+  id: 'omniplan.milestones.create',
   permission: 'omniplan:milestones:create',
   target: { command: 'createMilestone', resource: 'Milestone' },
   description: 'Create a new milestone',
@@ -1288,7 +1288,7 @@ const resourceListResourcesOperation: OperationDescriptor<
   Record<string, never>,
   readonly Resource[]
 > = {
-  id: 'omniplan.resources.listResources',
+  id: 'omniplan.resources.list',
   permission: 'omniplan:resources:list',
   target: { command: 'listResources', resource: 'Resource' },
   description: 'List all resources',
@@ -1297,7 +1297,7 @@ const resourceListResourcesOperation: OperationDescriptor<
 }
 
 const resourceGetResourceOperation: OperationDescriptor<{ readonly id: Integer }, Resource> = {
-  id: 'omniplan.resources.getResource',
+  id: 'omniplan.resources.get',
   permission: 'omniplan:resources:get',
   target: { command: 'getResource', resource: 'Resource' },
   description: 'Get a resource by ID',
@@ -1308,7 +1308,7 @@ const resourceGetResourceOperation: OperationDescriptor<{ readonly id: Integer }
 }
 
 const resourceCreateResourceOperation: OperationDescriptor<ResourceCreateInput, Resource> = {
-  id: 'omniplan.resources.createResource',
+  id: 'omniplan.resources.create',
   permission: 'omniplan:resources:create',
   target: { command: 'createResource', resource: 'Resource' },
   description: 'Create a new resource',
@@ -1320,7 +1320,7 @@ const assignmentListAssignmentsOperation: OperationDescriptor<
   Record<string, never>,
   readonly Assignment[]
 > = {
-  id: 'omniplan.assignments.listAssignments',
+  id: 'omniplan.assignments.list',
   permission: 'omniplan:assignments:list',
   target: { command: 'listAssignments', resource: 'Assignment' },
   description: 'List all assignments',
@@ -1332,7 +1332,7 @@ const dependencyListDependenciesOperation: OperationDescriptor<
   Record<string, never>,
   readonly Dependency[]
 > = {
-  id: 'omniplan.dependencies.listDependencies',
+  id: 'omniplan.dependencies.list',
   permission: 'omniplan:dependencies:list',
   target: { command: 'listDependencies', resource: 'Dependency' },
   description: 'List all dependencies',
@@ -1344,7 +1344,7 @@ const violationListViolationsOperation: OperationDescriptor<
   Record<string, never>,
   readonly Violation[]
 > = {
-  id: 'omniplan.violations.listViolations',
+  id: 'omniplan.violations.list',
   permission: 'omniplan:violations:list',
   target: { command: 'listViolations', resource: 'Violation' },
   description: 'List all violations',
@@ -1356,7 +1356,7 @@ const scenarioListScenariosOperation: OperationDescriptor<
   Record<string, never>,
   readonly Scenario[]
 > = {
-  id: 'omniplan.scenarios.listScenarios',
+  id: 'omniplan.scenarios.list',
   permission: 'omniplan:scenarios:list',
   target: { command: 'listScenarios', resource: 'Scenario' },
   description: 'List all scenarios',
@@ -1365,7 +1365,7 @@ const scenarioListScenariosOperation: OperationDescriptor<
 }
 
 const scenarioGetScenarioOperation: OperationDescriptor<{ readonly id: string }, Scenario> = {
-  id: 'omniplan.scenarios.getScenario',
+  id: 'omniplan.scenarios.get',
   permission: 'omniplan:scenarios:get',
   target: { command: 'getScenario', resource: 'Scenario' },
   description: 'Get a scenario by ID',
@@ -1506,22 +1506,22 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<OmniPlanClient>['operations'] = {
-  'omniplan.projects.listProjects': projectListProjectsOperation,
-  'omniplan.projects.getProject': projectGetProjectOperation,
-  'omniplan.tasks.listTasks': taskListTasksOperation,
-  'omniplan.tasks.getTask': taskGetTaskOperation,
-  'omniplan.tasks.createTask': taskCreateTaskOperation,
-  'omniplan.milestones.listMilestones': milestoneListMilestonesOperation,
-  'omniplan.milestones.getMilestone': milestoneGetMilestoneOperation,
-  'omniplan.milestones.createMilestone': milestoneCreateMilestoneOperation,
-  'omniplan.resources.listResources': resourceListResourcesOperation,
-  'omniplan.resources.getResource': resourceGetResourceOperation,
-  'omniplan.resources.createResource': resourceCreateResourceOperation,
-  'omniplan.assignments.listAssignments': assignmentListAssignmentsOperation,
-  'omniplan.dependencies.listDependencies': dependencyListDependenciesOperation,
-  'omniplan.violations.listViolations': violationListViolationsOperation,
-  'omniplan.scenarios.listScenarios': scenarioListScenariosOperation,
-  'omniplan.scenarios.getScenario': scenarioGetScenarioOperation,
+  'omniplan.projects.list': projectListProjectsOperation,
+  'omniplan.projects.get': projectGetProjectOperation,
+  'omniplan.tasks.list': taskListTasksOperation,
+  'omniplan.tasks.get': taskGetTaskOperation,
+  'omniplan.tasks.create': taskCreateTaskOperation,
+  'omniplan.milestones.list': milestoneListMilestonesOperation,
+  'omniplan.milestones.get': milestoneGetMilestoneOperation,
+  'omniplan.milestones.create': milestoneCreateMilestoneOperation,
+  'omniplan.resources.list': resourceListResourcesOperation,
+  'omniplan.resources.get': resourceGetResourceOperation,
+  'omniplan.resources.create': resourceCreateResourceOperation,
+  'omniplan.assignments.list': assignmentListAssignmentsOperation,
+  'omniplan.dependencies.list': dependencyListDependenciesOperation,
+  'omniplan.violations.list': violationListViolationsOperation,
+  'omniplan.scenarios.list': scenarioListScenariosOperation,
+  'omniplan.scenarios.get': scenarioGetScenarioOperation,
   'omniplan.app.export': appExportOperation,
   'omniplan.app.assign': appAssignOperation,
   'omniplan.app.depend': appDependOperation,

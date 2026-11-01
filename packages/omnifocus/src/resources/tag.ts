@@ -24,20 +24,20 @@ export class TagResourceClient {
    * List all tags.
    */
   async list(): Promise<Tag[]> {
-    return this.#http.rpc<Tag[]>(`${this.#app}.${this.#resource}.listTags`)
+    return this.#http.rpc<Tag[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a tag by id.
    */
   async get(id: string): Promise<Tag> {
-    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.getTag`, { id })
+    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new tag.
    */
   async create(input: TagCreateInput): Promise<Tag> {
-    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.createTag`, input)
+    return this.#http.rpc<Tag>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

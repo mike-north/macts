@@ -370,6 +370,7 @@ commands:
   # Reminder commands
   listReminders:
     name: list
+    routeName: list
     description: List all reminders in a list
     scope: resource
     resourceType: Reminder
@@ -379,10 +380,10 @@ commands:
         type: string
         description: List identifier
         required: true
-    permission: reminders:reminders:list
 
   getReminder:
     name: get
+    routeName: get
     description: Get a reminder by ID
     scope: resource
     resourceType: Reminder
@@ -392,10 +393,10 @@ commands:
         type: string
         description: Reminder identifier
         required: true
-    permission: reminders:reminders:get
 
   createReminder:
     name: create
+    routeName: create
     description: Create a new reminder
     scope: resource
     resourceType: Reminder
@@ -429,10 +430,10 @@ commands:
         type: boolean
         description: Whether to flag the reminder
         required: false
-    permission: reminders:reminders:create
 
   deleteReminder:
     name: delete
+    routeName: delete
     description: Delete a reminder
     scope: resource
     resourceType: Reminder
@@ -442,7 +443,6 @@ commands:
         type: string
         description: Reminder identifier
         required: true
-    permission: reminders:reminders:delete
 
   completeReminder:
     name: complete
@@ -469,12 +469,12 @@ commands:
   # Account commands
   listAccounts:
     name: list
+    routeName: list
     description: List all accounts
     scope: resource
     resourceType: Account
     code: core
     parameters: []
-    permission: reminders:accounts:list
 
 # Permissions mapping - defines coarse->fine permission relationships
 permissions:

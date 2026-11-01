@@ -367,6 +367,7 @@ export const photosApiPlugin = {
         resourceType: 'MediaItem',
         parameters: [],
         code: 'core',
+        routeName: 'list',
         permission: 'photos:mediaItems:list',
       },
       getMediaItem: {
@@ -383,6 +384,7 @@ export const photosApiPlugin = {
           },
         ],
         code: 'getd',
+        routeName: 'get',
         permission: 'photos:mediaItems:get',
       },
       listAlbums: {
@@ -392,7 +394,7 @@ export const photosApiPlugin = {
         resourceType: 'Album',
         parameters: [],
         code: 'core',
-        permission: 'photos:albums:list',
+        routeName: 'list',
       },
       getAlbum: {
         name: 'get',
@@ -408,7 +410,7 @@ export const photosApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'photos:albums:get',
+        routeName: 'get',
       },
       listFolders: {
         name: 'list',
@@ -417,7 +419,7 @@ export const photosApiPlugin = {
         resourceType: 'Folder',
         parameters: [],
         code: 'core',
-        permission: 'photos:folders:list',
+        routeName: 'list',
       },
       getFolder: {
         name: 'get',
@@ -433,7 +435,7 @@ export const photosApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'photos:folders:get',
+        routeName: 'get',
       },
       import: {
         name: 'import',

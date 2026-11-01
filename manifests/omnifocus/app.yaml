@@ -667,15 +667,16 @@ hierarchy:
 commands:
   listFolders:
     name: list
+    routeName: list
     description: List all folders
     scope: resource
     resourceType: Folder
     code: core
     parameters: []
-    permission: omnifocus:folders:list
 
   getFolder:
     name: get
+    routeName: get
     description: Get a folder by ID
     scope: resource
     resourceType: Folder
@@ -685,10 +686,10 @@ commands:
         type: string
         description: Folder identifier
         required: true
-    permission: omnifocus:folders:get
 
   createFolder:
     name: create
+    routeName: create
     description: Create a new folder
     scope: resource
     resourceType: Folder
@@ -702,19 +703,19 @@ commands:
         type: string
         description: Folder note
         required: false
-    permission: omnifocus:folders:create
 
   listProjects:
     name: list
+    routeName: list
     description: List all projects
     scope: resource
     resourceType: Project
     code: core
     parameters: []
-    permission: omnifocus:projects:list
 
   getProject:
     name: get
+    routeName: get
     description: Get a project by ID
     scope: resource
     resourceType: Project
@@ -724,10 +725,10 @@ commands:
         type: string
         description: Project identifier
         required: true
-    permission: omnifocus:projects:get
 
   createProject:
     name: create
+    routeName: create
     description: Create a new project
     scope: resource
     resourceType: Project
@@ -745,19 +746,19 @@ commands:
         type: ProjectStatus
         description: Project status
         required: false
-    permission: omnifocus:projects:create
 
   listTasks:
     name: list
+    routeName: list
     description: List all tasks
     scope: resource
     resourceType: Task
     code: core
     parameters: []
-    permission: omnifocus:tasks:list
 
   getTask:
     name: get
+    routeName: get
     description: Get a task by ID
     scope: resource
     resourceType: Task
@@ -767,10 +768,10 @@ commands:
         type: string
         description: Task identifier
         required: true
-    permission: omnifocus:tasks:get
 
   createTask:
     name: create
+    routeName: create
     description: Create a new task
     scope: resource
     resourceType: Task
@@ -792,19 +793,19 @@ commands:
         type: date
         description: Due date
         required: false
-    permission: omnifocus:tasks:create
 
   listTags:
     name: list
+    routeName: list
     description: List all tags
     scope: resource
     resourceType: Tag
     code: core
     parameters: []
-    permission: omnifocus:tags:list
 
   getTag:
     name: get
+    routeName: get
     description: Get a tag by ID
     scope: resource
     resourceType: Tag
@@ -814,10 +815,10 @@ commands:
         type: string
         description: Tag identifier
         required: true
-    permission: omnifocus:tags:get
 
   createTag:
     name: create
+    routeName: create
     description: Create a new tag
     scope: resource
     resourceType: Tag
@@ -827,10 +828,10 @@ commands:
         type: string
         description: Tag name
         required: true
-    permission: omnifocus:tags:create
 
   listInboxTasks:
     name: list
+    routeName: list
     description: List all inbox tasks
     scope: resource
     resourceType: InboxTask
@@ -840,6 +841,7 @@ commands:
 
   getInboxTask:
     name: get
+    routeName: get
     description: Get an inbox task by ID
     scope: resource
     resourceType: InboxTask
@@ -853,6 +855,7 @@ commands:
 
   createInboxTask:
     name: create
+    routeName: create
     description: Create a new inbox task
     scope: resource
     resourceType: InboxTask
@@ -870,15 +873,16 @@ commands:
 
   listPerspectives:
     name: list
+    routeName: list
     description: List all perspectives
     scope: resource
     resourceType: Perspective
     code: core
     parameters: []
-    permission: omnifocus:perspectives:list
 
   getPerspective:
     name: get
+    routeName: get
     description: Get a perspective by ID
     scope: resource
     resourceType: Perspective
@@ -888,7 +892,6 @@ commands:
         type: string
         description: Perspective identifier
         required: true
-    permission: omnifocus:perspectives:get
 
   complete:
     name: complete

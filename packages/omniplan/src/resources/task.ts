@@ -24,20 +24,20 @@ export class TaskResourceClient {
    * List all tasks.
    */
   async list(): Promise<Task[]> {
-    return this.#http.rpc<Task[]>(`${this.#app}.${this.#resource}.listTasks`)
+    return this.#http.rpc<Task[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a task by id.
    */
   async get(id: string): Promise<Task> {
-    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.getTask`, { id })
+    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new task.
    */
   async create(input: TaskCreateInput): Promise<Task> {
-    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.createTask`, input)
+    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

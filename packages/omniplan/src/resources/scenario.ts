@@ -24,13 +24,13 @@ export class ScenarioResourceClient {
    * List all scenarios.
    */
   async list(): Promise<Scenario[]> {
-    return this.#http.rpc<Scenario[]>(`${this.#app}.${this.#resource}.listScenarios`)
+    return this.#http.rpc<Scenario[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a scenario by id.
    */
   async get(id: string): Promise<Scenario> {
-    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.getScenario`, { id })
+    return this.#http.rpc<Scenario>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

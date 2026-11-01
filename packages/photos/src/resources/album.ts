@@ -24,13 +24,13 @@ export class AlbumResourceClient {
    * List all albums.
    */
   async list(): Promise<Album[]> {
-    return this.#http.rpc<Album[]>(`${this.#app}.${this.#resource}.listAlbums`)
+    return this.#http.rpc<Album[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a album by id.
    */
   async get(id: string): Promise<Album> {
-    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.getAlbum`, { id })
+    return this.#http.rpc<Album>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

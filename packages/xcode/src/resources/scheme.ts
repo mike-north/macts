@@ -24,13 +24,13 @@ export class SchemeResourceClient {
    * List all schemes.
    */
   async list(workspaceName: string): Promise<Scheme[]> {
-    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.listSchemes`, { workspaceName })
+    return this.#http.rpc<Scheme[]>(`${this.#app}.${this.#resource}.list`, { workspaceName })
   }
 
   /**
    * Get a scheme by id.
    */
   async get(id: string): Promise<Scheme> {
-    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.getScheme`, { id })
+    return this.#http.rpc<Scheme>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

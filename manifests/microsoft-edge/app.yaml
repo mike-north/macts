@@ -247,6 +247,7 @@ hierarchy:
 commands:
   listWindows:
     name: list
+    routeName: list
     description: List all windows
     scope: resource
     resourceType: Window
@@ -256,6 +257,7 @@ commands:
 
   getWindow:
     name: get
+    routeName: get
     description: Get a window by ID
     scope: resource
     resourceType: Window
@@ -269,6 +271,7 @@ commands:
 
   createWindow:
     name: create
+    routeName: create
     description: Create a new window
     scope: resource
     resourceType: Window
@@ -282,6 +285,7 @@ commands:
 
   listTabs:
     name: list
+    routeName: list
     description: List all tabs in a window
     scope: resource
     resourceType: Tab
@@ -295,6 +299,7 @@ commands:
 
   getTab:
     name: get
+    routeName: get
     description: Get a tab by ID
     scope: resource
     resourceType: Tab
@@ -308,6 +313,7 @@ commands:
 
   createTab:
     name: create
+    routeName: create
     description: Create a new tab
     scope: resource
     resourceType: Tab
@@ -325,6 +331,7 @@ commands:
 
   listBookmarkFolders:
     name: list
+    routeName: list
     description: List all bookmark folders
     scope: resource
     resourceType: BookmarkFolder
@@ -334,6 +341,7 @@ commands:
 
   getBookmarkFolder:
     name: get
+    routeName: get
     description: Get a bookmark folder by ID
     scope: resource
     resourceType: BookmarkFolder
@@ -347,6 +355,7 @@ commands:
 
   listBookmarkItems:
     name: list
+    routeName: list
     description: List all bookmark items in a folder
     scope: resource
     resourceType: BookmarkItem
@@ -360,6 +369,7 @@ commands:
 
   getBookmarkItem:
     name: get
+    routeName: get
     description: Get a bookmark item by ID
     scope: resource
     resourceType: BookmarkItem

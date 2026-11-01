@@ -24,7 +24,7 @@ export class ViolationResourceClient {
    * List all violations.
    */
   async list(): Promise<Violation[]> {
-    return this.#http.rpc<Violation[]>(`${this.#app}.${this.#resource}.listViolations`)
+    return this.#http.rpc<Violation[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

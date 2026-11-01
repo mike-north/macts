@@ -24,20 +24,20 @@ export class ShapeResourceClient {
    * List all shapes.
    */
   async list(canvasId: string): Promise<Shape[]> {
-    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.listShapes`, { canvasId })
+    return this.#http.rpc<Shape[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**
    * Get a shape by id.
    */
   async get(id: string): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.getShape`, { id })
+    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new shape.
    */
   async create(input: ShapeCreateInput): Promise<Shape> {
-    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.createShape`, input)
+    return this.#http.rpc<Shape>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

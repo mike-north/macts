@@ -496,7 +496,7 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'core',
-        permission: 'reminders:reminders:list',
+        routeName: 'list',
       },
       getReminder: {
         name: 'get',
@@ -512,7 +512,7 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'reminders:reminders:get',
+        routeName: 'get',
       },
       createReminder: {
         name: 'create',
@@ -564,7 +564,7 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'crel',
-        permission: 'reminders:reminders:create',
+        routeName: 'create',
       },
       deleteReminder: {
         name: 'delete',
@@ -580,7 +580,7 @@ export const remindersApiPlugin = {
           },
         ],
         code: 'dele',
-        permission: 'reminders:reminders:delete',
+        routeName: 'delete',
       },
       completeReminder: {
         name: 'complete',
@@ -614,7 +614,7 @@ export const remindersApiPlugin = {
         resourceType: 'Account',
         parameters: [],
         code: 'core',
-        permission: 'reminders:accounts:list',
+        routeName: 'list',
       },
     },
     permissions: {

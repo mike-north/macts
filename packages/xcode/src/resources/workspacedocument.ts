@@ -24,19 +24,14 @@ export class WorkspaceDocumentResourceClient {
    * List all workspacedocuments.
    */
   async list(): Promise<WorkspaceDocument[]> {
-    return this.#http.rpc<WorkspaceDocument[]>(
-      `${this.#app}.${this.#resource}.listWorkspaceDocuments`
-    )
+    return this.#http.rpc<WorkspaceDocument[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a workspacedocument by name.
    */
   async get(name: string): Promise<WorkspaceDocument> {
-    return this.#http.rpc<WorkspaceDocument>(
-      `${this.#app}.${this.#resource}.getWorkspaceDocument`,
-      { name }
-    )
+    return this.#http.rpc<WorkspaceDocument>(`${this.#app}.${this.#resource}.get`, { name })
   }
 
   /**

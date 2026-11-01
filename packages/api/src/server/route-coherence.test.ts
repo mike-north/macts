@@ -78,7 +78,7 @@ describe('server route registration matches the canonical routes', () => {
     expect(mismatches).toEqual([])
   })
 
-  it('exposes the calendar createEvent route, not the name-keyed create', async () => {
+  it('exposes the calendar event create under its operation name, not its command key', async () => {
     const calendar = apps.find((a) => a.dir === 'calendar')
     if (!calendar) throw new Error('calendar manifest not found')
 
@@ -87,7 +87,8 @@ describe('server route registration matches the canonical routes', () => {
     const body = (await res.json()) as IntrospectBody
     const paths = body.endpoints.map((e) => e.path)
 
-    expect(paths).toContain('/rpc/calendar.events.createEvent')
-    expect(paths).not.toContain('/rpc/calendar.events.create')
+    // The command key is `createEvent`; its routeName publishes `create`.
+    expect(paths).toContain('/rpc/calendar.events.create')
+    expect(paths).not.toContain('/rpc/calendar.events.createEvent')
   })
 })

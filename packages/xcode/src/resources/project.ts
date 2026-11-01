@@ -24,15 +24,13 @@ export class ProjectResourceClient {
    * List all projects.
    */
   async list(workspaceName: string): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.listProjects`, {
-      workspaceName,
-    })
+    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`, { workspaceName })
   }
 
   /**
    * Get a project by id.
    */
   async get(id: string): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.getProject`, { id })
+    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

@@ -944,7 +944,7 @@ export const manifest: unknown = {
       resourceType: 'Folder',
       parameters: [],
       code: 'core',
-      permission: 'omnifocus:folders:list',
+      routeName: 'list',
     },
     getFolder: {
       name: 'get',
@@ -960,7 +960,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnifocus:folders:get',
+      routeName: 'get',
     },
     createFolder: {
       name: 'create',
@@ -982,7 +982,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnifocus:folders:create',
+      routeName: 'create',
     },
     listProjects: {
       name: 'list',
@@ -991,7 +991,7 @@ export const manifest: unknown = {
       resourceType: 'Project',
       parameters: [],
       code: 'core',
-      permission: 'omnifocus:projects:list',
+      routeName: 'list',
     },
     getProject: {
       name: 'get',
@@ -1007,7 +1007,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnifocus:projects:get',
+      routeName: 'get',
     },
     createProject: {
       name: 'create',
@@ -1035,7 +1035,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnifocus:projects:create',
+      routeName: 'create',
     },
     listTasks: {
       name: 'list',
@@ -1044,7 +1044,7 @@ export const manifest: unknown = {
       resourceType: 'Task',
       parameters: [],
       code: 'core',
-      permission: 'omnifocus:tasks:list',
+      routeName: 'list',
     },
     getTask: {
       name: 'get',
@@ -1060,7 +1060,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnifocus:tasks:get',
+      routeName: 'get',
     },
     createTask: {
       name: 'create',
@@ -1094,7 +1094,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnifocus:tasks:create',
+      routeName: 'create',
     },
     listTags: {
       name: 'list',
@@ -1103,7 +1103,7 @@ export const manifest: unknown = {
       resourceType: 'Tag',
       parameters: [],
       code: 'core',
-      permission: 'omnifocus:tags:list',
+      routeName: 'list',
     },
     getTag: {
       name: 'get',
@@ -1119,7 +1119,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnifocus:tags:get',
+      routeName: 'get',
     },
     createTag: {
       name: 'create',
@@ -1135,7 +1135,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnifocus:tags:create',
+      routeName: 'create',
     },
     listInboxTasks: {
       name: 'list',
@@ -1144,6 +1144,7 @@ export const manifest: unknown = {
       resourceType: 'InboxTask',
       parameters: [],
       code: 'core',
+      routeName: 'list',
       permission: 'omnifocus:inboxTasks:list',
     },
     getInboxTask: {
@@ -1160,6 +1161,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'omnifocus:inboxTasks:get',
     },
     createInboxTask: {
@@ -1182,6 +1184,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
+      routeName: 'create',
       permission: 'omnifocus:inboxTasks:create',
     },
     listPerspectives: {
@@ -1191,7 +1194,7 @@ export const manifest: unknown = {
       resourceType: 'Perspective',
       parameters: [],
       code: 'core',
-      permission: 'omnifocus:perspectives:list',
+      routeName: 'list',
     },
     getPerspective: {
       name: 'get',
@@ -1207,7 +1210,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnifocus:perspectives:get',
+      routeName: 'get',
     },
     complete: {
       name: 'complete',

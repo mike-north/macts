@@ -24,28 +24,28 @@ export class ReminderResourceClient {
    * List all reminders.
    */
   async list(listId: string): Promise<Reminder[]> {
-    return this.#http.rpc<Reminder[]>(`${this.#app}.${this.#resource}.listReminders`, { listId })
+    return this.#http.rpc<Reminder[]>(`${this.#app}.${this.#resource}.list`, { listId })
   }
 
   /**
    * Get a reminder by id.
    */
   async get(id: string): Promise<Reminder> {
-    return this.#http.rpc<Reminder>(`${this.#app}.${this.#resource}.getReminder`, { id })
+    return this.#http.rpc<Reminder>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new reminder.
    */
   async create(input: ReminderCreateInput): Promise<Reminder> {
-    return this.#http.rpc<Reminder>(`${this.#app}.${this.#resource}.createReminder`, input)
+    return this.#http.rpc<Reminder>(`${this.#app}.${this.#resource}.create`, input)
   }
 
   /**
    * Delete an reminder.
    */
   async delete(id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteReminder`, { id })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { id })
   }
 
   /**

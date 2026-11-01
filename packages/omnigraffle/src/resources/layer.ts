@@ -24,20 +24,20 @@ export class LayerResourceClient {
    * List all layers.
    */
   async list(canvasId: string): Promise<Layer[]> {
-    return this.#http.rpc<Layer[]>(`${this.#app}.${this.#resource}.listLayers`, { canvasId })
+    return this.#http.rpc<Layer[]>(`${this.#app}.${this.#resource}.list`, { canvasId })
   }
 
   /**
    * Get a layer by name.
    */
   async get(name: string): Promise<Layer> {
-    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.getLayer`, { name })
+    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.get`, { name })
   }
 
   /**
    * Create a new layer.
    */
   async create(input: LayerCreateInput): Promise<Layer> {
-    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.createLayer`, input)
+    return this.#http.rpc<Layer>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

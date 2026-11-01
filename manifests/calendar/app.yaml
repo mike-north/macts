@@ -707,6 +707,7 @@ commands:
   # Event-specific CRUD commands
   listEvents:
     name: list
+    routeName: list
     description: List all events in a calendar
     scope: resource
     resourceType: Event
@@ -716,10 +717,10 @@ commands:
         type: string
         description: Calendar identifier
         required: true
-    permission: calendar:events:list
 
   getEvent:
     name: get
+    routeName: get
     description: Get an event by ID
     scope: resource
     resourceType: Event
@@ -733,10 +734,10 @@ commands:
         type: string
         description: Event identifier (uid)
         required: true
-    permission: calendar:events:get
 
   createEvent:
     name: create
+    routeName: create
     description: Create a new event
     scope: resource
     resourceType: Event
@@ -792,10 +793,10 @@ commands:
         type: string
         description: URL associated with the event
         required: false
-    permission: calendar:events:create
 
   updateEvent:
     name: update
+    routeName: update
     description: Update an existing event
     scope: resource
     resourceType: Event
@@ -855,10 +856,10 @@ commands:
         type: string
         description: URL associated with the event
         required: false
-    permission: calendar:events:update
 
   deleteEvent:
     name: delete
+    routeName: delete
     description: Delete an event by ID
     scope: resource
     resourceType: Event
@@ -872,7 +873,6 @@ commands:
         type: string
         description: Event identifier (uid)
         required: true
-    permission: calendar:events:delete
 
   reloadCalendars:
     name: reloadCalendars
