@@ -36,9 +36,9 @@ export type AccountUpdateInput = Partial<AccountCreateInput>;
 // @public
 export interface Attachment {
     contentIdentifier?: string;
-    creationDate: string;
+    creationDate: Date;
     id: string;
-    modificationDate: string;
+    modificationDate: Date;
     name: string;
 }
 
@@ -123,9 +123,9 @@ export class HttpClient {
 // @public
 export interface Note {
     body: string;
-    creationDate: string;
+    creationDate: Date;
     id: string;
-    modificationDate: string;
+    modificationDate: Date;
     name: string;
     passwordProtected: boolean;
     plaintext: string;

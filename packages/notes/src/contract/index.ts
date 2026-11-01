@@ -98,12 +98,12 @@ export interface Note {
    * The creation date of the note.
    * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
    */
-  readonly creationDate: string
+  readonly creationDate: Date
   /**
    * The modification date of the note.
    * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
    */
-  readonly modificationDate: string
+  readonly modificationDate: Date
   /**
    * Whether the note is shared.
    * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
@@ -137,12 +137,12 @@ export interface Attachment {
    * The creation date of the attachment.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly creationDate: string | null
+  readonly creationDate: Date | null
   /**
    * The modification date of the attachment.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly modificationDate: string | null
+  readonly modificationDate: Date | null
 }
 
 /** Input for creating an Account. */
@@ -290,8 +290,8 @@ const noteRecordType: ValueType<Note> = t.record(
     id: t.string({ description: 'The unique identifier of the note' }),
     body: t.nullable(t.string(), { description: 'The HTML content of the note body' }),
     plaintext: t.nullable(t.string(), { description: 'The plaintext content of the note' }),
-    creationDate: t.string({ description: 'The creation date of the note' }),
-    modificationDate: t.string({ description: 'The modification date of the note' }),
+    creationDate: t.date({ description: 'The creation date of the note' }),
+    modificationDate: t.date({ description: 'The modification date of the note' }),
     shared: t.boolean({ description: 'Whether the note is shared' }),
     passwordProtected: t.boolean({ description: 'Whether the note is password protected' }),
   },
@@ -305,8 +305,8 @@ const attachmentRecordType: ValueType<Attachment> = t.record(
     contentIdentifier: t.optional(
       t.nullable(t.string(), { description: 'The content identifier of the attachment' })
     ),
-    creationDate: t.nullable(t.string(), { description: 'The creation date of the attachment' }),
-    modificationDate: t.nullable(t.string(), {
+    creationDate: t.nullable(t.date(), { description: 'The creation date of the attachment' }),
+    modificationDate: t.nullable(t.date(), {
       description: 'The modification date of the attachment',
     }),
   },
