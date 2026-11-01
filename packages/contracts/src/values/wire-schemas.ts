@@ -130,9 +130,9 @@ function unsupportedDynamicPayload(kind: string) {
  * values; every object is a control record: an integer, a double, a date, or
  * a `{ "record": { … } }` envelope around a user record whose values are
  * dynamic values in turn. A bare number or a bare user object is rejected.
- * References and file values are part of the dynamic wire form but are not
- * supported in dynamic content yet; they are rejected with an issue that says
- * so.
+ * References and file values are not representable in dynamic content; they
+ * are rejected with an issue that states the rule, and the derived JSON Schema
+ * does not admit them.
  */
 export const DynamicWireValueSchema: z.ZodType<DynamicWireValue> = z.lazy(() =>
   z.union(
