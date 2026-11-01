@@ -26,6 +26,9 @@ Each app package exposes its contract at the `/contract` subpath, for example
    npm install @macts/sdk @macts/calendar @macts/reminders
    ```
 
+   `@macts/sdk` is an ES module only, for Node.js 22.13.0 or later. Load it
+   with `import`; `require('@macts/sdk')` is not supported.
+
 3. For remote clients, the macts service is running on the Mac (by default at
    `http://localhost:8372`).
 
@@ -50,6 +53,32 @@ await reminders.reminders.create({
 
 `resolveClientOptions()` reads `MACTS_API_KEY` (required) and `MACTS_API_URL`
 (optional, default `http://localhost:8372`) and returns `{ token, url }`.
+
+### Moving from `createMactsClients()`
+
+`createMactsClients()`, its `MactsClients` map, `resolveConnectionOptions()`,
+and `MactsConnectionOptions` are gone. Create each app's client from its
+contract instead, and install only the app packages a script uses. The
+`m.<app>` property becomes a client of its own, and
+`resolveConnectionOptions()` becomes `resolveClientOptions()`, which reads the
+same two variables.
+
+```typescript
+// Before: one map of every app's client, configured from the environment.
+import { createMactsClients } from '@macts/sdk'
+
+const m = createMactsClients()
+const calendars = await m.calendar.calendars.list()
+
+// After: one client per app, created from that app's contract.
+import { createClient, resolveClientOptions } from '@macts/sdk'
+import { calendarContract } from '@macts/calendar/contract'
+
+const calendar = createClient(calendarContract, resolveClientOptions())
+const calendars = await calendar.calendars.list()
+```
+
+Method names, arguments, and results are unchanged.
 
 ## 3. Remote or local
 

@@ -114,6 +114,25 @@ before, or will likely ask again, or the task touches more than one app:
    `{ token }`; the client, the calls, and the error classes are the same, and
    every call is governed the same way.
 
+   Older scripts that call `createMactsClients()` no longer run: that factory
+   is gone. Rewrite each `m.<app>` as a client created from that app's
+   contract. The methods do not change:
+
+   ```typescript
+   // Before: one map of every app's client, configured from the environment.
+   import { createMactsClients } from '@macts/sdk'
+
+   const m = createMactsClients()
+   const calendars = await m.calendar.calendars.list()
+
+   // After: one client per app, created from that app's contract.
+   import { createClient, resolveClientOptions } from '@macts/sdk'
+   import { calendarContract } from '@macts/calendar/contract'
+
+   const calendar = createClient(calendarContract, resolveClientOptions())
+   const calendars = await calendar.calendars.list()
+   ```
+
 3. **Show the script to the user and ask for approval.** (Your harness's
    job — macts does not run the script.) Explain what each operation does and
    what permissions it requires.

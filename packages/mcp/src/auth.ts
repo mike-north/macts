@@ -24,6 +24,13 @@ import { validateApiKey } from '@macts/runtime'
  * `@macts/contracts` and the `{ error: { code, message, details } }` envelope
  * the `@macts/api` server uses; the daemon does not run through the shared
  * runtime, so callers must not expect the structured vocabulary from it.
+ *
+ * The daemon also enforces no governance of its own. Its tool handlers call
+ * each app's generated HTTP client, so a call is governed by whichever macts
+ * server the client reaches.
+ *
+ * TODO(#101): run MCP tool calls through the shared runtime, with an explicit
+ * governance option, and adopt the structured error vocabulary.
  */
 export type McpAuthErrorCode =
   | 'MISSING_AUTHORIZATION'

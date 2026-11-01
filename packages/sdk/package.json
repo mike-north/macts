@@ -53,6 +53,7 @@
     "@macts/runtime": "workspace:*"
   },
   "devDependencies": {
+    "@hono/node-server": "^1.13.0",
     "@macts/api": "workspace:*",
     "@macts/calendar": "workspace:*",
     "@macts/notes": "workspace:*",
