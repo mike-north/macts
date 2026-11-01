@@ -1,0 +1,1196 @@
+/**
+ * Generator for an app's transport-neutral contract (`@macts/<app>/contract`).
+ *
+ * The contract is the single description of an app that every client and
+ * runtime shares. It declares the SDK types callers see (records, create and
+ * update inputs, enums, and the client interface), one operation descriptor
+ * per route (identity, required permission, manifest target, and input and
+ * output value types), the resource table that references resolve against,
+ * a lazy loader for the manifest, and a `bind` function that turns a
+ * factory-supplied `ClientRuntime` into the app's client. It performs no I/O
+ * and imports only `@macts/contracts`, so it loads on any platform; clients
+ * come from the local and remote factories, never from the contract itself.
+ *
+ * Two modules are emitted: `src/contract/index.ts` (the contract) and
+ * `src/contract/manifest.ts` (the manifest as data, imported only by
+ * `loadManifest`).
+ *
+ * The client surface (namespaces, method names, positional parameters) follows
+ * the shared derivation in `../surface.ts`, the same one the HTTP client SDK
+ * uses, so the two clients have the same shape.
+ *
+ * @packageDocumentation
+ */
+
+import type { AppManifest, Command, CommandParameter, Resource } from '../../manifest/index.js'
+import {
+  normalizeAppRouteSegment,
+  resolveManifestRoutes,
+  resolvePrimaryIdentifierProperty,
+  type ManifestRoute,
+} from '../../manifest/index.js'
+import {
+  appCommandEntries,
+  commandMethodParameters,
+  createInputFields,
+  findCrudCommand,
+  isCrudName,
+  listMethodParameters,
+  resolveIdParams,
+  resourceCommandEntries,
+  resourceHasOperations,
+  resourceNamespace,
+  safeIdentifier,
+  type CrudOperation,
+  type DeclaredType,
+} from '../surface.js'
+import {
+  ValueRenderer,
+  createNameResolver,
+  mapDeclaredType,
+  stringLiteral,
+  type ContractTypeName,
+  type NameResolver,
+  type ValuePosition,
+  type ValueShape,
+} from './value-mapping.js'
+
+/** The package-relative path of the generated contract module. */
+export const CONTRACT_MODULE_PATH = 'src/contract/index.ts'
+
+/** The package-relative path of the generated manifest data module. */
+export const CONTRACT_MANIFEST_MODULE_PATH = 'src/contract/manifest.ts'
+
+/**
+ * A manifest type the contract could not resolve, so it is `unknown` in the
+ * contract.
+ */
+export interface ContractDiagnostic {
+  /** The app's route segment. */
+  readonly app: string
+  /**
+   * Where the type is declared, as a manifest path, e.g.
+   * `resources.FinderWindow.properties.iconViewOptions` or
+   * `commands.open.parameters.target`.
+   */
+  readonly position: string
+  /** The declared type, as the manifest states it. */
+  readonly type: unknown
+  /** A one-line description of the finding. */
+  readonly message: string
+}
+
+/** The generated contract modules and what generation found. */
+export interface GeneratedContract {
+  /** The contract and manifest modules, with package-relative paths. */
+  readonly files: { path: string; content: string }[]
+  /** Unresolved types, which generation tolerated as `unknown`. */
+  readonly diagnostics: ContractDiagnostic[]
+  /**
+   * Problems that make the contract invalid (name collisions, malformed
+   * permissions). A contract with errors must not be published.
+   */
+  readonly errors: string[]
+}
+
+/** Names derived from the app for the generated contract. */
+export interface ContractNames {
+  /** The app's route segment (`AppContract.app`), e.g. `google-chrome`. */
+  readonly app: string
+  /** The client interface, e.g. `GoogleChromeClient`. */
+  readonly client: string
+  /** The exported contract binding, e.g. `googleChromeContract`. */
+  readonly contract: string
+}
+
+/**
+ * The contract's names for an app. The client interface keeps the HTTP client
+ * class's name (the app name without spaces), and the contract binding is its
+ * lower camel case form.
+ */
+export function contractNames(manifest: AppManifest): ContractNames {
+  const appName = manifest.app.name.replace(/\s+/g, '')
+  return {
+    app: normalizeAppRouteSegment(manifest.app.name),
+    client: `${appName}Client`,
+    contract: `${lowerCamel(appName)}Contract`,
+  }
+}
+
+/**
+ * Lower camel case of a Pascal case name: a leading run of capitals is
+ * lowercased, except the last capital when it starts the next word
+ * (`TV` → `tv`, `OmniFocus` → `omniFocus`, `XMLParser` → `xmlParser`).
+ */
+export function lowerCamel(name: string): string {
+  const run = /^[A-Z]+/.exec(name)?.[0] ?? ''
+  if (run.length === 0) return name
+  if (run.length === name.length) return name.toLowerCase()
+  if (run.length === 1) return name.charAt(0).toLowerCase() + name.slice(1)
+  return run.slice(0, -1).toLowerCase() + name.slice(run.length - 1)
+}
+
+/**
+ * Report every manifest type that does not resolve, once per declaration
+ * site: resource properties, command parameters, and command results.
+ */
+export function collectContractDiagnostics(manifest: AppManifest): ContractDiagnostic[] {
+  const app = normalizeAppRouteSegment(manifest.app.name)
+  const names = createNameResolver(manifest)
+  const diagnostics: ContractDiagnostic[] = []
+  const check = (type: DeclaredType, position: string): void => {
+    if (mapDeclaredType(type, 'output', names).resolved) return
+    diagnostics.push({
+      app,
+      position,
+      type,
+      message: `${app}: ${position}: the type ${JSON.stringify(type)} names no resource or enum, so the contract describes it as unknown.`,
+    })
+  }
+  for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
+    for (const [propName, prop] of Object.entries(resource.properties)) {
+      check(prop.type, `resources.${resourceKey}.properties.${propName}`)
+    }
+  }
+  for (const [commandKey, command] of Object.entries(manifest.commands)) {
+    for (const param of command.parameters) {
+      check(param.type, `commands.${commandKey}.parameters.${param.name}`)
+    }
+    if (command.returns !== undefined) check(command.returns, `commands.${commandKey}.returns`)
+  }
+  return diagnostics
+}
+
+/** Options for {@link generateContract}. */
+export interface GenerateContractOptions {
+  /** The client package the contract ships in, e.g. `@macts/calendar`. */
+  readonly packageName: string
+}
+
+/**
+ * Generate the contract and manifest modules for an app.
+ *
+ * @param manifest - The validated app manifest.
+ * @param options - Where the contract is published.
+ */
+export function generateContract(
+  manifest: AppManifest,
+  options: GenerateContractOptions
+): GeneratedContract {
+  const builder = new ContractBuilder(manifest, options.packageName)
+  const contract = builder.build()
+  return {
+    files: [
+      { path: CONTRACT_MODULE_PATH, content: contract },
+      { path: CONTRACT_MANIFEST_MODULE_PATH, content: generateManifestModule(manifest) },
+    ],
+    diagnostics: collectContractDiagnostics(manifest),
+    errors: builder.errors,
+  }
+}
+
+/** The manifest data module, imported lazily by `loadManifest`. */
+function generateManifestModule(manifest: AppManifest): string {
+  const names = contractNames(manifest)
+  return `/**
+ * The ${manifest.app.name} manifest, as data.
+ *
+ * \`${names.contract}.loadManifest()\` imports this module lazily. Only the
+ * Mac-side runtime calls it, and it validates the manifest before use, so the
+ * value is deliberately typed \`unknown\`. Remote clients never load this module.
+ *
+ * Generated from the ${manifest.app.name} manifest; do not edit.
+ *
+ * @packageDocumentation
+ */
+
+/** The ${manifest.app.name} manifest. */
+export const manifest: unknown = ${JSON.stringify(manifest, null, 2)}
+`
+}
+
+// ---------------------------------------------------------------------------
+// Contract module
+// ---------------------------------------------------------------------------
+
+/** One field of a generated record type (a record, an input, or a request). */
+interface FieldModel {
+  readonly name: string
+  readonly shape: ValueShape
+  readonly optional: boolean
+  readonly description: string
+}
+
+/** How an operation's input is typed in its descriptor. */
+type InputModel =
+  | {
+      /** The input is a named create input, shared with its value type. */
+      readonly kind: 'create'
+      readonly resourceKey: string
+    }
+  | {
+      /** The input is a request record spelled out field by field. */
+      readonly kind: 'fields'
+      readonly fields: readonly FieldModel[]
+    }
+
+/** What an operation returns. */
+type OutputModel =
+  | { readonly kind: 'none' }
+  | { readonly kind: 'record'; readonly resourceKey: string }
+  | { readonly kind: 'records'; readonly resourceKey: string }
+  | { readonly kind: 'value'; readonly shape: ValueShape }
+
+/** One operation descriptor to emit. */
+interface OperationModel {
+  readonly route: ManifestRoute
+  readonly binding: string
+  readonly input: InputModel
+  readonly output: OutputModel
+}
+
+/** One client method, and the operation it invokes. */
+interface MethodModel {
+  readonly name: string
+  readonly doc: string
+  /** Positional parameters, before the trailing call options. */
+  readonly params: readonly {
+    readonly binding: string
+    readonly type: string
+    readonly optional: boolean
+  }[]
+  readonly returnType: string
+  readonly operation: OperationModel
+  /** How the method builds the input record from its arguments. */
+  readonly body:
+    | {
+        readonly kind: 'fields'
+        readonly fields: readonly { readonly field: string; readonly binding: string }[]
+      }
+    | { readonly kind: 'input'; readonly binding: string }
+    | {
+        readonly kind: 'input-with-fields'
+        readonly binding: string
+        readonly fields: readonly { readonly field: string; readonly binding: string }[]
+      }
+}
+
+/** A client namespace (one per resource with operations). */
+interface NamespaceModel {
+  readonly name: string
+  readonly interfaceName: string
+  readonly description: string
+  readonly methods: readonly MethodModel[]
+}
+
+/** The `@macts/contracts` value exports the contract module uses. */
+const CONTRACT_VALUE_IMPORTS = ['ValueTypes'] as const
+
+/** The `@macts/contracts` types every contract module uses. */
+const CONTRACT_BASE_TYPE_IMPORTS = [
+  'AppContract',
+  'CallOptions',
+  'ClientRuntime',
+  'OperationDescriptor',
+  'ValueType',
+] as const
+
+/** Builds the text of one app's contract module. */
+class ContractBuilder {
+  readonly errors: string[] = []
+  readonly #manifest: AppManifest
+  readonly #packageName: string
+  readonly #names: ContractNames
+  readonly #resolver: NameResolver
+  readonly #renderer: ValueRenderer
+  readonly #identifiers = new Map<string, ValueShape>()
+  readonly #operations: OperationModel[] = []
+  readonly #operationsByRoute = new Map<string, OperationModel>()
+  readonly #privateBindings = new Set<string>(['t', 'resources', 'operations', 'bind'])
+
+  constructor(manifest: AppManifest, packageName: string) {
+    this.#manifest = manifest
+    this.#packageName = packageName
+    this.#names = contractNames(manifest)
+    this.#resolver = createNameResolver(manifest)
+    for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
+      const identifier = this.#identifierProperty(resource)
+      if (identifier !== undefined) {
+        this.#identifiers.set(resourceKey, this.#map(identifier.type, 'output'))
+      }
+    }
+    this.#renderer = new ValueRenderer({
+      enumMembers: (enumKey) => `${lowerCamel(enumKey)}Members`,
+      recordInterface: (resourceKey) => resourceKey,
+      identifier: (resourceKey) => this.#identifiers.get(resourceKey),
+      resourcesBinding: 'resources',
+    })
+  }
+
+  build(): string {
+    this.#deriveOperations()
+    const namespaces = this.#deriveNamespaces()
+    const appMethods = appCommandEntries(this.#manifest).flatMap(([commandKey, command]) => {
+      const operation = this.#operationsByRoute.get(this.#routeOf(commandKey, undefined))
+      return operation === undefined ? [] : [this.#commandMethod(command, operation)]
+    })
+
+    // Sections are rendered first so the renderer has recorded every enum
+    // tuple and contract type they use; the imports and tuples come last.
+    const enumTypes = this.#renderEnumTypes()
+    const records = this.#renderRecordInterfaces()
+    const inputs = this.#renderInputInterfaces()
+    const clientTypes = this.#renderClientInterfaces(namespaces, appMethods)
+    const recordValues = this.#renderRecordValueTypes()
+    const createValues = this.#renderCreateInputValueTypes()
+    const resourceTable = this.#renderResourceTable()
+    const descriptors = this.#operations.map((operation) => this.#renderOperation(operation))
+    const operationTable = this.#renderOperationTable()
+    const bind = this.#renderBind(namespaces, appMethods)
+    const contract = this.#renderContract()
+    const enumTuples = this.#renderEnumTuples()
+
+    this.#checkNames(namespaces, appMethods)
+
+    return [
+      this.#renderHeader(),
+      this.#renderImports(),
+      'const t = ValueTypes\n',
+      ...enumTypes,
+      ...records,
+      ...inputs,
+      ...clientTypes,
+      ...enumTuples,
+      ...recordValues,
+      ...createValues,
+      resourceTable,
+      ...descriptors,
+      operationTable,
+      bind,
+      contract,
+    ].join('\n')
+  }
+
+  // --- Derivation ---------------------------------------------------------
+
+  #map(type: DeclaredType, position: ValuePosition): ValueShape {
+    return mapDeclaredType(type, position, this.#resolver).shape
+  }
+
+  /** The primary identifier property of a resource, when it declares one. */
+  #identifierProperty(resource: Resource): { type: DeclaredType; description: string } | undefined {
+    const property = resolvePrimaryIdentifierProperty(resource)
+    if (property === undefined) return undefined
+    const declared = resource.properties[property]
+    // An identifier the resource does not also declare as a property has no
+    // declared type; it is a string, the default property type.
+    return declared === undefined
+      ? { type: undefined, description: `The ${resource.name} identifier.` }
+      : { type: declared.type, description: declared.description }
+  }
+
+  #routeOf(commandKey: string, resourceType: string | undefined): string {
+    return `${commandKey}\u0000${resourceType ?? ''}`
+  }
+
+  #deriveOperations(): void {
+    const used = new Set<string>()
+    for (const route of resolveManifestRoutes(this.#manifest)) {
+      const binding = uniqueName(
+        `${lowerCamel(route.resourceType ?? 'App')}${upperFirst(route.commandKey)}Operation`,
+        used
+      )
+      this.#privateBindings.add(binding)
+      if (!/^[^:]*:[^:]*:/.test(route.permission)) {
+        this.errors.push(
+          `${route.route}: the permission ${JSON.stringify(route.permission)} is not of the form app:resource:operation.`
+        )
+      }
+      const operation: OperationModel = {
+        route,
+        binding,
+        input: this.#inputModel(route),
+        output: this.#outputModel(route),
+      }
+      this.#operations.push(operation)
+      this.#operationsByRoute.set(this.#routeOf(route.commandKey, route.resourceType), operation)
+    }
+  }
+
+  /** The CRUD shape a route fulfils, judged by command name (resource scope only). */
+  #crudShape(route: ManifestRoute): CrudOperation | undefined {
+    if (route.command.scope !== 'resource') return undefined
+    return isCrudName(route.command.name) ? route.command.name : undefined
+  }
+
+  /**
+   * Whether the route's command is the one its resource's client method uses
+   * for its CRUD shape: the first command of that name.
+   */
+  #isChosenCrud(route: ManifestRoute, shape: CrudOperation): boolean {
+    if (route.resourceType === undefined) return false
+    const chosen = findCrudCommand(
+      resourceCommandEntries(this.#manifest, route.resourceType),
+      shape
+    )
+    return chosen?.[0] === route.commandKey
+  }
+
+  /**
+   * The input record of a route: the command's parameters, plus whatever the
+   * client method sends for the route's CRUD shape (identifier parameters, and
+   * create or update input fields), keyed exactly as sent.
+   */
+  #inputModel(route: ManifestRoute): InputModel {
+    const shape = this.#crudShape(route)
+    const resourceKey = route.resourceType
+    if (shape === 'create' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
+      return { kind: 'create', resourceKey }
+    }
+    const fields = new Map<string, FieldModel>()
+    const identifiers = new Map<string, FieldModel>()
+    if (
+      (shape === 'get' || shape === 'update' || shape === 'delete') &&
+      this.#isChosenCrud(route, shape)
+    ) {
+      for (const field of this.#identifierFields(route.command)) identifiers.set(field.name, field)
+    }
+    for (const [name, field] of identifiers) fields.set(name, field)
+    if (shape === 'update' && resourceKey !== undefined && this.#isChosenCrud(route, shape)) {
+      for (const field of this.#updateInputFields(resourceKey)) fields.set(field.name, field)
+    }
+    for (const param of route.command.parameters) {
+      if (fields.has(param.name)) continue
+      fields.set(param.name, this.#parameterField(param))
+    }
+    return { kind: 'fields', fields: [...fields.values()] }
+  }
+
+  #parameterField(param: CommandParameter): FieldModel {
+    return {
+      name: param.name,
+      shape: this.#map(param.type, 'input'),
+      optional: !param.required,
+      description: param.description,
+    }
+  }
+
+  /**
+   * The identifier parameters of a get, update, or delete command, in
+   * positional order (parent scope, then child), each typed by its parameter
+   * declaration. A child identifier the command does not declare (it has no
+   * required parameters) is a string named `id`.
+   */
+  #identifierFields(command: Command): FieldModel[] {
+    const { parentParam, childParam } = resolveIdParams(command)
+    const field = (name: string): FieldModel => {
+      const param = command.parameters.find((p) => p.name === name)
+      return param === undefined
+        ? { name, shape: { kind: 'string' }, optional: false, description: `The ${name}.` }
+        : { ...this.#parameterField(param), optional: false }
+    }
+    return parentParam === undefined ? [field(childParam)] : [field(parentParam), field(childParam)]
+  }
+
+  /** The create input fields of a resource. */
+  #createInputFields(resourceKey: string): FieldModel[] {
+    return [...createInputFields(this.#manifest, resourceKey)].map(([name, field]) => ({
+      name,
+      shape: this.#map(field.type, 'input'),
+      optional: !field.required,
+      description: field.description,
+    }))
+  }
+
+  /**
+   * The update input fields of a resource: every create input field except the
+   * identifiers the update command takes positionally, all optional and never
+   * nullable, so an omitted field is unchanged and `null` is not a reset.
+   */
+  #updateInputFields(resourceKey: string): FieldModel[] {
+    const update = findCrudCommand(resourceCommandEntries(this.#manifest, resourceKey), 'update')
+    const positional = new Set<string>()
+    if (update !== undefined) {
+      const { parentParam, childParam } = resolveIdParams(update[1])
+      positional.add(childParam)
+      if (parentParam !== undefined) positional.add(parentParam)
+    }
+    return this.#createInputFields(resourceKey)
+      .filter((field) => !positional.has(field.name))
+      .map((field) => ({ ...field, optional: true }))
+  }
+
+  #outputModel(route: ManifestRoute): OutputModel {
+    const shape = this.#crudShape(route)
+    const resourceKey = route.resourceType
+    if (shape !== undefined && resourceKey !== undefined) {
+      if (route.resource === undefined) {
+        this.errors.push(`${route.route}: the command targets the unknown resource ${resourceKey}.`)
+        return { kind: 'value', shape: { kind: 'unknown' } }
+      }
+      switch (shape) {
+        case 'list':
+          return { kind: 'records', resourceKey }
+        case 'get':
+        case 'create':
+        case 'update':
+          return { kind: 'record', resourceKey }
+        case 'delete':
+          return { kind: 'none' }
+      }
+    }
+    const returns = route.command.returns
+    return returns === undefined
+      ? { kind: 'none' }
+      : { kind: 'value', shape: this.#map(returns, 'output') }
+  }
+
+  #deriveNamespaces(): NamespaceModel[] {
+    const namespaces: NamespaceModel[] = []
+    for (const [resourceKey, resource] of Object.entries(this.#manifest.resources)) {
+      if (!resourceHasOperations(this.#manifest, resourceKey)) continue
+      const commands = resourceCommandEntries(this.#manifest, resourceKey)
+      const methods: MethodModel[] = []
+      const crud = (shape: CrudOperation): [Command, OperationModel] | undefined => {
+        const found = findCrudCommand(commands, shape)
+        if (found === undefined) return undefined
+        const operation = this.#operationsByRoute.get(this.#routeOf(found[0], resourceKey))
+        return operation === undefined ? undefined : [found[1], operation]
+      }
+      const list = crud('list')
+      if (list) methods.push(this.#listMethod(resource, ...list))
+      const get = crud('get')
+      if (get) methods.push(this.#getMethod(resource, ...get))
+      const create = crud('create')
+      if (create) methods.push(this.#createMethod(resourceKey, resource, create[1]))
+      const update = crud('update')
+      if (update) methods.push(this.#updateMethod(resourceKey, resource, ...update))
+      const remove = crud('delete')
+      if (remove) methods.push(this.#deleteMethod(resource, ...remove))
+      for (const [commandKey, command] of commands) {
+        if (isCrudName(command.name)) continue
+        const operation = this.#operationsByRoute.get(this.#routeOf(commandKey, resourceKey))
+        if (operation !== undefined) methods.push(this.#commandMethod(command, operation))
+      }
+      namespaces.push({
+        name: resourceNamespace(resource),
+        interfaceName: `${resourceKey}ResourceClient`,
+        description: resource.description,
+        methods,
+      })
+    }
+    return namespaces
+  }
+
+  #positional(fields: readonly FieldModel[]): MethodModel['params'] {
+    return fields.map((field) => ({
+      binding: safeIdentifier(field.name),
+      type: this.#renderer.sdkType(field.shape),
+      optional: false,
+    }))
+  }
+
+  #bodyFields(fields: readonly FieldModel[]): { field: string; binding: string }[] {
+    return fields.map((field) => ({ field: field.name, binding: safeIdentifier(field.name) }))
+  }
+
+  #listMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
+    const fields = listMethodParameters(command).map((param) => ({
+      ...this.#parameterField(param),
+      optional: false,
+    }))
+    return {
+      name: 'list',
+      doc: `List ${resource.plural.toLowerCase()}.`,
+      params: this.#positional(fields),
+      returnType: `readonly ${resource.name}[]`,
+      operation,
+      body: { kind: 'fields', fields: this.#bodyFields(fields) },
+    }
+  }
+
+  #identified(resource: Resource, command: Command): { fields: FieldModel[]; phrase: string } {
+    const fields = this.#identifierFields(command)
+    const { parentParam, childParam } = resolveIdParams(command)
+    const scope = parentParam === undefined ? '' : ` within \`${parentParam}\``
+    return {
+      fields,
+      phrase: `the ${resource.name.toLowerCase()} identified by \`${childParam}\`${scope}`,
+    }
+  }
+
+  #getMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
+    const { fields, phrase } = this.#identified(resource, command)
+    return {
+      name: 'get',
+      doc: `Read ${phrase}.`,
+      params: this.#positional(fields),
+      returnType: resource.name,
+      operation,
+      body: { kind: 'fields', fields: this.#bodyFields(fields) },
+    }
+  }
+
+  #createMethod(resourceKey: string, resource: Resource, operation: OperationModel): MethodModel {
+    return {
+      name: 'create',
+      doc: `Create ${withArticle(resource.name.toLowerCase())}.`,
+      params: [{ binding: 'input', type: `${resourceKey}CreateInput`, optional: false }],
+      returnType: resource.name,
+      operation,
+      body: { kind: 'input', binding: 'input' },
+    }
+  }
+
+  #updateMethod(
+    resourceKey: string,
+    resource: Resource,
+    command: Command,
+    operation: OperationModel
+  ): MethodModel {
+    const { fields, phrase } = this.#identified(resource, command)
+    const params = this.#positional(fields)
+    const input = uniqueName('input', new Set(params.map((param) => param.binding)))
+    return {
+      name: 'update',
+      doc: `Update ${phrase}. Omitted fields are left unchanged.`,
+      params: [...params, { binding: input, type: `${resourceKey}UpdateInput`, optional: false }],
+      returnType: resource.name,
+      operation,
+      body: { kind: 'input-with-fields', binding: input, fields: this.#bodyFields(fields) },
+    }
+  }
+
+  #deleteMethod(resource: Resource, command: Command, operation: OperationModel): MethodModel {
+    const { fields, phrase } = this.#identified(resource, command)
+    return {
+      name: 'delete',
+      doc: `Delete ${phrase}.`,
+      params: this.#positional(fields),
+      returnType: 'void',
+      operation,
+      body: { kind: 'fields', fields: this.#bodyFields(fields) },
+    }
+  }
+
+  /** A method for an app command or a resource command that is not a CRUD shape. */
+  #commandMethod(command: Command, operation: OperationModel): MethodModel {
+    const { signature, body } = commandMethodParameters(command)
+    const output = operation.output
+    return {
+      name: safeIdentifier(command.name),
+      doc: command.description,
+      params: signature.map(({ parameter, bindingName, optional }) => ({
+        binding: bindingName,
+        type: this.#renderer.sdkType(this.#map(parameter.type, 'input')),
+        optional,
+      })),
+      returnType: output.kind === 'none' ? 'void' : this.#outputType(output),
+      operation,
+      body: {
+        kind: 'fields',
+        fields: body.map(({ fieldName, bindingName }) => ({
+          field: fieldName,
+          binding: bindingName,
+        })),
+      },
+    }
+  }
+
+  // --- Rendering: types ---------------------------------------------------
+
+  #renderHeader(): string {
+    const { client, contract } = this.#names
+    const appName = this.#manifest.app.name
+    return `/**
+ * The ${appName} contract: the transport-neutral description of every
+ * ${appName} operation.
+ *
+ * It declares the types callers work with (records, create and update inputs,
+ * enums, and the \`${client}\` interface) and one descriptor per operation:
+ * its identity, the permission it requires, and the value types of its input
+ * and result. Its resource table tells references how to identify and resolve
+ * the objects they point to.
+ *
+ * The contract performs no I/O. A client is created from it by a client
+ * factory, local or remote, which supplies the runtime that \`bind\` turns into
+ * a \`${client}\`; application code changes locality by changing the factory,
+ * not the contract.
+ *
+ * @example
+ * \`\`\`ts
+ * import { createClient } from '@macts/sdk'
+ * import { ${contract} } from '${this.#packageName}/contract'
+ *
+ * const client = createClient(${contract}, { token, url })
+ * \`\`\`
+ *
+ * Generated from the ${appName} manifest; do not edit.
+ *
+ * @packageDocumentation
+ */
+`
+  }
+
+  #renderImports(): string {
+    const types: string[] = [...CONTRACT_BASE_TYPE_IMPORTS]
+    const used: readonly ContractTypeName[] = [...this.#renderer.usedTypes]
+    types.push(...used)
+    const specifiers = [
+      ...CONTRACT_VALUE_IMPORTS,
+      ...types.sort((a, b) => a.localeCompare(b)).map((name) => `type ${name}`),
+    ]
+    return `import {\n${specifiers.map((s) => `  ${s},`).join('\n')}\n} from '@macts/contracts'\n`
+  }
+
+  #renderEnumTypes(): string[] {
+    return Object.entries(this.#manifest.enums).map(([enumKey, enumDef]) => {
+      const members = enumMembers(enumDef.values).map(stringLiteral).join(' | ')
+      return `${docComment(enumDef.description ?? enumKey, '')}export type ${enumKey} = ${members}\n`
+    })
+  }
+
+  #renderEnumTuples(): string[] {
+    return Object.entries(this.#manifest.enums)
+      .filter(([enumKey]) => this.#renderer.usedEnums.has(enumKey))
+      .map(([enumKey, enumDef]) => {
+        const binding = `${lowerCamel(enumKey)}Members`
+        this.#privateBindings.add(binding)
+        const members = enumMembers(enumDef.values).map(stringLiteral).join(', ')
+        return `/** The members of {@link ${enumKey}}, for its value type. */\nconst ${binding} = [${members}] as const\n`
+      })
+  }
+
+  #renderRecordInterfaces(): string[] {
+    return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+      const props = Object.entries(resource.properties)
+      const doc = docComment(resource.description, '')
+      if (props.length === 0) return `${doc}export type ${resourceKey} = Record<string, never>\n`
+      const lines = props.map(([propName, prop]) => {
+        const readonly = prop.access === 'r' ? 'readonly ' : ''
+        const optional = prop.optional ? '?' : ''
+        const type = this.#renderer.sdkType(this.#map(prop.type, 'output'))
+        return `${docComment(prop.description, '  ')}  ${readonly}${propertyKey(propName)}${optional}: ${type}`
+      })
+      return `${doc}export interface ${resourceKey} {\n${lines.join('\n')}\n}\n`
+    })
+  }
+
+  #renderInputInterfaces(): string[] {
+    return Object.entries(this.#manifest.resources).flatMap(([resourceKey, resource]) => [
+      this.#renderInputInterface(
+        `${resourceKey}CreateInput`,
+        `Input for creating ${withArticle(resource.name)}.`,
+        this.#createInputFields(resourceKey)
+      ),
+      this.#renderInputInterface(
+        `${resourceKey}UpdateInput`,
+        `Input for updating ${withArticle(resource.name)}. Omitted fields are left unchanged.`,
+        this.#updateInputFields(resourceKey)
+      ),
+    ])
+  }
+
+  #renderInputInterface(name: string, description: string, fields: readonly FieldModel[]): string {
+    const doc = docComment(description, '')
+    if (fields.length === 0) return `${doc}export type ${name} = Record<string, never>\n`
+    const lines = fields.map(
+      (field) =>
+        `${docComment(field.description, '  ')}  ${propertyKey(field.name)}${field.optional ? '?' : ''}: ${this.#renderer.sdkType(field.shape)}`
+    )
+    return `${doc}export interface ${name} {\n${lines.join('\n')}\n}\n`
+  }
+
+  #renderClientInterfaces(
+    namespaces: readonly NamespaceModel[],
+    appMethods: readonly MethodModel[]
+  ): string[] {
+    const namespaceInterfaces = namespaces.map((namespace) => {
+      const doc = docComment(namespace.description, '')
+      if (namespace.methods.length === 0) {
+        return `${doc}export type ${namespace.interfaceName} = Record<string, never>\n`
+      }
+      const members = namespace.methods.map((method) => this.#renderMethodSignature(method))
+      return `${doc}export interface ${namespace.interfaceName} {\n${members.join('\n')}\n}\n`
+    })
+    const { client, contract } = this.#names
+    const members = [
+      ...namespaces.map(
+        (namespace) =>
+          `${docComment(namespace.description, '  ')}  readonly ${namespace.name}: ${namespace.interfaceName}`
+      ),
+      ...appMethods.map((method) => this.#renderMethodSignature(method)),
+    ]
+    const doc = docComment(
+      `The ${this.#manifest.app.name} client: one namespace per resource that has operations, plus the app's own commands. A client factory creates one from {@link ${contract}}.`,
+      ''
+    )
+    const body =
+      members.length === 0
+        ? `export type ${client} = Record<string, never>\n`
+        : `export interface ${client} {\n${members.join('\n')}\n}\n`
+    return [...namespaceInterfaces, `${doc}${body}`]
+  }
+
+  #renderMethodSignature(method: MethodModel): string {
+    const options = callOptionsBinding(method)
+    const params = [
+      ...method.params.map((p) => `${p.binding}${p.optional ? '?' : ''}: ${p.type}`),
+      `${options}?: CallOptions`,
+    ].join(', ')
+    return `${docComment(method.doc, '  ')}  ${method.name}(${params}): Promise<${method.returnType}>`
+  }
+
+  // --- Rendering: values --------------------------------------------------
+
+  #recordBinding(resourceKey: string): string {
+    return `${lowerCamel(resourceKey)}RecordType`
+  }
+
+  #createInputBinding(resourceKey: string): string {
+    return `${lowerCamel(resourceKey)}CreateInputType`
+  }
+
+  /** The fields object of a `t.record(…)` call, its lines indented by `indent`. */
+  #renderRecordFields(fields: readonly FieldModel[], indent = ''): string {
+    if (fields.length === 0) return '{}'
+    const lines = fields.map((field) => {
+      const expression = this.#renderer.expression(field.shape, field.description)
+      return `${indent}  ${propertyKey(field.name)}: ${field.optional ? `t.optional(${expression})` : expression},`
+    })
+    return `{\n${lines.join('\n')}\n${indent}}`
+  }
+
+  #renderRecordValueTypes(): string[] {
+    return Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+      const binding = this.#recordBinding(resourceKey)
+      this.#privateBindings.add(binding)
+      const fields = Object.entries(resource.properties).map(([name, prop]) => ({
+        name,
+        shape: this.#map(prop.type, 'output'),
+        optional: prop.optional,
+        description: prop.description,
+      }))
+      return `const ${binding}: ValueType<${resourceKey}> = t.record(${this.#renderRecordFields(fields)}, { description: ${stringLiteral(resource.description)} })\n`
+    })
+  }
+
+  #renderCreateInputValueTypes(): string[] {
+    const resourceKeys = new Set(
+      this.#operations.flatMap((operation) =>
+        operation.input.kind === 'create' ? [operation.input.resourceKey] : []
+      )
+    )
+    return [...resourceKeys].map((resourceKey) => {
+      const binding = this.#createInputBinding(resourceKey)
+      this.#privateBindings.add(binding)
+      const fields = this.#renderRecordFields(this.#createInputFields(resourceKey))
+      return `const ${binding}: ValueType<${resourceKey}CreateInput> = t.record(${fields})\n`
+    })
+  }
+
+  #renderResourceTable(): string {
+    const entries = Object.entries(this.#manifest.resources).map(([resourceKey, resource]) => {
+      const members = [
+        `name: ${stringLiteral(resourceKey)}`,
+        `record: ${this.#recordBinding(resourceKey)}`,
+      ]
+      const identifier = this.#identifierProperty(resource)
+      const identifierShape = this.#identifiers.get(resourceKey)
+      if (identifier !== undefined && identifierShape !== undefined) {
+        members.push(`id: ${this.#renderer.expression(identifierShape, identifier.description)}`)
+      }
+      const commands = resourceCommandEntries(this.#manifest, resourceKey)
+      for (const shape of ['get', 'list'] as const) {
+        const found = findCrudCommand(commands, shape)
+        const operation =
+          found === undefined
+            ? undefined
+            : this.#operationsByRoute.get(this.#routeOf(found[0], resourceKey))
+        if (operation !== undefined) {
+          members.push(`${shape}: ${stringLiteral(operation.route.route)}`)
+        }
+      }
+      return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
+    })
+    const { client } = this.#names
+    return `/**
+ * Every resource, keyed by manifest resource key: its record, its identifier
+ * (when it has one), and the operations that resolve references to it. This
+ * table is also the registry that reference value types read, lazily.
+ */
+const resources: AppContract<${client}>['resources'] = {
+${entries.join('\n')}
+}
+`
+  }
+
+  #inputType(input: InputModel): string {
+    if (input.kind === 'create') return `${input.resourceKey}CreateInput`
+    if (input.fields.length === 0) return 'Record<string, never>'
+    const members = input.fields.map((field) => {
+      const type = this.#renderer.sdkType(field.shape)
+      // Optional request fields also accept `undefined`, which encodes as
+      // absent, so methods can forward optional arguments as they are.
+      // (`unknown` already includes it.)
+      if (!field.optional) return `readonly ${propertyKey(field.name)}: ${type}`
+      const orUndefined = type === 'unknown' ? '' : ' | undefined'
+      return `readonly ${propertyKey(field.name)}?: ${type}${orUndefined}`
+    })
+    return `{ ${members.join('; ')} }`
+  }
+
+  #outputType(output: OutputModel): string {
+    switch (output.kind) {
+      case 'none':
+        return 'undefined'
+      case 'record':
+        return output.resourceKey
+      case 'records':
+        return `readonly ${output.resourceKey}[]`
+      case 'value':
+        return this.#renderer.sdkType(output.shape)
+    }
+  }
+
+  #outputExpression(output: OutputModel): string {
+    switch (output.kind) {
+      case 'none':
+        return 't.none()'
+      case 'record':
+        return this.#recordBinding(output.resourceKey)
+      case 'records':
+        return `t.array(${this.#recordBinding(output.resourceKey)})`
+      case 'value':
+        return this.#renderer.expression(output.shape)
+    }
+  }
+
+  #renderOperation(operation: OperationModel): string {
+    const { route } = operation
+    const input =
+      operation.input.kind === 'create'
+        ? this.#createInputBinding(operation.input.resourceKey)
+        : `t.record(${this.#renderRecordFields(operation.input.fields, '  ')})`
+    const target =
+      route.resourceType === undefined
+        ? `{ command: ${stringLiteral(route.commandKey)} }`
+        : `{ command: ${stringLiteral(route.commandKey)}, resource: ${stringLiteral(route.resourceType)} }`
+    return `const ${operation.binding}: OperationDescriptor<${this.#inputType(operation.input)}, ${this.#outputType(operation.output)}> = {
+  id: ${stringLiteral(route.route)},
+  permission: ${stringLiteral(route.permission)},
+  target: ${target},
+  description: ${stringLiteral(route.command.description)},
+  input: ${input},
+  output: ${this.#outputExpression(operation.output)},
+}
+`
+  }
+
+  #renderOperationTable(): string {
+    const { client } = this.#names
+    const entries = this.#operations.map(
+      (operation) => `  ${stringLiteral(operation.route.route)}: ${operation.binding},`
+    )
+    return `/** Every operation, keyed by its identity. */
+const operations: AppContract<${client}>['operations'] = {
+${entries.join('\n')}
+}
+`
+  }
+
+  #renderBind(namespaces: readonly NamespaceModel[], appMethods: readonly MethodModel[]): string {
+    const allMethods = [...namespaces.flatMap((namespace) => namespace.methods), ...appMethods]
+    const runtime = uniqueName(
+      'runtime',
+      new Set(
+        allMethods.flatMap((method) => [
+          ...method.params.map((p) => p.binding),
+          callOptionsBinding(method),
+        ])
+      )
+    )
+    const method = (m: MethodModel, indent: string): string => {
+      const options = callOptionsBinding(m)
+      const params = [...m.params.map((p) => p.binding), options].join(', ')
+      return `${indent}${m.name}: (${params}) => ${runtime}.invoke(${m.operation.binding}, ${renderBody(m.body)}, ${options}),`
+    }
+    const members = [
+      ...namespaces.map(
+        (namespace) =>
+          `    ${namespace.name}: {\n${namespace.methods.map((m) => method(m, '      ')).join('\n')}\n    },`
+      ),
+      ...appMethods.map((m) => method(m, '    ')),
+    ]
+    const { client } = this.#names
+    return `/** Build the client on top of a factory-supplied runtime. */
+function bind(${runtime}: ClientRuntime): ${client} {
+  return {
+${members.join('\n')}
+  }
+}
+`
+  }
+
+  #renderContract(): string {
+    const { app, client, contract } = this.#names
+    return `/**
+ * The ${this.#manifest.app.name} contract. Pass it to a client factory to obtain a
+ * {@link ${client}}.
+ */
+export const ${contract}: AppContract<${client}> = {
+  app: ${stringLiteral(app)},
+  operations,
+  resources,
+  loadManifest: async () => (await import('./manifest.js')).manifest,
+  bind,
+}
+`
+  }
+
+  // --- Checks -------------------------------------------------------------
+
+  /**
+   * Every top-level name must be unique (manifest-derived exports, private
+   * bindings, and contract imports share one module scope), and so must the
+   * members of each client interface.
+   */
+  #checkNames(namespaces: readonly NamespaceModel[], appMethods: readonly MethodModel[]): void {
+    const exported = [
+      ...Object.keys(this.#manifest.enums),
+      ...Object.keys(this.#manifest.resources).flatMap((key) => [
+        key,
+        `${key}CreateInput`,
+        `${key}UpdateInput`,
+      ]),
+      ...namespaces.map((namespace) => namespace.interfaceName),
+      this.#names.client,
+      this.#names.contract,
+    ]
+    const imported = [
+      ...CONTRACT_VALUE_IMPORTS,
+      ...CONTRACT_BASE_TYPE_IMPORTS,
+      ...this.#renderer.usedTypes,
+    ]
+    reportDuplicates(
+      [...exported, ...this.#privateBindings, ...imported],
+      'module scope',
+      this.errors,
+      this.#names.app
+    )
+    for (const namespace of namespaces) {
+      reportDuplicates(
+        namespace.methods.map((m) => m.name),
+        `the ${namespace.name} namespace`,
+        this.errors,
+        this.#names.app
+      )
+    }
+    reportDuplicates(
+      [...namespaces.map((n) => n.name), ...appMethods.map((m) => m.name)],
+      `the ${this.#names.client} interface`,
+      this.errors,
+      this.#names.app
+    )
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rendering helpers
+// ---------------------------------------------------------------------------
+
+/** The string members of an enum: each value, as text. */
+function enumMembers(values: readonly { readonly value: string | number }[]): string[] {
+  return values.map((v) => String(v.value))
+}
+
+/** The binding of a method's trailing call options, avoiding its parameters. */
+function callOptionsBinding(method: MethodModel): string {
+  return uniqueName('options', new Set(method.params.map((p) => p.binding)))
+}
+
+function renderBody(body: MethodModel['body']): string {
+  const fields = (entries: readonly { field: string; binding: string }[]): string =>
+    entries
+      .map(({ field, binding }) =>
+        field === binding ? binding : `${propertyKey(field)}: ${binding}`
+      )
+      .join(', ')
+  switch (body.kind) {
+    case 'input':
+      return body.binding
+    case 'fields':
+      return body.fields.length === 0 ? '{}' : `{ ${fields(body.fields)} }`
+    case 'input-with-fields':
+      // Positional identifiers come last so they win over any same-named key
+      // an untyped caller slips into the input.
+      return `{ ...${body.binding}, ${fields(body.fields)} }`
+  }
+}
+
+/** A property key: bare when it is an identifier, quoted otherwise. */
+function propertyKey(name: string): string {
+  return /^[A-Za-z_$][\w$]*$/.test(name) ? name : stringLiteral(name)
+}
+
+/** The width generated doc comments wrap at, matching the formatter's line width. */
+const DOC_WIDTH = 100
+
+/**
+ * A JSDoc comment for `text` at `indent`, safe for any text: a `*\/` in the
+ * text cannot end the comment, and long lines wrap at word boundaries.
+ */
+function docComment(text: string, indent: string): string {
+  const escaped = text.replace(/\*\//g, '*\\/').trim()
+  const single = `${indent}/** ${escaped} */`
+  if (!escaped.includes('\n') && single.length <= DOC_WIDTH) return `${single}\n`
+  const width = DOC_WIDTH - indent.length - ' * '.length
+  const lines = escaped.split(/\r?\n/).flatMap((line) => wrap(line, width))
+  return `${indent}/**\n${lines.map((line) => `${indent} * ${line}`.trimEnd()).join('\n')}\n${indent} */\n`
+}
+
+/** Break `line` into lines of at most `width` characters, at spaces. */
+function wrap(line: string, width: number): string[] {
+  const lines: string[] = []
+  let current = ''
+  for (const word of line.split(' ')) {
+    if (current !== '' && current.length + 1 + word.length > width) {
+      lines.push(current)
+      current = word
+    } else {
+      current = current === '' ? word : `${current} ${word}`
+    }
+  }
+  lines.push(current)
+  return lines
+}
+
+function upperFirst(name: string): string {
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+/** `a note`, `an event`: the noun with an indefinite article. */
+function withArticle(noun: string): string {
+  return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
+}
+
+/** `base`, or `base2`, `base3`, … : the first not in `used`, which it joins. */
+function uniqueName(base: string, used: Set<string>): string {
+  let name = base
+  for (let n = 2; used.has(name); n++) name = `${base}${String(n)}`
+  used.add(name)
+  return name
+}
+
+function reportDuplicates(
+  names: readonly string[],
+  scope: string,
+  errors: string[],
+  app: string
+): void {
+  const seen = new Set<string>()
+  for (const name of names) {
+    if (seen.has(name)) errors.push(`${app}: the name ${name} is declared twice in ${scope}.`)
+    seen.add(name)
+  }
+}

@@ -288,7 +288,8 @@ describe('generateServerPackage', () => {
     expect(pkg.name).toBe('@macts/calendar-server')
     expect(pkg.version).toBe('1.2.3')
     expect(pkg.type).toBe('module')
-    expect(pkg.engines).toEqual({ node: '>=22' })
+    // Node 22.13.0 is the first 22.x that loads node:sqlite unflagged (phases/13, D1).
+    expect(pkg.engines).toEqual({ node: '>=22.13.0' })
 
     // npm publishing metadata
     expect(pkg.license).toBe('MIT')

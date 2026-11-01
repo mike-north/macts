@@ -12,6 +12,7 @@ import { generateApiPlugin } from '../api/index.js'
 import { generateMcpPlugin } from '../mcp/index.js'
 import { createMcpGeneratorContext } from '../mcp/context.js'
 import { MIT_LICENSE } from '../license.js'
+import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
 /**
  * Options for generating a server package.
@@ -199,7 +200,7 @@ function generatePackageJson(
       files: ['dist'],
       publishConfig: { access: 'public' },
       engines: {
-        node: '>=22',
+        node: GENERATED_PACKAGE_NODE_ENGINE,
       },
       scripts: {
         build: 'tsup',

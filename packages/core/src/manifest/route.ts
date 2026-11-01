@@ -98,6 +98,30 @@ export interface ManifestRoute {
   resource: Resource | undefined
   /** The resource type name this route targets; undefined for app scope. */
   resourceType: string | undefined
+  /**
+   * The permission the operation requires (`app:scope:commandKey`).
+   *
+   * The command's explicit `permission` wins. Otherwise it is derived from the
+   * app route segment, the scope (`app` for application commands, else the
+   * resource route segment), and the command key, which is the rule the server
+   * enforces. Deriving it here, once, lets every surface that declares or
+   * checks an operation's permission (generated contracts, the runtime's
+   * registration check, the server) agree by construction.
+   */
+  permission: string
+}
+
+/**
+ * The permission a command requires on one route: its explicit `permission`,
+ * or `{app}:{scope}:{commandKey}`.
+ */
+function routePermission(
+  appName: string,
+  scopeSegment: string,
+  commandKey: string,
+  command: Command
+): string {
+  return command.permission ?? `${normalizeAppRouteSegment(appName)}:${scopeSegment}:${commandKey}`
 }
 
 /**
@@ -139,6 +163,7 @@ export function resolveCommandRoutes(
         command,
         resource: undefined,
         resourceType: undefined,
+        permission: routePermission(appName, 'app', commandKey, command),
       },
     ]
   }
@@ -153,6 +178,12 @@ export function resolveCommandRoutes(
       command,
       resource,
       resourceType,
+      permission: routePermission(
+        appName,
+        normalizeResourceRouteSegment(resourcePlural),
+        commandKey,
+        command
+      ),
     })
   }
   return routes

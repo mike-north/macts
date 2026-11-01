@@ -3,7 +3,9 @@
  *
  * Generates a single package that combines the HTTP client SDK and CLI plugin
  * into one published package, `@macts/<app>`, rather than separate per-surface
- * packages.
+ * packages. The package also carries the app's transport-neutral contract,
+ * exported only through the `@macts/<app>/contract` subpath so that loading it
+ * never loads the HTTP client or the CLI.
  *
  * @packageDocumentation
  */
@@ -12,7 +14,9 @@ import type { AppManifest } from '../../manifest/index.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { generateCapabilitiesModule } from '../capabilities/index.js'
+import { generateContract } from '../contract/index.js'
 import { MIT_LICENSE } from '../license.js'
+import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
 /**
  * Options for client package generation.
@@ -36,6 +40,11 @@ export interface GenerateClientPackageResult {
   files: { path: string; content: string }[]
   /** Any errors encountered during generation */
   errors: string[]
+  /**
+   * Non-fatal findings, such as manifest types the contract could not resolve
+   * and describes as `unknown`. Present only when there are any.
+   */
+  diagnostics?: string[]
 }
 
 /**
@@ -58,6 +67,7 @@ const CONFIG_FILE_PATHS = new Set([
  * Combines the HTTP client SDK and CLI plugin into a single package with:
  * - SDK source files at `src/` root (client.ts, types.ts, resources/, index.ts)
  * - CLI source files under `src/cli/` (commands/, plugin.ts, index.ts, output/, sdk.ts)
+ * - The app contract under `src/contract/` (index.ts, manifest.ts)
  * - Unified config files (package.json, tsconfig, tsup, api-extractor)
  *
  * @param manifest - The app manifest
@@ -145,6 +155,12 @@ export function generateClientPackage(
     }
   }
 
+  // --- Generate the app contract (its own subpath; imports only @macts/contracts) ---
+  const contractResult = generateContract(manifest, { packageName: options.clientPackageName })
+  files.push(...contractResult.files)
+  errors.push(...contractResult.errors)
+  const diagnostics = contractResult.diagnostics.map((diagnostic) => diagnostic.message)
+
   // --- Generate unified config files ---
   const unscopedName = options.clientPackageName.replace(/^@[^/]+\//, '')
 
@@ -184,6 +200,7 @@ export function generateClientPackage(
     dir: appName,
     files,
     errors,
+    ...(diagnostics.length > 0 ? { diagnostics } : {}),
   }
 }
 
@@ -214,12 +231,16 @@ function generatePackageJson(
         types: './dist/cli.d.ts',
         import: './dist/cli/index.js',
       },
+      './contract': {
+        types: './dist/contract/index.d.ts',
+        import: './dist/contract/index.js',
+      },
     },
     main: './dist/index.js',
     types: `./dist/${unscopedName}.d.ts`,
     files: ['dist'],
     engines: {
-      node: '>=22',
+      node: GENERATED_PACKAGE_NODE_ENGINE,
     },
     keywords: ['macts-sdk', 'macts-cli-plugin'],
     scripts: {
@@ -231,6 +252,7 @@ function generatePackageJson(
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
+      '@macts/contracts': 'workspace:*',
       zod: 'catalog:',
     },
     peerDependencies: {
@@ -277,6 +299,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'cli/index': 'src/cli/index.ts',
+    'contract/index': 'src/contract/index.ts',
   },
   format: ['esm'],
   dts: true,

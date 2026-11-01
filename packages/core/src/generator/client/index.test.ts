@@ -133,3 +133,91 @@ describe('generateClientPackage', () => {
     expect(result.files.filter((f) => f.path === 'LICENSE')).toHaveLength(1)
   })
 })
+
+/**
+ * The contract subpath, `@macts/<app>/contract`, mirrors `./cli`: its own
+ * `exports` entry, its own tsup entry, and its own declaration output. It
+ * depends only on `@macts/contracts`.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md §D1 (subpath exports; generated packages → contracts)
+ */
+describe('generateClientPackage: contract subpath', () => {
+  function generate(manifest: AppManifest = createCalendarManifest()) {
+    return generateClientPackage(manifest, {
+      appName: 'calendar',
+      clientPackageName: '@macts/calendar',
+      version: '1.2.3',
+    })
+  }
+
+  function packageJson(result: ReturnType<typeof generate>): {
+    exports: Record<string, { types: string; import: string }>
+    engines: Record<string, string>
+    dependencies: Record<string, string>
+  } {
+    const file = result.files.find((f) => f.path === 'package.json')
+    if (!file) throw new Error('package.json not found')
+    return JSON.parse(file.content) as ReturnType<typeof packageJson>
+  }
+
+  it('emits the contract and manifest modules under src/contract/', () => {
+    const paths = generate().files.map((f) => f.path)
+    expect(paths).toContain('src/contract/index.ts')
+    expect(paths).toContain('src/contract/manifest.ts')
+  })
+
+  it('exports the contract only through ./contract, beside the unchanged root and ./cli', () => {
+    const pkg = packageJson(generate())
+    expect(pkg.exports).toEqual({
+      '.': { types: './dist/calendar.d.ts', import: './dist/index.js' },
+      './cli': { types: './dist/cli.d.ts', import: './dist/cli/index.js' },
+      './contract': {
+        types: './dist/contract/index.d.ts',
+        import: './dist/contract/index.js',
+      },
+    })
+    const index = generate().files.find((f) => f.path === 'src/index.ts')
+    expect(index?.content).not.toContain('contract')
+  })
+
+  it('builds the contract as its own tsup entry', () => {
+    const tsup = generate().files.find((f) => f.path === 'tsup.config.ts')
+    expect(tsup?.content).toContain(`  entry: {
+    index: 'src/index.ts',
+    'cli/index': 'src/cli/index.ts',
+    'contract/index': 'src/contract/index.ts',
+  },`)
+  })
+
+  it('depends on @macts/contracts from the workspace', () => {
+    expect(packageJson(generate()).dependencies).toEqual({
+      '@macts/contracts': 'workspace:*',
+      zod: 'catalog:',
+    })
+  })
+
+  it('requires Node 22.13.0, the first 22.x with node:sqlite unflagged', () => {
+    expect(packageJson(generate()).engines).toEqual({ node: '>=22.13.0' })
+  })
+
+  it('reports unresolvable manifest types as diagnostics, not errors', () => {
+    const manifest = createCalendarManifest()
+    const calendar = manifest.resources['Calendar']
+    if (!calendar) throw new Error('fixture missing Calendar')
+    calendar.properties['viewOptions'] = {
+      access: 'r',
+      type: { resource: 'view options' },
+      description: 'View options',
+      optional: true,
+    }
+    const result = generate(manifest)
+    expect(result.errors).toEqual([])
+    expect(result.diagnostics).toEqual([
+      'calendar: resources.Calendar.properties.viewOptions: the type {"resource":"view options"} names no resource or enum, so the contract describes it as unknown.',
+    ])
+  })
+
+  it('has no diagnostics when every type resolves', () => {
+    expect(generate().diagnostics).toBeUndefined()
+  })
+})

@@ -1073,6 +1073,7 @@ export interface GenerateClientPackageOptions {
 
 // @public
 export interface GenerateClientPackageResult {
+    diagnostics?: string[];
     dir: string;
     errors: string[];
     files: {
@@ -1119,6 +1120,7 @@ export interface GenerateConsolidatedResult {
             content: string;
         }[];
     };
+    diagnostics?: string[];
     // (undocumented)
     errors: string[];
     // (undocumented)
@@ -1635,6 +1637,7 @@ export class ManifestLoadError extends Error {
 export interface ManifestRoute {
     command: Command;
     commandKey: string;
+    permission: string;
     resource: Resource | undefined;
     resourceType: string | undefined;
     route: string;

@@ -140,6 +140,11 @@ export interface GenerateConsolidatedResult {
   client: { dir: string; files: { path: string; content: string }[] }
   server: { dir: string; files: { path: string; content: string }[] }
   errors: string[]
+  /**
+   * Non-fatal findings, such as manifest types the contract could not resolve
+   * and describes as `unknown`. Present only when there are any.
+   */
+  diagnostics?: string[]
 }
 
 /**
@@ -191,5 +196,6 @@ export function generateConsolidatedPackages(
       files: serverResult.files,
     },
     errors,
+    ...(clientResult.diagnostics === undefined ? {} : { diagnostics: clientResult.diagnostics }),
   }
 }
