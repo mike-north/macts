@@ -124,7 +124,21 @@ that carried it: two clients with different keys on one daemon are each
 governed by their own key, and the runtime verifies the key again on every
 call. There is no trusted-caller mode.
 
-**`macts-mcp-stdio` caveat:** the socat-based stdio bridge (`packages/cli/scripts/macts-mcp-stdio.sh`) connects directly to the daemon's Unix socket and sends no HTTP headers at all, so it cannot present a key, and its requests are refused with `401`. Use `macts --mcp` for stdio clients.
+**Stdio clients.** The daemon speaks HTTP only. An MCP client that talks over
+stdio starts its own server with `macts --mcp`, with its key in
+`MACTS_API_KEY`:
+
+```json
+{
+  "mcpServers": {
+    "macts": {
+      "command": "macts",
+      "args": ["--mcp"],
+      "env": { "MACTS_API_KEY": "macts_sk_..." }
+    }
+  }
+}
+```
 
 ## Architecture
 
@@ -206,14 +220,12 @@ When using TCP mode:
 - **Legacy transport**: SSE is one-way (server → client), requires POST for client → server
 - **Scalability**: Single process, not designed for high-concurrency scenarios
 - **State**: No shared state between client connections
-- **Authentication**: the `macts-mcp-stdio` socat bridge cannot present a key (see caveat above)
 
 ## Future Enhancements
 
 Potential improvements for future versions:
 
 - WebSocket transport for bidirectional communication
-- Header injection for the `macts-mcp-stdio` bridge, so it can present a key
 - Connection pooling and rate limiting
 - Metrics and monitoring endpoints
 - Multi-process scaling with shared state

@@ -301,11 +301,22 @@ Use `macts mcp stop` to stop it first.
 The `start` and `stop` commands automatically detect and handle stale PID files
 (when PID file exists but process is not running).
 
-## Integration with Fast Stdio Adapter
+## Connecting a Stdio MCP Client
 
-The `mcp diagnose` command is designed to be called automatically by the fast
-stdio adapter when it encounters errors connecting to the daemon. This provides
-users with actionable debugging information without manual intervention.
+The daemon speaks HTTP only. An MCP client that talks over stdio starts its own
+server with `macts --mcp` instead, with its key in `MACTS_API_KEY`:
+
+```json
+{
+  "mcpServers": {
+    "macts": {
+      "command": "macts",
+      "args": ["--mcp"],
+      "env": { "MACTS_API_KEY": "macts_sk_..." }
+    }
+  }
+}
+```
 
 ## Testing
 

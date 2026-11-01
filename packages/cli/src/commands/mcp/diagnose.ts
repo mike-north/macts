@@ -70,11 +70,8 @@ interface DiagnosticReport {
  * MCP server problems. It checks:
  * - Daemon process status
  * - Socket file and permissions
- * - Plugin loading
+ * - Installed apps
  * - Health endpoint connectivity
- *
- * This command is called automatically by the fast stdio adapter when
- * it encounters errors, providing actionable debugging information.
  */
 export class McpDiagnoseCommand extends Command {
   static override paths = [['mcp', 'diagnose']]
@@ -85,15 +82,13 @@ export class McpDiagnoseCommand extends Command {
       Produces detailed diagnostic information for troubleshooting MCP issues.
 
       This command checks:
+
       - Daemon process status (PID file, running process)
       - Unix socket status (exists, permissions, connectivity)
       - Installed apps (loaded apps and their operations, failures)
       - Health endpoint (connectivity, response)
 
       The output includes specific recommendations for fixing any issues found.
-
-      This command is automatically invoked by the fast stdio adapter when
-      it encounters errors connecting to the daemon.
 
       Exit codes:
       - 0: No issues found

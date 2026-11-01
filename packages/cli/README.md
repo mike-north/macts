@@ -575,8 +575,6 @@ The command outputs a detailed JSON diagnostic report including:
 }
 ```
 
-This command is automatically invoked by the MCP stdio adapter when connection errors occur.
-
 Exit codes:
 
 - `0` - No issues found

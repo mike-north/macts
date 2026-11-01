@@ -32,4 +32,6 @@ Other behavior changes:
 
 `@macts/cli` API changes: `RootCommand` no longer has a `disableApiKeyValidation` property.
 
+`@macts/cli` no longer ships the `macts-mcp-stdio` bin. Use `macts --mcp`, with the key in `MACTS_API_KEY`, instead. The old bin piped raw stdio into the daemon's socket and never carried a bearer token, so it could not authenticate to the daemon.
+
 `@macts/runtime` adds a `destination` parameter to `createLogger(options, destination)`, with the `LogDestination` type (`'stdout'`, the default, or `'stderr'`), so a host whose stdout is a protocol channel can log to stderr.
