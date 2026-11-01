@@ -1,0 +1,48 @@
+/**
+ * Type tests for the two client factories.
+ *
+ * phases/13 D1 and D2 fix the shape both factories share: an `AppContract`
+ * plus locality-specific options yields the app's client, so switching
+ * locality changes only the import and the options object. `url` exists only
+ * for remote. Both entry points export the same error class bindings, so a
+ * value or error from one is the same type in the other.
+ *
+ * Invalid usage is expressed with `expectNotAssignable` rather than
+ * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D1, D2)
+ */
+
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
+import type { AppContract, ClientFactory } from '@macts/contracts'
+import * as remote from './index.js'
+import * as local from './local.js'
+import type { FixtureClient } from './test-helpers.js'
+
+declare const contract: AppContract<FixtureClient>
+
+// Both factories have the shared ClientFactory shape.
+expectAssignable<ClientFactory<remote.RemoteClientOptions>>(remote.createClient)
+expectAssignable<ClientFactory<local.LocalClientOptions>>(local.createClient)
+
+// The same contract yields the same client type in both localities.
+expectType<FixtureClient>(
+  remote.createClient(contract, { token: 't', url: 'http://localhost:8372' })
+)
+expectType<FixtureClient>(local.createClient(contract, { token: 't' }))
+
+// Remote options require the service URL; local options need only the token.
+expectAssignable<remote.RemoteClientOptions>({ token: 't', url: new URL('http://localhost:8372') })
+expectNotAssignable<remote.RemoteClientOptions>({ token: 't' })
+expectAssignable<local.LocalClientOptions>({ token: 't' })
+expectNotAssignable<local.LocalClientOptions>({})
+
+// The environment resolver produces remote options.
+expectType<remote.RemoteClientOptions>(remote.resolveClientOptions())
+
+// One identity per error class and value type across both entry points.
+expectType<typeof remote.TargetNotFoundError>(local.TargetNotFoundError)
+expectType<typeof remote.MactsError>(local.MactsError)
+declare const integer: remote.Integer
+expectType<local.Integer>(integer)
+expectNotAssignable<local.Integer>(7)

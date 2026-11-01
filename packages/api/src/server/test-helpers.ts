@@ -294,6 +294,11 @@ export interface TestServerOptions extends Omit<AppOptions, 'executor' | 'verifi
  * Build the full server app over {@link CALENDAR_MANIFEST} and
  * {@link NOTES_MANIFEST} with a recording executor, the fake verifier, and a
  * captured logger. CORS, pretty JSON, and request logging are off.
+ *
+ * Governance is the explicit {@link ALLOW_ALL} policy unless the test supplies
+ * its own, so no test reads or writes the governance files of the machine it
+ * runs on. The server's default (this Mac's governance) is covered with a
+ * temporary `MACTS_HOME` in `host-governance.test.ts`.
  */
 export function createTestServer(options: TestServerOptions = {}): TestServer {
   const {
@@ -310,6 +315,7 @@ export function createTestServer(options: TestServerOptions = {}): TestServer {
     executor,
     verifier,
     logger: log.logger,
+    governance: { policy: ALLOW_ALL },
     ...rest,
   })
   return { app, executor, verifier, log }

@@ -9,8 +9,9 @@
  * - **Credentials** — minting, verifying, and revoking API keys, and the
  *   on-disk key store (signing secret, key metadata, per-key policies).
  * - **Governance loading** — the active host policy, the configured approval
- *   provider, per-key policy resolution, and the governance context a call is
- *   enforced against.
+ *   provider, per-key policy resolution, the governance context a call is
+ *   enforced against, and `loadHostGovernance`, which composes them into this
+ *   Mac's governance.
  * - **Shared host state** — where macts keeps its configuration and data
  *   (`MACTS_HOME`), and the process-wide structured logger.
  * - **Invocation** — the single pipeline every operation runs through
@@ -82,6 +83,13 @@ export {
   ActivePolicyError,
   type LoadActivePolicyOptions,
 } from './governance/active-policy.js'
+
+// This Mac's governance: policy, approvals, per-key policies, and audit log
+export {
+  loadHostGovernance,
+  getAuditLogPath,
+  type LoadHostGovernanceOptions,
+} from './governance/host.js'
 
 // Human-in-the-loop approval provider loading
 export {

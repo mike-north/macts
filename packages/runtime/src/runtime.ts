@@ -84,11 +84,21 @@ export interface CreateRuntimeOptions {
   /** Carries out authorized, validated operations. */
   readonly executor: Executor
   /**
-   * Governance enforced on every call.
+   * Governance enforced on every call: a context, or a loader that produces
+   * one.
+   *
+   * @remarks
+   * A loader (for example `loadHostGovernance`) is called once, when the first
+   * call reaches the governance step, and its result is reused for every later
+   * call. If it fails, that call and every later one is denied with
+   * `InternalError` and the cause is logged. The failure is kept rather than
+   * retried, because the usual causes (a malformed or unreadable policy or
+   * approval file) do not fix themselves while the process runs, and a call
+   * must never run under governance that could not be established.
    *
    * @defaultValue allow-all host policy, no audit writer, no approval gate
    */
-  readonly governance?: GovernanceContext
+  readonly governance?: GovernanceContext | (() => Promise<GovernanceContext>)
   /**
    * Turns credentials into authority.
    *
@@ -174,9 +184,11 @@ function isWireRecord(value: WireValue): value is WireRecord {
  *
  * @remarks
  * The executor is fixed at construction; every invocation dispatches through
- * it. Governance defaults to allow-all, so a runtime with no configured policy
- * behaves as macts does with no policy file, while still verifying
- * credentials, checking permissions, and validating input.
+ * it. Governance is either a context or a loader that runs on first use (see
+ * {@link CreateRuntimeOptions.governance}). It defaults to allow-all, so a
+ * runtime built without governance still verifies credentials, checks
+ * permissions, and validates input. Hosts that act for this Mac pass
+ * `loadHostGovernance` instead.
  *
  * @param options - The executor and optional governance, verifier, clock, and
  *   logger.
@@ -184,7 +196,9 @@ function isWireRecord(value: WireValue): value is WireRecord {
  */
 export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   const executor = options.executor
-  const governance: GovernanceContext = options.governance ?? { policy: ALLOW_ALL_POLICY }
+  const governanceSource = options.governance ?? { policy: ALLOW_ALL_POLICY }
+  /** The single load of a governance loader, kept whether it succeeds or fails. */
+  let governanceLoad: Promise<GovernanceContext> | undefined
   const verifier = options.verifier ?? createKeyStoreVerifier()
   const clock = options.clock ?? (() => new Date())
   const log = (): RuntimeLogger => options.logger ?? getLogger()
@@ -193,6 +207,18 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   /** Details for an internal failure, carrying the caller's correlation id when given. */
   function internalDetails(context: InvocationContext): { correlationId?: string } {
     return context.correlationId === undefined ? {} : { correlationId: context.correlationId }
+  }
+
+  /**
+   * The governance context calls are enforced against. A loader runs once; a
+   * synchronous throw from it is captured like a rejection.
+   */
+  function loadGovernance(): Promise<GovernanceContext> {
+    if (typeof governanceSource !== 'function') {
+      return Promise.resolve(governanceSource)
+    }
+    governanceLoad ??= (async () => governanceSource())()
+    return governanceLoad
   }
 
   /** Step 0 and the pre-execution check: honor a caller's abort. */
@@ -274,9 +300,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * Step 3: governance. Resolves the caller's key policy, enforces and audits
-   * the decision, and for a held call either reports it pending (no gate) or
-   * obtains and records a human decision. Returns only when the call may run.
+   * Step 3: governance. Loads the governance context (once, for a loader),
+   * resolves the caller's key policy, enforces and audits the decision, and
+   * for a held call either reports it pending (no gate) or obtains and records
+   * a human decision. Returns only when the call may run.
    */
   async function enforceGovernance(
     operation: RegisteredOperation,
@@ -303,6 +330,21 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         message
       )
       return new InternalError('Governance enforcement failed.', internalDetails(context), {
+        cause: error,
+      })
+    }
+
+    let governance: GovernanceContext
+    try {
+      governance = await loadGovernance()
+    } catch (error) {
+      // Fail closed: governance that could not be established never degrades
+      // into a default policy.
+      log().error(
+        { err: error, operation: operation.descriptor.id, permission, apiKeyId },
+        'Could not load the governance context; denying the call'
+      )
+      throw new InternalError('Governance could not be loaded.', internalDetails(context), {
         cause: error,
       })
     }

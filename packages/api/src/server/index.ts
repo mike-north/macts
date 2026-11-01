@@ -17,10 +17,10 @@ import { prettyJSON } from 'hono/pretty-json'
 import type pino from 'pino'
 import { createNativeExecutor, type AppManifest, type Executor } from '@macts/core'
 import {
-  ALLOW_ALL_POLICY,
   createRateLimiter,
   createRuntime,
   getLogger,
+  loadHostGovernance,
   setLogger,
   type CredentialVerifier,
   type GovernanceContext,
@@ -110,20 +110,24 @@ export interface ServerOptions {
    */
   rateLimit?: RateLimitOptions | false
   /**
-   * Governance enforcement context (active policy, optional audit writer, and
-   * optional human-in-the-loop approval gate).
+   * Governance enforcement context (active policy, optional audit writer,
+   * optional per-key policy resolver, and optional human-in-the-loop approval
+   * gate).
    *
-   * When omitted, defaults to the allow-all policy with no audit writer, so
-   * call-time policy enforcement is a no-op and pre-governance behavior is
-   * preserved. Supply a loaded `GovernanceContext` (see `loadActivePolicy` and
-   * `loadApprovalGate` in `@macts/runtime`, and `createFileAuditWriter` in
-   * `@macts/core`) to enforce a real policy, seek human approval for
-   * `confirm-first` calls, and record an audit trail.
+   * When omitted, the server enforces this Mac's governance: `loadHostGovernance`
+   * from `@macts/runtime`, loaded on the first call that reaches the governance
+   * step. That is the policy file under `MACTS_HOME` (or the default policy when
+   * there is none), the registered approval provider if any, every key's own
+   * policy, and an audit log under `MACTS_HOME`. If that configuration is
+   * malformed or unreadable, every call is denied with `INTERNAL`; it never
+   * falls back to allowing everything.
    *
-   * To also honor the policy attached to an individual API key — which can only
-   * ever tighten the host policy for that key — set the context's `keyPolicies`
-   * to `createStoredKeyPolicyResolver()` from `@macts/runtime`. Keys with no
-   * policy of their own are unaffected.
+   * Supply a context to enforce something else instead, for example in tests
+   * or a custom deployment. Build one from `loadActivePolicy`,
+   * `loadApprovalGate`, and `createStoredKeyPolicyResolver` in `@macts/runtime`
+   * and `createFileAuditWriter` in `@macts/core`.
+   *
+   * @defaultValue this Mac's governance, from `loadHostGovernance`
    */
   governance?: GovernanceContext
   /**
@@ -229,7 +233,7 @@ export function createMultiServer(
     gracefulShutdownTimeout = 10_000,
     tls,
     rateLimit,
-    governance = { policy: ALLOW_ALL_POLICY },
+    governance,
     executor,
     verifier,
     clientAddress,
@@ -241,7 +245,7 @@ export function createMultiServer(
 
   const runtime = createRuntime({
     executor: executor ?? createNativeExecutor(),
-    governance,
+    governance: governance ?? loadHostGovernance,
     ...(verifier === undefined ? {} : { verifier }),
     ...(customLogger === undefined ? {} : { logger: customLogger }),
     ...(rateLimit === false

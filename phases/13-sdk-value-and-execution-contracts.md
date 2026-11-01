@@ -981,6 +981,23 @@ Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
 There is no local shortcut that skips steps 1–3.
 
+**This Mac's governance.** `loadHostGovernance()` in `@macts/runtime` is the
+single definition of the governance a host enforces when none is supplied. It
+composes the active policy (`<macts-home>/governance/policy.json`), the
+registered approval gate, the stored per-key policy resolver, and a file audit
+writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
+server both default to it, passing the loader itself; the runtime loads it once,
+on the first call that reaches step 3. Missing and malformed configuration are
+treated differently:
+
+- A **missing** policy file resolves to the documented default policy, so a
+  first run works. The key's own permissions still gate the call at step 2.
+- A **malformed or unreadable** policy file or approval registration fails
+  closed. Every call fails with `InternalError`, and nothing ever falls back to
+  allow-all. The failed load is kept, not retried, for the life of the runtime.
+- An **audit-write failure** under `MACTS_HOME` denies the call, per the
+  fail-closed rule above.
+
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
 Defined in `@macts/contracts` (`errors/`). Every canonical class extends the

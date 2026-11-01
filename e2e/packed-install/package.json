@@ -1,0 +1,31 @@
+{
+  "name": "@macts-e2e/packed-install",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Packed-install UAT: installs the packed @macts/sdk with a fixture app package and checks error identity, brand identity, native-addon freedom, and remote-only installs",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src test",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@macts/contracts": "workspace:*",
+    "@macts/core": "workspace:*",
+    "@macts/runtime": "workspace:*",
+    "@macts/sdk": "workspace:*",
+    "@types/node": "^26.0.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "nx": {
+    "targets": {
+      "test": {
+        "dependsOn": [
+          "^build"
+        ]
+      }
+    }
+  }
+}

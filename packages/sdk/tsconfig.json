@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    // The integration tests import @macts/api, whose HTTP framework types
+    // reference DOM fetch types; @macts/api and @macts/cli compile with the
+    // same library set.
+    "lib": ["ES2022", "DOM"]
   },
   "include": ["src"]
 }

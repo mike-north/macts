@@ -77,24 +77,42 @@ before, or will likely ask again, or the task touches more than one app:
 
 1. **Discover** all required capabilities with `macts capabilities search`.
 
-2. **Compose** a single TypeScript script using `@macts/sdk`:
+2. **Compose** a single TypeScript script using `@macts/sdk`. Create one
+   client per app from that app's contract; app packages expose their contract
+   at the `/contract` subpath:
 
    ```typescript
    // scripts/my-workflow.ts
-   import { createMactsClients } from '@macts/sdk'
+   import { createClient, PolicyDeniedError, resolveClientOptions } from '@macts/sdk'
+   import { calendarContract } from '@macts/calendar/contract'
+   import { remindersContract } from '@macts/reminders/contract'
 
-   const m = createMactsClients()
+   const options = resolveClientOptions()
+   const calendar = createClient(calendarContract, options)
+   const reminders = createClient(remindersContract, options)
+
    // All ops in one script — one execution, N operations
-   const calendars = await m.calendar.calendars.list()
-   const lists = await m.reminders.lists.list()
-   await m.reminders.reminders.create({
-     name: `Review: ${calendars[0]?.name ?? 'calendar'}`,
-     listId: lists[0]?.id ?? '',
-   })
+   try {
+     const calendars = await calendar.calendars.list()
+     const lists = await reminders.lists.list()
+     await reminders.reminders.create({
+       name: `Review: ${calendars[0]?.name ?? 'calendar'}`,
+       listId: lists[0]?.id ?? '',
+     })
+   } catch (error) {
+     if (error instanceof PolicyDeniedError) {
+       console.error(`Blocked by governance: ${error.details.permission}`)
+     } else {
+       throw error
+     }
+   }
    ```
 
-   `createMactsClients()` reads `MACTS_API_KEY` and `MACTS_API_URL` from the
-   environment — no credentials in the script body.
+   `resolveClientOptions()` reads `MACTS_API_KEY` and `MACTS_API_URL` from the
+   environment — no credentials in the script body. A script that runs on the
+   Mac itself can import `createClient` from `@macts/sdk/local` instead and pass
+   `{ token }`; the client, the calls, and the error classes are the same, and
+   every call is governed the same way.
 
 3. **Show the script to the user and ask for approval.** (Your harness's
    job — macts does not run the script.) Explain what each operation does and
@@ -124,9 +142,12 @@ queue); for now, note the gap to the user.
 | N per-op calls      | High (one model turn per op)                  | Moderate                          | Partial                                               |
 | One composed script | Low (one turn to author, zero turns to reuse) | High (API-level, not pixel-level) | Yes — every call is logged against a named permission |
 
-Governance is inherited automatically: every `m.<app>.<resource>.<operation>()`
-call goes through the macts API server and the active policy. You do not add any
-permission logic to the script.
+Governance is inherited automatically: every client call is verified,
+permission-checked, and checked against the active policy, whether the client
+is remote or local. You do not add any permission logic to the script. Denials
+arrive as canonical error classes (`PermissionDeniedError`,
+`PolicyDeniedError`, and the rest), so a script can `catch` them with
+`instanceof`.
 
 ---
 
@@ -161,15 +182,18 @@ export MACTS_API_KEY=<token printed above>
 
 ## Capability-to-SDK mapping
 
-The dotted name from `macts capabilities search` maps directly to the client
-property path:
+The dotted name from `macts capabilities search` names the app package and the
+method path on that app's client:
 
 ```
-capability name          → m.<app>.<resource>.<operation>(...)
-calendar.events.create   → m.calendar.events.create({ ... })
-reminders.lists.list     → m.reminders.lists.list()
-finder.files.show        → m.finder.files.show({ ... })
+capability name          → client                                    → call
+calendar.events.create   → createClient(calendarContract, options)   → .events.create({ ... })
+reminders.lists.list     → createClient(remindersContract, options)  → .lists.list()
+finder.files.show        → createClient(finderContract, options)     → .files.show({ ... })
 ```
+
+Each contract comes from its app package's `/contract` subpath, for example
+`@macts/calendar/contract`.
 
 Full worked example — see `packages/sdk/AUTHORING.md` for the complete
 multi-op reference with governance and error-handling notes.
@@ -181,7 +205,7 @@ multi-op reference with governance and error-handling notes.
 - [ ] Run `macts capabilities search "<intent>"` before reaching for the UI.
 - [ ] Inspect the best match with `macts capabilities inspect <name>`.
 - [ ] For 2+ operations or any recurring task, compose one script with
-      `createMactsClients()`.
+      `createClient(<app>Contract, resolveClientOptions())` from `@macts/sdk`.
 - [ ] Show the script to the user; get explicit approval.
 - [ ] Save the approved script as a reusable skill in your harness.
 - [ ] Never hardcode credentials — always use `MACTS_API_KEY`.

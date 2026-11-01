@@ -1,25 +1,31 @@
 /**
- * `@macts/sdk` — frictionless authoring helper for governed macts scripts.
+ * `@macts/sdk` — typed, governed clients for macOS apps automated by macts.
  *
- * This package is the Rung-1 authoring entry point for agents writing TS/JS
- * scripts that compose `@macts/*` SDK calls. It resolves the API key and
- * base URL once from the environment and returns ready-to-use, fully-typed
- * clients for every installed app SDK.
+ * Application code imports everything it needs from here: the client factory,
+ * the canonical structured errors, and the value types (such as `Integer`,
+ * references, and file values). App packages supply the contract a client is
+ * created from; they expose it at the `/contract` subpath.
  *
- * ## Quick start
+ * ## Remote and local
+ *
+ * `createClient` from this entry point runs operations on a macts service
+ * over HTTP. It never loads the Mac-side runtime or native execution, so it
+ * works anywhere Node runs. `createClient` from `@macts/sdk/local` takes the
+ * same contract and runs operations in process on this Mac. Both return the
+ * same client and throw the same error classes; switching locality changes
+ * only the import specifier and the options object.
  *
  * ```typescript
- * import { createMactsClients } from '@macts/sdk';
+ * import { createClient, resolveClientOptions, PolicyDeniedError } from '@macts/sdk'
+ * import { calendarContract } from '@macts/calendar/contract'
  *
- * const m = createMactsClients();
- *
- * // Compose operations across apps
- * const calendars = await m.calendar.calendars.list();
- * const lists = await m.reminders.lists.list();
- * await m.reminders.reminders.create({
- *   name: `Review meeting: ${calendars[0]?.name ?? 'calendar'}`,
- *   listId: lists[0]?.id ?? '',
- * });
+ * const calendar = createClient(calendarContract, resolveClientOptions())
+ * try {
+ *   const calendars = await calendar.calendars.list()
+ * } catch (error) {
+ *   if (error instanceof PolicyDeniedError) console.error('Blocked by policy')
+ *   else throw error
+ * }
  * ```
  *
  * ## Environment variables
@@ -27,61 +33,20 @@
  * | Variable | Required | Description |
  * |---|---|---|
  * | `MACTS_API_KEY` | Yes | API key token (`macts_sk_...`). Create with `macts api-key create`. |
- * | `MACTS_API_URL` | No | Base URL of the macts daemon. Default: `http://localhost:8372`. |
+ * | `MACTS_API_URL` | No | Root URL of the macts service. Default: `http://localhost:8372`. |
  *
- * ## Governance
+ * ## Governance and errors
  *
- * Every client call is routed through the macts API server, where the active
- * governance policy is applied. A policy-denied operation surfaces as an error
- * thrown by the client method (e.g. `CalendarError` with
- * `code: 'GOVERNANCE_DENIED'`). No additional configuration is needed.
+ * Every call is verified, permission-checked, and governed by macts before it
+ * runs, whichever entry point created the client. Failures are thrown as the
+ * canonical classes re-exported here (`PermissionDeniedError`,
+ * `PolicyDeniedError`, `TargetNotFoundError`, and the rest), all extending
+ * `MactsError`, so `instanceof` and `switch (error.code)` work the same in
+ * both localities.
  *
  * @packageDocumentation
  */
 
-export { createMactsClients } from './clients.js'
-export type { MactsClients } from './clients.js'
-export type {
-  AlfredClient,
-  ArcClient,
-  AutomatorClient,
-  BluetoothFileExchangeClient,
-  CalendarClient,
-  ConsoleClient,
-  ContactsClient,
-  FinderClient,
-  GoogleChromeClient,
-  iTermClient,
-  MailClient,
-  MessagesClient,
-  MicrosoftEdgeClient,
-  MicrosoftWordClient,
-  MusicClient,
-  NotesClient,
-  OmniFocusClient,
-  OmniGraffleClient,
-  OmniPlanClient,
-  PhotosClient,
-  PreviewClient,
-  QuickTimePlayerClient,
-  RemindersClient,
-  SafariClient,
-  ScreenSharingClient,
-  ScriptEditorClient,
-  ShortcutsClient,
-  SpotifyClient,
-  SystemEventsClient,
-  SystemInformationClient,
-  SystemSettingsClient,
-  TerminalClient,
-  TextEditClient,
-  TVClient,
-  XcodeClient,
-} from './clients.js'
-export {
-  resolveApiKey,
-  resolveBaseUrl,
-  resolveConnectionOptions,
-  DEFAULT_BASE_URL,
-} from './resolve.js'
-export type { MactsConnectionOptions } from './resolve.js'
+export * from '@macts/contracts'
+export { createClient, type RemoteClientOptions } from './remote.js'
+export { resolveApiKey, resolveBaseUrl, resolveClientOptions, DEFAULT_BASE_URL } from './resolve.js'

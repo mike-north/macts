@@ -13,6 +13,9 @@
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 import type { Executor } from '@macts/core'
 import type { Credential, InvocationContext, WireValue } from '@macts/contracts'
+import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
+import type { GovernanceContext } from './governance/context.js'
+import { loadHostGovernance } from './governance/host.js'
 import { createBearerCredential } from './invocation/credential.js'
 import type { CreateRuntimeOptions, MactsRuntime } from './runtime.js'
 import { createRuntime } from './runtime.js'
@@ -28,6 +31,15 @@ expectAssignable<CreateRuntimeOptions>({ executor })
 expectNotAssignable<CreateRuntimeOptions>({})
 expectNotAssignable<CreateRuntimeOptions>({ clock: () => new Date(0) })
 expectType<MactsRuntime>(createRuntime({ executor, clock: () => new Date(0) }))
+
+// Governance is a context or a loader of one; this Mac's loader is passed as-is.
+expectAssignable<CreateRuntimeOptions>({ executor, governance: { policy: ALLOW_ALL_POLICY } })
+expectAssignable<CreateRuntimeOptions>({ executor, governance: loadHostGovernance })
+expectType<Promise<GovernanceContext>>(loadHostGovernance())
+expectNotAssignable<CreateRuntimeOptions>({
+  executor,
+  governance: () => ({ policy: ALLOW_ALL_POLICY }),
+})
 
 // Invocation requires a context carrying a credential, and resolves to a wire value.
 const context: InvocationContext = { credential: createBearerCredential('macts_sk_x') }
