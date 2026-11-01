@@ -597,6 +597,9 @@ export function buildCapabilityRegistry(manifests: readonly AppManifest[]): Capa
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
+export function buildNativeBody(manifest: AppManifest, target: OperationTarget): string;
+
+// @public
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, segment: string): string;
 
 // @public
@@ -914,6 +917,9 @@ export interface CreateMcpContextOptions {
 
 // @public
 export function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext;
+
+// @public
+export function createNativeExecutor(options?: NativeExecutorOptions): Executor;
 
 // @public
 export function createPolicyGovernanceFilter(policy: GovernancePolicy): GovernanceFilter;
@@ -1869,6 +1875,14 @@ export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 // @public
 export interface NativeCodec {
     readonly prelude: string;
+}
+
+// @public
+export interface NativeExecutorOptions {
+    readonly run?: (script: string, options: {
+        readonly timeoutMs: number;
+    }) => Promise<unknown>;
+    readonly timeoutMs?: number;
 }
 
 // @public

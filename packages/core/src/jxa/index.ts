@@ -13,6 +13,10 @@ export {
   type NativeOutcome,
 } from './native-codec.js'
 
+// Native executor (the macOS provider's implementation of the executor seam)
+export { createNativeExecutor, type NativeExecutorOptions } from './native-executor.js'
+export { buildNativeBody } from './native-scripts.js'
+
 // Connection
 export {
   connect,
