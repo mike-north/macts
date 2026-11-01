@@ -1,32 +1,13 @@
 /**
- * Server middleware exports.
+ * Server-level middleware: request logging and in-flight request tracking.
+ *
+ * Authentication, permission, governance, and rate limiting are not
+ * middleware: they are steps of the runtime's invocation pipeline, which the
+ * HTTP adapter dispatches every operation through.
+ *
  * @packageDocumentation
  */
-
-export {
-  authMiddleware,
-  type AuthVariables,
-  type AuthErrorCode,
-  type AuthErrorResponse,
-} from './auth.js'
-
-export {
-  requirePermission,
-  rpcPathToPermission,
-  type PermissionErrorResponse,
-  type PermissionMiddlewareOptions,
-} from './permission.js'
-
-export {
-  requirePolicy,
-  type RequirePolicyOptions,
-  type GovernanceDeniedResponse,
-  type GovernancePendingResponse,
-  type GovernanceApprovalDeniedResponse,
-} from './governance.js'
 
 export { requestLogger } from './request-logger.js'
 
 export { createInFlightTracker, type InFlightTracker } from './in-flight.js'
-
-export { createRateLimiter, type RateLimitOptions, type RateLimiterInstance } from './rate-limit.js'

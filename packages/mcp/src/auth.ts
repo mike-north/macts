@@ -4,9 +4,10 @@
  * The MCP server itself has no notion of "logged in" — the only credential is
  * a `macts_sk_`-prefixed API key minted and verified by `@macts/runtime`. This
  * module enforces that a valid key is present at startup (stdio transport) and
- * validates bearer tokens on incoming HTTP requests (daemon transport). Error-code semantics mirror
- * `packages/api/src/server/middleware/auth.ts` exactly so that callers see a
- * consistent contract regardless of which transport handled the request.
+ * validates bearer tokens on incoming HTTP requests (daemon transport). The
+ * daemon's 401 body keeps its own {@link McpAuthErrorCode} vocabulary, which is
+ * not the structured `UNAUTHENTICATED` code (with a `details.reason`) that the
+ * `@macts/api` HTTP server answers with.
  *
  * @packageDocumentation
  */
@@ -16,10 +17,13 @@ import type { ApiKeyPayload } from '@macts/core'
 import { validateApiKey } from '@macts/runtime'
 
 /**
- * Error codes for authentication failures.
+ * Error codes for authentication failures of the MCP daemon's HTTP transport.
  *
- * Mirrors the `error.code` values of `AuthErrorResponse` in `@macts/api/server`
- * so HTTP and MCP callers share one vocabulary.
+ * These are the key validator's own failure codes plus the two header-shape
+ * codes. They are deliberately not the structured error codes of
+ * `@macts/contracts` and the `{ error: { code, message, details } }` envelope
+ * the `@macts/api` server uses; the daemon does not run through the shared
+ * runtime, so callers must not expect the structured vocabulary from it.
  */
 export type McpAuthErrorCode =
   | 'MISSING_AUTHORIZATION'
@@ -101,10 +105,9 @@ export async function requireStartupApiKey(): Promise<void> {
  * Authenticate an incoming HTTP request against a macts API key.
  *
  * Reads the `Authorization` header, expects `Bearer <macts_sk_...>`, and
- * validates the token via `@macts/runtime`. Mirrors the error-code and
- * response-shape semantics of `packages/api/src/server/middleware/auth.ts`
- * exactly, but operates on a raw `node:http` `IncomingMessage` so it works
- * outside of Hono (e.g. the MCP daemon's own HTTP handling).
+ * validates the token via `@macts/runtime`. Operates on a raw `node:http`
+ * `IncomingMessage` so it works outside of Hono (e.g. the MCP daemon's own HTTP
+ * handling), and answers failures in the {@link McpAuthErrorCode} vocabulary.
  *
  * @param req - The incoming HTTP request to authenticate
  * @returns A discriminated {@link AuthResult}: `ok: true` with the validated

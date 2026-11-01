@@ -22,6 +22,7 @@ const EXPECTED_WIRE_CLASSES: Record<WireErrorCode, string> = {
   VALIDATION_FAILED: 'ValidationError',
   UNEXPECTED_VALUE: 'UnexpectedValueError',
   UNAUTHENTICATED: 'AuthenticationError',
+  RATE_LIMITED: 'RateLimitedError',
   PERMISSION_DENIED: 'PermissionDeniedError',
   POLICY_DENIED: 'PolicyDeniedError',
   APPROVAL_PENDING: 'ApprovalPendingError',

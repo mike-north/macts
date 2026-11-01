@@ -4,117 +4,51 @@
 
 ```ts
 
-import { activateApp } from '@macts/core';
-import { ApiKeyPayload } from '@macts/core';
-import { ApiKeyValidationErrorCode } from '@macts/core';
-import { AppConnection } from '@macts/core';
-import { AppConnectionOptions } from '@macts/core';
+import { AnyMactsError } from '@macts/contracts';
 import { AppManifest } from '@macts/core';
-import { ApprovalDeniedState } from '@macts/core';
-import { booleanCoercer } from '@macts/core';
-import { colorCoercer } from '@macts/core';
-import { Command } from '@macts/core';
-import { connect } from '@macts/core';
-import { createArrayCoercer } from '@macts/core';
-import { createEnumCoercer } from '@macts/core';
-import { dateCoercer } from '@macts/core';
-import { getAppName } from '@macts/core';
+import { Context } from 'hono';
+import { CredentialVerifier } from '@macts/runtime';
+import { Executor } from '@macts/core';
 import { GovernanceContext } from '@macts/runtime';
-import { HexColor } from '@macts/core';
-import { HexColorSchema } from '@macts/core';
 import { Hono } from 'hono';
-import { isAppRunning } from '@macts/core';
-import { JxaEnumValue } from '@macts/core';
-import { JxaExecutionError } from '@macts/core';
-import { JxaExecutorOptions } from '@macts/core';
+import { MactsRuntime } from '@macts/runtime';
 import { MiddlewareHandler } from 'hono';
-import { nullSafe } from '@macts/core';
-import { numberCoercer } from '@macts/core';
-import { ObjectSpecifier } from '@macts/core';
-import { pathCoercer } from '@macts/core';
-import { PermissionHistoryEntry } from '@macts/core';
 import pino from 'pino';
-import { PolicyLayer } from '@macts/core';
-import { quitApp } from '@macts/core';
-import { Resource } from '@macts/core';
-import { RiskClass } from '@macts/core';
-import { runJxa } from '@macts/core';
-import { runWithApp } from '@macts/core';
-import { Selector } from '@macts/core';
-import { SpecifierStep } from '@macts/core';
-import { stringCoercer } from '@macts/core';
-import { TypeCoercer } from '@macts/core';
+import { RateLimiter } from '@macts/runtime';
+import { RateLimiterOptions } from '@macts/runtime';
+import { RuntimeLogger } from '@macts/runtime';
 import { VERSION } from '@macts/core';
+import { WireErrorEnvelope } from '@macts/contracts';
 
-export { activateApp }
-
-export { AppConnection }
-
-export { AppConnectionOptions }
+// @public
+export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'gracefulShutdownTimeout'>;
 
 // @public
 export type AttributeValue = string | number | boolean;
 
 // @public
-export type AuthErrorCode = 'MISSING_AUTHORIZATION' | 'INVALID_AUTH_SCHEME' | ApiKeyValidationErrorCode;
-
-// @public
-export interface AuthErrorResponse {
-    // (undocumented)
-    error: {
-        code: AuthErrorCode;
-        message: string;
-    };
-}
-
-// @public
-export function authMiddleware(): MiddlewareHandler<{
-    Variables: AuthVariables;
-}>;
-
-// @public
-export interface AuthVariables {
-    apiKeyPayload: ApiKeyPayload;
-}
-
-export { booleanCoercer }
-
-export { colorCoercer }
+export type ClientAddressResolver = (c: Context) => string | undefined;
 
 // @public
 export function configureTelemetry(_options?: TelemetryOptions): void;
 
-export { connect }
+// @public
+export function createApp(manifests: AppManifest[], options?: AppOptions): Hono;
 
 // @public
-export function createApp(manifests: AppManifest[], options?: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'>): Hono<{
-    Variables: AuthVariables;
-}>;
-
-export { createArrayCoercer }
-
-export { createEnumCoercer }
+export function createHttpAdapter(runtime: MactsRuntime, options?: HttpAdapterOptions): Hono;
 
 // @public
 export function createInFlightTracker(): InFlightTracker;
 
 // @public
-export function createMultiAppRpcRouter(manifests: AppManifest[], governance?: GovernanceContext): Hono<{
-    Variables: AuthVariables;
-}>;
-
-// @public
 export function createMultiServer(manifests: AppManifest[], options?: ServerOptions): ServerInstance;
-
-// @public
-export function createRpcRouter(manifest: AppManifest, governance?: GovernanceContext): Hono<{
-    Variables: AuthVariables;
-}>;
 
 // @public
 export function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
 
-export { dateCoercer }
+// @public
+export const DEFAULT_ADDRESS_RATE_LIMIT = 300;
 
 // @public
 export const DEFAULT_HOST = "localhost";
@@ -122,45 +56,24 @@ export const DEFAULT_HOST = "localhost";
 // @public
 export const DEFAULT_PORT = 8372;
 
-export { getAppName }
+// @public
+export const DEFAULT_SUBJECT_RATE_LIMIT = 100;
+
+// @public
+export function defaultClientAddress(c: Context): string | undefined;
 
 // @public
 export function getTracer(_name?: string): Tracer;
 
 // @public
-export interface GovernanceApprovalDeniedResponse {
-    // (undocumented)
-    error: {
-        code: 'GOVERNANCE_APPROVAL_DENIED';
-        message: string;
-        permission: string;
-        approval: ApprovalDeniedState;
-    };
+export interface HttpAdapterOptions {
+    readonly addressRateLimiter?: RateLimiter | false;
+    readonly clientAddress?: ClientAddressResolver;
+    readonly logger?: RuntimeLogger;
 }
 
 // @public
-export interface GovernanceDeniedResponse {
-    // (undocumented)
-    error: {
-        code: 'GOVERNANCE_DENIED';
-        message: string;
-        permission: string;
-    };
-}
-
-// @public
-export interface GovernancePendingResponse {
-    // (undocumented)
-    pendingApproval: {
-        message: string;
-        permission: string;
-        layer: PolicyLayer;
-    };
-}
-
-export { HexColor }
-
-export { HexColorSchema }
+export function httpStatusForError(error: AnyMactsError): number;
 
 // @public
 export interface InFlightTracker {
@@ -168,14 +81,6 @@ export interface InFlightTracker {
     middleware(): MiddlewareHandler;
     waitForDrain(timeoutMs: number): Promise<void>;
 }
-
-export { isAppRunning }
-
-export { JxaEnumValue }
-
-export { JxaExecutionError }
-
-export { JxaExecutorOptions }
 
 // @public
 export interface LoadedTlsOptions {
@@ -187,110 +92,19 @@ export interface LoadedTlsOptions {
     key: Buffer;
 }
 
-export { nullSafe }
-
-export { numberCoercer }
-
-export { ObjectSpecifier }
-
-export { pathCoercer }
-
 // @public
-export interface PermissionErrorResponse {
-    // (undocumented)
-    error: {
-        code: 'PERMISSION_DENIED';
-        message: string;
-        required: string;
-        hint?: string;
-        changelog?: {
-            version: string;
-            previousPermission: string;
-            reason?: string;
-        };
-    };
+export interface RateLimitOptions extends RateLimiterOptions {
+    readonly perAddress?: RateLimiterOptions;
 }
-
-// @public
-export interface PermissionMiddlewareOptions {
-    permissionHistory?: PermissionHistoryEntry[];
-}
-
-export { quitApp }
-
-// @public
-export function requirePermission(requiredPermission: string, options?: PermissionMiddlewareOptions): MiddlewareHandler<{
-    Variables: AuthVariables;
-}>;
-
-// @public
-export function requirePolicy(options: RequirePolicyOptions): MiddlewareHandler<{
-    Variables: AuthVariables;
-}>;
-
-// @public
-export interface RequirePolicyOptions {
-    readonly governance: GovernanceContext;
-    readonly permission: string;
-    readonly risk: RiskClass;
-}
-
-// @public
-export interface RpcEndpointInfo {
-    // (undocumented)
-    command: Command;
-    // (undocumented)
-    path: string;
-    // (undocumented)
-    permission: string;
-    // (undocumented)
-    resource?: Resource | undefined;
-}
-
-// @public
-export interface RpcErrorResponse {
-    // (undocumented)
-    error: {
-        code: string;
-        message: string;
-        details?: unknown;
-    };
-}
-
-// @public
-export type RpcHandler = (args: RpcRequest, ctx: RpcHandlerContext) => Promise<unknown>;
-
-// @public
-export interface RpcHandlerContext {
-    // (undocumented)
-    bundleId: string;
-    // (undocumented)
-    manifest: AppManifest;
-}
-
-// @public
-export function rpcPathToPermission(path: string): string;
-
-// @public
-export type RpcRequest = Record<string, unknown>;
 
 // @public
 export interface RpcSuccessResponse<T = unknown> {
-    // (undocumented)
     result: T;
 }
 
-export { runJxa }
-
-export { runWithApp }
-
-export { Selector }
-
 // @public
 export interface ServerInstance {
-    app: Hono<{
-        Variables: AuthVariables;
-    }>;
+    app: Hono;
     start(): Promise<void>;
     stop(): Promise<void>;
     url: string | null;
@@ -298,9 +112,11 @@ export interface ServerInstance {
 
 // @public
 export interface ServerOptions {
+    clientAddress?: ClientAddressResolver;
     cors?: boolean | {
         origin: string | string[];
     };
+    executor?: Executor;
     governance?: GovernanceContext;
     gracefulShutdownTimeout?: number;
     host?: string;
@@ -308,9 +124,9 @@ export interface ServerOptions {
     logging?: boolean;
     port?: number;
     prettyJson?: boolean;
-    // Warning: (ae-forgotten-export) The symbol "RateLimitOptions" needs to be exported by the entry point index.d.ts
     rateLimit?: RateLimitOptions | false;
     tls?: TlsOptions;
+    verifier?: CredentialVerifier;
 }
 
 // @public
@@ -334,10 +150,6 @@ export const SpanStatusCode: {
 // @public
 export type SpanStatusCodeValue = (typeof SpanStatusCode)[keyof typeof SpanStatusCode];
 
-export { SpecifierStep }
-
-export { stringCoercer }
-
 // @public
 export interface TelemetryOptions {
     endpoint?: string;
@@ -358,9 +170,9 @@ export interface Tracer {
     }): Span;
 }
 
-export { TypeCoercer }
-
 export { VERSION }
+
+export { WireErrorEnvelope }
 
 // @public
 export function withSpan<T>(name: string, fn: (span: Span) => Promise<T>, attributes?: Record<string, AttributeValue>): Promise<T>;

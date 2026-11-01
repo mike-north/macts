@@ -2,8 +2,8 @@
  * Tests for the runtime's invocation pipeline.
  *
  * Expected outcomes are hand-written from phases/13: the D5 pipeline table
- * (verify → permission → governance → input validation → execute, in that
- * order, failing closed) and the D6 error table (which canonical class and
+ * (verify → admission → permission → governance → input validation →
+ * execute, in that order, failing closed) and the D6 error table (which canonical class and
  * details each failure carries). Every branch that must not execute is
  * asserted against the recording executor, so "denied" always means "the
  * executor was never called".
@@ -25,6 +25,7 @@ import {
   PASSTHROUGH_PLAN,
   PermissionDeniedError,
   PolicyDeniedError,
+  RateLimitedError,
   TargetNotFoundError,
   ValidationError,
   type Authority,
@@ -34,6 +35,7 @@ import {
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import type { GovernanceContext } from './governance/context.js'
 import { createBearerCredential } from './invocation/credential.js'
+import type { RateLimitAdmission, RateLimiter } from './invocation/rate-limiter.js'
 import { createRuntime, type RuntimeLogger } from './runtime.js'
 import {
   CALENDAR_MANIFEST,
@@ -87,6 +89,7 @@ interface Harness {
 interface HarnessOptions {
   readonly executor?: RecordingExecutor
   readonly governance?: GovernanceContext
+  readonly rateLimiter?: RateLimiter
 }
 
 /** A runtime over {@link CALENDAR_MANIFEST} with a recording executor and fake verifier. */
@@ -104,6 +107,7 @@ function harness(options: HarnessOptions = {}): Harness {
     clock: fixedClock,
     logger,
     ...(options.governance === undefined ? {} : { governance: options.governance }),
+    ...(options.rateLimiter === undefined ? {} : { rateLimiter: options.rateLimiter }),
   })
   runtime.registerManifest(CALENDAR_MANIFEST)
   return { runtime, executor, verifier, logger }
@@ -356,6 +360,130 @@ describe('step 1: credential verification', () => {
     expect(logged).toContain('E_UPSTREAM')
     // Fields beyond name, message, code, and stack are never logged.
     expect(logged).not.toContain('authorization')
+  })
+})
+
+/** A limiter that records the keys it is asked about and answers with `decide`. */
+function recordingLimiter(decide: (key: string) => RateLimitAdmission): RateLimiter & {
+  readonly keys: string[]
+} {
+  const keys: string[] = []
+  return {
+    keys,
+    admit(key) {
+      keys.push(key)
+      return decide(key)
+    },
+  }
+}
+
+describe('step 1b: admission', () => {
+  it('admits a call by the verified subject and leaves the authority untouched', async () => {
+    const limiter = recordingLimiter(() => ({ allowed: true }))
+    const { runtime, executor } = harness({ rateLimiter: limiter })
+
+    await runtime.invoke(LIST, {}, as(READER_SECRET))
+
+    // Keyed by Authority.subject, never by the secret.
+    expect(limiter.keys).toEqual(['key_reader'])
+    expect(executor.requests).toHaveLength(1)
+  })
+
+  it('turns a denied call away with RateLimitedError carrying the retry delay, never executing', async () => {
+    const writer = createMemoryAuditWriter()
+    const limiter = recordingLimiter(() => ({ allowed: false, retryAfterSeconds: 37 }))
+    const { runtime, executor } = harness({
+      rateLimiter: limiter,
+      governance: { policy: ALLOW_ALL_POLICY, writer },
+    })
+
+    const error = await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(RateLimitedError)
+    if (!(error instanceof RateLimitedError)) return
+    expect(error.code).toBe('RATE_LIMITED')
+    expect(error.details).toEqual({ retryAfterSeconds: 37 })
+    expect(executor.requests).toHaveLength(0)
+    // Turned away before governance, so nothing was audited.
+    expect(writer.records).toHaveLength(0)
+  })
+
+  it('runs before the permission check: a denied caller without the permission sees the limit', async () => {
+    const limiter = recordingLimiter(() => ({ allowed: false, retryAfterSeconds: 1 }))
+    const { runtime } = harness({ rateLimiter: limiter })
+
+    const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(RateLimitedError)
+  })
+
+  it('never grants: an admitted caller without the permission is still denied', async () => {
+    const limiter = recordingLimiter(() => ({ allowed: true }))
+    const { runtime, executor } = harness({ rateLimiter: limiter })
+
+    const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('runs after verification: an unauthenticated call is never counted', async () => {
+    const limiter = recordingLimiter(() => ({ allowed: false, retryAfterSeconds: 1 }))
+    const { runtime } = harness({ rateLimiter: limiter })
+
+    const error = await rejection(runtime.invoke(LIST, {}, as('macts_sk_unknown')))
+
+    expect(error).toBeInstanceOf(AuthenticationError)
+    expect(limiter.keys).toEqual([])
+  })
+
+  it('fails closed with InternalError, not RateLimitedError, when the limiter throws', async () => {
+    const limiter: RateLimiter = {
+      admit: () => {
+        throw new Error('limiter state corrupted at /var/macts/limits')
+      },
+    }
+    const { runtime, executor, logger } = harness({ rateLimiter: limiter })
+
+    const error = await rejection(
+      runtime.invoke(LIST, {}, as(READER_SECRET, { correlationId: 'req-9' }))
+    )
+
+    expect(error).toBeInstanceOf(InternalError)
+    expect(error).not.toBeInstanceOf(RateLimitedError)
+    if (!(error instanceof InternalError)) return
+    expect(error.message).not.toContain('/var/macts/limits')
+    expect(error.details).toEqual({ correlationId: 'req-9' })
+    expect(executor.requests).toHaveLength(0)
+    expect(logger.error).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(logger.error.mock.calls)).not.toContain(READER_SECRET)
+  })
+
+  it.each([
+    ['negative', -1],
+    ['fractional', 1.5],
+    ['non-finite', Number.POSITIVE_INFINITY],
+  ])(
+    'fails closed with InternalError when a denial carries a %s retry delay',
+    async (_kind, retryAfterSeconds) => {
+      const limiter = recordingLimiter(() => ({ allowed: false, retryAfterSeconds }))
+      const { runtime, executor } = harness({ rateLimiter: limiter })
+
+      const error = await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+      expect(error).toBeInstanceOf(InternalError)
+      expect(executor.requests).toHaveLength(0)
+    }
+  )
+
+  it('applies no limit when no limiter is configured', async () => {
+    const { runtime, executor } = harness()
+
+    for (let i = 0; i < 150; i++) {
+      await runtime.invoke(LIST, {}, as(READER_SECRET))
+    }
+
+    expect(executor.requests).toHaveLength(150)
   })
 })
 

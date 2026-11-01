@@ -4,10 +4,9 @@
  *
  * Keys are created by the real built CLI binary (a subprocess with its own
  * `MACTS_HOME`), then used against the key store that CLI wrote: through the
- * invocation runtime with a recording executor (no Mac app runs), and through
- * the real HTTP router. The router calls are chosen so that nothing executes:
- * a granted call is sent an unparseable body and is rejected with 400 after
- * the permission check, a denied call is rejected with 403 by the check itself.
+ * invocation runtime and through the real HTTP server, each with a recording
+ * executor so no Mac app runs. A granted call is answered 200 and reaches the
+ * executor; a denied call is answered 403 and never does.
  *
  * Permissions are hand-derived from the shipped manifests:
  * `manifests/photos/app.yaml` declares `photos:mediaItems:list` for command
@@ -235,13 +234,30 @@ describe('camelCase grants authorize real calls (UAT)', () => {
     }
   }
 
-  async function postRpc(route: string, token: string, body: string): Promise<Response> {
-    const app = apiModule.createApp(manifests, { cors: false, logging: false })
-    return app.request(`/api/v1/rpc/${route}`, {
+  /** POST one operation to the real HTTP server over the real key store and a recording executor. */
+  async function postRpc(
+    route: string,
+    token: string,
+    body: string
+  ): Promise<{ res: Response; requests: ExecutionRequest[] }> {
+    const requests: ExecutionRequest[] = []
+    const app = apiModule.createApp(manifests, {
+      cors: false,
+      logging: false,
+      executor: {
+        provider: 'recording-stub',
+        execute(request) {
+          requests.push(request)
+          return Promise.resolve({ ok: true })
+        },
+      },
+    })
+    const res = await app.request(`/api/v1/rpc/${route}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body,
     })
+    return { res, requests }
   }
 
   it('a CLI-created photos:mediaItems:list key invokes the operation', async () => {
@@ -267,19 +283,19 @@ describe('camelCase grants authorize real calls (UAT)', () => {
     expect(requests).toHaveLength(1)
   })
 
-  it('the HTTP router lets a CLI-created camelCase key past the permission check', async () => {
+  it('the HTTP server answers 200 to CLI-created camelCase keys', async () => {
     const photosToken = await createKeyWithCli(PHOTOS_LIST)
     const itermToken = await createKeyWithCli(ITERM_SPLIT)
     await loadModules()
 
-    // 400 (unparseable body) is only reachable after authentication and the
-    // permission check, and runs nothing.
-    for (const [route, token] of [
-      [PHOTOS_LIST_ROUTE, photosToken],
-      [ITERM_SPLIT_ROUTE, itermToken],
+    for (const [route, token, input] of [
+      [PHOTOS_LIST_ROUTE, photosToken, {}],
+      [ITERM_SPLIT_ROUTE, itermToken, { withProfile: 'Default' }],
     ] as const) {
-      const res = await postRpc(route, token, 'not json')
-      expect(res.status, route).toBe(400)
+      const { res, requests } = await postRpc(route, token, JSON.stringify(input))
+      expect(res.status, route).toBe(200)
+      expect(await res.json(), route).toEqual({ result: { ok: true } })
+      expect(requests, route).toHaveLength(1)
     }
   })
 
@@ -302,10 +318,14 @@ describe('camelCase grants authorize real calls (UAT)', () => {
     expect(hint).toContain('Grant "photos:mediaItems:list"')
     expect(requests).toHaveLength(0)
 
-    const res = await postRpc(PHOTOS_LIST_ROUTE, token, '{}')
-    expect(res.status).toBe(403)
-    const body = (await res.json()) as { error: { code: string; hint: string } }
+    const http = await postRpc(PHOTOS_LIST_ROUTE, token, '{}')
+    expect(http.res.status).toBe(403)
+    const body = (await http.res.json()) as {
+      error: { code: string; details: { required: string; hint: string } }
+    }
     expect(body.error.code).toBe('PERMISSION_DENIED')
-    expect(body.error.hint).toContain('Grant "photos:mediaItems:list"')
+    expect(body.error.details.required).toBe(PHOTOS_LIST)
+    expect(body.error.details.hint).toContain('Grant "photos:mediaItems:list"')
+    expect(http.requests).toHaveLength(0)
   })
 })

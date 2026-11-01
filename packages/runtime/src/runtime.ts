@@ -8,6 +8,9 @@
  * the call arrived through and whether it originated locally or remotely:
  *
  * 1. verify the credential and derive the caller's authority;
+ *    1b. when a rate limiter is configured, admit the call for that
+ *        authority's subject (admission only turns calls away; it never
+ *        changes the authority or grants anything);
  * 2. check the operation's permission against that authority;
  * 3. enforce governance policy, auditing the decision and, for a held call,
  *    seeking and recording a human decision;
@@ -42,6 +45,7 @@ import {
   OperationCancelledError,
   PermissionDeniedError,
   PolicyDeniedError,
+  RateLimitedError,
   ValidationError,
   type AppContract,
   type Authority,
@@ -53,6 +57,7 @@ import {
 } from '@macts/contracts'
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { resolveGovernanceForRequest, type GovernanceContext } from './governance/context.js'
+import type { RateLimiter } from './invocation/rate-limiter.js'
 import { createKeyStoreVerifier, type CredentialVerifier } from './invocation/verifier.js'
 import { hasPermission } from './keys/validator.js'
 import { getLogger } from './logger.js'
@@ -90,6 +95,19 @@ export interface CreateRuntimeOptions {
    * @defaultValue {@link createKeyStoreVerifier}
    */
   readonly verifier?: CredentialVerifier
+  /**
+   * Admission limit applied per verified subject, after the credential is
+   * verified and before the permission check.
+   *
+   * @remarks
+   * Admission only turns calls away: a denied call raises `RateLimitedError`,
+   * and an admitted call still passes through every later step. A limiter that
+   * throws denies the call with `InternalError` (fail-closed), never with
+   * `RateLimitedError`, because the caller did not exceed a limit.
+   *
+   * @defaultValue no admission limit
+   */
+  readonly rateLimiter?: RateLimiter
   /**
    * Source of the timestamps written to audit records and approval requests.
    *
@@ -200,6 +218,46 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         cause: error,
       })
     }
+  }
+
+  /**
+   * Step 1b: admission. Counts the call against the subject's limit and turns
+   * it away when the limit is exhausted. Never alters the authority.
+   */
+  function admit(authority: Authority, context: InvocationContext, id: OperationId): void {
+    if (options.rateLimiter === undefined) {
+      return
+    }
+    let admission
+    try {
+      admission = options.rateLimiter.admit(authority.subject)
+    } catch (error) {
+      // Fail closed. Not a rate-limit denial: the caller exceeded nothing, and a
+      // 429 would invite a retry that cannot help.
+      log().error(
+        { err: error, operation: id, subject: authority.subject },
+        'Rate limiter failed; denying the call'
+      )
+      throw new InternalError('Admission control failed.', internalDetails(context), {
+        cause: error,
+      })
+    }
+    if (admission.allowed) {
+      return
+    }
+    const { retryAfterSeconds } = admission
+    if (!Number.isSafeInteger(retryAfterSeconds) || retryAfterSeconds < 0) {
+      // A denial whose delay cannot be stated truthfully is a limiter defect.
+      log().error(
+        { operation: id, subject: authority.subject, retryAfterSeconds },
+        'Rate limiter returned an invalid retry delay; denying the call'
+      )
+      throw new InternalError('Admission control failed.', internalDetails(context))
+    }
+    throw new RateLimitedError(
+      `Rate limit exceeded. Try again in ${String(retryAfterSeconds)} seconds.`,
+      { retryAfterSeconds }
+    )
   }
 
   /** Step 2: the authority must hold the operation's permission. */
@@ -477,6 +535,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // operation lookup: an unauthenticated caller learns nothing beyond the
       // authentication failure, as on every other step.
       const authority = await verify(context, id)
+      admit(authority, context, id)
 
       const operation = registry.get(id)
       if (operation === undefined) {

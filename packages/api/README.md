@@ -2,15 +2,21 @@
 
 HTTP API server for macOS app automation.
 
-Provides a Hono-based HTTP server that exposes RPC endpoints for macOS app automation, along with JWT-based authentication, permission management, and a JXA (JavaScript for Automation) bridge for executing AppleScript operations.
+Serves macts operations over HTTP. The server composes the shared macts
+runtime ([`@macts/runtime`](../runtime/README.md)) with a thin HTTP adapter:
+every operation request is translated into one runtime invocation, which
+verifies the credential, applies the rate limit, checks permission, enforces
+governance, validates input, and only then executes. The HTTP layer adds
+routing, the error envelope, CORS, logging, TLS, and graceful shutdown; it
+duplicates none of the authorization logic.
 
 ## Features
 
-- **HTTP Server**: Hono-based server with automatic RPC endpoint generation from manifests
-- **Authentication**: JWT-based API key validation with Bearer token support
-- **Permission System**: Fine-grained permission checking with wildcard and coarse permission expansion
-- **API Key Enforcement**: Every RPC call is authenticated and authorized with API keys managed by [`@macts/runtime`](../runtime/README.md)
-- **JXA Bridge**: Execute AppleScript operations via JavaScript for Automation
+- **Operation endpoints from manifests**: `POST /api/v1/rpc/{app}.{resource}.{operation}` for every manifest operation
+- **One invocation pipeline**: authentication, permissions, governance, and input validation run in `@macts/runtime`, identically for every macts surface
+- **Structured errors**: every failure is a `{ "error": { code, message, details } }` envelope with a closed set of codes that `@macts/contracts` clients reconstruct into the same error classes
+- **Rate limiting**: per API key after authentication, and per client address before it
+- **Pluggable execution**: the native macOS executor by default; inject any `Executor` for tests or alternate providers
 - **Multi-App Support**: Serve multiple macOS apps from a single server instance
 
 ## Installation
@@ -98,7 +104,21 @@ interface ServerOptions {
   host?: string // Default: 'localhost'
   cors?: boolean | { origin: string | string[] } // Default: true
   logging?: boolean // Default: false
+  logger?: pino.Logger // Default: the process-wide macts logger
   prettyJson?: boolean // Default: true in development
+  gracefulShutdownTimeout?: number // Default: 10000 (ms)
+  tls?: TlsOptions // HTTPS when set
+  rateLimit?: RateLimitOptions | false // Default: 100/min per key, 300/min per address
+  governance?: GovernanceContext // Default: allow-all policy, no audit, no approvals
+  executor?: Executor // Default: createNativeExecutor() from @macts/core
+  verifier?: CredentialVerifier // Default: the @macts/runtime key-store verifier
+  clientAddress?: (c: Context) => string | undefined // Default: the socket's remote address
+}
+
+interface RateLimitOptions {
+  windowMs?: number // Per-key window. Default: 60000
+  max?: number // Calls per key per window. Default: 100
+  perAddress?: { windowMs?: number; max?: number } // Default: 300 per 60000 ms
 }
 
 interface ServerInstance {
@@ -137,10 +157,17 @@ const server = createMultiServer([calendarManifest, remindersManifest], {
 
 #### `createApp(manifests, options?)`
 
-Create just the Hono app without server lifecycle methods. Useful for testing or custom server setups.
+Create just the Hono app without server lifecycle methods. Accepts every
+`ServerOptions` field except the listener ones (`port`, `host`, `tls`,
+`gracefulShutdownTimeout`). Useful for testing, with an injected executor and
+verifier, or for custom server setups.
 
 ```typescript
-const app = createApp([manifest], { cors: true, logging: false })
+const app = createApp([manifest], { executor: myStubExecutor, verifier: myFakeVerifier })
+const res = await app.request('/api/v1/rpc/calendar.events.list', {
+  method: 'POST',
+  headers: { Authorization: 'Bearer macts_sk_...' },
+})
 ```
 
 ### API Key Management
@@ -318,288 +345,46 @@ const keyId = extractKeyIdFromToken(token)
 console.log('Key ID:', keyId)
 ```
 
-### Middleware
+### HTTP Adapter
 
-#### `authMiddleware()`
+#### `createHttpAdapter(runtime, options?)`
 
-Authentication middleware for Hono routes. Validates Bearer tokens and attaches payload to context.
+The pure HTTP transport over a `MactsRuntime`. `createServer` mounts it at
+`/api/v1`; use it directly to serve a runtime you composed yourself.
 
 ```typescript
+import { createHttpAdapter } from '@macts/api/server'
+import { createRuntime } from '@macts/runtime'
+import { createNativeExecutor } from '@macts/core'
 import { Hono } from 'hono'
-import { authMiddleware, type AuthVariables } from '@macts/api'
 
-const app = new Hono<{ Variables: AuthVariables }>()
+const runtime = createRuntime({ executor: createNativeExecutor() })
+runtime.registerManifest(manifest)
 
-// Apply to all /api routes
-app.use('/api/*', authMiddleware())
-
-app.get('/api/protected', (c) => {
-  const payload = c.get('apiKeyPayload')
-  return c.json({ keyId: payload.sub })
-})
+const app = new Hono().route('/api/v1', createHttpAdapter(runtime))
 ```
 
-**Error responses:**
-
-```typescript
-interface AuthErrorResponse {
-  error: {
-    code:
-      | 'MISSING_AUTHORIZATION'
-      | 'INVALID_AUTH_SCHEME'
-      | 'INVALID_FORMAT'
-      | 'INVALID_SIGNATURE'
-      | 'EXPIRED'
-      | 'REVOKED'
-      | 'MALFORMED_PAYLOAD'
-    message: string
-  }
-}
-```
-
-#### `requirePermission(permission, options?)`
-
-Permission checking middleware. Must be used after `authMiddleware()`.
-
-```typescript
-import { requirePermission } from '@macts/api'
-
-app.post(
-  '/api/rpc/calendar.events.create',
-  authMiddleware(),
-  requirePermission('calendar:events:create'),
-  (c) => {
-    // User has permission, handle request
-  }
-)
-```
-
-**With permission history (for helpful error messages):**
-
-```typescript
-app.post(
-  '/api/rpc/calendar.events.create',
-  authMiddleware(),
-  requirePermission('calendar:events:create', {
-    permissionHistory: manifest.permissions?.history,
-  }),
-  handler
-)
-```
-
-**Error response:**
-
-```typescript
-interface PermissionErrorResponse {
-  error: {
-    code: 'PERMISSION_DENIED'
-    message: string
-    required: string // Required permission
-    hint?: string // Helpful hint
-    changelog?: {
-      // If permission was renamed
-      version: string
-      previousPermission: string
-      reason?: string
-    }
-  }
-}
-```
-
-#### `rpcPathToPermission(path)`
-
-Utility to convert RPC path to permission string.
-
-```typescript
-// '/rpc/calendar.events.list' -> 'calendar:events:list'
-const permission = rpcPathToPermission('/rpc/calendar.events.list')
-```
-
-### RPC Handlers
-
-RPC endpoints are automatically generated from manifest commands. Each command becomes a `POST /api/v1/rpc/{app}.{resource}.{operation}` endpoint.
-
-#### `createRpcRouter(manifest)`
-
-Create a Hono router with RPC endpoints from a manifest.
-
-```typescript
-import { createRpcRouter } from '@macts/api'
-
-const rpcRouter = createRpcRouter(manifest)
-app.route('/api/v1', rpcRouter)
-```
-
-#### `createMultiAppRpcRouter(manifests)`
-
-Create a router for multiple apps.
-
-```typescript
-const rpcRouter = createMultiAppRpcRouter([calendarManifest, remindersManifest])
-```
-
-**RPC Request:**
-
-```typescript
-interface RpcRequest {
-  [key: string]: unknown // Command arguments
-}
-```
-
-**RPC Success Response:**
-
-```typescript
-interface RpcSuccessResponse<T = unknown> {
-  result: T
-}
-```
-
-**RPC Error Response:**
-
-```typescript
-interface RpcErrorResponse {
-  error: {
-    code: string
-    message: string
-    details?: unknown
-  }
-}
-```
-
-### JXA Bridge
-
-The JXA bridge provides the execution layer for macOS automation via JavaScript for Automation.
-
-#### `runJxa(code, options?)`
-
-Execute JXA code and return the result.
-
-```typescript
-import { runJxa } from '@macts/api'
-
-const result = await runJxa(`
-  const app = Application('Calendar');
-  return app.calendars().map(c => c.name());
-`)
-
-console.log('Calendars:', result)
-```
-
-#### `runWithApp(bundleId, code, options?)`
-
-Execute JXA code with an app connection.
-
-```typescript
-import { runWithApp } from '@macts/api'
-
-const calendars = await runWithApp(
-  'com.apple.iCal',
-  `
-  const app = Application.currentApplication();
-  app.includeStandardAdditions = true;
-
-  const Calendar = Application('Calendar');
-  return Calendar.calendars().map(c => ({
-    name: c.name(),
-    color: c.color()
-  }));
-`
-)
-```
-
-#### `connect(bundleId, options?)`
-
-Create a persistent connection to a macOS app.
-
-```typescript
-import { connect, type AppConnection } from '@macts/api'
-
-const cal: AppConnection = await connect('com.apple.iCal', {
-  autoActivate: true,
-  checkRunning: true,
-})
-
-// Use the connection
-const result = await cal.run(`
-  return Application('Calendar').calendars().length;
-`)
-
-// Close when done
-await cal.close()
-```
-
-#### App Control
-
-```typescript
-import { isAppRunning, activateApp, quitApp, getAppName } from '@macts/api'
-
-// Check if app is running
-const running = await isAppRunning('com.apple.iCal')
-
-// Get app name
-const name = await getAppName('com.apple.iCal')
-console.log(name) // "Calendar"
-
-// Activate (bring to front)
-await activateApp('com.apple.iCal')
-
-// Quit app
-await quitApp('com.apple.iCal')
-```
-
-#### Object Specifiers
-
-Build type-safe object specifiers for JXA queries.
-
-```typescript
-import { ObjectSpecifier } from '@macts/api'
-
-// Build: Application('Calendar').calendars.whose({name: 'Work'})
-const spec = new ObjectSpecifier('Calendar').elements('calendars').whose({ name: 'Work' })
-
-console.log(spec.build())
-```
-
-#### Type Coercers
-
-Convert between JavaScript and JXA types.
-
-```typescript
-import {
-  dateCoercer,
-  colorCoercer,
-  createEnumCoercer,
-  pathCoercer,
-  booleanCoercer,
-  numberCoercer,
-  stringCoercer,
-  createArrayCoercer,
-  nullSafe,
-} from '@macts/api'
-
-// Date coercion
-const date = dateCoercer.toJs(new Date())
-const jsDate = dateCoercer.fromJs('2026-02-17T10:00:00Z')
-
-// Color coercion (hex <-> RGB)
-const rgb = colorCoercer.toJs('#FF0000') // [255, 0, 0]
-const hex = colorCoercer.fromJs([255, 0, 0]) // '#ff0000'
-
-// Enum coercion
-const statusCoercer = createEnumCoercer({
-  accepted: 'accepted',
-  declined: 'declined',
-  tentative: 'tentative',
-})
-
-// Array coercion
-const arrayOfDates = createArrayCoercer(dateCoercer)
-const dates = arrayOfDates.fromJs(['2026-01-01T00:00:00Z', '2026-02-01T00:00:00Z'])
-
-// Null-safe coercion
-const optionalDate = nullSafe(dateCoercer)
-const maybeDate = optionalDate.fromJs(null) // undefined
-```
+It registers `POST /rpc/<operation id>` for each operation registered on the
+runtime when it is built, plus `GET /introspect` and `GET /introspect/all`. For
+each request it reads the JSON body (a missing or blank body is `{}`), the
+`Authorization: Bearer` credential, the request's abort signal, and an optional
+`X-Request-Id` correlation id, and calls `runtime.invoke`. It never verifies a
+credential or evaluates policy itself.
+
+Options:
+
+- `logger` — destination for diagnostics about failed requests.
+- `clientAddress(c)` — resolves the client address for the per-address limit.
+  The default reads the socket's remote address (Node via `@hono/node-server`,
+  or Bun's `requestIP`). Requests with no network peer, such as in-process
+  `app.request` calls, are not counted.
+- `addressRateLimiter` — a `RateLimiter` from `@macts/runtime`, or `false`.
+  Default: 300 requests per minute per address.
+
+#### `httpStatusForError(error)`
+
+The HTTP status the adapter uses for a structured error. See
+[Error Codes](#error-codes) for the full table.
 
 ## Server Endpoints
 
@@ -616,10 +401,12 @@ GET /health
 ```json
 {
   "status": "ok",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "apps": ["calendar"]
 }
 ```
+
+`version` is the installed `@macts/api` package version.
 
 ### API Info (No Auth)
 
@@ -649,6 +436,7 @@ GET /api/v1
 POST /api/v1/rpc/{app}.{resource}.{operation}
 Authorization: Bearer macts_sk_...
 Content-Type: application/json
+X-Request-Id: optional-correlation-id
 
 {
   "arg1": "value1",
@@ -656,7 +444,7 @@ Content-Type: application/json
 }
 ```
 
-**Success Response:**
+**Success Response (200):**
 
 ```json
 {
@@ -671,312 +459,53 @@ Content-Type: application/json
   "error": {
     "code": "PERMISSION_DENIED",
     "message": "Missing required permission: calendar:events:create",
-    "required": "calendar:events:create"
+    "details": { "required": "calendar:events:create" }
   }
 }
+```
+
+### Introspection (No Auth)
+
+```bash
+GET /api/v1/introspect       # the first app's endpoints, with descriptions, parameters, and returns
+GET /api/v1/introspect/all   # every app's endpoints
 ```
 
 ## Error Codes
 
-The API uses standardized error codes across all endpoints. Each error response includes a `code`, `message`, and optionally additional details.
-
-### Authentication Errors (401)
-
-Returned by the `authMiddleware` when token validation fails.
-
-#### `MISSING_AUTHORIZATION`
-
-No `Authorization` header was provided in the request.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "MISSING_AUTHORIZATION",
-    "message": "Authorization header is required"
-  }
-}
-```
-
-**How to fix:** Include an `Authorization: Bearer macts_sk_...` header in your request.
-
-#### `INVALID_AUTH_SCHEME`
-
-The `Authorization` header doesn't use the Bearer scheme.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "INVALID_AUTH_SCHEME",
-    "message": "Authorization header must use Bearer scheme"
-  }
-}
-```
-
-**How to fix:** Use `Authorization: Bearer <token>` instead of other schemes like Basic or custom formats.
-
-#### `INVALID_FORMAT`
-
-The token doesn't have the correct format (must start with `macts_sk_`).
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "INVALID_FORMAT",
-    "message": "Invalid token format: must start with macts_sk_"
-  }
-}
-```
-
-**How to fix:** Verify you're using a token generated by `createApiKey()`. Tokens always start with `macts_sk_`.
-
-#### `INVALID_SIGNATURE`
-
-The JWT signature verification failed.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "INVALID_SIGNATURE",
-    "message": "Invalid token signature"
-  }
-}
-```
-
-**How to fix:** This means the token was tampered with or was signed with a different secret. Generate a new token.
-
-#### `EXPIRED`
-
-The token has passed its expiration time.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "EXPIRED",
-    "message": "Token has expired"
-  }
-}
-```
-
-**How to fix:** Create a new API key with a new expiration date.
-
-#### `REVOKED`
-
-The token has been explicitly revoked.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "REVOKED",
-    "message": "Token has been revoked"
-  }
-}
-```
-
-**How to fix:** Create a new API key. Revoked keys cannot be un-revoked.
-
-#### `MALFORMED_PAYLOAD`
-
-The token payload doesn't match the expected structure.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "MALFORMED_PAYLOAD",
-    "message": "Malformed token payload"
-  }
-}
-```
-
-**How to fix:** Generate a new token using `createApiKey()`. This error indicates a corrupted or manually-crafted token.
-
-### Permission Errors (403)
-
-Returned by `requirePermission` middleware when the authenticated user lacks required permissions.
-
-#### `PERMISSION_DENIED`
-
-The token doesn't have the required permission for the operation.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "PERMISSION_DENIED",
-    "message": "Missing required permission: calendar:events:create",
-    "required": "calendar:events:create",
-    "hint": "You need permission: calendar:events:create"
-  }
-}
-```
-
-**With changelog (if permission was renamed):**
-
-```json
-{
-  "error": {
-    "code": "PERMISSION_DENIED",
-    "message": "Missing required permission: calendar:events:create",
-    "required": "calendar:events:create",
-    "hint": "This permission was previously named calendar:events:add",
-    "changelog": {
-      "version": "2.0.0",
-      "previousPermission": "calendar:events:add",
-      "reason": "Renamed for consistency"
-    }
-  }
-}
-```
-
-**How to fix:** Create a new API key with the required permission, or update an existing key's permissions (requires revoking and recreating).
-
-### RPC Errors (400/500)
-
-Returned by RPC endpoint handlers.
-
-#### `INVALID_REQUEST` (400)
-
-The request body is not valid JSON.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "Request body must be valid JSON"
-  }
-}
-```
-
-**How to fix:** Ensure your request has `Content-Type: application/json` and a valid JSON body.
-
-#### `VALIDATION_ERROR` (400)
-
-The request body doesn't match the command's parameter schema.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Request validation failed",
-    "details": [
-      {
-        "code": "invalid_type",
-        "expected": "string",
-        "received": "number",
-        "path": ["title"],
-        "message": "Expected string, received number"
-      }
-    ]
-  }
-}
-```
-
-**How to fix:** Review the `details` array to see which parameters are invalid. Check the manifest or API documentation for parameter requirements.
-
-#### `EXECUTION_ERROR` (500)
-
-The JXA command execution failed.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "EXECUTION_ERROR",
-    "message": "Command execution failed: Calendar is not running"
-  }
-}
-```
-
-**How to fix:** Common causes include:
-
-- The target app is not running
-- The app doesn't have the required permissions (check System Settings > Privacy & Security > Automation)
-- Invalid parameters passed to the JXA command
-- The app is in an unexpected state
-
-### Server Errors
-
-#### `INTERNAL_ERROR` (500)
-
-An unexpected server error occurred.
-
-**Example Response (production):**
-
-```json
-{
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "Internal server error"
-  }
-}
-```
-
-**Example Response (development):**
-
-```json
-{
-  "error": {
-    "code": "INTERNAL_ERROR",
-    "message": "Cannot read property 'name' of undefined"
-  }
-}
-```
-
-**How to fix:** Check server logs for details. In production, error messages are sanitized for security.
-
-#### `NOT_FOUND` (404)
-
-The requested endpoint doesn't exist.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Route not found: POST /api/v1/rpc/calendar.foo.bar"
-  }
-}
-```
-
-**How to fix:** Verify the endpoint path matches a defined RPC route. Use `GET /api/v1/introspect` to see available endpoints.
-
-#### `RATE_LIMIT_EXCEEDED` (429)
-
-Too many requests in the rate limit window.
-
-**Example Response:**
-
-```json
-{
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Rate limit exceeded. Try again in 60 seconds.",
-    "retryAfter": 60
-  }
-}
-```
-
-**How to fix:** Wait for the specified `retryAfter` seconds before making another request. Consider adjusting rate limits in server configuration or distributing requests over time.
+Every failure is the envelope `{ "error": { "code", "message", "details" } }`.
+The codes and the shape of `details` for each are defined by
+`@macts/contracts` (`ErrorDetailsByCode`), and a client reconstructs the error
+class from `code` with `fromWireErrorEnvelope`. The HTTP status is advisory.
+
+| `code`                       | Status          | Meaning and `details`                                                                                   |
+| ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
+| `VALIDATION_FAILED`          | 400             | The request body or input violated the operation contract. `issues[]`, each `{ path, message, code? }`. |
+| `UNAUTHENTICATED`            | 401             | No usable credential. `reason`: `missing`, `malformed`, `invalid`, `expired`, or `revoked`.             |
+| `RATE_LIMITED`               | 429             | Too many requests. `retryAfterSeconds`; the same value is sent as the `Retry-After` header.             |
+| `PERMISSION_DENIED`          | 403             | The key lacks the permission. `required`, and `hint` / `changelog` when the permission was renamed.     |
+| `POLICY_DENIED`              | 403             | Governance policy forbids the call. `permission`, `layer` (`host` or `key`).                            |
+| `APPROVAL_PENDING`           | 409             | The call needs human confirmation and no approval provider is configured; it did not run.               |
+| `APPROVAL_REJECTED`          | 403             | The call was put to a human and not approved. `permission`, `layer`, `state` (`rejected` or `timeout`). |
+| `TARGET_NOT_FOUND`           | 404             | A singular target does not exist. `resource?`.                                                          |
+| `FILE_NOT_FOUND`             | 404             | A referenced file does not exist. `path?`.                                                              |
+| `INVALID_SELECTION`          | 400             | A range or index selection is invalid. `resource?`.                                                     |
+| `UNEXPECTED_VALUE`           | 502             | The app returned a value outside the operation contract. `issues[]`.                                    |
+| `APP_UNAVAILABLE`            | 503             | The app is not installed or not responding. `app`, `reason`.                                            |
+| `APP_AUTHORIZATION_REQUIRED` | 503             | macOS has not authorized automating the app. `app`.                                                     |
+| `APP_OPERATION_FAILED`       | 502             | The app reported another failure. `app`, `appErrorCode?`.                                               |
+| `TIMEOUT`                    | 504             | The operation exceeded its time budget. `timeoutMs`.                                                    |
+| `CANCELLED`                  | 499             | The caller aborted the request.                                                                         |
+| `TRANSFER_FAILED`            | 400 / 410 / 413 | A transfer was incomplete or unknown (400), expired (410), or too large (413). `reason`.                |
+| `INTERNAL`                   | 500             | An unexpected failure. The message is generic; `correlationId?` echoes `X-Request-Id`.                  |
+
+`NOT_FOUND` (404) is returned for a request that matches no route, including
+`POST /api/v1/rpc/<unknown operation>`. It is deliberately not one of the codes
+above: it means the client and server disagree about the API, and clients treat
+it as a protocol mismatch.
+
+Messages never contain the credential, and an unexpected failure's original
+text is logged on the server but never returned.
 
 ## Environment Variables
 
@@ -1103,7 +632,7 @@ export HOME=/Users/username
 
 #### Invalid Token Format
 
-**Symptom:** `INVALID_FORMAT` error even though token looks correct
+**Symptom:** `UNAUTHENTICATED` with `reason: "malformed"` even though the token looks correct
 
 **Cause:** Token is not prefixed with `macts_sk_` or is truncated.
 
@@ -1115,7 +644,7 @@ export HOME=/Users/username
 
 #### Expired Keys
 
-**Symptom:** `EXPIRED` error code
+**Symptom:** `UNAUTHENTICATED` with `reason: "expired"`
 
 **Cause:** Token expiration time has passed.
 
@@ -1127,7 +656,7 @@ export HOME=/Users/username
 
 #### Wrong Signing Secret
 
-**Symptom:** `INVALID_SIGNATURE` error on a valid-looking token
+**Symptom:** `UNAUTHENTICATED` with `reason: "invalid"` on a valid-looking token
 
 **Cause:** The server's signing secret doesn't match the secret used to create the token.
 
@@ -1179,43 +708,44 @@ chmod 600 server.key
 
 #### Too Many Requests
 
-**Symptom:** `RATE_LIMIT_EXCEEDED` error code
+**Symptom:** `RATE_LIMITED` error code (HTTP 429)
 
-**Cause:** Exceeded the configured rate limit (default: 100 requests/minute per API key).
+**Cause:** Exceeded a configured limit: 100 calls per minute per API key, or
+300 requests per minute per client address (counted before authentication).
 
 **Solution:**
 
-1. Wait for the `retryAfter` period specified in the error
-2. Adjust rate limits in server configuration:
+1. Wait `details.retryAfterSeconds` (also sent as the `Retry-After` header)
+2. Adjust the limits in server configuration:
    ```typescript
    createServer(manifest, {
      rateLimit: {
-       maxRequests: 1000,
+       max: 1000, // per API key
        windowMs: 60_000, // 1 minute
+       perAddress: { max: 3000 },
      },
    })
    ```
-3. Disable rate limiting (not recommended for production):
+3. Disable both limits (not recommended for production):
    ```typescript
    createServer(manifest, { rateLimit: false })
    ```
 
-### JXA Execution Errors
+### App Errors
 
 #### App Not Running
 
-**Symptom:** `EXECUTION_ERROR: Calendar is not running`
+**Symptom:** `APP_UNAVAILABLE` error code
 
 **Cause:** Target macOS app is not currently running.
 
 **Solution:**
 
-- Launch the app manually or programmatically with `activateApp(bundleId)`
-- Check if app is running with `isAppRunning(bundleId)` before commands
+- Launch the app before sending it commands
 
 #### Permission Not Granted
 
-**Symptom:** `EXECUTION_ERROR: Not authorized to send Apple events to Calendar`
+**Symptom:** `APP_AUTHORIZATION_REQUIRED` error code
 
 **Cause:** Your Node.js process doesn't have Automation permission for the target app.
 
@@ -1228,7 +758,7 @@ chmod 600 server.key
 
 #### App in Unexpected State
 
-**Symptom:** Various `EXECUTION_ERROR` messages about missing properties or invalid operations
+**Symptom:** `TARGET_NOT_FOUND` or `APP_OPERATION_FAILED` error codes
 
 **Cause:** The app's state doesn't match what the command expects (e.g., trying to show an event that was deleted).
 
@@ -1388,10 +918,10 @@ The package provides three entry points:
 
 ```typescript
 // Main export
-import { createServer, runJxa } from '@macts/api'
+import { createServer } from '@macts/api'
 
 // Server-only export
-import { createServer, authMiddleware, requirePermission } from '@macts/api/server'
+import { createServer, createHttpAdapter, httpStatusForError } from '@macts/api/server'
 
 // Telemetry export
 import { configureTelemetry, withSpan } from '@macts/api/telemetry'
@@ -1409,22 +939,6 @@ try {
   })
 } catch (error) {
   console.error('Failed to create key:', error.message)
-}
-```
-
-JXA execution errors are wrapped in `JxaExecutionError`:
-
-```typescript
-import { runJxa, JxaExecutionError } from '@macts/api'
-
-try {
-  await runJxa('invalid javascript')
-} catch (error) {
-  if (error instanceof JxaExecutionError) {
-    console.error('JXA error:', error.message)
-    console.error('Exit code:', error.exitCode)
-    console.error('stderr:', error.stderr)
-  }
 }
 ```
 

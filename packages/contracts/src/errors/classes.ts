@@ -58,6 +58,16 @@ export class AuthenticationError extends MactsError<'UNAUTHENTICATED'> {
   override readonly name = 'AuthenticationError'
 }
 
+/**
+ * The caller exceeded its admission limit, so the call was turned away before
+ * any authorization decision and did not run. Admission never grants
+ * anything: an admitted call is still subject to every later check.
+ */
+export class RateLimitedError extends MactsError<'RATE_LIMITED'> {
+  override readonly code = 'RATE_LIMITED'
+  override readonly name = 'RateLimitedError'
+}
+
 /** The authority lacks the permission the operation requires. */
 export class PermissionDeniedError extends MactsError<'PERMISSION_DENIED'> {
   override readonly code = 'PERMISSION_DENIED'
@@ -160,6 +170,7 @@ export interface MactsErrorByCode {
   readonly VALIDATION_FAILED: ValidationError
   readonly UNEXPECTED_VALUE: UnexpectedValueError
   readonly UNAUTHENTICATED: AuthenticationError
+  readonly RATE_LIMITED: RateLimitedError
   readonly PERMISSION_DENIED: PermissionDeniedError
   readonly POLICY_DENIED: PolicyDeniedError
   readonly APPROVAL_PENDING: ApprovalPendingError

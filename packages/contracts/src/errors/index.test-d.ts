@@ -9,6 +9,7 @@ import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 import {
   ERROR_CLASSES,
   MactsError,
+  RateLimitedError,
   TargetNotFoundError,
   TransportError,
   ValidationError,
@@ -32,6 +33,10 @@ switch (error.code) {
     break
   case 'PERMISSION_DENIED':
     expectType<string>(error.details.required)
+    break
+  case 'RATE_LIMITED':
+    expectType<RateLimitedError>(error)
+    expectType<number>(error.details.retryAfterSeconds)
     break
   case 'TRANSPORT_FAILED':
     expectType<TransportError>(error)

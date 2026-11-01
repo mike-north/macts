@@ -60,6 +60,12 @@ export interface ErrorDetailsByCode {
   readonly UNEXPECTED_VALUE: { readonly issues: readonly ValidationIssue[] }
   /** The credential was missing or could not establish authority. */
   readonly UNAUTHENTICATED: { readonly reason: AuthenticationFailureReason }
+  /**
+   * The caller exceeded its admission limit; the call was not evaluated
+   * further and did not run. `retryAfterSeconds` is a non-negative integer:
+   * how long to wait before the limit admits another call.
+   */
+  readonly RATE_LIMITED: { readonly retryAfterSeconds: number }
   /** The authority lacks the operation's permission. */
   readonly PERMISSION_DENIED: {
     readonly required: string

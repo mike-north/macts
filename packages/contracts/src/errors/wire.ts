@@ -68,6 +68,7 @@ export const WIRE_ERROR_DETAILS_SCHEMAS: {
   UNAUTHENTICATED: z.object({
     reason: z.enum(['missing', 'malformed', 'invalid', 'expired', 'revoked']),
   }),
+  RATE_LIMITED: z.object({ retryAfterSeconds: z.number().int().nonnegative() }),
   PERMISSION_DENIED: z.object({
     required: z.string(),
     hint: z.exactOptional(z.string()),

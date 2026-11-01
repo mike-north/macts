@@ -21,10 +21,10 @@
  *
  * ## Scope
  *
- * This seam covers the **direct** SDK / MCP / CLI call path — the calls
- * `requirePolicy` holds one at a time. Composed scripts are approved as a whole
- * by the human's own harness before they run, so they do not funnel through
- * here.
+ * This seam covers the **direct** SDK / MCP / CLI call path — the calls the
+ * runtime's governance step holds one at a time. Composed scripts are approved
+ * as a whole by the human's own harness before they run, so they do not funnel
+ * through here.
  *
  * ## Terminal states and fail-closed semantics
  *

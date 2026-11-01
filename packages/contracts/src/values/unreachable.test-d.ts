@@ -70,6 +70,7 @@ export function describeCode(code: ErrorCode): string {
     case 'VALIDATION_FAILED':
     case 'UNEXPECTED_VALUE':
     case 'UNAUTHENTICATED':
+    case 'RATE_LIMITED':
     case 'PERMISSION_DENIED':
     case 'POLICY_DENIED':
     case 'APPROVAL_PENDING':
@@ -98,6 +99,7 @@ export function isClientOnly(code: ErrorCode): boolean {
     case 'VALIDATION_FAILED':
     case 'UNEXPECTED_VALUE':
     case 'UNAUTHENTICATED':
+    case 'RATE_LIMITED':
     case 'PERMISSION_DENIED':
     case 'POLICY_DENIED':
     case 'APPROVAL_PENDING':

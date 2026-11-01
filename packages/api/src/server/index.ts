@@ -1,8 +1,12 @@
 /**
  * HTTP server for the macts API.
  *
- * Creates a Hono-based HTTP server that exposes RPC endpoints
- * for macOS app automation.
+ * Composes a macts runtime (executor, credential verifier, governance, and the
+ * per-subject admission limit) with the HTTP adapter, and adds the
+ * server-level concerns around it: the unauthenticated `/health` and
+ * `/api/v1` endpoints, CORS, pretty JSON, request logging, in-flight request
+ * tracking, TLS, and graceful shutdown. Every operation request is handled by
+ * the adapter and runs through the runtime's invocation pipeline.
  *
  * @packageDocumentation
  */
@@ -11,52 +15,71 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
 import type pino from 'pino'
-import type { AppManifest } from '@macts/core'
-import { ALLOW_ALL_POLICY, getLogger, setLogger, type GovernanceContext } from '@macts/runtime'
-import { authMiddleware, type AuthVariables } from './middleware/auth.js'
+import { createNativeExecutor, type AppManifest, type Executor } from '@macts/core'
+import {
+  ALLOW_ALL_POLICY,
+  createRateLimiter,
+  createRuntime,
+  getLogger,
+  setLogger,
+  type CredentialVerifier,
+  type GovernanceContext,
+  type RateLimiterOptions,
+} from '@macts/runtime'
+import { getPackageVersion } from '../package-version.js'
+import {
+  createHttpAdapter,
+  DEFAULT_ADDRESS_RATE_LIMIT,
+  errorLogFields,
+  internalErrorResponse,
+  notFoundResponse,
+  type ClientAddressResolver,
+} from './adapter.js'
 import { createInFlightTracker } from './middleware/in-flight.js'
-import { createRateLimiter, type RateLimitOptions } from './middleware/rate-limit.js'
 import { requestLogger } from './middleware/request-logger.js'
-import { createRpcRouter, createMultiAppRpcRouter } from './handlers/rpc.js'
 import { loadTlsOptions, type TlsOptions } from './tls.js'
 
-// Re-export middleware and handlers
 export {
-  authMiddleware,
-  type AuthVariables,
-  type AuthErrorCode,
-  type AuthErrorResponse,
-} from './middleware/auth.js'
-export {
-  requirePermission,
-  rpcPathToPermission,
-  type PermissionErrorResponse,
-  type PermissionMiddlewareOptions,
-} from './middleware/permission.js'
-export {
-  requirePolicy,
-  type RequirePolicyOptions,
-  type GovernanceDeniedResponse,
-  type GovernancePendingResponse,
-  type GovernanceApprovalDeniedResponse,
-} from './middleware/governance.js'
-export {
-  createRpcRouter,
-  createMultiAppRpcRouter,
-  type RpcRequest,
+  createHttpAdapter,
+  httpStatusForError,
+  defaultClientAddress,
+  DEFAULT_ADDRESS_RATE_LIMIT,
+  type ClientAddressResolver,
+  type HttpAdapterOptions,
   type RpcSuccessResponse,
-  type RpcErrorResponse,
-  type RpcHandler,
-  type RpcHandlerContext,
-  type RpcEndpointInfo,
-} from './handlers/rpc.js'
+} from './adapter.js'
+export type { WireErrorEnvelope } from '@macts/contracts'
 export { createInFlightTracker, type InFlightTracker } from './middleware/in-flight.js'
 export { type TlsOptions, type LoadedTlsOptions } from './tls.js'
-export {
-  createRateLimiter,
-  type RateLimitOptions,
-  type RateLimiterInstance,
-} from './middleware/rate-limit.js'
+
+/** Calls per minute admitted per verified subject when no limit is configured. */
+export const DEFAULT_SUBJECT_RATE_LIMIT = 100
+
+/** Window, in milliseconds, of both default rate limits. */
+const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000
+
+/**
+ * Rate limiting for the HTTP server.
+ *
+ * @remarks
+ * Two independent fixed-window limits apply to operation requests:
+ *
+ * - The top-level `windowMs` and `max` limit calls per verified subject (the
+ *   API key). This is the runtime's admission step, after the credential is
+ *   verified and before the permission check.
+ * - `perAddress` limits requests per client network address, before the
+ *   credential is examined, so failed authentication attempts are bounded too.
+ *
+ * Both answer `429` with the `RATE_LIMITED` error and a `Retry-After` header.
+ */
+export interface RateLimitOptions extends RateLimiterOptions {
+  /**
+   * The per-client-address limit.
+   *
+   * @defaultValue 300 requests per minute per address
+   */
+  readonly perAddress?: RateLimiterOptions
+}
 
 /**
  * Server configuration options.
@@ -78,7 +101,13 @@ export interface ServerOptions {
   gracefulShutdownTimeout?: number
   /** TLS configuration for HTTPS support */
   tls?: TlsOptions
-  /** Rate limiting configuration, or false to disable (default: enabled with 100 req/min) */
+  /**
+   * Rate limiting, or `false` to disable both the per-subject and the
+   * per-address limit.
+   *
+   * @defaultValue 100 calls per minute per subject and 300 requests per minute
+   *   per client address
+   */
   rateLimit?: RateLimitOptions | false
   /**
    * Governance enforcement context (active policy, optional audit writer, and
@@ -97,6 +126,27 @@ export interface ServerOptions {
    * policy of their own are unaffected.
    */
   governance?: GovernanceContext
+  /**
+   * The executor that carries out authorized operations. A composition point
+   * for tests and alternate providers.
+   *
+   * @defaultValue the native macOS executor from `createNativeExecutor()`
+   */
+  executor?: Executor
+  /**
+   * Turns presented credentials into authority. A composition point for tests
+   * and alternate credential stores.
+   *
+   * @defaultValue the runtime's key-store verifier
+   */
+  verifier?: CredentialVerifier
+  /**
+   * Resolves the client address the per-address limit is keyed by. A
+   * composition point for tests and for deployments behind a trusted proxy.
+   *
+   * @defaultValue the connection's remote address
+   */
+  clientAddress?: ClientAddressResolver
 }
 
 /**
@@ -104,7 +154,7 @@ export interface ServerOptions {
  */
 export interface ServerInstance {
   /** The Hono app */
-  app: Hono<{ Variables: AuthVariables }>
+  app: Hono
   /** Start the server */
   start(): Promise<void>
   /** Stop the server */
@@ -180,13 +230,48 @@ export function createMultiServer(
     tls,
     rateLimit,
     governance = { policy: ALLOW_ALL_POLICY },
+    executor,
+    verifier,
+    clientAddress,
   } = options
 
   if (customLogger) {
     setLogger(customLogger)
   }
 
-  const app = new Hono<{ Variables: AuthVariables }>()
+  const runtime = createRuntime({
+    executor: executor ?? createNativeExecutor(),
+    governance,
+    ...(verifier === undefined ? {} : { verifier }),
+    ...(customLogger === undefined ? {} : { logger: customLogger }),
+    ...(rateLimit === false
+      ? {}
+      : {
+          rateLimiter: createRateLimiter({
+            max: DEFAULT_SUBJECT_RATE_LIMIT,
+            windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
+            ...subjectLimitOptions(rateLimit),
+          }),
+        }),
+  })
+  for (const manifest of manifests) {
+    runtime.registerManifest(manifest)
+  }
+
+  const adapter = createHttpAdapter(runtime, {
+    ...(customLogger === undefined ? {} : { logger: customLogger }),
+    ...(clientAddress === undefined ? {} : { clientAddress }),
+    addressRateLimiter:
+      rateLimit === false
+        ? false
+        : createRateLimiter({
+            max: DEFAULT_ADDRESS_RATE_LIMIT,
+            windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
+            ...rateLimit?.perAddress,
+          }),
+  })
+
+  const app = new Hono()
 
   // Track in-flight requests for graceful shutdown
   const tracker = createInFlightTracker()
@@ -208,10 +293,11 @@ export function createMultiServer(
   }
 
   // Health check endpoint (no auth required)
+  const version = getPackageVersion()
   app.get('/health', (c) => {
     return c.json({
       status: 'ok',
-      version: '1.0.0',
+      version,
       apps: manifests.map((m) => m.app.name),
     })
   })
@@ -229,50 +315,20 @@ export function createMultiServer(
     })
   })
 
-  // Protected API routes
-  app.use('/api/v1/rpc/*', authMiddleware())
+  // Every operation request goes through the adapter, and from it through the
+  // runtime's invocation pipeline.
+  app.route('/api/v1', adapter)
 
-  // Rate limiting (after auth so we can key by API key ID)
-  if (rateLimit !== false) {
-    const limiter = createRateLimiter(typeof rateLimit === 'object' ? rateLimit : undefined)
-    app.use('/api/v1/rpc/*', limiter.middleware())
-  }
-
-  // Mount RPC router, threading the governance context so call-time policy
-  // enforcement runs after the API-key permission check on every endpoint.
-  const firstManifest = manifests[0]
-  const rpcRouter =
-    manifests.length === 1 && firstManifest
-      ? createRpcRouter(firstManifest, governance)
-      : createMultiAppRpcRouter(manifests, governance)
-  app.route('/api/v1', rpcRouter)
-
-  // Error handling
-  app.onError((err, c) => {
-    getLogger().error({ err }, 'Server error')
-    return c.json(
-      {
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: process.env['NODE_ENV'] === 'production' ? 'Internal server error' : err.message,
-        },
-      },
-      500
-    )
+  // Fallbacks, in the same envelope as every other failure.
+  app.onError((err) => {
+    try {
+      getLogger().error({ err: errorLogFields(err) }, 'Server error')
+    } catch {
+      // The fallback must answer even when logging itself is what failed.
+    }
+    return internalErrorResponse()
   })
-
-  // 404 handler
-  app.notFound((c) => {
-    return c.json(
-      {
-        error: {
-          code: 'NOT_FOUND',
-          message: `Route not found: ${c.req.method} ${c.req.path}`,
-        },
-      },
-      404
-    )
-  })
+  app.notFound(() => notFoundResponse())
 
   // Server state
   let serverUrl: string | null = null
@@ -349,17 +405,27 @@ export function createMultiServer(
 }
 
 /**
+ * The server options that shape the app itself, as opposed to its listener.
+ */
+export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'gracefulShutdownTimeout'>
+
+/**
  * Create just the Hono app without server lifecycle.
  *
- * Useful for testing or custom server setups.
+ * Useful for testing (with an injected `executor` and `verifier`) or custom
+ * server setups.
  *
  * @param manifests - Array of app manifests
- * @param options - Server configuration (only middleware options used)
+ * @param options - Server configuration, excluding listener options
  * @returns Configured Hono app
  */
-export function createApp(
-  manifests: AppManifest[],
-  options: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'> = {}
-): Hono<{ Variables: AuthVariables }> {
+export function createApp(manifests: AppManifest[], options: AppOptions = {}): Hono {
   return createMultiServer(manifests, options).app
+}
+
+/** The per-subject limiter options from the server's rate-limit options. */
+function subjectLimitOptions(rateLimit: RateLimitOptions | undefined): RateLimiterOptions {
+  if (rateLimit === undefined) return {}
+  const { perAddress: _perAddress, ...subject } = rateLimit
+  return subject
 }

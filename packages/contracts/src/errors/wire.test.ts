@@ -33,6 +33,7 @@ import {
   OperationCancelledError,
   OperationTimeoutError,
   PolicyDeniedError,
+  RateLimitedError,
   TargetNotFoundError,
   UnexpectedValueError,
   ValidationError,
@@ -48,6 +49,7 @@ const SAMPLES: Record<WireErrorCode, () => MactsError<WireErrorCode>> = {
   VALIDATION_FAILED: () => new ValidationError('invalid', { issues: ISSUES }),
   UNEXPECTED_VALUE: () => new UnexpectedValueError('unexpected', { issues: ISSUES }),
   UNAUTHENTICATED: () => new AuthenticationError('no cred', { reason: 'expired' }),
+  RATE_LIMITED: () => new RateLimitedError('slow down', { retryAfterSeconds: 42 }),
   PERMISSION_DENIED: () =>
     new PermissionDeniedError('denied', {
       required: 'notes:note:read',
@@ -122,6 +124,12 @@ const DECODE_TABLE: readonly {
     expectedClass: AuthenticationError,
     expectedName: 'AuthenticationError',
     expectedDetails: { reason: 'revoked' },
+  },
+  {
+    json: '{"error":{"code":"RATE_LIMITED","message":"m","details":{"retryAfterSeconds":30}}}',
+    expectedClass: RateLimitedError,
+    expectedName: 'RateLimitedError',
+    expectedDetails: { retryAfterSeconds: 30 },
   },
   {
     json: '{"error":{"code":"PERMISSION_DENIED","message":"m","details":{"required":"calendar:events:create"}}}',
@@ -228,6 +236,7 @@ describe('hand-written decode table', () => {
         'INVALID_SELECTION',
         'PERMISSION_DENIED',
         'POLICY_DENIED',
+        'RATE_LIMITED',
         'TARGET_NOT_FOUND',
         'TIMEOUT',
         'TRANSFER_FAILED',
@@ -295,6 +304,25 @@ describe('wire JSON', () => {
         },
       },
     })
+  })
+
+  it('encodes RATE_LIMITED with its retry delay', () => {
+    const error = new RateLimitedError('Rate limit exceeded', { retryAfterSeconds: 17 })
+    expect(JSON.parse(JSON.stringify(toWireErrorEnvelope(error)))).toEqual({
+      error: {
+        code: 'RATE_LIMITED',
+        message: 'Rate limit exceeded',
+        details: { retryAfterSeconds: 17 },
+      },
+    })
+  })
+
+  it('accepts a zero retry delay, the lower bound of the non-negative integer', () => {
+    const decoded = fromWireErrorEnvelope({
+      error: { code: 'RATE_LIMITED', message: 'm', details: { retryAfterSeconds: 0 } },
+    })
+    expect(decoded).toBeInstanceOf(RateLimitedError)
+    expect(decoded.details).toEqual({ retryAfterSeconds: 0 })
   })
 
   it('encodes TRANSFER_FAILED', () => {
@@ -374,6 +402,19 @@ describe('decode failures become protocol-mismatch', () => {
     ['null details', { code: 'CANCELLED', message: 'm', details: null }],
     ['negative timeoutMs', { code: 'TIMEOUT', message: 'm', details: { timeoutMs: -1 } }],
     ['fractional timeoutMs', { code: 'TIMEOUT', message: 'm', details: { timeoutMs: 1.5 } }],
+    [
+      'negative retryAfterSeconds',
+      { code: 'RATE_LIMITED', message: 'm', details: { retryAfterSeconds: -1 } },
+    ],
+    [
+      'fractional retryAfterSeconds',
+      { code: 'RATE_LIMITED', message: 'm', details: { retryAfterSeconds: 0.5 } },
+    ],
+    [
+      'string retryAfterSeconds',
+      { code: 'RATE_LIMITED', message: 'm', details: { retryAfterSeconds: '30' } },
+    ],
+    ['missing retryAfterSeconds', { code: 'RATE_LIMITED', message: 'm', details: {} }],
     [
       'non-finite appErrorCode',
       { code: 'APP_OPERATION_FAILED', message: 'm', details: { app: 'A', appErrorCode: Infinity } },

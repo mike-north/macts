@@ -212,6 +212,9 @@ export interface ErrorDetailsByCode {
         readonly permission: string;
         readonly layer: PolicyLayerName;
     };
+    readonly RATE_LIMITED: {
+        readonly retryAfterSeconds: number;
+    };
     readonly TARGET_NOT_FOUND: {
         readonly resource?: string;
     };
@@ -439,6 +442,8 @@ export interface MactsErrorByCode {
     // (undocumented)
     readonly POLICY_DENIED: PolicyDeniedError;
     // (undocumented)
+    readonly RATE_LIMITED: RateLimitedError;
+    // (undocumented)
     readonly TARGET_NOT_FOUND: TargetNotFoundError;
     // (undocumented)
     readonly TIMEOUT: OperationTimeoutError;
@@ -582,6 +587,14 @@ export interface RangeSelector {
     readonly by: 'range';
     readonly end: Integer;
     readonly start: Integer;
+}
+
+// @public
+export class RateLimitedError extends MactsError<'RATE_LIMITED'> {
+    // (undocumented)
+    readonly code = "RATE_LIMITED";
+    // (undocumented)
+    readonly name = "RateLimitedError";
 }
 
 // @public
