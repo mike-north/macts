@@ -122,6 +122,12 @@ importers:
       '@macts/notes-server':
         specifier: workspace:*
         version: link:../../packages/notes-server
+      '@macts/reminders':
+        specifier: workspace:*
+        version: link:../../packages/reminders
+      '@macts/reminders-server':
+        specifier: workspace:*
+        version: link:../../packages/reminders-server
       '@types/node':
         specifier: ^26.0.0
         version: 26.2.0

@@ -34,6 +34,8 @@ export interface AppPackageOptions {
   readonly contractPermission?: string
   /** The body of `manifest.js`, replacing the valid manifest. */
   readonly manifestSource?: string
+  /** The body of `contract.js`, replacing the valid contract module. */
+  readonly contractSource?: string
   /**
    * Where the app package is installed relative to its host package:
    * `hoisted` beside it, or `nested` in the host package's own `node_modules`.
@@ -158,7 +160,8 @@ export function writeAppPackage(
   writeFileSync(join(dir, 'index.js'), 'export {}\n')
   writeFileSync(
     join(dir, 'contract.js'),
-    contractSource(app, options.contractPermission ?? `${app}:widgets:list`)
+    options.contractSource ??
+      contractSource(app, options.contractPermission ?? `${app}:widgets:list`)
   )
   writeFileSync(join(dir, 'manifest.js'), options.manifestSource ?? validManifestSource(app))
   return dir

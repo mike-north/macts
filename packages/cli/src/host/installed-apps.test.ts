@@ -184,6 +184,26 @@ describe('registerInstalledApps', () => {
     expect(registeredIds()).toEqual(['widgets.widgets.list'])
   })
 
+  it('reports and skips an app whose contract module throws on import, scrubbing the reason', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', {
+      contractSource:
+        "throw new Error('contract init read macts_sk_eyJhbGciOi.import-secret\\nfrom the environment')\n",
+    })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toEqual([
+      {
+        app: 'gadgets',
+        reason:
+          "@macts/gadgets's contract failed to load: contract init read [redacted credential] from the environment",
+      },
+    ])
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+    expect(registeredIds()).toEqual(['widgets.widgets.list'])
+  })
+
   it('never reports a credential in a failure reason', async () => {
     writeInstalledApp(plugins.nodeModules, 'widgets', {
       manifestSource:
