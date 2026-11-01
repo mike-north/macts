@@ -227,3 +227,33 @@ describe('ObjectSpecifier', () => {
     })
   })
 })
+
+describe('ObjectSpecifier embeds names and values as literals', () => {
+  // Bundle ids, element names, selector values, and property keys are emitted
+  // as JSON string literals or bracketed accesses, so none can terminate an
+  // expression and become code.
+  it('JSON-encodes the bundle id and selector values', () => {
+    const spec = ObjectSpecifier.app('com.x"); evil("').collection('calendars').byId('a"b\\c')
+    expect(spec.toGetCode()).toBe('Application("com.x\\"); evil(\\"").calendars.byId("a\\"b\\\\c")')
+  })
+
+  it('JSON-encodes a name selector', () => {
+    const spec = ObjectSpecifier.app('com.apple.iCal').collection('calendars').byName('Work "Q3"')
+    expect(spec.toGetCode()).toBe('Application("com.apple.iCal").calendars.byName("Work \\"Q3\\"")')
+  })
+
+  it('uses bracket access for element and property names that are not plain identifiers', () => {
+    const spec = ObjectSpecifier.app('com.example').collection('odd name').byId('1').property('x-y')
+    expect(spec.toGetCode()).toBe('Application("com.example")["odd name"].byId("1")["x-y"]()')
+  })
+
+  it('uses computed keys for non-identifier and __proto__ property keys', () => {
+    const code = ObjectSpecifier.app('com.example')
+      .collection('items')
+      // JSON.parse creates `__proto__` as an own key; an object literal would not.
+      .toMakeCode(JSON.parse('{"plain":1,"a b":2,"__proto__":3}') as Record<string, unknown>)
+    expect(code).toContain('plain: 1')
+    expect(code).toContain('["a b"]: 2')
+    expect(code).toContain('["__proto__"]: 3')
+  })
+})

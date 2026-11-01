@@ -17,7 +17,7 @@ export interface AppConnection {
  */
 export async function isAppRunning(bundleId: string): Promise<boolean> {
   const code = `
-    var app = Application("${bundleId}");
+    var app = Application(${JSON.stringify(bundleId)});
     return app.running();
   `
   return runJxa<boolean>(code)
@@ -28,7 +28,7 @@ export async function isAppRunning(bundleId: string): Promise<boolean> {
  */
 export async function activateApp(bundleId: string): Promise<undefined> {
   const code = `
-    var app = Application("${bundleId}");
+    var app = Application(${JSON.stringify(bundleId)});
     app.activate();
   `
   await runJxa<undefined>(code)
@@ -40,7 +40,7 @@ export async function activateApp(bundleId: string): Promise<undefined> {
  */
 export async function quitApp(bundleId: string): Promise<undefined> {
   const code = `
-    var app = Application("${bundleId}");
+    var app = Application(${JSON.stringify(bundleId)});
     app.quit();
   `
   await runJxa<undefined>(code)

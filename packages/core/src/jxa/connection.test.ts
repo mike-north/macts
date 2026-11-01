@@ -69,3 +69,13 @@ describe('connect', () => {
     expect(typeof conn.activate).toBe('function')
   })
 })
+
+describe('bundle identifiers are embedded as literals', () => {
+  // Regression: a bundle identifier was interpolated into script source inside
+  // double quotes, so a quote in it ended the literal. It is now a JSON string
+  // literal: the hostile id is just an unknown application, never code.
+  it('treats a bundle id containing quotes as an unknown application', async () => {
+    const hostile = 'com.apple.finder"); return "escaped"; Application("'
+    await expect(isAppRunning(hostile)).rejects.toThrow(JxaExecutionError)
+  })
+})

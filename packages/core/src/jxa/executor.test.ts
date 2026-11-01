@@ -71,6 +71,41 @@ describe('runJxa', () => {
   }, 10000)
 })
 
+// Regression: script text must reach the automation process exactly as
+// composed. It previously passed through a shell whose quoting rewrote some
+// escape sequences, so embedded values containing quotes, backslashes, or
+// newlines could arrive altered. Every value must arrive byte for byte.
+describe('runJxa passes script text verbatim', () => {
+  const payloads: readonly string[] = [
+    'a"+"b',
+    '\\',
+    'back\\slash \\" quote',
+    "single ' quote",
+    "$'ansi' quoting",
+    '$(echo subshell) and `backticks`',
+    'line\nbreak and\ttab',
+    '\\x27 and \\u0022 escapes',
+    'unicode: café ✓ \u2028 separator',
+  ]
+
+  it.each(payloads)('round-trips %j unchanged', async (value) => {
+    const result = await runJxa<string>(`var v = ${JSON.stringify(value)}; return v;`)
+    expect(result).toBe(value)
+  })
+})
+
+describe('runJxa with a script larger than the pipe buffer', () => {
+  // Regression: a process that exits before reading all of stdin made the
+  // pending write fail with EPIPE, which had no listener and crashed the host
+  // process. The call must reject normally instead.
+  it('rejects without crashing when the process is killed mid-write', async () => {
+    const filler = 'x'.repeat(8 * 1024 * 1024)
+    await expect(
+      runJxa(`var pad = ${JSON.stringify(filler)}; delay(2); return 1;`, { timeout: 1 })
+    ).rejects.toThrow(JxaExecutionError)
+  }, 15000)
+})
+
 describe('runWithApp', () => {
   it('should get Calendar app name', async () => {
     const result = await runWithApp<string>('com.apple.iCal', 'return app.name();')
