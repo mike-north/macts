@@ -1,8 +1,9 @@
 /**
  * Cross-system integration tests.
  *
- * Tests that the same @macts/ scoped directory structure can serve both
- * CLI and MCP plugin discovery simultaneously.
+ * Tests that the same @macts/ scoped directory structure serves both CLI
+ * plugin discovery and the MCP hosts, which find installed `@macts/*-server`
+ * packages through `findInstalledServerPackages` (the host registration path).
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
@@ -11,7 +12,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { Project } from 'fixturify-project'
 import { discoverPlugins } from './loader.js'
-import { discoverMcpPlugins } from '@macts/mcp'
+import { findInstalledServerPackages } from './manager.js'
 
 /**
  * Create a plugins Project configured at the right path inside mactsHome.
@@ -118,7 +119,7 @@ describe('cross-system plugin discovery', () => {
     expect(cliResult.plugins[0]?.description).toBe('Test CLI app')
   })
 
-  it('should discover MCP plugins from @macts/*-server packages', async () => {
+  it('should find MCP host packages among @macts/*-server packages only', async () => {
     // CLI plugin (should be ignored by MCP discovery)
     addCliPlugin(
       pluginsProject,
@@ -135,11 +136,7 @@ describe('cross-system plugin discovery', () => {
 
     await pluginsProject.write()
 
-    const mcpResult = await discoverMcpPlugins()
-    expect(mcpResult.errors).toEqual([])
-    expect(mcpResult.plugins).toHaveLength(1)
-    expect(mcpResult.plugins[0]?.name).toBe('test-app')
-    expect(mcpResult.plugins[0]?.description).toBe('Test MCP app')
+    expect(findInstalledServerPackages()).toEqual(['@macts/test-app-server'])
   })
 
   it('should discover both CLI and MCP plugins from shared plugins directory', async () => {
@@ -180,19 +177,13 @@ describe('cross-system plugin discovery', () => {
     const cliCalendar = cliResult.plugins.find((p) => p.name === 'calendar')
     expect(cliCalendar?.description).toBe('Calendar CLI')
 
-    // Discover MCP plugins
-    const mcpResult = await discoverMcpPlugins()
-    expect(mcpResult.errors).toEqual([])
-    expect(mcpResult.plugins).toHaveLength(2)
-    const mcpNames = mcpResult.plugins.map((p) => p.name).sort()
-    expect(mcpNames).toEqual(['calendar', 'contacts'])
-
-    // Verify MCP plugins have correct descriptions
-    const mcpCalendar = mcpResult.plugins.find((p) => p.name === 'calendar')
-    expect(mcpCalendar?.description).toBe('Calendar MCP')
+    // Find the MCP host packages
+    expect(findInstalledServerPackages()).toEqual([
+      '@macts/calendar-server',
+      '@macts/contacts-server',
+    ])
 
     // Verify no cross-contamination
     expect(cliResult.plugins.every((p) => 'commands' in p)).toBe(true)
-    expect(mcpResult.plugins.every((p) => 'tools' in p)).toBe(true)
   })
 })

@@ -1,6 +1,7 @@
 import { Command } from 'clipanion'
 import { readFileSync, existsSync } from 'node:fs'
-import { getPidFile, getSocketPath, discoverMcpPlugins } from '@macts/mcp'
+import { getPidFile, getSocketPath } from '@macts/mcp'
+import { loadInstalledApps } from '../../host/installed-apps.js'
 import { request } from 'node:http'
 import type { Stats } from 'node:fs'
 import { stat } from 'node:fs/promises'
@@ -27,19 +28,28 @@ interface SocketDiagnostics {
   healthCheck: {
     success: boolean
     status?: string
-    plugins?: number
+    /** How many tools the running daemon serves, from its health endpoint. */
+    tools?: number
     error?: string
   }
 }
 
 /**
- * Diagnostic information about MCP plugins.
+ * Diagnostic information about the installed apps an MCP server serves: the
+ * same host registration path `macts --mcp` and `macts mcp serve` load them
+ * through.
  */
-interface PluginDiagnostics {
-  totalFound: number
-  totalErrors: number
-  plugins: { name: string; description: string; tools: number }[]
-  errors: { packageName: string; error: string }[]
+interface AppDiagnostics {
+  /** How many installed apps loaded and can be registered. */
+  totalLoaded: number
+  /** How many installed apps failed to load. */
+  totalFailed: number
+  /** Each loaded app, its host package, and how many operations it serves. */
+  apps: { app: string; hostPackage: string; operations: number }[]
+  /** Each app that failed to load, and why. */
+  failed: { app: string; reason: string }[]
+  /** Each app package installed without the host package that serves it. */
+  missingHost: { app: string; hostPackage: string; installCommand: string }[]
 }
 
 /**
@@ -49,7 +59,7 @@ interface DiagnosticReport {
   timestamp: string
   daemon: DaemonDiagnostics
   socket: SocketDiagnostics
-  plugins: PluginDiagnostics
+  apps: AppDiagnostics
   recommendations: string[]
 }
 
@@ -60,11 +70,8 @@ interface DiagnosticReport {
  * MCP server problems. It checks:
  * - Daemon process status
  * - Socket file and permissions
- * - Plugin loading
+ * - Installed apps
  * - Health endpoint connectivity
- *
- * This command is called automatically by the fast stdio adapter when
- * it encounters errors, providing actionable debugging information.
  */
 export class McpDiagnoseCommand extends Command {
   static override paths = [['mcp', 'diagnose']]
@@ -75,15 +82,13 @@ export class McpDiagnoseCommand extends Command {
       Produces detailed diagnostic information for troubleshooting MCP issues.
 
       This command checks:
+
       - Daemon process status (PID file, running process)
       - Unix socket status (exists, permissions, connectivity)
-      - Plugin discovery (loaded plugins, errors)
+      - Installed apps (loaded apps and their operations, failures)
       - Health endpoint (connectivity, response)
 
       The output includes specific recommendations for fixing any issues found.
-
-      This command is automatically invoked by the fast stdio adapter when
-      it encounters errors connecting to the daemon.
 
       Exit codes:
       - 0: No issues found
@@ -97,7 +102,7 @@ export class McpDiagnoseCommand extends Command {
       timestamp: new Date().toISOString(),
       daemon: this.checkDaemon(),
       socket: await this.checkSocket(),
-      plugins: await this.checkPlugins(),
+      apps: await this.checkApps(),
       recommendations: [],
     }
 
@@ -191,7 +196,7 @@ export class McpDiagnoseCommand extends Command {
       diagnostics.healthCheck = {
         success: true,
         status: health.status,
-        plugins: health.plugins,
+        tools: health.tools,
       }
     } catch (error) {
       diagnostics.healthCheck = {
@@ -204,22 +209,24 @@ export class McpDiagnoseCommand extends Command {
   }
 
   /**
-   * Check plugin discovery status.
+   * Check which installed apps load, through the host registration path.
    */
-  private async checkPlugins(): Promise<PluginDiagnostics> {
-    const { plugins, errors } = await discoverMcpPlugins()
+  private async checkApps(): Promise<AppDiagnostics> {
+    const { loaded, failed, missingHost } = await loadInstalledApps()
 
     return {
-      totalFound: plugins.length,
-      totalErrors: errors.length,
-      plugins: plugins.map((p) => ({
-        name: p.name,
-        description: p.description,
-        tools: p.tools.length,
+      totalLoaded: loaded.length,
+      totalFailed: failed.length,
+      apps: loaded.map(({ app, hostPackage, contract }) => ({
+        app,
+        hostPackage,
+        operations: Object.keys(contract.operations).length,
       })),
-      errors: errors.map((e) => ({
-        packageName: e.packageName,
-        error: e.message,
+      failed: failed.map(({ app, reason }) => ({ app, reason })),
+      missingHost: missingHost.map(({ app, hostPackage, installCommand }) => ({
+        app,
+        hostPackage,
+        installCommand,
       })),
     }
   }
@@ -227,7 +234,7 @@ export class McpDiagnoseCommand extends Command {
   /**
    * Perform health check on daemon.
    */
-  private async healthCheck(socketPath: string): Promise<{ status: string; plugins: number }> {
+  private async healthCheck(socketPath: string): Promise<{ status: string; tools: number }> {
     return new Promise((resolve, reject) => {
       const req = request(
         {
@@ -245,7 +252,7 @@ export class McpDiagnoseCommand extends Command {
 
           res.on('end', () => {
             try {
-              const json = JSON.parse(data) as { status: string; plugins: number }
+              const json = JSON.parse(data) as { status: string; tools: number }
               resolve(json)
             } catch (_error) {
               reject(new Error(`Invalid health response: ${data}`))
@@ -290,30 +297,37 @@ export class McpDiagnoseCommand extends Command {
       )
     }
 
-    // Check plugin status
-    if (diagnostics.plugins.totalFound === 0 && diagnostics.plugins.totalErrors === 0) {
+    // Check installed apps
+    const { apps } = diagnostics
+    if (apps.totalLoaded === 0 && apps.totalFailed === 0 && apps.missingHost.length === 0) {
       recommendations.push(
-        'No MCP plugins found. Install plugins with: macts plugin install <package>'
+        "No apps are installed. Install an app's server package with: macts mcp install <app>"
       )
     }
 
-    if (diagnostics.plugins.totalErrors > 0) {
+    if (apps.totalFailed > 0) {
       recommendations.push(
-        `${String(diagnostics.plugins.totalErrors)} plugin(s) failed to load. Check plugin installation and compatibility.`
+        `${String(apps.totalFailed)} app(s) failed to load. Reinstall them with: macts mcp install <app>`
       )
-      for (const error of diagnostics.plugins.errors) {
-        recommendations.push(`  - ${error.packageName}: ${error.error}`)
+      for (const { app, reason } of apps.failed) {
+        recommendations.push(`  - ${app}: ${reason}`)
       }
     }
 
-    // Check for running but no plugins loaded
+    for (const { app, hostPackage, installCommand } of apps.missingHost) {
+      recommendations.push(
+        `${app} is installed without ${hostPackage}. Install it with: ${installCommand}`
+      )
+    }
+
+    // Check for a running daemon that serves nothing
     if (
       diagnostics.daemon.processRunning &&
       diagnostics.socket.healthCheck.success &&
-      diagnostics.socket.healthCheck.plugins === 0
+      diagnostics.socket.healthCheck.tools === 0
     ) {
       recommendations.push(
-        'Daemon is running but no plugins are loaded. Install plugins or check plugin discovery.'
+        "Daemon is running but serves no tools. Install an app's server package and restart it."
       )
     }
 

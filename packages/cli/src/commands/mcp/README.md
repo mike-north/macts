@@ -1,29 +1,31 @@
 # MCP Daemon Management Commands
 
 This directory contains CLI commands for managing the MCP daemon server and the
-MCP server plugins it exposes.
+app server packages (`@macts/<app>-server`) whose operations it serves as
+tools.
 
 ## Happy Path
 
 ```bash
-# 1. Install an app's MCP server plugin (@macts/<app>-server) into ~/.macts/plugins/
+# 1. Install an app's server package (@macts/<app>-server) into ~/.macts/plugins/
 macts mcp install calendar
 
-# 2. (Re)start the daemon so it discovers and exposes the new tools
+# 2. (Re)start the daemon so it registers the app and serves its tools
 macts mcp start
 
-# 3. Point your MCP client at the daemon — the app's tools are now available
+# 3. Point your MCP client at the daemon, sending a macts API key as
+#    `Authorization: Bearer <key>` (create one with `macts api-key create`)
 ```
 
 The install location is `~/.macts/plugins/` (override with the `MACTS_HOME`
-environment variable). The daemon discovers every installed
-`@macts/<app>-server` package there automatically.
+environment variable). When it starts, the daemon registers every installed
+`@macts/<app>-server` package there from its generated contract.
 
 ## Commands
 
 ### `macts mcp install`
 
-Install an app's MCP server plugin so the daemon exposes its tools.
+Install an app's server package so the daemon serves its tools.
 
 **Arguments:**
 
@@ -52,7 +54,7 @@ macts mcp install calendar@1.0.0
 
 - Resolves the app name to the `@macts/<app>-server` package
 - Installs into `~/.macts/plugins/` via `npm install --ignore-scripts`
-- Invalidates the plugin cache so discovery picks up the change
+- Invalidates the CLI's plugin cache
 - Returns exit code 0 on success, 1 on failure (invalid name, npm error)
 
 > After installing, restart the daemon (`macts mcp start`) so it exposes the new
@@ -60,7 +62,7 @@ macts mcp install calendar@1.0.0
 
 ### `macts mcp uninstall`
 
-Remove an app's MCP server plugin.
+Remove an app's server package.
 
 **Arguments:**
 
@@ -74,8 +76,8 @@ macts mcp uninstall calendar
 
 ### `macts mcp list`
 
-List installed MCP server plugins (the `@macts/<app>-server` packages the daemon
-discovers).
+List installed app server packages (the `@macts/<app>-server` packages the
+daemon registers).
 
 **Options:**
 
@@ -95,7 +97,6 @@ Start the MCP daemon server in the foreground. Useful for development and debugg
 
 - `--port <number>` - TCP port to listen on (instead of Unix socket)
 - `--socket <path>` - Custom Unix socket path (default: `~/.macts/mcp.sock`)
-- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Usage:**
 
@@ -108,20 +109,17 @@ macts mcp serve --port 3000
 
 # Use custom socket path
 macts mcp serve --socket /tmp/my-mcp.sock
-
-# Start without API key validation (not recommended)
-macts mcp serve --disable-api-key-validation
 ```
 
 **Behavior:**
 
-- Discovers and loads all installed MCP plugins
+- Builds the runtime and registers every installed app from its generated contract, exactly as `macts --mcp` does, and serves each operation as a tool, plus the capability-discovery tool
+- Reports the apps it serves, and any it cannot with the reason, on stderr
 - Starts the MCP HTTP transports (streamable HTTP at `/mcp`, legacy SSE at `/sse` + `/message`) on Unix socket or TCP port
-- Requires `Authorization: Bearer macts_sk_...` on every route except `GET /health`, unless `--disable-api-key-validation` is passed
-- Logs whether API key validation is enabled or disabled to stderr on startup
+- Requires `Authorization: Bearer macts_sk_...` on every route except `GET /health`, and runs every tool call under the key of the request that carried it
 - Runs in foreground (use Ctrl+C to stop)
 - Logs output to stderr
-- Returns exit code 1 if no plugins found or startup fails
+- Returns exit code 1 if startup fails
 
 ### `macts mcp start`
 
@@ -131,7 +129,6 @@ Start the MCP daemon server in the background as a detached process.
 
 - `--port <number>` - TCP port to listen on
 - `--socket <path>` - Custom Unix socket path
-- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Usage:**
 
@@ -141,14 +138,11 @@ macts mcp start
 
 # Start on TCP port
 macts mcp start --port 3000
-
-# Start without API key validation (not recommended)
-macts mcp start --disable-api-key-validation
 ```
 
 **Behavior:**
 
-- Spawns `mcp serve` as detached background process, forwarding `--disable-api-key-validation` when passed
+- Spawns `mcp serve` as detached background process
 - Checks for existing daemon (fails if already running)
 - Removes stale PID files automatically
 - Writes PID to `~/.macts/mcp.pid`
@@ -196,7 +190,7 @@ macts mcp status --json
 - Checks if PID file exists
 - Verifies process is running
 - Tests health endpoint connectivity
-- Reports number of loaded plugins
+- Reports the number of tools the daemon serves
 - Returns exit code 0 if running and healthy, 1 otherwise
 
 **JSON Output:**
@@ -208,7 +202,7 @@ macts mcp status --json
   "endpoint": "/Users/you/.macts/mcp.sock",
   "health": {
     "status": "ok",
-    "plugins": 3
+    "tools": 42
   }
 }
 ```
@@ -227,7 +221,7 @@ macts mcp diagnose
 
 - Checks daemon process status (PID file, running process)
 - Checks Unix socket status (exists, permissions, connectivity)
-- Discovers and reports plugin loading status
+- Loads every installed app and reports which register, which fail and why, and which are installed without their server package
 - Tests health endpoint
 - Generates actionable recommendations
 - Always outputs JSON to stdout
@@ -255,14 +249,15 @@ macts mcp diagnose
     "healthCheck": {
       "success": true,
       "status": "ok",
-      "plugins": 3
+      "tools": 42
     }
   },
-  "plugins": {
-    "totalFound": 3,
-    "totalErrors": 0,
-    "plugins": [{ "packageName": "@macts/calendar-server", "version": "1.0.0", "tools": 5 }],
-    "errors": []
+  "apps": {
+    "totalLoaded": 1,
+    "totalFailed": 0,
+    "apps": [{ "app": "calendar", "hostPackage": "@macts/calendar-server", "operations": 41 }],
+    "failed": [],
+    "missingHost": []
   },
   "recommendations": []
 }
@@ -270,13 +265,19 @@ macts mcp diagnose
 
 ## Error Handling
 
-### No Plugins Found
+### No Apps Installed
 
-If no MCP plugins are installed, `mcp serve` will fail with:
+`mcp serve` starts even when no app is installed; it serves only the
+capability-discovery tool and reports `Serving 0 app(s)` on stderr. Install an
+app with `macts mcp install <app>` and restart the daemon.
 
-```
-No MCP plugins found. Install plugins with: macts plugin install
-```
+### Requests Refused With 401
+
+Every route except `GET /health` needs `Authorization: Bearer macts_sk_...`. A
+request without a usable key is refused with `401` and a structured
+`UNAUTHENTICATED` error whose `details.reason` says why (`missing`,
+`malformed`, `invalid`, `expired`, or `revoked`). Create a key with
+`macts api-key create --name <name> --permission <app:resource:operation>`.
 
 ### Port/Socket Already in Use
 
@@ -300,25 +301,36 @@ Use `macts mcp stop` to stop it first.
 The `start` and `stop` commands automatically detect and handle stale PID files
 (when PID file exists but process is not running).
 
-## Integration with Fast Stdio Adapter
+## Connecting a Stdio MCP Client
 
-The `mcp diagnose` command is designed to be called automatically by the fast
-stdio adapter when it encounters errors connecting to the daemon. This provides
-users with actionable debugging information without manual intervention.
+The daemon speaks HTTP only. An MCP client that talks over stdio starts its own
+server with `macts --mcp` instead, with its key in `MACTS_API_KEY`:
+
+```json
+{
+  "mcpServers": {
+    "macts": {
+      "command": "macts",
+      "args": ["--mcp"],
+      "env": { "MACTS_API_KEY": "macts_sk_..." }
+    }
+  }
+}
+```
 
 ## Testing
 
 Tests are located in:
 
 - `commands.test.ts` - Command registration and basic functionality
-- `serve.test.ts` - Serve command with plugin discovery mocking
+- `serve.test.ts` - Serve command, against a temporary macts home holding real installed apps
 
 Tests focus on:
 
 - Command registration and path validation
 - Option parsing
 - Error handling
-- Plugin discovery integration
+- App registration from installed server packages
 - JSON output structure
 
 ## Implementation Notes
@@ -352,7 +364,7 @@ The daemon handles SIGINT and SIGTERM for graceful shutdown:
 The daemon exposes `/health` endpoint:
 
 - Method: GET
-- Response: `{ "status": "ok", "plugins": <count> }`
+- Response: `{ "status": "ok", "tools": <count> }`
 - Used by `status` and `diagnose` commands
 - Connects via Unix socket or TCP
 
@@ -364,4 +376,4 @@ Potential improvements:
 - Systemd/launchd integration for auto-start
 - Daemon restart command
 - Performance metrics endpoint
-- Plugin hot-reload without restart
+- Registering newly installed apps without a restart

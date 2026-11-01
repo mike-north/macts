@@ -4,6 +4,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { getPidFile, getSocketPath } from '@macts/mcp'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { warnIfRemovedTrustSwitchSet } from '../../removed-options.js'
 
 /**
  * Start MCP server in background.
@@ -16,11 +17,13 @@ export class McpStartCommand extends Command {
   static override paths = [['mcp', 'start']]
 
   static override usage = Command.Usage({
-    description: 'Start MCP server in background',
+    description: 'Start the MCP HTTP server in background',
     details: `
-      Starts the MCP daemon server as a background process.
+      Starts the MCP daemon server ('macts mcp serve') as a background
+      process.
 
       The server will:
+
       - Run detached from the terminal
       - Continue running after terminal closes
       - Write logs to ~/.macts/mcp.log
@@ -29,25 +32,23 @@ export class McpStartCommand extends Command {
       Use 'macts mcp stop' to stop the server.
       Use 'macts mcp status' to check if it's running.
 
-      By default, every route except GET /health requires a valid
-      MACTS_API_KEY (as a Bearer token). Pass --disable-api-key-validation
-      to skip this check (not recommended).
+      Every route except GET /health requires an API key as a Bearer token
+      (Authorization: Bearer macts_sk_...). Every tool call runs under the
+      key of the request that carried it. Create a key with
+      'macts api-key create --name <name> --permission <app:resource:operation>'.
     `,
     examples: [
       ['Start on default Unix socket', '$0 mcp start'],
       ['Start on TCP port', '$0 mcp start --port 3000'],
       ['Use custom socket path', '$0 mcp start --socket /tmp/mcp.sock'],
-      ['Start without API key validation', '$0 mcp start --disable-api-key-validation'],
     ],
   })
 
   port = Option.String('--port', { description: 'TCP port to listen on' })
   socket = Option.String('--socket', { description: 'Unix socket path' })
-  disableApiKeyValidation = Option.Boolean('--disable-api-key-validation', false, {
-    description: 'Skip API key validation on all daemon routes (not recommended)',
-  })
 
   async execute(): Promise<number> {
+    warnIfRemovedTrustSwitchSet(process.env, this.context.stderr)
     const pidFile = getPidFile()
 
     // Check if daemon is already running
@@ -85,9 +86,6 @@ export class McpStartCommand extends Command {
     }
     if (this.socket !== undefined) {
       args.push('--socket', this.socket)
-    }
-    if (this.disableApiKeyValidation) {
-      args.push('--disable-api-key-validation')
     }
 
     // Spawn daemon process

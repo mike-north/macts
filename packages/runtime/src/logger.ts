@@ -34,6 +34,19 @@ export function isPrettyTransportAvailable(
 let logger: pino.Logger | null = null
 
 /**
+ * The stream a logger writes to.
+ *
+ * @remarks
+ * `stdout` is the default. `stderr` is for a process whose standard output is
+ * a protocol channel, such as an MCP server on the stdio transport, where any
+ * log line on stdout would corrupt the protocol stream.
+ */
+export type LogDestination = 'stdout' | 'stderr'
+
+/** The file descriptor of each {@link LogDestination}. */
+const DESTINATION_FD: Readonly<Record<LogDestination, 1 | 2>> = { stdout: 1, stderr: 2 }
+
+/**
  * Create a new Pino logger instance.
  *
  * In development (NODE_ENV !== 'production'), uses pino-pretty for
@@ -41,13 +54,19 @@ let logger: pino.Logger | null = null
  * production, outputs structured JSON.
  *
  * @param options - Pino logger options to merge with defaults
+ * @param destination - The stream every line is written to, pretty-printed
+ *   or not. Defaults to `stdout`.
  * @returns Configured Pino logger
  */
-export function createLogger(options?: pino.LoggerOptions): pino.Logger {
+export function createLogger(
+  options?: pino.LoggerOptions,
+  destination: LogDestination = 'stdout'
+): pino.Logger {
   const opts: pino.LoggerOptions = {
     level: process.env['LOG_LEVEL'] ?? 'info',
     ...options,
   }
+  const fd = DESTINATION_FD[destination]
 
   // Use pino-pretty in development, when it is installed
   if (process.env['NODE_ENV'] !== 'production' && isPrettyTransportAvailable()) {
@@ -55,12 +74,15 @@ export function createLogger(options?: pino.LoggerOptions): pino.Logger {
       ...opts,
       transport: {
         target: 'pino-pretty',
-        options: { colorize: true },
+        options: { colorize: true, destination: fd },
       },
     })
   }
 
-  return pino(opts)
+  // Pino's own default stream is stdout; only a redirected logger needs one.
+  return destination === 'stdout'
+    ? pino(opts)
+    : pino(opts, pino.destination({ dest: fd, sync: true }))
 }
 
 /**

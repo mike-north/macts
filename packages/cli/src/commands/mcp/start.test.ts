@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { Cli } from 'clipanion'
 import { McpStartCommand } from './start.js'
 import { createMockStreams } from './test-helpers.js'
+import { MactsCli, REMOVED_TRUST_SWITCH_HINT } from '../../removed-options.js'
 
 // Mock modules before imports
 vi.mock('node:fs', async () => {
@@ -203,42 +204,24 @@ describe('McpStartCommand', () => {
       expect(getStdout()).toContain('/custom/path.sock')
     })
 
-    it('should append --disable-api-key-validation to spawned args when flag is set', async () => {
-      const { stdout, stderr } = createMockStreams()
+    it('refuses the removed --disable-api-key-validation option with the replacement, spawning nothing', async () => {
+      const { stdout, stderr, getStdout } = createMockStreams()
+      const mactsCli = new MactsCli({ binaryLabel: 'macts', binaryName: 'macts' })
+      mactsCli.register(McpStartCommand)
 
-      const mockChild = {
-        unref: vi.fn(),
-      }
-      vi.mocked(childProcess.spawn).mockReturnValue(mockChild as never)
-
-      let pidCheckCount = 0
-      vi.mocked(fs.existsSync).mockImplementation((path) => {
-        if (path === '/tmp/test-mcp.pid') {
-          pidCheckCount++
-          return pidCheckCount > 1
-        }
-        return true
-      })
-
-      vi.mocked(fs.readFileSync).mockReturnValue('5678')
-
-      const exitCode = await cli.run(['mcp', 'start', '--disable-api-key-validation'], {
+      const exitCode = await mactsCli.run(['mcp', 'start', '--disable-api-key-validation'], {
         stdout,
         stderr,
       })
 
-      expect(exitCode).toBe(0)
-      expect(childProcess.spawn).toHaveBeenCalledWith(
-        process.execPath,
-        expect.arrayContaining(['mcp', 'serve', '--disable-api-key-validation']) as string[],
-        expect.objectContaining({
-          detached: true,
-          stdio: 'ignore',
-        })
-      )
+      expect(exitCode).toBe(1)
+      // Clipanion reports command-line errors on stdout.
+      expect(getStdout()).toContain('Unsupported option name ("--disable-api-key-validation")')
+      expect(getStdout()).toContain(REMOVED_TRUST_SWITCH_HINT)
+      expect(childProcess.spawn).not.toHaveBeenCalled()
     })
 
-    it('should not include --disable-api-key-validation in spawned args by default', async () => {
+    it('spawns exactly `mcp serve` when no option is given', async () => {
       const { stdout, stderr } = createMockStreams()
 
       const mockChild = {
@@ -261,7 +244,7 @@ describe('McpStartCommand', () => {
 
       expect(exitCode).toBe(0)
       const spawnArgs = vi.mocked(childProcess.spawn).mock.calls[0]?.[1] as string[]
-      expect(spawnArgs).not.toContain('--disable-api-key-validation')
+      expect(spawnArgs.slice(1)).toEqual(['mcp', 'serve'])
     })
 
     it('should handle missing binary path', async () => {

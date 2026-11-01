@@ -1,20 +1,32 @@
 import { Command, Option } from 'clipanion'
-import {
-  createMcpServer,
-  discoverMcpPlugins,
-  createDiscoveryTool,
-  type McpPlugin,
-} from '@macts/mcp'
+import { startStdioServer } from '@macts/mcp'
 import { createMultiServer, DEFAULT_PORT } from '@macts/api/server'
-import { loadCapabilityRegistry } from '@macts/core'
-import { resolveManifestsDir } from './capabilities/registry.js'
-import { loadActiveGovernanceFilter } from './capabilities/policy.js'
-import { resolveExecutor, type ResolvedExecutor } from '../host/executor.js'
+import { createBearerCredential, createLogger, setLogger } from '@macts/runtime'
+import { resolveExecutor } from '../host/executor.js'
 import {
   loadInstalledApps,
   registerInstalledApps,
   type AppRegistrationReport,
 } from '../host/installed-apps.js'
+import { createMcpHost } from '../host/mcp-host.js'
+import { writeAppRegistrationReport, writeExecutorWarning } from '../host/startup-report.js'
+import { warnIfRemovedTrustSwitchSet } from '../removed-options.js'
+
+/** The environment variable holding the API key `macts --mcp` presents on every call. */
+export const MCP_API_KEY_ENV = 'MACTS_API_KEY'
+
+/**
+ * Why `macts --mcp` refuses to start without a key, and how to get one.
+ *
+ * @remarks
+ * Fixed text: it never echoes anything from the environment.
+ */
+export const MISSING_MCP_API_KEY_MESSAGE = [
+  `${MCP_API_KEY_ENV} is not set. Every MCP tool call is verified by this key.`,
+  'Create a local key with:',
+  '  macts api-key create --name <name> --permission <app:resource:operation>',
+  `Then set it as ${MCP_API_KEY_ENV} in the environment the MCP client starts \`macts --mcp\` with.`,
+].join('\n')
 
 /**
  * Root command that handles global flags like --mcp and --serve.
@@ -28,49 +40,40 @@ export class RootCommand extends Command {
   static override usage = Command.Usage({
     description: 'macOS application automation CLI',
     details: `
-      macts provides command-line access to macOS application automation.
-
-      Use subcommands to interact with specific applications:
-        macts calendar calendars list
-        macts calendar events create --summary "Meeting"
+      macts provides command-line access to macOS application automation. Use
+      subcommands to interact with specific applications, for example
+      'macts calendar calendars list'.
 
       Special modes:
-        --mcp      Start as an MCP server (for AI assistants)
-        --serve    Start HTTP server for remote access to installed apps
 
-      Serve Mode:
-        The HTTP server serves every app whose server package is installed
-        in ~/.macts/plugins/, and reports at startup any app it cannot serve.
-        Install an app's server package with:
-          macts mcp install calendar
+      - --mcp starts an MCP server on stdio (for AI assistants)
+      - --serve starts an HTTP server for remote access to installed apps
 
-      MCP Mode:
-        The MCP server exposes automation tools for AI assistants via the
-        Model Context Protocol. Install an app's MCP server plugin with:
-          macts mcp install calendar
+      Both serve every app whose server package is installed in
+      ~/.macts/plugins/, and report at startup, on stderr for --mcp, any app
+      they cannot serve. Install an app's server package with
+      'macts mcp install calendar'.
 
-        The MCP server discovers plugins from ~/.macts/plugins/ automatically.
+      In --mcp mode, macts serves each installed app's operations as MCP
+      tools, plus a built-in capability-discovery tool. Every tool call is verified by the
+      API key in MACTS_API_KEY, with the same permissions and governance
+      policy as the HTTP API. Create a key with
+      'macts api-key create --name <name> --permission <app:resource:operation>'.
 
-        By default, the MCP server requires a valid MACTS_API_KEY environment
-        variable at startup. Create one with:
-          macts api-key create --name <name> --permission <app:resource:operation>
-        Pass --disable-api-key-validation to skip this check (not recommended).
+      To serve MCP over HTTP instead, use 'macts mcp serve' or
+      'macts mcp start'; each request then presents its own key as a Bearer
+      token.
     `,
     examples: [
       ['List available commands', '$0 --help'],
-      ['Start MCP server', '$0 --mcp'],
-      ['Start MCP server without API key validation', '$0 --mcp --disable-api-key-validation'],
-      ['Install an app MCP server plugin', '$0 mcp install calendar'],
+      ['Start MCP server on stdio', 'MACTS_API_KEY=macts_sk_... $0 --mcp'],
+      ['Install an app server package', '$0 mcp install calendar'],
       ['Start HTTP server on port 8080', '$0 --serve --port 8080'],
     ],
   })
 
   mcp = Option.Boolean('--mcp', {
-    description: 'Start as an MCP (Model Context Protocol) server',
-  })
-
-  disableApiKeyValidation = Option.Boolean('--disable-api-key-validation', false, {
-    description: 'Skip MACTS_API_KEY validation at MCP server startup (not recommended)',
+    description: 'Start an MCP (Model Context Protocol) server on stdio',
   })
 
   serve = Option.Boolean('--serve', {
@@ -107,73 +110,44 @@ export class RootCommand extends Command {
     return Promise.resolve(0)
   }
 
+  /**
+   * Serve every installed app's operations, and the discovery tool, as MCP
+   * tools over stdio.
+   *
+   * @remarks
+   * Every call runs through the runtime under the key in `MACTS_API_KEY`,
+   * which is verified on every call, so a key revoked during the session is
+   * refused on its next call. Stdout is the MCP channel: every diagnostic,
+   * and every runtime log line, goes to stderr.
+   */
   private async runMcpServer(): Promise<number> {
-    // Discover MCP plugins from ~/.macts/plugins/
-    const { plugins, errors } = await discoverMcpPlugins()
+    const stderr = this.context.stderr
+    // Anything logged on stdout would corrupt the protocol stream.
+    setLogger(createLogger({}, 'stderr'))
+    warnIfRemovedTrustSwitchSet(process.env, stderr)
 
-    // Log errors to stderr (stdout is for MCP protocol)
-    for (const error of errors) {
-      this.context.stderr.write(`Plugin load error: ${error.packageName}: ${error.message}\n`)
-    }
-
-    // Build the built-in capability-discovery plugin from the manifests
-    // directory, so agents can search/inspect typed capabilities without every
-    // app plugin being installed. The discovery tool degrades gracefully: if no
-    // manifests directory is found, it is simply omitted.
-    const discoveryPlugins = await this.buildDiscoveryPlugins()
-
-    const allPlugins = [...discoveryPlugins, ...plugins]
-
-    // Log plugin count to stderr for debugging
-    this.context.stderr.write(`Starting MCP server with ${String(allPlugins.length)} plugin(s)\n`)
-
-    try {
-      // Start MCP server on stdio
-      // This will run until stdin closes
-      await createMcpServer(allPlugins, { disableApiKeyValidation: this.disableApiKeyValidation })
-      return 0
-    } catch (error) {
-      // Startup validation errors (e.g. missing/invalid MACTS_API_KEY) carry
-      // an actionable, remediation-bearing message and no useful stack trace
-      // for operators, so print only the message, not the stack.
-      const message = error instanceof Error ? error.message : String(error)
-      this.context.stderr.write(`Failed to start MCP server: ${message}\n`)
+    const apiKey = process.env[MCP_API_KEY_ENV]
+    if (apiKey === undefined || apiKey.trim() === '') {
+      stderr.write(`Failed to start MCP server: ${MISSING_MCP_API_KEY_MESSAGE}\n`)
       return 1
     }
-  }
+    const credential = createBearerCredential(apiKey)
 
-  /**
-   * Build the built-in capability-discovery plugin (a single discovery tool)
-   * from the auto-detected manifests directory. Returns an empty array when no
-   * manifests directory can be located, so the server still starts.
-   */
-  private async buildDiscoveryPlugins(): Promise<McpPlugin[]> {
-    const manifestsDir = resolveManifestsDir()
-    if (!manifestsDir) {
-      this.context.stderr.write(
-        'No manifests directory found; capability-discovery tool disabled.\n'
+    try {
+      const host = await createMcpHost({ env: process.env, diagnostics: stderr })
+      await startStdioServer({ adapter: host.adapter, credential })
+      stderr.write(
+        `MCP server running on stdio with ${String(host.adapter.listTools().length)} tool(s)\n`
       )
-      return []
+      // The process now runs until the client closes stdin.
+      return 0
+    } catch (error) {
+      // Startup failures carry an actionable message and no stack trace an
+      // operator needs, so print only the message.
+      const message = error instanceof Error ? error.message : String(error)
+      stderr.write(`Failed to start MCP server: ${message}\n`)
+      return 1
     }
-
-    const [{ registry, errors }, governance] = await Promise.all([
-      loadCapabilityRegistry(manifestsDir),
-      loadActiveGovernanceFilter(this.context.stderr),
-    ])
-    for (const error of errors) {
-      this.context.stderr.write(`Manifest load error: ${error.app}: ${error.message}\n`)
-    }
-
-    // Pass the real policy-backed governance filter into the discovery tool
-    // so the MCP surface honours the same policy as CLI capabilities search.
-    const discoveryTool = createDiscoveryTool({ registry, governance })
-    return [
-      {
-        name: 'capabilities',
-        description: 'Built-in macts capability discovery',
-        tools: [discoveryTool],
-      },
-    ]
   }
 
   private async runHttpServer(): Promise<number> {
@@ -182,9 +156,7 @@ export class RootCommand extends Command {
     try {
       const resolved = resolveExecutor(process.env)
       const { executor } = resolved
-      if (resolved.warning !== undefined) {
-        this.context.stderr.write(`${resolved.warning}\n`)
-      }
+      writeExecutorWarning(this.context.stderr, resolved)
 
       // Load first (asynchronous), then register on the server's runtime while
       // it is constructed, so every registered app is routed.
@@ -206,7 +178,7 @@ export class RootCommand extends Command {
         ...(tls && { tls }),
       })
 
-      this.writeStartupReport(report, resolved)
+      writeAppRegistrationReport(this.context.stdout, report, resolved)
 
       await server.start()
 
@@ -250,44 +222,6 @@ export class RootCommand extends Command {
       const message = error instanceof Error ? error.message : String(error)
       this.context.stderr.write(`Failed to start HTTP server: ${message}\n`)
       return 1
-    }
-  }
-
-  /**
-   * Print which installed apps are served, which are not and why, and which
-   * are installed without their server package. The executor's provider is
-   * printed whenever it is not the native one.
-   */
-  private writeStartupReport(report: AppRegistrationReport, resolved: ResolvedExecutor): void {
-    const out = this.context.stdout
-    if (report.registered.length > 0) {
-      out.write(`Serving ${String(report.registered.length)} app(s):\n`)
-      for (const { app } of report.registered) {
-        out.write(`  ${app}\n`)
-      }
-    } else if (report.failed.length === 0 && report.missingHost.length === 0) {
-      out.write(
-        'No apps are installed, so no operations are served. Use `macts mcp install <app>` to add one.\n'
-      )
-    } else {
-      out.write('No apps are served.\n')
-    }
-    if (report.failed.length > 0) {
-      out.write(`Not serving ${String(report.failed.length)} app(s) that failed to register:\n`)
-      for (const { app, reason } of report.failed) {
-        out.write(`  ${app}: ${reason}\n`)
-      }
-    }
-    if (report.missingHost.length > 0) {
-      out.write(
-        `Not serving ${String(report.missingHost.length)} app(s) installed without their server package:\n`
-      )
-      for (const { app, hostPackage, installCommand } of report.missingHost) {
-        out.write(`  ${app}: install ${hostPackage} with \`${installCommand}\`\n`)
-      }
-    }
-    if (resolved.kind !== 'native') {
-      out.write(`Executor: ${resolved.executor.provider}\n`)
     }
   }
 }

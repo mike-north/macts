@@ -13,8 +13,7 @@
   },
   "type": "module",
   "bin": {
-    "macts": "./dist/bin.js",
-    "macts-mcp-stdio": "./scripts/macts-mcp-stdio.sh"
+    "macts": "./dist/bin.js"
   },
   "exports": {
     ".": {
@@ -25,8 +24,7 @@
   "main": "./dist/index.js",
   "types": "./dist/cli.d.ts",
   "files": [
-    "dist",
-    "scripts"
+    "dist"
   ],
   "engines": {
     "node": ">=22.13.0"

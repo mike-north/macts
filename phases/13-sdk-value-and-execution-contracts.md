@@ -455,7 +455,7 @@ construction.
 @macts/sdk         "."  → contracts only      "./local" → runtime
    ↑
 @macts/api         HTTP adapter (remote service) and transfer endpoints → runtime
-@macts/mcp         stdio / HTTP MCP adapter → runtime, types
+@macts/mcp         stdio / HTTP MCP adapter → runtime
 @macts/cli         → sdk, runtime (key administration), api, mcp
 
 @macts/types       plugin registration descriptions (unchanged; no @macts deps)
@@ -463,8 +463,8 @@ construction.
 @macts/<app>-server  generated adapter registration → api, mcp, @macts/<app>
 ```
 
-The graph is acyclic. `@macts/mcp` stops depending on `@macts/api`; it imports
-only `validateApiKey` today, which moves to the runtime.
+The graph is acyclic. `@macts/mcp` does not depend on `@macts/api`: key
+verification comes from the runtime's credential verifier.
 
 **Who owns what.**
 
@@ -982,8 +982,11 @@ Defined in `@macts/contracts` (`invocation/`):
   or the remote `Authorization` header.
 - **`InvocationContext`** — `{ credential, signal?, correlationId? }`. One per
   invocation. The client holds the credential from factory options and attaches
-  it to every call. MCP adapters attach the credential configured for the
-  session to every tool call; they no longer rely on a startup-only check.
+  it to every call. MCP adapters attach a credential to every tool call and
+  never rely on a startup-only check. Over stdio (`macts --mcp`) it is the key
+  configured for the session; over HTTP (the MCP server of `macts mcp serve`
+  and `macts mcp start`) it is the bearer token of the request that carried
+  the call, threaded into `invoke`, so each caller is governed by its own key.
 - **`Authority`** — `{ subject, displayName?, permissions, expiresAt? }`. This
   is what verification derives. `subject` is today's `apiKeyPayload.sub` and is
   the sole audit attribution key. An `Authority` never holds the secret.
@@ -1046,17 +1049,18 @@ forgot to supply. Missing and malformed configuration are treated differently:
   fail-closed rule above.
 
 **Registering installed apps.** Every macts host on this Mac (`macts --serve`,
-`macts --mcp`) registers the installed apps' generated contracts through one
-host registration function, so every surface validates calls against the same
-descriptors. The function finds each installed host package
-(`@macts/<app>-server`) in the plugins directory, resolves the app's contract
-(`@macts/<app>/contract`) from the host package's own location, validates the
-manifest the contract loads, and calls `registerContract(contract, manifest)`.
-An app that fails to load or register is reported with its reason and skipped,
-and the other apps still register. An app installed without its host package
-is reported at startup, with the command that installs it. Manifest
-registration (`registerManifest`) remains for embedders and tests; it runs
-passthrough descriptors, validated by each command's request schema.
+`macts --mcp`, and the MCP server of `macts mcp serve`) registers the installed
+apps' generated contracts through one host registration function, so every
+surface validates calls against the same descriptors. The function finds each
+installed host package (`@macts/<app>-server`) in the plugins directory,
+resolves the app's contract (`@macts/<app>/contract`) from the host package's
+own location, validates the manifest the contract loads, and calls
+`registerContract(contract, manifest)`. An app that fails to load or register is
+reported with its reason and skipped, and the other apps still register. An app
+installed without its host package is reported at startup, with the command that
+installs it. Manifest registration (`registerManifest`) remains for embedders
+and tests; it runs passthrough descriptors, validated by each command's request
+schema.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 

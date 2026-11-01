@@ -3,7 +3,7 @@
  * CLI entry point
  */
 
-import { Cli, Builtins } from 'clipanion'
+import { Builtins } from 'clipanion'
 import { GenerateCommand } from './commands/generate.js'
 import { ProbeCommand } from './commands/probe.js'
 import { RootCommand } from './commands/root.js'
@@ -40,8 +40,9 @@ import {
 } from './commands/service/index.js'
 import { discoverPlugins, registerAllPlugins } from './plugin/index.js'
 import { VERSION } from '@macts/core'
+import { MactsCli } from './removed-options.js'
 
-const cli = new Cli({
+const cli = new MactsCli({
   binaryLabel: 'macts',
   binaryName: 'macts',
   binaryVersion: VERSION,

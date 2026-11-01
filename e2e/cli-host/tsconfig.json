@@ -3,7 +3,19 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
-    "composite": false
+    "composite": false,
+    // The MCP SDK's declarations use DOM fetch types (`HeadersInit`) without
+    // declaring them, so they need the DOM library to type-check.
+    "lib": ["ES2022", "DOM"],
+    // The MCP SDK's declarations do not type-check under this repo's
+    // `exactOptionalPropertyTypes`: in client/streamableHttp.d.ts, the
+    // `sessionId` getter of `StreamableHTTPClientTransport` returns
+    // `string | undefined`, while the `Transport` interface it implements
+    // declares `sessionId?: string`. That holds in the installed SDK and in
+    // 1.32.2, the latest at the time of writing. This package is private and
+    // unpublished, so skipping library checks here changes no shipped type
+    // surface. packages/mcp sets it for the same SDK.
+    "skipLibCheck": true
   },
   "include": ["src", "test"]
 }
