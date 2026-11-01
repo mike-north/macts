@@ -30,16 +30,11 @@ const CONTRACT_OPERATION_ID = /\bid: '([^'.\s]+\.[^'.\s]+\.[^'.\s]+)'/g
 
 /**
  * Operations whose generated tool name differs from the derived one, mapped to
- * the generated name.
- *
- * `reminders.reminders.completeReminder` was generated as `…_complete`, from a
- * route name the contract does not yet carry. The operation is being renamed
- * at its source (`routeName: complete`), which makes the derived name match;
- * this entry then fails the test below and must be removed.
+ * the generated name. Each entry must still diverge (the test below fails
+ * otherwise), so fixing the name at its source in the manifest removes the
+ * entry. There are none.
  */
-const EXPECTED_DIVERGENCES: ReadonlyMap<OperationId, string> = new Map([
-  ['reminders.reminders.completeReminder', 'macts__reminders__reminders_complete'],
-])
+const EXPECTED_DIVERGENCES: ReadonlyMap<OperationId, string> = new Map<OperationId, string>()
 
 /** Every match of `pattern`'s first group across `files`. */
 function collect(files: readonly string[], pattern: RegExp): string[] {

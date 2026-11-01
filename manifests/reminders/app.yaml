@@ -473,6 +473,7 @@ commands:
 
   completeReminder:
     name: complete
+    routeName: complete
     description: Mark a reminder as complete
     scope: resource
     resourceType: Reminder
