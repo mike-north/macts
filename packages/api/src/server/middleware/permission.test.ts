@@ -14,8 +14,9 @@ import {
 } from './permission.js'
 import type { AuthVariables } from './auth.js'
 
-// Mock the validator module
-vi.mock('../../keys/validator.js', () => ({
+// Mock key verification; everything else in the runtime stays real
+vi.mock('@macts/runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@macts/runtime')>()),
   checkPayloadPermission: vi.fn(),
 }))
 
@@ -65,7 +66,7 @@ describe('requirePermission', () => {
 
   describe('positive cases', () => {
     it('should allow request with valid permission', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: true,
@@ -101,7 +102,7 @@ describe('requirePermission', () => {
     })
 
     it('should allow request with wildcard permission', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: true,
@@ -133,7 +134,7 @@ describe('requirePermission', () => {
     })
 
     it('should proceed to next middleware after permission check', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: true,
@@ -167,7 +168,7 @@ describe('requirePermission', () => {
     })
 
     it('should pass permission history to check function', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       const permissionHistory = [
         {
@@ -212,7 +213,7 @@ describe('requirePermission', () => {
 
   describe('negative cases - missing permission', () => {
     it('should return 403 when permission is denied', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -244,7 +245,7 @@ describe('requirePermission', () => {
     })
 
     it('should not proceed to handler when permission denied', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -274,7 +275,7 @@ describe('requirePermission', () => {
     })
 
     it('should include hint in error response when provided', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -304,7 +305,7 @@ describe('requirePermission', () => {
     })
 
     it('should include changelog in error response when provided', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -368,7 +369,7 @@ describe('requirePermission', () => {
     })
 
     it('should use default message when hint is not provided', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -397,7 +398,7 @@ describe('requirePermission', () => {
     })
 
     it('should handle empty permission string', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       vi.mocked(checkPayloadPermission).mockReturnValue({
         granted: false,
@@ -424,7 +425,7 @@ describe('requirePermission', () => {
     })
 
     it('should work with multiple permission middleware in chain', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       // First permission check passes
       vi.mocked(checkPayloadPermission)
@@ -467,7 +468,7 @@ describe('requirePermission', () => {
 
   describe('wildcard permissions', () => {
     it('should accept permission matched by wildcard', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       // Payload has calendar:*:* which should match calendar:events:list
       vi.mocked(checkPayloadPermission).mockReturnValue({
@@ -507,7 +508,7 @@ describe('requirePermission', () => {
     })
 
     it('should accept permission matched by partial wildcard', async () => {
-      const { checkPayloadPermission } = await import('../../keys/validator.js')
+      const { checkPayloadPermission } = await import('@macts/runtime')
 
       // Payload has calendar:events:* which should match calendar:events:list
       vi.mocked(checkPayloadPermission).mockReturnValue({

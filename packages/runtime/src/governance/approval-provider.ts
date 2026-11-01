@@ -1,11 +1,12 @@
 /**
- * Loading the configured human-in-the-loop approval provider for the API server.
+ * Loading the configured human-in-the-loop approval provider for governance
+ * enforcement.
  *
  * The governance evaluator can hold a call pending human confirmation. This
  * module resolves *who gets asked*: it reads the approval-provider registration
  * (`<macts-home>/governance/approval.json`), resolves the named package from the
  * shared plugins directory, and hands back a ready
- * {@link ApprovalGateContext} for the enforcement middleware.
+ * {@link ApprovalGateContext} for governance enforcement.
  *
  * ## Resolution
  *
@@ -58,8 +59,8 @@ import { isAbsolute, join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import type { ApprovalConfig, ApprovalProvider, AuditWriter } from '@macts/core'
 import { parseApprovalConfig, resolveApprovalConfigPath } from '@macts/core'
-import { getMactsHome } from '../../paths.js'
-import type { GovernanceContextWithApprovals } from '../middleware/governance.js'
+import { getMactsHome } from '../paths.js'
+import type { GovernanceContextWithApprovals } from './context.js'
 
 /**
  * Subpath a provider package may export its factory from, for packages that
@@ -190,8 +191,8 @@ export async function loadApprovalConfig(
 }
 
 /**
- * Load the configured approval provider and build the gate context the
- * enforcement middleware consumes.
+ * Load the configured approval provider and build the gate context that
+ * governance enforcement consumes.
  *
  * @param options - The audit writer (required) and an optional registration
  *   path override.

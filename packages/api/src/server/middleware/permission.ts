@@ -9,7 +9,7 @@
 
 import type { MiddlewareHandler } from 'hono'
 import type { PermissionHistoryEntry } from '@macts/core'
-import { checkPayloadPermission } from '../../keys/validator.js'
+import { checkPayloadPermission } from '@macts/runtime'
 import { getTracer, SpanStatusCode } from '../../telemetry.js'
 import type { AuthVariables } from './auth.js'
 

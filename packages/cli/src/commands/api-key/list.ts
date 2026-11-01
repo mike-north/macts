@@ -1,5 +1,5 @@
 import { Command, Option } from 'clipanion'
-import { loadKeyMetadata } from '@macts/api'
+import { loadKeyMetadata } from '@macts/runtime'
 import { createFormatter } from '../../output/index.js'
 
 /**
@@ -82,7 +82,7 @@ export class ApiKeyListCommand extends Command {
   }
 }
 
-function formatKeyMetadata(key: import('@macts/api').ApiKeyMetadata): object {
+function formatKeyMetadata(key: import('@macts/runtime').ApiKeyMetadata): object {
   return {
     id: key.id,
     name: key.name,
@@ -95,7 +95,7 @@ function formatKeyMetadata(key: import('@macts/api').ApiKeyMetadata): object {
   }
 }
 
-function formatKeyMetadataForTable(key: import('@macts/api').ApiKeyMetadata): object {
+function formatKeyMetadataForTable(key: import('@macts/runtime').ApiKeyMetadata): object {
   const now = new Date()
   let status = 'active'
   if (key.revoked) {

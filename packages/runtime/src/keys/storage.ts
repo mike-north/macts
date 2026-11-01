@@ -11,6 +11,11 @@
  * - Concurrent access safety
  * - Efficient queries by key ID
  *
+ * The database is Node's built-in `node:sqlite`, loaded through
+ * {@link loadSqlite}, so the store needs no native addon. Rows come back as
+ * null-prototype objects; nothing here relies on `Object.prototype` methods on
+ * them.
+ *
  * @packageDocumentation
  */
 
@@ -18,12 +23,13 @@ import * as fs from 'node:fs/promises'
 import * as fsSync from 'node:fs'
 import * as path from 'node:path'
 import * as crypto from 'node:crypto'
-import Database from 'better-sqlite3'
+import type { DatabaseSync } from 'node:sqlite'
 import type { ApiKeyMetadata, GovernancePolicy } from '@macts/core'
 import { parsePolicy } from '@macts/core'
 import { getLogger } from '../logger.js'
 import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
+import { loadSqlite, runInTransaction } from './sqlite.js'
 
 /**
  * Default directory for macts configuration.
@@ -52,7 +58,7 @@ const LEGACY_JSON_FILE = path.join(MACTS_DIR, 'api-keys.json')
 const SECRET_ENV_VAR = 'MACTS_API_KEY_SECRET'
 
 /** Singleton database instance */
-let db: Database.Database | null = null
+let db: DatabaseSync | null = null
 
 /** Cached signing secret (indefinite per-process cache) */
 let cachedSigningSecret: string | null = null
@@ -62,6 +68,14 @@ let cachedEncryptionKey: Buffer | null = null
 
 /** Current schema version (bump when adding migrations) */
 const SCHEMA_VERSION = 1
+
+/**
+ * How long, in milliseconds, a statement waits for another connection's lock
+ * before failing with `SQLITE_BUSY`. The CLI and a running server can open the
+ * same database at once; a short wait turns brief contention into a delay
+ * rather than an error.
+ */
+const BUSY_TIMEOUT_MS = 5000
 
 /**
  * Database row type for key metadata.
@@ -90,17 +104,19 @@ function ensureMactsDir(): void {
 /**
  * Get or create the database connection.
  */
-function getDb(): Database.Database {
+function getDb(): DatabaseSync {
   if (db) {
     return db
   }
 
   ensureMactsDir()
 
-  db = new Database(DB_FILE)
+  const { DatabaseSync } = loadSqlite()
+  db = new DatabaseSync(DB_FILE)
 
   // Enable WAL mode for better concurrent access
-  db.pragma('journal_mode = WAL')
+  db.exec('PRAGMA journal_mode = WAL')
+  db.exec(`PRAGMA busy_timeout = ${String(BUSY_TIMEOUT_MS)}`)
 
   // Create table if it doesn't exist
   db.exec(`
@@ -152,9 +168,11 @@ function getDb(): Database.Database {
 /**
  * Run schema migrations based on user_version pragma.
  */
-function migrateSchema(database: Database.Database): void {
-  const currentVersion =
-    (database.pragma('user_version') as { user_version: number }[])[0]?.user_version ?? 0
+function migrateSchema(database: DatabaseSync): void {
+  const versionRow = database.prepare('PRAGMA user_version').get() as
+    | { user_version: number }
+    | undefined
+  const currentVersion = versionRow?.user_version ?? 0
 
   if (currentVersion < 1) {
     // Migration 1: Add encrypted column if it doesn't exist
@@ -166,7 +184,7 @@ function migrateSchema(database: Database.Database): void {
       database.exec('ALTER TABLE api_keys ADD COLUMN encrypted INTEGER NOT NULL DEFAULT 0')
     }
 
-    database.pragma(`user_version = ${String(SCHEMA_VERSION)}`)
+    database.exec(`PRAGMA user_version = ${String(SCHEMA_VERSION)}`)
   }
 }
 
@@ -245,7 +263,7 @@ function decryptRow(row: KeyRow): KeyRow {
  * Auto-migrate an unencrypted row to encrypted form.
  * Called lazily on read when an unencrypted row is encountered.
  */
-function autoEncryptRow(database: Database.Database, row: KeyRow): KeyRow {
+function autoEncryptRow(database: DatabaseSync, row: KeyRow): KeyRow {
   if (row.encrypted === 1) {
     return row
   }
@@ -275,7 +293,7 @@ function autoEncryptRow(database: Database.Database, row: KeyRow): KeyRow {
 /**
  * Migrate data from legacy JSON file to SQLite.
  */
-function migrateFromJson(database: Database.Database): void {
+function migrateFromJson(database: DatabaseSync): void {
   if (!fsSync.existsSync(LEGACY_JSON_FILE)) {
     return
   }
@@ -307,7 +325,8 @@ function migrateFromJson(database: Database.Database): void {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
     `)
 
-    const insertMany = database.transaction((keys: ApiKeyMetadata[]) => {
+    const keys = storage.keys
+    runInTransaction(database, () => {
       for (const key of keys) {
         const encrypted = encryptRow(
           JSON.stringify(key.permissions),
@@ -326,8 +345,6 @@ function migrateFromJson(database: Database.Database): void {
         )
       }
     })
-
-    insertMany(storage.keys)
 
     // Remove legacy file after successful migration
     fsSync.unlinkSync(LEGACY_JSON_FILE)
@@ -359,10 +376,15 @@ function rowToMetadata(row: KeyRow): ApiKeyMetadata {
 }
 
 /**
- * Close the database connection.
- * Call this when shutting down to ensure clean closure.
+ * Close the API-key store's database connection.
+ *
+ * The connection is opened lazily on first use and kept for the life of the
+ * process; it is also closed automatically on exit and on `SIGINT`/`SIGTERM`.
+ * Call this from a long-lived host that wants to release the database file
+ * deterministically (graceful shutdown, or before switching `MACTS_HOME`).
+ * The next store operation reopens it.
  */
-export function closeDatabase(): void {
+export function closeKeyStore(): void {
   if (db) {
     db.close()
     db = null
@@ -455,7 +477,11 @@ export async function setSigningSecret(secret: string): Promise<void> {
  */
 export function loadKeyMetadata(): ApiKeyMetadata[] {
   const database = getDb()
-  const rows = database.prepare('SELECT * FROM api_keys ORDER BY created_at DESC').all() as KeyRow[]
+  // node:sqlite types every row as an untyped column record; the `api_keys`
+  // schema created in getDb() fixes its actual shape to KeyRow.
+  const rows = database
+    .prepare('SELECT * FROM api_keys ORDER BY created_at DESC')
+    .all() as unknown as KeyRow[]
   return rows.map((row) => {
     const migrated = autoEncryptRow(database, row)
     return rowToMetadata(migrated)
@@ -491,9 +517,9 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
     'DELETE FROM api_key_policies WHERE key_id NOT IN (SELECT id FROM api_keys)'
   )
 
-  const replaceAll = database.transaction((keysToSave: ApiKeyMetadata[]) => {
+  runInTransaction(database, () => {
     deleteAll.run()
-    for (const key of keysToSave) {
+    for (const key of keys) {
       const encrypted = encryptRow(
         JSON.stringify(key.permissions),
         JSON.stringify(key.originalPermissions),
@@ -516,8 +542,6 @@ export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
     // later key issued with the same id.
     dropOrphanedPolicies.run()
   })
-
-  replaceAll(keys)
 }
 
 /**
@@ -677,13 +701,12 @@ export function revokeKey(keyId: string): boolean {
  */
 export function deleteKeyMetadata(keyId: string): boolean {
   const database = getDb()
-  const deleteBoth = database.transaction((id: string) => {
+  const result = runInTransaction(database, () => {
     // A key's policy is part of the key; deleting one without the other would
     // leave a governance document with nothing to govern.
-    database.prepare('DELETE FROM api_key_policies WHERE key_id = ?').run(id)
-    return database.prepare('DELETE FROM api_keys WHERE id = ?').run(id)
+    database.prepare('DELETE FROM api_key_policies WHERE key_id = ?').run(keyId)
+    return database.prepare('DELETE FROM api_keys WHERE id = ?').run(keyId)
   })
-  const result = deleteBoth(keyId)
   return result.changes > 0
 }
 
@@ -884,12 +907,12 @@ function registerCleanupHandlers(): void {
   globalObj[CLEANUP_REGISTERED_KEY] = true
 
   process.on('exit', () => {
-    closeDatabase()
+    closeKeyStore()
   })
 
   // Handle SIGINT (Ctrl+C) and SIGTERM gracefully
   const handleSignal = (): void => {
-    closeDatabase()
+    closeKeyStore()
     process.exit(0)
   }
 

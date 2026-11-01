@@ -9,7 +9,7 @@
 
 import type { MiddlewareHandler } from 'hono'
 import type { ApiKeyPayload, ApiKeyValidationErrorCode } from '@macts/core'
-import { validateApiKey } from '../../keys/validator.js'
+import { validateApiKey } from '@macts/runtime'
 import { withSpan } from '../../telemetry.js'
 
 /**

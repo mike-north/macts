@@ -5,22 +5,13 @@
 ```ts
 
 import { activateApp } from '@macts/core';
-import { ApiKeyMetadata } from '@macts/core';
 import { ApiKeyPayload } from '@macts/core';
 import { ApiKeyValidationErrorCode } from '@macts/core';
-import { ApiKeyValidationFailure } from '@macts/core';
-import { ApiKeyValidationResult } from '@macts/core';
-import { ApiKeyValidationSuccess } from '@macts/core';
 import { AppConnection } from '@macts/core';
 import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
-import { ApprovalConfig } from '@macts/core';
 import { ApprovalDeniedState } from '@macts/core';
-import { ApprovalProvider } from '@macts/core';
-import { AuditWriter } from '@macts/core';
 import { booleanCoercer } from '@macts/core';
-import { checkPermission } from '@macts/core';
-import { checkPermissions } from '@macts/core';
 import { colorCoercer } from '@macts/core';
 import { Command } from '@macts/core';
 import { connect } from '@macts/core';
@@ -28,8 +19,7 @@ import { createArrayCoercer } from '@macts/core';
 import { createEnumCoercer } from '@macts/core';
 import { dateCoercer } from '@macts/core';
 import { getAppName } from '@macts/core';
-import { GovernancePolicy } from '@macts/core';
-import { hasPermission } from '@macts/core';
+import { GovernanceContext } from '@macts/runtime';
 import { HexColor } from '@macts/core';
 import { HexColorSchema } from '@macts/core';
 import { Hono } from 'hono';
@@ -37,15 +27,12 @@ import { isAppRunning } from '@macts/core';
 import { JxaEnumValue } from '@macts/core';
 import { JxaExecutionError } from '@macts/core';
 import { JxaExecutorOptions } from '@macts/core';
-import * as _macts_core from '@macts/core';
 import { MiddlewareHandler } from 'hono';
 import { nullSafe } from '@macts/core';
 import { numberCoercer } from '@macts/core';
 import { ObjectSpecifier } from '@macts/core';
 import { pathCoercer } from '@macts/core';
-import { PermissionCheckResult } from '@macts/core';
 import { PermissionHistoryEntry } from '@macts/core';
-import { PermissionsSection } from '@macts/core';
 import pino from 'pino';
 import { PolicyLayer } from '@macts/core';
 import { quitApp } from '@macts/core';
@@ -61,50 +48,9 @@ import { VERSION } from '@macts/core';
 
 export { activateApp }
 
-// @public
-export class ActivePolicyError extends Error {
-    constructor(
-    path: string, message: string);
-    readonly path: string;
-}
-
-// @public
-export function addKeyMetadata(metadata: ApiKeyMetadata): void;
-
-// @public
-export const ALLOW_ALL_POLICY: GovernancePolicy;
-
-export { ApiKeyMetadata }
-
-export { ApiKeyPayload }
-
-export { ApiKeyValidationErrorCode }
-
-export { ApiKeyValidationFailure }
-
-export { ApiKeyValidationResult }
-
-export { ApiKeyValidationSuccess }
-
 export { AppConnection }
 
 export { AppConnectionOptions }
-
-// @public
-export interface ApprovalGateContext {
-    readonly provider: ApprovalProvider;
-    readonly timeoutMs?: number | undefined;
-}
-
-// @public
-export class ApprovalProviderError extends Error {
-    constructor(
-    path: string, message: string);
-    readonly path: string;
-}
-
-// @public
-export type ApprovalProviderFactory = (options: Readonly<Record<string, unknown>>) => ApprovalProvider | Promise<ApprovalProvider>;
 
 // @public
 export type AttributeValue = string | number | boolean;
@@ -133,48 +79,12 @@ export interface AuthVariables {
 
 export { booleanCoercer }
 
-// @public
-export function calculateExpiration(expires: Date | number | string): number;
-
-// @public
-export function checkPayloadPermission(payload: ApiKeyPayload, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): PermissionCheckResult;
-
-// @public
-export function checkPayloadPermissions(payload: ApiKeyPayload, requiredPermissions: string[]): {
-    granted: boolean;
-    results: PermissionCheckResult[];
-};
-
-export { checkPermission }
-
-export { checkPermissions }
-
 export { colorCoercer }
 
 // @public
 export function configureTelemetry(_options?: TelemetryOptions): void;
 
 export { connect }
-
-// @public
-export function createApiKey(options: CreateApiKeyOptions, permissionsSection?: PermissionsSection): Promise<CreateApiKeyResult>;
-
-// @public
-export interface CreateApiKeyOptions {
-    expires?: Date | number | string | undefined;
-    name: string;
-    permissions: string[];
-}
-
-// @public
-export interface CreateApiKeyResult {
-    keyId: string;
-    metadata: _macts_core.ApiKeyMetadata;
-    token: string;
-}
-
-// @public
-export function createApiKeySimple(options: CreateApiKeyOptions): Promise<CreateApiKeyResult>;
 
 // @public
 export function createApp(manifests: AppManifest[], options?: Pick<ServerOptions, 'cors' | 'logging' | 'prettyJson'>): Hono<{
@@ -186,23 +96,7 @@ export { createArrayCoercer }
 export { createEnumCoercer }
 
 // @public
-export function createFullAccessKey(appName: string, name: string, expires?: Date | number | string): Promise<CreateApiKeyResult>;
-
-// @public
 export function createInFlightTracker(): InFlightTracker;
-
-// @public
-export function createKeyPolicyResolver(options: CreateKeyPolicyResolverOptions): KeyPolicyResolver;
-
-// @public
-export interface CreateKeyPolicyResolverOptions {
-    readonly cacheTtlMs?: number;
-    readonly load: KeyPolicyLoader;
-    readonly now?: () => number;
-}
-
-// @public
-export function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 // @public
 export function createMultiAppRpcRouter(manifests: AppManifest[], governance?: GovernanceContext): Hono<{
@@ -213,9 +107,6 @@ export function createMultiAppRpcRouter(manifests: AppManifest[], governance?: G
 export function createMultiServer(manifests: AppManifest[], options?: ServerOptions): ServerInstance;
 
 // @public
-export function createReadOnlyKey(appName: string, name: string, permissionsSection: PermissionsSection, expires?: Date | number | string): Promise<CreateApiKeyResult>;
-
-// @public
 export function createRpcRouter(manifest: AppManifest, governance?: GovernanceContext): Hono<{
     Variables: AuthVariables;
 }>;
@@ -223,69 +114,15 @@ export function createRpcRouter(manifest: AppManifest, governance?: GovernanceCo
 // @public
 export function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
 
-// @public
-export function createStoredKeyPolicyResolver(options?: Omit<CreateKeyPolicyResolverOptions, 'load'>): KeyPolicyResolver;
-
 export { dateCoercer }
-
-// @public
-export function decrypt(ciphertext: string, key: Buffer): string;
 
 // @public
 export const DEFAULT_HOST = "localhost";
 
 // @public
-export const DEFAULT_KEY_POLICY_CACHE_TTL_MS = 5000;
-
-// @public
 export const DEFAULT_PORT = 8372;
 
-// @public
-export function deleteKeyMetadata(keyId: string): boolean;
-
-// @public
-export function deleteKeyPolicy(keyId: string): boolean;
-
-// @public
-export function deriveEncryptionKey(signingSecret: string): Buffer;
-
-// @public
-export type DurationString = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'}`;
-
-// @public
-export function encrypt(plaintext: string, key: Buffer): string;
-
-// @public
-export function extractKeyIdFromToken(token: string): string | undefined;
-
-// @public
-export function extractPermissionsFromToken(token: string): string[] | undefined;
-
-// @public
-export function generateKeyId(): string;
-
-// @public
-export function generateSecret(): string;
-
-// @public
-export function getActivePolicyPath(): string;
-
 export { getAppName }
-
-// @public
-export function getApprovalConfigPath(): string;
-
-// @public
-export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
-
-// @public
-export function getKeyPolicy(keyId: string): GovernancePolicy | undefined;
-
-// @public
-export function getLogger(): pino.Logger;
-
-// @public
-export function getSigningSecret(): Promise<string>;
 
 // @public
 export function getTracer(_name?: string): Tracer;
@@ -299,27 +136,6 @@ export interface GovernanceApprovalDeniedResponse {
         permission: string;
         approval: ApprovalDeniedState;
     };
-}
-
-// @public
-export type GovernanceContext = GovernanceContextWithoutApprovals | GovernanceContextWithApprovals;
-
-// @public
-export interface GovernanceContextBase {
-    readonly keyPolicies?: KeyPolicyResolver | undefined;
-    readonly policy: GovernancePolicy;
-}
-
-// @public
-export interface GovernanceContextWithApprovals extends GovernanceContextBase {
-    readonly approvals: ApprovalGateContext;
-    readonly writer: AuditWriter;
-}
-
-// @public
-export interface GovernanceContextWithoutApprovals extends GovernanceContextBase {
-    readonly approvals?: undefined;
-    readonly writer?: AuditWriter | undefined;
 }
 
 // @public
@@ -342,8 +158,6 @@ export interface GovernancePendingResponse {
     };
 }
 
-export { hasPermission }
-
 export { HexColor }
 
 export { HexColorSchema }
@@ -357,66 +171,11 @@ export interface InFlightTracker {
 
 export { isAppRunning }
 
-// @public
-export function isKeyRevoked(keyId: string): boolean;
-
 export { JxaEnumValue }
 
 export { JxaExecutionError }
 
 export { JxaExecutorOptions }
-
-// @public
-export class KeyPolicyError extends Error {
-    constructor(
-    keyId: string, message: string);
-    readonly keyId: string;
-}
-
-// @public
-export type KeyPolicyLoader = (apiKeyId: string) => GovernancePolicy | undefined | Promise<GovernancePolicy | undefined>;
-
-// @public
-export interface KeyPolicyResolver {
-    invalidate(apiKeyId?: string): void;
-    resolve(apiKeyId: string): Promise<GovernancePolicy | undefined>;
-}
-
-// @public
-export interface ListApiKeysOptions {
-    includeRevoked?: boolean;
-    namePattern?: string;
-}
-
-// @public
-export function listKeyPolicyIds(): string[];
-
-// @public
-export function loadActivePolicy(options?: LoadActivePolicyOptions): Promise<GovernancePolicy>;
-
-// @public
-export interface LoadActivePolicyOptions {
-    readonly path?: string;
-}
-
-// @public
-export function loadApprovalConfig(options?: LoadApprovalOptions): Promise<ApprovalConfig | undefined>;
-
-// @public
-export function loadApprovalGate(options: LoadApprovalGateOptions): Promise<LoadedApprovalGate | undefined>;
-
-// @public
-export interface LoadApprovalGateOptions extends LoadApprovalOptions {
-    readonly writer: AuditWriter;
-}
-
-// @public
-export interface LoadApprovalOptions {
-    readonly path?: string;
-}
-
-// @public
-export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' | 'approvals'>;
 
 // @public
 export interface LoadedTlsOptions {
@@ -428,21 +187,13 @@ export interface LoadedTlsOptions {
     key: Buffer;
 }
 
-// @public
-export function loadKeyMetadata(): ApiKeyMetadata[];
-
 export { nullSafe }
 
 export { numberCoercer }
 
 export { ObjectSpecifier }
 
-// @public
-export function parseDuration(duration: string): number;
-
 export { pathCoercer }
-
-export { PermissionCheckResult }
 
 // @public
 export interface PermissionErrorResponse {
@@ -483,17 +234,6 @@ export interface RequirePolicyOptions {
     readonly permission: string;
     readonly risk: RiskClass;
 }
-
-// @public
-export type ResolvedGovernanceContext = GovernanceContext & {
-    readonly keyPolicy?: GovernancePolicy | undefined;
-};
-
-// @public
-export function resolveGovernanceForRequest(governance: GovernanceContext, apiKeyId: string): Promise<ResolvedGovernanceContext>;
-
-// @public
-export function revokeKey(keyId: string): boolean;
 
 // @public
 export interface RpcEndpointInfo {
@@ -544,9 +284,6 @@ export { runJxa }
 
 export { runWithApp }
 
-// @public
-export function saveKeyMetadata(keys: ApiKeyMetadata[]): void;
-
 export { Selector }
 
 // @public
@@ -575,15 +312,6 @@ export interface ServerOptions {
     rateLimit?: RateLimitOptions | false;
     tls?: TlsOptions;
 }
-
-// @public
-export function setKeyPolicy(keyId: string, policy: GovernancePolicy, updatedAt?: Date): void;
-
-// @public
-export function setLogger(newLogger: pino.Logger): void;
-
-// @public
-export function setSigningSecret(secret: string): Promise<void>;
 
 // @public
 export interface Span {
@@ -630,36 +358,7 @@ export interface Tracer {
     }): Span;
 }
 
-// @public
-export class TtlCache<T> {
-    constructor(defaultTtlMs: number);
-    clear(): void;
-    delete(key: string): boolean;
-    get(key: string): T | undefined;
-    has(key: string): boolean;
-    set(key: string, value: T, ttlMs?: number): void;
-    get size(): number;
-}
-
 export { TypeCoercer }
-
-// @public
-export class UnexpandableCoarsePermissionError extends Error {
-    constructor(permission: string);
-    // (undocumented)
-    readonly permission: string;
-}
-
-// @public
-export function updateKeyMetadata(keyId: string, updates: Partial<ApiKeyMetadata>): ApiKeyMetadata | undefined;
-
-// @public
-export function validateAndCheckPermission(token: string, requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): Promise<PermissionCheckResult & {
-    validationError?: string;
-}>;
-
-// @public
-export function validateApiKey(token: string): Promise<ApiKeyValidationResult>;
 
 export { VERSION }
 

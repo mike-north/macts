@@ -8,8 +8,11 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
-import Database from 'better-sqlite3'
+import { loadSqlite } from './sqlite.js'
 import type { ApiKeyMetadata, GovernancePolicy, PolicyDisposition } from '@macts/core'
+
+/** Raw database access, for tests that inspect or corrupt the file behind the store. */
+const { DatabaseSync } = loadSqlite()
 
 // We need to reset the module state between tests
 let storage: typeof import('./storage.js')
@@ -36,7 +39,7 @@ describe('storage integration', () => {
 
   afterEach(() => {
     // Close database and restore environment
-    storage.closeDatabase()
+    storage.closeKeyStore()
     process.env['HOME'] = originalHome
     if (originalEnvSecret) {
       process.env['MACTS_API_KEY_SECRET'] = originalEnvSecret
@@ -432,7 +435,7 @@ describe('storage integration', () => {
 
       // Close should not throw
       expect(() => {
-        storage.closeDatabase()
+        storage.closeKeyStore()
       }).not.toThrow()
 
       // Can re-open by accessing again
@@ -507,7 +510,7 @@ describe('storage integration', () => {
       })
 
       // Close and recreate with legacy file
-      storage.closeDatabase()
+      storage.closeKeyStore()
 
       const mactsDir = path.join(tempDir, '.macts')
       const legacyData = {
@@ -598,7 +601,7 @@ describe('storage integration', () => {
 
     it('should encrypt the policy document at rest', () => {
       storage.setKeyPolicy('key_a', policyFor('confirm-first'))
-      storage.closeDatabase()
+      storage.closeKeyStore()
 
       // Read the raw column: the policy must not be readable from the file.
       const raw = fs.readFileSync(path.join(tempDir, '.macts', 'api-keys.db'), 'utf-8')
@@ -619,7 +622,7 @@ describe('storage integration', () => {
 
       // Corrupt the stored blob behind the store's back. Reporting "no policy"
       // here would widen the key back to the host policy alone.
-      const db = new Database(path.join(tempDir, '.macts', 'api-keys.db'))
+      const db = new DatabaseSync(path.join(tempDir, '.macts', 'api-keys.db'))
       db.prepare('UPDATE api_key_policies SET policy = ? WHERE key_id = ?').run('garbage', 'key_a')
       db.close()
 
@@ -721,10 +724,10 @@ describe('storage integration', () => {
     it('should add the policy table to a database created before per-key policies', () => {
       // Simulate an older database: the key table exists, the policy table does not.
       storage.addKeyMetadata(createTestMetadata('key_a'))
-      storage.closeDatabase()
+      storage.closeKeyStore()
 
       const dbPath = path.join(tempDir, '.macts', 'api-keys.db')
-      const db = new Database(dbPath)
+      const db = new DatabaseSync(dbPath)
       db.exec('DROP TABLE api_key_policies')
       db.close()
 

@@ -208,12 +208,13 @@ structured path to grow the available toolset.
 
 ### Infrastructure Packages
 
-| Package       | Description                                   |
-| ------------- | --------------------------------------------- |
-| `@macts/cli`  | Command-line interface                        |
-| `@macts/api`  | Local HTTP API server                         |
-| `@macts/core` | Manifest schemas, code generators, app bridge |
-| `@macts/mcp`  | MCP server framework and plugin loader        |
+| Package          | Description                                              |
+| ---------------- | -------------------------------------------------------- |
+| `@macts/cli`     | Command-line interface                                   |
+| `@macts/api`     | Local HTTP API server                                    |
+| `@macts/core`    | Manifest schemas, code generators, app bridge            |
+| `@macts/mcp`     | MCP server framework and plugin loader                   |
+| `@macts/runtime` | Shared Mac-side runtime: API keys and governance loading |
 
 ### Which package should I use?
 

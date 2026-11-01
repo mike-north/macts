@@ -9,7 +9,7 @@
 
 import type { MiddlewareHandler } from 'hono'
 import { randomUUID } from 'node:crypto'
-import { getLogger } from '../../logger.js'
+import { getLogger } from '@macts/runtime'
 
 /**
  * Create a request logging middleware.

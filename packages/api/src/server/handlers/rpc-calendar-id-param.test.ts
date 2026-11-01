@@ -42,7 +42,8 @@ vi.mock('@macts/core', async (importOriginal) => {
 })
 
 // Mock auth so we can make authenticated requests without real keys.
-vi.mock('../../keys/validator.js', () => ({
+vi.mock('@macts/runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@macts/runtime')>()),
   validateApiKey: vi.fn().mockResolvedValue({
     valid: true,
     payload: { iss: 'macts', sub: 'test-key', iat: 0, permissions: ['*:*:*'] },

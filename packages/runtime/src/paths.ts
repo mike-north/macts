@@ -20,7 +20,7 @@ import { join } from 'node:path'
  * Resolution order:
  * 1. The `MACTS_HOME` environment variable, when set to a non-empty,
  *    non-whitespace value (custom installations).
- * 2. `~/.macts`, where the home directory comes from {@link homedir}.
+ * 2. `~/.macts`, where the home directory comes from `os.homedir()`.
  *
  * An empty or whitespace-only `MACTS_HOME` is treated as **unset** and the
  * default `~/.macts` is used instead. This prevents a set-but-empty variable

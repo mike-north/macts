@@ -8,8 +8,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { Hono } from 'hono'
 import { authMiddleware, type AuthVariables, type AuthErrorResponse } from './auth.js'
 
-// Mock the validator module
-vi.mock('../../keys/validator.js', () => ({
+// Mock key verification; everything else in the runtime stays real
+vi.mock('@macts/runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@macts/runtime')>()),
   validateApiKey: vi.fn(),
 }))
 
@@ -20,7 +21,7 @@ describe('authMiddleware', () => {
 
   describe('positive cases', () => {
     it('should allow request with valid token', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       const mockPayload = {
         iss: 'macts' as const,
@@ -58,7 +59,7 @@ describe('authMiddleware', () => {
     })
 
     it('should set apiKeyPayload in context', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       const mockPayload = {
         iss: 'macts' as const,
@@ -92,7 +93,7 @@ describe('authMiddleware', () => {
     })
 
     it('should proceed to next middleware after validation', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: true,
@@ -197,7 +198,7 @@ describe('authMiddleware', () => {
 
   describe('negative cases - token validation failures', () => {
     it('should return 401 for expired token', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -223,7 +224,7 @@ describe('authMiddleware', () => {
     })
 
     it('should return 401 for revoked token', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -249,7 +250,7 @@ describe('authMiddleware', () => {
     })
 
     it('should return 401 for malformed token payload', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -275,7 +276,7 @@ describe('authMiddleware', () => {
     })
 
     it('should return 401 for invalid token format', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -301,7 +302,7 @@ describe('authMiddleware', () => {
     })
 
     it('should return 401 for invalid signature', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -334,7 +335,7 @@ describe('authMiddleware', () => {
     // middleware's message fallback and its test were removed.
 
     it('should not proceed to handler when validation fails', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,
@@ -362,7 +363,7 @@ describe('authMiddleware', () => {
     })
 
     it('should handle empty Bearer token', async () => {
-      const { validateApiKey } = await import('../../keys/validator.js')
+      const { validateApiKey } = await import('@macts/runtime')
 
       vi.mocked(validateApiKey).mockResolvedValue({
         valid: false,

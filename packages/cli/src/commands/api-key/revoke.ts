@@ -1,5 +1,5 @@
 import { Command, Option } from 'clipanion'
-import { revokeKey, getKeyMetadata, extractKeyIdFromToken } from '@macts/api'
+import { revokeKey, getKeyMetadata, extractKeyIdFromToken } from '@macts/runtime'
 import { createFormatter } from '../../output/index.js'
 
 /**

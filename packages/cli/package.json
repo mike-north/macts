@@ -29,7 +29,7 @@
     "scripts"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "build": "tsup",
@@ -44,6 +44,7 @@
     "@macts/api": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/mcp": "workspace:*",
+    "@macts/runtime": "workspace:*",
     "clipanion": "catalog:"
   },
   "devDependencies": {

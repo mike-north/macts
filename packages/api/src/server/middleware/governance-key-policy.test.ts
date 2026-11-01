@@ -42,9 +42,9 @@ import type {
   PolicyDisposition,
 } from '@macts/core'
 import { createFileAuditWriter } from '@macts/core'
-import { requirePolicy, type GovernanceContext } from './governance.js'
+import { createKeyPolicyResolver, type GovernanceContext } from '@macts/runtime'
+import { requirePolicy } from './governance.js'
 import type { GovernanceDeniedResponse, GovernancePendingResponse } from './governance.js'
-import { createKeyPolicyResolver } from '../governance/key-policy.js'
 import type { AuthVariables } from './auth.js'
 
 // ---------------------------------------------------------------------------
