@@ -29,9 +29,9 @@ export type AccountUpdateInput = Record<string, never>;
 // @public
 export interface Attachment {
     readonly contentIdentifier?: string | null;
-    readonly creationDate: string | null;
+    readonly creationDate: Date | null;
     readonly id: string;
-    readonly modificationDate: string | null;
+    readonly modificationDate: Date | null;
     readonly name: string | null;
 }
 
@@ -74,9 +74,9 @@ export interface FolderUpdateInput {
 // @public
 export interface Note {
     body: string | null;
-    readonly creationDate: string;
+    readonly creationDate: Date;
     readonly id: string;
-    readonly modificationDate: string;
+    readonly modificationDate: Date;
     name: string;
     readonly passwordProtected: boolean;
     readonly plaintext: string | null;

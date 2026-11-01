@@ -179,9 +179,9 @@ export const manifest: unknown = {
         },
         creationDate: {
           access: 'r',
-          type: 'string',
+          type: 'date',
           description: 'The creation date of the note',
-          code: 'NTcd',
+          code: 'ascd',
           optional: false,
           nullable: false,
           evidence: {
@@ -199,9 +199,9 @@ export const manifest: unknown = {
         },
         modificationDate: {
           access: 'r',
-          type: 'string',
+          type: 'date',
           description: 'The modification date of the note',
-          code: 'NTmd',
+          code: 'asmo',
           optional: false,
           nullable: false,
           evidence: {
@@ -318,16 +318,16 @@ export const manifest: unknown = {
         },
         creationDate: {
           access: 'r',
-          type: 'string',
+          type: 'date',
           description: 'The creation date of the attachment',
-          code: 'NTcd',
+          code: 'ascd',
           optional: false,
         },
         modificationDate: {
           access: 'r',
-          type: 'string',
+          type: 'date',
           description: 'The modification date of the attachment',
-          code: 'NTmd',
+          code: 'asmo',
           optional: false,
         },
       },

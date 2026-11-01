@@ -53,9 +53,9 @@ export interface Note {
   /** The plaintext content of the note */
   plaintext: string
   /** The creation date of the note */
-  creationDate: string
+  creationDate: Date
   /** The modification date of the note */
-  modificationDate: string
+  modificationDate: Date
   /** Whether the note is shared */
   shared: boolean
   /** Whether the note is password protected */
@@ -82,9 +82,9 @@ export interface Attachment {
   /** The content identifier of the attachment */
   contentIdentifier?: string
   /** The creation date of the attachment */
-  creationDate: string
+  creationDate: Date
   /** The modification date of the attachment */
-  modificationDate: string
+  modificationDate: Date
 }
 
 /** Input for creating a Attachment */
