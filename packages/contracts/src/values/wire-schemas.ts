@@ -1,5 +1,6 @@
 /**
- * Zod schemas for the wire control records.
+ * Zod schemas for the wire control records and the payloads of the file
+ * control records.
  *
  * These schemas are the validators for raw wire values, and the source from
  * which HTTP and MCP JSON Schemas are derived, with
@@ -18,11 +19,12 @@
  */
 
 import { z } from 'zod'
+import type { FileSourceWire, FileWire } from '../files/index.js'
 import { INTEGER_LIMITS } from './integer.js'
 import {
   DATE_TEXT_PATTERN,
   checkDateText,
-  DYNAMIC_REFERENCE_OR_FILE_MESSAGE,
+  DYNAMIC_TYPED_ONLY_MESSAGE,
   checkDoublePayload,
   wireIntegerSchema,
 } from './wire-checks.js'
@@ -107,18 +109,23 @@ function dateTextMessage(text: string): string {
 }
 
 /**
- * The payload of a reference or file control record in dynamic content, where
- * such values are not representable. It always fails with the shared rule's
- * message, and its JSON Schema (`not: {}`) admits nothing, so the derived
- * schema never advertises the kind as accepted.
+ * A dynamic-content branch for a kind that is not representable there:
+ * `{ "<key>": … }` for a reference, file, or file source control record. It
+ * matches the key
+ * only to report the shared rule's message at the payload, and its JSON
+ * Schema (`not: {}` for the payload) admits nothing, so the derived schema
+ * never advertises the kind as accepted.
  */
-function unrepresentableDynamicPayload() {
-  return z
+function unrepresentableDynamicKind(key: 'reference' | 'file' | 'fileSource'): z.ZodType<never> {
+  const payload = z
     .unknown()
     .refine((_payload: unknown): _payload is never => false, {
-      error: DYNAMIC_REFERENCE_OR_FILE_MESSAGE,
+      error: DYNAMIC_TYPED_ONLY_MESSAGE,
     })
     .meta({ not: {} })
+  // The payload never validates, so the branch never yields a value: its
+  // output is `never`, not the `{ [key]: never }` object type zod infers.
+  return z.strictObject({ [key]: payload }) as z.ZodType as z.ZodType<never>
 }
 
 /**
@@ -130,9 +137,10 @@ function unrepresentableDynamicPayload() {
  * values; every object is a control record: an integer, a double, a date, or
  * a `{ "record": { … } }` envelope around a user record whose values are
  * dynamic values in turn. A bare number or a bare user object is rejected.
- * References and file values are not representable in dynamic content; they
- * are rejected with an issue that states the rule, and the derived JSON Schema
- * does not admit them.
+ * References, file values, and file sources appear only at typed positions,
+ * so they are not representable in dynamic content: they are rejected with an
+ * issue that states the rule, and the derived JSON Schema does not admit
+ * them.
  */
 export const DynamicWireValueSchema: z.ZodType<DynamicWireValue> = z.lazy(() =>
   z.union(
@@ -145,8 +153,9 @@ export const DynamicWireValueSchema: z.ZodType<DynamicWireValue> = z.lazy(() =>
       WireDoubleSchema,
       WireDateSchema,
       z.strictObject({ record: z.record(z.string(), DynamicWireValueSchema) }),
-      z.strictObject({ reference: unrepresentableDynamicPayload() }),
-      z.strictObject({ file: unrepresentableDynamicPayload() }),
+      unrepresentableDynamicKind('reference'),
+      unrepresentableDynamicKind('file'),
+      unrepresentableDynamicKind('fileSource'),
     ],
     {
       error:
@@ -156,3 +165,41 @@ export const DynamicWireValueSchema: z.ZodType<DynamicWireValue> = z.lazy(() =>
     }
   )
 )
+
+/**
+ * Schema for the payload of a `file` control record: file metadata and the
+ * runtime-issued fetch grant.
+ *
+ * @remarks
+ * The payload has the keys `path` (optional text), `exists` (a boolean),
+ * `observedAt` (a date control record, validated by {@link WireDateSchema}),
+ * and `grant` (non-empty text), and no others.
+ */
+export const FileWireSchema: z.ZodType<FileWire> = z.strictObject({
+  path: z.string().exactOptional(),
+  exists: z.boolean(),
+  observedAt: WireDateSchema,
+  grant: z.string().min(1, { error: 'A file grant must be non-empty text.' }),
+})
+
+/**
+ * Schema for the payload of a `fileSource` control record: a caller-owned
+ * file by path, or a completed upload by id.
+ *
+ * @remarks
+ * A caller-owned file has the keys `kind` (`"caller-owned-file"`) and `path`;
+ * an uploaded file has `kind` (`"uploaded-file"`) and `uploadId`. No other
+ * keys are allowed, and the path and the upload id are non-empty. The runtime's transfer step validates input against
+ * this schema and resolves uploads from the `FileSourceWire` it yields, before
+ * any SDK decoding.
+ */
+export const FileSourceWireSchema: z.ZodType<FileSourceWire> = z.discriminatedUnion('kind', [
+  z.strictObject({
+    kind: z.literal('caller-owned-file'),
+    path: z.string().min(1, { error: 'A caller-owned file path must be non-empty.' }),
+  }),
+  z.strictObject({
+    kind: z.literal('uploaded-file'),
+    uploadId: z.string().min(1, { error: 'An upload id must be non-empty.' }),
+  }),
+])

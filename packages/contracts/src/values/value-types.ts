@@ -27,12 +27,19 @@
  */
 
 import { z, type ZodType } from 'zod'
+import type { FileSource, FileValue } from '../files/index.js'
 import type { IssuePath } from '../issues.js'
+import type {
+  CollectionReferenceVariant,
+  ObjectReferenceVariant,
+  ReferenceRegistry,
+} from '../references/index.js'
 import { RGB_CHANNEL_MAX, type Rgb } from './color.js'
 import { INVALID, codecOf, defineValueType, mismatch, type Codec, type Issues } from './codec.js'
 import { DYNAMIC_CODEC } from './dynamic-codec.js'
+import { fileSourceType, fileType } from './file-types.js'
 import type { Point, Rectangle } from './geometry.js'
-import { INTEGER_LIMITS, Integer } from './integer.js'
+import { INTEGER_LIMITS, type Integer } from './integer.js'
 import { defineField, describeReceived, issue, isPlainObject, quote } from './issue-helpers.js'
 import {
   BOOLEAN_CODEC,
@@ -43,8 +50,10 @@ import {
   integerCodec,
 } from './leaf-codecs.js'
 import type { FieldPlan, ValuePlan } from './plan.js'
+import { referenceType } from './reference-type.js'
 import type { ValueType } from './value-type.js'
-import { EARLIEST_DATE_MS, LATEST_DATE_MS, wireIntegerSchema } from './wire-checks.js'
+import { dateSdkSchema, integerSdkSchema } from './sdk-schemas.js'
+import { wireIntegerSchema } from './wire-checks.js'
 import {
   DynamicWireValueSchema,
   WireDateSchema,
@@ -225,6 +234,76 @@ export interface ValueTypeConstructors {
    * nullable value, or a record field throws `TypeError`.
    */
   none(options?: ValueTypeOptions): ValueType<undefined>
+  /**
+   * A reference to one object of `resource`, in either form: an
+   * {@link IdentityReference} or a {@link SelectorReference}.
+   *
+   * @remarks
+   * `registry` returns the app's resource table (the app contract's
+   * `resources`), which supplies the identifier value type of `resource` and
+   * of every resource a container can name. It is a thunk so that record
+   * types of mutually referencing resources can compose: constructing the
+   * value type never calls it, while encoding, decoding, and schema use do.
+   *
+   * On the wire a reference is `{"reference": {…}}` (see {@link ReferenceWire}).
+   * Encoding reads only the data fields and never calls `resolve`, so a bound
+   * reference and a plain {@link ObjectReferenceData} descriptor encode alike.
+   * Decoding hands the decoded {@link ReferenceData} to
+   * `DecodeContext.bindReference`. A materialized {@link ReferenceList} is
+   * `t.array(t.reference(registry, resource, 'one'))`.
+   *
+   * @typeParam T - The referenced record.
+   * @typeParam Id - The SDK type of the resource's identifier.
+   * @throws `TypeError` when `registry` is not a function, `resource` is not a
+   * non-empty string, or `cardinality` is neither `'one'` nor `'many'`.
+   */
+  reference<T = unknown, Id = unknown>(
+    registry: () => ReferenceRegistry,
+    resource: string,
+    cardinality: 'one',
+    options?: ValueTypeOptions
+  ): ValueType<ObjectReferenceVariant<T, Id>>
+  /**
+   * A deferred collection of `resource` objects, in either form: an
+   * {@link IdentityCollectionReference} or a
+   * {@link SelectorCollectionReference}.
+   *
+   * @remarks
+   * As the single-object overload, with collection semantics: identity
+   * entries are single identity references to `resource`, and a range
+   * selector has `start <= end`.
+   *
+   * @typeParam T - The member record.
+   * @typeParam Id - The SDK type of the resource's identifier.
+   * @throws `TypeError` as the single-object overload.
+   */
+  reference<T = unknown, Id = unknown>(
+    registry: () => ReferenceRegistry,
+    resource: string,
+    cardinality: 'many',
+    options?: ValueTypeOptions
+  ): ValueType<CollectionReferenceVariant<T, Id>>
+  /**
+   * A {@link FileValue} an operation returns: `{"file": {…}}` on the wire.
+   *
+   * @remarks
+   * Decoding hands the decoded {@link FileData} to `DecodeContext.bindFile`,
+   * which keeps the grant private to the bound value. Encoding is the
+   * runtime's, from `FileData`; a value without a grant, such as a bound
+   * `FileValue`, is rejected, because operation inputs take file sources.
+   */
+  file(options?: ValueTypeOptions): ValueType<FileValue>
+  /**
+   * A {@link FileSource} an operation consumes: `{"fileSource": {…}}` on the
+   * wire.
+   *
+   * @remarks
+   * An uploaded file encodes as its `uploadId` only; its `expiresAt` must be
+   * a valid `Date` but is not sent, because the service is authoritative for
+   * expiry. Decoding admits only caller-owned files: upload handles are
+   * resolved by the service from the wire form, so decoding one fails.
+   */
+  fileSource(options?: ValueTypeOptions): ValueType<FileSource>
 }
 
 const DOUBLE_SDK_SCHEMA = z.union([
@@ -232,15 +311,6 @@ const DOUBLE_SDK_SCHEMA = z.union([
   z.nan(),
   z.literal([Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]),
 ])
-
-/** An SDK integer schema for `min..max` whose output carries the brand. */
-function integerSdkSchema(min: number, max: number) {
-  return z
-    .int()
-    .min(min)
-    .max(max)
-    .transform((value) => Integer.validate(value))
-}
 
 function stringType(options?: ValueTypeOptions): ValueType<string> {
   return defineValueType(
@@ -284,7 +354,7 @@ function dateType(options?: ValueTypeOptions): ValueType<Date> {
   return defineValueType(
     {
       plan: { kind: 'date' },
-      sdk: z.date().min(new Date(EARLIEST_DATE_MS)).max(new Date(LATEST_DATE_MS)),
+      sdk: dateSdkSchema(),
       wire: WireDateSchema,
       codec: DATE_CODEC,
     },
@@ -695,4 +765,7 @@ export const ValueTypes: ValueTypeConstructors = Object.freeze({
   optional: optionalField,
   unknown: unknownType,
   none: noneType,
+  reference: referenceType,
+  file: fileType,
+  fileSource: fileSourceType,
 })

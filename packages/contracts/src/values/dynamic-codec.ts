@@ -14,9 +14,12 @@
  * observable for a plain JavaScript number, and integrality is never treated
  * as evidence of it. Integer control records still decode, to numbers.
  *
- * References and file values cannot be represented in dynamic content: only a
- * typed position, whose contract names the resource or file, can bind them.
- * They are rejected as `unsupported`.
+ * References, file values, and file sources cannot be represented in dynamic
+ * content: they appear only at typed positions, whose contracts name the
+ * resource or the file kind. Their control records are rejected as
+ * `unsupported`. On the encode side there is nothing to reject by shape: a
+ * plain object shaped like a file source or a reference descriptor is a user
+ * record, and travels enveloped like any other.
  *
  * Absence is never materialized as `null`. A record value holding `undefined`
  * is absent and omitted; `undefined` anywhere else (at the root, or as an
@@ -31,7 +34,7 @@ import type { IssuePath } from '../issues.js'
 import { INVALID, mismatch, type Codec, type Invalid, type Issues } from './codec.js'
 import { DATE_CODEC, DOUBLE_CODEC, integerCodec } from './leaf-codecs.js'
 import { defineField, describeReceived, issue, isPlainObject, quote } from './issue-helpers.js'
-import { DYNAMIC_REFERENCE_OR_FILE_MESSAGE, checkDateValue, doublePayload } from './wire-checks.js'
+import { DYNAMIC_TYPED_ONLY_MESSAGE, checkDateValue, doublePayload } from './wire-checks.js'
 import type { DecodeContext } from './value-type.js'
 import type { WireValue } from './wire.js'
 
@@ -207,7 +210,8 @@ function decodeDynamic(
       return decodeEnvelope(wire[key], path, context, issues)
     case 'reference':
     case 'file':
-      issues.push(issue(path, 'unsupported', DYNAMIC_REFERENCE_OR_FILE_MESSAGE))
+    case 'fileSource':
+      issues.push(issue(path, 'unsupported', DYNAMIC_TYPED_ONLY_MESSAGE))
       return INVALID
     default:
       issues.push(

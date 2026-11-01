@@ -66,15 +66,23 @@ export interface OperationDescriptor<Input, Output> {
 export type AnyOperationDescriptor = OperationDescriptor<unknown, unknown>
 
 /**
- * What a client needs to hydrate references to one resource.
+ * What a client needs to encode, decode, and hydrate references to one
+ * resource.
  *
  * @typeParam RecordType - The resource's SDK record.
+ * @typeParam Id - The SDK type of the resource's identifier.
  */
-export interface ResourceDescriptor<RecordType> {
+export interface ResourceDescriptor<RecordType, Id = unknown> {
   /** The manifest resource key. */
   readonly name: string
   /** Contract of the resource's record. */
   readonly record: ValueType<RecordType>
+  /**
+   * Contract of the resource's identifier: it encodes and decodes the `id` of
+   * every identity reference to this resource, including references that
+   * appear as another reference's container.
+   */
+  readonly id: ValueType<Id>
   /** Operation that reads one object, used to resolve single references. */
   readonly get?: OperationId
   /** Operation that lists objects, used to resolve collection references. */
@@ -108,7 +116,16 @@ export interface AppContract<Client> {
   readonly app: string
   /** Every operation, keyed by identity. */
   readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
-  /** Every resource that references can point to, keyed by manifest resource key. */
+  /**
+   * Every resource that references can point to, keyed by manifest resource
+   * key.
+   *
+   * @remarks
+   * This table is the app's reference registry: it is assignable to
+   * {@link ReferenceRegistry}, and reference value types read identifier
+   * types from it (through a lazy thunk), so generated code builds no
+   * parallel table.
+   */
   readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>
   /**
    * Load the app manifest. Called only by the Mac-side runtime, which validates

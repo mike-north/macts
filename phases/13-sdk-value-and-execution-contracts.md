@@ -617,7 +617,7 @@ authority.
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `app`                                  | Route segment                                                                                                                                                                            |
 | `operations`                           | All operation descriptors, keyed by `OperationId`                                                                                                                                        |
-| `resources`                            | Per-resource record value type plus the operation ids used to resolve references                                                                                                         |
+| `resources`                            | Per-resource record value type, identifier value type (`id`), and the operation ids used to resolve references. This table is the reference registry (D7).                               |
 | `loadManifest(): Promise<unknown>`     | A lazy dynamic import of the generated manifest module. It is called only by the Mac-side runtime, which validates the result with `AppManifestSchema`, so remote clients never load it. |
 | `bind(runtime: ClientRuntime): Client` | A generated, fully type-checked function that maps positional SDK methods onto `runtime.invoke(descriptor, inputRecord)`                                                                 |
 
@@ -687,12 +687,15 @@ example `{"x":{"double":1},"y":{"double":2}}` and
    `{"record":{"integer":"42"}}` and decodes back to the same record. A bare
    object that is not a known control record is a decode error.
 
-   References and files are part of `DynamicWireValue`, but until the
-   reference and file value types (D7, D8) and their `DecodeContext` binding
-   exist, the dynamic wire schema and codecs reject `{"reference":…}` and
-   `{"file":…}` inside dynamic content as not representable there, and the
-   derived JSON Schema does not advertise them. The follow-up that adds those
-   value types decides whether dynamic content admits them.
+   References, file values, and file sources appear only at typed
+   positions. Inside dynamic content, `{"reference":…}`, `{"file":…}`, and
+   `{"fileSource":…}` are decode and encode failures, `DynamicWireValue` does
+   not include them, and the derived JSON Schema does not advertise them.
+   Decoding a reference needs the resource's identifier type from the app's
+   resource table, which an `unknown` position does not name. A file value
+   carries a runtime-issued grant that dynamic content has no way to
+   establish. The native side cannot produce them there either: app objects
+   and path objects fail to encode (D10).
 
 ## D4. Native Codec Interface and Executor Consumption
 
@@ -905,9 +908,45 @@ filter, order, and range ("ten most recent") are defined there as well.
 - either `id` (wire-encoded), `entries`, or `selector`, depending on the form
 - an optional `container` reference
 
+**Identifier types.** A reference's `id` and every container's `id` are
+wire-encoded by their own resource's identifier value type. A container
+usually belongs to a different resource. The reference value type is built
+as `t.reference(registry, resource, cardinality)`. `registry` is a lazy view
+of the app contract's `resources` table, where each `ResourceDescriptor`
+carries `id` (D2), so generated code builds no parallel table. Laziness lets
+mutually referencing record types compose, and construction never reads the
+table. A resource key that is missing from the table, whether at the top
+level or in a container, is an encode and decode issue. A materialized
+`ReferenceList` is `t.array(t.reference(…, 'one'))`, with no constructor of
+its own. A typed reference position accepts both forms of its cardinality.
+
+**Encoding.** Encoding reads only the data fields (`resource`, `form`,
+`cardinality`, and `id`, `selector`, `entries`, or `container`). It never
+calls `resolve` or any other live member, so a bound reference and a plain
+descriptor encode alike, whichever client decoded the reference. It
+validates the following:
+
+- `resource` and `cardinality` equal the declared ones.
+- Every identity-collection entry is a single identity reference to the same
+  resource.
+- Selector indexes and range bounds are non-negative integers, and a range
+  has `start <= end`. `start === end` is a valid empty range. A range past the
+  collection's end is detectable only at resolution, so it remains an
+  `InvalidSelectionError`.
+- A container is a single reference.
+
+Decoding applies the same rules to the strict wire form.
+
 **Binding.** References are live objects bound to the client that decoded
-them, via `DecodeContext.bindReference`. Hydration therefore follows the
-factory, with no separate API. Resolution is a runtime-level call executed by
+them, via `DecodeContext.bindReference`. The binder receives decoded
+`ReferenceData` (the data-only form of each variant): ids decoded through the
+registry, selector positions as `Integer`, and containers as nested data. It
+never receives wire encodings. Each bound reference type is its data form
+plus `Resolvable`, so a bound reference is itself valid encode input. A
+remote `resolve()` sends the reference by re-encoding its data through the
+same value type, which yields the canonical wire form. It never replays the
+wire it received. Hydration therefore follows the factory, with no separate
+API. Resolution is a runtime-level call executed by
 the provider. A single reference requires the resource's `get` permission, and
 a collection reference requires the resource's `list` permission. A resource
 with no corresponding operation is not resolvable, and its references fail
@@ -961,6 +1000,37 @@ tests:
 - completion rules: an upload is unusable until fully received, and an expired
   or incomplete upload fails with `TransferError`
 - cleanup after use or failure
+
+**Decoding and binding.** `t.file()` decodes the strict `file` wire form
+into `FileData` (`path?`, `existence` with `observedAt` as a `Date`, and
+`grant`) and passes it to `DecodeContext.bindFile`. The binder keeps the
+grant in a closure. `FileValue` has no grant property, enumerable or
+otherwise, so serializing, inspecting, or logging a file value cannot reveal
+it. Encoding a file value happens only on the runtime side, from `FileData`.
+File values are outputs, so a `FileValue` at an input position, or any value
+without a grant, is a `ValidationError`.
+
+The native codec cannot issue grants. Its file output is a grant-free
+observation, and execution attaches the grant before the `file` wire form
+leaves the runtime. Execution specifies that intermediate shape together
+with the native file conversion. The native codec never emits a placeholder
+grant.
+
+**File sources.** Encoding an `UploadedFile` emits only `kind` and `uploadId`.
+`expiresAt` stays on the SDK type because it is the upload endpoint's answer
+to the caller, but an expiry asserted by the caller would be untrusted. The
+transfer store is authoritative for expiry and completion. The runtime
+validates input against the wire schema and works on `FileSourceWire`. Its
+transfer step resolves `uploadId` against the store and checks that the
+upload belongs to the invoking authority's subject. An unknown upload, or
+one belonging to another subject, fails as `TransferError` `unknown-transfer`.
+An expired upload fails as `expired`. The transfer step then stages the
+source for the executor. SDK decoding of a `fileSource` is reachable only
+when that step is bypassed, so `t.fileSource().decode` decodes
+`caller-owned-file` and rejects `uploaded-file` with an issue ("upload
+handles are resolved by the service"). This is the fail-closed behavior.
+`@macts/contracts` exports the strict `FileSourceWireSchema` for the
+transfer step.
 
 **MCP.** MCP tool results carry only `file` metadata and `FetchedFile` handles.
 Bytes are never inlined.

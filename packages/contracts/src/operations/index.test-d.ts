@@ -13,9 +13,13 @@ import type {
   ClientFactory,
   FileValue,
   ClientRuntime,
+  Integer,
   OperationDescriptor,
   OperationId,
   PermissionString,
+  ReferenceRegistry,
+  ResourceDescriptor,
+  ValueType,
 } from '../index.js'
 
 interface ListEventsInput {
@@ -53,3 +57,22 @@ expectNotAssignable<PermissionString>('calendar:events')
 // reference resolution.
 expectType<CallOptions>(null as unknown as NonNullable<Parameters<ClientRuntime['invoke']>[2]>)
 expectType<CallOptions>(null as unknown as NonNullable<Parameters<FileValue['fetch']>[0]>)
+
+// Resource descriptors carry the identifier value type, so an app contract's
+// resources table is its reference registry, with no parallel table.
+expectType<ValueType<unknown>>(null as unknown as ResourceDescriptor<CalendarEvent>['id'])
+
+// The identifier type is carried, and a typed descriptor still fits the
+// contract's untyped resources table.
+declare const typedEvents: ResourceDescriptor<CalendarEvent, Integer>
+expectType<ValueType<Integer>>(typedEvents.id)
+expectAssignable<ResourceDescriptor<unknown>>(typedEvents)
+expectAssignable<AppContract<CalendarClient>['resources']>({ events: typedEvents })
+expectAssignable<ReferenceRegistry>({ events: typedEvents })
+// Negative: an identifier type does not substitute for a different one.
+expectNotAssignable<ResourceDescriptor<CalendarEvent, string>>(typedEvents)
+expectAssignable<ReferenceRegistry>(calendar.resources)
+expectAssignable<ReferenceRegistry>(null as unknown as AppContract<CalendarClient>['resources'])
+declare const eventRecord: ValueType<CalendarEvent>
+// Negative: a resource descriptor without an identifier type is incomplete.
+expectNotAssignable<ResourceDescriptor<CalendarEvent>>({ name: 'events', record: eventRecord })

@@ -14,11 +14,18 @@
  * @see phases/13-sdk-value-and-execution-contracts.md §A4 (Presence, Nullability, and Updates)
  * @see phases/13-sdk-value-and-execution-contracts.md §A5 (closed enums)
  * @see phases/13-sdk-value-and-execution-contracts.md §D2 (SDK types versus wire types)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D7 (Reference Hydration Contracts)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D8 (Binary Transfer Handle Shapes)
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 import {
   ValueTypes,
+  type CollectionReferenceVariant,
+  type FileSource,
+  type FileValue,
+  type ObjectReferenceVariant,
+  type ReferenceRegistry,
   type CodecResult,
   type DecodeContext,
   type InferSdk,
@@ -134,3 +141,40 @@ expectType<OptionalField<string>>(t.optional(t.string()))
 expectNotAssignable<ValueType<unknown>>(t.optional(t.string()))
 expectNotAssignable<Parameters<typeof t.array>[0]>(t.optional(t.string()))
 expectNotAssignable<Parameters<typeof t.nullable>[0]>(t.optional(t.string()))
+
+// References: the cardinality overload fixes the bound union, and the record
+// and identifier types default to unknown.
+declare const registry: () => ReferenceRegistry
+interface Note {
+  readonly title: string
+}
+expectType<ValueType<ObjectReferenceVariant<unknown, unknown>>>(
+  t.reference(registry, 'note', 'one')
+)
+expectType<ValueType<CollectionReferenceVariant<unknown, unknown>>>(
+  t.reference(registry, 'note', 'many')
+)
+const noteRef = t.reference<Note, string>(registry, 'note', 'one')
+expectType<ValueType<ObjectReferenceVariant<Note>>>(noteRef)
+expectType<ValueType<CollectionReferenceVariant<Note>>>(
+  t.reference<Note, string>(registry, 'note', 'many', { description: 'Notes.' })
+)
+expectNotAssignable<ValueType<CollectionReferenceVariant<Note>>>(noteRef)
+
+// A materialized reference list is an array of single references, and records
+// compose reference fields.
+expectType<ValueType<readonly ObjectReferenceVariant<Note>[]>>(t.array(noteRef))
+const folder = t.record({ name: t.string(), pinned: t.optional(t.nullable(noteRef)) })
+expectAssignable<ValueType<unknown>>(folder)
+expectType<{ readonly name: string; readonly pinned?: ObjectReferenceVariant<Note> | null }>(
+  null as unknown as InferSdk<typeof folder>
+)
+
+// Negative: a cardinality must be a literal; the registry is a thunk, not a table.
+expectNotAssignable<Parameters<typeof t.reference>[2]>('some')
+declare const table: ReferenceRegistry
+expectNotAssignable<Parameters<typeof t.reference>[0]>(table)
+
+// Files.
+expectType<ValueType<FileValue>>(t.file())
+expectType<ValueType<FileSource>>(t.fileSource())
