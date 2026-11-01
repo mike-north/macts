@@ -1,10 +1,13 @@
 /**
  * End-to-end tests for the macts API server.
  *
- * Uses real authentication, permissions, validation, rate limiting,
- * and storage (no mocks). Tests the full middleware stack through
- * the Hono app.request() interface.
+ * Uses the real key store, credential verification, permissions, input
+ * validation, and rate limiting, driven through the Hono `app.request()`
+ * interface. Only the executor is a recording stub, so no Mac app runs and a
+ * request that passes every check answers 200. Expected error codes and
+ * statuses follow the phases/13 D6 table.
  *
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6)
  * @packageDocumentation
  */
 
@@ -13,6 +16,8 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
 import type { AppManifest } from '@macts/core'
+import type { AppOptions } from './index.js'
+import { createRecordingExecutor, type RecordingExecutor } from './test-helpers.js'
 
 /**
  * Dynamically imported modules that depend on HOME environment.
@@ -21,14 +26,28 @@ import type { AppManifest } from '@macts/core'
 let runtime: typeof import('@macts/runtime')
 let serverModule: typeof import('./index.js')
 
-/** Type aliases for responses */
+/** The D6 error envelope. */
 interface ErrorResponse {
   error: {
     code: string
     message: string
-    required?: string
-    details?: unknown
+    details: Record<string, unknown>
   }
+}
+
+/** The stub executor for the current test. */
+let executor: RecordingExecutor
+
+/** The server app over the test manifest, with the stub executor. */
+function appWith(
+  options: Omit<AppOptions, 'executor'> = {}
+): ReturnType<typeof serverModule.createApp> {
+  return serverModule.createApp([testManifest], {
+    cors: false,
+    logging: false,
+    executor,
+    ...options,
+  })
 }
 
 /** Test manifest with realistic commands */
@@ -111,6 +130,7 @@ describe('E2E: API Server', () => {
     // Re-import modules to pick up new HOME / secret
     runtime = await import('@macts/runtime')
     serverModule = await import('./index.js')
+    executor = createRecordingExecutor()
   })
 
   afterEach(() => {
@@ -140,10 +160,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:items:list'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',
@@ -154,18 +171,13 @@ describe('E2E: API Server', () => {
         body: JSON.stringify({}),
       })
 
-      // Should pass auth and permission checks.
-      // Will return 500 because JXA execution doesn't work in tests,
-      // but the point is it got past auth (not 401) and permissions (not 403).
-      expect(res.status).not.toBe(401)
-      expect(res.status).not.toBe(403)
+      expect(res.status).toBe(200)
+      expect(await res.json()).toEqual({ result: { events: [] } })
+      expect(executor.requests).toHaveLength(1)
     })
 
     it('should reject requests without authorization header', async () => {
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',
@@ -173,14 +185,12 @@ describe('E2E: API Server', () => {
 
       expect(res.status).toBe(401)
       const body = (await res.json()) as ErrorResponse
-      expect(body.error.code).toBe('MISSING_AUTHORIZATION')
+      expect(body.error.code).toBe('UNAUTHENTICATED')
+      expect(body.error.details).toEqual({ reason: 'missing' })
     })
 
     it('should reject requests with a tampered token', async () => {
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',
@@ -190,7 +200,13 @@ describe('E2E: API Server', () => {
         },
       })
 
+      // Six dot-separated segments are not a compact JWS, so the key is not
+      // well-formed (INVALID_FORMAT → malformed).
       expect(res.status).toBe(401)
+      const body = (await res.json()) as ErrorResponse
+      expect(body.error.code).toBe('UNAUTHENTICATED')
+      expect(body.error.details).toEqual({ reason: 'malformed' })
+      expect(executor.requests).toHaveLength(0)
     })
   })
 
@@ -202,10 +218,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:items:list'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       // Try to access an endpoint requiring a different permission
       const res = await app.request('/api/v1/rpc/testapp.app.quit', {
@@ -220,7 +233,8 @@ describe('E2E: API Server', () => {
       expect(res.status).toBe(403)
       const body = (await res.json()) as ErrorResponse
       expect(body.error.code).toBe('PERMISSION_DENIED')
-      expect(body.error.required).toBe('testapp:app:quit')
+      expect(body.error.details['required']).toBe('testapp:app:quit')
+      expect(executor.requests).toHaveLength(0)
     })
 
     it('should allow access when key has the required permission', async () => {
@@ -229,10 +243,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:app:quit'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.app.quit', {
         method: 'POST',
@@ -243,9 +254,8 @@ describe('E2E: API Server', () => {
         body: JSON.stringify({}),
       })
 
-      // Should pass auth and permission -- 500 from JXA is expected
-      expect(res.status).not.toBe(401)
-      expect(res.status).not.toBe(403)
+      expect(res.status).toBe(200)
+      expect(executor.requests[0]?.target).toEqual({ command: 'quit' })
     })
   })
 
@@ -257,11 +267,7 @@ describe('E2E: API Server', () => {
       })
 
       // Create server with very low rate limit
-      const { app } = serverModule.createMultiServer([testManifest], {
-        cors: false,
-        logging: false,
-        rateLimit: { max: 2, windowMs: 60_000 },
-      })
+      const app = appWith({ rateLimit: { max: 2, windowMs: 60_000 } })
 
       const makeRequest = () =>
         app.request('/api/v1/rpc/testapp.items.list', {
@@ -273,20 +279,20 @@ describe('E2E: API Server', () => {
           body: JSON.stringify({}),
         })
 
-      // First two requests should not be rate limited
-      const res1 = await makeRequest()
-      expect(res1.status).not.toBe(429)
+      // First two requests are admitted
+      expect((await makeRequest()).status).toBe(200)
+      expect((await makeRequest()).status).toBe(200)
 
-      const res2 = await makeRequest()
-      expect(res2.status).not.toBe(429)
-
-      // Third request should be rate limited
+      // The third is turned away before it runs
       const res3 = await makeRequest()
       expect(res3.status).toBe(429)
 
       const body = (await res3.json()) as ErrorResponse
-      expect(body.error.code).toBe('RATE_LIMIT_EXCEEDED')
-      expect(res3.headers.get('Retry-After')).toBeTruthy()
+      expect(body.error.code).toBe('RATE_LIMITED')
+      const retryAfter = body.error.details['retryAfterSeconds']
+      expect(Number.isInteger(retryAfter)).toBe(true)
+      expect(res3.headers.get('Retry-After')).toBe(String(retryAfter))
+      expect(executor.requests).toHaveLength(2)
     })
 
     it('should allow requests when rate limiting is disabled', async () => {
@@ -295,11 +301,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:items:list'],
       })
 
-      const { app } = serverModule.createMultiServer([testManifest], {
-        cors: false,
-        logging: false,
-        rateLimit: false,
-      })
+      const app = appWith({ rateLimit: false })
 
       const makeRequest = () =>
         app.request('/api/v1/rpc/testapp.items.list', {
@@ -311,10 +313,10 @@ describe('E2E: API Server', () => {
           body: JSON.stringify({}),
         })
 
-      // Should never get 429 regardless of request count
+      // Never limited, regardless of request count
       for (let i = 0; i < 5; i++) {
         const res = await makeRequest()
-        expect(res.status).not.toBe(429)
+        expect(res.status).toBe(200)
       }
     })
   })
@@ -331,10 +333,7 @@ describe('E2E: API Server', () => {
       const revoked = runtime.revokeKey(metadata.id)
       expect(revoked).toBe(true)
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',
@@ -347,7 +346,9 @@ describe('E2E: API Server', () => {
       expect(res.status).toBe(401)
 
       const body = (await res.json()) as ErrorResponse
-      expect(body.error.code).toBe('REVOKED')
+      expect(body.error.code).toBe('UNAUTHENTICATED')
+      expect(body.error.details).toEqual({ reason: 'revoked' })
+      expect(executor.requests).toHaveLength(0)
     })
 
     it('should allow requests with a non-revoked key', async () => {
@@ -356,10 +357,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:items:list'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',
@@ -370,8 +368,7 @@ describe('E2E: API Server', () => {
         body: JSON.stringify({}),
       })
 
-      // Should pass auth -- 500 from JXA execution is expected
-      expect(res.status).not.toBe(401)
+      expect(res.status).toBe(200)
     })
   })
 
@@ -382,10 +379,7 @@ describe('E2E: API Server', () => {
         permissions: ['testapp:items:get'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1/rpc/testapp.items.get', {
         method: 'POST',
@@ -398,19 +392,19 @@ describe('E2E: API Server', () => {
 
       expect(res.status).toBe(400)
       const body = (await res.json()) as ErrorResponse
-      expect(body.error.code).toBe('INVALID_REQUEST')
+      expect(body.error.code).toBe('VALIDATION_FAILED')
+      expect(body.error.details).toEqual({
+        issues: [{ path: [], message: 'Request body must be valid JSON' }],
+      })
     })
 
-    it('should return 400 VALIDATION_ERROR for missing required parameter', async () => {
+    it('should return 400 VALIDATION_FAILED for missing required parameter', async () => {
       const { token } = await runtime.createApiKey({
         name: 'e2e-missing-param-key',
         permissions: ['testapp:items:get'],
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       // The 'get' command requires an 'id' parameter
       const res = await app.request('/api/v1/rpc/testapp.items.get', {
@@ -424,17 +418,16 @@ describe('E2E: API Server', () => {
 
       expect(res.status).toBe(400)
       const body = (await res.json()) as ErrorResponse
-      expect(body.error.code).toBe('VALIDATION_ERROR')
-      expect(body.error.message).toBe('Request validation failed')
+      expect(body.error.code).toBe('VALIDATION_FAILED')
+      const issues = body.error.details['issues'] as { path: unknown }[]
+      expect(issues.map((issue) => issue.path)).toEqual([['id']])
+      expect(executor.requests).toHaveLength(0)
     })
   })
 
   describe('unauthenticated endpoints', () => {
     it('should serve health endpoint without auth', async () => {
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/health')
       expect(res.status).toBe(200)
@@ -445,10 +438,7 @@ describe('E2E: API Server', () => {
     })
 
     it('should serve API info endpoint without auth', async () => {
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       const res = await app.request('/api/v1')
       expect(res.status).toBe(200)
@@ -468,10 +458,7 @@ describe('E2E: API Server', () => {
         expires: '1s',
       })
 
-      const app = serverModule.createApp([testManifest], {
-        cors: false,
-        logging: false,
-      })
+      const app = appWith()
 
       // Wait for expiration
       await new Promise<void>((resolve) => {
@@ -489,7 +476,8 @@ describe('E2E: API Server', () => {
 
       expect(res.status).toBe(401)
       const body = (await res.json()) as ErrorResponse
-      expect(body.error.code).toBe('EXPIRED')
+      expect(body.error.code).toBe('UNAUTHENTICATED')
+      expect(body.error.details).toEqual({ reason: 'expired' })
     })
   })
 })

@@ -12,42 +12,29 @@ export {
   createApp,
   DEFAULT_PORT,
   DEFAULT_HOST,
+  DEFAULT_SUBJECT_RATE_LIMIT,
+  type AppOptions,
+  type RateLimitOptions,
   type ServerOptions,
   type ServerInstance,
   type TlsOptions,
   type LoadedTlsOptions,
 } from './server/index.js'
 
-// Middleware
+// HTTP adapter over the runtime
 export {
-  authMiddleware,
-  createInFlightTracker,
-  requirePermission,
-  rpcPathToPermission,
-  requirePolicy,
-  type AuthVariables,
-  type AuthErrorCode,
-  type AuthErrorResponse,
-  type InFlightTracker,
-  type PermissionErrorResponse,
-  type PermissionMiddlewareOptions,
-  type RequirePolicyOptions,
-  type GovernanceDeniedResponse,
-  type GovernancePendingResponse,
-  type GovernanceApprovalDeniedResponse,
-} from './server/middleware/index.js'
-
-// RPC handlers
-export {
-  createRpcRouter,
-  createMultiAppRpcRouter,
-  type RpcRequest,
+  createHttpAdapter,
+  httpStatusForError,
+  defaultClientAddress,
+  DEFAULT_ADDRESS_RATE_LIMIT,
+  type ClientAddressResolver,
+  type HttpAdapterOptions,
   type RpcSuccessResponse,
-  type RpcErrorResponse,
-  type RpcHandler,
-  type RpcHandlerContext,
-  type RpcEndpointInfo,
-} from './server/handlers/index.js'
+} from './server/adapter.js'
+export type { WireErrorEnvelope } from '@macts/contracts'
+
+// Server-level middleware
+export { createInFlightTracker, type InFlightTracker } from './server/middleware/index.js'
 
 // Telemetry
 export {

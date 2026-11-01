@@ -146,6 +146,9 @@ export function createKeyStoreVerifier(): CredentialVerifier;
 export function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 // @public
+export function createRateLimiter(options?: RateLimiterOptions): RateLimiter;
+
+// @public
 export function createReadOnlyKey(appName: string, name: string, permissionsSection: PermissionsSection, expires?: Date | number | string): Promise<CreateApiKeyResult>;
 
 // @public
@@ -157,6 +160,7 @@ export interface CreateRuntimeOptions {
     readonly executor: Executor;
     readonly governance?: GovernanceContext;
     readonly logger?: RuntimeLogger;
+    readonly rateLimiter?: RateLimiter;
     readonly verifier?: CredentialVerifier;
 }
 
@@ -334,6 +338,26 @@ export class PermissionCaseMismatchError extends Error {
 }
 
 export { PermissionCheckResult }
+
+// @public
+export type RateLimitAdmission = {
+    readonly allowed: true;
+} | {
+    readonly allowed: false;
+    readonly retryAfterSeconds: number;
+};
+
+// @public
+export interface RateLimiter {
+    admit(key: string): RateLimitAdmission;
+}
+
+// @public
+export interface RateLimiterOptions {
+    readonly clock?: () => Date;
+    readonly max?: number;
+    readonly windowMs?: number;
+}
 
 // @public
 export interface RegisteredOperation {

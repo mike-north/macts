@@ -846,6 +846,7 @@ authority, in both modes. Adapters translate protocol context into an
 | Step                                                                                                 | Reuses                                                                                                     | Failure                                                                                                                                                                                                                                                     |
 | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1. Verify credential → `Authority`                                                                   | `validateApiKey`, moved unchanged to the runtime                                                           | `AuthenticationError` with `reason`: `missing`, `malformed` (`INVALID_FORMAT`, `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`                                                                                                  |
+| 1b. Admission (optional): `rateLimiter.admit(authority.subject)`                                     | The fixed-window counter of the former HTTP rate-limit middleware, as `createRateLimiter`                  | `RateLimitedError` (`retryAfterSeconds`). A limiter that throws denies with `InternalError`, never `RateLimitedError`.                                                                                                                                      |
 | 2. Permission check against `descriptor.permission`, using the manifest command's permission history | `checkPayloadPermission` / `hasPermission`                                                                 | `PermissionDeniedError` (`required`, `hint`, `changelog`)                                                                                                                                                                                                   |
 | 3. Governance: `resolveGovernanceForRequest(governance, authority.subject)` → `enforceCall`          | Audit context `{ apiKeyId: subject, argsSummary: redactArgs(wire input), timestamp: clock(), approvalId }` | `PolicyDeniedError`. With no approval gate, a confirm-first hold raises `ApprovalPendingError`. With a gate, the runtime calls `seekApproval` then `recordApprovalDecision`; a rejection, a timeout, or a failure to record raises `ApprovalRejectedError`. |
 | 4. Input validation against `descriptor.input.wire`                                                  | —                                                                                                          | `ValidationError`. This catches raw wire requests and casts that bypassed client-side `encode`.                                                                                                                                                             |
@@ -855,6 +856,22 @@ The step order is today's order. Fail-closed rules carry over unchanged: a
 resolver failure, an `enforceCall` failure, or an audit-write failure denies
 the call. Steps 1–3 also govern reference resolution and file fetch, which are
 read-risk calls (D7, D8). Execution owns the pipeline.
+
+Step 1b is admission, not authority. It runs only when the runtime is
+constructed with a `rateLimiter`, keyed by the verified subject, so it never
+sees an unauthenticated call. It never changes the `Authority` and never
+grants anything: an admitted call still passes steps 2–5. If the limiter
+itself fails (`admit` throws, or a denial carries an invalid retry delay), the
+call is denied with `InternalError`, following the fail-closed rule. It is not
+reported as `RateLimitedError`, because the caller did not exceed a limit and
+a 429 would invite a retry that cannot help.
+
+Transport protection that is not policy stays in the adapter and outside this
+table. The HTTP adapter applies a coarse per-client-address request limit
+before calling the runtime, because step 1b never counts failed
+authentication. It answers with the same `RATE_LIMITED` envelope and
+`Retry-After`, and is skipped when the request has no network peer (an
+in-process request).
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
@@ -873,31 +890,52 @@ abstract `MactsError<Code>` and carries:
 `AnyMactsError` is the union of all classes. A `switch (error.code)` over it
 narrows `details`.
 
-| Class                           | `code`                       | Distinct meaning                                                                                                                   | Default HTTP                     |
-| ------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                          | 400                              |
-| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`). | 502                              |
-| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                          | 401                              |
-| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                           | 403                              |
-| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                         | 403                              |
-| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                             | 409                              |
-| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                   | 403                              |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist                                                                                                   | 404                              |
-| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                    | 404                              |
-| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                           | 400                              |
-| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                      | 503                              |
-| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                        | 503                              |
-| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                     | 502                              |
-| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                             | 504                              |
-| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                   | n/a (the caller stopped waiting) |
-| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                   | 400 / 410 / 413                  |
-| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                              | 500                              |
-| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                         | n/a                              |
+| Class                           | `code`                       | Distinct meaning                                                                                                                   | Default HTTP                                      |
+| ------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `ValidationError`               | `VALIDATION_FAILED`          | Caller input violated the operation contract (`issues[]`)                                                                          | 400                                               |
+| `UnexpectedValueError`          | `UNEXPECTED_VALUE`           | An app result violated the contract. This includes an enum member the SDK does not know and an out-of-policy integer (`issues[]`). | 502                                               |
+| `AuthenticationError`           | `UNAUTHENTICATED`            | Credential missing or unusable (`reason`)                                                                                          | 401                                               |
+| `RateLimitedError`              | `RATE_LIMITED`               | The caller exceeded its admission limit; not evaluated further (`retryAfterSeconds`, a non-negative integer)                       | 429                                               |
+| `PermissionDeniedError`         | `PERMISSION_DENIED`          | Credential lacks the required permission                                                                                           | 403                                               |
+| `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                         | 403                                               |
+| `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                             | 409                                               |
+| `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                   | 403                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist                                                                                                   | 404                                               |
+| `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                    | 404                                               |
+| `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                           | 400                                               |
+| `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                      | 503                                               |
+| `AppAuthorizationRequiredError` | `APP_AUTHORIZATION_REQUIRED` | macOS has not authorized automating the app. This is distinct from macts permission denial.                                        | 503                                               |
+| `AppOperationError`             | `APP_OPERATION_FAILED`       | The app reported a failure not covered above (`appErrorCode?`)                                                                     | 502                                               |
+| `OperationTimeoutError`         | `TIMEOUT`                    | The operation exceeded its time budget                                                                                             | 504                                               |
+| `OperationCancelledError`       | `CANCELLED`                  | The caller aborted the operation                                                                                                   | n/a (the caller stopped waiting); recorded as 499 |
+| `TransferError`                 | `TRANSFER_FAILED`            | A transfer expired, was incomplete, was too large, or is unknown                                                                   | 400 / 410 / 413                                   |
+| `InternalError`                 | `INTERNAL`                   | An unexpected macts failure, with a sanitized message                                                                              | 500                                               |
+| `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                         | n/a                                               |
 
 **Wire codec.** An error response body is
 `{ "error": { "code", "message", "details" } }`. The error envelope is protocol
 metadata with its own per-code schemas, not the value codec. Its fields are
 strings, booleans, and small integers, which JSON represents exactly.
+
+**Route misses.** A request that matches no HTTP route, including
+`POST /rpc/<unregistered id>`, is answered 404 with
+`{ "error": { "code": "NOT_FOUND", "message", "details": {} } }` and never
+reaches the runtime. `NOT_FOUND` is deliberately outside the registry: a
+client hitting an unknown route is a protocol mismatch, not an operation
+outcome, so the client reconstructs it as `TransportError` with reason
+`'protocol-mismatch'` like any other unknown code.
+
+**Unreadable bodies.** A request body that is not JSON cannot become an
+operation input, so the HTTP adapter answers it with `ValidationError` (400,
+one issue at path `[]`) before invoking the runtime. This is a framing check,
+like a route miss: no credential is verified and nothing is executed, and
+route names are already public through unauthenticated introspection. An
+absent or empty body is the empty input `{}` and is invoked normally.
+
+**Unexpected failures.** Anything the HTTP adapter cannot encode as a
+canonical wire error (a non-canonical throw, or details that fail their
+schema) is answered 500 with a generic `INTERNAL` envelope. The original is
+logged on the service and never echoed.
 
 **Reconstruction.**
 

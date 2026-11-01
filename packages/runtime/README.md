@@ -13,6 +13,7 @@ other.
 | Area               | Highlights                                                                                                                                                    |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Invocation         | `createRuntime`, `MactsRuntime` (`registerManifest`, `registerContract`, `invoke`), `createBearerCredential`, `createKeyStoreVerifier`                        |
+| Admission          | `createRateLimiter`, `RateLimiter`, `RateLimitAdmission`                                                                                                      |
 | API keys           | `createApiKey`, `validateApiKey`, `validateAndCheckPermission`, `checkPayloadPermission`, `revokeKey`, `loadKeyMetadata`, `getSigningSecret`, `closeKeyStore` |
 | Per-key policies   | `setKeyPolicy`, `getKeyPolicy`, `deleteKeyPolicy`, `listKeyPolicyIds`, `createStoredKeyPolicyResolver`                                                        |
 | Governance loading | `loadActivePolicy`, `ALLOW_ALL_POLICY`, `loadApprovalGate`, `GovernanceContext`, `resolveGovernanceForRequest`                                                |
@@ -38,10 +39,23 @@ if (result.valid) {
 ## Invoking operations
 
 Every operation runs through one pipeline, in this order, for every caller:
-verify the credential, check the operation's permission, enforce governance
-policy (auditing the decision and, for a held call, asking a human), validate
-the input, then hand the request to the executor the runtime was built with.
-Failures are the structured errors from `@macts/contracts`.
+verify the credential, admit the call against the optional per-subject rate
+limit, check the operation's permission, enforce governance policy (auditing
+the decision and, for a held call, asking a human), validate the input, then
+hand the request to the executor the runtime was built with. Failures are the
+structured errors from `@macts/contracts`.
+
+Admission only turns calls away (`RateLimitedError`); it never grants
+anything. A limiter that fails denies the call with `InternalError`.
+
+```ts
+import { createRateLimiter, createRuntime } from '@macts/runtime'
+
+const runtime = createRuntime({
+  executor,
+  rateLimiter: createRateLimiter({ max: 100, windowMs: 60_000 }),
+})
+```
 
 ```ts
 import { createBearerCredential, createRuntime } from '@macts/runtime'

@@ -14,9 +14,9 @@
  * - **Shared host state** — where macts keeps its configuration and data
  *   (`MACTS_HOME`), and the process-wide structured logger.
  * - **Invocation** — the single pipeline every operation runs through
- *   (verify the credential, check permission, enforce governance, validate
- *   input, execute), the operation registry it dispatches from, and the
- *   self-redacting credential holder.
+ *   (verify the credential, admit it against an optional rate limit, check
+ *   permission, enforce governance, validate input, execute), the operation
+ *   registry it dispatches from, and the self-redacting credential holder.
  *
  * The runtime depends on `@macts/core` and `@macts/contracts`. It never
  * depends on a transport adapter or on the public client package, so both can
@@ -36,6 +36,14 @@ export {
 // Credentials and their verification
 export { createBearerCredential } from './invocation/credential.js'
 export { createKeyStoreVerifier, type CredentialVerifier } from './invocation/verifier.js'
+
+// Admission limiting
+export {
+  createRateLimiter,
+  type RateLimiter,
+  type RateLimiterOptions,
+  type RateLimitAdmission,
+} from './invocation/rate-limiter.js'
 
 // Registered operations and manifest-derived descriptors
 export {

@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.13.0",
+    "@macts/contracts": "workspace:*",
     "@macts/core": "workspace:*",
     "@macts/runtime": "workspace:*",
     "hono": "^4.7.0",

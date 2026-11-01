@@ -200,6 +200,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.0
         version: 1.19.9(hono@4.11.9)
+      '@macts/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@macts/core':
         specifier: workspace:*
         version: link:../core
