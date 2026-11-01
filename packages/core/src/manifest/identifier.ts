@@ -19,6 +19,7 @@
  */
 
 import type { Identifier, IdentifierTargeting, Resource } from './schemas/resource.js'
+import { usableProperties } from './unsupported.js'
 
 /**
  * The canonical key under which every generated surface exposes a resource's
@@ -134,11 +135,13 @@ export function resolveIdentifierTargeting(
  * Resolve the set of property names a `list` operation must read for a resource
  * so its output is usable by sibling operations.
  *
- * This is every declared property plus the primary-identifier property (which a
- * manifest may declare in `identifiers` without also listing it under
- * `properties`). Deriving the list here — rather than reading
- * `Object.keys(resource.properties)` directly — guarantees the identifier is
- * always present in list output even when it is not a regular property.
+ * This is every usable property (declared and not marked unsupported, see
+ * `usableProperties`) plus the primary-identifier property, which a manifest
+ * may declare in `identifiers` without also listing it under `properties` and
+ * which cannot be marked unsupported. Deriving the list here — rather than
+ * reading `Object.keys(resource.properties)` directly — guarantees the
+ * identifier is always present in list output even when it is not a regular
+ * property, and that a property the app cannot provide is never read.
  *
  * @param resource - The resource definition from the manifest, or `undefined`.
  * @returns The property names to read, with the identifier guaranteed present.
@@ -146,7 +149,7 @@ export function resolveIdentifierTargeting(
  *   still reads something addressable.
  */
 export function resolveListOutputProperties(resource: Resource | undefined): string[] {
-  const declared = resource?.properties ? Object.keys(resource.properties) : []
+  const declared = resource === undefined ? [] : usableProperties(resource).map(([name]) => name)
   const idProperty = resolvePrimaryIdentifierProperty(resource)
 
   const names = new Set<string>(declared)

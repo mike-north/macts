@@ -106,6 +106,13 @@ function runBody(body: string, app: unknown, args: Record<string, unknown>): unk
   }
 }
 
+/** Run a body as `(app, args)` and return what it returns. */
+function callBody(body: string, app: unknown, args: Record<string, unknown>): unknown {
+  const compiled: unknown = new Script(`(function (app, args) {\n${body}\n})`).runInThisContext()
+  if (typeof compiled !== 'function') throw new Error('body did not compile to a function')
+  return (compiled as (app: unknown, args: Record<string, unknown>) => unknown)(app, args)
+}
+
 /**
  * A stand-in for an app object specifier, recording what a body does with it.
  * `exists()` answers `present`; every other use is recorded in `used`, so a test
@@ -341,6 +348,62 @@ describe('list bodies: batched reads (issue #89)', () => {
 
   it('lists the top-level collection when there is no parent parameter', () => {
     expect(listBody(eventResource)).toContain('var items = app["events"]();')
+  })
+})
+
+describe('usable properties: a property marked unsupported is never read', () => {
+  // manifests/finder/app.yaml: Container declares `entireContents` and four
+  // properties the probe marked unsupported, `expandable`, `expanded`,
+  // `completelyExpanded` (every read fails with -1728) and `containerWindow`
+  // (an object reference). It declares no identifier, so the one property a
+  // body reads is `entireContents`.
+  let manifest: AppManifest
+  beforeAll(async () => {
+    const finder = await loadManifest(manifestPath('finder'))
+    const container = finder.resources['Container']
+    if (container === undefined) throw new Error('Finder Container not found')
+    manifest = manifestWith(
+      { Container: container },
+      {
+        list: resourceCommand('list', 'Container'),
+        get: resourceCommand('get', 'Container', [param('id')]),
+      }
+    )
+  })
+
+  it('a get reads every usable property and no unsupported one', () => {
+    const item = fakeSpecifier(true)
+    const app = { containers: { byId: () => item.specifier } }
+    const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
+    expect(runBody(body, app, { id: 'c1' })).toBeUndefined()
+    expect(item.used).toEqual(['read entireContents'])
+  })
+
+  it('a list falling back to per-field reads reads only usable properties', () => {
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        throw new Error('the property record cannot be read')
+      },
+    })
+    const app = { containers: () => [item.specifier] }
+    const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
+    expect(callBody(body, app, {})).toEqual([{}])
+    expect(item.used).toEqual(['read entireContents'])
+  })
+
+  it('a list copies only usable fields from the property record', () => {
+    const item = fakeSpecifier(true, {
+      properties: () => ({
+        entireContents: 'contents',
+        expandable: true,
+        expanded: false,
+        completelyExpanded: false,
+        containerWindow: 'window',
+      }),
+    })
+    const app = { containers: () => [item.specifier] }
+    const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
+    expect(callBody(body, app, {})).toEqual([{ entireContents: 'contents' }])
   })
 })
 
@@ -814,7 +877,7 @@ describe('free identifiers', () => {
     expect(freeIdentifiers([body])).toEqual([[]])
   })
 
-  it('finds none in any body of any shipped manifest', async () => {
+  it('finds none in any body of any shipped manifest, with or without identifier aliases', async () => {
     const apps = readdirSync(MANIFESTS_DIR, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
@@ -827,8 +890,12 @@ describe('free identifiers', () => {
           route.resourceType === undefined
             ? { command: route.commandKey }
             : { command: route.commandKey, resource: route.resourceType }
-        routes.push(route.route)
-        bodies.push(buildNativeBody(manifest, target))
+        // Passthrough output builds bodies with the identifier aliases, typed
+        // output without them; both variants ship.
+        for (const identifierAliases of [true, false]) {
+          routes.push(`${route.route} (identifierAliases: ${String(identifierAliases)})`)
+          bodies.push(buildNativeBody(manifest, target, { identifierAliases }))
+        }
       }
     }
     expect(bodies.length).toBeGreaterThan(0)

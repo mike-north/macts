@@ -42,6 +42,7 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
+import { usableProperties } from '../manifest/unsupported.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
@@ -596,10 +597,12 @@ function buildListBody(
 }
 
 /**
- * Read one item's declared properties. A nested resource is addressed through
- * its parent; a top-level one directly. The item must exist (see
- * {@link failIfMissing}); each property read is then guarded, so a property
- * the item cannot report is omitted.
+ * Read one item's usable properties: those declared and not marked
+ * unsupported, since reading a property the app cannot provide only costs a
+ * failed round trip. A nested resource is addressed through its parent; a
+ * top-level one directly. The item must exist (see {@link failIfMissing});
+ * each property read is then guarded, so a property the item cannot report is
+ * omitted.
  */
 function buildGetBody(
   command: Command,
@@ -609,7 +612,8 @@ function buildGetBody(
 ): ResourceBody {
   const parentScope = resolveParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
-  const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
+  const propNames =
+    resource === undefined ? ['name'] : usableProperties(resource).map(([name]) => name)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(
     bindItem,
