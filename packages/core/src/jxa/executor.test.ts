@@ -94,6 +94,18 @@ describe('runJxa passes script text verbatim', () => {
   })
 })
 
+describe('runJxa with a script larger than the pipe buffer', () => {
+  // Regression: a process that exits before reading all of stdin made the
+  // pending write fail with EPIPE, which had no listener and crashed the host
+  // process. The call must reject normally instead.
+  it('rejects without crashing when the process is killed mid-write', async () => {
+    const filler = 'x'.repeat(8 * 1024 * 1024)
+    await expect(
+      runJxa(`var pad = ${JSON.stringify(filler)}; delay(2); return 1;`, { timeout: 1 })
+    ).rejects.toThrow(JxaExecutionError)
+  }, 15000)
+})
+
 describe('runWithApp', () => {
   it('should get Calendar app name', async () => {
     const result = await runWithApp<string>('com.apple.iCal', 'return app.name();')

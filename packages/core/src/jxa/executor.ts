@@ -105,12 +105,21 @@ function runOsascript(
       { timeout, encoding: 'utf8' },
       (error, stdout, stderr) => {
         if (error) {
-          reject(Object.assign(error, { stderr }))
+          // The child-process error is an Error instance whose declared type
+          // is derived with Omit, so it is widened to Error for the rejection.
+          // The object itself (with code, killed, signal, stderr) is unchanged.
+          const failure: Error = Object.assign(error, { stderr })
+          reject(failure)
           return
         }
         resolve({ stdout, stderr })
       }
     )
+    // If the process exits before draining a large script (a timeout kill,
+    // say), writing to its closed stdin raises EPIPE. The exit is already
+    // reported through the callback above; without a listener the write
+    // error would be unhandled and crash the host process.
+    child.stdin?.on('error', () => undefined)
     child.stdin?.end(script, 'utf8')
   })
 }
