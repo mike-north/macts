@@ -115,7 +115,7 @@ const COMMON_FALLBACK_PROPERTIES = ['name', 'id'] as const
  * conversion every `app[plural]()` call returns undefined and the probe
  * silently reports `no-items` for every resource.
  */
-function toLowerCamelCase(s: string): string {
+export function toLowerCamelCase(s: string): string {
   if (s.length === 0) return s
   return s.charAt(0).toLowerCase() + s.slice(1)
 }

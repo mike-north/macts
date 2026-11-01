@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { PropertySchema } from './property.js'
+import { ObservedAtSchema } from './evidence.js'
 
 /**
  * How the structured/runtime layer addresses a resource by its identifier.
@@ -106,8 +107,8 @@ export type NullabilityProbeStatus = z.infer<typeof NullabilityProbeStatusSchema
  * read. It never contains an observed value.
  */
 export const NullabilityProbeSchema = z.object({
-  /** When the probe ran (ISO 8601). */
-  observedAt: z.string().min(1),
+  /** When the probe ran: an ISO 8601 UTC timestamp. */
+  observedAt: ObservedAtSchema,
   /** The bundle identifier of the probed app. */
   bundleId: z.string().min(1),
   /** The probed app's version. */
@@ -121,13 +122,26 @@ export const NullabilityProbeSchema = z.object({
   accessPath: z.string(),
   /** How many items the probe read. */
   itemsRead: z.number().int().nonnegative(),
+  /**
+   * How many collections the items were drawn from: the parents (calendars,
+   * lists, folders) of a nested resource, or 1 for a top-level collection.
+   * Absent on blocks written before the probe spread its sample.
+   */
+  sampledParents: z.number().int().nonnegative().optional(),
   /** The outcome of the probe. */
   status: NullabilityProbeStatusSchema,
   /**
    * Properties the probe did not read, by name: file and data properties,
-   * properties that hold large content, and any the caller excluded.
+   * lists of references, properties that hold large content, and any the
+   * caller excluded.
    */
   skipped: z.array(z.string()),
+  /**
+   * Why fewer items were read than the probe could have, or why it failed:
+   * e.g. `stopped at the time limit after 12 items`. Never contains an
+   * observed value.
+   */
+  note: z.string().min(1).optional(),
 })
 export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>
 
