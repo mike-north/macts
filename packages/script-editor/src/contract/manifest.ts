@@ -100,7 +100,6 @@ export const manifest: unknown = {
       resourceType: 'Document',
       parameters: [],
       code: 'core',
-      permission: 'scripteditor:documents:list',
     },
     get: {
       name: 'get',
@@ -116,7 +115,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'scripteditor:documents:get',
     },
     create: {
       name: 'create',
@@ -132,13 +130,12 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'scripteditor:documents:create',
     },
   },
   permissions: {
     documents: {
-      read: ['scripteditor:documents:list', 'scripteditor:documents:get'],
-      create: ['scripteditor:documents:create'],
+      read: ['script-editor:documents:list', 'script-editor:documents:get'],
+      create: ['script-editor:documents:create'],
     },
   },
   extraction: {

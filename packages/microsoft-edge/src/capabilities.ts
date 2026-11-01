@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'bookmarkFolders',
     operation: 'get',
     description: 'Get a bookmark folder by ID',
-    permission: 'edge:bookmarkFolders:get',
+    permission: 'microsoft-edge:bookmarkFolders:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -69,7 +69,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'bookmarkFolders',
     operation: 'list',
     description: 'List all bookmark folders',
-    permission: 'edge:bookmarkFolders:list',
+    permission: 'microsoft-edge:bookmarkFolders:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -84,7 +84,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'bookmarkItems',
     operation: 'get',
     description: 'Get a bookmark item by ID',
-    permission: 'edge:bookmarkItems:get',
+    permission: 'microsoft-edge:bookmarkItems:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -105,7 +105,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'bookmarkItems',
     operation: 'list',
     description: 'List all bookmark items in a folder',
-    permission: 'edge:bookmarkItems:list',
+    permission: 'microsoft-edge:bookmarkItems:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -126,7 +126,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'copySelection',
     description: 'Copy text',
-    permission: 'edge:tabs:copySelection',
+    permission: 'microsoft-edge:tabs:copySelection',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -147,7 +147,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'create',
     description: 'Create a new tab',
-    permission: 'edge:tabs:create',
+    permission: 'microsoft-edge:tabs:create',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -172,7 +172,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'cutSelection',
     description: 'Cut selected text (If Possible)',
-    permission: 'edge:tabs:cutSelection',
+    permission: 'microsoft-edge:tabs:cutSelection',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -193,7 +193,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'execute',
     description: 'Execute a piece of javascript',
-    permission: 'edge:tabs:execute',
+    permission: 'microsoft-edge:tabs:execute',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -218,7 +218,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'get',
     description: 'Get a tab by ID',
-    permission: 'edge:tabs:get',
+    permission: 'microsoft-edge:tabs:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -239,7 +239,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'goBack',
     description: 'Go Back (If Possible)',
-    permission: 'edge:tabs:goBack',
+    permission: 'microsoft-edge:tabs:goBack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -260,7 +260,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'goForward',
     description: 'Go Forward (If Possible)',
-    permission: 'edge:tabs:goForward',
+    permission: 'microsoft-edge:tabs:goForward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -281,7 +281,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'list',
     description: 'List all tabs in a window',
-    permission: 'edge:tabs:list',
+    permission: 'microsoft-edge:tabs:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -302,7 +302,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'pasteSelection',
     description: 'Paste text (If Possible)',
-    permission: 'edge:tabs:pasteSelection',
+    permission: 'microsoft-edge:tabs:pasteSelection',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -323,7 +323,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'redo',
     description: 'Redo the last change',
-    permission: 'edge:tabs:redo',
+    permission: 'microsoft-edge:tabs:redo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -344,7 +344,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'reload',
     description: 'Reload a tab',
-    permission: 'edge:tabs:reload',
+    permission: 'microsoft-edge:tabs:reload',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -365,7 +365,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'selectAll',
     description: 'Select all',
-    permission: 'edge:tabs:selectAll',
+    permission: 'microsoft-edge:tabs:selectAll',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -386,7 +386,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'stop',
     description: 'Stop the current tab from loading',
-    permission: 'edge:tabs:stop',
+    permission: 'microsoft-edge:tabs:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -407,7 +407,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'undo',
     description: 'Undo the last change',
-    permission: 'edge:tabs:undo',
+    permission: 'microsoft-edge:tabs:undo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -428,7 +428,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'tabs',
     operation: 'viewSource',
     description: 'View the HTML source of the tab',
-    permission: 'edge:tabs:viewSource',
+    permission: 'microsoft-edge:tabs:viewSource',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -449,7 +449,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'windows',
     operation: 'create',
     description: 'Create a new window',
-    permission: 'edge:windows:create',
+    permission: 'microsoft-edge:windows:create',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -506,7 +506,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'windows',
     operation: 'get',
     description: 'Get a window by ID',
-    permission: 'edge:windows:get',
+    permission: 'microsoft-edge:windows:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -527,7 +527,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'windows',
     operation: 'list',
     description: 'List all windows',
-    permission: 'edge:windows:list',
+    permission: 'microsoft-edge:windows:list',
     risk: 'read',
     inputSchema: {
       type: 'object',

@@ -350,7 +350,6 @@ export const manifest: unknown = {
       parameters: [],
       code: 'core',
       routeName: 'list',
-      permission: 'edge:windows:list',
     },
     getWindow: {
       name: 'get',
@@ -367,7 +366,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'edge:windows:get',
     },
     createWindow: {
       name: 'create',
@@ -384,7 +382,6 @@ export const manifest: unknown = {
       ],
       code: 'crel',
       routeName: 'create',
-      permission: 'edge:windows:create',
     },
     listTabs: {
       name: 'list',
@@ -401,7 +398,6 @@ export const manifest: unknown = {
       ],
       code: 'core',
       routeName: 'list',
-      permission: 'edge:tabs:list',
     },
     getTab: {
       name: 'get',
@@ -418,7 +414,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'edge:tabs:get',
     },
     createTab: {
       name: 'create',
@@ -441,7 +436,6 @@ export const manifest: unknown = {
       ],
       code: 'crel',
       routeName: 'create',
-      permission: 'edge:tabs:create',
     },
     listBookmarkFolders: {
       name: 'list',
@@ -451,7 +445,6 @@ export const manifest: unknown = {
       parameters: [],
       code: 'core',
       routeName: 'list',
-      permission: 'edge:bookmarkFolders:list',
     },
     getBookmarkFolder: {
       name: 'get',
@@ -468,7 +461,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'edge:bookmarkFolders:get',
     },
     listBookmarkItems: {
       name: 'list',
@@ -485,7 +477,6 @@ export const manifest: unknown = {
       ],
       code: 'core',
       routeName: 'list',
-      permission: 'edge:bookmarkItems:list',
     },
     getBookmarkItem: {
       name: 'get',
@@ -502,7 +493,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'edge:bookmarkItems:get',
     },
     reload: {
       name: 'reload',
@@ -518,7 +508,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:reload',
     },
     goBack: {
       name: 'goBack',
@@ -534,7 +523,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:goBack',
     },
     goForward: {
       name: 'goForward',
@@ -550,7 +538,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:goForward',
     },
     selectAll: {
       name: 'selectAll',
@@ -566,7 +553,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:selectAll',
     },
     cutSelection: {
       name: 'cutSelection',
@@ -582,7 +568,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:cutSelection',
     },
     copySelection: {
       name: 'copySelection',
@@ -598,7 +583,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:copySelection',
     },
     pasteSelection: {
       name: 'pasteSelection',
@@ -614,7 +598,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:pasteSelection',
     },
     undo: {
       name: 'undo',
@@ -630,7 +613,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:undo',
     },
     redo: {
       name: 'redo',
@@ -646,7 +628,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:redo',
     },
     stop: {
       name: 'stop',
@@ -662,7 +643,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:stop',
     },
     viewSource: {
       name: 'viewSource',
@@ -678,7 +658,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:viewSource',
     },
     execute: {
       name: 'execute',
@@ -700,41 +679,40 @@ export const manifest: unknown = {
         },
       ],
       code: 'CrSu',
-      permission: 'edge:tabs:execute',
     },
   },
   permissions: {
     windows: {
-      read: ['edge:windows:list', 'edge:windows:get'],
-      create: ['edge:windows:create'],
-      write: ['edge:windows:update'],
-      delete: ['edge:windows:delete'],
+      read: ['microsoft-edge:windows:list', 'microsoft-edge:windows:get'],
+      create: ['microsoft-edge:windows:create'],
+      write: ['microsoft-edge:windows:update'],
+      delete: ['microsoft-edge:windows:delete'],
     },
     tabs: {
-      read: ['edge:tabs:list', 'edge:tabs:get'],
-      create: ['edge:tabs:create'],
+      read: ['microsoft-edge:tabs:list', 'microsoft-edge:tabs:get'],
+      create: ['microsoft-edge:tabs:create'],
       write: [
-        'edge:tabs:update',
-        'edge:tabs:reload',
-        'edge:tabs:goBack',
-        'edge:tabs:goForward',
-        'edge:tabs:selectAll',
-        'edge:tabs:cutSelection',
-        'edge:tabs:copySelection',
-        'edge:tabs:pasteSelection',
-        'edge:tabs:undo',
-        'edge:tabs:redo',
-        'edge:tabs:stop',
-        'edge:tabs:viewSource',
-        'edge:tabs:execute',
+        'microsoft-edge:tabs:update',
+        'microsoft-edge:tabs:reload',
+        'microsoft-edge:tabs:goBack',
+        'microsoft-edge:tabs:goForward',
+        'microsoft-edge:tabs:selectAll',
+        'microsoft-edge:tabs:cutSelection',
+        'microsoft-edge:tabs:copySelection',
+        'microsoft-edge:tabs:pasteSelection',
+        'microsoft-edge:tabs:undo',
+        'microsoft-edge:tabs:redo',
+        'microsoft-edge:tabs:stop',
+        'microsoft-edge:tabs:viewSource',
+        'microsoft-edge:tabs:execute',
       ],
-      delete: ['edge:tabs:delete'],
+      delete: ['microsoft-edge:tabs:delete'],
     },
     bookmarkFolders: {
-      read: ['edge:bookmarkFolders:list', 'edge:bookmarkFolders:get'],
+      read: ['microsoft-edge:bookmarkFolders:list', 'microsoft-edge:bookmarkFolders:get'],
     },
     bookmarkItems: {
-      read: ['edge:bookmarkItems:list', 'edge:bookmarkItems:get'],
+      read: ['microsoft-edge:bookmarkItems:list', 'microsoft-edge:bookmarkItems:get'],
     },
   },
   extraction: {
