@@ -329,9 +329,7 @@ export function parseDuration(duration: string): number;
 // @public
 export class PermissionCaseMismatchError extends Error {
     constructor(permission: string, canonical: string);
-    // (undocumented)
     readonly canonical: string;
-    // (undocumented)
     readonly permission: string;
 }
 

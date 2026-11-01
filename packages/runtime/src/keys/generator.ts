@@ -52,16 +52,24 @@ export class UnexpandableCoarsePermissionError extends Error {
  * at creation names the permission to use instead of minting a dead key.
  */
 export class PermissionCaseMismatchError extends Error {
-  constructor(
-    public readonly permission: string,
-    public readonly canonical: string
-  ) {
+  /** The permission as requested, which the app does not define in this letter case. */
+  readonly permission: string
+
+  /**
+   * The permission the app defines that differs from {@link PermissionCaseMismatchError.permission}
+   * only in letter case: the one to grant instead.
+   */
+  readonly canonical: string
+
+  constructor(permission: string, canonical: string) {
     super(
       `Permission "${permission}" differs from "${canonical}" only in letter case. ` +
         `Permissions are case-sensitive, so "${permission}" would never authorize anything. ` +
         `Use "${canonical}".`
     )
     this.name = 'PermissionCaseMismatchError'
+    this.permission = permission
+    this.canonical = canonical
   }
 }
 

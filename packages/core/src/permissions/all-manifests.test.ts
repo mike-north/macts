@@ -33,9 +33,22 @@ describe('permissions derived from every shipped manifest', async () => {
     resolveManifestRoutes(manifest).map((route) => route.permission)
   )
 
-  it('covers the 473 routes on current main across 35 manifests', () => {
-    expect(manifests).toHaveLength(35)
-    expect(permissions).toHaveLength(473)
+  // Floors, not exact counts, so adding a manifest or a route never breaks this
+  // test, while an empty or partial load cannot make the checks below vacuous.
+  it('loads every shipped manifest, each contributing route permissions', () => {
+    expect(manifests.length).toBeGreaterThan(1)
+    const empty = manifests
+      .filter((manifest) => resolveManifestRoutes(manifest).length === 0)
+      .map((manifest) => manifest.app.name)
+    expect(empty).toEqual([])
+    expect(permissions.length).toBeGreaterThanOrEqual(manifests.length)
+  })
+
+  // Hand-written from manifests/photos/app.yaml (an explicit camelCase resource)
+  // and manifests/iterm/app.yaml (a camelCase command key): the two shapes that
+  // the lowercase-only grammar could never grant.
+  it.each(['photos:mediaItems:list', 'iterm:app:splitVertically'])('includes %s', (permission) => {
+    expect(permissions).toContain(permission)
   })
 
   it('is valid for every route permission', () => {

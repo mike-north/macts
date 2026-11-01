@@ -154,6 +154,23 @@ describe('macts api-key create (UAT): permission grammar and case', () => {
     expect(result.stderr).toContain('photos:memories:list')
   })
 
+  it('names the permissions map when a permission is declared there but no route requires it', async () => {
+    // manifests/photos/app.yaml lists photos:mediaItems:update under the
+    // mediaItems `write` mapping, and no Photos route requires it.
+    const result = await runCli([
+      'api-key',
+      'create',
+      '--name',
+      'declared-only',
+      '--permission',
+      'photos:mediaItems:update',
+    ])
+    expect(result.code, result.stderr).toBe(0)
+    expect(result.stderr).toContain(
+      'warning: "photos:mediaItems:update" is listed in the photos manifest\'s permissions map, but no photos route requires it yet'
+    )
+  })
+
   it('accepts a correctly cased permission without warning', async () => {
     const result = await runCli([
       'api-key',

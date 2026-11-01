@@ -139,7 +139,10 @@ export class ApiKeyCreateCommand extends Command {
         )
         return 1
       }
-      for (const warning of unknownPermissionWarnings(permissions, known)) {
+      const declaredOnly = manifests.flatMap((manifest) =>
+        Object.values(manifest.permissions ?? {}).flatMap((coarse) => Object.values(coarse).flat())
+      )
+      for (const warning of unknownPermissionWarnings(permissions, known, declaredOnly)) {
         this.context.stderr.write(`warning: ${warning}\n`)
       }
 
@@ -209,7 +212,11 @@ async function discoverManifests(): Promise<AppManifest[]> {
  * Wildcards and coarse operations (expanded against the manifest) are not
  * checked here, and apps without a known manifest cannot be judged.
  */
-function unknownPermissionWarnings(permissions: string[], known: string[]): string[] {
+function unknownPermissionWarnings(
+  permissions: string[],
+  known: string[],
+  declaredInPermissionsMap: string[]
+): string[] {
   const knownApps = new Set(known.map((p) => p.split(':')[0]))
   return permissions.flatMap((permission) => {
     const parsed = parsePermission(permission)
@@ -221,6 +228,12 @@ function unknownPermissionWarnings(permissions: string[], known: string[]): stri
       isCoarseOperation(parsed.operation)
     ) {
       return []
+    }
+    if (declaredInPermissionsMap.includes(permission)) {
+      return [
+        `"${permission}" is listed in the ${parsed.app} manifest's permissions map, but no ` +
+          `${parsed.app} route requires it yet, so it authorizes nothing today.`,
+      ]
     }
     const suggestions = suggestPermissions(permission, known)
     const hint =
