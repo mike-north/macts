@@ -10,11 +10,11 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface Account {
-    readonly connectionStatus: string;
-    readonly description: string;
-    enabled: boolean;
+    readonly connectionStatus: string | null;
+    readonly description: string | null;
+    enabled: boolean | null;
     readonly id: string;
-    readonly serviceType: string;
+    readonly serviceType: string | null;
 }
 
 // @public
@@ -29,9 +29,9 @@ export interface AccountUpdateInput {
 
 // @public
 export interface Chat {
-    readonly account: ObjectReferenceVariant<Account, string>;
+    readonly account: ObjectReferenceVariant<Account, string> | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -58,13 +58,13 @@ export const messagesContract: AppContract<MessagesClient>;
 
 // @public
 export interface Participant {
-    readonly account: ObjectReferenceVariant<Account, string>;
-    readonly firstName: string;
-    readonly fullName: string;
-    readonly handle: string;
+    readonly account: ObjectReferenceVariant<Account, string> | null;
+    readonly firstName: string | null;
+    readonly fullName: string | null;
+    readonly handle: string | null;
     readonly id: string;
-    readonly lastName: string;
-    readonly name: string;
+    readonly lastName: string | null;
+    readonly name: string | null;
 }
 
 // @public

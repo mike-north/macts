@@ -14,7 +14,6 @@ import {
   resolveCommandRoutes,
   resolveManifestRoutes,
   normalizeAppRouteSegment,
-  normalizeResourceRouteSegment,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
   resolveIdentifierTargeting,
@@ -224,16 +223,10 @@ export function getCommandEndpoints(
   command: Command,
   manifest: AppManifest
 ): RpcEndpointInfo[] {
-  const appSegment = normalizeAppRouteSegment(manifest.app.name)
   return resolveCommandRoutes(manifest, commandKey, command).map((r) => {
-    const permissionScope =
-      r.resourceType === undefined
-        ? 'app'
-        : normalizeResourceRouteSegment(r.resource?.plural ?? `${r.resourceType}s`)
-    const permission = command.permission ?? `${appSegment}:${permissionScope}:${commandKey}`
     return {
       path: `/rpc/${r.route}`,
-      permission,
+      permission: r.permission,
       command,
       resource: r.resource,
     }
@@ -245,15 +238,9 @@ export function getCommandEndpoints(
  */
 export function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
   return resolveManifestRoutes(manifest).map((r) => {
-    const appSegment = normalizeAppRouteSegment(manifest.app.name)
-    const permissionScope =
-      r.resourceType === undefined
-        ? 'app'
-        : normalizeResourceRouteSegment(r.resource?.plural ?? `${r.resourceType}s`)
-    const permission = r.command.permission ?? `${appSegment}:${permissionScope}:${r.commandKey}`
     return {
       path: `/rpc/${r.route}`,
-      permission,
+      permission: r.permission,
       command: r.command,
       resource: r.resource,
     }

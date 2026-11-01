@@ -32,7 +32,10 @@ const t = ValueTypes
 
 /** The Bluetooth File Exchange application */
 export interface Application {
-  /** The name of the application */
+  /**
+   * The name of the application.
+   * Never null: the primary identifier.
+   */
   readonly name: string
 }
 
@@ -47,9 +50,18 @@ export type ApplicationUpdateInput = Record<string, never>
  * app's own commands. A client factory creates one from {@link bluetoothFileExchangeContract}.
  */
 export interface BluetoothFileExchangeClient {
-  /** Browse a device */
+  /**
+   * Browse a device
+   *
+   * @param device - The device to browse. Does not accept null.
+   */
   browse(device?: string, options?: CallOptions): Promise<void>
-  /** Send a file to a bluetooth device */
+  /**
+   * Send a file to a bluetooth device
+   *
+   * @param file - The file(s) to send. Does not accept null.
+   * @param toDevice - The device to send the file to. Does not accept null.
+   */
   send(file?: readonly FileSource[], toDevice?: string, options?: CallOptions): Promise<void>
 }
 

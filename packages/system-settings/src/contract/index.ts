@@ -31,16 +31,25 @@ const t = ValueTypes
 
 /** A settings pane. */
 export interface Pane {
-  /** The id of the settings pane. */
+  /**
+   * The id of the settings pane.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the settings pane. */
-  readonly name: string
+  /**
+   * The name of the settings pane.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** An anchor within a settings pane. */
 export interface Anchor {
-  /** The name of the anchor. */
-  readonly name: string
+  /**
+   * The name of the anchor.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** Input for creating a Pane. */
@@ -79,14 +88,14 @@ export interface SystemSettingsClient {
 const paneRecordType: ValueType<Pane> = t.record(
   {
     id: t.string({ description: 'The id of the settings pane.' }),
-    name: t.string({ description: 'The name of the settings pane.' }),
+    name: t.nullable(t.string(), { description: 'The name of the settings pane.' }),
   },
   { description: 'A settings pane.' }
 )
 
 const anchorRecordType: ValueType<Anchor> = t.record(
   {
-    name: t.string({ description: 'The name of the anchor.' }),
+    name: t.nullable(t.string(), { description: 'The name of the anchor.' }),
   },
   { description: 'An anchor within a settings pane.' }
 )

@@ -47,162 +47,354 @@ export type SchedulingGranularity = 'exactScheduling' | 'hourlyScheduling' | 'da
 
 /** An OmniPlan project */
 export interface Project {
-  /** The unique identifier for the project */
+  /**
+   * The unique identifier for the project.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The project's name */
-  readonly name: string
-  /** The date on which work can begin */
-  startingDate: Date
-  /** The date on which work is complete */
-  readonly endingDate: Date
-  /** The cost of the entire project */
-  readonly totalCost: number
-  /** The percentage of the project which is complete (1.0 = 100%) */
-  readonly completed: number
-  /** The total duration of the project in seconds */
-  readonly duration: number
-  /** The number of person-seconds required to complete the project */
-  readonly effort: number
+  /**
+   * The project's name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The date on which work can begin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingDate: Date | null
+  /**
+   * The date on which work is complete.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly endingDate: Date | null
+  /**
+   * The cost of the entire project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalCost: number | null
+  /**
+   * The percentage of the project which is complete (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly completed: number | null
+  /**
+   * The total duration of the project in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: number | null
+  /**
+   * The number of person-seconds required to complete the project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effort: number | null
 }
 
 /** A task within an OmniPlan project */
 export interface Task {
-  /** Internal identifier for this task */
+  /**
+   * Internal identifier for this task.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** The name of the task */
-  name: string
-  /** The date on which work begins */
-  startingDate: Date
-  /** The date on which work ends */
-  endingDate: Date
-  /** The number of working seconds occupied by task */
-  duration: number
-  /** The number of person-seconds required to perform the task */
-  effort: number
-  /** The percentage of the task which is complete (1.0 = 100%) */
-  completed: number
-  /** The person-seconds completed */
-  completedEffort: number
-  /** The person-seconds remaining */
-  readonly remainingEffort: number
-  /** Priority of this task */
-  priority: Integer
-  /** The status of the current task */
-  readonly taskStatus: TaskStatus
-  /** Whether this task is a standard task, milestone, group, or hammock */
-  taskType: TaskType
-  /** Cost for this task itself */
-  staticCost: number
-  /** Cost for paying resources assigned to this task */
-  readonly resourceCost: number
-  /** Total cost for this task */
-  readonly totalCost: number
-  /** The depth or level of this task in the project hierarchy */
-  readonly outlineDepth: Integer
-  /** The hierarchical or WBS number of this task */
-  readonly outlineNumber: string
-  /** The earliest date this task may start */
-  startingConstraintDate: Date
-  /** The latest date this task may end */
-  endingConstraintDate: Date
-  /** Whether the start date is locked or not */
-  startingDateLocked: boolean
-  /** Whether the end date is locked or not */
-  endingDateLocked: boolean
-  /** Notes */
-  note: string
+  /**
+   * The name of the task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The date on which work begins.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingDate: Date | null
+  /**
+   * The date on which work ends.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingDate: Date | null
+  /**
+   * The number of working seconds occupied by task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  duration: number | null
+  /**
+   * The number of person-seconds required to perform the task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  effort: number | null
+  /**
+   * The percentage of the task which is complete (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  completed: number | null
+  /**
+   * The person-seconds completed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  completedEffort: number | null
+  /**
+   * The person-seconds remaining.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly remainingEffort: number | null
+  /**
+   * Priority of this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  priority: Integer | null
+  /**
+   * The status of the current task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly taskStatus: TaskStatus | null
+  /**
+   * Whether this task is a standard task, milestone, group, or hammock.
+   * Nullable. No evidence that the app always sets it.
+   */
+  taskType: TaskType | null
+  /**
+   * Cost for this task itself.
+   * Nullable. No evidence that the app always sets it.
+   */
+  staticCost: number | null
+  /**
+   * Cost for paying resources assigned to this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly resourceCost: number | null
+  /**
+   * Total cost for this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalCost: number | null
+  /**
+   * The depth or level of this task in the project hierarchy.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly outlineDepth: Integer | null
+  /**
+   * The hierarchical or WBS number of this task.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly outlineNumber: string | null
+  /**
+   * The earliest date this task may start.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingConstraintDate: Date | null
+  /**
+   * The latest date this task may end.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingConstraintDate: Date | null
+  /**
+   * Whether the start date is locked or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingDateLocked: boolean | null
+  /**
+   * Whether the end date is locked or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  endingDateLocked: boolean | null
+  /**
+   * Notes.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
 }
 
 /** A milestone (zero-duration marker task) */
 export interface Milestone {
-  /** Internal identifier for this milestone */
+  /**
+   * Internal identifier for this milestone.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** The name of the milestone */
-  name: string
-  /** The date of the milestone */
-  startingDate: Date
-  /** Notes */
-  note: string
+  /**
+   * The name of the milestone.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The date of the milestone.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingDate: Date | null
+  /**
+   * Notes.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
 }
 
 /** A resource (person, equipment, or material) */
 export interface Resource {
-  /** Internal identifier for this resource */
+  /**
+   * Internal identifier for this resource.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** The name of the resource */
-  name: string
-  /** Type of the resource */
-  resourceType: ResourceType
-  /** The total number of units for this resource (1.0 = 100%) */
-  number: number
-  /** Email address for this resource */
-  emailAddress: string
-  /** The fixed cost per use of this resource */
-  costPerUse: number
-  /** The cost per hour of this resource */
-  costPerHour: number
-  /** Resource efficiency (1.0 = 100%) */
-  efficiency: number
-  /** Total number of uses of this resource */
-  readonly totalUses: Integer
-  /** Total seconds worked by this resource */
-  readonly totalSeconds: number
-  /** Total cost of all assignments for this resource */
-  readonly totalCost: number
-  /** Notes */
-  note: string
-  /** The depth or level of this resource in the hierarchy */
-  readonly outlineDepth: Integer
+  /**
+   * The name of the resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * Type of the resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  resourceType: ResourceType | null
+  /**
+   * The total number of units for this resource (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  number: number | null
+  /**
+   * Email address for this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  emailAddress: string | null
+  /**
+   * The fixed cost per use of this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  costPerUse: number | null
+  /**
+   * The cost per hour of this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  costPerHour: number | null
+  /**
+   * Resource efficiency (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  efficiency: number | null
+  /**
+   * Total number of uses of this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalUses: Integer | null
+  /**
+   * Total seconds worked by this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalSeconds: number | null
+  /**
+   * Total cost of all assignments for this resource.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalCost: number | null
+  /**
+   * Notes.
+   * Nullable. No evidence that the app always sets it.
+   */
+  note: string | null
+  /**
+   * The depth or level of this resource in the hierarchy.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly outlineDepth: Integer | null
 }
 
 /** An assignment of a resource to a task */
 export interface Assignment {
-  /** Units of the resource required for this task (1.0 = 100%) */
-  units: number
+  /**
+   * Units of the resource required for this task (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  units: number | null
 }
 
 /** A dependency of one task upon another task */
 export interface Dependency {
-  /** Type of dependency */
-  dependencyType: DependencyType
-  /** The number of seconds of lead time required between the tasks */
-  leadTime: number
-  /** The lead time, in percentage of the length of the prerequisite */
-  leadPercentage: number
+  /**
+   * Type of dependency.
+   * Nullable. No evidence that the app always sets it.
+   */
+  dependencyType: DependencyType | null
+  /**
+   * The number of seconds of lead time required between the tasks.
+   * Nullable. No evidence that the app always sets it.
+   */
+  leadTime: number | null
+  /**
+   * The lead time, in percentage of the length of the prerequisite.
+   * Nullable. No evidence that the app always sets it.
+   */
+  leadPercentage: number | null
 }
 
 /** A scheduling conflict or issue */
 export interface Violation {
-  /** The type of violation */
-  readonly violationType: string
-  /** The short description of this violation */
-  readonly shortDescription: string
-  /** The long description HTML for this violation */
-  readonly html: string
+  /**
+   * The type of violation.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly violationType: string | null
+  /**
+   * The short description of this violation.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shortDescription: string | null
+  /**
+   * The long description HTML for this violation.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly html: string | null
 }
 
 /** An alternative project plan */
 export interface Scenario {
-  /** The unique identifier for the scenario */
+  /**
+   * The unique identifier for the scenario.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the scenario */
-  name: string
-  /** The date on which work can begin */
-  startingDate: Date
-  /** The date on which work is complete */
-  readonly endingDate: Date
-  /** The cost of the entire project */
-  readonly totalCost: number
-  /** The percentage complete (1.0 = 100%) */
-  readonly completed: number
-  /** The total duration in seconds */
-  readonly duration: number
-  /** The number of person-seconds required */
-  readonly effort: number
-  /** Number of violations in the scenario */
-  readonly violationCount: Integer
-  /** Scheduling granularity for this scenario */
-  schedulingGranularity: SchedulingGranularity
+  /**
+   * The name of the scenario.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The date on which work can begin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  startingDate: Date | null
+  /**
+   * The date on which work is complete.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly endingDate: Date | null
+  /**
+   * The cost of the entire project.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalCost: number | null
+  /**
+   * The percentage complete (1.0 = 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly completed: number | null
+  /**
+   * The total duration in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: number | null
+  /**
+   * The number of person-seconds required.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly effort: number | null
+  /**
+   * Number of violations in the scenario.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly violationCount: Integer | null
+  /**
+   * Scheduling granularity for this scenario.
+   * Nullable. No evidence that the app always sets it.
+   */
+  schedulingGranularity: SchedulingGranularity | null
 }
 
 /** A schedule of working time */
@@ -210,12 +402,21 @@ export type Schedule = Record<string, never>
 
 /** A locale based currency object */
 export interface Currency {
-  /** Locale code for this currency */
-  readonly code: string
-  /** Name for this currency */
-  readonly name: string
-  /** Symbol for this currency */
-  readonly symbol: string
+  /**
+   * Locale code for this currency.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly code: string | null
+  /**
+   * Name for this currency.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * Symbol for this currency.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly symbol: string | null
 }
 
 /** Input for creating a Project. */
@@ -226,7 +427,10 @@ export interface ProjectCreateInput {
 
 /** Input for updating a Project. Omitted fields are left unchanged. */
 export interface ProjectUpdateInput {
-  /** The date on which work can begin */
+  /**
+   * The date on which work can begin.
+   * Cannot be reset: null is rejected.
+   */
   startingDate?: Date
 }
 
@@ -266,35 +470,80 @@ export interface TaskCreateInput {
 
 /** Input for updating a Task. Omitted fields are left unchanged. */
 export interface TaskUpdateInput {
-  /** Task name */
+  /**
+   * Task name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Start date */
+  /**
+   * Start date.
+   * Cannot be reset: null is rejected.
+   */
   startingDate?: Date
-  /** The date on which work ends */
+  /**
+   * The date on which work ends.
+   * Cannot be reset: null is rejected.
+   */
   endingDate?: Date
-  /** Duration in seconds */
+  /**
+   * Duration in seconds.
+   * Cannot be reset: null is rejected.
+   */
   duration?: number
-  /** The number of person-seconds required to perform the task */
+  /**
+   * The number of person-seconds required to perform the task.
+   * Cannot be reset: null is rejected.
+   */
   effort?: number
-  /** The percentage of the task which is complete (1.0 = 100%) */
+  /**
+   * The percentage of the task which is complete (1.0 = 100%).
+   * Cannot be reset: null is rejected.
+   */
   completed?: number
-  /** The person-seconds completed */
+  /**
+   * The person-seconds completed.
+   * Cannot be reset: null is rejected.
+   */
   completedEffort?: number
-  /** Priority of this task */
+  /**
+   * Priority of this task.
+   * Cannot be reset: null is rejected.
+   */
   priority?: Integer
-  /** Whether this task is a standard task, milestone, group, or hammock */
+  /**
+   * Whether this task is a standard task, milestone, group, or hammock.
+   * Cannot be reset: null is rejected.
+   */
   taskType?: TaskType
-  /** Cost for this task itself */
+  /**
+   * Cost for this task itself.
+   * Cannot be reset: null is rejected.
+   */
   staticCost?: number
-  /** The earliest date this task may start */
+  /**
+   * The earliest date this task may start.
+   * Cannot be reset: null is rejected.
+   */
   startingConstraintDate?: Date
-  /** The latest date this task may end */
+  /**
+   * The latest date this task may end.
+   * Cannot be reset: null is rejected.
+   */
   endingConstraintDate?: Date
-  /** Whether the start date is locked or not */
+  /**
+   * Whether the start date is locked or not.
+   * Cannot be reset: null is rejected.
+   */
   startingDateLocked?: boolean
-  /** Whether the end date is locked or not */
+  /**
+   * Whether the end date is locked or not.
+   * Cannot be reset: null is rejected.
+   */
   endingDateLocked?: boolean
-  /** Notes */
+  /**
+   * Notes.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
 }
 
@@ -310,11 +559,20 @@ export interface MilestoneCreateInput {
 
 /** Input for updating a Milestone. Omitted fields are left unchanged. */
 export interface MilestoneUpdateInput {
-  /** Milestone name */
+  /**
+   * Milestone name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Milestone date */
+  /**
+   * Milestone date.
+   * Cannot be reset: null is rejected.
+   */
   startingDate?: Date
-  /** Notes */
+  /**
+   * Notes.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
 }
 
@@ -340,21 +598,45 @@ export interface ResourceCreateInput {
 
 /** Input for updating a Resource. Omitted fields are left unchanged. */
 export interface ResourceUpdateInput {
-  /** Resource name */
+  /**
+   * Resource name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Resource type */
+  /**
+   * Resource type.
+   * Cannot be reset: null is rejected.
+   */
   resourceType?: ResourceType
-  /** The total number of units for this resource (1.0 = 100%) */
+  /**
+   * The total number of units for this resource (1.0 = 100%).
+   * Cannot be reset: null is rejected.
+   */
   number?: number
-  /** Email address for this resource */
+  /**
+   * Email address for this resource.
+   * Cannot be reset: null is rejected.
+   */
   emailAddress?: string
-  /** The fixed cost per use of this resource */
+  /**
+   * The fixed cost per use of this resource.
+   * Cannot be reset: null is rejected.
+   */
   costPerUse?: number
-  /** The cost per hour of this resource */
+  /**
+   * The cost per hour of this resource.
+   * Cannot be reset: null is rejected.
+   */
   costPerHour?: number
-  /** Resource efficiency (1.0 = 100%) */
+  /**
+   * Resource efficiency (1.0 = 100%).
+   * Cannot be reset: null is rejected.
+   */
   efficiency?: number
-  /** Notes */
+  /**
+   * Notes.
+   * Cannot be reset: null is rejected.
+   */
   note?: string
 }
 
@@ -366,7 +648,10 @@ export interface AssignmentCreateInput {
 
 /** Input for updating an Assignment. Omitted fields are left unchanged. */
 export interface AssignmentUpdateInput {
-  /** Units of the resource required for this task (1.0 = 100%) */
+  /**
+   * Units of the resource required for this task (1.0 = 100%).
+   * Cannot be reset: null is rejected.
+   */
   units?: number
 }
 
@@ -382,11 +667,20 @@ export interface DependencyCreateInput {
 
 /** Input for updating a Dependency. Omitted fields are left unchanged. */
 export interface DependencyUpdateInput {
-  /** Type of dependency */
+  /**
+   * Type of dependency.
+   * Cannot be reset: null is rejected.
+   */
   dependencyType?: DependencyType
-  /** The number of seconds of lead time required between the tasks */
+  /**
+   * The number of seconds of lead time required between the tasks.
+   * Cannot be reset: null is rejected.
+   */
   leadTime?: number
-  /** The lead time, in percentage of the length of the prerequisite */
+  /**
+   * The lead time, in percentage of the length of the prerequisite.
+   * Cannot be reset: null is rejected.
+   */
   leadPercentage?: number
 }
 
@@ -408,11 +702,20 @@ export interface ScenarioCreateInput {
 
 /** Input for updating a Scenario. Omitted fields are left unchanged. */
 export interface ScenarioUpdateInput {
-  /** The name of the scenario */
+  /**
+   * The name of the scenario.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The date on which work can begin */
+  /**
+   * The date on which work can begin.
+   * Cannot be reset: null is rejected.
+   */
   startingDate?: Date
-  /** Scheduling granularity for this scenario */
+  /**
+   * Scheduling granularity for this scenario.
+   * Cannot be reset: null is rejected.
+   */
   schedulingGranularity?: SchedulingGranularity
 }
 
@@ -432,7 +735,11 @@ export type CurrencyUpdateInput = Record<string, never>
 export interface ProjectResourceClient {
   /** List projects. */
   list(options?: CallOptions): Promise<readonly Project[]>
-  /** Read the project identified by `id`. */
+  /**
+   * Read the project identified by `id`.
+   *
+   * @param id - Project identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Project>
 }
 
@@ -440,7 +747,11 @@ export interface ProjectResourceClient {
 export interface TaskResourceClient {
   /** List tasks. */
   list(options?: CallOptions): Promise<readonly Task[]>
-  /** Read the task identified by `id`. */
+  /**
+   * Read the task identified by `id`.
+   *
+   * @param id - Task identifier. Does not accept null.
+   */
   get(id: Integer, options?: CallOptions): Promise<Task>
   /** Create a task. */
   create(input: TaskCreateInput, options?: CallOptions): Promise<Task>
@@ -450,7 +761,11 @@ export interface TaskResourceClient {
 export interface MilestoneResourceClient {
   /** List milestones. */
   list(options?: CallOptions): Promise<readonly Milestone[]>
-  /** Read the milestone identified by `id`. */
+  /**
+   * Read the milestone identified by `id`.
+   *
+   * @param id - Milestone identifier. Does not accept null.
+   */
   get(id: Integer, options?: CallOptions): Promise<Milestone>
   /** Create a milestone. */
   create(input: MilestoneCreateInput, options?: CallOptions): Promise<Milestone>
@@ -460,7 +775,11 @@ export interface MilestoneResourceClient {
 export interface ResourceResourceClient {
   /** List resources. */
   list(options?: CallOptions): Promise<readonly Resource[]>
-  /** Read the resource identified by `id`. */
+  /**
+   * Read the resource identified by `id`.
+   *
+   * @param id - Resource identifier. Does not accept null.
+   */
   get(id: Integer, options?: CallOptions): Promise<Resource>
   /** Create a resource. */
   create(input: ResourceCreateInput, options?: CallOptions): Promise<Resource>
@@ -490,7 +809,11 @@ export interface ViolationResourceClient {
 export interface ScenarioResourceClient {
   /** List scenarios. */
   list(options?: CallOptions): Promise<readonly Scenario[]>
-  /** Read the scenario identified by `id`. */
+  /**
+   * Read the scenario identified by `id`.
+   *
+   * @param id - Scenario identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Scenario>
 }
 
@@ -515,23 +838,49 @@ export interface OmniPlanClient {
   readonly violations: ViolationResourceClient
   /** An alternative project plan */
   readonly scenarios: ScenarioResourceClient
-  /** Export a document */
+  /**
+   * Export a document
+   *
+   * @param to - Export file path. Does not accept null.
+   */
   _export(to: string, options?: CallOptions): Promise<void>
-  /** Assign resources to tasks */
+  /**
+   * Assign resources to tasks
+   *
+   * @param resource - Resource to assign. Does not accept null.
+   * @param task - Task to assign to. Does not accept null.
+   */
   assign(resource: string, task: string, options?: CallOptions): Promise<void>
-  /** Create a dependency between tasks */
+  /**
+   * Create a dependency between tasks
+   *
+   * @param prerequisite - Prerequisite task. Does not accept null.
+   * @param dependent - Dependent task. Does not accept null.
+   */
   depend(prerequisite: string, dependent: string, options?: CallOptions): Promise<void>
   /** Commit the current schedule as the baseline schedule */
   baseline(options?: CallOptions): Promise<void>
   /** Level resources on project */
   level(options?: CallOptions): Promise<void>
-  /** Look up a task via a custom data key */
+  /**
+   * Look up a task via a custom data key
+   *
+   * @param key - Custom data key. Does not accept null.
+   */
   lookup(key: string, options?: CallOptions): Promise<void>
   /** Make a change tracking mark on project */
   changeMark(options?: CallOptions): Promise<void>
-  /** Add working hours to a schedule */
+  /**
+   * Add working hours to a schedule
+   *
+   * @param schedule - Target schedule. Does not accept null.
+   */
   addWorkTime(schedule: string, options?: CallOptions): Promise<void>
-  /** Remove working hours from a schedule */
+  /**
+   * Remove working hours from a schedule
+   *
+   * @param schedule - Target schedule. Does not accept null.
+   */
   subtractWorkTime(schedule: string, options?: CallOptions): Promise<void>
   /** Undo the last command */
   undo(options?: CallOptions): Promise<void>
@@ -561,15 +910,17 @@ const schedulingGranularityMembers = [
 const projectRecordType: ValueType<Project> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the project' }),
-    name: t.string({ description: "The project's name" }),
-    startingDate: t.date({ description: 'The date on which work can begin' }),
-    endingDate: t.date({ description: 'The date on which work is complete' }),
-    totalCost: t.double({ description: 'The cost of the entire project' }),
-    completed: t.double({
+    name: t.nullable(t.string(), { description: "The project's name" }),
+    startingDate: t.nullable(t.date(), { description: 'The date on which work can begin' }),
+    endingDate: t.nullable(t.date(), { description: 'The date on which work is complete' }),
+    totalCost: t.nullable(t.double(), { description: 'The cost of the entire project' }),
+    completed: t.nullable(t.double(), {
       description: 'The percentage of the project which is complete (1.0 = 100%)',
     }),
-    duration: t.double({ description: 'The total duration of the project in seconds' }),
-    effort: t.double({
+    duration: t.nullable(t.double(), {
+      description: 'The total duration of the project in seconds',
+    }),
+    effort: t.nullable(t.double(), {
       description: 'The number of person-seconds required to complete the project',
     }),
   },
@@ -579,33 +930,51 @@ const projectRecordType: ValueType<Project> = t.record(
 const taskRecordType: ValueType<Task> = t.record(
   {
     id: t.integer({ description: 'Internal identifier for this task' }),
-    name: t.string({ description: 'The name of the task' }),
-    startingDate: t.date({ description: 'The date on which work begins' }),
-    endingDate: t.date({ description: 'The date on which work ends' }),
-    duration: t.double({ description: 'The number of working seconds occupied by task' }),
-    effort: t.double({ description: 'The number of person-seconds required to perform the task' }),
-    completed: t.double({
+    name: t.nullable(t.string(), { description: 'The name of the task' }),
+    startingDate: t.nullable(t.date(), { description: 'The date on which work begins' }),
+    endingDate: t.nullable(t.date(), { description: 'The date on which work ends' }),
+    duration: t.nullable(t.double(), {
+      description: 'The number of working seconds occupied by task',
+    }),
+    effort: t.nullable(t.double(), {
+      description: 'The number of person-seconds required to perform the task',
+    }),
+    completed: t.nullable(t.double(), {
       description: 'The percentage of the task which is complete (1.0 = 100%)',
     }),
-    completedEffort: t.double({ description: 'The person-seconds completed' }),
-    remainingEffort: t.double({ description: 'The person-seconds remaining' }),
-    priority: t.integer({ description: 'Priority of this task' }),
-    taskStatus: t.enumeration(taskStatusMembers, { description: 'The status of the current task' }),
-    taskType: t.enumeration(taskTypeMembers, {
+    completedEffort: t.nullable(t.double(), { description: 'The person-seconds completed' }),
+    remainingEffort: t.nullable(t.double(), { description: 'The person-seconds remaining' }),
+    priority: t.nullable(t.integer(), { description: 'Priority of this task' }),
+    taskStatus: t.nullable(t.enumeration(taskStatusMembers), {
+      description: 'The status of the current task',
+    }),
+    taskType: t.nullable(t.enumeration(taskTypeMembers), {
       description: 'Whether this task is a standard task, milestone, group, or hammock',
     }),
-    staticCost: t.double({ description: 'Cost for this task itself' }),
-    resourceCost: t.double({ description: 'Cost for paying resources assigned to this task' }),
-    totalCost: t.double({ description: 'Total cost for this task' }),
-    outlineDepth: t.integer({
+    staticCost: t.nullable(t.double(), { description: 'Cost for this task itself' }),
+    resourceCost: t.nullable(t.double(), {
+      description: 'Cost for paying resources assigned to this task',
+    }),
+    totalCost: t.nullable(t.double(), { description: 'Total cost for this task' }),
+    outlineDepth: t.nullable(t.integer(), {
       description: 'The depth or level of this task in the project hierarchy',
     }),
-    outlineNumber: t.string({ description: 'The hierarchical or WBS number of this task' }),
-    startingConstraintDate: t.date({ description: 'The earliest date this task may start' }),
-    endingConstraintDate: t.date({ description: 'The latest date this task may end' }),
-    startingDateLocked: t.boolean({ description: 'Whether the start date is locked or not' }),
-    endingDateLocked: t.boolean({ description: 'Whether the end date is locked or not' }),
-    note: t.string({ description: 'Notes' }),
+    outlineNumber: t.nullable(t.string(), {
+      description: 'The hierarchical or WBS number of this task',
+    }),
+    startingConstraintDate: t.nullable(t.date(), {
+      description: 'The earliest date this task may start',
+    }),
+    endingConstraintDate: t.nullable(t.date(), {
+      description: 'The latest date this task may end',
+    }),
+    startingDateLocked: t.nullable(t.boolean(), {
+      description: 'Whether the start date is locked or not',
+    }),
+    endingDateLocked: t.nullable(t.boolean(), {
+      description: 'Whether the end date is locked or not',
+    }),
+    note: t.nullable(t.string(), { description: 'Notes' }),
   },
   { description: 'A task within an OmniPlan project' }
 )
@@ -613,9 +982,9 @@ const taskRecordType: ValueType<Task> = t.record(
 const milestoneRecordType: ValueType<Milestone> = t.record(
   {
     id: t.integer({ description: 'Internal identifier for this milestone' }),
-    name: t.string({ description: 'The name of the milestone' }),
-    startingDate: t.date({ description: 'The date of the milestone' }),
-    note: t.string({ description: 'Notes' }),
+    name: t.nullable(t.string(), { description: 'The name of the milestone' }),
+    startingDate: t.nullable(t.date(), { description: 'The date of the milestone' }),
+    note: t.nullable(t.string(), { description: 'Notes' }),
   },
   { description: 'A milestone (zero-duration marker task)' }
 )
@@ -623,18 +992,24 @@ const milestoneRecordType: ValueType<Milestone> = t.record(
 const resourceRecordType: ValueType<Resource> = t.record(
   {
     id: t.integer({ description: 'Internal identifier for this resource' }),
-    name: t.string({ description: 'The name of the resource' }),
-    resourceType: t.enumeration(resourceTypeMembers, { description: 'Type of the resource' }),
-    number: t.double({ description: 'The total number of units for this resource (1.0 = 100%)' }),
-    emailAddress: t.string({ description: 'Email address for this resource' }),
-    costPerUse: t.double({ description: 'The fixed cost per use of this resource' }),
-    costPerHour: t.double({ description: 'The cost per hour of this resource' }),
-    efficiency: t.double({ description: 'Resource efficiency (1.0 = 100%)' }),
-    totalUses: t.integer({ description: 'Total number of uses of this resource' }),
-    totalSeconds: t.double({ description: 'Total seconds worked by this resource' }),
-    totalCost: t.double({ description: 'Total cost of all assignments for this resource' }),
-    note: t.string({ description: 'Notes' }),
-    outlineDepth: t.integer({
+    name: t.nullable(t.string(), { description: 'The name of the resource' }),
+    resourceType: t.nullable(t.enumeration(resourceTypeMembers), {
+      description: 'Type of the resource',
+    }),
+    number: t.nullable(t.double(), {
+      description: 'The total number of units for this resource (1.0 = 100%)',
+    }),
+    emailAddress: t.nullable(t.string(), { description: 'Email address for this resource' }),
+    costPerUse: t.nullable(t.double(), { description: 'The fixed cost per use of this resource' }),
+    costPerHour: t.nullable(t.double(), { description: 'The cost per hour of this resource' }),
+    efficiency: t.nullable(t.double(), { description: 'Resource efficiency (1.0 = 100%)' }),
+    totalUses: t.nullable(t.integer(), { description: 'Total number of uses of this resource' }),
+    totalSeconds: t.nullable(t.double(), { description: 'Total seconds worked by this resource' }),
+    totalCost: t.nullable(t.double(), {
+      description: 'Total cost of all assignments for this resource',
+    }),
+    note: t.nullable(t.string(), { description: 'Notes' }),
+    outlineDepth: t.nullable(t.integer(), {
       description: 'The depth or level of this resource in the hierarchy',
     }),
   },
@@ -643,18 +1018,22 @@ const resourceRecordType: ValueType<Resource> = t.record(
 
 const assignmentRecordType: ValueType<Assignment> = t.record(
   {
-    units: t.double({ description: 'Units of the resource required for this task (1.0 = 100%)' }),
+    units: t.nullable(t.double(), {
+      description: 'Units of the resource required for this task (1.0 = 100%)',
+    }),
   },
   { description: 'An assignment of a resource to a task' }
 )
 
 const dependencyRecordType: ValueType<Dependency> = t.record(
   {
-    dependencyType: t.enumeration(dependencyTypeMembers, { description: 'Type of dependency' }),
-    leadTime: t.double({
+    dependencyType: t.nullable(t.enumeration(dependencyTypeMembers), {
+      description: 'Type of dependency',
+    }),
+    leadTime: t.nullable(t.double(), {
       description: 'The number of seconds of lead time required between the tasks',
     }),
-    leadPercentage: t.double({
+    leadPercentage: t.nullable(t.double(), {
       description: 'The lead time, in percentage of the length of the prerequisite',
     }),
   },
@@ -663,9 +1042,11 @@ const dependencyRecordType: ValueType<Dependency> = t.record(
 
 const violationRecordType: ValueType<Violation> = t.record(
   {
-    violationType: t.string({ description: 'The type of violation' }),
-    shortDescription: t.string({ description: 'The short description of this violation' }),
-    html: t.string({ description: 'The long description HTML for this violation' }),
+    violationType: t.nullable(t.string(), { description: 'The type of violation' }),
+    shortDescription: t.nullable(t.string(), {
+      description: 'The short description of this violation',
+    }),
+    html: t.nullable(t.string(), { description: 'The long description HTML for this violation' }),
   },
   { description: 'A scheduling conflict or issue' }
 )
@@ -673,15 +1054,17 @@ const violationRecordType: ValueType<Violation> = t.record(
 const scenarioRecordType: ValueType<Scenario> = t.record(
   {
     id: t.string({ description: 'The unique identifier for the scenario' }),
-    name: t.string({ description: 'The name of the scenario' }),
-    startingDate: t.date({ description: 'The date on which work can begin' }),
-    endingDate: t.date({ description: 'The date on which work is complete' }),
-    totalCost: t.double({ description: 'The cost of the entire project' }),
-    completed: t.double({ description: 'The percentage complete (1.0 = 100%)' }),
-    duration: t.double({ description: 'The total duration in seconds' }),
-    effort: t.double({ description: 'The number of person-seconds required' }),
-    violationCount: t.integer({ description: 'Number of violations in the scenario' }),
-    schedulingGranularity: t.enumeration(schedulingGranularityMembers, {
+    name: t.nullable(t.string(), { description: 'The name of the scenario' }),
+    startingDate: t.nullable(t.date(), { description: 'The date on which work can begin' }),
+    endingDate: t.nullable(t.date(), { description: 'The date on which work is complete' }),
+    totalCost: t.nullable(t.double(), { description: 'The cost of the entire project' }),
+    completed: t.nullable(t.double(), { description: 'The percentage complete (1.0 = 100%)' }),
+    duration: t.nullable(t.double(), { description: 'The total duration in seconds' }),
+    effort: t.nullable(t.double(), { description: 'The number of person-seconds required' }),
+    violationCount: t.nullable(t.integer(), {
+      description: 'Number of violations in the scenario',
+    }),
+    schedulingGranularity: t.nullable(t.enumeration(schedulingGranularityMembers), {
       description: 'Scheduling granularity for this scenario',
     }),
   },
@@ -695,9 +1078,9 @@ const scheduleRecordType: ValueType<Schedule> = t.record(
 
 const currencyRecordType: ValueType<Currency> = t.record(
   {
-    code: t.string({ description: 'Locale code for this currency' }),
-    name: t.string({ description: 'Name for this currency' }),
-    symbol: t.string({ description: 'Symbol for this currency' }),
+    code: t.nullable(t.string(), { description: 'Locale code for this currency' }),
+    name: t.nullable(t.string(), { description: 'Name for this currency' }),
+    symbol: t.nullable(t.string(), { description: 'Symbol for this currency' }),
   },
   { description: 'A locale based currency object' }
 )

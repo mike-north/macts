@@ -11,12 +11,12 @@ import { Integer } from '@macts/contracts';
 
 // @public
 export interface Document {
-    currentTime: number;
-    readonly duration: number;
+    currentTime: number | null;
+    readonly duration: number | null;
     readonly id: string;
-    readonly name: string;
-    readonly path: string;
-    playing: boolean;
+    readonly name: string | null;
+    readonly path: string | null;
+    playing: boolean | null;
 }
 
 // @public

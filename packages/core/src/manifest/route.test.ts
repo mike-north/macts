@@ -3,18 +3,21 @@
  *
  * The route string (`app.resource.operation`) is the contract between the
  * generated client SDK and the server router. These tests pin the canonical
- * derivation — keyed by the command's manifest KEY, not `command.name` — that
- * both surfaces must share. See issue: client `events.create` vs server
+ * derivation — keyed by the command's manifest KEY (or its `routeName`), not
+ * `command.name` — that both surfaces must share. See issue: client `events.create` vs server
  * `events.createEvent`.
  */
 
 import { describe, it, expect } from 'vitest'
 import type { AppManifest } from './schemas/index.js'
 import type { Command } from './schemas/command.js'
+import { AppManifestSchema } from './schemas/index.js'
 import {
   normalizeAppRouteSegment,
   buildAppCommandRoute,
   buildResourceCommandRoute,
+  commandRouteSegment,
+  findDuplicateRoutes,
   resolveCommandRoutes,
   resolveManifestRoutes,
 } from './route.js'
@@ -256,3 +259,135 @@ describe('ManifestRoute.permission', () => {
     expect(byRoute.get('calendar.app.reloadCalendars')).toBe('calendar:app:reloadCalendars')
   })
 })
+
+/**
+ * The `routeName` override: a command's segment in its public route and
+ * default permission, defaulting to its key. Two commands that share a CRUD
+ * verb but differ in signature (an Event `get` keyed by a different
+ * identifier than the shared `get`) can each publish `get`.
+ */
+describe('routeName', () => {
+  const getEvent: Command = {
+    name: 'get',
+    routeName: 'get',
+    description: 'Get an event by uid',
+    scope: 'resource',
+    resourceType: 'Event',
+    parameters: [{ name: 'uid', type: 'string', description: 'Event uid', required: true }],
+  }
+
+  it('is the route segment and permission segment, while commandKey stays the manifest key', () => {
+    expect(resolveCommandRoutes(manifest, 'getEvent', getEvent)).toEqual([
+      {
+        route: 'calendar.events.get',
+        commandKey: 'getEvent',
+        command: getEvent,
+        resource: manifest.resources['Event'],
+        resourceType: 'Event',
+        permission: 'calendar:events:get',
+      },
+    ])
+  })
+
+  it('names an application command route too', () => {
+    const command: Command = {
+      name: 'reloadCalendars',
+      routeName: 'reload',
+      description: 'Reload',
+      scope: 'application',
+      parameters: [],
+    }
+    const [route] = resolveCommandRoutes(manifest, 'reloadCalendars', command)
+    expect(route).toMatchObject({
+      route: 'calendar.app.reload',
+      commandKey: 'reloadCalendars',
+      permission: 'calendar:app:reload',
+    })
+  })
+
+  it('leaves the route and permission keyed by command key when absent', () => {
+    const command = manifest.commands['createEvent']
+    if (!command) throw new Error('fixture missing createEvent')
+    expect(commandRouteSegment('createEvent', command)).toBe('createEvent')
+    expect(resolveCommandRoutes(manifest, 'createEvent', command)[0]).toMatchObject({
+      route: 'calendar.events.createEvent',
+      permission: 'calendar:events:createEvent',
+    })
+  })
+
+  it("does not override the command's explicit permission", () => {
+    const command: Command = { ...getEvent, permission: 'calendar:events:read' }
+    expect(resolveCommandRoutes(manifest, 'getEvent', command)[0]?.permission).toBe(
+      'calendar:events:read'
+    )
+  })
+
+  it('rejects an empty routeName, or one containing "." or ":"', () => {
+    for (const routeName of ['', 'events.get', 'events:get']) {
+      const parsed = AppManifestSchema.safeParse({
+        ...manifest,
+        commands: { getEvent: { ...getEvent, routeName } },
+      })
+      expect(parsed.success).toBe(false)
+    }
+  })
+})
+
+describe('duplicate routes', () => {
+  // The shared Event get plus a second command that publishes the same route.
+  const duplicated: AppManifest = {
+    ...manifest,
+    commands: {
+      ...manifest.commands,
+      get: {
+        name: 'get',
+        description: 'Get a calendar or event',
+        scope: 'resource',
+        resourceType: ['Calendar', 'Event'],
+        parameters: [{ name: 'name', type: 'string', description: 'Name', required: true }],
+      },
+      getEvent: {
+        name: 'get',
+        routeName: 'get',
+        description: 'Get an event by uid',
+        scope: 'resource',
+        resourceType: 'Event',
+        parameters: [{ name: 'uid', type: 'string', description: 'Event uid', required: true }],
+      },
+    },
+  }
+
+  it('finds each route two commands resolve to, with their keys', () => {
+    expect(findDuplicateRoutes(duplicated)).toEqual([
+      { route: 'calendar.events.get', commandKeys: ['get', 'getEvent'] },
+    ])
+    expect(findDuplicateRoutes(manifest)).toEqual([])
+  })
+
+  it('is a manifest error, naming the commands and the route', () => {
+    const parsed = AppManifestSchema.safeParse(duplicated)
+    expect(parsed.success).toBe(false)
+    expect(parsed.error?.issues).toEqual([
+      expect.objectContaining({
+        path: ['commands', 'getEvent'],
+        message:
+          'Commands "get", "getEvent" all resolve to the route "calendar.events.get"; give each a distinct key or routeName.',
+      }),
+    ])
+  })
+
+  it('accepts the same routeName on different resources', () => {
+    const narrowed: AppManifest = {
+      ...duplicated,
+      commands: {
+        ...duplicated.commands,
+        get: { ...(duplicated.commands['get'] ?? never()), resourceType: 'Calendar' },
+      },
+    }
+    expect(AppManifestSchema.safeParse(narrowed).success).toBe(true)
+  })
+})
+
+function never(): never {
+  throw new Error('unreachable')
+}

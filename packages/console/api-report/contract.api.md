@@ -18,7 +18,7 @@ export const consoleContract: AppContract<ConsoleClient>;
 // @public
 export interface Device {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public

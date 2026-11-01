@@ -83,19 +83,19 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.Notes',
     resource: 'attachments',
     operation: 'get',
-    description: 'Get an item by name',
+    description: 'Get an attachment by ID',
     permission: null,
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
-          description: 'Item name',
+        id: {
+          description: 'Attachment identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {

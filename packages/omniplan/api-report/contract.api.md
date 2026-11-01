@@ -10,7 +10,7 @@ import { Integer } from '@macts/contracts';
 
 // @public
 export interface Assignment {
-    units: number;
+    units: number | null;
 }
 
 // @public
@@ -30,9 +30,9 @@ export interface AssignmentUpdateInput {
 
 // @public
 export interface Currency {
-    readonly code: string;
-    readonly name: string;
-    readonly symbol: string;
+    readonly code: string | null;
+    readonly name: string | null;
+    readonly symbol: string | null;
 }
 
 // @public
@@ -43,9 +43,9 @@ export type CurrencyUpdateInput = Record<string, never>;
 
 // @public
 export interface Dependency {
-    dependencyType: DependencyType;
-    leadPercentage: number;
-    leadTime: number;
+    dependencyType: DependencyType | null;
+    leadPercentage: number | null;
+    leadTime: number | null;
 }
 
 // @public
@@ -73,9 +73,9 @@ export interface DependencyUpdateInput {
 // @public
 export interface Milestone {
     readonly id: Integer;
-    name: string;
-    note: string;
-    startingDate: Date;
+    name: string | null;
+    note: string | null;
+    startingDate: Date | null;
 }
 
 // @public
@@ -127,14 +127,14 @@ export const omniPlanContract: AppContract<OmniPlanClient>;
 
 // @public
 export interface Project {
-    readonly completed: number;
-    readonly duration: number;
-    readonly effort: number;
-    readonly endingDate: Date;
+    readonly completed: number | null;
+    readonly duration: number | null;
+    readonly effort: number | null;
+    readonly endingDate: Date | null;
     readonly id: string;
-    readonly name: string;
-    startingDate: Date;
-    readonly totalCost: number;
+    readonly name: string | null;
+    startingDate: Date | null;
+    readonly totalCost: number | null;
 }
 
 // @public
@@ -155,19 +155,19 @@ export interface ProjectUpdateInput {
 
 // @public
 export interface Resource {
-    costPerHour: number;
-    costPerUse: number;
-    efficiency: number;
-    emailAddress: string;
+    costPerHour: number | null;
+    costPerUse: number | null;
+    efficiency: number | null;
+    emailAddress: string | null;
     readonly id: Integer;
-    name: string;
-    note: string;
-    number: number;
-    readonly outlineDepth: Integer;
-    resourceType: ResourceType;
-    readonly totalCost: number;
-    readonly totalSeconds: number;
-    readonly totalUses: Integer;
+    name: string | null;
+    note: string | null;
+    number: number | null;
+    readonly outlineDepth: Integer | null;
+    resourceType: ResourceType | null;
+    readonly totalCost: number | null;
+    readonly totalSeconds: number | null;
+    readonly totalUses: Integer | null;
 }
 
 // @public
@@ -206,16 +206,16 @@ export interface ResourceUpdateInput {
 
 // @public
 export interface Scenario {
-    readonly completed: number;
-    readonly duration: number;
-    readonly effort: number;
-    readonly endingDate: Date;
+    readonly completed: number | null;
+    readonly duration: number | null;
+    readonly effort: number | null;
+    readonly endingDate: Date | null;
     readonly id: string;
-    name: string;
-    schedulingGranularity: SchedulingGranularity;
-    startingDate: Date;
-    readonly totalCost: number;
-    readonly violationCount: Integer;
+    name: string | null;
+    schedulingGranularity: SchedulingGranularity | null;
+    startingDate: Date | null;
+    readonly totalCost: number | null;
+    readonly violationCount: Integer | null;
 }
 
 // @public
@@ -252,28 +252,28 @@ export type SchedulingGranularity = 'exactScheduling' | 'hourlyScheduling' | 'da
 
 // @public
 export interface Task {
-    completed: number;
-    completedEffort: number;
-    duration: number;
-    effort: number;
-    endingConstraintDate: Date;
-    endingDate: Date;
-    endingDateLocked: boolean;
+    completed: number | null;
+    completedEffort: number | null;
+    duration: number | null;
+    effort: number | null;
+    endingConstraintDate: Date | null;
+    endingDate: Date | null;
+    endingDateLocked: boolean | null;
     readonly id: Integer;
-    name: string;
-    note: string;
-    readonly outlineDepth: Integer;
-    readonly outlineNumber: string;
-    priority: Integer;
-    readonly remainingEffort: number;
-    readonly resourceCost: number;
-    startingConstraintDate: Date;
-    startingDate: Date;
-    startingDateLocked: boolean;
-    staticCost: number;
-    readonly taskStatus: TaskStatus;
-    taskType: TaskType;
-    readonly totalCost: number;
+    name: string | null;
+    note: string | null;
+    readonly outlineDepth: Integer | null;
+    readonly outlineNumber: string | null;
+    priority: Integer | null;
+    readonly remainingEffort: number | null;
+    readonly resourceCost: number | null;
+    startingConstraintDate: Date | null;
+    startingDate: Date | null;
+    startingDateLocked: boolean | null;
+    staticCost: number | null;
+    readonly taskStatus: TaskStatus | null;
+    taskType: TaskType | null;
+    readonly totalCost: number | null;
 }
 
 // @public
@@ -329,9 +329,9 @@ export interface TaskUpdateInput {
 
 // @public
 export interface Violation {
-    readonly html: string;
-    readonly shortDescription: string;
-    readonly violationType: string;
+    readonly html: string | null;
+    readonly shortDescription: string | null;
+    readonly violationType: string | null;
 }
 
 // @public

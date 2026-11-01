@@ -45,57 +45,123 @@ export type ViewType = 'dayView' | 'weekView' | 'monthView'
 
 /** A calendar containing events */
 export interface Calendar {
-  /** The calendar title */
+  /**
+   * The calendar title.
+   * Never null: the primary identifier.
+   */
   name: string
-  /** The calendar title (synonym for name) */
-  title: string
-  /** The calendar color */
-  color: Rgb
-  /** A unique calendar key */
-  readonly calendarIdentifier: string
-  /** Whether the calendar can be modified */
-  readonly writable: boolean
-  /** The calendar description */
-  description: string
+  /**
+   * The calendar title (synonym for name).
+   * Nullable. No evidence that the app always sets it.
+   */
+  title: string | null
+  /**
+   * The calendar color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * A unique calendar key.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly calendarIdentifier: string | null
+  /**
+   * Whether the calendar can be modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly writable: boolean | null
+  /**
+   * The calendar description.
+   * Nullable. No evidence that the app always sets it.
+   */
+  description: string | null
 }
 
 /** A calendar event */
 export interface Event {
-  /** The event summary/title */
+  /**
+   * The event summary/title.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   summary: string
-  /** The event notes */
-  description: string
-  /** The event location */
-  location: string
-  /** The event start date */
+  /**
+   * The event notes.
+   * Nullable. Observed missing in 13 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  description: string | null
+  /**
+   * The event location.
+   * Nullable. Observed missing in 14 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  location: string | null
+  /**
+   * The event start date.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   startDate: Date
-  /** The event end date */
+  /**
+   * The event end date.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   endDate: Date
-  /** True if the event is an all-day event */
+  /**
+   * True if the event is an all-day event.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   alldayEvent: boolean
-  /** The iCalendar (RFC 2445) string describing the event recurrence, if defined */
-  recurrence: string
-  /** The event status */
+  /**
+   * The iCalendar (RFC 2445) string describing the event recurrence, if defined.
+   * Nullable. Observed missing in 13 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  recurrence: string | null
+  /**
+   * The event status.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   status: EventStatus
-  /** The event version */
+  /**
+   * The event version.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   readonly sequence: Integer
-  /** The event modification date */
+  /**
+   * The event modification date.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   stampDate: Date
-  /** The exception dates for recurring events */
+  /**
+   * The exception dates for recurring events.
+   * Never null: observed in all 37 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   excludedDates: readonly Date[]
-  /** A unique event key */
+  /**
+   * A unique event key.
+   * Never null: the primary identifier.
+   */
   readonly uid: string
-  /** The URL associated with the event */
-  url: string
+  /**
+   * The URL associated with the event.
+   * Nullable. Observed missing in 14 of 22 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  url: string | null
 }
 
 /** An event attendee */
 export interface Attendee {
-  /** The first and last name of the attendee */
-  readonly displayName: string
-  /** Email address of the attendee */
+  /**
+   * The first and last name of the attendee.
+   * Nullable. Observed missing in 45 of 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  readonly displayName: string | null
+  /**
+   * Email address of the attendee.
+   * Never null: observed in all 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   readonly email: string
-  /** The invitation status for the attendee */
+  /**
+   * The invitation status for the attendee.
+   * Never null: observed in all 60 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
   readonly participationStatus: ParticipationStatus
 }
 
@@ -103,50 +169,77 @@ export interface Attendee {
 export interface DisplayAlarm {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Nullable: An alarm has either a trigger interval (relative to the event start) or an absolute
+   * trigger date. The 52 sampled alarms were all relative; an absolute alarm has no interval
+   * (Calendar 27.0).
    */
-  triggerInterval: Integer
-  /** An absolute alarm date */
-  triggerDate: Date
+  triggerInterval: Integer | null
+  /**
+   * An absolute alarm date.
+   * Nullable. Observed missing in 52 of 52 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  triggerDate: Date | null
 }
 
 /** A mail/email alarm */
 export interface MailAlarm {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Nullable. No evidence that the app always sets it.
    */
-  triggerInterval: Integer
-  /** An absolute alarm date */
-  triggerDate: Date
+  triggerInterval: Integer | null
+  /**
+   * An absolute alarm date.
+   * Nullable. No evidence that the app always sets it.
+   */
+  triggerDate: Date | null
 }
 
 /** A sound alarm */
 export interface SoundAlarm {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Nullable. No evidence that the app always sets it.
    */
-  triggerInterval: Integer
-  /** An absolute alarm date */
-  triggerDate: Date
-  /** The system sound name to be used for the alarm */
-  soundName: string
-  /** The (POSIX) path to the sound file to be used for the alarm */
-  soundFile: string
+  triggerInterval: Integer | null
+  /**
+   * An absolute alarm date.
+   * Nullable. Observed missing in 9 of 9 items (Calendar 27.0, macOS 27.2, 2026-11-01).
+   */
+  triggerDate: Date | null
+  /**
+   * The system sound name to be used for the alarm.
+   * Nullable. No evidence that the app always sets it.
+   */
+  soundName: string | null
+  /**
+   * The (POSIX) path to the sound file to be used for the alarm.
+   * Nullable. No evidence that the app always sets it.
+   */
+  soundFile: string | null
 }
 
 /** An 'open file' alarm */
 export interface OpenFileAlarm {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Nullable. No evidence that the app always sets it.
    */
-  triggerInterval: Integer
-  /** An absolute alarm date */
-  triggerDate: Date
-  /** The (POSIX) path to be opened by the alarm */
-  filepath: string
+  triggerInterval: Integer | null
+  /**
+   * An absolute alarm date.
+   * Nullable. No evidence that the app always sets it.
+   */
+  triggerDate: Date | null
+  /**
+   * The (POSIX) path to be opened by the alarm.
+   * Nullable. No evidence that the app always sets it.
+   */
+  filepath: string | null
 }
 
 /** Input for creating a Calendar. */
@@ -163,13 +256,25 @@ export interface CalendarCreateInput {
 
 /** Input for updating a Calendar. Omitted fields are left unchanged. */
 export interface CalendarUpdateInput {
-  /** Calendar name */
+  /**
+   * Calendar name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The calendar title (synonym for name) */
+  /**
+   * The calendar title (synonym for name).
+   * Cannot be reset: null is rejected.
+   */
   title?: string
-  /** Calendar color */
+  /**
+   * Calendar color.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The calendar description */
+  /**
+   * The calendar description.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
 }
 
@@ -203,27 +308,60 @@ export interface EventCreateInput {
 
 /** Input for updating an Event. Omitted fields are left unchanged. */
 export interface EventUpdateInput {
-  /** Event title */
+  /**
+   * Event title.
+   * Cannot be reset: null is rejected.
+   */
   summary?: string
-  /** Event notes */
+  /**
+   * Event notes.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
-  /** Event location */
+  /**
+   * Event location.
+   * Cannot be reset: null is rejected.
+   */
   location?: string
-  /** Event start date */
+  /**
+   * Event start date.
+   * Cannot be reset: null is rejected.
+   */
   startDate?: Date
-  /** Event end date */
+  /**
+   * Event end date.
+   * Cannot be reset: null is rejected.
+   */
   endDate?: Date
-  /** Whether this is an all-day event */
+  /**
+   * Whether this is an all-day event.
+   * Cannot be reset: null is rejected.
+   */
   alldayEvent?: boolean
-  /** The iCalendar (RFC 2445) recurrence string */
+  /**
+   * The iCalendar (RFC 2445) recurrence string.
+   * Cannot be reset: null is rejected.
+   */
   recurrence?: string
-  /** Event status */
+  /**
+   * Event status.
+   * Cannot be reset: null is rejected.
+   */
   status?: EventStatus
-  /** Event modification date */
+  /**
+   * Event modification date.
+   * Cannot be reset: null is rejected.
+   */
   stampDate?: Date
-  /** Exception dates for recurring events */
+  /**
+   * Exception dates for recurring events.
+   * Cannot be reset: null is rejected.
+   */
   excludedDates?: readonly Date[]
-  /** URL associated with the event */
+  /**
+   * URL associated with the event.
+   * Cannot be reset: null is rejected.
+   */
   url?: string
 }
 
@@ -248,10 +386,14 @@ export interface DisplayAlarmCreateInput {
 export interface DisplayAlarmUpdateInput {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Cannot be reset: null is rejected.
    */
   triggerInterval?: Integer
-  /** An absolute alarm date */
+  /**
+   * An absolute alarm date.
+   * Cannot be reset: null is rejected.
+   */
   triggerDate?: Date
 }
 
@@ -270,10 +412,14 @@ export interface MailAlarmCreateInput {
 export interface MailAlarmUpdateInput {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Cannot be reset: null is rejected.
    */
   triggerInterval?: Integer
-  /** An absolute alarm date */
+  /**
+   * An absolute alarm date.
+   * Cannot be reset: null is rejected.
+   */
   triggerDate?: Date
 }
 
@@ -296,14 +442,24 @@ export interface SoundAlarmCreateInput {
 export interface SoundAlarmUpdateInput {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Cannot be reset: null is rejected.
    */
   triggerInterval?: Integer
-  /** An absolute alarm date */
+  /**
+   * An absolute alarm date.
+   * Cannot be reset: null is rejected.
+   */
   triggerDate?: Date
-  /** The system sound name to be used for the alarm */
+  /**
+   * The system sound name to be used for the alarm.
+   * Cannot be reset: null is rejected.
+   */
   soundName?: string
-  /** The (POSIX) path to the sound file to be used for the alarm */
+  /**
+   * The (POSIX) path to the sound file to be used for the alarm.
+   * Cannot be reset: null is rejected.
+   */
   soundFile?: string
 }
 
@@ -324,12 +480,19 @@ export interface OpenFileAlarmCreateInput {
 export interface OpenFileAlarmUpdateInput {
   /**
    * The interval in minutes between the event and the alarm (positive for after, negative for
-   * before)
+   * before).
+   * Cannot be reset: null is rejected.
    */
   triggerInterval?: Integer
-  /** An absolute alarm date */
+  /**
+   * An absolute alarm date.
+   * Cannot be reset: null is rejected.
+   */
   triggerDate?: Date
-  /** The (POSIX) path to be opened by the alarm */
+  /**
+   * The (POSIX) path to be opened by the alarm.
+   * Cannot be reset: null is rejected.
+   */
   filepath?: string
 }
 
@@ -337,7 +500,11 @@ export interface OpenFileAlarmUpdateInput {
 export interface CalendarResourceClient {
   /** List calendars. */
   list(options?: CallOptions): Promise<readonly Calendar[]>
-  /** Read the calendar identified by `id`. */
+  /**
+   * Read the calendar identified by `id`.
+   *
+   * @param id - Calendar identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Calendar>
   /** Create a calendar. */
   create(input: CalendarCreateInput, options?: CallOptions): Promise<Calendar>
@@ -345,20 +512,42 @@ export interface CalendarResourceClient {
 
 /** A calendar event */
 export interface EventResourceClient {
-  /** List events. */
+  /**
+   * List events.
+   *
+   * @param calendarId - Calendar identifier. Does not accept null.
+   */
   list(calendarId: string, options?: CallOptions): Promise<readonly Event[]>
-  /** Read the event identified by `id` within `calendarId`. */
+  /**
+   * Read the event identified by `id` within `calendarId`.
+   *
+   * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
+   * null.
+   * @param id - Event identifier (uid). Does not accept null.
+   */
   get(calendarId: string, id: string, options?: CallOptions): Promise<Event>
   /** Create an event. */
   create(input: EventCreateInput, options?: CallOptions): Promise<Event>
-  /** Update the event identified by `id` within `calendarId`. Omitted fields are left unchanged. */
+  /**
+   * Update the event identified by `id` within `calendarId`. Omitted fields are left unchanged.
+   *
+   * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
+   * null.
+   * @param id - Event identifier (uid). Does not accept null.
+   */
   update(
     calendarId: string,
     id: string,
     input: EventUpdateInput,
     options?: CallOptions
   ): Promise<Event>
-  /** Delete the event identified by `id` within `calendarId`. */
+  /**
+   * Delete the event identified by `id` within `calendarId`.
+   *
+   * @param calendarId - Calendar identifier (the calendar containing the event). Does not accept
+   * null.
+   * @param id - Event identifier (uid). Does not accept null.
+   */
   delete(calendarId: string, id: string, options?: CallOptions): Promise<void>
   /** Show the event or to-do in the calendar window */
   show(options?: CallOptions): Promise<void>
@@ -375,9 +564,17 @@ export interface CalendarClient {
   readonly events: EventResourceClient
   /** Tell the application to reload all calendar files contents */
   reloadCalendars(options?: CallOptions): Promise<void>
-  /** Show calendar on the given view */
+  /**
+   * Show calendar on the given view
+   *
+   * @param to - The calendar view to be displayed. Does not accept null.
+   */
   switchView(to: ViewType, options?: CallOptions): Promise<void>
-  /** Show calendar on the given date */
+  /**
+   * Show calendar on the given date
+   *
+   * @param at - The date to be displayed. Does not accept null.
+   */
   viewCalendar(at: Date, options?: CallOptions): Promise<void>
 }
 
@@ -393,11 +590,11 @@ const viewTypeMembers = ['dayView', 'weekView', 'monthView'] as const
 const calendarRecordType: ValueType<Calendar> = t.record(
   {
     name: t.string({ description: 'The calendar title' }),
-    title: t.string({ description: 'The calendar title (synonym for name)' }),
-    color: t.rgb({ description: 'The calendar color' }),
-    calendarIdentifier: t.string({ description: 'A unique calendar key' }),
-    writable: t.boolean({ description: 'Whether the calendar can be modified' }),
-    description: t.string({ description: 'The calendar description' }),
+    title: t.nullable(t.string(), { description: 'The calendar title (synonym for name)' }),
+    color: t.nullable(t.rgb(), { description: 'The calendar color' }),
+    calendarIdentifier: t.nullable(t.string(), { description: 'A unique calendar key' }),
+    writable: t.nullable(t.boolean(), { description: 'Whether the calendar can be modified' }),
+    description: t.nullable(t.string(), { description: 'The calendar description' }),
   },
   { description: 'A calendar containing events' }
 )
@@ -405,12 +602,12 @@ const calendarRecordType: ValueType<Calendar> = t.record(
 const eventRecordType: ValueType<Event> = t.record(
   {
     summary: t.string({ description: 'The event summary/title' }),
-    description: t.string({ description: 'The event notes' }),
-    location: t.string({ description: 'The event location' }),
+    description: t.nullable(t.string(), { description: 'The event notes' }),
+    location: t.nullable(t.string(), { description: 'The event location' }),
     startDate: t.date({ description: 'The event start date' }),
     endDate: t.date({ description: 'The event end date' }),
     alldayEvent: t.boolean({ description: 'True if the event is an all-day event' }),
-    recurrence: t.string({
+    recurrence: t.nullable(t.string(), {
       description: 'The iCalendar (RFC 2445) string describing the event recurrence, if defined',
     }),
     status: t.enumeration(eventStatusMembers, { description: 'The event status' }),
@@ -418,14 +615,14 @@ const eventRecordType: ValueType<Event> = t.record(
     stampDate: t.date({ description: 'The event modification date' }),
     excludedDates: t.array(t.date(), { description: 'The exception dates for recurring events' }),
     uid: t.string({ description: 'A unique event key' }),
-    url: t.string({ description: 'The URL associated with the event' }),
+    url: t.nullable(t.string(), { description: 'The URL associated with the event' }),
   },
   { description: 'A calendar event' }
 )
 
 const attendeeRecordType: ValueType<Attendee> = t.record(
   {
-    displayName: t.string({ description: 'The first and last name of the attendee' }),
+    displayName: t.nullable(t.string(), { description: 'The first and last name of the attendee' }),
     email: t.string({ description: 'Email address of the attendee' }),
     participationStatus: t.enumeration(participationStatusMembers, {
       description: 'The invitation status for the attendee',
@@ -436,35 +633,37 @@ const attendeeRecordType: ValueType<Attendee> = t.record(
 
 const displayAlarmRecordType: ValueType<DisplayAlarm> = t.record(
   {
-    triggerInterval: t.integer({
+    triggerInterval: t.nullable(t.integer(), {
       description:
         'The interval in minutes between the event and the alarm (positive for after, negative for before)',
     }),
-    triggerDate: t.date({ description: 'An absolute alarm date' }),
+    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
   },
   { description: 'A message/display alarm' }
 )
 
 const mailAlarmRecordType: ValueType<MailAlarm> = t.record(
   {
-    triggerInterval: t.integer({
+    triggerInterval: t.nullable(t.integer(), {
       description:
         'The interval in minutes between the event and the alarm (positive for after, negative for before)',
     }),
-    triggerDate: t.date({ description: 'An absolute alarm date' }),
+    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
   },
   { description: 'A mail/email alarm' }
 )
 
 const soundAlarmRecordType: ValueType<SoundAlarm> = t.record(
   {
-    triggerInterval: t.integer({
+    triggerInterval: t.nullable(t.integer(), {
       description:
         'The interval in minutes between the event and the alarm (positive for after, negative for before)',
     }),
-    triggerDate: t.date({ description: 'An absolute alarm date' }),
-    soundName: t.string({ description: 'The system sound name to be used for the alarm' }),
-    soundFile: t.string({
+    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
+    soundName: t.nullable(t.string(), {
+      description: 'The system sound name to be used for the alarm',
+    }),
+    soundFile: t.nullable(t.string(), {
       description: 'The (POSIX) path to the sound file to be used for the alarm',
     }),
   },
@@ -473,12 +672,12 @@ const soundAlarmRecordType: ValueType<SoundAlarm> = t.record(
 
 const openFileAlarmRecordType: ValueType<OpenFileAlarm> = t.record(
   {
-    triggerInterval: t.integer({
+    triggerInterval: t.nullable(t.integer(), {
       description:
         'The interval in minutes between the event and the alarm (positive for after, negative for before)',
     }),
-    triggerDate: t.date({ description: 'An absolute alarm date' }),
-    filepath: t.string({ description: 'The (POSIX) path to be opened by the alarm' }),
+    triggerDate: t.nullable(t.date(), { description: 'An absolute alarm date' }),
+    filepath: t.nullable(t.string(), { description: 'The (POSIX) path to be opened by the alarm' }),
   },
   { description: "An 'open file' alarm" }
 )

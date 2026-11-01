@@ -44,6 +44,7 @@
     "fast-xml-parser": "^5.0.9",
     "js-yaml": "^4.1.1",
     "pluralize": "^8.0.0",
+    "yaml": "catalog:",
     "zod": "catalog:",
     "zod-to-json-schema": "^3.25.1"
   },

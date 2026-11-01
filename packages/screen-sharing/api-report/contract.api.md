@@ -10,8 +10,8 @@ import { CallOptions } from '@macts/contracts';
 // @public
 export interface Connection {
     readonly id: string;
-    readonly name: string;
-    readonly url: string;
+    readonly name: string | null;
+    readonly url: string | null;
 }
 
 // @public

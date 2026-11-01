@@ -84,238 +84,526 @@ export type ExportAreaType = 'selectedGraphics' | 'allGraphics' | 'currentCanvas
 
 /** A drawing page/canvas in OmniGraffle */
 export interface Canvas {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   id: string
-  /** Name of this canvas */
-  name: string
-  /** Adjust number of pages on the canvas automatically? */
-  adjustsPages: boolean
-  /** Whether canvas size is reported as multiples of page size */
-  canvasSizeIsMeasuredInPages: boolean
-  /** Size of the canvas (page size multiplied by number of pages) */
-  canvasSize: Point
-  /** Size of each page */
-  readonly pageSize: Point
-  /** Horizontal pages */
-  horizontalPages: Integer
-  /** Vertical pages */
-  verticalPages: Integer
-  /** Column alignment */
-  columnAlignment: HorizontalAlignment
-  /** Row alignment */
-  rowAlignment: VerticalAlignment
-  /** Spacing between graphics in a column */
-  columnSpacing: number
-  /** Spacing between graphics in a row */
-  rowSpacing: number
+  /**
+   * Name of this canvas.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * Adjust number of pages on the canvas automatically?
+   * Nullable. No evidence that the app always sets it.
+   */
+  adjustsPages: boolean | null
+  /**
+   * Whether canvas size is reported as multiples of page size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  canvasSizeIsMeasuredInPages: boolean | null
+  /**
+   * Size of the canvas (page size multiplied by number of pages).
+   * Nullable. No evidence that the app always sets it.
+   */
+  canvasSize: Point | null
+  /**
+   * Size of each page.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly pageSize: Point | null
+  /**
+   * Horizontal pages.
+   * Nullable. No evidence that the app always sets it.
+   */
+  horizontalPages: Integer | null
+  /**
+   * Vertical pages.
+   * Nullable. No evidence that the app always sets it.
+   */
+  verticalPages: Integer | null
+  /**
+   * Column alignment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  columnAlignment: HorizontalAlignment | null
+  /**
+   * Row alignment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rowAlignment: VerticalAlignment | null
+  /**
+   * Spacing between graphics in a column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  columnSpacing: number | null
+  /**
+   * Spacing between graphics in a row.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rowSpacing: number | null
 }
 
 /** Base class for visual elements in OmniGraffle */
 export interface Graphic {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Origin of the graphic (position of the upper-left corner of the bounding rectangle) */
-  origin: Point
-  /** Size of the graphic (width and height of the bounding rectangle) */
-  size: Point
-  /** Is this graphic locked? */
-  locked: boolean
-  /** Does this graphic allow connections to it? */
-  allowsConnections: boolean
-  /** When snapped to the grid does this graphic align its edges to the grid? */
-  alignsEdgesToGrid: boolean
-  /** Curvature of corners in the stroke path */
-  cornerRadius: number
-  /** Does this graphic draw its shadow? */
-  drawsShadow: boolean
-  /** Does this graphic draw its stroke? */
-  drawsStroke: boolean
-  /** Does this graphic have a double-lined stroke? */
-  doubleStroke: boolean
-  /** Is this graphic flipped horizontally? */
-  flippedHorizontally: boolean
-  /** Is this graphic flipped vertically? */
-  flippedVertically: boolean
-  /** Color of the shadow */
-  shadowColor: Rgb
-  /** The 'fuzziness' of the graphic's shadow */
-  shadowFuzziness: number
-  /** The direction of the graphic's shadow */
-  shadowVector: Point
-  /** Does this graphic draw its shadow immediately beneath itself? */
-  shadowBeneath: boolean
-  /** Color of the stroke */
-  strokeColor: Rgb
-  /** Type of cap at ends of the stroke */
-  strokeCap: StrokeCap
-  /** Type of join between segments of the stroke */
-  strokeJoin: StrokeJoin
-  /** Dash pattern of the stroke */
-  strokePattern: Integer
-  /** Thickness of the stroke */
-  thickness: number
-  /** Notes for this graphic */
-  notes: string
-  /** Name of a graphic */
-  userName: string
-  /** Arbitrary string tag attached to this graphic */
-  tag: string
-  /** Web link for this graphic */
-  url: string
-  /** Source of attached AppleScript */
-  script: string
-  /** Rank group assigned to this graphic for hierarchical layout */
-  rankGroup: Integer
+  /**
+   * Origin of the graphic (position of the upper-left corner of the bounding rectangle).
+   * Nullable. No evidence that the app always sets it.
+   */
+  origin: Point | null
+  /**
+   * Size of the graphic (width and height of the bounding rectangle).
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: Point | null
+  /**
+   * Is this graphic locked?
+   * Nullable. No evidence that the app always sets it.
+   */
+  locked: boolean | null
+  /**
+   * Does this graphic allow connections to it?
+   * Nullable. No evidence that the app always sets it.
+   */
+  allowsConnections: boolean | null
+  /**
+   * When snapped to the grid does this graphic align its edges to the grid?
+   * Nullable. No evidence that the app always sets it.
+   */
+  alignsEdgesToGrid: boolean | null
+  /**
+   * Curvature of corners in the stroke path.
+   * Nullable. No evidence that the app always sets it.
+   */
+  cornerRadius: number | null
+  /**
+   * Does this graphic draw its shadow?
+   * Nullable. No evidence that the app always sets it.
+   */
+  drawsShadow: boolean | null
+  /**
+   * Does this graphic draw its stroke?
+   * Nullable. No evidence that the app always sets it.
+   */
+  drawsStroke: boolean | null
+  /**
+   * Does this graphic have a double-lined stroke?
+   * Nullable. No evidence that the app always sets it.
+   */
+  doubleStroke: boolean | null
+  /**
+   * Is this graphic flipped horizontally?
+   * Nullable. No evidence that the app always sets it.
+   */
+  flippedHorizontally: boolean | null
+  /**
+   * Is this graphic flipped vertically?
+   * Nullable. No evidence that the app always sets it.
+   */
+  flippedVertically: boolean | null
+  /**
+   * Color of the shadow.
+   * Nullable. No evidence that the app always sets it.
+   */
+  shadowColor: Rgb | null
+  /**
+   * The 'fuzziness' of the graphic's shadow.
+   * Nullable. No evidence that the app always sets it.
+   */
+  shadowFuzziness: number | null
+  /**
+   * The direction of the graphic's shadow.
+   * Nullable. No evidence that the app always sets it.
+   */
+  shadowVector: Point | null
+  /**
+   * Does this graphic draw its shadow immediately beneath itself?
+   * Nullable. No evidence that the app always sets it.
+   */
+  shadowBeneath: boolean | null
+  /**
+   * Color of the stroke.
+   * Nullable. No evidence that the app always sets it.
+   */
+  strokeColor: Rgb | null
+  /**
+   * Type of cap at ends of the stroke.
+   * Nullable. No evidence that the app always sets it.
+   */
+  strokeCap: StrokeCap | null
+  /**
+   * Type of join between segments of the stroke.
+   * Nullable. No evidence that the app always sets it.
+   */
+  strokeJoin: StrokeJoin | null
+  /**
+   * Dash pattern of the stroke.
+   * Nullable. No evidence that the app always sets it.
+   */
+  strokePattern: Integer | null
+  /**
+   * Thickness of the stroke.
+   * Nullable. No evidence that the app always sets it.
+   */
+  thickness: number | null
+  /**
+   * Notes for this graphic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  notes: string | null
+  /**
+   * Name of a graphic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  userName: string | null
+  /**
+   * Arbitrary string tag attached to this graphic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  tag: string | null
+  /**
+   * Web link for this graphic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  url: string | null
+  /**
+   * Source of attached AppleScript.
+   * Nullable. No evidence that the app always sets it.
+   */
+  script: string | null
+  /**
+   * Rank group assigned to this graphic for hierarchical layout.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rankGroup: Integer | null
 }
 
 /** A shape graphic in OmniGraffle */
 export interface Shape {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Name of the shape */
-  name: string
-  /** The text inside the shape */
-  text: string
-  /** The type of fill for this shape */
-  fill: FillType
-  /** The fill color */
-  fillColor: Rgb
-  /** For linear and radial fills, this is the ending color */
-  gradientColor: Rgb
-  /** Angle of a linear gradient fill */
-  gradientAngle: number
-  /** Rotation of the graphic in degrees */
-  rotation: number
-  /** Placement of the text inside the shape */
-  textPlacement: VerticalAlignment
-  /** Autosizing behavior of the shape around the text */
-  autosizing: TextAutosizing
-  /** Padding at the left and right of the text space */
-  sidePadding: Integer
-  /** Padding at the top and bottom of the text space */
-  verticalPadding: Integer
+  /**
+   * Name of the shape.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The text inside the shape.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
+  /**
+   * The type of fill for this shape.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fill: FillType | null
+  /**
+   * The fill color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fillColor: Rgb | null
+  /**
+   * For linear and radial fills, this is the ending color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  gradientColor: Rgb | null
+  /**
+   * Angle of a linear gradient fill.
+   * Nullable. No evidence that the app always sets it.
+   */
+  gradientAngle: number | null
+  /**
+   * Rotation of the graphic in degrees.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rotation: number | null
+  /**
+   * Placement of the text inside the shape.
+   * Nullable. No evidence that the app always sets it.
+   */
+  textPlacement: VerticalAlignment | null
+  /**
+   * Autosizing behavior of the shape around the text.
+   * Nullable. No evidence that the app always sets it.
+   */
+  autosizing: TextAutosizing | null
+  /**
+   * Padding at the left and right of the text space.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sidePadding: Integer | null
+  /**
+   * Padding at the top and bottom of the text space.
+   * Nullable. No evidence that the app always sets it.
+   */
+  verticalPadding: Integer | null
 }
 
 /** A line/connector in OmniGraffle */
 export interface Line {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Type of the line */
-  lineType: LineType
-  /** The behavior when one line crosses over another line */
-  hopType: HopType
-  /** Type of line ending on the head of the line */
-  headType: string
-  /** Type of line ending on the tail of the line */
-  tailType: string
-  /** Scale of line ending on the head of the line */
-  headScale: number
-  /** Scale of line ending on the tail of the line */
-  tailScale: number
-  /** Which magnet of the destination graphic the line attaches to */
-  headMagnet: Integer
-  /** Which magnet of the source graphic the line attaches to */
-  tailMagnet: Integer
+  /**
+   * Type of the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  lineType: LineType | null
+  /**
+   * The behavior when one line crosses over another line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  hopType: HopType | null
+  /**
+   * Type of line ending on the head of the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  headType: string | null
+  /**
+   * Type of line ending on the tail of the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  tailType: string | null
+  /**
+   * Scale of line ending on the head of the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  headScale: number | null
+  /**
+   * Scale of line ending on the tail of the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  tailScale: number | null
+  /**
+   * Which magnet of the destination graphic the line attaches to.
+   * Nullable. No evidence that the app always sets it.
+   */
+  headMagnet: Integer | null
+  /**
+   * Which magnet of the source graphic the line attaches to.
+   * Nullable. No evidence that the app always sets it.
+   */
+  tailMagnet: Integer | null
 }
 
 /** A group of graphics in OmniGraffle */
 export interface Group {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Rotation of the group in degrees */
-  rotation: number
-  /** Only connect to the group? */
-  connectToGroupOnly: boolean
+  /**
+   * Rotation of the group in degrees.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rotation: number | null
+  /**
+   * Only connect to the group?
+   * Nullable. No evidence that the app always sets it.
+   */
+  connectToGroupOnly: boolean | null
 }
 
 /** A drawing layer in OmniGraffle */
 export interface Layer {
-  /** Name of the layer */
+  /**
+   * Name of the layer.
+   * Never null: the primary identifier.
+   */
   name: string
-  /** Are the layer's graphics locked? */
-  locked: boolean
-  /** Are the layer's graphics visible? */
-  visible: boolean
-  /** Do the layer's graphics print? */
-  prints: boolean
+  /**
+   * Are the layer's graphics locked?
+   * Nullable. No evidence that the app always sets it.
+   */
+  locked: boolean | null
+  /**
+   * Are the layer's graphics visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Do the layer's graphics print?
+   * Nullable. No evidence that the app always sets it.
+   */
+  prints: boolean | null
 }
 
 /** A subgraph container in OmniGraffle */
 export interface Subgraph {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Is the subgraph collapsed? */
-  collapsed: boolean
-  /** Top margin */
-  topMargin: number
-  /** Bottom margin */
-  bottomMargin: number
-  /** Left margin */
-  leftMargin: number
-  /** Right margin */
-  rightMargin: number
+  /**
+   * Is the subgraph collapsed?
+   * Nullable. No evidence that the app always sets it.
+   */
+  collapsed: boolean | null
+  /**
+   * Top margin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  topMargin: number | null
+  /**
+   * Bottom margin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bottomMargin: number | null
+  /**
+   * Left margin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  leftMargin: number | null
+  /**
+   * Right margin.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rightMargin: number | null
 }
 
 /** A text label on a line */
 export interface Label {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The text inside the label */
-  text: string
-  /** The position along the line */
-  labelPosition: number
-  /** The offset from the line */
-  labelOffset: number
-  /** The type of rotation around the line */
-  labelRotation: LabelOrientation
+  /**
+   * The text inside the label.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
+  /**
+   * The position along the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  labelPosition: number | null
+  /**
+   * The offset from the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  labelOffset: number | null
+  /**
+   * The type of rotation around the line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  labelRotation: LabelOrientation | null
 }
 
 /** Grid settings for a canvas */
 export interface Grid {
-  /** Is the grid visible? */
-  visible: boolean
-  /** Do points snap to the grid? */
-  snaps: boolean
-  /** Number of pixels between minor grid lines */
-  spacing: number
-  /** Does the grid have 'major' lines? */
-  major: boolean
-  /** The number of minor grid lines for each major line */
-  majorSpacing: Integer
-  /** Does the grid draw in front of all shapes? */
-  drawsInFront: boolean
-  /** Color of the grid */
-  scriptGridColor: Rgb
-  /** Color of major lines */
-  scriptMajorGridColor: Rgb
+  /**
+   * Is the grid visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Do points snap to the grid?
+   * Nullable. No evidence that the app always sets it.
+   */
+  snaps: boolean | null
+  /**
+   * Number of pixels between minor grid lines.
+   * Nullable. No evidence that the app always sets it.
+   */
+  spacing: number | null
+  /**
+   * Does the grid have 'major' lines?
+   * Nullable. No evidence that the app always sets it.
+   */
+  major: boolean | null
+  /**
+   * The number of minor grid lines for each major line.
+   * Nullable. No evidence that the app always sets it.
+   */
+  majorSpacing: Integer | null
+  /**
+   * Does the grid draw in front of all shapes?
+   * Nullable. No evidence that the app always sets it.
+   */
+  drawsInFront: boolean | null
+  /**
+   * Color of the grid.
+   * Nullable. No evidence that the app always sets it.
+   */
+  scriptGridColor: Rgb | null
+  /**
+   * Color of major lines.
+   * Nullable. No evidence that the app always sets it.
+   */
+  scriptMajorGridColor: Rgb | null
 }
 
 /** A reusable template/master in OmniGraffle */
 export interface Master {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Never null: the primary identifier.
+   */
   id: string
-  /** Name of this master */
-  name: string
+  /**
+   * Name of this master.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** Export configuration settings */
 export interface ExportSettings {
-  /** The type of area to be exported */
-  areaType: ExportAreaType
-  /** The scale to use during export */
-  exportScale: number
-  /** The number of pixels per point in the resulting exported image */
-  resolution: number
-  /** Draw the background canvas color */
-  drawsBackground: boolean
-  /** Whether or not to include a border area */
-  includeBorder: boolean
-  /** The number of pixels of border area to include */
-  borderAmount: number
-  /** Whether to export with non printing layers */
-  includeNonprintingLayers: boolean
-  /** Whether to export with artboards */
-  useArtboards: boolean
+  /**
+   * The type of area to be exported.
+   * Nullable. No evidence that the app always sets it.
+   */
+  areaType: ExportAreaType | null
+  /**
+   * The scale to use during export.
+   * Nullable. No evidence that the app always sets it.
+   */
+  exportScale: number | null
+  /**
+   * The number of pixels per point in the resulting exported image.
+   * Nullable. No evidence that the app always sets it.
+   */
+  resolution: number | null
+  /**
+   * Draw the background canvas color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  drawsBackground: boolean | null
+  /**
+   * Whether or not to include a border area.
+   * Nullable. No evidence that the app always sets it.
+   */
+  includeBorder: boolean | null
+  /**
+   * The number of pixels of border area to include.
+   * Nullable. No evidence that the app always sets it.
+   */
+  borderAmount: number | null
+  /**
+   * Whether to export with non printing layers.
+   * Nullable. No evidence that the app always sets it.
+   */
+  includeNonprintingLayers: boolean | null
+  /**
+   * Whether to export with artboards.
+   * Nullable. No evidence that the app always sets it.
+   */
+  useArtboards: boolean | null
 }
 
 /** Input for creating a Canvas. */
@@ -346,27 +634,60 @@ export interface CanvasCreateInput {
 
 /** Input for updating a Canvas. Omitted fields are left unchanged. */
 export interface CanvasUpdateInput {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Cannot be reset: null is rejected.
+   */
   id?: string
-  /** Canvas name */
+  /**
+   * Canvas name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Adjust number of pages on the canvas automatically? */
+  /**
+   * Adjust number of pages on the canvas automatically?
+   * Cannot be reset: null is rejected.
+   */
   adjustsPages?: boolean
-  /** Whether canvas size is reported as multiples of page size */
+  /**
+   * Whether canvas size is reported as multiples of page size.
+   * Cannot be reset: null is rejected.
+   */
   canvasSizeIsMeasuredInPages?: boolean
-  /** Size of the canvas (page size multiplied by number of pages) */
+  /**
+   * Size of the canvas (page size multiplied by number of pages).
+   * Cannot be reset: null is rejected.
+   */
   canvasSize?: Point
-  /** Horizontal pages */
+  /**
+   * Horizontal pages.
+   * Cannot be reset: null is rejected.
+   */
   horizontalPages?: Integer
-  /** Vertical pages */
+  /**
+   * Vertical pages.
+   * Cannot be reset: null is rejected.
+   */
   verticalPages?: Integer
-  /** Column alignment */
+  /**
+   * Column alignment.
+   * Cannot be reset: null is rejected.
+   */
   columnAlignment?: HorizontalAlignment
-  /** Row alignment */
+  /**
+   * Row alignment.
+   * Cannot be reset: null is rejected.
+   */
   rowAlignment?: VerticalAlignment
-  /** Spacing between graphics in a column */
+  /**
+   * Spacing between graphics in a column.
+   * Cannot be reset: null is rejected.
+   */
   columnSpacing?: number
-  /** Spacing between graphics in a row */
+  /**
+   * Spacing between graphics in a row.
+   * Cannot be reset: null is rejected.
+   */
   rowSpacing?: number
 }
 
@@ -428,57 +749,135 @@ export interface GraphicCreateInput {
 
 /** Input for updating a Graphic. Omitted fields are left unchanged. */
 export interface GraphicUpdateInput {
-  /** Origin of the graphic (position of the upper-left corner of the bounding rectangle) */
+  /**
+   * Origin of the graphic (position of the upper-left corner of the bounding rectangle).
+   * Cannot be reset: null is rejected.
+   */
   origin?: Point
-  /** Size of the graphic (width and height of the bounding rectangle) */
+  /**
+   * Size of the graphic (width and height of the bounding rectangle).
+   * Cannot be reset: null is rejected.
+   */
   size?: Point
-  /** Is this graphic locked? */
+  /**
+   * Is this graphic locked?
+   * Cannot be reset: null is rejected.
+   */
   locked?: boolean
-  /** Does this graphic allow connections to it? */
+  /**
+   * Does this graphic allow connections to it?
+   * Cannot be reset: null is rejected.
+   */
   allowsConnections?: boolean
-  /** When snapped to the grid does this graphic align its edges to the grid? */
+  /**
+   * When snapped to the grid does this graphic align its edges to the grid?
+   * Cannot be reset: null is rejected.
+   */
   alignsEdgesToGrid?: boolean
-  /** Curvature of corners in the stroke path */
+  /**
+   * Curvature of corners in the stroke path.
+   * Cannot be reset: null is rejected.
+   */
   cornerRadius?: number
-  /** Does this graphic draw its shadow? */
+  /**
+   * Does this graphic draw its shadow?
+   * Cannot be reset: null is rejected.
+   */
   drawsShadow?: boolean
-  /** Does this graphic draw its stroke? */
+  /**
+   * Does this graphic draw its stroke?
+   * Cannot be reset: null is rejected.
+   */
   drawsStroke?: boolean
-  /** Does this graphic have a double-lined stroke? */
+  /**
+   * Does this graphic have a double-lined stroke?
+   * Cannot be reset: null is rejected.
+   */
   doubleStroke?: boolean
-  /** Is this graphic flipped horizontally? */
+  /**
+   * Is this graphic flipped horizontally?
+   * Cannot be reset: null is rejected.
+   */
   flippedHorizontally?: boolean
-  /** Is this graphic flipped vertically? */
+  /**
+   * Is this graphic flipped vertically?
+   * Cannot be reset: null is rejected.
+   */
   flippedVertically?: boolean
-  /** Color of the shadow */
+  /**
+   * Color of the shadow.
+   * Cannot be reset: null is rejected.
+   */
   shadowColor?: Rgb
-  /** The 'fuzziness' of the graphic's shadow */
+  /**
+   * The 'fuzziness' of the graphic's shadow.
+   * Cannot be reset: null is rejected.
+   */
   shadowFuzziness?: number
-  /** The direction of the graphic's shadow */
+  /**
+   * The direction of the graphic's shadow.
+   * Cannot be reset: null is rejected.
+   */
   shadowVector?: Point
-  /** Does this graphic draw its shadow immediately beneath itself? */
+  /**
+   * Does this graphic draw its shadow immediately beneath itself?
+   * Cannot be reset: null is rejected.
+   */
   shadowBeneath?: boolean
-  /** Color of the stroke */
+  /**
+   * Color of the stroke.
+   * Cannot be reset: null is rejected.
+   */
   strokeColor?: Rgb
-  /** Type of cap at ends of the stroke */
+  /**
+   * Type of cap at ends of the stroke.
+   * Cannot be reset: null is rejected.
+   */
   strokeCap?: StrokeCap
-  /** Type of join between segments of the stroke */
+  /**
+   * Type of join between segments of the stroke.
+   * Cannot be reset: null is rejected.
+   */
   strokeJoin?: StrokeJoin
-  /** Dash pattern of the stroke */
+  /**
+   * Dash pattern of the stroke.
+   * Cannot be reset: null is rejected.
+   */
   strokePattern?: Integer
-  /** Thickness of the stroke */
+  /**
+   * Thickness of the stroke.
+   * Cannot be reset: null is rejected.
+   */
   thickness?: number
-  /** Notes for this graphic */
+  /**
+   * Notes for this graphic.
+   * Cannot be reset: null is rejected.
+   */
   notes?: string
-  /** Name of a graphic */
+  /**
+   * Name of a graphic.
+   * Cannot be reset: null is rejected.
+   */
   userName?: string
-  /** Arbitrary string tag attached to this graphic */
+  /**
+   * Arbitrary string tag attached to this graphic.
+   * Cannot be reset: null is rejected.
+   */
   tag?: string
-  /** Web link for this graphic */
+  /**
+   * Web link for this graphic.
+   * Cannot be reset: null is rejected.
+   */
   url?: string
-  /** Source of attached AppleScript */
+  /**
+   * Source of attached AppleScript.
+   * Cannot be reset: null is rejected.
+   */
   script?: string
-  /** Rank group assigned to this graphic for hierarchical layout */
+  /**
+   * Rank group assigned to this graphic for hierarchical layout.
+   * Cannot be reset: null is rejected.
+   */
   rankGroup?: Integer
 }
 
@@ -516,33 +915,75 @@ export interface ShapeCreateInput {
 
 /** Input for updating a Shape. Omitted fields are left unchanged. */
 export interface ShapeUpdateInput {
-  /** Name of the shape */
+  /**
+   * Name of the shape.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Text content */
+  /**
+   * Text content.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
-  /** The type of fill for this shape */
+  /**
+   * The type of fill for this shape.
+   * Cannot be reset: null is rejected.
+   */
   fill?: FillType
-  /** The fill color */
+  /**
+   * The fill color.
+   * Cannot be reset: null is rejected.
+   */
   fillColor?: Rgb
-  /** For linear and radial fills, this is the ending color */
+  /**
+   * For linear and radial fills, this is the ending color.
+   * Cannot be reset: null is rejected.
+   */
   gradientColor?: Rgb
-  /** Angle of a linear gradient fill */
+  /**
+   * Angle of a linear gradient fill.
+   * Cannot be reset: null is rejected.
+   */
   gradientAngle?: number
-  /** Rotation of the graphic in degrees */
+  /**
+   * Rotation of the graphic in degrees.
+   * Cannot be reset: null is rejected.
+   */
   rotation?: number
-  /** Placement of the text inside the shape */
+  /**
+   * Placement of the text inside the shape.
+   * Cannot be reset: null is rejected.
+   */
   textPlacement?: VerticalAlignment
-  /** Autosizing behavior of the shape around the text */
+  /**
+   * Autosizing behavior of the shape around the text.
+   * Cannot be reset: null is rejected.
+   */
   autosizing?: TextAutosizing
-  /** Padding at the left and right of the text space */
+  /**
+   * Padding at the left and right of the text space.
+   * Cannot be reset: null is rejected.
+   */
   sidePadding?: Integer
-  /** Padding at the top and bottom of the text space */
+  /**
+   * Padding at the top and bottom of the text space.
+   * Cannot be reset: null is rejected.
+   */
   verticalPadding?: Integer
-  /** Canvas identifier for the shape */
+  /**
+   * Canvas identifier for the shape.
+   * Cannot be reset: null is rejected.
+   */
   canvasId?: Integer
-  /** Shape origin */
+  /**
+   * Shape origin.
+   * Cannot be reset: null is rejected.
+   */
   origin?: Point
-  /** Shape size */
+  /**
+   * Shape size.
+   * Cannot be reset: null is rejected.
+   */
   size?: Point
 }
 
@@ -568,21 +1009,45 @@ export interface LineCreateInput {
 
 /** Input for updating a Line. Omitted fields are left unchanged. */
 export interface LineUpdateInput {
-  /** Type of the line */
+  /**
+   * Type of the line.
+   * Cannot be reset: null is rejected.
+   */
   lineType?: LineType
-  /** The behavior when one line crosses over another line */
+  /**
+   * The behavior when one line crosses over another line.
+   * Cannot be reset: null is rejected.
+   */
   hopType?: HopType
-  /** Type of line ending on the head of the line */
+  /**
+   * Type of line ending on the head of the line.
+   * Cannot be reset: null is rejected.
+   */
   headType?: string
-  /** Type of line ending on the tail of the line */
+  /**
+   * Type of line ending on the tail of the line.
+   * Cannot be reset: null is rejected.
+   */
   tailType?: string
-  /** Scale of line ending on the head of the line */
+  /**
+   * Scale of line ending on the head of the line.
+   * Cannot be reset: null is rejected.
+   */
   headScale?: number
-  /** Scale of line ending on the tail of the line */
+  /**
+   * Scale of line ending on the tail of the line.
+   * Cannot be reset: null is rejected.
+   */
   tailScale?: number
-  /** Which magnet of the destination graphic the line attaches to */
+  /**
+   * Which magnet of the destination graphic the line attaches to.
+   * Cannot be reset: null is rejected.
+   */
   headMagnet?: Integer
-  /** Which magnet of the source graphic the line attaches to */
+  /**
+   * Which magnet of the source graphic the line attaches to.
+   * Cannot be reset: null is rejected.
+   */
   tailMagnet?: Integer
 }
 
@@ -596,9 +1061,15 @@ export interface GroupCreateInput {
 
 /** Input for updating a Group. Omitted fields are left unchanged. */
 export interface GroupUpdateInput {
-  /** Rotation of the group in degrees */
+  /**
+   * Rotation of the group in degrees.
+   * Cannot be reset: null is rejected.
+   */
   rotation?: number
-  /** Only connect to the group? */
+  /**
+   * Only connect to the group?
+   * Cannot be reset: null is rejected.
+   */
   connectToGroupOnly?: boolean
 }
 
@@ -618,15 +1089,30 @@ export interface LayerCreateInput {
 
 /** Input for updating a Layer. Omitted fields are left unchanged. */
 export interface LayerUpdateInput {
-  /** Layer name */
+  /**
+   * Layer name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Are the layer's graphics locked? */
+  /**
+   * Are the layer's graphics locked?
+   * Cannot be reset: null is rejected.
+   */
   locked?: boolean
-  /** Are the layer's graphics visible? */
+  /**
+   * Are the layer's graphics visible?
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** Do the layer's graphics print? */
+  /**
+   * Do the layer's graphics print?
+   * Cannot be reset: null is rejected.
+   */
   prints?: boolean
-  /** Canvas identifier for the layer */
+  /**
+   * Canvas identifier for the layer.
+   * Cannot be reset: null is rejected.
+   */
   canvasId?: string
 }
 
@@ -646,15 +1132,30 @@ export interface SubgraphCreateInput {
 
 /** Input for updating a Subgraph. Omitted fields are left unchanged. */
 export interface SubgraphUpdateInput {
-  /** Is the subgraph collapsed? */
+  /**
+   * Is the subgraph collapsed?
+   * Cannot be reset: null is rejected.
+   */
   collapsed?: boolean
-  /** Top margin */
+  /**
+   * Top margin.
+   * Cannot be reset: null is rejected.
+   */
   topMargin?: number
-  /** Bottom margin */
+  /**
+   * Bottom margin.
+   * Cannot be reset: null is rejected.
+   */
   bottomMargin?: number
-  /** Left margin */
+  /**
+   * Left margin.
+   * Cannot be reset: null is rejected.
+   */
   leftMargin?: number
-  /** Right margin */
+  /**
+   * Right margin.
+   * Cannot be reset: null is rejected.
+   */
   rightMargin?: number
 }
 
@@ -672,13 +1173,25 @@ export interface LabelCreateInput {
 
 /** Input for updating a Label. Omitted fields are left unchanged. */
 export interface LabelUpdateInput {
-  /** The text inside the label */
+  /**
+   * The text inside the label.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
-  /** The position along the line */
+  /**
+   * The position along the line.
+   * Cannot be reset: null is rejected.
+   */
   labelPosition?: number
-  /** The offset from the line */
+  /**
+   * The offset from the line.
+   * Cannot be reset: null is rejected.
+   */
   labelOffset?: number
-  /** The type of rotation around the line */
+  /**
+   * The type of rotation around the line.
+   * Cannot be reset: null is rejected.
+   */
   labelRotation?: LabelOrientation
 }
 
@@ -704,21 +1217,45 @@ export interface GridCreateInput {
 
 /** Input for updating a Grid. Omitted fields are left unchanged. */
 export interface GridUpdateInput {
-  /** Is the grid visible? */
+  /**
+   * Is the grid visible?
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** Do points snap to the grid? */
+  /**
+   * Do points snap to the grid?
+   * Cannot be reset: null is rejected.
+   */
   snaps?: boolean
-  /** Number of pixels between minor grid lines */
+  /**
+   * Number of pixels between minor grid lines.
+   * Cannot be reset: null is rejected.
+   */
   spacing?: number
-  /** Does the grid have 'major' lines? */
+  /**
+   * Does the grid have 'major' lines?
+   * Cannot be reset: null is rejected.
+   */
   major?: boolean
-  /** The number of minor grid lines for each major line */
+  /**
+   * The number of minor grid lines for each major line.
+   * Cannot be reset: null is rejected.
+   */
   majorSpacing?: Integer
-  /** Does the grid draw in front of all shapes? */
+  /**
+   * Does the grid draw in front of all shapes?
+   * Cannot be reset: null is rejected.
+   */
   drawsInFront?: boolean
-  /** Color of the grid */
+  /**
+   * Color of the grid.
+   * Cannot be reset: null is rejected.
+   */
   scriptGridColor?: Rgb
-  /** Color of major lines */
+  /**
+   * Color of major lines.
+   * Cannot be reset: null is rejected.
+   */
   scriptMajorGridColor?: Rgb
 }
 
@@ -732,9 +1269,15 @@ export interface MasterCreateInput {
 
 /** Input for updating a Master. Omitted fields are left unchanged. */
 export interface MasterUpdateInput {
-  /** Unique identifier */
+  /**
+   * Unique identifier.
+   * Cannot be reset: null is rejected.
+   */
   id?: string
-  /** Name of this master */
+  /**
+   * Name of this master.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -760,21 +1303,45 @@ export interface ExportSettingsCreateInput {
 
 /** Input for updating an ExportSettings. Omitted fields are left unchanged. */
 export interface ExportSettingsUpdateInput {
-  /** The type of area to be exported */
+  /**
+   * The type of area to be exported.
+   * Cannot be reset: null is rejected.
+   */
   areaType?: ExportAreaType
-  /** The scale to use during export */
+  /**
+   * The scale to use during export.
+   * Cannot be reset: null is rejected.
+   */
   exportScale?: number
-  /** The number of pixels per point in the resulting exported image */
+  /**
+   * The number of pixels per point in the resulting exported image.
+   * Cannot be reset: null is rejected.
+   */
   resolution?: number
-  /** Draw the background canvas color */
+  /**
+   * Draw the background canvas color.
+   * Cannot be reset: null is rejected.
+   */
   drawsBackground?: boolean
-  /** Whether or not to include a border area */
+  /**
+   * Whether or not to include a border area.
+   * Cannot be reset: null is rejected.
+   */
   includeBorder?: boolean
-  /** The number of pixels of border area to include */
+  /**
+   * The number of pixels of border area to include.
+   * Cannot be reset: null is rejected.
+   */
   borderAmount?: number
-  /** Whether to export with non printing layers */
+  /**
+   * Whether to export with non printing layers.
+   * Cannot be reset: null is rejected.
+   */
   includeNonprintingLayers?: boolean
-  /** Whether to export with artboards */
+  /**
+   * Whether to export with artboards.
+   * Cannot be reset: null is rejected.
+   */
   useArtboards?: boolean
 }
 
@@ -782,7 +1349,11 @@ export interface ExportSettingsUpdateInput {
 export interface CanvasResourceClient {
   /** List canvases. */
   list(options?: CallOptions): Promise<readonly Canvas[]>
-  /** Read the canvas identified by `id`. */
+  /**
+   * Read the canvas identified by `id`.
+   *
+   * @param id - Canvas identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Canvas>
   /** Create a canvas. */
   create(input: CanvasCreateInput, options?: CallOptions): Promise<Canvas>
@@ -790,17 +1361,33 @@ export interface CanvasResourceClient {
 
 /** Base class for visual elements in OmniGraffle */
 export interface GraphicResourceClient {
-  /** List graphics. */
+  /**
+   * List graphics.
+   *
+   * @param canvasId - Canvas identifier. Does not accept null.
+   */
   list(canvasId: string, options?: CallOptions): Promise<readonly Graphic[]>
-  /** Read the graphic identified by `id`. */
+  /**
+   * Read the graphic identified by `id`.
+   *
+   * @param id - Graphic identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Graphic>
 }
 
 /** A shape graphic in OmniGraffle */
 export interface ShapeResourceClient {
-  /** List shapes. */
+  /**
+   * List shapes.
+   *
+   * @param canvasId - Canvas identifier. Does not accept null.
+   */
   list(canvasId: string, options?: CallOptions): Promise<readonly Shape[]>
-  /** Read the shape identified by `id`. */
+  /**
+   * Read the shape identified by `id`.
+   *
+   * @param id - Shape identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Shape>
   /** Create a shape. */
   create(input: ShapeCreateInput, options?: CallOptions): Promise<Shape>
@@ -808,17 +1395,33 @@ export interface ShapeResourceClient {
 
 /** A line/connector in OmniGraffle */
 export interface LineResourceClient {
-  /** List lines. */
+  /**
+   * List lines.
+   *
+   * @param canvasId - Canvas identifier. Does not accept null.
+   */
   list(canvasId: string, options?: CallOptions): Promise<readonly Line[]>
-  /** Read the line identified by `id`. */
+  /**
+   * Read the line identified by `id`.
+   *
+   * @param id - Line identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Line>
 }
 
 /** A drawing layer in OmniGraffle */
 export interface LayerResourceClient {
-  /** List layers. */
+  /**
+   * List layers.
+   *
+   * @param canvasId - Canvas identifier. Does not accept null.
+   */
   list(canvasId: string, options?: CallOptions): Promise<readonly Layer[]>
-  /** Read the layer identified by `name`. */
+  /**
+   * Read the layer identified by `name`.
+   *
+   * @param name - Layer name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Layer>
   /** Create a layer. */
   create(input: LayerCreateInput, options?: CallOptions): Promise<Layer>
@@ -839,21 +1442,48 @@ export interface OmniGraffleClient {
   readonly lines: LineResourceClient
   /** A drawing layer in OmniGraffle */
   readonly layers: LayerResourceClient
-  /** Draw a line between graphics */
+  /**
+   * Draw a line between graphics
+   *
+   * @param from - Source graphic ID. Does not accept null.
+   * @param to - Destination graphic ID. Does not accept null.
+   */
   connect(from: string, to: string, options?: CallOptions): Promise<void>
   /** Layout graphics using the document's Layout Info */
   layout(options?: CallOptions): Promise<void>
-  /** Export documents */
+  /**
+   * Export documents
+   *
+   * @param as - File type. Does not accept null.
+   * @param scope - Area to export. Does not accept null.
+   * @param to - Output file path. Does not accept null.
+   */
   _export(as: string, scope: ExportAreaType, to: string, options?: CallOptions): Promise<void>
-  /** Flip graphics */
+  /**
+   * Flip graphics
+   *
+   * @param over - Flip orientation. Does not accept null.
+   */
   flip(over: Orientation, options?: CallOptions): Promise<void>
-  /** Slide graphics by a vector amount */
+  /**
+   * Slide graphics by a vector amount
+   *
+   * @param by - Vector to slide by. Does not accept null.
+   */
   slide(by: Point, options?: CallOptions): Promise<void>
-  /** Group graphics */
+  /**
+   * Group graphics
+   *
+   * @param subgraph - Create as subgraph. Does not accept null.
+   */
   assemble(subgraph?: boolean, options?: CallOptions): Promise<void>
   /** Change the number of pages to fit the current graphics */
   pageAdjust(options?: CallOptions): Promise<void>
-  /** Evaluate JavaScript and return the result */
+  /**
+   * Evaluate JavaScript and return the result
+   *
+   * @param script - JavaScript code to evaluate. Does not accept null.
+   */
   evaluateJavascript(script: string, options?: CallOptions): Promise<void>
 }
 
@@ -913,21 +1543,27 @@ const exportAreaTypeMembers = [
 const canvasRecordType: ValueType<Canvas> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    name: t.string({ description: 'Name of this canvas' }),
-    adjustsPages: t.boolean({ description: 'Adjust number of pages on the canvas automatically?' }),
-    canvasSizeIsMeasuredInPages: t.boolean({
+    name: t.nullable(t.string(), { description: 'Name of this canvas' }),
+    adjustsPages: t.nullable(t.boolean(), {
+      description: 'Adjust number of pages on the canvas automatically?',
+    }),
+    canvasSizeIsMeasuredInPages: t.nullable(t.boolean(), {
       description: 'Whether canvas size is reported as multiples of page size',
     }),
-    canvasSize: t.point({
+    canvasSize: t.nullable(t.point(), {
       description: 'Size of the canvas (page size multiplied by number of pages)',
     }),
-    pageSize: t.point({ description: 'Size of each page' }),
-    horizontalPages: t.integer({ description: 'Horizontal pages' }),
-    verticalPages: t.integer({ description: 'Vertical pages' }),
-    columnAlignment: t.enumeration(horizontalAlignmentMembers, { description: 'Column alignment' }),
-    rowAlignment: t.enumeration(verticalAlignmentMembers, { description: 'Row alignment' }),
-    columnSpacing: t.double({ description: 'Spacing between graphics in a column' }),
-    rowSpacing: t.double({ description: 'Spacing between graphics in a row' }),
+    pageSize: t.nullable(t.point(), { description: 'Size of each page' }),
+    horizontalPages: t.nullable(t.integer(), { description: 'Horizontal pages' }),
+    verticalPages: t.nullable(t.integer(), { description: 'Vertical pages' }),
+    columnAlignment: t.nullable(t.enumeration(horizontalAlignmentMembers), {
+      description: 'Column alignment',
+    }),
+    rowAlignment: t.nullable(t.enumeration(verticalAlignmentMembers), {
+      description: 'Row alignment',
+    }),
+    columnSpacing: t.nullable(t.double(), { description: 'Spacing between graphics in a column' }),
+    rowSpacing: t.nullable(t.double(), { description: 'Spacing between graphics in a row' }),
   },
   { description: 'A drawing page/canvas in OmniGraffle' }
 )
@@ -935,45 +1571,57 @@ const canvasRecordType: ValueType<Canvas> = t.record(
 const graphicRecordType: ValueType<Graphic> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    origin: t.point({
+    origin: t.nullable(t.point(), {
       description:
         'Origin of the graphic (position of the upper-left corner of the bounding rectangle)',
     }),
-    size: t.point({
+    size: t.nullable(t.point(), {
       description: 'Size of the graphic (width and height of the bounding rectangle)',
     }),
-    locked: t.boolean({ description: 'Is this graphic locked?' }),
-    allowsConnections: t.boolean({ description: 'Does this graphic allow connections to it?' }),
-    alignsEdgesToGrid: t.boolean({
+    locked: t.nullable(t.boolean(), { description: 'Is this graphic locked?' }),
+    allowsConnections: t.nullable(t.boolean(), {
+      description: 'Does this graphic allow connections to it?',
+    }),
+    alignsEdgesToGrid: t.nullable(t.boolean(), {
       description: 'When snapped to the grid does this graphic align its edges to the grid?',
     }),
-    cornerRadius: t.double({ description: 'Curvature of corners in the stroke path' }),
-    drawsShadow: t.boolean({ description: 'Does this graphic draw its shadow?' }),
-    drawsStroke: t.boolean({ description: 'Does this graphic draw its stroke?' }),
-    doubleStroke: t.boolean({ description: 'Does this graphic have a double-lined stroke?' }),
-    flippedHorizontally: t.boolean({ description: 'Is this graphic flipped horizontally?' }),
-    flippedVertically: t.boolean({ description: 'Is this graphic flipped vertically?' }),
-    shadowColor: t.rgb({ description: 'Color of the shadow' }),
-    shadowFuzziness: t.double({ description: "The 'fuzziness' of the graphic's shadow" }),
-    shadowVector: t.point({ description: "The direction of the graphic's shadow" }),
-    shadowBeneath: t.boolean({
+    cornerRadius: t.nullable(t.double(), {
+      description: 'Curvature of corners in the stroke path',
+    }),
+    drawsShadow: t.nullable(t.boolean(), { description: 'Does this graphic draw its shadow?' }),
+    drawsStroke: t.nullable(t.boolean(), { description: 'Does this graphic draw its stroke?' }),
+    doubleStroke: t.nullable(t.boolean(), {
+      description: 'Does this graphic have a double-lined stroke?',
+    }),
+    flippedHorizontally: t.nullable(t.boolean(), {
+      description: 'Is this graphic flipped horizontally?',
+    }),
+    flippedVertically: t.nullable(t.boolean(), {
+      description: 'Is this graphic flipped vertically?',
+    }),
+    shadowColor: t.nullable(t.rgb(), { description: 'Color of the shadow' }),
+    shadowFuzziness: t.nullable(t.double(), {
+      description: "The 'fuzziness' of the graphic's shadow",
+    }),
+    shadowVector: t.nullable(t.point(), { description: "The direction of the graphic's shadow" }),
+    shadowBeneath: t.nullable(t.boolean(), {
       description: 'Does this graphic draw its shadow immediately beneath itself?',
     }),
-    strokeColor: t.rgb({ description: 'Color of the stroke' }),
-    strokeCap: t.enumeration(strokeCapMembers, {
+    strokeColor: t.nullable(t.rgb(), { description: 'Color of the stroke' }),
+    strokeCap: t.nullable(t.enumeration(strokeCapMembers), {
       description: 'Type of cap at ends of the stroke',
     }),
-    strokeJoin: t.enumeration(strokeJoinMembers, {
+    strokeJoin: t.nullable(t.enumeration(strokeJoinMembers), {
       description: 'Type of join between segments of the stroke',
     }),
-    strokePattern: t.integer({ description: 'Dash pattern of the stroke' }),
-    thickness: t.double({ description: 'Thickness of the stroke' }),
-    notes: t.string({ description: 'Notes for this graphic' }),
-    userName: t.string({ description: 'Name of a graphic' }),
-    tag: t.string({ description: 'Arbitrary string tag attached to this graphic' }),
-    url: t.string({ description: 'Web link for this graphic' }),
-    script: t.string({ description: 'Source of attached AppleScript' }),
-    rankGroup: t.integer({
+    strokePattern: t.nullable(t.integer(), { description: 'Dash pattern of the stroke' }),
+    thickness: t.nullable(t.double(), { description: 'Thickness of the stroke' }),
+    notes: t.nullable(t.string(), { description: 'Notes for this graphic' }),
+    userName: t.nullable(t.string(), { description: 'Name of a graphic' }),
+    tag: t.nullable(t.string(), { description: 'Arbitrary string tag attached to this graphic' }),
+    url: t.nullable(t.string(), { description: 'Web link for this graphic' }),
+    script: t.nullable(t.string(), { description: 'Source of attached AppleScript' }),
+    rankGroup: t.nullable(t.integer(), {
       description: 'Rank group assigned to this graphic for hierarchical layout',
     }),
   },
@@ -983,21 +1631,29 @@ const graphicRecordType: ValueType<Graphic> = t.record(
 const shapeRecordType: ValueType<Shape> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    name: t.string({ description: 'Name of the shape' }),
-    text: t.string({ description: 'The text inside the shape' }),
-    fill: t.enumeration(fillTypeMembers, { description: 'The type of fill for this shape' }),
-    fillColor: t.rgb({ description: 'The fill color' }),
-    gradientColor: t.rgb({ description: 'For linear and radial fills, this is the ending color' }),
-    gradientAngle: t.double({ description: 'Angle of a linear gradient fill' }),
-    rotation: t.double({ description: 'Rotation of the graphic in degrees' }),
-    textPlacement: t.enumeration(verticalAlignmentMembers, {
+    name: t.nullable(t.string(), { description: 'Name of the shape' }),
+    text: t.nullable(t.string(), { description: 'The text inside the shape' }),
+    fill: t.nullable(t.enumeration(fillTypeMembers), {
+      description: 'The type of fill for this shape',
+    }),
+    fillColor: t.nullable(t.rgb(), { description: 'The fill color' }),
+    gradientColor: t.nullable(t.rgb(), {
+      description: 'For linear and radial fills, this is the ending color',
+    }),
+    gradientAngle: t.nullable(t.double(), { description: 'Angle of a linear gradient fill' }),
+    rotation: t.nullable(t.double(), { description: 'Rotation of the graphic in degrees' }),
+    textPlacement: t.nullable(t.enumeration(verticalAlignmentMembers), {
       description: 'Placement of the text inside the shape',
     }),
-    autosizing: t.enumeration(textAutosizingMembers, {
+    autosizing: t.nullable(t.enumeration(textAutosizingMembers), {
       description: 'Autosizing behavior of the shape around the text',
     }),
-    sidePadding: t.integer({ description: 'Padding at the left and right of the text space' }),
-    verticalPadding: t.integer({ description: 'Padding at the top and bottom of the text space' }),
+    sidePadding: t.nullable(t.integer(), {
+      description: 'Padding at the left and right of the text space',
+    }),
+    verticalPadding: t.nullable(t.integer(), {
+      description: 'Padding at the top and bottom of the text space',
+    }),
   },
   { description: 'A shape graphic in OmniGraffle' }
 )
@@ -1005,18 +1661,26 @@ const shapeRecordType: ValueType<Shape> = t.record(
 const lineRecordType: ValueType<Line> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    lineType: t.enumeration(lineTypeMembers, { description: 'Type of the line' }),
-    hopType: t.enumeration(hopTypeMembers, {
+    lineType: t.nullable(t.enumeration(lineTypeMembers), { description: 'Type of the line' }),
+    hopType: t.nullable(t.enumeration(hopTypeMembers), {
       description: 'The behavior when one line crosses over another line',
     }),
-    headType: t.string({ description: 'Type of line ending on the head of the line' }),
-    tailType: t.string({ description: 'Type of line ending on the tail of the line' }),
-    headScale: t.double({ description: 'Scale of line ending on the head of the line' }),
-    tailScale: t.double({ description: 'Scale of line ending on the tail of the line' }),
-    headMagnet: t.integer({
+    headType: t.nullable(t.string(), {
+      description: 'Type of line ending on the head of the line',
+    }),
+    tailType: t.nullable(t.string(), {
+      description: 'Type of line ending on the tail of the line',
+    }),
+    headScale: t.nullable(t.double(), {
+      description: 'Scale of line ending on the head of the line',
+    }),
+    tailScale: t.nullable(t.double(), {
+      description: 'Scale of line ending on the tail of the line',
+    }),
+    headMagnet: t.nullable(t.integer(), {
       description: 'Which magnet of the destination graphic the line attaches to',
     }),
-    tailMagnet: t.integer({
+    tailMagnet: t.nullable(t.integer(), {
       description: 'Which magnet of the source graphic the line attaches to',
     }),
   },
@@ -1026,8 +1690,8 @@ const lineRecordType: ValueType<Line> = t.record(
 const groupRecordType: ValueType<Group> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    rotation: t.double({ description: 'Rotation of the group in degrees' }),
-    connectToGroupOnly: t.boolean({ description: 'Only connect to the group?' }),
+    rotation: t.nullable(t.double(), { description: 'Rotation of the group in degrees' }),
+    connectToGroupOnly: t.nullable(t.boolean(), { description: 'Only connect to the group?' }),
   },
   { description: 'A group of graphics in OmniGraffle' }
 )
@@ -1035,9 +1699,9 @@ const groupRecordType: ValueType<Group> = t.record(
 const layerRecordType: ValueType<Layer> = t.record(
   {
     name: t.string({ description: 'Name of the layer' }),
-    locked: t.boolean({ description: "Are the layer's graphics locked?" }),
-    visible: t.boolean({ description: "Are the layer's graphics visible?" }),
-    prints: t.boolean({ description: "Do the layer's graphics print?" }),
+    locked: t.nullable(t.boolean(), { description: "Are the layer's graphics locked?" }),
+    visible: t.nullable(t.boolean(), { description: "Are the layer's graphics visible?" }),
+    prints: t.nullable(t.boolean(), { description: "Do the layer's graphics print?" }),
   },
   { description: 'A drawing layer in OmniGraffle' }
 )
@@ -1045,11 +1709,11 @@ const layerRecordType: ValueType<Layer> = t.record(
 const subgraphRecordType: ValueType<Subgraph> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    collapsed: t.boolean({ description: 'Is the subgraph collapsed?' }),
-    topMargin: t.double({ description: 'Top margin' }),
-    bottomMargin: t.double({ description: 'Bottom margin' }),
-    leftMargin: t.double({ description: 'Left margin' }),
-    rightMargin: t.double({ description: 'Right margin' }),
+    collapsed: t.nullable(t.boolean(), { description: 'Is the subgraph collapsed?' }),
+    topMargin: t.nullable(t.double(), { description: 'Top margin' }),
+    bottomMargin: t.nullable(t.double(), { description: 'Bottom margin' }),
+    leftMargin: t.nullable(t.double(), { description: 'Left margin' }),
+    rightMargin: t.nullable(t.double(), { description: 'Right margin' }),
   },
   { description: 'A subgraph container in OmniGraffle' }
 )
@@ -1057,10 +1721,10 @@ const subgraphRecordType: ValueType<Subgraph> = t.record(
 const labelRecordType: ValueType<Label> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    text: t.string({ description: 'The text inside the label' }),
-    labelPosition: t.double({ description: 'The position along the line' }),
-    labelOffset: t.double({ description: 'The offset from the line' }),
-    labelRotation: t.enumeration(labelOrientationMembers, {
+    text: t.nullable(t.string(), { description: 'The text inside the label' }),
+    labelPosition: t.nullable(t.double(), { description: 'The position along the line' }),
+    labelOffset: t.nullable(t.double(), { description: 'The offset from the line' }),
+    labelRotation: t.nullable(t.enumeration(labelOrientationMembers), {
       description: 'The type of rotation around the line',
     }),
   },
@@ -1069,14 +1733,18 @@ const labelRecordType: ValueType<Label> = t.record(
 
 const gridRecordType: ValueType<Grid> = t.record(
   {
-    visible: t.boolean({ description: 'Is the grid visible?' }),
-    snaps: t.boolean({ description: 'Do points snap to the grid?' }),
-    spacing: t.double({ description: 'Number of pixels between minor grid lines' }),
-    major: t.boolean({ description: "Does the grid have 'major' lines?" }),
-    majorSpacing: t.integer({ description: 'The number of minor grid lines for each major line' }),
-    drawsInFront: t.boolean({ description: 'Does the grid draw in front of all shapes?' }),
-    scriptGridColor: t.rgb({ description: 'Color of the grid' }),
-    scriptMajorGridColor: t.rgb({ description: 'Color of major lines' }),
+    visible: t.nullable(t.boolean(), { description: 'Is the grid visible?' }),
+    snaps: t.nullable(t.boolean(), { description: 'Do points snap to the grid?' }),
+    spacing: t.nullable(t.double(), { description: 'Number of pixels between minor grid lines' }),
+    major: t.nullable(t.boolean(), { description: "Does the grid have 'major' lines?" }),
+    majorSpacing: t.nullable(t.integer(), {
+      description: 'The number of minor grid lines for each major line',
+    }),
+    drawsInFront: t.nullable(t.boolean(), {
+      description: 'Does the grid draw in front of all shapes?',
+    }),
+    scriptGridColor: t.nullable(t.rgb(), { description: 'Color of the grid' }),
+    scriptMajorGridColor: t.nullable(t.rgb(), { description: 'Color of major lines' }),
   },
   { description: 'Grid settings for a canvas' }
 )
@@ -1084,27 +1752,31 @@ const gridRecordType: ValueType<Grid> = t.record(
 const masterRecordType: ValueType<Master> = t.record(
   {
     id: t.string({ description: 'Unique identifier' }),
-    name: t.string({ description: 'Name of this master' }),
+    name: t.nullable(t.string(), { description: 'Name of this master' }),
   },
   { description: 'A reusable template/master in OmniGraffle' }
 )
 
 const exportSettingsRecordType: ValueType<ExportSettings> = t.record(
   {
-    areaType: t.enumeration(exportAreaTypeMembers, {
+    areaType: t.nullable(t.enumeration(exportAreaTypeMembers), {
       description: 'The type of area to be exported',
     }),
-    exportScale: t.double({ description: 'The scale to use during export' }),
-    resolution: t.double({
+    exportScale: t.nullable(t.double(), { description: 'The scale to use during export' }),
+    resolution: t.nullable(t.double(), {
       description: 'The number of pixels per point in the resulting exported image',
     }),
-    drawsBackground: t.boolean({ description: 'Draw the background canvas color' }),
-    includeBorder: t.boolean({ description: 'Whether or not to include a border area' }),
-    borderAmount: t.double({ description: 'The number of pixels of border area to include' }),
-    includeNonprintingLayers: t.boolean({
+    drawsBackground: t.nullable(t.boolean(), { description: 'Draw the background canvas color' }),
+    includeBorder: t.nullable(t.boolean(), {
+      description: 'Whether or not to include a border area',
+    }),
+    borderAmount: t.nullable(t.double(), {
+      description: 'The number of pixels of border area to include',
+    }),
+    includeNonprintingLayers: t.nullable(t.boolean(), {
       description: 'Whether to export with non printing layers',
     }),
-    useArtboards: t.boolean({ description: 'Whether to export with artboards' }),
+    useArtboards: t.nullable(t.boolean(), { description: 'Whether to export with artboards' }),
   },
   { description: 'Export configuration settings' }
 )

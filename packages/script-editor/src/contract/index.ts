@@ -31,16 +31,31 @@ const t = ValueTypes
 
 /** A Script Editor document */
 export interface Document {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Never null: the primary identifier.
+   */
   name: string
-  /** The file path of the document */
-  readonly path?: string
-  /** The source code of the script */
-  contents: string
-  /** The scripting language (AppleScript or JavaScript) */
-  language: string
-  /** Whether the document has been modified since last save */
-  readonly modified: boolean
+  /**
+   * The file path of the document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path?: string | null
+  /**
+   * The source code of the script.
+   * Nullable. No evidence that the app always sets it.
+   */
+  contents: string | null
+  /**
+   * The scripting language (AppleScript or JavaScript).
+   * Nullable. No evidence that the app always sets it.
+   */
+  language: string | null
+  /**
+   * Whether the document has been modified since last save.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modified: boolean | null
 }
 
 /** Input for creating a Document. */
@@ -55,11 +70,20 @@ export interface DocumentCreateInput {
 
 /** Input for updating a Document. Omitted fields are left unchanged. */
 export interface DocumentUpdateInput {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Initial script contents */
+  /**
+   * Initial script contents.
+   * Cannot be reset: null is rejected.
+   */
   contents?: string
-  /** The scripting language (AppleScript or JavaScript) */
+  /**
+   * The scripting language (AppleScript or JavaScript).
+   * Cannot be reset: null is rejected.
+   */
   language?: string
 }
 
@@ -67,7 +91,11 @@ export interface DocumentUpdateInput {
 export interface DocumentResourceClient {
   /** List documents. */
   list(options?: CallOptions): Promise<readonly Document[]>
-  /** Read the document identified by `name`. */
+  /**
+   * Read the document identified by `name`.
+   *
+   * @param name - Document name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Document>
   /** Create a document. */
   create(input: DocumentCreateInput, options?: CallOptions): Promise<Document>
@@ -85,10 +113,14 @@ export interface ScriptEditorClient {
 const documentRecordType: ValueType<Document> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
-    path: t.optional(t.string({ description: 'The file path of the document' })),
-    contents: t.string({ description: 'The source code of the script' }),
-    language: t.string({ description: 'The scripting language (AppleScript or JavaScript)' }),
-    modified: t.boolean({ description: 'Whether the document has been modified since last save' }),
+    path: t.optional(t.nullable(t.string(), { description: 'The file path of the document' })),
+    contents: t.nullable(t.string(), { description: 'The source code of the script' }),
+    language: t.nullable(t.string(), {
+      description: 'The scripting language (AppleScript or JavaScript)',
+    }),
+    modified: t.nullable(t.boolean(), {
+      description: 'Whether the document has been modified since last save',
+    }),
   },
   { description: 'A Script Editor document' }
 )

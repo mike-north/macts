@@ -11,7 +11,7 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface AliasFile {
-    originalItem: string;
+    originalItem: string | null;
 }
 
 // @public
@@ -26,13 +26,13 @@ export interface AliasFileUpdateInput {
 
 // @public
 export interface ApplicationFile {
-    readonly acceptsHighLevelEvents: boolean;
-    readonly hasScriptingTerminology: boolean;
+    readonly acceptsHighLevelEvents: boolean | null;
+    readonly hasScriptingTerminology: boolean | null;
     readonly id: string;
-    minimumSize: Integer;
-    opensInClassic: boolean;
-    preferredSize: Integer;
-    readonly suggestedSize: Integer;
+    minimumSize: Integer | null;
+    opensInClassic: boolean | null;
+    preferredSize: Integer | null;
+    readonly suggestedSize: Integer | null;
 }
 
 // @public
@@ -51,7 +51,7 @@ export interface ApplicationFileUpdateInput {
 
 // @public
 export interface Clipping {
-    readonly clippingWindow: string;
+    readonly clippingWindow: string | null;
 }
 
 // @public
@@ -62,7 +62,7 @@ export type ClippingUpdateInput = Record<string, never>;
 
 // @public
 export interface ClippingWindow {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -73,13 +73,13 @@ export type ClippingWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
-    index: Integer;
-    readonly maximumWidth: Integer;
-    readonly minimumWidth: Integer;
-    readonly name: string;
-    sortDirection: string;
-    visible: boolean;
-    width: Integer;
+    index: Integer | null;
+    readonly maximumWidth: Integer | null;
+    readonly minimumWidth: Integer | null;
+    readonly name: string | null;
+    sortDirection: string | null;
+    visible: boolean | null;
+    width: Integer | null;
 }
 
 // @public
@@ -100,11 +100,11 @@ export interface ColumnUpdateInput {
 
 // @public
 export interface Container {
-    completelyExpanded: boolean;
-    readonly containerWindow: string;
-    readonly entireContents: string;
-    readonly expandable: boolean;
-    expanded: boolean;
+    completelyExpanded: boolean | null;
+    readonly containerWindow: string | null;
+    readonly entireContents: string | null;
+    readonly expandable: boolean | null;
+    expanded: boolean | null;
 }
 
 // @public
@@ -121,7 +121,7 @@ export interface ContainerUpdateInput {
 
 // @public
 export interface DesktopObject {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -132,15 +132,15 @@ export type DesktopObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface Disk {
-    readonly capacity: number;
-    readonly ejectable: boolean;
-    readonly format: string;
-    readonly freeSpace: number;
+    readonly capacity: number | null;
+    readonly ejectable: boolean | null;
+    readonly format: string | null;
+    readonly freeSpace: number | null;
     readonly id: Integer;
-    ignorePrivileges: boolean;
-    readonly journalingEnabled: boolean;
-    readonly localVolume: boolean;
-    readonly startup: boolean;
+    ignorePrivileges: boolean | null;
+    readonly journalingEnabled: boolean | null;
+    readonly localVolume: boolean | null;
+    readonly startup: boolean | null;
 }
 
 // @public
@@ -155,7 +155,7 @@ export interface DiskUpdateInput {
 
 // @public
 export interface DocumentFile {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -181,8 +181,8 @@ export type Epos = 'right' | 'bottom';
 
 // @public
 interface File_2 {
-    creatorType: string;
-    fileType: string;
+    creatorType: string | null;
+    fileType: string | null;
     readonly productVersion: string;
     stationery: boolean;
     readonly version: string;
@@ -238,14 +238,14 @@ export const finderContract: AppContract<FinderClient>;
 // @public
 export interface FinderWindow {
     readonly columnViewOptions: unknown;
-    currentView: string;
+    currentView: string | null;
     readonly iconViewOptions: unknown;
-    readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never>;
-    pathbarVisible: boolean;
-    sidebarWidth: Integer;
-    statusbarVisible: boolean;
-    target: string;
-    toolbarVisible: boolean;
+    readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never> | null;
+    pathbarVisible: boolean | null;
+    sidebarWidth: Integer | null;
+    statusbarVisible: boolean | null;
+    target: string | null;
+    toolbarVisible: boolean | null;
 }
 
 // @public
@@ -270,7 +270,7 @@ export interface FinderWindowUpdateInput {
 
 // @public
 export interface Folder {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -281,7 +281,7 @@ export type FolderUpdateInput = Record<string, never>;
 
 // @public
 export interface InternetLocationFile {
-    readonly location: string;
+    readonly location: string | null;
 }
 
 // @public
@@ -298,12 +298,12 @@ export type Isiz = 'mini' | 'small' | 'large';
 
 // @public
 export interface ListViewOptions {
-    calculatesFolderSizes: boolean;
-    iconSize: string;
-    showsIconPreview: boolean;
-    sortColumn: ObjectReferenceVariant<Column, never>;
-    textSize: Integer;
-    usesRelativeDates: boolean;
+    calculatesFolderSizes: boolean | null;
+    iconSize: string | null;
+    showsIconPreview: boolean | null;
+    sortColumn: ObjectReferenceVariant<Column, never> | null;
+    textSize: Integer | null;
+    usesRelativeDates: boolean | null;
 }
 
 // @public
@@ -331,7 +331,7 @@ export type Lvic = 'smallIcon' | 'largeIcon';
 
 // @public
 export interface Package {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -354,7 +354,7 @@ export type Sort = 'name' | 'modificationDate' | 'creationDate' | 'size' | 'kind
 
 // @public
 export interface TrashObject {
-    warnsBeforeEmptying: boolean;
+    warnsBeforeEmptying: boolean | null;
 }
 
 // @public

@@ -31,7 +31,10 @@ const t = ValueTypes
 
 /** The Alfred application */
 export interface Application {
-  /** The name of the application */
+  /**
+   * The name of the application.
+   * Never null: the primary identifier.
+   */
   readonly name: string
 }
 
@@ -46,29 +49,70 @@ export type ApplicationUpdateInput = Record<string, never>
  * client factory creates one from {@link alfredContract}.
  */
 export interface AlfredClient {
-  /** Show Alfred with the given text */
+  /**
+   * Show Alfred with the given text
+   *
+   * @param query - The search string to populate Alfred with. Does not accept null.
+   */
   search(query?: string, options?: CallOptions): Promise<void>
-  /** Show Alfred actions for the given file */
+  /**
+   * Show Alfred actions for the given file
+   *
+   * @param items - The items to show actions for. Does not accept null.
+   * @param asType - An optional type for the items - file, url or text. Does not accept null.
+   */
   action(items: readonly string[], asType?: string, options?: CallOptions): Promise<void>
-  /** Show Alfred file system navigation for given path */
+  /**
+   * Show Alfred file system navigation for given path
+   *
+   * @param path - The path or search string to browse. Does not accept null.
+   */
   browse(path: string, options?: CallOptions): Promise<void>
-  /** Run Alfred workflow trigger */
+  /**
+   * Run Alfred workflow trigger
+   *
+   * @param trigger - The identifier of the trigger. Does not accept null.
+   * @param inWorkflow - The workflow bundle identifier. Does not accept null.
+   * @param withArgument - An optional argument. Does not accept null.
+   */
   runTrigger(
     trigger: string,
     inWorkflow: string,
     withArgument?: string,
     options?: CallOptions
   ): Promise<void>
-  /** Reload Workflow with given UID (folder name) or Bundle ID */
+  /**
+   * Reload Workflow with given UID (folder name) or Bundle ID
+   *
+   * @param workflow - The UID (folder name), or the Bundle ID of the workflow to reload. Does not
+   * accept null.
+   */
   reloadWorkflow(workflow: string, options?: CallOptions): Promise<void>
-  /** Reveal Workflow with given UID (folder name) or Bundle ID */
+  /**
+   * Reveal Workflow with given UID (folder name) or Bundle ID
+   *
+   * @param workflow - The UID (folder name), or the Bundle ID of the workflow to reveal. Does not
+   * accept null.
+   * @param configuration - Optionally open the configuration for this workflow. Does not accept
+   * null.
+   * @param details - Optionally open the details for this workflow. Does not accept null.
+   */
   revealWorkflow(
     workflow: string,
     configuration?: boolean,
     details?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Modify workflow configuration value, or set environment variable */
+  /**
+   * Modify workflow configuration value, or set environment variable
+   *
+   * @param variable - The name of the variable. Does not accept null.
+   * @param toValue - The value to set. Does not accept null.
+   * @param inWorkflow - The workflow bundle identifier. Does not accept null.
+   * @param exportable - If this environment variable is fine for export, i.e. the Don't Export box
+   * is left unchecked (Defaults to Don't Export). This option is ignored for workflow configuration
+   * items. Does not accept null.
+   */
   setConfiguration(
     variable: string,
     toValue: string,
@@ -76,9 +120,18 @@ export interface AlfredClient {
     exportable?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Revert workflow configuration value to default, or delete environment variable */
+  /**
+   * Revert workflow configuration value to default, or delete environment variable
+   *
+   * @param variable - The name of the variable. Does not accept null.
+   * @param inWorkflow - The workflow bundle identifier. Does not accept null.
+   */
   removeConfiguration(variable: string, inWorkflow: string, options?: CallOptions): Promise<void>
-  /** Change theme in Alfred */
+  /**
+   * Change theme in Alfred
+   *
+   * @param theme - The name of the theme to switch to. Does not accept null.
+   */
   setTheme(theme: string, options?: CallOptions): Promise<void>
 }
 

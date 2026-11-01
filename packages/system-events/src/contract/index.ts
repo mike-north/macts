@@ -105,429 +105,823 @@ export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly'
 
 /** A collection of settings for configuring a connection */
 export interface Configuration {
-  /** the name used to authenticate */
-  accountName: string
-  /** Is the configuration connected? */
-  readonly connected: boolean
-  /** the unique identifier for the configuration */
+  /**
+   * the name used to authenticate.
+   * Nullable. No evidence that the app always sets it.
+   */
+  accountName: string | null
+  /**
+   * Is the configuration connected?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly connected: boolean | null
+  /**
+   * the unique identifier for the configuration.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the name of the configuration */
-  readonly name: string
+  /**
+   * the name of the configuration.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** A collection of settings for a network interface */
 export interface Interface {
-  /** configure the interface speed, duplex, and mtu automatically? */
-  automatic: boolean
-  /** the duplex setting  half | full | full with flow control */
-  duplex: string
-  /** the unique identifier for the interface */
+  /**
+   * configure the interface speed, duplex, and mtu automatically?
+   * Nullable. No evidence that the app always sets it.
+   */
+  automatic: boolean | null
+  /**
+   * the duplex setting  half | full | full with flow control.
+   * Nullable. No evidence that the app always sets it.
+   */
+  duplex: string | null
+  /**
+   * the unique identifier for the interface.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the type of interface */
-  readonly kind: string
-  /** the MAC address for the interface */
-  readonly mACAddress: string
-  /** the packet size */
-  mtu: Integer
-  /** the name of the interface */
-  readonly name: string
-  /** ethernet speed 10 | 100 | 1000 */
-  speed: Integer
+  /**
+   * the type of interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * the MAC address for the interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly mACAddress: string | null
+  /**
+   * the packet size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  mtu: Integer | null
+  /**
+   * the name of the interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * ethernet speed 10 | 100 | 1000.
+   * Nullable. No evidence that the app always sets it.
+   */
+  speed: Integer | null
 }
 
 /** A set of services */
 export interface Location {
-  /** the unique identifier for the location */
+  /**
+   * the unique identifier for the location.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the name of the location */
-  name: string
+  /**
+   * the name of the location.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** the preferences for the current user's network */
 export interface NetworkPreferencesObject {
-  /** the current location */
-  currentLocation: ObjectReferenceVariant<Location, string>
+  /**
+   * the current location.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentLocation: ObjectReferenceVariant<Location, string> | null
 }
 
 /** A collection of settings for a network service */
 export interface Service {
-  /** Is the service active? */
-  readonly active: boolean
-  /** the currently selected configuration */
-  currentConfiguration: ObjectReferenceVariant<Configuration, string>
-  /** the unique identifier for the service */
+  /**
+   * Is the service active?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly active: boolean | null
+  /**
+   * the currently selected configuration.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentConfiguration: ObjectReferenceVariant<Configuration, string> | null
+  /**
+   * the unique identifier for the service.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the interface the service is built on */
-  readonly interface: ObjectReferenceVariant<Interface, string>
-  /** the type of service */
-  readonly kind: Integer
-  /** the name of the service */
-  name: string
+  /**
+   * the interface the service is built on.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly interface: ObjectReferenceVariant<Interface, string> | null
+  /**
+   * the type of service.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: Integer | null
+  /**
+   * the name of the service.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** An alias in the file system */
 export interface Alias {
-  /** the OSType identifying the application that created the alias */
-  creatorType: string
-  /** the application that will launch if the alias is opened */
-  defaultApplication: string
-  /** the OSType identifying the type of data contained in the alias */
-  fileType: string
-  /** The kind of alias, as shown in Finder */
-  readonly kind: string
-  /** the version of the product (visible at the top of the "Get Info" window) */
-  readonly productVersion: string
-  /** the short version of the application bundle referenced by the alias */
-  readonly shortVersion: string
-  /** Is the alias a stationery pad? */
-  stationery: boolean
-  /** The type identifier of the alias */
-  readonly typeIdentifier: string
+  /**
+   * the OSType identifying the application that created the alias.
+   * Nullable. No evidence that the app always sets it.
+   */
+  creatorType: string | null
+  /**
+   * the application that will launch if the alias is opened.
+   * Nullable. No evidence that the app always sets it.
+   */
+  defaultApplication: string | null
+  /**
+   * the OSType identifying the type of data contained in the alias.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fileType: string | null
+  /**
+   * The kind of alias, as shown in Finder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * the version of the product (visible at the top of the "Get Info" window).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly productVersion: string | null
+  /**
+   * the short version of the application bundle referenced by the alias.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shortVersion: string | null
+  /**
+   * Is the alias a stationery pad?
+   * Nullable. No evidence that the app always sets it.
+   */
+  stationery: boolean | null
+  /**
+   * The type identifier of the alias.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly typeIdentifier: string | null
   /**
    * the version of the application bundle referenced by the alias (visible at the bottom of the
-   * "Get Info" window)
+   * "Get Info" window).
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly version: string
+  readonly version: string | null
 }
 
 /** The Classic domain in the file system */
 export interface ClassicDomainObject {
-  /** The Apple Menu Items folder */
-  readonly appleMenuFolder: ObjectReferenceVariant<Folder, never>
-  /** The Control Panels folder */
-  readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Control Strip Modules folder */
-  readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Classic Desktop folder */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never>
-  /** The Extensions folder */
-  readonly extensionsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Fonts folder */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Launcher Items folder */
-  readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Classic Preferences folder */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Shutdown Items folder */
-  readonly shutdownFolder: ObjectReferenceVariant<Folder, never>
-  /** The StartupItems folder */
-  readonly startupItemsFolder: ObjectReferenceVariant<Folder, never>
-  /** The System folder */
-  readonly systemFolder: ObjectReferenceVariant<Folder, never>
+  /**
+   * The Apple Menu Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly appleMenuFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Control Panels folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Control Strip Modules folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Classic Desktop folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Extensions folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly extensionsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Fonts folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Launcher Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Classic Preferences folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Shutdown Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shutdownFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The StartupItems folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly startupItemsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The System folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly systemFolder: ObjectReferenceVariant<Folder, never> | null
 }
 
 /** A disk in the file system */
 export interface Disk {
-  /** the total number of bytes (free or used) on the disk */
-  readonly capacity: number
-  /** Can the media be ejected (floppies, CD's, and so on)? */
-  readonly ejectable: boolean
-  /** the file system format of this disk */
-  readonly format: string
-  /** the number of free bytes left on the disk */
-  readonly freeSpace: number
-  /** Ignore permissions on this disk? */
-  ignorePrivileges: boolean
-  /** Is the media a local volume (as opposed to a file server)? */
-  readonly localVolume: boolean
-  /** the server on which the disk resides, AFP volumes only */
-  readonly server: string
-  /** Is this disk the boot disk? */
-  readonly startup: boolean
-  /** the zone in which the disk's server resides, AFP volumes only */
-  readonly zone: string
+  /**
+   * the total number of bytes (free or used) on the disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly capacity: number | null
+  /**
+   * Can the media be ejected (floppies, CD's, and so on)?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly ejectable: boolean | null
+  /**
+   * the file system format of this disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly format: string | null
+  /**
+   * the number of free bytes left on the disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly freeSpace: number | null
+  /**
+   * Ignore permissions on this disk?
+   * Nullable. No evidence that the app always sets it.
+   */
+  ignorePrivileges: boolean | null
+  /**
+   * Is the media a local volume (as opposed to a file server)?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly localVolume: boolean | null
+  /**
+   * the server on which the disk resides, AFP volumes only.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly server: string | null
+  /**
+   * Is this disk the boot disk?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly startup: boolean | null
+  /**
+   * the zone in which the disk's server resides, AFP volumes only.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly zone: string | null
 }
 
 /** An item stored in the file system */
 export interface DiskItem {
-  /** Is the disk item busy? */
-  readonly busyStatus: boolean
-  /** the folder or disk which has this disk item as an element */
-  readonly container: ObjectReferenceVariant<DiskItem, string>
-  /** the date on which the disk item was created */
-  readonly creationDate: Date
-  /** the name of the disk item as displayed in the User Interface */
-  readonly displayedName: string
-  /** the unique ID of the disk item */
+  /**
+   * Is the disk item busy?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly busyStatus: boolean | null
+  /**
+   * the folder or disk which has this disk item as an element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly container: ObjectReferenceVariant<DiskItem, string> | null
+  /**
+   * the date on which the disk item was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: Date | null
+  /**
+   * the name of the disk item as displayed in the User Interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly displayedName: string | null
+  /**
+   * the unique ID of the disk item.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the date on which the disk item was last modified */
-  modificationDate: Date
-  /** the name of the disk item */
-  name: string
-  /** the extension portion of the name */
-  readonly nameExtension: string
-  /** Is the disk item a package? */
-  readonly packageFolder: boolean
-  /** the file system path of the disk item */
-  readonly path: string
-  /** the actual space used by the disk item on disk */
-  readonly physicalSize: Integer
-  /** the POSIX file system path of the disk item */
-  readonly pOSIXPath: string
-  /** the logical size of the disk item */
-  readonly size: Integer
-  /** the URL of the disk item */
-  readonly uRL: string
-  /** Is the disk item visible? */
-  visible: boolean
-  /** the volume on which the disk item resides */
-  readonly volume: string
+  /**
+   * the date on which the disk item was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  modificationDate: Date | null
+  /**
+   * the name of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * the extension portion of the name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly nameExtension: string | null
+  /**
+   * Is the disk item a package?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly packageFolder: boolean | null
+  /**
+   * the file system path of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * the actual space used by the disk item on disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly physicalSize: Integer | null
+  /**
+   * the POSIX file system path of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly pOSIXPath: string | null
+  /**
+   * the logical size of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly size: Integer | null
+  /**
+   * the URL of the disk item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly uRL: string | null
+  /**
+   * Is the disk item visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * the volume on which the disk item resides.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly volume: string | null
 }
 
 /** A domain in the file system */
 export interface Domain {
-  /** The Application Support folder */
-  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never>
-  /** The Applications folder */
-  readonly applicationsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Desktop Pictures folder */
-  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Folder Action Scripts folder */
-  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Fonts folder */
-  readonly fontsFolder: ObjectReferenceVariant<Folder, never>
-  /** the unique identifier of the domain */
+  /**
+   * The Application Support folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Applications folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly applicationsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Desktop Pictures folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Folder Action Scripts folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Fonts folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * the unique identifier of the domain.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The Library folder */
-  readonly libraryFolder: ObjectReferenceVariant<Folder, never>
-  /** the name of the domain */
-  readonly name: string
-  /** The Preferences folder */
-  readonly preferencesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Scripting Additions folder */
-  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Scripts folder */
-  readonly scriptsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Shared Documents folder */
-  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Speakable Items folder */
-  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never>
-  /** The Utilities folder */
-  readonly utilitiesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Automator Workflows folder */
-  readonly workflowsFolder: ObjectReferenceVariant<Folder, never>
+  /**
+   * The Library folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly libraryFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * the name of the domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The Preferences folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Scripting Additions folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Scripts folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly scriptsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Shared Documents folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Speakable Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Utilities folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly utilitiesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Automator Workflows folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly workflowsFolder: ObjectReferenceVariant<Folder, never> | null
 }
 
 /** A file in the file system */
 export interface File {
-  /** the OSType identifying the application that created the file */
-  creatorType: string
-  /** the application that will launch if the file is opened */
-  defaultApplication: string
-  /** the OSType identifying the type of data contained in the file */
-  fileType: string
-  /** The kind of file, as shown in Finder */
-  readonly kind: string
-  /** the version of the product (visible at the top of the "Get Info" window) */
-  readonly productVersion: string
-  /** the short version of the file */
-  readonly shortVersion: string
-  /** Is the file a stationery pad? */
-  stationery: boolean
-  /** The type identifier of the file */
-  readonly typeIdentifier: string
-  /** the version of the file (visible at the bottom of the "Get Info" window) */
-  readonly version: string
+  /**
+   * the OSType identifying the application that created the file.
+   * Nullable. No evidence that the app always sets it.
+   */
+  creatorType: string | null
+  /**
+   * the application that will launch if the file is opened.
+   * Nullable. No evidence that the app always sets it.
+   */
+  defaultApplication: string | null
+  /**
+   * the OSType identifying the type of data contained in the file.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fileType: string | null
+  /**
+   * The kind of file, as shown in Finder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * the version of the product (visible at the top of the "Get Info" window).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly productVersion: string | null
+  /**
+   * the short version of the file.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shortVersion: string | null
+  /**
+   * Is the file a stationery pad?
+   * Nullable. No evidence that the app always sets it.
+   */
+  stationery: boolean | null
+  /**
+   * The type identifier of the file.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly typeIdentifier: string | null
+  /**
+   * the version of the file (visible at the bottom of the "Get Info" window).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly version: string | null
 }
 
 /** A file package in the file system */
 export interface FilePackage {
-  /** Unique identifier for this package */
-  readonly id: string
+  /**
+   * Unique identifier for this package.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A folder in the file system */
 export interface Folder {
-  /** Unique identifier for this folder */
-  readonly id: string
+  /**
+   * Unique identifier for this folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** The local domain in the file system */
 export interface LocalDomainObject {
-  /** Unique identifier for this domain */
-  readonly id: string
+  /**
+   * Unique identifier for this domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** The network domain in the file system */
 export interface NetworkDomainObject {
-  /** Unique identifier for this domain */
-  readonly id: string
+  /**
+   * Unique identifier for this domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** The system domain in the file system */
 export interface SystemDomainObject {
-  /** Unique identifier for this domain */
-  readonly id: string
+  /**
+   * Unique identifier for this domain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** The user domain in the file system */
 export interface UserDomainObject {
-  /** The user's Desktop folder */
-  readonly desktopFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Documents folder */
-  readonly documentsFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Downloads folder */
-  readonly downloadsFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Favorites folder */
-  readonly favoritesFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Home folder */
-  readonly homeFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Movies folder */
-  readonly moviesFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Music folder */
-  readonly musicFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Pictures folder */
-  readonly picturesFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Public folder */
-  readonly publicFolder: ObjectReferenceVariant<Folder, never>
-  /** The user's Sites folder */
-  readonly sitesFolder: ObjectReferenceVariant<Folder, never>
-  /** The Temporary Items folder */
-  readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never>
+  /**
+   * The user's Desktop folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Documents folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly documentsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Downloads folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloadsFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Favorites folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly favoritesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Home folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly homeFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Movies folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly moviesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Music folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly musicFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Pictures folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly picturesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Public folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly publicFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The user's Sites folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sitesFolder: ObjectReferenceVariant<Folder, never> | null
+  /**
+   * The Temporary Items folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never> | null
 }
 
 /** An action that can be performed on the UI element */
 export interface Action {
-  /** what the action does */
-  readonly description: string
-  /** the name of the action */
-  readonly name: string
+  /**
+   * what the action does.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * the name of the action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** An named data value associated with the UI element */
 export interface Attribute {
-  /** the name of the attribute */
-  readonly name: string
-  /** Can the attribute be set? */
-  readonly settable: boolean
-  /** the current value of the attribute */
-  value: string
+  /**
+   * the name of the attribute.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * Can the attribute be set?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly settable: boolean | null
+  /**
+   * the current value of the attribute.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A browser belonging to a window */
 export interface Browser {
-  /** Unique identifier for this browser */
-  readonly id: string
+  /**
+   * Unique identifier for this browser.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A busy indicator belonging to a window */
 export interface BusyIndicator {
-  /** Unique identifier for this busy indicator */
-  readonly id: string
+  /**
+   * Unique identifier for this busy indicator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A button belonging to a window or scroll bar */
 export interface Button {
-  /** Unique identifier for this button */
-  readonly id: string
+  /**
+   * Unique identifier for this button.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A checkbox belonging to a window */
 export interface Checkbox {
-  /** Unique identifier for this checkbox */
-  readonly id: string
+  /**
+   * Unique identifier for this checkbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A color well belonging to a window */
 export interface ColorWell {
-  /** Unique identifier for this color well */
-  readonly id: string
+  /**
+   * Unique identifier for this color well.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A column belonging to a table */
 export interface Column {
-  /** Unique identifier for this column */
-  readonly id: string
+  /**
+   * Unique identifier for this column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A combo box belonging to a window */
 export interface ComboBox {
-  /** Unique identifier for this combo box */
-  readonly id: string
+  /**
+   * Unique identifier for this combo box.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A drawer that may be extended from a window */
 export interface Drawer {
-  /** Unique identifier for this drawer */
-  readonly id: string
+  /**
+   * Unique identifier for this drawer.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A group belonging to a window */
 export interface Group {
-  /** Unique identifier for this group */
-  readonly id: string
+  /**
+   * Unique identifier for this group.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A grow area belonging to a window */
 export interface GrowArea {
-  /** Unique identifier for this grow area */
-  readonly id: string
+  /**
+   * Unique identifier for this grow area.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** An image belonging to a static text field */
 export interface Image {
-  /** Unique identifier for this image */
-  readonly id: string
+  /**
+   * Unique identifier for this image.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A incrementor belonging to a window */
 export interface Incrementor {
-  /** Unique identifier for this incrementor */
-  readonly id: string
+  /**
+   * Unique identifier for this incrementor.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A list belonging to a window */
 export interface List {
-  /** Unique identifier for this list */
-  readonly id: string
+  /**
+   * Unique identifier for this list.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A menu belonging to a menu bar item */
 export interface Menu {
-  /** Unique identifier for this menu */
-  readonly id: string
+  /**
+   * Unique identifier for this menu.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A menu bar belonging to a process */
 export interface MenuBar {
-  /** Unique identifier for this menu bar */
-  readonly id: string
+  /**
+   * Unique identifier for this menu bar.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A menu bar item belonging to a menu bar */
 export interface MenuBarItem {
-  /** Unique identifier for this menu bar item */
-  readonly id: string
+  /**
+   * Unique identifier for this menu bar item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A menu button belonging to a window */
 export interface MenuButton {
-  /** Unique identifier for this menu button */
-  readonly id: string
+  /**
+   * Unique identifier for this menu button.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A menu item belonging to a menu */
 export interface MenuItem {
-  /** Unique identifier for this menu item */
-  readonly id: string
+  /**
+   * Unique identifier for this menu item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A outline belonging to a window */
 export interface Outline {
-  /** Unique identifier for this outline */
-  readonly id: string
+  /**
+   * Unique identifier for this outline.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A pop over belonging to a window */
 export interface PopOver {
-  /** Unique identifier for this pop over */
-  readonly id: string
+  /**
+   * Unique identifier for this pop over.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A pop up button belonging to a window */
 export interface PopUpButton {
-  /** Unique identifier for this pop up button */
-  readonly id: string
+  /**
+   * Unique identifier for this pop up button.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A process running on this computer */
@@ -535,362 +929,679 @@ export interface Process {
   /**
    * Is the process high-level event aware (accepts open application, open document, print document,
    * and quit)?
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly acceptsHighLevelEvents: boolean
-  /** Does the process accept remote events? */
-  readonly acceptsRemoteEvents: boolean
-  /** the architecture in which the process is running */
-  readonly architecture: string
-  /** Does the process run exclusively in the background? */
-  readonly backgroundOnly: boolean
-  /** the bundle identifier of the process' application file */
-  readonly bundleIdentifier: string
-  /** Is the process running in the Classic environment? */
-  readonly classic: boolean
-  /** the OSType of the creator of the process (the signature) */
-  readonly creatorType: string
+  readonly acceptsHighLevelEvents: boolean | null
   /**
-   * the name of the file from which the process was launched, as displayed in the User Interface
+   * Does the process accept remote events?
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly displayedName: string
-  /** the file from which the process was launched */
-  readonly file: string
-  /** the OSType of the file type of the process */
-  readonly fileType: string
-  /** Is the process the frontmost process */
-  frontmost: boolean
-  /** Does the process have a scripting terminology, i.e., can it be scripted? */
-  readonly hasScriptingTerminology: boolean
-  /** The unique identifier of the process */
+  readonly acceptsRemoteEvents: boolean | null
+  /**
+   * the architecture in which the process is running.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly architecture: string | null
+  /**
+   * Does the process run exclusively in the background?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly backgroundOnly: boolean | null
+  /**
+   * the bundle identifier of the process' application file.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly bundleIdentifier: string | null
+  /**
+   * Is the process running in the Classic environment?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly classic: boolean | null
+  /**
+   * the OSType of the creator of the process (the signature).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creatorType: string | null
+  /**
+   * the name of the file from which the process was launched, as displayed in the User Interface.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly displayedName: string | null
+  /**
+   * the file from which the process was launched.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly file: string | null
+  /**
+   * the OSType of the file type of the process.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fileType: string | null
+  /**
+   * Is the process the frontmost process.
+   * Nullable. No evidence that the app always sets it.
+   */
+  frontmost: boolean | null
+  /**
+   * Does the process have a scripting terminology, i.e., can it be scripted?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hasScriptingTerminology: boolean | null
+  /**
+   * The unique identifier of the process.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** the name of the process */
-  readonly name: string
-  /** the number of bytes currently used in the process' partition */
-  readonly partitionSpaceUsed: Integer
-  /** the short name of the file from which the process was launched */
-  readonly shortName: string
-  /** the size of the partition with which the process was launched */
-  readonly totalPartitionSize: Integer
+  /**
+   * the name of the process.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * the number of bytes currently used in the process' partition.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly partitionSpaceUsed: Integer | null
+  /**
+   * the short name of the file from which the process was launched.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shortName: string | null
+  /**
+   * the size of the partition with which the process was launched.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly totalPartitionSize: Integer | null
   /**
    * The Unix process identifier of a process running in the native environment, or -1 for a process
-   * running in the Classic environment
+   * running in the Classic environment.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly unixId: Integer
-  /** Is the process' layer visible? */
-  visible: string
+  readonly unixId: Integer | null
+  /**
+   * Is the process' layer visible?
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: string | null
 }
 
 /** A progress indicator belonging to a window */
 export interface ProgressIndicator {
-  /** Unique identifier for this progress indicator */
-  readonly id: string
+  /**
+   * Unique identifier for this progress indicator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A radio button belonging to a window */
 export interface RadioButton {
-  /** Unique identifier for this radio button */
-  readonly id: string
+  /**
+   * Unique identifier for this radio button.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A radio button group belonging to a window */
 export interface RadioGroup {
-  /** Unique identifier for this radio group */
-  readonly id: string
+  /**
+   * Unique identifier for this radio group.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A relevance indicator belonging to a window */
 export interface RelevanceIndicator {
-  /** Unique identifier for this relevance indicator */
-  readonly id: string
+  /**
+   * Unique identifier for this relevance indicator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A row belonging to a table */
 export interface Row {
-  /** Unique identifier for this row */
-  readonly id: string
+  /**
+   * Unique identifier for this row.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A scroll area belonging to a window */
 export interface ScrollArea {
-  /** Unique identifier for this scroll area */
-  readonly id: string
+  /**
+   * Unique identifier for this scroll area.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A scroll bar belonging to a window */
 export interface ScrollBar {
-  /** Unique identifier for this scroll bar */
-  readonly id: string
+  /**
+   * Unique identifier for this scroll bar.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A sheet displayed over a window */
 export interface Sheet {
-  /** Unique identifier for this sheet */
-  readonly id: string
+  /**
+   * Unique identifier for this sheet.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A slider belonging to a window */
 export interface Slider {
-  /** Unique identifier for this slider */
-  readonly id: string
+  /**
+   * Unique identifier for this slider.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A splitter belonging to a window */
 export interface Splitter {
-  /** Unique identifier for this splitter */
-  readonly id: string
+  /**
+   * Unique identifier for this splitter.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A splitter group belonging to a window */
 export interface SplitterGroup {
-  /** Unique identifier for this splitter group */
-  readonly id: string
+  /**
+   * Unique identifier for this splitter group.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A static text field belonging to a window */
 export interface StaticText {
-  /** Unique identifier for this static text */
-  readonly id: string
+  /**
+   * Unique identifier for this static text.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A tab group belonging to a window */
 export interface TabGroup {
-  /** Unique identifier for this tab group */
-  readonly id: string
+  /**
+   * Unique identifier for this tab group.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A table belonging to a window */
 export interface Table {
-  /** Unique identifier for this table */
-  readonly id: string
+  /**
+   * Unique identifier for this table.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A text area belonging to a window */
 export interface TextArea {
-  /** Unique identifier for this text area */
-  readonly id: string
+  /**
+   * Unique identifier for this text area.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A text field belonging to a window */
 export interface TextField {
-  /** Unique identifier for this text field */
-  readonly id: string
+  /**
+   * Unique identifier for this text field.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A toolbar belonging to a window */
 export interface Toolbar {
-  /** Unique identifier for this toolbar */
-  readonly id: string
+  /**
+   * Unique identifier for this toolbar.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A piece of the user interface of a process */
 export interface UIElement {
-  /** a more complete description of the UI element and its capabilities */
-  readonly accessibilityDescription: string
-  /** the class of the UI Element, which identifies it function */
-  readonly class: string
-  /** the accessibility description, if available; otherwise, the role description */
-  readonly description: string
-  /** Is the UI element enabled? ( Does it accept clicks? ) */
-  readonly enabled: string
+  /**
+   * a more complete description of the UI element and its capabilities.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly accessibilityDescription: string | null
+  /**
+   * the class of the UI Element, which identifies it function.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly class: string | null
+  /**
+   * the accessibility description, if available; otherwise, the role description.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the UI element enabled? ( Does it accept clicks? ).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly enabled: string | null
   /**
    * a list of every UI element contained in this UI element and its child UI elements, to the
-   * limits of the tree
+   * limits of the tree.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly entireContents: string
-  /** Is the focus on this UI element? */
-  focused: string
-  /** an elaborate description of the UI element and its capabilities */
-  readonly help: string
-  /** the maximum value that the UI element can take on */
-  readonly maximumValue: string
-  /** the minimum value that the UI element can take on */
-  readonly minimumValue: string
-  /** the name of the UI Element, which identifies it within its container */
-  readonly name: string
-  /** the orientation of the UI element */
-  readonly orientation: string
-  /** the position of the UI element */
-  position: string
-  /** an encoded description of the UI element and its capabilities */
-  readonly role: string
-  /** a more complete description of the UI element's role */
-  readonly roleDescription: string
-  /** Is the UI element selected? */
-  selected: string
-  /** the size of the UI element */
-  size: string
-  /** an encoded description of the UI element and its capabilities */
-  readonly subrole: string
-  /** the title of the UI element as it appears on the screen */
-  readonly title: string
-  /** the current value of the UI element */
-  value: string
+  readonly entireContents: string | null
+  /**
+   * Is the focus on this UI element?
+   * Nullable. No evidence that the app always sets it.
+   */
+  focused: string | null
+  /**
+   * an elaborate description of the UI element and its capabilities.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly help: string | null
+  /**
+   * the maximum value that the UI element can take on.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly maximumValue: string | null
+  /**
+   * the minimum value that the UI element can take on.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly minimumValue: string | null
+  /**
+   * the name of the UI Element, which identifies it within its container.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * the orientation of the UI element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly orientation: string | null
+  /**
+   * the position of the UI element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  position: string | null
+  /**
+   * an encoded description of the UI element and its capabilities.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly role: string | null
+  /**
+   * a more complete description of the UI element's role.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly roleDescription: string | null
+  /**
+   * Is the UI element selected?
+   * Nullable. No evidence that the app always sets it.
+   */
+  selected: string | null
+  /**
+   * the size of the UI element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: string | null
+  /**
+   * an encoded description of the UI element and its capabilities.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly subrole: string | null
+  /**
+   * the title of the UI element as it appears on the screen.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly title: string | null
+  /**
+   * the current value of the UI element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A value indicator ( thumb or slider ) belonging to a scroll bar */
 export interface ValueIndicator {
-  /** Unique identifier for this value indicator */
-  readonly id: string
+  /**
+   * Unique identifier for this value indicator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A unit of data in Property List format */
 export interface PropertyListItem {
   /**
-   * the kind of data stored in the property list item: boolean/data/date/list/number/record/string
+   * the kind of data stored in the property list item: boolean/data/date/list/number/record/string.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly kind: string
-  /** the name of the property list item ( if any ) */
-  readonly name: string
-  /** the text representation of the property list data */
-  text: string
-  /** the value of the property list item */
-  value: string
+  readonly kind: string | null
+  /**
+   * the name of the property list item ( if any ).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * the text representation of the property list data.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
+  /**
+   * the value of the property list item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A named value associated with a unit of data in XML format */
 export interface XMLAttribute {
-  /** the name of the XML attribute */
-  readonly name: string
-  /** the value of the XML attribute */
-  value: string
+  /**
+   * the name of the XML attribute.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * the value of the XML attribute.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** Data in XML format */
 export interface XMLData {
-  /** the unique identifier of the XML data */
+  /**
+   * the unique identifier of the XML data.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the name of the XML data */
-  name: string
-  /** the text representation of the XML data */
-  text: string
+  /**
+   * the name of the XML data.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * the text representation of the XML data.
+   * Nullable. No evidence that the app always sets it.
+   */
+  text: string | null
 }
 
 /** A unit of data in XML format */
 export interface XMLElement {
-  /** the unique identifier of the XML element */
+  /**
+   * the unique identifier of the XML element.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** the name of the XML element */
-  readonly name: string
-  /** the value of the XML element */
-  value: string
+  /**
+   * the name of the XML element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * the value of the XML element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  value: string | null
 }
 
 /** A class within a suite within a scripting definition */
 export interface ScriptingClass {
-  /** The name of the class */
-  readonly name: string
-  /** The unique identifier of the class */
+  /**
+   * The name of the class.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the class.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The description of the class */
-  readonly description: string
-  /** Is the class hidden? */
-  readonly hidden: boolean
-  /** The plural name of the class */
-  readonly pluralName: string
-  /** The name of the suite to which this class belongs */
-  readonly suiteName: string
-  /** The class from which this class inherits */
-  readonly superclass: ObjectReferenceVariant<ScriptingClass, string>
+  /**
+   * The description of the class.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the class hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
+  /**
+   * The plural name of the class.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly pluralName: string | null
+  /**
+   * The name of the suite to which this class belongs.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly suiteName: string | null
+  /**
+   * The class from which this class inherits.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly superclass: ObjectReferenceVariant<ScriptingClass, string> | null
 }
 
 /** A command within a suite within a scripting definition */
 export interface ScriptingCommand {
-  /** The name of the command */
-  readonly name: string
-  /** The unique identifier of the command */
+  /**
+   * The name of the command.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the command.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The description of the command */
-  readonly description: string
-  /** The direct parameter of the command */
-  readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string>
-  /** Is the command hidden? */
-  readonly hidden: boolean
-  /** The object or data returned by this command */
+  /**
+   * The description of the command.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * The direct parameter of the command.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string> | null
+  /**
+   * Is the command hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
+  /**
+   * The object or data returned by this command.
+   * Nullable. No evidence that the app always sets it.
+   */
   readonly scriptingResult: unknown
-  /** The name of the suite to which this command belongs */
-  readonly suiteName: string
+  /**
+   * The name of the suite to which this command belongs.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly suiteName: string | null
 }
 
 /** The scripting definition of the System Events applicaation */
 export interface ScriptingDefinitionObject {
-  /** Unique identifier for this scripting definition object */
-  readonly id: string
+  /**
+   * Unique identifier for this scripting definition object.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** An element within a class within a suite within a scripting definition */
 export interface ScriptingElement {
-  /** Unique identifier for this scripting element */
-  readonly id: string
+  /**
+   * Unique identifier for this scripting element.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** An enumeration within a suite within a scripting definition */
 export interface ScriptingEnumeration {
-  /** The name of the enumeration */
-  readonly name: string
-  /** The unique identifier of the enumeration */
+  /**
+   * The name of the enumeration.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the enumeration.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Is the enumeration hidden? */
-  readonly hidden: boolean
+  /**
+   * Is the enumeration hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
 }
 
 /** An enumerator within an enumeration within a suite within a scripting definition */
 export interface ScriptingEnumerator {
-  /** The name of the enumerator */
-  readonly name: string
-  /** The unique identifier of the enumerator */
+  /**
+   * The name of the enumerator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the enumerator.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The description of the enumerator */
-  readonly description: string
-  /** Is the enumerator hidden? */
-  readonly hidden: boolean
+  /**
+   * The description of the enumerator.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the enumerator hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
 }
 
 /** A parameter within a command within a suite within a scripting definition */
 export interface ScriptingParameter {
-  /** The name of the parameter */
-  readonly name: string
-  /** The unique identifier of the parameter */
+  /**
+   * The name of the parameter.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the parameter.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The description of the parameter */
-  readonly description: string
-  /** Is the parameter hidden? */
-  readonly hidden: boolean
-  /** The kind of object or data specified by this parameter */
-  readonly kind: string
-  /** Is the parameter optional? */
-  readonly optional: boolean
+  /**
+   * The description of the parameter.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the parameter hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
+  /**
+   * The kind of object or data specified by this parameter.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * Is the parameter optional?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly optional: boolean | null
 }
 
 /** A property within a class within a suite within a scripting definition */
 export interface ScriptingProperty {
-  /** The name of the property */
-  readonly name: string
-  /** The unique identifier of the property */
+  /**
+   * The name of the property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the property.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The type of access to this property */
-  readonly access: string
-  /** The description of the property */
-  readonly description: string
-  /** Is the property's value an enumerator? */
-  readonly enumerated: boolean
-  /** Is the property hidden? */
-  readonly hidden: boolean
-  /** The kind of object or data returned by this property */
-  readonly kind: string
-  /** Is the property's value a list? */
-  readonly listed: boolean
+  /**
+   * The type of access to this property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly access: string | null
+  /**
+   * The description of the property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the property's value an enumerator?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly enumerated: boolean | null
+  /**
+   * Is the property hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
+  /**
+   * The kind of object or data returned by this property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * Is the property's value a list?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly listed: boolean | null
 }
 
 /** A suite within a scripting definition */
 export interface ScriptingSuite {
-  /** The name of the suite */
-  readonly name: string
-  /** The unique identifier of the suite */
+  /**
+   * The name of the suite.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the suite.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The description of the suite */
-  readonly description: string
-  /** Is the suite hidden? */
-  readonly hidden: boolean
+  /**
+   * The description of the suite.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly description: string | null
+  /**
+   * Is the suite hidden?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly hidden: boolean | null
 }
 
 /** Input for creating a Configuration. */
@@ -901,7 +1612,10 @@ export interface ConfigurationCreateInput {
 
 /** Input for updating a Configuration. Omitted fields are left unchanged. */
 export interface ConfigurationUpdateInput {
-  /** the name used to authenticate */
+  /**
+   * the name used to authenticate.
+   * Cannot be reset: null is rejected.
+   */
   accountName?: string
 }
 
@@ -919,13 +1633,25 @@ export interface InterfaceCreateInput {
 
 /** Input for updating an Interface. Omitted fields are left unchanged. */
 export interface InterfaceUpdateInput {
-  /** configure the interface speed, duplex, and mtu automatically? */
+  /**
+   * configure the interface speed, duplex, and mtu automatically?
+   * Cannot be reset: null is rejected.
+   */
   automatic?: boolean
-  /** the duplex setting  half | full | full with flow control */
+  /**
+   * the duplex setting  half | full | full with flow control.
+   * Cannot be reset: null is rejected.
+   */
   duplex?: string
-  /** the packet size */
+  /**
+   * the packet size.
+   * Cannot be reset: null is rejected.
+   */
   mtu?: Integer
-  /** ethernet speed 10 | 100 | 1000 */
+  /**
+   * ethernet speed 10 | 100 | 1000.
+   * Cannot be reset: null is rejected.
+   */
   speed?: Integer
 }
 
@@ -937,7 +1663,10 @@ export interface LocationCreateInput {
 
 /** Input for updating a Location. Omitted fields are left unchanged. */
 export interface LocationUpdateInput {
-  /** the name of the location */
+  /**
+   * the name of the location.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -949,7 +1678,10 @@ export interface NetworkPreferencesObjectCreateInput {
 
 /** Input for updating a NetworkPreferencesObject. Omitted fields are left unchanged. */
 export interface NetworkPreferencesObjectUpdateInput {
-  /** the current location */
+  /**
+   * the current location.
+   * Cannot be reset: null is rejected.
+   */
   currentLocation?: ObjectReferenceVariant<Location, string>
 }
 
@@ -963,9 +1695,15 @@ export interface ServiceCreateInput {
 
 /** Input for updating a Service. Omitted fields are left unchanged. */
 export interface ServiceUpdateInput {
-  /** the currently selected configuration */
+  /**
+   * the currently selected configuration.
+   * Cannot be reset: null is rejected.
+   */
   currentConfiguration?: ObjectReferenceVariant<Configuration, string>
-  /** the name of the service */
+  /**
+   * the name of the service.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -983,13 +1721,25 @@ export interface AliasCreateInput {
 
 /** Input for updating an Alias. Omitted fields are left unchanged. */
 export interface AliasUpdateInput {
-  /** the OSType identifying the application that created the alias */
+  /**
+   * the OSType identifying the application that created the alias.
+   * Cannot be reset: null is rejected.
+   */
   creatorType?: string
-  /** the application that will launch if the alias is opened */
+  /**
+   * the application that will launch if the alias is opened.
+   * Cannot be reset: null is rejected.
+   */
   defaultApplication?: string
-  /** the OSType identifying the type of data contained in the alias */
+  /**
+   * the OSType identifying the type of data contained in the alias.
+   * Cannot be reset: null is rejected.
+   */
   fileType?: string
-  /** Is the alias a stationery pad? */
+  /**
+   * Is the alias a stationery pad?
+   * Cannot be reset: null is rejected.
+   */
   stationery?: boolean
 }
 
@@ -1007,7 +1757,10 @@ export interface DiskCreateInput {
 
 /** Input for updating a Disk. Omitted fields are left unchanged. */
 export interface DiskUpdateInput {
-  /** Ignore permissions on this disk? */
+  /**
+   * Ignore permissions on this disk?
+   * Cannot be reset: null is rejected.
+   */
   ignorePrivileges?: boolean
 }
 
@@ -1023,11 +1776,20 @@ export interface DiskItemCreateInput {
 
 /** Input for updating a DiskItem. Omitted fields are left unchanged. */
 export interface DiskItemUpdateInput {
-  /** the date on which the disk item was last modified */
+  /**
+   * the date on which the disk item was last modified.
+   * Cannot be reset: null is rejected.
+   */
   modificationDate?: Date
-  /** the name of the disk item */
+  /**
+   * the name of the disk item.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Is the disk item visible? */
+  /**
+   * Is the disk item visible?
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
 }
 
@@ -1051,13 +1813,25 @@ export interface FileCreateInput {
 
 /** Input for updating a File. Omitted fields are left unchanged. */
 export interface FileUpdateInput {
-  /** the OSType identifying the application that created the file */
+  /**
+   * the OSType identifying the application that created the file.
+   * Cannot be reset: null is rejected.
+   */
   creatorType?: string
-  /** the application that will launch if the file is opened */
+  /**
+   * the application that will launch if the file is opened.
+   * Cannot be reset: null is rejected.
+   */
   defaultApplication?: string
-  /** the OSType identifying the type of data contained in the file */
+  /**
+   * the OSType identifying the type of data contained in the file.
+   * Cannot be reset: null is rejected.
+   */
   fileType?: string
-  /** Is the file a stationery pad? */
+  /**
+   * Is the file a stationery pad?
+   * Cannot be reset: null is rejected.
+   */
   stationery?: boolean
 }
 
@@ -1111,7 +1885,10 @@ export interface AttributeCreateInput {
 
 /** Input for updating an Attribute. Omitted fields are left unchanged. */
 export interface AttributeUpdateInput {
-  /** the current value of the attribute */
+  /**
+   * the current value of the attribute.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -1251,9 +2028,15 @@ export interface ProcessCreateInput {
 
 /** Input for updating a Process. Omitted fields are left unchanged. */
 export interface ProcessUpdateInput {
-  /** Is the process the frontmost process */
+  /**
+   * Is the process the frontmost process.
+   * Cannot be reset: null is rejected.
+   */
   frontmost?: boolean
-  /** Is the process' layer visible? */
+  /**
+   * Is the process' layer visible?
+   * Cannot be reset: null is rejected.
+   */
   visible?: string
 }
 
@@ -1375,15 +2158,30 @@ export interface UIElementCreateInput {
 
 /** Input for updating an UIElement. Omitted fields are left unchanged. */
 export interface UIElementUpdateInput {
-  /** Is the focus on this UI element? */
+  /**
+   * Is the focus on this UI element?
+   * Cannot be reset: null is rejected.
+   */
   focused?: string
-  /** the position of the UI element */
+  /**
+   * the position of the UI element.
+   * Cannot be reset: null is rejected.
+   */
   position?: string
-  /** Is the UI element selected? */
+  /**
+   * Is the UI element selected?
+   * Cannot be reset: null is rejected.
+   */
   selected?: string
-  /** the size of the UI element */
+  /**
+   * the size of the UI element.
+   * Cannot be reset: null is rejected.
+   */
   size?: string
-  /** the current value of the UI element */
+  /**
+   * the current value of the UI element.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -1403,9 +2201,15 @@ export interface PropertyListItemCreateInput {
 
 /** Input for updating a PropertyListItem. Omitted fields are left unchanged. */
 export interface PropertyListItemUpdateInput {
-  /** the text representation of the property list data */
+  /**
+   * the text representation of the property list data.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
-  /** the value of the property list item */
+  /**
+   * the value of the property list item.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -1417,7 +2221,10 @@ export interface XMLAttributeCreateInput {
 
 /** Input for updating a XMLAttribute. Omitted fields are left unchanged. */
 export interface XMLAttributeUpdateInput {
-  /** the value of the XML attribute */
+  /**
+   * the value of the XML attribute.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -1431,9 +2238,15 @@ export interface XMLDataCreateInput {
 
 /** Input for updating a XMLData. Omitted fields are left unchanged. */
 export interface XMLDataUpdateInput {
-  /** the name of the XML data */
+  /**
+   * the name of the XML data.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** the text representation of the XML data */
+  /**
+   * the text representation of the XML data.
+   * Cannot be reset: null is rejected.
+   */
   text?: string
 }
 
@@ -1445,7 +2258,10 @@ export interface XMLElementCreateInput {
 
 /** Input for updating a XMLElement. Omitted fields are left unchanged. */
 export interface XMLElementUpdateInput {
-  /** the value of the XML element */
+  /**
+   * the value of the XML element.
+   * Cannot be reset: null is rejected.
+   */
   value?: string
 }
 
@@ -1505,7 +2321,11 @@ export type ScriptingSuiteUpdateInput = Record<string, never>
 
 /** An item stored in the file system */
 export interface DiskItemResourceClient {
-  /** Delete the diskitem identified by `id`. */
+  /**
+   * Delete the diskitem identified by `id`.
+   *
+   * @param id - The id.
+   */
   delete(id: string, options?: CallOptions): Promise<void>
 }
 
@@ -1517,7 +2337,12 @@ export interface ActionResourceClient {
 
 /** A piece of the user interface of a process */
 export interface UIElementResourceClient {
-  /** cause the target process to behave as if the UI element were clicked */
+  /**
+   * cause the target process to behave as if the UI element were clicked
+   *
+   * @param at - when sent to a "process" object, the { x, y } location at which to click, in global
+   * coordinates. Does not accept null.
+   */
   click(at?: string, options?: CallOptions): Promise<void>
   /** set the selected property of the UI element */
   select(options?: CallOptions): Promise<void>
@@ -1548,23 +2373,49 @@ export interface SystemEventsClient {
   start(options?: CallOptions): Promise<void>
   /** stop the screen saver */
   stop(options?: CallOptions): Promise<void>
-  /** Move disk item(s) to a new location. */
+  /**
+   * Move disk item(s) to a new location.
+   *
+   * @param to - The new location for the disk item(s). Does not accept null.
+   */
   move(to: string, options?: CallOptions): Promise<void>
   /** Open disk item(s) with the appropriate application. */
   open(options?: CallOptions): Promise<void>
   /** Log out the current user */
   logOut(options?: CallOptions): Promise<void>
-  /** Restart the computer */
+  /**
+   * Restart the computer
+   *
+   * @param stateSavingPreference - Is the user defined state saving preference followed? Does not
+   * accept null.
+   */
   restart(stateSavingPreference?: boolean, options?: CallOptions): Promise<void>
-  /** Shut Down the computer */
+  /**
+   * Shut Down the computer
+   *
+   * @param stateSavingPreference - Is the user defined state saving preference followed? Does not
+   * accept null.
+   */
   shutDown(stateSavingPreference?: boolean, options?: CallOptions): Promise<void>
   /** Put the computer to sleep */
   sleep(options?: CallOptions): Promise<void>
-  /** cause the target process to behave as if key codes were entered */
+  /**
+   * cause the target process to behave as if key codes were entered
+   *
+   * @param using - modifiers with which the key codes are to be entered. Does not accept null.
+   */
   keyCode(using?: string, options?: CallOptions): Promise<void>
-  /** cause the target process to behave as if keystrokes were entered */
+  /**
+   * cause the target process to behave as if keystrokes were entered
+   *
+   * @param using - modifiers with which the keystrokes are to be entered. Does not accept null.
+   */
   keystroke(using?: string, options?: CallOptions): Promise<void>
-  /** Attach an action to a folder */
+  /**
+   * Attach an action to a folder
+   *
+   * @param using - a file containing the script to attach. Does not accept null.
+   */
   attachActionTo(using: string, options?: CallOptions): Promise<void>
   /** List the actions attached to a folder */
   attachedScripts(options?: CallOptions): Promise<void>
@@ -1574,14 +2425,27 @@ export interface SystemEventsClient {
   confirm(options?: CallOptions): Promise<void>
   /** cause the target process to behave as if the UI element were decremented */
   decrement(options?: CallOptions): Promise<void>
-  /** Send a folder action code to a folder action script */
+  /**
+   * Send a folder action code to a folder action script
+   *
+   * @param folderActionCode - the folder action message to process. Does not accept null.
+   * @param withItemList - a list of items for the folder action message to process. Does not accept
+   * null.
+   * @param withWindowSize - the new window size for the folder action message to process. Does not
+   * accept null.
+   */
   doFolderAction(
     folderActionCode: string,
     withItemList?: unknown,
     withWindowSize?: Rectangle,
     options?: CallOptions
   ): Promise<void>
-  /** Edit an action of a folder */
+  /**
+   * Edit an action of a folder
+   *
+   * @param usingActionName - ...or the name of the action to edit. Does not accept null.
+   * @param usingActionNumber - the index number of the action to edit... Does not accept null.
+   */
   editActionOf(
     usingActionName?: string,
     usingActionNumber?: Integer,
@@ -1595,7 +2459,12 @@ export interface SystemEventsClient {
   keyUp(options?: CallOptions): Promise<void>
   /** cause the target process to behave as if the UI element were picked */
   pick(options?: CallOptions): Promise<void>
-  /** Remove a folder action from a folder */
+  /**
+   * Remove a folder action from a folder
+   *
+   * @param usingActionName - ...or the name of the action to remove. Does not accept null.
+   * @param usingActionNumber - the index number of the action to remove... Does not accept null.
+   */
   removeActionFrom(
     usingActionName?: string,
     usingActionNumber?: Integer,
@@ -1605,26 +2474,28 @@ export interface SystemEventsClient {
 
 const configurationRecordType: ValueType<Configuration> = t.record(
   {
-    accountName: t.string({ description: 'the name used to authenticate' }),
-    connected: t.boolean({ description: 'Is the configuration connected?' }),
+    accountName: t.nullable(t.string(), { description: 'the name used to authenticate' }),
+    connected: t.nullable(t.boolean(), { description: 'Is the configuration connected?' }),
     id: t.string({ description: 'the unique identifier for the configuration' }),
-    name: t.string({ description: 'the name of the configuration' }),
+    name: t.nullable(t.string(), { description: 'the name of the configuration' }),
   },
   { description: 'A collection of settings for configuring a connection' }
 )
 
 const interfaceRecordType: ValueType<Interface> = t.record(
   {
-    automatic: t.boolean({
+    automatic: t.nullable(t.boolean(), {
       description: 'configure the interface speed, duplex, and mtu automatically?',
     }),
-    duplex: t.string({ description: 'the duplex setting  half | full | full with flow control' }),
+    duplex: t.nullable(t.string(), {
+      description: 'the duplex setting  half | full | full with flow control',
+    }),
     id: t.string({ description: 'the unique identifier for the interface' }),
-    kind: t.string({ description: 'the type of interface' }),
-    mACAddress: t.string({ description: 'the MAC address for the interface' }),
-    mtu: t.integer({ description: 'the packet size' }),
-    name: t.string({ description: 'the name of the interface' }),
-    speed: t.integer({ description: 'ethernet speed 10 | 100 | 1000' }),
+    kind: t.nullable(t.string(), { description: 'the type of interface' }),
+    mACAddress: t.nullable(t.string(), { description: 'the MAC address for the interface' }),
+    mtu: t.nullable(t.integer(), { description: 'the packet size' }),
+    name: t.nullable(t.string(), { description: 'the name of the interface' }),
+    speed: t.nullable(t.integer(), { description: 'ethernet speed 10 | 100 | 1000' }),
   },
   { description: 'A collection of settings for a network interface' }
 )
@@ -1632,60 +2503,60 @@ const interfaceRecordType: ValueType<Interface> = t.record(
 const locationRecordType: ValueType<Location> = t.record(
   {
     id: t.string({ description: 'the unique identifier for the location' }),
-    name: t.string({ description: 'the name of the location' }),
+    name: t.nullable(t.string(), { description: 'the name of the location' }),
   },
   { description: 'A set of services' }
 )
 
 const networkPreferencesObjectRecordType: ValueType<NetworkPreferencesObject> = t.record(
   {
-    currentLocation: t.reference<Location, string>(() => resources, 'Location', 'one', {
-      description: 'the current location',
-    }),
+    currentLocation: t.nullable(
+      t.reference<Location, string>(() => resources, 'Location', 'one'),
+      { description: 'the current location' }
+    ),
   },
   { description: "the preferences for the current user's network" }
 )
 
 const serviceRecordType: ValueType<Service> = t.record(
   {
-    active: t.boolean({ description: 'Is the service active?' }),
-    currentConfiguration: t.reference<Configuration, string>(
-      () => resources,
-      'Configuration',
-      'one',
+    active: t.nullable(t.boolean(), { description: 'Is the service active?' }),
+    currentConfiguration: t.nullable(
+      t.reference<Configuration, string>(() => resources, 'Configuration', 'one'),
       { description: 'the currently selected configuration' }
     ),
     id: t.string({ description: 'the unique identifier for the service' }),
-    interface: t.reference<Interface, string>(() => resources, 'Interface', 'one', {
-      description: 'the interface the service is built on',
-    }),
-    kind: t.integer({ description: 'the type of service' }),
-    name: t.string({ description: 'the name of the service' }),
+    interface: t.nullable(
+      t.reference<Interface, string>(() => resources, 'Interface', 'one'),
+      { description: 'the interface the service is built on' }
+    ),
+    kind: t.nullable(t.integer(), { description: 'the type of service' }),
+    name: t.nullable(t.string(), { description: 'the name of the service' }),
   },
   { description: 'A collection of settings for a network service' }
 )
 
 const aliasRecordType: ValueType<Alias> = t.record(
   {
-    creatorType: t.string({
+    creatorType: t.nullable(t.string(), {
       description: 'the OSType identifying the application that created the alias',
     }),
-    defaultApplication: t.string({
+    defaultApplication: t.nullable(t.string(), {
       description: 'the application that will launch if the alias is opened',
     }),
-    fileType: t.string({
+    fileType: t.nullable(t.string(), {
       description: 'the OSType identifying the type of data contained in the alias',
     }),
-    kind: t.string({ description: 'The kind of alias, as shown in Finder' }),
-    productVersion: t.string({
+    kind: t.nullable(t.string(), { description: 'The kind of alias, as shown in Finder' }),
+    productVersion: t.nullable(t.string(), {
       description: 'the version of the product (visible at the top of the "Get Info" window)',
     }),
-    shortVersion: t.string({
+    shortVersion: t.nullable(t.string(), {
       description: 'the short version of the application bundle referenced by the alias',
     }),
-    stationery: t.boolean({ description: 'Is the alias a stationery pad?' }),
-    typeIdentifier: t.string({ description: 'The type identifier of the alias' }),
-    version: t.string({
+    stationery: t.nullable(t.boolean(), { description: 'Is the alias a stationery pad?' }),
+    typeIdentifier: t.nullable(t.string(), { description: 'The type identifier of the alias' }),
+    version: t.nullable(t.string(), {
       description:
         'the version of the application bundle referenced by the alias (visible at the bottom of the "Get Info" window)',
     }),
@@ -1695,56 +2566,73 @@ const aliasRecordType: ValueType<Alias> = t.record(
 
 const classicDomainObjectRecordType: ValueType<ClassicDomainObject> = t.record(
   {
-    appleMenuFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Apple Menu Items folder',
-    }),
-    controlPanelsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Control Panels folder',
-    }),
-    controlStripModulesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Control Strip Modules folder',
-    }),
-    desktopFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Classic Desktop folder',
-    }),
-    extensionsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Extensions folder',
-    }),
-    fontsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Fonts folder',
-    }),
-    launcherItemsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Launcher Items folder',
-    }),
-    preferencesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Classic Preferences folder',
-    }),
-    shutdownFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Shutdown Items folder',
-    }),
-    startupItemsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The StartupItems folder',
-    }),
-    systemFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The System folder',
-    }),
+    appleMenuFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Apple Menu Items folder' }
+    ),
+    controlPanelsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Control Panels folder' }
+    ),
+    controlStripModulesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Control Strip Modules folder' }
+    ),
+    desktopFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Classic Desktop folder' }
+    ),
+    extensionsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Extensions folder' }
+    ),
+    fontsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Fonts folder' }
+    ),
+    launcherItemsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Launcher Items folder' }
+    ),
+    preferencesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Classic Preferences folder' }
+    ),
+    shutdownFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Shutdown Items folder' }
+    ),
+    startupItemsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The StartupItems folder' }
+    ),
+    systemFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The System folder' }
+    ),
   },
   { description: 'The Classic domain in the file system' }
 )
 
 const diskRecordType: ValueType<Disk> = t.record(
   {
-    capacity: t.double({ description: 'the total number of bytes (free or used) on the disk' }),
-    ejectable: t.boolean({ description: "Can the media be ejected (floppies, CD's, and so on)?" }),
-    format: t.string({ description: 'the file system format of this disk' }),
-    freeSpace: t.double({ description: 'the number of free bytes left on the disk' }),
-    ignorePrivileges: t.boolean({ description: 'Ignore permissions on this disk?' }),
-    localVolume: t.boolean({
+    capacity: t.nullable(t.double(), {
+      description: 'the total number of bytes (free or used) on the disk',
+    }),
+    ejectable: t.nullable(t.boolean(), {
+      description: "Can the media be ejected (floppies, CD's, and so on)?",
+    }),
+    format: t.nullable(t.string(), { description: 'the file system format of this disk' }),
+    freeSpace: t.nullable(t.double(), { description: 'the number of free bytes left on the disk' }),
+    ignorePrivileges: t.nullable(t.boolean(), { description: 'Ignore permissions on this disk?' }),
+    localVolume: t.nullable(t.boolean(), {
       description: 'Is the media a local volume (as opposed to a file server)?',
     }),
-    server: t.string({ description: 'the server on which the disk resides, AFP volumes only' }),
-    startup: t.boolean({ description: 'Is this disk the boot disk?' }),
-    zone: t.string({
+    server: t.nullable(t.string(), {
+      description: 'the server on which the disk resides, AFP volumes only',
+    }),
+    startup: t.nullable(t.boolean(), { description: 'Is this disk the boot disk?' }),
+    zone: t.nullable(t.string(), {
       description: "the zone in which the disk's server resides, AFP volumes only",
     }),
   },
@@ -1753,96 +2641,118 @@ const diskRecordType: ValueType<Disk> = t.record(
 
 const diskItemRecordType: ValueType<DiskItem> = t.record(
   {
-    busyStatus: t.boolean({ description: 'Is the disk item busy?' }),
-    container: t.reference<DiskItem, string>(() => resources, 'DiskItem', 'one', {
-      description: 'the folder or disk which has this disk item as an element',
+    busyStatus: t.nullable(t.boolean(), { description: 'Is the disk item busy?' }),
+    container: t.nullable(
+      t.reference<DiskItem, string>(() => resources, 'DiskItem', 'one'),
+      { description: 'the folder or disk which has this disk item as an element' }
+    ),
+    creationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was created',
     }),
-    creationDate: t.date({ description: 'the date on which the disk item was created' }),
-    displayedName: t.string({
+    displayedName: t.nullable(t.string(), {
       description: 'the name of the disk item as displayed in the User Interface',
     }),
     id: t.string({ description: 'the unique ID of the disk item' }),
-    modificationDate: t.date({ description: 'the date on which the disk item was last modified' }),
-    name: t.string({ description: 'the name of the disk item' }),
-    nameExtension: t.string({ description: 'the extension portion of the name' }),
-    packageFolder: t.boolean({ description: 'Is the disk item a package?' }),
-    path: t.string({ description: 'the file system path of the disk item' }),
-    physicalSize: t.integer({ description: 'the actual space used by the disk item on disk' }),
-    pOSIXPath: t.string({ description: 'the POSIX file system path of the disk item' }),
-    size: t.integer({ description: 'the logical size of the disk item' }),
-    uRL: t.string({ description: 'the URL of the disk item' }),
-    visible: t.boolean({ description: 'Is the disk item visible?' }),
-    volume: t.string({ description: 'the volume on which the disk item resides' }),
+    modificationDate: t.nullable(t.date(), {
+      description: 'the date on which the disk item was last modified',
+    }),
+    name: t.nullable(t.string(), { description: 'the name of the disk item' }),
+    nameExtension: t.nullable(t.string(), { description: 'the extension portion of the name' }),
+    packageFolder: t.nullable(t.boolean(), { description: 'Is the disk item a package?' }),
+    path: t.nullable(t.string(), { description: 'the file system path of the disk item' }),
+    physicalSize: t.nullable(t.integer(), {
+      description: 'the actual space used by the disk item on disk',
+    }),
+    pOSIXPath: t.nullable(t.string(), {
+      description: 'the POSIX file system path of the disk item',
+    }),
+    size: t.nullable(t.integer(), { description: 'the logical size of the disk item' }),
+    uRL: t.nullable(t.string(), { description: 'the URL of the disk item' }),
+    visible: t.nullable(t.boolean(), { description: 'Is the disk item visible?' }),
+    volume: t.nullable(t.string(), { description: 'the volume on which the disk item resides' }),
   },
   { description: 'An item stored in the file system' }
 )
 
 const domainRecordType: ValueType<Domain> = t.record(
   {
-    applicationSupportFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Application Support folder',
-    }),
-    applicationsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Applications folder',
-    }),
-    desktopPicturesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Desktop Pictures folder',
-    }),
-    folderActionScriptsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Folder Action Scripts folder',
-    }),
-    fontsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Fonts folder',
-    }),
+    applicationSupportFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Application Support folder' }
+    ),
+    applicationsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Applications folder' }
+    ),
+    desktopPicturesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Desktop Pictures folder' }
+    ),
+    folderActionScriptsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Folder Action Scripts folder' }
+    ),
+    fontsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Fonts folder' }
+    ),
     id: t.string({ description: 'the unique identifier of the domain' }),
-    libraryFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Library folder',
-    }),
-    name: t.string({ description: 'the name of the domain' }),
-    preferencesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Preferences folder',
-    }),
-    scriptingAdditionsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Scripting Additions folder',
-    }),
-    scriptsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Scripts folder',
-    }),
-    sharedDocumentsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Shared Documents folder',
-    }),
-    speakableItemsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Speakable Items folder',
-    }),
-    utilitiesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Utilities folder',
-    }),
-    workflowsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Automator Workflows folder',
-    }),
+    libraryFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Library folder' }
+    ),
+    name: t.nullable(t.string(), { description: 'the name of the domain' }),
+    preferencesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Preferences folder' }
+    ),
+    scriptingAdditionsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Scripting Additions folder' }
+    ),
+    scriptsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Scripts folder' }
+    ),
+    sharedDocumentsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Shared Documents folder' }
+    ),
+    speakableItemsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Speakable Items folder' }
+    ),
+    utilitiesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Utilities folder' }
+    ),
+    workflowsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Automator Workflows folder' }
+    ),
   },
   { description: 'A domain in the file system' }
 )
 
 const fileRecordType: ValueType<File> = t.record(
   {
-    creatorType: t.string({
+    creatorType: t.nullable(t.string(), {
       description: 'the OSType identifying the application that created the file',
     }),
-    defaultApplication: t.string({
+    defaultApplication: t.nullable(t.string(), {
       description: 'the application that will launch if the file is opened',
     }),
-    fileType: t.string({
+    fileType: t.nullable(t.string(), {
       description: 'the OSType identifying the type of data contained in the file',
     }),
-    kind: t.string({ description: 'The kind of file, as shown in Finder' }),
-    productVersion: t.string({
+    kind: t.nullable(t.string(), { description: 'The kind of file, as shown in Finder' }),
+    productVersion: t.nullable(t.string(), {
       description: 'the version of the product (visible at the top of the "Get Info" window)',
     }),
-    shortVersion: t.string({ description: 'the short version of the file' }),
-    stationery: t.boolean({ description: 'Is the file a stationery pad?' }),
-    typeIdentifier: t.string({ description: 'The type identifier of the file' }),
-    version: t.string({
+    shortVersion: t.nullable(t.string(), { description: 'the short version of the file' }),
+    stationery: t.nullable(t.boolean(), { description: 'Is the file a stationery pad?' }),
+    typeIdentifier: t.nullable(t.string(), { description: 'The type identifier of the file' }),
+    version: t.nullable(t.string(), {
       description: 'the version of the file (visible at the bottom of the "Get Info" window)',
     }),
   },
@@ -1851,475 +2761,504 @@ const fileRecordType: ValueType<File> = t.record(
 
 const filePackageRecordType: ValueType<FilePackage> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this package' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this package' }),
   },
   { description: 'A file package in the file system' }
 )
 
 const folderRecordType: ValueType<Folder> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this folder' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this folder' }),
   },
   { description: 'A folder in the file system' }
 )
 
 const localDomainObjectRecordType: ValueType<LocalDomainObject> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this domain' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this domain' }),
   },
   { description: 'The local domain in the file system' }
 )
 
 const networkDomainObjectRecordType: ValueType<NetworkDomainObject> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this domain' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this domain' }),
   },
   { description: 'The network domain in the file system' }
 )
 
 const systemDomainObjectRecordType: ValueType<SystemDomainObject> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this domain' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this domain' }),
   },
   { description: 'The system domain in the file system' }
 )
 
 const userDomainObjectRecordType: ValueType<UserDomainObject> = t.record(
   {
-    desktopFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Desktop folder",
-    }),
-    documentsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Documents folder",
-    }),
-    downloadsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Downloads folder",
-    }),
-    favoritesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Favorites folder",
-    }),
-    homeFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Home folder",
-    }),
-    moviesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Movies folder",
-    }),
-    musicFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Music folder",
-    }),
-    picturesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Pictures folder",
-    }),
-    publicFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Public folder",
-    }),
-    sitesFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: "The user's Sites folder",
-    }),
-    temporaryItemsFolder: t.reference<Folder, never>(() => resources, 'Folder', 'one', {
-      description: 'The Temporary Items folder',
-    }),
+    desktopFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Desktop folder" }
+    ),
+    documentsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Documents folder" }
+    ),
+    downloadsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Downloads folder" }
+    ),
+    favoritesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Favorites folder" }
+    ),
+    homeFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Home folder" }
+    ),
+    moviesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Movies folder" }
+    ),
+    musicFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Music folder" }
+    ),
+    picturesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Pictures folder" }
+    ),
+    publicFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Public folder" }
+    ),
+    sitesFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: "The user's Sites folder" }
+    ),
+    temporaryItemsFolder: t.nullable(
+      t.reference<Folder, never>(() => resources, 'Folder', 'one'),
+      { description: 'The Temporary Items folder' }
+    ),
   },
   { description: 'The user domain in the file system' }
 )
 
 const actionRecordType: ValueType<Action> = t.record(
   {
-    description: t.string({ description: 'what the action does' }),
-    name: t.string({ description: 'the name of the action' }),
+    description: t.nullable(t.string(), { description: 'what the action does' }),
+    name: t.nullable(t.string(), { description: 'the name of the action' }),
   },
   { description: 'An action that can be performed on the UI element' }
 )
 
 const attributeRecordType: ValueType<Attribute> = t.record(
   {
-    name: t.string({ description: 'the name of the attribute' }),
-    settable: t.boolean({ description: 'Can the attribute be set?' }),
-    value: t.string({ description: 'the current value of the attribute' }),
+    name: t.nullable(t.string(), { description: 'the name of the attribute' }),
+    settable: t.nullable(t.boolean(), { description: 'Can the attribute be set?' }),
+    value: t.nullable(t.string(), { description: 'the current value of the attribute' }),
   },
   { description: 'An named data value associated with the UI element' }
 )
 
 const browserRecordType: ValueType<Browser> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this browser' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this browser' }),
   },
   { description: 'A browser belonging to a window' }
 )
 
 const busyIndicatorRecordType: ValueType<BusyIndicator> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this busy indicator' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this busy indicator' }),
   },
   { description: 'A busy indicator belonging to a window' }
 )
 
 const buttonRecordType: ValueType<Button> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this button' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this button' }),
   },
   { description: 'A button belonging to a window or scroll bar' }
 )
 
 const checkboxRecordType: ValueType<Checkbox> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this checkbox' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this checkbox' }),
   },
   { description: 'A checkbox belonging to a window' }
 )
 
 const colorWellRecordType: ValueType<ColorWell> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this color well' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this color well' }),
   },
   { description: 'A color well belonging to a window' }
 )
 
 const columnRecordType: ValueType<Column> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this column' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this column' }),
   },
   { description: 'A column belonging to a table' }
 )
 
 const comboBoxRecordType: ValueType<ComboBox> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this combo box' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this combo box' }),
   },
   { description: 'A combo box belonging to a window' }
 )
 
 const drawerRecordType: ValueType<Drawer> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this drawer' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this drawer' }),
   },
   { description: 'A drawer that may be extended from a window' }
 )
 
 const groupRecordType: ValueType<Group> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this group' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this group' }),
   },
   { description: 'A group belonging to a window' }
 )
 
 const growAreaRecordType: ValueType<GrowArea> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this grow area' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this grow area' }),
   },
   { description: 'A grow area belonging to a window' }
 )
 
 const imageRecordType: ValueType<Image> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this image' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this image' }),
   },
   { description: 'An image belonging to a static text field' }
 )
 
 const incrementorRecordType: ValueType<Incrementor> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this incrementor' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this incrementor' }),
   },
   { description: 'A incrementor belonging to a window' }
 )
 
 const listRecordType: ValueType<List> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this list' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this list' }),
   },
   { description: 'A list belonging to a window' }
 )
 
 const menuRecordType: ValueType<Menu> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this menu' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this menu' }),
   },
   { description: 'A menu belonging to a menu bar item' }
 )
 
 const menuBarRecordType: ValueType<MenuBar> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this menu bar' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this menu bar' }),
   },
   { description: 'A menu bar belonging to a process' }
 )
 
 const menuBarItemRecordType: ValueType<MenuBarItem> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this menu bar item' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this menu bar item' }),
   },
   { description: 'A menu bar item belonging to a menu bar' }
 )
 
 const menuButtonRecordType: ValueType<MenuButton> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this menu button' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this menu button' }),
   },
   { description: 'A menu button belonging to a window' }
 )
 
 const menuItemRecordType: ValueType<MenuItem> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this menu item' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this menu item' }),
   },
   { description: 'A menu item belonging to a menu' }
 )
 
 const outlineRecordType: ValueType<Outline> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this outline' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this outline' }),
   },
   { description: 'A outline belonging to a window' }
 )
 
 const popOverRecordType: ValueType<PopOver> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this pop over' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this pop over' }),
   },
   { description: 'A pop over belonging to a window' }
 )
 
 const popUpButtonRecordType: ValueType<PopUpButton> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this pop up button' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this pop up button' }),
   },
   { description: 'A pop up button belonging to a window' }
 )
 
 const processRecordType: ValueType<Process> = t.record(
   {
-    acceptsHighLevelEvents: t.boolean({
+    acceptsHighLevelEvents: t.nullable(t.boolean(), {
       description:
         'Is the process high-level event aware (accepts open application, open document, print document, and quit)?',
     }),
-    acceptsRemoteEvents: t.boolean({ description: 'Does the process accept remote events?' }),
-    architecture: t.string({ description: 'the architecture in which the process is running' }),
-    backgroundOnly: t.boolean({
+    acceptsRemoteEvents: t.nullable(t.boolean(), {
+      description: 'Does the process accept remote events?',
+    }),
+    architecture: t.nullable(t.string(), {
+      description: 'the architecture in which the process is running',
+    }),
+    backgroundOnly: t.nullable(t.boolean(), {
       description: 'Does the process run exclusively in the background?',
     }),
-    bundleIdentifier: t.string({
+    bundleIdentifier: t.nullable(t.string(), {
       description: "the bundle identifier of the process' application file",
     }),
-    classic: t.boolean({ description: 'Is the process running in the Classic environment?' }),
-    creatorType: t.string({
+    classic: t.nullable(t.boolean(), {
+      description: 'Is the process running in the Classic environment?',
+    }),
+    creatorType: t.nullable(t.string(), {
       description: 'the OSType of the creator of the process (the signature)',
     }),
-    displayedName: t.string({
+    displayedName: t.nullable(t.string(), {
       description:
         'the name of the file from which the process was launched, as displayed in the User Interface',
     }),
-    file: t.string({ description: 'the file from which the process was launched' }),
-    fileType: t.string({ description: 'the OSType of the file type of the process' }),
-    frontmost: t.boolean({ description: 'Is the process the frontmost process' }),
-    hasScriptingTerminology: t.boolean({
+    file: t.nullable(t.string(), { description: 'the file from which the process was launched' }),
+    fileType: t.nullable(t.string(), { description: 'the OSType of the file type of the process' }),
+    frontmost: t.nullable(t.boolean(), { description: 'Is the process the frontmost process' }),
+    hasScriptingTerminology: t.nullable(t.boolean(), {
       description: 'Does the process have a scripting terminology, i.e., can it be scripted?',
     }),
     id: t.integer({ description: 'The unique identifier of the process' }),
-    name: t.string({ description: 'the name of the process' }),
-    partitionSpaceUsed: t.integer({
+    name: t.nullable(t.string(), { description: 'the name of the process' }),
+    partitionSpaceUsed: t.nullable(t.integer(), {
       description: "the number of bytes currently used in the process' partition",
     }),
-    shortName: t.string({
+    shortName: t.nullable(t.string(), {
       description: 'the short name of the file from which the process was launched',
     }),
-    totalPartitionSize: t.integer({
+    totalPartitionSize: t.nullable(t.integer(), {
       description: 'the size of the partition with which the process was launched',
     }),
-    unixId: t.integer({
+    unixId: t.nullable(t.integer(), {
       description:
         'The Unix process identifier of a process running in the native environment, or -1 for a process running in the Classic environment',
     }),
-    visible: t.string({ description: "Is the process' layer visible?" }),
+    visible: t.nullable(t.string(), { description: "Is the process' layer visible?" }),
   },
   { description: 'A process running on this computer' }
 )
 
 const progressIndicatorRecordType: ValueType<ProgressIndicator> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this progress indicator' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this progress indicator' }),
   },
   { description: 'A progress indicator belonging to a window' }
 )
 
 const radioButtonRecordType: ValueType<RadioButton> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this radio button' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this radio button' }),
   },
   { description: 'A radio button belonging to a window' }
 )
 
 const radioGroupRecordType: ValueType<RadioGroup> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this radio group' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this radio group' }),
   },
   { description: 'A radio button group belonging to a window' }
 )
 
 const relevanceIndicatorRecordType: ValueType<RelevanceIndicator> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this relevance indicator' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this relevance indicator' }),
   },
   { description: 'A relevance indicator belonging to a window' }
 )
 
 const rowRecordType: ValueType<Row> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this row' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this row' }),
   },
   { description: 'A row belonging to a table' }
 )
 
 const scrollAreaRecordType: ValueType<ScrollArea> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this scroll area' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this scroll area' }),
   },
   { description: 'A scroll area belonging to a window' }
 )
 
 const scrollBarRecordType: ValueType<ScrollBar> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this scroll bar' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this scroll bar' }),
   },
   { description: 'A scroll bar belonging to a window' }
 )
 
 const sheetRecordType: ValueType<Sheet> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this sheet' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this sheet' }),
   },
   { description: 'A sheet displayed over a window' }
 )
 
 const sliderRecordType: ValueType<Slider> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this slider' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this slider' }),
   },
   { description: 'A slider belonging to a window' }
 )
 
 const splitterRecordType: ValueType<Splitter> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this splitter' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this splitter' }),
   },
   { description: 'A splitter belonging to a window' }
 )
 
 const splitterGroupRecordType: ValueType<SplitterGroup> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this splitter group' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this splitter group' }),
   },
   { description: 'A splitter group belonging to a window' }
 )
 
 const staticTextRecordType: ValueType<StaticText> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this static text' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this static text' }),
   },
   { description: 'A static text field belonging to a window' }
 )
 
 const tabGroupRecordType: ValueType<TabGroup> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this tab group' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this tab group' }),
   },
   { description: 'A tab group belonging to a window' }
 )
 
 const tableRecordType: ValueType<Table> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this table' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this table' }),
   },
   { description: 'A table belonging to a window' }
 )
 
 const textAreaRecordType: ValueType<TextArea> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this text area' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this text area' }),
   },
   { description: 'A text area belonging to a window' }
 )
 
 const textFieldRecordType: ValueType<TextField> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this text field' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this text field' }),
   },
   { description: 'A text field belonging to a window' }
 )
 
 const toolbarRecordType: ValueType<Toolbar> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this toolbar' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this toolbar' }),
   },
   { description: 'A toolbar belonging to a window' }
 )
 
 const uiElementRecordType: ValueType<UIElement> = t.record(
   {
-    accessibilityDescription: t.string({
+    accessibilityDescription: t.nullable(t.string(), {
       description: 'a more complete description of the UI element and its capabilities',
     }),
-    class: t.string({ description: 'the class of the UI Element, which identifies it function' }),
-    description: t.string({
+    class: t.nullable(t.string(), {
+      description: 'the class of the UI Element, which identifies it function',
+    }),
+    description: t.nullable(t.string(), {
       description: 'the accessibility description, if available; otherwise, the role description',
     }),
-    enabled: t.string({ description: 'Is the UI element enabled? ( Does it accept clicks? )' }),
-    entireContents: t.string({
+    enabled: t.nullable(t.string(), {
+      description: 'Is the UI element enabled? ( Does it accept clicks? )',
+    }),
+    entireContents: t.nullable(t.string(), {
       description:
         'a list of every UI element contained in this UI element and its child UI elements, to the limits of the tree',
     }),
-    focused: t.string({ description: 'Is the focus on this UI element?' }),
-    help: t.string({
+    focused: t.nullable(t.string(), { description: 'Is the focus on this UI element?' }),
+    help: t.nullable(t.string(), {
       description: 'an elaborate description of the UI element and its capabilities',
     }),
-    maximumValue: t.string({ description: 'the maximum value that the UI element can take on' }),
-    minimumValue: t.string({ description: 'the minimum value that the UI element can take on' }),
-    name: t.string({
+    maximumValue: t.nullable(t.string(), {
+      description: 'the maximum value that the UI element can take on',
+    }),
+    minimumValue: t.nullable(t.string(), {
+      description: 'the minimum value that the UI element can take on',
+    }),
+    name: t.nullable(t.string(), {
       description: 'the name of the UI Element, which identifies it within its container',
     }),
-    orientation: t.string({ description: 'the orientation of the UI element' }),
-    position: t.string({ description: 'the position of the UI element' }),
-    role: t.string({
+    orientation: t.nullable(t.string(), { description: 'the orientation of the UI element' }),
+    position: t.nullable(t.string(), { description: 'the position of the UI element' }),
+    role: t.nullable(t.string(), {
       description: 'an encoded description of the UI element and its capabilities',
     }),
-    roleDescription: t.string({
+    roleDescription: t.nullable(t.string(), {
       description: "a more complete description of the UI element's role",
     }),
-    selected: t.string({ description: 'Is the UI element selected?' }),
-    size: t.string({ description: 'the size of the UI element' }),
-    subrole: t.string({
+    selected: t.nullable(t.string(), { description: 'Is the UI element selected?' }),
+    size: t.nullable(t.string(), { description: 'the size of the UI element' }),
+    subrole: t.nullable(t.string(), {
       description: 'an encoded description of the UI element and its capabilities',
     }),
-    title: t.string({ description: 'the title of the UI element as it appears on the screen' }),
-    value: t.string({ description: 'the current value of the UI element' }),
+    title: t.nullable(t.string(), {
+      description: 'the title of the UI element as it appears on the screen',
+    }),
+    value: t.nullable(t.string(), { description: 'the current value of the UI element' }),
   },
   { description: 'A piece of the user interface of a process' }
 )
 
 const valueIndicatorRecordType: ValueType<ValueIndicator> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this value indicator' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this value indicator' }),
   },
   { description: 'A value indicator ( thumb or slider ) belonging to a scroll bar' }
 )
 
 const propertyListItemRecordType: ValueType<PropertyListItem> = t.record(
   {
-    kind: t.string({
+    kind: t.nullable(t.string(), {
       description:
         'the kind of data stored in the property list item: boolean/data/date/list/number/record/string',
     }),
-    name: t.string({ description: 'the name of the property list item ( if any )' }),
-    text: t.string({ description: 'the text representation of the property list data' }),
-    value: t.string({ description: 'the value of the property list item' }),
+    name: t.nullable(t.string(), { description: 'the name of the property list item ( if any )' }),
+    text: t.nullable(t.string(), {
+      description: 'the text representation of the property list data',
+    }),
+    value: t.nullable(t.string(), { description: 'the value of the property list item' }),
   },
   { description: 'A unit of data in Property List format' }
 )
 
 const xmlAttributeRecordType: ValueType<XMLAttribute> = t.record(
   {
-    name: t.string({ description: 'the name of the XML attribute' }),
-    value: t.string({ description: 'the value of the XML attribute' }),
+    name: t.nullable(t.string(), { description: 'the name of the XML attribute' }),
+    value: t.nullable(t.string(), { description: 'the value of the XML attribute' }),
   },
   { description: 'A named value associated with a unit of data in XML format' }
 )
@@ -2327,8 +3266,8 @@ const xmlAttributeRecordType: ValueType<XMLAttribute> = t.record(
 const xmlDataRecordType: ValueType<XMLData> = t.record(
   {
     id: t.string({ description: 'the unique identifier of the XML data' }),
-    name: t.string({ description: 'the name of the XML data' }),
-    text: t.string({ description: 'the text representation of the XML data' }),
+    name: t.nullable(t.string(), { description: 'the name of the XML data' }),
+    text: t.nullable(t.string(), { description: 'the text representation of the XML data' }),
   },
   { description: 'Data in XML format' }
 )
@@ -2336,74 +3275,79 @@ const xmlDataRecordType: ValueType<XMLData> = t.record(
 const xmlElementRecordType: ValueType<XMLElement> = t.record(
   {
     id: t.string({ description: 'the unique identifier of the XML element' }),
-    name: t.string({ description: 'the name of the XML element' }),
-    value: t.string({ description: 'the value of the XML element' }),
+    name: t.nullable(t.string(), { description: 'the name of the XML element' }),
+    value: t.nullable(t.string(), { description: 'the value of the XML element' }),
   },
   { description: 'A unit of data in XML format' }
 )
 
 const scriptingClassRecordType: ValueType<ScriptingClass> = t.record(
   {
-    name: t.string({ description: 'The name of the class' }),
+    name: t.nullable(t.string(), { description: 'The name of the class' }),
     id: t.string({ description: 'The unique identifier of the class' }),
-    description: t.string({ description: 'The description of the class' }),
-    hidden: t.boolean({ description: 'Is the class hidden?' }),
-    pluralName: t.string({ description: 'The plural name of the class' }),
-    suiteName: t.string({ description: 'The name of the suite to which this class belongs' }),
-    superclass: t.reference<ScriptingClass, string>(() => resources, 'ScriptingClass', 'one', {
-      description: 'The class from which this class inherits',
+    description: t.nullable(t.string(), { description: 'The description of the class' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the class hidden?' }),
+    pluralName: t.nullable(t.string(), { description: 'The plural name of the class' }),
+    suiteName: t.nullable(t.string(), {
+      description: 'The name of the suite to which this class belongs',
     }),
+    superclass: t.nullable(
+      t.reference<ScriptingClass, string>(() => resources, 'ScriptingClass', 'one'),
+      { description: 'The class from which this class inherits' }
+    ),
   },
   { description: 'A class within a suite within a scripting definition' }
 )
 
 const scriptingCommandRecordType: ValueType<ScriptingCommand> = t.record(
   {
-    name: t.string({ description: 'The name of the command' }),
+    name: t.nullable(t.string(), { description: 'The name of the command' }),
     id: t.string({ description: 'The unique identifier of the command' }),
-    description: t.string({ description: 'The description of the command' }),
-    directParameter: t.reference<ScriptingParameter, string>(
-      () => resources,
-      'ScriptingParameter',
-      'one',
+    description: t.nullable(t.string(), { description: 'The description of the command' }),
+    directParameter: t.nullable(
+      t.reference<ScriptingParameter, string>(() => resources, 'ScriptingParameter', 'one'),
       { description: 'The direct parameter of the command' }
     ),
-    hidden: t.boolean({ description: 'Is the command hidden?' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the command hidden?' }),
     scriptingResult: t.unknown({ description: 'The object or data returned by this command' }),
-    suiteName: t.string({ description: 'The name of the suite to which this command belongs' }),
+    suiteName: t.nullable(t.string(), {
+      description: 'The name of the suite to which this command belongs',
+    }),
   },
   { description: 'A command within a suite within a scripting definition' }
 )
 
 const scriptingDefinitionObjectRecordType: ValueType<ScriptingDefinitionObject> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this scripting definition object' }),
+    id: t.nullable(t.string(), {
+      description: 'Unique identifier for this scripting definition object',
+    }),
   },
   { description: 'The scripting definition of the System Events applicaation' }
 )
 
 const scriptingElementRecordType: ValueType<ScriptingElement> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this scripting element' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this scripting element' }),
   },
   { description: 'An element within a class within a suite within a scripting definition' }
 )
 
 const scriptingEnumerationRecordType: ValueType<ScriptingEnumeration> = t.record(
   {
-    name: t.string({ description: 'The name of the enumeration' }),
+    name: t.nullable(t.string(), { description: 'The name of the enumeration' }),
     id: t.string({ description: 'The unique identifier of the enumeration' }),
-    hidden: t.boolean({ description: 'Is the enumeration hidden?' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the enumeration hidden?' }),
   },
   { description: 'An enumeration within a suite within a scripting definition' }
 )
 
 const scriptingEnumeratorRecordType: ValueType<ScriptingEnumerator> = t.record(
   {
-    name: t.string({ description: 'The name of the enumerator' }),
+    name: t.nullable(t.string(), { description: 'The name of the enumerator' }),
     id: t.string({ description: 'The unique identifier of the enumerator' }),
-    description: t.string({ description: 'The description of the enumerator' }),
-    hidden: t.boolean({ description: 'Is the enumerator hidden?' }),
+    description: t.nullable(t.string(), { description: 'The description of the enumerator' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the enumerator hidden?' }),
   },
   {
     description: 'An enumerator within an enumeration within a suite within a scripting definition',
@@ -2412,36 +3356,40 @@ const scriptingEnumeratorRecordType: ValueType<ScriptingEnumerator> = t.record(
 
 const scriptingParameterRecordType: ValueType<ScriptingParameter> = t.record(
   {
-    name: t.string({ description: 'The name of the parameter' }),
+    name: t.nullable(t.string(), { description: 'The name of the parameter' }),
     id: t.string({ description: 'The unique identifier of the parameter' }),
-    description: t.string({ description: 'The description of the parameter' }),
-    hidden: t.boolean({ description: 'Is the parameter hidden?' }),
-    kind: t.string({ description: 'The kind of object or data specified by this parameter' }),
-    optional: t.boolean({ description: 'Is the parameter optional?' }),
+    description: t.nullable(t.string(), { description: 'The description of the parameter' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the parameter hidden?' }),
+    kind: t.nullable(t.string(), {
+      description: 'The kind of object or data specified by this parameter',
+    }),
+    optional: t.nullable(t.boolean(), { description: 'Is the parameter optional?' }),
   },
   { description: 'A parameter within a command within a suite within a scripting definition' }
 )
 
 const scriptingPropertyRecordType: ValueType<ScriptingProperty> = t.record(
   {
-    name: t.string({ description: 'The name of the property' }),
+    name: t.nullable(t.string(), { description: 'The name of the property' }),
     id: t.string({ description: 'The unique identifier of the property' }),
-    access: t.string({ description: 'The type of access to this property' }),
-    description: t.string({ description: 'The description of the property' }),
-    enumerated: t.boolean({ description: "Is the property's value an enumerator?" }),
-    hidden: t.boolean({ description: 'Is the property hidden?' }),
-    kind: t.string({ description: 'The kind of object or data returned by this property' }),
-    listed: t.boolean({ description: "Is the property's value a list?" }),
+    access: t.nullable(t.string(), { description: 'The type of access to this property' }),
+    description: t.nullable(t.string(), { description: 'The description of the property' }),
+    enumerated: t.nullable(t.boolean(), { description: "Is the property's value an enumerator?" }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the property hidden?' }),
+    kind: t.nullable(t.string(), {
+      description: 'The kind of object or data returned by this property',
+    }),
+    listed: t.nullable(t.boolean(), { description: "Is the property's value a list?" }),
   },
   { description: 'A property within a class within a suite within a scripting definition' }
 )
 
 const scriptingSuiteRecordType: ValueType<ScriptingSuite> = t.record(
   {
-    name: t.string({ description: 'The name of the suite' }),
+    name: t.nullable(t.string(), { description: 'The name of the suite' }),
     id: t.string({ description: 'The unique identifier of the suite' }),
-    description: t.string({ description: 'The description of the suite' }),
-    hidden: t.boolean({ description: 'Is the suite hidden?' }),
+    description: t.nullable(t.string(), { description: 'The description of the suite' }),
+    hidden: t.nullable(t.boolean(), { description: 'Is the suite hidden?' }),
   },
   { description: 'A suite within a scripting definition' }
 )

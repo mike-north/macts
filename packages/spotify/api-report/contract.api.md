@@ -26,19 +26,19 @@ export const spotifyContract: AppContract<SpotifyClient>;
 
 // @public
 export interface Track {
-    readonly album: string;
-    readonly albumArtist: string;
-    readonly artist: string;
-    readonly artwork: string;
-    readonly artworkUrl: string;
-    readonly discNumber: Integer;
-    readonly duration: Integer;
+    readonly album: string | null;
+    readonly albumArtist: string | null;
+    readonly artist: string | null;
+    readonly artwork: string | null;
+    readonly artworkUrl: string | null;
+    readonly discNumber: Integer | null;
+    readonly duration: Integer | null;
     readonly id: string;
-    readonly name: string;
-    readonly playedCount: Integer;
-    readonly playerState: PlayerState;
-    readonly spotifyUrl: string;
-    readonly trackNumber: Integer;
+    readonly name: string | null;
+    readonly playedCount: Integer | null;
+    readonly playerState: PlayerState | null;
+    readonly spotifyUrl: string | null;
+    readonly trackNumber: Integer | null;
 }
 
 // @public

@@ -60,218 +60,464 @@ export type FieldType =
 
 /** A Microsoft Word document */
 export interface Document {
-  /** The name of the document */
+  /**
+   * The name of the document.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** The full path of the document in HFS format */
-  readonly fullName: string
-  /** The full path of the document in POSIX format */
-  readonly posixFullName: string
-  /** The path to the document (HFS format) */
-  readonly path: string
-  /** Whether the document has been saved */
-  saved: boolean
-  /** Whether the document is read-only */
-  readonly readOnly: boolean
-  /** Whether this is the active document */
-  readonly active: boolean
-  /** The main document text */
-  readonly content: string
-  /** Whether changes are tracked in the document */
-  trackRevisions: boolean
-  /** Whether tracked changes are shown */
-  showRevisions: boolean
-  /** The interval in points between default tab stops */
-  defaultTabStop: number
+  /**
+   * The full path of the document in HFS format.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fullName: string | null
+  /**
+   * The full path of the document in POSIX format.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly posixFullName: string | null
+  /**
+   * The path to the document (HFS format).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * Whether the document has been saved.
+   * Nullable. No evidence that the app always sets it.
+   */
+  saved: boolean | null
+  /**
+   * Whether the document is read-only.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly readOnly: boolean | null
+  /**
+   * Whether this is the active document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly active: boolean | null
+  /**
+   * The main document text.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly content: string | null
+  /**
+   * Whether changes are tracked in the document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  trackRevisions: boolean | null
+  /**
+   * Whether tracked changes are shown.
+   * Nullable. No evidence that the app always sets it.
+   */
+  showRevisions: boolean | null
+  /**
+   * The interval in points between default tab stops.
+   * Nullable. No evidence that the app always sets it.
+   */
+  defaultTabStop: number | null
 }
 
 /** A single paragraph in a document */
 export interface Paragraph {
-  /** The alignment for the paragraph */
-  alignment: ParagraphAlignment
-  /** The first-line or hanging indent value in points */
-  firstLineIndent: number
-  /** The left indent in points */
-  leftIndent: number
-  /** The right indent in points */
-  rightIndent: number
-  /** The line spacing in points */
-  lineSpacing: number
-  /** The spacing in points after the paragraph */
-  spaceAfter: number
-  /** The spacing in points before the paragraph */
-  spaceBefore: number
-  /** Whether a page break is forced before the paragraph */
-  pageBreakBefore: boolean
-  /** Whether all lines remain on the same page */
-  keepTogether: boolean
-  /** Whether paragraph stays with next paragraph */
-  keepWithNext: boolean
-  /** The paragraph ID */
+  /**
+   * The alignment for the paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  alignment: ParagraphAlignment | null
+  /**
+   * The first-line or hanging indent value in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  firstLineIndent: number | null
+  /**
+   * The left indent in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  leftIndent: number | null
+  /**
+   * The right indent in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rightIndent: number | null
+  /**
+   * The line spacing in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  lineSpacing: number | null
+  /**
+   * The spacing in points after the paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  spaceAfter: number | null
+  /**
+   * The spacing in points before the paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  spaceBefore: number | null
+  /**
+   * Whether a page break is forced before the paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  pageBreakBefore: boolean | null
+  /**
+   * Whether all lines remain on the same page.
+   * Nullable. No evidence that the app always sets it.
+   */
+  keepTogether: boolean | null
+  /**
+   * Whether paragraph stays with next paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  keepWithNext: boolean | null
+  /**
+   * The paragraph ID.
+   * Never null: the primary identifier.
+   */
   readonly paragraphId: Integer
-  /** The text content of the paragraph */
-  readonly content: string
+  /**
+   * The text content of the paragraph.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly content: string | null
 }
 
 /** A contiguous area in a document */
 export interface TextRange {
-  /** The text in the range */
-  content: string
-  /** Whether the text is formatted as bold */
-  bold: boolean
-  /** Whether the text is formatted as italic */
-  italic: boolean
-  /** The underline type */
-  underline: UnderlineType
-  /** The font size in points */
-  fontSize: number
-  /** The font name */
-  fontName: string
-  /** The starting character position */
-  start: Integer
-  /** The ending character position */
-  end: Integer
+  /**
+   * The text in the range.
+   * Nullable. No evidence that the app always sets it.
+   */
+  content: string | null
+  /**
+   * Whether the text is formatted as bold.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bold: boolean | null
+  /**
+   * Whether the text is formatted as italic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  italic: boolean | null
+  /**
+   * The underline type.
+   * Nullable. No evidence that the app always sets it.
+   */
+  underline: UnderlineType | null
+  /**
+   * The font size in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontSize: number | null
+  /**
+   * The font name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontName: string | null
+  /**
+   * The starting character position.
+   * Nullable. No evidence that the app always sets it.
+   */
+  start: Integer | null
+  /**
+   * The ending character position.
+   * Nullable. No evidence that the app always sets it.
+   */
+  end: Integer | null
 }
 
 /** The current selection in a document */
 export interface Selection {
-  /** The text in the selection */
-  content: string
-  /** Whether the selection is formatted as bold */
-  bold: boolean
-  /** Whether the selection is formatted as italic */
-  italic: boolean
-  /** The font size of the selection in points */
-  fontSize: number
-  /** The font name of the selection */
-  fontName: string
-  /** The starting character position of the selection */
-  readonly start: Integer
-  /** The ending character position of the selection */
-  readonly end: Integer
-  /** The type of selection (e.g., text, table, graphic) */
-  readonly selectionType: string
+  /**
+   * The text in the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
+  content: string | null
+  /**
+   * Whether the selection is formatted as bold.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bold: boolean | null
+  /**
+   * Whether the selection is formatted as italic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  italic: boolean | null
+  /**
+   * The font size of the selection in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontSize: number | null
+  /**
+   * The font name of the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fontName: string | null
+  /**
+   * The starting character position of the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly start: Integer | null
+  /**
+   * The ending character position of the selection.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly end: Integer | null
+  /**
+   * The type of selection (e.g., text, table, graphic).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly selectionType: string | null
 }
 
 /** A table in a document */
 export interface Table {
-  /** The number of rows in the table */
-  readonly rowCount: Integer
-  /** The number of columns in the table */
-  readonly columnCount: Integer
-  /** Whether the table is allowed to autofit */
-  allowAutoFit: boolean
-  /** Whether the table has borders */
-  borders: boolean
+  /**
+   * The number of rows in the table.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly rowCount: Integer | null
+  /**
+   * The number of columns in the table.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly columnCount: Integer | null
+  /**
+   * Whether the table is allowed to autofit.
+   * Nullable. No evidence that the app always sets it.
+   */
+  allowAutoFit: boolean | null
+  /**
+   * Whether the table has borders.
+   * Nullable. No evidence that the app always sets it.
+   */
+  borders: boolean | null
 }
 
 /** A row in a table */
 export interface Row {
-  /** The height of the row in points */
-  height: number
-  /** Whether the row can break across pages */
-  allowBreakAcrossPages: boolean
-  /** Whether the row is formatted as a heading */
-  headingFormat: boolean
+  /**
+   * The height of the row in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  height: number | null
+  /**
+   * Whether the row can break across pages.
+   * Nullable. No evidence that the app always sets it.
+   */
+  allowBreakAcrossPages: boolean | null
+  /**
+   * Whether the row is formatted as a heading.
+   * Nullable. No evidence that the app always sets it.
+   */
+  headingFormat: boolean | null
 }
 
 /** A column in a table */
 export interface Column {
-  /** The width of the column in points */
-  width: number
-  /** The preferred width of the column */
-  preferredWidth: number
+  /**
+   * The width of the column in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  width: number | null
+  /**
+   * The preferred width of the column.
+   * Nullable. No evidence that the app always sets it.
+   */
+  preferredWidth: number | null
 }
 
 /** A cell in a table */
 export interface Cell {
-  /** The text content of the cell */
-  content: string
-  /** The width of the cell in points */
-  width: number
-  /** The height of the cell in points */
-  height: number
-  /** The vertical alignment of text in the cell */
-  verticalAlignment: string
-  /** The row index of the cell */
-  readonly rowIndex: Integer
-  /** The column index of the cell */
-  readonly columnIndex: Integer
+  /**
+   * The text content of the cell.
+   * Nullable. No evidence that the app always sets it.
+   */
+  content: string | null
+  /**
+   * The width of the cell in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  width: number | null
+  /**
+   * The height of the cell in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  height: number | null
+  /**
+   * The vertical alignment of text in the cell.
+   * Nullable. No evidence that the app always sets it.
+   */
+  verticalAlignment: string | null
+  /**
+   * The row index of the cell.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly rowIndex: Integer | null
+  /**
+   * The column index of the cell.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly columnIndex: Integer | null
 }
 
 /** Font formatting properties */
 export interface Font {
-  /** Whether the font is bold */
-  bold: boolean
-  /** Whether the font is italic */
-  italic: boolean
-  /** The underline type */
-  underline: UnderlineType
-  /** The font size in points */
-  size: number
-  /** The font name */
-  name: string
-  /** The font color */
-  color: Rgb
-  /** Whether the font is subscript */
-  subscript: boolean
-  /** Whether the font is superscript */
-  superscript: boolean
-  /** Whether the font has strikethrough */
-  strikethrough: boolean
-  /** Whether the font is all caps */
-  allCaps: boolean
+  /**
+   * Whether the font is bold.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bold: boolean | null
+  /**
+   * Whether the font is italic.
+   * Nullable. No evidence that the app always sets it.
+   */
+  italic: boolean | null
+  /**
+   * The underline type.
+   * Nullable. No evidence that the app always sets it.
+   */
+  underline: UnderlineType | null
+  /**
+   * The font size in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
+  /**
+   * The font name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The font color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * Whether the font is subscript.
+   * Nullable. No evidence that the app always sets it.
+   */
+  subscript: boolean | null
+  /**
+   * Whether the font is superscript.
+   * Nullable. No evidence that the app always sets it.
+   */
+  superscript: boolean | null
+  /**
+   * Whether the font has strikethrough.
+   * Nullable. No evidence that the app always sets it.
+   */
+  strikethrough: boolean | null
+  /**
+   * Whether the font is all caps.
+   * Nullable. No evidence that the app always sets it.
+   */
+  allCaps: boolean | null
 }
 
 /** Page setup properties for a document or section */
 export interface PageSetup {
-  /** The top margin in points */
-  topMargin: number
-  /** The bottom margin in points */
-  bottomMargin: number
-  /** The left margin in points */
-  leftMargin: number
-  /** The right margin in points */
-  rightMargin: number
-  /** The page height in points */
-  pageHeight: number
-  /** The page width in points */
-  pageWidth: number
-  /** The page orientation (portrait or landscape) */
-  orientation: string
-  /** The paper size */
-  paperSize: string
+  /**
+   * The top margin in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  topMargin: number | null
+  /**
+   * The bottom margin in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bottomMargin: number | null
+  /**
+   * The left margin in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  leftMargin: number | null
+  /**
+   * The right margin in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rightMargin: number | null
+  /**
+   * The page height in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  pageHeight: number | null
+  /**
+   * The page width in points.
+   * Nullable. No evidence that the app always sets it.
+   */
+  pageWidth: number | null
+  /**
+   * The page orientation (portrait or landscape).
+   * Nullable. No evidence that the app always sets it.
+   */
+  orientation: string | null
+  /**
+   * The paper size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  paperSize: string | null
 }
 
 /** A section in a document */
 export interface Section {
-  /** The index of the section */
-  readonly sectionIndex: Integer
-  /** Whether the section is protected for forms */
-  protectedForForms: boolean
+  /**
+   * The index of the section.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sectionIndex: Integer | null
+  /**
+   * Whether the section is protected for forms.
+   * Nullable. No evidence that the app always sets it.
+   */
+  protectedForForms: boolean | null
 }
 
 /** A bookmark in a document */
 export interface Bookmark {
-  /** The name of the bookmark */
-  name: string
-  /** The starting character position */
-  readonly start: Integer
-  /** The ending character position */
-  readonly end: Integer
+  /**
+   * The name of the bookmark.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The starting character position.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly start: Integer | null
+  /**
+   * The ending character position.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly end: Integer | null
 }
 
 /** A field in a document */
 export interface Field {
-  /** The field type */
-  readonly fieldType: FieldType
-  /** The field code */
-  fieldCode: string
-  /** The field text */
-  fieldText: string
-  /** Whether the field is locked */
-  locked: boolean
-  /** Whether field codes are displayed */
-  showCodes: boolean
+  /**
+   * The field type.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fieldType: FieldType | null
+  /**
+   * The field code.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fieldCode: string | null
+  /**
+   * The field text.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fieldText: string | null
+  /**
+   * Whether the field is locked.
+   * Nullable. No evidence that the app always sets it.
+   */
+  locked: boolean | null
+  /**
+   * Whether field codes are displayed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  showCodes: boolean | null
 }
 
 /** Input for creating a Document. */
@@ -288,13 +534,25 @@ export interface DocumentCreateInput {
 
 /** Input for updating a Document. Omitted fields are left unchanged. */
 export interface DocumentUpdateInput {
-  /** Whether the document has been saved */
+  /**
+   * Whether the document has been saved.
+   * Cannot be reset: null is rejected.
+   */
   saved?: boolean
-  /** Whether changes are tracked in the document */
+  /**
+   * Whether changes are tracked in the document.
+   * Cannot be reset: null is rejected.
+   */
   trackRevisions?: boolean
-  /** Whether tracked changes are shown */
+  /**
+   * Whether tracked changes are shown.
+   * Cannot be reset: null is rejected.
+   */
   showRevisions?: boolean
-  /** The interval in points between default tab stops */
+  /**
+   * The interval in points between default tab stops.
+   * Cannot be reset: null is rejected.
+   */
   defaultTabStop?: number
 }
 
@@ -324,25 +582,55 @@ export interface ParagraphCreateInput {
 
 /** Input for updating a Paragraph. Omitted fields are left unchanged. */
 export interface ParagraphUpdateInput {
-  /** The alignment for the paragraph */
+  /**
+   * The alignment for the paragraph.
+   * Cannot be reset: null is rejected.
+   */
   alignment?: ParagraphAlignment
-  /** The first-line or hanging indent value in points */
+  /**
+   * The first-line or hanging indent value in points.
+   * Cannot be reset: null is rejected.
+   */
   firstLineIndent?: number
-  /** The left indent in points */
+  /**
+   * The left indent in points.
+   * Cannot be reset: null is rejected.
+   */
   leftIndent?: number
-  /** The right indent in points */
+  /**
+   * The right indent in points.
+   * Cannot be reset: null is rejected.
+   */
   rightIndent?: number
-  /** The line spacing in points */
+  /**
+   * The line spacing in points.
+   * Cannot be reset: null is rejected.
+   */
   lineSpacing?: number
-  /** The spacing in points after the paragraph */
+  /**
+   * The spacing in points after the paragraph.
+   * Cannot be reset: null is rejected.
+   */
   spaceAfter?: number
-  /** The spacing in points before the paragraph */
+  /**
+   * The spacing in points before the paragraph.
+   * Cannot be reset: null is rejected.
+   */
   spaceBefore?: number
-  /** Whether a page break is forced before the paragraph */
+  /**
+   * Whether a page break is forced before the paragraph.
+   * Cannot be reset: null is rejected.
+   */
   pageBreakBefore?: boolean
-  /** Whether all lines remain on the same page */
+  /**
+   * Whether all lines remain on the same page.
+   * Cannot be reset: null is rejected.
+   */
   keepTogether?: boolean
-  /** Whether paragraph stays with next paragraph */
+  /**
+   * Whether paragraph stays with next paragraph.
+   * Cannot be reset: null is rejected.
+   */
   keepWithNext?: boolean
 }
 
@@ -368,21 +656,45 @@ export interface TextRangeCreateInput {
 
 /** Input for updating a TextRange. Omitted fields are left unchanged. */
 export interface TextRangeUpdateInput {
-  /** The text in the range */
+  /**
+   * The text in the range.
+   * Cannot be reset: null is rejected.
+   */
   content?: string
-  /** Whether the text is formatted as bold */
+  /**
+   * Whether the text is formatted as bold.
+   * Cannot be reset: null is rejected.
+   */
   bold?: boolean
-  /** Whether the text is formatted as italic */
+  /**
+   * Whether the text is formatted as italic.
+   * Cannot be reset: null is rejected.
+   */
   italic?: boolean
-  /** The underline type */
+  /**
+   * The underline type.
+   * Cannot be reset: null is rejected.
+   */
   underline?: UnderlineType
-  /** The font size in points */
+  /**
+   * The font size in points.
+   * Cannot be reset: null is rejected.
+   */
   fontSize?: number
-  /** The font name */
+  /**
+   * The font name.
+   * Cannot be reset: null is rejected.
+   */
   fontName?: string
-  /** The starting character position */
+  /**
+   * The starting character position.
+   * Cannot be reset: null is rejected.
+   */
   start?: Integer
-  /** The ending character position */
+  /**
+   * The ending character position.
+   * Cannot be reset: null is rejected.
+   */
   end?: Integer
 }
 
@@ -402,15 +714,30 @@ export interface SelectionCreateInput {
 
 /** Input for updating a Selection. Omitted fields are left unchanged. */
 export interface SelectionUpdateInput {
-  /** The text in the selection */
+  /**
+   * The text in the selection.
+   * Cannot be reset: null is rejected.
+   */
   content?: string
-  /** Whether the selection is formatted as bold */
+  /**
+   * Whether the selection is formatted as bold.
+   * Cannot be reset: null is rejected.
+   */
   bold?: boolean
-  /** Whether the selection is formatted as italic */
+  /**
+   * Whether the selection is formatted as italic.
+   * Cannot be reset: null is rejected.
+   */
   italic?: boolean
-  /** The font size of the selection in points */
+  /**
+   * The font size of the selection in points.
+   * Cannot be reset: null is rejected.
+   */
   fontSize?: number
-  /** The font name of the selection */
+  /**
+   * The font name of the selection.
+   * Cannot be reset: null is rejected.
+   */
   fontName?: string
 }
 
@@ -424,9 +751,15 @@ export interface TableCreateInput {
 
 /** Input for updating a Table. Omitted fields are left unchanged. */
 export interface TableUpdateInput {
-  /** Whether the table is allowed to autofit */
+  /**
+   * Whether the table is allowed to autofit.
+   * Cannot be reset: null is rejected.
+   */
   allowAutoFit?: boolean
-  /** Whether the table has borders */
+  /**
+   * Whether the table has borders.
+   * Cannot be reset: null is rejected.
+   */
   borders?: boolean
 }
 
@@ -442,11 +775,20 @@ export interface RowCreateInput {
 
 /** Input for updating a Row. Omitted fields are left unchanged. */
 export interface RowUpdateInput {
-  /** The height of the row in points */
+  /**
+   * The height of the row in points.
+   * Cannot be reset: null is rejected.
+   */
   height?: number
-  /** Whether the row can break across pages */
+  /**
+   * Whether the row can break across pages.
+   * Cannot be reset: null is rejected.
+   */
   allowBreakAcrossPages?: boolean
-  /** Whether the row is formatted as a heading */
+  /**
+   * Whether the row is formatted as a heading.
+   * Cannot be reset: null is rejected.
+   */
   headingFormat?: boolean
 }
 
@@ -460,9 +802,15 @@ export interface ColumnCreateInput {
 
 /** Input for updating a Column. Omitted fields are left unchanged. */
 export interface ColumnUpdateInput {
-  /** The width of the column in points */
+  /**
+   * The width of the column in points.
+   * Cannot be reset: null is rejected.
+   */
   width?: number
-  /** The preferred width of the column */
+  /**
+   * The preferred width of the column.
+   * Cannot be reset: null is rejected.
+   */
   preferredWidth?: number
 }
 
@@ -480,13 +828,25 @@ export interface CellCreateInput {
 
 /** Input for updating a Cell. Omitted fields are left unchanged. */
 export interface CellUpdateInput {
-  /** The text content of the cell */
+  /**
+   * The text content of the cell.
+   * Cannot be reset: null is rejected.
+   */
   content?: string
-  /** The width of the cell in points */
+  /**
+   * The width of the cell in points.
+   * Cannot be reset: null is rejected.
+   */
   width?: number
-  /** The height of the cell in points */
+  /**
+   * The height of the cell in points.
+   * Cannot be reset: null is rejected.
+   */
   height?: number
-  /** The vertical alignment of text in the cell */
+  /**
+   * The vertical alignment of text in the cell.
+   * Cannot be reset: null is rejected.
+   */
   verticalAlignment?: string
 }
 
@@ -516,25 +876,55 @@ export interface FontCreateInput {
 
 /** Input for updating a Font. Omitted fields are left unchanged. */
 export interface FontUpdateInput {
-  /** Whether the font is bold */
+  /**
+   * Whether the font is bold.
+   * Cannot be reset: null is rejected.
+   */
   bold?: boolean
-  /** Whether the font is italic */
+  /**
+   * Whether the font is italic.
+   * Cannot be reset: null is rejected.
+   */
   italic?: boolean
-  /** The underline type */
+  /**
+   * The underline type.
+   * Cannot be reset: null is rejected.
+   */
   underline?: UnderlineType
-  /** The font size in points */
+  /**
+   * The font size in points.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
-  /** The font name */
+  /**
+   * The font name.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The font color */
+  /**
+   * The font color.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** Whether the font is subscript */
+  /**
+   * Whether the font is subscript.
+   * Cannot be reset: null is rejected.
+   */
   subscript?: boolean
-  /** Whether the font is superscript */
+  /**
+   * Whether the font is superscript.
+   * Cannot be reset: null is rejected.
+   */
   superscript?: boolean
-  /** Whether the font has strikethrough */
+  /**
+   * Whether the font has strikethrough.
+   * Cannot be reset: null is rejected.
+   */
   strikethrough?: boolean
-  /** Whether the font is all caps */
+  /**
+   * Whether the font is all caps.
+   * Cannot be reset: null is rejected.
+   */
   allCaps?: boolean
 }
 
@@ -560,21 +950,45 @@ export interface PageSetupCreateInput {
 
 /** Input for updating a PageSetup. Omitted fields are left unchanged. */
 export interface PageSetupUpdateInput {
-  /** The top margin in points */
+  /**
+   * The top margin in points.
+   * Cannot be reset: null is rejected.
+   */
   topMargin?: number
-  /** The bottom margin in points */
+  /**
+   * The bottom margin in points.
+   * Cannot be reset: null is rejected.
+   */
   bottomMargin?: number
-  /** The left margin in points */
+  /**
+   * The left margin in points.
+   * Cannot be reset: null is rejected.
+   */
   leftMargin?: number
-  /** The right margin in points */
+  /**
+   * The right margin in points.
+   * Cannot be reset: null is rejected.
+   */
   rightMargin?: number
-  /** The page height in points */
+  /**
+   * The page height in points.
+   * Cannot be reset: null is rejected.
+   */
   pageHeight?: number
-  /** The page width in points */
+  /**
+   * The page width in points.
+   * Cannot be reset: null is rejected.
+   */
   pageWidth?: number
-  /** The page orientation (portrait or landscape) */
+  /**
+   * The page orientation (portrait or landscape).
+   * Cannot be reset: null is rejected.
+   */
   orientation?: string
-  /** The paper size */
+  /**
+   * The paper size.
+   * Cannot be reset: null is rejected.
+   */
   paperSize?: string
 }
 
@@ -586,7 +1000,10 @@ export interface SectionCreateInput {
 
 /** Input for updating a Section. Omitted fields are left unchanged. */
 export interface SectionUpdateInput {
-  /** Whether the section is protected for forms */
+  /**
+   * Whether the section is protected for forms.
+   * Cannot be reset: null is rejected.
+   */
   protectedForForms?: boolean
 }
 
@@ -598,7 +1015,10 @@ export interface BookmarkCreateInput {
 
 /** Input for updating a Bookmark. Omitted fields are left unchanged. */
 export interface BookmarkUpdateInput {
-  /** The name of the bookmark */
+  /**
+   * The name of the bookmark.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -616,13 +1036,25 @@ export interface FieldCreateInput {
 
 /** Input for updating a Field. Omitted fields are left unchanged. */
 export interface FieldUpdateInput {
-  /** The field code */
+  /**
+   * The field code.
+   * Cannot be reset: null is rejected.
+   */
   fieldCode?: string
-  /** The field text */
+  /**
+   * The field text.
+   * Cannot be reset: null is rejected.
+   */
   fieldText?: string
-  /** Whether the field is locked */
+  /**
+   * Whether the field is locked.
+   * Cannot be reset: null is rejected.
+   */
   locked?: boolean
-  /** Whether field codes are displayed */
+  /**
+   * Whether field codes are displayed.
+   * Cannot be reset: null is rejected.
+   */
   showCodes?: boolean
 }
 
@@ -630,19 +1062,37 @@ export interface FieldUpdateInput {
 export interface DocumentResourceClient {
   /** List documents. */
   list(options?: CallOptions): Promise<readonly Document[]>
-  /** Read the document identified by `id`. */
+  /**
+   * Read the document identified by `id`.
+   *
+   * @param id - Document name. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Document>
   /** Save the specified document */
   save(options?: CallOptions): Promise<void>
-  /** Save the document with a new name or format */
+  /**
+   * Save the document with a new name or format
+   *
+   * @param fileName - The file name for the document. Does not accept null.
+   * @param fileFormat - The file format for saving. Does not accept null.
+   */
   saveAs(fileName: string, fileFormat?: SaveFormat, options?: CallOptions): Promise<void>
-  /** Close the specified document */
+  /**
+   * Close the specified document
+   *
+   * @param saving - Whether to save changes before closing. Does not accept null.
+   */
   close(saving?: boolean, options?: CallOptions): Promise<void>
   /** Print the specified document */
   print(options?: CallOptions): Promise<void>
   /** Activate the specified document window */
   activate(options?: CallOptions): Promise<void>
-  /** Create a text range by character positions */
+  /**
+   * Create a text range by character positions
+   *
+   * @param start - The starting character position. Does not accept null.
+   * @param end - The ending character position. Does not accept null.
+   */
   createRange(start?: Integer, end?: Integer, options?: CallOptions): Promise<void>
 }
 
@@ -665,23 +1115,44 @@ export interface MicrosoftWordClient {
   pasteObject(options?: CallOptions): Promise<void>
   /** Select all content in the document */
   selectAll(options?: CallOptions): Promise<void>
-  /** Find text in the document */
+  /**
+   * Find text in the document
+   *
+   * @param findText - The text to search for. Does not accept null.
+   * @param matchCase - Whether to match case. Does not accept null.
+   * @param matchWholeWord - Whether to match whole words only. Does not accept null.
+   */
   find(
     findText: string,
     matchCase?: boolean,
     matchWholeWord?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Replace text in the document */
+  /**
+   * Replace text in the document
+   *
+   * @param findText - The text to search for. Does not accept null.
+   * @param replaceWith - The replacement text. Does not accept null.
+   * @param replaceAll - Whether to replace all occurrences. Does not accept null.
+   */
   replace(
     findText: string,
     replaceWith: string,
     replaceAll?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Insert text at the specified location */
+  /**
+   * Insert text at the specified location
+   *
+   * @param text - The text to insert. Does not accept null.
+   * @param at - The character position to insert at. Does not accept null.
+   */
   insertText(text: string, at?: Integer, options?: CallOptions): Promise<void>
-  /** Create a new document */
+  /**
+   * Create a new document
+   *
+   * @param attachedTemplate - Path to template for the new document. Does not accept null.
+   */
   createNewDocument(attachedTemplate?: string, options?: CallOptions): Promise<void>
 }
 
@@ -714,163 +1185,203 @@ const fieldTypeMembers = [
 const documentRecordType: ValueType<Document> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
-    fullName: t.string({ description: 'The full path of the document in HFS format' }),
-    posixFullName: t.string({ description: 'The full path of the document in POSIX format' }),
-    path: t.string({ description: 'The path to the document (HFS format)' }),
-    saved: t.boolean({ description: 'Whether the document has been saved' }),
-    readOnly: t.boolean({ description: 'Whether the document is read-only' }),
-    active: t.boolean({ description: 'Whether this is the active document' }),
-    content: t.string({ description: 'The main document text' }),
-    trackRevisions: t.boolean({ description: 'Whether changes are tracked in the document' }),
-    showRevisions: t.boolean({ description: 'Whether tracked changes are shown' }),
-    defaultTabStop: t.double({ description: 'The interval in points between default tab stops' }),
+    fullName: t.nullable(t.string(), {
+      description: 'The full path of the document in HFS format',
+    }),
+    posixFullName: t.nullable(t.string(), {
+      description: 'The full path of the document in POSIX format',
+    }),
+    path: t.nullable(t.string(), { description: 'The path to the document (HFS format)' }),
+    saved: t.nullable(t.boolean(), { description: 'Whether the document has been saved' }),
+    readOnly: t.nullable(t.boolean(), { description: 'Whether the document is read-only' }),
+    active: t.nullable(t.boolean(), { description: 'Whether this is the active document' }),
+    content: t.nullable(t.string(), { description: 'The main document text' }),
+    trackRevisions: t.nullable(t.boolean(), {
+      description: 'Whether changes are tracked in the document',
+    }),
+    showRevisions: t.nullable(t.boolean(), { description: 'Whether tracked changes are shown' }),
+    defaultTabStop: t.nullable(t.double(), {
+      description: 'The interval in points between default tab stops',
+    }),
   },
   { description: 'A Microsoft Word document' }
 )
 
 const paragraphRecordType: ValueType<Paragraph> = t.record(
   {
-    alignment: t.enumeration(paragraphAlignmentMembers, {
+    alignment: t.nullable(t.enumeration(paragraphAlignmentMembers), {
       description: 'The alignment for the paragraph',
     }),
-    firstLineIndent: t.double({ description: 'The first-line or hanging indent value in points' }),
-    leftIndent: t.double({ description: 'The left indent in points' }),
-    rightIndent: t.double({ description: 'The right indent in points' }),
-    lineSpacing: t.double({ description: 'The line spacing in points' }),
-    spaceAfter: t.double({ description: 'The spacing in points after the paragraph' }),
-    spaceBefore: t.double({ description: 'The spacing in points before the paragraph' }),
-    pageBreakBefore: t.boolean({
+    firstLineIndent: t.nullable(t.double(), {
+      description: 'The first-line or hanging indent value in points',
+    }),
+    leftIndent: t.nullable(t.double(), { description: 'The left indent in points' }),
+    rightIndent: t.nullable(t.double(), { description: 'The right indent in points' }),
+    lineSpacing: t.nullable(t.double(), { description: 'The line spacing in points' }),
+    spaceAfter: t.nullable(t.double(), {
+      description: 'The spacing in points after the paragraph',
+    }),
+    spaceBefore: t.nullable(t.double(), {
+      description: 'The spacing in points before the paragraph',
+    }),
+    pageBreakBefore: t.nullable(t.boolean(), {
       description: 'Whether a page break is forced before the paragraph',
     }),
-    keepTogether: t.boolean({ description: 'Whether all lines remain on the same page' }),
-    keepWithNext: t.boolean({ description: 'Whether paragraph stays with next paragraph' }),
+    keepTogether: t.nullable(t.boolean(), {
+      description: 'Whether all lines remain on the same page',
+    }),
+    keepWithNext: t.nullable(t.boolean(), {
+      description: 'Whether paragraph stays with next paragraph',
+    }),
     paragraphId: t.integer({ description: 'The paragraph ID' }),
-    content: t.string({ description: 'The text content of the paragraph' }),
+    content: t.nullable(t.string(), { description: 'The text content of the paragraph' }),
   },
   { description: 'A single paragraph in a document' }
 )
 
 const textRangeRecordType: ValueType<TextRange> = t.record(
   {
-    content: t.string({ description: 'The text in the range' }),
-    bold: t.boolean({ description: 'Whether the text is formatted as bold' }),
-    italic: t.boolean({ description: 'Whether the text is formatted as italic' }),
-    underline: t.enumeration(underlineTypeMembers, { description: 'The underline type' }),
-    fontSize: t.double({ description: 'The font size in points' }),
-    fontName: t.string({ description: 'The font name' }),
-    start: t.integer({ description: 'The starting character position' }),
-    end: t.integer({ description: 'The ending character position' }),
+    content: t.nullable(t.string(), { description: 'The text in the range' }),
+    bold: t.nullable(t.boolean(), { description: 'Whether the text is formatted as bold' }),
+    italic: t.nullable(t.boolean(), { description: 'Whether the text is formatted as italic' }),
+    underline: t.nullable(t.enumeration(underlineTypeMembers), {
+      description: 'The underline type',
+    }),
+    fontSize: t.nullable(t.double(), { description: 'The font size in points' }),
+    fontName: t.nullable(t.string(), { description: 'The font name' }),
+    start: t.nullable(t.integer(), { description: 'The starting character position' }),
+    end: t.nullable(t.integer(), { description: 'The ending character position' }),
   },
   { description: 'A contiguous area in a document' }
 )
 
 const selectionRecordType: ValueType<Selection> = t.record(
   {
-    content: t.string({ description: 'The text in the selection' }),
-    bold: t.boolean({ description: 'Whether the selection is formatted as bold' }),
-    italic: t.boolean({ description: 'Whether the selection is formatted as italic' }),
-    fontSize: t.double({ description: 'The font size of the selection in points' }),
-    fontName: t.string({ description: 'The font name of the selection' }),
-    start: t.integer({ description: 'The starting character position of the selection' }),
-    end: t.integer({ description: 'The ending character position of the selection' }),
-    selectionType: t.string({ description: 'The type of selection (e.g., text, table, graphic)' }),
+    content: t.nullable(t.string(), { description: 'The text in the selection' }),
+    bold: t.nullable(t.boolean(), { description: 'Whether the selection is formatted as bold' }),
+    italic: t.nullable(t.boolean(), {
+      description: 'Whether the selection is formatted as italic',
+    }),
+    fontSize: t.nullable(t.double(), { description: 'The font size of the selection in points' }),
+    fontName: t.nullable(t.string(), { description: 'The font name of the selection' }),
+    start: t.nullable(t.integer(), {
+      description: 'The starting character position of the selection',
+    }),
+    end: t.nullable(t.integer(), { description: 'The ending character position of the selection' }),
+    selectionType: t.nullable(t.string(), {
+      description: 'The type of selection (e.g., text, table, graphic)',
+    }),
   },
   { description: 'The current selection in a document' }
 )
 
 const tableRecordType: ValueType<Table> = t.record(
   {
-    rowCount: t.integer({ description: 'The number of rows in the table' }),
-    columnCount: t.integer({ description: 'The number of columns in the table' }),
-    allowAutoFit: t.boolean({ description: 'Whether the table is allowed to autofit' }),
-    borders: t.boolean({ description: 'Whether the table has borders' }),
+    rowCount: t.nullable(t.integer(), { description: 'The number of rows in the table' }),
+    columnCount: t.nullable(t.integer(), { description: 'The number of columns in the table' }),
+    allowAutoFit: t.nullable(t.boolean(), {
+      description: 'Whether the table is allowed to autofit',
+    }),
+    borders: t.nullable(t.boolean(), { description: 'Whether the table has borders' }),
   },
   { description: 'A table in a document' }
 )
 
 const rowRecordType: ValueType<Row> = t.record(
   {
-    height: t.double({ description: 'The height of the row in points' }),
-    allowBreakAcrossPages: t.boolean({ description: 'Whether the row can break across pages' }),
-    headingFormat: t.boolean({ description: 'Whether the row is formatted as a heading' }),
+    height: t.nullable(t.double(), { description: 'The height of the row in points' }),
+    allowBreakAcrossPages: t.nullable(t.boolean(), {
+      description: 'Whether the row can break across pages',
+    }),
+    headingFormat: t.nullable(t.boolean(), {
+      description: 'Whether the row is formatted as a heading',
+    }),
   },
   { description: 'A row in a table' }
 )
 
 const columnRecordType: ValueType<Column> = t.record(
   {
-    width: t.double({ description: 'The width of the column in points' }),
-    preferredWidth: t.double({ description: 'The preferred width of the column' }),
+    width: t.nullable(t.double(), { description: 'The width of the column in points' }),
+    preferredWidth: t.nullable(t.double(), { description: 'The preferred width of the column' }),
   },
   { description: 'A column in a table' }
 )
 
 const cellRecordType: ValueType<Cell> = t.record(
   {
-    content: t.string({ description: 'The text content of the cell' }),
-    width: t.double({ description: 'The width of the cell in points' }),
-    height: t.double({ description: 'The height of the cell in points' }),
-    verticalAlignment: t.string({ description: 'The vertical alignment of text in the cell' }),
-    rowIndex: t.integer({ description: 'The row index of the cell' }),
-    columnIndex: t.integer({ description: 'The column index of the cell' }),
+    content: t.nullable(t.string(), { description: 'The text content of the cell' }),
+    width: t.nullable(t.double(), { description: 'The width of the cell in points' }),
+    height: t.nullable(t.double(), { description: 'The height of the cell in points' }),
+    verticalAlignment: t.nullable(t.string(), {
+      description: 'The vertical alignment of text in the cell',
+    }),
+    rowIndex: t.nullable(t.integer(), { description: 'The row index of the cell' }),
+    columnIndex: t.nullable(t.integer(), { description: 'The column index of the cell' }),
   },
   { description: 'A cell in a table' }
 )
 
 const fontRecordType: ValueType<Font> = t.record(
   {
-    bold: t.boolean({ description: 'Whether the font is bold' }),
-    italic: t.boolean({ description: 'Whether the font is italic' }),
-    underline: t.enumeration(underlineTypeMembers, { description: 'The underline type' }),
-    size: t.double({ description: 'The font size in points' }),
-    name: t.string({ description: 'The font name' }),
-    color: t.rgb({ description: 'The font color' }),
-    subscript: t.boolean({ description: 'Whether the font is subscript' }),
-    superscript: t.boolean({ description: 'Whether the font is superscript' }),
-    strikethrough: t.boolean({ description: 'Whether the font has strikethrough' }),
-    allCaps: t.boolean({ description: 'Whether the font is all caps' }),
+    bold: t.nullable(t.boolean(), { description: 'Whether the font is bold' }),
+    italic: t.nullable(t.boolean(), { description: 'Whether the font is italic' }),
+    underline: t.nullable(t.enumeration(underlineTypeMembers), {
+      description: 'The underline type',
+    }),
+    size: t.nullable(t.double(), { description: 'The font size in points' }),
+    name: t.nullable(t.string(), { description: 'The font name' }),
+    color: t.nullable(t.rgb(), { description: 'The font color' }),
+    subscript: t.nullable(t.boolean(), { description: 'Whether the font is subscript' }),
+    superscript: t.nullable(t.boolean(), { description: 'Whether the font is superscript' }),
+    strikethrough: t.nullable(t.boolean(), { description: 'Whether the font has strikethrough' }),
+    allCaps: t.nullable(t.boolean(), { description: 'Whether the font is all caps' }),
   },
   { description: 'Font formatting properties' }
 )
 
 const pageSetupRecordType: ValueType<PageSetup> = t.record(
   {
-    topMargin: t.double({ description: 'The top margin in points' }),
-    bottomMargin: t.double({ description: 'The bottom margin in points' }),
-    leftMargin: t.double({ description: 'The left margin in points' }),
-    rightMargin: t.double({ description: 'The right margin in points' }),
-    pageHeight: t.double({ description: 'The page height in points' }),
-    pageWidth: t.double({ description: 'The page width in points' }),
-    orientation: t.string({ description: 'The page orientation (portrait or landscape)' }),
-    paperSize: t.string({ description: 'The paper size' }),
+    topMargin: t.nullable(t.double(), { description: 'The top margin in points' }),
+    bottomMargin: t.nullable(t.double(), { description: 'The bottom margin in points' }),
+    leftMargin: t.nullable(t.double(), { description: 'The left margin in points' }),
+    rightMargin: t.nullable(t.double(), { description: 'The right margin in points' }),
+    pageHeight: t.nullable(t.double(), { description: 'The page height in points' }),
+    pageWidth: t.nullable(t.double(), { description: 'The page width in points' }),
+    orientation: t.nullable(t.string(), {
+      description: 'The page orientation (portrait or landscape)',
+    }),
+    paperSize: t.nullable(t.string(), { description: 'The paper size' }),
   },
   { description: 'Page setup properties for a document or section' }
 )
 
 const sectionRecordType: ValueType<Section> = t.record(
   {
-    sectionIndex: t.integer({ description: 'The index of the section' }),
-    protectedForForms: t.boolean({ description: 'Whether the section is protected for forms' }),
+    sectionIndex: t.nullable(t.integer(), { description: 'The index of the section' }),
+    protectedForForms: t.nullable(t.boolean(), {
+      description: 'Whether the section is protected for forms',
+    }),
   },
   { description: 'A section in a document' }
 )
 
 const bookmarkRecordType: ValueType<Bookmark> = t.record(
   {
-    name: t.string({ description: 'The name of the bookmark' }),
-    start: t.integer({ description: 'The starting character position' }),
-    end: t.integer({ description: 'The ending character position' }),
+    name: t.nullable(t.string(), { description: 'The name of the bookmark' }),
+    start: t.nullable(t.integer(), { description: 'The starting character position' }),
+    end: t.nullable(t.integer(), { description: 'The ending character position' }),
   },
   { description: 'A bookmark in a document' }
 )
 
 const fieldRecordType: ValueType<Field> = t.record(
   {
-    fieldType: t.enumeration(fieldTypeMembers, { description: 'The field type' }),
-    fieldCode: t.string({ description: 'The field code' }),
-    fieldText: t.string({ description: 'The field text' }),
-    locked: t.boolean({ description: 'Whether the field is locked' }),
-    showCodes: t.boolean({ description: 'Whether field codes are displayed' }),
+    fieldType: t.nullable(t.enumeration(fieldTypeMembers), { description: 'The field type' }),
+    fieldCode: t.nullable(t.string(), { description: 'The field code' }),
+    fieldText: t.nullable(t.string(), { description: 'The field text' }),
+    locked: t.nullable(t.boolean(), { description: 'Whether the field is locked' }),
+    showCodes: t.nullable(t.boolean(), { description: 'Whether field codes are displayed' }),
   },
   { description: 'A field in a document' }
 )

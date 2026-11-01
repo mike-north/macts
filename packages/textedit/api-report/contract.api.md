@@ -9,10 +9,10 @@ import { CallOptions } from '@macts/contracts';
 
 // @public
 export interface Document {
-    readonly modified: boolean;
+    readonly modified: boolean | null;
     name: string;
-    readonly path?: string;
-    text: string;
+    readonly path?: string | null;
+    text: string | null;
 }
 
 // @public

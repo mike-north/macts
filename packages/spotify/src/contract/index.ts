@@ -35,32 +35,71 @@ export type PlayerState = 'stopped' | 'playing' | 'paused'
 
 /** The currently playing track */
 export interface Track {
-  /** The name of the track */
-  readonly name: string
-  /** The artist of the track */
-  readonly artist: string
-  /** The album of the track */
-  readonly album: string
-  /** The album artist of the track */
-  readonly albumArtist: string
-  /** The disc number of the track */
-  readonly discNumber: Integer
-  /** The duration of the track in milliseconds */
-  readonly duration: Integer
-  /** Number of times this track has been played */
-  readonly playedCount: Integer
-  /** The track number */
-  readonly trackNumber: Integer
-  /** The Spotify URL for the track */
-  readonly spotifyUrl: string
-  /** The unique identifier of the track */
+  /**
+   * The name of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The artist of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly artist: string | null
+  /**
+   * The album of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly album: string | null
+  /**
+   * The album artist of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly albumArtist: string | null
+  /**
+   * The disc number of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly discNumber: Integer | null
+  /**
+   * The duration of the track in milliseconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: Integer | null
+  /**
+   * Number of times this track has been played.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly playedCount: Integer | null
+  /**
+   * The track number.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly trackNumber: Integer | null
+  /**
+   * The Spotify URL for the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly spotifyUrl: string | null
+  /**
+   * The unique identifier of the track.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The URL of the track artwork */
-  readonly artworkUrl: string
-  /** The track artwork */
-  readonly artwork: string
-  /** The current player state */
-  readonly playerState: PlayerState
+  /**
+   * The URL of the track artwork.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly artworkUrl: string | null
+  /**
+   * The track artwork.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly artwork: string | null
+  /**
+   * The current player state.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly playerState: PlayerState | null
 }
 
 /** Input for creating a Track. */
@@ -84,7 +123,11 @@ export interface SpotifyClient {
   pause(options?: CallOptions): Promise<void>
   /** Resume playback. */
   play(options?: CallOptions): Promise<void>
-  /** Start playback of a track in the given context. */
+  /**
+   * Start playback of a track in the given context.
+   *
+   * @param inContext - the URI of the context to play in. Does not accept null.
+   */
   playTrack(inContext?: string, options?: CallOptions): Promise<void>
 }
 
@@ -93,19 +136,23 @@ const playerStateMembers = ['stopped', 'playing', 'paused'] as const
 
 const trackRecordType: ValueType<Track> = t.record(
   {
-    name: t.string({ description: 'The name of the track' }),
-    artist: t.string({ description: 'The artist of the track' }),
-    album: t.string({ description: 'The album of the track' }),
-    albumArtist: t.string({ description: 'The album artist of the track' }),
-    discNumber: t.integer({ description: 'The disc number of the track' }),
-    duration: t.integer({ description: 'The duration of the track in milliseconds' }),
-    playedCount: t.integer({ description: 'Number of times this track has been played' }),
-    trackNumber: t.integer({ description: 'The track number' }),
-    spotifyUrl: t.string({ description: 'The Spotify URL for the track' }),
+    name: t.nullable(t.string(), { description: 'The name of the track' }),
+    artist: t.nullable(t.string(), { description: 'The artist of the track' }),
+    album: t.nullable(t.string(), { description: 'The album of the track' }),
+    albumArtist: t.nullable(t.string(), { description: 'The album artist of the track' }),
+    discNumber: t.nullable(t.integer(), { description: 'The disc number of the track' }),
+    duration: t.nullable(t.integer(), { description: 'The duration of the track in milliseconds' }),
+    playedCount: t.nullable(t.integer(), {
+      description: 'Number of times this track has been played',
+    }),
+    trackNumber: t.nullable(t.integer(), { description: 'The track number' }),
+    spotifyUrl: t.nullable(t.string(), { description: 'The Spotify URL for the track' }),
     id: t.string({ description: 'The unique identifier of the track' }),
-    artworkUrl: t.string({ description: 'The URL of the track artwork' }),
-    artwork: t.string({ description: 'The track artwork' }),
-    playerState: t.enumeration(playerStateMembers, { description: 'The current player state' }),
+    artworkUrl: t.nullable(t.string(), { description: 'The URL of the track artwork' }),
+    artwork: t.nullable(t.string(), { description: 'The track artwork' }),
+    playerState: t.nullable(t.enumeration(playerStateMembers), {
+      description: 'The current player state',
+    }),
   },
   { description: 'The currently playing track' }
 )

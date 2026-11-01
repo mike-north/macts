@@ -9,7 +9,7 @@ import { CallOptions } from '@macts/contracts';
 
 // @public
 export interface Anchor {
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -21,7 +21,7 @@ export type AnchorUpdateInput = Record<string, never>;
 // @public
 export interface Pane {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public

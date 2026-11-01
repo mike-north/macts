@@ -14,6 +14,7 @@ import {
   normalizeResourceRouteSegment,
   resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
+  commandRouteSegment,
 } from '../../manifest/index.js'
 import { propertyTypeToTs } from '../types.js'
 import {
@@ -429,7 +430,7 @@ function generateClientFile(
 
   // Generate app-level command methods
   const appCommands = appCommandEntries(manifest)
-    .map(([key, cmd]) => generateAppCommandMethod(key, cmd, appNameLower))
+    .map(([key, cmd]) => generateAppCommandMethod(commandRouteSegment(key, cmd), cmd, appNameLower))
     .join('\n\n')
 
   return `/**
@@ -540,10 +541,15 @@ ${appCommands}
 /**
  * Generate method for app-level command.
  *
- * The route is keyed by the command's manifest key (`commandKey`), matching the
- * server router. Application commands are addressed as `{app}.app.{commandKey}`.
+ * The route is keyed by the command's route segment (`commandRouteSegment`: its
+ * `routeName`, else its manifest key), matching the server router. Application
+ * commands are addressed as `{app}.app.{routeSegment}`.
  */
-function generateAppCommandMethod(commandKey: string, cmd: Command, appNameLower: string): string {
+function generateAppCommandMethod(
+  routeSegment: string,
+  cmd: Command,
+  appNameLower: string
+): string {
   const { signature, bodyArg } = buildParamsAndBody(cmd)
 
   const returnType = cmd.returns ? propertyTypeToTs(cmd.returns as PropertyType) : 'void'
@@ -551,8 +557,8 @@ function generateAppCommandMethod(commandKey: string, cmd: Command, appNameLower
   const needsAwait = returnType === 'void'
 
   const rpcCall = needsAwait
-    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${commandKey}', ${bodyArg});`
-    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${commandKey}', ${bodyArg});`
+    ? `await this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
+    : `return this.#httpClient.rpc<${rpcReturnType}>('${appNameLower}.app.${routeSegment}', ${bodyArg});`
 
   return `
   /**
@@ -586,7 +592,7 @@ function generateResourceClient(
   const deleteCmd = findCrudCommand(resourceCommands, 'delete')
 
   const commandMethods = resourceCommands
-    .map(([key, cmd]) => generateResourceCommandMethod(key, cmd))
+    .map(([key, cmd]) => generateResourceCommandMethod(commandRouteSegment(key, cmd), cmd))
     .join('\n')
 
   // The resource's own type is referenced by the CRUD methods' return types
@@ -623,11 +629,31 @@ function generateResourceClient(
   }
 
   const crudMethods = [
-    listCmd ? generateListMethod(listCmd[0], listCmd[1], resourceName, plural) : '',
-    getCmd ? generateGetMethod(getCmd[0], getCmd[1], resourceName, nameLower) : '',
-    createCmd ? generateCreateMethod(createCmd[0], createCmd[1], resourceName, nameLower) : '',
-    updateCmd ? generateUpdateMethod(updateCmd[0], updateCmd[1], resourceName, nameLower) : '',
-    deleteCmd ? generateDeleteMethod(deleteCmd[0], deleteCmd[1], nameLower) : '',
+    listCmd
+      ? generateListMethod(commandRouteSegment(...listCmd), listCmd[1], resourceName, plural)
+      : '',
+    getCmd
+      ? generateGetMethod(commandRouteSegment(...getCmd), getCmd[1], resourceName, nameLower)
+      : '',
+    createCmd
+      ? generateCreateMethod(
+          commandRouteSegment(...createCmd),
+          createCmd[1],
+          resourceName,
+          nameLower
+        )
+      : '',
+    updateCmd
+      ? generateUpdateMethod(
+          commandRouteSegment(...updateCmd),
+          updateCmd[1],
+          resourceName,
+          nameLower
+        )
+      : '',
+    deleteCmd
+      ? generateDeleteMethod(commandRouteSegment(...deleteCmd), deleteCmd[1], nameLower)
+      : '',
   ]
     .filter(Boolean)
     .join('\n')
@@ -714,7 +740,7 @@ ${methodBody}
  * `listMethodParameters`), so SDK and server always agree on parameter names.
  */
 function generateListMethod(
-  commandKey: string,
+  routeSegment: string,
   command: Command,
   resourceName: string,
   plural: string
@@ -727,7 +753,7 @@ function generateListMethod(
    * List all ${plural}.
    */
   async list(): Promise<${resourceName}[]> {
-    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${commandKey}\`);
+    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`);
   }
 `
   }
@@ -753,7 +779,7 @@ function generateListMethod(
    * List all ${plural}.
    */
   async list(${signature}): Promise<${resourceName}[]> {
-    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});
+    return this.#http.rpc<${resourceName}[]>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});
   }
 `
 }
@@ -767,7 +793,7 @@ function generateListMethod(
  * .events.byId(id)` instead of the broken `app.events.byId(id)`.
  */
 function generateGetMethod(
-  commandKey: string,
+  routeSegment: string,
   command: Command,
   resourceName: string,
   nameLower: string
@@ -779,7 +805,7 @@ function generateGetMethod(
    * Get a ${nameLower} by ${childParam} within a parent scope.
    */
   async get(${parentParam}: string, ${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam} });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
   }
 `
   }
@@ -788,7 +814,7 @@ function generateGetMethod(
    * Get a ${nameLower} by ${childParam}.
    */
   async get(${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam} });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
   }
 `
 }
@@ -803,7 +829,7 @@ function generateGetMethod(
  * param-name drift where the property-derived input omitted `calendarId`.
  */
 function generateCreateMethod(
-  commandKey: string,
+  routeSegment: string,
   _command: Command,
   resourceName: string,
   nameLower: string
@@ -813,7 +839,7 @@ function generateCreateMethod(
    * Create a new ${nameLower}.
    */
   async create(input: ${resourceName}CreateInput): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, input);
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, input);
   }
 `
 }
@@ -828,7 +854,7 @@ function generateCreateMethod(
  * (`additionalProperties: false`) does not reject the request.
  */
 function generateUpdateMethod(
-  commandKey: string,
+  routeSegment: string,
   command: Command,
   resourceName: string,
   nameLower: string
@@ -843,7 +869,7 @@ function generateUpdateMethod(
     const { ${parentParam}: _p, ...updateFields } = input as ${resourceName}UpdateInput & { ${parentParam}?: string };
     void _p;
     const defined = Object.fromEntries(Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam}, ...defined });
   }
 `
   }
@@ -853,7 +879,7 @@ function generateUpdateMethod(
    */
   async update(${childParam}: string, input: ${resourceName}UpdateInput): Promise<${resourceName}> {
     const defined = Object.fromEntries(Object.entries(input as Record<string, unknown>).filter(([, v]) => v !== undefined));
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam}, ...defined });
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam}, ...defined });
   }
 `
 }
@@ -865,7 +891,7 @@ function generateUpdateMethod(
  * `deleteEvent`), it is the first argument so the server can scope the JXA
  * query to the correct parent collection.
  */
-function generateDeleteMethod(commandKey: string, command: Command, nameLower: string): string {
+function generateDeleteMethod(routeSegment: string, command: Command, nameLower: string): string {
   const { parentParam, childParam } = resolveIdParams(command)
   if (parentParam !== undefined) {
     return `
@@ -873,7 +899,7 @@ function generateDeleteMethod(commandKey: string, command: Command, nameLower: s
    * Delete an ${nameLower} within a parent scope.
    */
   async delete(${parentParam}: string, ${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${parentParam}, ${childParam} });
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${parentParam}, ${childParam} });
   }
 `
   }
@@ -882,7 +908,7 @@ function generateDeleteMethod(commandKey: string, command: Command, nameLower: s
    * Delete an ${nameLower}.
    */
   async delete(${childParam}: string): Promise<void> {
-    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, { ${childParam} });
+    await this.#http.rpc<undefined>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
   }
 `
 }
@@ -913,12 +939,12 @@ function buildParamsAndBody(command: Command): { signature: string; bodyArg: str
 /**
  * Generate method for a non-CRUD resource-level command.
  *
- * The route is keyed by the command's manifest key (`commandKey`), the same
+ * The route is keyed by the command's route segment (`commandRouteSegment`), the same
  * value the server router uses — addressing by `command.name` is what broke the
  * structured path. CRUD-shaped commands are emitted separately by
  * `generateResourceClient`, so they are skipped here.
  */
-function generateResourceCommandMethod(commandKey: string, cmd: Command): string {
+function generateResourceCommandMethod(routeSegment: string, cmd: Command): string {
   // Skip standard CRUD commands as they're already generated
   if (isCrudName(cmd.name)) {
     return ''
@@ -931,8 +957,8 @@ function generateResourceCommandMethod(commandKey: string, cmd: Command): string
   const needsAwait = returnType === 'void'
 
   const rpcCall = needsAwait
-    ? `await this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});`
-    : `return this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${commandKey}\`, ${bodyArg});`
+    ? `await this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
+    : `return this.#http.rpc<${rpcReturnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, ${bodyArg});`
 
   return `
   /**

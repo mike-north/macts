@@ -13,12 +13,12 @@ import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
 export interface Artwork {
-    data: string;
-    description: string;
-    readonly downloaded: boolean;
-    readonly format: string;
-    readonly id: Integer;
-    kind: Integer;
+    data: string | null;
+    description: string | null;
+    readonly downloaded: boolean | null;
+    readonly format: string | null;
+    readonly id: Integer | null;
+    kind: Integer | null;
     rawData: unknown;
 }
 
@@ -40,9 +40,9 @@ export interface ArtworkUpdateInput {
 
 // @public
 export interface BrowserWindow {
-    readonly id: Integer;
-    readonly selection: string;
-    view: ObjectReferenceVariant<Playlist, never>;
+    readonly id: Integer | null;
+    readonly selection: string | null;
+    view: ObjectReferenceVariant<Playlist, never> | null;
 }
 
 // @public
@@ -75,8 +75,8 @@ export type ESrc = 'library' | 'sharedLibrary' | 'iTunesStore' | 'unknown';
 
 // @public
 export interface FileTrack {
-    readonly id: Integer;
-    location: FileValue;
+    readonly id: Integer | null;
+    location: FileValue | null;
 }
 
 // @public
@@ -96,7 +96,7 @@ export interface FileTrackUpdateInput {
 
 // @public
 export interface LibraryPlaylist {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -107,15 +107,15 @@ export type LibraryPlaylistUpdateInput = Record<string, never>;
 
 // @public
 export interface Playlist {
-    description: string;
-    readonly duration: Integer;
-    readonly id: Integer;
-    name: string;
-    readonly parent: ObjectReferenceVariant<Playlist, never>;
-    readonly size: Integer;
-    readonly specialKind: string;
-    readonly time: string;
-    readonly visible: boolean;
+    description: string | null;
+    readonly duration: Integer | null;
+    readonly id: Integer | null;
+    name: string | null;
+    readonly parent: ObjectReferenceVariant<Playlist, never> | null;
+    readonly size: Integer | null;
+    readonly specialKind: string | null;
+    readonly time: string | null;
+    readonly visible: boolean | null;
 }
 
 // @public
@@ -138,9 +138,9 @@ export interface PlaylistUpdateInput {
 
 // @public
 export interface PlaylistWindow {
-    readonly id: Integer;
-    readonly selection: string;
-    readonly view: ObjectReferenceVariant<Playlist, never>;
+    readonly id: Integer | null;
+    readonly selection: string | null;
+    readonly view: ObjectReferenceVariant<Playlist, never> | null;
 }
 
 // @public
@@ -151,7 +151,7 @@ export type PlaylistWindowUpdateInput = Record<string, never>;
 
 // @public
 export interface SharedTrack {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -162,10 +162,10 @@ export type SharedTrackUpdateInput = Record<string, never>;
 
 // @public
 export interface Source {
-    readonly capacity: number;
-    readonly freeSpace: number;
-    readonly id: Integer;
-    readonly kind: string;
+    readonly capacity: number | null;
+    readonly freeSpace: number | null;
+    readonly id: Integer | null;
+    readonly kind: string | null;
 }
 
 // @public
@@ -176,58 +176,58 @@ export type SourceUpdateInput = Record<string, never>;
 
 // @public
 export interface Track {
-    album: string;
-    albumRating: Integer;
-    readonly albumRatingKind: string;
-    readonly bitRate: Integer;
-    bookmark: number;
-    bookmarkable: boolean;
-    category: string;
-    comment: string;
-    readonly databaseID: Integer;
-    readonly dateAdded: Date;
-    description: string;
-    director: string;
-    discCount: Integer;
-    discNumber: Integer;
-    readonly downloaderAccount: string;
-    readonly downloaderName: string;
-    readonly duration: number;
-    enabled: boolean;
-    episodeID: string;
-    episodeNumber: Integer;
-    finish: number;
-    genre: string;
-    grouping: string;
-    readonly id: Integer;
-    readonly kind: string;
-    longDescription: string;
-    mediaKind: string;
-    readonly modificationDate: Date;
-    playedCount: Integer;
-    playedDate: Date;
-    readonly purchaserAccount: string;
-    readonly purchaserName: string;
-    rating: Integer;
-    readonly ratingKind: string;
-    readonly releaseDate: Date;
-    readonly sampleRate: Integer;
-    seasonNumber: Integer;
-    show: string;
-    readonly size: number;
-    skippedCount: Integer;
-    skippedDate: Date;
-    sortAlbum: string;
-    sortDirector: string;
-    sortName: string;
-    sortShow: string;
-    start: number;
-    readonly time: string;
-    trackCount: Integer;
-    trackNumber: Integer;
-    unplayed: boolean;
-    volumeAdjustment: Integer;
-    year: Integer;
+    album: string | null;
+    albumRating: Integer | null;
+    readonly albumRatingKind: string | null;
+    readonly bitRate: Integer | null;
+    bookmark: number | null;
+    bookmarkable: boolean | null;
+    category: string | null;
+    comment: string | null;
+    readonly databaseID: Integer | null;
+    readonly dateAdded: Date | null;
+    description: string | null;
+    director: string | null;
+    discCount: Integer | null;
+    discNumber: Integer | null;
+    readonly downloaderAccount: string | null;
+    readonly downloaderName: string | null;
+    readonly duration: number | null;
+    enabled: boolean | null;
+    episodeID: string | null;
+    episodeNumber: Integer | null;
+    finish: number | null;
+    genre: string | null;
+    grouping: string | null;
+    readonly id: Integer | null;
+    readonly kind: string | null;
+    longDescription: string | null;
+    mediaKind: string | null;
+    readonly modificationDate: Date | null;
+    playedCount: Integer | null;
+    playedDate: Date | null;
+    readonly purchaserAccount: string | null;
+    readonly purchaserName: string | null;
+    rating: Integer | null;
+    readonly ratingKind: string | null;
+    readonly releaseDate: Date | null;
+    readonly sampleRate: Integer | null;
+    seasonNumber: Integer | null;
+    show: string | null;
+    readonly size: number | null;
+    skippedCount: Integer | null;
+    skippedDate: Date | null;
+    sortAlbum: string | null;
+    sortDirector: string | null;
+    sortName: string | null;
+    sortShow: string | null;
+    start: number | null;
+    readonly time: string | null;
+    trackCount: Integer | null;
+    trackNumber: Integer | null;
+    unplayed: boolean | null;
+    volumeAdjustment: Integer | null;
+    year: Integer | null;
 }
 
 // @public
@@ -345,8 +345,8 @@ export const tvContract: AppContract<TVClient>;
 
 // @public
 export interface URLTrack {
-    address: string;
-    readonly id: Integer;
+    address: string | null;
+    readonly id: Integer | null;
 }
 
 // @public
@@ -361,9 +361,9 @@ export interface URLTrackUpdateInput {
 
 // @public
 export interface UserPlaylist {
-    readonly id: Integer;
-    shared: boolean;
-    readonly smart: boolean;
+    readonly id: Integer | null;
+    shared: boolean | null;
+    readonly smart: boolean | null;
 }
 
 // @public
@@ -378,7 +378,7 @@ export interface UserPlaylistUpdateInput {
 
 // @public
 export interface VideoWindow {
-    readonly id: Integer;
+    readonly id: Integer | null;
 }
 
 // @public

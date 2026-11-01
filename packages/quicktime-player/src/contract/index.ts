@@ -33,18 +33,36 @@ const t = ValueTypes
 
 /** A QuickTime Player document */
 export interface Document {
-  /** The document name */
-  readonly name: string
-  /** The unique identifier of the document */
+  /**
+   * The document name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the document.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The file path of the document */
-  readonly path: string
-  /** Whether the document is currently playing */
-  playing: boolean
-  /** The duration of the document in seconds */
-  readonly duration: number
-  /** The current playback time in seconds */
-  currentTime: number
+  /**
+   * The file path of the document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly path: string | null
+  /**
+   * Whether the document is currently playing.
+   * Nullable. No evidence that the app always sets it.
+   */
+  playing: boolean | null
+  /**
+   * The duration of the document in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: number | null
+  /**
+   * The current playback time in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentTime: number | null
 }
 
 /** Input for creating a Document. */
@@ -57,9 +75,15 @@ export interface DocumentCreateInput {
 
 /** Input for updating a Document. Omitted fields are left unchanged. */
 export interface DocumentUpdateInput {
-  /** Whether the document is currently playing */
+  /**
+   * Whether the document is currently playing.
+   * Cannot be reset: null is rejected.
+   */
   playing?: boolean
-  /** The current playback time in seconds */
+  /**
+   * The current playback time in seconds.
+   * Cannot be reset: null is rejected.
+   */
   currentTime?: number
 }
 
@@ -80,11 +104,24 @@ export interface QuickTimePlayerClient {
   resume(options?: CallOptions): Promise<void>
   /** Stop the movie or recording. */
   stop(options?: CallOptions): Promise<void>
-  /** Step the movie backward the specified number of steps (default is 1). */
+  /**
+   * Step the movie backward the specified number of steps (default is 1).
+   *
+   * @param by - number of steps. Does not accept null.
+   */
   stepBackward(by?: Integer, options?: CallOptions): Promise<void>
-  /** Step the movie forward the specified number of steps (default is 1). */
+  /**
+   * Step the movie forward the specified number of steps (default is 1).
+   *
+   * @param by - number of steps. Does not accept null.
+   */
   stepForward(by?: Integer, options?: CallOptions): Promise<void>
-  /** Trim the movie. */
+  /**
+   * Trim the movie.
+   *
+   * @param from - start time in seconds. Does not accept null.
+   * @param to - end time in seconds. Does not accept null.
+   */
   trim(from: number, to: number, options?: CallOptions): Promise<void>
   /** Present the document full screen. */
   present(options?: CallOptions): Promise<void>
@@ -94,7 +131,13 @@ export interface QuickTimePlayerClient {
   newAudioRecording(options?: CallOptions): Promise<void>
   /** Create a new screen recording document. */
   newScreenRecording(options?: CallOptions): Promise<void>
-  /** Export a movie to another file */
+  /**
+   * Export a movie to another file
+   *
+   * @param _in - the destination file. Does not accept null.
+   * @param usingSettingsPreset - the name of the export settings preset to use. Does not accept
+   * null.
+   */
   _export(_in: FileSource, usingSettingsPreset: string, options?: CallOptions): Promise<void>
   /** Show the document's Remote HUD */
   showRemoteHud(options?: CallOptions): Promise<void>
@@ -102,12 +145,12 @@ export interface QuickTimePlayerClient {
 
 const documentRecordType: ValueType<Document> = t.record(
   {
-    name: t.string({ description: 'The document name' }),
+    name: t.nullable(t.string(), { description: 'The document name' }),
     id: t.string({ description: 'The unique identifier of the document' }),
-    path: t.string({ description: 'The file path of the document' }),
-    playing: t.boolean({ description: 'Whether the document is currently playing' }),
-    duration: t.double({ description: 'The duration of the document in seconds' }),
-    currentTime: t.double({ description: 'The current playback time in seconds' }),
+    path: t.nullable(t.string(), { description: 'The file path of the document' }),
+    playing: t.nullable(t.boolean(), { description: 'Whether the document is currently playing' }),
+    duration: t.nullable(t.double(), { description: 'The duration of the document in seconds' }),
+    currentTime: t.nullable(t.double(), { description: 'The current playback time in seconds' }),
   },
   { description: 'A QuickTime Player document' }
 )

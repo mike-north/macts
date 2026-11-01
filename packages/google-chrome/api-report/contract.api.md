@@ -14,8 +14,8 @@ import { Rectangle } from '@macts/contracts';
 // @public
 export interface BookmarkFolder {
     readonly id: string;
-    readonly index: number;
-    title: string;
+    readonly index: number | null;
+    title: string | null;
 }
 
 // @public
@@ -31,9 +31,9 @@ export interface BookmarkFolderUpdateInput {
 // @public
 export interface BookmarkItem {
     readonly id: string;
-    readonly index: number;
-    title: string;
-    uRL: string;
+    readonly index: number | null;
+    title: string | null;
+    uRL: string | null;
 }
 
 // @public
@@ -81,9 +81,9 @@ export const googleChromeContract: AppContract<GoogleChromeClient>;
 // @public
 export interface Tab {
     readonly id: string;
-    readonly loading: boolean;
-    readonly title: string;
-    uRL: string;
+    readonly loading: boolean | null;
+    readonly title: string | null;
+    uRL: string | null;
 }
 
 // @public
@@ -98,21 +98,21 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeTab: ObjectReferenceVariant<Tab, string>;
-    activeTabIndex: Integer;
-    bounds: Rectangle;
-    readonly closeable: boolean;
-    givenName: string;
+    readonly activeTab: ObjectReferenceVariant<Tab, string> | null;
+    activeTabIndex: Integer | null;
+    bounds: Rectangle | null;
+    readonly closeable: boolean | null;
+    givenName: string | null;
     readonly id: string;
-    index: Integer;
-    readonly minimizable: boolean;
-    minimized: boolean;
-    mode: string;
-    readonly name: string;
-    readonly resizable: boolean;
-    visible: boolean;
-    readonly zoomable: boolean;
-    zoomed: boolean;
+    index: Integer | null;
+    readonly minimizable: boolean | null;
+    minimized: boolean | null;
+    mode: string | null;
+    readonly name: string | null;
+    readonly resizable: boolean | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
 
 // @public

@@ -15,8 +15,8 @@ export type Accs = 'none' | 'readOnly' | 'readWrite' | 'writeOnly';
 
 // @public
 export interface Action {
-    readonly description: string;
-    readonly name: string;
+    readonly description: string | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -35,15 +35,15 @@ export type Actn = 'itemsAdded' | 'itemsRemoved' | 'windowClosed' | 'windowMoved
 
 // @public
 export interface Alias {
-    creatorType: string;
-    defaultApplication: string;
-    fileType: string;
-    readonly kind: string;
-    readonly productVersion: string;
-    readonly shortVersion: string;
-    stationery: boolean;
-    readonly typeIdentifier: string;
-    readonly version: string;
+    creatorType: string | null;
+    defaultApplication: string | null;
+    fileType: string | null;
+    readonly kind: string | null;
+    readonly productVersion: string | null;
+    readonly shortVersion: string | null;
+    stationery: boolean | null;
+    readonly typeIdentifier: string | null;
+    readonly version: string | null;
 }
 
 // @public
@@ -67,9 +67,9 @@ export type Appearances = 'blue' | 'graphite';
 
 // @public
 export interface Attribute {
-    readonly name: string;
-    readonly settable: boolean;
-    value: string;
+    readonly name: string | null;
+    readonly settable: boolean | null;
+    value: string | null;
 }
 
 // @public
@@ -84,7 +84,7 @@ export interface AttributeUpdateInput {
 
 // @public
 export interface Browser {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -95,7 +95,7 @@ export type BrowserUpdateInput = Record<string, never>;
 
 // @public
 export interface BusyIndicator {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -106,7 +106,7 @@ export type BusyIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Button {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -117,7 +117,7 @@ export type ButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface Checkbox {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -128,17 +128,17 @@ export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
-    readonly appleMenuFolder: ObjectReferenceVariant<Folder, never>;
-    readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly desktopFolder: ObjectReferenceVariant<Folder, never>;
-    readonly extensionsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly fontsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly preferencesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly shutdownFolder: ObjectReferenceVariant<Folder, never>;
-    readonly startupItemsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly systemFolder: ObjectReferenceVariant<Folder, never>;
+    readonly appleMenuFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly extensionsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly shutdownFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly startupItemsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly systemFolder: ObjectReferenceVariant<Folder, never> | null;
 }
 
 // @public
@@ -149,7 +149,7 @@ export type ClassicDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ColorWell {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -160,7 +160,7 @@ export type ColorWellUpdateInput = Record<string, never>;
 
 // @public
 export interface Column {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -171,7 +171,7 @@ export type ColumnUpdateInput = Record<string, never>;
 
 // @public
 export interface ComboBox {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -182,10 +182,10 @@ export type ComboBoxUpdateInput = Record<string, never>;
 
 // @public
 export interface Configuration {
-    accountName: string;
-    readonly connected: boolean;
+    accountName: string | null;
+    readonly connected: boolean | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -203,15 +203,15 @@ export type Dhac = 'askWhatToDo' | 'ignore' | 'openApplication' | 'runAScript';
 
 // @public
 export interface Disk {
-    readonly capacity: number;
-    readonly ejectable: boolean;
-    readonly format: string;
-    readonly freeSpace: number;
-    ignorePrivileges: boolean;
-    readonly localVolume: boolean;
-    readonly server: string;
-    readonly startup: boolean;
-    readonly zone: string;
+    readonly capacity: number | null;
+    readonly ejectable: boolean | null;
+    readonly format: string | null;
+    readonly freeSpace: number | null;
+    ignorePrivileges: boolean | null;
+    readonly localVolume: boolean | null;
+    readonly server: string | null;
+    readonly startup: boolean | null;
+    readonly zone: string | null;
 }
 
 // @public
@@ -221,22 +221,22 @@ export interface DiskCreateInput {
 
 // @public
 export interface DiskItem {
-    readonly busyStatus: boolean;
-    readonly container: ObjectReferenceVariant<DiskItem, string>;
-    readonly creationDate: Date;
-    readonly displayedName: string;
+    readonly busyStatus: boolean | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string> | null;
+    readonly creationDate: Date | null;
+    readonly displayedName: string | null;
     readonly id: string;
-    modificationDate: Date;
-    name: string;
-    readonly nameExtension: string;
-    readonly packageFolder: boolean;
-    readonly path: string;
-    readonly physicalSize: Integer;
-    readonly pOSIXPath: string;
-    readonly size: Integer;
-    readonly uRL: string;
-    visible: boolean;
-    readonly volume: string;
+    modificationDate: Date | null;
+    name: string | null;
+    readonly nameExtension: string | null;
+    readonly packageFolder: boolean | null;
+    readonly path: string | null;
+    readonly physicalSize: Integer | null;
+    readonly pOSIXPath: string | null;
+    readonly size: Integer | null;
+    readonly uRL: string | null;
+    visible: boolean | null;
+    readonly volume: string | null;
 }
 
 // @public
@@ -265,21 +265,21 @@ export interface DiskUpdateInput {
 
 // @public
 export interface Domain {
-    readonly applicationsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never>;
-    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly fontsFolder: ObjectReferenceVariant<Folder, never>;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null;
     readonly id: string;
-    readonly libraryFolder: ObjectReferenceVariant<Folder, never>;
-    readonly name: string;
-    readonly preferencesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly scriptsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly utilitiesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly workflowsFolder: ObjectReferenceVariant<Folder, never>;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly name: string | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, never> | null;
 }
 
 // @public
@@ -299,7 +299,7 @@ export type Dpls = 'bottom' | 'left' | 'right';
 
 // @public
 export interface Drawer {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -325,15 +325,15 @@ export type Enum = 'standard' | 'detailed';
 
 // @public
 interface File_2 {
-    creatorType: string;
-    defaultApplication: string;
-    fileType: string;
-    readonly kind: string;
-    readonly productVersion: string;
-    readonly shortVersion: string;
-    stationery: boolean;
-    readonly typeIdentifier: string;
-    readonly version: string;
+    creatorType: string | null;
+    defaultApplication: string | null;
+    fileType: string | null;
+    readonly kind: string | null;
+    readonly productVersion: string | null;
+    readonly shortVersion: string | null;
+    stationery: boolean | null;
+    readonly typeIdentifier: string | null;
+    readonly version: string | null;
 }
 export { File_2 as File }
 
@@ -347,7 +347,7 @@ export interface FileCreateInput {
 
 // @public
 export interface FilePackage {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -366,7 +366,7 @@ export interface FileUpdateInput {
 
 // @public
 export interface Folder {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -380,7 +380,7 @@ export type FontSmoothingStyles = 'automatic' | 'light' | 'medium' | 'standard' 
 
 // @public
 export interface Group {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -391,7 +391,7 @@ export type GroupUpdateInput = Record<string, never>;
 
 // @public
 export interface GrowArea {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -405,7 +405,7 @@ export type HighlightColors = 'blue' | 'gold' | 'graphite' | 'green' | 'orange' 
 
 // @public
 export interface Image {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -416,7 +416,7 @@ export type ImageUpdateInput = Record<string, never>;
 
 // @public
 export interface Incrementor {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -427,14 +427,14 @@ export type IncrementorUpdateInput = Record<string, never>;
 
 // @public
 export interface Interface {
-    automatic: boolean;
-    duplex: string;
+    automatic: boolean | null;
+    duplex: string | null;
     readonly id: string;
-    readonly kind: string;
-    readonly mACAddress: string;
-    mtu: Integer;
-    readonly name: string;
-    speed: Integer;
+    readonly kind: string | null;
+    readonly mACAddress: string | null;
+    mtu: Integer | null;
+    readonly name: string | null;
+    speed: Integer | null;
 }
 
 // @public
@@ -455,7 +455,7 @@ export interface InterfaceUpdateInput {
 
 // @public
 export interface List {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -466,7 +466,7 @@ export type ListUpdateInput = Record<string, never>;
 
 // @public
 export interface LocalDomainObject {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -478,7 +478,7 @@ export type LocalDomainObjectUpdateInput = Record<string, never>;
 // @public
 export interface Location {
     readonly id: string;
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -493,12 +493,12 @@ export interface LocationUpdateInput {
 
 // @public
 export interface Menu {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
 export interface MenuBar {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -506,7 +506,7 @@ export type MenuBarCreateInput = Record<string, never>;
 
 // @public
 export interface MenuBarItem {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -520,7 +520,7 @@ export type MenuBarUpdateInput = Record<string, never>;
 
 // @public
 export interface MenuButton {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -534,7 +534,7 @@ export type MenuCreateInput = Record<string, never>;
 
 // @public
 export interface MenuItem {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -548,7 +548,7 @@ export type MenuUpdateInput = Record<string, never>;
 
 // @public
 export interface NetworkDomainObject {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -559,7 +559,7 @@ export type NetworkDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface NetworkPreferencesObject {
-    currentLocation: ObjectReferenceVariant<Location, string>;
+    currentLocation: ObjectReferenceVariant<Location, string> | null;
 }
 
 // @public
@@ -574,7 +574,7 @@ export interface NetworkPreferencesObjectUpdateInput {
 
 // @public
 export interface Outline {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -585,7 +585,7 @@ export type OutlineUpdateInput = Record<string, never>;
 
 // @public
 export interface PopOver {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -596,7 +596,7 @@ export type PopOverUpdateInput = Record<string, never>;
 
 // @public
 export interface PopUpButton {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -607,25 +607,25 @@ export type PopUpButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface Process {
-    readonly acceptsHighLevelEvents: boolean;
-    readonly acceptsRemoteEvents: boolean;
-    readonly architecture: string;
-    readonly backgroundOnly: boolean;
-    readonly bundleIdentifier: string;
-    readonly classic: boolean;
-    readonly creatorType: string;
-    readonly displayedName: string;
-    readonly file: string;
-    readonly fileType: string;
-    frontmost: boolean;
-    readonly hasScriptingTerminology: boolean;
+    readonly acceptsHighLevelEvents: boolean | null;
+    readonly acceptsRemoteEvents: boolean | null;
+    readonly architecture: string | null;
+    readonly backgroundOnly: boolean | null;
+    readonly bundleIdentifier: string | null;
+    readonly classic: boolean | null;
+    readonly creatorType: string | null;
+    readonly displayedName: string | null;
+    readonly file: string | null;
+    readonly fileType: string | null;
+    frontmost: boolean | null;
+    readonly hasScriptingTerminology: boolean | null;
     readonly id: Integer;
-    readonly name: string;
-    readonly partitionSpaceUsed: Integer;
-    readonly shortName: string;
-    readonly totalPartitionSize: Integer;
-    readonly unixId: Integer;
-    visible: string;
+    readonly name: string | null;
+    readonly partitionSpaceUsed: Integer | null;
+    readonly shortName: string | null;
+    readonly totalPartitionSize: Integer | null;
+    readonly unixId: Integer | null;
+    visible: string | null;
 }
 
 // @public
@@ -642,7 +642,7 @@ export interface ProcessUpdateInput {
 
 // @public
 export interface ProgressIndicator {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -653,10 +653,10 @@ export type ProgressIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface PropertyListItem {
-    readonly kind: string;
-    readonly name: string;
-    text: string;
-    value: string;
+    readonly kind: string | null;
+    readonly name: string | null;
+    text: string | null;
+    value: string | null;
 }
 
 // @public
@@ -673,7 +673,7 @@ export interface PropertyListItemUpdateInput {
 
 // @public
 export interface RadioButton {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -684,7 +684,7 @@ export type RadioButtonUpdateInput = Record<string, never>;
 
 // @public
 export interface RadioGroup {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -695,7 +695,7 @@ export type RadioGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface RelevanceIndicator {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -706,7 +706,7 @@ export type RelevanceIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface Row {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -720,13 +720,13 @@ export type SaveableFileFormat = 'text';
 
 // @public
 export interface ScriptingClass {
-    readonly description: string;
-    readonly hidden: boolean;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly name: string;
-    readonly pluralName: string;
-    readonly suiteName: string;
-    readonly superclass: ObjectReferenceVariant<ScriptingClass, string>;
+    readonly name: string | null;
+    readonly pluralName: string | null;
+    readonly suiteName: string | null;
+    readonly superclass: ObjectReferenceVariant<ScriptingClass, string> | null;
 }
 
 // @public
@@ -737,13 +737,13 @@ export type ScriptingClassUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingCommand {
-    readonly description: string;
-    readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string>;
-    readonly hidden: boolean;
+    readonly description: string | null;
+    readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string> | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
     readonly scriptingResult: unknown;
-    readonly suiteName: string;
+    readonly suiteName: string | null;
 }
 
 // @public
@@ -754,7 +754,7 @@ export type ScriptingCommandUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingDefinitionObject {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -765,7 +765,7 @@ export type ScriptingDefinitionObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingElement {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -776,9 +776,9 @@ export type ScriptingElementUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumeration {
-    readonly hidden: boolean;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -789,10 +789,10 @@ export type ScriptingEnumerationUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingEnumerator {
-    readonly description: string;
-    readonly hidden: boolean;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -803,12 +803,12 @@ export type ScriptingEnumeratorUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingParameter {
-    readonly description: string;
-    readonly hidden: boolean;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly kind: string;
-    readonly name: string;
-    readonly optional: boolean;
+    readonly kind: string | null;
+    readonly name: string | null;
+    readonly optional: boolean | null;
 }
 
 // @public
@@ -819,14 +819,14 @@ export type ScriptingParameterUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingProperty {
-    readonly access: string;
-    readonly description: string;
-    readonly enumerated: boolean;
-    readonly hidden: boolean;
+    readonly access: string | null;
+    readonly description: string | null;
+    readonly enumerated: boolean | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly kind: string;
-    readonly listed: boolean;
-    readonly name: string;
+    readonly kind: string | null;
+    readonly listed: boolean | null;
+    readonly name: string | null;
 }
 
 // @public
@@ -837,10 +837,10 @@ export type ScriptingPropertyUpdateInput = Record<string, never>;
 
 // @public
 export interface ScriptingSuite {
-    readonly description: string;
-    readonly hidden: boolean;
+    readonly description: string | null;
+    readonly hidden: boolean | null;
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -851,7 +851,7 @@ export type ScriptingSuiteUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollArea {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -862,7 +862,7 @@ export type ScrollAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface ScrollBar {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -876,12 +876,12 @@ export type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
 
 // @public
 export interface Service {
-    readonly active: boolean;
-    currentConfiguration: ObjectReferenceVariant<Configuration, string>;
+    readonly active: boolean | null;
+    currentConfiguration: ObjectReferenceVariant<Configuration, string> | null;
     readonly id: string;
-    readonly interface: ObjectReferenceVariant<Interface, string>;
-    readonly kind: Integer;
-    name: string;
+    readonly interface: ObjectReferenceVariant<Interface, string> | null;
+    readonly kind: Integer | null;
+    name: string | null;
 }
 
 // @public
@@ -898,7 +898,7 @@ export interface ServiceUpdateInput {
 
 // @public
 export interface Sheet {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -909,7 +909,7 @@ export type SheetUpdateInput = Record<string, never>;
 
 // @public
 export interface Slider {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -920,7 +920,7 @@ export type SliderUpdateInput = Record<string, never>;
 
 // @public
 export interface Splitter {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -928,7 +928,7 @@ export type SplitterCreateInput = Record<string, never>;
 
 // @public
 export interface SplitterGroup {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -942,7 +942,7 @@ export type SplitterUpdateInput = Record<string, never>;
 
 // @public
 export interface StaticText {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -953,7 +953,7 @@ export type StaticTextUpdateInput = Record<string, never>;
 
 // @public
 export interface SystemDomainObject {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1001,7 +1001,7 @@ export const systemEventsContract: AppContract<SystemEventsClient>;
 
 // @public
 export interface TabGroup {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1012,7 +1012,7 @@ export type TabGroupUpdateInput = Record<string, never>;
 
 // @public
 export interface Table {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1023,7 +1023,7 @@ export type TableUpdateInput = Record<string, never>;
 
 // @public
 export interface TextArea {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1034,7 +1034,7 @@ export type TextAreaUpdateInput = Record<string, never>;
 
 // @public
 export interface TextField {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1045,7 +1045,7 @@ export type TextFieldUpdateInput = Record<string, never>;
 
 // @public
 export interface Toolbar {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1056,25 +1056,25 @@ export type ToolbarUpdateInput = Record<string, never>;
 
 // @public
 export interface UIElement {
-    readonly accessibilityDescription: string;
-    readonly class: string;
-    readonly description: string;
-    readonly enabled: string;
-    readonly entireContents: string;
-    focused: string;
-    readonly help: string;
-    readonly maximumValue: string;
-    readonly minimumValue: string;
-    readonly name: string;
-    readonly orientation: string;
-    position: string;
-    readonly role: string;
-    readonly roleDescription: string;
-    selected: string;
-    size: string;
-    readonly subrole: string;
-    readonly title: string;
-    value: string;
+    readonly accessibilityDescription: string | null;
+    readonly class: string | null;
+    readonly description: string | null;
+    readonly enabled: string | null;
+    readonly entireContents: string | null;
+    focused: string | null;
+    readonly help: string | null;
+    readonly maximumValue: string | null;
+    readonly minimumValue: string | null;
+    readonly name: string | null;
+    readonly orientation: string | null;
+    position: string | null;
+    readonly role: string | null;
+    readonly roleDescription: string | null;
+    selected: string | null;
+    size: string | null;
+    readonly subrole: string | null;
+    readonly title: string | null;
+    value: string | null;
 }
 
 // @public
@@ -1103,17 +1103,17 @@ export interface UIElementUpdateInput {
 
 // @public
 export interface UserDomainObject {
-    readonly desktopFolder: ObjectReferenceVariant<Folder, never>;
-    readonly documentsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly downloadsFolder: ObjectReferenceVariant<Folder, never>;
-    readonly favoritesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly homeFolder: ObjectReferenceVariant<Folder, never>;
-    readonly moviesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly musicFolder: ObjectReferenceVariant<Folder, never>;
-    readonly picturesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly publicFolder: ObjectReferenceVariant<Folder, never>;
-    readonly sitesFolder: ObjectReferenceVariant<Folder, never>;
-    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never>;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly documentsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly downloadsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly favoritesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly homeFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly moviesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly musicFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly picturesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly publicFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly sitesFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never> | null;
 }
 
 // @public
@@ -1124,7 +1124,7 @@ export type UserDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface ValueIndicator {
-    readonly id: string;
+    readonly id: string | null;
 }
 
 // @public
@@ -1135,8 +1135,8 @@ export type ValueIndicatorUpdateInput = Record<string, never>;
 
 // @public
 export interface XMLAttribute {
-    readonly name: string;
-    value: string;
+    readonly name: string | null;
+    value: string | null;
 }
 
 // @public
@@ -1152,8 +1152,8 @@ export interface XMLAttributeUpdateInput {
 // @public
 export interface XMLData {
     readonly id: string;
-    name: string;
-    text: string;
+    name: string | null;
+    text: string | null;
 }
 
 // @public
@@ -1171,8 +1171,8 @@ export interface XMLDataUpdateInput {
 // @public
 export interface XMLElement {
     readonly id: string;
-    readonly name: string;
-    value: string;
+    readonly name: string | null;
+    value: string | null;
 }
 
 // @public

@@ -65,6 +65,9 @@ export interface ApiPluginGeneratorOptions {
     version?: string | undefined;
 }
 
+// @public
+export const APP_VERSION_BODY = "return String(app.version());";
+
 // @public (undocumented)
 export interface AppConnection {
     // (undocumented)
@@ -136,13 +139,13 @@ export const AppManifestSchema: z.ZodObject<{
                 r: "r";
                 rw: "rw";
             }>;
-            type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+            type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
                 array: PropertyType;
             } | {
                 resource: string;
             } | {
                 enum: string;
-            }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+            }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
                 array: PropertyType;
             } | {
                 resource: string;
@@ -156,6 +159,35 @@ export const AppManifestSchema: z.ZodObject<{
             deprecated: z.ZodOptional<z.ZodObject<{
                 message: z.ZodString;
                 since: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>>;
+            nullable: z.ZodOptional<z.ZodBoolean>;
+            resettable: z.ZodOptional<z.ZodBoolean>;
+            evidence: z.ZodOptional<z.ZodObject<{
+                nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                    source: z.ZodLiteral<"probe">;
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    sampleSize: z.ZodNumber;
+                    nullCount: z.ZodNumber;
+                    failedReads: z.ZodNumber;
+                    note: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>, z.ZodObject<{
+                    source: z.ZodLiteral<"curated">;
+                    note: z.ZodString;
+                    observedAt: z.ZodOptional<z.ZodISODateTime>;
+                    appVersion: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>, z.ZodObject<{
+                    source: z.ZodLiteral<"sdef">;
+                    note: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>], "source">>;
+                resettable: z.ZodOptional<z.ZodObject<{
+                    source: z.ZodLiteral<"curated">;
+                    note: z.ZodString;
+                    observedAt: z.ZodOptional<z.ZodISODateTime>;
+                    appVersion: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>>;
             }, z.core.$strip>>;
         }, z.core.$strip>>>;
         identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -176,6 +208,24 @@ export const AppManifestSchema: z.ZodObject<{
                 failed: "failed";
             }>;
             probedAt: z.ZodOptional<z.ZodString>;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>;
+        nullabilityProbe: z.ZodOptional<z.ZodObject<{
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            accessPath: z.ZodString;
+            itemsRead: z.ZodNumber;
+            sampledParents: z.ZodOptional<z.ZodNumber>;
+            status: z.ZodEnum<{
+                error: "error";
+                probed: "probed";
+                "no-items": "no-items";
+                unreachable: "unreachable";
+                budget: "budget";
+            }>;
+            skipped: z.ZodArray<z.ZodString>;
             note: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>>;
     }, z.core.$strip>>;
@@ -231,9 +281,32 @@ export const AppManifestSchema: z.ZodObject<{
             required: z.ZodDefault<z.ZodBoolean>;
             default: z.ZodOptional<z.ZodUnknown>;
             code: z.ZodOptional<z.ZodString>;
+            nullable: z.ZodOptional<z.ZodBoolean>;
+            evidence: z.ZodOptional<z.ZodObject<{
+                nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                    source: z.ZodLiteral<"probe">;
+                    observedAt: z.ZodISODateTime;
+                    bundleId: z.ZodString;
+                    appVersion: z.ZodString;
+                    osVersion: z.ZodString;
+                    sampleSize: z.ZodNumber;
+                    nullCount: z.ZodNumber;
+                    failedReads: z.ZodNumber;
+                    note: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>, z.ZodObject<{
+                    source: z.ZodLiteral<"curated">;
+                    note: z.ZodString;
+                    observedAt: z.ZodOptional<z.ZodISODateTime>;
+                    appVersion: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>, z.ZodObject<{
+                    source: z.ZodLiteral<"sdef">;
+                    note: z.ZodOptional<z.ZodString>;
+                }, z.core.$strip>], "source">>;
+            }, z.core.$strip>>;
         }, z.core.$strip>>>;
         returns: z.ZodOptional<z.ZodString>;
         code: z.ZodOptional<z.ZodString>;
+        routeName: z.ZodOptional<z.ZodString>;
         permission: z.ZodOptional<z.ZodString>;
         risk: z.ZodOptional<z.ZodEnum<{
             read: "read";
@@ -295,6 +368,18 @@ export const AppMetadataSchema: z.ZodObject<{
         system: "system";
     }>>;
 }, z.core.$strip>;
+
+// @public
+export interface AppNullabilityResult {
+    // (undocumented)
+    readonly appName: string;
+    readonly appVersion: string;
+    // (undocumented)
+    readonly bundleId: string;
+    readonly observedAt: string;
+    readonly osVersion: string;
+    readonly resources: Readonly<Record<string, ResourceNullabilityResult>>;
+}
 
 // @public
 export type AppPattern = z.infer<typeof AppPatternSchema>;
@@ -503,7 +588,7 @@ export interface AuditWriter {
 export const booleanCoercer: TypeCoercer<boolean>;
 
 // @public
-export function buildAppCommandRoute(appName: string, commandKey: string): string;
+export function buildAppCommandRoute(appName: string, segment: string): string;
 
 // @public
 export function buildCapabilityRegistry(manifests: readonly AppManifest[]): CapabilityRegistry;
@@ -512,7 +597,7 @@ export function buildCapabilityRegistry(manifests: readonly AppManifest[]): Capa
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
-export function buildResourceCommandRoute(appName: string, resourcePlural: string, commandKey: string): string;
+export function buildResourceCommandRoute(appName: string, resourcePlural: string, segment: string): string;
 
 // @public
 export interface CallAuditContext {
@@ -566,6 +651,11 @@ export const CardinalitySchema: z.ZodEnum<{
     "many-to-many": "many-to-many";
 }>;
 
+// Warning: (ae-forgotten-export) The symbol "NullabilityClaim" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function checkNullabilityClaim(claim: NullabilityClaim, ctx: z.RefinementCtx): void;
+
 // @public
 export function checkPermission(grantedPermissions: string[], requiredPermission: string): boolean;
 
@@ -576,7 +666,13 @@ export function checkPermissions(grantedPermissions: string[], requiredPermissio
 };
 
 // @public
+export type ClaimChange = 'set' | 'refreshed' | 'unchanged';
+
+// @public
 export function classifyCommandRisk(command: Command): RiskClass;
+
+// @public
+export function classifyPresence(presence: PropertyPresence): PropertyObservation;
 
 // @public
 export function classifyRiskFromOperation(operationName: string): RiskClass;
@@ -656,7 +752,32 @@ export const CommandParameterSchema: z.ZodObject<{
     required: z.ZodDefault<z.ZodBoolean>;
     default: z.ZodOptional<z.ZodUnknown>;
     code: z.ZodOptional<z.ZodString>;
+    nullable: z.ZodOptional<z.ZodBoolean>;
+    evidence: z.ZodOptional<z.ZodObject<{
+        nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            sampleSize: z.ZodNumber;
+            nullCount: z.ZodNumber;
+            failedReads: z.ZodNumber;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>, z.ZodObject<{
+            source: z.ZodLiteral<"curated">;
+            note: z.ZodString;
+            observedAt: z.ZodOptional<z.ZodISODateTime>;
+            appVersion: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>, z.ZodObject<{
+            source: z.ZodLiteral<"sdef">;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>], "source">>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
+
+// @public
+export function commandRouteSegment(commandKey: string, command: Pick<Command, 'routeName'>): string;
 
 // @public
 export const CommandSchema: z.ZodObject<{
@@ -674,9 +795,32 @@ export const CommandSchema: z.ZodObject<{
         required: z.ZodDefault<z.ZodBoolean>;
         default: z.ZodOptional<z.ZodUnknown>;
         code: z.ZodOptional<z.ZodString>;
+        nullable: z.ZodOptional<z.ZodBoolean>;
+        evidence: z.ZodOptional<z.ZodObject<{
+            nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                sampleSize: z.ZodNumber;
+                nullCount: z.ZodNumber;
+                failedReads: z.ZodNumber;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>, z.ZodObject<{
+                source: z.ZodLiteral<"curated">;
+                note: z.ZodString;
+                observedAt: z.ZodOptional<z.ZodISODateTime>;
+                appVersion: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>, z.ZodObject<{
+                source: z.ZodLiteral<"sdef">;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>], "source">>;
+        }, z.core.$strip>>;
     }, z.core.$strip>>>;
     returns: z.ZodOptional<z.ZodString>;
     code: z.ZodOptional<z.ZodString>;
+    routeName: z.ZodOptional<z.ZodString>;
     permission: z.ZodOptional<z.ZodString>;
     risk: z.ZodOptional<z.ZodEnum<{
         read: "read";
@@ -777,6 +921,17 @@ export function createPolicyGovernanceFilter(policy: GovernancePolicy): Governan
 // @public
 export function createStaticApprovalProvider(options: StaticApprovalProviderOptions): ApprovalProvider;
 
+// @public (undocumented)
+export type CuratedNullabilityEvidence = z.infer<typeof CuratedNullabilityEvidenceSchema>;
+
+// @public
+export const CuratedNullabilityEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"curated">;
+    note: z.ZodString;
+    observedAt: z.ZodOptional<z.ZodISODateTime>;
+    appVersion: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+
 // @public
 export const dateCoercer: TypeCoercer<Date>;
 
@@ -788,6 +943,12 @@ export const DateTypeSchema: z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>;
 
 // @public
 export const DEFAULT_APPROVAL_TIMEOUT_MS = 120000;
+
+// @public
+export const DEFAULT_NULLABILITY_BUDGET_MS = 120000;
+
+// @public
+export const DEFAULT_NULLABILITY_ENVIRONMENT: NullabilityProbeEnvironment;
 
 // @public
 export const DEFAULT_RISK: RiskClass;
@@ -968,6 +1129,12 @@ export function filterPermissionsByApp(permissions: string[], app: string): stri
 
 // @public
 export function findCoarseCategory(finePermission: string, permissionsSection: PermissionsSection): string | undefined;
+
+// @public
+export function findDuplicateRoutes(manifest: AppManifest): {
+    route: string;
+    commandKeys: string[];
+}[];
 
 // @public
 export function findMatchingPolicyRule(policy: GovernancePolicy, app: string, _resource: string, operation: string): PolicyRuleMatch | undefined;
@@ -1386,6 +1553,9 @@ export function groupPermissionsByResource(permissions: string[]): Map<string, s
 // @public
 export function hasPermission(grantedPermissions: string[], requiredPermission: string, permissionHistory?: PermissionHistoryEntry[]): PermissionCheckResult;
 
+// @public
+export const HEAVY_PROPERTY_NAMES: readonly string[];
+
 // @public (undocumented)
 export type HexColor = z.infer<typeof HexColorSchema>;
 
@@ -1442,6 +1612,15 @@ export interface HttpClientGeneratorOptions {
 export type Identifier = z.infer<typeof IdentifierSchema>;
 
 // @public
+export interface IdentifierDefect {
+    readonly empty: number;
+    readonly failed: number;
+    readonly itemsRead: number;
+    readonly probed: boolean;
+    readonly property: string;
+}
+
+// @public
 export interface IdentifierProbeResult {
     error?: string;
     property: string;
@@ -1473,6 +1652,9 @@ export const IdentifierTargetingSchema: z.ZodEnum<{
     byId: "byId";
     byProperty: "byProperty";
 }>;
+
+// @public
+export function ignoredIdentifierNullability(resource: Resource, propertyName: string, property: Property): NullabilityEvidence | undefined;
 
 // @public (undocumented)
 export type Inheritance = z.infer<typeof InheritanceSchema>;
@@ -1655,6 +1837,12 @@ export interface MatchedPolicyRule {
 export const MAX_APPROVAL_TIMEOUT_MS = 3600000;
 
 // @public
+export const MAX_CALL_MS = 25000;
+
+// @public
+export const MAX_ITEMS_PER_COLLECTION = 60;
+
+// @public
 export interface McpGeneratorContext {
     appName: string;
     manifest: AppManifest;
@@ -1662,6 +1850,9 @@ export interface McpGeneratorContext {
     sdkPackageName: string;
     version?: string | undefined;
 }
+
+// @public
+export function mergeNullabilityObservations(manifest: AppManifest, observed: AppNullabilityResult): NullabilityMergeResult;
 
 // @public
 export const NATIVE_CODEC: NativeCodec;
@@ -1711,10 +1902,106 @@ export interface NativeScript {
 }
 
 // @public
+export const NON_NULL_SAMPLE_THRESHOLD = 30;
+
+// @public
 export function normalizeAppRouteSegment(appName: string): string;
 
 // @public
 export function normalizeResourceRouteSegment(plural: string): string;
+
+// @public
+export type NullabilityBasis = 'identifier' | 'default' | NullabilityEvidence;
+
+// @public (undocumented)
+export type NullabilityEvidence = z.infer<typeof NullabilityEvidenceSchema>;
+
+// @public
+export const NullabilityEvidenceSchema: z.ZodDiscriminatedUnion<[z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    nullCount: z.ZodNumber;
+    failedReads: z.ZodNumber;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    source: z.ZodLiteral<"curated">;
+    note: z.ZodString;
+    observedAt: z.ZodOptional<z.ZodISODateTime>;
+    appVersion: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>, z.ZodObject<{
+    source: z.ZodLiteral<"sdef">;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>], "source">;
+
+// @public
+export interface NullabilityMergeResult {
+    // (undocumented)
+    readonly appName: string;
+    // (undocumented)
+    readonly bundleId: string;
+    // (undocumented)
+    readonly resources: readonly ResourceMergeOutcome[];
+}
+
+// @public (undocumented)
+export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>;
+
+// @public
+export function nullabilityProbeBody(accessors: readonly string[], properties: readonly string[], maxItems: number, timeLimitMs: number): string;
+
+// @public
+export interface NullabilityProbeEnvironment {
+    clock(): number;
+    observedAt(): string;
+    osVersion(): Promise<string>;
+}
+
+// @public
+export const NullabilityProbeSchema: z.ZodObject<{
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    accessPath: z.ZodString;
+    itemsRead: z.ZodNumber;
+    sampledParents: z.ZodOptional<z.ZodNumber>;
+    status: z.ZodEnum<{
+        error: "error";
+        probed: "probed";
+        "no-items": "no-items";
+        unreachable: "unreachable";
+        budget: "budget";
+    }>;
+    skipped: z.ZodArray<z.ZodString>;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+
+// @public (undocumented)
+export type NullabilityProbeStatus = z.infer<typeof NullabilityProbeStatusSchema>;
+
+// @public
+export const NullabilityProbeStatusSchema: z.ZodEnum<{
+    error: "error";
+    probed: "probed";
+    "no-items": "no-items";
+    unreachable: "unreachable";
+    budget: "budget";
+}>;
+
+// @public
+export interface NullabilityResolution {
+    readonly basis: NullabilityBasis;
+    readonly nullable: boolean;
+}
+
+// @public
+export interface NullabilityWriteResult {
+    readonly keptEarlierBlocks: readonly string[];
+}
 
 // @public
 export function nullSafe<T>(coercer: TypeCoercer<T>): TypeCoercer<T | null | undefined>;
@@ -1737,6 +2024,9 @@ export class ObjectSpecifier {
     toSetCode(value: unknown): string;
     whose(predicate: Record<string, unknown>): ObjectSpecifier;
 }
+
+// @public
+export const ObservedAtSchema: z.ZodISODateTime;
 
 // @public (undocumented)
 export type OpenQuestion = z.infer<typeof OpenQuestionSchema>;
@@ -2002,11 +2292,11 @@ export const PrimitiveTypeSchema: z.ZodEnum<{
     string: "string";
     number: "number";
     boolean: "boolean";
-    integer: "integer";
-    date: "date";
-    data: "data";
     any: "any";
+    date: "date";
     file: "file";
+    integer: "integer";
+    data: "data";
     point: "point";
     rect: "rect";
     rgb: "rgb";
@@ -2019,6 +2309,34 @@ export function probeManifest(manifest: AppManifest, runner: JxaRunner, options?
 export interface ProbeManifestOptions {
     now?: string;
     resources?: string[];
+}
+
+// @public
+export function probeNullability(manifest: AppManifest, runner: JxaRunner, options?: ProbeNullabilityOptions): Promise<AppNullabilityResult>;
+
+// @public (undocumented)
+export type ProbeNullabilityEvidence = z.infer<typeof ProbeNullabilityEvidenceSchema>;
+
+// @public
+export const ProbeNullabilityEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"probe">;
+    observedAt: z.ZodISODateTime;
+    bundleId: z.ZodString;
+    appVersion: z.ZodString;
+    osVersion: z.ZodString;
+    sampleSize: z.ZodNumber;
+    nullCount: z.ZodNumber;
+    failedReads: z.ZodNumber;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+
+// @public
+export interface ProbeNullabilityOptions {
+    readonly budgetMs?: number;
+    readonly environment?: NullabilityProbeEnvironment;
+    readonly maxItems?: number;
+    readonly resources?: readonly string[];
+    readonly skipProperties?: readonly string[];
 }
 
 // @public (undocumented)
@@ -2044,19 +2362,78 @@ export const PropertyAccessSchema: z.ZodEnum<{
     rw: "rw";
 }>;
 
+// @public (undocumented)
+export type PropertyEvidence = z.infer<typeof PropertyEvidenceSchema>;
+
+// @public
+export const PropertyEvidenceSchema: z.ZodObject<{
+    nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+        source: z.ZodLiteral<"probe">;
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        sampleSize: z.ZodNumber;
+        nullCount: z.ZodNumber;
+        failedReads: z.ZodNumber;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>, z.ZodObject<{
+        source: z.ZodLiteral<"curated">;
+        note: z.ZodString;
+        observedAt: z.ZodOptional<z.ZodISODateTime>;
+        appVersion: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>, z.ZodObject<{
+        source: z.ZodLiteral<"sdef">;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>], "source">>;
+    resettable: z.ZodOptional<z.ZodObject<{
+        source: z.ZodLiteral<"curated">;
+        note: z.ZodString;
+        observedAt: z.ZodOptional<z.ZodISODateTime>;
+        appVersion: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+
+// @public
+export interface PropertyMergeOutcome {
+    // (undocumented)
+    readonly change: ClaimChange;
+    readonly claim?: {
+        readonly nullable: boolean;
+        readonly evidence: ProbeNullabilityEvidence;
+    };
+    readonly contradicted?: NullabilityEvidence['source'];
+    // (undocumented)
+    readonly observation: PropertyObservation;
+    // (undocumented)
+    readonly presence: PropertyPresence;
+    // (undocumented)
+    readonly property: string;
+}
+
+// @public
+export type PropertyObservation = 'nullable' | 'non-null' | 'insufficient-sample' | 'read-failed' | 'not-read';
+
+// @public
+export interface PropertyPresence {
+    readonly failures: number;
+    readonly nulls: number;
+    readonly reads: number;
+}
+
 // @public
 export const PropertySchema: z.ZodObject<{
     access: z.ZodEnum<{
         r: "r";
         rw: "rw";
     }>;
-    type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+    type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
         array: PropertyType;
     } | {
         resource: string;
     } | {
         enum: string;
-    }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+    }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
         array: PropertyType;
     } | {
         resource: string;
@@ -2070,6 +2447,35 @@ export const PropertySchema: z.ZodObject<{
     deprecated: z.ZodOptional<z.ZodObject<{
         message: z.ZodString;
         since: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
+    nullable: z.ZodOptional<z.ZodBoolean>;
+    resettable: z.ZodOptional<z.ZodBoolean>;
+    evidence: z.ZodOptional<z.ZodObject<{
+        nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+            source: z.ZodLiteral<"probe">;
+            observedAt: z.ZodISODateTime;
+            bundleId: z.ZodString;
+            appVersion: z.ZodString;
+            osVersion: z.ZodString;
+            sampleSize: z.ZodNumber;
+            nullCount: z.ZodNumber;
+            failedReads: z.ZodNumber;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>, z.ZodObject<{
+            source: z.ZodLiteral<"curated">;
+            note: z.ZodString;
+            observedAt: z.ZodOptional<z.ZodISODateTime>;
+            appVersion: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>, z.ZodObject<{
+            source: z.ZodLiteral<"sdef">;
+            note: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>], "source">>;
+        resettable: z.ZodOptional<z.ZodObject<{
+            source: z.ZodLiteral<"curated">;
+            note: z.ZodString;
+            observedAt: z.ZodOptional<z.ZodISODateTime>;
+            appVersion: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 
@@ -2185,6 +2591,9 @@ export interface RawSuite {
 }
 
 // @public
+export function readMacosVersion(): Promise<string>;
+
+// @public
 export function recordApprovalCancellation(options: RecordApprovalCancellationOptions): Promise<AuditDecision>;
 
 // @public
@@ -2246,6 +2655,20 @@ export const RelationshipSchema: z.ZodObject<{
     description: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 
+// @public (undocumented)
+export type ResettabilityEvidence = z.infer<typeof ResettabilityEvidenceSchema>;
+
+// @public
+export const ResettabilityEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"curated">;
+    note: z.ZodString;
+    observedAt: z.ZodOptional<z.ZodISODateTime>;
+    appVersion: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+
+// @public
+export function resolveAccessChain(manifest: AppManifest, resourceKey: string): string[];
+
 // @public
 export function resolveActivePolicyPath(home: string): string;
 
@@ -2268,10 +2691,41 @@ export function resolveListOutputProperties(resource: Resource | undefined): str
 export function resolveManifestRoutes(manifest: AppManifest): ManifestRoute[];
 
 // @public
+export function resolveParameterNullability(parameter: CommandParameter): NullabilityResolution;
+
+// @public
 export function resolvePrimaryIdentifierProperty(resource: Resource | undefined): string | undefined;
+
+// @public
+export function resolveReadNullability(resource: Resource, propertyName: string, property: Property): NullabilityResolution;
+
+// @public
+export function resolveResettability(property: Property): ResettabilityEvidence | undefined;
 
 // @public (undocumented)
 export type Resource = z.infer<typeof ResourceSchema>;
+
+// @public
+export interface ResourceMergeOutcome {
+    readonly block: NullabilityProbe;
+    readonly identifierDefect?: IdentifierDefect;
+    readonly properties: readonly PropertyMergeOutcome[];
+    // (undocumented)
+    readonly resource: string;
+}
+
+// @public
+export interface ResourceNullabilityResult {
+    readonly accessPath: string;
+    readonly itemsRead: number;
+    readonly note?: string;
+    readonly presence: Readonly<Record<string, PropertyPresence>>;
+    readonly resource: string;
+    readonly sampledParents: number;
+    readonly skipped: readonly SkippedProperty[];
+    readonly status: NullabilityProbeStatus;
+    readonly truncated: boolean;
+}
 
 // @public
 export interface ResourceProbeResult {
@@ -2293,13 +2747,13 @@ export const ResourceSchema: z.ZodObject<{
             r: "r";
             rw: "rw";
         }>;
-        type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+        type: z.ZodOptional<z.ZodType<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
             array: PropertyType;
         } | {
             resource: string;
         } | {
             enum: string;
-        }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "integer" | "date" | "data" | "any" | "file" | "point" | "rect" | "rgb" | {
+        }, unknown, z.core.$ZodTypeInternals<"string" | "number" | "boolean" | "any" | "date" | "file" | "integer" | "data" | "point" | "rect" | "rgb" | {
             array: PropertyType;
         } | {
             resource: string;
@@ -2313,6 +2767,35 @@ export const ResourceSchema: z.ZodObject<{
         deprecated: z.ZodOptional<z.ZodObject<{
             message: z.ZodString;
             since: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>>;
+        nullable: z.ZodOptional<z.ZodBoolean>;
+        resettable: z.ZodOptional<z.ZodBoolean>;
+        evidence: z.ZodOptional<z.ZodObject<{
+            nullable: z.ZodOptional<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                source: z.ZodLiteral<"probe">;
+                observedAt: z.ZodISODateTime;
+                bundleId: z.ZodString;
+                appVersion: z.ZodString;
+                osVersion: z.ZodString;
+                sampleSize: z.ZodNumber;
+                nullCount: z.ZodNumber;
+                failedReads: z.ZodNumber;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>, z.ZodObject<{
+                source: z.ZodLiteral<"curated">;
+                note: z.ZodString;
+                observedAt: z.ZodOptional<z.ZodISODateTime>;
+                appVersion: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>, z.ZodObject<{
+                source: z.ZodLiteral<"sdef">;
+                note: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>], "source">>;
+            resettable: z.ZodOptional<z.ZodObject<{
+                source: z.ZodLiteral<"curated">;
+                note: z.ZodString;
+                observedAt: z.ZodOptional<z.ZodISODateTime>;
+                appVersion: z.ZodOptional<z.ZodString>;
+            }, z.core.$strip>>;
         }, z.core.$strip>>;
     }, z.core.$strip>>>;
     identifiers: z.ZodOptional<z.ZodArray<z.ZodObject<{
@@ -2333,6 +2816,24 @@ export const ResourceSchema: z.ZodObject<{
             failed: "failed";
         }>;
         probedAt: z.ZodOptional<z.ZodString>;
+        note: z.ZodOptional<z.ZodString>;
+    }, z.core.$strip>>;
+    nullabilityProbe: z.ZodOptional<z.ZodObject<{
+        observedAt: z.ZodISODateTime;
+        bundleId: z.ZodString;
+        appVersion: z.ZodString;
+        osVersion: z.ZodString;
+        accessPath: z.ZodString;
+        itemsRead: z.ZodNumber;
+        sampledParents: z.ZodOptional<z.ZodNumber>;
+        status: z.ZodEnum<{
+            error: "error";
+            probed: "probed";
+            "no-items": "no-items";
+            unreachable: "unreachable";
+            budget: "budget";
+        }>;
+        skipped: z.ZodArray<z.ZodString>;
         note: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -2409,6 +2910,15 @@ options?: JxaExecutorOptions): Promise<T>;
 // @public
 export function scoreCapability(capability: Capability, terms: readonly string[]): number;
 
+// @public (undocumented)
+export type SdefNullabilityEvidence = z.infer<typeof SdefNullabilityEvidenceSchema>;
+
+// @public
+export const SdefNullabilityEvidenceSchema: z.ZodObject<{
+    source: z.ZodLiteral<"sdef">;
+    note: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+
 // @public
 export const SEARCH_WEIGHTS: {
     readonly operationExact: 10;
@@ -2460,6 +2970,12 @@ export type Selector = {
 };
 
 // @public
+export function selectProbedProperties(manifest: AppManifest, resource: Resource, skipProperties: readonly string[]): {
+    read: string[];
+    skipped: SkippedProperty[];
+};
+
+// @public
 export type SensitivityTag = z.infer<typeof SensitivityTagSchema>;
 
 // @public
@@ -2479,6 +2995,17 @@ export interface SerializedAuditRecord {
     readonly reason?: string;
     readonly timestamp: string;
 }
+
+// @public
+export interface SkippedProperty {
+    // (undocumented)
+    readonly property: string;
+    // (undocumented)
+    readonly reason: SkipReason;
+}
+
+// @public
+export type SkipReason = 'file' | 'references' | 'heavy' | 'excluded';
 
 // @public
 export type SpecialOperation = string;
@@ -2583,6 +3110,9 @@ export function writeFiles(files: {
     path: string;
     content: string;
 }[], outDir: string): Promise<void>;
+
+// @public
+export function writeNullabilityResults(manifestPath: string, merged: NullabilityMergeResult): Promise<NullabilityWriteResult>;
 
 // @public
 export function writeProbeResults(manifestPath: string, result: AppProbeResult): Promise<void>;

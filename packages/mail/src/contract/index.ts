@@ -133,162 +133,335 @@ export type TypeOfAccount = 'pop' | 'smtp' | 'imap' | 'iCloud' | 'unknown'
 
 /** Rich (styled) text */
 export interface RichText {
-  /** The color of the first character. */
-  color: Rgb
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+  /**
+   * The color of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * The name of the font of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  font: string | null
+  /**
+   * The size in points of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
 }
 
 /** Represents an inline text attachment. This class is used mainly for make commands. */
 export interface Attachment {
-  /** The file for the attachment */
-  fileName: FileValue
+  /**
+   * The file for the attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fileName: FileValue | null
 }
 
 /** This subdivides the text into paragraphs. */
 export interface Paragraph {
-  /** The color of the first character. */
-  color: Rgb
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+  /**
+   * The color of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * The name of the font of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  font: string | null
+  /**
+   * The size in points of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
 }
 
 /** This subdivides the text into words. */
 export interface Word {
-  /** The color of the first character. */
-  color: Rgb
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+  /**
+   * The color of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * The name of the font of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  font: string | null
+  /**
+   * The size in points of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
 }
 
 /** This subdivides the text into characters. */
 export interface Character {
-  /** The color of the character. */
-  color: Rgb
-  /** The name of the font of the character. */
-  font: string
-  /** The size in points of the character. */
-  size: number
+  /**
+   * The color of the character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * The name of the font of the character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  font: string | null
+  /**
+   * The size in points of the character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
 }
 
 /** This subdivides the text into chunks that all have the same attributes. */
 export interface AttributeRun {
-  /** The color of the first character. */
-  color: Rgb
-  /** The name of the font of the first character. */
-  font: string
-  /** The size in points of the first character. */
-  size: number
+  /**
+   * The color of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  color: Rgb | null
+  /**
+   * The name of the font of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  font: string | null
+  /**
+   * The size in points of the first character.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: number | null
 }
 
 /** A new email message */
 export interface OutgoingMessage {
-  /** The sender of the message */
-  sender: string
-  /** The subject of the message */
-  subject: string
-  /** Controls whether the message window is shown on the screen. The default is false */
-  visible: boolean
-  /** The signature of the message */
-  messageSignature: string
-  /** The unique identifier of the message */
+  /**
+   * The sender of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sender: string | null
+  /**
+   * The subject of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  subject: string | null
+  /**
+   * Controls whether the message window is shown on the screen. The default is false.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * The signature of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  messageSignature: string | null
+  /**
+   * The unique identifier of the message.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** Does nothing at all (deprecated) */
-  htmlContent: string
-  /** Does nothing at all (deprecated) */
-  vcardPath: FileValue
+  /**
+   * Does nothing at all (deprecated).
+   * Nullable. No evidence that the app always sets it.
+   */
+  htmlContent: string | null
+  /**
+   * Does nothing at all (deprecated).
+   * Nullable. No evidence that the app always sets it.
+   */
+  vcardPath: FileValue | null
 }
 
 /** Represents the object responsible for managing a viewer window */
 export interface MessageViewer {
-  /** The top level Drafts mailbox */
-  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never>
-  /** The top level In mailbox */
-  readonly inbox: ObjectReferenceVariant<Mailbox, never>
-  /** The top level Junk mailbox */
-  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never>
-  /** The top level Out mailbox */
-  readonly outbox: ObjectReferenceVariant<Mailbox, never>
-  /** The top level Sent mailbox */
-  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never>
-  /** The top level Trash mailbox */
-  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never>
-  /** The column that is currently sorted in the viewer */
-  sortColumn: string
-  /** Whether the viewer is sorted ascending or not */
-  sortedAscending: boolean
-  /** Controls whether the list of mailboxes is visible or not */
-  mailboxListVisible: boolean
-  /** Controls whether the preview pane of the message viewer window is visible or not */
-  previewPaneIsVisible: boolean
+  /**
+   * The top level Drafts mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The top level In mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly inbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The top level Junk mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The top level Out mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly outbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The top level Sent mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The top level Trash mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * The column that is currently sorted in the viewer.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortColumn: string | null
+  /**
+   * Whether the viewer is sorted ascending or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortedAscending: boolean | null
+  /**
+   * Controls whether the list of mailboxes is visible or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  mailboxListVisible: boolean | null
+  /**
+   * Controls whether the preview pane of the message viewer window is visible or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  previewPaneIsVisible: boolean | null
   /**
    * List of columns that are visible. The subject column and the message status column will always
-   * be visible
+   * be visible.
+   * Nullable. No evidence that the app always sets it.
    */
-  visibleColumns: string
-  /** The unique identifier of the message viewer */
+  visibleColumns: string | null
+  /**
+   * The unique identifier of the message viewer.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** List of messages currently being displayed in the viewer */
-  visibleMessages: string
-  /** List of messages currently selected */
-  selectedMessages: string
-  /** List of mailboxes currently selected in the list of mailboxes */
-  selectedMailboxes: string
+  /**
+   * List of messages currently being displayed in the viewer.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visibleMessages: string | null
+  /**
+   * List of messages currently selected.
+   * Nullable. No evidence that the app always sets it.
+   */
+  selectedMessages: string | null
+  /**
+   * List of mailboxes currently selected in the list of mailboxes.
+   * Nullable. No evidence that the app always sets it.
+   */
+  selectedMailboxes: string | null
 }
 
 /** An email message */
 export interface Message {
-  /** The unique identifier of the message. */
+  /**
+   * The unique identifier of the message.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** All the headers of the message */
-  readonly allHeaders: string
-  /** The background color of the message */
-  backgroundColor: string
-  /** The mailbox in which this message is filed */
-  mailbox: ObjectReferenceVariant<Mailbox, never>
-  /** Contents of an email message */
-  readonly content: ObjectReferenceVariant<RichText, never>
-  /** The date a message was received */
-  readonly dateReceived: Date
-  /** The date a message was sent */
-  readonly dateSent: Date
-  /** Indicates whether the message is deleted or not */
-  deletedStatus: boolean
-  /** Indicates whether the message is flagged or not */
-  flaggedStatus: boolean
-  /** The flag on the message, or -1 if the message is not flagged */
-  flagIndex: Integer
+  /**
+   * All the headers of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly allHeaders: string | null
+  /**
+   * The background color of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  backgroundColor: string | null
+  /**
+   * The mailbox in which this message is filed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  mailbox: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * Contents of an email message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly content: ObjectReferenceVariant<RichText, never> | null
+  /**
+   * The date a message was received.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly dateReceived: Date | null
+  /**
+   * The date a message was sent.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly dateSent: Date | null
+  /**
+   * Indicates whether the message is deleted or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deletedStatus: boolean | null
+  /**
+   * Indicates whether the message is flagged or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  flaggedStatus: boolean | null
+  /**
+   * The flag on the message, or -1 if the message is not flagged.
+   * Nullable. No evidence that the app always sets it.
+   */
+  flagIndex: Integer | null
   /**
    * Indicates whether the message has been marked junk or evaluated to be junk by the junk mail
    * filter.
+   * Nullable. No evidence that the app always sets it.
    */
-  junkMailStatus: boolean
-  /** Indicates whether the message is read or not */
-  readStatus: boolean
-  /** The unique message ID string */
-  readonly messageId: string
-  /** Raw source of the message */
-  readonly source: string
-  /** The address that replies should be sent to */
-  readonly replyTo: string
-  /** The size (in bytes) of a message */
-  readonly messageSize: Integer
-  /** The sender of the message */
-  readonly sender: string
-  /** The subject of the message */
-  readonly subject: string
-  /** Indicates whether the message was forwarded or not */
-  readonly wasForwarded: boolean
-  /** Indicates whether the message was redirected or not */
-  readonly wasRedirected: boolean
-  /** Indicates whether the message was replied to or not */
-  readonly wasRepliedTo: boolean
+  junkMailStatus: boolean | null
+  /**
+   * Indicates whether the message is read or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readStatus: boolean | null
+  /**
+   * The unique message ID string.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly messageId: string | null
+  /**
+   * Raw source of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly source: string | null
+  /**
+   * The address that replies should be sent to.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly replyTo: string | null
+  /**
+   * The size (in bytes) of a message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly messageSize: Integer | null
+  /**
+   * The sender of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sender: string | null
+  /**
+   * The subject of the message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly subject: string | null
+  /**
+   * Indicates whether the message was forwarded or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly wasForwarded: boolean | null
+  /**
+   * Indicates whether the message was redirected or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly wasRedirected: boolean | null
+  /**
+   * Indicates whether the message was replied to or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly wasRepliedTo: boolean | null
 }
 
 /**
@@ -296,188 +469,359 @@ export interface Message {
  * account', 'imap account', and 'iCloud account' objects
  */
 export interface Account {
-  /** The delivery account used when sending mail from this account */
-  deliveryAccount: string
-  /** The name of an account */
-  name: string
-  /** The unique identifier of the account */
+  /**
+   * The delivery account used when sending mail from this account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deliveryAccount: string | null
+  /**
+   * The name of an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The unique identifier of the account.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** Password for this account. Can be set, but not read via scripting */
-  password: string
-  /** Preferred authentication scheme for account */
-  authentication: string
-  /** The type of an account */
-  readonly accountType: string
-  /** The list of email addresses configured for an account */
-  emailAddresses: string
-  /** The users full name configured for an account */
-  fullName: string
-  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
-  emptyJunkMessagesFrequency: Integer
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesFrequency: Integer
+  /**
+   * Password for this account. Can be set, but not read via scripting.
+   * Nullable. No evidence that the app always sets it.
+   */
+  password: string | null
+  /**
+   * Preferred authentication scheme for account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  authentication: string | null
+  /**
+   * The type of an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly accountType: string | null
+  /**
+   * The list of email addresses configured for an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  emailAddresses: string | null
+  /**
+   * The users full name configured for an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  fullName: string | null
+  /**
+   * Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete).
+   * Nullable. No evidence that the app always sets it.
+   */
+  emptyJunkMessagesFrequency: Integer | null
+  /**
+   * Does nothing at all (deprecated).
+   * Nullable. No evidence that the app always sets it.
+   */
+  emptySentMessagesFrequency: Integer | null
   /**
    * Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 =
-   * never delete)
+   * never delete).
+   * Nullable. No evidence that the app always sets it.
    */
-  emptyTrashFrequency: Integer
-  /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
-  emptyJunkMessagesOnQuit: boolean
-  /** Does nothing at all (deprecated) */
-  emptySentMessagesOnQuit: boolean
+  emptyTrashFrequency: Integer | null
+  /**
+   * Indicates whether the messages in the junk messages mailboxes will be deleted on quit.
+   * Nullable. No evidence that the app always sets it.
+   */
+  emptyJunkMessagesOnQuit: boolean | null
+  /**
+   * Does nothing at all (deprecated).
+   * Nullable. No evidence that the app always sets it.
+   */
+  emptySentMessagesOnQuit: boolean | null
   /**
    * Indicates whether the messages in deleted messages mailboxes will be permanently deleted on
-   * quit
+   * quit.
+   * Nullable. No evidence that the app always sets it.
    */
-  emptyTrashOnQuit: boolean
-  /** Indicates whether the account is enabled or not */
-  enabled: boolean
-  /** The user name used to connect to an account */
-  userName: string
-  /** The directory where the account stores things on disk */
-  readonly accountDirectory: FileValue
-  /** The port used to connect to an account */
-  port: Integer
-  /** The host name used to connect to an account */
-  serverName: string
-  /** Does nothing at all (deprecated) */
-  includeWhenGettingNewMail: boolean
-  /** Indicates whether messages that are deleted will be moved to the trash mailbox */
-  moveDeletedMessagesToTrash: boolean
-  /** Indicates whether SSL is enabled for this receiving account */
-  usesSsl: boolean
+  emptyTrashOnQuit: boolean | null
+  /**
+   * Indicates whether the account is enabled or not.
+   * Nullable. No evidence that the app always sets it.
+   */
+  enabled: boolean | null
+  /**
+   * The user name used to connect to an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  userName: string | null
+  /**
+   * The directory where the account stores things on disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly accountDirectory: FileValue | null
+  /**
+   * The port used to connect to an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  port: Integer | null
+  /**
+   * The host name used to connect to an account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  serverName: string | null
+  /**
+   * Does nothing at all (deprecated).
+   * Nullable. No evidence that the app always sets it.
+   */
+  includeWhenGettingNewMail: boolean | null
+  /**
+   * Indicates whether messages that are deleted will be moved to the trash mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  moveDeletedMessagesToTrash: boolean | null
+  /**
+   * Indicates whether SSL is enabled for this receiving account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  usesSsl: boolean | null
 }
 
 /** A mailbox that holds messages */
 export interface Mailbox {
-  /** The name of a mailbox */
-  name: string
-  /** The number of unread messages in the mailbox */
-  readonly unreadCount: Integer
-  /** The account property */
-  readonly account: ObjectReferenceVariant<Account, string>
-  /** The container property */
-  readonly container: ObjectReferenceVariant<Mailbox, never>
+  /**
+   * The name of a mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The number of unread messages in the mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly unreadCount: Integer | null
+  /**
+   * The account property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly account: ObjectReferenceVariant<Account, string> | null
+  /**
+   * The container property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly container: ObjectReferenceVariant<Mailbox, never> | null
 }
 
 /** Class for message rules */
 export interface Rule {
-  /** If rule matches, apply this color */
-  colorMessage: string
-  /** If rule matches, delete message */
-  deleteMessage: boolean
+  /**
+   * If rule matches, apply this color.
+   * Nullable. No evidence that the app always sets it.
+   */
+  colorMessage: string | null
+  /**
+   * If rule matches, delete message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  deleteMessage: boolean | null
   /**
    * If rule matches, prepend this text to the forwarded message. Set to empty string to include no
-   * prepended text
+   * prepended text.
+   * Nullable. No evidence that the app always sets it.
    */
-  forwardText: string
+  forwardText: string | null
   /**
    * If rule matches, forward message to this address, or multiple addresses, separated by commas.
-   * Set to empty string to disable this action
+   * Set to empty string to disable this action.
+   * Nullable. No evidence that the app always sets it.
    */
-  forwardMessage: string
-  /** If rule matches, mark message as flagged */
-  markFlagged: boolean
-  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
-  markFlagIndex: Integer
-  /** If rule matches, mark message as read */
-  markRead: boolean
-  /** If rule matches, play this sound (specify name of sound or path to sound) */
-  playSound: string
+  forwardMessage: string | null
+  /**
+   * If rule matches, mark message as flagged.
+   * Nullable. No evidence that the app always sets it.
+   */
+  markFlagged: boolean | null
+  /**
+   * If rule matches, mark message with the specified flag. Set to -1 to disable this action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  markFlagIndex: Integer | null
+  /**
+   * If rule matches, mark message as read.
+   * Nullable. No evidence that the app always sets it.
+   */
+  markRead: boolean | null
+  /**
+   * If rule matches, play this sound (specify name of sound or path to sound).
+   * Nullable. No evidence that the app always sets it.
+   */
+  playSound: string | null
   /**
    * If rule matches, redirect message to this address or multiple addresses, separate by commas.
-   * Set to empty string to disable this action
+   * Set to empty string to disable this action.
+   * Nullable. No evidence that the app always sets it.
    */
-  redirectMessage: string
+  redirectMessage: string | null
   /**
    * If rule matches, reply to message and prepend with this text. Set to empty string to disable
-   * this action
+   * this action.
+   * Nullable. No evidence that the app always sets it.
    */
-  replyText: string
+  replyText: string | null
   /**
-   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
+   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this
+   * action.
+   * Nullable. No evidence that the app always sets it.
    */
-  runScript: string
-  /** Indicates whether all conditions must be met for rule to execute */
-  allConditionsMustBeMet: boolean
-  /** If rule matches, copy to this mailbox */
-  copyMessage: ObjectReferenceVariant<Mailbox, never>
-  /** If rule matches, move to this mailbox */
-  moveMessage: ObjectReferenceVariant<Mailbox, never>
+  runScript: string | null
+  /**
+   * Indicates whether all conditions must be met for rule to execute.
+   * Nullable. No evidence that the app always sets it.
+   */
+  allConditionsMustBeMet: boolean | null
+  /**
+   * If rule matches, copy to this mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  copyMessage: ObjectReferenceVariant<Mailbox, never> | null
+  /**
+   * If rule matches, move to this mailbox.
+   * Nullable. No evidence that the app always sets it.
+   */
+  moveMessage: ObjectReferenceVariant<Mailbox, never> | null
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
-   * the message list
+   * the message list.
+   * Nullable. No evidence that the app always sets it.
    */
-  highlightTextUsingColor: boolean
-  /** Indicates whether the rule is enabled */
-  enabled: boolean
-  /** Name of rule */
-  name: string
-  /** Indicates whether the rule has a copy action */
-  shouldCopyMessage: boolean
-  /** Indicates whether the rule has a move action */
-  shouldMoveMessage: boolean
-  /** If rule matches, stop rule evaluation for this message */
-  stopEvaluatingRules: boolean
+  highlightTextUsingColor: boolean | null
+  /**
+   * Indicates whether the rule is enabled.
+   * Nullable. No evidence that the app always sets it.
+   */
+  enabled: boolean | null
+  /**
+   * Name of rule.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * Indicates whether the rule has a copy action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  shouldCopyMessage: boolean | null
+  /**
+   * Indicates whether the rule has a move action.
+   * Nullable. No evidence that the app always sets it.
+   */
+  shouldMoveMessage: boolean | null
+  /**
+   * If rule matches, stop rule evaluation for this message.
+   * Nullable. No evidence that the app always sets it.
+   */
+  stopEvaluatingRules: boolean | null
 }
 
 /** Class for conditions that can be attached to a single rule */
 export interface RuleCondition {
-  /** Rule expression field */
-  expression: string
-  /** Rule header key */
-  header: string
-  /** Rule qualifier */
-  qualifier: string
-  /** Rule type */
-  ruleType: string
+  /**
+   * Rule expression field.
+   * Nullable. No evidence that the app always sets it.
+   */
+  expression: string | null
+  /**
+   * Rule header key.
+   * Nullable. No evidence that the app always sets it.
+   */
+  header: string | null
+  /**
+   * Rule qualifier.
+   * Nullable. No evidence that the app always sets it.
+   */
+  qualifier: string | null
+  /**
+   * Rule type.
+   * Nullable. No evidence that the app always sets it.
+   */
+  ruleType: string | null
 }
 
 /** An email recipient */
 export interface Recipient {
-  /** The recipients email address */
-  address: string
-  /** The name used for display */
-  name: string
+  /**
+   * The recipients email address.
+   * Nullable. No evidence that the app always sets it.
+   */
+  address: string | null
+  /**
+   * The name used for display.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** An email recipient in the Bcc: field */
 export interface BccRecipient {
-  /** Unique identifier for this recipient */
-  readonly id: string
+  /**
+   * Unique identifier for this recipient.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** An email recipient in the Cc: field */
 export interface CcRecipient {
-  /** Unique identifier for this recipient */
-  readonly id: string
+  /**
+   * Unique identifier for this recipient.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** An email recipient in the To: field */
 export interface ToRecipient {
-  /** Unique identifier for this recipient */
-  readonly id: string
+  /**
+   * Unique identifier for this recipient.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
 }
 
 /** A header value for a message. E.g. To, Subject, From. */
 export interface Header {
-  /** Contents of the header */
-  content: string
-  /** Name of the header value */
-  name: string
+  /**
+   * Contents of the header.
+   * Nullable. No evidence that the app always sets it.
+   */
+  content: string | null
+  /**
+   * Name of the header value.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
 }
 
 /** A file attached to a received message. */
 export interface MailAttachment {
-  /** Name of the attachment */
-  readonly name: string
-  /** MIME type of the attachment E.g. text/plain. */
-  readonly mIMEType: string
-  /** Approximate size in bytes. */
-  readonly fileSize: Integer
-  /** Indicates whether the attachment has been downloaded. */
-  readonly downloaded: boolean
-  /** The unique identifier of the attachment. */
+  /**
+   * Name of the attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * MIME type of the attachment E.g. text/plain.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly mIMEType: string | null
+  /**
+   * Approximate size in bytes.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly fileSize: Integer | null
+  /**
+   * Indicates whether the attachment has been downloaded.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloaded: boolean | null
+  /**
+   * The unique identifier of the attachment.
+   * Never null: the primary identifier.
+   */
   readonly id: string
 }
 
@@ -493,11 +837,20 @@ export interface RichTextCreateInput {
 
 /** Input for updating a RichText. Omitted fields are left unchanged. */
 export interface RichTextUpdateInput {
-  /** The color of the first character. */
+  /**
+   * The color of the first character.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The name of the font of the first character. */
+  /**
+   * The name of the font of the first character.
+   * Cannot be reset: null is rejected.
+   */
   font?: string
-  /** The size in points of the first character. */
+  /**
+   * The size in points of the first character.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
 }
 
@@ -509,7 +862,10 @@ export interface AttachmentCreateInput {
 
 /** Input for updating an Attachment. Omitted fields are left unchanged. */
 export interface AttachmentUpdateInput {
-  /** The file for the attachment */
+  /**
+   * The file for the attachment.
+   * Cannot be reset: null is rejected.
+   */
   fileName?: FileSource
 }
 
@@ -525,11 +881,20 @@ export interface ParagraphCreateInput {
 
 /** Input for updating a Paragraph. Omitted fields are left unchanged. */
 export interface ParagraphUpdateInput {
-  /** The color of the first character. */
+  /**
+   * The color of the first character.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The name of the font of the first character. */
+  /**
+   * The name of the font of the first character.
+   * Cannot be reset: null is rejected.
+   */
   font?: string
-  /** The size in points of the first character. */
+  /**
+   * The size in points of the first character.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
 }
 
@@ -545,11 +910,20 @@ export interface WordCreateInput {
 
 /** Input for updating a Word. Omitted fields are left unchanged. */
 export interface WordUpdateInput {
-  /** The color of the first character. */
+  /**
+   * The color of the first character.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The name of the font of the first character. */
+  /**
+   * The name of the font of the first character.
+   * Cannot be reset: null is rejected.
+   */
   font?: string
-  /** The size in points of the first character. */
+  /**
+   * The size in points of the first character.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
 }
 
@@ -565,11 +939,20 @@ export interface CharacterCreateInput {
 
 /** Input for updating a Character. Omitted fields are left unchanged. */
 export interface CharacterUpdateInput {
-  /** The color of the character. */
+  /**
+   * The color of the character.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The name of the font of the character. */
+  /**
+   * The name of the font of the character.
+   * Cannot be reset: null is rejected.
+   */
   font?: string
-  /** The size in points of the character. */
+  /**
+   * The size in points of the character.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
 }
 
@@ -585,11 +968,20 @@ export interface AttributeRunCreateInput {
 
 /** Input for updating an AttributeRun. Omitted fields are left unchanged. */
 export interface AttributeRunUpdateInput {
-  /** The color of the first character. */
+  /**
+   * The color of the first character.
+   * Cannot be reset: null is rejected.
+   */
   color?: Rgb
-  /** The name of the font of the first character. */
+  /**
+   * The name of the font of the first character.
+   * Cannot be reset: null is rejected.
+   */
   font?: string
-  /** The size in points of the first character. */
+  /**
+   * The size in points of the first character.
+   * Cannot be reset: null is rejected.
+   */
   size?: number
 }
 
@@ -611,17 +1003,35 @@ export interface OutgoingMessageCreateInput {
 
 /** Input for updating an OutgoingMessage. Omitted fields are left unchanged. */
 export interface OutgoingMessageUpdateInput {
-  /** The sender of the message */
+  /**
+   * The sender of the message.
+   * Cannot be reset: null is rejected.
+   */
   sender?: string
-  /** The subject of the message */
+  /**
+   * The subject of the message.
+   * Cannot be reset: null is rejected.
+   */
   subject?: string
-  /** Controls whether the message window is shown on the screen. The default is false */
+  /**
+   * Controls whether the message window is shown on the screen. The default is false.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** The signature of the message */
+  /**
+   * The signature of the message.
+   * Cannot be reset: null is rejected.
+   */
   messageSignature?: string
-  /** Does nothing at all (deprecated) */
+  /**
+   * Does nothing at all (deprecated).
+   * Cannot be reset: null is rejected.
+   */
   htmlContent?: string
-  /** Does nothing at all (deprecated) */
+  /**
+   * Does nothing at all (deprecated).
+   * Cannot be reset: null is rejected.
+   */
   vcardPath?: FileSource
 }
 
@@ -650,24 +1060,46 @@ export interface MessageViewerCreateInput {
 
 /** Input for updating a MessageViewer. Omitted fields are left unchanged. */
 export interface MessageViewerUpdateInput {
-  /** The column that is currently sorted in the viewer */
+  /**
+   * The column that is currently sorted in the viewer.
+   * Cannot be reset: null is rejected.
+   */
   sortColumn?: string
-  /** Whether the viewer is sorted ascending or not */
+  /**
+   * Whether the viewer is sorted ascending or not.
+   * Cannot be reset: null is rejected.
+   */
   sortedAscending?: boolean
-  /** Controls whether the list of mailboxes is visible or not */
+  /**
+   * Controls whether the list of mailboxes is visible or not.
+   * Cannot be reset: null is rejected.
+   */
   mailboxListVisible?: boolean
-  /** Controls whether the preview pane of the message viewer window is visible or not */
+  /**
+   * Controls whether the preview pane of the message viewer window is visible or not.
+   * Cannot be reset: null is rejected.
+   */
   previewPaneIsVisible?: boolean
   /**
    * List of columns that are visible. The subject column and the message status column will always
-   * be visible
+   * be visible.
+   * Cannot be reset: null is rejected.
    */
   visibleColumns?: string
-  /** List of messages currently being displayed in the viewer */
+  /**
+   * List of messages currently being displayed in the viewer.
+   * Cannot be reset: null is rejected.
+   */
   visibleMessages?: string
-  /** List of messages currently selected */
+  /**
+   * List of messages currently selected.
+   * Cannot be reset: null is rejected.
+   */
   selectedMessages?: string
-  /** List of mailboxes currently selected in the list of mailboxes */
+  /**
+   * List of mailboxes currently selected in the list of mailboxes.
+   * Cannot be reset: null is rejected.
+   */
   selectedMailboxes?: string
 }
 
@@ -694,22 +1126,41 @@ export interface MessageCreateInput {
 
 /** Input for updating a Message. Omitted fields are left unchanged. */
 export interface MessageUpdateInput {
-  /** The background color of the message */
+  /**
+   * The background color of the message.
+   * Cannot be reset: null is rejected.
+   */
   backgroundColor?: string
-  /** The mailbox in which this message is filed */
+  /**
+   * The mailbox in which this message is filed.
+   * Cannot be reset: null is rejected.
+   */
   mailbox?: ObjectReferenceVariant<Mailbox, never>
-  /** Indicates whether the message is deleted or not */
+  /**
+   * Indicates whether the message is deleted or not.
+   * Cannot be reset: null is rejected.
+   */
   deletedStatus?: boolean
-  /** Indicates whether the message is flagged or not */
+  /**
+   * Indicates whether the message is flagged or not.
+   * Cannot be reset: null is rejected.
+   */
   flaggedStatus?: boolean
-  /** The flag on the message, or -1 if the message is not flagged */
+  /**
+   * The flag on the message, or -1 if the message is not flagged.
+   * Cannot be reset: null is rejected.
+   */
   flagIndex?: Integer
   /**
    * Indicates whether the message has been marked junk or evaluated to be junk by the junk mail
    * filter.
+   * Cannot be reset: null is rejected.
    */
   junkMailStatus?: boolean
-  /** Indicates whether the message is read or not */
+  /**
+   * Indicates whether the message is read or not.
+   * Cannot be reset: null is rejected.
+   */
   readStatus?: boolean
 }
 
@@ -763,49 +1214,102 @@ export interface AccountCreateInput {
 
 /** Input for updating an Account. Omitted fields are left unchanged. */
 export interface AccountUpdateInput {
-  /** The delivery account used when sending mail from this account */
+  /**
+   * The delivery account used when sending mail from this account.
+   * Cannot be reset: null is rejected.
+   */
   deliveryAccount?: string
-  /** The name of an account */
+  /**
+   * The name of an account.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Password for this account. Can be set, but not read via scripting */
+  /**
+   * Password for this account. Can be set, but not read via scripting.
+   * Cannot be reset: null is rejected.
+   */
   password?: string
-  /** Preferred authentication scheme for account */
+  /**
+   * Preferred authentication scheme for account.
+   * Cannot be reset: null is rejected.
+   */
   authentication?: string
-  /** The list of email addresses configured for an account */
+  /**
+   * The list of email addresses configured for an account.
+   * Cannot be reset: null is rejected.
+   */
   emailAddresses?: string
-  /** The users full name configured for an account */
+  /**
+   * The users full name configured for an account.
+   * Cannot be reset: null is rejected.
+   */
   fullName?: string
-  /** Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete) */
+  /**
+   * Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete).
+   * Cannot be reset: null is rejected.
+   */
   emptyJunkMessagesFrequency?: Integer
-  /** Does nothing at all (deprecated) */
+  /**
+   * Does nothing at all (deprecated).
+   * Cannot be reset: null is rejected.
+   */
   emptySentMessagesFrequency?: Integer
   /**
    * Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 =
-   * never delete)
+   * never delete).
+   * Cannot be reset: null is rejected.
    */
   emptyTrashFrequency?: Integer
-  /** Indicates whether the messages in the junk messages mailboxes will be deleted on quit */
+  /**
+   * Indicates whether the messages in the junk messages mailboxes will be deleted on quit.
+   * Cannot be reset: null is rejected.
+   */
   emptyJunkMessagesOnQuit?: boolean
-  /** Does nothing at all (deprecated) */
+  /**
+   * Does nothing at all (deprecated).
+   * Cannot be reset: null is rejected.
+   */
   emptySentMessagesOnQuit?: boolean
   /**
    * Indicates whether the messages in deleted messages mailboxes will be permanently deleted on
-   * quit
+   * quit.
+   * Cannot be reset: null is rejected.
    */
   emptyTrashOnQuit?: boolean
-  /** Indicates whether the account is enabled or not */
+  /**
+   * Indicates whether the account is enabled or not.
+   * Cannot be reset: null is rejected.
+   */
   enabled?: boolean
-  /** The user name used to connect to an account */
+  /**
+   * The user name used to connect to an account.
+   * Cannot be reset: null is rejected.
+   */
   userName?: string
-  /** The port used to connect to an account */
+  /**
+   * The port used to connect to an account.
+   * Cannot be reset: null is rejected.
+   */
   port?: Integer
-  /** The host name used to connect to an account */
+  /**
+   * The host name used to connect to an account.
+   * Cannot be reset: null is rejected.
+   */
   serverName?: string
-  /** Does nothing at all (deprecated) */
+  /**
+   * Does nothing at all (deprecated).
+   * Cannot be reset: null is rejected.
+   */
   includeWhenGettingNewMail?: boolean
-  /** Indicates whether messages that are deleted will be moved to the trash mailbox */
+  /**
+   * Indicates whether messages that are deleted will be moved to the trash mailbox.
+   * Cannot be reset: null is rejected.
+   */
   moveDeletedMessagesToTrash?: boolean
-  /** Indicates whether SSL is enabled for this receiving account */
+  /**
+   * Indicates whether SSL is enabled for this receiving account.
+   * Cannot be reset: null is rejected.
+   */
   usesSsl?: boolean
 }
 
@@ -817,7 +1321,10 @@ export interface MailboxCreateInput {
 
 /** Input for updating a Mailbox. Omitted fields are left unchanged. */
 export interface MailboxUpdateInput {
-  /** The name of a mailbox */
+  /**
+   * The name of a mailbox.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -884,62 +1391,111 @@ export interface RuleCreateInput {
 
 /** Input for updating a Rule. Omitted fields are left unchanged. */
 export interface RuleUpdateInput {
-  /** If rule matches, apply this color */
+  /**
+   * If rule matches, apply this color.
+   * Cannot be reset: null is rejected.
+   */
   colorMessage?: string
-  /** If rule matches, delete message */
+  /**
+   * If rule matches, delete message.
+   * Cannot be reset: null is rejected.
+   */
   deleteMessage?: boolean
   /**
    * If rule matches, prepend this text to the forwarded message. Set to empty string to include no
-   * prepended text
+   * prepended text.
+   * Cannot be reset: null is rejected.
    */
   forwardText?: string
   /**
    * If rule matches, forward message to this address, or multiple addresses, separated by commas.
-   * Set to empty string to disable this action
+   * Set to empty string to disable this action.
+   * Cannot be reset: null is rejected.
    */
   forwardMessage?: string
-  /** If rule matches, mark message as flagged */
+  /**
+   * If rule matches, mark message as flagged.
+   * Cannot be reset: null is rejected.
+   */
   markFlagged?: boolean
-  /** If rule matches, mark message with the specified flag. Set to -1 to disable this action */
+  /**
+   * If rule matches, mark message with the specified flag. Set to -1 to disable this action.
+   * Cannot be reset: null is rejected.
+   */
   markFlagIndex?: Integer
-  /** If rule matches, mark message as read */
+  /**
+   * If rule matches, mark message as read.
+   * Cannot be reset: null is rejected.
+   */
   markRead?: boolean
-  /** If rule matches, play this sound (specify name of sound or path to sound) */
+  /**
+   * If rule matches, play this sound (specify name of sound or path to sound).
+   * Cannot be reset: null is rejected.
+   */
   playSound?: string
   /**
    * If rule matches, redirect message to this address or multiple addresses, separate by commas.
-   * Set to empty string to disable this action
+   * Set to empty string to disable this action.
+   * Cannot be reset: null is rejected.
    */
   redirectMessage?: string
   /**
    * If rule matches, reply to message and prepend with this text. Set to empty string to disable
-   * this action
+   * this action.
+   * Cannot be reset: null is rejected.
    */
   replyText?: string
   /**
-   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this action
+   * If rule matches, run this compiled AppleScript file. Set to empty string to disable this
+   * action.
+   * Cannot be reset: null is rejected.
    */
   runScript?: string
-  /** Indicates whether all conditions must be met for rule to execute */
+  /**
+   * Indicates whether all conditions must be met for rule to execute.
+   * Cannot be reset: null is rejected.
+   */
   allConditionsMustBeMet?: boolean
-  /** If rule matches, copy to this mailbox */
+  /**
+   * If rule matches, copy to this mailbox.
+   * Cannot be reset: null is rejected.
+   */
   copyMessage?: ObjectReferenceVariant<Mailbox, never>
-  /** If rule matches, move to this mailbox */
+  /**
+   * If rule matches, move to this mailbox.
+   * Cannot be reset: null is rejected.
+   */
   moveMessage?: ObjectReferenceVariant<Mailbox, never>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
-   * the message list
+   * the message list.
+   * Cannot be reset: null is rejected.
    */
   highlightTextUsingColor?: boolean
-  /** Indicates whether the rule is enabled */
+  /**
+   * Indicates whether the rule is enabled.
+   * Cannot be reset: null is rejected.
+   */
   enabled?: boolean
-  /** Name of rule */
+  /**
+   * Name of rule.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** Indicates whether the rule has a copy action */
+  /**
+   * Indicates whether the rule has a copy action.
+   * Cannot be reset: null is rejected.
+   */
   shouldCopyMessage?: boolean
-  /** Indicates whether the rule has a move action */
+  /**
+   * Indicates whether the rule has a move action.
+   * Cannot be reset: null is rejected.
+   */
   shouldMoveMessage?: boolean
-  /** If rule matches, stop rule evaluation for this message */
+  /**
+   * If rule matches, stop rule evaluation for this message.
+   * Cannot be reset: null is rejected.
+   */
   stopEvaluatingRules?: boolean
 }
 
@@ -957,13 +1513,25 @@ export interface RuleConditionCreateInput {
 
 /** Input for updating a RuleCondition. Omitted fields are left unchanged. */
 export interface RuleConditionUpdateInput {
-  /** Rule expression field */
+  /**
+   * Rule expression field.
+   * Cannot be reset: null is rejected.
+   */
   expression?: string
-  /** Rule header key */
+  /**
+   * Rule header key.
+   * Cannot be reset: null is rejected.
+   */
   header?: string
-  /** Rule qualifier */
+  /**
+   * Rule qualifier.
+   * Cannot be reset: null is rejected.
+   */
   qualifier?: string
-  /** Rule type */
+  /**
+   * Rule type.
+   * Cannot be reset: null is rejected.
+   */
   ruleType?: string
 }
 
@@ -977,9 +1545,15 @@ export interface RecipientCreateInput {
 
 /** Input for updating a Recipient. Omitted fields are left unchanged. */
 export interface RecipientUpdateInput {
-  /** The recipients email address */
+  /**
+   * The recipients email address.
+   * Cannot be reset: null is rejected.
+   */
   address?: string
-  /** The name used for display */
+  /**
+   * The name used for display.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -1011,9 +1585,15 @@ export interface HeaderCreateInput {
 
 /** Input for updating a Header. Omitted fields are left unchanged. */
 export interface HeaderUpdateInput {
-  /** Contents of the header */
+  /**
+   * Contents of the header.
+   * Cannot be reset: null is rejected.
+   */
   content?: string
-  /** Name of the header value */
+  /**
+   * Name of the header value.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -1033,11 +1613,28 @@ export interface OutgoingMessageResourceClient {
 export interface MessageResourceClient {
   /** Does nothing at all (deprecated) */
   bounce(options?: CallOptions): Promise<void>
-  /** Creates a forwarded message. */
+  /**
+   * Creates a forwarded message.
+   *
+   * @param openingWindow - Whether the window for the forwarded message is shown. Default is to not
+   * show the window. Does not accept null.
+   */
   forward(openingWindow?: boolean, options?: CallOptions): Promise<void>
-  /** Creates a redirected message. */
+  /**
+   * Creates a redirected message.
+   *
+   * @param openingWindow - Whether the window for the redirected message is shown. Default is to
+   * not show the window. Does not accept null.
+   */
   redirect(openingWindow?: boolean, options?: CallOptions): Promise<void>
-  /** Creates a reply message. */
+  /**
+   * Creates a reply message.
+   *
+   * @param openingWindow - Whether the window for the reply message is shown. Default is to not
+   * show the window. Does not accept null.
+   * @param replyToAll - Whether to reply to all recipients. Default is to reply to the sender only.
+   * Does not accept null.
+   */
   reply(openingWindow?: boolean, replyToAll?: boolean, options?: CallOptions): Promise<void>
 }
 
@@ -1052,11 +1649,25 @@ export interface MailClient {
   readonly messages: MessageResourceClient
   /** Delete an object. */
   _delete(options?: CallOptions): Promise<void>
-  /** Copy an object. */
+  /**
+   * Copy an object.
+   *
+   * @param to - The location for the new copy or copies. Does not accept null.
+   * @param withProperties - Properties to set in the new copy or copies right away. Does not accept
+   * null.
+   */
   duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>
-  /** Move an object to a new location. */
+  /**
+   * Move an object to a new location.
+   *
+   * @param to - The new location for the object(s). Does not accept null.
+   */
   move(to: string, options?: CallOptions): Promise<void>
-  /** Triggers a check for email. */
+  /**
+   * Triggers a check for email.
+   *
+   * @param _for - Specify the account that you wish to check for mail. Does not accept null.
+   */
   checkForNewMail(
     _for?: ObjectReferenceVariant<Account, string>,
     options?: CallOptions
@@ -1073,35 +1684,49 @@ export interface MailClient {
   extractAddressFrom(options?: CallOptions): Promise<void>
   /** Opens a mailto URL. */
   getURL(options?: CallOptions): Promise<void>
-  /** Imports a mailbox created by Mail. */
+  /**
+   * Imports a mailbox created by Mail.
+   *
+   * @param at - the mailbox or folder of mailboxes to import. Does not accept null.
+   */
   importMailMailbox(at: FileSource, options?: CallOptions): Promise<void>
   /** Opens a mailto URL. */
   mailto(options?: CallOptions): Promise<void>
   /**
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of
    * this handler is a list of messages being acted upon.
+   *
+   * @param inMailboxes - If the script is being executed by the user selecting an item in the
+   * scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise
+   * it will not be specified. Does not accept null.
+   * @param forRule - If the script is being executed by a rule action, this argument will be the
+   * rule being invoked. Otherwise it will not be specified. Does not accept null.
    */
   performMailActionWithMessages(
     inMailboxes?: ObjectReferenceVariant<Mailbox, never>,
     forRule?: ObjectReferenceVariant<Rule, never>,
     options?: CallOptions
   ): Promise<void>
-  /** Command to trigger synchronizing of an IMAP account with the server. */
+  /**
+   * Command to trigger synchronizing of an IMAP account with the server.
+   *
+   * @param _with - The account to synchronize. Does not accept null.
+   */
   synchronize(_with: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>
 }
 
 const richTextRecordType: ValueType<RichText> = t.record(
   {
-    color: t.rgb({ description: 'The color of the first character.' }),
-    font: t.string({ description: 'The name of the font of the first character.' }),
-    size: t.double({ description: 'The size in points of the first character.' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
+    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
+    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
   },
   { description: 'Rich (styled) text' }
 )
 
 const attachmentRecordType: ValueType<Attachment> = t.record(
   {
-    fileName: t.file({ description: 'The file for the attachment' }),
+    fileName: t.nullable(t.file(), { description: 'The file for the attachment' }),
   },
   {
     description:
@@ -1111,95 +1736,107 @@ const attachmentRecordType: ValueType<Attachment> = t.record(
 
 const paragraphRecordType: ValueType<Paragraph> = t.record(
   {
-    color: t.rgb({ description: 'The color of the first character.' }),
-    font: t.string({ description: 'The name of the font of the first character.' }),
-    size: t.double({ description: 'The size in points of the first character.' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
+    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
+    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
   },
   { description: 'This subdivides the text into paragraphs.' }
 )
 
 const wordRecordType: ValueType<Word> = t.record(
   {
-    color: t.rgb({ description: 'The color of the first character.' }),
-    font: t.string({ description: 'The name of the font of the first character.' }),
-    size: t.double({ description: 'The size in points of the first character.' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
+    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
+    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
   },
   { description: 'This subdivides the text into words.' }
 )
 
 const characterRecordType: ValueType<Character> = t.record(
   {
-    color: t.rgb({ description: 'The color of the character.' }),
-    font: t.string({ description: 'The name of the font of the character.' }),
-    size: t.double({ description: 'The size in points of the character.' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the character.' }),
+    font: t.nullable(t.string(), { description: 'The name of the font of the character.' }),
+    size: t.nullable(t.double(), { description: 'The size in points of the character.' }),
   },
   { description: 'This subdivides the text into characters.' }
 )
 
 const attributeRunRecordType: ValueType<AttributeRun> = t.record(
   {
-    color: t.rgb({ description: 'The color of the first character.' }),
-    font: t.string({ description: 'The name of the font of the first character.' }),
-    size: t.double({ description: 'The size in points of the first character.' }),
+    color: t.nullable(t.rgb(), { description: 'The color of the first character.' }),
+    font: t.nullable(t.string(), { description: 'The name of the font of the first character.' }),
+    size: t.nullable(t.double(), { description: 'The size in points of the first character.' }),
   },
   { description: 'This subdivides the text into chunks that all have the same attributes.' }
 )
 
 const outgoingMessageRecordType: ValueType<OutgoingMessage> = t.record(
   {
-    sender: t.string({ description: 'The sender of the message' }),
-    subject: t.string({ description: 'The subject of the message' }),
-    visible: t.boolean({
+    sender: t.nullable(t.string(), { description: 'The sender of the message' }),
+    subject: t.nullable(t.string(), { description: 'The subject of the message' }),
+    visible: t.nullable(t.boolean(), {
       description:
         'Controls whether the message window is shown on the screen. The default is false',
     }),
-    messageSignature: t.string({ description: 'The signature of the message' }),
+    messageSignature: t.nullable(t.string(), { description: 'The signature of the message' }),
     id: t.integer({ description: 'The unique identifier of the message' }),
-    htmlContent: t.string({ description: 'Does nothing at all (deprecated)' }),
-    vcardPath: t.file({ description: 'Does nothing at all (deprecated)' }),
+    htmlContent: t.nullable(t.string(), { description: 'Does nothing at all (deprecated)' }),
+    vcardPath: t.nullable(t.file(), { description: 'Does nothing at all (deprecated)' }),
   },
   { description: 'A new email message' }
 )
 
 const messageViewerRecordType: ValueType<MessageViewer> = t.record(
   {
-    draftsMailbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level Drafts mailbox',
+    draftsMailbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level Drafts mailbox' }
+    ),
+    inbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level In mailbox' }
+    ),
+    junkMailbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level Junk mailbox' }
+    ),
+    outbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level Out mailbox' }
+    ),
+    sentMailbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level Sent mailbox' }
+    ),
+    trashMailbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The top level Trash mailbox' }
+    ),
+    sortColumn: t.nullable(t.string(), {
+      description: 'The column that is currently sorted in the viewer',
     }),
-    inbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level In mailbox',
+    sortedAscending: t.nullable(t.boolean(), {
+      description: 'Whether the viewer is sorted ascending or not',
     }),
-    junkMailbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level Junk mailbox',
-    }),
-    outbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level Out mailbox',
-    }),
-    sentMailbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level Sent mailbox',
-    }),
-    trashMailbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The top level Trash mailbox',
-    }),
-    sortColumn: t.string({ description: 'The column that is currently sorted in the viewer' }),
-    sortedAscending: t.boolean({ description: 'Whether the viewer is sorted ascending or not' }),
-    mailboxListVisible: t.boolean({
+    mailboxListVisible: t.nullable(t.boolean(), {
       description: 'Controls whether the list of mailboxes is visible or not',
     }),
-    previewPaneIsVisible: t.boolean({
+    previewPaneIsVisible: t.nullable(t.boolean(), {
       description:
         'Controls whether the preview pane of the message viewer window is visible or not',
     }),
-    visibleColumns: t.string({
+    visibleColumns: t.nullable(t.string(), {
       description:
         'List of columns that are visible. The subject column and the message status column will always be visible',
     }),
     id: t.integer({ description: 'The unique identifier of the message viewer' }),
-    visibleMessages: t.string({
+    visibleMessages: t.nullable(t.string(), {
       description: 'List of messages currently being displayed in the viewer',
     }),
-    selectedMessages: t.string({ description: 'List of messages currently selected' }),
-    selectedMailboxes: t.string({
+    selectedMessages: t.nullable(t.string(), {
+      description: 'List of messages currently selected',
+    }),
+    selectedMailboxes: t.nullable(t.string(), {
       description: 'List of mailboxes currently selected in the list of mailboxes',
     }),
   },
@@ -1209,87 +1846,115 @@ const messageViewerRecordType: ValueType<MessageViewer> = t.record(
 const messageRecordType: ValueType<Message> = t.record(
   {
     id: t.integer({ description: 'The unique identifier of the message.' }),
-    allHeaders: t.string({ description: 'All the headers of the message' }),
-    backgroundColor: t.string({ description: 'The background color of the message' }),
-    mailbox: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The mailbox in which this message is filed',
+    allHeaders: t.nullable(t.string(), { description: 'All the headers of the message' }),
+    backgroundColor: t.nullable(t.string(), { description: 'The background color of the message' }),
+    mailbox: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The mailbox in which this message is filed' }
+    ),
+    content: t.nullable(
+      t.reference<RichText, never>(() => resources, 'RichText', 'one'),
+      { description: 'Contents of an email message' }
+    ),
+    dateReceived: t.nullable(t.date(), { description: 'The date a message was received' }),
+    dateSent: t.nullable(t.date(), { description: 'The date a message was sent' }),
+    deletedStatus: t.nullable(t.boolean(), {
+      description: 'Indicates whether the message is deleted or not',
     }),
-    content: t.reference<RichText, never>(() => resources, 'RichText', 'one', {
-      description: 'Contents of an email message',
+    flaggedStatus: t.nullable(t.boolean(), {
+      description: 'Indicates whether the message is flagged or not',
     }),
-    dateReceived: t.date({ description: 'The date a message was received' }),
-    dateSent: t.date({ description: 'The date a message was sent' }),
-    deletedStatus: t.boolean({ description: 'Indicates whether the message is deleted or not' }),
-    flaggedStatus: t.boolean({ description: 'Indicates whether the message is flagged or not' }),
-    flagIndex: t.integer({
+    flagIndex: t.nullable(t.integer(), {
       description: 'The flag on the message, or -1 if the message is not flagged',
     }),
-    junkMailStatus: t.boolean({
+    junkMailStatus: t.nullable(t.boolean(), {
       description:
         'Indicates whether the message has been marked junk or evaluated to be junk by the junk mail filter.',
     }),
-    readStatus: t.boolean({ description: 'Indicates whether the message is read or not' }),
-    messageId: t.string({ description: 'The unique message ID string' }),
-    source: t.string({ description: 'Raw source of the message' }),
-    replyTo: t.string({ description: 'The address that replies should be sent to' }),
-    messageSize: t.integer({ description: 'The size (in bytes) of a message' }),
-    sender: t.string({ description: 'The sender of the message' }),
-    subject: t.string({ description: 'The subject of the message' }),
-    wasForwarded: t.boolean({ description: 'Indicates whether the message was forwarded or not' }),
-    wasRedirected: t.boolean({
+    readStatus: t.nullable(t.boolean(), {
+      description: 'Indicates whether the message is read or not',
+    }),
+    messageId: t.nullable(t.string(), { description: 'The unique message ID string' }),
+    source: t.nullable(t.string(), { description: 'Raw source of the message' }),
+    replyTo: t.nullable(t.string(), { description: 'The address that replies should be sent to' }),
+    messageSize: t.nullable(t.integer(), { description: 'The size (in bytes) of a message' }),
+    sender: t.nullable(t.string(), { description: 'The sender of the message' }),
+    subject: t.nullable(t.string(), { description: 'The subject of the message' }),
+    wasForwarded: t.nullable(t.boolean(), {
+      description: 'Indicates whether the message was forwarded or not',
+    }),
+    wasRedirected: t.nullable(t.boolean(), {
       description: 'Indicates whether the message was redirected or not',
     }),
-    wasRepliedTo: t.boolean({ description: 'Indicates whether the message was replied to or not' }),
+    wasRepliedTo: t.nullable(t.boolean(), {
+      description: 'Indicates whether the message was replied to or not',
+    }),
   },
   { description: 'An email message' }
 )
 
 const accountRecordType: ValueType<Account> = t.record(
   {
-    deliveryAccount: t.string({
+    deliveryAccount: t.nullable(t.string(), {
       description: 'The delivery account used when sending mail from this account',
     }),
-    name: t.string({ description: 'The name of an account' }),
+    name: t.nullable(t.string(), { description: 'The name of an account' }),
     id: t.string({ description: 'The unique identifier of the account' }),
-    password: t.string({
+    password: t.nullable(t.string(), {
       description: 'Password for this account. Can be set, but not read via scripting',
     }),
-    authentication: t.string({ description: 'Preferred authentication scheme for account' }),
-    accountType: t.string({ description: 'The type of an account' }),
-    emailAddresses: t.string({
+    authentication: t.nullable(t.string(), {
+      description: 'Preferred authentication scheme for account',
+    }),
+    accountType: t.nullable(t.string(), { description: 'The type of an account' }),
+    emailAddresses: t.nullable(t.string(), {
       description: 'The list of email addresses configured for an account',
     }),
-    fullName: t.string({ description: 'The users full name configured for an account' }),
-    emptyJunkMessagesFrequency: t.integer({
+    fullName: t.nullable(t.string(), {
+      description: 'The users full name configured for an account',
+    }),
+    emptyJunkMessagesFrequency: t.nullable(t.integer(), {
       description:
         'Number of days before junk messages are deleted (0 = delete on quit, -1 = never delete)',
     }),
-    emptySentMessagesFrequency: t.integer({ description: 'Does nothing at all (deprecated)' }),
-    emptyTrashFrequency: t.integer({
+    emptySentMessagesFrequency: t.nullable(t.integer(), {
+      description: 'Does nothing at all (deprecated)',
+    }),
+    emptyTrashFrequency: t.nullable(t.integer(), {
       description:
         'Number of days before messages in the trash are permanently deleted (0 = delete on quit, -1 = never delete)',
     }),
-    emptyJunkMessagesOnQuit: t.boolean({
+    emptyJunkMessagesOnQuit: t.nullable(t.boolean(), {
       description:
         'Indicates whether the messages in the junk messages mailboxes will be deleted on quit',
     }),
-    emptySentMessagesOnQuit: t.boolean({ description: 'Does nothing at all (deprecated)' }),
-    emptyTrashOnQuit: t.boolean({
+    emptySentMessagesOnQuit: t.nullable(t.boolean(), {
+      description: 'Does nothing at all (deprecated)',
+    }),
+    emptyTrashOnQuit: t.nullable(t.boolean(), {
       description:
         'Indicates whether the messages in deleted messages mailboxes will be permanently deleted on quit',
     }),
-    enabled: t.boolean({ description: 'Indicates whether the account is enabled or not' }),
-    userName: t.string({ description: 'The user name used to connect to an account' }),
-    accountDirectory: t.file({
+    enabled: t.nullable(t.boolean(), {
+      description: 'Indicates whether the account is enabled or not',
+    }),
+    userName: t.nullable(t.string(), {
+      description: 'The user name used to connect to an account',
+    }),
+    accountDirectory: t.nullable(t.file(), {
       description: 'The directory where the account stores things on disk',
     }),
-    port: t.integer({ description: 'The port used to connect to an account' }),
-    serverName: t.string({ description: 'The host name used to connect to an account' }),
-    includeWhenGettingNewMail: t.boolean({ description: 'Does nothing at all (deprecated)' }),
-    moveDeletedMessagesToTrash: t.boolean({
+    port: t.nullable(t.integer(), { description: 'The port used to connect to an account' }),
+    serverName: t.nullable(t.string(), {
+      description: 'The host name used to connect to an account',
+    }),
+    includeWhenGettingNewMail: t.nullable(t.boolean(), {
+      description: 'Does nothing at all (deprecated)',
+    }),
+    moveDeletedMessagesToTrash: t.nullable(t.boolean(), {
       description: 'Indicates whether messages that are deleted will be moved to the trash mailbox',
     }),
-    usesSsl: t.boolean({
+    usesSsl: t.nullable(t.boolean(), {
       description: 'Indicates whether SSL is enabled for this receiving account',
     }),
   },
@@ -1301,69 +1966,81 @@ const accountRecordType: ValueType<Account> = t.record(
 
 const mailboxRecordType: ValueType<Mailbox> = t.record(
   {
-    name: t.string({ description: 'The name of a mailbox' }),
-    unreadCount: t.integer({ description: 'The number of unread messages in the mailbox' }),
-    account: t.reference<Account, string>(() => resources, 'Account', 'one', {
-      description: 'The account property',
+    name: t.nullable(t.string(), { description: 'The name of a mailbox' }),
+    unreadCount: t.nullable(t.integer(), {
+      description: 'The number of unread messages in the mailbox',
     }),
-    container: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'The container property',
-    }),
+    account: t.nullable(
+      t.reference<Account, string>(() => resources, 'Account', 'one'),
+      { description: 'The account property' }
+    ),
+    container: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'The container property' }
+    ),
   },
   { description: 'A mailbox that holds messages' }
 )
 
 const ruleRecordType: ValueType<Rule> = t.record(
   {
-    colorMessage: t.string({ description: 'If rule matches, apply this color' }),
-    deleteMessage: t.boolean({ description: 'If rule matches, delete message' }),
-    forwardText: t.string({
+    colorMessage: t.nullable(t.string(), { description: 'If rule matches, apply this color' }),
+    deleteMessage: t.nullable(t.boolean(), { description: 'If rule matches, delete message' }),
+    forwardText: t.nullable(t.string(), {
       description:
         'If rule matches, prepend this text to the forwarded message. Set to empty string to include no prepended text',
     }),
-    forwardMessage: t.string({
+    forwardMessage: t.nullable(t.string(), {
       description:
         'If rule matches, forward message to this address, or multiple addresses, separated by commas. Set to empty string to disable this action',
     }),
-    markFlagged: t.boolean({ description: 'If rule matches, mark message as flagged' }),
-    markFlagIndex: t.integer({
+    markFlagged: t.nullable(t.boolean(), {
+      description: 'If rule matches, mark message as flagged',
+    }),
+    markFlagIndex: t.nullable(t.integer(), {
       description:
         'If rule matches, mark message with the specified flag. Set to -1 to disable this action',
     }),
-    markRead: t.boolean({ description: 'If rule matches, mark message as read' }),
-    playSound: t.string({
+    markRead: t.nullable(t.boolean(), { description: 'If rule matches, mark message as read' }),
+    playSound: t.nullable(t.string(), {
       description: 'If rule matches, play this sound (specify name of sound or path to sound)',
     }),
-    redirectMessage: t.string({
+    redirectMessage: t.nullable(t.string(), {
       description:
         'If rule matches, redirect message to this address or multiple addresses, separate by commas. Set to empty string to disable this action',
     }),
-    replyText: t.string({
+    replyText: t.nullable(t.string(), {
       description:
         'If rule matches, reply to message and prepend with this text. Set to empty string to disable this action',
     }),
-    runScript: t.string({
+    runScript: t.nullable(t.string(), {
       description:
         'If rule matches, run this compiled AppleScript file. Set to empty string to disable this action',
     }),
-    allConditionsMustBeMet: t.boolean({
+    allConditionsMustBeMet: t.nullable(t.boolean(), {
       description: 'Indicates whether all conditions must be met for rule to execute',
     }),
-    copyMessage: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'If rule matches, copy to this mailbox',
-    }),
-    moveMessage: t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
-      description: 'If rule matches, move to this mailbox',
-    }),
-    highlightTextUsingColor: t.boolean({
+    copyMessage: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'If rule matches, copy to this mailbox' }
+    ),
+    moveMessage: t.nullable(
+      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      { description: 'If rule matches, move to this mailbox' }
+    ),
+    highlightTextUsingColor: t.nullable(t.boolean(), {
       description:
         'Indicates whether the color will be used to highlight the text or background of a message in the message list',
     }),
-    enabled: t.boolean({ description: 'Indicates whether the rule is enabled' }),
-    name: t.string({ description: 'Name of rule' }),
-    shouldCopyMessage: t.boolean({ description: 'Indicates whether the rule has a copy action' }),
-    shouldMoveMessage: t.boolean({ description: 'Indicates whether the rule has a move action' }),
-    stopEvaluatingRules: t.boolean({
+    enabled: t.nullable(t.boolean(), { description: 'Indicates whether the rule is enabled' }),
+    name: t.nullable(t.string(), { description: 'Name of rule' }),
+    shouldCopyMessage: t.nullable(t.boolean(), {
+      description: 'Indicates whether the rule has a copy action',
+    }),
+    shouldMoveMessage: t.nullable(t.boolean(), {
+      description: 'Indicates whether the rule has a move action',
+    }),
+    stopEvaluatingRules: t.nullable(t.boolean(), {
       description: 'If rule matches, stop rule evaluation for this message',
     }),
   },
@@ -1372,57 +2049,61 @@ const ruleRecordType: ValueType<Rule> = t.record(
 
 const ruleConditionRecordType: ValueType<RuleCondition> = t.record(
   {
-    expression: t.string({ description: 'Rule expression field' }),
-    header: t.string({ description: 'Rule header key' }),
-    qualifier: t.string({ description: 'Rule qualifier' }),
-    ruleType: t.string({ description: 'Rule type' }),
+    expression: t.nullable(t.string(), { description: 'Rule expression field' }),
+    header: t.nullable(t.string(), { description: 'Rule header key' }),
+    qualifier: t.nullable(t.string(), { description: 'Rule qualifier' }),
+    ruleType: t.nullable(t.string(), { description: 'Rule type' }),
   },
   { description: 'Class for conditions that can be attached to a single rule' }
 )
 
 const recipientRecordType: ValueType<Recipient> = t.record(
   {
-    address: t.string({ description: 'The recipients email address' }),
-    name: t.string({ description: 'The name used for display' }),
+    address: t.nullable(t.string(), { description: 'The recipients email address' }),
+    name: t.nullable(t.string(), { description: 'The name used for display' }),
   },
   { description: 'An email recipient' }
 )
 
 const bccRecipientRecordType: ValueType<BccRecipient> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this recipient' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
   },
   { description: 'An email recipient in the Bcc: field' }
 )
 
 const ccRecipientRecordType: ValueType<CcRecipient> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this recipient' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
   },
   { description: 'An email recipient in the Cc: field' }
 )
 
 const toRecipientRecordType: ValueType<ToRecipient> = t.record(
   {
-    id: t.string({ description: 'Unique identifier for this recipient' }),
+    id: t.nullable(t.string(), { description: 'Unique identifier for this recipient' }),
   },
   { description: 'An email recipient in the To: field' }
 )
 
 const headerRecordType: ValueType<Header> = t.record(
   {
-    content: t.string({ description: 'Contents of the header' }),
-    name: t.string({ description: 'Name of the header value' }),
+    content: t.nullable(t.string(), { description: 'Contents of the header' }),
+    name: t.nullable(t.string(), { description: 'Name of the header value' }),
   },
   { description: 'A header value for a message. E.g. To, Subject, From.' }
 )
 
 const mailAttachmentRecordType: ValueType<MailAttachment> = t.record(
   {
-    name: t.string({ description: 'Name of the attachment' }),
-    mIMEType: t.string({ description: 'MIME type of the attachment E.g. text/plain.' }),
-    fileSize: t.integer({ description: 'Approximate size in bytes.' }),
-    downloaded: t.boolean({ description: 'Indicates whether the attachment has been downloaded.' }),
+    name: t.nullable(t.string(), { description: 'Name of the attachment' }),
+    mIMEType: t.nullable(t.string(), {
+      description: 'MIME type of the attachment E.g. text/plain.',
+    }),
+    fileSize: t.nullable(t.integer(), { description: 'Approximate size in bytes.' }),
+    downloaded: t.nullable(t.boolean(), {
+      description: 'Indicates whether the attachment has been downloaded.',
+    }),
     id: t.string({ description: 'The unique identifier of the attachment.' }),
   },
   { description: 'A file attached to a received message.' }

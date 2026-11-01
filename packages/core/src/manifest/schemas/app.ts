@@ -5,6 +5,7 @@ import { CommandSchema } from './command.js'
 import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
+import { findDuplicateRoutes } from '../route.js'
 
 /**
  * Coarse category to fine-grained permissions mapping.
@@ -62,5 +63,16 @@ export const AppManifestSchema = z
   .refine((data) => Object.keys(data.resources).length > 0, {
     message: 'At least one resource is required',
     path: ['resources'],
+  })
+  .superRefine((data, ctx) => {
+    // A route string identifies one operation; two commands that resolve to
+    // the same route (through `routeName`, say) would shadow each other.
+    for (const { route, commandKeys } of findDuplicateRoutes(data)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Commands ${commandKeys.map((key) => `"${key}"`).join(', ')} all resolve to the route "${route}"; give each a distinct key or routeName.`,
+        path: ['commands', commandKeys[1] ?? commandKeys[0] ?? ''],
+      })
+    }
   })
 export type AppManifest = z.infer<typeof AppManifestSchema>

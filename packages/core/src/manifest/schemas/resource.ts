@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { PropertySchema } from './property.js'
+import { ObservedAtSchema } from './evidence.js'
 
 /**
  * How the structured/runtime layer addresses a resource by its identifier.
@@ -78,6 +79,73 @@ export const RuntimeProbeSchema = z.object({
 export type RuntimeProbe = z.infer<typeof RuntimeProbeSchema>
 
 /**
+ * Outcome of a nullability probe of one resource.
+ *
+ * - `probed`      – items were read; their properties' evidence is recorded
+ * - `no-items`    – the collection was reachable but empty
+ * - `unreachable` – the collection could not be reached from the app
+ * - `budget`      – the probe's time budget ran out before this resource
+ * - `error`       – the probe of this resource failed as a whole
+ */
+export const NullabilityProbeStatusSchema = z.enum([
+  'probed',
+  'no-items',
+  'unreachable',
+  'budget',
+  'error',
+])
+export type NullabilityProbeStatus = z.infer<typeof NullabilityProbeStatusSchema>
+
+/**
+ * Record of the last nullability probe of a resource, written by
+ * `macts probe --nullability`.
+ *
+ * It is separate from the identifier {@link RuntimeProbeSchema | probe}
+ * block: it describes how the per-property nullability evidence was gathered
+ * (which app build and macOS version, how the collection was reached, and how
+ * many items were read), and names the properties it deliberately did not
+ * read. It never contains an observed value.
+ */
+export const NullabilityProbeSchema = z.object({
+  /** When the probe ran: an ISO 8601 UTC timestamp. */
+  observedAt: ObservedAtSchema,
+  /** The bundle identifier of the probed app. */
+  bundleId: z.string().min(1),
+  /** The probed app's version. */
+  appVersion: z.string().min(1),
+  /** The macOS product version the app ran on, e.g. `27.2`. */
+  osVersion: z.string().min(1),
+  /**
+   * How the probe reached the resource's items from the app: the chain of
+   * collections, e.g. `calendars/events`.
+   */
+  accessPath: z.string(),
+  /** How many items the probe read. */
+  itemsRead: z.number().int().nonnegative(),
+  /**
+   * How many collections the items were drawn from: the parents (calendars,
+   * lists, folders) of a nested resource, or 1 for a top-level collection.
+   * Absent on blocks written before the probe spread its sample.
+   */
+  sampledParents: z.number().int().nonnegative().optional(),
+  /** The outcome of the probe. */
+  status: NullabilityProbeStatusSchema,
+  /**
+   * Properties the probe did not read, by name: file and data properties,
+   * lists of references, properties that hold large content, and any the
+   * caller excluded.
+   */
+  skipped: z.array(z.string()),
+  /**
+   * Why fewer items were read than the probe could have, or why it failed:
+   * e.g. `stopped at the time limit after 12 items`. Never contains an
+   * observed value.
+   */
+  note: z.string().min(1).optional(),
+})
+export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>
+
+/**
  * Schema for a resource type definition.
  */
 export const ResourceSchema = z.object({
@@ -104,5 +172,10 @@ export const ResourceSchema = z.object({
    * primary identifier.
    */
   probe: RuntimeProbeSchema.optional(),
+  /**
+   * Record of the last nullability probe, written by
+   * `macts probe --nullability`. Absent until that probe has run.
+   */
+  nullabilityProbe: NullabilityProbeSchema.optional(),
 })
 export type Resource = z.infer<typeof ResourceSchema>

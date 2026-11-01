@@ -48,7 +48,7 @@ export type AttachmentCreateInput = Record<string, never>;
 // @public
 export class AttachmentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Attachment>;
+    get(id: string): Promise<Attachment>;
     list(): Promise<Attachment[]>;
 }
 

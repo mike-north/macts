@@ -35,73 +35,149 @@ const t = ValueTypes
 
 /** A window. */
 export interface Window {
-  /** The given name of the window. */
-  givenName: string
-  /** The full title of the window. */
-  readonly name: string
-  /** The unique identifier of the window. */
+  /**
+   * The given name of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  givenName: string | null
+  /**
+   * The full title of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the window.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The index of the window, ordered front to back. */
-  index: Integer
-  /** The bounding rectangle of the window. */
-  bounds: Rectangle
-  /** Whether the window has a close box. */
-  readonly closeable: boolean
-  /** Whether the window can be minimized. */
-  readonly minimizable: boolean
-  /** Whether the window is currently minimized. */
-  minimized: boolean
-  /** Whether the window can be resized. */
-  readonly resizable: boolean
-  /** Whether the window is currently visible. */
-  visible: boolean
-  /** Whether the window can be zoomed. */
-  readonly zoomable: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed: boolean
-  /** Returns the currently selected tab */
-  readonly activeTab: ObjectReferenceVariant<Tab, string>
+  /**
+   * The index of the window, ordered front to back.
+   * Nullable. No evidence that the app always sets it.
+   */
+  index: Integer | null
+  /**
+   * The bounding rectangle of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bounds: Rectangle | null
+  /**
+   * Whether the window has a close box.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly closeable: boolean | null
+  /**
+   * Whether the window can be minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly minimizable: boolean | null
+  /**
+   * Whether the window is currently minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  minimized: boolean | null
+  /**
+   * Whether the window can be resized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly resizable: boolean | null
+  /**
+   * Whether the window is currently visible.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Whether the window can be zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly zoomable: boolean | null
+  /**
+   * Whether the window is currently zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  zoomed: boolean | null
+  /**
+   * Returns the currently selected tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly activeTab: ObjectReferenceVariant<Tab, string> | null
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
+   * Nullable. No evidence that the app always sets it.
    */
-  mode: string
-  /** The index of the active tab. */
-  activeTabIndex: Integer
+  mode: string | null
+  /**
+   * The index of the active tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  activeTabIndex: Integer | null
 }
 
 /** A tab. */
 export interface Tab {
-  /** Unique ID of the tab. */
+  /**
+   * Unique ID of the tab.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The title of the tab. */
-  readonly title: string
-  /** The url visible to the user. */
-  uRL: string
-  /** Is loading? */
-  readonly loading: boolean
+  /**
+   * The title of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly title: string | null
+  /**
+   * The url visible to the user.
+   * Nullable. No evidence that the app always sets it.
+   */
+  uRL: string | null
+  /**
+   * Is loading?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly loading: boolean | null
 }
 
 /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
 export interface BookmarkFolder {
-  /** Unique ID of the bookmark folder. */
+  /**
+   * Unique ID of the bookmark folder.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The title of the folder. */
-  title: string
-  /** Returns the index with respect to its parent bookmark folder. */
-  readonly index: number
+  /**
+   * The title of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  title: string | null
+  /**
+   * Returns the index with respect to its parent bookmark folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly index: number | null
 }
 
 /** An item consists of an URL and the title of a bookmark */
 export interface BookmarkItem {
-  /** Unique ID of the bookmark item. */
+  /**
+   * Unique ID of the bookmark item.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The title of the bookmark item. */
-  title: string
-  /** The URL of the bookmark. */
-  uRL: string
-  /** Returns the index with respect to its parent bookmark folder. */
-  readonly index: number
+  /**
+   * The title of the bookmark item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  title: string | null
+  /**
+   * The URL of the bookmark.
+   * Nullable. No evidence that the app always sets it.
+   */
+  uRL: string | null
+  /**
+   * Returns the index with respect to its parent bookmark folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly index: number | null
 }
 
 /** Input for creating a Window. */
@@ -129,24 +205,46 @@ export interface WindowCreateInput {
 
 /** Input for updating a Window. Omitted fields are left unchanged. */
 export interface WindowUpdateInput {
-  /** The given name of the window. */
+  /**
+   * The given name of the window.
+   * Cannot be reset: null is rejected.
+   */
   givenName?: string
-  /** The index of the window, ordered front to back. */
+  /**
+   * The index of the window, ordered front to back.
+   * Cannot be reset: null is rejected.
+   */
   index?: Integer
-  /** The bounding rectangle of the window. */
+  /**
+   * The bounding rectangle of the window.
+   * Cannot be reset: null is rejected.
+   */
   bounds?: Rectangle
-  /** Whether the window is currently minimized. */
+  /**
+   * Whether the window is currently minimized.
+   * Cannot be reset: null is rejected.
+   */
   minimized?: boolean
-  /** Whether the window is currently visible. */
+  /**
+   * Whether the window is currently visible.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** Whether the window is currently zoomed. */
+  /**
+   * Whether the window is currently zoomed.
+   * Cannot be reset: null is rejected.
+   */
   zoomed?: boolean
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
+   * Cannot be reset: null is rejected.
    */
   mode?: string
-  /** The index of the active tab. */
+  /**
+   * The index of the active tab.
+   * Cannot be reset: null is rejected.
+   */
   activeTabIndex?: Integer
 }
 
@@ -158,7 +256,10 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /** The url visible to the user. */
+  /**
+   * The url visible to the user.
+   * Cannot be reset: null is rejected.
+   */
   uRL?: string
 }
 
@@ -170,7 +271,10 @@ export interface BookmarkFolderCreateInput {
 
 /** Input for updating a BookmarkFolder. Omitted fields are left unchanged. */
 export interface BookmarkFolderUpdateInput {
-  /** The title of the folder. */
+  /**
+   * The title of the folder.
+   * Cannot be reset: null is rejected.
+   */
   title?: string
 }
 
@@ -184,9 +288,15 @@ export interface BookmarkItemCreateInput {
 
 /** Input for updating a BookmarkItem. Omitted fields are left unchanged. */
 export interface BookmarkItemUpdateInput {
-  /** The title of the bookmark item. */
+  /**
+   * The title of the bookmark item.
+   * Cannot be reset: null is rejected.
+   */
   title?: string
-  /** The URL of the bookmark. */
+  /**
+   * The URL of the bookmark.
+   * Cannot be reset: null is rejected.
+   */
   uRL?: string
 }
 
@@ -195,7 +305,13 @@ export interface BookmarkItemUpdateInput {
  * commands. A client factory creates one from {@link googleChromeContract}.
  */
 export interface GoogleChromeClient {
-  /** Save an object. */
+  /**
+   * Save an object.
+   *
+   * @param _in - The file in which to save the object. Does not accept null.
+   * @param as - The file type in which to save the data. Can be 'only html', 'complete html', or
+   * 'single file'; default is 'complete html'. Does not accept null.
+   */
   save(_in?: FileSource, as?: string, options?: CallOptions): Promise<void>
   /** Open a document. */
   open(options?: CallOptions): Promise<void>
@@ -203,15 +319,32 @@ export interface GoogleChromeClient {
   close(options?: CallOptions): Promise<void>
   /** Quit the application. */
   quit(options?: CallOptions): Promise<void>
-  /** Return the number of elements of a particular class within an object. */
+  /**
+   * Return the number of elements of a particular class within an object.
+   *
+   * @param each - The class of objects to be counted. Does not accept null.
+   */
   count(each?: string, options?: CallOptions): Promise<void>
   /** Delete an object. */
   _delete(options?: CallOptions): Promise<void>
-  /** Copy object(s) and put the copies at a new location. */
+  /**
+   * Copy object(s) and put the copies at a new location.
+   *
+   * @param to - The location for the new object(s). Does not accept null.
+   * @param withProperties - Properties to be set in the new duplicated object(s). Does not accept
+   * null.
+   */
   duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>
   /** Verify if an object exists. */
   exists(options?: CallOptions): Promise<void>
-  /** Make a new object. */
+  /**
+   * Make a new object.
+   *
+   * @param _new - The class of the new object. Does not accept null.
+   * @param at - The location at which to insert the object. Does not accept null.
+   * @param withData - The initial contents of the object. Does not accept null.
+   * @param withProperties - The initial values for properties of the object. Does not accept null.
+   */
   make(
     _new: string,
     at?: string,
@@ -219,7 +352,11 @@ export interface GoogleChromeClient {
     withProperties?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Move object(s) to a new location. */
+  /**
+   * Move object(s) to a new location.
+   *
+   * @param to - The new location for the object(s). Does not accept null.
+   */
   move(to: string, options?: CallOptions): Promise<void>
   /** Print an object. */
   print(options?: CallOptions): Promise<void>
@@ -245,32 +382,41 @@ export interface GoogleChromeClient {
   stop(options?: CallOptions): Promise<void>
   /** View the HTML source of the tab. */
   viewSource(options?: CallOptions): Promise<void>
-  /** Execute a piece of javascript. */
+  /**
+   * Execute a piece of javascript.
+   *
+   * @param javascript - The javascript code to execute. Does not accept null.
+   */
   execute(javascript: string, options?: CallOptions): Promise<void>
 }
 
 const windowRecordType: ValueType<Window> = t.record(
   {
-    givenName: t.string({ description: 'The given name of the window.' }),
-    name: t.string({ description: 'The full title of the window.' }),
+    givenName: t.nullable(t.string(), { description: 'The given name of the window.' }),
+    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
     id: t.string({ description: 'The unique identifier of the window.' }),
-    index: t.integer({ description: 'The index of the window, ordered front to back.' }),
-    bounds: t.rectangle({ description: 'The bounding rectangle of the window.' }),
-    closeable: t.boolean({ description: 'Whether the window has a close box.' }),
-    minimizable: t.boolean({ description: 'Whether the window can be minimized.' }),
-    minimized: t.boolean({ description: 'Whether the window is currently minimized.' }),
-    resizable: t.boolean({ description: 'Whether the window can be resized.' }),
-    visible: t.boolean({ description: 'Whether the window is currently visible.' }),
-    zoomable: t.boolean({ description: 'Whether the window can be zoomed.' }),
-    zoomed: t.boolean({ description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.reference<Tab, string>(() => resources, 'Tab', 'one', {
-      description: 'Returns the currently selected tab',
+    index: t.nullable(t.integer(), {
+      description: 'The index of the window, ordered front to back.',
     }),
-    mode: t.string({
+    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
+    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
+    minimizable: t.nullable(t.boolean(), { description: 'Whether the window can be minimized.' }),
+    minimized: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently minimized.',
+    }),
+    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
+    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
+    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    activeTab: t.nullable(
+      t.reference<Tab, string>(() => resources, 'Tab', 'one'),
+      { description: 'Returns the currently selected tab' }
+    ),
+    mode: t.nullable(t.string(), {
       description:
         "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
     }),
-    activeTabIndex: t.integer({ description: 'The index of the active tab.' }),
+    activeTabIndex: t.nullable(t.integer(), { description: 'The index of the active tab.' }),
   },
   { description: 'A window.' }
 )
@@ -278,9 +424,9 @@ const windowRecordType: ValueType<Window> = t.record(
 const tabRecordType: ValueType<Tab> = t.record(
   {
     id: t.string({ description: 'Unique ID of the tab.' }),
-    title: t.string({ description: 'The title of the tab.' }),
-    uRL: t.string({ description: 'The url visible to the user.' }),
-    loading: t.boolean({ description: 'Is loading?' }),
+    title: t.nullable(t.string(), { description: 'The title of the tab.' }),
+    uRL: t.nullable(t.string(), { description: 'The url visible to the user.' }),
+    loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
   },
   { description: 'A tab.' }
 )
@@ -288,8 +434,8 @@ const tabRecordType: ValueType<Tab> = t.record(
 const bookmarkFolderRecordType: ValueType<BookmarkFolder> = t.record(
   {
     id: t.string({ description: 'Unique ID of the bookmark folder.' }),
-    title: t.string({ description: 'The title of the folder.' }),
-    index: t.double({
+    title: t.nullable(t.string(), { description: 'The title of the folder.' }),
+    index: t.nullable(t.double(), {
       description: 'Returns the index with respect to its parent bookmark folder.',
     }),
   },
@@ -299,9 +445,9 @@ const bookmarkFolderRecordType: ValueType<BookmarkFolder> = t.record(
 const bookmarkItemRecordType: ValueType<BookmarkItem> = t.record(
   {
     id: t.string({ description: 'Unique ID of the bookmark item.' }),
-    title: t.string({ description: 'The title of the bookmark item.' }),
-    uRL: t.string({ description: 'The URL of the bookmark.' }),
-    index: t.double({
+    title: t.nullable(t.string(), { description: 'The title of the bookmark item.' }),
+    uRL: t.nullable(t.string(), { description: 'The URL of the bookmark.' }),
+    index: t.nullable(t.double(), {
       description: 'Returns the index with respect to its parent bookmark folder.',
     }),
   },

@@ -12,7 +12,7 @@ import { Rgb } from '@macts/contracts';
 // @public
 export interface Account {
     readonly id: string;
-    readonly name: string;
+    readonly name: string | null;
 }
 
 // @public
@@ -28,10 +28,10 @@ export type AccountUpdateInput = Record<string, never>;
 
 // @public
 export interface List {
-    color: Rgb;
-    emblem: string;
+    color: Rgb | null;
+    emblem: string | null;
     readonly id: string;
-    name: string;
+    name: string | null;
 }
 
 // @public
@@ -57,18 +57,18 @@ export interface ListUpdateInput {
 
 // @public
 export interface Reminder {
-    allDayDueDate: Date;
-    body: string;
+    allDayDueDate: Date | null;
+    body: string | null;
     completed: boolean;
-    readonly completionDate: Date;
+    readonly completionDate: Date | null;
     readonly creationDate: Date;
-    dueDate: Date;
+    dueDate: Date | null;
     flagged: boolean;
     readonly id: string;
     readonly modificationDate: Date;
     name: string;
     priority: Integer;
-    remindMeDate: Date;
+    remindMeDate: Date | null;
 }
 
 // @public

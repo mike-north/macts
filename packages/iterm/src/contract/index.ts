@@ -40,144 +40,334 @@ export type SaveOptions = 'yes' | 'no' | 'ask'
 
 /** A window. */
 export interface Window {
-  /** The unique identifier of the session. */
+  /**
+   * The unique identifier of the session.
+   * Never null: the primary identifier.
+   */
   readonly id: Integer
-  /** The alternate unique identifier of the session. */
-  readonly alternateIdentifier: string
-  /** The full title of the window. */
-  readonly name: string
-  /** The index of the window, ordered front to back. */
-  index: Integer
-  /** The bounding rectangle of the window. */
-  bounds: Rectangle
-  /** Whether the window has a close box. */
-  readonly closeable: boolean
-  /** Whether the window can be minimized. */
-  readonly miniaturizable: boolean
-  /** Whether the window is currently minimized. */
-  miniaturized: boolean
-  /** Whether the window can be resized. */
-  readonly resizable: boolean
-  /** Whether the window is currently visible. */
-  visible: boolean
-  /** Whether the window can be zoomed. */
-  readonly zoomable: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed: boolean
-  /** Whether the window is currently the frontmost window. */
-  frontmost: boolean
-  /** The currently selected tab */
-  currentTab: ObjectReferenceVariant<Tab, never>
-  /** The current session in a window */
-  currentSession: ObjectReferenceVariant<Session, string>
-  /** Whether the window is a hotkey window. */
-  isHotkeyWindow: boolean
+  /**
+   * The alternate unique identifier of the session.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly alternateIdentifier: string | null
+  /**
+   * The full title of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The index of the window, ordered front to back.
+   * Nullable. No evidence that the app always sets it.
+   */
+  index: Integer | null
+  /**
+   * The bounding rectangle of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bounds: Rectangle | null
+  /**
+   * Whether the window has a close box.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly closeable: boolean | null
+  /**
+   * Whether the window can be minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly miniaturizable: boolean | null
+  /**
+   * Whether the window is currently minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  miniaturized: boolean | null
+  /**
+   * Whether the window can be resized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly resizable: boolean | null
+  /**
+   * Whether the window is currently visible.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Whether the window can be zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly zoomable: boolean | null
+  /**
+   * Whether the window is currently zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  zoomed: boolean | null
+  /**
+   * Whether the window is currently the frontmost window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  frontmost: boolean | null
+  /**
+   * The currently selected tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentTab: ObjectReferenceVariant<Tab, never> | null
+  /**
+   * The current session in a window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentSession: ObjectReferenceVariant<Session, string> | null
+  /**
+   * Whether the window is a hotkey window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  isHotkeyWindow: boolean | null
   /**
    * If the window is a hotkey window, this gives the name of the profile that created the window.
+   * Nullable. No evidence that the app always sets it.
    */
-  hotkeyWindowProfile: string
-  /** The position of the window, relative to the upper left corner of the screen. */
-  position: Point
-  /** The position of the window, relative to the lower left corner of the screen. */
-  origin: Point
-  /** The width and height of the window */
-  size: Point
-  /** The bounding rectangle, relative to the lower left corner of the screen. */
-  frame: Rectangle
+  hotkeyWindowProfile: string | null
+  /**
+   * The position of the window, relative to the upper left corner of the screen.
+   * Nullable. No evidence that the app always sets it.
+   */
+  position: Point | null
+  /**
+   * The position of the window, relative to the lower left corner of the screen.
+   * Nullable. No evidence that the app always sets it.
+   */
+  origin: Point | null
+  /**
+   * The width and height of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: Point | null
+  /**
+   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Nullable. No evidence that the app always sets it.
+   */
+  frame: Rectangle | null
 }
 
 /** A terminal tab */
 export interface Tab {
-  /** The current session in a tab */
-  currentSession: ObjectReferenceVariant<Session, string>
-  /** Index of tab in parent tab view control */
-  index: Integer
-  /** The title property */
-  title: string
+  /**
+   * The current session in a tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  currentSession: ObjectReferenceVariant<Session, string> | null
+  /**
+   * Index of tab in parent tab view control.
+   * Nullable. No evidence that the app always sets it.
+   */
+  index: Integer | null
+  /**
+   * The title property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  title: string | null
 }
 
 /** A terminal session */
 export interface Session {
-  /** The unique identifier of the session. */
+  /**
+   * The unique identifier of the session.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The session has received output recently. */
-  isProcessing: boolean
-  /** The terminal is at the shell prompt. Requires shell integration. */
-  isAtShellPrompt: boolean
-  /** The columns property */
-  columns: Integer
-  /** The rows property */
-  rows: Integer
-  /** The tty property */
-  readonly tty: string
-  /** The currently visible contents of the session. */
-  contents: string
-  /** The currently visible contents of the session. */
-  readonly text: string
-  /** The colorPreset property */
-  colorPreset: string
-  /** The backgroundColor property */
-  backgroundColor: Rgb
-  /** The boldColor property */
-  boldColor: Rgb
-  /** The cursorColor property */
-  cursorColor: Rgb
-  /** The cursorTextColor property */
-  cursorTextColor: Rgb
-  /** The foregroundColor property */
-  foregroundColor: Rgb
-  /** The selectedTextColor property */
-  selectedTextColor: Rgb
-  /** The selectionColor property */
-  selectionColor: Rgb
-  /** The aNSIBlackColor property */
-  aNSIBlackColor: Rgb
-  /** The aNSIRedColor property */
-  aNSIRedColor: Rgb
-  /** The aNSIGreenColor property */
-  aNSIGreenColor: Rgb
-  /** The aNSIYellowColor property */
-  aNSIYellowColor: Rgb
-  /** The aNSIBlueColor property */
-  aNSIBlueColor: Rgb
-  /** The aNSIMagentaColor property */
-  aNSIMagentaColor: Rgb
-  /** The aNSICyanColor property */
-  aNSICyanColor: Rgb
-  /** The aNSIWhiteColor property */
-  aNSIWhiteColor: Rgb
-  /** The aNSIBrightBlackColor property */
-  aNSIBrightBlackColor: Rgb
-  /** The aNSIBrightRedColor property */
-  aNSIBrightRedColor: Rgb
-  /** The aNSIBrightGreenColor property */
-  aNSIBrightGreenColor: Rgb
-  /** The aNSIBrightYellowColor property */
-  aNSIBrightYellowColor: Rgb
-  /** The aNSIBrightBlueColor property */
-  aNSIBrightBlueColor: Rgb
-  /** The aNSIBrightMagentaColor property */
-  aNSIBrightMagentaColor: Rgb
-  /** The aNSIBrightCyanColor property */
-  aNSIBrightCyanColor: Rgb
-  /** The aNSIBrightWhiteColor property */
-  aNSIBrightWhiteColor: Rgb
-  /** The underlineColor property */
-  underlineColor: Rgb
-  /** Whether the use a dedicated color for underlining. */
-  useUnderlineColor: boolean
-  /** The backgroundImage property */
-  backgroundImage: string
-  /** The name property */
-  name: string
-  /** The transparency property */
-  transparency: number
-  /** The uniqueID property */
-  readonly uniqueID: string
-  /** The session's profile name */
-  readonly profileName: string
-  /** ENQ Answerback string */
-  answerbackString: string
+  /**
+   * The session has received output recently.
+   * Nullable. No evidence that the app always sets it.
+   */
+  isProcessing: boolean | null
+  /**
+   * The terminal is at the shell prompt. Requires shell integration.
+   * Nullable. No evidence that the app always sets it.
+   */
+  isAtShellPrompt: boolean | null
+  /**
+   * The columns property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  columns: Integer | null
+  /**
+   * The rows property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  rows: Integer | null
+  /**
+   * The tty property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly tty: string | null
+  /**
+   * The currently visible contents of the session.
+   * Nullable. No evidence that the app always sets it.
+   */
+  contents: string | null
+  /**
+   * The currently visible contents of the session.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly text: string | null
+  /**
+   * The colorPreset property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  colorPreset: string | null
+  /**
+   * The backgroundColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  backgroundColor: Rgb | null
+  /**
+   * The boldColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  boldColor: Rgb | null
+  /**
+   * The cursorColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  cursorColor: Rgb | null
+  /**
+   * The cursorTextColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  cursorTextColor: Rgb | null
+  /**
+   * The foregroundColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  foregroundColor: Rgb | null
+  /**
+   * The selectedTextColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  selectedTextColor: Rgb | null
+  /**
+   * The selectionColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  selectionColor: Rgb | null
+  /**
+   * The aNSIBlackColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBlackColor: Rgb | null
+  /**
+   * The aNSIRedColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIRedColor: Rgb | null
+  /**
+   * The aNSIGreenColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIGreenColor: Rgb | null
+  /**
+   * The aNSIYellowColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIYellowColor: Rgb | null
+  /**
+   * The aNSIBlueColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBlueColor: Rgb | null
+  /**
+   * The aNSIMagentaColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIMagentaColor: Rgb | null
+  /**
+   * The aNSICyanColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSICyanColor: Rgb | null
+  /**
+   * The aNSIWhiteColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIWhiteColor: Rgb | null
+  /**
+   * The aNSIBrightBlackColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightBlackColor: Rgb | null
+  /**
+   * The aNSIBrightRedColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightRedColor: Rgb | null
+  /**
+   * The aNSIBrightGreenColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightGreenColor: Rgb | null
+  /**
+   * The aNSIBrightYellowColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightYellowColor: Rgb | null
+  /**
+   * The aNSIBrightBlueColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightBlueColor: Rgb | null
+  /**
+   * The aNSIBrightMagentaColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightMagentaColor: Rgb | null
+  /**
+   * The aNSIBrightCyanColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightCyanColor: Rgb | null
+  /**
+   * The aNSIBrightWhiteColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  aNSIBrightWhiteColor: Rgb | null
+  /**
+   * The underlineColor property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  underlineColor: Rgb | null
+  /**
+   * Whether the use a dedicated color for underlining.
+   * Nullable. No evidence that the app always sets it.
+   */
+  useUnderlineColor: boolean | null
+  /**
+   * The backgroundImage property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  backgroundImage: string | null
+  /**
+   * The name property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * The transparency property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  transparency: number | null
+  /**
+   * The uniqueID property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly uniqueID: string | null
+  /**
+   * The session's profile name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly profileName: string | null
+  /**
+   * ENQ Answerback string.
+   * Nullable. No evidence that the app always sets it.
+   */
+  answerbackString: string | null
 }
 
 /** Input for creating a Window. */
@@ -216,35 +406,75 @@ export interface WindowCreateInput {
 
 /** Input for updating a Window. Omitted fields are left unchanged. */
 export interface WindowUpdateInput {
-  /** The index of the window, ordered front to back. */
+  /**
+   * The index of the window, ordered front to back.
+   * Cannot be reset: null is rejected.
+   */
   index?: Integer
-  /** The bounding rectangle of the window. */
+  /**
+   * The bounding rectangle of the window.
+   * Cannot be reset: null is rejected.
+   */
   bounds?: Rectangle
-  /** Whether the window is currently minimized. */
+  /**
+   * Whether the window is currently minimized.
+   * Cannot be reset: null is rejected.
+   */
   miniaturized?: boolean
-  /** Whether the window is currently visible. */
+  /**
+   * Whether the window is currently visible.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** Whether the window is currently zoomed. */
+  /**
+   * Whether the window is currently zoomed.
+   * Cannot be reset: null is rejected.
+   */
   zoomed?: boolean
-  /** Whether the window is currently the frontmost window. */
+  /**
+   * Whether the window is currently the frontmost window.
+   * Cannot be reset: null is rejected.
+   */
   frontmost?: boolean
-  /** The currently selected tab */
+  /**
+   * The currently selected tab.
+   * Cannot be reset: null is rejected.
+   */
   currentTab?: ObjectReferenceVariant<Tab, never>
-  /** The current session in a window */
+  /**
+   * The current session in a window.
+   * Cannot be reset: null is rejected.
+   */
   currentSession?: ObjectReferenceVariant<Session, string>
-  /** Whether the window is a hotkey window. */
+  /**
+   * Whether the window is a hotkey window.
+   * Cannot be reset: null is rejected.
+   */
   isHotkeyWindow?: boolean
   /**
    * If the window is a hotkey window, this gives the name of the profile that created the window.
+   * Cannot be reset: null is rejected.
    */
   hotkeyWindowProfile?: string
-  /** The position of the window, relative to the upper left corner of the screen. */
+  /**
+   * The position of the window, relative to the upper left corner of the screen.
+   * Cannot be reset: null is rejected.
+   */
   position?: Point
-  /** The position of the window, relative to the lower left corner of the screen. */
+  /**
+   * The position of the window, relative to the lower left corner of the screen.
+   * Cannot be reset: null is rejected.
+   */
   origin?: Point
-  /** The width and height of the window */
+  /**
+   * The width and height of the window.
+   * Cannot be reset: null is rejected.
+   */
   size?: Point
-  /** The bounding rectangle, relative to the lower left corner of the screen. */
+  /**
+   * The bounding rectangle, relative to the lower left corner of the screen.
+   * Cannot be reset: null is rejected.
+   */
   frame?: Rectangle
 }
 
@@ -260,11 +490,20 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /** The current session in a tab */
+  /**
+   * The current session in a tab.
+   * Cannot be reset: null is rejected.
+   */
   currentSession?: ObjectReferenceVariant<Session, string>
-  /** Index of tab in parent tab view control */
+  /**
+   * Index of tab in parent tab view control.
+   * Cannot be reset: null is rejected.
+   */
   index?: Integer
-  /** The title property */
+  /**
+   * The title property.
+   * Cannot be reset: null is rejected.
+   */
   title?: string
 }
 
@@ -344,75 +583,180 @@ export interface SessionCreateInput {
 
 /** Input for updating a Session. Omitted fields are left unchanged. */
 export interface SessionUpdateInput {
-  /** The session has received output recently. */
+  /**
+   * The session has received output recently.
+   * Cannot be reset: null is rejected.
+   */
   isProcessing?: boolean
-  /** The terminal is at the shell prompt. Requires shell integration. */
+  /**
+   * The terminal is at the shell prompt. Requires shell integration.
+   * Cannot be reset: null is rejected.
+   */
   isAtShellPrompt?: boolean
-  /** The columns property */
+  /**
+   * The columns property.
+   * Cannot be reset: null is rejected.
+   */
   columns?: Integer
-  /** The rows property */
+  /**
+   * The rows property.
+   * Cannot be reset: null is rejected.
+   */
   rows?: Integer
-  /** The currently visible contents of the session. */
+  /**
+   * The currently visible contents of the session.
+   * Cannot be reset: null is rejected.
+   */
   contents?: string
-  /** The colorPreset property */
+  /**
+   * The colorPreset property.
+   * Cannot be reset: null is rejected.
+   */
   colorPreset?: string
-  /** The backgroundColor property */
+  /**
+   * The backgroundColor property.
+   * Cannot be reset: null is rejected.
+   */
   backgroundColor?: Rgb
-  /** The boldColor property */
+  /**
+   * The boldColor property.
+   * Cannot be reset: null is rejected.
+   */
   boldColor?: Rgb
-  /** The cursorColor property */
+  /**
+   * The cursorColor property.
+   * Cannot be reset: null is rejected.
+   */
   cursorColor?: Rgb
-  /** The cursorTextColor property */
+  /**
+   * The cursorTextColor property.
+   * Cannot be reset: null is rejected.
+   */
   cursorTextColor?: Rgb
-  /** The foregroundColor property */
+  /**
+   * The foregroundColor property.
+   * Cannot be reset: null is rejected.
+   */
   foregroundColor?: Rgb
-  /** The selectedTextColor property */
+  /**
+   * The selectedTextColor property.
+   * Cannot be reset: null is rejected.
+   */
   selectedTextColor?: Rgb
-  /** The selectionColor property */
+  /**
+   * The selectionColor property.
+   * Cannot be reset: null is rejected.
+   */
   selectionColor?: Rgb
-  /** The aNSIBlackColor property */
+  /**
+   * The aNSIBlackColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBlackColor?: Rgb
-  /** The aNSIRedColor property */
+  /**
+   * The aNSIRedColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIRedColor?: Rgb
-  /** The aNSIGreenColor property */
+  /**
+   * The aNSIGreenColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIGreenColor?: Rgb
-  /** The aNSIYellowColor property */
+  /**
+   * The aNSIYellowColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIYellowColor?: Rgb
-  /** The aNSIBlueColor property */
+  /**
+   * The aNSIBlueColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBlueColor?: Rgb
-  /** The aNSIMagentaColor property */
+  /**
+   * The aNSIMagentaColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIMagentaColor?: Rgb
-  /** The aNSICyanColor property */
+  /**
+   * The aNSICyanColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSICyanColor?: Rgb
-  /** The aNSIWhiteColor property */
+  /**
+   * The aNSIWhiteColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIWhiteColor?: Rgb
-  /** The aNSIBrightBlackColor property */
+  /**
+   * The aNSIBrightBlackColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightBlackColor?: Rgb
-  /** The aNSIBrightRedColor property */
+  /**
+   * The aNSIBrightRedColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightRedColor?: Rgb
-  /** The aNSIBrightGreenColor property */
+  /**
+   * The aNSIBrightGreenColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightGreenColor?: Rgb
-  /** The aNSIBrightYellowColor property */
+  /**
+   * The aNSIBrightYellowColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightYellowColor?: Rgb
-  /** The aNSIBrightBlueColor property */
+  /**
+   * The aNSIBrightBlueColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightBlueColor?: Rgb
-  /** The aNSIBrightMagentaColor property */
+  /**
+   * The aNSIBrightMagentaColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightMagentaColor?: Rgb
-  /** The aNSIBrightCyanColor property */
+  /**
+   * The aNSIBrightCyanColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightCyanColor?: Rgb
-  /** The aNSIBrightWhiteColor property */
+  /**
+   * The aNSIBrightWhiteColor property.
+   * Cannot be reset: null is rejected.
+   */
   aNSIBrightWhiteColor?: Rgb
-  /** The underlineColor property */
+  /**
+   * The underlineColor property.
+   * Cannot be reset: null is rejected.
+   */
   underlineColor?: Rgb
-  /** Whether the use a dedicated color for underlining. */
+  /**
+   * Whether the use a dedicated color for underlining.
+   * Cannot be reset: null is rejected.
+   */
   useUnderlineColor?: boolean
-  /** The backgroundImage property */
+  /**
+   * The backgroundImage property.
+   * Cannot be reset: null is rejected.
+   */
   backgroundImage?: string
-  /** The name property */
+  /**
+   * The name property.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** The transparency property */
+  /**
+   * The transparency property.
+   * Cannot be reset: null is rejected.
+   */
   transparency?: number
-  /** ENQ Answerback string */
+  /**
+   * ENQ Answerback string.
+   * Cannot be reset: null is rejected.
+   */
   answerbackString?: string
 }
 
@@ -421,15 +765,32 @@ export interface SessionUpdateInput {
  * client factory creates one from {@link iTermContract}.
  */
 export interface iTermClient {
-  /** Return the number of elements of a particular class within an object. */
+  /**
+   * Return the number of elements of a particular class within an object.
+   *
+   * @param each - The class of objects to be counted. Does not accept null.
+   */
   count(each?: string, options?: CallOptions): Promise<void>
   /** Delete an object. */
   _delete(options?: CallOptions): Promise<void>
-  /** Copy object(s) and put the copies at a new location. */
+  /**
+   * Copy object(s) and put the copies at a new location.
+   *
+   * @param to - The location for the new object(s). Does not accept null.
+   * @param withProperties - Properties to be set in the new duplicated object(s). Does not accept
+   * null.
+   */
   duplicate(to: string, withProperties?: unknown, options?: CallOptions): Promise<void>
   /** Verify if an object exists. */
   exists(options?: CallOptions): Promise<void>
-  /** Make a new object. */
+  /**
+   * Make a new object.
+   *
+   * @param _new - The class of the new object. Does not accept null.
+   * @param at - The location at which to insert the object. Does not accept null.
+   * @param withData - The initial contents of the object. Does not accept null.
+   * @param withProperties - The initial values for properties of the object. Does not accept null.
+   */
   make(
     _new: string,
     at?: string,
@@ -437,27 +798,64 @@ export interface iTermClient {
     withProperties?: unknown,
     options?: CallOptions
   ): Promise<void>
-  /** Move object(s) to a new location. */
+  /**
+   * Move object(s) to a new location.
+   *
+   * @param to - The new location for the object(s). Does not accept null.
+   */
   move(to: string, options?: CallOptions): Promise<void>
   /** Close a document. */
   close(options?: CallOptions): Promise<void>
-  /** Request a Python API cookie */
+  /**
+   * Request a Python API cookie
+   *
+   * @param andKeyForAppNamed - Name of script using the cookie. This is shown in the console. Does
+   * not accept null.
+   */
   requestCookie(andKeyForAppNamed?: string, options?: CallOptions): Promise<void>
-  /** Create a new tab */
+  /**
+   * Create a new tab
+   *
+   * @param withProfile - The profile name. Does not accept null.
+   * @param command - Shell command to run. Does not accept null.
+   */
   createTab(withProfile: string, command?: string, options?: CallOptions): Promise<void>
-  /** Create a new tab with the default profile */
+  /**
+   * Create a new tab with the default profile
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   createTabWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Create a new window */
+  /**
+   * Create a new window
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   createWindowWithProfile(command?: string, options?: CallOptions): Promise<void>
   /** Create a hotkey window */
   createHotkeyWindowWithProfile(options?: CallOptions): Promise<void>
-  /** Launch API script by name */
+  /**
+   * Launch API script by name
+   *
+   * @param _arguments - Arguments to pass to script. Does not accept null.
+   */
   launchAPIScriptNamed(_arguments?: string, options?: CallOptions): Promise<void>
   /** Invokes an expression, such as a registered function. */
   invokeAPIExpression(options?: CallOptions): Promise<void>
-  /** Create a new window with the default profile */
+  /**
+   * Create a new window with the default profile
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   createWindowWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Send text as though it was typed. */
+  /**
+   * Send text as though it was typed.
+   *
+   * @param contentsOfFile - Filename to send the contents of. Does not accept null.
+   * @param text - Text to send. Does not accept null.
+   * @param newline - If newline should be added to end of text (default: yes). Does not accept
+   * null.
+   */
   write(
     contentsOfFile?: FileSource,
     text?: string,
@@ -466,21 +864,56 @@ export interface iTermClient {
   ): Promise<void>
   /** Make receiver visible and selected. */
   select(options?: CallOptions): Promise<void>
-  /** Split a session vertically. */
+  /**
+   * Split a session vertically.
+   *
+   * @param withProfile - Name of profile for new session. Does not accept null.
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitVertically(withProfile: string, command?: string, options?: CallOptions): Promise<void>
-  /** Split a session vertically, using the default profile for the new session */
+  /**
+   * Split a session vertically, using the default profile for the new session
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitVerticallyWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Split a session vertically, using the original session's profile for the new session */
+  /**
+   * Split a session vertically, using the original session's profile for the new session
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitVerticallyWithSameProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Split a session horizontally. */
+  /**
+   * Split a session horizontally.
+   *
+   * @param withProfile - Name of profile for new session. Does not accept null.
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitHorizontally(withProfile: string, command?: string, options?: CallOptions): Promise<void>
-  /** Split a session horizontally, using the default profile for the new session */
+  /**
+   * Split a session horizontally, using the default profile for the new session
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitHorizontallyWithDefaultProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Split a session horizontally, using the original session's profile for the new session */
+  /**
+   * Split a session horizontally, using the original session's profile for the new session
+   *
+   * @param command - Shell command to run. Does not accept null.
+   */
   splitHorizontallyWithSameProfile(command?: string, options?: CallOptions): Promise<void>
-  /** Returns the value of a session variable with the given name */
+  /**
+   * Returns the value of a session variable with the given name
+   *
+   * @param named - Name of variable. Does not accept null.
+   */
   variable(named: string, options?: CallOptions): Promise<void>
-  /** Sets the value of a session variable */
+  /**
+   * Sets the value of a session variable
+   *
+   * @param named - Name of variable. Does not accept null.
+   * @param to - New value. Does not accept null.
+   */
   setVariable(named: string, to: string, options?: CallOptions): Promise<void>
   /** Reveals a hotkey window. Only to be called on windows that are hotkey windows. */
   revealHotkeyWindow(options?: CallOptions): Promise<void>
@@ -496,39 +929,51 @@ export interface iTermClient {
 const windowRecordType: ValueType<Window> = t.record(
   {
     id: t.integer({ description: 'The unique identifier of the session.' }),
-    alternateIdentifier: t.string({
+    alternateIdentifier: t.nullable(t.string(), {
       description: 'The alternate unique identifier of the session.',
     }),
-    name: t.string({ description: 'The full title of the window.' }),
-    index: t.integer({ description: 'The index of the window, ordered front to back.' }),
-    bounds: t.rectangle({ description: 'The bounding rectangle of the window.' }),
-    closeable: t.boolean({ description: 'Whether the window has a close box.' }),
-    miniaturizable: t.boolean({ description: 'Whether the window can be minimized.' }),
-    miniaturized: t.boolean({ description: 'Whether the window is currently minimized.' }),
-    resizable: t.boolean({ description: 'Whether the window can be resized.' }),
-    visible: t.boolean({ description: 'Whether the window is currently visible.' }),
-    zoomable: t.boolean({ description: 'Whether the window can be zoomed.' }),
-    zoomed: t.boolean({ description: 'Whether the window is currently zoomed.' }),
-    frontmost: t.boolean({ description: 'Whether the window is currently the frontmost window.' }),
-    currentTab: t.reference<Tab, never>(() => resources, 'Tab', 'one', {
-      description: 'The currently selected tab',
+    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
+    index: t.nullable(t.integer(), {
+      description: 'The index of the window, ordered front to back.',
     }),
-    currentSession: t.reference<Session, string>(() => resources, 'Session', 'one', {
-      description: 'The current session in a window',
+    bounds: t.nullable(t.rectangle(), { description: 'The bounding rectangle of the window.' }),
+    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
+    miniaturizable: t.nullable(t.boolean(), {
+      description: 'Whether the window can be minimized.',
     }),
-    isHotkeyWindow: t.boolean({ description: 'Whether the window is a hotkey window.' }),
-    hotkeyWindowProfile: t.string({
+    miniaturized: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently minimized.',
+    }),
+    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
+    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
+    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    frontmost: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently the frontmost window.',
+    }),
+    currentTab: t.nullable(
+      t.reference<Tab, never>(() => resources, 'Tab', 'one'),
+      { description: 'The currently selected tab' }
+    ),
+    currentSession: t.nullable(
+      t.reference<Session, string>(() => resources, 'Session', 'one'),
+      { description: 'The current session in a window' }
+    ),
+    isHotkeyWindow: t.nullable(t.boolean(), {
+      description: 'Whether the window is a hotkey window.',
+    }),
+    hotkeyWindowProfile: t.nullable(t.string(), {
       description:
         'If the window is a hotkey window, this gives the name of the profile that created the window.',
     }),
-    position: t.point({
+    position: t.nullable(t.point(), {
       description: 'The position of the window, relative to the upper left corner of the screen.',
     }),
-    origin: t.point({
+    origin: t.nullable(t.point(), {
       description: 'The position of the window, relative to the lower left corner of the screen.',
     }),
-    size: t.point({ description: 'The width and height of the window' }),
-    frame: t.rectangle({
+    size: t.nullable(t.point(), { description: 'The width and height of the window' }),
+    frame: t.nullable(t.rectangle(), {
       description: 'The bounding rectangle, relative to the lower left corner of the screen.',
     }),
   },
@@ -537,11 +982,12 @@ const windowRecordType: ValueType<Window> = t.record(
 
 const tabRecordType: ValueType<Tab> = t.record(
   {
-    currentSession: t.reference<Session, string>(() => resources, 'Session', 'one', {
-      description: 'The current session in a tab',
-    }),
-    index: t.integer({ description: 'Index of tab in parent tab view control' }),
-    title: t.string({ description: 'The title property' }),
+    currentSession: t.nullable(
+      t.reference<Session, string>(() => resources, 'Session', 'one'),
+      { description: 'The current session in a tab' }
+    ),
+    index: t.nullable(t.integer(), { description: 'Index of tab in parent tab view control' }),
+    title: t.nullable(t.string(), { description: 'The title property' }),
   },
   { description: 'A terminal tab' }
 )
@@ -549,49 +995,57 @@ const tabRecordType: ValueType<Tab> = t.record(
 const sessionRecordType: ValueType<Session> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the session.' }),
-    isProcessing: t.boolean({ description: 'The session has received output recently.' }),
-    isAtShellPrompt: t.boolean({
+    isProcessing: t.nullable(t.boolean(), {
+      description: 'The session has received output recently.',
+    }),
+    isAtShellPrompt: t.nullable(t.boolean(), {
       description: 'The terminal is at the shell prompt. Requires shell integration.',
     }),
-    columns: t.integer({ description: 'The columns property' }),
-    rows: t.integer({ description: 'The rows property' }),
-    tty: t.string({ description: 'The tty property' }),
-    contents: t.string({ description: 'The currently visible contents of the session.' }),
-    text: t.string({ description: 'The currently visible contents of the session.' }),
-    colorPreset: t.string({ description: 'The colorPreset property' }),
-    backgroundColor: t.rgb({ description: 'The backgroundColor property' }),
-    boldColor: t.rgb({ description: 'The boldColor property' }),
-    cursorColor: t.rgb({ description: 'The cursorColor property' }),
-    cursorTextColor: t.rgb({ description: 'The cursorTextColor property' }),
-    foregroundColor: t.rgb({ description: 'The foregroundColor property' }),
-    selectedTextColor: t.rgb({ description: 'The selectedTextColor property' }),
-    selectionColor: t.rgb({ description: 'The selectionColor property' }),
-    aNSIBlackColor: t.rgb({ description: 'The aNSIBlackColor property' }),
-    aNSIRedColor: t.rgb({ description: 'The aNSIRedColor property' }),
-    aNSIGreenColor: t.rgb({ description: 'The aNSIGreenColor property' }),
-    aNSIYellowColor: t.rgb({ description: 'The aNSIYellowColor property' }),
-    aNSIBlueColor: t.rgb({ description: 'The aNSIBlueColor property' }),
-    aNSIMagentaColor: t.rgb({ description: 'The aNSIMagentaColor property' }),
-    aNSICyanColor: t.rgb({ description: 'The aNSICyanColor property' }),
-    aNSIWhiteColor: t.rgb({ description: 'The aNSIWhiteColor property' }),
-    aNSIBrightBlackColor: t.rgb({ description: 'The aNSIBrightBlackColor property' }),
-    aNSIBrightRedColor: t.rgb({ description: 'The aNSIBrightRedColor property' }),
-    aNSIBrightGreenColor: t.rgb({ description: 'The aNSIBrightGreenColor property' }),
-    aNSIBrightYellowColor: t.rgb({ description: 'The aNSIBrightYellowColor property' }),
-    aNSIBrightBlueColor: t.rgb({ description: 'The aNSIBrightBlueColor property' }),
-    aNSIBrightMagentaColor: t.rgb({ description: 'The aNSIBrightMagentaColor property' }),
-    aNSIBrightCyanColor: t.rgb({ description: 'The aNSIBrightCyanColor property' }),
-    aNSIBrightWhiteColor: t.rgb({ description: 'The aNSIBrightWhiteColor property' }),
-    underlineColor: t.rgb({ description: 'The underlineColor property' }),
-    useUnderlineColor: t.boolean({
+    columns: t.nullable(t.integer(), { description: 'The columns property' }),
+    rows: t.nullable(t.integer(), { description: 'The rows property' }),
+    tty: t.nullable(t.string(), { description: 'The tty property' }),
+    contents: t.nullable(t.string(), {
+      description: 'The currently visible contents of the session.',
+    }),
+    text: t.nullable(t.string(), { description: 'The currently visible contents of the session.' }),
+    colorPreset: t.nullable(t.string(), { description: 'The colorPreset property' }),
+    backgroundColor: t.nullable(t.rgb(), { description: 'The backgroundColor property' }),
+    boldColor: t.nullable(t.rgb(), { description: 'The boldColor property' }),
+    cursorColor: t.nullable(t.rgb(), { description: 'The cursorColor property' }),
+    cursorTextColor: t.nullable(t.rgb(), { description: 'The cursorTextColor property' }),
+    foregroundColor: t.nullable(t.rgb(), { description: 'The foregroundColor property' }),
+    selectedTextColor: t.nullable(t.rgb(), { description: 'The selectedTextColor property' }),
+    selectionColor: t.nullable(t.rgb(), { description: 'The selectionColor property' }),
+    aNSIBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBlackColor property' }),
+    aNSIRedColor: t.nullable(t.rgb(), { description: 'The aNSIRedColor property' }),
+    aNSIGreenColor: t.nullable(t.rgb(), { description: 'The aNSIGreenColor property' }),
+    aNSIYellowColor: t.nullable(t.rgb(), { description: 'The aNSIYellowColor property' }),
+    aNSIBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBlueColor property' }),
+    aNSIMagentaColor: t.nullable(t.rgb(), { description: 'The aNSIMagentaColor property' }),
+    aNSICyanColor: t.nullable(t.rgb(), { description: 'The aNSICyanColor property' }),
+    aNSIWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIWhiteColor property' }),
+    aNSIBrightBlackColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlackColor property' }),
+    aNSIBrightRedColor: t.nullable(t.rgb(), { description: 'The aNSIBrightRedColor property' }),
+    aNSIBrightGreenColor: t.nullable(t.rgb(), { description: 'The aNSIBrightGreenColor property' }),
+    aNSIBrightYellowColor: t.nullable(t.rgb(), {
+      description: 'The aNSIBrightYellowColor property',
+    }),
+    aNSIBrightBlueColor: t.nullable(t.rgb(), { description: 'The aNSIBrightBlueColor property' }),
+    aNSIBrightMagentaColor: t.nullable(t.rgb(), {
+      description: 'The aNSIBrightMagentaColor property',
+    }),
+    aNSIBrightCyanColor: t.nullable(t.rgb(), { description: 'The aNSIBrightCyanColor property' }),
+    aNSIBrightWhiteColor: t.nullable(t.rgb(), { description: 'The aNSIBrightWhiteColor property' }),
+    underlineColor: t.nullable(t.rgb(), { description: 'The underlineColor property' }),
+    useUnderlineColor: t.nullable(t.boolean(), {
       description: 'Whether the use a dedicated color for underlining.',
     }),
-    backgroundImage: t.string({ description: 'The backgroundImage property' }),
-    name: t.string({ description: 'The name property' }),
-    transparency: t.double({ description: 'The transparency property' }),
-    uniqueID: t.string({ description: 'The uniqueID property' }),
-    profileName: t.string({ description: "The session's profile name" }),
-    answerbackString: t.string({ description: 'ENQ Answerback string' }),
+    backgroundImage: t.nullable(t.string(), { description: 'The backgroundImage property' }),
+    name: t.nullable(t.string(), { description: 'The name property' }),
+    transparency: t.nullable(t.double(), { description: 'The transparency property' }),
+    uniqueID: t.nullable(t.string(), { description: 'The uniqueID property' }),
+    profileName: t.nullable(t.string(), { description: "The session's profile name" }),
+    answerbackString: t.nullable(t.string(), { description: 'ENQ Answerback string' }),
   },
   { description: 'A terminal session' }
 )

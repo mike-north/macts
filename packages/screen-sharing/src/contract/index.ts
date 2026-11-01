@@ -31,12 +31,21 @@ const t = ValueTypes
 
 /** A screen sharing connection */
 export interface Connection {
-  /** The connection name */
-  readonly name: string
-  /** The unique identifier of the connection */
+  /**
+   * The connection name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the connection.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The VNC URL of the connection */
-  readonly url: string
+  /**
+   * The VNC URL of the connection.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly url: string | null
 }
 
 /** Input for creating a Connection. */
@@ -49,7 +58,11 @@ export type ConnectionUpdateInput = Record<string, never>
 export interface ConnectionResourceClient {
   /** List connections. */
   list(options?: CallOptions): Promise<readonly Connection[]>
-  /** Read the connection identified by `id`. */
+  /**
+   * Read the connection identified by `id`.
+   *
+   * @param id - Connection identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Connection>
 }
 
@@ -60,15 +73,19 @@ export interface ConnectionResourceClient {
 export interface ScreenSharingClient {
   /** A screen sharing connection */
   readonly connections: ConnectionResourceClient
-  /** Open a vnc URL */
+  /**
+   * Open a vnc URL
+   *
+   * @param url - The VNC URL to open. Does not accept null.
+   */
   getURL(url: string, options?: CallOptions): Promise<void>
 }
 
 const connectionRecordType: ValueType<Connection> = t.record(
   {
-    name: t.string({ description: 'The connection name' }),
+    name: t.nullable(t.string(), { description: 'The connection name' }),
     id: t.string({ description: 'The unique identifier of the connection' }),
-    url: t.string({ description: 'The VNC URL of the connection' }),
+    url: t.nullable(t.string(), { description: 'The VNC URL of the connection' }),
   },
   { description: 'A screen sharing connection' }
 )

@@ -33,68 +33,137 @@ const t = ValueTypes
 
 /** A media item, such as a photo or video */
 export interface MediaItem {
-  /** The unique ID of the media item */
+  /**
+   * The unique ID of the media item.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name (title) of the media item */
-  name: string
-  /** A description of the media item */
-  description: string
-  /** The name of the file on disk */
-  readonly filename: string
-  /** The date of the media item */
-  date: Date
-  /** The height of the media item in pixels */
-  readonly height: Integer
-  /** The width of the media item in pixels */
-  readonly width: Integer
-  /** The GPS altitude in meters */
-  readonly altitude: number
-  /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
+  /**
+   * The name (title) of the media item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * A description of the media item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  description: string | null
+  /**
+   * The name of the file on disk.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly filename: string | null
+  /**
+   * The date of the media item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  date: Date | null
+  /**
+   * The height of the media item in pixels.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly height: Integer | null
+  /**
+   * The width of the media item in pixels.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly width: Integer | null
+  /**
+   * The GPS altitude in meters.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly altitude: number | null
+  /**
+   * The GPS latitude and longitude, in an ordered list of 2 numbers or missing values.
+   * Nullable. No evidence that the app always sets it.
+   */
   location: unknown
-  /** Whether the media item has been favorited */
-  favorite: boolean
-  /** A list of keywords to associate with a media item */
-  keywords: readonly string[]
-  /** The selected media item file size */
-  size: Integer
+  /**
+   * Whether the media item has been favorited.
+   * Nullable. No evidence that the app always sets it.
+   */
+  favorite: boolean | null
+  /**
+   * A list of keywords to associate with a media item.
+   * Nullable. No evidence that the app always sets it.
+   */
+  keywords: readonly string[] | null
+  /**
+   * The selected media item file size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  size: Integer | null
 }
 
 /** Base class for collections that contains other items, such as albums and folders */
 export interface Container {
-  /** The unique ID of this container */
+  /**
+   * The unique ID of this container.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of this container */
-  name: string
-  /** This container's parent folder, if any */
-  readonly parent: ObjectReferenceVariant<Folder, string>
+  /**
+   * The name of this container.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * This container's parent folder, if any.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly parent: ObjectReferenceVariant<Folder, string> | null
 }
 
 /** An album. A container that holds media items */
 export interface Album {
-  /** The unique ID of this album */
+  /**
+   * The unique ID of this album.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of this album */
-  name: string
-  /** This album's parent folder, if any */
-  readonly parent: ObjectReferenceVariant<Folder, string>
+  /**
+   * The name of this album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * This album's parent folder, if any.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly parent: ObjectReferenceVariant<Folder, string> | null
 }
 
 /** A folder. A container that holds albums and other folders, but not media items */
 export interface Folder {
-  /** The unique ID of this folder */
+  /**
+   * The unique ID of this folder.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of this folder */
-  name: string
-  /** This folder's parent folder, if any */
-  readonly parent: ObjectReferenceVariant<Folder, string>
+  /**
+   * The name of this folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * This folder's parent folder, if any.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly parent: ObjectReferenceVariant<Folder, string> | null
 }
 
 /** A set of media items that represents a Moment */
 export interface Moment {
-  /** The unique ID of the Moment */
+  /**
+   * The unique ID of the Moment.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The name of the Moment */
-  readonly name: string
+  /**
+   * The name of the Moment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
 }
 
 /** Input for creating a MediaItem. */
@@ -117,19 +186,40 @@ export interface MediaItemCreateInput {
 
 /** Input for updating a MediaItem. Omitted fields are left unchanged. */
 export interface MediaItemUpdateInput {
-  /** The name (title) of the media item */
+  /**
+   * The name (title) of the media item.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** A description of the media item */
+  /**
+   * A description of the media item.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
-  /** The date of the media item */
+  /**
+   * The date of the media item.
+   * Cannot be reset: null is rejected.
+   */
   date?: Date
-  /** The GPS latitude and longitude, in an ordered list of 2 numbers or missing values */
+  /**
+   * The GPS latitude and longitude, in an ordered list of 2 numbers or missing values.
+   * Cannot be reset: null is rejected.
+   */
   location?: unknown
-  /** Whether the media item has been favorited */
+  /**
+   * Whether the media item has been favorited.
+   * Cannot be reset: null is rejected.
+   */
   favorite?: boolean
-  /** A list of keywords to associate with a media item */
+  /**
+   * A list of keywords to associate with a media item.
+   * Cannot be reset: null is rejected.
+   */
   keywords?: readonly string[]
-  /** The selected media item file size */
+  /**
+   * The selected media item file size.
+   * Cannot be reset: null is rejected.
+   */
   size?: Integer
 }
 
@@ -141,7 +231,10 @@ export interface ContainerCreateInput {
 
 /** Input for updating a Container. Omitted fields are left unchanged. */
 export interface ContainerUpdateInput {
-  /** The name of this container */
+  /**
+   * The name of this container.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -153,7 +246,10 @@ export interface AlbumCreateInput {
 
 /** Input for updating an Album. Omitted fields are left unchanged. */
 export interface AlbumUpdateInput {
-  /** The name of this album */
+  /**
+   * The name of this album.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -165,7 +261,10 @@ export interface FolderCreateInput {
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
 export interface FolderUpdateInput {
-  /** The name of this folder */
+  /**
+   * The name of this folder.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -179,9 +278,17 @@ export type MomentUpdateInput = Record<string, never>
 export interface MediaItemResourceClient {
   /** List mediaitems. */
   list(options?: CallOptions): Promise<readonly MediaItem[]>
-  /** Read the mediaitem identified by `id`. */
+  /**
+   * Read the mediaitem identified by `id`.
+   *
+   * @param id - Media item identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<MediaItem>
-  /** Duplicate a media item */
+  /**
+   * Duplicate a media item
+   *
+   * @param id - The media item to duplicate. Does not accept null.
+   */
   duplicate(id: string, options?: CallOptions): Promise<void>
 }
 
@@ -189,7 +296,11 @@ export interface MediaItemResourceClient {
 export interface AlbumResourceClient {
   /** List albums. */
   list(options?: CallOptions): Promise<readonly Album[]>
-  /** Read the album identified by `id`. */
+  /**
+   * Read the album identified by `id`.
+   *
+   * @param id - Album identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Album>
 }
 
@@ -197,7 +308,11 @@ export interface AlbumResourceClient {
 export interface FolderResourceClient {
   /** List folders. */
   list(options?: CallOptions): Promise<readonly Folder[]>
-  /** Read the folder identified by `id`. */
+  /**
+   * Read the folder identified by `id`.
+   *
+   * @param id - Folder identifier. Does not accept null.
+   */
   get(id: string, options?: CallOptions): Promise<Folder>
 }
 
@@ -212,27 +327,60 @@ export interface PhotosClient {
   readonly albums: AlbumResourceClient
   /** A folder. A container that holds albums and other folders, but not media items */
   readonly folders: FolderResourceClient
-  /** Import files into the library */
+  /**
+   * Import files into the library
+   *
+   * @param files - The list of files to copy. Does not accept null.
+   * @param into - The album to import into. Does not accept null.
+   * @param skipCheckDuplicates - Skip duplicate checking and import everything. Does not accept
+   * null.
+   */
   _import(
     files: readonly string[],
     into?: string,
     skipCheckDuplicates?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Export media items to the specified location as files */
+  /**
+   * Export media items to the specified location as files
+   *
+   * @param mediaItems - The list of media items to export. Does not accept null.
+   * @param to - The destination of the export. Does not accept null.
+   * @param usingOriginals - Export the original files if true, otherwise export rendered jpgs. Does
+   * not accept null.
+   */
   _export(
     mediaItems: readonly string[],
     to: string,
     usingOriginals?: boolean,
     options?: CallOptions
   ): Promise<void>
-  /** Create a new album or folder */
+  /**
+   * Create a new album or folder
+   *
+   * @param _new - The class of the new object (album or folder). Does not accept null.
+   * @param named - The name of the new object. Does not accept null.
+   * @param at - The parent folder for the new object. Does not accept null.
+   */
   make(_new: string, named?: string, at?: string, options?: CallOptions): Promise<void>
-  /** Delete an album or folder */
+  /**
+   * Delete an album or folder
+   *
+   * @param target - The album or folder to delete. Does not accept null.
+   */
   _delete(target: string, options?: CallOptions): Promise<void>
-  /** Add media items to an album */
+  /**
+   * Add media items to an album
+   *
+   * @param mediaItems - The list of media items to add. Does not accept null.
+   * @param to - The album to add to. Does not accept null.
+   */
   add(mediaItems: readonly string[], to: string, options?: CallOptions): Promise<void>
-  /** Display an ad-hoc slide show from a list of media items */
+  /**
+   * Display an ad-hoc slide show from a list of media items
+   *
+   * @param using - The media items to show. Does not accept null.
+   */
   startSlideshow(using: readonly string[], options?: CallOptions): Promise<void>
   /** End the currently-playing slideshow */
   stopSlideshow(options?: CallOptions): Promise<void>
@@ -244,31 +392,39 @@ export interface PhotosClient {
   pauseSlideshow(options?: CallOptions): Promise<void>
   /** Resume the currently-playing slideshow */
   resumeSlideshow(options?: CallOptions): Promise<void>
-  /** Show the image at path in the application */
+  /**
+   * Show the image at path in the application
+   *
+   * @param target - The full path to the image or media item ID. Does not accept null.
+   */
   spotlight(target: string, options?: CallOptions): Promise<void>
-  /** Search for items matching the search string */
+  /**
+   * Search for items matching the search string
+   *
+   * @param _for - The text to search for. Does not accept null.
+   */
   search(_for: string, options?: CallOptions): Promise<void>
 }
 
 const mediaItemRecordType: ValueType<MediaItem> = t.record(
   {
     id: t.string({ description: 'The unique ID of the media item' }),
-    name: t.string({ description: 'The name (title) of the media item' }),
-    description: t.string({ description: 'A description of the media item' }),
-    filename: t.string({ description: 'The name of the file on disk' }),
-    date: t.date({ description: 'The date of the media item' }),
-    height: t.integer({ description: 'The height of the media item in pixels' }),
-    width: t.integer({ description: 'The width of the media item in pixels' }),
-    altitude: t.double({ description: 'The GPS altitude in meters' }),
+    name: t.nullable(t.string(), { description: 'The name (title) of the media item' }),
+    description: t.nullable(t.string(), { description: 'A description of the media item' }),
+    filename: t.nullable(t.string(), { description: 'The name of the file on disk' }),
+    date: t.nullable(t.date(), { description: 'The date of the media item' }),
+    height: t.nullable(t.integer(), { description: 'The height of the media item in pixels' }),
+    width: t.nullable(t.integer(), { description: 'The width of the media item in pixels' }),
+    altitude: t.nullable(t.double(), { description: 'The GPS altitude in meters' }),
     location: t.unknown({
       description:
         'The GPS latitude and longitude, in an ordered list of 2 numbers or missing values',
     }),
-    favorite: t.boolean({ description: 'Whether the media item has been favorited' }),
-    keywords: t.array(t.string(), {
+    favorite: t.nullable(t.boolean(), { description: 'Whether the media item has been favorited' }),
+    keywords: t.nullable(t.array(t.string()), {
       description: 'A list of keywords to associate with a media item',
     }),
-    size: t.integer({ description: 'The selected media item file size' }),
+    size: t.nullable(t.integer(), { description: 'The selected media item file size' }),
   },
   { description: 'A media item, such as a photo or video' }
 )
@@ -276,10 +432,11 @@ const mediaItemRecordType: ValueType<MediaItem> = t.record(
 const containerRecordType: ValueType<Container> = t.record(
   {
     id: t.string({ description: 'The unique ID of this container' }),
-    name: t.string({ description: 'The name of this container' }),
-    parent: t.reference<Folder, string>(() => resources, 'Folder', 'one', {
-      description: "This container's parent folder, if any",
-    }),
+    name: t.nullable(t.string(), { description: 'The name of this container' }),
+    parent: t.nullable(
+      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      { description: "This container's parent folder, if any" }
+    ),
   },
   {
     description: 'Base class for collections that contains other items, such as albums and folders',
@@ -289,10 +446,11 @@ const containerRecordType: ValueType<Container> = t.record(
 const albumRecordType: ValueType<Album> = t.record(
   {
     id: t.string({ description: 'The unique ID of this album' }),
-    name: t.string({ description: 'The name of this album' }),
-    parent: t.reference<Folder, string>(() => resources, 'Folder', 'one', {
-      description: "This album's parent folder, if any",
-    }),
+    name: t.nullable(t.string(), { description: 'The name of this album' }),
+    parent: t.nullable(
+      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      { description: "This album's parent folder, if any" }
+    ),
   },
   { description: 'An album. A container that holds media items' }
 )
@@ -300,10 +458,11 @@ const albumRecordType: ValueType<Album> = t.record(
 const folderRecordType: ValueType<Folder> = t.record(
   {
     id: t.string({ description: 'The unique ID of this folder' }),
-    name: t.string({ description: 'The name of this folder' }),
-    parent: t.reference<Folder, string>(() => resources, 'Folder', 'one', {
-      description: "This folder's parent folder, if any",
-    }),
+    name: t.nullable(t.string(), { description: 'The name of this folder' }),
+    parent: t.nullable(
+      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      { description: "This folder's parent folder, if any" }
+    ),
   },
   { description: 'A folder. A container that holds albums and other folders, but not media items' }
 )
@@ -311,7 +470,7 @@ const folderRecordType: ValueType<Folder> = t.record(
 const momentRecordType: ValueType<Moment> = t.record(
   {
     id: t.string({ description: 'The unique ID of the Moment' }),
-    name: t.string({ description: 'The name of the Moment' }),
+    name: t.nullable(t.string(), { description: 'The name of the Moment' }),
   },
   { description: 'A set of media items that represents a Moment' }
 )

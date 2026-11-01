@@ -132,6 +132,17 @@ resources:
         type: string
         description: the container window for this folder
         code: cwnd
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: containers
+      itemsRead: 18
+      sampledParents: 1
+      status: probed
+      skipped:
+        - entireContents
   Disk:
     name: Disk
     plural: Disks
@@ -186,6 +197,16 @@ resources:
     identifiers:
       - property: id
         primary: true
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: disks
+      itemsRead: 14
+      sampledParents: 1
+      status: probed
+      skipped: []
   Folder:
     name: Folder
     plural: Folders
@@ -198,6 +219,16 @@ resources:
         description: Unique identifier for this folder
         optional: false
         code: 'ID  '
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: folders
+      itemsRead: 18
+      sampledParents: 1
+      status: probed
+      skipped: []
 
   DesktopObject:
     name: DesktopObject
@@ -211,6 +242,16 @@ resources:
         description: Unique identifier for the desktop
         optional: false
         code: 'ID  '
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: desktopObjects
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
 
   TrashObject:
     name: TrashObject
@@ -223,6 +264,16 @@ resources:
         type: boolean
         description: Display a dialog when emptying the trash?
         code: warn
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: trashObjects
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   File:
     name: File
     plural: Files
@@ -234,26 +285,91 @@ resources:
         type: string
         description: the OSType identifying the type of data contained in the item
         code: asty
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T06:05:32.244Z'
+            bundleId: com.apple.finder
+            appVersion: '27.2'
+            osVersion: '27.2'
+            sampleSize: 60
+            nullCount: 58
+            failedReads: 0
       creatorType:
         access: rw
         type: string
         description: the OSType identifying the application that created the item
         code: fcrt
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T06:05:32.244Z'
+            bundleId: com.apple.finder
+            appVersion: '27.2'
+            osVersion: '27.2'
+            sampleSize: 60
+            nullCount: 58
+            failedReads: 0
       stationery:
         access: rw
         type: boolean
         description: Is the file a stationery pad?
         code: pspd
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T06:05:32.244Z'
+            bundleId: com.apple.finder
+            appVersion: '27.2'
+            osVersion: '27.2'
+            sampleSize: 60
+            nullCount: 0
+            failedReads: 0
       productVersion:
         access: r
         type: string
         description: the version of the product (visible at the top of the “Get Info” window)
         code: ver2
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T06:05:32.244Z'
+            bundleId: com.apple.finder
+            appVersion: '27.2'
+            osVersion: '27.2'
+            sampleSize: 60
+            nullCount: 0
+            failedReads: 0
       version:
         access: r
         type: string
         description: the version of the file (visible at the bottom of the “Get Info” window)
         code: vers
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T06:05:32.244Z'
+            bundleId: com.apple.finder
+            appVersion: '27.2'
+            osVersion: '27.2'
+            sampleSize: 60
+            nullCount: 0
+            failedReads: 0
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: files
+      itemsRead: 60
+      sampledParents: 1
+      status: probed
+      skipped: []
   AliasFile:
     name: AliasFile
     plural: AliasFiles
@@ -265,6 +381,16 @@ resources:
         type: string
         description: the original item pointed to by the alias
         code: orig
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: aliasFiles
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   ApplicationFile:
     name: ApplicationFile
     plural: ApplicationFiles
@@ -309,6 +435,16 @@ resources:
     identifiers:
       - property: id
         primary: true
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: applicationFiles
+      itemsRead: 5
+      sampledParents: 1
+      status: probed
+      skipped: []
   DocumentFile:
     name: DocumentFile
     plural: DocumentFiles
@@ -321,6 +457,16 @@ resources:
         description: Unique identifier for this document
         optional: false
         code: 'ID  '
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: documentFiles
+      itemsRead: 60
+      sampledParents: 1
+      status: probed
+      skipped: []
 
   InternetLocationFile:
     name: InternetLocationFile
@@ -333,6 +479,16 @@ resources:
         type: string
         description: the internet location
         code: iloc
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: internetLocationFiles
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   Clipping:
     name: Clipping
     plural: Clippings
@@ -344,6 +500,16 @@ resources:
         type: string
         description: (NOT AVAILABLE YET) the clipping window for this clipping
         code: lwnd
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: clippings
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   Package:
     name: Package
     plural: Packages
@@ -356,6 +522,16 @@ resources:
         description: Unique identifier for this package
         optional: false
         code: 'ID  '
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: packages
+      itemsRead: 5
+      sampledParents: 1
+      status: probed
+      skipped: []
 
   FinderWindow:
     name: FinderWindow
@@ -411,6 +587,16 @@ resources:
         type: integer
         description: the width of the sidebar for the container window
         code: sbwi
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: finderWindows
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   ClippingWindow:
     name: ClippingWindow
     plural: ClippingWindows
@@ -423,6 +609,16 @@ resources:
         description: Unique identifier for this window
         optional: false
         code: 'ID  '
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: clippingWindows
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
 
   ListViewOptions:
     name: ListViewOptions
@@ -461,6 +657,16 @@ resources:
         type: boolean
         description: Are relative dates (e.g., today, yesterday) shown in the list view?
         code: urdt
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: listViewOptionss
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
   Column:
     name: Column
     plural: Columns
@@ -502,6 +708,16 @@ resources:
         type: boolean
         description: is this column visible
         code: pvis
+    nullabilityProbe:
+      observedAt: '2026-11-01T06:05:32.244Z'
+      bundleId: com.apple.finder
+      appVersion: '27.2'
+      osVersion: '27.2'
+      accessPath: columns
+      itemsRead: 0
+      sampledParents: 0
+      status: no-items
+      skipped: []
 enums:
   Priv:
     name: Priv

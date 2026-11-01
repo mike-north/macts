@@ -29,7 +29,7 @@ export const arcContract: AppContract<ArcClient>;
 // @public
 export interface Space {
     readonly id: string;
-    readonly title: string;
+    readonly title: string | null;
 }
 
 // @public
@@ -41,10 +41,10 @@ export type SpaceUpdateInput = Record<string, never>;
 // @public
 export interface Tab {
     readonly id: string;
-    readonly loading: boolean;
-    location: string;
-    readonly title: string;
-    uRL: string;
+    readonly loading: boolean | null;
+    location: string | null;
+    readonly title: string | null;
+    uRL: string | null;
 }
 
 // @public
@@ -61,20 +61,20 @@ export interface TabUpdateInput {
 
 // @public
 export interface Window {
-    readonly activeSpace: ObjectReferenceVariant<Space, string>;
-    readonly activeTab: ObjectReferenceVariant<Tab, string>;
-    readonly closeable: boolean;
+    readonly activeSpace: ObjectReferenceVariant<Space, string> | null;
+    readonly activeTab: ObjectReferenceVariant<Tab, string> | null;
+    readonly closeable: boolean | null;
     readonly id: string;
-    incognito: boolean;
-    index: Integer;
-    readonly minimizable: boolean;
-    minimized: boolean;
-    mode: string;
-    readonly name: string;
-    readonly resizable: boolean;
-    visible: boolean;
-    readonly zoomable: boolean;
-    zoomed: boolean;
+    incognito: boolean | null;
+    index: Integer | null;
+    readonly minimizable: boolean | null;
+    minimized: boolean | null;
+    mode: string | null;
+    readonly name: string | null;
+    readonly resizable: boolean | null;
+    visible: boolean | null;
+    readonly zoomable: boolean | null;
+    zoomed: boolean | null;
 }
 
 // @public

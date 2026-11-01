@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { NullabilityEvidenceSchema, checkNullabilityClaim } from './evidence.js'
 
 /**
  * Command scope - whether command operates on application or specific resource.
@@ -26,21 +27,38 @@ export type RiskClassValue = z.infer<typeof RiskClassSchema>
 
 /**
  * Command parameter schema.
+ *
+ * @remarks
+ * A parameter accepts `null` only when it claims `nullable: true`, with
+ * evidence; without a claim it does not. (Widening an input to accept `null`
+ * later is compatible for callers; narrowing it is not, so inputs start
+ * narrow.)
  */
-export const CommandParameterSchema = z.object({
-  /** Parameter name */
-  name: z.string(),
-  /** Parameter type (primitive string or reference object) */
-  type: z.union([z.string(), z.record(z.string(), z.string())]),
-  /** Human-readable description */
-  description: z.string(),
-  /** Whether parameter is required */
-  required: z.boolean().default(true),
-  /** Default value if not required */
-  default: z.unknown().optional(),
-  /** AppleScript four-character code */
-  code: z.string().min(1).max(4).optional(),
-})
+export const CommandParameterSchema = z
+  .object({
+    /** Parameter name */
+    name: z.string(),
+    /** Parameter type (primitive string or reference object) */
+    type: z.union([z.string(), z.record(z.string(), z.string())]),
+    /** Human-readable description */
+    description: z.string(),
+    /** Whether parameter is required */
+    required: z.boolean().default(true),
+    /** Default value if not required */
+    default: z.unknown().optional(),
+    /** AppleScript four-character code */
+    code: z.string().min(1).max(4).optional(),
+    /** Whether the parameter accepts `null`. Absent means it does not. */
+    nullable: z.boolean().optional(),
+    /** The evidence for `nullable`. */
+    evidence: z
+      .object({
+        /** Evidence for the `nullable` claim. */
+        nullable: NullabilityEvidenceSchema.optional(),
+      })
+      .optional(),
+  })
+  .superRefine(checkNullabilityClaim)
 export type CommandParameter = z.infer<typeof CommandParameterSchema>
 
 /**
@@ -77,6 +95,22 @@ export const CommandSchema = z.object({
   returns: z.string().optional(),
   /** AppleScript four-character code */
   code: z.string().min(1).max(4).optional(),
+  /**
+   * The command's segment in its public route (`app.resource.<routeName>`) and
+   * in its default permission (`app:resource:<routeName>`). Defaults to the
+   * command's key in `manifest.commands`.
+   *
+   * It lets two manifest commands that share a CRUD verb but differ in
+   * signature (a resource whose `get` takes a different identifier than the
+   * shared `get`, say) each publish the canonical operation name, while
+   * keeping distinct manifest keys. Two routes that end up with the same
+   * route string are a manifest error.
+   */
+  routeName: z
+    .string()
+    .min(1)
+    .regex(/^[^.:]+$/, 'routeName must not contain "." or ":"')
+    .optional(),
   /**
    * Fine-grained permission required to execute this command.
    * Format: `app:resource:operation` (e.g., `calendar:events:list`)

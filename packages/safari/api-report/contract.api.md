@@ -10,8 +10,8 @@ import { CallOptions } from '@macts/contracts';
 // @public
 export interface Document {
     readonly id: string;
-    readonly name: string;
-    url: string;
+    readonly name: string | null;
+    url: string | null;
 }
 
 // @public
@@ -44,10 +44,10 @@ export const safariContract: AppContract<SafariClient>;
 // @public
 export interface Tab {
     readonly id: string;
-    readonly name: string;
-    readonly source: string;
-    readonly text: string;
-    url: string;
+    readonly name: string | null;
+    readonly source: string | null;
+    readonly text: string | null;
+    url: string | null;
 }
 
 // @public

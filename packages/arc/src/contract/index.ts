@@ -33,61 +33,120 @@ const t = ValueTypes
 
 /** An application's window */
 export interface Window {
-  /** The unique identifier of the window. */
+  /**
+   * The unique identifier of the window.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The full title of the window. */
-  readonly name: string
-  /** The index of the window, ordered front to back. */
-  index: Integer
-  /** Whether the window has a close box. */
-  readonly closeable: boolean
-  /** Whether the window can be minimized. */
-  readonly minimizable: boolean
-  /** Whether the window is currently minimized. */
-  minimized: boolean
-  /** Whether the window can be resized. */
-  readonly resizable: boolean
-  /** Whether the window is currently visible. */
-  visible: boolean
-  /** Whether the window can be zoomed. */
-  readonly zoomable: boolean
-  /** Whether the window is currently zoomed. */
-  zoomed: boolean
-  /** Returns the currently selected tab */
-  readonly activeTab: ObjectReferenceVariant<Tab, string>
-  /** Returns the currently active space */
-  readonly activeSpace: ObjectReferenceVariant<Space, string>
-  /** Whether the window is an incognito window. */
-  incognito: boolean
+  /**
+   * The full title of the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly name: string | null
+  /**
+   * The index of the window, ordered front to back.
+   * Nullable. No evidence that the app always sets it.
+   */
+  index: Integer | null
+  /**
+   * Whether the window has a close box.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly closeable: boolean | null
+  /**
+   * Whether the window can be minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly minimizable: boolean | null
+  /**
+   * Whether the window is currently minimized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  minimized: boolean | null
+  /**
+   * Whether the window can be resized.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly resizable: boolean | null
+  /**
+   * Whether the window is currently visible.
+   * Nullable. No evidence that the app always sets it.
+   */
+  visible: boolean | null
+  /**
+   * Whether the window can be zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly zoomable: boolean | null
+  /**
+   * Whether the window is currently zoomed.
+   * Nullable. No evidence that the app always sets it.
+   */
+  zoomed: boolean | null
+  /**
+   * Returns the currently selected tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly activeTab: ObjectReferenceVariant<Tab, string> | null
+  /**
+   * Returns the currently active space.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly activeSpace: ObjectReferenceVariant<Space, string> | null
+  /**
+   * Whether the window is an incognito window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  incognito: boolean | null
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
+   * Nullable. No evidence that the app always sets it.
    */
-  mode: string
+  mode: string | null
 }
 
 /** A window's tab */
 export interface Tab {
-  /** The unique identifier of the tab. */
+  /**
+   * The unique identifier of the tab.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The full title of the tab. */
-  readonly title: string
-  /** The url of the tab. */
-  uRL: string
-  /** Is loading? */
-  readonly loading: boolean
+  /**
+   * The full title of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly title: string | null
+  /**
+   * The url of the tab.
+   * Nullable. No evidence that the app always sets it.
+   */
+  uRL: string | null
+  /**
+   * Is loading?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly loading: boolean | null
   /**
    * Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
+   * Nullable. No evidence that the app always sets it.
    */
-  location: string
+  location: string | null
 }
 
 /** A space */
 export interface Space {
-  /** The unique identifier of the space. */
+  /**
+   * The unique identifier of the space.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The full title of the space. */
-  readonly title: string
+  /**
+   * The full title of the space.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly title: string | null
 }
 
 /** Input for creating a Window. */
@@ -111,19 +170,35 @@ export interface WindowCreateInput {
 
 /** Input for updating a Window. Omitted fields are left unchanged. */
 export interface WindowUpdateInput {
-  /** The index of the window, ordered front to back. */
+  /**
+   * The index of the window, ordered front to back.
+   * Cannot be reset: null is rejected.
+   */
   index?: Integer
-  /** Whether the window is currently minimized. */
+  /**
+   * Whether the window is currently minimized.
+   * Cannot be reset: null is rejected.
+   */
   minimized?: boolean
-  /** Whether the window is currently visible. */
+  /**
+   * Whether the window is currently visible.
+   * Cannot be reset: null is rejected.
+   */
   visible?: boolean
-  /** Whether the window is currently zoomed. */
+  /**
+   * Whether the window is currently zoomed.
+   * Cannot be reset: null is rejected.
+   */
   zoomed?: boolean
-  /** Whether the window is an incognito window. */
+  /**
+   * Whether the window is an incognito window.
+   * Cannot be reset: null is rejected.
+   */
   incognito?: boolean
   /**
    * Represents the mode of the window which can be 'normal' or 'incognito', can be set only once
    * during creation of the window.
+   * Cannot be reset: null is rejected.
    */
   mode?: string
 }
@@ -140,10 +215,14 @@ export interface TabCreateInput {
 
 /** Input for updating a Tab. Omitted fields are left unchanged. */
 export interface TabUpdateInput {
-  /** The url of the tab. */
+  /**
+   * The url of the tab.
+   * Cannot be reset: null is rejected.
+   */
   uRL?: string
   /**
    * Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.
+   * Cannot be reset: null is rejected.
    */
   location?: string
 }
@@ -159,9 +238,18 @@ export type SpaceUpdateInput = Record<string, never>
  * client factory creates one from {@link arcContract}.
  */
 export interface ArcClient {
-  /** Make a new object. */
+  /**
+   * Make a new object.
+   *
+   * @param _new - The class of the new object. Does not accept null.
+   * @param withProperties - The initial values for properties of the object. Does not accept null.
+   */
   make(_new: string, withProperties?: unknown, options?: CallOptions): Promise<void>
-  /** Return the number of elements of a particular class within an object. */
+  /**
+   * Return the number of elements of a particular class within an object.
+   *
+   * @param each - The class of objects to be counted. Does not accept null.
+   */
   count(each?: string, options?: CallOptions): Promise<void>
   /** Close */
   close(options?: CallOptions): Promise<void>
@@ -175,7 +263,11 @@ export interface ArcClient {
   reload(options?: CallOptions): Promise<void>
   /** Stop the current tab from loading. */
   stop(options?: CallOptions): Promise<void>
-  /** Execute a piece of javascript. */
+  /**
+   * Execute a piece of javascript.
+   *
+   * @param javascript - The javascript code to execute. Does not accept null.
+   */
   execute(javascript: string, options?: CallOptions): Promise<void>
   /** Focus on a space. */
   focus(options?: CallOptions): Promise<void>
@@ -184,23 +276,31 @@ export interface ArcClient {
 const windowRecordType: ValueType<Window> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the window.' }),
-    name: t.string({ description: 'The full title of the window.' }),
-    index: t.integer({ description: 'The index of the window, ordered front to back.' }),
-    closeable: t.boolean({ description: 'Whether the window has a close box.' }),
-    minimizable: t.boolean({ description: 'Whether the window can be minimized.' }),
-    minimized: t.boolean({ description: 'Whether the window is currently minimized.' }),
-    resizable: t.boolean({ description: 'Whether the window can be resized.' }),
-    visible: t.boolean({ description: 'Whether the window is currently visible.' }),
-    zoomable: t.boolean({ description: 'Whether the window can be zoomed.' }),
-    zoomed: t.boolean({ description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.reference<Tab, string>(() => resources, 'Tab', 'one', {
-      description: 'Returns the currently selected tab',
+    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
+    index: t.nullable(t.integer(), {
+      description: 'The index of the window, ordered front to back.',
     }),
-    activeSpace: t.reference<Space, string>(() => resources, 'Space', 'one', {
-      description: 'Returns the currently active space',
+    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
+    minimizable: t.nullable(t.boolean(), { description: 'Whether the window can be minimized.' }),
+    minimized: t.nullable(t.boolean(), {
+      description: 'Whether the window is currently minimized.',
     }),
-    incognito: t.boolean({ description: 'Whether the window is an incognito window.' }),
-    mode: t.string({
+    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
+    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
+    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
+    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
+    activeTab: t.nullable(
+      t.reference<Tab, string>(() => resources, 'Tab', 'one'),
+      { description: 'Returns the currently selected tab' }
+    ),
+    activeSpace: t.nullable(
+      t.reference<Space, string>(() => resources, 'Space', 'one'),
+      { description: 'Returns the currently active space' }
+    ),
+    incognito: t.nullable(t.boolean(), {
+      description: 'Whether the window is an incognito window.',
+    }),
+    mode: t.nullable(t.string(), {
       description:
         "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
     }),
@@ -211,10 +311,10 @@ const windowRecordType: ValueType<Window> = t.record(
 const tabRecordType: ValueType<Tab> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the tab.' }),
-    title: t.string({ description: 'The full title of the tab.' }),
-    uRL: t.string({ description: 'The url of the tab.' }),
-    loading: t.boolean({ description: 'Is loading?' }),
-    location: t.string({
+    title: t.nullable(t.string(), { description: 'The full title of the tab.' }),
+    uRL: t.nullable(t.string(), { description: 'The url of the tab.' }),
+    loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
+    location: t.nullable(t.string(), {
       description:
         "Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.",
     }),
@@ -225,7 +325,7 @@ const tabRecordType: ValueType<Tab> = t.record(
 const spaceRecordType: ValueType<Space> = t.record(
   {
     id: t.string({ description: 'The unique identifier of the space.' }),
-    title: t.string({ description: 'The full title of the space.' }),
+    title: t.nullable(t.string(), { description: 'The full title of the space.' }),
   },
   { description: 'A space' }
 )

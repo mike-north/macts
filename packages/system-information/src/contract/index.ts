@@ -34,14 +34,26 @@ export type DetailLevel = 'mini' | 'basic' | 'full'
 
 /** A system profile document */
 export interface Document {
-  /** The document name */
+  /**
+   * The document name.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** Plain text representation of the system profile document */
-  readonly plainText: string
-  /** XML representation of the system profile document */
-  readonly xmlText: string
-  /** The desired level of detail for the system profile document */
-  detailLevel: DetailLevel
+  /**
+   * Plain text representation of the system profile document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly plainText: string | null
+  /**
+   * XML representation of the system profile document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly xmlText: string | null
+  /**
+   * The desired level of detail for the system profile document.
+   * Nullable. No evidence that the app always sets it.
+   */
+  detailLevel: DetailLevel | null
 }
 
 /** Input for creating a Document. */
@@ -52,7 +64,10 @@ export interface DocumentCreateInput {
 
 /** Input for updating a Document. Omitted fields are left unchanged. */
 export interface DocumentUpdateInput {
-  /** The desired level of detail for the system profile document */
+  /**
+   * The desired level of detail for the system profile document.
+   * Cannot be reset: null is rejected.
+   */
   detailLevel?: DetailLevel
 }
 
@@ -60,7 +75,11 @@ export interface DocumentUpdateInput {
 export interface DocumentResourceClient {
   /** List documents. */
   list(options?: CallOptions): Promise<readonly Document[]>
-  /** Read the document identified by `name`. */
+  /**
+   * Read the document identified by `name`.
+   *
+   * @param name - Document name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Document>
 }
 
@@ -81,11 +100,13 @@ const detailLevelMembers = ['mini', 'basic', 'full'] as const
 const documentRecordType: ValueType<Document> = t.record(
   {
     name: t.string({ description: 'The document name' }),
-    plainText: t.string({
+    plainText: t.nullable(t.string(), {
       description: 'Plain text representation of the system profile document',
     }),
-    xmlText: t.string({ description: 'XML representation of the system profile document' }),
-    detailLevel: t.enumeration(detailLevelMembers, {
+    xmlText: t.nullable(t.string(), {
+      description: 'XML representation of the system profile document',
+    }),
+    detailLevel: t.nullable(t.enumeration(detailLevelMembers), {
       description: 'The desired level of detail for the system profile document',
     }),
   },

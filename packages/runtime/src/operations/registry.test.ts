@@ -4,10 +4,11 @@
  *
  * Expected ids, permissions, and targets are written by hand from the
  * derivation the RPC router uses (phases/13 D2): the id is the route
- * `app.<resource plural>.<command key>` (or `app.app.<command key>`), the
- * permission is the command's declared permission or
- * `app:<resource plural>:<command key>` (or `app:app:<command key>`), and the
- * target names the manifest command key and resource key. A contract
+ * `app.<resource plural>.<segment>` (or `app.app.<segment>`), the permission
+ * is the command's declared permission or `app:<resource plural>:<segment>`
+ * (or `app:app:<segment>`), where the segment is the command's `routeName`,
+ * else its key, and the target names the manifest command key and resource
+ * key. A contract
  * descriptor whose permission disagrees with the manifest is refused at
  * registration (D2, fail closed).
  */
@@ -148,6 +149,23 @@ describe('operationsFromManifest', () => {
         target: { command: 'reloadCalendars' }, // application commands name no resource
       },
     ])
+  })
+
+  it('publishes a routeName command under its route name, targeting its own key', async () => {
+    // The real Notes manifest: the attachment get has the key getAttachment
+    // (its signature differs from the shared get) and routeName get, with no
+    // declared permission.
+    const notes = await loadManifest(
+      fileURLToPath(new URL('../../../../manifests/notes/app.yaml', import.meta.url))
+    )
+    const get = operationsFromManifest(notes).find(
+      ({ descriptor }) => descriptor.id === 'notes.attachments.get'
+    )
+    expect(get?.descriptor.permission).toBe('notes:attachments:get')
+    expect(get?.descriptor.target).toEqual({ command: 'getAttachment', resource: 'Attachment' })
+    expect(operationsFromManifest(notes).map(({ descriptor }) => descriptor.id)).not.toContain(
+      'notes.attachments.getAttachment'
+    )
   })
 
   it('classifies risk from the command and carries permission history', () => {

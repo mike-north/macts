@@ -53,231 +53,491 @@ export type ERtK = 'user' | 'computed'
 
 /** a piece of art within a track or playlist */
 export interface Artwork {
-  /** Unique identifier for this artwork */
-  readonly id: Integer
-  /** data for this artwork, in the form of a picture */
-  data: string
-  /** description of artwork as a string */
-  description: string
-  /** was this artwork downloaded by iTunes? */
-  readonly downloaded: boolean
-  /** the data format for this piece of artwork */
-  readonly format: string
-  /** kind or purpose of this piece of artwork */
-  kind: Integer
-  /** data for this artwork, in original format */
+  /**
+   * Unique identifier for this artwork.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * data for this artwork, in the form of a picture.
+   * Nullable. No evidence that the app always sets it.
+   */
+  data: string | null
+  /**
+   * description of artwork as a string.
+   * Nullable. No evidence that the app always sets it.
+   */
+  description: string | null
+  /**
+   * was this artwork downloaded by iTunes?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloaded: boolean | null
+  /**
+   * the data format for this piece of artwork.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly format: string | null
+  /**
+   * kind or purpose of this piece of artwork.
+   * Nullable. No evidence that the app always sets it.
+   */
+  kind: Integer | null
+  /**
+   * data for this artwork, in original format.
+   * Nullable. No evidence that the app always sets it.
+   */
   rawData: unknown
 }
 
 /** the main window */
 export interface BrowserWindow {
-  /** Unique identifier for this window */
-  readonly id: Integer
-  /** the selected tracks */
-  readonly selection: string
-  /** the playlist currently displayed in the window */
-  view: ObjectReferenceVariant<Playlist, never>
+  /**
+   * Unique identifier for this window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the selected tracks.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly selection: string | null
+  /**
+   * the playlist currently displayed in the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  view: ObjectReferenceVariant<Playlist, never> | null
 }
 
 /** a track representing a video file */
 export interface FileTrack {
-  /** Unique identifier for this track */
-  readonly id: Integer
-  /** the location of the file represented by this track */
-  location: FileValue
+  /**
+   * Unique identifier for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the location of the file represented by this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  location: FileValue | null
 }
 
 /** the main library playlist */
 export interface LibraryPlaylist {
-  /** Unique identifier for this playlist */
-  readonly id: Integer
+  /**
+   * Unique identifier for this playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** a list of tracks/streams */
 export interface Playlist {
-  /** Unique identifier for this playlist */
-  readonly id: Integer
-  /** the description of the playlist */
-  description: string
-  /** the total length of all tracks (in seconds) */
-  readonly duration: Integer
-  /** the name of the playlist */
-  name: string
-  /** folder which contains this playlist (if any) */
-  readonly parent: ObjectReferenceVariant<Playlist, never>
-  /** the total size of all tracks (in bytes) */
-  readonly size: Integer
-  /** special playlist kind */
-  readonly specialKind: string
-  /** the length of all tracks in MM:SS format */
-  readonly time: string
-  /** is this playlist visible in the Source list? */
-  readonly visible: boolean
+  /**
+   * Unique identifier for this playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the description of the playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  description: string | null
+  /**
+   * the total length of all tracks (in seconds).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: Integer | null
+  /**
+   * the name of the playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  name: string | null
+  /**
+   * folder which contains this playlist (if any).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly parent: ObjectReferenceVariant<Playlist, never> | null
+  /**
+   * the total size of all tracks (in bytes).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly size: Integer | null
+  /**
+   * special playlist kind.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly specialKind: string | null
+  /**
+   * the length of all tracks in MM:SS format.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly time: string | null
+  /**
+   * is this playlist visible in the Source list?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly visible: boolean | null
 }
 
 /** a sub-window showing a single playlist */
 export interface PlaylistWindow {
-  /** Unique identifier for this window */
-  readonly id: Integer
-  /** the selected tracks */
-  readonly selection: string
-  /** the playlist displayed in the window */
-  readonly view: ObjectReferenceVariant<Playlist, never>
+  /**
+   * Unique identifier for this window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the selected tracks.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly selection: string | null
+  /**
+   * the playlist displayed in the window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly view: ObjectReferenceVariant<Playlist, never> | null
 }
 
 /** a track residing in a shared library */
 export interface SharedTrack {
-  /** Unique identifier for this track */
-  readonly id: Integer
+  /**
+   * Unique identifier for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** a media source (library, CD, device, etc.) */
 export interface Source {
-  /** Unique identifier for this source */
-  readonly id: Integer
-  /** the total size of the source if it has a fixed size */
-  readonly capacity: number
-  /** the free space on the source if it has a fixed size */
-  readonly freeSpace: number
-  /** The kind property */
-  readonly kind: string
+  /**
+   * Unique identifier for this source.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the total size of the source if it has a fixed size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly capacity: number | null
+  /**
+   * the free space on the source if it has a fixed size.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly freeSpace: number | null
+  /**
+   * The kind property.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
 }
 
 /** playable video source */
 export interface Track {
-  /** Unique identifier for this track */
-  readonly id: Integer
-  /** the album name of the track */
-  album: string
-  /** the rating of the album for this track (0 to 100) */
-  albumRating: Integer
-  /** the rating kind of the album rating for this track */
-  readonly albumRatingKind: string
-  /** the bit rate of the track (in kbps) */
-  readonly bitRate: Integer
-  /** the bookmark time of the track in seconds */
-  bookmark: number
-  /** is the playback position for this track remembered? */
-  bookmarkable: boolean
-  /** the category of the track */
-  category: string
-  /** freeform notes about the track */
-  comment: string
+  /**
+   * Unique identifier for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the album name of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  album: string | null
+  /**
+   * the rating of the album for this track (0 to 100).
+   * Nullable. No evidence that the app always sets it.
+   */
+  albumRating: Integer | null
+  /**
+   * the rating kind of the album rating for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly albumRatingKind: string | null
+  /**
+   * the bit rate of the track (in kbps).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly bitRate: Integer | null
+  /**
+   * the bookmark time of the track in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  bookmark: number | null
+  /**
+   * is the playback position for this track remembered?
+   * Nullable. No evidence that the app always sets it.
+   */
+  bookmarkable: boolean | null
+  /**
+   * the category of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  category: string | null
+  /**
+   * freeform notes about the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  comment: string | null
   /**
    * the common, unique ID for this track. If two tracks in different playlists have the same
    * database ID, they are sharing the same data.
+   * Nullable. No evidence that the app always sets it.
    */
-  readonly databaseID: Integer
-  /** the date the track was added to the playlist */
-  readonly dateAdded: Date
-  /** the description of the track */
-  description: string
-  /** the artist/source of the track */
-  director: string
-  /** the total number of discs in the source album */
-  discCount: Integer
-  /** the index of the disc containing this track on the source album */
-  discNumber: Integer
-  /** the account of the person who downloaded this track */
-  readonly downloaderAccount: string
-  /** the name of the person who downloaded this track */
-  readonly downloaderName: string
-  /** the length of the track in seconds */
-  readonly duration: number
-  /** is this track checked for playback? */
-  enabled: boolean
-  /** the episode ID of the track */
-  episodeID: string
-  /** the episode number of the track */
-  episodeNumber: Integer
-  /** the stop time of the track in seconds */
-  finish: number
-  /** the genre (category) of the track */
-  genre: string
+  readonly databaseID: Integer | null
+  /**
+   * the date the track was added to the playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly dateAdded: Date | null
+  /**
+   * the description of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  description: string | null
+  /**
+   * the artist/source of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  director: string | null
+  /**
+   * the total number of discs in the source album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  discCount: Integer | null
+  /**
+   * the index of the disc containing this track on the source album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  discNumber: Integer | null
+  /**
+   * the account of the person who downloaded this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloaderAccount: string | null
+  /**
+   * the name of the person who downloaded this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly downloaderName: string | null
+  /**
+   * the length of the track in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly duration: number | null
+  /**
+   * is this track checked for playback?
+   * Nullable. No evidence that the app always sets it.
+   */
+  enabled: boolean | null
+  /**
+   * the episode ID of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  episodeID: string | null
+  /**
+   * the episode number of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  episodeNumber: Integer | null
+  /**
+   * the stop time of the track in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  finish: number | null
+  /**
+   * the genre (category) of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  genre: string | null
   /**
    * the grouping (piece) of the track. Generally used to denote movements within a classical work.
+   * Nullable. No evidence that the app always sets it.
    */
-  grouping: string
-  /** a text description of the track */
-  readonly kind: string
-  /** the long description of the track */
-  longDescription: string
-  /** the media kind of the track */
-  mediaKind: string
-  /** the modification date of the content of this track */
-  readonly modificationDate: Date
-  /** number of times this track has been played */
-  playedCount: Integer
-  /** the date and time this track was last played */
-  playedDate: Date
-  /** the account of the person who purchased this track */
-  readonly purchaserAccount: string
-  /** the name of the person who purchased this track */
-  readonly purchaserName: string
-  /** the rating of this track (0 to 100) */
-  rating: Integer
-  /** the rating kind of this track */
-  readonly ratingKind: string
-  /** the release date of this track */
-  readonly releaseDate: Date
-  /** the sample rate of the track (in Hz) */
-  readonly sampleRate: Integer
-  /** the season number of the track */
-  seasonNumber: Integer
-  /** number of times this track has been skipped */
-  skippedCount: Integer
-  /** the date and time this track was last skipped */
-  skippedDate: Date
-  /** the show name of the track */
-  show: string
-  /** override string to use for the track when sorting by album */
-  sortAlbum: string
-  /** override string to use for the track when sorting by artist */
-  sortDirector: string
-  /** override string to use for the track when sorting by name */
-  sortName: string
-  /** override string to use for the track when sorting by show name */
-  sortShow: string
-  /** the size of the track (in bytes) */
-  readonly size: number
-  /** the start time of the track in seconds */
-  start: number
-  /** the length of the track in MM:SS format */
-  readonly time: string
-  /** the total number of tracks on the source album */
-  trackCount: Integer
-  /** the index of the track on the source album */
-  trackNumber: Integer
-  /** is this track unplayed? */
-  unplayed: boolean
-  /** relative volume adjustment of the track (-100% to 100%) */
-  volumeAdjustment: Integer
-  /** the year the track was recorded/released */
-  year: Integer
+  grouping: string | null
+  /**
+   * a text description of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly kind: string | null
+  /**
+   * the long description of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  longDescription: string | null
+  /**
+   * the media kind of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  mediaKind: string | null
+  /**
+   * the modification date of the content of this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
+  /**
+   * number of times this track has been played.
+   * Nullable. No evidence that the app always sets it.
+   */
+  playedCount: Integer | null
+  /**
+   * the date and time this track was last played.
+   * Nullable. No evidence that the app always sets it.
+   */
+  playedDate: Date | null
+  /**
+   * the account of the person who purchased this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly purchaserAccount: string | null
+  /**
+   * the name of the person who purchased this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly purchaserName: string | null
+  /**
+   * the rating of this track (0 to 100).
+   * Nullable. No evidence that the app always sets it.
+   */
+  rating: Integer | null
+  /**
+   * the rating kind of this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly ratingKind: string | null
+  /**
+   * the release date of this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly releaseDate: Date | null
+  /**
+   * the sample rate of the track (in Hz).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly sampleRate: Integer | null
+  /**
+   * the season number of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  seasonNumber: Integer | null
+  /**
+   * number of times this track has been skipped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  skippedCount: Integer | null
+  /**
+   * the date and time this track was last skipped.
+   * Nullable. No evidence that the app always sets it.
+   */
+  skippedDate: Date | null
+  /**
+   * the show name of the track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  show: string | null
+  /**
+   * override string to use for the track when sorting by album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortAlbum: string | null
+  /**
+   * override string to use for the track when sorting by artist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortDirector: string | null
+  /**
+   * override string to use for the track when sorting by name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortName: string | null
+  /**
+   * override string to use for the track when sorting by show name.
+   * Nullable. No evidence that the app always sets it.
+   */
+  sortShow: string | null
+  /**
+   * the size of the track (in bytes).
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly size: number | null
+  /**
+   * the start time of the track in seconds.
+   * Nullable. No evidence that the app always sets it.
+   */
+  start: number | null
+  /**
+   * the length of the track in MM:SS format.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly time: string | null
+  /**
+   * the total number of tracks on the source album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  trackCount: Integer | null
+  /**
+   * the index of the track on the source album.
+   * Nullable. No evidence that the app always sets it.
+   */
+  trackNumber: Integer | null
+  /**
+   * is this track unplayed?
+   * Nullable. No evidence that the app always sets it.
+   */
+  unplayed: boolean | null
+  /**
+   * relative volume adjustment of the track (-100% to 100%).
+   * Nullable. No evidence that the app always sets it.
+   */
+  volumeAdjustment: Integer | null
+  /**
+   * the year the track was recorded/released.
+   * Nullable. No evidence that the app always sets it.
+   */
+  year: Integer | null
 }
 
 /** a track representing a network stream */
 export interface URLTrack {
-  /** Unique identifier for this track */
-  readonly id: Integer
-  /** the URL for this track */
-  address: string
+  /**
+   * Unique identifier for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * the URL for this track.
+   * Nullable. No evidence that the app always sets it.
+   */
+  address: string | null
 }
 
 /** custom playlists created by the user */
 export interface UserPlaylist {
-  /** Unique identifier for this playlist */
-  readonly id: Integer
-  /** is this playlist shared? */
-  shared: boolean
-  /** is this a Smart Playlist? */
-  readonly smart: boolean
+  /**
+   * Unique identifier for this playlist.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
+  /**
+   * is this playlist shared?
+   * Nullable. No evidence that the app always sets it.
+   */
+  shared: boolean | null
+  /**
+   * is this a Smart Playlist?
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly smart: boolean | null
 }
 
 /** the video window */
 export interface VideoWindow {
-  /** Unique identifier for this window */
-  readonly id: Integer
+  /**
+   * Unique identifier for this window.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: Integer | null
 }
 
 /** Input for creating an Artwork. */
@@ -294,13 +554,25 @@ export interface ArtworkCreateInput {
 
 /** Input for updating an Artwork. Omitted fields are left unchanged. */
 export interface ArtworkUpdateInput {
-  /** data for this artwork, in the form of a picture */
+  /**
+   * data for this artwork, in the form of a picture.
+   * Cannot be reset: null is rejected.
+   */
   data?: string
-  /** description of artwork as a string */
+  /**
+   * description of artwork as a string.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
-  /** kind or purpose of this piece of artwork */
+  /**
+   * kind or purpose of this piece of artwork.
+   * Cannot be reset: null is rejected.
+   */
   kind?: Integer
-  /** data for this artwork, in original format */
+  /**
+   * data for this artwork, in original format.
+   * Cannot be reset: null is rejected.
+   */
   rawData?: unknown
 }
 
@@ -312,7 +584,10 @@ export interface BrowserWindowCreateInput {
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
 export interface BrowserWindowUpdateInput {
-  /** the playlist currently displayed in the window */
+  /**
+   * the playlist currently displayed in the window.
+   * Cannot be reset: null is rejected.
+   */
   view?: ObjectReferenceVariant<Playlist, never>
 }
 
@@ -324,7 +599,10 @@ export interface FileTrackCreateInput {
 
 /** Input for updating a FileTrack. Omitted fields are left unchanged. */
 export interface FileTrackUpdateInput {
-  /** the location of the file represented by this track */
+  /**
+   * the location of the file represented by this track.
+   * Cannot be reset: null is rejected.
+   */
   location?: FileSource
 }
 
@@ -344,9 +622,15 @@ export interface PlaylistCreateInput {
 
 /** Input for updating a Playlist. Omitted fields are left unchanged. */
 export interface PlaylistUpdateInput {
-  /** the description of the playlist */
+  /**
+   * the description of the playlist.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
-  /** the name of the playlist */
+  /**
+   * the name of the playlist.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -446,77 +730,180 @@ export interface TrackCreateInput {
 
 /** Input for updating a Track. Omitted fields are left unchanged. */
 export interface TrackUpdateInput {
-  /** the album name of the track */
+  /**
+   * the album name of the track.
+   * Cannot be reset: null is rejected.
+   */
   album?: string
-  /** the rating of the album for this track (0 to 100) */
+  /**
+   * the rating of the album for this track (0 to 100).
+   * Cannot be reset: null is rejected.
+   */
   albumRating?: Integer
-  /** the bookmark time of the track in seconds */
+  /**
+   * the bookmark time of the track in seconds.
+   * Cannot be reset: null is rejected.
+   */
   bookmark?: number
-  /** is the playback position for this track remembered? */
+  /**
+   * is the playback position for this track remembered?
+   * Cannot be reset: null is rejected.
+   */
   bookmarkable?: boolean
-  /** the category of the track */
+  /**
+   * the category of the track.
+   * Cannot be reset: null is rejected.
+   */
   category?: string
-  /** freeform notes about the track */
+  /**
+   * freeform notes about the track.
+   * Cannot be reset: null is rejected.
+   */
   comment?: string
-  /** the description of the track */
+  /**
+   * the description of the track.
+   * Cannot be reset: null is rejected.
+   */
   description?: string
-  /** the artist/source of the track */
+  /**
+   * the artist/source of the track.
+   * Cannot be reset: null is rejected.
+   */
   director?: string
-  /** the total number of discs in the source album */
+  /**
+   * the total number of discs in the source album.
+   * Cannot be reset: null is rejected.
+   */
   discCount?: Integer
-  /** the index of the disc containing this track on the source album */
+  /**
+   * the index of the disc containing this track on the source album.
+   * Cannot be reset: null is rejected.
+   */
   discNumber?: Integer
-  /** is this track checked for playback? */
+  /**
+   * is this track checked for playback?
+   * Cannot be reset: null is rejected.
+   */
   enabled?: boolean
-  /** the episode ID of the track */
+  /**
+   * the episode ID of the track.
+   * Cannot be reset: null is rejected.
+   */
   episodeID?: string
-  /** the episode number of the track */
+  /**
+   * the episode number of the track.
+   * Cannot be reset: null is rejected.
+   */
   episodeNumber?: Integer
-  /** the stop time of the track in seconds */
+  /**
+   * the stop time of the track in seconds.
+   * Cannot be reset: null is rejected.
+   */
   finish?: number
-  /** the genre (category) of the track */
+  /**
+   * the genre (category) of the track.
+   * Cannot be reset: null is rejected.
+   */
   genre?: string
   /**
    * the grouping (piece) of the track. Generally used to denote movements within a classical work.
+   * Cannot be reset: null is rejected.
    */
   grouping?: string
-  /** the long description of the track */
+  /**
+   * the long description of the track.
+   * Cannot be reset: null is rejected.
+   */
   longDescription?: string
-  /** the media kind of the track */
+  /**
+   * the media kind of the track.
+   * Cannot be reset: null is rejected.
+   */
   mediaKind?: string
-  /** number of times this track has been played */
+  /**
+   * number of times this track has been played.
+   * Cannot be reset: null is rejected.
+   */
   playedCount?: Integer
-  /** the date and time this track was last played */
+  /**
+   * the date and time this track was last played.
+   * Cannot be reset: null is rejected.
+   */
   playedDate?: Date
-  /** the rating of this track (0 to 100) */
+  /**
+   * the rating of this track (0 to 100).
+   * Cannot be reset: null is rejected.
+   */
   rating?: Integer
-  /** the season number of the track */
+  /**
+   * the season number of the track.
+   * Cannot be reset: null is rejected.
+   */
   seasonNumber?: Integer
-  /** number of times this track has been skipped */
+  /**
+   * number of times this track has been skipped.
+   * Cannot be reset: null is rejected.
+   */
   skippedCount?: Integer
-  /** the date and time this track was last skipped */
+  /**
+   * the date and time this track was last skipped.
+   * Cannot be reset: null is rejected.
+   */
   skippedDate?: Date
-  /** the show name of the track */
+  /**
+   * the show name of the track.
+   * Cannot be reset: null is rejected.
+   */
   show?: string
-  /** override string to use for the track when sorting by album */
+  /**
+   * override string to use for the track when sorting by album.
+   * Cannot be reset: null is rejected.
+   */
   sortAlbum?: string
-  /** override string to use for the track when sorting by artist */
+  /**
+   * override string to use for the track when sorting by artist.
+   * Cannot be reset: null is rejected.
+   */
   sortDirector?: string
-  /** override string to use for the track when sorting by name */
+  /**
+   * override string to use for the track when sorting by name.
+   * Cannot be reset: null is rejected.
+   */
   sortName?: string
-  /** override string to use for the track when sorting by show name */
+  /**
+   * override string to use for the track when sorting by show name.
+   * Cannot be reset: null is rejected.
+   */
   sortShow?: string
-  /** the start time of the track in seconds */
+  /**
+   * the start time of the track in seconds.
+   * Cannot be reset: null is rejected.
+   */
   start?: number
-  /** the total number of tracks on the source album */
+  /**
+   * the total number of tracks on the source album.
+   * Cannot be reset: null is rejected.
+   */
   trackCount?: Integer
-  /** the index of the track on the source album */
+  /**
+   * the index of the track on the source album.
+   * Cannot be reset: null is rejected.
+   */
   trackNumber?: Integer
-  /** is this track unplayed? */
+  /**
+   * is this track unplayed?
+   * Cannot be reset: null is rejected.
+   */
   unplayed?: boolean
-  /** relative volume adjustment of the track (-100% to 100%) */
+  /**
+   * relative volume adjustment of the track (-100% to 100%).
+   * Cannot be reset: null is rejected.
+   */
   volumeAdjustment?: Integer
-  /** the year the track was recorded/released */
+  /**
+   * the year the track was recorded/released.
+   * Cannot be reset: null is rejected.
+   */
   year?: Integer
 }
 
@@ -528,7 +915,10 @@ export interface URLTrackCreateInput {
 
 /** Input for updating an URLTrack. Omitted fields are left unchanged. */
 export interface URLTrackUpdateInput {
-  /** the URL for this track */
+  /**
+   * the URL for this track.
+   * Cannot be reset: null is rejected.
+   */
   address?: string
 }
 
@@ -540,7 +930,10 @@ export interface UserPlaylistCreateInput {
 
 /** Input for updating an UserPlaylist. Omitted fields are left unchanged. */
 export interface UserPlaylistUpdateInput {
-  /** is this playlist shared? */
+  /**
+   * is this playlist shared?
+   * Cannot be reset: null is rejected.
+   */
   shared?: boolean
 }
 
@@ -558,11 +951,18 @@ export interface FileTrackResourceClient {
 
 /** a list of tracks/streams */
 export interface PlaylistResourceClient {
-  /** Move playlist(s) to a new location */
+  /**
+   * Move playlist(s) to a new location
+   *
+   * @param to - the new location for the playlist(s). Does not accept null.
+   */
   move(to: string, options?: CallOptions): Promise<void>
   /**
    * search a playlist for tracks matching the search string. Identical to entering search text in
    * the Search field.
+   *
+   * @param _for - the search text. Does not accept null.
+   * @param only - area to search (default is all). Does not accept null.
    */
   search(_for: string, only?: string, options?: CallOptions): Promise<void>
 }
@@ -578,15 +978,32 @@ export interface TVClient {
   readonly playlists: PlaylistResourceClient
   /** Close an object */
   close(options?: CallOptions): Promise<void>
-  /** Return the number of elements of a particular class within an object */
+  /**
+   * Return the number of elements of a particular class within an object
+   *
+   * @param each - the class of the elements to be counted. Keyword 'each' is optional in
+   * AppleScript. Does not accept null.
+   */
   count(each: string, options?: CallOptions): Promise<void>
   /** Delete an element from an object */
   _delete(options?: CallOptions): Promise<void>
-  /** Duplicate one or more object(s) */
+  /**
+   * Duplicate one or more object(s)
+   *
+   * @param to - the new location for the object(s). Does not accept null.
+   */
   duplicate(to?: string, options?: CallOptions): Promise<void>
   /** Verify if an object exists */
   exists(options?: CallOptions): Promise<void>
-  /** Make a new element */
+  /**
+   * Make a new element
+   *
+   * @param _new - the class of the new element. Keyword 'new' is optional in AppleScript. Does not
+   * accept null.
+   * @param at - the location at which to insert the element. Does not accept null.
+   * @param withProperties - the initial values for the properties of the element. Does not accept
+   * null.
+   */
   make(_new: string, at?: string, withProperties?: unknown, options?: CallOptions): Promise<void>
   /** Open the specified object(s) */
   open(options?: CallOptions): Promise<void>
@@ -596,7 +1013,11 @@ export interface TVClient {
   quit(options?: CallOptions): Promise<void>
   /** Save the specified object(s) */
   save(options?: CallOptions): Promise<void>
-  /** add one or more files to a playlist */
+  /**
+   * add one or more files to a playlist
+   *
+   * @param to - the location of the added file(s). Does not accept null.
+   */
   add(to?: string, options?: CallOptions): Promise<void>
   /**
    * reposition to beginning of current track or go to previous track if already at start of current
@@ -613,7 +1034,11 @@ export interface TVClient {
   nextTrack(options?: CallOptions): Promise<void>
   /** pause playback */
   pause(options?: CallOptions): Promise<void>
-  /** play the current track or the specified track or file. */
+  /**
+   * play the current track or the specified track or file.
+   *
+   * @param once - If true, play this track once and then stop. Does not accept null.
+   */
   play(once?: boolean, options?: CallOptions): Promise<void>
   /** toggle the playing/paused state of the current track */
   playpause(options?: CallOptions): Promise<void>
@@ -635,12 +1060,14 @@ export interface TVClient {
 
 const artworkRecordType: ValueType<Artwork> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this artwork' }),
-    data: t.string({ description: 'data for this artwork, in the form of a picture' }),
-    description: t.string({ description: 'description of artwork as a string' }),
-    downloaded: t.boolean({ description: 'was this artwork downloaded by iTunes?' }),
-    format: t.string({ description: 'the data format for this piece of artwork' }),
-    kind: t.integer({ description: 'kind or purpose of this piece of artwork' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this artwork' }),
+    data: t.nullable(t.string(), {
+      description: 'data for this artwork, in the form of a picture',
+    }),
+    description: t.nullable(t.string(), { description: 'description of artwork as a string' }),
+    downloaded: t.nullable(t.boolean(), { description: 'was this artwork downloaded by iTunes?' }),
+    format: t.nullable(t.string(), { description: 'the data format for this piece of artwork' }),
+    kind: t.nullable(t.integer(), { description: 'kind or purpose of this piece of artwork' }),
     rawData: t.unknown({ description: 'data for this artwork, in original format' }),
   },
   { description: 'a piece of art within a track or playlist' }
@@ -648,177 +1075,216 @@ const artworkRecordType: ValueType<Artwork> = t.record(
 
 const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this window' }),
-    selection: t.string({ description: 'the selected tracks' }),
-    view: t.reference<Playlist, never>(() => resources, 'Playlist', 'one', {
-      description: 'the playlist currently displayed in the window',
-    }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
+    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
+    view: t.nullable(
+      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      { description: 'the playlist currently displayed in the window' }
+    ),
   },
   { description: 'the main window' }
 )
 
 const fileTrackRecordType: ValueType<FileTrack> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this track' }),
-    location: t.file({ description: 'the location of the file represented by this track' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
+    location: t.nullable(t.file(), {
+      description: 'the location of the file represented by this track',
+    }),
   },
   { description: 'a track representing a video file' }
 )
 
 const libraryPlaylistRecordType: ValueType<LibraryPlaylist> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this playlist' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
   },
   { description: 'the main library playlist' }
 )
 
 const playlistRecordType: ValueType<Playlist> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this playlist' }),
-    description: t.string({ description: 'the description of the playlist' }),
-    duration: t.integer({ description: 'the total length of all tracks (in seconds)' }),
-    name: t.string({ description: 'the name of the playlist' }),
-    parent: t.reference<Playlist, never>(() => resources, 'Playlist', 'one', {
-      description: 'folder which contains this playlist (if any)',
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
+    description: t.nullable(t.string(), { description: 'the description of the playlist' }),
+    duration: t.nullable(t.integer(), {
+      description: 'the total length of all tracks (in seconds)',
     }),
-    size: t.integer({ description: 'the total size of all tracks (in bytes)' }),
-    specialKind: t.string({ description: 'special playlist kind' }),
-    time: t.string({ description: 'the length of all tracks in MM:SS format' }),
-    visible: t.boolean({ description: 'is this playlist visible in the Source list?' }),
+    name: t.nullable(t.string(), { description: 'the name of the playlist' }),
+    parent: t.nullable(
+      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      { description: 'folder which contains this playlist (if any)' }
+    ),
+    size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
+    specialKind: t.nullable(t.string(), { description: 'special playlist kind' }),
+    time: t.nullable(t.string(), { description: 'the length of all tracks in MM:SS format' }),
+    visible: t.nullable(t.boolean(), {
+      description: 'is this playlist visible in the Source list?',
+    }),
   },
   { description: 'a list of tracks/streams' }
 )
 
 const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this window' }),
-    selection: t.string({ description: 'the selected tracks' }),
-    view: t.reference<Playlist, never>(() => resources, 'Playlist', 'one', {
-      description: 'the playlist displayed in the window',
-    }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
+    selection: t.nullable(t.string(), { description: 'the selected tracks' }),
+    view: t.nullable(
+      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      { description: 'the playlist displayed in the window' }
+    ),
   },
   { description: 'a sub-window showing a single playlist' }
 )
 
 const sharedTrackRecordType: ValueType<SharedTrack> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this track' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
   },
   { description: 'a track residing in a shared library' }
 )
 
 const sourceRecordType: ValueType<Source> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this source' }),
-    capacity: t.double({ description: 'the total size of the source if it has a fixed size' }),
-    freeSpace: t.double({ description: 'the free space on the source if it has a fixed size' }),
-    kind: t.string({ description: 'The kind property' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this source' }),
+    capacity: t.nullable(t.double(), {
+      description: 'the total size of the source if it has a fixed size',
+    }),
+    freeSpace: t.nullable(t.double(), {
+      description: 'the free space on the source if it has a fixed size',
+    }),
+    kind: t.nullable(t.string(), { description: 'The kind property' }),
   },
   { description: 'a media source (library, CD, device, etc.)' }
 )
 
 const trackRecordType: ValueType<Track> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this track' }),
-    album: t.string({ description: 'the album name of the track' }),
-    albumRating: t.integer({ description: 'the rating of the album for this track (0 to 100)' }),
-    albumRatingKind: t.string({
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
+    album: t.nullable(t.string(), { description: 'the album name of the track' }),
+    albumRating: t.nullable(t.integer(), {
+      description: 'the rating of the album for this track (0 to 100)',
+    }),
+    albumRatingKind: t.nullable(t.string(), {
       description: 'the rating kind of the album rating for this track',
     }),
-    bitRate: t.integer({ description: 'the bit rate of the track (in kbps)' }),
-    bookmark: t.double({ description: 'the bookmark time of the track in seconds' }),
-    bookmarkable: t.boolean({ description: 'is the playback position for this track remembered?' }),
-    category: t.string({ description: 'the category of the track' }),
-    comment: t.string({ description: 'freeform notes about the track' }),
-    databaseID: t.integer({
+    bitRate: t.nullable(t.integer(), { description: 'the bit rate of the track (in kbps)' }),
+    bookmark: t.nullable(t.double(), { description: 'the bookmark time of the track in seconds' }),
+    bookmarkable: t.nullable(t.boolean(), {
+      description: 'is the playback position for this track remembered?',
+    }),
+    category: t.nullable(t.string(), { description: 'the category of the track' }),
+    comment: t.nullable(t.string(), { description: 'freeform notes about the track' }),
+    databaseID: t.nullable(t.integer(), {
       description:
         'the common, unique ID for this track. If two tracks in different playlists have the same database ID, they are sharing the same data.',
     }),
-    dateAdded: t.date({ description: 'the date the track was added to the playlist' }),
-    description: t.string({ description: 'the description of the track' }),
-    director: t.string({ description: 'the artist/source of the track' }),
-    discCount: t.integer({ description: 'the total number of discs in the source album' }),
-    discNumber: t.integer({
+    dateAdded: t.nullable(t.date(), {
+      description: 'the date the track was added to the playlist',
+    }),
+    description: t.nullable(t.string(), { description: 'the description of the track' }),
+    director: t.nullable(t.string(), { description: 'the artist/source of the track' }),
+    discCount: t.nullable(t.integer(), {
+      description: 'the total number of discs in the source album',
+    }),
+    discNumber: t.nullable(t.integer(), {
       description: 'the index of the disc containing this track on the source album',
     }),
-    downloaderAccount: t.string({
+    downloaderAccount: t.nullable(t.string(), {
       description: 'the account of the person who downloaded this track',
     }),
-    downloaderName: t.string({ description: 'the name of the person who downloaded this track' }),
-    duration: t.double({ description: 'the length of the track in seconds' }),
-    enabled: t.boolean({ description: 'is this track checked for playback?' }),
-    episodeID: t.string({ description: 'the episode ID of the track' }),
-    episodeNumber: t.integer({ description: 'the episode number of the track' }),
-    finish: t.double({ description: 'the stop time of the track in seconds' }),
-    genre: t.string({ description: 'the genre (category) of the track' }),
-    grouping: t.string({
+    downloaderName: t.nullable(t.string(), {
+      description: 'the name of the person who downloaded this track',
+    }),
+    duration: t.nullable(t.double(), { description: 'the length of the track in seconds' }),
+    enabled: t.nullable(t.boolean(), { description: 'is this track checked for playback?' }),
+    episodeID: t.nullable(t.string(), { description: 'the episode ID of the track' }),
+    episodeNumber: t.nullable(t.integer(), { description: 'the episode number of the track' }),
+    finish: t.nullable(t.double(), { description: 'the stop time of the track in seconds' }),
+    genre: t.nullable(t.string(), { description: 'the genre (category) of the track' }),
+    grouping: t.nullable(t.string(), {
       description:
         'the grouping (piece) of the track. Generally used to denote movements within a classical work.',
     }),
-    kind: t.string({ description: 'a text description of the track' }),
-    longDescription: t.string({ description: 'the long description of the track' }),
-    mediaKind: t.string({ description: 'the media kind of the track' }),
-    modificationDate: t.date({ description: 'the modification date of the content of this track' }),
-    playedCount: t.integer({ description: 'number of times this track has been played' }),
-    playedDate: t.date({ description: 'the date and time this track was last played' }),
-    purchaserAccount: t.string({
+    kind: t.nullable(t.string(), { description: 'a text description of the track' }),
+    longDescription: t.nullable(t.string(), { description: 'the long description of the track' }),
+    mediaKind: t.nullable(t.string(), { description: 'the media kind of the track' }),
+    modificationDate: t.nullable(t.date(), {
+      description: 'the modification date of the content of this track',
+    }),
+    playedCount: t.nullable(t.integer(), {
+      description: 'number of times this track has been played',
+    }),
+    playedDate: t.nullable(t.date(), {
+      description: 'the date and time this track was last played',
+    }),
+    purchaserAccount: t.nullable(t.string(), {
       description: 'the account of the person who purchased this track',
     }),
-    purchaserName: t.string({ description: 'the name of the person who purchased this track' }),
-    rating: t.integer({ description: 'the rating of this track (0 to 100)' }),
-    ratingKind: t.string({ description: 'the rating kind of this track' }),
-    releaseDate: t.date({ description: 'the release date of this track' }),
-    sampleRate: t.integer({ description: 'the sample rate of the track (in Hz)' }),
-    seasonNumber: t.integer({ description: 'the season number of the track' }),
-    skippedCount: t.integer({ description: 'number of times this track has been skipped' }),
-    skippedDate: t.date({ description: 'the date and time this track was last skipped' }),
-    show: t.string({ description: 'the show name of the track' }),
-    sortAlbum: t.string({
+    purchaserName: t.nullable(t.string(), {
+      description: 'the name of the person who purchased this track',
+    }),
+    rating: t.nullable(t.integer(), { description: 'the rating of this track (0 to 100)' }),
+    ratingKind: t.nullable(t.string(), { description: 'the rating kind of this track' }),
+    releaseDate: t.nullable(t.date(), { description: 'the release date of this track' }),
+    sampleRate: t.nullable(t.integer(), { description: 'the sample rate of the track (in Hz)' }),
+    seasonNumber: t.nullable(t.integer(), { description: 'the season number of the track' }),
+    skippedCount: t.nullable(t.integer(), {
+      description: 'number of times this track has been skipped',
+    }),
+    skippedDate: t.nullable(t.date(), {
+      description: 'the date and time this track was last skipped',
+    }),
+    show: t.nullable(t.string(), { description: 'the show name of the track' }),
+    sortAlbum: t.nullable(t.string(), {
       description: 'override string to use for the track when sorting by album',
     }),
-    sortDirector: t.string({
+    sortDirector: t.nullable(t.string(), {
       description: 'override string to use for the track when sorting by artist',
     }),
-    sortName: t.string({
+    sortName: t.nullable(t.string(), {
       description: 'override string to use for the track when sorting by name',
     }),
-    sortShow: t.string({
+    sortShow: t.nullable(t.string(), {
       description: 'override string to use for the track when sorting by show name',
     }),
-    size: t.double({ description: 'the size of the track (in bytes)' }),
-    start: t.double({ description: 'the start time of the track in seconds' }),
-    time: t.string({ description: 'the length of the track in MM:SS format' }),
-    trackCount: t.integer({ description: 'the total number of tracks on the source album' }),
-    trackNumber: t.integer({ description: 'the index of the track on the source album' }),
-    unplayed: t.boolean({ description: 'is this track unplayed?' }),
-    volumeAdjustment: t.integer({
+    size: t.nullable(t.double(), { description: 'the size of the track (in bytes)' }),
+    start: t.nullable(t.double(), { description: 'the start time of the track in seconds' }),
+    time: t.nullable(t.string(), { description: 'the length of the track in MM:SS format' }),
+    trackCount: t.nullable(t.integer(), {
+      description: 'the total number of tracks on the source album',
+    }),
+    trackNumber: t.nullable(t.integer(), {
+      description: 'the index of the track on the source album',
+    }),
+    unplayed: t.nullable(t.boolean(), { description: 'is this track unplayed?' }),
+    volumeAdjustment: t.nullable(t.integer(), {
       description: 'relative volume adjustment of the track (-100% to 100%)',
     }),
-    year: t.integer({ description: 'the year the track was recorded/released' }),
+    year: t.nullable(t.integer(), { description: 'the year the track was recorded/released' }),
   },
   { description: 'playable video source' }
 )
 
 const urlTrackRecordType: ValueType<URLTrack> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this track' }),
-    address: t.string({ description: 'the URL for this track' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this track' }),
+    address: t.nullable(t.string(), { description: 'the URL for this track' }),
   },
   { description: 'a track representing a network stream' }
 )
 
 const userPlaylistRecordType: ValueType<UserPlaylist> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this playlist' }),
-    shared: t.boolean({ description: 'is this playlist shared?' }),
-    smart: t.boolean({ description: 'is this a Smart Playlist?' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this playlist' }),
+    shared: t.nullable(t.boolean(), { description: 'is this playlist shared?' }),
+    smart: t.nullable(t.boolean(), { description: 'is this a Smart Playlist?' }),
   },
   { description: 'custom playlists created by the user' }
 )
 
 const videoWindowRecordType: ValueType<VideoWindow> = t.record(
   {
-    id: t.integer({ description: 'Unique identifier for this window' }),
+    id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
   },
   { description: 'the video window' }
 )

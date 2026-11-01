@@ -11,9 +11,9 @@ import { Rgb } from '@macts/contracts';
 
 // @public
 export interface Bookmark {
-    readonly end: Integer;
-    name: string;
-    readonly start: Integer;
+    readonly end: Integer | null;
+    name: string | null;
+    readonly start: Integer | null;
 }
 
 // @public
@@ -28,12 +28,12 @@ export interface BookmarkUpdateInput {
 
 // @public
 export interface Cell {
-    readonly columnIndex: Integer;
-    content: string;
-    height: number;
-    readonly rowIndex: Integer;
-    verticalAlignment: string;
-    width: number;
+    readonly columnIndex: Integer | null;
+    content: string | null;
+    height: number | null;
+    readonly rowIndex: Integer | null;
+    verticalAlignment: string | null;
+    width: number | null;
 }
 
 // @public
@@ -54,8 +54,8 @@ export interface CellUpdateInput {
 
 // @public
 export interface Column {
-    preferredWidth: number;
-    width: number;
+    preferredWidth: number | null;
+    width: number | null;
 }
 
 // @public
@@ -72,17 +72,17 @@ export interface ColumnUpdateInput {
 
 // @public
 export interface Document {
-    readonly active: boolean;
-    readonly content: string;
-    defaultTabStop: number;
-    readonly fullName: string;
+    readonly active: boolean | null;
+    readonly content: string | null;
+    defaultTabStop: number | null;
+    readonly fullName: string | null;
     readonly name: string;
-    readonly path: string;
-    readonly posixFullName: string;
-    readonly readOnly: boolean;
-    saved: boolean;
-    showRevisions: boolean;
-    trackRevisions: boolean;
+    readonly path: string | null;
+    readonly posixFullName: string | null;
+    readonly readOnly: boolean | null;
+    saved: boolean | null;
+    showRevisions: boolean | null;
+    trackRevisions: boolean | null;
 }
 
 // @public
@@ -115,11 +115,11 @@ export interface DocumentUpdateInput {
 
 // @public
 export interface Field {
-    fieldCode: string;
-    fieldText: string;
-    readonly fieldType: FieldType;
-    locked: boolean;
-    showCodes: boolean;
+    fieldCode: string | null;
+    fieldText: string | null;
+    readonly fieldType: FieldType | null;
+    locked: boolean | null;
+    showCodes: boolean | null;
 }
 
 // @public
@@ -143,16 +143,16 @@ export interface FieldUpdateInput {
 
 // @public
 export interface Font {
-    allCaps: boolean;
-    bold: boolean;
-    color: Rgb;
-    italic: boolean;
-    name: string;
-    size: number;
-    strikethrough: boolean;
-    subscript: boolean;
-    superscript: boolean;
-    underline: UnderlineType;
+    allCaps: boolean | null;
+    bold: boolean | null;
+    color: Rgb | null;
+    italic: boolean | null;
+    name: string | null;
+    size: number | null;
+    strikethrough: boolean | null;
+    subscript: boolean | null;
+    superscript: boolean | null;
+    underline: UnderlineType | null;
 }
 
 // @public
@@ -203,14 +203,14 @@ export const microsoftWordContract: AppContract<MicrosoftWordClient>;
 
 // @public
 export interface PageSetup {
-    bottomMargin: number;
-    leftMargin: number;
-    orientation: string;
-    pageHeight: number;
-    pageWidth: number;
-    paperSize: string;
-    rightMargin: number;
-    topMargin: number;
+    bottomMargin: number | null;
+    leftMargin: number | null;
+    orientation: string | null;
+    pageHeight: number | null;
+    pageWidth: number | null;
+    paperSize: string | null;
+    rightMargin: number | null;
+    topMargin: number | null;
 }
 
 // @public
@@ -239,18 +239,18 @@ export interface PageSetupUpdateInput {
 
 // @public
 export interface Paragraph {
-    alignment: ParagraphAlignment;
-    readonly content: string;
-    firstLineIndent: number;
-    keepTogether: boolean;
-    keepWithNext: boolean;
-    leftIndent: number;
-    lineSpacing: number;
-    pageBreakBefore: boolean;
+    alignment: ParagraphAlignment | null;
+    readonly content: string | null;
+    firstLineIndent: number | null;
+    keepTogether: boolean | null;
+    keepWithNext: boolean | null;
+    leftIndent: number | null;
+    lineSpacing: number | null;
+    pageBreakBefore: boolean | null;
     readonly paragraphId: Integer;
-    rightIndent: number;
-    spaceAfter: number;
-    spaceBefore: number;
+    rightIndent: number | null;
+    spaceAfter: number | null;
+    spaceBefore: number | null;
 }
 
 // @public
@@ -286,9 +286,9 @@ export interface ParagraphUpdateInput {
 
 // @public
 export interface Row {
-    allowBreakAcrossPages: boolean;
-    headingFormat: boolean;
-    height: number;
+    allowBreakAcrossPages: boolean | null;
+    headingFormat: boolean | null;
+    height: number | null;
 }
 
 // @public
@@ -310,8 +310,8 @@ export type SaveFormat = 'document' | 'documentFormat97' | 'template' | 'rtf' | 
 
 // @public
 export interface Section {
-    protectedForForms: boolean;
-    readonly sectionIndex: Integer;
+    protectedForForms: boolean | null;
+    readonly sectionIndex: Integer | null;
 }
 
 // @public
@@ -326,14 +326,14 @@ export interface SectionUpdateInput {
 
 // @public
 export interface Selection {
-    bold: boolean;
-    content: string;
-    readonly end: Integer;
-    fontName: string;
-    fontSize: number;
-    italic: boolean;
-    readonly selectionType: string;
-    readonly start: Integer;
+    bold: boolean | null;
+    content: string | null;
+    readonly end: Integer | null;
+    fontName: string | null;
+    fontSize: number | null;
+    italic: boolean | null;
+    readonly selectionType: string | null;
+    readonly start: Integer | null;
 }
 
 // @public
@@ -356,10 +356,10 @@ export interface SelectionUpdateInput {
 
 // @public
 export interface Table {
-    allowAutoFit: boolean;
-    borders: boolean;
-    readonly columnCount: Integer;
-    readonly rowCount: Integer;
+    allowAutoFit: boolean | null;
+    borders: boolean | null;
+    readonly columnCount: Integer | null;
+    readonly rowCount: Integer | null;
 }
 
 // @public
@@ -376,14 +376,14 @@ export interface TableUpdateInput {
 
 // @public
 export interface TextRange {
-    bold: boolean;
-    content: string;
-    end: Integer;
-    fontName: string;
-    fontSize: number;
-    italic: boolean;
-    start: Integer;
-    underline: UnderlineType;
+    bold: boolean | null;
+    content: string | null;
+    end: Integer | null;
+    fontName: string | null;
+    fontSize: number | null;
+    italic: boolean | null;
+    start: Integer | null;
+    underline: UnderlineType | null;
 }
 
 // @public

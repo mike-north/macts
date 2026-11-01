@@ -31,58 +31,118 @@ const t = ValueTypes
 
 /** A Notes account */
 export interface Account {
-  /** The name of the account */
+  /**
+   * The name of the account.
+   * Never null: the primary identifier.
+   */
   readonly name: string
-  /** The unique identifier of the account */
-  readonly id: string
-  /** Whether the account has been upgraded */
-  readonly upgraded: boolean
+  /**
+   * The unique identifier of the account.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * Whether the account has been upgraded.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly upgraded: boolean | null
 }
 
 /** A Notes folder */
 export interface Folder {
-  /** The name of the folder */
+  /**
+   * The name of the folder.
+   * Never null: the primary identifier.
+   */
   name: string
-  /** The unique identifier of the folder */
-  readonly id: string
-  /** The container of the folder */
-  readonly container?: string
-  /** Whether the folder is shared */
-  readonly shared: boolean
+  /**
+   * The unique identifier of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly id: string | null
+  /**
+   * The container of the folder.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly container?: string | null
+  /**
+   * Whether the folder is shared.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly shared: boolean | null
 }
 
 /** A note */
 export interface Note {
-  /** The name of the note (first line) */
+  /**
+   * The name of the note (first line).
+   * Never null: the primary identifier.
+   */
   name: string
-  /** The unique identifier of the note */
+  /**
+   * The unique identifier of the note.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
   readonly id: string
-  /** The HTML content of the note body */
-  body: string
-  /** The plaintext content of the note */
-  readonly plaintext: string
-  /** The creation date of the note */
+  /**
+   * The HTML content of the note body.
+   * Nullable. No evidence that the app always sets it.
+   */
+  body: string | null
+  /**
+   * The plaintext content of the note.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly plaintext: string | null
+  /**
+   * The creation date of the note.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
   readonly creationDate: string
-  /** The modification date of the note */
+  /**
+   * The modification date of the note.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
   readonly modificationDate: string
-  /** Whether the note is shared */
+  /**
+   * Whether the note is shared.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
   readonly shared: boolean
-  /** Whether the note is password protected */
+  /**
+   * Whether the note is password protected.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
   readonly passwordProtected: boolean
 }
 
 /** A note attachment */
 export interface Attachment {
-  /** The name of the attachment */
-  readonly name: string
-  /** The unique identifier of the attachment */
+  /**
+   * The name of the attachment.
+   * Nullable. Observed missing in 10 of 25 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   */
+  readonly name: string | null
+  /**
+   * The unique identifier of the attachment.
+   * Never null: the primary identifier.
+   */
   readonly id: string
-  /** The content identifier of the attachment */
-  readonly contentIdentifier?: string
-  /** The creation date of the attachment */
-  readonly creationDate: string
-  /** The modification date of the attachment */
-  readonly modificationDate: string
+  /**
+   * The content identifier of the attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly contentIdentifier?: string | null
+  /**
+   * The creation date of the attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: string | null
+  /**
+   * The modification date of the attachment.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: string | null
 }
 
 /** Input for creating an Account. */
@@ -99,7 +159,10 @@ export interface FolderCreateInput {
 
 /** Input for updating a Folder. Omitted fields are left unchanged. */
 export interface FolderUpdateInput {
-  /** The name of the folder */
+  /**
+   * The name of the folder.
+   * Cannot be reset: null is rejected.
+   */
   name?: string
 }
 
@@ -113,9 +176,15 @@ export interface NoteCreateInput {
 
 /** Input for updating a Note. Omitted fields are left unchanged. */
 export interface NoteUpdateInput {
-  /** The name of the note (first line) */
+  /**
+   * The name of the note (first line).
+   * Cannot be reset: null is rejected.
+   */
   name?: string
-  /** HTML content of the note */
+  /**
+   * HTML content of the note.
+   * Cannot be reset: null is rejected.
+   */
   body?: string
 }
 
@@ -129,7 +198,11 @@ export type AttachmentUpdateInput = Record<string, never>
 export interface AccountResourceClient {
   /** List accounts. */
   list(options?: CallOptions): Promise<readonly Account[]>
-  /** Read the account identified by `name`. */
+  /**
+   * Read the account identified by `name`.
+   *
+   * @param name - Item name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Account>
 }
 
@@ -137,7 +210,11 @@ export interface AccountResourceClient {
 export interface FolderResourceClient {
   /** List folders. */
   list(options?: CallOptions): Promise<readonly Folder[]>
-  /** Read the folder identified by `name`. */
+  /**
+   * Read the folder identified by `name`.
+   *
+   * @param name - Item name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Folder>
 }
 
@@ -145,11 +222,19 @@ export interface FolderResourceClient {
 export interface NoteResourceClient {
   /** List notes. */
   list(options?: CallOptions): Promise<readonly Note[]>
-  /** Read the note identified by `name`. */
+  /**
+   * Read the note identified by `name`.
+   *
+   * @param name - Item name. Does not accept null.
+   */
   get(name: string, options?: CallOptions): Promise<Note>
   /** Create a note. */
   create(input: NoteCreateInput, options?: CallOptions): Promise<Note>
-  /** Show a note in the Notes app */
+  /**
+   * Show a note in the Notes app
+   *
+   * @param name - Note name. Does not accept null.
+   */
   show(name: string, options?: CallOptions): Promise<void>
 }
 
@@ -157,8 +242,12 @@ export interface NoteResourceClient {
 export interface AttachmentResourceClient {
   /** List attachments. */
   list(options?: CallOptions): Promise<readonly Attachment[]>
-  /** Read the attachment identified by `name`. */
-  get(name: string, options?: CallOptions): Promise<Attachment>
+  /**
+   * Read the attachment identified by `id`.
+   *
+   * @param id - Attachment identifier. Does not accept null.
+   */
+  get(id: string, options?: CallOptions): Promise<Attachment>
 }
 
 /**
@@ -179,8 +268,8 @@ export interface NotesClient {
 const accountRecordType: ValueType<Account> = t.record(
   {
     name: t.string({ description: 'The name of the account' }),
-    id: t.string({ description: 'The unique identifier of the account' }),
-    upgraded: t.boolean({ description: 'Whether the account has been upgraded' }),
+    id: t.nullable(t.string(), { description: 'The unique identifier of the account' }),
+    upgraded: t.nullable(t.boolean(), { description: 'Whether the account has been upgraded' }),
   },
   { description: 'A Notes account' }
 )
@@ -188,9 +277,9 @@ const accountRecordType: ValueType<Account> = t.record(
 const folderRecordType: ValueType<Folder> = t.record(
   {
     name: t.string({ description: 'The name of the folder' }),
-    id: t.string({ description: 'The unique identifier of the folder' }),
-    container: t.optional(t.string({ description: 'The container of the folder' })),
-    shared: t.boolean({ description: 'Whether the folder is shared' }),
+    id: t.nullable(t.string(), { description: 'The unique identifier of the folder' }),
+    container: t.optional(t.nullable(t.string(), { description: 'The container of the folder' })),
+    shared: t.nullable(t.boolean(), { description: 'Whether the folder is shared' }),
   },
   { description: 'A Notes folder' }
 )
@@ -199,8 +288,8 @@ const noteRecordType: ValueType<Note> = t.record(
   {
     name: t.string({ description: 'The name of the note (first line)' }),
     id: t.string({ description: 'The unique identifier of the note' }),
-    body: t.string({ description: 'The HTML content of the note body' }),
-    plaintext: t.string({ description: 'The plaintext content of the note' }),
+    body: t.nullable(t.string(), { description: 'The HTML content of the note body' }),
+    plaintext: t.nullable(t.string(), { description: 'The plaintext content of the note' }),
     creationDate: t.string({ description: 'The creation date of the note' }),
     modificationDate: t.string({ description: 'The modification date of the note' }),
     shared: t.boolean({ description: 'Whether the note is shared' }),
@@ -211,13 +300,15 @@ const noteRecordType: ValueType<Note> = t.record(
 
 const attachmentRecordType: ValueType<Attachment> = t.record(
   {
-    name: t.string({ description: 'The name of the attachment' }),
+    name: t.nullable(t.string(), { description: 'The name of the attachment' }),
     id: t.string({ description: 'The unique identifier of the attachment' }),
     contentIdentifier: t.optional(
-      t.string({ description: 'The content identifier of the attachment' })
+      t.nullable(t.string(), { description: 'The content identifier of the attachment' })
     ),
-    creationDate: t.string({ description: 'The creation date of the attachment' }),
-    modificationDate: t.string({ description: 'The modification date of the attachment' }),
+    creationDate: t.nullable(t.string(), { description: 'The creation date of the attachment' }),
+    modificationDate: t.nullable(t.string(), {
+      description: 'The modification date of the attachment',
+    }),
   },
   { description: 'A note attachment' }
 )
@@ -257,7 +348,7 @@ const resources: AppContract<NotesClient>['resources'] = {
   Attachment: {
     name: 'Attachment',
     record: attachmentRecordType,
-    id: t.string({ description: 'The name of the attachment' }),
+    id: t.string({ description: 'The unique identifier of the attachment' }),
     get: 'notes.attachments.get',
     list: 'notes.attachments.list',
   },
@@ -332,13 +423,13 @@ const noteGetOperation: OperationDescriptor<{ readonly name: string }, Note> = {
   output: noteRecordType,
 }
 
-const attachmentGetOperation: OperationDescriptor<{ readonly name: string }, Attachment> = {
+const attachmentGetAttachmentOperation: OperationDescriptor<{ readonly id: string }, Attachment> = {
   id: 'notes.attachments.get',
   permission: 'notes:attachments:get',
-  target: { command: 'get', resource: 'Attachment' },
-  description: 'Get an item by name',
+  target: { command: 'getAttachment', resource: 'Attachment' },
+  description: 'Get an attachment by ID',
   input: t.record({
-    name: t.string({ description: 'Item name' }),
+    id: t.string({ description: 'Attachment identifier' }),
   }),
   output: attachmentRecordType,
 }
@@ -372,7 +463,7 @@ const operations: AppContract<NotesClient>['operations'] = {
   'notes.accounts.get': accountGetOperation,
   'notes.folders.get': folderGetOperation,
   'notes.notes.get': noteGetOperation,
-  'notes.attachments.get': attachmentGetOperation,
+  'notes.attachments.get': attachmentGetAttachmentOperation,
   'notes.notes.create': noteCreateOperation,
   'notes.notes.show': noteShowOperation,
 }
@@ -396,7 +487,7 @@ function bind(runtime: ClientRuntime): NotesClient {
     },
     attachments: {
       list: (options) => runtime.invoke(attachmentListOperation, {}, options),
-      get: (name, options) => runtime.invoke(attachmentGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(attachmentGetAttachmentOperation, { id }, options),
     },
   }
 }
