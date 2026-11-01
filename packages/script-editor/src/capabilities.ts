@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'create',
     description: 'Create a new script document',
-    permission: 'scripteditor:documents:create',
+    permission: 'script-editor:documents:create',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -77,7 +77,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'get',
     description: 'Get a script document by name',
-    permission: 'scripteditor:documents:get',
+    permission: 'script-editor:documents:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -98,7 +98,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'list',
     description: 'List all open script documents',
-    permission: 'scripteditor:documents:list',
+    permission: 'script-editor:documents:list',
     risk: 'read',
     inputSchema: {
       type: 'object',

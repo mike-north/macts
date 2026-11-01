@@ -568,7 +568,7 @@ const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
 
 const windowListWindowsOperation: OperationDescriptor<Record<string, never>, readonly Window[]> = {
   id: 'microsoft-edge.windows.list',
-  permission: 'edge:windows:list',
+  permission: 'microsoft-edge:windows:list',
   target: { command: 'listWindows', resource: 'Window' },
   description: 'List all windows',
   input: t.record({}),
@@ -577,7 +577,7 @@ const windowListWindowsOperation: OperationDescriptor<Record<string, never>, rea
 
 const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Window> = {
   id: 'microsoft-edge.windows.get',
-  permission: 'edge:windows:get',
+  permission: 'microsoft-edge:windows:get',
   target: { command: 'getWindow', resource: 'Window' },
   description: 'Get a window by ID',
   input: t.record({
@@ -588,7 +588,7 @@ const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Win
 
 const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window> = {
   id: 'microsoft-edge.windows.create',
-  permission: 'edge:windows:create',
+  permission: 'microsoft-edge:windows:create',
   target: { command: 'createWindow', resource: 'Window' },
   description: 'Create a new window',
   input: windowCreateInputType,
@@ -597,7 +597,7 @@ const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window
 
 const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, readonly Tab[]> = {
   id: 'microsoft-edge.tabs.list',
-  permission: 'edge:tabs:list',
+  permission: 'microsoft-edge:tabs:list',
   target: { command: 'listTabs', resource: 'Tab' },
   description: 'List all tabs in a window',
   input: t.record({
@@ -608,7 +608,7 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, r
 
 const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
   id: 'microsoft-edge.tabs.get',
-  permission: 'edge:tabs:get',
+  permission: 'microsoft-edge:tabs:get',
   target: { command: 'getTab', resource: 'Tab' },
   description: 'Get a tab by ID',
   input: t.record({
@@ -619,7 +619,7 @@ const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
 
 const tabCreateTabOperation: OperationDescriptor<TabCreateInput, Tab> = {
   id: 'microsoft-edge.tabs.create',
-  permission: 'edge:tabs:create',
+  permission: 'microsoft-edge:tabs:create',
   target: { command: 'createTab', resource: 'Tab' },
   description: 'Create a new tab',
   input: tabCreateInputType,
@@ -631,7 +631,7 @@ const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
   readonly BookmarkFolder[]
 > = {
   id: 'microsoft-edge.bookmarkFolders.list',
-  permission: 'edge:bookmarkFolders:list',
+  permission: 'microsoft-edge:bookmarkFolders:list',
   target: { command: 'listBookmarkFolders', resource: 'BookmarkFolder' },
   description: 'List all bookmark folders',
   input: t.record({}),
@@ -643,7 +643,7 @@ const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
   BookmarkFolder
 > = {
   id: 'microsoft-edge.bookmarkFolders.get',
-  permission: 'edge:bookmarkFolders:get',
+  permission: 'microsoft-edge:bookmarkFolders:get',
   target: { command: 'getBookmarkFolder', resource: 'BookmarkFolder' },
   description: 'Get a bookmark folder by ID',
   input: t.record({
@@ -657,7 +657,7 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
   readonly BookmarkItem[]
 > = {
   id: 'microsoft-edge.bookmarkItems.list',
-  permission: 'edge:bookmarkItems:list',
+  permission: 'microsoft-edge:bookmarkItems:list',
   target: { command: 'listBookmarkItems', resource: 'BookmarkItem' },
   description: 'List all bookmark items in a folder',
   input: t.record({
@@ -671,7 +671,7 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
   BookmarkItem
 > = {
   id: 'microsoft-edge.bookmarkItems.get',
-  permission: 'edge:bookmarkItems:get',
+  permission: 'microsoft-edge:bookmarkItems:get',
   target: { command: 'getBookmarkItem', resource: 'BookmarkItem' },
   description: 'Get a bookmark item by ID',
   input: t.record({
@@ -682,7 +682,7 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
 
 const tabReloadOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.reload',
-  permission: 'edge:tabs:reload',
+  permission: 'microsoft-edge:tabs:reload',
   target: { command: 'reload', resource: 'Tab' },
   description: 'Reload a tab',
   input: t.record({
@@ -693,7 +693,7 @@ const tabReloadOperation: OperationDescriptor<{ readonly tabId: string }, undefi
 
 const tabGoBackOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.goBack',
-  permission: 'edge:tabs:goBack',
+  permission: 'microsoft-edge:tabs:goBack',
   target: { command: 'goBack', resource: 'Tab' },
   description: 'Go Back (If Possible)',
   input: t.record({
@@ -704,7 +704,7 @@ const tabGoBackOperation: OperationDescriptor<{ readonly tabId: string }, undefi
 
 const tabGoForwardOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.goForward',
-  permission: 'edge:tabs:goForward',
+  permission: 'microsoft-edge:tabs:goForward',
   target: { command: 'goForward', resource: 'Tab' },
   description: 'Go Forward (If Possible)',
   input: t.record({
@@ -715,7 +715,7 @@ const tabGoForwardOperation: OperationDescriptor<{ readonly tabId: string }, und
 
 const tabSelectAllOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.selectAll',
-  permission: 'edge:tabs:selectAll',
+  permission: 'microsoft-edge:tabs:selectAll',
   target: { command: 'selectAll', resource: 'Tab' },
   description: 'Select all',
   input: t.record({
@@ -726,7 +726,7 @@ const tabSelectAllOperation: OperationDescriptor<{ readonly tabId: string }, und
 
 const tabCutSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.cutSelection',
-  permission: 'edge:tabs:cutSelection',
+  permission: 'microsoft-edge:tabs:cutSelection',
   target: { command: 'cutSelection', resource: 'Tab' },
   description: 'Cut selected text (If Possible)',
   input: t.record({
@@ -737,7 +737,7 @@ const tabCutSelectionOperation: OperationDescriptor<{ readonly tabId: string }, 
 
 const tabCopySelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.copySelection',
-  permission: 'edge:tabs:copySelection',
+  permission: 'microsoft-edge:tabs:copySelection',
   target: { command: 'copySelection', resource: 'Tab' },
   description: 'Copy text',
   input: t.record({
@@ -748,7 +748,7 @@ const tabCopySelectionOperation: OperationDescriptor<{ readonly tabId: string },
 
 const tabPasteSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.pasteSelection',
-  permission: 'edge:tabs:pasteSelection',
+  permission: 'microsoft-edge:tabs:pasteSelection',
   target: { command: 'pasteSelection', resource: 'Tab' },
   description: 'Paste text (If Possible)',
   input: t.record({
@@ -759,7 +759,7 @@ const tabPasteSelectionOperation: OperationDescriptor<{ readonly tabId: string }
 
 const tabUndoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.undo',
-  permission: 'edge:tabs:undo',
+  permission: 'microsoft-edge:tabs:undo',
   target: { command: 'undo', resource: 'Tab' },
   description: 'Undo the last change',
   input: t.record({
@@ -770,7 +770,7 @@ const tabUndoOperation: OperationDescriptor<{ readonly tabId: string }, undefine
 
 const tabRedoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.redo',
-  permission: 'edge:tabs:redo',
+  permission: 'microsoft-edge:tabs:redo',
   target: { command: 'redo', resource: 'Tab' },
   description: 'Redo the last change',
   input: t.record({
@@ -781,7 +781,7 @@ const tabRedoOperation: OperationDescriptor<{ readonly tabId: string }, undefine
 
 const tabStopOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.stop',
-  permission: 'edge:tabs:stop',
+  permission: 'microsoft-edge:tabs:stop',
   target: { command: 'stop', resource: 'Tab' },
   description: 'Stop the current tab from loading',
   input: t.record({
@@ -792,7 +792,7 @@ const tabStopOperation: OperationDescriptor<{ readonly tabId: string }, undefine
 
 const tabViewSourceOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
   id: 'microsoft-edge.tabs.viewSource',
-  permission: 'edge:tabs:viewSource',
+  permission: 'microsoft-edge:tabs:viewSource',
   target: { command: 'viewSource', resource: 'Tab' },
   description: 'View the HTML source of the tab',
   input: t.record({
@@ -806,7 +806,7 @@ const tabExecuteOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-edge.tabs.execute',
-  permission: 'edge:tabs:execute',
+  permission: 'microsoft-edge:tabs:execute',
   target: { command: 'execute', resource: 'Tab' },
   description: 'Execute a piece of javascript',
   input: t.record({

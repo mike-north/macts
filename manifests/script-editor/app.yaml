@@ -70,7 +70,6 @@ commands:
     resourceType: Document
     code: core
     parameters: []
-    permission: scripteditor:documents:list
   get:
     name: get
     description: Get a script document by name
@@ -82,7 +81,6 @@ commands:
         type: string
         description: Document name
         required: true
-    permission: scripteditor:documents:get
   create:
     name: create
     description: Create a new script document
@@ -94,14 +92,13 @@ commands:
         type: string
         description: Initial script contents
         required: false
-    permission: scripteditor:documents:create
 permissions:
   documents:
     read:
-      - scripteditor:documents:list
-      - scripteditor:documents:get
+      - script-editor:documents:list
+      - script-editor:documents:get
     create:
-      - scripteditor:documents:create
+      - script-editor:documents:create
 
 extraction:
   sourceFile: source.sdef

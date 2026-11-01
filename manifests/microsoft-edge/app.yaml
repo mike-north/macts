@@ -253,7 +253,6 @@ commands:
     resourceType: Window
     code: core
     parameters: []
-    permission: edge:windows:list
 
   getWindow:
     name: get
@@ -267,7 +266,6 @@ commands:
         type: string
         description: Window identifier
         required: true
-    permission: edge:windows:get
 
   createWindow:
     name: create
@@ -281,7 +279,6 @@ commands:
         type: string
         description: Window mode (normal or incognito)
         required: false
-    permission: edge:windows:create
 
   listTabs:
     name: list
@@ -295,7 +292,6 @@ commands:
         type: string
         description: Window identifier
         required: true
-    permission: edge:tabs:list
 
   getTab:
     name: get
@@ -309,7 +305,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:get
 
   createTab:
     name: create
@@ -327,7 +322,6 @@ commands:
         type: string
         description: URL to load in the tab
         required: false
-    permission: edge:tabs:create
 
   listBookmarkFolders:
     name: list
@@ -337,7 +331,6 @@ commands:
     resourceType: BookmarkFolder
     code: core
     parameters: []
-    permission: edge:bookmarkFolders:list
 
   getBookmarkFolder:
     name: get
@@ -351,7 +344,6 @@ commands:
         type: string
         description: Bookmark folder identifier
         required: true
-    permission: edge:bookmarkFolders:get
 
   listBookmarkItems:
     name: list
@@ -365,7 +357,6 @@ commands:
         type: string
         description: Bookmark folder identifier
         required: true
-    permission: edge:bookmarkItems:list
 
   getBookmarkItem:
     name: get
@@ -379,7 +370,6 @@ commands:
         type: string
         description: Bookmark item identifier
         required: true
-    permission: edge:bookmarkItems:get
 
   reload:
     name: reload
@@ -392,7 +382,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:reload
 
   goBack:
     name: goBack
@@ -405,7 +394,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:goBack
 
   goForward:
     name: goForward
@@ -418,7 +406,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:goForward
 
   selectAll:
     name: selectAll
@@ -431,7 +418,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:selectAll
 
   cutSelection:
     name: cutSelection
@@ -444,7 +430,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:cutSelection
 
   copySelection:
     name: copySelection
@@ -457,7 +442,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:copySelection
 
   pasteSelection:
     name: pasteSelection
@@ -470,7 +454,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:pasteSelection
 
   undo:
     name: undo
@@ -483,7 +466,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:undo
 
   redo:
     name: redo
@@ -496,7 +478,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:redo
 
   stop:
     name: stop
@@ -509,7 +490,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:stop
 
   viewSource:
     name: viewSource
@@ -522,7 +502,6 @@ commands:
         type: string
         description: Tab identifier
         required: true
-    permission: edge:tabs:viewSource
 
   execute:
     name: execute
@@ -539,52 +518,51 @@ commands:
         type: string
         description: The javascript code to execute
         required: true
-    permission: edge:tabs:execute
 
 permissions:
   windows:
     read:
-      - edge:windows:list
-      - edge:windows:get
+      - microsoft-edge:windows:list
+      - microsoft-edge:windows:get
     create:
-      - edge:windows:create
+      - microsoft-edge:windows:create
     write:
-      - edge:windows:update
+      - microsoft-edge:windows:update
     delete:
-      - edge:windows:delete
+      - microsoft-edge:windows:delete
 
   tabs:
     read:
-      - edge:tabs:list
-      - edge:tabs:get
+      - microsoft-edge:tabs:list
+      - microsoft-edge:tabs:get
     create:
-      - edge:tabs:create
+      - microsoft-edge:tabs:create
     write:
-      - edge:tabs:update
-      - edge:tabs:reload
-      - edge:tabs:goBack
-      - edge:tabs:goForward
-      - edge:tabs:selectAll
-      - edge:tabs:cutSelection
-      - edge:tabs:copySelection
-      - edge:tabs:pasteSelection
-      - edge:tabs:undo
-      - edge:tabs:redo
-      - edge:tabs:stop
-      - edge:tabs:viewSource
-      - edge:tabs:execute
+      - microsoft-edge:tabs:update
+      - microsoft-edge:tabs:reload
+      - microsoft-edge:tabs:goBack
+      - microsoft-edge:tabs:goForward
+      - microsoft-edge:tabs:selectAll
+      - microsoft-edge:tabs:cutSelection
+      - microsoft-edge:tabs:copySelection
+      - microsoft-edge:tabs:pasteSelection
+      - microsoft-edge:tabs:undo
+      - microsoft-edge:tabs:redo
+      - microsoft-edge:tabs:stop
+      - microsoft-edge:tabs:viewSource
+      - microsoft-edge:tabs:execute
     delete:
-      - edge:tabs:delete
+      - microsoft-edge:tabs:delete
 
   bookmarkFolders:
     read:
-      - edge:bookmarkFolders:list
-      - edge:bookmarkFolders:get
+      - microsoft-edge:bookmarkFolders:list
+      - microsoft-edge:bookmarkFolders:get
 
   bookmarkItems:
     read:
-      - edge:bookmarkItems:list
-      - edge:bookmarkItems:get
+      - microsoft-edge:bookmarkItems:list
+      - microsoft-edge:bookmarkItems:get
 
 extraction:
   sourceFile: edge-sdef.xml

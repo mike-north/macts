@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'copyObject',
     description: 'Copy the selected content to the clipboard',
-    permission: 'word:app:copy',
+    permission: 'microsoft-word:app:copy',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createNewDocument',
     description: 'Create a new document',
-    permission: 'word:documents:create',
+    permission: 'microsoft-word:documents:create',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -83,7 +83,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'cutObject',
     description: 'Cut the selected content to the clipboard',
-    permission: 'word:app:cut',
+    permission: 'microsoft-word:app:cut',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -98,7 +98,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'find',
     description: 'Find text in the document',
-    permission: 'word:app:find',
+    permission: 'microsoft-word:app:find',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -127,7 +127,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'insertText',
     description: 'Insert text at the specified location',
-    permission: 'word:documents:insert',
+    permission: 'microsoft-word:documents:insert',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -152,7 +152,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pasteObject',
     description: 'Paste content from the clipboard',
-    permission: 'word:app:paste',
+    permission: 'microsoft-word:app:paste',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -167,7 +167,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'redo',
     description: 'Redo the last undone action',
-    permission: 'word:app:redo',
+    permission: 'microsoft-word:app:redo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -182,7 +182,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'replace',
     description: 'Replace text in the document',
-    permission: 'word:app:replace',
+    permission: 'microsoft-word:app:replace',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -211,7 +211,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'selectAll',
     description: 'Select all content in the document',
-    permission: 'word:app:selectAll',
+    permission: 'microsoft-word:app:selectAll',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -226,7 +226,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'undo',
     description: 'Undo the last action',
-    permission: 'word:app:undo',
+    permission: 'microsoft-word:app:undo',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -241,7 +241,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'activate',
     description: 'Activate the specified document window',
-    permission: 'word:documents:activate',
+    permission: 'microsoft-word:documents:activate',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -256,7 +256,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'close',
     description: 'Close the specified document',
-    permission: 'word:documents:close',
+    permission: 'microsoft-word:documents:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -276,7 +276,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'createRange',
     description: 'Create a text range by character positions',
-    permission: 'word:documents:createRange',
+    permission: 'microsoft-word:documents:createRange',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -300,7 +300,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'get',
     description: 'Get a document by name',
-    permission: 'word:documents:get',
+    permission: 'microsoft-word:documents:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -325,7 +325,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'list',
     description: 'List all documents',
-    permission: 'word:documents:list',
+    permission: 'microsoft-word:documents:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -340,7 +340,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'print',
     description: 'Print the specified document',
-    permission: 'word:documents:print',
+    permission: 'microsoft-word:documents:print',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -355,7 +355,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'save',
     description: 'Save the specified document',
-    permission: 'word:documents:save',
+    permission: 'microsoft-word:documents:save',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -370,7 +370,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'documents',
     operation: 'saveAs',
     description: 'Save the document with a new name or format',
-    permission: 'word:documents:save',
+    permission: 'microsoft-word:documents:save',
     risk: 'write',
     inputSchema: {
       type: 'object',

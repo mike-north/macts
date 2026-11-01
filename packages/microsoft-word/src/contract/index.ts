@@ -1452,7 +1452,7 @@ const resources: AppContract<MicrosoftWordClient>['resources'] = {
 
 const documentListOperation: OperationDescriptor<Record<string, never>, readonly Document[]> = {
   id: 'microsoft-word.documents.list',
-  permission: 'word:documents:list',
+  permission: 'microsoft-word:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all documents',
   input: t.record({}),
@@ -1461,7 +1461,7 @@ const documentListOperation: OperationDescriptor<Record<string, never>, readonly
 
 const documentGetOperation: OperationDescriptor<{ readonly id: string }, Document> = {
   id: 'microsoft-word.documents.get',
-  permission: 'word:documents:get',
+  permission: 'microsoft-word:documents:get',
   target: { command: 'get', resource: 'Document' },
   description: 'Get a document by name',
   input: t.record({
@@ -1472,7 +1472,7 @@ const documentGetOperation: OperationDescriptor<{ readonly id: string }, Documen
 
 const documentSaveOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.documents.save',
-  permission: 'word:documents:save',
+  permission: 'microsoft-word:documents:save',
   target: { command: 'save', resource: 'Document' },
   description: 'Save the specified document',
   input: t.record({}),
@@ -1484,7 +1484,7 @@ const documentSaveAsOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.documents.saveAs',
-  permission: 'word:documents:save',
+  permission: 'microsoft-word:documents:save',
   target: { command: 'saveAs', resource: 'Document' },
   description: 'Save the document with a new name or format',
   input: t.record({
@@ -1501,7 +1501,7 @@ const documentCloseOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.documents.close',
-  permission: 'word:documents:close',
+  permission: 'microsoft-word:documents:close',
   target: { command: 'close', resource: 'Document' },
   description: 'Close the specified document',
   input: t.record({
@@ -1512,7 +1512,7 @@ const documentCloseOperation: OperationDescriptor<
 
 const documentPrintOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.documents.print',
-  permission: 'word:documents:print',
+  permission: 'microsoft-word:documents:print',
   target: { command: 'print', resource: 'Document' },
   description: 'Print the specified document',
   input: t.record({}),
@@ -1521,7 +1521,7 @@ const documentPrintOperation: OperationDescriptor<Record<string, never>, undefin
 
 const documentActivateOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.documents.activate',
-  permission: 'word:documents:activate',
+  permission: 'microsoft-word:documents:activate',
   target: { command: 'activate', resource: 'Document' },
   description: 'Activate the specified document window',
   input: t.record({}),
@@ -1530,7 +1530,7 @@ const documentActivateOperation: OperationDescriptor<Record<string, never>, unde
 
 const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.undo',
-  permission: 'word:app:undo',
+  permission: 'microsoft-word:app:undo',
   target: { command: 'undo' },
   description: 'Undo the last action',
   input: t.record({}),
@@ -1539,7 +1539,7 @@ const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = 
 
 const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.redo',
-  permission: 'word:app:redo',
+  permission: 'microsoft-word:app:redo',
   target: { command: 'redo' },
   description: 'Redo the last undone action',
   input: t.record({}),
@@ -1548,7 +1548,7 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
 
 const appCopyObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.copyObject',
-  permission: 'word:app:copy',
+  permission: 'microsoft-word:app:copy',
   target: { command: 'copyObject' },
   description: 'Copy the selected content to the clipboard',
   input: t.record({}),
@@ -1557,7 +1557,7 @@ const appCopyObjectOperation: OperationDescriptor<Record<string, never>, undefin
 
 const appCutObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.cutObject',
-  permission: 'word:app:cut',
+  permission: 'microsoft-word:app:cut',
   target: { command: 'cutObject' },
   description: 'Cut the selected content to the clipboard',
   input: t.record({}),
@@ -1566,7 +1566,7 @@ const appCutObjectOperation: OperationDescriptor<Record<string, never>, undefine
 
 const appPasteObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.pasteObject',
-  permission: 'word:app:paste',
+  permission: 'microsoft-word:app:paste',
   target: { command: 'pasteObject' },
   description: 'Paste content from the clipboard',
   input: t.record({}),
@@ -1575,7 +1575,7 @@ const appPasteObjectOperation: OperationDescriptor<Record<string, never>, undefi
 
 const appSelectAllOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'microsoft-word.app.selectAll',
-  permission: 'word:app:selectAll',
+  permission: 'microsoft-word:app:selectAll',
   target: { command: 'selectAll' },
   description: 'Select all content in the document',
   input: t.record({}),
@@ -1591,7 +1591,7 @@ const appFindOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.app.find',
-  permission: 'word:app:find',
+  permission: 'microsoft-word:app:find',
   target: { command: 'find' },
   description: 'Find text in the document',
   input: t.record({
@@ -1611,7 +1611,7 @@ const appReplaceOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.app.replace',
-  permission: 'word:app:replace',
+  permission: 'microsoft-word:app:replace',
   target: { command: 'replace' },
   description: 'Replace text in the document',
   input: t.record({
@@ -1627,7 +1627,7 @@ const appInsertTextOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.app.insertText',
-  permission: 'word:documents:insert',
+  permission: 'microsoft-word:documents:insert',
   target: { command: 'insertText' },
   description: 'Insert text at the specified location',
   input: t.record({
@@ -1642,7 +1642,7 @@ const appCreateNewDocumentOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.app.createNewDocument',
-  permission: 'word:documents:create',
+  permission: 'microsoft-word:documents:create',
   target: { command: 'createNewDocument' },
   description: 'Create a new document',
   input: t.record({
@@ -1658,7 +1658,7 @@ const documentCreateRangeOperation: OperationDescriptor<
   undefined
 > = {
   id: 'microsoft-word.documents.createRange',
-  permission: 'word:documents:createRange',
+  permission: 'microsoft-word:documents:createRange',
   target: { command: 'createRange', resource: 'Document' },
   description: 'Create a text range by character positions',
   input: t.record({

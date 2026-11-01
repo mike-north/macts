@@ -150,7 +150,7 @@ const resources: AppContract<ScriptEditorClient>['resources'] = {
 
 const documentListOperation: OperationDescriptor<Record<string, never>, readonly Document[]> = {
   id: 'script-editor.documents.list',
-  permission: 'scripteditor:documents:list',
+  permission: 'script-editor:documents:list',
   target: { command: 'list', resource: 'Document' },
   description: 'List all open script documents',
   input: t.record({}),
@@ -159,7 +159,7 @@ const documentListOperation: OperationDescriptor<Record<string, never>, readonly
 
 const documentGetOperation: OperationDescriptor<{ readonly name: string }, Document> = {
   id: 'script-editor.documents.get',
-  permission: 'scripteditor:documents:get',
+  permission: 'script-editor:documents:get',
   target: { command: 'get', resource: 'Document' },
   description: 'Get a script document by name',
   input: t.record({
@@ -170,7 +170,7 @@ const documentGetOperation: OperationDescriptor<{ readonly name: string }, Docum
 
 const documentCreateOperation: OperationDescriptor<DocumentCreateInput, Document> = {
   id: 'script-editor.documents.create',
-  permission: 'scripteditor:documents:create',
+  permission: 'script-editor:documents:create',
   target: { command: 'create', resource: 'Document' },
   description: 'Create a new script document',
   input: documentCreateInputType,

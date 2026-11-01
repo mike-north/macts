@@ -1026,7 +1026,6 @@ export const microsoftWordApiPlugin = {
         resourceType: 'Document',
         parameters: [],
         code: 'core',
-        permission: 'word:documents:list',
       },
       get: {
         name: 'get',
@@ -1042,7 +1041,6 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'word:documents:get',
       },
       save: {
         name: 'save',
@@ -1051,7 +1049,6 @@ export const microsoftWordApiPlugin = {
         resourceType: 'Document',
         parameters: [],
         code: 'save',
-        permission: 'word:documents:save',
       },
       saveAs: {
         name: 'saveAs',
@@ -1075,7 +1072,7 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:documents:save',
+        permission: 'microsoft-word:documents:save',
       },
       close: {
         name: 'close',
@@ -1092,7 +1089,6 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'clos',
-        permission: 'word:documents:close',
       },
       print: {
         name: 'print',
@@ -1101,7 +1097,6 @@ export const microsoftWordApiPlugin = {
         resourceType: 'Document',
         parameters: [],
         code: 'aevt',
-        permission: 'word:documents:print',
       },
       activate: {
         name: 'activate',
@@ -1110,7 +1105,6 @@ export const microsoftWordApiPlugin = {
         resourceType: 'Document',
         parameters: [],
         code: 'misc',
-        permission: 'word:documents:activate',
       },
       undo: {
         name: 'undo',
@@ -1118,7 +1112,6 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'sWRD',
-        permission: 'word:app:undo',
       },
       redo: {
         name: 'redo',
@@ -1126,7 +1119,6 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'sWRD',
-        permission: 'word:app:redo',
       },
       copyObject: {
         name: 'copyObject',
@@ -1134,7 +1126,7 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'sWRD',
-        permission: 'word:app:copy',
+        permission: 'microsoft-word:app:copy',
       },
       cutObject: {
         name: 'cutObject',
@@ -1142,7 +1134,7 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'sWRD',
-        permission: 'word:app:cut',
+        permission: 'microsoft-word:app:cut',
       },
       pasteObject: {
         name: 'pasteObject',
@@ -1150,7 +1142,7 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'sWRD',
-        permission: 'word:app:paste',
+        permission: 'microsoft-word:app:paste',
       },
       selectAll: {
         name: 'selectAll',
@@ -1158,7 +1150,6 @@ export const microsoftWordApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'misc',
-        permission: 'word:app:selectAll',
       },
       find: {
         name: 'find',
@@ -1188,7 +1179,6 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:app:find',
       },
       replace: {
         name: 'replace',
@@ -1218,7 +1208,6 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:app:replace',
       },
       insertText: {
         name: 'insertText',
@@ -1241,7 +1230,7 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:documents:insert',
+        permission: 'microsoft-word:documents:insert',
       },
       createNewDocument: {
         name: 'createNewDocument',
@@ -1257,7 +1246,7 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:documents:create',
+        permission: 'microsoft-word:documents:create',
       },
       createRange: {
         name: 'createRange',
@@ -1281,46 +1270,49 @@ export const microsoftWordApiPlugin = {
           },
         ],
         code: 'sWRD',
-        permission: 'word:documents:createRange',
       },
     },
     permissions: {
       documents: {
-        read: ['word:documents:list', 'word:documents:get'],
-        create: ['word:documents:create', 'word:documents:createRange'],
-        write: ['word:documents:save', 'word:documents:insert', 'word:documents:update'],
-        delete: ['word:documents:close', 'word:documents:delete'],
+        read: ['microsoft-word:documents:list', 'microsoft-word:documents:get'],
+        create: ['microsoft-word:documents:create', 'microsoft-word:documents:createRange'],
+        write: [
+          'microsoft-word:documents:save',
+          'microsoft-word:documents:insert',
+          'microsoft-word:documents:update',
+        ],
+        delete: ['microsoft-word:documents:close', 'microsoft-word:documents:delete'],
       },
       paragraphs: {
-        read: ['word:paragraphs:list', 'word:paragraphs:get'],
-        write: ['word:paragraphs:update'],
+        read: ['microsoft-word:paragraphs:list', 'microsoft-word:paragraphs:get'],
+        write: ['microsoft-word:paragraphs:update'],
       },
       tables: {
-        read: ['word:tables:list', 'word:tables:get'],
-        create: ['word:tables:create'],
-        write: ['word:tables:update'],
-        delete: ['word:tables:delete'],
+        read: ['microsoft-word:tables:list', 'microsoft-word:tables:get'],
+        create: ['microsoft-word:tables:create'],
+        write: ['microsoft-word:tables:update'],
+        delete: ['microsoft-word:tables:delete'],
       },
       bookmarks: {
-        read: ['word:bookmarks:list', 'word:bookmarks:get'],
-        create: ['word:bookmarks:create'],
-        delete: ['word:bookmarks:delete'],
+        read: ['microsoft-word:bookmarks:list', 'microsoft-word:bookmarks:get'],
+        create: ['microsoft-word:bookmarks:create'],
+        delete: ['microsoft-word:bookmarks:delete'],
       },
       fields: {
-        read: ['word:fields:list', 'word:fields:get'],
-        create: ['word:fields:create'],
-        write: ['word:fields:update'],
-        delete: ['word:fields:delete'],
+        read: ['microsoft-word:fields:list', 'microsoft-word:fields:get'],
+        create: ['microsoft-word:fields:create'],
+        write: ['microsoft-word:fields:update'],
+        delete: ['microsoft-word:fields:delete'],
       },
       app: {
-        read: ['word:app:find', 'word:app:selectAll'],
+        read: ['microsoft-word:app:find', 'microsoft-word:app:selectAll'],
         write: [
-          'word:app:undo',
-          'word:app:redo',
-          'word:app:copy',
-          'word:app:cut',
-          'word:app:paste',
-          'word:app:replace',
+          'microsoft-word:app:undo',
+          'microsoft-word:app:redo',
+          'microsoft-word:app:copy',
+          'microsoft-word:app:cut',
+          'microsoft-word:app:paste',
+          'microsoft-word:app:replace',
         ],
       },
     },

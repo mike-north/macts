@@ -746,7 +746,6 @@ commands:
     resourceType: Document
     code: core
     parameters: []
-    permission: word:documents:list
 
   get:
     name: get
@@ -759,7 +758,6 @@ commands:
         type: string
         description: Document name
         required: true
-    permission: word:documents:get
 
   save:
     name: save
@@ -768,7 +766,6 @@ commands:
     resourceType: Document
     code: save
     parameters: []
-    permission: word:documents:save
 
   saveAs:
     name: saveAs
@@ -787,7 +784,7 @@ commands:
         description: The file format for saving
         required: false
         code: '1327'
-    permission: word:documents:save
+    permission: microsoft-word:documents:save
 
   close:
     name: close
@@ -801,7 +798,6 @@ commands:
         description: Whether to save changes before closing
         required: false
         code: savo
-    permission: word:documents:close
 
   print:
     name: print
@@ -810,7 +806,6 @@ commands:
     resourceType: Document
     code: aevt
     parameters: []
-    permission: word:documents:print
 
   activate:
     name: activate
@@ -819,7 +814,6 @@ commands:
     resourceType: Document
     code: misc
     parameters: []
-    permission: word:documents:activate
 
   undo:
     name: undo
@@ -827,7 +821,6 @@ commands:
     scope: application
     code: sWRD
     parameters: []
-    permission: word:app:undo
 
   redo:
     name: redo
@@ -835,7 +828,6 @@ commands:
     scope: application
     code: sWRD
     parameters: []
-    permission: word:app:redo
 
   copyObject:
     name: copyObject
@@ -843,7 +835,7 @@ commands:
     scope: application
     code: sWRD
     parameters: []
-    permission: word:app:copy
+    permission: microsoft-word:app:copy
 
   cutObject:
     name: cutObject
@@ -851,7 +843,7 @@ commands:
     scope: application
     code: sWRD
     parameters: []
-    permission: word:app:cut
+    permission: microsoft-word:app:cut
 
   pasteObject:
     name: pasteObject
@@ -859,7 +851,7 @@ commands:
     scope: application
     code: sWRD
     parameters: []
-    permission: word:app:paste
+    permission: microsoft-word:app:paste
 
   selectAll:
     name: selectAll
@@ -867,7 +859,6 @@ commands:
     scope: application
     code: misc
     parameters: []
-    permission: word:app:selectAll
 
   find:
     name: find
@@ -890,7 +881,6 @@ commands:
         description: Whether to match whole words only
         required: false
         code: '5634'
-    permission: word:app:find
 
   replace:
     name: replace
@@ -913,7 +903,6 @@ commands:
         description: Whether to replace all occurrences
         required: false
         code: '5642'
-    permission: word:app:replace
 
   insertText:
     name: insertText
@@ -931,7 +920,7 @@ commands:
         description: The character position to insert at
         required: false
         code: insh
-    permission: word:documents:insert
+    permission: microsoft-word:documents:insert
 
   createNewDocument:
     name: createNewDocument
@@ -944,7 +933,7 @@ commands:
         description: Path to template for the new document
         required: false
         code: '1335'
-    permission: word:documents:create
+    permission: microsoft-word:documents:create
 
   createRange:
     name: createRange
@@ -963,73 +952,72 @@ commands:
         description: The ending character position
         required: false
         code: '5264'
-    permission: word:documents:createRange
 
 permissions:
   documents:
     read:
-      - word:documents:list
-      - word:documents:get
+      - microsoft-word:documents:list
+      - microsoft-word:documents:get
     create:
-      - word:documents:create
-      - word:documents:createRange
+      - microsoft-word:documents:create
+      - microsoft-word:documents:createRange
     write:
-      - word:documents:save
-      - word:documents:insert
-      - word:documents:update
+      - microsoft-word:documents:save
+      - microsoft-word:documents:insert
+      - microsoft-word:documents:update
     delete:
-      - word:documents:close
-      - word:documents:delete
+      - microsoft-word:documents:close
+      - microsoft-word:documents:delete
 
   paragraphs:
     read:
-      - word:paragraphs:list
-      - word:paragraphs:get
+      - microsoft-word:paragraphs:list
+      - microsoft-word:paragraphs:get
     write:
-      - word:paragraphs:update
+      - microsoft-word:paragraphs:update
 
   tables:
     read:
-      - word:tables:list
-      - word:tables:get
+      - microsoft-word:tables:list
+      - microsoft-word:tables:get
     create:
-      - word:tables:create
+      - microsoft-word:tables:create
     write:
-      - word:tables:update
+      - microsoft-word:tables:update
     delete:
-      - word:tables:delete
+      - microsoft-word:tables:delete
 
   bookmarks:
     read:
-      - word:bookmarks:list
-      - word:bookmarks:get
+      - microsoft-word:bookmarks:list
+      - microsoft-word:bookmarks:get
     create:
-      - word:bookmarks:create
+      - microsoft-word:bookmarks:create
     delete:
-      - word:bookmarks:delete
+      - microsoft-word:bookmarks:delete
 
   fields:
     read:
-      - word:fields:list
-      - word:fields:get
+      - microsoft-word:fields:list
+      - microsoft-word:fields:get
     create:
-      - word:fields:create
+      - microsoft-word:fields:create
     write:
-      - word:fields:update
+      - microsoft-word:fields:update
     delete:
-      - word:fields:delete
+      - microsoft-word:fields:delete
 
   app:
     read:
-      - word:app:find
-      - word:app:selectAll
+      - microsoft-word:app:find
+      - microsoft-word:app:selectAll
     write:
-      - word:app:undo
-      - word:app:redo
-      - word:app:copy
-      - word:app:cut
-      - word:app:paste
-      - word:app:replace
+      - microsoft-word:app:undo
+      - microsoft-word:app:redo
+      - microsoft-word:app:copy
+      - microsoft-word:app:cut
+      - microsoft-word:app:paste
+      - microsoft-word:app:replace
 
 extraction:
   sourceFile: word.sdef
