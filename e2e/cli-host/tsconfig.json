@@ -4,12 +4,9 @@
     "outDir": "./dist",
     "rootDir": ".",
     "composite": false,
-    // Required by @modelcontextprotocol/sdk's declarations, an upstream issue:
-    // they use DOM fetch types (`HeadersInit`) without declaring them, and
-    // `StreamableHTTPClientTransport` does not satisfy its own `Transport`
-    // interface under `exactOptionalPropertyTypes`. This package is a private
-    // test suite, never published.
-    "skipLibCheck": true
+    // The MCP SDK's declarations use DOM fetch types (`HeadersInit`) without
+    // declaring them, so they need the DOM library to type-check.
+    "lib": ["ES2022", "DOM"]
   },
   "include": ["src", "test"]
 }

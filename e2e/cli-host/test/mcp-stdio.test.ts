@@ -25,6 +25,9 @@
  *   with `INTERNAL` ("Governance could not be loaded.") before execution.
  * - From phases/13 A1: a token accompanies every invocation, so a missing key
  *   fails startup, and the removed trusted-caller flag is refused.
+ * - From the MCP stdio transport: the server must not write anything to its
+ *   stdout that is not a valid MCP message, and messages are delimited by
+ *   newlines; logging goes to stderr.
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (A1, D5, D6, D9)
  * @see ../../../packages/notes/src/contract/index.ts
@@ -37,6 +40,7 @@ import { notesContract } from '@macts/notes/contract'
 import {
   callTool,
   connectMcpStdio,
+  connectMcpStdioRaw,
   createKey,
   createMactsHome,
   runCli,
@@ -134,6 +138,59 @@ describe('macts --mcp (UAT): tools', () => {
     expect(document.intent).toBe('list notes')
     expect(document.results.map((match) => match.name)).toContain('notes.notes.list')
   })
+})
+
+describe('macts --mcp (UAT): stdout carries only protocol frames', () => {
+  it(
+    'writes nothing but JSON-RPC messages to stdout while starting, listing tools, and calling a tool',
+    async () => {
+      const token = await createKey(home, 'notes:notes:list')
+      const session = await connectMcpStdioRaw(home, {
+        MACTS_TEST_EXECUTOR: 'stub',
+        MACTS_API_KEY: token,
+      })
+      try {
+        await session.client.listTools()
+        const result = await callTool(session, LIST_TOOL, {})
+        expect(toolDocument(result)).toEqual({ result: STUB_LIST_RESULT })
+
+        // The server has finished starting once it says so on stderr.
+        await expect
+          .poll(() => session.stderr(), { timeout: 10_000 })
+          .toContain('MCP server running on stdio with')
+
+        // Every line on stdout is one JSON-RPC 2.0 message: at least the
+        // initialize, tools/list, and tools/call responses.
+        const lines = session
+          .stdout()
+          .split('\n')
+          .filter((line) => line.trim() !== '')
+        expect(lines.length).toBeGreaterThanOrEqual(3)
+        for (const line of lines) {
+          let frame: unknown
+          try {
+            frame = JSON.parse(line)
+          } catch {
+            throw new Error(`stdout carries a line that is not JSON: ${JSON.stringify(line)}`)
+          }
+          expect(frame, line).toBeTypeOf('object')
+          expect(frame, line).not.toBeNull()
+          expect(Array.isArray(frame), line).toBe(false)
+          expect((frame as { jsonrpc?: unknown }).jsonrpc, line).toBe('2.0')
+        }
+        expect(session.stdout()).not.toContain('Serving 1 app(s)')
+        expect(session.stdout()).not.toContain('MACTS_TEST_EXECUTOR')
+
+        // The startup report and the test-executor warning are produced, on stderr.
+        expect(session.stderr()).toContain('Serving 1 app(s):\n  notes\n')
+        expect(session.stderr()).toContain('Executor: test-stub\n')
+        expect(session.stderr()).toContain('Warning: MACTS_TEST_EXECUTOR=stub is set')
+      } finally {
+        await session.close()
+      }
+    },
+    SETUP_TIMEOUT_MS
+  )
 })
 
 describe('macts --mcp (UAT): governance fails closed', () => {
