@@ -219,7 +219,7 @@ export function createRpcRouter(
  * `command.name`). Resource-scoped commands may generate multiple endpoints if
  * they apply to multiple resource types.
  */
-function getCommandEndpoints(
+export function getCommandEndpoints(
   commandKey: string,
   command: Command,
   manifest: AppManifest
@@ -243,7 +243,7 @@ function getCommandEndpoints(
 /**
  * Get all endpoints from a manifest.
  */
-function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
+export function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
   return resolveManifestRoutes(manifest).map((r) => {
     const appSegment = normalizeAppRouteSegment(manifest.app.name)
     const permissionScope =

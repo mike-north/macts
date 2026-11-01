@@ -12,6 +12,7 @@ import type {
   ApprovalDecision,
   ApprovalProvider,
   ApprovalRequest,
+  ApprovalRequestContext,
   AuditRecord,
   AuditWriter,
   ExecutionRequest,
@@ -216,16 +217,16 @@ export interface RecordingApprovalProvider extends ApprovalProvider {
 
 /** Build a {@link RecordingApprovalProvider}. */
 export function createRecordingApprovalProvider(
-  decide: (request: ApprovalRequest) => Promise<ApprovalDecision>
+  decide: (request: ApprovalRequest, context: ApprovalRequestContext) => Promise<ApprovalDecision>
 ): RecordingApprovalProvider {
   const requests: ApprovalRequest[] = []
   return {
     name: 'recording-approver',
     capabilities: { supportsPolicySuggestions: false, supportsDistinctRouting: false },
     requests,
-    requestApproval(request) {
+    requestApproval(request, context) {
       requests.push(request)
-      return decide(request)
+      return decide(request, context)
     },
   }
 }

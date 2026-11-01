@@ -13,7 +13,6 @@
  *   enforced against.
  * - **Shared host state** — where macts keeps its configuration and data
  *   (`MACTS_HOME`), and the process-wide structured logger.
- *
  * - **Invocation** — the single pipeline every operation runs through
  *   (verify the credential, check permission, enforce governance, validate
  *   input, execute), the operation registry it dispatches from, and the
@@ -40,6 +39,7 @@ export { createKeyStoreVerifier, type CredentialVerifier } from './invocation/ve
 
 // Registered operations and manifest-derived descriptors
 export {
+  operationsFromContract,
   operationsFromManifest,
   OperationRegistrationError,
   type RegisteredOperation,

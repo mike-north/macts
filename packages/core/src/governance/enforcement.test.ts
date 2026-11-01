@@ -15,7 +15,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { enforceCall, recordApprovalDecision } from './enforcement.js'
+import { enforceCall, recordApprovalCancellation, recordApprovalDecision } from './enforcement.js'
 import type { EnforceCallOptions, CallAuditContext } from './enforcement.js'
 import type { ApprovalOutcome } from './approval.js'
 import type { AuditRecord } from './audit.js'
@@ -464,5 +464,28 @@ describe('recordApprovalDecision', () => {
         writer,
       })
     ).rejects.toThrow('audit disk full')
+  })
+})
+
+describe('recordApprovalCancellation', () => {
+  const heldAudit: CallAuditContext = { ...baseAudit, approvalId: 'approval-123' }
+
+  it('records an abandoned hold as "cancelled", paired with its pending record', async () => {
+    const { writer, records } = makeCapturingWriter()
+
+    const decision = await recordApprovalCancellation({
+      permission: 'calendar:events:create',
+      cancellation: { cancelled: true, auditReason: 'the caller cancelled while waiting' },
+      audit: heldAudit,
+      writer,
+    })
+
+    expect(decision).toBe('cancelled')
+    expect(records).toHaveLength(1)
+    expect(records[0]?.decision).toBe('cancelled')
+    expect(records[0]?.capability).toBe('calendar:events:create')
+    expect(records[0]?.app).toBe('calendar')
+    expect(records[0]?.approvalId).toBe('approval-123')
+    expect(records[0]?.reason).toBe('the caller cancelled while waiting')
   })
 })

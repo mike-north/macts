@@ -68,6 +68,7 @@ export interface RegisteredOperation {
  * invocation outcome, so it is not one of the canonical structured errors.
  */
 export class OperationRegistrationError extends Error {
+  /** Identifies registration failures in logs and serialized errors. */
   override readonly name = 'OperationRegistrationError'
 }
 
@@ -209,6 +210,9 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * run that command under the read grant.
  *
  * A contract may cover a subset of the manifest's operations.
+ *
+ * Exported so a contract can be checked against its manifest without
+ * constructing a runtime, for example when verifying generated packages.
  *
  * @param contract - The generated app contract.
  * @param manifest - The validated manifest the contract was generated from.

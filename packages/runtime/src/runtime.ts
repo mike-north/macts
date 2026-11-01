@@ -30,7 +30,9 @@ import {
   enforceCall,
   recordApprovalDecision,
   redactArgs,
-  seekApproval,
+  isApprovalCancellation,
+  recordApprovalCancellation,
+  seekApprovalUnlessCancelled,
 } from '@macts/core'
 import {
   ApprovalPendingError,
@@ -43,6 +45,7 @@ import {
   ValidationError,
   type AppContract,
   type Authority,
+  type Credential,
   type InvocationContext,
   type OperationId,
   type WireRecord,
@@ -189,7 +192,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       if (error instanceof MactsError) {
         throw error
       }
-      log().error({ err: error, operation: id }, 'Credential verification failed unexpectedly')
+      log().error(
+        { err: loggableError(error, context.credential), operation: id },
+        'Credential verification failed unexpectedly'
+      )
       throw new InternalError('Credential verification failed.', internalDetails(context), {
         cause: error,
       })
@@ -229,7 +235,15 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const approvalId = randomUUID()
 
     const enforcementFailed = (error: unknown, message: string): InternalError => {
-      log().error({ err: error, operation: operation.descriptor.id, permission, apiKeyId }, message)
+      log().error(
+        {
+          err: loggableError(error, context.credential),
+          operation: operation.descriptor.id,
+          permission,
+          apiKeyId,
+        },
+        message
+      )
       return new InternalError('Governance enforcement failed.', internalDetails(context), {
         cause: error,
       })
@@ -294,9 +308,36 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       layer,
     }
 
-    // seekApproval never rejects, and reports anything but an explicit approval
-    // (rejection, timeout, provider failure) as not approved.
-    const outcome = await seekApproval({ provider: gate.provider, request })
+    // The wait never rejects, and reports anything but an explicit approval
+    // (rejection, timeout, provider failure) as not approved. A caller abort
+    // ends the wait at once and is recorded as a cancellation, never as a
+    // decision. Without a caller signal the wait can only end by decision or
+    // timeout.
+    const result = await seekApprovalUnlessCancelled({
+      provider: gate.provider,
+      request,
+      signal: context.signal ?? new AbortController().signal,
+    })
+    if (isApprovalCancellation(result)) {
+      try {
+        await recordApprovalCancellation({
+          permission,
+          cancellation: result,
+          audit: { apiKeyId, argsSummary, timestamp: clock(), approvalId },
+          writer,
+        })
+      } catch (error) {
+        // The call is not executed either way; a missing record is an
+        // operator-side problem, not a reason to report anything but the
+        // cancellation to the caller.
+        log().error(
+          { err: loggableError(error, context.credential), permission, approvalId },
+          'Approval cancellation could not be audited'
+        )
+      }
+      throw new OperationCancelledError('The operation was cancelled while awaiting approval.', {})
+    }
+    const outcome = result
 
     try {
       await recordApprovalDecision({
@@ -308,7 +349,12 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     } catch (error) {
       // An approval that leaves no durable record is not acted on.
       log().error(
-        { err: error, permission, approvalId, approvalState: outcome.state },
+        {
+          err: loggableError(error, context.credential),
+          permission,
+          approvalId,
+          approvalState: outcome.state,
+        },
         'Approval decision could not be audited; denying the call'
       )
       throw new ApprovalRejectedError(
@@ -395,7 +441,11 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       // The raw failure may carry native or third-party detail; it stays in the
       // operator log and the local `cause`, never in the caller's message.
       log().error(
-        { err: error, operation: descriptor.id, provider: executor.provider },
+        {
+          err: loggableError(error, context.credential),
+          operation: descriptor.id,
+          provider: executor.provider,
+        },
         'Executor failed with a non-canonical error'
       )
       throw new InternalError('The operation failed unexpectedly.', internalDetails(context), {
@@ -445,5 +495,43 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       throwIfCancelled(context)
       return execute(operation, validated, context)
     },
+  }
+}
+
+/** The smallest secret worth scrubbing; shorter text would match unrelated words. */
+const MIN_SCRUBBED_SECRET_LENGTH = 8
+
+/**
+ * An error's operator-log form: name, code, message, and stack, with the
+ * caller's credential replaced wherever it appears.
+ *
+ * Third-party code (a credential verifier, an approval provider, an executor)
+ * can echo a request's token in its exception text. The raw error object is
+ * never logged, because a logger serializes every enumerable field it carries.
+ * Only these four fields are, and each is scrubbed.
+ */
+function loggableError(
+  error: unknown,
+  credential: Credential
+): {
+  readonly name: string
+  readonly message: string
+  readonly code?: string
+  readonly stack?: string
+} {
+  const secret = credential.reveal()
+  const scrub = (text: string): string =>
+    secret.length >= MIN_SCRUBBED_SECRET_LENGTH
+      ? text.split(secret).join('[redacted credential]')
+      : text
+  if (!(error instanceof Error)) {
+    return { name: typeof error, message: scrub(String(error)) }
+  }
+  const code = (error as { code?: unknown }).code
+  return {
+    name: error.name,
+    message: scrub(error.message),
+    ...(typeof code === 'string' ? { code: scrub(code) } : {}),
+    ...(error.stack === undefined ? {} : { stack: scrub(error.stack) }),
   }
 }

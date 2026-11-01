@@ -42,7 +42,7 @@
 import type { GovernancePolicy } from './policy.js'
 import type { AuditWriter } from './writer.js'
 import type { PolicyEvaluation } from './evaluator.js'
-import type { ApprovalOutcome } from './approval.js'
+import type { ApprovalCancellation, ApprovalOutcome } from './approval.js'
 import { createAuditRecord, type AuditDecision } from './audit.js'
 import type { LayeredPolicyEvaluation } from './composition.js'
 import { evaluateLayeredPolicy } from './composition.js'
@@ -372,5 +372,50 @@ export async function recordApprovalDecision(
   })
   await writer.append(record)
 
+  return decision
+}
+
+/**
+ * Options for {@link recordApprovalCancellation}.
+ */
+export interface RecordApprovalCancellationOptions {
+  /** The held capability, the same permission recorded as `'pending'`. */
+  readonly permission: string
+  /** The cancellation returned by the approval gate. */
+  readonly cancellation: ApprovalCancellation
+  /** Audit context for this call; its `approvalId` pairs with the `pending` record. */
+  readonly audit: CallAuditContext
+  /** Audit writer. Required: a held call's resolution is always persisted. */
+  readonly writer: AuditWriter
+}
+
+/**
+ * Record that the caller abandoned a held `confirm-first` call before any
+ * decision.
+ *
+ * It resolves the `'pending'` record that {@link enforceCall} wrote, as
+ * {@link recordApprovalDecision} does for a decision, but records
+ * `'cancelled'`: nobody approved or rejected the call, and it did not run.
+ * Recording it as approved or rejected would misstate what happened.
+ *
+ * @param options - Permission, cancellation, audit context, and writer.
+ * @returns The {@link AuditDecision} that was recorded (`'cancelled'`).
+ */
+export async function recordApprovalCancellation(
+  options: RecordApprovalCancellationOptions
+): Promise<AuditDecision> {
+  const { permission, cancellation, audit, writer } = options
+  const decision: AuditDecision = 'cancelled'
+  const record = createAuditRecord({
+    capability: permission,
+    app: deriveAuditApp(permission),
+    argsSummary: audit.argsSummary,
+    apiKeyId: audit.apiKeyId,
+    decision,
+    timestamp: audit.timestamp,
+    reason: cancellation.auditReason,
+    ...(audit.approvalId === undefined ? {} : { approvalId: audit.approvalId }),
+  })
+  await writer.append(record)
   return decision
 }

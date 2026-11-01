@@ -313,9 +313,11 @@ export interface MactsRuntime {
 
 // @public
 export class OperationRegistrationError extends Error {
-    // (undocumented)
     readonly name = "OperationRegistrationError";
 }
+
+// @public
+export function operationsFromContract(contract: AppContract<unknown>, manifest: AppManifest): RegisteredOperation[];
 
 // @public
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[];

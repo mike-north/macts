@@ -211,18 +211,81 @@ describe('step 0: operation lookup and cancellation', () => {
     expect(executor.requests).toHaveLength(0)
   })
 
-  it('rejects a call aborted while awaiting approval as cancelled, never executing it', async () => {
+  // An abort during a human hold used to be ignored by the approval wait: the
+  // call waited out the full approval timeout, and an approval that arrived in
+  // the meantime was audited as 'approved' for a call that never ran.
+  it('records a call aborted while awaiting approval as cancelled, never as a decision', async () => {
     const controller = new AbortController()
+    const writer = createMemoryAuditWriter()
     const provider = createRecordingApprovalProvider(() => {
       controller.abort()
       return Promise.resolve({ state: 'approved' })
     })
     const { runtime, executor } = harness({
-      governance: {
-        policy: CONFIRM_FIRST_CALENDAR,
-        writer: createMemoryAuditWriter(),
-        approvals: { provider },
-      },
+      governance: { policy: CONFIRM_FIRST_CALENDAR, writer, approvals: { provider } },
+    })
+
+    const error = await rejection(
+      runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET, { signal: controller.signal }))
+    )
+
+    expect(error).toBeInstanceOf(OperationCancelledError)
+    expect(executor.requests).toHaveLength(0)
+    expect(writer.records.map((r) => r.decision)).toEqual(['pending', 'cancelled'])
+    expect(writer.records[0]?.approvalId).toBe(writer.records[1]?.approvalId)
+  })
+
+  it('ends the approval wait as soon as the caller aborts, without waiting out the timeout', async () => {
+    vi.useFakeTimers()
+    try {
+      const controller = new AbortController()
+      const writer = createMemoryAuditWriter()
+      let providerSignal: AbortSignal | undefined
+      const provider = createRecordingApprovalProvider((_request, context) => {
+        providerSignal = context.signal
+        return new Promise<ApprovalDecision>(() => undefined)
+      })
+      const { runtime, executor } = harness({
+        governance: {
+          policy: CONFIRM_FIRST_CALENDAR,
+          writer,
+          approvals: { provider, timeoutMs: 600_000 },
+        },
+      })
+
+      let settled = false
+      const pending = rejection(
+        runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET, { signal: controller.signal }))
+      ).finally(() => {
+        settled = true
+      })
+      await vi.advanceTimersByTimeAsync(1_000)
+      expect(settled).toBe(false)
+
+      controller.abort()
+      const error = await pending
+
+      expect(error).toBeInstanceOf(OperationCancelledError)
+      // The approval timer was cleared rather than left to run out.
+      expect(vi.getTimerCount()).toBe(0)
+      expect(providerSignal?.aborted).toBe(true)
+      expect(executor.requests).toHaveLength(0)
+      expect(writer.records.map((r) => r.decision)).toEqual(['pending', 'cancelled'])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('still reports the cancellation when the cancellation record cannot be written', async () => {
+    const controller = new AbortController()
+    // The first append is the 'pending' record; the second, the cancellation, fails.
+    const writer = createMemoryAuditWriter([2])
+    const provider = createRecordingApprovalProvider(() => {
+      controller.abort()
+      return new Promise<ApprovalDecision>(() => undefined)
+    })
+    const { runtime, executor } = harness({
+      governance: { policy: CONFIRM_FIRST_CALENDAR, writer, approvals: { provider } },
     })
 
     const error = await rejection(
@@ -266,6 +329,33 @@ describe('step 1: credential verification', () => {
     if (!(error instanceof InternalError)) return
     expect(error.message).not.toContain('key database is locked')
     expect(executor.requests).toHaveLength(0)
+  })
+
+  it('scrubs the credential from an unexpected verifier failure before logging it', async () => {
+    const logger = createSpyLogger()
+    const runtime = createRuntime({
+      executor: createRecordingExecutor(),
+      logger,
+      verifier: {
+        verify: (credential) =>
+          Promise.reject(
+            Object.assign(new Error(`upstream rejected token ${credential.reveal()}`), {
+              code: 'E_UPSTREAM',
+              headers: { authorization: `Bearer ${credential.reveal()}` },
+            })
+          ),
+      },
+    })
+    runtime.registerManifest(CALENDAR_MANIFEST)
+
+    await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+    const logged = JSON.stringify(logger.error.mock.calls)
+    expect(logged).not.toContain(READER_SECRET)
+    expect(logged).toContain('upstream rejected token [redacted credential]')
+    expect(logged).toContain('E_UPSTREAM')
+    // Fields beyond name, message, code, and stack are never logged.
+    expect(logged).not.toContain('authorization')
   })
 })
 
@@ -438,25 +528,32 @@ describe('step 3: governance', () => {
   })
 
   it('never executes a held call nobody answers in time', async () => {
-    const { runtime, executor } = harness({
-      governance: {
-        policy: CONFIRM_FIRST_CALENDAR,
-        writer: createMemoryAuditWriter(),
-        approvals: {
-          provider: createRecordingApprovalProvider(
-            () => new Promise<ApprovalDecision>(() => undefined)
-          ),
-          timeoutMs: 20,
+    vi.useFakeTimers()
+    try {
+      const { runtime, executor } = harness({
+        governance: {
+          policy: CONFIRM_FIRST_CALENDAR,
+          writer: createMemoryAuditWriter(),
+          approvals: {
+            provider: createRecordingApprovalProvider(
+              () => new Promise<ApprovalDecision>(() => undefined)
+            ),
+            timeoutMs: 5_000,
+          },
         },
-      },
-    })
+      })
 
-    const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET)))
+      const pending = rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(WRITER_SECRET)))
+      await vi.advanceTimersByTimeAsync(5_000)
+      const error = await pending
 
-    expect(error).toBeInstanceOf(ApprovalRejectedError)
-    if (!(error instanceof ApprovalRejectedError)) return
-    expect(error.details.state).toBe('timeout')
-    expect(executor.requests).toHaveLength(0)
+      expect(error).toBeInstanceOf(ApprovalRejectedError)
+      if (!(error instanceof ApprovalRejectedError)) return
+      expect(error.details.state).toBe('timeout')
+      expect(executor.requests).toHaveLength(0)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('denies an approved call whose approval cannot be recorded', async () => {

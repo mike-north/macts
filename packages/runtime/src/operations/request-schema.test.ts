@@ -1,7 +1,8 @@
 /**
  * Tests for the per-command request schemas derived from manifest parameters.
  *
- * @packageDocumentation
+ * @see ../../../core/src/manifest/schemas/command.ts
+ * @see https://zod.dev/api
  */
 
 import { describe, it, expect } from 'vitest'
