@@ -1,8 +1,18 @@
 /**
- * Request validation using Zod schemas built from command definitions.
+ * Per-command request schemas derived directly from manifest parameters.
  *
- * Schemas are built once at server startup via {@link buildSchemaRegistry},
- * not per-request, to avoid repeated schema construction overhead.
+ * These are the input contracts of today's RPC requests: plain JSON records
+ * whose parameters are checked for presence and primitive type, with extra keys
+ * allowed for forward compatibility. They back the passthrough operation
+ * descriptors the runtime builds from a manifest, and the HTTP adapter's
+ * request validation, so both surfaces accept exactly the same requests.
+ *
+ * They are an interim source. Once generated contracts carry value types, each
+ * operation's wire schema comes from its descriptor and this independent
+ * mapping is retired.
+ *
+ * Schemas are built once at registration or startup via
+ * {@link buildSchemaRegistry}, not per request.
  *
  * @packageDocumentation
  */
@@ -14,12 +24,12 @@ import type { Command } from '@macts/core'
  * Build a Zod schema for a command's parameters.
  *
  * Maps command parameter types to Zod validators:
- * - `string` (and unknown types) -> `z.string()`
- * - `number` / `integer` -> `z.number()`
- * - `boolean` -> `z.boolean()`
- * - `date` -> ISO datetime or date string
+ * - `string` (and unknown types) maps to `z.string()`
+ * - `number` / `integer` maps to `z.number()`
+ * - `boolean` maps to `z.boolean()`
+ * - `date` maps to ISO datetime or date string
  *
- * Optional parameters use `.optional()`. The schema uses `.passthrough()`
+ * Optional parameters use `.optional()`. The schema uses `.loose()`
  * to allow additional properties (forward-compatibility).
  *
  * @param command - The command definition to build a schema for

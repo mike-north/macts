@@ -47,8 +47,7 @@
     "@macts/core": "workspace:*",
     "@macts/runtime": "workspace:*",
     "hono": "^4.7.0",
-    "pino": "^10.3.1",
-    "zod": "catalog:"
+    "pino": "^10.3.1"
   },
   "devDependencies": {
     "tsup": "catalog:",

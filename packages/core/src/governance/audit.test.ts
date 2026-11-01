@@ -128,7 +128,15 @@ describe('serializeAuditRecord', () => {
 
   it('exposes the canonical decision set', () => {
     // spec: allowed (ran), denied (policy), pending (confirm-first, withheld),
-    // approved (human ok), rejected (human no).
-    expect(AUDIT_DECISIONS).toEqual(['allowed', 'denied', 'pending', 'approved', 'rejected'])
+    // approved (human ok), rejected (human no), cancelled (the caller abandoned
+    // a held call before any decision).
+    expect(AUDIT_DECISIONS).toEqual([
+      'allowed',
+      'denied',
+      'pending',
+      'approved',
+      'rejected',
+      'cancelled',
+    ])
   })
 })

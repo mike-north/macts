@@ -1,12 +1,13 @@
 /**
- * Tests for request validation with Zod schemas.
+ * Tests for the per-command request schemas derived from manifest parameters.
  *
- * @packageDocumentation
+ * @see ../../../core/src/manifest/schemas/command.ts
+ * @see https://zod.dev/api
  */
 
 import { describe, it, expect } from 'vitest'
 import type { Command } from '@macts/core'
-import { buildCommandSchema, buildSchemaRegistry } from './validation.js'
+import { buildCommandSchema, buildSchemaRegistry } from './request-schema.js'
 
 /**
  * Create a minimal Command for testing, with overrides.

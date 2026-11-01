@@ -32,6 +32,9 @@
  *                rejected yet, and it did NOT execute.
  * - `approved` — the call required confirmation and a human approved it.
  * - `rejected` — the call required confirmation and a human declined it.
+ * - `cancelled` — the call required confirmation and its caller abandoned it
+ *                 before any decision. Nobody approved or rejected it, and it
+ *                 did NOT execute.
  *
  * Distinguishing `denied` (policy) from `rejected` (human) keeps the audit
  * trail precise about *why* a call did not run. Likewise, `pending` is kept
@@ -39,7 +42,14 @@
  * deferral awaiting approval — so recording it as `denied` would misattribute
  * the reason the call did not proceed.
  */
-export const AUDIT_DECISIONS = ['allowed', 'denied', 'pending', 'approved', 'rejected'] as const
+export const AUDIT_DECISIONS = [
+  'allowed',
+  'denied',
+  'pending',
+  'approved',
+  'rejected',
+  'cancelled',
+] as const
 
 /**
  * A single audit decision value.

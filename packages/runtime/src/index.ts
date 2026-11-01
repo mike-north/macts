@@ -13,14 +13,38 @@
  *   enforced against.
  * - **Shared host state** — where macts keeps its configuration and data
  *   (`MACTS_HOME`), and the process-wide structured logger.
+ * - **Invocation** — the single pipeline every operation runs through
+ *   (verify the credential, check permission, enforce governance, validate
+ *   input, execute), the operation registry it dispatches from, and the
+ *   self-redacting credential holder.
  *
- * The runtime depends only on `@macts/core` (and through it
- * `@macts/contracts`). It never depends on a transport adapter or on the
- * public client package, so both can depend on it without depending on each
- * other. It installs no native addon.
+ * The runtime depends on `@macts/core` and `@macts/contracts`. It never
+ * depends on a transport adapter or on the public client package, so both can
+ * depend on it without depending on each other. It installs no native addon.
  *
  * @packageDocumentation
  */
+
+// The invocation pipeline and the runtime that runs it
+export {
+  createRuntime,
+  type CreateRuntimeOptions,
+  type MactsRuntime,
+  type RuntimeLogger,
+} from './runtime.js'
+
+// Credentials and their verification
+export { createBearerCredential } from './invocation/credential.js'
+export { createKeyStoreVerifier, type CredentialVerifier } from './invocation/verifier.js'
+
+// Registered operations and manifest-derived descriptors
+export {
+  operationsFromContract,
+  operationsFromManifest,
+  OperationRegistrationError,
+  type RegisteredOperation,
+} from './operations/registry.js'
+export { buildCommandSchema, buildSchemaRegistry } from './operations/request-schema.js'
 
 // API keys: minting, verification, and the key store
 export * from './keys/index.js'

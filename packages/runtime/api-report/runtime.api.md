@@ -4,24 +4,37 @@
 
 ```ts
 
+import { AnyOperationDescriptor } from '@macts/contracts';
 import { ApiKeyMetadata } from '@macts/core';
 import { ApiKeyPayload } from '@macts/core';
 import { ApiKeyValidationErrorCode } from '@macts/core';
 import { ApiKeyValidationFailure } from '@macts/core';
 import { ApiKeyValidationResult } from '@macts/core';
 import { ApiKeyValidationSuccess } from '@macts/core';
+import { AppContract } from '@macts/contracts';
+import { AppManifest } from '@macts/core';
 import { ApprovalConfig } from '@macts/core';
 import { ApprovalProvider } from '@macts/core';
 import { AuditWriter } from '@macts/core';
+import { Authority } from '@macts/contracts';
 import { checkPermission } from '@macts/core';
 import { checkPermissions } from '@macts/core';
+import { Command } from '@macts/core';
+import { Credential } from '@macts/contracts';
+import { Executor } from '@macts/core';
 import { GovernancePolicy } from '@macts/core';
 import { hasPermission } from '@macts/core';
+import { InvocationContext } from '@macts/contracts';
+import { Logger } from 'pino';
 import * as _macts_core from '@macts/core';
+import { OperationId } from '@macts/contracts';
 import { PermissionCheckResult } from '@macts/core';
 import { PermissionHistoryEntry } from '@macts/core';
 import { PermissionsSection } from '@macts/core';
 import pino from 'pino';
+import { RiskClass } from '@macts/core';
+import { WireValue } from '@macts/contracts';
+import { z } from 'zod';
 
 // @public
 export class ActivePolicyError extends Error {
@@ -65,6 +78,12 @@ export class ApprovalProviderError extends Error {
 export type ApprovalProviderFactory = (options: Readonly<Record<string, unknown>>) => ApprovalProvider | Promise<ApprovalProvider>;
 
 // @public
+export function buildCommandSchema(command: Command): z.ZodType;
+
+// @public
+export function buildSchemaRegistry(commands: Record<string, Command>): Map<string, z.ZodType>;
+
+// @public
 export function calculateExpiration(expires: Date | number | string): number;
 
 // @public
@@ -104,6 +123,9 @@ export interface CreateApiKeyResult {
 export function createApiKeySimple(options: CreateApiKeyOptions): Promise<CreateApiKeyResult>;
 
 // @public
+export function createBearerCredential(secret: string): Credential;
+
+// @public
 export function createFullAccessKey(appName: string, name: string, expires?: Date | number | string): Promise<CreateApiKeyResult>;
 
 // @public
@@ -117,13 +139,33 @@ export interface CreateKeyPolicyResolverOptions {
 }
 
 // @public
+export function createKeyStoreVerifier(): CredentialVerifier;
+
+// @public
 export function createLogger(options?: pino.LoggerOptions): pino.Logger;
 
 // @public
 export function createReadOnlyKey(appName: string, name: string, permissionsSection: PermissionsSection, expires?: Date | number | string): Promise<CreateApiKeyResult>;
 
 // @public
+export function createRuntime(options: CreateRuntimeOptions): MactsRuntime;
+
+// @public
+export interface CreateRuntimeOptions {
+    readonly clock?: () => Date;
+    readonly executor: Executor;
+    readonly governance?: GovernanceContext;
+    readonly logger?: RuntimeLogger;
+    readonly verifier?: CredentialVerifier;
+}
+
+// @public
 export function createStoredKeyPolicyResolver(options?: Omit<CreateKeyPolicyResolverOptions, 'load'>): KeyPolicyResolver;
+
+// @public
+export interface CredentialVerifier {
+    verify(credential: Credential): Promise<Authority>;
+}
 
 // @public
 export function decrypt(ciphertext: string, key: Buffer): string;
@@ -261,9 +303,37 @@ export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' |
 export function loadKeyMetadata(): ApiKeyMetadata[];
 
 // @public
+export interface MactsRuntime {
+    invoke(id: OperationId, input: unknown, context: InvocationContext): Promise<WireValue>;
+    operation(id: OperationId): RegisteredOperation | undefined;
+    operations(): readonly RegisteredOperation[];
+    registerContract(contract: AppContract<unknown>, manifest: AppManifest): void;
+    registerManifest(manifest: AppManifest): void;
+}
+
+// @public
+export class OperationRegistrationError extends Error {
+    readonly name = "OperationRegistrationError";
+}
+
+// @public
+export function operationsFromContract(contract: AppContract<unknown>, manifest: AppManifest): RegisteredOperation[];
+
+// @public
+export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[];
+
+// @public
 export function parseDuration(duration: string): number;
 
 export { PermissionCheckResult }
+
+// @public
+export interface RegisteredOperation {
+    readonly descriptor: AnyOperationDescriptor;
+    readonly manifest: AppManifest;
+    readonly permissionHistory?: PermissionHistoryEntry[];
+    readonly risk: RiskClass;
+}
 
 // @public
 export type ResolvedGovernanceContext = GovernanceContext & {
@@ -275,6 +345,9 @@ export function resolveGovernanceForRequest(governance: GovernanceContext, apiKe
 
 // @public
 export function revokeKey(keyId: string): boolean;
+
+// @public
+export type RuntimeLogger = Pick<Logger, 'error' | 'warn' | 'info'>;
 
 // @public
 export function saveKeyMetadata(keys: ApiKeyMetadata[]): void;

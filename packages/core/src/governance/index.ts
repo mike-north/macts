@@ -139,6 +139,8 @@ export {
   enforceCall,
   type RecordApprovalDecisionOptions,
   recordApprovalDecision,
+  recordApprovalCancellation,
+  type RecordApprovalCancellationOptions,
 } from './enforcement.js'
 
 // Human-in-the-loop approval provider interface (the seam macts owns for
@@ -165,6 +167,10 @@ export {
   type ApprovalOutcome,
   type SeekApprovalOptions,
   seekApproval,
+  seekApprovalUnlessCancelled,
+  isApprovalCancellation,
+  type ApprovalCancellation,
+  type SeekCancellableApprovalOptions,
 } from './approval.js'
 
 // Reference approval providers (tests and wiring verification only).

@@ -20,7 +20,13 @@ import type {
   ApprovalRequest,
   ApprovalRequestContext,
 } from './approval.js'
-import { DEFAULT_APPROVAL_TIMEOUT_MS, isApprovalState, seekApproval } from './approval.js'
+import {
+  DEFAULT_APPROVAL_TIMEOUT_MS,
+  isApprovalCancellation,
+  isApprovalState,
+  seekApproval,
+  seekApprovalUnlessCancelled,
+} from './approval.js'
 import { createStaticApprovalProvider } from './approval-providers.js'
 import { FIXED_TIMESTAMP, makeAppRule } from './policy-test-fixtures.js'
 
@@ -435,5 +441,82 @@ describe('createStaticApprovalProvider', () => {
     const outcome = await seekApproval({ provider, request: makeRequest() })
 
     expect(outcome.evidence).toBe('artifact')
+  })
+})
+
+describe('seekApprovalUnlessCancelled', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('ends the wait when the caller aborts, aborting the provider and clearing the timeout', async () => {
+    vi.useFakeTimers()
+    let providerSignal: AbortSignal | undefined
+    const provider = makeProvider(
+      (_request, ctx) =>
+        new Promise<ApprovalDecision>(() => {
+          providerSignal = ctx.signal
+        })
+    )
+    const controller = new AbortController()
+
+    const pending = seekApprovalUnlessCancelled({
+      provider,
+      request: makeRequest({ timeoutMs: 600_000 }),
+      signal: controller.signal,
+    })
+    await vi.advanceTimersByTimeAsync(1_000)
+    controller.abort()
+    const result = await pending
+
+    expect(isApprovalCancellation(result)).toBe(true)
+    if (!isApprovalCancellation(result)) return
+    expect(result.auditReason).toContain('calendar:events:create')
+    expect(result.auditReason).toContain('not executed')
+    expect(providerSignal?.aborted).toBe(true)
+    expect(vi.getTimerCount()).toBe(0)
+  })
+
+  it('never asks the provider when the caller has already aborted', async () => {
+    const decide = vi.fn(() => Promise.resolve<ApprovalDecision>({ state: 'approved' }))
+    const controller = new AbortController()
+    controller.abort()
+
+    const result = await seekApprovalUnlessCancelled({
+      provider: makeProvider(decide),
+      request: makeRequest(),
+      signal: controller.signal,
+    })
+
+    expect(isApprovalCancellation(result)).toBe(true)
+    expect(decide).not.toHaveBeenCalled()
+  })
+
+  it('returns the decision unchanged when the caller does not abort', async () => {
+    const result = await seekApprovalUnlessCancelled({
+      provider: makeProvider(() => Promise.resolve<ApprovalDecision>({ state: 'rejected' })),
+      request: makeRequest(),
+      signal: new AbortController().signal,
+    })
+
+    expect(isApprovalCancellation(result)).toBe(false)
+    if (isApprovalCancellation(result)) return
+    expect(result.approved).toBe(false)
+    expect(result.state).toBe('rejected')
+  })
+
+  it('still times out when the caller never aborts', async () => {
+    vi.useFakeTimers()
+    const pending = seekApprovalUnlessCancelled({
+      provider: makeProvider(() => new Promise<ApprovalDecision>(() => undefined)),
+      request: makeRequest({ timeoutMs: 1_000 }),
+      signal: new AbortController().signal,
+    })
+    await vi.advanceTimersByTimeAsync(1_000)
+    const result = await pending
+
+    expect(isApprovalCancellation(result)).toBe(false)
+    if (isApprovalCancellation(result)) return
+    expect(result.state).toBe('timeout')
   })
 })

@@ -21,12 +21,11 @@ import {
   classifyCommandRisk,
   CANONICAL_IDENTIFIER_KEY,
 } from '@macts/core'
-import { ALLOW_ALL_POLICY, type GovernanceContext } from '@macts/runtime'
+import { ALLOW_ALL_POLICY, buildSchemaRegistry, type GovernanceContext } from '@macts/runtime'
 import { requirePermission } from '../middleware/permission.js'
 import { requirePolicy } from '../middleware/governance.js'
 import type { AuthVariables } from '../middleware/auth.js'
 import { withSpan } from '../../telemetry.js'
-import { buildSchemaRegistry } from './validation.js'
 
 /**
  * RPC request body structure.
@@ -220,7 +219,7 @@ export function createRpcRouter(
  * `command.name`). Resource-scoped commands may generate multiple endpoints if
  * they apply to multiple resource types.
  */
-function getCommandEndpoints(
+export function getCommandEndpoints(
   commandKey: string,
   command: Command,
   manifest: AppManifest
@@ -244,7 +243,7 @@ function getCommandEndpoints(
 /**
  * Get all endpoints from a manifest.
  */
-function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
+export function getAllEndpoints(manifest: AppManifest): RpcEndpointInfo[] {
   return resolveManifestRoutes(manifest).map((r) => {
     const appSegment = normalizeAppRouteSegment(manifest.app.name)
     const permissionScope =

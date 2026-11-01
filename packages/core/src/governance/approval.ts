@@ -432,6 +432,46 @@ export interface SeekApprovalOptions {
 }
 
 /**
+ * Options for {@link seekApprovalUnlessCancelled}: a held call whose caller can
+ * abandon it while it waits.
+ */
+export interface SeekCancellableApprovalOptions extends SeekApprovalOptions {
+  /**
+   * The caller's abort signal. Aborting it before a decision stops the wait:
+   * the provider's own signal is aborted so it can retract its prompt, and the
+   * result is an {@link ApprovalCancellation} rather than a decision.
+   */
+  readonly signal: AbortSignal
+}
+
+/**
+ * The caller abandoned a held call before any decision was reached.
+ *
+ * This is not a decision. Nobody approved or rejected the call, and it must
+ * not run. Its audit record is `'cancelled'`, written with
+ * `recordApprovalCancellation`.
+ */
+export interface ApprovalCancellation {
+  /** Discriminant: the wait was abandoned by the caller. */
+  readonly cancelled: true
+  /** Operator-facing explanation for the audit trail. */
+  readonly auditReason: string
+}
+
+/**
+ * Whether a {@link seekApprovalUnlessCancelled} result is a cancellation rather
+ * than a decision.
+ *
+ * @param result - The result to classify.
+ * @returns True when the caller abandoned the held call.
+ */
+export function isApprovalCancellation(
+  result: ApprovalOutcome | ApprovalCancellation
+): result is ApprovalCancellation {
+  return 'cancelled' in result
+}
+
+/**
  * Ask a provider for a human decision, bounded by the request's `timeoutMs`,
  * and normalize the answer fail-closed.
  *
@@ -444,7 +484,55 @@ export interface SeekApprovalOptions {
  * @returns The normalized {@link ApprovalOutcome}. Never rejects.
  */
 export async function seekApproval(options: SeekApprovalOptions): Promise<ApprovalOutcome> {
-  const { provider, request } = options
+  const result = await seekBounded(options.provider, options.request, undefined)
+  // Without a signal nothing can cancel the wait; a cancellation here would be
+  // a defect, and it still denies.
+  if (isApprovalCancellation(result)) {
+    return {
+      approved: false,
+      state: 'rejected',
+      reason: `Approval for "${options.request.permission}" was not obtained. Treated as rejected (fail-closed).`,
+      auditReason: result.auditReason,
+    }
+  }
+  return result
+}
+
+/**
+ * Ask a provider for a human decision, as {@link seekApproval} does, while
+ * letting the caller abandon the wait.
+ *
+ * An abort before a decision resolves at once to an {@link ApprovalCancellation}
+ * instead of waiting out the approval timeout, and aborts the provider's signal
+ * so it can retract its prompt. A signal that is already aborted never reaches
+ * the provider. Every other outcome is exactly {@link seekApproval}'s.
+ *
+ * @param options - Provider, request, and the caller's abort signal.
+ * @returns The normalized decision, or the cancellation. Never rejects.
+ */
+export async function seekApprovalUnlessCancelled(
+  options: SeekCancellableApprovalOptions
+): Promise<ApprovalOutcome | ApprovalCancellation> {
+  return seekBounded(options.provider, options.request, options.signal)
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * The shared wait behind {@link seekApproval} and
+ * {@link seekApprovalUnlessCancelled}: bounded by the request's timeout and,
+ * when given, by the caller's signal.
+ */
+async function seekBounded(
+  provider: ApprovalProvider,
+  request: ApprovalRequest,
+  callerSignal: AbortSignal | undefined
+): Promise<ApprovalOutcome | ApprovalCancellation> {
+  if (callerSignal?.aborted === true) {
+    return cancellationOf(provider, request)
+  }
 
   // A non-positive or non-finite bound leaves no time for a human to answer.
   // Fail closed immediately rather than asking a provider we will not wait for.
@@ -457,6 +545,7 @@ export async function seekApproval(options: SeekApprovalOptions): Promise<Approv
 
   const controller = new AbortController()
   let timer: ReturnType<typeof setTimeout> | undefined
+  let onCallerAbort: (() => void) | undefined
 
   try {
     const timedOut = new Promise<ProviderResult>((resolve) => {
@@ -467,23 +556,45 @@ export async function seekApproval(options: SeekApprovalOptions): Promise<Approv
         resolve({ kind: 'timeout' })
       }, request.timeoutMs)
     })
+    const abandoned = new Promise<ProviderResult>((resolve) => {
+      if (callerSignal === undefined) return
+      onCallerAbort = () => {
+        controller.abort()
+        resolve({ kind: 'cancelled' })
+      }
+      callerSignal.addEventListener('abort', onCallerAbort, { once: true })
+    })
 
     const result = await Promise.race([
       invokeProvider(provider, request, controller.signal),
       timedOut,
+      abandoned,
     ])
 
+    if (result.kind === 'cancelled') {
+      return cancellationOf(provider, request)
+    }
     return normalizeProviderResult(provider, request, result)
   } finally {
     if (timer !== undefined) {
       clearTimeout(timer)
     }
+    if (onCallerAbort !== undefined) {
+      callerSignal?.removeEventListener('abort', onCallerAbort)
+    }
   }
 }
 
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
+/** The cancellation for a held call its caller abandoned. */
+function cancellationOf(
+  provider: ApprovalProvider,
+  request: ApprovalRequest
+): ApprovalCancellation {
+  return {
+    cancelled: true,
+    auditReason: `The caller cancelled the call to "${request.permission}" while it awaited approval from provider "${provider.name}". It was not executed.`,
+  }
+}
 
 /**
  * The raw shapes a provider invocation can produce, before normalization.
@@ -492,6 +603,7 @@ type ProviderResult =
   | { readonly kind: 'decision'; readonly decision: ApprovalDecision }
   | { readonly kind: 'failed'; readonly failure: ApprovalFailure; readonly detail: string }
   | { readonly kind: 'timeout' }
+  | { readonly kind: 'cancelled' }
 
 /**
  * Invoke a provider without letting it throw.
@@ -590,7 +702,7 @@ function isPolicySuggestion(value: unknown): value is ApprovalPolicySuggestion {
 function normalizeProviderResult(
   provider: ApprovalProvider,
   request: ApprovalRequest,
-  result: ProviderResult
+  result: Exclude<ProviderResult, { readonly kind: 'cancelled' }>
 ): ApprovalOutcome {
   if (result.kind === 'timeout') {
     const reason = `No approval decision for "${request.permission}" from provider "${provider.name}" within ${String(request.timeoutMs)}ms. Treated as rejected (fail-closed).`

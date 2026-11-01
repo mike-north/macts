@@ -333,6 +333,12 @@ export interface ApprovalApprovedOutcome extends ApprovalOutcomeBase {
 }
 
 // @public
+export interface ApprovalCancellation {
+    readonly auditReason: string;
+    readonly cancelled: true;
+}
+
+// @public
 export type ApprovalConfig = z.infer<typeof ApprovalConfigSchema>;
 
 // @public
@@ -459,7 +465,7 @@ export const AppRuleSchema: z.ZodObject<{
 }, z.core.$strict>;
 
 // @public
-export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected"];
+export const AUDIT_DECISIONS: readonly ["allowed", "denied", "pending", "approved", "rejected", "cancelled"];
 
 // @public
 export type AuditDecision = (typeof AUDIT_DECISIONS)[number];
@@ -1495,6 +1501,9 @@ export type InspectOutcome = {
 };
 
 // @public
+export function isApprovalCancellation(result: ApprovalOutcome | ApprovalCancellation): result is ApprovalCancellation;
+
+// @public
 export function isApprovalState(value: unknown): value is ApprovalState;
 
 // @public
@@ -2173,6 +2182,17 @@ export interface RawSuite {
 }
 
 // @public
+export function recordApprovalCancellation(options: RecordApprovalCancellationOptions): Promise<AuditDecision>;
+
+// @public
+export interface RecordApprovalCancellationOptions {
+    readonly audit: CallAuditContext;
+    readonly cancellation: ApprovalCancellation;
+    readonly permission: string;
+    readonly writer: AuditWriter;
+}
+
+// @public
 export function recordApprovalDecision(options: RecordApprovalDecisionOptions): Promise<AuditDecision>;
 
 // @public
@@ -2411,6 +2431,14 @@ export function seekApproval(options: SeekApprovalOptions): Promise<ApprovalOutc
 export interface SeekApprovalOptions {
     readonly provider: ApprovalProvider;
     readonly request: ApprovalRequest;
+}
+
+// @public
+export function seekApprovalUnlessCancelled(options: SeekCancellableApprovalOptions): Promise<ApprovalOutcome | ApprovalCancellation>;
+
+// @public
+export interface SeekCancellableApprovalOptions extends SeekApprovalOptions {
+    readonly signal: AbortSignal;
 }
 
 // @public
