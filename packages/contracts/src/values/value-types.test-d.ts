@@ -148,27 +148,24 @@ declare const registry: () => ReferenceRegistry
 interface Note {
   readonly title: string
 }
-expectType<ValueType<ObjectReferenceVariant<unknown, unknown>>>(
-  t.reference(registry, 'note', 'one')
-)
-expectType<ValueType<CollectionReferenceVariant<unknown, unknown>>>(
-  t.reference(registry, 'note', 'many')
-)
+expectType<ValueType<ObjectReferenceVariant<unknown>>>(t.reference(registry, 'note', 'one'))
+expectType<ValueType<CollectionReferenceVariant<unknown>>>(t.reference(registry, 'note', 'many'))
 const noteRef = t.reference<Note, string>(registry, 'note', 'one')
-expectType<ValueType<ObjectReferenceVariant<Note>>>(noteRef)
-expectType<ValueType<CollectionReferenceVariant<Note>>>(
+expectType<ValueType<ObjectReferenceVariant<Note, string>>>(noteRef)
+expectType<ValueType<CollectionReferenceVariant<Note, string>>>(
   t.reference<Note, string>(registry, 'note', 'many', { description: 'Notes.' })
 )
-expectNotAssignable<ValueType<CollectionReferenceVariant<Note>>>(noteRef)
+expectNotAssignable<ValueType<CollectionReferenceVariant<Note, string>>>(noteRef)
 
 // A materialized reference list is an array of single references, and records
 // compose reference fields.
-expectType<ValueType<readonly ObjectReferenceVariant<Note>[]>>(t.array(noteRef))
+expectType<ValueType<readonly ObjectReferenceVariant<Note, string>[]>>(t.array(noteRef))
 const folder = t.record({ name: t.string(), pinned: t.optional(t.nullable(noteRef)) })
 expectAssignable<ValueType<unknown>>(folder)
-expectType<{ readonly name: string; readonly pinned?: ObjectReferenceVariant<Note> | null }>(
-  null as unknown as InferSdk<typeof folder>
-)
+expectType<{
+  readonly name: string
+  readonly pinned?: ObjectReferenceVariant<Note, string> | null
+}>(null as unknown as InferSdk<typeof folder>)
 
 // Negative: a cardinality must be a literal; the registry is a thunk, not a table.
 expectNotAssignable<Parameters<typeof t.reference>[2]>('some')

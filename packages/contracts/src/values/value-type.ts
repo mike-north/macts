@@ -60,7 +60,7 @@ export interface DecodeContext {
    */
   bindReference(
     reference: ReferenceData
-  ): ObjectReferenceVariant<unknown, unknown> | CollectionReferenceVariant<unknown, unknown>
+  ): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>
   /**
    * Produce a file value bound to the decoding client from its decoded data.
    *

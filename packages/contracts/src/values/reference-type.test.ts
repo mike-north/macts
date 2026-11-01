@@ -256,7 +256,7 @@ describe('binding', () => {
 describe('encoding', () => {
   const type = t.reference(registry, 'folder', 'one')
 
-  it('never calls resolve or any other live member, and ignores non-data properties', () => {
+  it('never calls resolve or any other live member, and ignores function members', () => {
     const reference = {
       resource: 'folder',
       form: 'identity',
@@ -414,6 +414,143 @@ describe('encoding', () => {
     ],
   ] as const)('rejects %s', (_label, value, issues) => {
     expectEncodeIssues(type, value, [...issues])
+  })
+})
+
+describe('the declared-fields rule', () => {
+  const note = t.reference(registry, 'note', 'one')
+  const notes = t.reference(registry, 'note', 'many')
+  const identity = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
+  const wireIdentity = { reference: identity }
+
+  it('encodes a class instance by its declared fields, ignoring prototype members and private state', () => {
+    class BoundNote {
+      readonly resource = 'note'
+      readonly form = 'identity'
+      readonly cardinality = 'one'
+      readonly #id: string
+      readonly #session: string
+      constructor(id: string, session: string) {
+        this.#id = id
+        this.#session = session
+      }
+      get id(): string {
+        return this.#id
+      }
+      resolve(): Promise<string> {
+        return Promise.resolve(this.#session)
+      }
+    }
+    const bound = new BoundNote('N1', 'session-secret')
+    expect(valueOf(note.encode(bound))).toEqual(wireIdentity)
+    expect(note.sdk.safeParse(bound).success).toBe(true)
+  })
+
+  it('accepts own function members and ignores non-enumerable properties', () => {
+    const bound = { ...identity, resolve: VECTOR_RESOLVE }
+    Object.defineProperty(bound, 'session', { value: 'session-secret', enumerable: false })
+    expect(valueOf(note.encode(bound))).toEqual(wireIdentity)
+    expect(note.sdk.safeParse(bound).success).toBe(true)
+  })
+
+  it('rejects an own data property the form does not declare, in the SDK schema too', () => {
+    const tagged = { ...identity, revision: 'r1' }
+    expectEncodeIssues(note, tagged, [{ path: ['revision'], code: 'unknown-field' }])
+    expect(note.sdk.safeParse(tagged).success).toBe(false)
+  })
+
+  it('names the fields of the form for an unknown key, in both directions', () => {
+    const expected =
+      '"contianer" is not a field of an identity reference (its fields are "resource", "form", ' +
+      '"cardinality", "id", "container").'
+    expect(messagesOf(note.encode({ ...identity, contianer: identity }))).toBe(expected)
+    expect(
+      messagesOf(
+        note.decode({ reference: { ...identity, contianer: identity } }, VECTOR_DECODE_CONTEXT)
+      )
+    ).toBe(expected)
+  })
+
+  it.each([
+    [
+      'an identity reference with a selector',
+      note,
+      { ...identity, selector: { by: 'every' } },
+      'An identity reference has no "selector": it denotes its object by its id, and a selector ' +
+        'belongs to the selector form.',
+    ],
+    [
+      'a selector reference with an id',
+      note,
+      {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Inbox' },
+        id: 'N1',
+      },
+      'A selector reference has no "id": it denotes its object by its selector, and an id ' +
+        'belongs to the identity form.',
+    ],
+    [
+      'an identity collection with a container',
+      notes,
+      { resource: 'note', form: 'identity', cardinality: 'many', entries: [], container: identity },
+      'An identity collection has no "container": each entry carries its own container.',
+    ],
+    [
+      'a name selector with an index',
+      note,
+      {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Inbox', index: 0 },
+      },
+      'A "name" selector has no "index": it selects by name, not by position.',
+    ],
+  ] as const)('explains %s by the form it belongs to', (_label, type, value, message) => {
+    expect(messagesOf(type.encode(value))).toBe(message)
+  })
+
+  it('gives the same explanation when decoding', () => {
+    expect(
+      messagesOf(
+        note.decode(
+          { reference: { ...identity, selector: { by: 'name', name: 'Inbox' } } },
+          VECTOR_DECODE_CONTEXT
+        )
+      )
+    ).toBe(
+      'An identity reference has no "selector": it denotes its object by its id, and a selector ' +
+        'belongs to the selector form.'
+    )
+  })
+
+  it('applies to nested containers and identity collection entries', () => {
+    expectEncodeIssues(
+      note,
+      { ...identity, container: { ...identity, resource: 'account', revision: 'r1' } },
+      [{ path: ['container', 'revision'], code: 'unknown-field' }]
+    )
+    expectEncodeIssues(
+      notes,
+      {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [identity, { ...identity, revision: 'r1' }],
+      },
+      [{ path: ['entries', 1, 'revision'], code: 'unknown-field' }]
+    )
+  })
+
+  it('still rejects undeclared keys whose value is a function when decoding', () => {
+    // Wire values are JSON; a function is never wire data, so decode does not
+    // carve out function members the way encode does.
+    expectDecodeIssues(note, { reference: { ...identity, resolve: VECTOR_RESOLVE } }, [
+      { path: ['resolve'], code: 'unknown-field' },
+    ])
   })
 })
 
@@ -695,6 +832,133 @@ describe('schemas', () => {
     expect(Object.isFrozen(note)).toBe(true)
     expect(Object.isFrozen(note.plan)).toBe(true)
     expect(JSON.parse(JSON.stringify(note.plan))).toEqual(note.plan)
+  })
+})
+
+describe('resources without an identifier', () => {
+  const table: ReferenceRegistry = { note: { id: t.string() }, paragraph: {} }
+  const resources = (): ReferenceRegistry => table
+  /** A table in which no resource has an identifier. */
+  const unidentified = (): ReferenceRegistry => ({ paragraph: {}, word: {} })
+
+  /** The `reference` payload schema of a derived draft-7 JSON Schema. */
+  const payloadSchema = (type: ValueType<unknown>): Record<string, unknown> => {
+    const schema = z.toJSONSchema(type.wire, { target: 'draft-7' }) as Record<string, unknown>
+    const properties = schema['properties'] as Record<string, Record<string, unknown>>
+    const payload = properties['reference']
+    if (payload === undefined) throw new Error('expected a reference property')
+    return payload
+  }
+
+  it('explains that only selectors can reference them', () => {
+    const result = t
+      .reference(resources, 'paragraph', 'one')
+      .encode({ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' })
+    expect(issuesOf(result)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      '"paragraph" has no identifier, so it can be referenced only by a selector ' +
+        '(name, index, every, or range).'
+    )
+  })
+
+  it.each(['one', 'many'] as const)(
+    'derive a %s wire JSON Schema with only the selector form',
+    (cardinality) => {
+      const payload = payloadSchema(
+        cardinality === 'one'
+          ? t.reference(resources, 'paragraph', 'one')
+          : t.reference(resources, 'paragraph', 'many')
+      )
+      // No union: the identity branch is omitted, and the selector branch remains.
+      expect(payload['anyOf']).toBeUndefined()
+      expect(payload['type']).toBe('object')
+      expect((payload['properties'] as Record<string, unknown>)['form']).toEqual({
+        type: 'string',
+        const: 'selector',
+      })
+      expect((payload['properties'] as Record<string, unknown>)['cardinality']).toEqual({
+        type: 'string',
+        const: cardinality,
+      })
+    }
+  )
+
+  it('omit identity branches from the container union on the wire and in the SDK schema', () => {
+    const notes = t.reference(resources, 'note', 'many')
+    const inParagraph = (container: Record<string, unknown>) => ({
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container,
+    })
+    const selected = {
+      resource: 'paragraph',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: { integer: '0' } },
+    }
+    const identified = { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }
+    expect(notes.wire.safeParse({ reference: inParagraph(selected) }).success).toBe(true)
+    expect(notes.wire.safeParse({ reference: inParagraph(identified) }).success).toBe(false)
+    expect(
+      notes.sdk.safeParse(inParagraph({ ...selected, selector: { by: 'index', index: 0 } })).success
+    ).toBe(true)
+    expect(notes.sdk.safeParse(inParagraph(identified)).success).toBe(false)
+  })
+
+  it('work when no resource in the table has an identifier', () => {
+    const paragraphs = t.reference(unidentified, 'paragraph', 'many')
+    const words = t.reference(unidentified, 'word', 'one')
+    const word = {
+      resource: 'word',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'macts' },
+      container: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: 1 },
+      },
+    }
+    expect(valueOf(words.encode(word))).toEqual({
+      reference: {
+        ...word,
+        container: { ...word.container, selector: { by: 'index', index: { integer: '1' } } },
+      },
+    })
+    expectEncodeIssues(
+      words,
+      {
+        ...word,
+        container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P' },
+      },
+      [{ path: ['container'], code: 'unsupported' }]
+    )
+    expectEncodeIssues(
+      paragraphs,
+      { resource: 'paragraph', form: 'identity', cardinality: 'many', entries: [] },
+      [{ path: [], code: 'unsupported' }]
+    )
+    for (const type of [paragraphs, words]) {
+      expect(() => z.toJSONSchema(type.wire, { target: 'draft-7' })).not.toThrow()
+    }
+    expect(
+      paragraphs.wire.safeParse({
+        reference: {
+          resource: 'paragraph',
+          form: 'selector',
+          cardinality: 'many',
+          selector: { by: 'every' },
+        },
+      }).success
+    ).toBe(true)
+    expect(
+      paragraphs.wire.safeParse({
+        reference: { resource: 'paragraph', form: 'identity', cardinality: 'many', entries: [] },
+      }).success
+    ).toBe(false)
   })
 })
 

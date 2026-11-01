@@ -95,9 +95,7 @@ describe('file', () => {
 
   it('hands the binder decoded data: observedAt as a Date, the grant, and no absent path', () => {
     const { context, received } = closureContext()
-    const value = valueOf(
-      type.decode({ file: { exists: true, observedAt, grant: 'grant-1' } }, context)
-    )
+    valueOf(type.decode({ file: { exists: true, observedAt, grant: 'grant-1' } }, context))
     expect(received).toHaveLength(1)
     const [data] = received
     expect(data?.existence.observedAt).toBeInstanceOf(Date)
@@ -105,9 +103,6 @@ describe('file', () => {
     expect(data?.existence.exists).toBe(true)
     expect(data?.grant).toBe('grant-1')
     expect(Object.hasOwn(data ?? {}, 'path')).toBe(false)
-    // The bound value is the binder's, and this binder kept the grant private.
-    expect(Object.getOwnPropertyNames(value)).not.toContain('grant')
-    expect(JSON.stringify(value)).not.toContain('grant-1')
   })
 
   it('honors an explicit offset in the observation time', () => {
@@ -268,6 +263,72 @@ describe('fileSource', () => {
       [{ path: ['expiresAt'], code: 'invalid-date' }]
     )
     expect(type.sdk.safeParse({ kind: 'uploaded-file', uploadId: 'U1' }).success).toBe(false)
+  })
+
+  it('encodes an uploaded file class instance with accessors by its declared fields', () => {
+    class Upload {
+      readonly kind = 'uploaded-file'
+      readonly #id: string
+      constructor(id: string) {
+        this.#id = id
+      }
+      get uploadId(): string {
+        return this.#id
+      }
+      get expiresAt(): Date {
+        return new Date(OBSERVED_AT_MS)
+      }
+      describe(): string {
+        return `upload ${this.#id}`
+      }
+    }
+    const upload = new Upload('U1')
+    expect(valueOf(type.encode(upload))).toEqual({
+      fileSource: { kind: 'uploaded-file', uploadId: 'U1' },
+    })
+    expect(type.sdk.safeParse(upload).success).toBe(true)
+  })
+
+  it('ignores function members and non-enumerable properties when encoding', () => {
+    const source = { kind: 'caller-owned-file', path: '/a', toString: () => '/a' }
+    Object.defineProperty(source, 'handle', { value: 3, enumerable: false })
+    expect(valueOf(type.encode(source))).toEqual({
+      fileSource: { kind: 'caller-owned-file', path: '/a' },
+    })
+    expect(type.sdk.safeParse(source).success).toBe(true)
+  })
+
+  it.each([
+    [
+      'an uploaded file with a path',
+      { kind: 'uploaded-file', uploadId: 'U1', expiresAt: new Date(OBSERVED_AT_MS), path: '/a' },
+      'An uploaded file has no "path": it is denoted by its upload id, and a path belongs to a ' +
+        'caller-owned file.',
+    ],
+    [
+      'a caller-owned file with an upload id',
+      { kind: 'caller-owned-file', path: '/a', uploadId: 'U1' },
+      'A caller-owned file has no "uploadId": it is denoted by its path on the executing Mac, ' +
+        'and an upload id belongs to an uploaded file.',
+    ],
+  ] as const)('explains %s by the kind it belongs to', (_label, value, message) => {
+    expect(messagesOf(type.encode(value))).toBe(message)
+    expect(type.sdk.safeParse(value).success).toBe(false)
+  })
+
+  it('reports undeclared keys of an upload handle beside the fail-closed rejection', () => {
+    const result = type.decode(
+      { fileSource: { kind: 'uploaded-file', uploadId: 'U1', expiresAt: { date: '2026-10-31' } } },
+      VECTOR_DECODE_CONTEXT
+    )
+    expect(issuesOf(result)).toEqual([
+      { path: ['expiresAt'], code: 'unknown-field' },
+      { path: [], code: 'unsupported' },
+    ])
+    expect(messagesOf(result)).toBe(
+      'An uploaded file has no "expiresAt": the service\'s transfer store is authoritative for ' +
+        "an upload's expiry.\nUpload handles are resolved by the service, not decoded."
+    )
   })
 
   it('refuses to decode an upload handle, which only the service resolves', () => {

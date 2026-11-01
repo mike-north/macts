@@ -126,7 +126,7 @@ export interface CollectionReference<T> extends Resolvable<readonly T[]> {
 export type CollectionReferenceData = IdentityCollectionReferenceData | SelectorCollectionReferenceData;
 
 // @public
-export type CollectionReferenceVariant<T, Id = string> = IdentityCollectionReference<T, Id> | SelectorCollectionReference<T>;
+export type CollectionReferenceVariant<T, Id = unknown> = IdentityCollectionReference<T, Id> | SelectorCollectionReference<T>;
 
 // @public
 export type CollectionSelector = EverySelector | RangeSelector;
@@ -149,7 +149,7 @@ export interface Credential {
 // @public
 export interface DecodeContext {
     bindFile(file: FileData): FileValue;
-    bindReference(reference: ReferenceData): ObjectReferenceVariant<unknown, unknown> | CollectionReferenceVariant<unknown, unknown>;
+    bindReference(reference: ReferenceData): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>;
 }
 
 // @public
@@ -317,7 +317,7 @@ export interface FromWireErrorOptions {
 }
 
 // @public
-export interface IdentityCollectionReference<T, Id = string> extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
+export interface IdentityCollectionReference<T, Id = unknown> extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
     readonly entries: readonly IdentityReference<T, Id>[];
     readonly form: 'identity';
 }
@@ -331,8 +331,8 @@ export interface IdentityCollectionReferenceData<Id = unknown> {
 }
 
 // @public
-export interface IdentityReference<T, Id = string> extends IdentityReferenceData<Id>, ObjectReference<T> {
-    readonly container?: ObjectReferenceVariant<unknown, unknown>;
+export interface IdentityReference<T, Id = unknown> extends IdentityReferenceData<Id>, ObjectReference<T> {
+    readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'identity';
 }
 
@@ -477,7 +477,7 @@ export interface ObjectReference<T> extends Resolvable<T> {
 export type ObjectReferenceData = IdentityReferenceData | SelectorReferenceData;
 
 // @public
-export type ObjectReferenceVariant<T, Id = string> = IdentityReference<T, Id> | SelectorReference<T>;
+export type ObjectReferenceVariant<T, Id = unknown> = IdentityReference<T, Id> | SelectorReference<T>;
 
 // @public
 export type ObjectSelector = NameSelector | IndexSelector;
@@ -624,7 +624,7 @@ export type ReferenceList<R extends ObjectReference<unknown>> = readonly R[];
 
 // @public
 export type ReferenceRegistry = Readonly<Record<string, {
-    readonly id: ValueType<unknown>;
+    readonly id?: ValueType<unknown>;
 }>>;
 
 // @public
@@ -661,7 +661,7 @@ export interface Resolvable<Result> {
 // @public
 export interface ResourceDescriptor<RecordType, Id = unknown> {
     readonly get?: OperationId;
-    readonly id: ValueType<Id>;
+    readonly id?: ValueType<Id>;
     readonly list?: OperationId;
     readonly name: string;
     readonly record: ValueType<RecordType>;
@@ -701,7 +701,7 @@ export interface RgbHelpers {
 
 // @public
 export interface SelectorCollectionReference<T> extends SelectorCollectionReferenceData, CollectionReference<T> {
-    readonly container?: ObjectReferenceVariant<unknown, unknown>;
+    readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
 }
 
@@ -716,7 +716,7 @@ export interface SelectorCollectionReferenceData {
 
 // @public
 export interface SelectorReference<T> extends SelectorReferenceData, ObjectReference<T> {
-    readonly container?: ObjectReferenceVariant<unknown, unknown>;
+    readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
 }
 

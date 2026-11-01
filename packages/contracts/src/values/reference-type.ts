@@ -13,16 +13,22 @@
  * while a folder record holds note references. Constructing a reference value
  * type never calls the thunk; encoding, decoding, and schema use do.
  *
- * Encoding reads only a reference's data fields (`resource`, `form`,
- * `cardinality`, and `id`, `selector`, `entries`, or `container`) and ignores
- * every other property, so a bound reference and a plain data descriptor
- * encode alike and `resolve` is never called. Decoding validates the strict
- * wire form, rejecting unknown keys, and hands the decoded
+ * Encoding reads only the declared data fields of the reference's variant
+ * (`resource`, `form`, `cardinality`, and `id`, `selector`, `entries`, or
+ * `container`), following the strictness rule of `declared-fields`: function
+ * members, prototype members, and private or non-enumerable state are
+ * ignored, so a bound reference and a plain data descriptor encode alike and
+ * `resolve` is never called, while any other own data property is rejected.
+ * Decoding validates the strict wire form, rejecting unknown keys, and hands
+ * the decoded
  * {@link ReferenceData} to `DecodeContext.bindReference`. Both directions
  * apply the same rules through one walker, so they cannot disagree:
  *
  * - `resource` and `cardinality` equal the declared ones, and every resource
  *   named (at the top level or in a container) is in the table;
+ * - an identity form (a single reference, an identity-collection entry, or an
+ *   identity container) names a resource that has an identifier; a resource
+ *   without one can be referenced only by selector forms;
  * - identity-collection entries are single identity references to the
  *   collection's resource;
  * - selector positions are non-negative integers, and a range has
@@ -62,9 +68,15 @@ import {
   type Issues,
 } from './codec.js'
 import { INTEGER_LIMITS, type Integer } from './integer.js'
-import { describeReceived, formatNumber, issue, isPlainObject, quote } from './issue-helpers.js'
+import {
+  declaredFields,
+  openSdkObject,
+  openWireObject,
+  type FieldReader,
+} from './declared-fields.js'
+import { describeReceived, formatNumber, issue, quote } from './issue-helpers.js'
 import { integerCodec } from './leaf-codecs.js'
-import { integerSdkSchema } from './sdk-schemas.js'
+import { integerSdkSchema, sdkObject } from './sdk-schemas.js'
 import type { DecodeContext, ValueType } from './value-type.js'
 import type { ValueTypeOptions } from './value-types.js'
 import { wireIntegerSchema } from './wire-checks.js'
@@ -74,9 +86,7 @@ import type { WireValue } from './wire.js'
 export type ReferenceRegistryThunk = () => ReferenceRegistry
 
 /** What a reference position holds once bound, before the contract fixes `T` and `Id`. */
-type BoundReference =
-  | ObjectReferenceVariant<unknown, unknown>
-  | CollectionReferenceVariant<unknown, unknown>
+type BoundReference = ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>
 
 /*
  * Reference shapes, generic over the representation of identifiers and
@@ -85,7 +95,8 @@ type BoundReference =
  * (`Shape<unknown, Integer>`, which is exactly `ReferenceData`). The structure
  * is the same in both directions; only the leaves differ.
  */
-/* eslint-disable @typescript-eslint/consistent-type-definitions -- type aliases, so the wire instantiation is assignable to `WireValue` */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- type aliases, so the wire
+   instantiation is assignable to `WireValue` */
 type ObjectSelectorShape<Position> =
   | { readonly by: 'name'; readonly name: string }
   | { readonly by: 'index'; readonly index: Position }
@@ -124,16 +135,8 @@ type CollectionShape<Id, Position> =
 type Shape<Id, Position> = ObjectShape<Id, Position> | CollectionShape<Id, Position>
 /* eslint-enable @typescript-eslint/consistent-type-definitions */
 
-/** The fields of an object being read, by key. */
-interface Source {
-  /** The value of `key`, or `undefined` when it is absent. */
-  read(key: string): unknown
-  /**
-   * Report every key outside `allowed` as an unknown field, when the
-   * direction rejects unknown keys. Returns whether any was reported.
-   */
-  rejectUnknown(allowed: readonly string[], path: IssuePath, issues: Issues): boolean
-}
+/** The fields of an object being read; see `declared-fields`. */
+type Source = FieldReader
 
 /** A converted selector position: its numeric value, for ordering, and its converted form. */
 interface Position<Converted> {
@@ -156,20 +159,14 @@ interface Direction<Id, Pos> {
 /** Selector positions: zero-based, non-negative integers. */
 const POSITION_CODEC = integerCodec(0, INTEGER_LIMITS.max)
 
-/** Encoding: read the data fields of any object, ignoring every other property. */
+/**
+ * Encoding: read the declared fields of any object by property access,
+ * ignoring functions and non-own or non-enumerable properties, and rejecting
+ * other own data properties.
+ */
 const ENCODING: Direction<WireValue, WireValue> = {
-  open(value, path, issues, expected) {
-    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-      return mismatch(value, path, issues, expected)
-    }
-    const source: object = value
-    return {
-      // Data fields may be accessors on a bound reference's prototype, so they
-      // are read as properties rather than as own data.
-      read: (key): unknown => Reflect.get(source, key),
-      rejectUnknown: () => false,
-    }
-  },
+  open: (value, path, issues, expected) =>
+    openSdkObject(value) ?? mismatch(value, path, issues, expected),
   id: (type, value, path, issues) => codecOf(type).encode(value, path, issues),
   position(value, path, issues) {
     const wire = POSITION_CODEC.encode(value, path, issues)
@@ -183,31 +180,8 @@ const ENCODING: Direction<WireValue, WireValue> = {
 /** Decoding: read a strict JSON object, rejecting keys the wire form does not declare. */
 function decoding(context: DecodeContext): Direction<unknown, Integer> {
   return {
-    open(value, path, issues, expected) {
-      if (!isPlainObject(value)) return mismatch(value, path, issues, expected)
-      const source = value
-      return {
-        // JSON cannot carry `undefined`, so an absent key and an own
-        // `undefined` (possible only in-process) both read as absent.
-        read: (key) => (Object.hasOwn(source, key) ? source[key] : undefined),
-        rejectUnknown(allowed, path, issues) {
-          let found = false
-          for (const key of Object.keys(source)) {
-            if (allowed.includes(key)) continue
-            found = true
-            issues.push(
-              issue(
-                [...path, key],
-                'unknown-field',
-                `${quote(key)} is not a field of this reference wire form (its fields are ` +
-                  `${allowed.map(quote).join(', ')}).`
-              )
-            )
-          }
-          return found
-        },
-      }
-    },
+    open: (value, path, issues, expected) =>
+      openWireObject(value) ?? mismatch(value, path, issues, expected),
     id: (type, value, path, issues) => codecOf(type).decode(value, path, context, issues),
     position(value, path, issues) {
       const integer = POSITION_CODEC.decode(value, path, context, issues)
@@ -235,16 +209,85 @@ interface Walk<Id, Pos> {
   readonly direction: Direction<Id, Pos>
 }
 
-/** A reference whose resource, form, and cardinality have been checked. */
-interface Header {
-  readonly source: Source
-  readonly resource: string
-  readonly form: ReferenceForm
-  /** The identifier value type of `resource`. */
-  readonly idType: ValueType<unknown>
-}
+/**
+ * A reference whose resource, form, and cardinality have been checked. An
+ * identity-form header always carries its resource's identifier value type:
+ * an identity reference to a resource without one is rejected while reading
+ * the header.
+ */
+type Header =
+  | {
+      readonly source: Source
+      readonly resource: string
+      readonly form: 'identity'
+      /** The identifier value type of `resource`. */
+      readonly idType: ValueType<unknown>
+    }
+  | { readonly source: Source; readonly resource: string; readonly form: 'selector' }
 
-const OBJECT_FIELDS = Object.freeze(['resource', 'form', 'cardinality'] as const)
+/** A header for an identity-form reference. */
+type IdentityHeader = Extract<Header, { readonly form: 'identity' }>
+
+const HEADER_FIELDS = ['resource', 'form', 'cardinality']
+const ENTRIES_BELONG = 'entries belong to an identity collection (cardinality "many")'
+
+/* The declared fields of each reference variant, in SDK and wire form alike. */
+const IDENTITY_FIELDS = declaredFields(
+  'an identity reference',
+  [...HEADER_FIELDS, 'id', 'container'],
+  {
+    selector: 'it denotes its object by its id, and a selector belongs to the selector form',
+    entries: ENTRIES_BELONG,
+  }
+)
+const SELECTOR_FIELDS = declaredFields(
+  'a selector reference',
+  [...HEADER_FIELDS, 'selector', 'container'],
+  {
+    id: 'it denotes its object by its selector, and an id belongs to the identity form',
+    entries: ENTRIES_BELONG,
+  }
+)
+const IDENTITY_COLLECTION_FIELDS = declaredFields(
+  'an identity collection',
+  [...HEADER_FIELDS, 'entries'],
+  {
+    selector: 'its members are its entries, and a selector belongs to the selector form',
+    container: 'each entry carries its own container',
+    id: 'each entry carries its own id',
+  }
+)
+const SELECTOR_COLLECTION_FIELDS = declaredFields(
+  'a selector collection',
+  [...HEADER_FIELDS, 'selector', 'container'],
+  {
+    id: 'its members are selected by its selector, and an id belongs to the identity form',
+    entries: 'its members are selected by its selector, and entries belong to the identity form',
+  }
+)
+
+/* The declared fields of each selection form. */
+const BY_POSITION = 'it selects by position'
+const NAME_SELECTOR_FIELDS = declaredFields('a "name" selector', ['by', 'name'], {
+  index: 'it selects by name, not by position',
+  start: 'it selects by name, not by position',
+  end: 'it selects by name, not by position',
+})
+const INDEX_SELECTOR_FIELDS = declaredFields('an "index" selector', ['by', 'index'], {
+  name: `${BY_POSITION}, not by name`,
+  start: 'a single position is its index, and a range selects a collection',
+  end: 'a single position is its index, and a range selects a collection',
+})
+const EVERY_SELECTOR_FIELDS = declaredFields('an "every" selector', ['by'], {
+  name: 'it selects every object',
+  index: 'it selects every object',
+  start: 'it selects every object; a range selects some of them',
+  end: 'it selects every object; a range selects some of them',
+})
+const RANGE_SELECTOR_FIELDS = declaredFields('a "range" selector', ['by', 'start', 'end'], {
+  name: `${BY_POSITION}, not by name`,
+  index: 'its positions are its start and end',
+})
 
 function readHeader<Id, Pos>(
   value: unknown,
@@ -317,6 +360,18 @@ function readHeader<Id, Pos>(
     )
     return INVALID
   }
+  if (form === 'selector') return { source, resource, form }
+  if (entry.id === undefined) {
+    issues.push(
+      issue(
+        path,
+        'unsupported',
+        `${quote(resource)} has no identifier, so it can be referenced only by a selector ` +
+          '(name, index, every, or range).'
+      )
+    )
+    return INVALID
+  }
   return { source, resource, form, idType: entry.id }
 }
 
@@ -369,7 +424,7 @@ function convertObject<Id, Pos>(
 }
 
 function identityBody<Id, Pos>(
-  header: Header,
+  header: IdentityHeader,
   path: IssuePath,
   walk: Walk<Id, Pos>,
   issues: Issues
@@ -381,14 +436,14 @@ function identityBody<Id, Pos>(
       ? fieldMismatch(raw, [...path, 'id'], issues, 'the object identifier')
       : walk.direction.id(header.idType, raw, [...path, 'id'], issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown([...OBJECT_FIELDS, 'id', 'container'], path, issues)
+  const unknown = source.rejectUnknown(IDENTITY_FIELDS, path, issues)
   if (id === INVALID || container === INVALID || unknown) return INVALID
   const base = { resource, form: 'identity', cardinality: 'one', id } as const
   return container === undefined ? base : { ...base, container }
 }
 
 function selectorBody<Id, Pos>(
-  header: Header,
+  header: Extract<Header, { readonly form: 'selector' }>,
   path: IssuePath,
   walk: Walk<Id, Pos>,
   issues: Issues
@@ -396,7 +451,7 @@ function selectorBody<Id, Pos>(
   const { source, resource } = header
   const selector = objectSelector(source.read('selector'), [...path, 'selector'], walk, issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown([...OBJECT_FIELDS, 'selector', 'container'], path, issues)
+  const unknown = source.rejectUnknown(SELECTOR_FIELDS, path, issues)
   if (selector === INVALID || container === INVALID || unknown) return INVALID
   const base = { resource, form: 'selector', cardinality: 'one', selector } as const
   return container === undefined ? base : { ...base, container }
@@ -422,14 +477,14 @@ function convertCollection<Id, Pos>(
       walk,
       issues
     )
-    const unknown = source.rejectUnknown([...OBJECT_FIELDS, 'entries'], path, issues)
+    const unknown = source.rejectUnknown(IDENTITY_COLLECTION_FIELDS, path, issues)
     if (entries === INVALID || unknown) return INVALID
     return { resource, form: 'identity', cardinality: 'many', entries }
   }
 
   const selector = collectionSelector(source.read('selector'), [...path, 'selector'], walk, issues)
   const container = readContainer(source, path, walk, issues)
-  const unknown = source.rejectUnknown([...OBJECT_FIELDS, 'selector', 'container'], path, issues)
+  const unknown = source.rejectUnknown(SELECTOR_COLLECTION_FIELDS, path, issues)
   if (selector === INVALID || container === INVALID || unknown) return INVALID
   const base = { resource, form: 'selector', cardinality: 'many', selector } as const
   return container === undefined ? base : { ...base, container }
@@ -470,7 +525,11 @@ function readEntries<Id, Pos>(
   for (const [index, item] of items.entries()) {
     const entryPath = [...path, index]
     const header = readHeader(item, entryPath, want, walk, issues)
-    const entry = header === INVALID ? INVALID : identityBody(header, entryPath, walk, issues)
+    // `want.form` is identity, so a valid header is always an identity header.
+    const entry =
+      header === INVALID || header.form !== 'identity'
+        ? INVALID
+        : identityBody(header, entryPath, walk, issues)
     if (entry === INVALID) valid = false
     else entries.push(entry)
   }
@@ -495,7 +554,7 @@ function objectSelector<Id, Pos>(
   switch (by) {
     case 'name': {
       const name = source.read('name')
-      const unknown = source.rejectUnknown(['by', 'name'], path, issues)
+      const unknown = source.rejectUnknown(NAME_SELECTOR_FIELDS, path, issues)
       if (typeof name !== 'string') {
         return fieldMismatch(name, [...path, 'name'], issues, 'the name to match (a string)')
       }
@@ -503,7 +562,7 @@ function objectSelector<Id, Pos>(
     }
     case 'index': {
       const index = readPosition(source, 'index', path, walk, issues)
-      const unknown = source.rejectUnknown(['by', 'index'], path, issues)
+      const unknown = source.rejectUnknown(INDEX_SELECTOR_FIELDS, path, issues)
       return index === INVALID || unknown ? INVALID : { by, index: index.converted }
     }
     default:
@@ -528,11 +587,11 @@ function collectionSelector<Id, Pos>(
   const by = source.read('by')
   switch (by) {
     case 'every':
-      return source.rejectUnknown(['by'], path, issues) ? INVALID : { by }
+      return source.rejectUnknown(EVERY_SELECTOR_FIELDS, path, issues) ? INVALID : { by }
     case 'range': {
       const start = readPosition(source, 'start', path, walk, issues)
       const end = readPosition(source, 'end', path, walk, issues)
-      const unknown = source.rejectUnknown(['by', 'start', 'end'], path, issues)
+      const unknown = source.rejectUnknown(RANGE_SELECTOR_FIELDS, path, issues)
       if (start === INVALID || end === INVALID) return INVALID
       if (start.value > end.value) {
         issues.push(
@@ -654,14 +713,19 @@ function wireSelector(
   })
 }
 
-/** Wire schema of a container: a single-object reference to any resource in the table. */
+/**
+ * Wire schema of a container: a single-object reference to any resource in
+ * the table. Identity branches exist only for resources with an identifier;
+ * the selector branch admits every resource, so the union is never empty
+ * while the table has a resource.
+ */
 function wireContainer(registry: ReferenceRegistry): ZodType<ReferenceWire> {
   const schema: ZodType<ReferenceWire> = z.lazy(() => {
     const [first, ...rest] = Object.keys(registry)
     if (first === undefined)
       return z.never({ error: 'The app has no resources to contain a reference.' })
     return z.union([
-      ...[first, ...rest].map((key) => wireIdentity(key, idOf(registry, key).wire, schema)),
+      ...identified(registry).map(([key, id]) => wireIdentity(key, id.wire, schema)),
       wireSelector(z.enum([first, ...rest]), schema),
     ])
   })
@@ -678,9 +742,22 @@ function wirePayload(
     return z.never({ error: `The app has no resource ${quote(resource)}.` })
   }
   const container = wireContainer(registry)
-  const identity = wireIdentity(resource, idOf(registry, resource).wire, container)
-  if (cardinality === 'one')
-    return z.union([identity, wireSelector(z.literal(resource), container)])
+  // A resource without an identifier has no identity forms; the selector
+  // branch alone remains, so the union is never empty.
+  const id = registry[resource]?.id
+  const identity = id === undefined ? undefined : wireIdentity(resource, id.wire, container)
+  if (cardinality === 'one') {
+    const selector = wireSelector(z.literal(resource), container)
+    return identity === undefined ? selector : z.union([identity, selector])
+  }
+  const selector = z.strictObject({
+    resource: z.literal(resource),
+    form: z.literal('selector'),
+    cardinality: z.literal('many'),
+    selector: WIRE_COLLECTION_SELECTOR_SCHEMA,
+    container: container.exactOptional(),
+  })
+  if (identity === undefined) return selector
   return z.union([
     z.strictObject({
       resource: z.literal(resource),
@@ -688,20 +765,14 @@ function wirePayload(
       cardinality: z.literal('many'),
       entries: z.array(identity),
     }),
-    z.strictObject({
-      resource: z.literal(resource),
-      form: z.literal('selector'),
-      cardinality: z.literal('many'),
-      selector: WIRE_COLLECTION_SELECTOR_SCHEMA,
-      container: container.exactOptional(),
-    }),
+    selector,
   ])
 }
 
 /*
- * SDK schemas. They accept the same structural data encoding accepts: data
- * fields are validated and every other property (such as `resolve` on a bound
- * reference) is allowed, so objects are loose rather than strict.
+ * SDK schemas. They accept the same structural data encoding accepts: declared
+ * fields are validated, function members (such as `resolve` on a bound
+ * reference) are allowed, and any other own data property is rejected.
  */
 
 /** SDK schema of a selector position: a non-negative integer. */
@@ -709,22 +780,24 @@ const SDK_POSITION_SCHEMA = integerSdkSchema(0, INTEGER_LIMITS.max)
 
 /** SDK schema of a single-object selector. */
 const SDK_OBJECT_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
-  z.looseObject({ by: z.literal('name'), name: z.string() }),
-  z.looseObject({ by: z.literal('index'), index: SDK_POSITION_SCHEMA }),
+  sdkObject({ by: z.literal('name'), name: z.string() }),
+  sdkObject({ by: z.literal('index'), index: SDK_POSITION_SCHEMA }),
 ])
 
 /** SDK schema of a collection selector; a range must have `start <= end`. */
 const SDK_COLLECTION_SELECTOR_SCHEMA = z.discriminatedUnion('by', [
-  z.looseObject({ by: z.literal('every') }),
-  z
-    .looseObject({ by: z.literal('range'), start: SDK_POSITION_SCHEMA, end: SDK_POSITION_SCHEMA })
-    .refine((range) => range.start <= range.end, {
-      error: "A range's start must not exceed its end.",
-    }),
+  sdkObject({ by: z.literal('every') }),
+  sdkObject({
+    by: z.literal('range'),
+    start: SDK_POSITION_SCHEMA,
+    end: SDK_POSITION_SCHEMA,
+  }).refine((range) => range.start <= range.end, {
+    error: "A range's start must not exceed its end.",
+  }),
 ])
 
 function sdkIdentity(resource: string, id: ZodType, container: ZodType): ZodType {
-  return z.looseObject({
+  return sdkObject({
     resource: z.literal(resource),
     form: z.literal('identity'),
     cardinality: z.literal('one'),
@@ -734,7 +807,7 @@ function sdkIdentity(resource: string, id: ZodType, container: ZodType): ZodType
 }
 
 function sdkSelector(resource: ZodType<string>, container: ZodType): ZodType {
-  return z.looseObject({
+  return sdkObject({
     resource,
     form: z.literal('selector'),
     cardinality: z.literal('one'),
@@ -743,12 +816,13 @@ function sdkSelector(resource: ZodType<string>, container: ZodType): ZodType {
   })
 }
 
+/** SDK schema of a container; identity branches only for resources with an identifier. */
 function sdkContainer(registry: ReferenceRegistry): ZodType {
   const schema: ZodType = z.lazy(() => {
     const [first, ...rest] = Object.keys(registry)
     if (first === undefined) return z.never()
     return z.union([
-      ...[first, ...rest].map((key) => sdkIdentity(key, idOf(registry, key).sdk, schema)),
+      ...identified(registry).map(([key, id]) => sdkIdentity(key, id.sdk, schema)),
       sdkSelector(z.enum([first, ...rest]), schema),
     ])
   })
@@ -762,30 +836,37 @@ function sdkReference(
 ): ZodType {
   if (!Object.hasOwn(registry, resource)) return z.never()
   const container = sdkContainer(registry)
-  const identity = sdkIdentity(resource, idOf(registry, resource).sdk, container)
-  if (cardinality === 'one') return z.union([identity, sdkSelector(z.literal(resource), container)])
+  const id = registry[resource]?.id
+  const identity = id === undefined ? undefined : sdkIdentity(resource, id.sdk, container)
+  if (cardinality === 'one') {
+    const selector = sdkSelector(z.literal(resource), container)
+    return identity === undefined ? selector : z.union([identity, selector])
+  }
+  const selector = sdkObject({
+    resource: z.literal(resource),
+    form: z.literal('selector'),
+    cardinality: z.literal('many'),
+    selector: SDK_COLLECTION_SELECTOR_SCHEMA,
+    container: container.optional(),
+  })
+  if (identity === undefined) return selector
   return z.union([
-    z.looseObject({
+    sdkObject({
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
       entries: z.array(identity),
     }),
-    z.looseObject({
-      resource: z.literal(resource),
-      form: z.literal('selector'),
-      cardinality: z.literal('many'),
-      selector: SDK_COLLECTION_SELECTOR_SCHEMA,
-      container: container.optional(),
-    }),
+    selector,
   ])
 }
 
-/** The identifier value type of a resource known to be in the table. */
-function idOf(registry: ReferenceRegistry, resource: string): ValueType<unknown> {
-  const entry = registry[resource]
-  if (entry === undefined) throw new TypeError(`The app has no resource ${quote(resource)}.`)
-  return entry.id
+/** Every resource in the table that has an identifier, with its identifier value type. */
+function identified(registry: ReferenceRegistry): [string, ValueType<unknown>][] {
+  return Object.keys(registry).flatMap((key): [string, ValueType<unknown>][] => {
+    const id = registry[key]?.id
+    return id === undefined ? [] : [[key, id]]
+  })
 }
 
 /**

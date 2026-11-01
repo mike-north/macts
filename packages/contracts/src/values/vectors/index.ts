@@ -149,7 +149,7 @@ export const VECTOR_RESOLVE = (): Promise<never> =>
 export const VECTOR_FETCH = (): Promise<never> =>
   Promise.reject(new Error('vector files do not fetch'))
 
-function bindIdentity(data: IdentityReferenceData): IdentityReference<unknown, unknown> {
+function bindIdentity(data: IdentityReferenceData): IdentityReference<unknown> {
   const { resource, form, cardinality, id } = data
   const base = { resource, form, cardinality, id, resolve: VECTOR_RESOLVE }
   return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
@@ -161,13 +161,13 @@ function bindSelector(data: SelectorReferenceData): SelectorReference<unknown> {
   return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
 }
 
-function bindObject(data: ObjectReferenceData): ObjectReferenceVariant<unknown, unknown> {
+function bindObject(data: ObjectReferenceData): ObjectReferenceVariant<unknown> {
   return data.form === 'identity' ? bindIdentity(data) : bindSelector(data)
 }
 
 function bindReference(
   data: ReferenceData
-): ObjectReferenceVariant<unknown, unknown> | CollectionReferenceVariant<unknown, unknown> {
+): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
   if (data.cardinality === 'one') return bindObject(data)
   const { resource, form, cardinality } = data
   if (form === 'identity') {
@@ -201,18 +201,25 @@ export const VECTOR_DECODE_CONTEXT: DecodeContext = Object.freeze({
 /**
  * The resource table of the reference vectors: notes with text identifiers,
  * folders with integer identifiers, and accounts with text identifiers. Notes
- * are contained in folders and folders in accounts.
+ * are contained in folders and folders in accounts. Paragraphs (in notes) and
+ * words (in paragraphs) have no identifier, so they are referenced only by
+ * selectors.
  */
 const VECTOR_RESOURCES: ReferenceRegistry = Object.freeze({
   note: { id: t.string() },
   folder: { id: t.integer() },
   account: { id: t.string() },
+  paragraph: {},
+  word: {},
 })
 const resources = (): ReferenceRegistry => VECTOR_RESOURCES
 
 const noteRef = t.reference(resources, 'note', 'one')
 const noteRefs = t.reference(resources, 'note', 'many')
 const folderRef = t.reference(resources, 'folder', 'one')
+const paragraphRef = t.reference(resources, 'paragraph', 'one')
+const paragraphRefs = t.reference(resources, 'paragraph', 'many')
+const wordRef = t.reference(resources, 'word', 'one')
 
 const file = t.file()
 const fileSource = t.fileSource()
@@ -835,6 +842,97 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
           form: 'selector',
           cardinality: 'one',
           selector: { by: 'name', name: 'Inbox' },
+        },
+      },
+    },
+  },
+
+  // References to resources without an identifier.
+  {
+    name: 'a resource without an identifier, selected by index',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    sdk: {
+      resource: 'paragraph',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: Integer.validate(2) },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '2' } },
+      },
+    },
+  },
+  {
+    name: 'every object of a resource without an identifier, in an identified container',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    sdk: {
+      resource: 'paragraph',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+        container: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+      },
+    },
+  },
+  {
+    name: 'a resource without an identifier serves as a selected container',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    sdk: {
+      resource: 'word',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: Integer.validate(0) },
+      container: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: Integer.validate(2) },
+        container: {
+          resource: 'note',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'N1',
+          resolve: VECTOR_RESOLVE,
+        },
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'word',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '0' } },
+        container: {
+          resource: 'paragraph',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'index', index: { integer: '2' } },
+          container: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
         },
       },
     },
@@ -1523,6 +1621,248 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     expectedIssuePaths: [['revision']],
   },
 
+  // One strictness rule in both directions: undeclared own data is rejected.
+  {
+    name: 'an identity reference with a selector',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      selector: { by: 'name', name: 'Inbox' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a wire identity reference with a selector',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        selector: { by: 'name', name: 'Inbox' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a selector reference with an id',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: 0 },
+      id: 'N1',
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['id']],
+  },
+  {
+    name: 'a wire selector reference with an id',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '0' } },
+        id: 'N1',
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['id']],
+  },
+  {
+    name: 'an identity collection with a selector and a container',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [],
+      selector: { by: 'every' },
+      container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field', 'unknown-field'],
+    expectedIssuePaths: [['selector'], ['container']],
+  },
+  {
+    name: 'a wire identity collection with a selector',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [],
+        selector: { by: 'every' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a misspelled container on a reference',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      contianer: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['contianer']],
+  },
+  {
+    name: 'a misspelled container on a wire reference',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        contianer: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['contianer']],
+  },
+  {
+    name: 'a name selector with an index',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Inbox', index: 0 },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector', 'index']],
+  },
+  {
+    // A reference-shaped object without its envelope is a user record to the
+    // dynamic codec, and a bare user record must be enveloped on the wire.
+    name: 'an unenveloped reference-shaped object in dynamic content',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: { resource: 'note', form: 'identity', cardinality: 'one', id: 'x' },
+    direction: 'decode',
+    expectedIssueCodes: ['invalid-control-record'],
+    expectedIssuePaths: [[]],
+  },
+
+  // Identity forms of resources without an identifier.
+  {
+    name: 'an identity reference to a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    input: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a wire identity reference to a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    input: {
+      reference: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    // The collection shares its entries' resource, so its own identity form is
+    // rejected before any entry is read.
+    name: 'an identity collection of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    input: {
+      resource: 'paragraph',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [{ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a wire identity collection of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    input: {
+      reference: {
+        resource: 'paragraph',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }],
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'an identity container of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    input: {
+      resource: 'word',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'macts' },
+      container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+  {
+    name: 'a wire identity container of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    input: {
+      reference: {
+        resource: 'word',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'macts' },
+        container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+
   // Files and file sources.
   {
     name: 'a bound file value sent as input has no grant to encode',
@@ -1567,6 +1907,43 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     expectedIssuePaths: [[]],
     // Valid wire input: the service's transfer step resolves it from the wire.
     schemaAccepts: true,
+  },
+  {
+    name: 'an uploaded file with a path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { kind: 'uploaded-file', uploadId: 'U1', expiresAt: at(OBSERVED_AT), path: '/x' },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['path']],
+  },
+  {
+    // Malformed keys are reported beside the fail-closed rejection.
+    name: 'a wire upload handle with a path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'uploaded-file', uploadId: 'U1', path: '/x' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field', 'unsupported'],
+    expectedIssuePaths: [['path'], []],
+  },
+  {
+    name: 'a caller-owned file with an upload id',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { kind: 'caller-owned-file', path: '/x', uploadId: 'U1' },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['uploadId']],
+  },
+  {
+    name: 'a wire caller-owned file with an upload id',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'caller-owned-file', path: '/x', uploadId: 'U1' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['uploadId']],
   },
   {
     name: 'a caller-owned file with an empty path',

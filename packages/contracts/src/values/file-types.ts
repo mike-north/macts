@@ -11,9 +11,11 @@
  *   value's `fetch`. Encoding happens only on the runtime side, from
  *   `FileData`; a value without a grant (such as a bound `FileValue` sent back
  *   as input) is rejected, because inputs take file sources.
- * - A **file source** is an operation's input. Encoding emits only what the
- *   wire form carries; an uploaded file's `expiresAt` stays on the SDK value
- *   but is not sent, because the service's transfer store is authoritative
+ * - A **file source** is an operation's input. Encoding follows the
+ *   declared-fields rule of `declared-fields` (any object, read by property
+ *   access; function members ignored; other undeclared own data rejected)
+ *   and emits only what the wire form carries; an uploaded file's `expiresAt`
+ *   is validated on the SDK value but is not sent, because the service's transfer store is authoritative
  *   for expiry. Decoding admits only caller-owned files: the runtime resolves
  *   uploads from the wire form in its transfer step before any SDK decoding,
  *   so an SDK decode of an upload handle is reached only when that step was
@@ -43,9 +45,15 @@ import {
   type Invalid,
   type Issues,
 } from './codec.js'
-import { describeReceived, issue, isPlainObject, quote } from './issue-helpers.js'
+import {
+  declaredFields,
+  openSdkObject,
+  openWireObject,
+  type FieldReader,
+} from './declared-fields.js'
+import { describeReceived, issue, quote } from './issue-helpers.js'
 import { DATE_CODEC } from './leaf-codecs.js'
-import { dateSdkSchema } from './sdk-schemas.js'
+import { dateSdkSchema, sdkObject } from './sdk-schemas.js'
 import type { ValueType } from './value-type.js'
 import type { ValueTypeOptions } from './value-types.js'
 import { FileSourceWireSchema, FileWireSchema } from './wire-schemas.js'
@@ -72,7 +80,33 @@ const FILE_SOURCE_EXAMPLE = 'a file source control record, {"fileSource": {…}}
 const FILE_SOURCE_KINDS = '"caller-owned-file" or "uploaded-file"'
 
 /** Wire fields of a `file` payload. */
-const FILE_WIRE_FIELDS = Object.freeze(['path', 'exists', 'observedAt', 'grant'])
+const FILE_WIRE_FIELDS = declaredFields('a file payload', ['path', 'exists', 'observedAt', 'grant'])
+
+/*
+ * The declared fields of each file source kind. In SDK form an uploaded file
+ * also declares `expiresAt`, which encoding validates and then drops; the
+ * wire form does not carry it.
+ */
+const CALLER_OWNED_FIELDS = declaredFields('a caller-owned file', ['kind', 'path'], {
+  uploadId:
+    'it is denoted by its path on the executing Mac, and an upload id belongs to an uploaded file',
+  expiresAt: 'it is a file on the executing Mac, and an expiry belongs to an uploaded file',
+})
+const UPLOADED_MISPLACED = {
+  path: 'it is denoted by its upload id, and a path belongs to a caller-owned file',
+}
+const UPLOADED_SDK_FIELDS = declaredFields(
+  'an uploaded file',
+  ['kind', 'uploadId', 'expiresAt'],
+  UPLOADED_MISPLACED
+)
+const UPLOADED_WIRE_FIELDS = declaredFields('an uploaded file', ['kind', 'uploadId'], {
+  ...UPLOADED_MISPLACED,
+  expiresAt: "the service's transfer store is authoritative for an upload's expiry",
+})
+
+const FILE_SOURCE_EXPECTED =
+  'a file source, {kind: "caller-owned-file", path} or {kind: "uploaded-file", uploadId, expiresAt}'
 
 /** SDK schema of a file value: what a bound `FileValue` exposes. */
 const FILE_SDK_SCHEMA = z.looseObject({
@@ -86,10 +120,13 @@ const FILE_SDK_SCHEMA = z.looseObject({
 /** Wire schema of a file value: a `file` control record. */
 const FILE_WIRE_SCHEMA = z.strictObject({ file: FileWireSchema })
 
-/** SDK schema of a file source; an uploaded file's expiry must be a valid `Date`. */
+/**
+ * SDK schema of a file source, under the declared-fields rule encoding
+ * follows; an uploaded file's expiry must be a valid `Date`.
+ */
 const FILE_SOURCE_SDK_SCHEMA = z.discriminatedUnion('kind', [
-  z.strictObject({ kind: z.literal('caller-owned-file'), path: z.string().min(1) }),
-  z.strictObject({
+  sdkObject({ kind: z.literal('caller-owned-file'), path: z.string().min(1) }),
+  sdkObject({
     kind: z.literal('uploaded-file'),
     uploadId: z.string().min(1),
     expiresAt: dateSdkSchema(),
@@ -113,29 +150,6 @@ function readText(
   if (raw !== '') return raw
   issues.push(issue(path, 'out-of-range', `Expected ${expected}; received empty text.`))
   return INVALID
-}
-
-/** Report each own key of `value` outside `allowed` as an unknown field. */
-function rejectUnknownKeys(
-  value: Readonly<Record<string, unknown>>,
-  allowed: readonly string[],
-  path: IssuePath,
-  issues: Issues,
-  what: string
-): boolean {
-  let found = false
-  for (const key of Object.keys(value)) {
-    if (allowed.includes(key)) continue
-    found = true
-    issues.push(
-      issue(
-        [...path, key],
-        'unknown-field',
-        `${quote(key)} is not a field of ${what} (its fields are ${allowed.map(quote).join(', ')}).`
-      )
-    )
-  }
-  return found
 }
 
 /** Read the optional path of a file: absent, or text. */
@@ -219,7 +233,8 @@ const FILE_CODEC: Codec<FileValue> = {
   decode(wire, path, context, issues) {
     const payload = controlPayload(wire, 'file', path, issues, FILE_EXAMPLE)
     if (payload === INVALID) return INVALID
-    if (!isPlainObject(payload)) {
+    const source = openWireObject(payload)
+    if (source === undefined) {
       issues.push(
         issue(
           path,
@@ -229,9 +244,9 @@ const FILE_CODEC: Codec<FileValue> = {
       )
       return INVALID
     }
-    const read = (key: string): unknown => (Object.hasOwn(payload, key) ? payload[key] : undefined)
+    const read = (key: string): unknown => source.read(key)
 
-    const unknown = rejectUnknownKeys(payload, FILE_WIRE_FIELDS, path, issues, 'a file payload')
+    const unknown = source.rejectUnknown(FILE_WIRE_FIELDS, path, issues)
     const filePath = readOptionalPath(read('path'), path, issues)
     const exists = read('exists')
     if (typeof exists !== 'boolean') {
@@ -263,6 +278,17 @@ const FILE_CODEC: Codec<FileValue> = {
   },
 }
 
+/** Read a caller-owned file's path: required, non-empty text. */
+function readFilePath(source: FieldReader, path: IssuePath, issues: Issues): string | Invalid {
+  return readText(source.read('path'), [...path, 'path'], issues, 'a file path (non-empty text)')
+}
+
+/** Read an uploaded file's id: required, non-empty text. */
+function readUploadId(source: FieldReader, path: IssuePath, issues: Issues): string | Invalid {
+  const raw = source.read('uploadId')
+  return readText(raw, [...path, 'uploadId'], issues, 'an upload id (non-empty text)')
+}
+
 /** Record an issue for a file source `kind` that is absent, mistyped, or unknown. */
 function fileSourceKindIssue(kind: unknown, path: IssuePath, issues: Issues): Invalid {
   if (typeof kind !== 'string') {
@@ -286,55 +312,28 @@ function fileSourceKindIssue(kind: unknown, path: IssuePath, issues: Issues): In
 /** Codec for file sources: encode both kinds, decode only caller-owned files. */
 const FILE_SOURCE_CODEC: Codec<FileSource> = {
   encode(value, path, issues) {
-    if (!isPlainObject(value)) {
-      return mismatch(
-        value,
-        path,
-        issues,
-        'a file source, {kind: "caller-owned-file", path} or {kind: "uploaded-file", uploadId, expiresAt}'
-      )
-    }
-    const read = (key: string): unknown => (Object.hasOwn(value, key) ? value[key] : undefined)
-    const kind = read('kind')
+    // Any object, read by property access under the declared-fields rule, so
+    // an uploaded file returned as a class instance with accessors encodes.
+    const source = openSdkObject(value)
+    if (source === undefined) return mismatch(value, path, issues, FILE_SOURCE_EXPECTED)
+    const kind = source.read('kind')
     switch (kind) {
       case 'caller-owned-file': {
-        const filePath = readText(
-          read('path'),
-          [...path, 'path'],
-          issues,
-          'a file path (non-empty text)'
-        )
-        const unknown = rejectUnknownKeys(
-          value,
-          ['kind', 'path'],
-          path,
-          issues,
-          'a caller-owned file'
-        )
+        const filePath = readFilePath(source, path, issues)
+        const unknown = source.rejectUnknown(CALLER_OWNED_FIELDS, path, issues)
         if (filePath === INVALID || unknown) return INVALID
         return { fileSource: { kind, path: filePath } }
       }
       case 'uploaded-file': {
-        const uploadId = readText(
-          read('uploadId'),
-          [...path, 'uploadId'],
-          issues,
-          'an upload id (non-empty text)'
-        )
+        const uploadId = readUploadId(source, path, issues)
         // The expiry is validated as the SDK value requires, but is not sent:
         // the service's transfer store is authoritative for it.
-        const expiresAt = read('expiresAt')
+        const expiresAt = source.read('expiresAt')
         const expiry =
           expiresAt === undefined
             ? fieldMismatch(expiresAt, [...path, 'expiresAt'], issues, 'a Date')
             : DATE_CODEC.encode(expiresAt, [...path, 'expiresAt'], issues)
-        const unknown = rejectUnknownKeys(
-          value,
-          ['kind', 'uploadId', 'expiresAt'],
-          path,
-          issues,
-          'an uploaded file'
-        )
+        const unknown = source.rejectUnknown(UPLOADED_SDK_FIELDS, path, issues)
         if (uploadId === INVALID || expiry === INVALID || unknown) return INVALID
         return { fileSource: { kind, uploadId } }
       }
@@ -346,7 +345,8 @@ const FILE_SOURCE_CODEC: Codec<FileSource> = {
   decode(wire, path, _context, issues) {
     const payload = controlPayload(wire, 'fileSource', path, issues, FILE_SOURCE_EXAMPLE)
     if (payload === INVALID) return INVALID
-    if (!isPlainObject(payload)) {
+    const source = openWireObject(payload)
+    if (source === undefined) {
       issues.push(
         issue(
           path,
@@ -356,22 +356,18 @@ const FILE_SOURCE_CODEC: Codec<FileSource> = {
       )
       return INVALID
     }
-    const kind = Object.hasOwn(payload, 'kind') ? payload['kind'] : undefined
+    const kind = source.read('kind')
     switch (kind) {
       case 'caller-owned-file': {
-        const raw = Object.hasOwn(payload, 'path') ? payload['path'] : undefined
-        const filePath = readText(raw, [...path, 'path'], issues, 'a file path (non-empty text)')
-        const unknown = rejectUnknownKeys(
-          payload,
-          ['kind', 'path'],
-          path,
-          issues,
-          'a caller-owned file'
-        )
+        const filePath = readFilePath(source, path, issues)
+        const unknown = source.rejectUnknown(CALLER_OWNED_FIELDS, path, issues)
         if (filePath === INVALID || unknown) return INVALID
         return { kind, path: filePath }
       }
       case 'uploaded-file':
+        // Malformed keys are reported too, so the issues describe the payload
+        // fully, but an upload handle never decodes.
+        source.rejectUnknown(UPLOADED_WIRE_FIELDS, path, issues)
         issues.push(issue(path, 'unsupported', UPLOAD_DECODE_MESSAGE))
         return INVALID
       default:

@@ -242,12 +242,12 @@ export type ReferenceData = ObjectReferenceData | CollectionReferenceData
  * @remarks
  * Its data form ({@link IdentityReferenceData}) plus {@link Resolvable}.
  */
-export interface IdentityReference<T, Id = string>
+export interface IdentityReference<T, Id = unknown>
   extends IdentityReferenceData<Id>, ObjectReference<T> {
   /** Always `'identity'`. */
   readonly form: 'identity'
   /** The object's container, bound to the same client. */
-  readonly container?: ObjectReferenceVariant<unknown, unknown>
+  readonly container?: ObjectReferenceVariant<unknown>
 }
 
 /**
@@ -261,7 +261,7 @@ export interface SelectorReference<T> extends SelectorReferenceData, ObjectRefer
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** The container the rule is evaluated in, bound to the same client. */
-  readonly container?: ObjectReferenceVariant<unknown, unknown>
+  readonly container?: ObjectReferenceVariant<unknown>
 }
 
 /**
@@ -273,7 +273,7 @@ export interface SelectorReference<T> extends SelectorReferenceData, ObjectRefer
  * replacing entries, unlike a selector collection, which callers edit by
  * changing the rule. Its data form is {@link IdentityCollectionReferenceData}.
  */
-export interface IdentityCollectionReference<T, Id = string>
+export interface IdentityCollectionReference<T, Id = unknown>
   extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
   /** Always `'identity'`. */
   readonly form: 'identity'
@@ -294,7 +294,7 @@ export interface SelectorCollectionReference<T>
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** The container the rule is evaluated in, bound to the same client. */
-  readonly container?: ObjectReferenceVariant<unknown, unknown>
+  readonly container?: ObjectReferenceVariant<unknown>
 }
 
 /**
@@ -310,7 +310,9 @@ export interface SelectorCollectionReference<T>
  * @typeParam T - The referenced record.
  * @typeParam Id - The SDK type of the resource's identifier.
  */
-export type ObjectReferenceVariant<T, Id = string> = IdentityReference<T, Id> | SelectorReference<T>
+export type ObjectReferenceVariant<T, Id = unknown> =
+  | IdentityReference<T, Id>
+  | SelectorReference<T>
 
 /**
  * What a typed collection reference position holds: a bound deferred
@@ -323,7 +325,7 @@ export type ObjectReferenceVariant<T, Id = string> = IdentityReference<T, Id> | 
  * @typeParam T - The member record.
  * @typeParam Id - The SDK type of the resource's identifier.
  */
-export type CollectionReferenceVariant<T, Id = string> =
+export type CollectionReferenceVariant<T, Id = unknown> =
   | IdentityCollectionReference<T, Id>
   | SelectorCollectionReference<T>
 
@@ -332,14 +334,16 @@ export type CollectionReferenceVariant<T, Id = string> =
  * can name, keyed by manifest resource key.
  *
  * @remarks
- * Each entry carries the resource's identifier value type, which encodes and
- * decodes the `id` of identity references to that resource. A reference's
+ * Each entry carries the resource's identifier value type, when the resource
+ * has an identifier; it encodes and decodes the `id` of identity references
+ * to that resource. A resource without an identifier (`id` absent) can be
+ * referenced only by selector forms: name, index, every, or range. A reference's
  * containers usually belong to other resources, so the table covers every
  * resource of the app, not only the one a position declares. An app
  * contract's `resources` table is assignable to this type, so generated code
  * passes that table rather than building a parallel one.
  */
-export type ReferenceRegistry = Readonly<Record<string, { readonly id: ValueType<unknown> }>>
+export type ReferenceRegistry = Readonly<Record<string, { readonly id?: ValueType<unknown> }>>
 
 /**
  * A materialized collection: an array whose reference entries are already

@@ -4,7 +4,7 @@
 
 Add reference and file value types
 
-`ValueTypes.reference(registry, resource, cardinality)` builds the value type for a typed reference position. It accepts both identity and selector forms for its cardinality, and a list of single references is `ValueTypes.array(ValueTypes.reference(…, 'one'))`. Identifiers are encoded and decoded with each resource's own identifier type, which `ResourceDescriptor.id` now carries, so containers of other resources round-trip correctly. Encoding reads only a reference's data fields and never resolves it. Both directions check:
+`ValueTypes.reference(registry, resource, cardinality)` builds the value type for a typed reference position. It accepts both identity and selector forms for its cardinality, and a list of single references is `ValueTypes.array(ValueTypes.reference(…, 'one'))`. Identifiers are encoded and decoded with each resource's own identifier type, which `ResourceDescriptor.id` now carries, so containers of other resources round-trip correctly. A resource without an identifier has no `id` and is referenced only by selector forms. Encoding reads only a reference's data fields and never resolves it. Class instances and accessors are accepted, but an undeclared data property, such as a typo or a field from the other form, is rejected. The same rule applies to file sources. Both directions check:
 
 - the resource and cardinality
 - identity-collection entries

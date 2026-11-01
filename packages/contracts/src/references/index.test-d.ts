@@ -51,11 +51,11 @@ interface Event {
   readonly title: string
 }
 
-declare const byId: IdentityReference<Event>
+declare const byId: IdentityReference<Event, string>
 declare const byName: SelectorReference<Event>
-declare const explicitSet: IdentityCollectionReference<Event>
+declare const explicitSet: IdentityCollectionReference<Event, string>
 declare const allEvents: SelectorCollectionReference<Event>
-declare const listed: ReferenceList<IdentityReference<Event>>
+declare const listed: ReferenceList<IdentityReference<Event, string>>
 
 // Single references resolve to one record, whatever their form.
 expectType<Promise<Event>>(byId.resolve())
@@ -81,11 +81,11 @@ expectAssignable<Resolvable<unknown>>(allEvents)
 expectAssignable<AnyReference<Event>>(byName)
 
 // A materialized list is an array of single references, not a resolvable.
-expectType<IdentityReference<Event> | undefined>(listed[0])
+expectType<IdentityReference<Event, string> | undefined>(listed[0])
 expectNotAssignable<Resolvable<unknown>>(listed)
 
 // Form narrows to the concrete variant.
-declare const single: IdentityReference<Event> | SelectorReference<Event>
+declare const single: IdentityReference<Event, string> | SelectorReference<Event>
 if (single.form === 'identity') {
   expectType<string>(single.id)
 } else {
@@ -95,6 +95,16 @@ if (single.form === 'identity') {
 // Edge: identifier types are carried through.
 declare const numericId: IdentityReference<Event, number>
 expectType<number>(numericId.id)
+
+// Edge: without an identifier type, every reference shape defaults it to unknown.
+declare const defaultBoundId: IdentityReference<Event>['id']
+expectType<unknown>(defaultBoundId)
+declare const defaultEntries: IdentityCollectionReference<Event>['entries']
+expectType<readonly IdentityReference<Event>[]>(defaultEntries)
+declare const defaultVariant: ObjectReferenceVariant<Event>
+if (defaultVariant.form === 'identity') expectType<unknown>(defaultVariant.id)
+declare const defaultCollection: CollectionReferenceVariant<Event>
+if (defaultCollection.form === 'identity') expectType<unknown>(defaultCollection.entries[0]?.id)
 
 // Resolution accepts the shared call options.
 expectType<CallOptions>(null as unknown as NonNullable<Parameters<typeof byId.resolve>[0]>)
@@ -217,8 +227,8 @@ expectNotAssignable<IdentityCollectionReferenceData>({
 })
 
 // Bound containers are bound references, of either form, and are valid data.
-expectType<ObjectReferenceVariant<unknown, unknown> | undefined>(byId.container)
-expectType<ObjectReferenceVariant<unknown, unknown> | undefined>(allEvents.container)
+expectType<ObjectReferenceVariant<unknown> | undefined>(byId.container)
+expectType<ObjectReferenceVariant<unknown> | undefined>(allEvents.container)
 expectAssignable<ObjectReferenceData | undefined>(byName.container)
 
 // A typed position holds either form of its cardinality, and narrows on form.
@@ -239,10 +249,12 @@ if (collectionAtPosition.form === 'identity') {
 expectNotAssignable<ObjectReferenceVariant<Event>>(collectionAtPosition)
 expectNotAssignable<CollectionReferenceVariant<Event>>(atPosition)
 
-// The reference registry maps resource keys to identifier value types, and an
-// app contract's resources table is one.
+// The reference registry maps resource keys to identifier value types, where
+// a resource has one, and an app contract's resources table is one.
 declare const textId: ValueType<string>
 expectAssignable<ReferenceRegistry>({ note: { id: textId } })
-expectNotAssignable<ReferenceRegistry>({ note: { record: textId } })
+expectAssignable<ReferenceRegistry>({ note: { id: textId }, paragraph: {} })
+expectType<ValueType<unknown> | undefined>(null as unknown as ReferenceRegistry[string]['id'])
+expectNotAssignable<ReferenceRegistry>({ note: { id: 'note-id' } })
 declare const contract: AppContract<unknown>
 expectAssignable<ReferenceRegistry>(contract.resources)

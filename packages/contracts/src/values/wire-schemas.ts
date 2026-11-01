@@ -189,9 +189,9 @@ export const FileWireSchema: z.ZodType<FileWire> = z.strictObject({
  * @remarks
  * A caller-owned file has the keys `kind` (`"caller-owned-file"`) and `path`;
  * an uploaded file has `kind` (`"uploaded-file"`) and `uploadId`. No other
- * keys are allowed, and the path and the upload id are non-empty. The runtime's transfer step validates input against
- * this schema and resolves uploads from the `FileSourceWire` it yields, before
- * any SDK decoding.
+ * keys are allowed, and the path and the upload id are non-empty. The
+ * runtime's transfer step validates input against this schema and resolves
+ * uploads from the `FileSourceWire` it yields, before any SDK decoding.
  */
 export const FileSourceWireSchema: z.ZodType<FileSourceWire> = z.discriminatedUnion('kind', [
   z.strictObject({

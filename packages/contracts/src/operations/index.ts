@@ -81,8 +81,13 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
    * Contract of the resource's identifier: it encodes and decodes the `id` of
    * every identity reference to this resource, including references that
    * appear as another reference's container.
+   *
+   * @remarks
+   * Absent when the resource has no identifier. Such a resource can be
+   * referenced only by selector forms (name, index, every, or range); an
+   * identity reference to it is rejected when encoding and decoding.
    */
-  readonly id: ValueType<Id>
+  readonly id?: ValueType<Id>
   /** Operation that reads one object, used to resolve single references. */
   readonly get?: OperationId
   /** Operation that lists objects, used to resolve collection references. */
