@@ -911,8 +911,25 @@ the plural ("AirPlay devices" is `airplayDevices`, not `airPlayDevices`), a
 spelling recorded in the manifest takes precedence over the default (#165). A
 macOS test resolves every top-level accessor of every body built from every
 shipped manifest against the installed app's dictionary with
-`Automation.getDisplayString`, which sends no Apple event. Known exceptions are
-listed with their issue, and the test fails when one starts resolving.
+`ObjectSpecifier.hasInstance`. The check never launches an app. The rule:
+
+- `hasInstance` sends the app no event and does not launch an app that ships a
+  static scripting definition (the `OSAScriptingDefinition` file in its
+  bundle).
+- `Automation.getDisplayString` does launch the app when it renders a resolved
+  specifier, so the check does not use it.
+- An app without a static definition publishes its terms only while running,
+  so resolving any of them launches it. Such an app is skipped, and the reason
+  is reported.
+- Each app is checked in its own process with an 8-second limit. An app that
+  does not answer is reported, not failed. An app the check launches anyway
+  fails it.
+- The built-in macOS apps that ship a static definition and have a top-level
+  collection in a body must be checked, so the test cannot pass by checking
+  nothing.
+
+Known exceptions are listed with their issue, and the test fails when one
+starts resolving.
 
 **Worker compatibility.** A later executor may run a long-lived automation
 worker (one process per target app, pooled and restartable) instead of one

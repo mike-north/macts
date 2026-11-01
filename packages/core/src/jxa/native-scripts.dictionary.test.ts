@@ -7,22 +7,37 @@
  * accessor is read from the body text, so a parent spelled from an identifier
  * parameter is checked as well as one matched to a resource. The automation
  * bridge resolves an accessor only when it is the app's own spelling of a
- * dictionary term. `Automation.getDisplayString` renders a resolved accessor
- * on the application object as a specifier (`Application("Photos").mediaItems`)
- * and an unknown one as a plain function, so each accessor can be checked
- * without sending the app an event. Checking needs no automation permission and
- * does not launch the app.
+ * dictionary term: `ObjectSpecifier.hasInstance(app[name])` is true for a
+ * resolved name and false for an unknown one.
+ *
+ * The check must never launch an app or wait on one, because a CI runner has
+ * other apps, no automation grants, and apps that stall on first launch:
+ *
+ * - `hasInstance` reads the dictionary without sending the app an event, and
+ *   does not launch an app that ships a static scripting definition (the
+ *   bundle's `OSAScriptingDefinition` file). Rendering a resolved specifier
+ *   with `Automation.getDisplayString` does launch it, so it is not used.
+ * - An app with no static definition publishes its terms only while running,
+ *   so resolving any of them launches it. Such an app is skipped, with that
+ *   reason.
+ * - Each app is checked in its own `osascript` process with a short time
+ *   limit. An app that does not answer in time is reported as not checked; it
+ *   is not a failure, except for the system apps every Mac has
+ *   ({@link REQUIRED_CHECKED}), which must be checked so the suite can never
+ *   pass by checking nothing.
+ * - An app the check launched anyway is a failure.
  *
  * Only top-level collections can be checked this way: under an element
- * specifier, the bridge echoes any name without consulting the dictionary.
- * Apps that are not installed are skipped; the suite fails if no accessor at
- * all could be checked.
+ * specifier, the bridge accepts any name without consulting the dictionary.
+ * The checked, skipped, absent, and unanswered apps are printed with each run.
  *
  * Runs on macOS only.
  *
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md — D4 (native
  *   script bodies)
  * @see https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
+ * @see https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html
+ *   (`OSAScriptingDefinition`)
  */
 
 import { execFileSync } from 'node:child_process'
@@ -47,6 +62,8 @@ const KNOWN_UNRESOLVED: Readonly<Record<string, string>> = {
   'screen-sharing: app["connections"]': 'https://github.com/mike-north/macts/issues/165',
   // Parents spelled from an identifier parameter that names no resource of
   // the manifest. The manifest must name the parent collection explicitly.
+  // Automator ships no static scripting definition, so the check skips it and
+  // its two entries document the defect without being verified here.
   'automator: app["workflowNames"]': 'https://github.com/mike-north/macts/issues/165',
   'automator: app["actions"]': 'https://github.com/mike-north/macts/issues/165',
   'xcode: app["workspaceNames"]': 'https://github.com/mike-north/macts/issues/165',
@@ -102,32 +119,95 @@ async function collectAccessors(): Promise<AppAccessors[]> {
 }
 
 /**
- * Resolve each accessor on the application object. Returns `undefined` when
- * the app is not installed, else whether each accessor resolved.
+ * Apps that come with every macOS install, by manifest directory, that ship a
+ * static scripting definition and whose bodies address at least one top-level
+ * collection. Each must be checked wherever the suite runs: one that cannot be
+ * checked fails the suite rather than shrinking it. (Other system apps with
+ * manifests either address no top-level collection, such as Finder and Mail,
+ * or ship no static definition, such as TextEdit.)
  */
-function resolveInDictionary(
-  bundleId: string,
-  accessors: readonly string[]
-): Record<string, boolean> | undefined {
-  const script = [
-    'var app;',
-    `try { app = Application(${JSON.stringify(bundleId)}); } catch (e) { app = null; }`,
-    'var out = null;',
-    'if (app !== null) {',
-    '  out = {};',
-    `  ${JSON.stringify(accessors)}.forEach(function (name) {`,
-    '    out[name] = Automation.getDisplayString(app[name]).indexOf("Application(") === 0;',
-    '  });',
+const REQUIRED_CHECKED: readonly string[] = [
+  'calendar',
+  'notes',
+  'photos',
+  'reminders',
+  'screen-sharing',
+  'shortcuts',
+  'terminal',
+]
+
+/** How long one app's check may take before it counts as not answering. */
+const CHECK_TIMEOUT_MS = 8000
+
+/** The result of checking one app's accessors. */
+type AppCheck =
+  | { readonly status: 'absent' }
+  | { readonly status: 'skipped'; readonly reason: string }
+  | { readonly status: 'unanswered'; readonly reason: string }
+  | {
+      readonly status: 'checked'
+      readonly resolved: Readonly<Record<string, boolean>>
+      readonly launched: boolean
+    }
+
+/**
+ * The automation script that checks `accessors` on the app `bundleId`,
+ * printing an {@link AppCheck} (without the `unanswered` case) as JSON.
+ */
+function checkScript(bundleId: string, accessors: readonly string[]): string {
+  return [
+    "ObjC.import('AppKit');",
+    `var id = ${JSON.stringify(bundleId)};`,
+    `var names = ${JSON.stringify(accessors)};`,
+    'function running() {',
+    '  return $.NSRunningApplication.runningApplicationsWithBundleIdentifier(id).count > 0;',
+    '}',
+    'function staticDefinition(bundle) {',
+    "  var name = bundle.objectForInfoDictionaryKey('OSAScriptingDefinition');",
+    '  if (name.isNil()) return false;',
+    "  var path = bundle.resourcePath.js + '/' + name.js;",
+    '  var files = $.NSFileManager.defaultManager;',
+    "  return files.fileExistsAtPath(path) || files.fileExistsAtPath(path + '.sdef');",
+    '}',
+    'var url = $.NSWorkspace.sharedWorkspace.URLForApplicationWithBundleIdentifier(id);',
+    'var out;',
+    'if (url.isNil()) {',
+    "  out = { status: 'absent' };",
+    '} else if (!staticDefinition($.NSBundle.bundleWithURL(url))) {',
+    "  out = { status: 'skipped', reason: 'no static scripting definition; resolving its terms launches it' };",
+    '} else {',
+    '  var before = running();',
+    '  var app = Application(id);',
+    '  var resolved = {};',
+    '  names.forEach(function (name) { resolved[name] = ObjectSpecifier.hasInstance(app[name]); });',
+    '  if (!before) delay(0.5);',
+    "  out = { status: 'checked', resolved: resolved, launched: !before && running() };",
     '}',
     'JSON.stringify(out);',
   ].join('\n')
-  const stdout = execFileSync('osascript', ['-l', 'JavaScript'], {
-    input: script,
-    encoding: 'utf8',
-    timeout: 30000,
-  })
-  const parsed = JSON.parse(stdout) as Record<string, boolean> | null
-  return parsed ?? undefined
+}
+
+/** Check one app's accessors in its own `osascript` process, within {@link CHECK_TIMEOUT_MS}. */
+function checkApp(bundleId: string, accessors: readonly string[]): AppCheck {
+  try {
+    const stdout = execFileSync('osascript', ['-l', 'JavaScript'], {
+      input: checkScript(bundleId, accessors),
+      encoding: 'utf8',
+      timeout: CHECK_TIMEOUT_MS,
+      killSignal: 'SIGKILL',
+    })
+    return JSON.parse(stdout) as AppCheck
+  } catch (error) {
+    const timedOut = (error as NodeJS.ErrnoException).code === 'ETIMEDOUT'
+    const reason = timedOut
+      ? `no answer within ${String(CHECK_TIMEOUT_MS / 1000)}s`
+      : `osascript failed: ${
+          String((error as { stderr?: unknown }).stderr ?? error)
+            .trim()
+            .split('\n')[0] ?? ''
+        }`
+    return { status: 'unanswered', reason }
+  }
 }
 
 // Runs everywhere: the check below is only as wide as the accessors collected.
@@ -153,6 +233,10 @@ describe('collecting the top-level accessors bodies address', () => {
     expect(accessorsOf('photos')).toEqual(expect.arrayContaining(['mediaItems']))
   })
 
+  it('collects accessors for every app that must be checked on macOS', () => {
+    for (const app of REQUIRED_CHECKED) expect(accessorsOf(app), app).not.toEqual([])
+  })
+
   it('skips command calls and class constructors', () => {
     const commandNames = new Set(['reload', 'close'])
     const body = [
@@ -175,31 +259,43 @@ describe.skipIf(process.platform !== 'darwin')(
     })
 
     it('every top-level accessor a body addresses names a collection of the app', () => {
-      let checked = 0
       const unresolved: string[] = []
       const expectedUnresolved: string[] = []
-      const checkedApps = new Set<string>()
+      const resolvedKnown: string[] = []
+      const checkedApps: string[] = []
+      const launched: string[] = []
+      const report: string[] = []
       for (const { app, bundleId, accessors } of apps) {
-        const resolved = resolveInDictionary(bundleId, [...accessors.keys()])
-        if (resolved === undefined) continue
-        checkedApps.add(app)
+        const result = checkApp(bundleId, [...accessors.keys()])
+        if (result.status !== 'checked') {
+          report.push(`${result.status}: ${app}${'reason' in result ? ` (${result.reason})` : ''}`)
+          continue
+        }
+        checkedApps.push(app)
+        if (result.launched) launched.push(app)
         for (const [accessor, route] of accessors) {
-          checked++
           const key = `${app}: app["${accessor}"]`
           if (key in KNOWN_UNRESOLVED) expectedUnresolved.push(key)
-          if (resolved[accessor] !== true) unresolved.push(key)
-          else expect(key in KNOWN_UNRESOLVED, `${key} (${route}) now resolves`).toBe(false)
+          if (result.resolved[accessor] !== true) unresolved.push(key)
+          else if (key in KNOWN_UNRESOLVED) resolvedKnown.push(`${key} (${route})`)
         }
       }
-      expect(checked, 'no installed app could be checked').toBeGreaterThan(0)
+      console.info([`checked: ${checkedApps.join(', ')}`, ...report].join('\n'))
+
+      expect(launched, 'the check launched these apps').toEqual([])
+      expect(
+        REQUIRED_CHECKED.filter((app) => !checkedApps.includes(app)),
+        'system apps that could not be checked'
+      ).toEqual([])
       expect(unresolved).toEqual(expectedUnresolved)
+      expect(resolvedKnown, 'known exceptions that now resolve').toEqual([])
       // A known entry whose app was checked but whose accessor no body
       // addresses any more is stale, and must be removed.
       const stale = Object.keys(KNOWN_UNRESOLVED).filter(
         (key) =>
-          checkedApps.has(key.slice(0, key.indexOf(':'))) && !expectedUnresolved.includes(key)
+          checkedApps.includes(key.slice(0, key.indexOf(':'))) && !expectedUnresolved.includes(key)
       )
       expect(stale).toEqual([])
-    }, 300000)
+    }, 600000)
   }
 )
