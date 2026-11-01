@@ -110,8 +110,7 @@ export function createMactsHome(apps: InstalledAppSet = 'default'): MactsHome {
   const scope = join(plugins, 'node_modules', '@macts')
   mkdirSync(scope, { recursive: true })
 
-  const installed: readonly string[] =
-    apps === 'default' ? INSTALLED_APPS : workspaceServerApps()
+  const installed: readonly string[] = apps === 'default' ? INSTALLED_APPS : workspaceServerApps()
   writeFileSync(
     join(plugins, 'package.json'),
     JSON.stringify({
