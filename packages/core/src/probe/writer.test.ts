@@ -93,10 +93,115 @@ function parseBlock(lines: readonly string[]): unknown {
   return jsYaml.load(lines.map((line) => line.slice(indent)).join('\n'))
 }
 
+/**
+ * A TextEdit-shaped manifest with no evidence: a frozen copy of the shipped
+ * TextEdit manifest as it was before any probe ran. It is inlined, not read
+ * from `manifests/`, so that probing the real TextEdit later cannot change
+ * these tests' premises. It keeps what the old writer destroyed: blank lines,
+ * single-quoted scalars, and declared properties with no claims.
+ */
+const TEXTEDIT_MANIFEST = `version: '1.0'
+
+app:
+  bundleId: com.apple.TextEdit
+  name: TextEdit
+  displayName: TextEdit
+  tccEntitlements:
+    - automation
+  distributionModel: system
+
+suites:
+  - name: Standard Suite
+    code: '????'
+    description: Common classes and commands for all applications
+  - name: TextEdit Suite
+    code: '????'
+    description: TextEdit document classes
+    resources:
+      - Document
+
+resources:
+  Document:
+    name: Document
+    plural: Documents
+    description: A TextEdit document
+    code: docu
+    identifiers:
+      - property: name
+        primary: true
+    properties:
+      name:
+        access: rw
+        type: string
+        description: The name of the document
+        code: pnam
+      path:
+        access: r
+        type: string
+        description: The file path of the document
+        code: ppth
+        optional: true
+      modified:
+        access: r
+        type: boolean
+        description: Whether the document has been modified since last save
+        code: imod
+      text:
+        access: rw
+        type: string
+        description: The text content of the document
+        code: ctxt
+
+hierarchy:
+  children:
+    documents:
+      resource: Document
+      access: rw
+      description: Open documents in TextEdit
+
+commands:
+  list:
+    name: list
+    description: List all open documents
+    scope: resource
+    resourceType: Document
+    parameters: []
+
+  get:
+    name: get
+    description: Get a document by name
+    scope: resource
+    resourceType: Document
+    parameters:
+      - name: name
+        type: string
+        description: Document name
+        required: true
+
+  create:
+    name: create
+    description: Create a new document
+    scope: resource
+    resourceType: Document
+    parameters:
+      - name: text
+        type: string
+        description: Initial text content
+        required: false
+
+permissions:
+  documents:
+    read:
+      - textedit:documents:list
+      - textedit:documents:get
+    create:
+      - textedit:documents:create
+`
+
 describe('writeProbeResults: format preservation (regression)', () => {
-  it('on TextEdit, inserts only the probe block and leaves every other line unchanged', async () => {
+  it('on a TextEdit-shaped manifest, inserts only the probe block and leaves every other line unchanged', async () => {
     const path = join(dir, 'app.yaml')
-    await copyFile(join(MANIFESTS_DIR, 'textedit', 'app.yaml'), path)
+    await writeFile(path, TEXTEDIT_MANIFEST)
     const before = await readFile(path, 'utf-8')
     // The copy has what the old writer destroyed: blank lines and single quotes.
     expect(before).toContain("version: '1.0'")
@@ -139,7 +244,7 @@ describe('writeProbeResults: format preservation (regression)', () => {
 
   it('quotes the timestamp, so the loader reads it back as text', async () => {
     const path = join(dir, 'app.yaml')
-    await copyFile(join(MANIFESTS_DIR, 'textedit', 'app.yaml'), path)
+    await writeFile(path, TEXTEDIT_MANIFEST)
     await writeProbeResults(path, probeResult('com.apple.TextEdit', { Document: 'name' }))
     expect(await readFile(path, 'utf-8')).toContain(`      probedAt: '${PROBED_AT}'\n`)
   })
@@ -751,9 +856,9 @@ function curatedClaimTexts(text: string): Map<string, string> {
 }
 
 describe('writeNullabilityResults on committed manifests (regression)', () => {
-  it('on TextEdit, which has no evidence, inserts only the claims and the block', async () => {
+  it('on a TextEdit-shaped manifest with no evidence, inserts only the claims and the block', async () => {
     const path = join(dir, 'app.yaml')
-    await copyFile(join(MANIFESTS_DIR, 'textedit', 'app.yaml'), path)
+    await writeFile(path, TEXTEDIT_MANIFEST)
     const before = await readFile(path, 'utf-8')
     expect(before).not.toContain('evidence:')
 

@@ -79,11 +79,33 @@ resources:
         type: string
         description: Zip or postal code of the address.
         code: az31
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 12
+            nullCount: 1
+            failedReads: 0
       country:
         access: rw
         type: string
         description: Country part of the address.
         code: az32
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 12
+            nullCount: 4
+            failedReads: 0
       label:
         access: rw
         type: string
@@ -94,6 +116,17 @@ resources:
         type: string
         description: Country code part of the address (should be a two character iso country code).
         code: az33
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 12
+            nullCount: 6
+            failedReads: 0
       state:
         access: rw
         type: string
@@ -102,6 +135,18 @@ resources:
     identifiers:
       - property: id
         primary: true
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/addresses
+      itemsRead: 12
+      sampledParents: 10
+      parentsScanned: 104
+      status: probed
+      skipped: []
+      note: the parent scan stopped at the time limit after 104 parents
   AIMHandle:
     name: AIMHandle
     plural: AIMHandles
@@ -126,6 +171,17 @@ resources:
         description: The AIM handle value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/aIMHandles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 295
+      status: no-items
+      skipped: []
 
   CustomDate:
     name: CustomDate
@@ -151,6 +207,18 @@ resources:
         description: The date value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/customDates
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 105
+      status: budget
+      skipped: []
+      note: no items found in the 105 parents scanned before the time limit
 
   Email:
     name: Email
@@ -164,18 +232,63 @@ resources:
         description: Unique identifier for this email
         optional: false
         code: 'ID  '
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 32
+            nullCount: 0
+            failedReads: 0
       label:
         access: rw
         type: string
         description: Label for this email
         optional: false
         code: az18
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 32
+            nullCount: 0
+            failedReads: 0
       value:
         access: rw
         type: string
         description: The email address
         optional: false
         code: valL
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 32
+            nullCount: 0
+            failedReads: 0
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/emails
+      itemsRead: 32
+      sampledParents: 26
+      parentsScanned: 105
+      status: probed
+      skipped: []
+      note: the parent scan stopped at the time limit after 105 parents
 
   Group:
     name: Group
@@ -188,6 +301,17 @@ resources:
         type: string
         description: The name of this group.
         code: pnam
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: groups
+      itemsRead: 1
+      sampledParents: 1
+      parentsScanned: 1
+      status: probed
+      skipped: []
   ICQHandle:
     name: ICQHandle
     plural: ICQHandles
@@ -212,6 +336,17 @@ resources:
         description: The ICQ handle value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/iCQHandles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 295
+      status: no-items
+      skipped: []
 
   InstantMessage:
     name: InstantMessage
@@ -234,6 +369,18 @@ resources:
         type: string
         description: The user name of this instant message address.
         code: az83
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/instantMessages
+      itemsRead: 5
+      sampledParents: 4
+      parentsScanned: 106
+      status: probed
+      skipped: []
+      note: the parent scan stopped at the time limit after 106 parents
   JabberHandle:
     name: JabberHandle
     plural: JabberHandles
@@ -258,6 +405,18 @@ resources:
         description: The Jabber handle value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/jabberHandles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 107
+      status: budget
+      skipped: []
+      note: no items found in the 107 parents scanned before the time limit
 
   MSNHandle:
     name: MSNHandle
@@ -283,6 +442,17 @@ resources:
         description: The MSN handle value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/mSNHandles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 295
+      status: no-items
+      skipped: []
 
   Person:
     name: Person
@@ -295,21 +465,65 @@ resources:
         type: string
         description: The Nickname of this person.
         code: az43
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 22
+            failedReads: 0
       organization:
         access: rw
         type: string
         description: Organization that employs this person.
         code: az38
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 17
+            failedReads: 0
       maidenName:
         access: rw
         type: string
         description: The Maiden name of this person.
         code: az42
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       suffix:
         access: rw
         type: string
         description: The Suffix of this person.
         code: az41
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       vcard:
         access: r
         type: string
@@ -320,31 +534,97 @@ resources:
         type: string
         description: The home page of this person.
         code: az13
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       birthDate:
         access: rw
         type: string
         description: The birth date of this person.
         code: az11
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       phoneticLastName:
         access: rw
         type: string
         description: The phonetic version of the Last name of this person.
         code: az10
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       title:
         access: rw
         type: string
         description: The title of this person.
         code: az39
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       phoneticMiddleName:
         access: rw
         type: string
         description: The Phonetic version of the Middle name of this person.
         code: az56
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       department:
         access: rw
         type: string
         description: Department that this person works for.
         code: az55
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       image:
         access: rw
         type: string
@@ -360,6 +640,17 @@ resources:
         type: string
         description: Notes for this person.
         code: az37
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       company:
         access: rw
         type: boolean
@@ -370,26 +661,94 @@ resources:
         type: string
         description: The Middle name of this person.
         code: az40
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       phoneticFirstName:
         access: rw
         type: string
         description: The phonetic version of the First name of this person.
         code: azf9
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       jobTitle:
         access: rw
         type: string
         description: The job title of this person.
         code: az12
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 23
+            failedReads: 0
       lastName:
         access: rw
         type: string
         description: The Last name of this person.
         code: azf8
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 6
+            failedReads: 0
       firstName:
         access: rw
         type: string
         description: The First name of this person.
         code: azf7
+        nullable: true
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 23
+            nullCount: 1
+            failedReads: 0
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people
+      itemsRead: 23
+      sampledParents: 1
+      parentsScanned: 1
+      status: probed
+      skipped:
+        - image
+      note: stopped at the time limit after 23 items
   Phone:
     name: Phone
     plural: Phones
@@ -402,18 +761,63 @@ resources:
         description: Unique identifier for this phone
         optional: false
         code: 'ID  '
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 48
+            nullCount: 0
+            failedReads: 0
       label:
         access: rw
         type: string
         description: Label for this phone
         optional: false
         code: az18
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 48
+            nullCount: 0
+            failedReads: 0
       value:
         access: rw
         type: string
         description: The phone number
         optional: false
         code: valL
+        nullable: false
+        evidence:
+          nullable:
+            source: probe
+            observedAt: '2026-11-01T16:38:08.485Z'
+            bundleId: com.apple.AddressBook
+            appVersion: '14.0'
+            osVersion: '27.2'
+            sampleSize: 48
+            nullCount: 0
+            failedReads: 0
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/phones
+      itemsRead: 48
+      sampledParents: 48
+      parentsScanned: 77
+      status: probed
+      skipped: []
+      note: the parent scan stopped at the time limit after 77 parents; the sample stopped at the time limit after 48 items
 
   RelatedName:
     name: RelatedName
@@ -439,6 +843,18 @@ resources:
         description: The related name value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/relatedNames
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 0
+      status: budget
+      skipped: []
+      note: 'not probed: the time budget was spent'
 
   SocialProfile:
     name: SocialProfile
@@ -474,6 +890,18 @@ resources:
     identifiers:
       - property: id
         primary: true
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/socialProfiles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 0
+      status: budget
+      skipped: []
+      note: 'not probed: the time budget was spent'
   Url:
     name: Url
     plural: Urls
@@ -498,6 +926,18 @@ resources:
         description: The URL value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/urls
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 0
+      status: budget
+      skipped: []
+      note: 'not probed: the time budget was spent'
 
   YahooHandle:
     name: YahooHandle
@@ -523,6 +963,18 @@ resources:
         description: The Yahoo handle value
         optional: false
         code: valL
+    nullabilityProbe:
+      observedAt: '2026-11-01T16:38:08.485Z'
+      bundleId: com.apple.AddressBook
+      appVersion: '14.0'
+      osVersion: '27.2'
+      accessPath: people/yahooHandles
+      itemsRead: 0
+      sampledParents: 0
+      parentsScanned: 0
+      status: budget
+      skipped: []
+      note: 'not probed: the time budget was spent'
 
 enums:
   SaveableFileFormat:

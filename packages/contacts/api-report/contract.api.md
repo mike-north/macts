@@ -100,9 +100,9 @@ export interface CustomDateUpdateInput {
 
 // @public
 export interface Email {
-    readonly id: string | null;
-    label: string | null;
-    value: string | null;
+    readonly id: string;
+    label: string;
+    value: string;
 }
 
 // @public
@@ -281,9 +281,9 @@ export interface PersonUpdateInput {
 
 // @public
 export interface Phone {
-    readonly id: string | null;
-    label: string | null;
-    value: string | null;
+    readonly id: string;
+    label: string;
+    value: string;
 }
 
 // @public
