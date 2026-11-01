@@ -4,6 +4,7 @@
 
 ```ts
 
+import { z } from 'zod';
 import { ZodType } from 'zod';
 
 // @public
@@ -283,6 +284,14 @@ export interface FileWire {
     readonly grant: string;
     readonly observedAt: WireDate;
     readonly path?: string;
+}
+
+// @public
+export function fromWireErrorEnvelope(body: unknown, options?: FromWireErrorOptions): AnyMactsError;
+
+// @public
+export interface FromWireErrorOptions {
+    readonly status?: number;
 }
 
 // @public
@@ -618,6 +627,12 @@ export interface TemporaryFileCopy {
 }
 
 // @public
+export function toWireError(error: MactsError<WireErrorCode>): WireError;
+
+// @public
+export function toWireErrorEnvelope(error: MactsError<WireErrorCode>): WireErrorEnvelope;
+
+// @public
 export class TransferError extends MactsError<'TRANSFER_FAILED'> {
     // (undocumented)
     readonly code = "TRANSFER_FAILED";
@@ -734,6 +749,11 @@ export interface ValueType<Sdk> {
     readonly sdk: ZodType<Sdk>;
     readonly wire: ZodType<WireValue>;
 }
+
+// @public
+export const WIRE_ERROR_DETAILS_SCHEMAS: {
+    readonly [C in WireErrorCode]: z.ZodType<ErrorDetailsByCode[C]>;
+};
 
 // @public
 export const WIRE_KEYS: Readonly<{
