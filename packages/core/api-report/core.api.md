@@ -2179,7 +2179,7 @@ export interface NullabilityMergeResult {
 export type NullabilityProbe = z.infer<typeof NullabilityProbeSchema>;
 
 // @public
-export function nullabilityProbeBody(accessors: readonly string[], properties: readonly string[], maxItems: number, timeLimitMs: number): string;
+export function nullabilityProbeBody(accessors: readonly string[], properties: readonly string[], maxItems: number, timeLimitMs: number, nativeNames?: Readonly<Record<string, string>>): string;
 
 // @public
 export interface NullabilityProbeEnvironment {

@@ -12,11 +12,13 @@
  * Expected counts are derived by hand from each fixture.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value; per-field evidence)
+ * @see https://github.com/mike-north/macts/issues/165 (the app's own spelling; unsupported markers)
  */
 
 import { runInNewContext } from 'node:vm'
 import { describe, expect, it } from 'vitest'
-import { parseManifestYaml } from '../manifest/loader.js'
+import { fileURLToPath } from 'node:url'
+import { loadManifest, parseManifestYaml } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
 import {
   APP_VERSION_BODY,
@@ -1456,3 +1458,94 @@ function leaves(value: unknown): unknown[] {
 function never(): never {
   throw new Error('unreachable')
 }
+
+describe("probeNullability: the app's own spelling (issue #165)", () => {
+  // The shipped manifests record where the app's spelling differs from the
+  // derived one: Music's AirPlay devices are `airplayDevices`, not the derived
+  // `airPlayDevices`, and Google Chrome's tab `uRL` is `url`. A probe that used
+  // the derived names would find no AirPlay devices and count every url read
+  // as failed: exactly the evidence an unsupported marker is taken from.
+  const manifestAt = (app: string): Promise<AppManifest> =>
+    loadManifest(fileURLToPath(new URL(`../../../../manifests/${app}/app.yaml`, import.meta.url)))
+
+  /**
+   * A fake object that records every name read from it. A name in
+   * `collections` is an element specifier; any other name is a property
+   * accessor returning a set value.
+   */
+  function recording(
+    reads: string[],
+    collections: Readonly<Record<string, readonly object[]>> = {}
+  ): object {
+    return new Proxy(
+      {},
+      {
+        get(_target, key) {
+          if (typeof key !== 'string') return undefined
+          reads.push(key)
+          const elements = collections[key]
+          return elements === undefined ? () => SECRET : elementsOf(elements)
+        },
+      }
+    )
+  }
+
+  /** A runner that answers the version read and runs every other body against `app`. */
+  function runnerFor(app: object): JxaRunner {
+    return (_bundleId, body) => {
+      if (body === APP_VERSION_BODY) return Promise.resolve('1.0')
+      const value: unknown = runInNewContext(`(function (app) {${body}})(app)`, {
+        app,
+        Date: { now: () => 1_000_000 },
+      })
+      return Promise.resolve(JSON.parse(JSON.stringify(value)))
+    }
+  }
+
+  it('reads a collection by the spelling the manifest records', async () => {
+    const manifest = await manifestAt('music')
+    const appReads: string[] = []
+    const app = recording(appReads, { airplayDevices: [recording([])] })
+    const result = await probeNullability(manifest, runnerFor(app), {
+      resources: ['AirPlayDevice'],
+      environment: environment(),
+    })
+    expect(appReads).toContain('airplayDevices')
+    expect(appReads).not.toContain('airPlayDevices')
+    expect(result.resources['AirPlayDevice']?.accessPath).toBe('airplayDevices')
+    expect(result.resources['AirPlayDevice']?.itemsRead).toBe(1)
+  })
+
+  it('reads a property by the spelling the manifest records and reports it under its key', async () => {
+    // A bookmark item is reached through its folder (the manifest's hierarchy).
+    const manifest = await manifestAt('google-chrome')
+    const itemReads: string[] = []
+    const app = recording([], {
+      bookmarkFolders: [recording([], { bookmarkItems: [recording(itemReads)] })],
+    })
+    const result = await probeNullability(manifest, runnerFor(app), {
+      resources: ['BookmarkItem'],
+      environment: environment(),
+    })
+    expect(itemReads).toContain('url')
+    expect(itemReads).not.toContain('uRL')
+    const bookmark = result.resources['BookmarkItem']
+    expect(bookmark?.accessPath).toBe('bookmarkFolders/bookmarkItems')
+    // One item read, and its url read succeeded: one read, no failures.
+    expect(bookmark?.presence['uRL']).toMatchObject({ reads: 1, nulls: 0, failures: 0 })
+    expect(Object.keys(bookmark?.presence ?? {})).not.toContain('url')
+  })
+
+  it('never probes a resource the manifest marks unsupported, even when asked to', async () => {
+    // Screen Sharing's dictionary has no connection class, so its manifest
+    // marks Connection unsupported.
+    const manifest = await manifestAt('screen-sharing')
+    const appReads: string[] = []
+    const result = await probeNullability(manifest, runnerFor(recording(appReads)), {
+      resources: ['Connection'],
+      environment: environment(),
+    })
+    expect(result.resources).toEqual({})
+    expect(appReads).not.toContain('connections')
+  })
+})
