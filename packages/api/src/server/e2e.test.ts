@@ -38,7 +38,11 @@ interface ErrorResponse {
 /** The stub executor for the current test. */
 let executor: RecordingExecutor
 
-/** The server app over the test manifest, with the stub executor. */
+/**
+ * The server app over the test manifest, with the stub executor and an
+ * explicit allow-all governance context (so the test never depends on
+ * governance files under the temporary home).
+ */
 function appWith(
   options: Omit<AppOptions, 'executor'> = {}
 ): ReturnType<typeof serverModule.createApp> {
@@ -46,6 +50,7 @@ function appWith(
     cors: false,
     logging: false,
     executor,
+    governance: { policy: runtime.ALLOW_ALL_POLICY },
     ...options,
   })
 }

@@ -16,7 +16,7 @@ other.
 | Admission          | `createRateLimiter`, `RateLimiter`, `RateLimitAdmission`                                                                                                      |
 | API keys           | `createApiKey`, `validateApiKey`, `validateAndCheckPermission`, `checkPayloadPermission`, `revokeKey`, `loadKeyMetadata`, `getSigningSecret`, `closeKeyStore` |
 | Per-key policies   | `setKeyPolicy`, `getKeyPolicy`, `deleteKeyPolicy`, `listKeyPolicyIds`, `createStoredKeyPolicyResolver`                                                        |
-| Governance loading | `loadActivePolicy`, `ALLOW_ALL_POLICY`, `loadApprovalGate`, `GovernanceContext`, `resolveGovernanceForRequest`                                                |
+| Governance loading | `loadHostGovernance`, `getAuditLogPath`, `loadActivePolicy`, `ALLOW_ALL_POLICY`, `loadApprovalGate`, `GovernanceContext`, `resolveGovernanceForRequest`       |
 | Host state         | `getMactsHome` (honours `MACTS_HOME`, defaults to `~/.macts`), and the process-wide logger: `getLogger`, `setLogger`, `createLogger`                          |
 
 ## Usage
@@ -45,22 +45,27 @@ the decision and, for a held call, asking a human), validate the input, then
 hand the request to the executor the runtime was built with. Failures are the
 structured errors from `@macts/contracts`.
 
+A runtime is built from an executor and the governance it enforces. Both are
+required: omitting governance is a compile error, never a silent allow-all.
+Hosts that act for this Mac pass `loadHostGovernance` (below).
+
 Admission only turns calls away (`RateLimitedError`); it never grants
 anything. A limiter that fails denies the call with `InternalError`.
 
 ```ts
-import { createRateLimiter, createRuntime } from '@macts/runtime'
+import { createRateLimiter, createRuntime, loadHostGovernance } from '@macts/runtime'
 
 const runtime = createRuntime({
   executor,
+  governance: loadHostGovernance,
   rateLimiter: createRateLimiter({ max: 100, windowMs: 60_000 }),
 })
 ```
 
 ```ts
-import { createBearerCredential, createRuntime } from '@macts/runtime'
+import { createBearerCredential, createRuntime, loadHostGovernance } from '@macts/runtime'
 
-const runtime = createRuntime({ executor })
+const runtime = createRuntime({ executor, governance: loadHostGovernance })
 runtime.registerManifest(manifest)
 
 const result = await runtime.invoke(
@@ -68,6 +73,37 @@ const result = await runtime.invoke(
   {},
   { credential: createBearerCredential(token) }
 )
+```
+
+## This Mac's governance
+
+`loadHostGovernance()` composes the governance a host enforces when nobody
+supplies one: the policy at `<macts-home>/governance/policy.json`, the approval
+provider registered in `<macts-home>/governance/approval.json`, each key's own
+policy from the key store, and an audit log at
+`<macts-home>/governance/audit.jsonl`. The local SDK client and the HTTP
+server both default to it. Pass the function itself as `governance`, and the
+runtime loads it on the first call:
+
+```ts
+import { createRuntime, loadHostGovernance } from '@macts/runtime'
+
+const runtime = createRuntime({ executor, governance: loadHostGovernance })
+```
+
+- A **missing** policy file means the default policy (`ALLOW_ALL_POLICY`), so a
+  first run works. The key's own permissions still gate every call.
+- A **malformed or unreadable** policy or approval file denies every call with
+  `InternalError`. Nothing falls back to allowing everything.
+- An audit record that cannot be written denies the call it describes.
+
+Tests and embedders that compose governance themselves pass their own context
+instead. To enforce no restrictions, say so explicitly:
+
+```ts
+import { ALLOW_ALL_POLICY, createRuntime } from '@macts/runtime'
+
+const runtime = createRuntime({ executor, governance: { policy: ALLOW_ALL_POLICY } })
 ```
 
 ## Storage

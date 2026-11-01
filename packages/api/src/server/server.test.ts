@@ -14,6 +14,7 @@ import type { AppManifest } from '@macts/core'
 import { createLogger, setLogger } from '@macts/runtime'
 import { createApp, createMultiServer, createServer } from './index.js'
 import {
+  ALLOW_ALL,
   createFakeVerifier,
   createRecordingExecutor,
   createTestServer,
@@ -153,6 +154,7 @@ describe('operation routes', () => {
       cors: false,
       executor: createRecordingExecutor(),
       verifier: createFakeVerifier({ [TOKEN]: { subject: 'k', permissions: ['testapp:*:*'] } }),
+      governance: { policy: ALLOW_ALL },
     }
     const single = createServer(testManifest, options).app
     const multi = createMultiServer([testManifest], options).app

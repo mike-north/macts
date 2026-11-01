@@ -109,7 +109,7 @@ interface ServerOptions {
   gracefulShutdownTimeout?: number // Default: 10000 (ms)
   tls?: TlsOptions // HTTPS when set
   rateLimit?: RateLimitOptions | false // Default: 100/min per key, 300/min per address
-  governance?: GovernanceContext // Default: allow-all policy, no audit, no approvals
+  governance?: GovernanceContext // Default: this Mac's governance (loadHostGovernance from @macts/runtime)
   executor?: Executor // Default: createNativeExecutor() from @macts/core
   verifier?: CredentialVerifier // Default: the @macts/runtime key-store verifier
   clientAddress?: (c: Context) => string | undefined // Default: the socket's remote address
@@ -128,6 +128,15 @@ interface ServerInstance {
   url: string | null // Server URL after start
 }
 ```
+
+When `governance` is omitted, the server enforces this Mac's governance,
+loaded from `MACTS_HOME` on the first call: the policy file at
+`governance/policy.json` (or the default policy when there is none), the
+approval provider registered in `governance/approval.json`, every key's own
+policy, and an audit log at `governance/audit.jsonl`. A malformed or unreadable
+policy or approval file denies every call with `500 INTERNAL`; it never falls
+back to allowing everything. Pass a `GovernanceContext` to enforce something
+else.
 
 **Example:**
 

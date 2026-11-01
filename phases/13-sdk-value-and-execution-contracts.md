@@ -505,8 +505,12 @@ resolves this in its first packaging pull request, the one that creates
    `@macts/sdk/local` fails with a clear error naming the missing package
    when it is absent.
 
-Either way, the packed-install UAT below also installs `@macts/sdk` alone and
-asserts that the installed tree contains no native addon.
+Either way, the packed-install UAT below installs `@macts/sdk` and an app
+package from packed tarballs. It asserts that the installed tree contains no
+native addon and that the macts packages installed are exactly the SDK's
+dependency closure (`@macts/contracts`, `@macts/core`, `@macts/runtime`) plus
+the SDK and the app. It then deletes `@macts/runtime` and `@macts/core` and
+asserts that `@macts/sdk` still loads and runs a remote call.
 
 **Resolution.** Option 1 was taken. The revocation and key store runs on
 `node:sqlite`. `engines.node` is `>=22.13.0`, the first release that loads
@@ -545,11 +549,12 @@ their brands mutually unassignable, so brands rely on the same single
 installed copy of `@macts/contracts` as error identity does, and the
 packed-install UAT covers both.
 
-**Governance defaults.** Servers (`createServer` and `createMultiServer`) and
-the CLI's serve mode enforce this Mac's governance (its active policy and its
-approval gate) by default. An allow-all policy applies only when the caller
-passes it explicitly. Omitting the governance option never means "no
-governance".
+**Governance defaults.** Servers (`createServer`, `createApp`, and
+`createMultiServer`), the CLI's HTTP serve mode, and the local client enforce
+this Mac's governance (`loadHostGovernance`, D5) by default. `createRuntime` has
+no default: its `governance` option is required, so every host states what it
+enforces. An allow-all policy applies only when the caller passes it
+explicitly. Omitting the governance option never means "no governance".
 
 **Release mechanics.** `@macts/contracts` starts at the fixed-group version and
 joins `@macts/*`. A never-published package needs the one-off bootstrap publish
@@ -980,6 +985,25 @@ in-process request).
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
 There is no local shortcut that skips steps 1–3.
+
+**This Mac's governance.** `loadHostGovernance()` in `@macts/runtime` is the
+single definition of the governance a host enforces when none is supplied. It
+composes the active policy (`<macts-home>/governance/policy.json`), the
+registered approval gate, the stored per-key policy resolver, and a file audit
+writer (`<macts-home>/governance/audit.jsonl`). The local client and the HTTP
+server both default to it, passing the loader itself; the runtime loads it once,
+on the first call that reaches step 3. `createRuntime` itself requires a
+`governance` option and has no default, so a host that builds a runtime
+directly (the MCP host included, #101) cannot run calls under governance it
+forgot to supply. Missing and malformed configuration are treated differently:
+
+- A **missing** policy file resolves to the documented default policy, so a
+  first run works. The key's own permissions still gate the call at step 2.
+- A **malformed or unreadable** policy file or approval registration fails
+  closed. Every call fails with `InternalError`, and nothing ever falls back to
+  allow-all. The failed load is kept, not retried, for the life of the runtime.
+- An **audit-write failure** under `MACTS_HOME` denies the call, per the
+  fail-closed rule above.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 

@@ -1,16 +1,16 @@
 /**
- * API key and base-URL resolution for macts scripting.
+ * Connection options for the remote client, resolved from the environment.
  *
- * Resolution strategy follows the same conventions used by the CLI SDK helpers
- * (`@macts/<app>/cli`) so that scripts, CLI commands, and MCP tools all share
- * one canonical lookup order:
+ * Scripts, CLI commands, and MCP tools share one lookup order, so a script can
+ * call `createClient(app, resolveClientOptions())` and connect to the same
+ * service with the same key as every other macts surface:
  *
- * **API key** (`MACTS_API_KEY` environment variable):
+ * **Token** (`MACTS_API_KEY` environment variable):
  *   Read from `process.env['MACTS_API_KEY']`. The caller (agent harness, shell,
  *   or test) sets this variable; macts itself never injects it automatically.
  *   If unset, `resolveApiKey()` throws with an actionable message.
  *
- * **Base URL** (`MACTS_API_URL` environment variable):
+ * **Service URL** (`MACTS_API_URL` environment variable):
  *   Read from `process.env['MACTS_API_URL']`. Falls back to the well-known
  *   local-daemon address `http://localhost:8372` when unset. An empty or
  *   whitespace-only value is treated as unset (same principle as `getMactsHome`
@@ -19,18 +19,10 @@
  * @packageDocumentation
  */
 
+import type { RemoteClientOptions } from './remote.js'
+
 /** Default base URL for the macts API server. */
 export const DEFAULT_BASE_URL = 'http://localhost:8372'
-
-/**
- * Resolved connection parameters for the macts API server.
- */
-export interface MactsConnectionOptions {
-  /** Validated API key token (`macts_sk_...`). */
-  readonly apiKey: string
-  /** Base URL of the macts API server. */
-  readonly baseUrl: string
-}
 
 /**
  * Resolve the macts API key from the environment.
@@ -70,16 +62,16 @@ export function resolveBaseUrl(): string {
 }
 
 /**
- * Resolve both the API key and base URL from the environment.
+ * Resolve the remote client's token and service URL from the environment.
  *
- * Convenience wrapper over {@link resolveApiKey} + {@link resolveBaseUrl}.
+ * Convenience wrapper over {@link resolveApiKey} and {@link resolveBaseUrl}.
  *
  * @throws {Error} When `MACTS_API_KEY` is not set or is whitespace-only.
- * @returns Resolved connection options ready to pass to any `@macts/<app>` client.
+ * @returns Options ready to pass to `createClient`.
  */
-export function resolveConnectionOptions(): MactsConnectionOptions {
+export function resolveClientOptions(): RemoteClientOptions {
   return {
-    apiKey: resolveApiKey(),
-    baseUrl: resolveBaseUrl(),
+    token: resolveApiKey(),
+    url: resolveBaseUrl(),
   }
 }

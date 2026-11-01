@@ -45,7 +45,7 @@ import {
   type WireErrorCode,
 } from '@macts/contracts'
 import { loadManifest, type ExecutionRequest } from '@macts/core'
-import { createRuntime, type RateLimiter } from '@macts/runtime'
+import { ALLOW_ALL_POLICY, createRuntime, type RateLimiter } from '@macts/runtime'
 import { createHttpAdapter, httpStatusForError } from './adapter.js'
 import {
   CALENDAR_MANIFEST,
@@ -559,7 +559,12 @@ describe('per-address transport limit', () => {
   it('fails closed with a generic 500 when the address limiter throws', async () => {
     const executor = createRecordingExecutor()
     const verifier = createFakeVerifier()
-    const runtime = createRuntime({ executor, verifier, logger: createCapturedLogger().logger })
+    const runtime = createRuntime({
+      executor,
+      verifier,
+      governance: { policy: ALLOW_ALL_POLICY },
+      logger: createCapturedLogger().logger,
+    })
     runtime.registerManifest(CALENDAR_MANIFEST)
     const broken: RateLimiter = {
       admit: () => {
@@ -630,6 +635,7 @@ describe('routing', () => {
     const runtime = createRuntime({
       executor: createRecordingExecutor(),
       verifier: createFakeVerifier(),
+      governance: { policy: ALLOW_ALL_POLICY },
     })
     runtime.registerManifest(CALENDAR_MANIFEST)
     const adapter = createHttpAdapter(runtime, { addressRateLimiter: false })

@@ -1,17 +1,13 @@
 /**
- * Tests for API key and base-URL resolution.
+ * Tests for resolving the remote client's token and service URL from the
+ * environment.
  *
  * Resolution strategy mirrors `@macts/<app>/cli` SDK helpers and
  * `getMactsHome()` in `@macts/runtime`.
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import {
-  DEFAULT_BASE_URL,
-  resolveApiKey,
-  resolveBaseUrl,
-  resolveConnectionOptions,
-} from './resolve.js'
+import { DEFAULT_BASE_URL, resolveApiKey, resolveBaseUrl, resolveClientOptions } from './resolve.js'
 
 // ---- env isolation ----
 
@@ -102,26 +98,21 @@ describe('resolveBaseUrl', () => {
   })
 })
 
-describe('resolveConnectionOptions', () => {
-  it('returns apiKey and baseUrl together', () => {
+describe('resolveClientOptions', () => {
+  it('returns the token and service URL together, ready for createClient', () => {
     process.env['MACTS_API_KEY'] = 'macts_sk_abc'
     process.env['MACTS_API_URL'] = 'http://custom:1234'
-    const opts = resolveConnectionOptions()
-    expect(opts.apiKey).toBe('macts_sk_abc')
-    expect(opts.baseUrl).toBe('http://custom:1234')
+    expect(resolveClientOptions()).toEqual({ token: 'macts_sk_abc', url: 'http://custom:1234' })
   })
 
-  it('uses default base URL when MACTS_API_URL is not set', () => {
+  it('uses the default service URL when MACTS_API_URL is not set', () => {
     process.env['MACTS_API_KEY'] = 'macts_sk_abc'
     delete process.env['MACTS_API_URL']
-    const opts = resolveConnectionOptions()
-    expect(opts.baseUrl).toBe(DEFAULT_BASE_URL)
+    expect(resolveClientOptions().url).toBe(DEFAULT_BASE_URL)
   })
 
   it('throws when MACTS_API_KEY is missing', () => {
     delete process.env['MACTS_API_KEY']
-    expect(() => resolveConnectionOptions()).toThrow(
-      'MACTS_API_KEY environment variable is required'
-    )
+    expect(() => resolveClientOptions()).toThrow('MACTS_API_KEY environment variable is required')
   })
 })

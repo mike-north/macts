@@ -158,7 +158,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime;
 export interface CreateRuntimeOptions {
     readonly clock?: () => Date;
     readonly executor: Executor;
-    readonly governance?: GovernanceContext;
+    readonly governance: GovernanceContext | (() => Promise<GovernanceContext>);
     readonly logger?: RuntimeLogger;
     readonly rateLimiter?: RateLimiter;
     readonly verifier?: CredentialVerifier;
@@ -210,6 +210,9 @@ export function getActivePolicyPath(): string;
 
 // @public
 export function getApprovalConfigPath(): string;
+
+// @public
+export function getAuditLogPath(): string;
 
 // @public
 export function getKeyMetadata(keyId: string): ApiKeyMetadata | undefined;
@@ -303,6 +306,16 @@ export interface LoadApprovalOptions {
 
 // @public
 export type LoadedApprovalGate = Pick<GovernanceContextWithApprovals, 'writer' | 'approvals'>;
+
+// @public
+export function loadHostGovernance(options?: LoadHostGovernanceOptions): Promise<GovernanceContext>;
+
+// @public
+export interface LoadHostGovernanceOptions {
+    readonly approvalConfigPath?: string;
+    readonly auditLogPath?: string;
+    readonly policyPath?: string;
+}
 
 // @public
 export function loadKeyMetadata(): ApiKeyMetadata[];

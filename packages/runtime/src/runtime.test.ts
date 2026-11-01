@@ -88,7 +88,7 @@ interface Harness {
 /** What a test varies about the runtime under test. */
 interface HarnessOptions {
   readonly executor?: RecordingExecutor
-  readonly governance?: GovernanceContext
+  readonly governance?: GovernanceContext | (() => Promise<GovernanceContext>)
   readonly rateLimiter?: RateLimiter
 }
 
@@ -106,7 +106,7 @@ function harness(options: HarnessOptions = {}): Harness {
     verifier,
     clock: fixedClock,
     logger,
-    ...(options.governance === undefined ? {} : { governance: options.governance }),
+    governance: options.governance ?? { policy: ALLOW_ALL_POLICY },
     ...(options.rateLimiter === undefined ? {} : { rateLimiter: options.rateLimiter }),
   })
   runtime.registerManifest(CALENDAR_MANIFEST)
@@ -322,6 +322,7 @@ describe('step 1: credential verification', () => {
     const executor = createRecordingExecutor()
     const runtime = createRuntime({
       executor,
+      governance: { policy: ALLOW_ALL_POLICY },
       logger: createSpyLogger(),
       verifier: { verify: () => Promise.reject(new Error('key database is locked')) },
     })
@@ -339,6 +340,7 @@ describe('step 1: credential verification', () => {
     const logger = createSpyLogger()
     const runtime = createRuntime({
       executor: createRecordingExecutor(),
+      governance: { policy: ALLOW_ALL_POLICY },
       logger,
       verifier: {
         verify: (credential) =>
@@ -765,6 +767,88 @@ describe('step 3: governance', () => {
     await rejection(runtime.invoke(LIST, ['not', 'a', 'record'], as(READER_SECRET)))
 
     expect(writer.records[0]?.argsSummary).toBe('(no arguments)')
+  })
+})
+
+describe('step 3: governance from a loader', () => {
+  it('loads governance once, on the first call that reaches the governance step', async () => {
+    const writer = createMemoryAuditWriter()
+    const load = vi.fn(() =>
+      Promise.resolve<GovernanceContext>({ policy: ALLOW_ALL_POLICY, writer })
+    )
+    const { runtime, executor } = harness({ governance: load })
+
+    // An unauthenticated call never reaches governance, so nothing is loaded.
+    await rejection(runtime.invoke(LIST, {}, as('macts_sk_unknown')))
+    expect(load).not.toHaveBeenCalled()
+
+    await runtime.invoke(LIST, {}, as(READER_SECRET))
+    await runtime.invoke(LIST, {}, as(READER_SECRET))
+
+    expect(load).toHaveBeenCalledTimes(1)
+    expect(writer.records).toHaveLength(2)
+    expect(executor.requests).toHaveLength(2)
+  })
+
+  it('enforces the loaded policy', async () => {
+    const { runtime, executor } = harness({
+      governance: () => Promise.resolve({ policy: FORBID_ALL }),
+    })
+
+    const error = await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(PolicyDeniedError)
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('denies every call with an internal error when the loader rejects, logging the cause once per call', async () => {
+    const cause = new Error(
+      'Invalid governance policy at "/secret/path/policy.json": not valid JSON'
+    )
+    const load = vi.fn(() => Promise.reject(cause))
+    const { runtime, executor, logger } = harness({ governance: load })
+
+    const first = await rejection(
+      runtime.invoke(LIST, {}, as(READER_SECRET, { correlationId: 'req-1' }))
+    )
+    const second = await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+    for (const error of [first, second]) {
+      expect(error).toBeInstanceOf(InternalError)
+      if (!(error instanceof InternalError)) return
+      expect(error.message).not.toContain('/secret/path')
+      expect(error.cause).toBe(cause)
+    }
+    expect(first).toMatchObject({ details: { correlationId: 'req-1' } })
+    // The failed load is kept, not retried: the same broken file would fail again.
+    expect(load).toHaveBeenCalledTimes(1)
+    expect(executor.requests).toHaveLength(0)
+    expect(logger.error).toHaveBeenCalledTimes(2)
+    expect(logger.error.mock.calls[0]?.[0]).toMatchObject({ err: cause, operation: LIST })
+    expect(JSON.stringify(logger.error.mock.calls)).not.toContain(READER_SECRET)
+  })
+
+  it('treats a loader that throws synchronously like one that rejects', async () => {
+    const { runtime, executor } = harness({
+      governance: () => {
+        throw new Error('loader exploded')
+      },
+    })
+
+    const error = await rejection(runtime.invoke(LIST, {}, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(InternalError)
+    expect(executor.requests).toHaveLength(0)
+  })
+
+  it('checks permission before loading governance', async () => {
+    const load = vi.fn(() => Promise.reject(new Error('unreadable')))
+    const { runtime } = harness({ governance: load })
+
+    const error = await rejection(runtime.invoke(CREATE, VALID_CREATE_INPUT, as(READER_SECRET)))
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    expect(load).not.toHaveBeenCalled()
   })
 })
 

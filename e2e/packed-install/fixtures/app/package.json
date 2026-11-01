@@ -1,0 +1,19 @@
+{
+  "name": "@macts-fixture/widgets",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A hand-written app package for the packed-install UAT: one resource, two operations, and its contract at the /contract subpath",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./contract": "./contract.js"
+  },
+  "files": [
+    "contract.js",
+    "manifest.js"
+  ],
+  "dependencies": {
+    "@macts/contracts": "0.0.0-filled-by-the-harness",
+    "zod": "^4.3.6"
+  }
+}
