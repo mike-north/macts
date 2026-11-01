@@ -12,6 +12,7 @@
     "clean": "nx reset && git clean -fdX -e '!**/node_modules' -e '!**/node_modules/**' -e '!.env*'",
     "lint": "nx run-many -t lint",
     "test": "nx run-many -t test",
+    "test:types": "nx run-many -t test:types",
     "typecheck": "nx run-many -t typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

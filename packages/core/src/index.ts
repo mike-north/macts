@@ -28,6 +28,9 @@ export * from './sdef/index.js'
 // JXA bridge
 export * from './jxa/index.js'
 
+// Executor seam (provider-supplied operation execution)
+export * from './execution/index.js'
+
 // Standardized types
 export * from './types/standardized.js'
 

@@ -47,6 +47,11 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Type-level tests (tsd) run against each package's published `types`
+      # rollup, so they pin the guarantees consumers actually install.
+      - name: Type tests
+        run: pnpm test:types
+
       - name: Format check
         run: pnpm format:check
 
