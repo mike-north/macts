@@ -123,6 +123,12 @@ export interface CollectionReference<T> extends Resolvable<readonly T[]> {
 }
 
 // @public
+export type CollectionReferenceData = IdentityCollectionReferenceData | SelectorCollectionReferenceData;
+
+// @public
+export type CollectionReferenceVariant<T, Id = unknown> = IdentityCollectionReference<T, Id> | SelectorCollectionReference<T>;
+
+// @public
 export type CollectionSelector = EverySelector | RangeSelector;
 
 // @public
@@ -142,8 +148,8 @@ export interface Credential {
 
 // @public
 export interface DecodeContext {
-    bindFile(file: FileWire): FileValue;
-    bindReference(reference: ReferenceWire): AnyReference<unknown>;
+    bindFile(file: FileData): FileValue;
+    bindReference(reference: ReferenceData): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>;
 }
 
 // @public
@@ -152,7 +158,7 @@ export type DynamicRecordWire = {
 };
 
 // @public
-export type DynamicWireValue = string | boolean | null | WireInteger | WireDouble | WireDate | WireReference | WireFile | DynamicRecordWire | readonly DynamicWireValue[];
+export type DynamicWireValue = string | boolean | null | WireInteger | WireDouble | WireDate | DynamicRecordWire | readonly DynamicWireValue[];
 
 // @public
 export const DynamicWireValueSchema: z.ZodType<DynamicWireValue>;
@@ -255,6 +261,13 @@ export interface FieldPlan {
 export type FieldPresence = 'required' | 'optional';
 
 // @public
+export interface FileData {
+    readonly existence: ExistenceObservation;
+    readonly grant: string;
+    readonly path?: string;
+}
+
+// @public
 export class FileNotFoundError extends MactsError<'FILE_NOT_FOUND'> {
     // (undocumented)
     readonly code = "FILE_NOT_FOUND";
@@ -275,6 +288,9 @@ export type FileSourceWire = {
 };
 
 // @public
+export const FileSourceWireSchema: z.ZodType<FileSourceWire>;
+
+// @public
 export interface FileValue {
     readonly existence: ExistenceObservation;
     fetch(options?: CallOptions): Promise<FetchedFile>;
@@ -290,6 +306,9 @@ export type FileWire = {
 };
 
 // @public
+export const FileWireSchema: z.ZodType<FileWire>;
+
+// @public
 export function fromWireErrorEnvelope(body: unknown, options?: FromWireErrorOptions): AnyMactsError;
 
 // @public
@@ -298,16 +317,32 @@ export interface FromWireErrorOptions {
 }
 
 // @public
-export interface IdentityCollectionReference<T, Id = string> extends CollectionReference<T> {
+export interface IdentityCollectionReference<T, Id = unknown> extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
     readonly entries: readonly IdentityReference<T, Id>[];
     readonly form: 'identity';
 }
 
 // @public
-export interface IdentityReference<T, Id = string> extends ObjectReference<T> {
-    readonly container?: ObjectReference<unknown>;
+export interface IdentityCollectionReferenceData<Id = unknown> {
+    readonly cardinality: 'many';
+    readonly entries: readonly IdentityReferenceData<Id>[];
+    readonly form: 'identity';
+    readonly resource: string;
+}
+
+// @public
+export interface IdentityReference<T, Id = unknown> extends IdentityReferenceData<Id>, ObjectReference<T> {
+    readonly container?: ObjectReferenceVariant<unknown>;
+    readonly form: 'identity';
+}
+
+// @public
+export interface IdentityReferenceData<Id = unknown> {
+    readonly cardinality: 'one';
+    readonly container?: ObjectReferenceData;
     readonly form: 'identity';
     readonly id: Id;
+    readonly resource: string;
 }
 
 // @public
@@ -437,6 +472,12 @@ export interface ObjectReference<T> extends Resolvable<T> {
     readonly form: ReferenceForm;
     readonly resource: string;
 }
+
+// @public
+export type ObjectReferenceData = IdentityReferenceData | SelectorReferenceData;
+
+// @public
+export type ObjectReferenceVariant<T, Id = unknown> = IdentityReference<T, Id> | SelectorReference<T>;
 
 // @public
 export type ObjectSelector = NameSelector | IndexSelector;
@@ -573,10 +614,18 @@ export interface Rectangle {
 export type ReferenceCardinality = 'one' | 'many';
 
 // @public
+export type ReferenceData = ObjectReferenceData | CollectionReferenceData;
+
+// @public
 export type ReferenceForm = 'identity' | 'selector';
 
 // @public
 export type ReferenceList<R extends ObjectReference<unknown>> = readonly R[];
+
+// @public
+export type ReferenceRegistry = Readonly<Record<string, {
+    readonly id?: ValueType<unknown>;
+}>>;
 
 // @public
 export type ReferenceWire = {
@@ -610,8 +659,9 @@ export interface Resolvable<Result> {
 }
 
 // @public
-export interface ResourceDescriptor<RecordType> {
+export interface ResourceDescriptor<RecordType, Id = unknown> {
     readonly get?: OperationId;
+    readonly id?: ValueType<Id>;
     readonly list?: OperationId;
     readonly name: string;
     readonly record: ValueType<RecordType>;
@@ -650,16 +700,32 @@ export interface RgbHelpers {
 }
 
 // @public
-export interface SelectorCollectionReference<T> extends CollectionReference<T> {
-    readonly container?: ObjectReference<unknown>;
+export interface SelectorCollectionReference<T> extends SelectorCollectionReferenceData, CollectionReference<T> {
+    readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
+}
+
+// @public
+export interface SelectorCollectionReferenceData {
+    readonly cardinality: 'many';
+    readonly container?: ObjectReferenceData;
+    readonly form: 'selector';
+    readonly resource: string;
     readonly selector: CollectionSelector;
 }
 
 // @public
-export interface SelectorReference<T> extends ObjectReference<T> {
-    readonly container?: ObjectReference<unknown>;
+export interface SelectorReference<T> extends SelectorReferenceData, ObjectReference<T> {
+    readonly container?: ObjectReferenceVariant<unknown>;
     readonly form: 'selector';
+}
+
+// @public
+export interface SelectorReferenceData {
+    readonly cardinality: 'one';
+    readonly container?: ObjectReferenceData;
+    readonly form: 'selector';
+    readonly resource: string;
     readonly selector: ObjectSelector;
 }
 
@@ -833,6 +899,8 @@ export interface ValueTypeConstructors {
     date(options?: ValueTypeOptions): ValueType<Date>;
     double(options?: ValueTypeOptions): ValueType<number>;
     enumeration<const Members extends readonly [string, ...string[]]>(members: Members, options?: ValueTypeOptions): ValueType<Members[number]>;
+    file(options?: ValueTypeOptions): ValueType<FileValue>;
+    fileSource(options?: ValueTypeOptions): ValueType<FileSource>;
     integer(options?: ValueTypeOptions): ValueType<Integer>;
     none(options?: ValueTypeOptions): ValueType<undefined>;
     nullable<Sdk>(inner: ValueType<Sdk>, options?: ValueTypeOptions): ValueType<Sdk | null>;
@@ -840,6 +908,8 @@ export interface ValueTypeConstructors {
     point(options?: ValueTypeOptions): ValueType<Point>;
     record<const Fields extends RecordFields>(fields: Fields, options?: ValueTypeOptions): ValueType<RecordSdk<Fields>>;
     rectangle(options?: ValueTypeOptions): ValueType<Rectangle>;
+    reference<T = unknown, Id = unknown>(registry: () => ReferenceRegistry, resource: string, cardinality: 'one', options?: ValueTypeOptions): ValueType<ObjectReferenceVariant<T, Id>>;
+    reference<T = unknown, Id = unknown>(registry: () => ReferenceRegistry, resource: string, cardinality: 'many', options?: ValueTypeOptions): ValueType<CollectionReferenceVariant<T, Id>>;
     rgb(options?: ValueTypeOptions): ValueType<Rgb>;
     string(options?: ValueTypeOptions): ValueType<string>;
     unknown(options?: ValueTypeOptions): ValueType<unknown>;

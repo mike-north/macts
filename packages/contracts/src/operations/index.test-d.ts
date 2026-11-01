@@ -13,9 +13,13 @@ import type {
   ClientFactory,
   FileValue,
   ClientRuntime,
+  Integer,
   OperationDescriptor,
   OperationId,
   PermissionString,
+  ReferenceRegistry,
+  ResourceDescriptor,
+  ValueType,
 } from '../index.js'
 
 interface ListEventsInput {
@@ -53,3 +57,32 @@ expectNotAssignable<PermissionString>('calendar:events')
 // reference resolution.
 expectType<CallOptions>(null as unknown as NonNullable<Parameters<ClientRuntime['invoke']>[2]>)
 expectType<CallOptions>(null as unknown as NonNullable<Parameters<FileValue['fetch']>[0]>)
+
+// Resource descriptors carry the identifier value type when the resource has
+// an identifier, so an app contract's resources table is its reference
+// registry, with no parallel table.
+expectType<ValueType<unknown> | undefined>(
+  null as unknown as ResourceDescriptor<CalendarEvent>['id']
+)
+
+// The identifier type is carried, and a typed descriptor still fits the
+// contract's untyped resources table.
+declare const eventRecord: ValueType<CalendarEvent>
+declare const typedEvents: ResourceDescriptor<CalendarEvent, Integer>
+expectType<ValueType<Integer> | undefined>(typedEvents.id)
+expectAssignable<ResourceDescriptor<unknown>>(typedEvents)
+expectAssignable<AppContract<CalendarClient>['resources']>({ events: typedEvents })
+expectAssignable<ReferenceRegistry>({ events: typedEvents })
+// Negative: an identifier type does not substitute for a different one.
+expectNotAssignable<ResourceDescriptor<CalendarEvent, string>>(typedEvents)
+expectAssignable<ReferenceRegistry>(calendar.resources)
+expectAssignable<ReferenceRegistry>(null as unknown as AppContract<CalendarClient>['resources'])
+
+// A resource without an identifier is valid; it is referenced only by
+// selectors, and the table holding it is still a reference registry.
+const paragraphs: ResourceDescriptor<CalendarEvent> = { name: 'paragraphs', record: eventRecord }
+expectAssignable<AppContract<CalendarClient>['resources']>({ paragraphs, events: typedEvents })
+expectAssignable<ReferenceRegistry>({ paragraphs, events: typedEvents })
+expectAssignable<ReferenceRegistry>({ paragraphs: {} })
+// Negative: a present identifier must be a value type.
+expectNotAssignable<ReferenceRegistry>({ paragraphs: { id: 'paragraph-id' } })

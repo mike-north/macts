@@ -3,6 +3,10 @@
  *
  * Control records are single-key objects whose key is the discriminator;
  * narrowing on the key must yield the payload type the wire contract assigns.
+ * References, file values, and file sources appear only at typed positions, so
+ * they are not dynamic wire values.
+ *
+ * @see phases/13-sdk-value-and-execution-contracts.md §D3 (Numeric Wire Encoding and Unambiguous Decoding)
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
@@ -71,25 +75,38 @@ if ('integer' in control) {
 } else if ('date' in control) {
   expectType<WireDate>(control)
   expectType<string>(control.date)
-} else if ('reference' in control) {
-  expectType<WireReference>(control)
-  expectType<ReferenceWire>(control.reference)
-} else if ('file' in control) {
-  expectType<WireFile>(control)
-  expectType<string>(control.file.grant)
 } else {
   expectType<DynamicRecordWire>(control)
   expectType<Readonly<Record<string, DynamicWireValue>>>(control.record)
 }
 
-// Negative: a reference payload is not a file payload, under either key.
+// Negative: references, file values, and file sources are typed-position
+// control records only; dynamic content does not include them.
 const eventReference = {
   resource: 'events',
   form: 'identity',
   cardinality: 'one',
   id: 'E1',
 } as const
+const reportFile = {
+  path: '/Users/me/report.pdf',
+  exists: true,
+  observedAt: { date: '2026-10-31T17:04:05.120Z' },
+  grant: 'grant-1',
+} as const
+expectNotAssignable<DynamicWireValue>({ reference: eventReference })
+expectNotAssignable<DynamicWireValue>({ file: reportFile })
+expectNotAssignable<DynamicWireValue>({
+  fileSource: { kind: 'caller-owned-file', path: '/Users/me/report.pdf' },
+})
+expectNotAssignable<DynamicWireValue>([{ reference: eventReference }])
+expectNotAssignable<DynamicWireValue>({ record: { owner: { reference: eventReference } } })
+
+// At typed positions they are control records; a reference payload is not a
+// file payload, under either key.
 expectAssignable<WireReference>({ reference: eventReference })
+expectType<ReferenceWire>(null as unknown as WireReference['reference'])
+expectAssignable<WireFile>({ file: reportFile })
 expectNotAssignable<WireFile>({ file: eventReference })
 
 // Edge: an enveloped user record may itself hold control records and nested

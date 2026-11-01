@@ -55,6 +55,29 @@ export interface FileValue {
 }
 
 /**
+ * The decoded payload of a file value: what a client's file binder receives.
+ *
+ * @remarks
+ * Decoding a `file` wire value yields this data, with `observedAt` as a
+ * `Date`, and passes it to `DecodeContext.bindFile`. The binder keeps `grant`
+ * in a closure that its {@link FileValue.fetch} uses; the grant never appears
+ * on the `FileValue`, enumerable or otherwise, so serializing, inspecting, or
+ * logging a file value cannot reveal it.
+ *
+ * It is also what the runtime encodes when an operation returns a file. File
+ * values are outputs only: a value without a grant, such as a bound
+ * `FileValue`, cannot be encoded.
+ */
+export interface FileData {
+  /** The original path on the executing Mac, when the content has one. */
+  readonly path?: string
+  /** Whether the file existed when the operation observed it. */
+  readonly existence: ExistenceObservation
+  /** Opaque, expiring fetch grant issued by the runtime for an authorized result. */
+  readonly grant: string
+}
+
+/**
  * Local read result: a temporary copy of the content on the executing Mac.
  *
  * @remarks
@@ -161,7 +184,16 @@ export type FileWire = {
   readonly grant: string
 }
 
-/** Wire form of a {@link FileSource}: the payload of a `fileSource` control record. */
+/**
+ * Wire form of a {@link FileSource}: the payload of a `fileSource` control
+ * record.
+ *
+ * @remarks
+ * An uploaded file travels as its `uploadId` only. The SDK value's
+ * `expiresAt` is not sent, because an expiry asserted by the caller would be
+ * untrusted: the service's transfer store is authoritative for expiry and
+ * completion.
+ */
 export type FileSourceWire =
   | { readonly kind: 'caller-owned-file'; readonly path: string }
   | { readonly kind: 'uploaded-file'; readonly uploadId: string }

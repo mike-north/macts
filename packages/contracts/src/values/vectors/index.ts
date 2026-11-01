@@ -14,13 +14,32 @@
  * Compare results with {@link sameValueMismatches}, which is exact about
  * signed zero, `NaN`, and own-property presence.
  *
+ * References and file values decode into live objects bound by a
+ * `DecodeContext`. Their vectors assume {@link VECTOR_DECODE_CONTEXT}, whose
+ * binders return the decoded data plus a shared marker function
+ * ({@link VECTOR_RESOLVE} on every reference, container, and entry;
+ * {@link VECTOR_FETCH} on every file), so a decoded value equals its vector's
+ * `sdk` exactly only when every decoded field and the binding both match.
+ *
  * @packageDocumentation
  */
 
 import { Integer } from '../integer.js'
 import { Rgb } from '../color.js'
+import type { FileData, FileValue } from '../../files/index.js'
 import type { IssuePath } from '../../issues.js'
-import type { ValueType } from '../value-type.js'
+import type {
+  CollectionReferenceVariant,
+  IdentityReference,
+  IdentityReferenceData,
+  ObjectReferenceData,
+  ObjectReferenceVariant,
+  ReferenceData,
+  ReferenceRegistry,
+  SelectorReference,
+  SelectorReferenceData,
+} from '../../references/index.js'
+import type { DecodeContext, ValueType } from '../value-type.js'
 import { ValueTypes as t } from '../value-types.js'
 import type { ValueIssueCode } from '../value-issues.js'
 import type { WireValue } from '../wire.js'
@@ -74,6 +93,16 @@ export interface RejectionVector {
   /** Every issue code reported, in any order, with repeats for repeated issues. */
   readonly expectedIssueCodes: readonly ValueIssueCode[]
   /**
+   * Whether the matching zod schema (the SDK schema for `encode`, the wire
+   * schema for `decode`) accepts the input although the codec rejects it.
+   * Defaults to `false`, except for encoding dynamic content, whose SDK
+   * schema accepts any value. It is `true` only where the contract separates
+   * the two on purpose: a bound file value is a valid SDK value that has no
+   * grant to encode, and an upload handle is valid wire input that only the
+   * service resolves.
+   */
+  readonly schemaAccepts?: boolean
+  /**
    * Where each issue sits, in any order, when the location is part of the
    * expectation. A path always names the value's location in the user's data,
    * in both directions: record keys and array indexes only, never the
@@ -105,6 +134,98 @@ const agenda = t.record({
 const update = t.record({ id: t.string(), note: t.optional(t.string()) })
 
 const event = t.record({ id: t.string(), count: t.integer() })
+
+/**
+ * The `resolve` of every reference bound by {@link VECTOR_DECODE_CONTEXT}: a
+ * marker that proves the binder ran. Vector references never resolve.
+ */
+export const VECTOR_RESOLVE = (): Promise<never> =>
+  Promise.reject(new Error('vector references do not resolve'))
+
+/**
+ * The `fetch` of every file value bound by {@link VECTOR_DECODE_CONTEXT}: a
+ * marker that proves the binder ran. Vector files never fetch.
+ */
+export const VECTOR_FETCH = (): Promise<never> =>
+  Promise.reject(new Error('vector files do not fetch'))
+
+function bindIdentity(data: IdentityReferenceData): IdentityReference<unknown> {
+  const { resource, form, cardinality, id } = data
+  const base = { resource, form, cardinality, id, resolve: VECTOR_RESOLVE }
+  return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
+}
+
+function bindSelector(data: SelectorReferenceData): SelectorReference<unknown> {
+  const { resource, form, cardinality, selector } = data
+  const base = { resource, form, cardinality, selector, resolve: VECTOR_RESOLVE }
+  return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
+}
+
+function bindObject(data: ObjectReferenceData): ObjectReferenceVariant<unknown> {
+  return data.form === 'identity' ? bindIdentity(data) : bindSelector(data)
+}
+
+function bindReference(
+  data: ReferenceData
+): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
+  if (data.cardinality === 'one') return bindObject(data)
+  const { resource, form, cardinality } = data
+  if (form === 'identity') {
+    return {
+      resource,
+      form,
+      cardinality,
+      entries: data.entries.map(bindIdentity),
+      resolve: VECTOR_RESOLVE,
+    }
+  }
+  const base = { resource, form, cardinality, selector: data.selector, resolve: VECTOR_RESOLVE }
+  return data.container === undefined ? base : { ...base, container: bindObject(data.container) }
+}
+
+/**
+ * The decode context the vectors assume.
+ *
+ * @remarks
+ * `bindReference` returns the decoded data with {@link VECTOR_RESOLVE} added
+ * to the reference and to every container and entry in it. `bindFile` returns
+ * the decoded file data with {@link VECTOR_FETCH} added. Unlike a real binder,
+ * it leaves the grant visible on the result, so the vectors can check that
+ * the grant was decoded; a real binder keeps the grant in a closure.
+ */
+export const VECTOR_DECODE_CONTEXT: DecodeContext = Object.freeze({
+  bindReference,
+  bindFile: (file: FileData): FileValue => ({ ...file, fetch: VECTOR_FETCH }),
+})
+
+/**
+ * The resource table of the reference vectors: notes with text identifiers,
+ * folders with integer identifiers, and accounts with text identifiers. Notes
+ * are contained in folders and folders in accounts. Paragraphs (in notes) and
+ * words (in paragraphs) have no identifier, so they are referenced only by
+ * selectors.
+ */
+const VECTOR_RESOURCES: ReferenceRegistry = Object.freeze({
+  note: { id: t.string() },
+  folder: { id: t.integer() },
+  account: { id: t.string() },
+  paragraph: {},
+  word: {},
+})
+const resources = (): ReferenceRegistry => VECTOR_RESOURCES
+
+const noteRef = t.reference(resources, 'note', 'one')
+const noteRefs = t.reference(resources, 'note', 'many')
+const folderRef = t.reference(resources, 'folder', 'one')
+const paragraphRef = t.reference(resources, 'paragraph', 'one')
+const paragraphRefs = t.reference(resources, 'paragraph', 'many')
+const wordRef = t.reference(resources, 'word', 'one')
+
+const file = t.file()
+const fileSource = t.fileSource()
+
+/** When the file vectors' existence was observed, as wire date text. */
+const OBSERVED_AT = '2026-10-31T17:04:05.120Z'
 
 /** Valid values, in both directions unless restricted. */
 export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
@@ -454,6 +575,20 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     },
   },
   {
+    name: 'a dynamic plain object shaped like a file source is a user record',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    sdk: { kind: 'caller-owned-file', path: '/x' },
+    wire: { record: { kind: 'caller-owned-file', path: '/x' } },
+  },
+  {
+    name: 'a dynamic user record with a key named "fileSource" is enveloped',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    sdk: { fileSource: { kind: 'caller-owned-file', path: '/x' } },
+    wire: { record: { fileSource: { record: { kind: 'caller-owned-file', path: '/x' } } } },
+  },
+  {
     name: 'a dynamic integer control record decodes to a number',
     see: 'phases/13 §D3',
     type: t.unknown(),
@@ -467,6 +602,388 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
     type: t.unknown(),
     sdk: { a: undefined, b: ['x'] },
     wire: { record: { b: ['x'] } },
+    direction: 'encode',
+  },
+
+  // References.
+  {
+    name: 'an identity reference with a text id',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    sdk: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: { reference: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } },
+  },
+  {
+    name: "an identity reference's integer id is wire-encoded by its resource's id type",
+    see: 'phases/13 §D7',
+    type: folderRef,
+    sdk: {
+      resource: 'folder',
+      form: 'identity',
+      cardinality: 'one',
+      id: Integer.validate(7),
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: { resource: 'folder', form: 'identity', cardinality: 'one', id: { integer: '7' } },
+    },
+  },
+  {
+    name: 'a single-object selector by name',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Groceries' },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Groceries' },
+      },
+    },
+  },
+  {
+    name: 'a single-object selector at zero-based index 0',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: Integer.validate(0) },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '0' } },
+      },
+    },
+  },
+  {
+    name: 'a collection selector for every object',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    },
+  },
+  {
+    name: 'a half-open range of the first ten objects',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'range', start: Integer.validate(0), end: Integer.validate(10) },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'range', start: { integer: '0' }, end: { integer: '10' } },
+      },
+    },
+  },
+  {
+    name: 'a range whose start equals its end is a valid empty range',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'range', start: Integer.validate(2), end: Integer.validate(2) },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'range', start: { integer: '2' }, end: { integer: '2' } },
+      },
+    },
+  },
+  {
+    name: 'an identity collection lists its entries in order',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    sdk: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [
+        {
+          resource: 'note',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'N2',
+          resolve: VECTOR_RESOLVE,
+        },
+        {
+          resource: 'note',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'N1',
+          resolve: VECTOR_RESOLVE,
+        },
+      ],
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [
+          { resource: 'note', form: 'identity', cardinality: 'one', id: 'N2' },
+          { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+        ],
+      },
+    },
+  },
+  {
+    name: "containers nest two deep, each id encoded by its own resource's id type",
+    see: 'phases/13 §D7',
+    type: noteRef,
+    sdk: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: {
+        resource: 'folder',
+        form: 'identity',
+        cardinality: 'one',
+        id: Integer.validate(7),
+        container: {
+          resource: 'account',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'A1',
+          resolve: VECTOR_RESOLVE,
+        },
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: {
+          resource: 'folder',
+          form: 'identity',
+          cardinality: 'one',
+          id: { integer: '7' },
+          container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+        },
+      },
+    },
+  },
+  {
+    name: 'a collection selector evaluated in a selected container',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    sdk: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container: {
+        resource: 'folder',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Inbox' },
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+        container: {
+          resource: 'folder',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'name', name: 'Inbox' },
+        },
+      },
+    },
+  },
+
+  // References to resources without an identifier.
+  {
+    name: 'a resource without an identifier, selected by index',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    sdk: {
+      resource: 'paragraph',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: Integer.validate(2) },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '2' } },
+      },
+    },
+  },
+  {
+    name: 'every object of a resource without an identifier, in an identified container',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    sdk: {
+      resource: 'paragraph',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+        container: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+      },
+    },
+  },
+  {
+    name: 'a resource without an identifier serves as a selected container',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    sdk: {
+      resource: 'word',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: Integer.validate(0) },
+      container: {
+        resource: 'paragraph',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: Integer.validate(2) },
+        container: {
+          resource: 'note',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'N1',
+          resolve: VECTOR_RESOLVE,
+        },
+        resolve: VECTOR_RESOLVE,
+      },
+      resolve: VECTOR_RESOLVE,
+    },
+    wire: {
+      reference: {
+        resource: 'word',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '0' } },
+        container: {
+          resource: 'paragraph',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'index', index: { integer: '2' } },
+          container: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+        },
+      },
+    },
+  },
+
+  // Files and file sources.
+  {
+    name: 'a file value with its original path',
+    see: 'phases/13 §D8',
+    type: file,
+    sdk: {
+      path: '/Users/me/report.pdf',
+      existence: { exists: true, observedAt: at(OBSERVED_AT) },
+      grant: 'grant-1',
+      fetch: VECTOR_FETCH,
+    },
+    wire: {
+      file: {
+        path: '/Users/me/report.pdf',
+        exists: true,
+        observedAt: { date: '2026-10-31T17:04:05.120Z' },
+        grant: 'grant-1',
+      },
+    },
+  },
+  {
+    name: 'a file value without a path, observed missing',
+    see: 'phases/13 §D8',
+    type: file,
+    sdk: {
+      existence: { exists: false, observedAt: at(OBSERVED_AT) },
+      grant: 'grant-2',
+      fetch: VECTOR_FETCH,
+    },
+    wire: {
+      file: { exists: false, observedAt: { date: '2026-10-31T17:04:05.120Z' }, grant: 'grant-2' },
+    },
+  },
+  {
+    name: 'a caller-owned file source travels as its path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    sdk: { kind: 'caller-owned-file', path: '/Users/me/upload.pdf' },
+    wire: { fileSource: { kind: 'caller-owned-file', path: '/Users/me/upload.pdf' } },
+  },
+  {
+    name: "an uploaded file source travels as its upload id, without the caller's expiry",
+    see: 'phases/13 §D8',
+    type: fileSource,
+    sdk: { kind: 'uploaded-file', uploadId: 'U1', expiresAt: at('2026-10-31T17:09:05.120Z') },
+    wire: { fileSource: { kind: 'uploaded-file', uploadId: 'U1' } },
     direction: 'encode',
   },
 
@@ -767,6 +1284,45 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     expectedIssuePaths: [[]],
   },
   {
+    name: 'a file value cannot be represented in dynamic content',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: { file: { exists: true, observedAt: { date: '2026-10-31T17:04:05.120Z' }, grant: 'g' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a file source cannot be represented in dynamic content',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: { fileSource: { kind: 'caller-owned-file', path: '/x' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a file source nested in dynamic content is located in the user data',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: { record: { attachments: [{ fileSource: { kind: 'uploaded-file', uploadId: 'U1' } }] } },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['attachments', 0]],
+  },
+  {
+    name: 'a bound file value in dynamic content cannot be encoded: its fetch is a function',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: {
+      existence: { exists: true, observedAt: at('2026-10-31T17:04:05.120Z') },
+      fetch: VECTOR_FETCH,
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['fetch']],
+  },
+  {
     name: 'a problem nested in dynamic envelopes is located in the user data on decode',
     see: 'phases/13 §D3',
     type: t.unknown(),
@@ -835,6 +1391,577 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     input: 10n,
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],
+  },
+
+  // References.
+  {
+    name: 'a reference to another resource',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: { resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a wire reference to another resource',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: { resource: 'folder', form: 'identity', cardinality: 'one', id: { integer: '7' } },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a collection at a single-object position',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: { resource: 'note', form: 'selector', cardinality: 'many', selector: { by: 'every' } },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a negative index',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: -1 },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['selector', 'index']],
+  },
+  {
+    name: 'a negative wire index',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '-1' } },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['selector', 'index']],
+  },
+  {
+    name: 'a fractional index',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: 1.5 },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['not-integer'],
+    expectedIssuePaths: [['selector', 'index']],
+  },
+  {
+    name: 'a range whose start exceeds its end',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'range', start: 5, end: 2 },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a wire range whose start exceeds its end',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'range', start: { integer: '5' }, end: { integer: '2' } },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'an identity-collection entry of another resource',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [
+        { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' },
+        { resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
+      ],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [['entries', 1]],
+  },
+  {
+    name: 'an identity-collection entry that is a selector',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [
+        {
+          resource: 'note',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'name', name: 'x' },
+        },
+      ],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [['entries', 0]],
+  },
+  {
+    name: 'a container of a resource the app does not have',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: { resource: 'calendar', form: 'identity', cardinality: 'one', id: 'C1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+  {
+    name: 'a wire container of a resource the app does not have',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: { resource: 'calendar', form: 'identity', cardinality: 'one', id: 'C1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+  {
+    name: 'a container that is a collection',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Groceries' },
+      container: {
+        resource: 'folder',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['invalid-type'],
+    expectedIssuePaths: [['container']],
+  },
+  {
+    name: 'a non-canonical integer id on the wire',
+    see: 'phases/13 §D3',
+    type: folderRef,
+    input: {
+      reference: {
+        resource: 'folder',
+        form: 'identity',
+        cardinality: 'one',
+        id: { integer: '007' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['not-integer'],
+    expectedIssuePaths: [['id']],
+  },
+  {
+    name: 'an undeclared key in a wire reference',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        revision: 'r1',
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['revision']],
+  },
+
+  // One strictness rule in both directions: undeclared own data is rejected.
+  {
+    name: 'an identity reference with a selector',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      selector: { by: 'name', name: 'Inbox' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a wire identity reference with a selector',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        selector: { by: 'name', name: 'Inbox' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a selector reference with an id',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: 0 },
+      id: 'N1',
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['id']],
+  },
+  {
+    name: 'a wire selector reference with an id',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'index', index: { integer: '0' } },
+        id: 'N1',
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['id']],
+  },
+  {
+    name: 'an identity collection with a selector and a container',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [],
+      selector: { by: 'every' },
+      container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field', 'unknown-field'],
+    expectedIssuePaths: [['selector'], ['container']],
+  },
+  {
+    name: 'a wire identity collection with a selector',
+    see: 'phases/13 §D7',
+    type: noteRefs,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [],
+        selector: { by: 'every' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector']],
+  },
+  {
+    name: 'a misspelled container on a reference',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      contianer: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['contianer']],
+  },
+  {
+    name: 'a misspelled container on a wire reference',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        contianer: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['contianer']],
+  },
+  {
+    name: 'a name selector with an index',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      resource: 'note',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'Inbox', index: 0 },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['selector', 'index']],
+  },
+  {
+    // A reference-shaped object without its envelope is a user record to the
+    // dynamic codec, and a bare user record must be enveloped on the wire.
+    name: 'an unenveloped reference-shaped object in dynamic content',
+    see: 'phases/13 §D3',
+    type: t.unknown(),
+    input: { resource: 'note', form: 'identity', cardinality: 'one', id: 'x' },
+    direction: 'decode',
+    expectedIssueCodes: ['invalid-control-record'],
+    expectedIssuePaths: [[]],
+  },
+
+  // Identity forms of resources without an identifier.
+  {
+    name: 'an identity reference to a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    input: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a wire identity reference to a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRef,
+    input: {
+      reference: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    // The collection shares its entries' resource, so its own identity form is
+    // rejected before any entry is read.
+    name: 'an identity collection of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    input: {
+      resource: 'paragraph',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [{ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a wire identity collection of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: paragraphRefs,
+    input: {
+      reference: {
+        resource: 'paragraph',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' }],
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'an identity container of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    input: {
+      resource: 'word',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'name', name: 'macts' },
+      container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+  {
+    name: 'a wire identity container of a resource without an identifier',
+    see: 'phases/13 §D7',
+    type: wordRef,
+    input: {
+      reference: {
+        resource: 'word',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'macts' },
+        container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container']],
+  },
+
+  // Files and file sources.
+  {
+    name: 'a bound file value sent as input has no grant to encode',
+    see: 'phases/13 §D8',
+    type: file,
+    input: {
+      path: '/Users/me/report.pdf',
+      existence: { exists: true, observedAt: at(OBSERVED_AT) },
+      fetch: VECTOR_FETCH,
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+    // A bound file value is a valid SDK value; only the runtime encodes files.
+    schemaAccepts: true,
+  },
+  {
+    name: 'an empty file grant on the wire',
+    see: 'phases/13 §D8',
+    type: file,
+    input: { file: { exists: true, observedAt: { date: OBSERVED_AT }, grant: '' } },
+    direction: 'decode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['grant']],
+  },
+  {
+    name: 'a file observation time that is not a real instant',
+    see: 'phases/13 §D8',
+    type: file,
+    input: { file: { exists: true, observedAt: { date: '2026-02-30T00:00:00.000Z' }, grant: 'g' } },
+    direction: 'decode',
+    expectedIssueCodes: ['invalid-date'],
+    expectedIssuePaths: [['existence', 'observedAt']],
+  },
+  {
+    name: 'an upload handle does not decode',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'uploaded-file', uploadId: 'U1' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+    // Valid wire input: the service's transfer step resolves it from the wire.
+    schemaAccepts: true,
+  },
+  {
+    name: 'an uploaded file with a path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { kind: 'uploaded-file', uploadId: 'U1', expiresAt: at(OBSERVED_AT), path: '/x' },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['path']],
+  },
+  {
+    // Malformed keys are reported beside the fail-closed rejection.
+    name: 'a wire upload handle with a path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'uploaded-file', uploadId: 'U1', path: '/x' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field', 'unsupported'],
+    expectedIssuePaths: [['path'], []],
+  },
+  {
+    name: 'a caller-owned file with an upload id',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { kind: 'caller-owned-file', path: '/x', uploadId: 'U1' },
+    direction: 'encode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['uploadId']],
+  },
+  {
+    name: 'a wire caller-owned file with an upload id',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'caller-owned-file', path: '/x', uploadId: 'U1' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-field'],
+    expectedIssuePaths: [['uploadId']],
+  },
+  {
+    name: 'a caller-owned file with an empty path',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { kind: 'caller-owned-file', path: '' },
+    direction: 'encode',
+    expectedIssueCodes: ['out-of-range'],
+    expectedIssuePaths: [['path']],
+  },
+  {
+    name: 'an unknown file source kind',
+    see: 'phases/13 §D8',
+    type: fileSource,
+    input: { fileSource: { kind: 'shared-folder', path: '/Volumes/share' } },
+    direction: 'decode',
+    expectedIssueCodes: ['unknown-enum-member'],
+    expectedIssuePaths: [['kind']],
   },
 
   // No value.

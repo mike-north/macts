@@ -128,19 +128,35 @@ export type WireDate = {
   readonly date: string
 }
 
-/** A reference to app objects; see the references module for the payload. */
+/**
+ * A reference to app objects; see the references module for the payload.
+ *
+ * @remarks
+ * Valid only at a typed reference position, whose contract names the
+ * resource.
+ */
 export type WireReference = {
   /** The reference payload. */
   readonly reference: ReferenceWire
 }
 
-/** A file or binary content returned by an operation. */
+/**
+ * A file or binary content returned by an operation.
+ *
+ * @remarks
+ * Valid only at a typed file position.
+ */
 export type WireFile = {
   /** The file metadata payload. */
   readonly file: FileWire
 }
 
-/** A source of bytes supplied to an operation that writes a file. */
+/**
+ * A source of bytes supplied to an operation that writes a file.
+ *
+ * @remarks
+ * Valid only at a typed file-source position.
+ */
 export type WireFileSource = {
   /** The source payload. */
   readonly fileSource: FileSourceWire
@@ -168,6 +184,13 @@ export type DynamicRecordWire = {
  * Strings, booleans, and `null` stand for themselves; arrays hold encoded
  * elements; every object is a control record. Numbers of unknown native
  * classification are encoded as doubles.
+ *
+ * References, file values, and file sources appear only at typed positions,
+ * never in dynamic content. Decoding a reference needs its resource's
+ * identifier type, which an `unknown` position does not name, and a file value
+ * carries a runtime-issued grant that dynamic content cannot establish. So
+ * {@link WireReference}, {@link WireFile}, and {@link WireFileSource} are not
+ * members of this type.
  */
 export type DynamicWireValue =
   | string
@@ -176,7 +199,5 @@ export type DynamicWireValue =
   | WireInteger
   | WireDouble
   | WireDate
-  | WireReference
-  | WireFile
   | DynamicRecordWire
   | readonly DynamicWireValue[]

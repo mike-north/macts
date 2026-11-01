@@ -12,23 +12,19 @@
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §A9 (Parity Acceptance: Numeric wire, Dates, Presence and updates)
  * @see phases/13-sdk-value-and-execution-contracts.md §D3 (Numeric Wire Encoding and Unambiguous Decoding)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D7 (Reference Hydration Contracts)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D8 (Binary Transfer Handle Shapes)
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (Positions on Precision, Signed Zero, Classification, and Dates)
  */
 
 import { describe, expect, it } from 'vitest'
-import type { DecodeContext } from '../value-type.js'
 import { VALUE_ISSUE_CODES } from '../value-issues.js'
-import { REJECTION_VECTORS, VALUE_VECTORS, sameValueMismatches } from './index.js'
-
-/** References and files are not involved in these vectors, so binding is never reached. */
-const context: DecodeContext = {
-  bindReference() {
-    throw new Error('no reference binding in value vectors')
-  },
-  bindFile() {
-    throw new Error('no file binding in value vectors')
-  },
-}
+import {
+  REJECTION_VECTORS,
+  VALUE_VECTORS,
+  VECTOR_DECODE_CONTEXT as context,
+  sameValueMismatches,
+} from './index.js'
 
 const NATIVE_TERMS = /applescript|jxa|osascript/i
 
@@ -116,8 +112,11 @@ describe('rejection vectors', () => {
     (_name, vector) => {
       const schema = vector.direction === 'encode' ? vector.type.sdk : vector.type.wire
       // Dynamic SDK values are typed `unknown`, so the SDK validator accepts any
-      // value; only encoding decides what dynamic content can represent.
-      const expected = vector.direction === 'encode' && vector.type.plan.kind === 'unknown'
+      // value; only encoding decides what dynamic content can represent. Other
+      // deliberate differences are marked on the vector.
+      const expected =
+        vector.schemaAccepts ??
+        (vector.direction === 'encode' && vector.type.plan.kind === 'unknown')
       expect(schema.safeParse(vector.input).success).toBe(expected)
     }
   )

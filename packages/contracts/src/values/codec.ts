@@ -6,9 +6,8 @@
  * more: to report every issue in one pass, each with its full path, and to
  * word messages that name that path. This module gives every value type built
  * by the constructors a path-aware {@link Codec}, registered against the value
- * type so composites can reach it, and adapts any other `ValueType` (built
- * elsewhere, for example by a reference or file module) through its public
- * methods.
+ * type so composites can reach it, and adapts any other `ValueType` (one not
+ * built by {@link defineValueType}) through its public methods.
  *
  * An issue path always names where the offending value sits in the user's
  * data, in both directions: record keys and array indexes only. Wire-only
@@ -24,7 +23,7 @@
 
 import type { ZodType } from 'zod'
 import type { IssuePath, ValidationIssue } from '../issues.js'
-import { describeReceived, issue, isPlainObject } from './issue-helpers.js'
+import { describeReceived, issue, isPlainObject, quote } from './issue-helpers.js'
 import type { ValuePlan } from './plan.js'
 import type { CodecResult, DecodeContext, ValueType } from './value-type.js'
 import type { WireValue } from './wire.js'
@@ -144,6 +143,29 @@ export function mismatch(
           `Expected ${expected}; received null, which is not allowed here.`
         )
       : issue(path, 'invalid-type', `Expected ${expected}; received ${describeReceived(value)}.`)
+  )
+  return INVALID
+}
+
+/**
+ * Record a problem with a required field located at `path` (whose last
+ * segment names the field): `missing-field` when it is absent (`undefined`),
+ * otherwise a type mismatch as {@link mismatch} reports it.
+ */
+export function fieldMismatch(
+  value: unknown,
+  path: IssuePath,
+  issues: Issues,
+  expected: string
+): Invalid {
+  if (value !== undefined) return mismatch(value, path, issues, expected)
+  const key = String(path[path.length - 1] ?? 'value')
+  issues.push(
+    issue(
+      path,
+      'missing-field',
+      `The required field ${quote(key)} is missing; expected ${expected}.`
+    )
   )
   return INVALID
 }

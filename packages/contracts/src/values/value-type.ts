@@ -16,9 +16,13 @@
  */
 
 import type { ZodType } from 'zod'
-import type { FileValue, FileWire } from '../files/index.js'
+import type { FileData, FileValue } from '../files/index.js'
 import type { ValidationIssue } from '../issues.js'
-import type { AnyReference, ReferenceWire } from '../references/index.js'
+import type {
+  CollectionReferenceVariant,
+  ObjectReferenceVariant,
+  ReferenceData,
+} from '../references/index.js'
 import type { ValuePlan } from './plan.js'
 import type { WireValue } from './wire.js'
 
@@ -38,13 +42,33 @@ export type CodecResult<T> =
  * @remarks
  * References and file values are live objects bound to the client that decoded
  * them, so resolving or fetching follows that client's locality (local
- * runtime or remote service) without separate APIs.
+ * runtime or remote service) without separate APIs. Binders receive decoded
+ * data, never wire encodings: the value type has already validated the wire
+ * form and decoded every nested value.
  */
 export interface DecodeContext {
-  /** Produce a reference bound to the decoding client. */
-  bindReference(reference: ReferenceWire): AnyReference<unknown>
-  /** Produce a file value bound to the decoding client. */
-  bindFile(file: FileWire): FileValue
+  /**
+   * Produce a reference bound to the decoding client from its decoded data.
+   *
+   * @remarks
+   * `reference` carries identifiers decoded through the app's resource table,
+   * selector positions as `Integer`, and any containers (and identity
+   * collection entries) as nested data. The result must be the bound form of
+   * the same variant (same resource, form, and cardinality, with the same data
+   * fields), with nested containers and entries bound as well, so that the
+   * result is itself valid encode input.
+   */
+  bindReference(
+    reference: ReferenceData
+  ): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>
+  /**
+   * Produce a file value bound to the decoding client from its decoded data.
+   *
+   * @remarks
+   * The binder keeps `file.grant` private to the file value's `fetch`; it
+   * must not appear on the result.
+   */
+  bindFile(file: FileData): FileValue
 }
 
 /**

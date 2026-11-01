@@ -18,13 +18,13 @@ import type { ValueIssueCode } from './value-issues.js'
 import { SPECIAL_DOUBLE_STATES, type SpecialDoubleState } from './wire.js'
 
 /**
- * The rule for references and file values inside dynamic content, stated once
- * so that the wire schema and the codec report it identically: they are not
- * representable there, and a contract that needs them declares them at a
- * typed position.
+ * The rule for references, file values, and file sources inside dynamic
+ * content, stated once so that the wire schema and the codec report it
+ * identically: they appear only at typed positions, so a contract that needs
+ * them declares them there.
  */
-export const DYNAMIC_REFERENCE_OR_FILE_MESSAGE =
-  'References and files cannot be represented in dynamic content; declare them at a typed position.'
+export const DYNAMIC_TYPED_ONLY_MESSAGE =
+  'References, files, and file sources cannot be represented in dynamic content; declare them at a typed position.'
 
 /** Outcome of checking one payload. */
 export type Check<T> =

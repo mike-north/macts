@@ -10,6 +10,7 @@
  * structurally too.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md §D3 (Numeric Wire Encoding and Unambiguous Decoding)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D8 (Binary Transfer Handle Shapes: wire forms, file sources)
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (Integer and signed zero, Double and signed zero)
  * @see phases/13-sdk-value-and-execution-contracts.md §D9 (Zod as the single schema source)
  * @see https://zod.dev/json-schema
@@ -20,6 +21,8 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import {
   DynamicWireValueSchema,
+  FileSourceWireSchema,
+  FileWireSchema,
   WireDateSchema,
   WireDoubleSchema,
   WireIntegerSchema,
@@ -214,7 +217,6 @@ describe('DynamicWireValueSchema', () => {
     ['an empty object inside an envelope', { record: { x: {} } }],
     ['an empty object inside an array', [{}]],
     ['undefined', undefined],
-    ['a file source, which is not dynamic content', { fileSource: { kind: 'upload' } }],
   ])('rejects %s', (_label, value) => {
     expect(accepts(DynamicWireValueSchema, value)).toBe(false)
   })
@@ -226,6 +228,12 @@ describe('DynamicWireValueSchema', () => {
       ['reference'],
     ],
     ['file', { file: { grant: 'g' } }, ['file']],
+    [
+      'file source',
+      { fileSource: { kind: 'caller-owned-file', path: '/Users/me/a.pdf' } },
+      ['fileSource'],
+    ],
+    ['file source', [{ fileSource: { kind: 'upload' } }], [0, 'fileSource']],
     ['reference', { record: { owner: [{ reference: {} }] } }, ['record', 'owner', 0, 'reference']],
   ] as const)(
     'rejects a %s value as not representable in dynamic content, at its path',
@@ -235,11 +243,61 @@ describe('DynamicWireValueSchema', () => {
       const issues = result.error?.issues ?? []
       expect(issues).toHaveLength(1)
       expect(issues[0]?.message).toBe(
-        'References and files cannot be represented in dynamic content; declare them at a typed position.'
+        'References, files, and file sources cannot be represented in dynamic content; declare them at a typed position.'
       )
       expect(issues[0]?.path).toEqual(path)
     }
   )
+})
+
+describe('FileWireSchema', () => {
+  const observedAt = { date: '2026-10-31T17:04:05.120Z' }
+
+  it.each([
+    ['with a path', { path: '/Users/me/a.pdf', exists: true, observedAt, grant: 'g' }],
+    ['without a path', { exists: false, observedAt, grant: 'g' }],
+  ])('accepts a file payload %s', (_label, payload) => {
+    expect(accepts(FileWireSchema, payload)).toBe(true)
+  })
+
+  it.each([
+    ['an empty grant', { exists: true, observedAt, grant: '' }],
+    ['no grant', { exists: true, observedAt }],
+    ['an undeclared key', { exists: true, observedAt, grant: 'g', size: 1 }],
+    ['a bare observation time', { exists: true, observedAt: observedAt.date, grant: 'g' }],
+    [
+      'an impossible observation time',
+      { exists: true, observedAt: { date: '2026-02-30T00:00:00.000Z' }, grant: 'g' },
+    ],
+    ['the SDK existence shape', { existence: { exists: true, observedAt }, grant: 'g' }],
+    ['a null path', { path: null, exists: true, observedAt, grant: 'g' }],
+  ])('rejects %s', (_label, payload) => {
+    expect(accepts(FileWireSchema, payload)).toBe(false)
+  })
+})
+
+describe('FileSourceWireSchema', () => {
+  it.each([
+    ['a caller-owned file', { kind: 'caller-owned-file', path: '/Users/me/a.pdf' }],
+    ['an uploaded file', { kind: 'uploaded-file', uploadId: 'U1' }],
+  ])('accepts %s', (_label, payload) => {
+    expect(accepts(FileSourceWireSchema, payload)).toBe(true)
+  })
+
+  it.each([
+    ['an empty path', { kind: 'caller-owned-file', path: '' }],
+    ['an empty upload id', { kind: 'uploaded-file', uploadId: '' }],
+    [
+      "an uploaded file with the caller's expiry",
+      { kind: 'uploaded-file', uploadId: 'U1', expiresAt: { date: '2026-10-31T17:04:05.120Z' } },
+    ],
+    ['an uploaded file named by path', { kind: 'uploaded-file', path: '/a' }],
+    ['an unknown kind', { kind: 'shared-folder', path: '/a' }],
+    ['no kind', { path: '/a' }],
+    ['a bare path', '/a'],
+  ])('rejects %s', (_label, payload) => {
+    expect(accepts(FileSourceWireSchema, payload)).toBe(false)
+  })
 })
 
 describe('JSON Schema derivation', () => {
@@ -251,6 +309,8 @@ describe('JSON Schema derivation', () => {
     ['WireDoubleSchema', WireDoubleSchema],
     ['WireDateSchema', WireDateSchema],
     ['DynamicWireValueSchema', DynamicWireValueSchema],
+    ['FileWireSchema', FileWireSchema],
+    ['FileSourceWireSchema', FileSourceWireSchema],
   ] as const)('converts %s without throwing', (_name, schema) => {
     expect(() => toJsonSchema(schema)).not.toThrow()
   })
@@ -291,6 +351,44 @@ describe('JSON Schema derivation', () => {
         pattern: String.raw`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}(Z|[+-]\d{2}:\d{2})$`,
       },
     })
+  })
+
+  it('describes a file payload with its required keys and no others', () => {
+    const schema = toJsonSchema(FileWireSchema)
+    expect(schema['type']).toBe('object')
+    expect(schema['required']).toEqual(['exists', 'observedAt', 'grant'])
+    expect(schema['additionalProperties']).toBe(false)
+    expect((schema['properties'] as Record<string, unknown>)['grant']).toEqual({
+      type: 'string',
+      minLength: 1,
+    })
+  })
+
+  it('describes a file source as exactly two strict kinds', () => {
+    const branches =
+      toJsonSchema(FileSourceWireSchema)['oneOf'] ?? toJsonSchema(FileSourceWireSchema)['anyOf']
+    expect(Array.isArray(branches)).toBe(true)
+    expect(branches).toHaveLength(2)
+    for (const branch of branches as Record<string, unknown>[]) {
+      expect(branch['additionalProperties']).toBe(false)
+    }
+  })
+
+  it('admits no reference, file, or file source in dynamic content', () => {
+    const branches = toJsonSchema(DynamicWireValueSchema)['anyOf'] as Record<string, unknown>[]
+    for (const key of ['reference', 'file', 'fileSource']) {
+      const branch = branches.find((candidate) => {
+        const properties = candidate['properties']
+        return typeof properties === 'object' && properties !== null && key in properties
+      })
+      // The key appears only to report the rule; its payload schema admits nothing.
+      expect(branch).toEqual({
+        type: 'object',
+        properties: { [key]: { not: {} } },
+        required: [key],
+        additionalProperties: false,
+      })
+    }
   })
 
   it('describes dynamic content as a recursive union that admits no bare numbers', () => {

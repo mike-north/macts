@@ -560,9 +560,9 @@ describe('unknown', () => {
       [{ path: [], code: 'invalid-control-record' }],
     ],
     [
-      'a file source, which is not dynamic content',
-      { fileSource: {} },
-      [{ path: [], code: 'invalid-control-record' }],
+      'a file source, which appears only at typed positions',
+      { fileSource: { kind: 'caller-owned-file', path: '/x' } },
+      [{ path: [], code: 'unsupported' }],
     ],
     ['undefined', undefined, [{ path: [], code: 'invalid-type' }]],
   ] as const)('decode rejects %s', (_label, wire, issues) => {
@@ -580,10 +580,10 @@ describe('unknown', () => {
     ])
   })
 
-  it('states the rule for references and files in dynamic content', () => {
-    for (const wire of [{ reference: {} }, { file: {} }]) {
+  it('states the rule for references, files, and file sources in dynamic content', () => {
+    for (const wire of [{ reference: {} }, { file: {} }, { fileSource: {} }]) {
       expect(messagesOf(type.decode(wire, context))).toBe(
-        'References and files cannot be represented in dynamic content; declare them at a typed position.'
+        'References, files, and file sources cannot be represented in dynamic content; declare them at a typed position.'
       )
     }
   })
@@ -616,6 +616,9 @@ describe('every constructor', () => {
     ['nullable', t.nullable(t.double())],
     ['unknown', t.unknown()],
     ['none', t.none()],
+    ['reference', t.reference(() => ({ note: { id: t.string() } }), 'note', 'one')],
+    ['file', t.file()],
+    ['fileSource', t.fileSource()],
   ]
 
   it.each(all)('%s has a frozen, JSON-serializable plan', (_name, type) => {
