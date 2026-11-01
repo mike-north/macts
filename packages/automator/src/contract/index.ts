@@ -366,13 +366,13 @@ export interface WorkflowResourceClient {
 /** A single step in a workflow */
 export interface AutomatorActionResourceClient {
   /**
-   * List automatoractions.
+   * List automator actions.
    *
    * @param workflowName - Workflow name. Does not accept null.
    */
   list(workflowName: string, options?: CallOptions): Promise<readonly AutomatorAction[]>
   /**
-   * Read the automatoraction identified by `id`.
+   * Read the automator action identified by `id`.
    *
    * @param id - Action identifier. Does not accept null.
    */
@@ -414,13 +414,13 @@ export interface SettingResourceClient {
 /** A resource required for proper operation of the action */
 export interface RequiredResourceResourceClient {
   /**
-   * List requiredresources.
+   * List required resources.
    *
    * @param actionId - Action identifier. Does not accept null.
    */
   list(actionId: string, options?: CallOptions): Promise<readonly RequiredResource[]>
   /**
-   * Read the requiredresource identified by `name`.
+   * Read the required resource identified by `name`.
    *
    * @param name - Resource name. Does not accept null.
    */
@@ -435,13 +435,13 @@ export interface AutomatorClient {
   /** A series of actions stored in a file */
   readonly workflows: WorkflowResourceClient
   /** A single step in a workflow */
-  readonly automatoractions: AutomatorActionResourceClient
+  readonly automatorActions: AutomatorActionResourceClient
   /** A variable used by the workflow */
   readonly variables: VariableResourceClient
   /** A named value in an action */
   readonly settings: SettingResourceClient
   /** A resource required for proper operation of the action */
-  readonly requiredresources: RequiredResourceResourceClient
+  readonly requiredResources: RequiredResourceResourceClient
   /**
    * Add an Automator action or variable to a workflow
    *
@@ -588,8 +588,8 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     name: 'AutomatorAction',
     record: automatorActionRecordType,
     id: t.string({ description: 'The unique identifier for the action' }),
-    get: 'automator.automatoractions.get',
-    list: 'automator.automatoractions.list',
+    get: 'automator.automatorActions.get',
+    list: 'automator.automatorActions.list',
   },
   Variable: {
     name: 'Variable',
@@ -609,8 +609,8 @@ const resources: AppContract<AutomatorClient>['resources'] = {
     name: 'RequiredResource',
     record: requiredResourceRecordType,
     id: t.string({ description: 'The name of the required resource' }),
-    get: 'automator.requiredresources.get',
-    list: 'automator.requiredresources.list',
+    get: 'automator.requiredResources.get',
+    list: 'automator.requiredResources.list',
   },
 }
 
@@ -649,7 +649,7 @@ const automatorActionListActionsOperation: OperationDescriptor<
   { readonly workflowName: string },
   readonly AutomatorAction[]
 > = {
-  id: 'automator.automatoractions.list',
+  id: 'automator.automatorActions.list',
   permission: 'automator:actions:list',
   target: { command: 'listActions', resource: 'AutomatorAction' },
   description: 'List all actions in a workflow',
@@ -663,7 +663,7 @@ const automatorActionGetActionOperation: OperationDescriptor<
   { readonly id: string },
   AutomatorAction
 > = {
-  id: 'automator.automatoractions.get',
+  id: 'automator.automatorActions.get',
   permission: 'automator:actions:get',
   target: { command: 'getAction', resource: 'AutomatorAction' },
   description: 'Get an action by ID',
@@ -756,7 +756,7 @@ const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
   { readonly actionId: string },
   readonly RequiredResource[]
 > = {
-  id: 'automator.requiredresources.list',
+  id: 'automator.requiredResources.list',
   permission: 'automator:requiredResources:list',
   target: { command: 'listRequiredResources', resource: 'RequiredResource' },
   description: 'List all required resources for an action',
@@ -770,7 +770,7 @@ const requiredResourceGetRequiredResourceOperation: OperationDescriptor<
   { readonly name: string },
   RequiredResource
 > = {
-  id: 'automator.requiredresources.get',
+  id: 'automator.requiredResources.get',
   permission: 'automator:requiredResources:get',
   target: { command: 'getRequiredResource', resource: 'RequiredResource' },
   description: 'Get a required resource by name',
@@ -785,16 +785,16 @@ const operations: AppContract<AutomatorClient>['operations'] = {
   'automator.workflows.list': workflowListOperation,
   'automator.workflows.get': workflowGetOperation,
   'automator.workflows.execute': workflowExecuteOperation,
-  'automator.automatoractions.list': automatorActionListActionsOperation,
-  'automator.automatoractions.get': automatorActionGetActionOperation,
+  'automator.automatorActions.list': automatorActionListActionsOperation,
+  'automator.automatorActions.get': automatorActionGetActionOperation,
   'automator.app.add': appAddOperation,
   'automator.app.remove': appRemoveOperation,
   'automator.variables.list': variableListVariablesOperation,
   'automator.variables.get': variableGetVariableOperation,
   'automator.settings.list': settingListSettingsOperation,
   'automator.settings.get': settingGetSettingOperation,
-  'automator.requiredresources.list': requiredResourceListRequiredResourcesOperation,
-  'automator.requiredresources.get': requiredResourceGetRequiredResourceOperation,
+  'automator.requiredResources.list': requiredResourceListRequiredResourcesOperation,
+  'automator.requiredResources.get': requiredResourceGetRequiredResourceOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
@@ -806,7 +806,7 @@ function bind(runtime: ClientRuntime): AutomatorClient {
       execute: (workflow, options) =>
         runtime.invoke(workflowExecuteOperation, { workflow }, options),
     },
-    automatoractions: {
+    automatorActions: {
       list: (workflowName, options) =>
         runtime.invoke(automatorActionListActionsOperation, { workflowName }, options),
       get: (id, options) => runtime.invoke(automatorActionGetActionOperation, { id }, options),
@@ -821,7 +821,7 @@ function bind(runtime: ClientRuntime): AutomatorClient {
         runtime.invoke(settingListSettingsOperation, { actionId }, options),
       get: (name, options) => runtime.invoke(settingGetSettingOperation, { name }, options),
     },
-    requiredresources: {
+    requiredResources: {
       list: (actionId, options) =>
         runtime.invoke(requiredResourceListRequiredResourcesOperation, { actionId }, options),
       get: (name, options) =>

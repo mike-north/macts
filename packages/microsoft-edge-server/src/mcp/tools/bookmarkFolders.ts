@@ -1,5 +1,5 @@
 /**
- * MCP tools for Microsoft-edge.app bookmarkfolders operations.
+ * MCP tools for Microsoft-edge.app bookmarkFolders operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all bookmark folders
  */
-export const bookmarkfoldersListTool: McpToolDefinition = {
-  name: 'macts__microsoft-edge__bookmarkfolders_list',
+export const bookmarkFoldersListTool: McpToolDefinition = {
+  name: 'macts__microsoft-edge__bookmarkFolders_list',
   description: 'List all bookmark folders',
   inputSchema: {
     type: 'object',
@@ -20,15 +20,15 @@ export const bookmarkfoldersListTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    return client.bookmarkfolders.list()
+    return client.bookmarkFolders.list()
   },
 }
 
 /**
  * Get a bookmark folder by ID
  */
-export const bookmarkfoldersGetTool: McpToolDefinition = {
-  name: 'macts__microsoft-edge__bookmarkfolders_get',
+export const bookmarkFoldersGetTool: McpToolDefinition = {
+  name: 'macts__microsoft-edge__bookmarkFolders_get',
   description: 'Get a bookmark folder by ID',
   inputSchema: {
     type: 'object',
@@ -44,8 +44,8 @@ export const bookmarkfoldersGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.bookmarkfolders.get(
-      id as unknown as Parameters<typeof client.bookmarkfolders.get>[0]
+    return client.bookmarkFolders.get(
+      id as unknown as Parameters<typeof client.bookmarkFolders.get>[0]
     )
   },
 }

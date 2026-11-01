@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a bookmarkfolder by ID.
+ * Get a bookmark folder by ID.
  */
 export class GetBookmarkFolderCommand extends Command {
   static override paths = [['microsoft-edge', 'bookmarkFolders', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a bookmarkfolder by ID',
+    description: 'Get a bookmark folder by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +21,7 @@ export class GetBookmarkFolderCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.bookmarkfolders.get(this.bookmarkFolderId)
+      const item = await client.bookmarkFolders.get(this.bookmarkFolderId)
 
       const output = formatter.format({
         id: item.id,

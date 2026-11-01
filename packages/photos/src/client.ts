@@ -87,7 +87,7 @@ export class PhotosClient {
   readonly #httpClient: HttpClient
 
   /** A media item, such as a photo or video */
-  readonly mediaitems: MediaItemResourceClient
+  readonly mediaItems: MediaItemResourceClient
 
   /** An album. A container that holds media items */
   readonly albums: AlbumResourceClient
@@ -98,7 +98,7 @@ export class PhotosClient {
   constructor(options: PhotosClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.mediaitems = new MediaItemResourceClient(this.#httpClient, 'photos', 'mediaitems')
+    this.mediaItems = new MediaItemResourceClient(this.#httpClient, 'photos', 'mediaItems')
     this.albums = new AlbumResourceClient(this.#httpClient, 'photos', 'albums')
     this.folders = new FolderResourceClient(this.#httpClient, 'photos', 'folders')
   }

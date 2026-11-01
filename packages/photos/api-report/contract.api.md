@@ -138,7 +138,7 @@ export interface PhotosClient {
     readonly folders: FolderResourceClient;
     _import(files: readonly string[], into?: string, skipCheckDuplicates?: boolean, options?: CallOptions): Promise<void>;
     make(_new: string, named?: string, at?: string, options?: CallOptions): Promise<void>;
-    readonly mediaitems: MediaItemResourceClient;
+    readonly mediaItems: MediaItemResourceClient;
     nextSlide(options?: CallOptions): Promise<void>;
     pauseSlideshow(options?: CallOptions): Promise<void>;
     previousSlide(options?: CallOptions): Promise<void>;

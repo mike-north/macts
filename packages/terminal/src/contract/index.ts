@@ -268,10 +268,10 @@ export interface TabResourceClient {
 
 /** A Terminal settings set (profile) */
 export interface SettingsSetResourceClient {
-  /** List settingssets. */
+  /** List settings sets. */
   list(options?: CallOptions): Promise<readonly SettingsSet[]>
   /**
-   * Read the settingsset identified by `name`.
+   * Read the settings set identified by `name`.
    *
    * @param name - Item identifier. Does not accept null.
    */
@@ -288,7 +288,7 @@ export interface TerminalClient {
   /** A Terminal tab */
   readonly tabs: TabResourceClient
   /** A Terminal settings set (profile) */
-  readonly settingssets: SettingsSetResourceClient
+  readonly settingsSets: SettingsSetResourceClient
   /**
    * Execute a shell command in a Terminal window or tab
    *
@@ -368,8 +368,8 @@ const resources: AppContract<TerminalClient>['resources'] = {
     name: 'SettingsSet',
     record: settingsSetRecordType,
     id: t.string({ description: 'The name of the settings set' }),
-    get: 'terminal.settingssets.get',
-    list: 'terminal.settingssets.list',
+    get: 'terminal.settingsSets.get',
+    list: 'terminal.settingsSets.list',
   },
 }
 
@@ -395,8 +395,8 @@ const settingsSetListOperation: OperationDescriptor<
   Record<string, never>,
   readonly SettingsSet[]
 > = {
-  id: 'terminal.settingssets.list',
-  permission: 'terminal:settingssets:list',
+  id: 'terminal.settingsSets.list',
+  permission: 'terminal:settingsSets:list',
   target: { command: 'list', resource: 'SettingsSet' },
   description: 'List items',
   input: t.record({}),
@@ -426,8 +426,8 @@ const tabGetOperation: OperationDescriptor<{ readonly name: string }, Tab> = {
 }
 
 const settingsSetGetOperation: OperationDescriptor<{ readonly name: string }, SettingsSet> = {
-  id: 'terminal.settingssets.get',
-  permission: 'terminal:settingssets:get',
+  id: 'terminal.settingsSets.get',
+  permission: 'terminal:settingsSets:get',
   target: { command: 'get', resource: 'SettingsSet' },
   description: 'Get an item by identifier',
   input: t.record({
@@ -455,10 +455,10 @@ const appDoScriptOperation: OperationDescriptor<
 const operations: AppContract<TerminalClient>['operations'] = {
   'terminal.windows.list': windowListOperation,
   'terminal.tabs.list': tabListOperation,
-  'terminal.settingssets.list': settingsSetListOperation,
+  'terminal.settingsSets.list': settingsSetListOperation,
   'terminal.windows.get': windowGetOperation,
   'terminal.tabs.get': tabGetOperation,
-  'terminal.settingssets.get': settingsSetGetOperation,
+  'terminal.settingsSets.get': settingsSetGetOperation,
   'terminal.app.doScript': appDoScriptOperation,
 }
 
@@ -473,7 +473,7 @@ function bind(runtime: ClientRuntime): TerminalClient {
       list: (options) => runtime.invoke(tabListOperation, {}, options),
       get: (name, options) => runtime.invoke(tabGetOperation, { name }, options),
     },
-    settingssets: {
+    settingsSets: {
       list: (options) => runtime.invoke(settingsSetListOperation, {}, options),
       get: (name, options) => runtime.invoke(settingsSetGetOperation, { name }, options),
     },

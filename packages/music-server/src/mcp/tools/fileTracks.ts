@@ -1,5 +1,5 @@
 /**
- * MCP tools for Music.app filetracks operations.
+ * MCP tools for Music.app fileTracks operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * update file track information from the current information in the track’s file
  */
-export const filetracksRefreshTool: McpToolDefinition = {
-  name: 'macts__music__filetracks_refresh',
+export const fileTracksRefreshTool: McpToolDefinition = {
+  name: 'macts__music__fileTracks_refresh',
   description: 'update file track information from the current information in the track’s file',
   inputSchema: {
     type: 'object',
@@ -20,7 +20,7 @@ export const filetracksRefreshTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    await client.filetracks.refresh()
+    await client.fileTracks.refresh()
     return { success: true }
   },
 }

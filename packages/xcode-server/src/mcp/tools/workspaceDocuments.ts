@@ -1,5 +1,5 @@
 /**
- * MCP tools for Xcode.app workspacedocuments operations.
+ * MCP tools for Xcode.app workspaceDocuments operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all workspace documents
  */
-export const workspacedocumentsListTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_list',
+export const workspaceDocumentsListTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_list',
   description: 'List all workspace documents',
   inputSchema: {
     type: 'object',
@@ -20,15 +20,15 @@ export const workspacedocumentsListTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    return client.workspacedocuments.list()
+    return client.workspaceDocuments.list()
   },
 }
 
 /**
  * Get a workspace document by name
  */
-export const workspacedocumentsGetTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_get',
+export const workspaceDocumentsGetTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_get',
   description: 'Get a workspace document by name',
   inputSchema: {
     type: 'object',
@@ -44,8 +44,8 @@ export const workspacedocumentsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.workspacedocuments.get(
-      name as unknown as Parameters<typeof client.workspacedocuments.get>[0]
+    return client.workspaceDocuments.get(
+      name as unknown as Parameters<typeof client.workspaceDocuments.get>[0]
     )
   },
 }
@@ -53,8 +53,8 @@ export const workspacedocumentsGetTool: McpToolDefinition = {
 /**
  * Invoke the "build" scheme action
  */
-export const workspacedocumentsBuildTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_build',
+export const workspaceDocumentsBuildTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_build',
   description: 'Invoke the "build" scheme action',
   inputSchema: {
     type: 'object',
@@ -70,8 +70,8 @@ export const workspacedocumentsBuildTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.build(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.build>[0]
+    await client.workspaceDocuments.build(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.build>[0]
     )
     return { success: true }
   },
@@ -80,8 +80,8 @@ export const workspacedocumentsBuildTool: McpToolDefinition = {
 /**
  * Invoke the "clean" scheme action
  */
-export const workspacedocumentsCleanTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_clean',
+export const workspaceDocumentsCleanTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_clean',
   description: 'Invoke the "clean" scheme action',
   inputSchema: {
     type: 'object',
@@ -97,8 +97,8 @@ export const workspacedocumentsCleanTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.clean(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.clean>[0]
+    await client.workspaceDocuments.clean(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.clean>[0]
     )
     return { success: true }
   },
@@ -107,8 +107,8 @@ export const workspacedocumentsCleanTool: McpToolDefinition = {
 /**
  * Stop the active scheme action, if one is running
  */
-export const workspacedocumentsStopTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_stop',
+export const workspaceDocumentsStopTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_stop',
   description: 'Stop the active scheme action, if one is running',
   inputSchema: {
     type: 'object',
@@ -124,8 +124,8 @@ export const workspacedocumentsStopTool: McpToolDefinition = {
   handler: async (args) => {
     const { workspaceName } = args as { workspaceName: string }
     const client = getClient()
-    await client.workspacedocuments.stop(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.stop>[0]
+    await client.workspaceDocuments.stop(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.stop>[0]
     )
     return { success: true }
   },
@@ -134,8 +134,8 @@ export const workspacedocumentsStopTool: McpToolDefinition = {
 /**
  * Invoke the "run" scheme action
  */
-export const workspacedocumentsRunTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_run',
+export const workspaceDocumentsRunTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_run',
   description: 'Invoke the "run" scheme action',
   inputSchema: {
     type: 'object',
@@ -163,10 +163,10 @@ export const workspacedocumentsRunTool: McpToolDefinition = {
       withEnvironmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.run(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.run>[0],
-      withCommandLineArguments as unknown as Parameters<typeof client.workspacedocuments.run>[1],
-      withEnvironmentVariables as unknown as Parameters<typeof client.workspacedocuments.run>[2]
+    await client.workspaceDocuments.run(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.run>[0],
+      withCommandLineArguments as unknown as Parameters<typeof client.workspaceDocuments.run>[1],
+      withEnvironmentVariables as unknown as Parameters<typeof client.workspaceDocuments.run>[2]
     )
     return { success: true }
   },
@@ -175,8 +175,8 @@ export const workspacedocumentsRunTool: McpToolDefinition = {
 /**
  * Invoke the "test" scheme action
  */
-export const workspacedocumentsTestTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_test',
+export const workspaceDocumentsTestTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_test',
   description: 'Invoke the "test" scheme action',
   inputSchema: {
     type: 'object',
@@ -204,10 +204,10 @@ export const workspacedocumentsTestTool: McpToolDefinition = {
       withEnvironmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.test(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.test>[0],
-      withCommandLineArguments as unknown as Parameters<typeof client.workspacedocuments.test>[1],
-      withEnvironmentVariables as unknown as Parameters<typeof client.workspacedocuments.test>[2]
+    await client.workspaceDocuments.test(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.test>[0],
+      withCommandLineArguments as unknown as Parameters<typeof client.workspaceDocuments.test>[1],
+      withEnvironmentVariables as unknown as Parameters<typeof client.workspaceDocuments.test>[2]
     )
     return { success: true }
   },
@@ -216,8 +216,8 @@ export const workspacedocumentsTestTool: McpToolDefinition = {
 /**
  * Start a new debugging session in the workspace
  */
-export const workspacedocumentsAttachTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_attach',
+export const workspaceDocumentsAttachTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_attach',
   description: 'Start a new debugging session in the workspace',
   inputSchema: {
     type: 'object',
@@ -245,10 +245,10 @@ export const workspacedocumentsAttachTool: McpToolDefinition = {
       suspended: boolean
     }
     const client = getClient()
-    await client.workspacedocuments.attach(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.attach>[0],
-      toProcessIdentifier as unknown as Parameters<typeof client.workspacedocuments.attach>[1],
-      suspended as unknown as Parameters<typeof client.workspacedocuments.attach>[2]
+    await client.workspaceDocuments.attach(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.attach>[0],
+      toProcessIdentifier as unknown as Parameters<typeof client.workspaceDocuments.attach>[1],
+      suspended as unknown as Parameters<typeof client.workspaceDocuments.attach>[2]
     )
     return { success: true }
   },
@@ -257,8 +257,8 @@ export const workspacedocumentsAttachTool: McpToolDefinition = {
 /**
  * Start a debugging session using the "run" or "run without building" scheme action
  */
-export const workspacedocumentsDebugTool: McpToolDefinition = {
-  name: 'macts__xcode__workspacedocuments_debug',
+export const workspaceDocumentsDebugTool: McpToolDefinition = {
+  name: 'macts__xcode__workspaceDocuments_debug',
   description: 'Start a debugging session using the "run" or "run without building" scheme action',
   inputSchema: {
     type: 'object',
@@ -308,13 +308,13 @@ export const workspacedocumentsDebugTool: McpToolDefinition = {
       environmentVariables?: string
     }
     const client = getClient()
-    await client.workspacedocuments.debug(
-      workspaceName as unknown as Parameters<typeof client.workspacedocuments.debug>[0],
-      scheme as unknown as Parameters<typeof client.workspacedocuments.debug>[1],
-      runDestinationSpecifier as unknown as Parameters<typeof client.workspacedocuments.debug>[2],
-      skipBuilding as unknown as Parameters<typeof client.workspacedocuments.debug>[3],
-      commandLineArguments as unknown as Parameters<typeof client.workspacedocuments.debug>[4],
-      environmentVariables as unknown as Parameters<typeof client.workspacedocuments.debug>[5]
+    await client.workspaceDocuments.debug(
+      workspaceName as unknown as Parameters<typeof client.workspaceDocuments.debug>[0],
+      scheme as unknown as Parameters<typeof client.workspaceDocuments.debug>[1],
+      runDestinationSpecifier as unknown as Parameters<typeof client.workspaceDocuments.debug>[2],
+      skipBuilding as unknown as Parameters<typeof client.workspaceDocuments.debug>[3],
+      commandLineArguments as unknown as Parameters<typeof client.workspaceDocuments.debug>[4],
+      environmentVariables as unknown as Parameters<typeof client.workspaceDocuments.debug>[5]
     )
     return { success: true }
   },

@@ -79,7 +79,6 @@ export const bluetoothFileExchangeApiPlugin = {
           },
         ],
         code: 'toFT',
-        permission: 'bluetooth-file-exchange:app:browse',
       },
       send: {
         name: 'send',
@@ -104,7 +103,6 @@ export const bluetoothFileExchangeApiPlugin = {
           },
         ],
         code: 'toOP',
-        permission: 'bluetooth-file-exchange:app:send',
       },
     },
     permissions: {

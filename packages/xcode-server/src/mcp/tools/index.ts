@@ -4,39 +4,39 @@
  * @packageDocumentation
  */
 
-import { workspacedocumentsListTool } from './workspacedocuments.js'
-import { workspacedocumentsGetTool } from './workspacedocuments.js'
-import { workspacedocumentsBuildTool } from './workspacedocuments.js'
-import { workspacedocumentsCleanTool } from './workspacedocuments.js'
-import { workspacedocumentsStopTool } from './workspacedocuments.js'
-import { workspacedocumentsRunTool } from './workspacedocuments.js'
-import { workspacedocumentsTestTool } from './workspacedocuments.js'
-import { workspacedocumentsAttachTool } from './workspacedocuments.js'
-import { workspacedocumentsDebugTool } from './workspacedocuments.js'
+import { workspaceDocumentsListTool } from './workspaceDocuments.js'
+import { workspaceDocumentsGetTool } from './workspaceDocuments.js'
+import { workspaceDocumentsBuildTool } from './workspaceDocuments.js'
+import { workspaceDocumentsCleanTool } from './workspaceDocuments.js'
+import { workspaceDocumentsStopTool } from './workspaceDocuments.js'
+import { workspaceDocumentsRunTool } from './workspaceDocuments.js'
+import { workspaceDocumentsTestTool } from './workspaceDocuments.js'
+import { workspaceDocumentsAttachTool } from './workspaceDocuments.js'
+import { workspaceDocumentsDebugTool } from './workspaceDocuments.js'
 import { projectsListTool } from './projects.js'
 import { projectsGetTool } from './projects.js'
 import { schemesListTool } from './schemes.js'
 import { schemesGetTool } from './schemes.js'
-import { rundestinationsListTool } from './rundestinations.js'
-import { rundestinationsGetTool } from './rundestinations.js'
+import { runDestinationsListTool } from './runDestinations.js'
+import { runDestinationsGetTool } from './runDestinations.js'
 
 /**
  * All MCP tools.
  */
 export const allTools = [
-  workspacedocumentsListTool,
-  workspacedocumentsGetTool,
-  workspacedocumentsBuildTool,
-  workspacedocumentsCleanTool,
-  workspacedocumentsStopTool,
-  workspacedocumentsRunTool,
-  workspacedocumentsTestTool,
-  workspacedocumentsAttachTool,
-  workspacedocumentsDebugTool,
+  workspaceDocumentsListTool,
+  workspaceDocumentsGetTool,
+  workspaceDocumentsBuildTool,
+  workspaceDocumentsCleanTool,
+  workspaceDocumentsStopTool,
+  workspaceDocumentsRunTool,
+  workspaceDocumentsTestTool,
+  workspaceDocumentsAttachTool,
+  workspaceDocumentsDebugTool,
   projectsListTool,
   projectsGetTool,
   schemesListTool,
   schemesGetTool,
-  rundestinationsListTool,
-  rundestinationsGetTool,
+  runDestinationsListTool,
+  runDestinationsGetTool,
 ] as const

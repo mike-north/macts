@@ -61,8 +61,8 @@ export interface BookmarkItemUpdateInput {
 
 // @public
 export interface MicrosoftEdgeClient {
-    readonly bookmarkfolders: BookmarkFolderResourceClient;
-    readonly bookmarkitems: BookmarkItemResourceClient;
+    readonly bookmarkFolders: BookmarkFolderResourceClient;
+    readonly bookmarkItems: BookmarkItemResourceClient;
     readonly tabs: TabResourceClient;
     readonly windows: WindowResourceClient;
 }

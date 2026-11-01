@@ -175,7 +175,6 @@ export const shortcutsApiPlugin = {
         resourceType: 'Shortcut',
         parameters: [],
         code: 'core',
-        permission: 'shortcuts:shortcuts:list',
       },
       get: {
         name: 'get',
@@ -191,7 +190,6 @@ export const shortcutsApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'shortcuts:shortcuts:get',
       },
       run: {
         name: 'run',
@@ -215,7 +213,6 @@ export const shortcutsApiPlugin = {
           },
         ],
         code: 'srun',
-        permission: 'shortcuts:shortcuts:run',
       },
       listFolders: {
         name: 'list',

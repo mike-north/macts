@@ -86,7 +86,7 @@ export class TVClient {
   readonly #httpClient: HttpClient
 
   /** a track representing a video file */
-  readonly filetracks: FileTrackResourceClient
+  readonly fileTracks: FileTrackResourceClient
 
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
@@ -94,7 +94,7 @@ export class TVClient {
   constructor(options: TVClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.filetracks = new FileTrackResourceClient(this.#httpClient, 'tv', 'filetracks')
+    this.fileTracks = new FileTrackResourceClient(this.#httpClient, 'tv', 'fileTracks')
     this.playlists = new PlaylistResourceClient(this.#httpClient, 'tv', 'playlists')
   }
 

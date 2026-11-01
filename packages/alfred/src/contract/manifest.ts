@@ -82,7 +82,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'aevt',
-      permission: 'alfred:app:search',
     },
     action: {
       name: 'action',
@@ -106,7 +105,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'aact',
-      permission: 'alfred:app:action',
     },
     browse: {
       name: 'browse',
@@ -121,7 +119,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'abro',
-      permission: 'alfred:app:browse',
     },
     runTrigger: {
       name: 'runTrigger',
@@ -268,7 +265,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'asth',
-      permission: 'alfred:app:setTheme',
     },
   },
   permissions: {

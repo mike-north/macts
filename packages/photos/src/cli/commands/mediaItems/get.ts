@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a mediaitem by ID.
+ * Get a media item by ID.
  */
 export class GetMediaItemCommand extends Command {
   static override paths = [['photos', 'mediaItems', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a mediaitem by ID',
+    description: 'Get a media item by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -21,7 +21,7 @@ export class GetMediaItemCommand extends Command {
 
     try {
       const client = getClient()
-      const item = await client.mediaitems.get(this.mediaItemId)
+      const item = await client.mediaItems.get(this.mediaItemId)
 
       const output = formatter.format({
         id: item.id,

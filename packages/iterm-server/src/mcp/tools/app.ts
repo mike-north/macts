@@ -321,7 +321,7 @@ export const appCreateHotkeyWindowWithProfileTool: McpToolDefinition = {
  * Launch API script by name
  */
 export const appLaunchAPIScriptNamedTool: McpToolDefinition = {
-  name: 'macts__iterm__app_launch_a_p_i_script_named',
+  name: 'macts__iterm__app_launch_api_script_named',
   description: 'Launch API script by name',
   inputSchema: {
     type: 'object',
@@ -347,7 +347,7 @@ export const appLaunchAPIScriptNamedTool: McpToolDefinition = {
  * Invokes an expression, such as a registered function.
  */
 export const appInvokeAPIExpressionTool: McpToolDefinition = {
-  name: 'macts__iterm__app_invoke_a_p_i_expression',
+  name: 'macts__iterm__app_invoke_api_expression',
   description: 'Invokes an expression, such as a registered function.',
   inputSchema: {
     type: 'object',

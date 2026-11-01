@@ -1644,7 +1644,7 @@ export interface MessageResourceClient {
  */
 export interface MailClient {
   /** A new email message */
-  readonly outgoingmessages: OutgoingMessageResourceClient
+  readonly outgoingMessages: OutgoingMessageResourceClient
   /** An email message */
   readonly messages: MessageResourceClient
   /** Delete an object. */
@@ -2403,8 +2403,8 @@ const messageReplyOperation: OperationDescriptor<
 }
 
 const outgoingMessageSendOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'mail.outgoingmessages.send',
-  permission: 'mail:outgoingmessages:send',
+  id: 'mail.outgoingMessages.send',
+  permission: 'mail:outgoingMessages:send',
   target: { command: 'send', resource: 'OutgoingMessage' },
   description: 'Sends a message.',
   input: t.record({}),
@@ -2443,14 +2443,14 @@ const operations: AppContract<MailClient>['operations'] = {
   'mail.app.performMailActionWithMessages': appPerformMailActionWithMessagesOperation,
   'mail.messages.redirect': messageRedirectOperation,
   'mail.messages.reply': messageReplyOperation,
-  'mail.outgoingmessages.send': outgoingMessageSendOperation,
+  'mail.outgoingMessages.send': outgoingMessageSendOperation,
   'mail.app.synchronize': appSynchronizeOperation,
 }
 
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): MailClient {
   return {
-    outgoingmessages: {
+    outgoingMessages: {
       send: (options) => runtime.invoke(outgoingMessageSendOperation, {}, options),
     },
     messages: {

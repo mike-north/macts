@@ -87,7 +87,7 @@ export class MailClient {
   readonly #httpClient: HttpClient
 
   /** A new email message */
-  readonly outgoingmessages: OutgoingMessageResourceClient
+  readonly outgoingMessages: OutgoingMessageResourceClient
 
   /** An email message */
   readonly messages: MessageResourceClient
@@ -95,10 +95,10 @@ export class MailClient {
   constructor(options: MailClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
-    this.outgoingmessages = new OutgoingMessageResourceClient(
+    this.outgoingMessages = new OutgoingMessageResourceClient(
       this.#httpClient,
       'mail',
-      'outgoingmessages'
+      'outgoingMessages'
     )
     this.messages = new MessageResourceClient(this.#httpClient, 'mail', 'messages')
   }

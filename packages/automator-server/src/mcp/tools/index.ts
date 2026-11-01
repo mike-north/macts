@@ -7,14 +7,14 @@
 import { workflowsListTool } from './workflows.js'
 import { workflowsGetTool } from './workflows.js'
 import { workflowsExecuteTool } from './workflows.js'
-import { automatoractionsListTool } from './automatoractions.js'
-import { automatoractionsGetTool } from './automatoractions.js'
+import { automatorActionsListTool } from './automatorActions.js'
+import { automatorActionsGetTool } from './automatorActions.js'
 import { variablesListTool } from './variables.js'
 import { variablesGetTool } from './variables.js'
 import { settingsListTool } from './settings.js'
 import { settingsGetTool } from './settings.js'
-import { requiredresourcesListTool } from './requiredresources.js'
-import { requiredresourcesGetTool } from './requiredresources.js'
+import { requiredResourcesListTool } from './requiredResources.js'
+import { requiredResourcesGetTool } from './requiredResources.js'
 import { appAddTool } from './app.js'
 import { appRemoveTool } from './app.js'
 
@@ -25,14 +25,14 @@ export const allTools = [
   workflowsListTool,
   workflowsGetTool,
   workflowsExecuteTool,
-  automatoractionsListTool,
-  automatoractionsGetTool,
+  automatorActionsListTool,
+  automatorActionsGetTool,
   variablesListTool,
   variablesGetTool,
   settingsListTool,
   settingsGetTool,
-  requiredresourcesListTool,
-  requiredresourcesGetTool,
+  requiredResourcesListTool,
+  requiredResourcesGetTool,
   appAddTool,
   appRemoveTool,
 ] as const

@@ -62,9 +62,9 @@ export interface AutomatorActionUpdateInput {
 // @public
 export interface AutomatorClient {
     add(object: unknown, to: unknown, atIndex?: Integer, options?: CallOptions): Promise<void>;
-    readonly automatoractions: AutomatorActionResourceClient;
+    readonly automatorActions: AutomatorActionResourceClient;
     remove(object: unknown, options?: CallOptions): Promise<void>;
-    readonly requiredresources: RequiredResourceResourceClient;
+    readonly requiredResources: RequiredResourceResourceClient;
     readonly settings: SettingResourceClient;
     readonly variables: VariableResourceClient;
     readonly workflows: WorkflowResourceClient;

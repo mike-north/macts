@@ -92,7 +92,6 @@ export const screenSharingApiPlugin = {
         resourceType: 'Connection',
         parameters: [],
         code: 'core',
-        permission: 'screen-sharing:connections:list',
       },
       get: {
         name: 'get',
@@ -108,7 +107,6 @@ export const screenSharingApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'screen-sharing:connections:get',
       },
       getURL: {
         name: 'getURL',
@@ -123,7 +121,6 @@ export const screenSharingApiPlugin = {
           },
         ],
         code: 'GURL',
-        permission: 'screen-sharing:app:getURL',
       },
     },
     permissions: {

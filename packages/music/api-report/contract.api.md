@@ -287,7 +287,7 @@ export interface MusicClient {
     exists(options?: CallOptions): Promise<void>;
     _export(as?: string, to?: FileSource, options?: CallOptions): Promise<void>;
     fastForward(options?: CallOptions): Promise<void>;
-    readonly filetracks: FileTrackResourceClient;
+    readonly fileTracks: FileTrackResourceClient;
     make(_new: string, at?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
     nextTrack(options?: CallOptions): Promise<void>;
     open(options?: CallOptions): Promise<void>;

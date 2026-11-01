@@ -16,9 +16,9 @@ import { foldersCreateTool } from './folders.js'
 import { tagsListTool } from './tags.js'
 import { tagsGetTool } from './tags.js'
 import { tagsCreateTool } from './tags.js'
-import { inboxtasksListTool } from './inboxtasks.js'
-import { inboxtasksGetTool } from './inboxtasks.js'
-import { inboxtasksCreateTool } from './inboxtasks.js'
+import { inboxTasksListTool } from './inboxTasks.js'
+import { inboxTasksGetTool } from './inboxTasks.js'
+import { inboxTasksCreateTool } from './inboxTasks.js'
 import { perspectivesListTool } from './perspectives.js'
 import { perspectivesGetTool } from './perspectives.js'
 import { appCompleteTool } from './app.js'
@@ -49,9 +49,9 @@ export const allTools = [
   tagsListTool,
   tagsGetTool,
   tagsCreateTool,
-  inboxtasksListTool,
-  inboxtasksGetTool,
-  inboxtasksCreateTool,
+  inboxTasksListTool,
+  inboxTasksGetTool,
+  inboxTasksCreateTool,
   perspectivesListTool,
   perspectivesGetTool,
   appCompleteTool,

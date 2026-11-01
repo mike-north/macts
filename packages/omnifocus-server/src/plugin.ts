@@ -1154,7 +1154,6 @@ export const omniFocusApiPlugin = {
         parameters: [],
         code: 'core',
         routeName: 'list',
-        permission: 'omnifocus:inboxTasks:list',
       },
       getInboxTask: {
         name: 'get',
@@ -1171,7 +1170,6 @@ export const omniFocusApiPlugin = {
         ],
         code: 'getd',
         routeName: 'get',
-        permission: 'omnifocus:inboxTasks:get',
       },
       createInboxTask: {
         name: 'create',
@@ -1194,7 +1192,6 @@ export const omniFocusApiPlugin = {
         ],
         code: 'crel',
         routeName: 'create',
-        permission: 'omnifocus:inboxTasks:create',
       },
       listPerspectives: {
         name: 'list',
@@ -1234,7 +1231,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCCm',
-        permission: 'omnifocus:app:complete',
       },
       markComplete: {
         name: 'markComplete',
@@ -1249,7 +1245,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCMc',
-        permission: 'omnifocus:app:markComplete',
       },
       markIncomplete: {
         name: 'markIncomplete',
@@ -1264,7 +1259,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCMi',
-        permission: 'omnifocus:app:markIncomplete',
       },
       markDropped: {
         name: 'markDropped',
@@ -1279,7 +1273,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCMd',
-        permission: 'omnifocus:app:markDropped',
       },
       parseTasksInto: {
         name: 'parseTasksInto',
@@ -1300,7 +1293,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCP?',
-        permission: 'omnifocus:app:parseTasksInto',
       },
       archive: {
         name: 'archive',
@@ -1321,7 +1313,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FCbk',
-        permission: 'omnifocus:app:archive',
       },
       compact: {
         name: 'compact',
@@ -1329,7 +1320,6 @@ export const omniFocusApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'FC><',
-        permission: 'omnifocus:app:compact',
       },
       synchronize: {
         name: 'synchronize',
@@ -1337,7 +1327,6 @@ export const omniFocusApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'FCsy',
-        permission: 'omnifocus:app:synchronize',
       },
       importInto: {
         name: 'importInto',
@@ -1352,7 +1341,6 @@ export const omniFocusApiPlugin = {
           },
         ],
         code: 'FC <',
-        permission: 'omnifocus:app:importInto',
       },
       undo: {
         name: 'undo',
@@ -1360,7 +1348,6 @@ export const omniFocusApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'FCUd',
-        permission: 'omnifocus:app:undo',
       },
       redo: {
         name: 'redo',
@@ -1368,7 +1355,6 @@ export const omniFocusApiPlugin = {
         scope: 'application',
         parameters: [],
         code: 'FCRd',
-        permission: 'omnifocus:app:redo',
       },
     },
     permissions: {

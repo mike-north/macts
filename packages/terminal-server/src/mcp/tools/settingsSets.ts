@@ -1,5 +1,5 @@
 /**
- * MCP tools for Terminal.app settingssets operations.
+ * MCP tools for Terminal.app settingsSets operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List items
  */
-export const settingssetsListTool: McpToolDefinition = {
-  name: 'macts__terminal__settingssets_list',
+export const settingsSetsListTool: McpToolDefinition = {
+  name: 'macts__terminal__settingsSets_list',
   description: 'List items',
   inputSchema: {
     type: 'object',
@@ -20,15 +20,15 @@ export const settingssetsListTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    return client.settingssets.list()
+    return client.settingsSets.list()
   },
 }
 
 /**
  * Get an item by identifier
  */
-export const settingssetsGetTool: McpToolDefinition = {
-  name: 'macts__terminal__settingssets_get',
+export const settingsSetsGetTool: McpToolDefinition = {
+  name: 'macts__terminal__settingsSets_get',
   description: 'Get an item by identifier',
   inputSchema: {
     type: 'object',
@@ -44,6 +44,6 @@ export const settingssetsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { name } = args as { name: string }
     const client = getClient()
-    return client.settingssets.get(name as unknown as Parameters<typeof client.settingssets.get>[0])
+    return client.settingsSets.get(name as unknown as Parameters<typeof client.settingsSets.get>[0])
   },
 }

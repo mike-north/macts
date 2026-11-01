@@ -93,14 +93,14 @@ export class TerminalClient {
   readonly tabs: TabResourceClient
 
   /** A Terminal settings set (profile) */
-  readonly settingssets: SettingsSetResourceClient
+  readonly settingsSets: SettingsSetResourceClient
 
   constructor(options: TerminalClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.windows = new WindowResourceClient(this.#httpClient, 'terminal', 'windows')
     this.tabs = new TabResourceClient(this.#httpClient, 'terminal', 'tabs')
-    this.settingssets = new SettingsSetResourceClient(this.#httpClient, 'terminal', 'settingssets')
+    this.settingsSets = new SettingsSetResourceClient(this.#httpClient, 'terminal', 'settingsSets')
   }
 
   /**

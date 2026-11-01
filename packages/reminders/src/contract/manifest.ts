@@ -459,7 +459,6 @@ export const manifest: unknown = {
       resourceType: 'List',
       parameters: [],
       code: 'core',
-      permission: 'reminders:lists:list',
     },
     get: {
       name: 'get',
@@ -475,7 +474,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'reminders:lists:get',
     },
     create: {
       name: 'create',
@@ -497,7 +495,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'reminders:lists:create',
     },
     listReminders: {
       name: 'list',
@@ -622,7 +619,6 @@ export const manifest: unknown = {
       resourceType: 'Reminder',
       parameters: [],
       code: '????',
-      permission: 'reminders:reminders:show',
     },
     listAccounts: {
       name: 'list',

@@ -973,7 +973,7 @@ export interface PlaylistResourceClient {
  */
 export interface TVClient {
   /** a track representing a video file */
-  readonly filetracks: FileTrackResourceClient
+  readonly fileTracks: FileTrackResourceClient
   /** a list of tracks/streams */
   readonly playlists: PlaylistResourceClient
   /** Close an object */
@@ -1561,8 +1561,8 @@ const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, unde
 }
 
 const fileTrackRefreshOperation: OperationDescriptor<Record<string, never>, undefined> = {
-  id: 'tv.filetracks.refresh',
-  permission: 'tv:filetracks:refresh',
+  id: 'tv.fileTracks.refresh',
+  permission: 'tv:fileTracks:refresh',
   target: { command: 'refresh', resource: 'FileTrack' },
   description: 'update file track information from the current information in the track’s file',
   input: t.record({}),
@@ -1662,7 +1662,7 @@ const operations: AppContract<TVClient>['operations'] = {
   'tv.app.play': appPlayOperation,
   'tv.app.playpause': appPlaypauseOperation,
   'tv.app.previousTrack': appPreviousTrackOperation,
-  'tv.filetracks.refresh': fileTrackRefreshOperation,
+  'tv.fileTracks.refresh': fileTrackRefreshOperation,
   'tv.app.resume': appResumeOperation,
   'tv.app.reveal': appRevealOperation,
   'tv.app.rewind': appRewindOperation,
@@ -1675,7 +1675,7 @@ const operations: AppContract<TVClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): TVClient {
   return {
-    filetracks: {
+    fileTracks: {
       refresh: (options) => runtime.invoke(fileTrackRefreshOperation, {}, options),
     },
     playlists: {

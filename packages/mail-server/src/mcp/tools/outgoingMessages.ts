@@ -1,5 +1,5 @@
 /**
- * MCP tools for Mail.app outgoingmessages operations.
+ * MCP tools for Mail.app outgoingMessages operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * Sends a message.
  */
-export const outgoingmessagesSendTool: McpToolDefinition = {
-  name: 'macts__mail__outgoingmessages_send',
+export const outgoingMessagesSendTool: McpToolDefinition = {
+  name: 'macts__mail__outgoingMessages_send',
   description: 'Sends a message.',
   inputSchema: {
     type: 'object',
@@ -20,7 +20,7 @@ export const outgoingmessagesSendTool: McpToolDefinition = {
   },
   handler: async () => {
     const client = getClient()
-    await client.outgoingmessages.send()
+    await client.outgoingMessages.send()
     return { success: true }
   },
 }

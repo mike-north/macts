@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * List automatoractions.
+ * List automator actions.
  */
 export class ListAutomatorActionsCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List automatoractions',
+    description: 'List automator actions',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -20,7 +20,7 @@ export class ListAutomatorActionsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.automatoractions.list(this.workflowName)
+      const items = await client.automatorActions.list(this.workflowName)
 
       const output = formatter.formatList(
         items.map((item) => ({

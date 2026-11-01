@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * List mediaitems.
+ * List media items.
  */
 export class ListMediaItemsCommand extends Command {
   static override paths = [['photos', 'albums', 'mediaItems', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List mediaitems',
+    description: 'List media items',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -19,7 +19,7 @@ export class ListMediaItemsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.mediaitems.list()
+      const items = await client.mediaItems.list()
 
       const output = formatter.formatList(
         items.map((item) => ({

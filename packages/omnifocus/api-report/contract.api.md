@@ -88,7 +88,7 @@ export interface OmniFocusClient {
     complete(text: string, options?: CallOptions): Promise<void>;
     readonly folders: FolderResourceClient;
     importInto(file: string, options?: CallOptions): Promise<void>;
-    readonly inboxtasks: InboxTaskResourceClient;
+    readonly inboxTasks: InboxTaskResourceClient;
     markComplete(targets: string, options?: CallOptions): Promise<void>;
     markDropped(targets: string, options?: CallOptions): Promise<void>;
     markIncomplete(targets: string, options?: CallOptions): Promise<void>;

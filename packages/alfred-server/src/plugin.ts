@@ -88,7 +88,6 @@ export const alfredApiPlugin = {
           },
         ],
         code: 'aevt',
-        permission: 'alfred:app:search',
       },
       action: {
         name: 'action',
@@ -112,7 +111,6 @@ export const alfredApiPlugin = {
           },
         ],
         code: 'aact',
-        permission: 'alfred:app:action',
       },
       browse: {
         name: 'browse',
@@ -127,7 +125,6 @@ export const alfredApiPlugin = {
           },
         ],
         code: 'abro',
-        permission: 'alfred:app:browse',
       },
       runTrigger: {
         name: 'runTrigger',
@@ -275,7 +272,6 @@ export const alfredApiPlugin = {
           },
         ],
         code: 'asth',
-        permission: 'alfred:app:setTheme',
       },
     },
     permissions: {

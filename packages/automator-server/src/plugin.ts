@@ -478,7 +478,6 @@ export const automatorApiPlugin = {
         resourceType: 'Workflow',
         parameters: [],
         code: 'core',
-        permission: 'automator:workflows:list',
       },
       get: {
         name: 'get',
@@ -494,7 +493,6 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'getd',
-        permission: 'automator:workflows:get',
       },
       execute: {
         name: 'execute',
@@ -510,7 +508,6 @@ export const automatorApiPlugin = {
           },
         ],
         code: 'exec',
-        permission: 'automator:workflows:execute',
       },
       listActions: {
         name: 'list',
@@ -669,7 +666,6 @@ export const automatorApiPlugin = {
         ],
         code: 'core',
         routeName: 'list',
-        permission: 'automator:requiredResources:list',
       },
       getRequiredResource: {
         name: 'get',
@@ -686,7 +682,6 @@ export const automatorApiPlugin = {
         ],
         code: 'getd',
         routeName: 'get',
-        permission: 'automator:requiredResources:get',
       },
     },
     permissions: {

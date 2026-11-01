@@ -525,13 +525,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'music.filetracks.refresh',
+    name: 'music.fileTracks.refresh',
     app: 'music',
     appBundleId: 'com.apple.Music',
-    resource: 'filetracks',
+    resource: 'fileTracks',
     operation: 'refresh',
     description: 'update file track information from the current information in the track’s file',
-    permission: 'music:filetracks:refresh',
+    permission: 'music:fileTracks:refresh',
     risk: 'execute',
     inputSchema: {
       type: 'object',

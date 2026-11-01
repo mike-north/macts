@@ -91,7 +91,6 @@ export const previewApiPlugin = {
         scope: 'resource',
         resourceType: 'Document',
         parameters: [],
-        permission: 'preview:documents:list',
       },
       get: {
         name: 'get',
@@ -106,7 +105,6 @@ export const previewApiPlugin = {
             required: true,
           },
         ],
-        permission: 'preview:documents:get',
       },
     },
     permissions: {

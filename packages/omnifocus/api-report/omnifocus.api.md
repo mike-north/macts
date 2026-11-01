@@ -126,7 +126,7 @@ export class OmniFocusClient {
     readonly folders: FolderResourceClient;
     get http(): HttpClient;
     importInto(file: string): Promise<void>;
-    readonly inboxtasks: InboxTaskResourceClient;
+    readonly inboxTasks: InboxTaskResourceClient;
     markComplete(targets: string): Promise<void>;
     markDropped(targets: string): Promise<void>;
     markIncomplete(targets: string): Promise<void>;

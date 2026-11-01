@@ -3,13 +3,13 @@ import { getClient } from '../../../sdk.js'
 import { createFormatter } from '../../../output/index.js'
 
 /**
- * List bookmarkfolders.
+ * List bookmark folders.
  */
 export class ListBookmarkFoldersCommand extends Command {
   static override paths = [['microsoft-edge', 'bookmarkFolders', 'bookmarkFolders', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List bookmarkfolders',
+    description: 'List bookmark folders',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -19,7 +19,7 @@ export class ListBookmarkFoldersCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.bookmarkfolders.list()
+      const items = await client.bookmarkFolders.list()
 
       const output = formatter.formatList(
         items.map((item) => ({

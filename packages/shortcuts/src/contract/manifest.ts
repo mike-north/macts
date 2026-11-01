@@ -169,7 +169,6 @@ export const manifest: unknown = {
       resourceType: 'Shortcut',
       parameters: [],
       code: 'core',
-      permission: 'shortcuts:shortcuts:list',
     },
     get: {
       name: 'get',
@@ -185,7 +184,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'shortcuts:shortcuts:get',
     },
     run: {
       name: 'run',
@@ -209,7 +207,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'srun',
-      permission: 'shortcuts:shortcuts:run',
     },
     listFolders: {
       name: 'list',

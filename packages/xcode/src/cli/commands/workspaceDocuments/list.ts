@@ -3,13 +3,13 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * List workspacedocuments.
+ * List workspace documents.
  */
 export class ListWorkspaceDocumentsCommand extends Command {
   static override paths = [['xcode', 'workspaceDocuments', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List workspacedocuments',
+    description: 'List workspace documents',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -19,7 +19,7 @@ export class ListWorkspaceDocumentsCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.workspacedocuments.list()
+      const items = await client.workspaceDocuments.list()
 
       const output = formatter.formatList(
         items.map((item) => ({

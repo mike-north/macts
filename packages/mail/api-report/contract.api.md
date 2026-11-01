@@ -241,7 +241,7 @@ export interface MailClient {
     mailto(options?: CallOptions): Promise<void>;
     readonly messages: MessageResourceClient;
     move(to: string, options?: CallOptions): Promise<void>;
-    readonly outgoingmessages: OutgoingMessageResourceClient;
+    readonly outgoingMessages: OutgoingMessageResourceClient;
     performMailActionWithMessages(inMailboxes?: ObjectReferenceVariant<Mailbox, never>, forRule?: ObjectReferenceVariant<Rule, never>, options?: CallOptions): Promise<void>;
     synchronize(_with: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>;
 }

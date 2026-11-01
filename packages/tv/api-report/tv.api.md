@@ -413,7 +413,7 @@ export class TVClient {
     duplicate(to?: string): Promise<void>;
     exists(): Promise<void>;
     fastForward(): Promise<void>;
-    readonly filetracks: FileTrackResourceClient;
+    readonly fileTracks: FileTrackResourceClient;
     get http(): HttpClient;
     make(_new: string, at?: string, withProperties?: unknown): Promise<void>;
     nextTrack(): Promise<void>;

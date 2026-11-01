@@ -472,7 +472,6 @@ export const manifest: unknown = {
       resourceType: 'Workflow',
       parameters: [],
       code: 'core',
-      permission: 'automator:workflows:list',
     },
     get: {
       name: 'get',
@@ -488,7 +487,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'automator:workflows:get',
     },
     execute: {
       name: 'execute',
@@ -504,7 +502,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'exec',
-      permission: 'automator:workflows:execute',
     },
     listActions: {
       name: 'list',
@@ -663,7 +660,6 @@ export const manifest: unknown = {
       ],
       code: 'core',
       routeName: 'list',
-      permission: 'automator:requiredResources:list',
     },
     getRequiredResource: {
       name: 'get',
@@ -680,7 +676,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'automator:requiredResources:get',
     },
   },
   permissions: {

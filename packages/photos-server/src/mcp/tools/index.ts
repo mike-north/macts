@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 
-import { mediaitemsListTool } from './mediaitems.js'
-import { mediaitemsGetTool } from './mediaitems.js'
-import { mediaitemsDuplicateTool } from './mediaitems.js'
+import { mediaItemsListTool } from './mediaItems.js'
+import { mediaItemsGetTool } from './mediaItems.js'
+import { mediaItemsDuplicateTool } from './mediaItems.js'
 import { albumsListTool } from './albums.js'
 import { albumsGetTool } from './albums.js'
 import { foldersListTool } from './folders.js'
@@ -29,9 +29,9 @@ import { appSearchTool } from './app.js'
  * All MCP tools.
  */
 export const allTools = [
-  mediaitemsListTool,
-  mediaitemsGetTool,
-  mediaitemsDuplicateTool,
+  mediaItemsListTool,
+  mediaItemsGetTool,
+  mediaItemsDuplicateTool,
   albumsListTool,
   albumsGetTool,
   foldersListTool,

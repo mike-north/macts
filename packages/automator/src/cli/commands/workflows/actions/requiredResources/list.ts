@@ -3,13 +3,13 @@ import { getClient } from '../../../../sdk.js'
 import { createFormatter } from '../../../../output/index.js'
 
 /**
- * List requiredresources.
+ * List required resources.
  */
 export class ListRequiredResourcesCommand extends Command {
   static override paths = [['automator', 'workflows', 'actions', 'requiredResources', 'list']]
 
   static override usage = Command.Usage({
-    description: 'List requiredresources',
+    description: 'List required resources',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
@@ -20,7 +20,7 @@ export class ListRequiredResourcesCommand extends Command {
 
     try {
       const client = getClient()
-      const items = await client.requiredresources.list(this.actionId)
+      const items = await client.requiredResources.list(this.actionId)
 
       const output = formatter.formatList(
         items.map((item) => ({

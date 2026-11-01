@@ -368,7 +368,6 @@ export const photosApiPlugin = {
         parameters: [],
         code: 'core',
         routeName: 'list',
-        permission: 'photos:mediaItems:list',
       },
       getMediaItem: {
         name: 'get',
@@ -385,7 +384,6 @@ export const photosApiPlugin = {
         ],
         code: 'getd',
         routeName: 'get',
-        permission: 'photos:mediaItems:get',
       },
       listAlbums: {
         name: 'list',
@@ -509,7 +507,6 @@ export const photosApiPlugin = {
           },
         ],
         code: 'IPXS',
-        permission: 'photos:mediaItems:duplicate',
       },
       make: {
         name: 'make',
@@ -646,7 +643,6 @@ export const photosApiPlugin = {
           },
         ],
         code: 'IPXS',
-        permission: 'photos:app:spotlight',
       },
       search: {
         name: 'search',
@@ -661,7 +657,6 @@ export const photosApiPlugin = {
           },
         ],
         code: 'IPXS',
-        permission: 'photos:app:search',
       },
     },
     permissions: {

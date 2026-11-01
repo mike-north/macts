@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { outgoingmessagesSendTool } from './outgoingmessages.js'
+import { outgoingMessagesSendTool } from './outgoingMessages.js'
 import { messagesBounceTool } from './messages.js'
 import { messagesForwardTool } from './messages.js'
 import { messagesRedirectTool } from './messages.js'
@@ -25,7 +25,7 @@ import { appSynchronizeTool } from './app.js'
  * All MCP tools.
  */
 export const allTools = [
-  outgoingmessagesSendTool,
+  outgoingMessagesSendTool,
   messagesBounceTool,
   messagesForwardTool,
   messagesRedirectTool,

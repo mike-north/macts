@@ -67,13 +67,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'terminal.settingssets.get',
+    name: 'terminal.settingsSets.get',
     app: 'terminal',
     appBundleId: 'com.apple.Terminal',
-    resource: 'settingssets',
+    resource: 'settingsSets',
     operation: 'get',
     description: 'Get an item by identifier',
-    permission: 'terminal:settingssets:get',
+    permission: 'terminal:settingsSets:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -88,13 +88,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     },
   },
   {
-    name: 'terminal.settingssets.list',
+    name: 'terminal.settingsSets.list',
     app: 'terminal',
     appBundleId: 'com.apple.Terminal',
-    resource: 'settingssets',
+    resource: 'settingsSets',
     operation: 'list',
     description: 'List items',
-    permission: 'terminal:settingssets:list',
+    permission: 'terminal:settingsSets:list',
     risk: 'read',
     inputSchema: {
       type: 'object',

@@ -1405,7 +1405,7 @@ export class SystemEventsClient {
     connect(): Promise<void>;
     decrement(): Promise<void>;
     disconnect(): Promise<void>;
-    readonly diskitems: DiskItemResourceClient;
+    readonly diskItems: DiskItemResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: {
         x: number;
         y: number;
@@ -1430,7 +1430,7 @@ export class SystemEventsClient {
     sleep(): Promise<void>;
     start(): Promise<void>;
     stop(): Promise<void>;
-    readonly uielements: UIElementResourceClient;
+    readonly uiElements: UIElementResourceClient;
 }
 
 // @public

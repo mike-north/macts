@@ -1145,7 +1145,6 @@ export const manifest: unknown = {
       parameters: [],
       code: 'core',
       routeName: 'list',
-      permission: 'omnifocus:inboxTasks:list',
     },
     getInboxTask: {
       name: 'get',
@@ -1162,7 +1161,6 @@ export const manifest: unknown = {
       ],
       code: 'getd',
       routeName: 'get',
-      permission: 'omnifocus:inboxTasks:get',
     },
     createInboxTask: {
       name: 'create',
@@ -1185,7 +1183,6 @@ export const manifest: unknown = {
       ],
       code: 'crel',
       routeName: 'create',
-      permission: 'omnifocus:inboxTasks:create',
     },
     listPerspectives: {
       name: 'list',
@@ -1225,7 +1222,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCCm',
-      permission: 'omnifocus:app:complete',
     },
     markComplete: {
       name: 'markComplete',
@@ -1240,7 +1236,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCMc',
-      permission: 'omnifocus:app:markComplete',
     },
     markIncomplete: {
       name: 'markIncomplete',
@@ -1255,7 +1250,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCMi',
-      permission: 'omnifocus:app:markIncomplete',
     },
     markDropped: {
       name: 'markDropped',
@@ -1270,7 +1264,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCMd',
-      permission: 'omnifocus:app:markDropped',
     },
     parseTasksInto: {
       name: 'parseTasksInto',
@@ -1291,7 +1284,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCP?',
-      permission: 'omnifocus:app:parseTasksInto',
     },
     archive: {
       name: 'archive',
@@ -1312,7 +1304,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FCbk',
-      permission: 'omnifocus:app:archive',
     },
     compact: {
       name: 'compact',
@@ -1320,7 +1311,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'FC><',
-      permission: 'omnifocus:app:compact',
     },
     synchronize: {
       name: 'synchronize',
@@ -1328,7 +1318,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'FCsy',
-      permission: 'omnifocus:app:synchronize',
     },
     importInto: {
       name: 'importInto',
@@ -1343,7 +1332,6 @@ export const manifest: unknown = {
         },
       ],
       code: 'FC <',
-      permission: 'omnifocus:app:importInto',
     },
     undo: {
       name: 'undo',
@@ -1351,7 +1339,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'FCUd',
-      permission: 'omnifocus:app:undo',
     },
     redo: {
       name: 'redo',
@@ -1359,7 +1346,6 @@ export const manifest: unknown = {
       scope: 'application',
       parameters: [],
       code: 'FCRd',
-      permission: 'omnifocus:app:redo',
     },
   },
   permissions: {

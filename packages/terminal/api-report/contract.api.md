@@ -79,7 +79,7 @@ export interface TabUpdateInput {
 // @public
 export interface TerminalClient {
     doScript(command: string, _in?: string, options?: CallOptions): Promise<void>;
-    readonly settingssets: SettingsSetResourceClient;
+    readonly settingsSets: SettingsSetResourceClient;
     readonly tabs: TabResourceClient;
     readonly windows: WindowResourceClient;
 }

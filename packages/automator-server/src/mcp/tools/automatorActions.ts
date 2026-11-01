@@ -1,5 +1,5 @@
 /**
- * MCP tools for Automator.app automatoractions operations.
+ * MCP tools for Automator.app automatorActions operations.
  *
  * @packageDocumentation
  */
@@ -10,8 +10,8 @@ import { getClient } from '../sdk.js'
 /**
  * List all actions in a workflow
  */
-export const automatoractionsListTool: McpToolDefinition = {
-  name: 'macts__automator__automatoractions_list',
+export const automatorActionsListTool: McpToolDefinition = {
+  name: 'macts__automator__automatorActions_list',
   description: 'List all actions in a workflow',
   inputSchema: {
     type: 'object',
@@ -28,15 +28,15 @@ export const automatoractionsListTool: McpToolDefinition = {
     const { workflowName } = args as { workflowName: string }
 
     const client = getClient()
-    return client.automatoractions.list(workflowName)
+    return client.automatorActions.list(workflowName)
   },
 }
 
 /**
  * Get an action by ID
  */
-export const automatoractionsGetTool: McpToolDefinition = {
-  name: 'macts__automator__automatoractions_get',
+export const automatorActionsGetTool: McpToolDefinition = {
+  name: 'macts__automator__automatorActions_get',
   description: 'Get an action by ID',
   inputSchema: {
     type: 'object',
@@ -52,8 +52,8 @@ export const automatoractionsGetTool: McpToolDefinition = {
   handler: async (args) => {
     const { id } = args as { id: string }
     const client = getClient()
-    return client.automatoractions.get(
-      id as unknown as Parameters<typeof client.automatoractions.get>[0]
+    return client.automatorActions.get(
+      id as unknown as Parameters<typeof client.automatorActions.get>[0]
     )
   },
 }

@@ -974,7 +974,7 @@ export interface SystemEventsClient {
     connect(options?: CallOptions): Promise<void>;
     decrement(options?: CallOptions): Promise<void>;
     disconnect(options?: CallOptions): Promise<void>;
-    readonly diskitems: DiskItemResourceClient;
+    readonly diskItems: DiskItemResourceClient;
     doFolderAction(folderActionCode: string, withItemList?: unknown, withWindowSize?: Rectangle, options?: CallOptions): Promise<void>;
     editActionOf(usingActionName?: string, usingActionNumber?: Integer, options?: CallOptions): Promise<void>;
     endTransaction(options?: CallOptions): Promise<void>;
@@ -993,7 +993,7 @@ export interface SystemEventsClient {
     sleep(options?: CallOptions): Promise<void>;
     start(options?: CallOptions): Promise<void>;
     stop(options?: CallOptions): Promise<void>;
-    readonly uielements: UIElementResourceClient;
+    readonly uiElements: UIElementResourceClient;
 }
 
 // @public

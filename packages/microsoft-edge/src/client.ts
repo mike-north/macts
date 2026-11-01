@@ -94,25 +94,25 @@ export class MicrosoftEdgeClient {
   readonly tabs: TabResourceClient
 
   /** A bookmarks folder that contains other bookmarks folder and bookmark items. */
-  readonly bookmarkfolders: BookmarkFolderResourceClient
+  readonly bookmarkFolders: BookmarkFolderResourceClient
 
   /** An item consists of an URL and the title of a bookmark */
-  readonly bookmarkitems: BookmarkItemResourceClient
+  readonly bookmarkItems: BookmarkItemResourceClient
 
   constructor(options: MicrosoftEdgeClientOptions) {
     const baseUrl = options.baseUrl ?? 'http://localhost:8372'
     this.#httpClient = new HttpClient(baseUrl, options.apiKey)
     this.windows = new WindowResourceClient(this.#httpClient, 'microsoft-edge', 'windows')
     this.tabs = new TabResourceClient(this.#httpClient, 'microsoft-edge', 'tabs')
-    this.bookmarkfolders = new BookmarkFolderResourceClient(
+    this.bookmarkFolders = new BookmarkFolderResourceClient(
       this.#httpClient,
       'microsoft-edge',
-      'bookmarkfolders'
+      'bookmarkFolders'
     )
-    this.bookmarkitems = new BookmarkItemResourceClient(
+    this.bookmarkItems = new BookmarkItemResourceClient(
       this.#httpClient,
       'microsoft-edge',
-      'bookmarkitems'
+      'bookmarkItems'
     )
   }
 
