@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'checkForNewMail',
     description: 'Triggers a check for email.',
-    permission: null,
+    permission: 'mail:app:checkForNewMail',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -68,7 +68,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'delete',
     description: 'Delete an object.',
-    permission: null,
+    permission: 'mail:app:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -83,7 +83,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'duplicate',
     description: 'Copy an object.',
-    permission: null,
+    permission: 'mail:app:duplicate',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -108,7 +108,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'extractAddressFrom',
     description:
       'Command to get just the email address of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "jdoe@example.com"',
-    permission: null,
+    permission: 'mail:app:extractAddressFrom',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -124,7 +124,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'extractNameFrom',
     description:
       'Command to get the full name out of a fully specified email address. E.g. Calling this with "John Doe <jdoe@example.com>" as the direct object would return "John Doe"',
-    permission: null,
+    permission: 'mail:app:extractNameFrom',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -139,7 +139,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'getURL',
     description: 'Opens a mailto URL.',
-    permission: null,
+    permission: 'mail:app:getURL',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -154,7 +154,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'importMailMailbox',
     description: 'Imports a mailbox created by Mail.',
-    permission: null,
+    permission: 'mail:app:importMailMailbox',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -175,7 +175,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'mailto',
     description: 'Opens a mailto URL.',
-    permission: null,
+    permission: 'mail:app:mailto',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -190,7 +190,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'move',
     description: 'Move an object to a new location.',
-    permission: null,
+    permission: 'mail:app:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -212,7 +212,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'performMailActionWithMessages',
     description:
       'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
-    permission: null,
+    permission: 'mail:app:performMailActionWithMessages',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -238,7 +238,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'synchronize',
     description: 'Command to trigger synchronizing of an IMAP account with the server.',
-    permission: null,
+    permission: 'mail:app:synchronize',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -259,7 +259,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'messages',
     operation: 'bounce',
     description: 'Does nothing at all (deprecated)',
-    permission: null,
+    permission: 'mail:messages:bounce',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -274,7 +274,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'messages',
     operation: 'forward',
     description: 'Creates a forwarded message.',
-    permission: null,
+    permission: 'mail:messages:forward',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -295,7 +295,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'messages',
     operation: 'redirect',
     description: 'Creates a redirected message.',
-    permission: null,
+    permission: 'mail:messages:redirect',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -316,7 +316,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'messages',
     operation: 'reply',
     description: 'Creates a reply message.',
-    permission: null,
+    permission: 'mail:messages:reply',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -342,7 +342,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'outgoingmessages',
     operation: 'send',
     description: 'Sends a message.',
-    permission: null,
+    permission: 'mail:outgoingmessages:send',
     risk: 'send',
     inputSchema: {
       type: 'object',

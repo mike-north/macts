@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'reveal',
     description: 'Reveals a settings pane or an anchor within a pane.',
-    permission: null,
+    permission: 'system-settings:app:reveal',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -64,7 +64,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'authorize',
     description:
       'Prompt for authorization for a settings pane. Deprecated: no longer does anything.',
-    permission: null,
+    permission: 'system-settings:panes:authorize',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -80,7 +80,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'timedLoad',
     description:
       'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.',
-    permission: null,
+    permission: 'system-settings:panes:timedLoad',
     risk: 'execute',
     inputSchema: {
       type: 'object',

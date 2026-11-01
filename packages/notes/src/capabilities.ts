@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'accounts',
     operation: 'get',
     description: 'Get an item by name',
-    permission: null,
+    permission: 'notes:accounts:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -69,7 +69,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'accounts',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'notes:accounts:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -84,7 +84,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'attachments',
     operation: 'get',
     description: 'Get an attachment by ID',
-    permission: null,
+    permission: 'notes:attachments:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -105,7 +105,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'attachments',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'notes:attachments:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -120,7 +120,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'folders',
     operation: 'get',
     description: 'Get an item by name',
-    permission: null,
+    permission: 'notes:folders:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -141,7 +141,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'folders',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'notes:folders:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -156,7 +156,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'notes',
     operation: 'create',
     description: 'Create a new note',
-    permission: null,
+    permission: 'notes:notes:create',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -180,7 +180,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'notes',
     operation: 'get',
     description: 'Get an item by name',
-    permission: null,
+    permission: 'notes:notes:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -201,7 +201,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'notes',
     operation: 'list',
     description: 'List items',
-    permission: null,
+    permission: 'notes:notes:list',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -216,7 +216,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'notes',
     operation: 'show',
     description: 'Show a note in the Notes app',
-    permission: null,
+    permission: 'notes:notes:show',
     risk: 'read',
     inputSchema: {
       type: 'object',

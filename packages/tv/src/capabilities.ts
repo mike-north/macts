@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'add',
     description: 'add one or more files to a playlist',
-    permission: null,
+    permission: 'tv:app:add',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -69,7 +69,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'backTrack',
     description:
       'reposition to beginning of current track or go to previous track if already at start of current track',
-    permission: null,
+    permission: 'tv:app:backTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -84,7 +84,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'close',
     description: 'Close an object',
-    permission: null,
+    permission: 'tv:app:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -99,7 +99,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'convert',
     description: 'convert one or more files or tracks',
-    permission: null,
+    permission: 'tv:app:convert',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -114,7 +114,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'count',
     description: 'Return the number of elements of a particular class within an object',
-    permission: null,
+    permission: 'tv:app:count',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -136,7 +136,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'delete',
     description: 'Delete an element from an object',
-    permission: null,
+    permission: 'tv:app:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -151,7 +151,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'download',
     description: 'download a cloud track or playlist',
-    permission: null,
+    permission: 'tv:app:download',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -166,7 +166,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'duplicate',
     description: 'Duplicate one or more object(s)',
-    permission: null,
+    permission: 'tv:app:duplicate',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -186,7 +186,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'exists',
     description: 'Verify if an object exists',
-    permission: null,
+    permission: 'tv:app:exists',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -201,7 +201,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'fastForward',
     description: 'skip forward in a playing track',
-    permission: null,
+    permission: 'tv:app:fastForward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -216,7 +216,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Make a new element',
-    permission: null,
+    permission: 'tv:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -245,7 +245,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'nextTrack',
     description: 'advance to the next track in the current playlist',
-    permission: null,
+    permission: 'tv:app:nextTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -260,7 +260,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'open',
     description: 'Open the specified object(s)',
-    permission: null,
+    permission: 'tv:app:open',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -275,7 +275,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'openLocation',
     description: 'Opens an iTunes Store or stream URL',
-    permission: null,
+    permission: 'tv:app:openLocation',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -290,7 +290,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pause',
     description: 'pause playback',
-    permission: null,
+    permission: 'tv:app:pause',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -305,7 +305,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'play',
     description: 'play the current track or the specified track or file.',
-    permission: null,
+    permission: 'tv:app:play',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -325,7 +325,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'playpause',
     description: 'toggle the playing/paused state of the current track',
-    permission: null,
+    permission: 'tv:app:playpause',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -340,7 +340,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'previousTrack',
     description: 'return to the previous track in the current playlist',
-    permission: null,
+    permission: 'tv:app:previousTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -355,7 +355,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'quit',
     description: 'Quit the application',
-    permission: null,
+    permission: 'tv:app:quit',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -370,7 +370,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'resume',
     description: 'disable fast forward/rewind and resume playback, if playing.',
-    permission: null,
+    permission: 'tv:app:resume',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -385,7 +385,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'reveal',
     description: 'reveal and select a track or playlist',
-    permission: null,
+    permission: 'tv:app:reveal',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -400,7 +400,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'rewind',
     description: 'skip backwards in a playing track',
-    permission: null,
+    permission: 'tv:app:rewind',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -415,7 +415,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'run',
     description: 'Run the application',
-    permission: null,
+    permission: 'tv:app:run',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -430,7 +430,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'save',
     description: 'Save the specified object(s)',
-    permission: null,
+    permission: 'tv:app:save',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -445,7 +445,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'select',
     description: 'select the specified object(s)',
-    permission: null,
+    permission: 'tv:app:select',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -460,7 +460,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stop',
     description: 'stop playback',
-    permission: null,
+    permission: 'tv:app:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -475,7 +475,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'filetracks',
     operation: 'refresh',
     description: 'update file track information from the current information in the track’s file',
-    permission: null,
+    permission: 'tv:filetracks:refresh',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -490,7 +490,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'playlists',
     operation: 'move',
     description: 'Move playlist(s) to a new location',
-    permission: null,
+    permission: 'tv:playlists:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -512,7 +512,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'search',
     description:
       'search a playlist for tracks matching the search string. Identical to entering search text in the Search field.',
-    permission: null,
+    permission: 'tv:playlists:search',
     risk: 'read',
     inputSchema: {
       type: 'object',

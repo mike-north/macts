@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'export',
     description: 'Export a movie to another file',
-    permission: null,
+    permission: 'quicktime-player:app:export',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -73,7 +73,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'newAudioRecording',
     description: 'Create a new audio recording document.',
-    permission: null,
+    permission: 'quicktime-player:app:newAudioRecording',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -88,7 +88,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'newMovieRecording',
     description: 'Create a new movie recording document.',
-    permission: null,
+    permission: 'quicktime-player:app:newMovieRecording',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -103,7 +103,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'newScreenRecording',
     description: 'Create a new screen recording document.',
-    permission: null,
+    permission: 'quicktime-player:app:newScreenRecording',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -118,7 +118,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'openURL',
     description: 'Open a URL.',
-    permission: null,
+    permission: 'quicktime-player:app:openURL',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -133,7 +133,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pause',
     description: 'Pause the recording.',
-    permission: null,
+    permission: 'quicktime-player:app:pause',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -148,7 +148,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'play',
     description: 'Play the movie.',
-    permission: null,
+    permission: 'quicktime-player:app:play',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -163,7 +163,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'present',
     description: 'Present the document full screen.',
-    permission: null,
+    permission: 'quicktime-player:app:present',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -178,7 +178,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'resume',
     description: 'Resume the recording.',
-    permission: null,
+    permission: 'quicktime-player:app:resume',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -193,7 +193,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'showRemoteHud',
     description: "Show the document's Remote HUD",
-    permission: null,
+    permission: 'quicktime-player:app:showRemoteHud',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -208,7 +208,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'start',
     description: 'Start the movie recording.',
-    permission: null,
+    permission: 'quicktime-player:app:start',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -223,7 +223,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stepBackward',
     description: 'Step the movie backward the specified number of steps (default is 1).',
-    permission: null,
+    permission: 'quicktime-player:app:stepBackward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -243,7 +243,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stepForward',
     description: 'Step the movie forward the specified number of steps (default is 1).',
-    permission: null,
+    permission: 'quicktime-player:app:stepForward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -263,7 +263,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stop',
     description: 'Stop the movie or recording.',
-    permission: null,
+    permission: 'quicktime-player:app:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -278,7 +278,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'trim',
     description: 'Trim the movie.',
-    permission: null,
+    permission: 'quicktime-player:app:trim',
     risk: 'execute',
     inputSchema: {
       type: 'object',

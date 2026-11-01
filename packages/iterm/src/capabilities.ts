@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'close',
     description: 'Close a document.',
-    permission: null,
+    permission: 'iterm:app:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'count',
     description: 'Return the number of elements of a particular class within an object.',
-    permission: null,
+    permission: 'iterm:app:count',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -83,7 +83,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createHotkeyWindowWithProfile',
     description: 'Create a hotkey window',
-    permission: null,
+    permission: 'iterm:app:createHotkeyWindowWithProfile',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -98,7 +98,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createTab',
     description: 'Create a new tab',
-    permission: null,
+    permission: 'iterm:app:createTab',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -123,7 +123,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createTabWithDefaultProfile',
     description: 'Create a new tab with the default profile',
-    permission: null,
+    permission: 'iterm:app:createTabWithDefaultProfile',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -143,7 +143,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createWindowWithDefaultProfile',
     description: 'Create a new window with the default profile',
-    permission: null,
+    permission: 'iterm:app:createWindowWithDefaultProfile',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -163,7 +163,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'createWindowWithProfile',
     description: 'Create a new window',
-    permission: null,
+    permission: 'iterm:app:createWindowWithProfile',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -183,7 +183,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'delete',
     description: 'Delete an object.',
-    permission: null,
+    permission: 'iterm:app:delete',
     risk: 'delete',
     inputSchema: {
       type: 'object',
@@ -198,7 +198,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'duplicate',
     description: 'Copy object(s) and put the copies at a new location.',
-    permission: null,
+    permission: 'iterm:app:duplicate',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -223,7 +223,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'exists',
     description: 'Verify if an object exists.',
-    permission: null,
+    permission: 'iterm:app:exists',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -238,7 +238,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'hideHotkeyWindow',
     description: 'Hides a hotkey window. Only to be called on windows that are hotkey windows.',
-    permission: null,
+    permission: 'iterm:app:hideHotkeyWindow',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -253,7 +253,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'invokeAPIExpression',
     description: 'Invokes an expression, such as a registered function.',
-    permission: null,
+    permission: 'iterm:app:invokeAPIExpression',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -268,7 +268,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'launchAPIScriptNamed',
     description: 'Launch API script by name',
-    permission: null,
+    permission: 'iterm:app:launchAPIScriptNamed',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -288,7 +288,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Make a new object.',
-    permission: null,
+    permission: 'iterm:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -321,7 +321,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'move',
     description: 'Move object(s) to a new location.',
-    permission: null,
+    permission: 'iterm:app:move',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -342,7 +342,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'requestCookie',
     description: 'Request a Python API cookie',
-    permission: null,
+    permission: 'iterm:app:requestCookie',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -362,7 +362,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'revealHotkeyWindow',
     description: 'Reveals a hotkey window. Only to be called on windows that are hotkey windows.',
-    permission: null,
+    permission: 'iterm:app:revealHotkeyWindow',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -377,7 +377,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'select',
     description: 'Make receiver visible and selected.',
-    permission: null,
+    permission: 'iterm:app:select',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -392,7 +392,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'setVariable',
     description: 'Sets the value of a session variable',
-    permission: null,
+    permission: 'iterm:app:setVariable',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -417,7 +417,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'splitHorizontally',
     description: 'Split a session horizontally.',
-    permission: null,
+    permission: 'iterm:app:splitHorizontally',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -442,7 +442,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'splitHorizontallyWithDefaultProfile',
     description: 'Split a session horizontally, using the default profile for the new session',
-    permission: null,
+    permission: 'iterm:app:splitHorizontallyWithDefaultProfile',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -463,7 +463,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'splitHorizontallyWithSameProfile',
     description:
       "Split a session horizontally, using the original session's profile for the new session",
-    permission: null,
+    permission: 'iterm:app:splitHorizontallyWithSameProfile',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -483,7 +483,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'splitVertically',
     description: 'Split a session vertically.',
-    permission: null,
+    permission: 'iterm:app:splitVertically',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -508,7 +508,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'splitVerticallyWithDefaultProfile',
     description: 'Split a session vertically, using the default profile for the new session',
-    permission: null,
+    permission: 'iterm:app:splitVerticallyWithDefaultProfile',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -529,7 +529,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'splitVerticallyWithSameProfile',
     description:
       "Split a session vertically, using the original session's profile for the new session",
-    permission: null,
+    permission: 'iterm:app:splitVerticallyWithSameProfile',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -550,7 +550,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'toggleHotkeyWindow',
     description:
       'Toggles the visibility of a hotkey window. Only to be called on windows that are hotkey windows.',
-    permission: null,
+    permission: 'iterm:app:toggleHotkeyWindow',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -565,7 +565,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'variable',
     description: 'Returns the value of a session variable with the given name',
-    permission: null,
+    permission: 'iterm:app:variable',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -586,7 +586,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'write',
     description: 'Send text as though it was typed.',
-    permission: null,
+    permission: 'iterm:app:write',
     risk: 'write',
     inputSchema: {
       type: 'object',

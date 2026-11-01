@@ -49,7 +49,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'addReadingListItem',
     description:
       'Add a new Reading List item with the given URL. Allows a custom title and preview text to be specified.',
-    permission: null,
+    permission: 'safari:app:addReadingListItem',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -74,7 +74,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'dispatchMessageToExtension',
     description: 'Dispatch a message to a Safari Extension.',
-    permission: null,
+    permission: 'safari:app:dispatchMessageToExtension',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -89,7 +89,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'doJavaScript',
     description: 'Applies a string of JavaScript code to a document.',
-    permission: null,
+    permission: 'safari:app:doJavaScript',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -109,7 +109,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'emailContents',
     description: 'Emails the contents of a tab.',
-    permission: null,
+    permission: 'safari:app:emailContents',
     risk: 'send',
     inputSchema: {
       type: 'object',
@@ -129,7 +129,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'searchTheWeb',
     description: "Searches the web using Safari's current search provider.",
-    permission: null,
+    permission: 'safari:app:searchTheWeb',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -154,7 +154,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'showBookmarks',
     description: "Shows Safari's bookmarks.",
-    permission: null,
+    permission: 'safari:app:showBookmarks',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -169,7 +169,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'showCreditCardSettings',
     description: 'Show Safari Credit Card Settings.',
-    permission: null,
+    permission: 'safari:app:showCreditCardSettings',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -184,7 +184,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'showExtensionsPreferences',
     description: 'Show Safari Extensions preferences.',
-    permission: null,
+    permission: 'safari:app:showExtensionsPreferences',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -199,7 +199,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'showPrivacyReport',
     description: "Show Safari's Privacy Report",
-    permission: null,
+    permission: 'safari:app:showPrivacyReport',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -215,7 +215,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     operation: 'syncAllPlistToDisk',
     description:
       'Make sure that all in-memory structures are in-sync with their on-disk counterparts.',
-    permission: null,
+    permission: 'safari:app:syncAllPlistToDisk',
     risk: 'system-change',
     inputSchema: {
       type: 'object',

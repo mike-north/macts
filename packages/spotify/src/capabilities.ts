@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'nextTrack',
     description: 'Skip to the next track.',
-    permission: null,
+    permission: 'spotify:app:nextTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'pause',
     description: 'Pause playback.',
-    permission: null,
+    permission: 'spotify:app:pause',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -78,7 +78,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'play',
     description: 'Resume playback.',
-    permission: null,
+    permission: 'spotify:app:play',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -93,7 +93,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'playTrack',
     description: 'Start playback of a track in the given context.',
-    permission: null,
+    permission: 'spotify:app:playTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -113,7 +113,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'playpause',
     description: 'Toggle play/pause.',
-    permission: null,
+    permission: 'spotify:app:playpause',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -128,7 +128,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'previousTrack',
     description: 'Skip to the previous track.',
-    permission: null,
+    permission: 'spotify:app:previousTrack',
     risk: 'execute',
     inputSchema: {
       type: 'object',

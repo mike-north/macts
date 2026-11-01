@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'selectDevice',
     description: 'Select a device.',
-    permission: null,
+    permission: 'console:app:selectDevice',
     risk: 'read',
     inputSchema: {
       type: 'object',

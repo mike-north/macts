@@ -48,7 +48,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'close',
     description: 'Close',
-    permission: null,
+    permission: 'arc:app:close',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -63,7 +63,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'count',
     description: 'Return the number of elements of a particular class within an object.',
-    permission: null,
+    permission: 'arc:app:count',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -83,7 +83,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'execute',
     description: 'Execute a piece of javascript.',
-    permission: null,
+    permission: 'arc:app:execute',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -104,7 +104,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'focus',
     description: 'Focus on a space.',
-    permission: null,
+    permission: 'arc:app:focus',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -119,7 +119,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'goBack',
     description: 'Go Back (If Possible).',
-    permission: null,
+    permission: 'arc:app:goBack',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -134,7 +134,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'goForward',
     description: 'Go Forward (If Possible).',
-    permission: null,
+    permission: 'arc:app:goForward',
     risk: 'execute',
     inputSchema: {
       type: 'object',
@@ -149,7 +149,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'make',
     description: 'Make a new object.',
-    permission: null,
+    permission: 'arc:app:make',
     risk: 'write',
     inputSchema: {
       type: 'object',
@@ -174,7 +174,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'reload',
     description: 'Reload a tab.',
-    permission: null,
+    permission: 'arc:app:reload',
     risk: 'system-change',
     inputSchema: {
       type: 'object',
@@ -189,7 +189,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'select',
     description: 'Select the tab.',
-    permission: null,
+    permission: 'arc:app:select',
     risk: 'read',
     inputSchema: {
       type: 'object',
@@ -204,7 +204,7 @@ export const capabilities: readonly CapabilityMetadata[] = [
     resource: 'app',
     operation: 'stop',
     description: 'Stop the current tab from loading.',
-    permission: null,
+    permission: 'arc:app:stop',
     risk: 'execute',
     inputSchema: {
       type: 'object',
