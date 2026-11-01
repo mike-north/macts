@@ -91,28 +91,26 @@ console.log(event.uid)
 
 **MCP tools (for AI assistants):**
 
-macts exposes each app's capabilities as MCP tools through its server package (e.g.
-`@macts/calendar-server`). The MCP daemon discovers server packages installed under the macts
-plugins directory (`~/.macts/plugins`, override with `MACTS_HOME`):
+macts serves each installed app's operations as MCP tools. Install an app's server package (e.g.
+`@macts/calendar-server`) into the macts plugins directory (`~/.macts/plugins`, override with
+`MACTS_HOME`), then start a server:
 
 ```bash
-# Install an app's server package into the plugins directory…
-# (--ignore-scripts mirrors the built-in installer and avoids running package lifecycle scripts)
-npm install --ignore-scripts --prefix ~/.macts/plugins @macts/calendar-server
-# …then start the daemon and point Claude Desktop (or another MCP client) at it.
+macts mcp install calendar
+
+# stdio, for an MCP client that starts the server itself (Claude Desktop, …)
+MACTS_API_KEY=macts_sk_... macts --mcp
+
+# or one long-running HTTP daemon that several clients connect to
 macts mcp start
 ```
 
-> **Note:** installing MCP **server** packages is currently a manual `npm install` step —
-> `macts plugin install` manages CLI plugins only and does not yet handle `-server` packages. A
-> first-class command is tracked in [#27](https://github.com/mike-north/macts/issues/27).
-
-The MCP server requires a valid API key by default, on every transport: `MACTS_API_KEY` for
-stdio (`macts --mcp`), and `Authorization: Bearer macts_sk_...` for HTTP (the daemon started by
-`macts mcp start`/`macts mcp serve`). Create one with
-`macts api-key create --name <name> --permission <app:resource:operation>`, or pass
-`--disable-api-key-validation` to opt out (not recommended). See
-[`packages/mcp/README.md`](./packages/mcp/README.md#authentication) for details.
+Every MCP tool call runs through the same pipeline as the HTTP API: the caller's API key is
+verified, its permissions are checked, this Mac's governance policy is enforced, and the input is
+validated. Over stdio the key is `MACTS_API_KEY`, required at startup; over HTTP every request
+carries `Authorization: Bearer macts_sk_...`, and each call runs under its own request's key.
+Create a key with `macts api-key create --name <name> --permission <app:resource:operation>`. See
+[`packages/mcp/README.md`](./packages/mcp/README.md#getting-a-key) for details.
 
 ## AI Agent Use Cases
 

@@ -29,7 +29,7 @@ macts api-key list
 # Install a CLI plugin (adds `macts calendar ...` commands)
 macts plugin install @macts/calendar
 
-# Install an app's MCP server plugin (so the MCP daemon exposes its tools)
+# Install an app's server package (so `macts --serve` and the MCP servers serve it)
 macts mcp install calendar
 ```
 
@@ -39,21 +39,45 @@ macts mcp install calendar
 
 #### `macts --mcp`
 
-Start the CLI as an MCP (Model Context Protocol) server for AI assistants.
+Start an MCP (Model Context Protocol) server on stdio, for an AI assistant
+that starts the server itself.
 
 ```bash
-# Start MCP server on stdio (for AI assistant integration)
-macts --mcp
+# Create a key holding the permissions the assistant needs
+macts api-key create --name assistant --permission notes:notes:list
+
+# Start the MCP server on stdio
+MACTS_API_KEY=macts_sk_... macts --mcp
 ```
 
 The MCP server:
 
-- Exposes automation tools via the Model Context Protocol
-- Communicates over stdio (standard input/output)
-- Automatically discovers plugins from `~/.macts/plugins/`
-- Logs to stderr (stdout is reserved for MCP protocol)
-- Requires a valid `MACTS_API_KEY` environment variable by default; validated once at startup. Set it in your MCP client's `env` config, or create a key with `macts api-key create --name <name> --permission <app:resource:operation>`
-- `--disable-api-key-validation` skips this check (not recommended — local development or trusted embedding only)
+- Serves every installed app's operations as MCP tools (install one with
+  `macts mcp install <app>`), plus the built-in capability-discovery tool
+  `macts__capabilities__discover`
+- Communicates over stdio; every diagnostic goes to stderr, because stdout is
+  the MCP channel
+- Reports at startup, on stderr, the apps it serves, any installed app that
+  failed to register (with the reason), and any app installed without its
+  server package
+- Requires `MACTS_API_KEY`, and fails to start without it. Set it in your MCP
+  client's `env` config
+- Runs every tool call under that key, through the same pipeline as the HTTP
+  API: the key is verified on every call (a key revoked during the session is
+  refused on its next call), its permissions are checked, this Mac's
+  governance policy is enforced and audited, and the input is validated
+
+A successful call returns one text content item holding
+`{ "result": <wire value> }`. A failed call has `isError: true` and one text
+content item holding the same envelope the HTTP API sends:
+`{ "error": { "code", "message", "details" } }`.
+
+To serve MCP over HTTP to several clients instead, use
+[`macts mcp serve`](#mcp-serve-options) or [`macts mcp start`](#mcp-start-options).
+
+`--disable-api-key-validation` has been removed: passing it is an error, and
+`MACTS_DISABLE_API_KEY_VALIDATION` only produces a warning. Create a local key
+with `macts api-key create` and set it as `MACTS_API_KEY` instead.
 
 #### `macts --serve [options]`
 
@@ -382,7 +406,7 @@ Useful for debugging access issues or inspecting key contents.
 
 ### MCP Daemon Management
 
-The MCP daemon runs as a background HTTP server over Unix sockets (or TCP), allowing multiple clients to share a single MCP instance. By default, every route except `GET /health` requires a valid `macts_sk_` API key as a `Bearer` token.
+The MCP daemon serves the same tools as `macts --mcp` over HTTP, on a Unix socket (or TCP), allowing multiple clients to share a single MCP instance. Every route except `GET /health` requires a macts API key as a `Bearer` token (`Authorization: Bearer macts_sk_...`), and every tool call runs under the key of the request that carried it, through the same pipeline as the HTTP API. A request without a usable key is refused with `401` and `{ "error": { "code": "UNAUTHENTICATED", "message", "details": { "reason" } } }`.
 
 #### `mcp serve [options]`
 
@@ -392,7 +416,6 @@ Start the MCP server in the foreground (for development/debugging).
 
 - `--port <number>` - TCP port to listen on (optional)
 - `--socket <path>` - Unix socket path (default: ~/.macts/mcp.sock)
-- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Examples:**
 
@@ -405,18 +428,16 @@ macts mcp serve --port 3000
 
 # Use custom socket path
 macts mcp serve --socket /tmp/custom.sock
-
-# Start without API key validation (not recommended)
-macts mcp serve --disable-api-key-validation
 ```
 
 The server will:
 
-- Load all installed MCP plugins
+- Serve every installed app's operations as MCP tools, plus the built-in
+  capability-discovery tool, and report the apps it serves (and any it cannot)
+  on stderr at startup
 - Listen on the specified socket or port
 - Handle MCP protocol requests over streamable HTTP (`/mcp`) and legacy SSE (`/sse` + `/message`)
-- Require `Authorization: Bearer macts_sk_...` on every route except `/health`, unless `--disable-api-key-validation` is passed
-- Log whether API key validation is enabled or disabled to stderr on startup
+- Require `Authorization: Bearer macts_sk_...` on every route except `/health`
 - Display logs to stderr
 
 Press Ctrl+C to stop the server.
@@ -429,7 +450,6 @@ Start the MCP server in the background as a detached process.
 
 - `--port <number>` - TCP port to listen on (optional)
 - `--socket <path>` - Unix socket path (default: ~/.macts/mcp.sock)
-- `--disable-api-key-validation` - Skip API key validation on all daemon routes (not recommended)
 
 **Examples:**
 
@@ -442,9 +462,6 @@ macts mcp start --port 3000
 
 # Use custom socket path
 macts mcp start --socket /tmp/custom.sock
-
-# Start without API key validation (not recommended)
-macts mcp start --disable-api-key-validation
 ```
 
 The server will:
@@ -453,7 +470,6 @@ The server will:
 - Continue running after the terminal closes
 - Write logs to `~/.macts/mcp.log`
 - Store its PID in `~/.macts/mcp.pid`
-- Forward `--disable-api-key-validation` to the spawned `mcp serve` process, when passed
 
 Use `macts mcp stop` to stop the server.
 
@@ -517,7 +533,7 @@ This command checks:
 
 - Daemon process status (PID file, running process)
 - Unix socket status (exists, permissions, connectivity)
-- Plugin discovery (loaded plugins, errors)
+- Installed apps (the apps the MCP servers load, their operation counts, and failures)
 - Health endpoint (connectivity, response)
 
 **Output:**
@@ -527,7 +543,7 @@ The command outputs a detailed JSON diagnostic report including:
 - Timestamp
 - Daemon status (PID, process running)
 - Socket status (path, existence, connectivity)
-- Plugin status (count, load errors)
+- Installed apps (loaded, failed with the reason, and installed without their server package)
 - Recommendations for fixing issues
 
 **Example output:**
@@ -545,13 +561,15 @@ The command outputs a detailed JSON diagnostic report including:
     "socketExists": true,
     "healthCheck": {
       "success": true,
-      "plugins": 2
+      "tools": 6
     }
   },
-  "plugins": {
-    "totalFound": 2,
-    "totalErrors": 0,
-    "plugins": [{ "name": "calendar", "tools": 5 }]
+  "apps": {
+    "totalLoaded": 1,
+    "totalFailed": 0,
+    "apps": [{ "app": "calendar", "hostPackage": "@macts/calendar-server", "operations": 5 }],
+    "failed": [],
+    "missingHost": []
   },
   "recommendations": []
 }
@@ -573,9 +591,9 @@ variable) and discovered automatically. There are two kinds:
 - **CLI plugins** — published as `@macts/<app>` (SDK + CLI commands). Installed
   with `macts plugin install` and discovered by the CLI, adding
   `macts <app> ...` commands.
-- **MCP server plugins** — published as `@macts/<app>-server` (HTTP API + MCP
-  plugin). Installed with [`macts mcp install`](#macts-mcp-install) and
-  discovered by the MCP daemon, exposing the app's tools to MCP clients.
+- **Server packages** — published as `@macts/<app>-server`. Installed with
+  [`macts mcp install`](#macts-mcp-install); `macts --serve`, `macts --mcp`,
+  and the MCP daemon serve the app's operations from its generated contract.
 
 #### `plugin install <package> [options]`
 
@@ -652,15 +670,17 @@ macts plugin uninstall @macts/calendar
 macts plugin uninstall @macts/calendar --json
 ```
 
-### MCP Server Plugin Management
+### Server Package Management
 
-MCP server plugins (`@macts/<app>-server`) expose an app's tools to MCP clients
-through the MCP daemon. They are installed into the same `~/.macts/plugins/`
-directory as CLI plugins and discovered automatically by `macts mcp start`.
+Server packages (`@macts/<app>-server`) make an app available to the macts
+hosts: `macts --serve`, `macts --mcp`, and the MCP daemon each serve its
+operations from its generated contract. They are installed into the same
+`~/.macts/plugins/` directory as CLI plugins and found automatically when a
+host starts.
 
 #### `macts mcp install <app> [options]`
 
-Install an app's MCP server plugin.
+Install an app's server package.
 
 **Arguments:**
 
@@ -973,11 +993,11 @@ JSON output provides:
 
 macts uses a plugin architecture to extend functionality. There are three types of plugins:
 
-| Type         | Keyword             | Purpose                                               |
-| ------------ | ------------------- | ----------------------------------------------------- |
-| CLI plugins  | `macts-cli-plugin`  | Add CLI commands (e.g., `macts calendar events list`) |
-| MCP plugins  | `macts-mcp-plugin`  | Add MCP tools for AI assistants                       |
-| HTTP plugins | `macts-http-plugin` | Add HTTP endpoints (future)                           |
+| Type            | Keyword             | Purpose                                               |
+| --------------- | ------------------- | ----------------------------------------------------- |
+| CLI plugins     | `macts-cli-plugin`  | Add CLI commands (e.g., `macts calendar events list`) |
+| Server packages | `macts-mcp-plugin`  | Serve an app's operations over HTTP and MCP           |
+| HTTP plugins    | `macts-http-plugin` | Add HTTP endpoints (future)                           |
 
 ### Available Plugins
 
@@ -1237,7 +1257,7 @@ macts mcp stop && macts mcp start
 
 - Verify package name spelling
 - Check that package is published to npm
-- Ensure CLI plugins are scoped under `@macts/<app>` and MCP server plugins
+- Ensure CLI plugins are scoped under `@macts/<app>` and server packages
   under `@macts/<app>-server`
 
 **Plugin won't load:**
