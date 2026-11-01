@@ -1041,6 +1041,7 @@ export const manifest: unknown = {
       resourceType: 'WorkspaceDocument',
       parameters: [],
       code: 'core',
+      routeName: 'list',
       permission: 'xcode:workspaceDocuments:list',
     },
     getWorkspaceDocument: {
@@ -1057,6 +1058,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'xcode:workspaceDocuments:get',
     },
     listProjects: {
@@ -1073,7 +1075,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'xcode:projects:list',
+      routeName: 'list',
     },
     getProject: {
       name: 'get',
@@ -1089,7 +1091,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'xcode:projects:get',
+      routeName: 'get',
     },
     listSchemes: {
       name: 'list',
@@ -1105,7 +1107,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'xcode:schemes:list',
+      routeName: 'list',
     },
     getScheme: {
       name: 'get',
@@ -1121,7 +1123,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'xcode:schemes:get',
+      routeName: 'get',
     },
     listRunDestinations: {
       name: 'list',
@@ -1137,6 +1139,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
+      routeName: 'list',
       permission: 'xcode:runDestinations:list',
     },
     getRunDestination: {
@@ -1153,6 +1156,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'xcode:runDestinations:get',
     },
     build: {

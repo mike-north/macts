@@ -24,21 +24,21 @@ export class TabResourceClient {
    * List all tabs.
    */
   async list(windowId: string): Promise<Tab[]> {
-    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.listTabs`, { windowId })
+    return this.#http.rpc<Tab[]>(`${this.#app}.${this.#resource}.list`, { windowId })
   }
 
   /**
    * Get a tab by id.
    */
   async get(id: string): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.getTab`, { id })
+    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new tab.
    */
   async create(input: TabCreateInput): Promise<Tab> {
-    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.createTab`, input)
+    return this.#http.rpc<Tab>(`${this.#app}.${this.#resource}.create`, input)
   }
 
   /**

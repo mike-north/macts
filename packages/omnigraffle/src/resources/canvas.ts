@@ -24,20 +24,20 @@ export class CanvasResourceClient {
    * List all canvases.
    */
   async list(): Promise<Canvas[]> {
-    return this.#http.rpc<Canvas[]>(`${this.#app}.${this.#resource}.listCanvases`)
+    return this.#http.rpc<Canvas[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a canvas by id.
    */
   async get(id: string): Promise<Canvas> {
-    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.getCanvas`, { id })
+    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new canvas.
    */
   async create(input: CanvasCreateInput): Promise<Canvas> {
-    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.createCanvas`, input)
+    return this.#http.rpc<Canvas>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

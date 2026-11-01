@@ -218,7 +218,7 @@ export const manifest: unknown = {
       resourceType: 'Folder',
       parameters: [],
       code: 'core',
-      permission: 'shortcuts:folders:list',
+      routeName: 'list',
     },
     getFolder: {
       name: 'get',
@@ -234,7 +234,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'shortcuts:folders:get',
+      routeName: 'get',
     },
   },
   permissions: {

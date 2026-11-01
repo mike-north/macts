@@ -349,6 +349,7 @@ export const manifest: unknown = {
       resourceType: 'Window',
       parameters: [],
       code: 'core',
+      routeName: 'list',
       permission: 'edge:windows:list',
     },
     getWindow: {
@@ -365,6 +366,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'edge:windows:get',
     },
     createWindow: {
@@ -381,6 +383,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
+      routeName: 'create',
       permission: 'edge:windows:create',
     },
     listTabs: {
@@ -397,6 +400,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
+      routeName: 'list',
       permission: 'edge:tabs:list',
     },
     getTab: {
@@ -413,6 +417,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'edge:tabs:get',
     },
     createTab: {
@@ -435,6 +440,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
+      routeName: 'create',
       permission: 'edge:tabs:create',
     },
     listBookmarkFolders: {
@@ -444,6 +450,7 @@ export const manifest: unknown = {
       resourceType: 'BookmarkFolder',
       parameters: [],
       code: 'core',
+      routeName: 'list',
       permission: 'edge:bookmarkFolders:list',
     },
     getBookmarkFolder: {
@@ -460,6 +467,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'edge:bookmarkFolders:get',
     },
     listBookmarkItems: {
@@ -476,6 +484,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
+      routeName: 'list',
       permission: 'edge:bookmarkItems:list',
     },
     getBookmarkItem: {
@@ -492,6 +501,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'edge:bookmarkItems:get',
     },
     reload: {

@@ -24,13 +24,13 @@ export class SettingResourceClient {
    * List all settings.
    */
   async list(actionId: string): Promise<Setting[]> {
-    return this.#http.rpc<Setting[]>(`${this.#app}.${this.#resource}.listSettings`, { actionId })
+    return this.#http.rpc<Setting[]>(`${this.#app}.${this.#resource}.list`, { actionId })
   }
 
   /**
    * Get a setting by name.
    */
   async get(name: string): Promise<Setting> {
-    return this.#http.rpc<Setting>(`${this.#app}.${this.#resource}.getSetting`, { name })
+    return this.#http.rpc<Setting>(`${this.#app}.${this.#resource}.get`, { name })
   }
 }

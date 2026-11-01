@@ -24,20 +24,20 @@ export class ProjectResourceClient {
    * List all projects.
    */
   async list(): Promise<Project[]> {
-    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.listProjects`)
+    return this.#http.rpc<Project[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a project by id.
    */
   async get(id: string): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.getProject`, { id })
+    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new project.
    */
   async create(input: ProjectCreateInput): Promise<Project> {
-    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.createProject`, input)
+    return this.#http.rpc<Project>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

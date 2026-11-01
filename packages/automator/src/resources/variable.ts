@@ -24,15 +24,13 @@ export class VariableResourceClient {
    * List all variables.
    */
   async list(workflowName: string): Promise<Variable[]> {
-    return this.#http.rpc<Variable[]>(`${this.#app}.${this.#resource}.listVariables`, {
-      workflowName,
-    })
+    return this.#http.rpc<Variable[]>(`${this.#app}.${this.#resource}.list`, { workflowName })
   }
 
   /**
    * Get a variable by id.
    */
   async get(id: string): Promise<Variable> {
-    return this.#http.rpc<Variable>(`${this.#app}.${this.#resource}.getVariable`, { id })
+    return this.#http.rpc<Variable>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

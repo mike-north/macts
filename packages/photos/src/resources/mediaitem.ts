@@ -24,14 +24,14 @@ export class MediaItemResourceClient {
    * List all mediaitems.
    */
   async list(): Promise<MediaItem[]> {
-    return this.#http.rpc<MediaItem[]>(`${this.#app}.${this.#resource}.listMediaItems`)
+    return this.#http.rpc<MediaItem[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a mediaitem by id.
    */
   async get(id: string): Promise<MediaItem> {
-    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.getMediaItem`, { id })
+    return this.#http.rpc<MediaItem>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**

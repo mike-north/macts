@@ -24,20 +24,20 @@ export class MilestoneResourceClient {
    * List all milestones.
    */
   async list(): Promise<Milestone[]> {
-    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.listMilestones`)
+    return this.#http.rpc<Milestone[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a milestone by id.
    */
   async get(id: string): Promise<Milestone> {
-    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.getMilestone`, { id })
+    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new milestone.
    */
   async create(input: MilestoneCreateInput): Promise<Milestone> {
-    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.createMilestone`, input)
+    return this.#http.rpc<Milestone>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

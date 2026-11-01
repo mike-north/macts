@@ -24,20 +24,20 @@ export class WindowResourceClient {
    * List all windows.
    */
   async list(): Promise<Window[]> {
-    return this.#http.rpc<Window[]>(`${this.#app}.${this.#resource}.listWindows`)
+    return this.#http.rpc<Window[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a window by id.
    */
   async get(id: string): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.getWindow`, { id })
+    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new window.
    */
   async create(input: WindowCreateInput): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.createWindow`, input)
+    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

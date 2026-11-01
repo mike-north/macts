@@ -1436,8 +1436,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     name: 'WorkspaceDocument',
     record: workspaceDocumentRecordType,
     id: t.string({ description: 'The name of the workspace' }),
-    get: 'xcode.workspacedocuments.getWorkspaceDocument',
-    list: 'xcode.workspacedocuments.listWorkspaceDocuments',
+    get: 'xcode.workspacedocuments.get',
+    list: 'xcode.workspacedocuments.list',
   },
   FileDocument: {
     name: 'FileDocument',
@@ -1458,8 +1458,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     name: 'Project',
     record: projectRecordType,
     id: t.string({ description: 'The unique identifier for the project' }),
-    get: 'xcode.projects.getProject',
-    list: 'xcode.projects.listProjects',
+    get: 'xcode.projects.get',
+    list: 'xcode.projects.list',
   },
   Target: {
     name: 'Target',
@@ -1485,8 +1485,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     name: 'Scheme',
     record: schemeRecordType,
     id: t.string({ description: 'The unique identifier for the scheme' }),
-    get: 'xcode.schemes.getScheme',
-    list: 'xcode.schemes.listSchemes',
+    get: 'xcode.schemes.get',
+    list: 'xcode.schemes.list',
   },
   RunDestination: {
     name: 'RunDestination',
@@ -1494,8 +1494,8 @@ const resources: AppContract<XcodeClient>['resources'] = {
     id: t.string({
       description: "The name of the run destination, as displayed in Xcode's interface",
     }),
-    get: 'xcode.rundestinations.getRunDestination',
-    list: 'xcode.rundestinations.listRunDestinations',
+    get: 'xcode.rundestinations.get',
+    list: 'xcode.rundestinations.list',
   },
   Device: {
     name: 'Device',
@@ -1533,7 +1533,7 @@ const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
   Record<string, never>,
   readonly WorkspaceDocument[]
 > = {
-  id: 'xcode.workspacedocuments.listWorkspaceDocuments',
+  id: 'xcode.workspacedocuments.list',
   permission: 'xcode:workspaceDocuments:list',
   target: { command: 'listWorkspaceDocuments', resource: 'WorkspaceDocument' },
   description: 'List all workspace documents',
@@ -1545,7 +1545,7 @@ const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
   { readonly name: string },
   WorkspaceDocument
 > = {
-  id: 'xcode.workspacedocuments.getWorkspaceDocument',
+  id: 'xcode.workspacedocuments.get',
   permission: 'xcode:workspaceDocuments:get',
   target: { command: 'getWorkspaceDocument', resource: 'WorkspaceDocument' },
   description: 'Get a workspace document by name',
@@ -1559,7 +1559,7 @@ const projectListProjectsOperation: OperationDescriptor<
   { readonly workspaceName: string },
   readonly Project[]
 > = {
-  id: 'xcode.projects.listProjects',
+  id: 'xcode.projects.list',
   permission: 'xcode:projects:list',
   target: { command: 'listProjects', resource: 'Project' },
   description: 'List all projects in a workspace',
@@ -1570,7 +1570,7 @@ const projectListProjectsOperation: OperationDescriptor<
 }
 
 const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
-  id: 'xcode.projects.getProject',
+  id: 'xcode.projects.get',
   permission: 'xcode:projects:get',
   target: { command: 'getProject', resource: 'Project' },
   description: 'Get a project by ID',
@@ -1584,7 +1584,7 @@ const schemeListSchemesOperation: OperationDescriptor<
   { readonly workspaceName: string },
   readonly Scheme[]
 > = {
-  id: 'xcode.schemes.listSchemes',
+  id: 'xcode.schemes.list',
   permission: 'xcode:schemes:list',
   target: { command: 'listSchemes', resource: 'Scheme' },
   description: 'List all schemes in a workspace',
@@ -1595,7 +1595,7 @@ const schemeListSchemesOperation: OperationDescriptor<
 }
 
 const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Scheme> = {
-  id: 'xcode.schemes.getScheme',
+  id: 'xcode.schemes.get',
   permission: 'xcode:schemes:get',
   target: { command: 'getScheme', resource: 'Scheme' },
   description: 'Get a scheme by ID',
@@ -1609,7 +1609,7 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
   { readonly workspaceName: string },
   readonly RunDestination[]
 > = {
-  id: 'xcode.rundestinations.listRunDestinations',
+  id: 'xcode.rundestinations.list',
   permission: 'xcode:runDestinations:list',
   target: { command: 'listRunDestinations', resource: 'RunDestination' },
   description: 'List all run destinations in a workspace',
@@ -1623,7 +1623,7 @@ const runDestinationGetRunDestinationOperation: OperationDescriptor<
   { readonly name: string },
   RunDestination
 > = {
-  id: 'xcode.rundestinations.getRunDestination',
+  id: 'xcode.rundestinations.get',
   permission: 'xcode:runDestinations:get',
   target: { command: 'getRunDestination', resource: 'RunDestination' },
   description: 'Get a run destination by name',
@@ -1781,15 +1781,14 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<XcodeClient>['operations'] = {
-  'xcode.workspacedocuments.listWorkspaceDocuments':
-    workspaceDocumentListWorkspaceDocumentsOperation,
-  'xcode.workspacedocuments.getWorkspaceDocument': workspaceDocumentGetWorkspaceDocumentOperation,
-  'xcode.projects.listProjects': projectListProjectsOperation,
-  'xcode.projects.getProject': projectGetProjectOperation,
-  'xcode.schemes.listSchemes': schemeListSchemesOperation,
-  'xcode.schemes.getScheme': schemeGetSchemeOperation,
-  'xcode.rundestinations.listRunDestinations': runDestinationListRunDestinationsOperation,
-  'xcode.rundestinations.getRunDestination': runDestinationGetRunDestinationOperation,
+  'xcode.workspacedocuments.list': workspaceDocumentListWorkspaceDocumentsOperation,
+  'xcode.workspacedocuments.get': workspaceDocumentGetWorkspaceDocumentOperation,
+  'xcode.projects.list': projectListProjectsOperation,
+  'xcode.projects.get': projectGetProjectOperation,
+  'xcode.schemes.list': schemeListSchemesOperation,
+  'xcode.schemes.get': schemeGetSchemeOperation,
+  'xcode.rundestinations.list': runDestinationListRunDestinationsOperation,
+  'xcode.rundestinations.get': runDestinationGetRunDestinationOperation,
   'xcode.workspacedocuments.build': workspaceDocumentBuildOperation,
   'xcode.workspacedocuments.clean': workspaceDocumentCleanOperation,
   'xcode.workspacedocuments.stop': workspaceDocumentStopOperation,

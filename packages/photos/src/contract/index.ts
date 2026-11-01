@@ -485,8 +485,8 @@ const resources: AppContract<PhotosClient>['resources'] = {
     name: 'MediaItem',
     record: mediaItemRecordType,
     id: t.string({ description: 'The unique ID of the media item' }),
-    get: 'photos.mediaitems.getMediaItem',
-    list: 'photos.mediaitems.listMediaItems',
+    get: 'photos.mediaitems.get',
+    list: 'photos.mediaitems.list',
   },
   Container: {
     name: 'Container',
@@ -497,15 +497,15 @@ const resources: AppContract<PhotosClient>['resources'] = {
     name: 'Album',
     record: albumRecordType,
     id: t.string({ description: 'The unique ID of this album' }),
-    get: 'photos.albums.getAlbum',
-    list: 'photos.albums.listAlbums',
+    get: 'photos.albums.get',
+    list: 'photos.albums.list',
   },
   Folder: {
     name: 'Folder',
     record: folderRecordType,
     id: t.string({ description: 'The unique ID of this folder' }),
-    get: 'photos.folders.getFolder',
-    list: 'photos.folders.listFolders',
+    get: 'photos.folders.get',
+    list: 'photos.folders.list',
   },
   Moment: {
     name: 'Moment',
@@ -518,7 +518,7 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<
   Record<string, never>,
   readonly MediaItem[]
 > = {
-  id: 'photos.mediaitems.listMediaItems',
+  id: 'photos.mediaitems.list',
   permission: 'photos:mediaItems:list',
   target: { command: 'listMediaItems', resource: 'MediaItem' },
   description: 'List all media items',
@@ -527,7 +527,7 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<
 }
 
 const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string }, MediaItem> = {
-  id: 'photos.mediaitems.getMediaItem',
+  id: 'photos.mediaitems.get',
   permission: 'photos:mediaItems:get',
   target: { command: 'getMediaItem', resource: 'MediaItem' },
   description: 'Get a media item by ID',
@@ -538,7 +538,7 @@ const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string 
 }
 
 const albumListAlbumsOperation: OperationDescriptor<Record<string, never>, readonly Album[]> = {
-  id: 'photos.albums.listAlbums',
+  id: 'photos.albums.list',
   permission: 'photos:albums:list',
   target: { command: 'listAlbums', resource: 'Album' },
   description: 'List all albums',
@@ -547,7 +547,7 @@ const albumListAlbumsOperation: OperationDescriptor<Record<string, never>, reado
 }
 
 const albumGetAlbumOperation: OperationDescriptor<{ readonly id: string }, Album> = {
-  id: 'photos.albums.getAlbum',
+  id: 'photos.albums.get',
   permission: 'photos:albums:get',
   target: { command: 'getAlbum', resource: 'Album' },
   description: 'Get an album by ID',
@@ -558,7 +558,7 @@ const albumGetAlbumOperation: OperationDescriptor<{ readonly id: string }, Album
 }
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
-  id: 'photos.folders.listFolders',
+  id: 'photos.folders.list',
   permission: 'photos:folders:list',
   target: { command: 'listFolders', resource: 'Folder' },
   description: 'List all folders',
@@ -567,7 +567,7 @@ const folderListFoldersOperation: OperationDescriptor<Record<string, never>, rea
 }
 
 const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
-  id: 'photos.folders.getFolder',
+  id: 'photos.folders.get',
   permission: 'photos:folders:get',
   target: { command: 'getFolder', resource: 'Folder' },
   description: 'Get a folder by ID',
@@ -759,12 +759,12 @@ const appSearchOperation: OperationDescriptor<{ readonly for: string }, undefine
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<PhotosClient>['operations'] = {
-  'photos.mediaitems.listMediaItems': mediaItemListMediaItemsOperation,
-  'photos.mediaitems.getMediaItem': mediaItemGetMediaItemOperation,
-  'photos.albums.listAlbums': albumListAlbumsOperation,
-  'photos.albums.getAlbum': albumGetAlbumOperation,
-  'photos.folders.listFolders': folderListFoldersOperation,
-  'photos.folders.getFolder': folderGetFolderOperation,
+  'photos.mediaitems.list': mediaItemListMediaItemsOperation,
+  'photos.mediaitems.get': mediaItemGetMediaItemOperation,
+  'photos.albums.list': albumListAlbumsOperation,
+  'photos.albums.get': albumGetAlbumOperation,
+  'photos.folders.list': folderListFoldersOperation,
+  'photos.folders.get': folderGetFolderOperation,
   'photos.app.import': appImportOperation,
   'photos.app.export': appExportOperation,
   'photos.mediaitems.duplicate': mediaItemDuplicateOperation,

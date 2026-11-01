@@ -912,7 +912,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'calendar:events:list',
+      routeName: 'list',
     },
     getEvent: {
       name: 'get',
@@ -934,7 +934,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'calendar:events:get',
+      routeName: 'get',
     },
     createEvent: {
       name: 'create',
@@ -1020,7 +1020,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'calendar:events:create',
+      routeName: 'create',
     },
     updateEvent: {
       name: 'update',
@@ -1112,7 +1112,7 @@ export const manifest: unknown = {
         },
       ],
       code: '????',
-      permission: 'calendar:events:update',
+      routeName: 'update',
     },
     deleteEvent: {
       name: 'delete',
@@ -1134,7 +1134,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'dele',
-      permission: 'calendar:events:delete',
+      routeName: 'delete',
     },
     reloadCalendars: {
       name: 'reloadCalendars',

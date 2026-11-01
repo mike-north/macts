@@ -520,6 +520,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
+      routeName: 'list',
       permission: 'automator:actions:list',
     },
     getAction: {
@@ -536,6 +537,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'automator:actions:get',
     },
     add: {
@@ -596,7 +598,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'automator:variables:list',
+      routeName: 'list',
     },
     getVariable: {
       name: 'get',
@@ -612,7 +614,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'automator:variables:get',
+      routeName: 'get',
     },
     listSettings: {
       name: 'list',
@@ -628,7 +630,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'automator:settings:list',
+      routeName: 'list',
     },
     getSetting: {
       name: 'get',
@@ -644,7 +646,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'automator:settings:get',
+      routeName: 'get',
     },
     listRequiredResources: {
       name: 'list',
@@ -660,6 +662,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
+      routeName: 'list',
       permission: 'automator:requiredResources:list',
     },
     getRequiredResource: {
@@ -676,6 +679,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
+      routeName: 'get',
       permission: 'automator:requiredResources:get',
     },
   },

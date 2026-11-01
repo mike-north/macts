@@ -540,34 +540,34 @@ const resources: AppContract<MicrosoftEdgeClient>['resources'] = {
     name: 'Window',
     record: windowRecordType,
     id: t.string({ description: 'The unique identifier of the window.' }),
-    get: 'microsoft-edge.windows.getWindow',
-    list: 'microsoft-edge.windows.listWindows',
+    get: 'microsoft-edge.windows.get',
+    list: 'microsoft-edge.windows.list',
   },
   Tab: {
     name: 'Tab',
     record: tabRecordType,
     id: t.string({ description: 'Unique ID of the tab.' }),
-    get: 'microsoft-edge.tabs.getTab',
-    list: 'microsoft-edge.tabs.listTabs',
+    get: 'microsoft-edge.tabs.get',
+    list: 'microsoft-edge.tabs.list',
   },
   BookmarkFolder: {
     name: 'BookmarkFolder',
     record: bookmarkFolderRecordType,
     id: t.string({ description: 'Unique ID of the bookmark folder.' }),
-    get: 'microsoft-edge.bookmarkfolders.getBookmarkFolder',
-    list: 'microsoft-edge.bookmarkfolders.listBookmarkFolders',
+    get: 'microsoft-edge.bookmarkfolders.get',
+    list: 'microsoft-edge.bookmarkfolders.list',
   },
   BookmarkItem: {
     name: 'BookmarkItem',
     record: bookmarkItemRecordType,
     id: t.string({ description: 'Unique ID of the bookmark item.' }),
-    get: 'microsoft-edge.bookmarkitems.getBookmarkItem',
-    list: 'microsoft-edge.bookmarkitems.listBookmarkItems',
+    get: 'microsoft-edge.bookmarkitems.get',
+    list: 'microsoft-edge.bookmarkitems.list',
   },
 }
 
 const windowListWindowsOperation: OperationDescriptor<Record<string, never>, readonly Window[]> = {
-  id: 'microsoft-edge.windows.listWindows',
+  id: 'microsoft-edge.windows.list',
   permission: 'edge:windows:list',
   target: { command: 'listWindows', resource: 'Window' },
   description: 'List all windows',
@@ -576,7 +576,7 @@ const windowListWindowsOperation: OperationDescriptor<Record<string, never>, rea
 }
 
 const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Window> = {
-  id: 'microsoft-edge.windows.getWindow',
+  id: 'microsoft-edge.windows.get',
   permission: 'edge:windows:get',
   target: { command: 'getWindow', resource: 'Window' },
   description: 'Get a window by ID',
@@ -587,7 +587,7 @@ const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Win
 }
 
 const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window> = {
-  id: 'microsoft-edge.windows.createWindow',
+  id: 'microsoft-edge.windows.create',
   permission: 'edge:windows:create',
   target: { command: 'createWindow', resource: 'Window' },
   description: 'Create a new window',
@@ -596,7 +596,7 @@ const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window
 }
 
 const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, readonly Tab[]> = {
-  id: 'microsoft-edge.tabs.listTabs',
+  id: 'microsoft-edge.tabs.list',
   permission: 'edge:tabs:list',
   target: { command: 'listTabs', resource: 'Tab' },
   description: 'List all tabs in a window',
@@ -607,7 +607,7 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, r
 }
 
 const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
-  id: 'microsoft-edge.tabs.getTab',
+  id: 'microsoft-edge.tabs.get',
   permission: 'edge:tabs:get',
   target: { command: 'getTab', resource: 'Tab' },
   description: 'Get a tab by ID',
@@ -618,7 +618,7 @@ const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
 }
 
 const tabCreateTabOperation: OperationDescriptor<TabCreateInput, Tab> = {
-  id: 'microsoft-edge.tabs.createTab',
+  id: 'microsoft-edge.tabs.create',
   permission: 'edge:tabs:create',
   target: { command: 'createTab', resource: 'Tab' },
   description: 'Create a new tab',
@@ -630,7 +630,7 @@ const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
   Record<string, never>,
   readonly BookmarkFolder[]
 > = {
-  id: 'microsoft-edge.bookmarkfolders.listBookmarkFolders',
+  id: 'microsoft-edge.bookmarkfolders.list',
   permission: 'edge:bookmarkFolders:list',
   target: { command: 'listBookmarkFolders', resource: 'BookmarkFolder' },
   description: 'List all bookmark folders',
@@ -642,7 +642,7 @@ const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
   { readonly id: string },
   BookmarkFolder
 > = {
-  id: 'microsoft-edge.bookmarkfolders.getBookmarkFolder',
+  id: 'microsoft-edge.bookmarkfolders.get',
   permission: 'edge:bookmarkFolders:get',
   target: { command: 'getBookmarkFolder', resource: 'BookmarkFolder' },
   description: 'Get a bookmark folder by ID',
@@ -656,7 +656,7 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
   { readonly folderId: string },
   readonly BookmarkItem[]
 > = {
-  id: 'microsoft-edge.bookmarkitems.listBookmarkItems',
+  id: 'microsoft-edge.bookmarkitems.list',
   permission: 'edge:bookmarkItems:list',
   target: { command: 'listBookmarkItems', resource: 'BookmarkItem' },
   description: 'List all bookmark items in a folder',
@@ -670,7 +670,7 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
   { readonly id: string },
   BookmarkItem
 > = {
-  id: 'microsoft-edge.bookmarkitems.getBookmarkItem',
+  id: 'microsoft-edge.bookmarkitems.get',
   permission: 'edge:bookmarkItems:get',
   target: { command: 'getBookmarkItem', resource: 'BookmarkItem' },
   description: 'Get a bookmark item by ID',
@@ -818,16 +818,16 @@ const tabExecuteOperation: OperationDescriptor<
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<MicrosoftEdgeClient>['operations'] = {
-  'microsoft-edge.windows.listWindows': windowListWindowsOperation,
-  'microsoft-edge.windows.getWindow': windowGetWindowOperation,
-  'microsoft-edge.windows.createWindow': windowCreateWindowOperation,
-  'microsoft-edge.tabs.listTabs': tabListTabsOperation,
-  'microsoft-edge.tabs.getTab': tabGetTabOperation,
-  'microsoft-edge.tabs.createTab': tabCreateTabOperation,
-  'microsoft-edge.bookmarkfolders.listBookmarkFolders': bookmarkFolderListBookmarkFoldersOperation,
-  'microsoft-edge.bookmarkfolders.getBookmarkFolder': bookmarkFolderGetBookmarkFolderOperation,
-  'microsoft-edge.bookmarkitems.listBookmarkItems': bookmarkItemListBookmarkItemsOperation,
-  'microsoft-edge.bookmarkitems.getBookmarkItem': bookmarkItemGetBookmarkItemOperation,
+  'microsoft-edge.windows.list': windowListWindowsOperation,
+  'microsoft-edge.windows.get': windowGetWindowOperation,
+  'microsoft-edge.windows.create': windowCreateWindowOperation,
+  'microsoft-edge.tabs.list': tabListTabsOperation,
+  'microsoft-edge.tabs.get': tabGetTabOperation,
+  'microsoft-edge.tabs.create': tabCreateTabOperation,
+  'microsoft-edge.bookmarkfolders.list': bookmarkFolderListBookmarkFoldersOperation,
+  'microsoft-edge.bookmarkfolders.get': bookmarkFolderGetBookmarkFolderOperation,
+  'microsoft-edge.bookmarkitems.list': bookmarkItemListBookmarkItemsOperation,
+  'microsoft-edge.bookmarkitems.get': bookmarkItemGetBookmarkItemOperation,
   'microsoft-edge.tabs.reload': tabReloadOperation,
   'microsoft-edge.tabs.goBack': tabGoBackOperation,
   'microsoft-edge.tabs.goForward': tabGoForwardOperation,

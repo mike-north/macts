@@ -1392,7 +1392,7 @@ export const manifest: unknown = {
       resourceType: 'Canvas',
       parameters: [],
       code: 'core',
-      permission: 'omnigraffle:canvases:list',
+      routeName: 'list',
     },
     getCanvas: {
       name: 'get',
@@ -1408,7 +1408,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnigraffle:canvases:get',
+      routeName: 'get',
     },
     createCanvas: {
       name: 'create',
@@ -1424,7 +1424,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnigraffle:canvases:create',
+      routeName: 'create',
     },
     listGraphics: {
       name: 'list',
@@ -1440,7 +1440,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'omnigraffle:graphics:list',
+      routeName: 'list',
     },
     getGraphic: {
       name: 'get',
@@ -1456,7 +1456,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnigraffle:graphics:get',
+      routeName: 'get',
     },
     listShapes: {
       name: 'list',
@@ -1472,7 +1472,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'omnigraffle:shapes:list',
+      routeName: 'list',
     },
     getShape: {
       name: 'get',
@@ -1488,7 +1488,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnigraffle:shapes:get',
+      routeName: 'get',
     },
     createShape: {
       name: 'create',
@@ -1522,7 +1522,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnigraffle:shapes:create',
+      routeName: 'create',
     },
     listLines: {
       name: 'list',
@@ -1538,7 +1538,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'omnigraffle:lines:list',
+      routeName: 'list',
     },
     getLine: {
       name: 'get',
@@ -1554,7 +1554,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnigraffle:lines:get',
+      routeName: 'get',
     },
     listLayers: {
       name: 'list',
@@ -1570,7 +1570,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'omnigraffle:layers:list',
+      routeName: 'list',
     },
     getLayer: {
       name: 'get',
@@ -1586,7 +1586,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'omnigraffle:layers:get',
+      routeName: 'get',
     },
     createLayer: {
       name: 'create',
@@ -1608,7 +1608,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'omnigraffle:layers:create',
+      routeName: 'create',
     },
     connect: {
       name: 'connect',

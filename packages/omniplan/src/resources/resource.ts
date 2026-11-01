@@ -24,20 +24,20 @@ export class ResourceResourceClient {
    * List all resources.
    */
   async list(): Promise<Resource[]> {
-    return this.#http.rpc<Resource[]>(`${this.#app}.${this.#resource}.listResources`)
+    return this.#http.rpc<Resource[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a resource by id.
    */
   async get(id: string): Promise<Resource> {
-    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.getResource`, { id })
+    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new resource.
    */
   async create(input: ResourceCreateInput): Promise<Resource> {
-    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.createResource`, input)
+    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

@@ -24,6 +24,6 @@ export class AccountResourceClient {
    * List all accounts.
    */
   async list(): Promise<Account[]> {
-    return this.#http.rpc<Account[]>(`${this.#app}.${this.#resource}.listAccounts`)
+    return this.#http.rpc<Account[]>(`${this.#app}.${this.#resource}.list`)
   }
 }

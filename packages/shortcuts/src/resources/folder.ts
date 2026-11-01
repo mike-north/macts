@@ -24,13 +24,13 @@ export class FolderResourceClient {
    * List all folders.
    */
   async list(): Promise<Folder[]> {
-    return this.#http.rpc<Folder[]>(`${this.#app}.${this.#resource}.listFolders`)
+    return this.#http.rpc<Folder[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a folder by id.
    */
   async get(id: string): Promise<Folder> {
-    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.getFolder`, { id })
+    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

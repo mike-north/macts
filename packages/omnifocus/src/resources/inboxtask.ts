@@ -24,20 +24,20 @@ export class InboxTaskResourceClient {
    * List all inboxtasks.
    */
   async list(): Promise<InboxTask[]> {
-    return this.#http.rpc<InboxTask[]>(`${this.#app}.${this.#resource}.listInboxTasks`)
+    return this.#http.rpc<InboxTask[]>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**
    * Get a inboxtask by id.
    */
   async get(id: string): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.getInboxTask`, { id })
+    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**
    * Create a new inboxtask.
    */
   async create(input: InboxTaskCreateInput): Promise<InboxTask> {
-    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.createInboxTask`, input)
+    return this.#http.rpc<InboxTask>(`${this.#app}.${this.#resource}.create`, input)
   }
 }

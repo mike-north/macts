@@ -490,7 +490,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'core',
-      permission: 'reminders:reminders:list',
+      routeName: 'list',
     },
     getReminder: {
       name: 'get',
@@ -506,7 +506,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'getd',
-      permission: 'reminders:reminders:get',
+      routeName: 'get',
     },
     createReminder: {
       name: 'create',
@@ -558,7 +558,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'crel',
-      permission: 'reminders:reminders:create',
+      routeName: 'create',
     },
     deleteReminder: {
       name: 'delete',
@@ -574,7 +574,7 @@ export const manifest: unknown = {
         },
       ],
       code: 'dele',
-      permission: 'reminders:reminders:delete',
+      routeName: 'delete',
     },
     completeReminder: {
       name: 'complete',
@@ -608,7 +608,7 @@ export const manifest: unknown = {
       resourceType: 'Account',
       parameters: [],
       code: 'core',
-      permission: 'reminders:accounts:list',
+      routeName: 'list',
     },
   },
   permissions: {

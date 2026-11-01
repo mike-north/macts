@@ -24,21 +24,21 @@ export class EventResourceClient {
    * List all events.
    */
   async list(calendarId: string): Promise<Event[]> {
-    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.listEvents`, { calendarId })
+    return this.#http.rpc<Event[]>(`${this.#app}.${this.#resource}.list`, { calendarId })
   }
 
   /**
    * Get a event by id within a parent scope.
    */
   async get(calendarId: string, id: string): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.getEvent`, { calendarId, id })
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.get`, { calendarId, id })
   }
 
   /**
    * Create a new event.
    */
   async create(input: EventCreateInput): Promise<Event> {
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.createEvent`, input)
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.create`, input)
   }
 
   /**
@@ -50,7 +50,7 @@ export class EventResourceClient {
     const defined = Object.fromEntries(
       Object.entries(updateFields as Record<string, unknown>).filter(([, v]) => v !== undefined)
     )
-    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.updateEvent`, {
+    return this.#http.rpc<Event>(`${this.#app}.${this.#resource}.update`, {
       calendarId,
       id,
       ...defined,
@@ -61,10 +61,7 @@ export class EventResourceClient {
    * Delete an event within a parent scope.
    */
   async delete(calendarId: string, id: string): Promise<void> {
-    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.deleteEvent`, {
-      calendarId,
-      id,
-    })
+    await this.#http.rpc<undefined>(`${this.#app}.${this.#resource}.delete`, { calendarId, id })
   }
 
   /**

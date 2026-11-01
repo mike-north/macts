@@ -723,8 +723,8 @@ const resources: AppContract<CalendarClient>['resources'] = {
     name: 'Event',
     record: eventRecordType,
     id: t.string({ description: 'A unique event key' }),
-    get: 'calendar.events.getEvent',
-    list: 'calendar.events.listEvents',
+    get: 'calendar.events.get',
+    list: 'calendar.events.list',
   },
   Attendee: {
     name: 'Attendee',
@@ -781,7 +781,7 @@ const eventListEventsOperation: OperationDescriptor<
   { readonly calendarId: string },
   readonly Event[]
 > = {
-  id: 'calendar.events.listEvents',
+  id: 'calendar.events.list',
   permission: 'calendar:events:list',
   target: { command: 'listEvents', resource: 'Event' },
   description: 'List all events in a calendar',
@@ -795,7 +795,7 @@ const eventGetEventOperation: OperationDescriptor<
   { readonly calendarId: string; readonly id: string },
   Event
 > = {
-  id: 'calendar.events.getEvent',
+  id: 'calendar.events.get',
   permission: 'calendar:events:get',
   target: { command: 'getEvent', resource: 'Event' },
   description: 'Get an event by ID',
@@ -809,7 +809,7 @@ const eventGetEventOperation: OperationDescriptor<
 }
 
 const eventCreateEventOperation: OperationDescriptor<EventCreateInput, Event> = {
-  id: 'calendar.events.createEvent',
+  id: 'calendar.events.create',
   permission: 'calendar:events:create',
   target: { command: 'createEvent', resource: 'Event' },
   description: 'Create a new event',
@@ -835,7 +835,7 @@ const eventUpdateEventOperation: OperationDescriptor<
   },
   Event
 > = {
-  id: 'calendar.events.updateEvent',
+  id: 'calendar.events.update',
   permission: 'calendar:events:update',
   target: { command: 'updateEvent', resource: 'Event' },
   description: 'Update an existing event',
@@ -865,7 +865,7 @@ const eventDeleteEventOperation: OperationDescriptor<
   { readonly calendarId: string; readonly id: string },
   undefined
 > = {
-  id: 'calendar.events.deleteEvent',
+  id: 'calendar.events.delete',
   permission: 'calendar:events:delete',
   target: { command: 'deleteEvent', resource: 'Event' },
   description: 'Delete an event by ID',
@@ -923,11 +923,11 @@ const operations: AppContract<CalendarClient>['operations'] = {
   'calendar.calendars.list': calendarListOperation,
   'calendar.calendars.get': calendarGetOperation,
   'calendar.calendars.create': calendarCreateOperation,
-  'calendar.events.listEvents': eventListEventsOperation,
-  'calendar.events.getEvent': eventGetEventOperation,
-  'calendar.events.createEvent': eventCreateEventOperation,
-  'calendar.events.updateEvent': eventUpdateEventOperation,
-  'calendar.events.deleteEvent': eventDeleteEventOperation,
+  'calendar.events.list': eventListEventsOperation,
+  'calendar.events.get': eventGetEventOperation,
+  'calendar.events.create': eventCreateEventOperation,
+  'calendar.events.update': eventUpdateEventOperation,
+  'calendar.events.delete': eventDeleteEventOperation,
   'calendar.app.reloadCalendars': appReloadCalendarsOperation,
   'calendar.app.switchView': appSwitchViewOperation,
   'calendar.app.viewCalendar': appViewCalendarOperation,
