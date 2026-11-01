@@ -4,54 +4,21 @@
 
 ```ts
 
-import { activateApp } from '@macts/core';
 import { AnyMactsError } from '@macts/contracts';
-import { AppConnection } from '@macts/core';
-import { AppConnectionOptions } from '@macts/core';
 import { AppManifest } from '@macts/core';
-import { booleanCoercer } from '@macts/core';
-import { colorCoercer } from '@macts/core';
-import { connect } from '@macts/core';
 import { Context } from 'hono';
-import { createArrayCoercer } from '@macts/core';
-import { createEnumCoercer } from '@macts/core';
 import { CredentialVerifier } from '@macts/runtime';
-import { dateCoercer } from '@macts/core';
 import { Executor } from '@macts/core';
-import { getAppName } from '@macts/core';
 import { GovernanceContext } from '@macts/runtime';
-import { HexColor } from '@macts/core';
-import { HexColorSchema } from '@macts/core';
 import { Hono } from 'hono';
-import { isAppRunning } from '@macts/core';
-import { JxaEnumValue } from '@macts/core';
-import { JxaExecutionError } from '@macts/core';
-import { JxaExecutorOptions } from '@macts/core';
 import { MactsRuntime } from '@macts/runtime';
 import { MiddlewareHandler } from 'hono';
-import { nullSafe } from '@macts/core';
-import { numberCoercer } from '@macts/core';
-import { ObjectSpecifier } from '@macts/core';
-import { pathCoercer } from '@macts/core';
 import pino from 'pino';
-import { quitApp } from '@macts/core';
 import { RateLimiter } from '@macts/runtime';
 import { RateLimiterOptions } from '@macts/runtime';
-import { runJxa } from '@macts/core';
 import { RuntimeLogger } from '@macts/runtime';
-import { runWithApp } from '@macts/core';
-import { Selector } from '@macts/core';
-import { SpecifierStep } from '@macts/core';
-import { stringCoercer } from '@macts/core';
-import { TypeCoercer } from '@macts/core';
 import { VERSION } from '@macts/core';
 import { WireErrorEnvelope } from '@macts/contracts';
-
-export { activateApp }
-
-export { AppConnection }
-
-export { AppConnectionOptions }
 
 // @public
 export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'gracefulShutdownTimeout'>;
@@ -59,24 +26,14 @@ export type AppOptions = Omit<ServerOptions, 'port' | 'host' | 'tls' | 'graceful
 // @public
 export type AttributeValue = string | number | boolean;
 
-export { booleanCoercer }
-
 // @public
 export type ClientAddressResolver = (c: Context) => string | undefined;
-
-export { colorCoercer }
 
 // @public
 export function configureTelemetry(_options?: TelemetryOptions): void;
 
-export { connect }
-
 // @public
 export function createApp(manifests: AppManifest[], options?: AppOptions): Hono;
-
-export { createArrayCoercer }
-
-export { createEnumCoercer }
 
 // @public
 export function createHttpAdapter(runtime: MactsRuntime, options?: HttpAdapterOptions): Hono;
@@ -89,8 +46,6 @@ export function createMultiServer(manifests: AppManifest[], options?: ServerOpti
 
 // @public
 export function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
-
-export { dateCoercer }
 
 // @public
 export const DEFAULT_ADDRESS_RATE_LIMIT = 300;
@@ -107,14 +62,8 @@ export const DEFAULT_SUBJECT_RATE_LIMIT = 100;
 // @public
 export function defaultClientAddress(c: Context): string | undefined;
 
-export { getAppName }
-
 // @public
 export function getTracer(_name?: string): Tracer;
-
-export { HexColor }
-
-export { HexColorSchema }
 
 // @public
 export interface HttpAdapterOptions {
@@ -133,14 +82,6 @@ export interface InFlightTracker {
     waitForDrain(timeoutMs: number): Promise<void>;
 }
 
-export { isAppRunning }
-
-export { JxaEnumValue }
-
-export { JxaExecutionError }
-
-export { JxaExecutorOptions }
-
 // @public
 export interface LoadedTlsOptions {
     // (undocumented)
@@ -151,16 +92,6 @@ export interface LoadedTlsOptions {
     key: Buffer;
 }
 
-export { nullSafe }
-
-export { numberCoercer }
-
-export { ObjectSpecifier }
-
-export { pathCoercer }
-
-export { quitApp }
-
 // @public
 export interface RateLimitOptions extends RateLimiterOptions {
     readonly perAddress?: RateLimiterOptions;
@@ -170,12 +101,6 @@ export interface RateLimitOptions extends RateLimiterOptions {
 export interface RpcSuccessResponse<T = unknown> {
     result: T;
 }
-
-export { runJxa }
-
-export { runWithApp }
-
-export { Selector }
 
 // @public
 export interface ServerInstance {
@@ -225,10 +150,6 @@ export const SpanStatusCode: {
 // @public
 export type SpanStatusCodeValue = (typeof SpanStatusCode)[keyof typeof SpanStatusCode];
 
-export { SpecifierStep }
-
-export { stringCoercer }
-
 // @public
 export interface TelemetryOptions {
     endpoint?: string;
@@ -248,8 +169,6 @@ export interface Tracer {
         attributes?: Record<string, AttributeValue>;
     }): Span;
 }
-
-export { TypeCoercer }
 
 export { VERSION }
 

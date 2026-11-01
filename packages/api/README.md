@@ -386,141 +386,6 @@ Options:
 The HTTP status the adapter uses for a structured error. See
 [Error Codes](#error-codes) for the full table.
 
-### JXA Bridge
-
-The JXA bridge provides the execution layer for macOS automation via JavaScript for Automation.
-
-#### `runJxa(code, options?)`
-
-Execute JXA code and return the result.
-
-```typescript
-import { runJxa } from '@macts/api'
-
-const result = await runJxa(`
-  const app = Application('Calendar');
-  return app.calendars().map(c => c.name());
-`)
-
-console.log('Calendars:', result)
-```
-
-#### `runWithApp(bundleId, code, options?)`
-
-Execute JXA code with an app connection.
-
-```typescript
-import { runWithApp } from '@macts/api'
-
-const calendars = await runWithApp(
-  'com.apple.iCal',
-  `
-  const app = Application.currentApplication();
-  app.includeStandardAdditions = true;
-
-  const Calendar = Application('Calendar');
-  return Calendar.calendars().map(c => ({
-    name: c.name(),
-    color: c.color()
-  }));
-`
-)
-```
-
-#### `connect(bundleId, options?)`
-
-Create a persistent connection to a macOS app.
-
-```typescript
-import { connect, type AppConnection } from '@macts/api'
-
-const cal: AppConnection = await connect('com.apple.iCal', {
-  autoActivate: true,
-  checkRunning: true,
-})
-
-// Use the connection
-const result = await cal.run(`
-  return Application('Calendar').calendars().length;
-`)
-
-// Close when done
-await cal.close()
-```
-
-#### App Control
-
-```typescript
-import { isAppRunning, activateApp, quitApp, getAppName } from '@macts/api'
-
-// Check if app is running
-const running = await isAppRunning('com.apple.iCal')
-
-// Get app name
-const name = await getAppName('com.apple.iCal')
-console.log(name) // "Calendar"
-
-// Activate (bring to front)
-await activateApp('com.apple.iCal')
-
-// Quit app
-await quitApp('com.apple.iCal')
-```
-
-#### Object Specifiers
-
-Build type-safe object specifiers for JXA queries.
-
-```typescript
-import { ObjectSpecifier } from '@macts/api'
-
-// Build: Application('Calendar').calendars.whose({name: 'Work'})
-const spec = new ObjectSpecifier('Calendar').elements('calendars').whose({ name: 'Work' })
-
-console.log(spec.build())
-```
-
-#### Type Coercers
-
-Convert between JavaScript and JXA types.
-
-```typescript
-import {
-  dateCoercer,
-  colorCoercer,
-  createEnumCoercer,
-  pathCoercer,
-  booleanCoercer,
-  numberCoercer,
-  stringCoercer,
-  createArrayCoercer,
-  nullSafe,
-} from '@macts/api'
-
-// Date coercion
-const date = dateCoercer.toJs(new Date())
-const jsDate = dateCoercer.fromJs('2026-02-17T10:00:00Z')
-
-// Color coercion (hex <-> RGB)
-const rgb = colorCoercer.toJs('#FF0000') // [255, 0, 0]
-const hex = colorCoercer.fromJs([255, 0, 0]) // '#ff0000'
-
-// Enum coercion
-const statusCoercer = createEnumCoercer({
-  accepted: 'accepted',
-  declined: 'declined',
-  tentative: 'tentative',
-})
-
-// Array coercion
-const arrayOfDates = createArrayCoercer(dateCoercer)
-const dates = arrayOfDates.fromJs(['2026-01-01T00:00:00Z', '2026-02-01T00:00:00Z'])
-
-// Null-safe coercion
-const optionalDate = nullSafe(dateCoercer)
-const maybeDate = optionalDate.fromJs(null) // undefined
-```
-
 ## Server Endpoints
 
 When you start a server, these endpoints are automatically available:
@@ -866,7 +731,7 @@ chmod 600 server.key
    createServer(manifest, { rateLimit: false })
    ```
 
-### JXA Execution Errors
+### App Errors
 
 #### App Not Running
 
@@ -876,8 +741,7 @@ chmod 600 server.key
 
 **Solution:**
 
-- Launch the app manually or programmatically with `activateApp(bundleId)`
-- Check if app is running with `isAppRunning(bundleId)` before commands
+- Launch the app before sending it commands
 
 #### Permission Not Granted
 
@@ -1054,7 +918,7 @@ The package provides three entry points:
 
 ```typescript
 // Main export
-import { createServer, runJxa } from '@macts/api'
+import { createServer } from '@macts/api'
 
 // Server-only export
 import { createServer, createHttpAdapter, httpStatusForError } from '@macts/api/server'
@@ -1075,22 +939,6 @@ try {
   })
 } catch (error) {
   console.error('Failed to create key:', error.message)
-}
-```
-
-JXA execution errors are wrapped in `JxaExecutionError`:
-
-```typescript
-import { runJxa, JxaExecutionError } from '@macts/api'
-
-try {
-  await runJxa('invalid javascript')
-} catch (error) {
-  if (error instanceof JxaExecutionError) {
-    console.error('JXA error:', error.message)
-    console.error('Exit code:', error.exitCode)
-    console.error('stderr:', error.stderr)
-  }
 }
 ```
 

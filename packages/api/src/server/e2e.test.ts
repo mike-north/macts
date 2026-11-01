@@ -450,7 +450,16 @@ describe('E2E: API Server', () => {
   })
 
   describe('key expiration', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     it('should reject expired keys', async () => {
+      // Only the clock is faked: the key store and the network-free request
+      // path need real timers, and expiry is a comparison against the clock.
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date('2026-01-15T10:00:00.000Z'))
+
       // Create key that expires in 1 second
       const { token } = await runtime.createApiKey({
         name: 'e2e-expiring-key',
@@ -460,10 +469,8 @@ describe('E2E: API Server', () => {
 
       const app = appWith()
 
-      // Wait for expiration
-      await new Promise<void>((resolve) => {
-        setTimeout(resolve, 1500)
-      })
+      // Move past expiration
+      vi.setSystemTime(new Date('2026-01-15T10:00:01.500Z'))
 
       const res = await app.request('/api/v1/rpc/testapp.items.list', {
         method: 'POST',

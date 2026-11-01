@@ -545,6 +545,12 @@ their brands mutually unassignable, so brands rely on the same single
 installed copy of `@macts/contracts` as error identity does, and the
 packed-install UAT covers both.
 
+**Governance defaults.** Servers (`createServer` and `createMultiServer`) and
+the CLI's serve mode enforce this Mac's governance (its active policy and its
+approval gate) by default. An allow-all policy applies only when the caller
+passes it explicitly. Omitting the governance option never means "no
+governance".
+
 **Release mechanics.** `@macts/contracts` starts at the fixed-group version and
 joins `@macts/*`. A never-published package needs the one-off bootstrap publish
 and a trusted publisher before CI can publish it (`RELEASING.md` → "Adding a
@@ -657,6 +663,14 @@ A permission must have exactly three non-empty segments,
 checks, for every shipped manifest, that the routes agree with the HTTP
 router's own guards and introspection on the set of operations and on each
 permission.
+
+**What introspection describes.** The HTTP adapter's `GET /introspect`
+describes each operation as its manifest command: the command's description,
+its `parameters`, and its `returns` type name, plus the operation's path,
+method, and permission. It does not publish the generated descriptor's wire
+contract (the input and output plans), so a client must not treat it as a
+schema for request or response values; the descriptors are that contract.
+`GET /introspect/all` lists only path, method, and permission.
 
 Each generated client package reports its `./contract` subpath in
 `api-report/contract.api.md`, using a second API Extractor config,
