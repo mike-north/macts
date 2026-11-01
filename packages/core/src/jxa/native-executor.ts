@@ -7,18 +7,19 @@
  * - composing the script for one operation from the native body (see
  *   `native-scripts.ts`), the app's bundle identifier, and the input record,
  *   without writing any input value into source text;
- * - running it through the process boundary, honoring the time limit and the
- *   caller's abort signal;
+ * - running it through the {@link NativeTransport}, honoring the time limit and
+ *   the caller's abort signal;
  * - classifying native failures into the canonical structured errors from
  *   `@macts/contracts`, in consumer vocabulary.
  *
  * Authorization, policy, and input validation have already happened above the
  * executor seam.
  *
- * Value plans: only passthrough plans are accepted. Under passthrough the input
- * is plain JSON and the result is whatever the script returns, serialized with
- * plain JSON semantics. Any other plan needs the in-process value codec, and is
- * refused with `InternalError` rather than silently ignored.
+ * Value plans: this executor runs only operations whose values pass through
+ * unconverted. Under passthrough the input is plain JSON and the result is
+ * whatever the script returns, serialized with plain JSON semantics. An
+ * operation with any other plan is refused with `InternalError`, never run with
+ * its plan ignored.
  *
  * @packageDocumentation
  */
@@ -38,7 +39,7 @@ import {
   type WireValue,
 } from '@macts/contracts'
 import type { ExecutionRequest, Executor } from '../execution/executor.js'
-import { runJxa } from './executor.js'
+import { JxaExecutionError, MAX_OUTPUT_BYTES, runJxa } from './executor.js'
 import {
   assertRequiredArguments,
   NO_SUCH_OBJECT_ERROR_NUMBER,
@@ -47,6 +48,35 @@ import {
 
 /** Time limit for one operation when none is configured, in milliseconds. */
 const DEFAULT_TIMEOUT_MS = 30_000
+
+/** Limits and cancellation for one {@link NativeTransport.run} call. */
+export interface NativeRunOptions {
+  /** Time limit in milliseconds. The transport stops the script when it elapses. */
+  readonly timeoutMs: number
+  /** The transport stops the script when this aborts. */
+  readonly signal?: AbortSignal | undefined
+}
+
+/**
+ * Runs one composed native script and reports how it ended.
+ *
+ * `run` resolves to the script's parsed JSON result. A failure rejects with a
+ * {@link JxaExecutionError}, whose `kind` says whether the script was stopped
+ * by the time limit or the caller, could not start, exceeded the output limit,
+ * died, or exited with a native error described by `stderr`. The executor
+ * classifies failures from those fields alone; any other rejection is a host
+ * defect.
+ */
+export interface NativeTransport {
+  /**
+   * Run one composed script.
+   *
+   * @param script - The composed script; see `composeNativeScript`.
+   * @param options - The time limit and the caller's abort signal.
+   * @returns The script's parsed JSON result. Rejects with a `JxaExecutionError`.
+   */
+  run(script: string, options: NativeRunOptions): Promise<unknown>
+}
 
 /**
  * Configuration for {@link createNativeExecutor}.
@@ -58,15 +88,10 @@ export interface NativeExecutorOptions {
    */
   readonly timeoutMs?: number
   /**
-   * The process boundary: runs one composed script and resolves to its parsed
-   * JSON result, or rejects with the process failure. Rejections carry the
-   * process's standard error as `stderr`, and a process stopped by the time
-   * limit carries `killed: true` (directly or on its `cause`).
-   *
-   * Defaults to running the script in the macOS automation host. Replaceable so
-   * the executor can be tested without one.
+   * How scripts are run. Defaults to the macOS automation host; replaceable so
+   * the executor can be exercised without one.
    */
-  readonly run?: (script: string, options: { readonly timeoutMs: number }) => Promise<unknown>
+  readonly transport?: NativeTransport
 }
 
 /**
@@ -86,18 +111,17 @@ export interface NativeFailureContext {
  *
  * @remarks
  * Cancellation: an abort before the run starts prevents it. An abort during the
- * run rejects immediately with `OperationCancelledError`, but the automation
- * process is not stopped early: it runs on until it finishes or reaches the
- * time limit, and its outcome is discarded. The default process boundary
- * offers no way to stop a running script, so whether the app completed the
- * operation is unknown after a mid-run abort.
+ * run rejects immediately with `OperationCancelledError`, and the transport
+ * stops the automation process. Whatever the app had already done by then
+ * stays done: whether it completed the operation is unknown after a mid-run
+ * abort.
  *
- * @param options - Time limit and, for tests, the process boundary.
+ * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
  */
 export function createNativeExecutor(options: NativeExecutorOptions = {}): Executor {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS
-  const run = options.run ?? runInAutomationHost
+  const transport = options.transport ?? AUTOMATION_HOST
 
   return {
     provider: 'macos',
@@ -105,7 +129,7 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const { manifest, target, input, inputPlan, outputPlan, signal } = request
       if (inputPlan.kind !== 'passthrough' || outputPlan.kind !== 'passthrough') {
         throw new InternalError(
-          'The native executor does not yet support the value contract of this operation.',
+          'The native executor runs only operations whose values pass through unconverted.',
           {}
         )
       }
@@ -116,7 +140,11 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const script = composeNativeScript(manifest.app.bundleId, plan.body, input)
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
-      const result = await runCancellable(() => run(script, { timeoutMs }), context, signal)
+      const result = await runCancellable(
+        () => transport.run(script, { timeoutMs, signal }),
+        context,
+        signal
+      )
       if (result === undefined) return null
       if (!isWireValue(result)) {
         throw new InternalError('The operation produced a result that is not valid JSON.', {})
@@ -149,9 +177,10 @@ export function composeNativeScript(bundleId: string, body: string, input: WireR
   ].join('\n')
 }
 
-/** The default process boundary: run a script body in the macOS automation host. */
-function runInAutomationHost(script: string, options: { readonly timeoutMs: number }) {
-  return runJxa<unknown>(script, { timeout: options.timeoutMs })
+/** The default transport: run a script body in the macOS automation host. */
+const AUTOMATION_HOST: NativeTransport = {
+  run: (script, options) =>
+    runJxa<unknown>(script, { timeout: options.timeoutMs, signal: options.signal }),
 }
 
 /** The error for a caller abort. */
@@ -212,8 +241,11 @@ const NativeErrorNumber = {
   invalidIndex: -1719,
   /** The operating system has not authorized sending events to the app. */
   notAuthorized: -1743,
-  /** The app did not answer in time, often because a permission prompt is open. */
-  timedOut: -1712,
+  /**
+   * The app did not answer an event within its own event timeout, often
+   * because a permission prompt is open.
+   */
+  noReply: -1712,
   /** The app is not running. */
   appNotRunning: -600,
   /** The connection to the app is no longer valid. */
@@ -236,27 +268,41 @@ const APP_NOT_FOUND_PATTERN = /Application can.t be found/i
 /**
  * Classify a native process failure as a canonical structured error.
  *
- * @remarks
- * Classification reads the error number at the end of the failure's standard
- * error output, and whether the process was stopped by the time limit:
+ * A {@link JxaExecutionError} is classified by its `kind` first. Only a script
+ * that exited with a failure (`kind: 'exited'`) is attributed to the app, by
+ * the native error number at the end of its standard error output:
  *
- * | Native failure                                  | Error                                         |
- * | ----------------------------------------------- | --------------------------------------------- |
- * | stopped by the time limit                       | `OperationTimeoutError`                       |
- * | -1728 (no such object)                          | `TargetNotFoundError`                         |
- * | -1719 (invalid index)                           | `InvalidSelectionError`                       |
- * | -1743 (not authorized)                          | `AppAuthorizationRequiredError`               |
- * | -600 (not running), -609 (connection invalid)   | `AppUnavailableError` (`not-responding`)      |
- * | -2700 "Application can't be found", -10814      | `AppUnavailableError` (`not-installed`)       |
- * | -1712 (the app did not answer in time)          | `OperationTimeoutError`                       |
- * | any other number                                | `AppOperationError` with `appErrorCode`       |
- * | no number                                       | `AppOperationError`                           |
+ * - `timed-out` (stopped by the time limit): `OperationTimeoutError`.
+ * - `cancelled` (stopped by the caller): `OperationCancelledError`.
+ * - `output-too-large`: `InternalError` naming the output limit.
+ * - `not-started` (the host could not be started), `signalled` (killed by a
+ *   signal macts did not send), `unreadable-output`: `InternalError`.
+ * - exited with -1728 (no such object): `TargetNotFoundError`.
+ * - exited with -1719 (invalid index): `InvalidSelectionError`.
+ * - exited with -1743 (not authorized): `AppAuthorizationRequiredError`.
+ * - exited with -600 (not running), -609 (connection invalid), or -1712 (no
+ *   answer in time): `AppUnavailableError` (`not-responding`).
+ * - exited with -2700 "Application can't be found", or -10814:
+ *   `AppUnavailableError` (`not-installed`).
+ * - exited with any other number: `AppOperationError` with `appErrorCode`.
+ * - exited with no number: `InternalError`.
+ * - anything that is not a `JxaExecutionError`: `InternalError`.
+ *
+ * Host failures are never blamed on the app: a host that cannot start, a
+ * process killed from outside, oversized output, and a failure that reports no
+ * native error number are macts or system faults, so they are `InternalError`.
+ * A missing host is `InternalError` rather than `AppUnavailableError`, because
+ * the target app may well be installed; it is the automation host that is
+ * unavailable.
+ *
+ * -1712 is the app's own event timeout, not the executor's time limit, so it is
+ * reported as an app that did not respond, with no claim about elapsed time.
  *
  * Messages use consumer vocabulary and may name the app and the resource. The
  * raw failure, including its standard error text, is kept only as `cause`; it
  * never reaches a message or `details`.
  *
- * @param error - What the process boundary rejected with.
+ * @param error - What the transport rejected with.
  * @param context - The app and operation, for messages and details.
  * @returns The structured error to throw.
  */
@@ -264,24 +310,54 @@ export function describeNativeFailure(
   error: unknown,
   context: NativeFailureContext
 ): AnyMactsError {
-  const { app, operation, timeoutMs } = context
+  const { app, timeoutMs } = context
   const options = { cause: error }
+  if (!(error instanceof JxaExecutionError)) {
+    return new InternalError('The automation host failed unexpectedly.', {}, options)
+  }
+  switch (error.kind) {
+    case 'timed-out':
+      return new OperationTimeoutError(
+        `${app} did not finish the operation within ${String(timeoutMs)} ms. If this is the first time ${app} is automated on this Mac, it may be waiting for an automation permission prompt to be answered.`,
+        { timeoutMs },
+        options
+      )
+    case 'cancelled':
+      return new OperationCancelledError('The operation was cancelled.', {}, options)
+    case 'output-too-large':
+      return new InternalError(
+        `The result from ${app} exceeded the ${String(MAX_OUTPUT_BYTES / (1024 * 1024))} MiB output limit.`,
+        {},
+        options
+      )
+    case 'not-started':
+      return new InternalError('The macOS automation host could not be started.', {}, options)
+    case 'signalled':
+      return new InternalError('The automation process was stopped unexpectedly.', {}, options)
+    case 'unreadable-output':
+      return new InternalError('The operation produced output that could not be read.', {}, options)
+    case 'exited':
+      return describeExitedFailure(error.stderr, context, options)
+  }
+}
+
+/** Classify a script that exited with a failure, by its native error number. */
+function describeExitedFailure(
+  stderr: string,
+  context: NativeFailureContext,
+  options: ErrorOptions
+): AnyMactsError {
+  const { app, operation } = context
   const resourceDetails = operation.resource === undefined ? {} : { resource: operation.resource }
   const subject = operation.resource ?? 'item'
-
-  if (wasStoppedByTimeLimit(error)) {
-    return new OperationTimeoutError(
-      `${app} did not finish the operation within ${String(timeoutMs)} ms. If this is the first time ${app} is automated on this Mac, it may be waiting for an automation permission prompt to be answered.`,
-      { timeoutMs },
-      options
-    )
-  }
-
-  const stderr = readStderr(error)
   const errorNumber = parseNativeErrorNumber(stderr)
   switch (errorNumber) {
     case undefined:
-      return new AppOperationError(`${app} could not complete the operation.`, { app }, options)
+      return new InternalError(
+        'The automation process failed without reporting an error.',
+        {},
+        options
+      )
     case NativeErrorNumber.noSuchObject:
       return new TargetNotFoundError(
         `${app} has no ${subject} matching the request.`,
@@ -307,17 +383,17 @@ export function describeNativeFailure(
         { app, reason: 'not-responding' },
         options
       )
+    case NativeErrorNumber.noReply:
+      return new AppUnavailableError(
+        `${app} did not respond in time. It may be waiting for an automation permission prompt to be answered on this Mac.`,
+        { app, reason: 'not-responding' },
+        options
+      )
     case NativeErrorNumber.appNotFound:
       return notInstalled(app, options)
     case NativeErrorNumber.scriptError:
       if (APP_NOT_FOUND_PATTERN.test(stderr)) return notInstalled(app, options)
       return appOperationFailed(app, errorNumber, options)
-    case NativeErrorNumber.timedOut:
-      return new OperationTimeoutError(
-        `${app} did not respond in time. It may be waiting for an automation permission prompt to be answered on this Mac.`,
-        { timeoutMs },
-        options
-      )
     default:
       return appOperationFailed(app, errorNumber, options)
   }
@@ -348,26 +424,6 @@ function parseNativeErrorNumber(stderr: string): number | undefined {
   const match = ERROR_NUMBER_PATTERN.exec(stderr.trimEnd())
   const digits = match?.[1]
   return digits === undefined ? undefined : Number(digits)
-}
-
-function isObject(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null
-}
-
-/** The standard error text a process failure carries, directly or on its cause. */
-function readStderr(error: unknown): string {
-  if (!isObject(error)) return ''
-  if (typeof error['stderr'] === 'string' && error['stderr'] !== '') return error['stderr']
-  const cause = error['cause']
-  return isObject(cause) && typeof cause['stderr'] === 'string' ? cause['stderr'] : ''
-}
-
-/** Whether the failure is the process being stopped by the time limit. */
-function wasStoppedByTimeLimit(error: unknown): boolean {
-  if (!isObject(error)) return false
-  if (error['killed'] === true) return true
-  const cause = error['cause']
-  return isObject(cause) && cause['killed'] === true
 }
 
 /** Whether `value` is a JSON value, and therefore a wire value under passthrough. */

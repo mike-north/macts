@@ -86,6 +86,55 @@ function compileBody(body: string): void {
   new Script(`(function (app, args) {\n${body}\n})`)
 }
 
+/** What a body threw, or `undefined` when it returned normally. */
+function runBody(body: string, app: unknown, args: Record<string, unknown>): unknown {
+  const compiled: unknown = new Script(`(function (app, args) {\n${body}\n})`).runInThisContext()
+  if (typeof compiled !== 'function') throw new Error('body did not compile to a function')
+  const fn = compiled as (app: unknown, args: Record<string, unknown>) => unknown
+  try {
+    fn(app, args)
+    return undefined
+  } catch (error) {
+    return error
+  }
+}
+
+/**
+ * A stand-in for an app object specifier, recording what a body does with it.
+ * `exists()` answers `present`; every other use is recorded in `used`, so a test
+ * can assert that a missing specifier was never read, written, or deleted.
+ */
+interface FakeSpecifier {
+  readonly used: string[]
+  readonly specifier: Record<string, unknown>
+}
+
+function fakeSpecifier(present: boolean, children: Record<string, unknown> = {}): FakeSpecifier {
+  const used: string[] = []
+  const specifier: Record<string, unknown> = {
+    exists: () => present,
+    delete: () => used.push('delete'),
+    properties: () => {
+      used.push('properties')
+      return {}
+    },
+    ...children,
+  }
+  return {
+    used,
+    specifier: new Proxy(specifier, {
+      get(target, key, receiver) {
+        if (typeof key === 'string' && !Object.hasOwn(target, key)) used.push(`read ${key}`)
+        return Reflect.get(target, key, receiver) as unknown
+      },
+      set(target, key, value) {
+        used.push(`write ${String(key)}`)
+        return Reflect.set(target, key, value)
+      },
+    }),
+  }
+}
+
 /** Build the list body for `resource` through a plain `list` command. */
 function listBody(resource: Resource): string {
   const manifest = manifestWith(
@@ -334,9 +383,8 @@ describe('Calendar bodies (shipped manifest)', () => {
     const text = body('getEvent', 'Event')
     expect(text).toContain('var parentId = args["calendarId"];')
     expect(text).toContain('var itemId = args["id"];')
-    expect(text).toContain(
-      'var item = app["calendars"].whose({ "name": parentId })[0]["events"].byId(itemId);'
-    )
+    expect(text).toContain('var parent = app["calendars"].whose({ "name": parentId })[0];')
+    expect(text).toContain('var item = parent["events"].byId(itemId);')
     // The request parameter is `id`, never the `uid` property.
     expect(text).not.toContain('args["uid"]')
     expect(text).not.toContain('app["events"]')
@@ -372,9 +420,8 @@ describe('Calendar bodies (shipped manifest)', () => {
   it('listEvents scopes the list to the parent calendar matched by name', () => {
     const text = body('listEvents', 'Event')
     expect(text).toContain('var parentId = args["calendarId"];')
-    expect(text).toContain(
-      'var items = app["calendars"].whose({ "name": parentId })[0]["events"]();'
-    )
+    expect(text).toContain('var parent = app["calendars"].whose({ "name": parentId })[0];')
+    expect(text).toContain('var items = parent["events"]();')
   })
 
   it('createEvent appends the new event to the parent calendar (-10024 regression)', () => {
@@ -405,9 +452,8 @@ describe('Calendar bodies (shipped manifest)', () => {
 
   it('updateEvent sets each supplied field, guarded, on the parent-scoped event', () => {
     const text = body('updateEvent', 'Event')
-    expect(text).toContain(
-      'var item = app["calendars"].whose({ "name": parentId })[0]["events"].byId(itemId);'
-    )
+    expect(text).toContain('var parent = app["calendars"].whose({ "name": parentId })[0];')
+    expect(text).toContain('var item = parent["events"].byId(itemId);')
     expect(text).toContain(
       'if (Object.prototype.hasOwnProperty.call(args, "summary")) { try { item["summary"] = args["summary"]; } catch (e) {} }'
     )
@@ -418,9 +464,8 @@ describe('Calendar bodies (shipped manifest)', () => {
 
   it('deleteEvent deletes the parent-scoped event', () => {
     const text = body('deleteEvent', 'Event')
-    expect(text).toContain(
-      'var item = app["calendars"].whose({ "name": parentId })[0]["events"].byId(itemId);'
-    )
+    expect(text).toContain('var parent = app["calendars"].whose({ "name": parentId })[0];')
+    expect(text).toContain('var item = parent["events"].byId(itemId);')
     expect(text).toContain('item.delete();')
     expect(text).toContain('return null;')
   })
@@ -430,6 +475,100 @@ describe('Calendar bodies (shipped manifest)', () => {
     expect(text).not.toContain('parent')
     expect(text).toContain('var item = app["Calendar"](props);')
     expect(text).toContain('item.make();')
+  })
+})
+
+// A missing target, or a missing parent of a scoped operation, is a missing
+// object (phases/13 D6), never an invalid selection or an empty result. Without
+// the existence check, a property match (`whose(...)[0]`) that matches nothing
+// fails with -1719 (invalid index) when first used, and a missing parent's
+// child collection reads as empty. Each body here is executed against fake
+// specifiers: the miss must throw the no-such-object number before the missing
+// specifier is read, written, or deleted.
+describe('missing targets and parents fail as no such object', () => {
+  const NO_SUCH_OBJECT = -1728
+
+  /** A top-level resource matched by a property, like Calendar's calendars. */
+  const widget: Resource = {
+    name: 'Widget',
+    plural: 'Widgets',
+    description: 'w',
+    identifiers: [{ property: 'name', primary: true, targeting: 'byProperty' }],
+    properties: {
+      name: { access: 'rw', type: 'string', description: 'n', optional: false },
+      label: { access: 'rw', type: 'string', description: 'l', optional: true },
+    },
+  }
+  const widgets = manifestWith(
+    { Widget: widget },
+    {
+      update: resourceCommand('update', 'Widget', [param('id'), param('label', false)]),
+      delete: resourceCommand('delete', 'Widget', [param('id')]),
+    }
+  )
+  const widgetApp = (item: FakeSpecifier) => ({ widgets: { whose: () => [item.specifier] } })
+
+  function expectNoSuchObject(thrown: unknown): void {
+    expect(thrown).toMatchObject({ errorNumber: NO_SUCH_OBJECT })
+  }
+
+  it('delete of a property-matched item that matches nothing never deletes', () => {
+    const item = fakeSpecifier(false)
+    const body = buildNativeBody(widgets, { command: 'delete', resource: 'Widget' })
+    expectNoSuchObject(runBody(body, widgetApp(item), { id: 'Nope' }))
+    expect(item.used).toEqual([])
+  })
+
+  it('delete of an existing item deletes it', () => {
+    const item = fakeSpecifier(true)
+    const body = buildNativeBody(widgets, { command: 'delete', resource: 'Widget' })
+    expect(runBody(body, widgetApp(item), { id: 'Kept' })).toBeUndefined()
+    expect(item.used).toEqual(['delete'])
+  })
+
+  it('update of a property-matched item that matches nothing writes nothing', () => {
+    const item = fakeSpecifier(false)
+    const body = buildNativeBody(widgets, { command: 'update', resource: 'Widget' })
+    expectNoSuchObject(runBody(body, widgetApp(item), { id: 'Nope', label: 'x' }))
+    expect(item.used).toEqual([])
+  })
+
+  describe('Calendar events, scoped to a calendar matched by name', () => {
+    const calendarApp = (parent: FakeSpecifier) => ({
+      calendars: { whose: () => [parent.specifier] },
+      Event: () => ({}),
+    })
+    const eventArgs = { calendarId: 'Nope', id: 'E1', summary: 's' }
+
+    it.each(['getEvent', 'updateEvent', 'deleteEvent', 'listEvents', 'createEvent'])(
+      '%s under a calendar that does not exist never touches its events',
+      (command) => {
+        const parent = fakeSpecifier(false)
+        const body = buildNativeBody(calendar, { command, resource: 'Event' })
+        const args =
+          command === 'createEvent'
+            ? {
+                calendarId: 'Nope',
+                summary: 's',
+                startDate: '2024-01-15T10:00:00.000Z',
+                endDate: '2024-01-15T11:00:00.000Z',
+              }
+            : eventArgs
+        expectNoSuchObject(runBody(body, calendarApp(parent), args))
+        expect(parent.used).toEqual([])
+      }
+    )
+
+    it.each(['getEvent', 'updateEvent', 'deleteEvent'])(
+      '%s of an event that does not exist in an existing calendar never touches the event',
+      (command) => {
+        const item = fakeSpecifier(false)
+        const parent = fakeSpecifier(true, { events: { byId: () => item.specifier } })
+        const body = buildNativeBody(calendar, { command, resource: 'Event' })
+        expectNoSuchObject(runBody(body, calendarApp(parent), eventArgs))
+        expect(item.used).toEqual([])
+      }
+    )
   })
 })
 
@@ -516,7 +655,9 @@ describe('command calls', () => {
 
 describe('source safety', () => {
   it('emits manifest names as string literals, so an odd key cannot alter the script', () => {
-    const hostile = 'x"]; throw 1; //'
+    // A key with a quote, a closing bracket, and a backslash: characters that
+    // would end a string literal or a member access if they were spliced in raw.
+    const oddKey = 'display "name"] \\ v2'
     const manifest = manifestWith(
       {
         Odd: {
@@ -524,14 +665,15 @@ describe('source safety', () => {
           plural: 'Odds',
           description: 'o',
           properties: {
-            [hostile]: { access: 'rw', type: 'string', description: 'h', optional: true },
+            [oddKey]: { access: 'rw', type: 'string', description: 'h', optional: true },
           },
         },
       },
-      { get: resourceCommand('get', 'Odd', [param(hostile)]) }
+      { get: resourceCommand('get', 'Odd', [param(oddKey)]) }
     )
     const text = buildNativeBody(manifest, { command: 'get', resource: 'Odd' })
-    expect(text).toContain(`args[${JSON.stringify(hostile)}]`)
+    expect(text).toContain(`args[${JSON.stringify(oddKey)}]`)
+    expect(text).toContain(`obj[${JSON.stringify(oddKey)}] = item[${JSON.stringify(oddKey)}]();`)
     expect(() => {
       compileBody(text)
     }).not.toThrow()

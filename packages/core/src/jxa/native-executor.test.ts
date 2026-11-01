@@ -1,11 +1,12 @@
 /**
  * Tests for the native macOS executor.
  *
- * Most cases inject the process boundary (`run`) so they need no automation
- * host. A few run the real host with scripts that send no events to any app,
- * which is safe on the macOS CI runners: constructing an application object
- * and reading the input record trigger no automation-permission prompt, and a
- * bundle identifier with no installed app fails before any event is sent.
+ * Most cases inject the transport so they need no automation host. A few run
+ * the real host with scripts that send no events to any app, which is safe on
+ * the macOS CI runners: constructing an application object and reading the
+ * input record trigger no automation-permission prompt, a bundle identifier
+ * with no installed app fails before any event is sent, and a host that kills
+ * itself touches no app.
  *
  * The failure table is written by hand from the structured error registry and
  * its classification rules. Standard error samples follow the form the
@@ -37,12 +38,13 @@ import {
 import type { ExecutionRequest } from '../execution/executor.js'
 import { loadManifest } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/app.js'
-import { JxaExecutionError, runJxa } from './executor.js'
+import { JxaExecutionError, runJxa, type JxaFailureKind } from './executor.js'
 import {
   composeNativeScript,
   createNativeExecutor,
   describeNativeFailure,
   type NativeFailureContext,
+  type NativeRunOptions,
 } from './native-executor.js'
 
 const NOTES_MANIFEST = fileURLToPath(
@@ -86,10 +88,9 @@ async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
   throw new Error('Expected the promise to reject')
 }
 
-/** A process failure shaped like the one the default boundary rejects with. */
-function processFailure(stderr: string, killed = false): JxaExecutionError {
-  const cause = Object.assign(new Error('Command failed'), { stderr, killed, code: 1 })
-  return new JxaExecutionError('Command failed', '1', stderr, cause)
+/** A transport failure of `kind`, with the host's standard error output. */
+function processFailure(stderr: string, kind: JxaFailureKind = 'exited'): JxaExecutionError {
+  return new JxaExecutionError('Command failed', '1', stderr, undefined, { kind })
 }
 
 const STRING_PLAN: ValuePlan = { kind: 'string' }
@@ -105,17 +106,19 @@ describe('createNativeExecutor', () => {
       ['output', { outputPlan: STRING_PLAN }],
     ] as const)('refuses a non-passthrough %s plan with InternalError', async (_, override) => {
       const run = vi.fn()
-      const error = await rejectionOf(createNativeExecutor({ run }).execute(request(override)))
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request(override))
+      )
       expect(error).toBeInstanceOf(InternalError)
       expect(run).not.toHaveBeenCalled()
     })
   })
 
   describe('script composition', () => {
-    it('passes the composed script and the time limit to the process boundary', async () => {
-      const run = vi.fn<(script: string, options: { timeoutMs: number }) => Promise<unknown>>()
+    it('passes the composed script and the time limit to the transport', async () => {
+      const run = vi.fn<(script: string, options: NativeRunOptions) => Promise<unknown>>()
       run.mockResolvedValue({ name: 'Groceries' })
-      const executor = createNativeExecutor({ run, timeoutMs: 1234 })
+      const executor = createNativeExecutor({ transport: { run }, timeoutMs: 1234 })
 
       const result = await executor.execute(request())
 
@@ -132,12 +135,12 @@ describe('createNativeExecutor', () => {
 
     it('defaults the time limit to 30000 ms', async () => {
       const run = vi.fn().mockResolvedValue(null)
-      await createNativeExecutor({ run }).execute(request())
+      await createNativeExecutor({ transport: { run } }).execute(request())
       expect(run).toHaveBeenCalledWith(expect.any(String), { timeoutMs: 30000 })
     })
 
     it('writes no input value into source text outside the JSON string literal', async () => {
-      const run = vi.fn<(script: string, options: { timeoutMs: number }) => Promise<unknown>>()
+      const run = vi.fn<(script: string, options: NativeRunOptions) => Promise<unknown>>()
       run.mockResolvedValue(null)
       const input = {
         calendarId: 'SENTINEL_CALENDAR_7f3a',
@@ -147,7 +150,7 @@ describe('createNativeExecutor', () => {
       const calendar = await loadManifest(
         fileURLToPath(new URL('../../../../manifests/calendar/app.yaml', import.meta.url))
       )
-      await createNativeExecutor({ run }).execute(
+      await createNativeExecutor({ transport: { run } }).execute(
         request({
           manifest: calendar,
           target: { command: 'updateEvent', resource: 'Event' },
@@ -166,18 +169,22 @@ describe('createNativeExecutor', () => {
 
     it('returns null when the script returns nothing', async () => {
       const run = vi.fn().mockResolvedValue(undefined)
-      expect(await createNativeExecutor({ run }).execute(request())).toBeNull()
+      expect(await createNativeExecutor({ transport: { run } }).execute(request())).toBeNull()
     })
 
     it('refuses a result that is not JSON with InternalError', async () => {
       const run = vi.fn().mockResolvedValue({ when: new Date(0) })
-      const error = await rejectionOf(createNativeExecutor({ run }).execute(request()))
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request())
+      )
       expect(error).toBeInstanceOf(InternalError)
     })
 
     it('rejects input missing a required parameter with ValidationError, without running', async () => {
       const run = vi.fn()
-      const error = await rejectionOf(createNativeExecutor({ run }).execute(request({ input: {} })))
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request({ input: {} }))
+      )
       expect(error).toBeInstanceOf(ValidationError)
       expect(run).not.toHaveBeenCalled()
     })
@@ -185,7 +192,9 @@ describe('createNativeExecutor', () => {
     it('fails with InternalError when the target names no manifest command', async () => {
       const run = vi.fn()
       const error = await rejectionOf(
-        createNativeExecutor({ run }).execute(request({ target: { command: 'missing' } }))
+        createNativeExecutor({ transport: { run } }).execute(
+          request({ target: { command: 'missing' } })
+        )
       )
       expect(error).toBeInstanceOf(InternalError)
       expect(run).not.toHaveBeenCalled()
@@ -198,7 +207,7 @@ describe('createNativeExecutor', () => {
       const controller = new AbortController()
       controller.abort()
       const error = await rejectionOf(
-        createNativeExecutor({ run }).execute(request({ signal: controller.signal }))
+        createNativeExecutor({ transport: { run } }).execute(request({ signal: controller.signal }))
       )
       expect(error).toBeInstanceOf(OperationCancelledError)
       expect(run).not.toHaveBeenCalled()
@@ -213,7 +222,9 @@ describe('createNativeExecutor', () => {
             finish = resolve
           })
       )
-      const pending = createNativeExecutor({ run }).execute(request({ signal: controller.signal }))
+      const pending = createNativeExecutor({ transport: { run } }).execute(
+        request({ signal: controller.signal })
+      )
       await vi.waitFor(() => {
         expect(run).toHaveBeenCalled()
       })
@@ -223,6 +234,16 @@ describe('createNativeExecutor', () => {
       expect(error).toBeInstanceOf(OperationCancelledError)
     })
 
+    it('hands the caller signal to the transport, so a mid-run abort stops the script', async () => {
+      const controller = new AbortController()
+      const run = vi.fn<(script: string, options: NativeRunOptions) => Promise<unknown>>()
+      run.mockResolvedValue(null)
+      await createNativeExecutor({ transport: { run } }).execute(
+        request({ signal: controller.signal })
+      )
+      expect(run.mock.calls[0]?.[1].signal).toBe(controller.signal)
+    })
+
     it('reports a run failure after an abort as a cancellation', async () => {
       const controller = new AbortController()
       const run = vi.fn(() => {
@@ -230,7 +251,7 @@ describe('createNativeExecutor', () => {
         return Promise.reject(processFailure('execution error: Error: x (-1728)'))
       })
       const error = await rejectionOf(
-        createNativeExecutor({ run }).execute(request({ signal: controller.signal }))
+        createNativeExecutor({ transport: { run } }).execute(request({ signal: controller.signal }))
       )
       expect(error).toBeInstanceOf(OperationCancelledError)
     })
@@ -240,19 +261,23 @@ describe('createNativeExecutor', () => {
     it('classifies a process failure and keeps the raw failure only as cause', async () => {
       const failure = processFailure("execution error: Error: Error: Can't get object. (-1728)")
       const run = vi.fn().mockRejectedValue(failure)
-      const error = await rejectionOf(createNativeExecutor({ run }).execute(request()))
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request())
+      )
       expect(error).toBeInstanceOf(TargetNotFoundError)
       if (!(error instanceof TargetNotFoundError)) return
       expect(error.details).toEqual({ resource: 'Note' })
       expect(error.cause).toBe(failure)
     })
 
-    it('classifies a synchronous throw from the process boundary', async () => {
+    it('reports a synchronous throw from the transport as a host failure', async () => {
       const run = vi.fn(() => {
-        throw new Error('spawn failed')
+        throw new Error('transport defect')
       })
-      const error = await rejectionOf(createNativeExecutor({ run }).execute(request()))
-      expect(error).toBeInstanceOf(AppOperationError)
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).execute(request())
+      )
+      expect(error).toBeInstanceOf(InternalError)
     })
   })
 })
@@ -338,28 +363,55 @@ describe('describeNativeFailure', () => {
       details: { app: 'Notes', reason: 'not-installed' },
     },
     {
+      // The app's own event timeout, not the executor's limit: no elapsed time
+      // is claimed.
       name: '-1712 (the app did not answer in time)',
       error: processFailure(stderr('AppleEvent timed out.', -1712)),
-      type: OperationTimeoutError,
-      details: { timeoutMs: 30000 },
+      type: AppUnavailableError,
+      details: { app: 'Notes', reason: 'not-responding' },
     },
     {
       name: 'a process stopped by the time limit',
-      error: processFailure('', true),
+      error: processFailure('', 'timed-out'),
       type: OperationTimeoutError,
       details: { timeoutMs: 30000 },
     },
     {
-      name: 'a stopped process, even with a classifiable number in its output',
-      error: processFailure(stderr("Can't get object.", -1728), true),
+      name: 'a process stopped by the time limit, even with a classifiable number in its output',
+      error: processFailure(stderr("Can't get object.", -1728), 'timed-out'),
       type: OperationTimeoutError,
       details: { timeoutMs: 30000 },
     },
     {
-      name: 'killed reported directly on the failure',
-      error: Object.assign(new Error('x'), { killed: true }),
-      type: OperationTimeoutError,
-      details: { timeoutMs: 30000 },
+      name: 'a process stopped by the caller',
+      error: processFailure('', 'cancelled'),
+      type: OperationCancelledError,
+      details: {},
+    },
+    {
+      // Node also reports this as a killed process; it is not a timeout.
+      name: 'output beyond the output limit',
+      error: processFailure('', 'output-too-large'),
+      type: InternalError,
+      details: {},
+    },
+    {
+      name: 'a process killed by a signal macts did not send',
+      error: processFailure('', 'signalled'),
+      type: InternalError,
+      details: {},
+    },
+    {
+      name: 'a host that could not be started',
+      error: processFailure('', 'not-started'),
+      type: InternalError,
+      details: {},
+    },
+    {
+      name: 'output that is not JSON',
+      error: processFailure('', 'unreadable-output'),
+      type: InternalError,
+      details: {},
     },
     {
       name: 'any other number',
@@ -374,36 +426,34 @@ describe('describeNativeFailure', () => {
       details: { app: 'Notes', appErrorCode: 3 },
     },
     {
-      name: 'output with no number',
+      name: 'an exit whose output has no number',
       error: processFailure('execution error: something went wrong\n'),
-      type: AppOperationError,
-      details: { app: 'Notes' },
+      type: InternalError,
+      details: {},
     },
     {
-      name: 'a failure with no output at all',
-      error: new Error('spawn osascript ENOENT'),
-      type: AppOperationError,
-      details: { app: 'Notes' },
-    },
-    {
-      name: 'a non-error value',
-      error: 'boom',
-      type: AppOperationError,
-      details: { app: 'Notes' },
+      name: 'an exit with no output at all',
+      error: processFailure(''),
+      type: InternalError,
+      details: {},
     },
     {
       name: 'a number in the middle of the output, not at its end',
       error: processFailure('execution error: Error (-1728) happened\n'),
-      type: AppOperationError,
-      details: { app: 'Notes' },
+      type: InternalError,
+      details: {},
     },
     {
-      name: 'stderr carried only on the cause',
-      error: Object.assign(new Error('x'), {
-        cause: { stderr: stderr("Can't get object.", -1728) },
-      }),
-      type: TargetNotFoundError,
-      details: { resource: 'Note' },
+      name: 'a plain error that is not a transport failure',
+      error: new Error('spawn osascript ENOENT'),
+      type: InternalError,
+      details: {},
+    },
+    {
+      name: 'a non-error value',
+      error: 'boom',
+      type: InternalError,
+      details: {},
     },
   ]
 
@@ -431,7 +481,7 @@ describe('describeNativeFailure', () => {
   })
 
   it('suggests a pending permission prompt for a timeout', () => {
-    const described = describeNativeFailure(processFailure('', true), context)
+    const described = describeNativeFailure(processFailure('', 'timed-out'), context)
     expect(described.message).toContain('permission prompt')
     expect(described.message).toContain('30000 ms')
   })
@@ -469,15 +519,17 @@ describe('against the real automation host (no app events)', () => {
     // The failure a get body raises when its item does not exist, run through
     // the real host so the reported error number is the one it prints.
     const executor = createNativeExecutor({
-      run: (_script, options) =>
-        runJxa(
-          composeNativeScript(
-            ALWAYS_INSTALLED_BUNDLE_ID,
-            "var missing = new Error('No such object.'); missing.errorNumber = -1728; throw missing;",
-            {}
+      transport: {
+        run: (_script, options) =>
+          runJxa(
+            composeNativeScript(
+              ALWAYS_INSTALLED_BUNDLE_ID,
+              "var missing = new Error('No such object.'); missing.errorNumber = -1728; throw missing;",
+              {}
+            ),
+            { timeout: options.timeoutMs }
           ),
-          { timeout: options.timeoutMs }
-        ),
+      },
     })
     const error = await rejectionOf(executor.execute(request()))
     expect(error).toBeInstanceOf(TargetNotFoundError)
@@ -491,5 +543,51 @@ describe('against the real automation host (no app events)', () => {
     const described = describeNativeFailure(failure, context)
     expect(described).toBeInstanceOf(OperationTimeoutError)
     expect(described.details).toEqual({ timeoutMs: 300 })
+  })
+
+  // Regression: a process killed from outside used to be reported as an app
+  // failure (and, through Node's killed flag, could pass for a timeout). It is
+  // a host failure.
+  it('classifies a process killed by a signal macts did not send as InternalError', async () => {
+    const failure = await rejectionOf(
+      runJxa("ObjC.import('signal'); ObjC.import('unistd'); $.kill($.getpid(), 9);")
+    )
+    expect(failure).toMatchObject({ kind: 'signalled', timedOut: false })
+    const context: NativeFailureContext = {
+      app: 'Notes',
+      operation: LIST_ACCOUNTS,
+      timeoutMs: 30000,
+    }
+    expect(describeNativeFailure(failure, context)).toBeInstanceOf(InternalError)
+  })
+
+  // Regression: overflowing the output buffer also sets Node's killed flag, and
+  // used to be reported as OperationTimeoutError.
+  it('classifies output beyond the output limit as InternalError, not a timeout', async () => {
+    const failure = await rejectionOf(runJxa("return 'x'.repeat(10000);", { maxOutputBytes: 1024 }))
+    expect(failure).toMatchObject({ kind: 'output-too-large', timedOut: false })
+    const context: NativeFailureContext = {
+      app: 'Notes',
+      operation: LIST_ACCOUNTS,
+      timeoutMs: 30000,
+    }
+    const described = describeNativeFailure(failure, context)
+    expect(described).toBeInstanceOf(InternalError)
+    expect(described.message).toContain('output limit')
+  })
+
+  it('stops the process when the caller aborts mid-run', async () => {
+    const controller = new AbortController()
+    const started = Date.now()
+    const pending = rejectionOf(
+      runJxa('while (true) {}', { timeout: 20000, signal: controller.signal })
+    )
+    setTimeout(() => {
+      controller.abort()
+    }, 300)
+    const failure = await pending
+    expect(failure).toMatchObject({ kind: 'cancelled', timedOut: false })
+    // Stopped by the abort, long before the time limit.
+    expect(Date.now() - started).toBeLessThan(10000)
   })
 })

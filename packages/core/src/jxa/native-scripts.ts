@@ -297,6 +297,39 @@ export const NO_SUCH_OBJECT_ERROR_NUMBER = -1728
 const PARENT_ID_LOCAL = 'parentId'
 /** Local that holds the target item's identifier value inside a body. */
 const ITEM_ID_LOCAL = 'itemId'
+/** Local that holds the parent specifier inside a body. */
+const PARENT_LOCAL = 'parent'
+
+/**
+ * Statement that fails the operation as "no such object" when the specifier in
+ * `local` does not exist.
+ *
+ * A missing singular target, or a missing parent of a scoped operation, is a
+ * distinct failure: never an empty result, and never an invalid selection. The
+ * existence check runs before the specifier is used, and a miss raises the
+ * native "no such object" number, so it is classified like any other missing
+ * object. It covers identifier lookups and property matches alike. An
+ * unchecked property match (`whose(...)[0]`) that matches nothing would
+ * otherwise surface as an invalid index when it is first used.
+ */
+function failIfMissing(local: string): string {
+  return [
+    `if (!${local}.exists()) {`,
+    "  var missing = new Error('No such object.');",
+    `  missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
+    '  throw missing;',
+    '}',
+  ].join('\n')
+}
+
+/**
+ * Statements binding the parent specifier of a scoped operation to
+ * {@link PARENT_LOCAL}, failing as "no such object" when the parent does not
+ * exist. `parentTarget` reads the parent identifier from {@link PARENT_ID_LOCAL}.
+ */
+function bindParent(parentTarget: string): string {
+  return lines(`var ${PARENT_LOCAL} = ${parentTarget};`, failIfMissing(PARENT_LOCAL))
+}
 
 /**
  * Resolve the parent scope of a get, update, or delete on a nested resource.
@@ -325,8 +358,11 @@ function findParameter(command: Command, name: string): CommandParameter | undef
 }
 
 /**
- * Statements binding the identifier locals a targeted body uses, and the
- * expression addressing the target item.
+ * Statements that bind the target item to `item` and fail as "no such object"
+ * when it, or the parent it is scoped under, does not exist.
+ *
+ * Every get, update, and delete addresses its target this way, so a missing
+ * target is reported identically whichever operation reached it.
  */
 function bindTarget(
   command: Command,
@@ -334,21 +370,25 @@ function bindTarget(
   resourcePlural: string,
   parentScope: ParentScope | undefined,
   identifierParam: string
-): { bindings: string; target: string } {
-  const bindings = lines(
-    parentScope === undefined
-      ? ''
-      : `var ${PARENT_ID_LOCAL} = ${argumentValue(
-          parentScope.parentIdParam,
-          findParameter(command, parentScope.parentIdParam)
-        )};`,
-    `var ${ITEM_ID_LOCAL} = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`
+): string {
+  const itemId = `var ${ITEM_ID_LOCAL} = ${argumentValue(identifierParam, findParameter(command, identifierParam))};`
+  if (parentScope === undefined) {
+    return lines(
+      itemId,
+      `var item = ${buildTargetExpression(resource, resourcePlural, ITEM_ID_LOCAL)};`,
+      failIfMissing('item')
+    )
+  }
+  return lines(
+    `var ${PARENT_ID_LOCAL} = ${argumentValue(
+      parentScope.parentIdParam,
+      findParameter(command, parentScope.parentIdParam)
+    )};`,
+    itemId,
+    bindParent(parentScope.parentTarget),
+    `var item = ${buildNestedTargetExpression(PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
+    failIfMissing('item')
   )
-  const target =
-    parentScope === undefined
-      ? buildTargetExpression(resource, resourcePlural, ITEM_ID_LOCAL)
-      : buildNestedTargetExpression(parentScope.parentTarget, resourcePlural, ITEM_ID_LOCAL)
-  return { bindings, target }
 }
 
 // ---------------------------------------------------------------------------
@@ -476,13 +516,17 @@ function buildListBody(
   const parentParam = command.parameters.find(
     (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
   )
+  // A parent that does not exist fails as "no such object", never as an empty
+  // list: an empty list would claim the parent exists and has no items.
   let parentBinding = ''
   let collectionExpression = `${member('app', resourcePlural)}()`
   if (parentParam !== undefined) {
     const parent = resolveParentCollection(manifest, parentParam.name)
-    parentBinding = `var ${PARENT_ID_LOCAL} = ${argumentValue(parentParam.name, parentParam)};`
-    const parentTarget = buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL)
-    collectionExpression = `${member(parentTarget, resourcePlural)}()`
+    parentBinding = lines(
+      `var ${PARENT_ID_LOCAL} = ${argumentValue(parentParam.name, parentParam)};`,
+      bindParent(buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL))
+    )
+    collectionExpression = `${member(PARENT_LOCAL, resourcePlural)}()`
   }
 
   const body = lines(
@@ -512,27 +556,10 @@ function buildListBody(
 }
 
 /**
- * Statement that fails the operation as "no such object" when `item` does not
- * exist. A missing singular target is a distinct failure, never an empty
- * result: the item's existence is checked before any guarded read, and a
- * missing item raises the native "no such object" number, so it is classified
- * like any other missing object. The check covers both identifier lookups and
- * property matches (`whose(...)[0]`), whose unguarded reads would otherwise
- * report a missing match as an invalid index.
- */
-const FAIL_IF_ITEM_MISSING = [
-  'if (!item.exists()) {',
-  "  var missing = new Error('No such object.');",
-  `  missing.errorNumber = ${String(NO_SUCH_OBJECT_ERROR_NUMBER)};`,
-  '  throw missing;',
-  '}',
-].join('\n')
-
-/**
  * Read one item's declared properties. A nested resource is addressed through
  * its parent; a top-level one directly. The item must exist (see
- * {@link FAIL_IF_ITEM_MISSING}); each property read is then guarded, so a
- * property the item cannot report is omitted.
+ * {@link failIfMissing}); each property read is then guarded, so a property
+ * the item cannot report is omitted.
  */
 function buildGetBody(
   command: Command,
@@ -543,17 +570,9 @@ function buildGetBody(
   const parentScope = resolveParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
-  const { bindings, target } = bindTarget(
-    command,
-    resource,
-    resourcePlural,
-    parentScope,
-    identifierParam
-  )
+  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(
-    bindings,
-    `var item = ${target};`,
-    FAIL_IF_ITEM_MISSING,
+    bindItem,
     'var obj = {};',
     ...propNames.map((p) => `try { ${member('obj', p)} = ${member('item', p)}(); } catch (e) {}`),
     'return obj;'
@@ -579,14 +598,8 @@ function buildDeleteBody(
   if (identifierParam === undefined) {
     return { body: buildCommandCallBody(command, true), identifierArguments: [] }
   }
-  const { bindings, target } = bindTarget(
-    command,
-    resource,
-    resourcePlural,
-    parentScope,
-    identifierParam
-  )
-  const body = lines(bindings, `var item = ${target};`, 'item.delete();', 'return null;')
+  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
+  const body = lines(bindItem, 'item.delete();', 'return null;')
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
 }
 
@@ -616,13 +629,13 @@ function buildCreateBody(
     const parentTarget = buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL)
     const body = lines(
       `var ${PARENT_ID_LOCAL} = ${argumentValue(parentParam.name, parentParam)};`,
-      `var parent = ${parentTarget};`,
+      bindParent(parentTarget),
       collectSuppliedParameters(
         'props',
         command.parameters.filter((p) => p.name !== parentParam.name)
       ),
       `var item = ${itemClass}(props);`,
-      `${member('parent', resourcePlural)}.push(item);`,
+      `${member(PARENT_LOCAL, resourcePlural)}.push(item);`,
       'return item.properties();'
     )
     return { body, identifierArguments: [parentParam.name] }
@@ -658,16 +671,9 @@ function buildUpdateBody(
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const excluded = new Set([identifierParam, parentScope?.parentIdParam])
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
-  const { bindings, target } = bindTarget(
-    command,
-    resource,
-    resourcePlural,
-    parentScope,
-    identifierParam
-  )
+  const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(
-    bindings,
-    `var item = ${target};`,
+    bindItem,
     ...writableFields.map(
       (p) =>
         `if (${supplied(p.name)}) { try { ${member('item', p.name)} = ${argumentValue(p.name, p)}; } catch (e) {} }`

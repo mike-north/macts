@@ -1,5 +1,13 @@
 // Executor
-export { runJxa, runWithApp, JxaExecutionError, type JxaExecutorOptions } from './executor.js'
+export {
+  runJxa,
+  runWithApp,
+  JxaExecutionError,
+  MAX_OUTPUT_BYTES,
+  type JxaExecutionErrorOptions,
+  type JxaExecutorOptions,
+  type JxaFailureKind,
+} from './executor.js'
 
 // Native value codec (in-process wire <-> native conversion)
 export {
@@ -14,7 +22,12 @@ export {
 } from './native-codec.js'
 
 // Native executor (the macOS provider's implementation of the executor seam)
-export { createNativeExecutor, type NativeExecutorOptions } from './native-executor.js'
+export {
+  createNativeExecutor,
+  type NativeExecutorOptions,
+  type NativeRunOptions,
+  type NativeTransport,
+} from './native-executor.js'
 export { buildNativeBody } from './native-scripts.js'
 
 // Connection
