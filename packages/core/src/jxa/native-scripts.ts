@@ -24,6 +24,11 @@
  * emitted as JSON string literals in bracket form wherever the syntax allows, so
  * an unusual manifest key cannot change the meaning of the script.
  *
+ * A body references only `app`, `args`, its own locals, and standard ECMAScript
+ * built-ins: no host globals, no codec bindings, and no per-call state. That
+ * keeps a body independent of how it is run, so a long-lived automation
+ * process can compile it once and invoke it for many calls.
+ *
  * @packageDocumentation
  */
 
@@ -37,6 +42,7 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
+import { usableProperties } from '../manifest/unsupported.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
@@ -54,16 +60,42 @@ export interface NativeInvocationPlan {
 }
 
 /**
+ * How a body shapes the records it returns.
+ */
+export interface NativeBodyOptions {
+  /**
+   * Add the legacy identifier aliases to list items: the identifier value
+   * under the stable key `id`, and, when a resource is matched on a working
+   * property instead of its declared identifier, that property's value
+   * mirrored into the declared identifier field.
+   *
+   * Only operations whose output passes through unconverted want these: their
+   * callers pass `item.id` back as the `id` request parameter. A typed output
+   * contract declares its record fields exactly and derives references from
+   * the record itself. Its encode silently drops undeclared keys such as `id`,
+   * but a mirrored identifier field is declared, so encode would accept it
+   * holding another property's value. A typed body must therefore produce only
+   * the declared fields, each holding its own value. Defaults to `false`.
+   */
+  readonly identifierAliases?: boolean
+}
+
+/**
  * Build the native function body for one operation.
  *
  * @param manifest - The validated manifest of the target app.
  * @param target - The manifest command (and resource) to run.
+ * @param options - How returned records are shaped.
  * @returns A function body run as `(app, args)`.
  * @throws `InternalError` when `target` names a command the manifest does not
  *   declare.
  */
-export function buildNativeBody(manifest: AppManifest, target: OperationTarget): string {
-  return planNativeInvocation(manifest, target).body
+export function buildNativeBody(
+  manifest: AppManifest,
+  target: OperationTarget,
+  options: NativeBodyOptions = {}
+): string {
+  return planNativeInvocation(manifest, target, options).body
 }
 
 /**
@@ -74,7 +106,8 @@ export function buildNativeBody(manifest: AppManifest, target: OperationTarget):
  */
 export function planNativeInvocation(
   manifest: AppManifest,
-  target: OperationTarget
+  target: OperationTarget,
+  options: NativeBodyOptions = {}
 ): NativeInvocationPlan {
   const command = Object.hasOwn(manifest.commands, target.command)
     ? manifest.commands[target.command]
@@ -92,7 +125,12 @@ export function planNativeInvocation(
     target.resource !== undefined && Object.hasOwn(manifest.resources, target.resource)
       ? manifest.resources[target.resource]
       : undefined
-  const { body, identifierArguments } = buildResourceBody(command, resource, manifest)
+  const { body, identifierArguments } = buildResourceBody(
+    command,
+    resource,
+    manifest,
+    options.identifierAliases === true
+  )
   return {
     body,
     requiredArguments: [...new Set([...requiredParameters, ...identifierArguments])],
@@ -409,12 +447,13 @@ interface ResourceBody {
 function buildResourceBody(
   command: Command,
   resource: Resource | undefined,
-  manifest: AppManifest
+  manifest: AppManifest,
+  identifierAliases: boolean
 ): ResourceBody {
   const resourcePlural = resource?.plural.toLowerCase() ?? 'items'
   switch (command.name) {
     case 'list':
-      return buildListBody(command, resource, resourcePlural, manifest)
+      return buildListBody(command, resource, resourcePlural, manifest, identifierAliases)
     case 'get':
       return buildGetBody(command, resource, resourcePlural, manifest)
     case 'delete':
@@ -466,7 +505,8 @@ function buildListBody(
   command: Command,
   resource: Resource | undefined,
   resourcePlural: string,
-  manifest: AppManifest
+  manifest: AppManifest,
+  identifierAliases: boolean
 ): ResourceBody {
   const allPropNames = resolveListOutputProperties(resource)
   const targeting = resolveIdentifierTargeting(resource)
@@ -474,7 +514,8 @@ function buildListBody(
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
 
   // For a byProperty resource the declared identifier is exactly the property
-  // whose read fails, so it is never read; the alias below mirrors it instead.
+  // whose read fails, so it is never read. With identifier aliases the working
+  // value is mirrored into it; without them the field is left absent.
   const skipPropertyRead =
     targeting?.strategy === 'byProperty' &&
     declaredIdProperty !== undefined &&
@@ -502,7 +543,7 @@ function buildListBody(
       ? `${member('obj', runtimeIdProperty)} = ${member('item', runtimeIdProperty)}();`
       : ''
   const idAlias =
-    runtimeIdProperty !== undefined
+    identifierAliases && runtimeIdProperty !== undefined
       ? lines(
           `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', runtimeIdProperty)};`,
           declaredIdProperty !== undefined && declaredIdProperty !== runtimeIdProperty
@@ -556,10 +597,12 @@ function buildListBody(
 }
 
 /**
- * Read one item's declared properties. A nested resource is addressed through
- * its parent; a top-level one directly. The item must exist (see
- * {@link failIfMissing}); each property read is then guarded, so a property
- * the item cannot report is omitted.
+ * Read one item's usable properties: those declared and not marked
+ * unsupported, since reading a property the app cannot provide only costs a
+ * failed round trip. A nested resource is addressed through its parent; a
+ * top-level one directly. The item must exist (see {@link failIfMissing});
+ * each property read is then guarded, so a property the item cannot report is
+ * omitted.
  */
 function buildGetBody(
   command: Command,
@@ -569,7 +612,8 @@ function buildGetBody(
 ): ResourceBody {
   const parentScope = resolveParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
-  const propNames = resource?.properties ? Object.keys(resource.properties) : ['name']
+  const propNames =
+    resource === undefined ? ['name'] : usableProperties(resource).map(([name]) => name)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(
     bindItem,

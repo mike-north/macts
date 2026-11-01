@@ -174,6 +174,37 @@ describe('resolveListOutputProperties', () => {
     expect(resolveListOutputProperties(resource)).toEqual(['name'])
   })
 
+  it('omits a property marked unsupported, keeping the identifier', () => {
+    // A marked property is declared by the dictionary but cannot be provided,
+    // so a list never reads it (manifest/unsupported.ts).
+    const resource = makeResource({
+      properties: {
+        name: { access: 'rw', type: 'string', description: 'Name', optional: false },
+        expandable: {
+          access: 'r',
+          type: 'boolean',
+          description: 'Never readable',
+          optional: true,
+          unsupported: {
+            reason: 'Every read fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.example.app',
+              appVersion: '1.0',
+              osVersion: '27.2',
+              sampleSize: 3,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
+        },
+      },
+      identifiers: [{ property: 'uid', primary: true }],
+    })
+    expect(resolveListOutputProperties(resource)).toEqual(['name', 'uid'])
+  })
+
   it('falls back to ["name"] for an empty resource with no identifier', () => {
     expect(resolveListOutputProperties(makeResource({}))).toEqual(['name'])
     expect(resolveListOutputProperties(undefined)).toEqual(['name'])

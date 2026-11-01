@@ -4,22 +4,24 @@
  *
  * It owns three things and nothing else:
  *
- * - composing the script for one operation from the native body (see
- *   `native-scripts.ts`), the app's bundle identifier, and the input record,
- *   without writing any input value into source text;
- * - running it through the {@link NativeTransport}, honoring the time limit and
- *   the caller's abort signal;
- * - classifying native failures into the canonical structured errors from
- *   `@macts/contracts`, in consumer vocabulary.
+ * - building the `NativeScript` for one operation from the native body (see
+ *   `native-scripts.ts`), the app's bundle identifier, the input record, and
+ *   the operation's input and output value plans;
+ * - running it through the {@link NativeTransport} with the in-process value
+ *   codec, honoring the time limit and the caller's abort signal;
+ * - classifying failures, whether reported by the automation process as a
+ *   `NativeOutcome` or raised by the transport itself, into the
+ *   canonical structured errors from `@macts/contracts`, in consumer
+ *   vocabulary.
  *
  * Authorization, policy, and input validation have already happened above the
  * executor seam.
  *
- * Value plans: this executor runs only operations whose values pass through
- * unconverted. Under passthrough the input is plain JSON and the result is
- * whatever the script returns, serialized with plain JSON semantics. An
- * operation with any other plan is refused with `InternalError`, never run with
- * its plan ignored.
+ * Value plans: every plan is executed through the codec, which decodes the
+ * wire input into native arguments and encodes the native result into wire
+ * form inside the automation process. Under passthrough plans the codec
+ * converts nothing and plain JSON semantics apply. The executor never converts
+ * values itself; the outcome's value is already in wire form.
  *
  * @packageDocumentation
  */
@@ -33,13 +35,20 @@ import {
   OperationCancelledError,
   OperationTimeoutError,
   TargetNotFoundError,
+  UnexpectedValueError,
+  ValidationError,
   type AnyMactsError,
   type OperationTarget,
-  type WireRecord,
   type WireValue,
 } from '@macts/contracts'
 import type { ExecutionRequest, Executor } from '../execution/executor.js'
-import { JxaExecutionError, MAX_OUTPUT_BYTES, runJxa } from './executor.js'
+import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
+import {
+  NATIVE_CODEC,
+  type NativeFailure,
+  type NativeOutcome,
+  type NativeScript,
+} from './native-codec.js'
 import {
   assertRequiredArguments,
   NO_SUCH_OBJECT_ERROR_NUMBER,
@@ -58,24 +67,28 @@ export interface NativeRunOptions {
 }
 
 /**
- * Runs one composed native script and reports how it ended.
+ * Runs one `NativeScript` with the in-process value codec and reports how it
+ * ended.
  *
- * `run` resolves to the script's parsed JSON result. A failure rejects with a
- * {@link JxaExecutionError}, whose `kind` says whether the script was stopped
- * by the time limit or the caller, could not start, exceeded the output limit,
- * died, or exited with a native error described by `stderr`. The executor
- * classifies failures from those fields alone; any other rejection is a host
- * defect.
+ * `run` resolves to the `NativeOutcome` the automation process reported:
+ * everything the app or the codec raised inside the process is a failed
+ * outcome, not a rejection. It rejects only when the process itself failed,
+ * with a {@link JxaExecutionError} whose `kind` says whether the script was
+ * stopped by the time limit or the caller, could not start, exceeded the output
+ * limit, died, exited with a native error described by `stderr`, or produced an
+ * unreadable outcome. The executor classifies failures from those fields alone;
+ * any other rejection is a host defect.
  */
 export interface NativeTransport {
   /**
-   * Run one composed script.
+   * Run one native script.
    *
-   * @param script - The composed script; see `composeNativeScript`.
+   * @param script - The invocation.
    * @param options - The time limit and the caller's abort signal.
-   * @returns The script's parsed JSON result. Rejects with a `JxaExecutionError`.
+   * @returns What the automation process reported. Rejects with a
+   *   `JxaExecutionError`.
    */
-  run(script: string, options: NativeRunOptions): Promise<unknown>
+  run(script: NativeScript, options: NativeRunOptions): Promise<NativeOutcome>
 }
 
 /**
@@ -88,8 +101,8 @@ export interface NativeExecutorOptions {
    */
   readonly timeoutMs?: number
   /**
-   * How scripts are run. Defaults to the macOS automation host; replaceable so
-   * the executor can be exercised without one.
+   * How scripts are run. Defaults to the macOS automation host with
+   * `NATIVE_CODEC`; replaceable so the executor can be exercised without one.
    */
   readonly transport?: NativeTransport
 }
@@ -105,6 +118,15 @@ export interface NativeFailureContext {
   /** The time limit the operation ran under, in milliseconds. */
   readonly timeoutMs: number
 }
+
+/**
+ * Why a native run did not produce a result: either the automation process
+ * ran to completion and reported a failed outcome, or the transport rejected
+ * and no outcome exists.
+ */
+export type NativeRunFailure =
+  | { readonly kind: 'reported'; readonly failure: NativeFailure }
+  | { readonly kind: 'process'; readonly error: unknown }
 
 /**
  * Create the native macOS executor.
@@ -127,60 +149,47 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
     provider: 'macos',
     async execute(request: ExecutionRequest): Promise<WireValue> {
       const { manifest, target, input, inputPlan, outputPlan, signal } = request
-      if (inputPlan.kind !== 'passthrough' || outputPlan.kind !== 'passthrough') {
-        throw new InternalError(
-          'The native executor runs only operations whose values pass through unconverted.',
-          {}
-        )
-      }
       throwIfAborted(signal)
 
-      const plan = planNativeInvocation(manifest, target)
+      // Legacy identifier aliases belong only to results that pass through
+      // unconverted; a typed result contract receives exactly its fields.
+      const plan = planNativeInvocation(manifest, target, {
+        identifierAliases: outputPlan.kind === 'passthrough',
+      })
       assertRequiredArguments(plan.requiredArguments, input)
-      const script = composeNativeScript(manifest.app.bundleId, plan.body, input)
+      const script: NativeScript = {
+        bundleId: manifest.app.bundleId,
+        body: plan.body,
+        input,
+        inputPlan,
+        outputPlan,
+      }
 
       const context: NativeFailureContext = { app: manifest.app.name, operation: target, timeoutMs }
-      const result = await runCancellable(
+      const outcome = await runCancellable(
         () => transport.run(script, { timeoutMs, signal }),
         context,
         signal
       )
-      if (result === undefined) return null
-      if (!isWireValue(result)) {
+      if (!outcome.ok) {
+        throw describeNativeFailure({ kind: 'reported', failure: outcome.failure }, context)
+      }
+      // The codec already produced a wire value; this guards a replaced
+      // transport that does not honor the outcome contract.
+      const value: unknown = outcome.value
+      if (value === undefined) return null
+      if (!isWireValue(value)) {
         throw new InternalError('The operation produced a result that is not valid JSON.', {})
       }
-      return result
+      return value
     },
   }
 }
 
-/**
- * Compose the script that runs one native body.
- *
- * The input travels as a JSON string literal parsed inside the process. It is
- * never an object literal: a `__proto__` key in an object literal sets the
- * prototype instead of creating a field, while `JSON.parse` always creates an
- * own property. The bundle identifier is likewise embedded as a JSON string
- * literal.
- *
- * The result is a function body: the process boundary wraps it, invokes it,
- * and serializes its return value.
- */
-export function composeNativeScript(bundleId: string, body: string, input: WireRecord): string {
-  return [
-    `var args = JSON.parse(${JSON.stringify(JSON.stringify(input))});`,
-    `var app = Application(${JSON.stringify(bundleId)});`,
-    'app.includeStandardAdditions = true;',
-    'return (function (app, args) {',
-    body,
-    '})(app, args);',
-  ].join('\n')
-}
-
-/** The default transport: run a script body in the macOS automation host. */
+/** The default transport: run a native script in the macOS automation host. */
 const AUTOMATION_HOST: NativeTransport = {
   run: (script, options) =>
-    runJxa<unknown>(script, { timeout: options.timeoutMs, signal: options.signal }),
+    runNativeScript(script, NATIVE_CODEC, { timeout: options.timeoutMs, signal: options.signal }),
 }
 
 /** The error for a caller abort. */
@@ -193,15 +202,15 @@ function throwIfAborted(signal: AbortSignal | undefined): void {
 }
 
 /**
- * Run `start`, classifying its failure, and settle early with
- * `OperationCancelledError` if `signal` aborts first. A late outcome after an
- * abort is discarded.
+ * Run `start`, classifying a rejection as a process failure, and settle early
+ * with `OperationCancelledError` if `signal` aborts first. A late outcome after
+ * an abort is discarded.
  */
 function runCancellable(
-  start: () => Promise<unknown>,
+  start: () => Promise<NativeOutcome>,
   context: NativeFailureContext,
   signal: AbortSignal | undefined
-): Promise<unknown> {
+): Promise<NativeOutcome> {
   return new Promise((resolve, reject) => {
     const onAbort = (): void => {
       reject(cancelled())
@@ -214,13 +223,17 @@ function runCancellable(
     Promise.resolve()
       .then(start)
       .then(
-        (value) => {
+        (outcome) => {
           settle()
-          resolve(value)
+          resolve(outcome)
         },
         (error: unknown) => {
           settle()
-          reject(signal?.aborted === true ? cancelled() : describeNativeFailure(error, context))
+          reject(
+            signal?.aborted === true
+              ? cancelled()
+              : describeNativeFailure({ kind: 'process', error }, context)
+          )
         }
       )
   })
@@ -231,8 +244,9 @@ function runCancellable(
 // ---------------------------------------------------------------------------
 
 /**
- * Native error numbers the executor classifies. Each is the number the
- * automation host prints in parentheses at the end of its error output.
+ * Native error numbers the executor classifies. Each is the `errorNumber` an
+ * app or bridge error carries inside the automation process, which is also the
+ * number the host prints in parentheses at the end of an uncaught error.
  */
 const NativeErrorNumber = {
   /** The addressed object does not exist. Also raised by bodies for a missing target. */
@@ -266,54 +280,107 @@ const ERROR_NUMBER_PATTERN = /\((-?\d+)\)\s*$/
 const APP_NOT_FOUND_PATTERN = /Application can.t be found/i
 
 /**
- * Classify a native process failure as a canonical structured error.
+ * The host's report that a script did not compile, `<start>:<end>: syntax
+ * error: ...`. It ends in -2700 like a runtime script error, so it is told
+ * apart by this prefix.
+ */
+const COMPILE_ERROR_PATTERN = /^\s*(?:\d+:\d+:\s*)?syntax error:/m
+
+/**
+ * Classify a native failure as a canonical structured error.
  *
- * A {@link JxaExecutionError} is classified by its `kind` first. Only a script
- * that exited with a failure (`kind: 'exited'`) is attributed to the app, by
- * the native error number at the end of its standard error output:
+ * @remarks
+ * A failure the automation process reported in its outcome:
  *
- * - `timed-out` (stopped by the time limit): `OperationTimeoutError`.
- * - `cancelled` (stopped by the caller): `OperationCancelledError`.
- * - `output-too-large`: `InternalError` naming the output limit.
- * - `not-started` (the host could not be started), `signalled` (killed by a
- *   signal macts did not send), `unreadable-output`: `InternalError`.
- * - exited with -1728 (no such object): `TargetNotFoundError`.
- * - exited with -1719 (invalid index): `InvalidSelectionError`.
- * - exited with -1743 (not authorized): `AppAuthorizationRequiredError`.
- * - exited with -600 (not running), -609 (connection invalid), or -1712 (no
- *   answer in time): `AppUnavailableError` (`not-responding`).
- * - exited with -2700 "Application can't be found", or -10814:
- *   `AppUnavailableError` (`not-installed`).
- * - exited with any other number: `AppOperationError` with `appErrorCode`.
- * - exited with no number: `InternalError`.
- * - anything that is not a `JxaExecutionError`: `InternalError`.
+ * | Reported failure                                         | Error                                    |
+ * | -------------------------------------------------------- | ---------------------------------------- |
+ * | codec, `decode`                                          | `ValidationError` with `issues`          |
+ * | codec, `encode`                                          | `UnexpectedValueError` with `issues`     |
+ * | app, -1728 (no such object)                              | `TargetNotFoundError`                    |
+ * | app, -1719 (invalid index)                               | `InvalidSelectionError`                  |
+ * | app, -1743 (not authorized)                              | `AppAuthorizationRequiredError`          |
+ * | app, -600 (not running), -609 (connection invalid)       | `AppUnavailableError` (`not-responding`) |
+ * | app, -1712 (no answer within the app's event timeout)    | `AppUnavailableError` (`not-responding`) |
+ * | app, -2700 "Application can't be found", -10814          | `AppUnavailableError` (`not-installed`)  |
+ * | app, any other number                                    | `AppOperationError` with `appErrorCode`  |
+ * | app, no number                                           | `AppOperationError`                      |
  *
- * Host failures are never blamed on the app: a host that cannot start, a
- * process killed from outside, oversized output, and a failure that reports no
- * native error number are macts or system faults, so they are `InternalError`.
- * A missing host is `InternalError` rather than `AppUnavailableError`, because
- * the target app may well be installed; it is the automation host that is
- * unavailable.
+ * A decode failure means a bridge form could not be produced from input that
+ * was already validated against its wire schema; it is still reported as the
+ * input not meeting the contract. Codec `path` and `message` are written by
+ * macts and describe the contract, so they become the error's `issues`.
+ *
+ * A failure of the transport, with no outcome, by the rejection's `kind`:
+ *
+ * | Process failure                                          | Error                                    |
+ * | -------------------------------------------------------- | ---------------------------------------- |
+ * | `timed-out` (the transport's own time limit)             | `OperationTimeoutError`                  |
+ * | `cancelled` (stopped by the caller)                      | `OperationCancelledError`                |
+ * | `output-too-large`                                       | `InternalError` naming the output limit  |
+ * | `not-started`, `signalled`, `unreadable-output`          | `InternalError`                          |
+ * | `exited`, the script did not compile                     | `InternalError`                          |
+ * | `exited`, standard error ends in an error number         | the app table above, by that number      |
+ * | `exited`, no error number                                | `InternalError`                          |
+ * | anything that is not a `JxaExecutionError`               | `InternalError`                          |
+ *
+ * Only the transport's own time limit makes a process failure a timeout: a
+ * process killed by an out-of-memory kill, the output limit, or an external
+ * signal is not one. Host failures are never blamed on the app: a host that
+ * cannot start (reported as `InternalError` rather than `AppUnavailableError`,
+ * since the target app may well be installed), a process killed from outside,
+ * oversized output, a script that does not compile, and a malformed outcome
+ * are macts or system faults.
  *
  * -1712 is the app's own event timeout, not the executor's time limit, so it is
  * reported as an app that did not respond, with no claim about elapsed time.
  *
- * Messages use consumer vocabulary and may name the app and the resource. The
- * raw failure, including its standard error text, is kept only as `cause`; it
- * never reaches a message or `details`.
+ * Messages use consumer vocabulary and may name the app and the resource.
+ * App-supplied text (an app failure's message, the process's standard error)
+ * never reaches a message or `details`: it is kept only as `cause`, either as
+ * the process failure itself or as an `Error` whose message is the app text.
  *
- * @param error - What the transport rejected with.
+ * @param failure - The reported failure, or what the process boundary rejected
+ *   with.
  * @param context - The app and operation, for messages and details.
  * @returns The structured error to throw.
  */
 export function describeNativeFailure(
-  error: unknown,
+  failure: NativeRunFailure,
   context: NativeFailureContext
 ): AnyMactsError {
+  return failure.kind === 'reported'
+    ? describeReportedFailure(failure.failure, context)
+    : describeProcessFailure(failure.error, context)
+}
+
+function describeReportedFailure(
+  failure: NativeFailure,
+  context: NativeFailureContext
+): AnyMactsError {
+  const { app } = context
+  if (failure.source === 'codec') {
+    const issues = [{ path: failure.path, message: failure.message }]
+    return failure.direction === 'encode'
+      ? new UnexpectedValueError(
+          `${app} returned a value that does not match the operation's contract.`,
+          { issues }
+        )
+      : new ValidationError(`The input could not be converted to the values ${app} expects.`, {
+          issues,
+        })
+  }
+  const options = { cause: new Error(failure.message) }
+  if (failure.errorNumber === undefined) {
+    return new AppOperationError(`${app} could not complete the operation.`, { app }, options)
+  }
+  return classifyErrorNumber(failure.errorNumber, failure.message, context, options)
+}
+
+function describeProcessFailure(error: unknown, context: NativeFailureContext): AnyMactsError {
   const { app, timeoutMs } = context
   const options = { cause: error }
   if (!(error instanceof JxaExecutionError)) {
-    return new InternalError('The automation host failed unexpectedly.', {}, options)
+    return new InternalError(`The automation for ${app} failed unexpectedly.`, {}, options)
   }
   switch (error.kind) {
     case 'timed-out':
@@ -333,31 +400,46 @@ export function describeNativeFailure(
     case 'not-started':
       return new InternalError('The macOS automation host could not be started.', {}, options)
     case 'signalled':
-      return new InternalError('The automation process was stopped unexpectedly.', {}, options)
+      return new InternalError(`The automation for ${app} was stopped unexpectedly.`, {}, options)
     case 'unreadable-output':
-      return new InternalError('The operation produced output that could not be read.', {}, options)
-    case 'exited':
-      return describeExitedFailure(error.stderr, context, options)
+      return new InternalError(
+        `The automation for ${app} reported a result macts could not read.`,
+        {},
+        options
+      )
+    case 'exited': {
+      if (COMPILE_ERROR_PATTERN.test(error.stderr)) {
+        return new InternalError(`The automation for ${app} could not be prepared.`, {}, options)
+      }
+      const errorNumber = parseNativeErrorNumber(error.stderr)
+      if (errorNumber === undefined) {
+        return new InternalError(
+          `The automation for ${app} failed without reporting an error.`,
+          {},
+          options
+        )
+      }
+      return classifyErrorNumber(errorNumber, error.stderr, context, options)
+    }
   }
 }
 
-/** Classify a script that exited with a failure, by its native error number. */
-function describeExitedFailure(
-  stderr: string,
+/**
+ * Classify a native error number by the error table above. `text` is the host's or the
+ * app's description of the failure; it is read only to recognize a missing
+ * app behind the generic -2700 number, and never copied into the result.
+ */
+function classifyErrorNumber(
+  errorNumber: number,
+  text: string,
   context: NativeFailureContext,
   options: ErrorOptions
 ): AnyMactsError {
   const { app, operation } = context
   const resourceDetails = operation.resource === undefined ? {} : { resource: operation.resource }
   const subject = operation.resource ?? 'item'
-  const errorNumber = parseNativeErrorNumber(stderr)
+
   switch (errorNumber) {
-    case undefined:
-      return new InternalError(
-        'The automation process failed without reporting an error.',
-        {},
-        options
-      )
     case NativeErrorNumber.noSuchObject:
       return new TargetNotFoundError(
         `${app} has no ${subject} matching the request.`,
@@ -392,7 +474,7 @@ function describeExitedFailure(
     case NativeErrorNumber.appNotFound:
       return notInstalled(app, options)
     case NativeErrorNumber.scriptError:
-      if (APP_NOT_FOUND_PATTERN.test(stderr)) return notInstalled(app, options)
+      if (APP_NOT_FOUND_PATTERN.test(text)) return notInstalled(app, options)
       return appOperationFailed(app, errorNumber, options)
     default:
       return appOperationFailed(app, errorNumber, options)
@@ -424,24 +506,4 @@ function parseNativeErrorNumber(stderr: string): number | undefined {
   const match = ERROR_NUMBER_PATTERN.exec(stderr.trimEnd())
   const digits = match?.[1]
   return digits === undefined ? undefined : Number(digits)
-}
-
-/** Whether `value` is a JSON value, and therefore a wire value under passthrough. */
-function isWireValue(value: unknown): value is WireValue {
-  if (value === null) return true
-  switch (typeof value) {
-    case 'string':
-    case 'boolean':
-      return true
-    case 'number':
-      return Number.isFinite(value)
-    case 'object': {
-      if (Array.isArray(value)) return value.every(isWireValue)
-      const prototype: unknown = Object.getPrototypeOf(value)
-      if (prototype !== Object.prototype && prototype !== null) return false
-      return Object.values(value).every(isWireValue)
-    }
-    default:
-      return false
-  }
 }

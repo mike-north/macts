@@ -18,14 +18,21 @@
  * - The request parameter carrying an identifier (`id`, `name`) is distinct
  *   from the resource property that holds it (`uid`, `calendarIdentifier`).
  *
+ * Every body must also reference no free identifier other than `app`, `args`,
+ * and the standard ECMAScript built-ins, so it can be compiled once and invoked
+ * many times by a long-lived automation process.
+ *
  * @see ../../../../manifests/calendar/app.yaml
  * @see ../../../../manifests/notes/app.yaml
+ * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, worker compatibility)
+ * @see https://tc39.es/ecma262/2011/#sec-15 (ES5 standard built-in objects)
  * @see https://github.com/mike-north/macts/issues/89
  */
 
 import { readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Script } from 'node:vm'
+import * as ts from 'typescript'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { InternalError, ValidationError, type OperationTarget } from '@macts/contracts'
 import { loadManifest } from '../manifest/loader.js'
@@ -99,6 +106,13 @@ function runBody(body: string, app: unknown, args: Record<string, unknown>): unk
   }
 }
 
+/** Run a body as `(app, args)` and return what it returns. */
+function callBody(body: string, app: unknown, args: Record<string, unknown>): unknown {
+  const compiled: unknown = new Script(`(function (app, args) {\n${body}\n})`).runInThisContext()
+  if (typeof compiled !== 'function') throw new Error('body did not compile to a function')
+  return (compiled as (app: unknown, args: Record<string, unknown>) => unknown)(app, args)
+}
+
 /**
  * A stand-in for an app object specifier, recording what a body does with it.
  * `exists()` answers `present`; every other use is recorded in `used`, so a test
@@ -135,15 +149,79 @@ function fakeSpecifier(present: boolean, children: Record<string, unknown> = {})
   }
 }
 
+/**
+ * The free identifiers of each body: names it references but neither declares
+ * nor receives as `app` or `args`, and that are not standard ECMAScript (ES5)
+ * built-ins.
+ *
+ * Each body is type-checked as the JavaScript function `(app, args)` in its
+ * own module, against the ES5 standard library only (no host or Node types),
+ * so every unresolved name is reported as "Cannot find name". Module scope
+ * keeps bodies from resolving names in one another. A body that does not parse
+ * fails here too.
+ */
+function freeIdentifiers(bodies: readonly string[]): string[][] {
+  const options: ts.CompilerOptions = {
+    allowJs: true,
+    checkJs: true,
+    noEmit: true,
+    target: ts.ScriptTarget.ES5,
+    module: ts.ModuleKind.ESNext,
+    lib: ['lib.es5.d.ts'],
+    types: [],
+  }
+  const files = new Map(
+    bodies.map((body, index) => [
+      `/native-body-${String(index)}.js`,
+      `function nativeBody(app, args) {\n${body}\n}\nexport {};\n`,
+    ])
+  )
+  const host = ts.createCompilerHost(options)
+  const getSourceFile = host.getSourceFile.bind(host)
+  host.getSourceFile = (fileName, languageVersion, ...rest) => {
+    const text = files.get(fileName)
+    return text === undefined
+      ? getSourceFile(fileName, languageVersion, ...rest)
+      : ts.createSourceFile(fileName, text, languageVersion, true, ts.ScriptKind.JS)
+  }
+  const fileExists = host.fileExists.bind(host)
+  host.fileExists = (fileName) => files.has(fileName) || fileExists(fileName)
+  const program = ts.createProgram([...files.keys()], options, host)
+
+  return [...files.keys()].map((fileName) => {
+    const sourceFile = program.getSourceFile(fileName)
+    if (sourceFile === undefined) throw new Error(`Missing source file ${fileName}`)
+    const syntax = program.getSyntacticDiagnostics(sourceFile)
+    if (syntax.length > 0) {
+      throw new Error(
+        `A body does not parse: ${ts.flattenDiagnosticMessageText(syntax[0]?.messageText, '\n')}`
+      )
+    }
+    return program
+      .getSemanticDiagnostics(sourceFile)
+      .filter((diagnostic) =>
+        ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n').startsWith('Cannot find name')
+      )
+      .map((diagnostic) =>
+        sourceFile.text.slice(diagnostic.start, (diagnostic.start ?? 0) + (diagnostic.length ?? 0))
+      )
+  })
+}
+
 /** Build the list body for `resource` through a plain `list` command. */
-function listBody(resource: Resource): string {
+/** A list body for `resource`, shaped for passthrough output unless `typed`. */
+function listBody(resource: Resource, typed = false): string {
   const manifest = manifestWith(
     { [resource.name]: resource },
     {
       list: resourceCommand('list', resource.name),
     }
   )
-  return buildNativeBody(manifest, { command: 'list', resource: resource.name })
+  return buildNativeBody(
+    manifest,
+    { command: 'list', resource: resource.name },
+    { identifierAliases: !typed }
+  )
 }
 
 /** The Calendar Event resource: 13 properties plus the `uid` identifier. */
@@ -270,6 +348,81 @@ describe('list bodies: batched reads (issue #89)', () => {
 
   it('lists the top-level collection when there is no parent parameter', () => {
     expect(listBody(eventResource)).toContain('var items = app["events"]();')
+  })
+})
+
+describe('usable properties: a property marked unsupported is never read', () => {
+  // manifests/finder/app.yaml: Container declares `entireContents` and four
+  // properties the probe marked unsupported, `expandable`, `expanded`,
+  // `completelyExpanded` (every read fails with -1728) and `containerWindow`
+  // (an object reference). It declares no identifier, so the one property a
+  // body reads is `entireContents`.
+  let manifest: AppManifest
+  beforeAll(async () => {
+    const finder = await loadManifest(manifestPath('finder'))
+    const container = finder.resources['Container']
+    if (container === undefined) throw new Error('Finder Container not found')
+    manifest = manifestWith(
+      { Container: container },
+      {
+        list: resourceCommand('list', 'Container'),
+        get: resourceCommand('get', 'Container', [param('id')]),
+      }
+    )
+  })
+
+  it('a get reads every usable property and no unsupported one', () => {
+    const item = fakeSpecifier(true)
+    const app = { containers: { byId: () => item.specifier } }
+    const body = buildNativeBody(manifest, { command: 'get', resource: 'Container' })
+    expect(runBody(body, app, { id: 'c1' })).toBeUndefined()
+    expect(item.used).toEqual(['read entireContents'])
+  })
+
+  it('a list falling back to per-field reads reads only usable properties', () => {
+    const item = fakeSpecifier(true, {
+      properties: () => {
+        throw new Error('the property record cannot be read')
+      },
+    })
+    const app = { containers: () => [item.specifier] }
+    const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
+    expect(callBody(body, app, {})).toEqual([{}])
+    expect(item.used).toEqual(['read entireContents'])
+  })
+
+  it('a list copies only usable fields from the property record', () => {
+    const item = fakeSpecifier(true, {
+      properties: () => ({
+        entireContents: 'contents',
+        expandable: true,
+        expanded: false,
+        completelyExpanded: false,
+        containerWindow: 'window',
+      }),
+    })
+    const app = { containers: () => [item.specifier] }
+    const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
+    expect(callBody(body, app, {})).toEqual([{ entireContents: 'contents' }])
+  })
+})
+
+describe('list bodies: typed output returns only declared fields', () => {
+  // A typed record contract derives references from the record itself. Its
+  // encode drops an undeclared `id` alias silently, and would accept a mirrored
+  // identifier field holding another property's value, so the body must not
+  // produce the legacy aliases at all.
+  it('omits the id alias for a byId resource', () => {
+    const body = listBody(calendarById, true)
+    expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')
+    expect(body).not.toContain('obj["id"]')
+  })
+
+  it('leaves the declared identifier absent instead of mirroring the working property', () => {
+    const body = listBody(calendarByRuntimeProperty, true)
+    expect(body).toContain('obj["name"] = props["name"];')
+    expect(body).not.toContain('obj["id"]')
+    expect(body).not.toContain('obj["calendarIdentifier"] =')
   })
 })
 
@@ -698,6 +851,59 @@ describe('source safety', () => {
       }
     }
   })
+})
+
+describe('free identifiers', () => {
+  it('detects names a body neither declares nor receives', () => {
+    const [free] = freeIdentifiers([
+      [
+        'var local = args.x;',
+        'leaked = local;',
+        'delay(1);',
+        'var other = Application("com.apple.finder");',
+        'return value + __mactsDecode(local, null);',
+      ].join('\n'),
+    ])
+    expect(free?.sort()).toEqual(['Application', '__mactsDecode', 'delay', 'leaked', 'value'])
+  })
+
+  it('accepts app, args, locals, and standard built-ins', () => {
+    const body = [
+      'var missing = new Error(JSON.stringify(Object.keys(args)));',
+      'var when = new Date(args.at);',
+      'try { app.windows(); } catch (e) { throw missing; }',
+      'return [when, Math.max(1, 2), String(app)];',
+    ].join('\n')
+    expect(freeIdentifiers([body])).toEqual([[]])
+  })
+
+  it('finds none in any body of any shipped manifest, with or without identifier aliases', async () => {
+    const apps = readdirSync(MANIFESTS_DIR, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+    const routes: string[] = []
+    const bodies: string[] = []
+    for (const app of apps) {
+      const manifest = await loadManifest(manifestPath(app))
+      for (const route of resolveManifestRoutes(manifest)) {
+        const target: OperationTarget =
+          route.resourceType === undefined
+            ? { command: route.commandKey }
+            : { command: route.commandKey, resource: route.resourceType }
+        // Passthrough output builds bodies with the identifier aliases, typed
+        // output without them; both variants ship.
+        for (const identifierAliases of [true, false]) {
+          routes.push(`${route.route} (identifierAliases: ${String(identifierAliases)})`)
+          bodies.push(buildNativeBody(manifest, target, { identifierAliases }))
+        }
+      }
+    }
+    expect(bodies.length).toBeGreaterThan(0)
+    const offenders = freeIdentifiers(bodies)
+      .map((free, index) => ({ route: routes[index], free }))
+      .filter(({ free }) => free.length > 0)
+    expect(offenders).toEqual([])
+  }, 60000)
 })
 
 describe('required arguments', () => {

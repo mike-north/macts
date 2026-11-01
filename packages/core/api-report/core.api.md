@@ -630,7 +630,7 @@ export function buildCapabilityRegistry(manifests: readonly AppManifest[]): Capa
 export function buildHierarchy(sdef: RawSdefData): HierarchyResult;
 
 // @public
-export function buildNativeBody(manifest: AppManifest, target: OperationTarget): string;
+export function buildNativeBody(manifest: AppManifest, target: OperationTarget, options?: NativeBodyOptions): string;
 
 // @public
 export function buildResourceCommandRoute(appName: string, resourcePlural: string, segment: string): string;
@@ -1938,6 +1938,11 @@ export const NATIVE_DECODE_FUNCTION = "__mactsDecode";
 export const NATIVE_ENCODE_FUNCTION = "__mactsEncode";
 
 // @public
+export interface NativeBodyOptions {
+    readonly identifierAliases?: boolean;
+}
+
+// @public
 export interface NativeCodec {
     readonly prelude: string;
 }
@@ -1986,7 +1991,7 @@ export interface NativeScript {
 
 // @public
 export interface NativeTransport {
-    run(script: string, options: NativeRunOptions): Promise<unknown>;
+    run(script: NativeScript, options: NativeRunOptions): Promise<NativeOutcome>;
 }
 
 // @public
@@ -3055,6 +3060,16 @@ export type RiskClassValue = z.infer<typeof RiskClassSchema>;
 
 // @public
 export function runJxa<T>(code: string, options?: JxaExecutorOptions): Promise<T>;
+
+// @public
+export function runNativeScript(script: NativeScript, codec: NativeCodec, options?: RunNativeScriptOptions): Promise<NativeOutcome>;
+
+// @public
+export interface RunNativeScriptOptions {
+    readonly maxOutputBytes?: number;
+    readonly signal?: AbortSignal | undefined;
+    readonly timeout?: number;
+}
 
 // @public (undocumented)
 export type RuntimeProbe = z.infer<typeof RuntimeProbeSchema>;

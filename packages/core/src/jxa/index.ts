@@ -2,11 +2,13 @@
 export {
   runJxa,
   runWithApp,
+  runNativeScript,
   JxaExecutionError,
   MAX_OUTPUT_BYTES,
   type JxaExecutionErrorOptions,
   type JxaExecutorOptions,
   type JxaFailureKind,
+  type RunNativeScriptOptions,
 } from './executor.js'
 
 // Native value codec (in-process wire <-> native conversion)
@@ -28,7 +30,7 @@ export {
   type NativeRunOptions,
   type NativeTransport,
 } from './native-executor.js'
-export { buildNativeBody } from './native-scripts.js'
+export { buildNativeBody, type NativeBodyOptions } from './native-scripts.js'
 
 // Connection
 export {
