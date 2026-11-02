@@ -23,7 +23,7 @@
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D7, D9, D11)
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import {
   PASSTHROUGH_PLAN,
@@ -40,7 +40,7 @@ import {
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { createBearerCredential } from './invocation/credential.js'
 import { toValidationIssues } from './operations/passthrough.js'
-import { createRuntime, type MactsRuntime } from './runtime.js'
+import { createRuntime, type MactsRuntime, type RuntimeLogger } from './runtime.js'
 import {
   BOOK_RECORD,
   LIBRARY_MANIFEST,
@@ -123,6 +123,14 @@ function libraryContractWithOutputs(
 interface Harness {
   readonly runtime: MactsRuntime
   readonly executor: RecordingExecutor
+  readonly logger: SpyLogger
+}
+
+/** A logger whose calls can be inspected. */
+interface SpyLogger extends RuntimeLogger {
+  readonly error: ReturnType<typeof vi.fn>
+  readonly warn: ReturnType<typeof vi.fn>
+  readonly info: ReturnType<typeof vi.fn>
 }
 
 /** A runtime with `contract` registered, whose executor answers every call with `result`. */
@@ -131,15 +139,16 @@ function harness(result: WireValue, contract = libraryContract()): Harness {
     () => Promise.resolve(result),
     () => Promise.resolve(result)
   )
+  const logger: SpyLogger = { error: vi.fn(), warn: vi.fn(), info: vi.fn() }
   const runtime = createRuntime({
     executor,
     verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
     clock: fixedClock,
-    logger: { error: () => undefined, warn: () => undefined, info: () => undefined },
+    logger,
     governance: { policy: ALLOW_ALL_POLICY },
   })
   runtime.registerContract(contract, LIBRARY_MANIFEST)
-  return { runtime, executor }
+  return { runtime, executor, logger }
 }
 
 /** The librarian's invocation context. */
@@ -260,6 +269,65 @@ describe.each(PATHS)('output validation through $path (D11)', ({ call, purpose }
         code: 'unrecognized_keys',
       },
     ])
+  })
+})
+
+describe.each(PATHS)('output mismatches in the operator log, through $path', ({ call }) => {
+  it('logs a warning with the operation, the executor provider, and the value-free issues only', async () => {
+    const SECRET = 'secret-7f3a'
+    const { runtime, logger } = harness({ isbn: SECRET, title: SECRET, pages: SECRET })
+
+    const error = await unexpectedValue(call(runtime))
+
+    expect(logger.warn).toHaveBeenCalledTimes(1)
+    expect(logger.warn).toHaveBeenCalledWith(
+      {
+        operation: 'library.books.lookupBook',
+        provider: 'recording-stub',
+        issues: error.details.issues,
+      },
+      'Executor result violates the output contract'
+    )
+    expect(JSON.stringify(logger.warn.mock.calls)).not.toContain(SECRET)
+    expect(logger.error).not.toHaveBeenCalled()
+  })
+
+  it('logs nothing for a conforming result', async () => {
+    const { runtime, logger } = harness({ ...DUNE_WIRE })
+
+    await call(runtime)
+
+    expect(logger.warn).not.toHaveBeenCalled()
+  })
+})
+
+describe('output validation of dynamic content (D3, D11)', () => {
+  it('never names a user key of a dynamic record in an issue path', async () => {
+    // Regression: zod reported the failing integer text inside a dynamic user
+    // record at ["notes", "record", <user key>, "integer"], so the user's key
+    // reached the caller.
+    const SECRET = 'secret-7f3a'
+    const { runtime, logger } = harness(
+      { isbn: '978-0441013593', notes: { record: { [SECRET]: { integer: 'abc' } } } },
+      libraryContractWithOutputs({
+        'library.books.lookupBook': t.record({ isbn: t.string(), notes: t.unknown() }),
+      })
+    )
+
+    const error = await unexpectedValue(
+      runtime.invoke('library.books.lookupBook', {}, asLibrarian())
+    )
+
+    expect(error.details.issues).toEqual([
+      {
+        path: ['notes', 'record'],
+        message: 'A value in this dynamic content does not match its contract.',
+        code: 'invalid_format',
+      },
+    ])
+    expect(error.message).not.toContain(SECRET)
+    expect(JSON.stringify(error.details)).not.toContain(SECRET)
+    expect(JSON.stringify(logger.warn.mock.calls)).not.toContain(SECRET)
   })
 })
 

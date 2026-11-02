@@ -22,7 +22,7 @@ const SECRET = 'secret-7f3a'
 function issuesOf(schema: z.ZodType, value: unknown): ValidationIssue[] {
   const parsed = schema.safeParse(value)
   if (parsed.success) throw new Error('expected the parse to fail')
-  const issues = toValueFreeIssues(parsed.error.issues)
+  const issues = toValueFreeIssues(parsed.error.issues, value)
   expect(JSON.stringify(issues)).not.toContain(SECRET)
   return issues
 }
@@ -43,28 +43,49 @@ describe('toValueFreeIssues', () => {
       z.string().min(40),
       SECRET,
       'too_small',
-      'Expected a string of at least 40.',
+      'Expected a string of at least 40 characters.',
     ],
     [
       'a number not above an exclusive minimum',
       z.number().gt(0),
       -1,
       'too_small',
-      'Expected a number of more than 0.',
+      'Expected a number more than 0.',
     ],
     [
       'text above a maximum length',
       z.string().max(2),
       SECRET,
       'too_big',
-      'Expected a string of at most 2.',
+      'Expected a string of at most 2 characters.',
     ],
     [
       'an array of the wrong exact length',
       z.array(z.string()).length(3),
       [SECRET],
       'too_small',
-      'Expected a array of exactly 3.',
+      'Expected an array of exactly 3 items.',
+    ],
+    [
+      'an array above a maximum of one item',
+      z.array(z.string()).max(1),
+      [SECRET, SECRET],
+      'too_big',
+      'Expected an array of at most 1 item.',
+    ],
+    [
+      'a bigint below a minimum',
+      z.bigint().min(0n),
+      -1n,
+      'too_small',
+      'Expected a number at least 0.',
+    ],
+    [
+      'a date before a minimum',
+      z.date().min(new Date('2026-01-01T00:00:00.000Z')),
+      new Date('2025-01-01T00:00:00.000Z'),
+      'too_small',
+      'Expected a date at least 2026-01-01T00:00:00.000Z.',
     ],
     ['a named format', z.email(), SECRET, 'invalid_format', 'Expected text in the email format.'],
     [
@@ -131,9 +152,21 @@ describe('toValueFreeIssues', () => {
     ])
   })
 
-  it('reports a bad value in dynamic content at the dynamic position, never under its user keys', () => {
-    // The value library's only data-keyed record is a user record in dynamic
-    // content; its failure is reported at the `unknown` field as a whole.
+  it('describes a map element whose key is not a property key, without the element', () => {
+    const schema = z.map(z.object({}), z.number())
+
+    expect(issuesOf(schema, new Map([[{}, SECRET]]))).toEqual([
+      {
+        path: [],
+        message: 'An element of this map does not match its contract.',
+        code: 'invalid_element',
+      },
+    ])
+  })
+
+  it('reports a dynamic value every branch rejects at the dynamic position', () => {
+    // A bare number aborts every branch of the dynamic union, so zod reports
+    // the union as a whole.
     const schema = t.record({ extra: t.unknown() }).wire
 
     expect(issuesOf(schema, { extra: { record: { [SECRET]: 5 } } })).toEqual([
@@ -141,6 +174,73 @@ describe('toValueFreeIssues', () => {
         path: ['extra'],
         message: 'The value matches none of the shapes its contract allows.',
         code: 'invalid_union',
+      },
+    ])
+  })
+
+  it('cuts a path at the dynamic record envelope, never naming a user key (integer text)', () => {
+    // Regression: zod reports the one failing branch of the dynamic union with
+    // its full path, ["extra", "record", <user key>, "integer"], so the user's
+    // key reached the issue.
+    const schema = t.record({ extra: t.unknown() }).wire
+
+    expect(issuesOf(schema, { extra: { record: { [SECRET]: { integer: 'abc' } } } })).toEqual([
+      {
+        path: ['extra', 'record'],
+        message: 'A value in this dynamic content does not match its contract.',
+        code: 'invalid_format',
+      },
+    ])
+  })
+
+  it('cuts a path at a dynamic record envelope inside an array, never naming a user key (date text)', () => {
+    // Regression: the full path was ["extra", 0, "record", <user key>, "date"].
+    const schema = t.record({ extra: t.unknown() }).wire
+
+    expect(issuesOf(schema, { extra: [{ record: { [SECRET]: { date: 'notadate' } } }] })).toEqual([
+      {
+        path: ['extra', 0, 'record'],
+        message: 'A value in this dynamic content does not match its contract.',
+        code: 'invalid_format',
+      },
+    ])
+  })
+
+  it('cuts at the outermost envelope and reports issues the cut makes identical once', () => {
+    // Two failures under different user keys, one in a nested user record,
+    // both cut to the same envelope.
+    const schema = t.record({ extra: t.unknown() }).wire
+    const value = {
+      extra: {
+        record: {
+          [`${SECRET}-outer`]: { record: { [`${SECRET}-inner`]: { integer: 'abc' } } },
+          [`${SECRET}-other`]: { integer: 'x' },
+        },
+      },
+    }
+
+    expect(issuesOf(schema, value)).toEqual([
+      {
+        path: ['extra', 'record'],
+        message: 'A value in this dynamic content does not match its contract.',
+        code: 'invalid_format',
+      },
+    ])
+  })
+
+  it('keeps a path that ends at a dynamic record envelope', () => {
+    // Nothing follows `record`, so no user key is in the path and the issue
+    // keeps its own message.
+    const issues = toValueFreeIssues(
+      [{ code: 'invalid_type', expected: 'object', path: ['extra', 'record'], message: SECRET }],
+      { extra: { record: {} } }
+    )
+
+    expect(issues).toEqual([
+      {
+        path: ['extra', 'record'],
+        message: 'Expected a value of type object.',
+        code: 'invalid_type',
       },
     ])
   })
@@ -156,7 +256,10 @@ describe('toValueFreeIssues', () => {
       },
     ])
     expect(
-      toValueFreeIssues([{ code: 'custom', path: [Symbol('s')], message: SECRET, input: SECRET }])
+      toValueFreeIssues(
+        [{ code: 'custom', path: [Symbol('s')], message: SECRET, input: SECRET }],
+        SECRET
+      )
     ).toEqual([
       {
         path: ['Symbol(s)'],

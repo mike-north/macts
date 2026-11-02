@@ -791,7 +791,9 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * happened, and only the result is unusable. The error says so, so a caller
    * never retries a create or a send on the assumption that nothing happened.
    * Its issues name paths and expectations but never repeat the result, which
-   * may hold user content and crosses to remote callers.
+   * may hold user content and crosses to remote callers. The operator log
+   * records each mismatch at warn level, with the operation, the executor's
+   * provider, and the same value-free issues.
    *
    * @param purpose - Why the operation ran, when it ran on the caller's
    *   behalf for something other than a direct call (`'to resolve a
@@ -808,9 +810,18 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     }
     const parsed = output.wire.safeParse(result)
     if (!parsed.success) {
+      const id = operation.descriptor.id
+      const issues = toValueFreeIssues(parsed.error.issues, result)
+      // Nothing else records a mismatch: governance has already audited the
+      // call as allowed, and adapters log only non-canonical failures. The
+      // value-free issues are logged, never the result.
+      log().warn(
+        { operation: id, provider: executor.provider, issues },
+        'Executor result violates the output contract'
+      )
       throw new UnexpectedValueError(
-        `The "${operation.descriptor.id}" operation ran in the app${purpose === undefined ? '' : ` ${purpose}`}, but its result does not match its contract; do not assume it had no effect.`,
-        { issues: toValueFreeIssues(parsed.error.issues) }
+        `The "${id}" operation ran in the app${purpose === undefined ? '' : ` ${purpose}`}, but its result does not match its contract; do not assume it had no effect.`,
+        { issues }
       )
     }
     return result
