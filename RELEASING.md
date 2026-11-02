@@ -156,14 +156,31 @@ that situation.
    not accepted by the trust endpoints):
 
    ```bash
+   npm whoami   # confirm the session from step 3 is still valid
    for pkg in packages/*/package.json; do
      name=$(node -p "require('./$pkg').name")
      npm trust github "$name" --repo mike-north/macts --file release.yml --allow-publish --yes
    done
    ```
 
-   Verify with `npm trust list <pkg-name>` or by spot-checking a package's
-   settings page on npmjs.com.
+   **Check `npm whoami` first.** Publishing every package takes a while, so
+   step 3's login can lapse before this step starts. An expired session does
+   not announce itself usefully here: every iteration prints a full,
+   plausible-looking "Establishing trust between ..." block and only then
+   fails with `E401 "You must be logged in to publish packages."` — seventy-six
+   times, with no summary. `npm whoami` failing the same way is the tell. Run
+   `npm login` again and re-run the loop.
+
+   Re-running is safe. A package that already has a matching configuration
+   returns `E409 Conflict` instead of creating a duplicate, so an interrupted
+   or partially-failed loop can simply be run again.
+
+   Note that `--allow-publish` grants **both** `createPackage` and
+   `createStagedPackage` (reported as "publish, stage publish"), not publish
+   alone. Pass no permission flag at all if a narrower grant is ever wanted.
+
+   Verify with `npm trust list <pkg-name>` (add `--json` for the permission
+   names) or by spot-checking a package's settings page on npmjs.com.
 
 5. Merge a trivial changeset to confirm CI can publish via OIDC end-to-end —
    check that the resulting npm versions show provenance badges.
