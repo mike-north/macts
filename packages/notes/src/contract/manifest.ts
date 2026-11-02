@@ -61,18 +61,19 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
       nullabilityProbe: {
-        observedAt: '2026-11-01T08:33:35.626Z',
+        observedAt: '2026-11-02T20:09:20.597Z',
         bundleId: 'com.apple.Notes',
         appVersion: '4.13',
         osVersion: '27.2',
         accessPath: 'accounts',
         itemsRead: 1,
         sampledParents: 1,
+        parentsScanned: 1,
         status: 'probed',
         skipped: [],
       },
@@ -130,12 +131,12 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
       nullabilityProbe: {
-        observedAt: '2026-11-01T09:28:11.279Z',
+        observedAt: '2026-11-02T20:09:20.980Z',
         bundleId: 'com.apple.Notes',
         appVersion: '4.13',
         osVersion: '27.2',
@@ -159,18 +160,11 @@ export const manifest: unknown = {
           description: 'The name of the note (first line)',
           code: 'pnam',
           optional: false,
-        },
-        id: {
-          access: 'r',
-          type: 'string',
-          description: 'The unique identifier of the note',
-          code: 'ID  ',
-          optional: false,
           nullable: false,
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T08:33:35.626Z',
+              observedAt: '2026-11-02T20:09:21.370Z',
               bundleId: 'com.apple.Notes',
               appVersion: '4.13',
               osVersion: '27.2',
@@ -179,6 +173,13 @@ export const manifest: unknown = {
               failedReads: 0,
             },
           },
+        },
+        id: {
+          access: 'r',
+          type: 'string',
+          description: 'The unique identifier of the note',
+          code: 'ID  ',
+          optional: false,
         },
         body: {
           access: 'rw',
@@ -204,7 +205,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T08:33:35.626Z',
+              observedAt: '2026-11-02T20:09:21.370Z',
               bundleId: 'com.apple.Notes',
               appVersion: '4.13',
               osVersion: '27.2',
@@ -224,7 +225,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T08:33:35.626Z',
+              observedAt: '2026-11-02T20:09:21.370Z',
               bundleId: 'com.apple.Notes',
               appVersion: '4.13',
               osVersion: '27.2',
@@ -244,7 +245,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T08:33:35.626Z',
+              observedAt: '2026-11-02T20:09:21.370Z',
               bundleId: 'com.apple.Notes',
               appVersion: '4.13',
               osVersion: '27.2',
@@ -264,7 +265,7 @@ export const manifest: unknown = {
           evidence: {
             nullable: {
               source: 'probe',
-              observedAt: '2026-11-01T08:33:35.626Z',
+              observedAt: '2026-11-02T20:09:21.370Z',
               bundleId: 'com.apple.Notes',
               appVersion: '4.13',
               osVersion: '27.2',
@@ -277,18 +278,19 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
       nullabilityProbe: {
-        observedAt: '2026-11-01T08:33:35.626Z',
+        observedAt: '2026-11-02T20:09:21.370Z',
         bundleId: 'com.apple.Notes',
         appVersion: '4.13',
         osVersion: '27.2',
         accessPath: 'notes',
         itemsRead: 60,
         sampledParents: 1,
+        parentsScanned: 1,
         status: 'probed',
         skipped: ['body', 'plaintext'],
       },
@@ -398,14 +400,14 @@ export const manifest: unknown = {
     },
     get: {
       name: 'get',
-      description: 'Get an item by name',
+      description: 'Get an item by identifier',
       scope: 'resource',
       resourceType: ['Account', 'Folder', 'Note'],
       parameters: [
         {
-          name: 'name',
+          name: 'id',
           type: 'string',
-          description: 'Item name',
+          description: 'Item identifier',
           required: true,
         },
       ],
@@ -431,6 +433,12 @@ export const manifest: unknown = {
       scope: 'resource',
       resourceType: 'Note',
       parameters: [
+        {
+          name: 'name',
+          type: 'string',
+          description: 'The name of the note (first line)',
+          required: false,
+        },
         {
           name: 'body',
           type: 'string',

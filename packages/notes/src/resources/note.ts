@@ -28,10 +28,10 @@ export class NoteResourceClient {
   }
 
   /**
-   * Get a note by name.
+   * Get a note by id.
    */
-  async get(name: string): Promise<Note> {
-    return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string): Promise<Note> {
+    return this.#http.rpc<Note>(`${this.#app}.${this.#resource}.get`, { id })
   }
 
   /**

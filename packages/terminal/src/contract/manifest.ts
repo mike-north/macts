@@ -46,7 +46,7 @@ export const manifest: unknown = {
         },
         id: {
           access: 'r',
-          type: 'number',
+          type: 'integer',
           description: 'The unique identifier of the window',
           code: 'ID  ',
           optional: false,
@@ -75,10 +75,22 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-02T20:09:25.475Z',
+        bundleId: 'com.apple.Terminal',
+        appVersion: '2.15',
+        osVersion: '27.2',
+        accessPath: 'windows',
+        itemsRead: 1,
+        sampledParents: 1,
+        parentsScanned: 1,
+        status: 'probed',
+        skipped: [],
+      },
     },
     Tab: {
       name: 'Tab',
@@ -172,7 +184,7 @@ export const manifest: unknown = {
         },
         id: {
           access: 'r',
-          type: 'number',
+          type: 'integer',
           description: 'The unique identifier of the settings set',
           code: 'ID  ',
           optional: false,
@@ -208,10 +220,22 @@ export const manifest: unknown = {
       },
       identifiers: [
         {
-          property: 'name',
+          property: 'id',
           primary: true,
         },
       ],
+      nullabilityProbe: {
+        observedAt: '2026-11-02T20:09:25.862Z',
+        bundleId: 'com.apple.Terminal',
+        appVersion: '2.15',
+        osVersion: '27.2',
+        accessPath: 'settingsSets',
+        itemsRead: 12,
+        sampledParents: 1,
+        parentsScanned: 1,
+        status: 'probed',
+        skipped: [],
+      },
     },
   },
   enums: {},
@@ -242,7 +266,21 @@ export const manifest: unknown = {
       name: 'get',
       description: 'Get an item by identifier',
       scope: 'resource',
-      resourceType: ['Window', 'Tab', 'SettingsSet'],
+      resourceType: ['Window', 'SettingsSet'],
+      parameters: [
+        {
+          name: 'id',
+          type: 'integer',
+          description: 'Item identifier',
+          required: true,
+        },
+      ],
+    },
+    getTab: {
+      name: 'get',
+      description: 'Get an item by identifier',
+      scope: 'resource',
+      resourceType: 'Tab',
       parameters: [
         {
           name: 'name',
@@ -251,6 +289,7 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      routeName: 'get',
     },
     doScript: {
       name: 'doScript',

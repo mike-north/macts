@@ -827,10 +827,32 @@ function generateGetMethod(
   /**
    * Get a ${nameWords} by ${childParam}.
    */
-  async get(${childParam}: string): Promise<${resourceName}> {
-    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${childParam} });
+  async get(${childParam}: ${identifierType(command, childParam)}): Promise<${resourceName}> {
+    return this.#http.rpc<${resourceName}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`, { ${identifierField(command, childParam)} });
   }
 `
+}
+
+/**
+ * The request-body field that carries an item identifier. An identifier
+ * declared `integer` travels in the contract's wire form, `{ integer: "<digits>" }`,
+ * which is the only form the operation's input accepts; `String()` takes the
+ * string a CLI passes and a number alike. Any other identifier is sent as given.
+ */
+function identifierField(command: Command, name: string): string {
+  return isIntegerParameter(command, name) ? `${name}: { integer: String(${name}) }` : name
+}
+
+/**
+ * The TypeScript type of an identifier argument: an integer identifier is
+ * accepted as the number it is or the string a CLI passes; any other is a string.
+ */
+function identifierType(command: Command, name: string): string {
+  return isIntegerParameter(command, name) ? 'string | number' : 'string'
+}
+
+function isIntegerParameter(command: Command, name: string): boolean {
+  return command.parameters.find((p) => p.name === name)?.type === 'integer'
 }
 
 /**

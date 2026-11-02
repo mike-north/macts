@@ -2,7 +2,9 @@
  * Tests for capability operation input schemas and MCP tool names.
  */
 
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
+import { loadManifest } from '../manifest/loader.js'
 import {
   generateToolName,
   generateResourceOperationSchema,
@@ -375,5 +377,28 @@ describe('generateAppCommandSchema', () => {
     expect(schema.properties).toHaveProperty('option1')
     expect(schema.properties).toHaveProperty('option2')
     expect(schema.required).toEqual(['option1'])
+  })
+})
+
+/**
+ * Notes' note create input schema (#194).
+ *
+ * A note's `name` is its first line, which the app derives from the body, and
+ * the dictionary's note class declares `name` read-write with no requirement.
+ * The SDK's `NoteCreateInput` makes both `name` and `body` optional, so the
+ * capability schema must not list any field as required, and must still offer
+ * `name`, so the two schemas for one operation agree.
+ *
+ * @see ../../../../manifests/notes/app.yaml
+ */
+describe('Notes create input schema', () => {
+  it('offers name and body and requires neither', async () => {
+    const notes = await loadManifest(resolve(process.cwd(), '../../manifests/notes/app.yaml'))
+    const create = notes.commands['create']
+    const note = notes.resources['Note']
+    if (create === undefined || note === undefined) throw new Error('Notes declares no note create')
+    const schema = generateResourceOperationSchema(create, note)
+    expect(Object.keys(schema.properties ?? {}).sort()).toEqual(['body', 'name'])
+    expect(schema).not.toHaveProperty('required')
   })
 })

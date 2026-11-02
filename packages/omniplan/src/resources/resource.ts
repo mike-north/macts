@@ -30,8 +30,10 @@ export class ResourceResourceClient {
   /**
    * Get a resource by id.
    */
-  async get(id: string): Promise<Resource> {
-    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string | number): Promise<Resource> {
+    return this.#http.rpc<Resource>(`${this.#app}.${this.#resource}.get`, {
+      id: { integer: String(id) },
+    })
   }
 
   /**

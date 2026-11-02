@@ -28,9 +28,11 @@ export class WindowResourceClient {
   }
 
   /**
-   * Get a window by name.
+   * Get a window by id.
    */
-  async get(name: string): Promise<Window> {
-    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string | number): Promise<Window> {
+    return this.#http.rpc<Window>(`${this.#app}.${this.#resource}.get`, {
+      id: { integer: String(id) },
+    })
   }
 }

@@ -1664,11 +1664,11 @@ describe('missing targets and parents fail as no such object', () => {
 })
 
 describe('identifier parameter names (issue #26)', () => {
-  it('Notes get reads the `name` parameter, not `id`', () => {
+  it('Notes get reads the `id` parameter, not `name`', () => {
     const text = buildNativeBody(notes, { command: 'get', resource: 'Note' })
-    expect(text).toContain('var itemId = args["name"];')
+    expect(text).toContain('var itemId = args["id"];')
     expect(text).toContain('app["notes"].byId(itemId)')
-    expect(text).not.toContain('args["id"]')
+    expect(text).not.toContain('args["name"]')
   })
 
   it('delete reads its declared identifier parameter', () => {
@@ -1710,6 +1710,117 @@ describe('identifier parameter names (issue #26)', () => {
     const text = buildNativeBody(manifest, { command: 'get', resource: 'Entry' })
     expect(text).toContain('var itemId = args["id"];')
     expect(text).toContain('app["entries"].byId(itemId)')
+  })
+})
+
+/**
+ * A resource keyed by `name` is addressed the way its app can find it (#194).
+ * The expected text is written by hand from each app's dictionary:
+ *
+ * - Notes' account, folder and note classes declare `id` ("the unique
+ *   identifier of the note"), so they are identified by it and looked up by
+ *   `id`; the request parameter is `id`, never the item's name.
+ * - Terminal's window and settings set classes declare an integer `id`.
+ * - TextEdit's, Preview's, Script Editor's and System Information's document
+ *   classes and Xcode's file, text and source document, build setting,
+ *   resolved build setting and run destination classes have no `id`, so they
+ *   are matched on `name`. Automator's setting and required resource have none
+ *   either, in Automator.scriptSuite.
+ *
+ * @see ../../../../manifests/notes/app.yaml
+ * @see https://github.com/mike-north/macts/issues/194
+ */
+describe('name-keyed resources are targeted by a working identifier (issue #194)', () => {
+  const byIdResources: readonly (readonly [string, string, string, string])[] = [
+    ['notes', 'Account', 'accounts', 'get'],
+    ['notes', 'Folder', 'folders', 'get'],
+    ['notes', 'Note', 'notes', 'get'],
+    ['terminal', 'Window', 'windows', 'get'],
+    ['terminal', 'SettingsSet', 'settingsSets', 'get'],
+  ]
+
+  it.each(byIdResources)(
+    '%s %s get looks the item up by its `id` identifier',
+    async (app, resource, collection, command) => {
+      const manifest = await loadManifest(manifestPath(app))
+      const text = buildNativeBody(manifest, { command, resource })
+      expect(text).toContain('var itemId = args["id"];')
+      expect(text).toContain(`var item = app["${collection}"].byId(itemId);`)
+      expect(text).not.toContain('.whose(')
+      expect(text).not.toContain('args["name"]')
+    }
+  )
+
+  it('Notes requires the `id` parameter, and no `name`, to get an item', () => {
+    const plan = planNativeInvocation(notes, { command: 'get', resource: 'Folder' })
+    expect(plan.requiredArguments).toEqual(['id'])
+  })
+
+  it('Notes lists each item with its own `id` as the identifier', () => {
+    const text = buildNativeBody(
+      notes,
+      { command: 'list', resource: 'Note' },
+      { identifierAliases: true }
+    )
+    expect(text).toContain('obj["id"] = props["id"];')
+    expect(text).not.toContain('obj["name"] = obj["id"]')
+  })
+
+  const byPropertyResources: readonly (readonly [string, string, string, string, string])[] = [
+    ['textedit', 'Document', 'documents', 'get', 'name'],
+    ['preview', 'Document', 'documents', 'get', 'name'],
+    ['script-editor', 'Document', 'documents', 'get', 'name'],
+    ['system-information', 'Document', 'documents', 'get', 'name'],
+    ['xcode', 'RunDestination', 'runDestinations', 'getRunDestination', 'name'],
+  ]
+
+  it.each(byPropertyResources)(
+    '%s %s get matches the item on its `name`',
+    async (app, resource, collection, command, property) => {
+      const manifest = await loadManifest(manifestPath(app))
+      const text = buildNativeBody(manifest, { command, resource })
+      expect(text).toContain('var itemId = args["name"];')
+      expect(text).toContain(`var item = app["${collection}"].whose({ "${property}": itemId })[0];`)
+      expect(text).not.toContain('.byId(')
+    }
+  )
+
+  it.each([
+    ['automator', 'Setting', 'settings'],
+    ['automator', 'RequiredResource', 'requiredResources'],
+    ['xcode', 'BuildSetting', 'buildSettings'],
+    ['xcode', 'ResolvedBuildSetting', 'resolvedBuildSettings'],
+    ['xcode', 'FileDocument', 'fileDocuments'],
+    ['xcode', 'TextDocument', 'textDocuments'],
+    ['xcode', 'SourceDocument', 'sourceDocuments'],
+  ])('%s %s is matched on its `name` wherever it is looked up', async (app, key, collection) => {
+    const manifest = await loadManifest(manifestPath(app))
+    const resource = manifest.resources[key]
+    expect(buildTargetExpression(resource, collection, 'itemId')).toBe(
+      `app["${collection}"].whose({ "name": itemId })[0]`
+    )
+  })
+
+  it('Notes create forwards a supplied name, then the body, into the new note’s properties', () => {
+    // The dictionary's note class declares `name` read-write (no access
+    // restriction), so it can be set when the note is made.
+    const text = buildNativeBody(notes, { command: 'create', resource: 'Note' })
+    const setup = [
+      'var props = {};',
+      'if (Object.prototype.hasOwnProperty.call(args, "name")) { props["name"] = args["name"]; }',
+      'if (Object.prototype.hasOwnProperty.call(args, "body")) { props["body"] = args["body"]; }',
+      'var item = app["Note"](props);',
+      'item.make();',
+    ].join('\n')
+    expect(text.startsWith(setup)).toBe(true)
+  })
+
+  it('Terminal tabs keep their own get, with the `name` parameter', async () => {
+    const terminal = await loadManifest(manifestPath('terminal'))
+    const tab = planNativeInvocation(terminal, { command: 'getTab', resource: 'Tab' })
+    expect(tab.requiredArguments).toEqual(['name'])
+    const window = planNativeInvocation(terminal, { command: 'get', resource: 'Window' })
+    expect(window.requiredArguments).toEqual(['id'])
   })
 })
 

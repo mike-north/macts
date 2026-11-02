@@ -47,19 +47,19 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.Notes',
     resource: 'accounts',
     operation: 'get',
-    description: 'Get an item by name',
+    description: 'Get an item by identifier',
     permission: 'notes:accounts:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
-          description: 'Item name',
+        id: {
+          description: 'Item identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {
@@ -119,19 +119,19 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.Notes',
     resource: 'folders',
     operation: 'get',
-    description: 'Get an item by name',
+    description: 'Get an item by identifier',
     permission: 'notes:folders:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
-          description: 'Item name',
+        id: {
+          description: 'Item identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {
@@ -161,12 +161,12 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        body: {
-          description: 'HTML content of the note',
-          type: 'string',
-        },
         name: {
           description: 'The name of the note (first line)',
+          type: 'string',
+        },
+        body: {
+          description: 'HTML content of the note',
           type: 'string',
         },
       },
@@ -179,19 +179,19 @@ export const capabilities: readonly CapabilityMetadata[] = [
     appBundleId: 'com.apple.Notes',
     resource: 'notes',
     operation: 'get',
-    description: 'Get an item by name',
+    description: 'Get an item by identifier',
     permission: 'notes:notes:get',
     risk: 'read',
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
-          description: 'Item name',
+        id: {
+          description: 'Item identifier',
           type: 'string',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {

@@ -9,8 +9,8 @@ import { CallOptions } from '@macts/contracts';
 
 // @public
 export interface Account {
-    readonly id: string | null;
-    readonly name: string;
+    readonly id: string;
+    readonly name: string | null;
     readonly upgraded: boolean | null;
 }
 
@@ -19,7 +19,7 @@ export type AccountCreateInput = Record<string, never>;
 
 // @public
 export interface AccountResourceClient {
-    get(name: string, options?: CallOptions): Promise<Account>;
+    get(id: string, options?: CallOptions): Promise<Account>;
     list(options?: CallOptions): Promise<readonly Account[]>;
 }
 
@@ -49,8 +49,8 @@ export type AttachmentUpdateInput = Record<string, never>;
 
 // @public
 export interface Folder {
-    readonly id: string | null;
-    name: string;
+    readonly id: string;
+    name: string | null;
     readonly shared: boolean | null;
 }
 
@@ -61,7 +61,7 @@ export interface FolderCreateInput {
 
 // @public
 export interface FolderResourceClient {
-    get(name: string, options?: CallOptions): Promise<Folder>;
+    get(id: string, options?: CallOptions): Promise<Folder>;
     list(options?: CallOptions): Promise<readonly Folder[]>;
 }
 
@@ -91,7 +91,7 @@ export interface NoteCreateInput {
 // @public
 export interface NoteResourceClient {
     create(input: NoteCreateInput, options?: CallOptions): Promise<Note>;
-    get(name: string, options?: CallOptions): Promise<Note>;
+    get(id: string, options?: CallOptions): Promise<Note>;
     list(options?: CallOptions): Promise<readonly Note[]>;
     show(name: string, options?: CallOptions): Promise<void>;
 }
