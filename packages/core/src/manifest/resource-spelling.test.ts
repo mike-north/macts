@@ -4,14 +4,15 @@
  * A resource's segment, the lower camel case of its plural (`MediaItems` →
  * `mediaItems`), names it in the route and operation id
  * (`photos.mediaItems.list`), the SDK accessor of the HTTP client and of the
- * contract (`photos.mediaItems`), the contract's reference table, the MCP tool
- * name, the capability, and the scope of a derived permission
+ * contract (`photos.mediaItems`), the contract's reference table and operation
+ * descriptors, the MCP tool name (which MCP adapters derive from a
+ * descriptor's id), the capability, and the scope of a derived permission
  * (`photos:mediaItems:list`). A caller can then carry one name from any of
  * them to the others; a surface that spells it differently breaks that.
  *
  * This suite reads each spelling from what the generators really produce (the
- * generated HTTP client and contract modules, parsed as syntax; the MCP tools
- * and capabilities as data; the routes and permissions from the resolver) and
+ * generated HTTP client and contract modules, parsed as syntax; the
+ * capabilities as data; the routes and permissions from the resolver) and
  * fails when two surfaces disagree for any resource of any shipped manifest.
  * Each spelling is also checked against the segment of the resource's own
  * plural (`normalizeResourceRouteSegment`), and the spellings of a few
@@ -34,8 +35,6 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { deriveCapabilities } from '../capabilities/registry.js'
 import { generateCliPlugin } from '../generator/cli/index.js'
 import { CONTRACT_MODULE_PATH, generateContract } from '../generator/contract/index.js'
-import { createMcpGeneratorContext } from '../generator/mcp/context.js'
-import { generateMcpPlugin } from '../generator/mcp/index.js'
 import { generateHttpClientSdk } from '../generator/sdk/http-client.js'
 import { loadManifest } from './loader.js'
 import {
@@ -172,29 +171,39 @@ function contractSpellings(manifest: AppManifest): Spelling[] {
   return found
 }
 
-/** The MCP tools: each tool's client namespace and the resource part of its name. */
-function mcpSpellings(manifest: AppManifest): Spelling[] {
-  const appName = normalizeAppRouteSegment(manifest.app.name)
-  const plugin = generateMcpPlugin(createMcpGeneratorContext({ appName, manifest }))
+/**
+ * The contract's operation descriptors: each descriptor's id, keyed by the
+ * resource its target names. MCP adapters name each tool from this id
+ * (`macts__<app>__<resource>_<operation>`), so it is also the MCP tool name's
+ * spelling of the resource.
+ */
+function descriptorSpellings(manifest: AppManifest): Spelling[] {
+  const content = generateContract(manifest).files.find(
+    (file) => file.path === CONTRACT_MODULE_PATH
+  )?.content
+  if (content === undefined) throw new Error('the contract has no contract module')
   const found: Spelling[] = []
-  const prefix = `macts__${appName}__`
-  for (const tool of plugin.tools) {
-    const resourceKey = tool.resourceType
-    if (!tool.isResourceOperation || resourceKey === undefined) continue
-    found.push({ surface: 'MCP tool namespace', resourceKey, spelling: tool.resourceName })
-    // The name is `macts__<app>__<resource>_<operation>`. A resource segment
-    // has no `_`, so the resource part ends at the first one.
-    const rest = tool.name.startsWith(prefix) ? tool.name.slice(prefix.length) : ''
-    const resource = rest.slice(0, Math.max(0, rest.indexOf('_')))
-    found.push({ surface: 'MCP tool name', resourceKey, spelling: resource })
+  // `const <binding>: OperationDescriptor<…> = { id: '<id>', target: { …, resource: '<Key>' }, … }`
+  walk(parse(CONTRACT_MODULE_PATH, content), (node) => {
+    if (!ts.isVariableDeclaration(node) || node.initializer === undefined) return
+    if (!ts.isObjectLiteralExpression(node.initializer)) return
+    const member = (object: ts.ObjectLiteralExpression, name: string): ts.Expression | undefined =>
+      object.properties.find(
+        (entry): entry is ts.PropertyAssignment =>
+          ts.isPropertyAssignment(entry) && ts.isIdentifier(entry.name) && entry.name.text === name
+      )?.initializer
+    const id = member(node.initializer, 'id')
+    const target = member(node.initializer, 'target')
+    if (id === undefined || !ts.isStringLiteral(id)) return
+    if (target === undefined || !ts.isObjectLiteralExpression(target)) return
+    const resource = member(target, 'resource')
+    if (resource === undefined || !ts.isStringLiteral(resource)) return
     found.push({
-      surface: 'MCP tool file',
-      resourceKey,
-      spelling:
-        plugin.toolFiles.find((file) => file.tools.includes(tool))?.fileName.replace(/\.ts$/, '') ??
-        '',
+      surface: 'contract descriptor id (MCP tool name)',
+      resourceKey: resource.text,
+      spelling: routeSegment(id.text),
     })
-  }
+  })
   return found
 }
 
@@ -224,7 +233,7 @@ function resourceSpellings(manifest: AppManifest): Spelling[] {
     ...routeSpellings(manifest),
     ...httpClientSpellings(manifest),
     ...contractSpellings(manifest),
-    ...mcpSpellings(manifest),
+    ...descriptorSpellings(manifest),
   ]
 }
 
@@ -300,9 +309,11 @@ describe('resource spelling across surfaces', () => {
     // be the one the shared rule derives from the resource's own plural.
     const found: string[] = []
     let compared = 0
+    const surfaces = new Set<string>()
     for (const { dir, manifest } of manifests) {
       for (const { surface, resourceKey, spelling } of resourceSpellings(manifest)) {
         compared++
+        surfaces.add(surface)
         const plural = manifest.resources[resourceKey]?.plural
         const expected =
           plural === undefined
@@ -314,8 +325,19 @@ describe('resource spelling across surfaces', () => {
       }
     }
     expect(found).toEqual([])
-    // Guards against a vacuous pass: every surface of every resource with operations.
-    expect(compared).toBeGreaterThan(1000)
+    // Guards against a vacuous pass: every surface of every resource with
+    // operations, and every surface contributes.
+    expect(compared).toBeGreaterThan(750)
+    expect([...surfaces].sort()).toEqual([
+      'HTTP client accessor',
+      'HTTP client route segment',
+      'contract accessor',
+      'contract descriptor id (MCP tool name)',
+      'contract reference table get',
+      'contract reference table list',
+      'derived permission scope',
+      'route',
+    ])
   })
 
   it('spells each capability as its resource is spelled elsewhere, for every manifest', () => {

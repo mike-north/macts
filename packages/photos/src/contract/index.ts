@@ -524,6 +524,12 @@ const mediaItemListMediaItemsOperation: OperationDescriptor<
   description: 'List all media items',
   input: t.record({}),
   output: t.array(mediaItemRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string }, MediaItem> = {
@@ -535,6 +541,13 @@ const mediaItemGetMediaItemOperation: OperationDescriptor<{ readonly id: string 
     id: t.string({ description: 'Media item identifier' }),
   }),
   output: mediaItemRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Media item identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const albumListAlbumsOperation: OperationDescriptor<Record<string, never>, readonly Album[]> = {
@@ -544,6 +557,12 @@ const albumListAlbumsOperation: OperationDescriptor<Record<string, never>, reado
   description: 'List all albums',
   input: t.record({}),
   output: t.array(albumRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const albumGetAlbumOperation: OperationDescriptor<{ readonly id: string }, Album> = {
@@ -555,6 +574,13 @@ const albumGetAlbumOperation: OperationDescriptor<{ readonly id: string }, Album
     id: t.string({ description: 'Album identifier' }),
   }),
   output: albumRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Album identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
@@ -564,6 +590,12 @@ const folderListFoldersOperation: OperationDescriptor<Record<string, never>, rea
   description: 'List all folders',
   input: t.record({}),
   output: t.array(folderRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
@@ -575,6 +607,13 @@ const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Fol
     id: t.string({ description: 'Folder identifier' }),
   }),
   output: folderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Folder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const appImportOperation: OperationDescriptor<
@@ -597,6 +636,20 @@ const appImportOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      files: { type: 'array', items: { type: 'string' }, description: 'The list of files to copy' },
+      into: { type: 'string', description: 'The album to import into' },
+      skipCheckDuplicates: {
+        type: 'boolean',
+        description: 'Skip duplicate checking and import everything',
+      },
+    },
+    required: ['files'],
+    additionalProperties: false,
+  },
 }
 
 const appExportOperation: OperationDescriptor<
@@ -621,6 +674,24 @@ const appExportOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      mediaItems: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'The list of media items to export',
+      },
+      to: { type: 'string', description: 'The destination of the export' },
+      usingOriginals: {
+        type: 'boolean',
+        description: 'Export the original files if true, otherwise export rendered jpgs',
+      },
+    },
+    required: ['mediaItems', 'to'],
+    additionalProperties: false,
+  },
 }
 
 const mediaItemDuplicateOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
@@ -632,6 +703,13 @@ const mediaItemDuplicateOperation: OperationDescriptor<{ readonly id: string }, 
     id: t.string({ description: 'The media item to duplicate' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'The media item to duplicate' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const appMakeOperation: OperationDescriptor<
@@ -648,6 +726,17 @@ const appMakeOperation: OperationDescriptor<
     at: t.optional(t.string({ description: 'The parent folder for the new object' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      new: { type: 'string', description: 'The class of the new object (album or folder)' },
+      named: { type: 'string', description: 'The name of the new object' },
+      at: { type: 'string', description: 'The parent folder for the new object' },
+    },
+    required: ['new'],
+    additionalProperties: false,
+  },
 }
 
 const appDeleteOperation: OperationDescriptor<{ readonly target: string }, undefined> = {
@@ -659,6 +748,13 @@ const appDeleteOperation: OperationDescriptor<{ readonly target: string }, undef
     target: t.string({ description: 'The album or folder to delete' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { target: { type: 'string', description: 'The album or folder to delete' } },
+    required: ['target'],
+    additionalProperties: false,
+  },
 }
 
 const appAddOperation: OperationDescriptor<
@@ -674,6 +770,20 @@ const appAddOperation: OperationDescriptor<
     to: t.string({ description: 'The album to add to' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      mediaItems: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'The list of media items to add',
+      },
+      to: { type: 'string', description: 'The album to add to' },
+    },
+    required: ['mediaItems', 'to'],
+    additionalProperties: false,
+  },
 }
 
 const appStartSlideshowOperation: OperationDescriptor<
@@ -688,6 +798,15 @@ const appStartSlideshowOperation: OperationDescriptor<
     using: t.array(t.string(), { description: 'The media items to show' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      using: { type: 'array', items: { type: 'string' }, description: 'The media items to show' },
+    },
+    required: ['using'],
+    additionalProperties: false,
+  },
 }
 
 const appStopSlideshowOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -697,6 +816,12 @@ const appStopSlideshowOperation: OperationDescriptor<Record<string, never>, unde
   description: 'End the currently-playing slideshow',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appNextSlideOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -706,6 +831,12 @@ const appNextSlideOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Skip to next slide in currently-playing slideshow',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPreviousSlideOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -715,6 +846,12 @@ const appPreviousSlideOperation: OperationDescriptor<Record<string, never>, unde
   description: 'Skip to previous slide in currently-playing slideshow',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPauseSlideshowOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -724,6 +861,12 @@ const appPauseSlideshowOperation: OperationDescriptor<Record<string, never>, und
   description: 'Pause the currently-playing slideshow',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appResumeSlideshowOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -733,6 +876,12 @@ const appResumeSlideshowOperation: OperationDescriptor<Record<string, never>, un
   description: 'Resume the currently-playing slideshow',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSpotlightOperation: OperationDescriptor<{ readonly target: string }, undefined> = {
@@ -744,6 +893,15 @@ const appSpotlightOperation: OperationDescriptor<{ readonly target: string }, un
     target: t.string({ description: 'The full path to the image or media item ID' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      target: { type: 'string', description: 'The full path to the image or media item ID' },
+    },
+    required: ['target'],
+    additionalProperties: false,
+  },
 }
 
 const appSearchOperation: OperationDescriptor<{ readonly for: string }, undefined> = {
@@ -755,6 +913,13 @@ const appSearchOperation: OperationDescriptor<{ readonly for: string }, undefine
     for: t.string({ description: 'The text to search for' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { for: { type: 'string', description: 'The text to search for' } },
+    required: ['for'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

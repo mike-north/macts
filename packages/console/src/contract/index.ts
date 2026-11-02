@@ -51,6 +51,12 @@ const appSelectDeviceOperation: OperationDescriptor<Record<string, never>, undef
   description: 'Select a device.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS GoogleChrome.app.
+ * The Google Chrome server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `googleChromeContract` from `@macts/google-chrome/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { googleChromeApiPlugin as plugin, googleChromeApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { googleChromeContract as contract } from '@macts/google-chrome/contract'

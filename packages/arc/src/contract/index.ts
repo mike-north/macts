@@ -368,6 +368,94 @@ const appMakeOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      new: { type: 'string', description: 'The class of the new object.' },
+      withProperties: {
+        allOf: [
+          {
+            description: 'The initial values for properties of the object.',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['new'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
@@ -379,6 +467,12 @@ const appCountOperation: OperationDescriptor<{ readonly each?: string | undefine
     each: t.optional(t.string({ description: 'The class of objects to be counted.' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { each: { type: 'string', description: 'The class of objects to be counted.' } },
+    additionalProperties: false,
+  },
 }
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -388,6 +482,12 @@ const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Close',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -397,6 +497,12 @@ const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Select the tab.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appGoBackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -406,6 +512,12 @@ const appGoBackOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Go Back (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appGoForwardOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -415,6 +527,12 @@ const appGoForwardOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Go Forward (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appReloadOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -424,6 +542,12 @@ const appReloadOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Reload a tab.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -433,6 +557,12 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Stop the current tab from loading.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appExecuteOperation: OperationDescriptor<{ readonly javascript: string }, undefined> = {
@@ -444,6 +574,13 @@ const appExecuteOperation: OperationDescriptor<{ readonly javascript: string }, 
     javascript: t.string({ description: 'The javascript code to execute.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { javascript: { type: 'string', description: 'The javascript code to execute.' } },
+    required: ['javascript'],
+    additionalProperties: false,
+  },
 }
 
 const appFocusOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -453,6 +590,12 @@ const appFocusOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Focus on a space.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

@@ -219,6 +219,19 @@ const appAddReadingListItemOperation: OperationDescriptor<
     withTitle: t.optional(t.string({ description: 'Title of the Reading List item' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      andPreviewText: {
+        type: 'string',
+        description:
+          'Preview text for the Reading List item, usually the first few sentences of the article',
+      },
+      withTitle: { type: 'string', description: 'Title of the Reading List item' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appDoJavaScriptOperation: OperationDescriptor<
@@ -235,6 +248,14 @@ const appDoJavaScriptOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      in: { type: 'string', description: 'The tab that the JavaScript should be evaluated in.' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appEmailContentsOperation: OperationDescriptor<
@@ -249,6 +270,12 @@ const appEmailContentsOperation: OperationDescriptor<
     of: t.optional(t.string({ description: 'The tab to send.' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { of: { type: 'string', description: 'The tab to send.' } },
+    additionalProperties: false,
+  },
 }
 
 const appSearchTheWebOperation: OperationDescriptor<
@@ -264,6 +291,16 @@ const appSearchTheWebOperation: OperationDescriptor<
     for: t.string({ description: 'The query to search for.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      in: { type: 'string', description: 'The tab that the search results should shown in.' },
+      for: { type: 'string', description: 'The query to search for.' },
+    },
+    required: ['for'],
+    additionalProperties: false,
+  },
 }
 
 const appShowBookmarksOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -273,6 +310,12 @@ const appShowBookmarksOperation: OperationDescriptor<Record<string, never>, unde
   description: "Shows Safari's bookmarks.",
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appShowExtensionsPreferencesOperation: OperationDescriptor<
@@ -285,6 +328,12 @@ const appShowExtensionsPreferencesOperation: OperationDescriptor<
   description: 'Show Safari Extensions preferences.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDispatchMessageToExtensionOperation: OperationDescriptor<
@@ -297,6 +346,12 @@ const appDispatchMessageToExtensionOperation: OperationDescriptor<
   description: 'Dispatch a message to a Safari Extension.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSyncAllPlistToDiskOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -307,6 +362,12 @@ const appSyncAllPlistToDiskOperation: OperationDescriptor<Record<string, never>,
     'Make sure that all in-memory structures are in-sync with their on-disk counterparts.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appShowPrivacyReportOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -316,6 +377,12 @@ const appShowPrivacyReportOperation: OperationDescriptor<Record<string, never>, 
   description: "Show Safari's Privacy Report",
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appShowCreditCardSettingsOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -325,6 +392,12 @@ const appShowCreditCardSettingsOperation: OperationDescriptor<Record<string, nev
   description: 'Show Safari Credit Card Settings.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

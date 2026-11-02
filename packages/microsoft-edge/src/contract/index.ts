@@ -573,6 +573,12 @@ const windowListWindowsOperation: OperationDescriptor<Record<string, never>, rea
   description: 'List all windows',
   input: t.record({}),
   output: t.array(windowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Window> = {
@@ -584,6 +590,13 @@ const windowGetWindowOperation: OperationDescriptor<{ readonly id: string }, Win
     id: t.string({ description: 'Window identifier' }),
   }),
   output: windowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Window identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window> = {
@@ -593,6 +606,92 @@ const windowCreateWindowOperation: OperationDescriptor<WindowCreateInput, Window
   description: 'Create a new window',
   input: windowCreateInputType,
   output: windowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      givenName: { type: 'string', description: 'The given name of the window.' },
+      index: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The index of the window, ordered front to back.',
+      },
+      bounds: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          width: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          height: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y', 'width', 'height'],
+        additionalProperties: false,
+        description: 'The bounding rectangle of the window.',
+      },
+      minimized: { type: 'boolean', description: 'Whether the window is currently minimized.' },
+      visible: { type: 'boolean', description: 'Whether the window is currently visible.' },
+      zoomed: { type: 'boolean', description: 'Whether the window is currently zoomed.' },
+      mode: { type: 'string', description: 'Window mode (normal or incognito)' },
+      activeTabIndex: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The index of the active tab.',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, readonly Tab[]> = {
@@ -604,6 +703,13 @@ const tabListTabsOperation: OperationDescriptor<{ readonly windowId: string }, r
     windowId: t.string({ description: 'Window identifier' }),
   }),
   output: t.array(tabRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { windowId: { type: 'string', description: 'Window identifier' } },
+    required: ['windowId'],
+    additionalProperties: false,
+  },
 }
 
 const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
@@ -615,6 +721,13 @@ const tabGetTabOperation: OperationDescriptor<{ readonly id: string }, Tab> = {
     id: t.string({ description: 'Tab identifier' }),
   }),
   output: tabRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Tab identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const tabCreateTabOperation: OperationDescriptor<TabCreateInput, Tab> = {
@@ -624,6 +737,16 @@ const tabCreateTabOperation: OperationDescriptor<TabCreateInput, Tab> = {
   description: 'Create a new tab',
   input: tabCreateInputType,
   output: tabRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      uRL: { type: 'string', description: 'URL to load in the tab' },
+      windowId: { type: 'string', description: 'Window identifier for the tab' },
+    },
+    required: ['windowId'],
+    additionalProperties: false,
+  },
 }
 
 const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
@@ -636,6 +759,12 @@ const bookmarkFolderListBookmarkFoldersOperation: OperationDescriptor<
   description: 'List all bookmark folders',
   input: t.record({}),
   output: t.array(bookmarkFolderRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
@@ -650,6 +779,13 @@ const bookmarkFolderGetBookmarkFolderOperation: OperationDescriptor<
     id: t.string({ description: 'Bookmark folder identifier' }),
   }),
   output: bookmarkFolderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Bookmark folder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
@@ -664,6 +800,13 @@ const bookmarkItemListBookmarkItemsOperation: OperationDescriptor<
     folderId: t.string({ description: 'Bookmark folder identifier' }),
   }),
   output: t.array(bookmarkItemRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { folderId: { type: 'string', description: 'Bookmark folder identifier' } },
+    required: ['folderId'],
+    additionalProperties: false,
+  },
 }
 
 const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
@@ -678,6 +821,13 @@ const bookmarkItemGetBookmarkItemOperation: OperationDescriptor<
     id: t.string({ description: 'Bookmark item identifier' }),
   }),
   output: bookmarkItemRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Bookmark item identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const tabReloadOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -689,6 +839,13 @@ const tabReloadOperation: OperationDescriptor<{ readonly tabId: string }, undefi
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabGoBackOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -700,6 +857,13 @@ const tabGoBackOperation: OperationDescriptor<{ readonly tabId: string }, undefi
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabGoForwardOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -711,6 +875,13 @@ const tabGoForwardOperation: OperationDescriptor<{ readonly tabId: string }, und
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabSelectAllOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -722,6 +893,13 @@ const tabSelectAllOperation: OperationDescriptor<{ readonly tabId: string }, und
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabCutSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -733,6 +911,13 @@ const tabCutSelectionOperation: OperationDescriptor<{ readonly tabId: string }, 
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabCopySelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -744,6 +929,13 @@ const tabCopySelectionOperation: OperationDescriptor<{ readonly tabId: string },
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabPasteSelectionOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -755,6 +947,13 @@ const tabPasteSelectionOperation: OperationDescriptor<{ readonly tabId: string }
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabUndoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -766,6 +965,13 @@ const tabUndoOperation: OperationDescriptor<{ readonly tabId: string }, undefine
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabRedoOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -777,6 +983,13 @@ const tabRedoOperation: OperationDescriptor<{ readonly tabId: string }, undefine
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabStopOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -788,6 +1001,13 @@ const tabStopOperation: OperationDescriptor<{ readonly tabId: string }, undefine
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabViewSourceOperation: OperationDescriptor<{ readonly tabId: string }, undefined> = {
@@ -799,6 +1019,13 @@ const tabViewSourceOperation: OperationDescriptor<{ readonly tabId: string }, un
     tabId: t.string({ description: 'Tab identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { tabId: { type: 'string', description: 'Tab identifier' } },
+    required: ['tabId'],
+    additionalProperties: false,
+  },
 }
 
 const tabExecuteOperation: OperationDescriptor<
@@ -814,6 +1041,16 @@ const tabExecuteOperation: OperationDescriptor<
     javascript: t.string({ description: 'The javascript code to execute' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      tabId: { type: 'string', description: 'Tab identifier' },
+      javascript: { type: 'string', description: 'The javascript code to execute' },
+    },
+    required: ['tabId', 'javascript'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

@@ -271,6 +271,13 @@ const appSendOperation: OperationDescriptor<{ readonly to: string }, undefined> 
     to: t.string({ description: 'The to parameter' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'The to parameter' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appLoginOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -280,6 +287,12 @@ const appLoginOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Login to all accounts.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appLogoutOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -289,6 +302,12 @@ const appLogoutOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Logout of all accounts.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

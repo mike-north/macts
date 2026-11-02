@@ -60,12 +60,6 @@ export interface ApiKeyValidationSuccess {
 }
 
 // @public
-export interface ApiPluginGeneratorOptions {
-    packageName: string;
-    version?: string | undefined;
-}
-
-// @public
 export const APP_VERSION_BODY = "return String(app.version());";
 
 // @public (undocumented)
@@ -1019,18 +1013,6 @@ export function createFileAuditWriter(path: string): AuditWriter;
 export function createGeneratorContext(manifest: AppManifest, options: GeneratorOptions): GeneratorContext;
 
 // @public
-export interface CreateMcpContextOptions {
-    appName: string;
-    manifest: AppManifest;
-    packageName?: string;
-    sdkPackageName?: string;
-    version?: string | undefined;
-}
-
-// @public
-export function createMcpGeneratorContext(options: CreateMcpContextOptions): McpGeneratorContext;
-
-// @public
 export function createNativeExecutor(options?: NativeExecutorOptions): Executor;
 
 // @public
@@ -1324,71 +1306,6 @@ export function finePermission(app: string, resource: string, operation: string)
 export function formatPermission(permission: ParsedPermission): string;
 
 // @public
-export function generateAllHttpPackages(manifest: AppManifest, options: GenerateAllOptions): GenerateAllResult;
-
-// @public
-export interface GenerateAllOptions {
-    apiPackageName?: string;
-    appName: string;
-    cliPackageName?: string;
-    mcpPackageName?: string;
-    sdkPackageName?: string;
-    version?: string | undefined;
-}
-
-// @public
-export interface GenerateAllResult {
-    // (undocumented)
-    api: {
-        dir: string;
-        files: {
-            path: string;
-            content: string;
-        }[];
-    };
-    // (undocumented)
-    cli: {
-        dir: string;
-        files: {
-            path: string;
-            content: string;
-        }[];
-    };
-    // (undocumented)
-    errors: string[];
-    // (undocumented)
-    mcp: {
-        dir: string;
-        files: {
-            path: string;
-            content: string;
-        }[];
-    };
-    // (undocumented)
-    sdk: {
-        dir: string;
-        files: {
-            path: string;
-            content: string;
-        }[];
-    };
-}
-
-// @public
-export function generateApiPlugin(manifest: AppManifest, options: ApiPluginGeneratorOptions): GenerateApiPluginResult;
-
-// @public
-export interface GenerateApiPluginResult {
-    // (undocumented)
-    errors: string[];
-    // (undocumented)
-    files: {
-        path: string;
-        content: string;
-    }[];
-}
-
-// @public
 export function generateApplicationClass(ctx: GeneratorContext): GeneratedApplication;
 
 // @public
@@ -1526,18 +1443,11 @@ export interface GeneratedHttpClientSdk {
 }
 
 // @public
-export interface GeneratedMcpPlugin {
-    files: {
-        path: string;
-        content: string;
-    }[];
-    indexContent: string;
-    packageJson: string;
-    pluginContent: string;
-    pluginName: string;
-    toolFiles: GeneratedToolFile[];
-    tools: GeneratedTool[];
-    toolsIndexContent: string;
+export interface GeneratedPackageWriteResult {
+    readonly emitted: readonly string[];
+    readonly previous: readonly string[];
+    readonly previousSource: OwnedOutputSource;
+    readonly pruned: readonly string[];
 }
 
 // @public (undocumented)
@@ -1548,25 +1458,6 @@ export interface GeneratedSchema {
     imports: string[];
     // (undocumented)
     name: string;
-}
-
-// @public
-export interface GeneratedTool {
-    commandName: string;
-    description: string;
-    inputSchema: JsonSchema;
-    isResourceOperation: boolean;
-    name: string;
-    operationName: string;
-    resourceName: string;
-    resourceType?: string;
-}
-
-// @public
-export interface GeneratedToolFile {
-    content: string;
-    fileName: string;
-    tools: GeneratedTool[];
 }
 
 // @public (undocumented)
@@ -1587,9 +1478,6 @@ export function generateEnumType(enumDef: Enum): GeneratedType;
 
 // @public
 export function generateHttpClientSdk(manifest: AppManifest, options: HttpClientGeneratorOptions): GeneratedHttpClientSdk;
-
-// @public
-export function generateMcpPlugin(context: McpGeneratorContext): GeneratedMcpPlugin;
 
 // @public
 export function generatePermissionMap(appName: string, permissionsSection: PermissionsSection): PermissionMap;
@@ -2049,15 +1937,6 @@ export const MAX_ITEMS_PER_COLLECTION = 60;
 export const MAX_OUTPUT_BYTES: number;
 
 // @public
-export interface McpGeneratorContext {
-    appName: string;
-    manifest: AppManifest;
-    packageName: string;
-    sdkPackageName: string;
-    version?: string | undefined;
-}
-
-// @public
 export function mergeNullabilityObservations(manifest: AppManifest, observed: AppNullabilityResult): NullabilityMergeResult;
 
 // @public
@@ -2298,6 +2177,12 @@ export interface OperationVocabulary {
     readonly coarse: readonly CoarseOperation[];
     readonly fine: ReadonlySet<string>;
 }
+
+// @public
+export const OWNED_OUTPUT_RECORD_FILE = ".macts-generated.json";
+
+// @public
+export type OwnedOutputSource = 'record' | 'headers' | 'none';
 
 // @public
 export function parseApprovalConfig(input: unknown): ParseApprovalConfigResult;
@@ -3694,6 +3579,12 @@ export function writeFiles(files: {
     path: string;
     content: string;
 }[], outDir: string): Promise<void>;
+
+// @public
+export function writeGeneratedPackage(files: {
+    path: string;
+    content: string;
+}[], packageDir: string): Promise<GeneratedPackageWriteResult>;
 
 // @public
 export function writeNullabilityResults(manifestPath: string, merged: NullabilityMergeResult): Promise<NullabilityWriteResult>;

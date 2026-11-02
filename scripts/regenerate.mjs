@@ -7,8 +7,16 @@
  * Prettier so the on-disk output matches the committed (formatted) style.
  *
  * This is the single source of truth for "regenerate all artifacts". It is
- * wired into CI behind a `git diff --exit-code` idempotence guard so committed
- * generated files can never drift from the generator again.
+ * wired into CI as `pnpm generate:check`, which then runs
+ * `scripts/check-clean-tree.mjs packages`: any modified, deleted or untracked
+ * file under `packages/` fails the check, so committed generated files can
+ * never drift from the generator again.
+ *
+ * The generator owns its output (see `packages/core/src/generator/owned-output.ts`):
+ * each package's `.macts-generated.json` records what a run emitted, and a file
+ * an earlier run emitted that this run does not is deleted. The CLI's report of
+ * those deletions, and of a package whose previous set came from generated
+ * headers because it had no record yet, is passed through on stdout.
  *
  * The CLI must be built first (`pnpm build`) — this script invokes the compiled
  * binary at `packages/cli/dist/bin.js`.
@@ -71,6 +79,13 @@ function discoverManifestApps() {
  */
 const WARNING_PREFIX = 'warning: '
 
+/**
+ * The prefixes of the CLI's stdout lines that report owned-output changes; see
+ * `PRUNED_FILE_PREFIX` and `BOOTSTRAP_REPORT_PREFIX` in
+ * `packages/cli/src/commands/generate.ts`. Every other stdout line is dropped.
+ */
+const OWNED_OUTPUT_REPORT_PREFIXES = ['pruned ', 'bootstrapped owned-output set from headers: ']
+
 const apps = discoverManifestApps()
 console.log(`Regenerating ${String(apps.length)} app(s) from manifests...`)
 
@@ -79,7 +94,7 @@ for (const app of apps) {
   const manifestPath = join(manifestsDir, app, 'app.yaml')
   console.log(`  - ${app}`)
   // stderr is captured, then passed through unchanged, so its warnings can be
-  // counted; stdout stays quiet.
+  // counted; of stdout, only the owned-output report is passed through.
   const run = spawnSync(
     process.execPath,
     [
@@ -93,9 +108,14 @@ for (const app of apps) {
       '--version',
       version,
     ],
-    { stdio: ['ignore', 'ignore', 'pipe'], encoding: 'utf-8' }
+    { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf-8' }
   )
   if (run.error !== undefined) throw run.error
+  for (const line of run.stdout.split('\n')) {
+    if (OWNED_OUTPUT_REPORT_PREFIXES.some((prefix) => line.startsWith(prefix))) {
+      console.log(`      ${line.replaceAll(`${repoRoot}/`, '')}`)
+    }
+  }
   process.stderr.write(run.stderr)
   if (run.status !== 0) {
     console.error(`Generating ${app} failed (exit status ${String(run.status)}).`)

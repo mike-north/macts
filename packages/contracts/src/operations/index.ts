@@ -60,6 +60,19 @@ export interface OperationDescriptor<Input, Output> {
   readonly input: ValueType<Input>
   /** Contract of the result. */
   readonly output: ValueType<Output>
+  /**
+   * The draft-7 JSON Schema of the input's wire values: exactly
+   * `z.toJSONSchema(input.wire, { target: 'draft-7' })`, computed when the
+   * contract is generated.
+   *
+   * @remarks
+   * It describes WIRE values, not SDK values, and is always present on
+   * generated descriptors. It exists so tooling can read an operation's input
+   * schema as plain data, without zod. Adapters never read or serve it: they
+   * always derive their schemas from `input.wire`, which stays the single
+   * source of truth (phases/13 D9).
+   */
+  readonly inputJsonSchema?: Readonly<Record<string, unknown>>
 }
 
 /** A descriptor whose input and output types are not statically known. */

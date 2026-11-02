@@ -22,6 +22,13 @@
  * @packageDocumentation
  */
 
+import { z } from 'zod'
+import {
+  ValueTypes as t,
+  type RecordField,
+  type ReferenceRegistry,
+  type ValueType,
+} from '@macts/contracts'
 import type {
   AppManifest,
   Command,
@@ -42,6 +49,7 @@ import {
   type ManifestRoute,
 } from '../../manifest/index.js'
 import { lowerCamel } from '../../manifest/lower-camel.js'
+import { manifestGeneratedNotice } from '../generated-header.js'
 import { usableCommands, usableProperties, usableResources } from '../../manifest/unsupported.js'
 import {
   appCommandEntries,
@@ -60,6 +68,7 @@ import {
   type DeclaredType,
 } from '../surface.js'
 import {
+  ValueBuilder,
   ValueRenderer,
   createNameResolver,
   mapDeclaredType,
@@ -223,7 +232,7 @@ function generateManifestModule(manifest: AppManifest): string {
  * Mac-side runtime calls it, and it validates the manifest before use, so the
  * value is deliberately typed \`unknown\`. Remote clients never load this module.
  *
- * Generated from the ${manifest.app.name} manifest; do not edit.
+ * ${manifestGeneratedNotice(manifest.app.name)}
  *
  * @packageDocumentation
  */
@@ -349,6 +358,8 @@ class ContractBuilder {
   readonly #names: ContractNames
   readonly #resolver: NameResolver
   readonly #renderer: ValueRenderer
+  readonly #builder: ValueBuilder
+  #registry: ReferenceRegistry | undefined
   readonly #identifiers = new Map<string, ValueShape>()
   readonly #operations: OperationModel[] = []
   readonly #operationsByRoute = new Map<string, OperationModel>()
@@ -370,6 +381,28 @@ class ContractBuilder {
       identifier: (resourceKey) => this.#identifiers.get(resourceKey),
       resourcesBinding: 'resources',
     })
+    this.#builder = new ValueBuilder({
+      enumMembers: (enumKey) => enumMembers(this.#manifest.enums[enumKey]?.values ?? []),
+      registry: () => (this.#registry ??= this.#buildRegistry()),
+    })
+  }
+
+  /**
+   * The resource table as references read it, built in process: the same
+   * resources in the same order as the generated table, each with the
+   * identifier value type the table renders for it.
+   */
+  #buildRegistry(): ReferenceRegistry {
+    const registry: Record<string, { readonly id?: ValueType<unknown> }> = {}
+    for (const [resourceKey, resource] of usableResources(this.#manifest)) {
+      const identifier = this.#identifierProperty(resource)
+      const identifierShape = this.#identifiers.get(resourceKey)
+      registry[resourceKey] =
+        identifier !== undefined && identifierShape !== undefined
+          ? { id: this.#builder.build(identifierShape, identifier.description) }
+          : {}
+    }
+    return registry
   }
 
   build(): string {
@@ -822,7 +855,7 @@ class ContractBuilder {
  * \`bind\` turns into a \`${client}\`; application code changes locality by
  * changing the factory, not the contract.
  *
- * Generated from the ${appName} manifest; do not edit.
+ * ${manifestGeneratedNotice(appName)}
  *
  * @packageDocumentation
  */
@@ -1067,6 +1100,32 @@ ${entries.join('\n')}
     }
   }
 
+  /**
+   * The input value type of an operation, built in process exactly as the
+   * descriptor's `input` expression constructs it: a create input's record,
+   * or the request record spelled out field by field. Neither carries a
+   * description of its own.
+   */
+  #buildInput(input: InputModel): ValueType<unknown> {
+    const fields =
+      input.kind === 'create' ? this.#createInputFields(input.resourceKey) : input.fields
+    const built: Record<string, RecordField> = {}
+    for (const field of fields) {
+      const type = this.#builder.build(field.shape, field.description)
+      built[field.name] = field.optional ? t.optional(type) : type
+    }
+    return t.record(built)
+  }
+
+  /**
+   * The descriptor's `inputJsonSchema`: the draft-7 JSON Schema of its input's
+   * wire values, derived from the built input value type by the same call an
+   * adapter makes (phases/13 D9), so it is never written by hand.
+   */
+  #inputJsonSchema(input: InputModel): string {
+    return JSON.stringify(z.toJSONSchema(this.#buildInput(input).wire, { target: 'draft-7' }))
+  }
+
   #renderOperation(operation: OperationModel): string {
     const { route } = operation
     const input =
@@ -1084,6 +1143,7 @@ ${entries.join('\n')}
   description: ${stringLiteral(route.command.description)},
   input: ${input},
   output: ${this.#outputExpression(operation.output)},
+  inputJsonSchema: ${this.#inputJsonSchema(operation.input)},
 }
 `
   }

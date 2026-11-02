@@ -500,6 +500,48 @@ const appSaveOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      in: {
+        type: 'object',
+        properties: {
+          fileSource: {
+            oneOf: [
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'caller-owned-file' },
+                  path: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'path'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'uploaded-file' },
+                  uploadId: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'uploadId'],
+                additionalProperties: false,
+              },
+            ],
+          },
+        },
+        required: ['fileSource'],
+        additionalProperties: false,
+        description: 'The file in which to save the object.',
+      },
+      as: {
+        type: 'string',
+        description:
+          "The file type in which to save the data. Can be 'only html', 'complete html', or 'single file'; default is 'complete html'.",
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -509,6 +551,12 @@ const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Open a document.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -518,6 +566,12 @@ const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Close a window.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appQuitOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -527,6 +581,12 @@ const appQuitOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Quit the application.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCountOperation: OperationDescriptor<{ readonly each?: string | undefined }, undefined> = {
@@ -538,6 +598,12 @@ const appCountOperation: OperationDescriptor<{ readonly each?: string | undefine
     each: t.optional(t.string({ description: 'The class of objects to be counted.' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { each: { type: 'string', description: 'The class of objects to be counted.' } },
+    additionalProperties: false,
+  },
 }
 
 const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -547,6 +613,12 @@ const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Delete an object.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDuplicateOperation: OperationDescriptor<
@@ -564,6 +636,93 @@ const appDuplicateOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      to: { type: 'string', description: 'The location for the new object(s).' },
+      withProperties: {
+        allOf: [
+          {
+            description: 'Properties to be set in the new duplicated object(s).',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appExistsOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -573,6 +732,12 @@ const appExistsOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Verify if an object exists.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appMakeOperation: OperationDescriptor<
@@ -597,6 +762,100 @@ const appMakeOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      new: { type: 'string', description: 'The class of the new object.' },
+      at: { type: 'string', description: 'The location at which to insert the object.' },
+      withData: {
+        allOf: [
+          { description: 'The initial contents of the object.', $ref: '#/definitions/__schema0' },
+        ],
+      },
+      withProperties: {
+        allOf: [
+          {
+            description: 'The initial values for properties of the object.',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['new'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
@@ -608,6 +867,13 @@ const appMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> 
     to: t.string({ description: 'The new location for the object(s).' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'The new location for the object(s).' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appPrintOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -617,6 +883,12 @@ const appPrintOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Print an object.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appReloadOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -626,6 +898,12 @@ const appReloadOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Reload a tab.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appGoBackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -635,6 +913,12 @@ const appGoBackOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Go Back (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appGoForwardOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -644,6 +928,12 @@ const appGoForwardOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Go Forward (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSelectAllOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -653,6 +943,12 @@ const appSelectAllOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Select all.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCutSelectionOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -662,6 +958,12 @@ const appCutSelectionOperation: OperationDescriptor<Record<string, never>, undef
   description: 'Cut selected text (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCopySelectionOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -671,6 +973,12 @@ const appCopySelectionOperation: OperationDescriptor<Record<string, never>, unde
   description: 'Copy text.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPasteSelectionOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -680,6 +988,12 @@ const appPasteSelectionOperation: OperationDescriptor<Record<string, never>, und
   description: 'Paste text (If Possible).',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -689,6 +1003,12 @@ const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Undo the last change.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -698,6 +1018,12 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Redo the last change.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -707,6 +1033,12 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Stop the current tab from loading.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appViewSourceOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -716,6 +1048,12 @@ const appViewSourceOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'View the HTML source of the tab.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appExecuteOperation: OperationDescriptor<{ readonly javascript: string }, undefined> = {
@@ -727,6 +1065,13 @@ const appExecuteOperation: OperationDescriptor<{ readonly javascript: string }, 
     javascript: t.string({ description: 'The javascript code to execute.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { javascript: { type: 'string', description: 'The javascript code to execute.' } },
+    required: ['javascript'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

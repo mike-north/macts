@@ -749,6 +749,12 @@ const calendarListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all calendars',
   input: t.record({}),
   output: t.array(calendarRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const calendarGetOperation: OperationDescriptor<{ readonly id: string }, Calendar> = {
@@ -760,6 +766,13 @@ const calendarGetOperation: OperationDescriptor<{ readonly id: string }, Calenda
     id: t.string({ description: 'Calendar identifier' }),
   }),
   output: calendarRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Calendar identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const calendarCreateOperation: OperationDescriptor<CalendarCreateInput, Calendar> = {
@@ -769,6 +782,43 @@ const calendarCreateOperation: OperationDescriptor<CalendarCreateInput, Calendar
   description: 'Create a new calendar',
   input: calendarCreateInputType,
   output: calendarRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Calendar name' },
+      title: { type: 'string', description: 'The calendar title (synonym for name)' },
+      color: {
+        type: 'object',
+        properties: {
+          r: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          g: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          b: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+        },
+        required: ['r', 'g', 'b'],
+        additionalProperties: false,
+        description: 'Calendar color',
+      },
+      description: { type: 'string', description: 'The calendar description' },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const eventListEventsOperation: OperationDescriptor<
@@ -783,6 +833,13 @@ const eventListEventsOperation: OperationDescriptor<
     calendarId: t.string({ description: 'Calendar identifier' }),
   }),
   output: t.array(eventRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { calendarId: { type: 'string', description: 'Calendar identifier' } },
+    required: ['calendarId'],
+    additionalProperties: false,
+  },
 }
 
 const eventGetEventOperation: OperationDescriptor<
@@ -800,6 +857,19 @@ const eventGetEventOperation: OperationDescriptor<
     id: t.string({ description: 'Event identifier (uid)' }),
   }),
   output: eventRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      calendarId: {
+        type: 'string',
+        description: 'Calendar identifier (the calendar containing the event)',
+      },
+      id: { type: 'string', description: 'Event identifier (uid)' },
+    },
+    required: ['calendarId', 'id'],
+    additionalProperties: false,
+  },
 }
 
 const eventCreateEventOperation: OperationDescriptor<EventCreateInput, Event> = {
@@ -809,6 +879,77 @@ const eventCreateEventOperation: OperationDescriptor<EventCreateInput, Event> = 
   description: 'Create a new event',
   input: eventCreateInputType,
   output: eventRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      summary: { type: 'string', description: 'Event title' },
+      description: { type: 'string', description: 'Event notes' },
+      location: { type: 'string', description: 'Event location' },
+      startDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event start date',
+      },
+      endDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event end date',
+      },
+      alldayEvent: { type: 'boolean', description: 'Whether this is an all-day event' },
+      recurrence: { type: 'string', description: 'The iCalendar (RFC 2445) recurrence string' },
+      status: {
+        type: 'string',
+        enum: ['cancelled', 'confirmed', 'none', 'tentative'],
+        description: 'Event status',
+      },
+      stampDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event modification date',
+      },
+      excludedDates: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            date: {
+              type: 'string',
+              pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+            },
+          },
+          required: ['date'],
+          additionalProperties: false,
+        },
+        description: 'Exception dates for recurring events',
+      },
+      url: { type: 'string', description: 'URL associated with the event' },
+      calendarId: { type: 'string', description: 'Calendar identifier for the event' },
+    },
+    required: ['summary', 'startDate', 'endDate', 'calendarId'],
+    additionalProperties: false,
+  },
 }
 
 const eventUpdateEventOperation: OperationDescriptor<
@@ -853,6 +994,81 @@ const eventUpdateEventOperation: OperationDescriptor<
     url: t.optional(t.string({ description: 'URL associated with the event' })),
   }),
   output: eventRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      calendarId: {
+        type: 'string',
+        description: 'Calendar identifier (the calendar containing the event)',
+      },
+      id: { type: 'string', description: 'Event identifier (uid)' },
+      summary: { type: 'string', description: 'Event title' },
+      description: { type: 'string', description: 'Event notes' },
+      location: { type: 'string', description: 'Event location' },
+      startDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event start date',
+      },
+      endDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event end date',
+      },
+      alldayEvent: { type: 'boolean', description: 'Whether this is an all-day event' },
+      recurrence: { type: 'string', description: 'The iCalendar (RFC 2445) recurrence string' },
+      status: {
+        type: 'string',
+        enum: ['cancelled', 'confirmed', 'none', 'tentative'],
+        description: 'Event status',
+      },
+      stampDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Event modification date',
+      },
+      excludedDates: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            date: {
+              type: 'string',
+              pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+            },
+          },
+          required: ['date'],
+          additionalProperties: false,
+        },
+        description: 'Exception dates for recurring events',
+      },
+      url: { type: 'string', description: 'URL associated with the event' },
+    },
+    required: ['calendarId', 'id'],
+    additionalProperties: false,
+  },
 }
 
 const eventDeleteEventOperation: OperationDescriptor<
@@ -870,6 +1086,19 @@ const eventDeleteEventOperation: OperationDescriptor<
     id: t.string({ description: 'Event identifier (uid)' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      calendarId: {
+        type: 'string',
+        description: 'Calendar identifier (the calendar containing the event)',
+      },
+      id: { type: 'string', description: 'Event identifier (uid)' },
+    },
+    required: ['calendarId', 'id'],
+    additionalProperties: false,
+  },
 }
 
 const appReloadCalendarsOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -879,6 +1108,12 @@ const appReloadCalendarsOperation: OperationDescriptor<Record<string, never>, un
   description: 'Tell the application to reload all calendar files contents',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSwitchViewOperation: OperationDescriptor<{ readonly to: ViewType }, undefined> = {
@@ -890,6 +1125,19 @@ const appSwitchViewOperation: OperationDescriptor<{ readonly to: ViewType }, und
     to: t.enumeration(viewTypeMembers, { description: 'The calendar view to be displayed' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      to: {
+        type: 'string',
+        enum: ['dayView', 'weekView', 'monthView'],
+        description: 'The calendar view to be displayed',
+      },
+    },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appViewCalendarOperation: OperationDescriptor<{ readonly at: Date }, undefined> = {
@@ -901,6 +1149,26 @@ const appViewCalendarOperation: OperationDescriptor<{ readonly at: Date }, undef
     at: t.date({ description: 'The date to be displayed' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      at: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'The date to be displayed',
+      },
+    },
+    required: ['at'],
+    additionalProperties: false,
+  },
 }
 
 const eventShowOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -910,6 +1178,12 @@ const eventShowOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Show the event or to-do in the calendar window',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

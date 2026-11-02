@@ -1210,6 +1210,12 @@ const projectListProjectsOperation: OperationDescriptor<
   description: 'List all projects',
   input: t.record({}),
   output: t.array(projectRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
@@ -1221,6 +1227,13 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
     id: t.string({ description: 'Project identifier' }),
   }),
   output: projectRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Project identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonly Task[]> = {
@@ -1230,6 +1243,12 @@ const taskListTasksOperation: OperationDescriptor<Record<string, never>, readonl
   description: 'List all tasks',
   input: t.record({}),
   output: t.array(taskRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const taskGetTaskOperation: OperationDescriptor<{ readonly id: Integer }, Task> = {
@@ -1241,6 +1260,21 @@ const taskGetTaskOperation: OperationDescriptor<{ readonly id: Integer }, Task> 
     id: t.integer({ description: 'Task identifier' }),
   }),
   output: taskRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Task identifier',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
@@ -1250,6 +1284,151 @@ const taskCreateTaskOperation: OperationDescriptor<TaskCreateInput, Task> = {
   description: 'Create a new task',
   input: taskCreateInputType,
   output: taskRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Task name' },
+      startingDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Start date',
+      },
+      endingDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'The date on which work ends',
+      },
+      duration: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Duration in seconds',
+      },
+      effort: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The number of person-seconds required to perform the task',
+      },
+      completed: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The percentage of the task which is complete (1.0 = 100%)',
+      },
+      completedEffort: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The person-seconds completed',
+      },
+      priority: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Priority of this task',
+      },
+      taskType: {
+        type: 'string',
+        enum: ['standardTask', 'milestoneTask', 'groupTask', 'hammockTask'],
+        description: 'Whether this task is a standard task, milestone, group, or hammock',
+      },
+      staticCost: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Cost for this task itself',
+      },
+      startingConstraintDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'The earliest date this task may start',
+      },
+      endingConstraintDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'The latest date this task may end',
+      },
+      startingDateLocked: {
+        type: 'boolean',
+        description: 'Whether the start date is locked or not',
+      },
+      endingDateLocked: { type: 'boolean', description: 'Whether the end date is locked or not' },
+      note: { type: 'string', description: 'Notes' },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const milestoneListMilestonesOperation: OperationDescriptor<
@@ -1262,6 +1441,12 @@ const milestoneListMilestonesOperation: OperationDescriptor<
   description: 'List all milestones',
   input: t.record({}),
   output: t.array(milestoneRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const milestoneGetMilestoneOperation: OperationDescriptor<{ readonly id: Integer }, Milestone> = {
@@ -1273,6 +1458,21 @@ const milestoneGetMilestoneOperation: OperationDescriptor<{ readonly id: Integer
     id: t.integer({ description: 'Milestone identifier' }),
   }),
   output: milestoneRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Milestone identifier',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const milestoneCreateMilestoneOperation: OperationDescriptor<MilestoneCreateInput, Milestone> = {
@@ -1282,6 +1482,28 @@ const milestoneCreateMilestoneOperation: OperationDescriptor<MilestoneCreateInpu
   description: 'Create a new milestone',
   input: milestoneCreateInputType,
   output: milestoneRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Milestone name' },
+      startingDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Milestone date',
+      },
+      note: { type: 'string', description: 'Notes' },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const resourceListResourcesOperation: OperationDescriptor<
@@ -1294,6 +1516,12 @@ const resourceListResourcesOperation: OperationDescriptor<
   description: 'List all resources',
   input: t.record({}),
   output: t.array(resourceRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const resourceGetResourceOperation: OperationDescriptor<{ readonly id: Integer }, Resource> = {
@@ -1305,6 +1533,21 @@ const resourceGetResourceOperation: OperationDescriptor<{ readonly id: Integer }
     id: t.integer({ description: 'Resource identifier' }),
   }),
   output: resourceRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Resource identifier',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const resourceCreateResourceOperation: OperationDescriptor<ResourceCreateInput, Resource> = {
@@ -1314,6 +1557,78 @@ const resourceCreateResourceOperation: OperationDescriptor<ResourceCreateInput, 
   description: 'Create a new resource',
   input: resourceCreateInputType,
   output: resourceRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Resource name' },
+      resourceType: {
+        type: 'string',
+        enum: ['person', 'equipment', 'material', 'resourceGroup'],
+        description: 'Resource type',
+      },
+      number: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The total number of units for this resource (1.0 = 100%)',
+      },
+      emailAddress: { type: 'string', description: 'Email address for this resource' },
+      costPerUse: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The fixed cost per use of this resource',
+      },
+      costPerHour: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'The cost per hour of this resource',
+      },
+      efficiency: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Resource efficiency (1.0 = 100%)',
+      },
+      note: { type: 'string', description: 'Notes' },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const assignmentListAssignmentsOperation: OperationDescriptor<
@@ -1326,6 +1641,12 @@ const assignmentListAssignmentsOperation: OperationDescriptor<
   description: 'List all assignments',
   input: t.record({}),
   output: t.array(assignmentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const dependencyListDependenciesOperation: OperationDescriptor<
@@ -1338,6 +1659,12 @@ const dependencyListDependenciesOperation: OperationDescriptor<
   description: 'List all dependencies',
   input: t.record({}),
   output: t.array(dependencyRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const violationListViolationsOperation: OperationDescriptor<
@@ -1350,6 +1677,12 @@ const violationListViolationsOperation: OperationDescriptor<
   description: 'List all violations',
   input: t.record({}),
   output: t.array(violationRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const scenarioListScenariosOperation: OperationDescriptor<
@@ -1362,6 +1695,12 @@ const scenarioListScenariosOperation: OperationDescriptor<
   description: 'List all scenarios',
   input: t.record({}),
   output: t.array(scenarioRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const scenarioGetScenarioOperation: OperationDescriptor<{ readonly id: string }, Scenario> = {
@@ -1373,6 +1712,13 @@ const scenarioGetScenarioOperation: OperationDescriptor<{ readonly id: string },
     id: t.string({ description: 'Scenario identifier' }),
   }),
   output: scenarioRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Scenario identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const appExportOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
@@ -1384,6 +1730,13 @@ const appExportOperation: OperationDescriptor<{ readonly to: string }, undefined
     to: t.string({ description: 'Export file path' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'Export file path' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appAssignOperation: OperationDescriptor<
@@ -1399,6 +1752,16 @@ const appAssignOperation: OperationDescriptor<
     task: t.string({ description: 'Task to assign to' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      resource: { type: 'string', description: 'Resource to assign' },
+      task: { type: 'string', description: 'Task to assign to' },
+    },
+    required: ['resource', 'task'],
+    additionalProperties: false,
+  },
 }
 
 const appDependOperation: OperationDescriptor<
@@ -1414,6 +1777,16 @@ const appDependOperation: OperationDescriptor<
     dependent: t.string({ description: 'Dependent task' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      prerequisite: { type: 'string', description: 'Prerequisite task' },
+      dependent: { type: 'string', description: 'Dependent task' },
+    },
+    required: ['prerequisite', 'dependent'],
+    additionalProperties: false,
+  },
 }
 
 const appBaselineOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1423,6 +1796,12 @@ const appBaselineOperation: OperationDescriptor<Record<string, never>, undefined
   description: 'Commit the current schedule as the baseline schedule',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appLevelOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1432,6 +1811,12 @@ const appLevelOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Level resources on project',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appLookupOperation: OperationDescriptor<{ readonly key: string }, undefined> = {
@@ -1443,6 +1828,13 @@ const appLookupOperation: OperationDescriptor<{ readonly key: string }, undefine
     key: t.string({ description: 'Custom data key' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { key: { type: 'string', description: 'Custom data key' } },
+    required: ['key'],
+    additionalProperties: false,
+  },
 }
 
 const appChangeMarkOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1452,6 +1844,12 @@ const appChangeMarkOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'Make a change tracking mark on project',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appAddWorkTimeOperation: OperationDescriptor<{ readonly schedule: string }, undefined> = {
@@ -1463,6 +1861,13 @@ const appAddWorkTimeOperation: OperationDescriptor<{ readonly schedule: string }
     schedule: t.string({ description: 'Target schedule' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { schedule: { type: 'string', description: 'Target schedule' } },
+    required: ['schedule'],
+    additionalProperties: false,
+  },
 }
 
 const appSubtractWorkTimeOperation: OperationDescriptor<{ readonly schedule: string }, undefined> =
@@ -1475,6 +1880,13 @@ const appSubtractWorkTimeOperation: OperationDescriptor<{ readonly schedule: str
       schedule: t.string({ description: 'Target schedule' }),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: { schedule: { type: 'string', description: 'Target schedule' } },
+      required: ['schedule'],
+      additionalProperties: false,
+    },
   }
 
 const violationFixOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1484,6 +1896,12 @@ const violationFixOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Fix a violation',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1493,6 +1911,12 @@ const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Undo the last command',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1502,6 +1926,12 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Redo the last undone command',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

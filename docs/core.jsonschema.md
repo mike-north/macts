@@ -4,7 +4,7 @@
 
 ## JsonSchema interface
 
-JSON Schema for MCP tool inputs. Simplified representation matching MCP's JsonSchema interface.
+A JSON Schema object, as capability input and output schemas carry it. Simplified representation matching MCP's JsonSchema interface.
 
 **Signature:**
 

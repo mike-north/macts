@@ -5,8 +5,9 @@
  *
  * The manifest keeps the command, with the live evidence; route resolution
  * and every generator leave it out: routes and the permissions derived from
- * them, capabilities, the contract, the HTTP client SDK, the CLI plugin, the
- * MCP tools, and the legacy SDK generator. The embedded manifest keeps the
+ * them, capabilities, the contract, the HTTP client SDK, the CLI plugin, and
+ * the legacy SDK generator. An MCP adapter names its tools from the contract's
+ * operations, so a command the contract leaves out has no tool either. The embedded manifest keeps the
  * marker, so the omission stays auditable.
  *
  * Each check is run on the same fixture with and without the markers: without
@@ -14,8 +15,7 @@
  * is never vacuous. Expected values are derived by hand from the fixture and
  * the naming rules: a route is `<app>.<resource segment>.<command key>` (or
  * `<app>.app.<command key>`), its permission the same with colons, a
- * capability `<app>.<resource segment>.<command name>`, an MCP tool
- * `macts__<app>__<resource segment>_<command name in snake case>`, and a CLI
+ * capability `<app>.<resource segment>.<command name>`, and a CLI
  * command `commands/<resource segment>/<command name in kebab case>.ts`.
  *
  * @see ../manifest/unsupported.ts
@@ -105,7 +105,6 @@ const NAMES = {
     // The resource client builds its route from its app and resource segments.
     sdkFile: 'client/src/resources/speaker.ts',
     sdkCall: '.getSpeaker`',
-    tool: "'macts__viewer__speakers_get'",
     cliPath: 'client/src/cli/commands/speakers/get.ts',
   },
   openURL: {
@@ -115,7 +114,6 @@ const NAMES = {
     // The client root calls an application command by its route literal.
     sdkFile: 'client/src/client.ts',
     sdkCall: "'viewer.app.openURL'",
-    tool: "'macts__viewer__app_open_url'",
     cliPath: 'client/src/cli/commands/open-url.ts',
   },
 } as const
@@ -138,19 +136,10 @@ function surfacesWith(manifest: AppManifest, commandKey: keyof typeof NAMES): Se
   }
   if (files.get(names.sdkFile)?.includes(names.sdkCall) === true) surfaces.add('SDK')
   if (files.has(names.cliPath)) surfaces.add('CLI')
-  if ([...files.values()].some((content) => content.includes(names.tool))) surfaces.add('MCP')
   return surfaces
 }
 
-const EVERY_SURFACE = new Set([
-  'routes',
-  'permissions',
-  'capabilities',
-  'contract',
-  'SDK',
-  'CLI',
-  'MCP',
-])
+const EVERY_SURFACE = new Set(['routes', 'permissions', 'capabilities', 'contract', 'SDK', 'CLI'])
 
 describe('a command marked unsupported', () => {
   it.each(['getSpeaker', 'openURL'] as const)(

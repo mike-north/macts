@@ -2,9 +2,8 @@
  * Capability registry derivation from manifests.
  *
  * Walks an app manifest's commands and produces one {@link Capability} per
- * command, reusing the same resource/command resolution and JSON-Schema
- * generation as the MCP generator so discovery metadata stays coherent with
- * the generated tools (one manifest → every surface).
+ * command, with its input schema and MCP tool name from `./operation-schema.ts`
+ * (one manifest → every surface).
  *
  * The derivation is deterministic and domain-agnostic: it depends only on the
  * manifest shape, never on macOS specifics, so a future non-macOS provider can
@@ -16,13 +15,15 @@
 import type { AppManifest, Command, Resource, HierarchyChild } from '../manifest/index.js'
 import { normalizeResourceRouteSegment, resolveManifestRoutes } from '../manifest/route.js'
 import type { ManifestRoute } from '../manifest/route.js'
-import type { JsonSchema } from '../generator/mcp/types.js'
-import { getResources, getResourceCommands, getAppCommands } from '../generator/mcp/context.js'
 import {
-  generateResourceOperationSchema,
   generateAppCommandSchema,
+  generateResourceOperationSchema,
   generateToolName,
-} from '../generator/mcp/tools.js'
+  getAppCommands,
+  getResourceCommands,
+  getResources,
+  type JsonSchema,
+} from './operation-schema.js'
 import { usableHierarchyChildren } from '../manifest/unsupported.js'
 import { classifyCommandRisk } from './risk.js'
 import type { Capability, CapabilityRegistry } from './types.js'
@@ -283,9 +284,10 @@ function deriveAppCapability(
 /**
  * Derive the list of capabilities from a single manifest.
  *
- * Mirrors the MCP generator's traversal so the registry and generated tools
- * stay in lock-step: one capability per resource command per matching
- * resource, plus one per application command.
+ * One capability per operation the manifest exposes: one per resource command
+ * per matching resource, plus one per application command. These are the same
+ * operations the app's generated contract describes, so every capability has
+ * exactly one contract operation and shares its MCP tool name.
  *
  * @param manifest - The app manifest
  * @returns Capabilities derived from this manifest, in stable name order

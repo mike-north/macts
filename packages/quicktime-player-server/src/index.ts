@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS QuickTimePlayer.app.
+ * The QuickTime Player server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `quickTimePlayerContract` from `@macts/quicktime-player/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { quickTimePlayerApiPlugin as plugin, quickTimePlayerApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { quickTimePlayerContract as contract } from '@macts/quicktime-player/contract'

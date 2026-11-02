@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Spotify.app.
+ * The Spotify server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `spotifyContract` from `@macts/spotify/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { spotifyApiPlugin as plugin, spotifyApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { spotifyContract as contract } from '@macts/spotify/contract'

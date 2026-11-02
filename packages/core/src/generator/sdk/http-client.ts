@@ -23,6 +23,7 @@ import {
   usableResources,
 } from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
+import { SDK_GENERATED_NOTICE } from '../generated-header.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -192,7 +193,7 @@ function generateTypesFile(manifest: AppManifest): string {
   const lines: string[] = [
     '/**',
     ' * Type definitions for the SDK.',
-    ' * Auto-generated - do not edit.',
+    ` * ${SDK_GENERATED_NOTICE}`,
     ' */',
     '',
     ...(resources.length > 0 ? ['import { z } from "zod";', ''] : []),
@@ -448,7 +449,7 @@ function generateClientFile(
 
   return `/**
  * ${appName} HTTP Client SDK.
- * Auto-generated - do not edit.
+ * ${SDK_GENERATED_NOTICE}
  *
  * @packageDocumentation
  */
@@ -681,7 +682,7 @@ function generateResourceClient(
   if (!hasMethods) {
     return `/**
  * ${resourceName} client for ${manifest.app.name} SDK.
- * Auto-generated - do not edit.
+ * ${SDK_GENERATED_NOTICE}
  */
 
 import type { HttpClient } from '../client.js';
@@ -716,7 +717,7 @@ export class ${resourceName}ResourceClient {
 
   return `/**
  * ${resourceName} client for ${manifest.app.name} SDK.
- * Auto-generated - do not edit.
+ * ${SDK_GENERATED_NOTICE}
  */
 
 import type { HttpClient } from '../client.js';${typesImportLine}

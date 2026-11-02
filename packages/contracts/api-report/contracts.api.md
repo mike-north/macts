@@ -509,6 +509,7 @@ export interface OperationDescriptor<Input, Output> {
     readonly description: string;
     readonly id: OperationId;
     readonly input: ValueType<Input>;
+    readonly inputJsonSchema?: Readonly<Record<string, unknown>>;
     readonly output: ValueType<Output>;
     readonly permission: PermissionString;
     readonly target: OperationTarget;

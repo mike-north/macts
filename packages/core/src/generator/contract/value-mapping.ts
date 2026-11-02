@@ -6,8 +6,11 @@
  * (conventionally aliased `t`). This module decides which composition a
  * manifest type maps to, and renders it twice: as the constructor expression
  * (`t.array(t.date())`) and as the SDK type callers see (`readonly Date[]`).
- * Both renderings come from one {@link ValueShape}, so the expression and the
- * declared type cannot disagree.
+ * It also builds the same composition in process, with the same constructors
+ * ({@link ValueBuilder}), so the generator can derive data from the value type
+ * the emitted expression will construct, such as its wire JSON Schema. All
+ * three come from one {@link ValueShape}, so the expression, the declared
+ * type, and the built value type cannot disagree.
  *
  * The mapping depends on position. File-like types (`file`, `data`) are
  * {@link FileValue}s where an operation returns them and file sources where an
@@ -22,6 +25,12 @@
  * @packageDocumentation
  */
 
+import {
+  ValueTypes as t,
+  type ReferenceRegistry,
+  type ValueType,
+  type ValueTypeOptions,
+} from '@macts/contracts'
 import type { AppManifest } from '../../manifest/index.js'
 import { normalizeTypeName } from '../../manifest/type-names.js'
 import { usableResources } from '../../manifest/unsupported.js'
@@ -352,6 +361,77 @@ export class ValueRenderer {
   #use(name: ContractTypeName): string {
     this.#usedTypes.add(name)
     return name
+  }
+}
+
+/** What building needs to know about the contract around a value. */
+export interface BuildContext {
+  /** The members of an enum, in the order the generated tuple lists them. */
+  enumMembers(enumKey: string): readonly string[]
+  /**
+   * The app's resource table as references read it: every resource the
+   * generated table lists, in its order, with the identifier value type of
+   * each one that has an identifier. Read lazily, as the generated table is.
+   */
+  registry(): ReferenceRegistry
+}
+
+/**
+ * Builds value shapes into the value types their rendered constructor
+ * expressions construct.
+ *
+ * @remarks
+ * Each case mirrors {@link ValueRenderer.expression} exactly: the same
+ * constructor, the same arguments, and the description on the outermost value
+ * type. A built value type is therefore indistinguishable, in its wire schema
+ * and so in its JSON Schema, from the one the generated module constructs.
+ */
+export class ValueBuilder {
+  readonly #context: BuildContext
+
+  constructor(context: BuildContext) {
+    this.#context = context
+  }
+
+  /** The value type `shape` describes, with `description` on its outermost type. */
+  build(shape: ValueShape, description?: string): ValueType<unknown> {
+    const options: ValueTypeOptions | undefined =
+      description === undefined ? undefined : { description }
+    switch (shape.kind) {
+      case 'string':
+        return t.string(options)
+      case 'boolean':
+        return t.boolean(options)
+      case 'integer':
+        return t.integer(options)
+      case 'double':
+        return t.double(options)
+      case 'date':
+        return t.date(options)
+      case 'point':
+        return t.point(options)
+      case 'rectangle':
+        return t.rectangle(options)
+      case 'rgb':
+        return t.rgb(options)
+      case 'file':
+        return t.file(options)
+      case 'fileSource':
+        return t.fileSource(options)
+      case 'unknown':
+        return t.unknown(options)
+      case 'enum': {
+        const [first, ...rest] = this.#context.enumMembers(shape.enumKey)
+        if (first === undefined) throw new Error(`Enum ${shape.enumKey} has no members.`)
+        return t.enumeration([first, ...rest], options)
+      }
+      case 'array':
+        return t.array(this.build(shape.item), options)
+      case 'nullable':
+        return t.nullable(this.build(shape.inner), options)
+      case 'reference':
+        return t.reference(() => this.#context.registry(), shape.resourceKey, 'one', options)
+    }
   }
 }
 

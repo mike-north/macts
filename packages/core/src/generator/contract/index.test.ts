@@ -328,6 +328,7 @@ describe('generateContract: operations', () => {
     noteId: t.string({ description: 'The note to read' }),
   }),
   output: noteRecordType,
+  inputJsonSchema: {"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"noteId":{"type":"string","description":"The note to read"}},"required":["noteId"],"additionalProperties":false},
 }`)
   })
 

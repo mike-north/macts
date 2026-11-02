@@ -6,8 +6,8 @@
  * shapes read as syntax (interface members, the keys of a `t.record({...})` or
  * `z.object({...})` call, CLI options and the fields a CLI command passes or
  * prints), so a check over them asserts on the fields themselves, never on
- * text that merely mentions a name. Schemas produced as data (MCP tool input
- * schemas, capability input schemas, create inputs) are read as data.
+ * text that merely mentions a name. Schemas produced as data (capability
+ * input schemas, create inputs) are read as data.
  *
  * Each list is attributed to the resource whose fields it holds, and records
  * the names it may also carry from a source other than that resource's
@@ -25,7 +25,6 @@ import { deriveCapabilities } from '../../capabilities/registry.js'
 import { CONTRACT_MODULE_PATH, generateContract } from '../contract/index.js'
 import { generateCliPlugin } from '../cli/index.js'
 import { createCliGeneratorContext } from '../cli/context.js'
-import { generateResourceOperationSchema } from '../mcp/tools.js'
 import { generateHttpClientSdk } from '../sdk/http-client.js'
 import { createInputFields, resourceCommandEntries, resourceNamespace } from '../surface.js'
 import { lowerCamel } from '../../manifest/lower-camel.js'
@@ -57,7 +56,6 @@ export function generatedFieldLists(manifest: AppManifest): FieldList[] {
   return [
     ...contractFieldLists(manifest),
     ...sdkFieldLists(manifest),
-    ...mcpFieldLists(manifest),
     ...capabilityFieldLists(manifest),
     ...createInputFieldLists(manifest),
     ...cliFieldLists(manifest),
@@ -175,23 +173,6 @@ function sdkFieldLists(manifest: AppManifest): FieldList[] {
     ]
     for (const [surface, fields, otherSources] of entries) {
       if (fields !== undefined) lists.push({ surface, resourceKey, fields, otherSources })
-    }
-  }
-  return lists
-}
-
-/** The MCP tools: the input schema of each tool for a resource command. */
-function mcpFieldLists(manifest: AppManifest): FieldList[] {
-  const lists: FieldList[] = []
-  for (const [resourceKey, resource] of Object.entries(manifest.resources)) {
-    for (const [commandKey, command] of resourceCommandEntries(manifest, resourceKey)) {
-      const schema = generateResourceOperationSchema(command, resource)
-      lists.push({
-        surface: `MCP ${commandKey} input schema`,
-        resourceKey,
-        fields: Object.keys(schema.properties ?? {}),
-        otherSources: new Set(command.parameters.map((parameter) => parameter.name)),
-      })
     }
   }
   return lists

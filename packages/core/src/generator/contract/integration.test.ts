@@ -18,7 +18,7 @@
  * @see phases/13-sdk-value-and-execution-contracts.md §D3 (wire forms)
  * @see phases/13-sdk-value-and-execution-contracts.md §D7 (references and the resource table)
  * @see phases/13-sdk-value-and-execution-contracts.md §D8 (file values and file sources)
- * @see phases/13-sdk-value-and-execution-contracts.md §D9 (no passthrough plans in descriptors)
+ * @see phases/13-sdk-value-and-execution-contracts.md §D9 (no passthrough plans in descriptors; inputJsonSchema)
  * @see phases/13-sdk-value-and-execution-contracts.md §A4 (nulls are data; updates reset with null)
  * @see phases/13-sdk-value-and-execution-contracts.md §D6 (issues name the field path)
  * @see phases/13-sdk-value-and-execution-contracts.md §D10 (native missing value maps to null at nullable fields)
@@ -30,6 +30,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { z } from 'zod'
 import {
   Integer,
   ValueTypes as t,
@@ -251,6 +252,23 @@ describe('every real app manifest', () => {
     await linkContracts(dir)
     expect(runTsc(dir)).toEqual({ status: 0, output: '' })
   }, 120_000)
+})
+
+describe('inputJsonSchema', () => {
+  // D9: each generated descriptor carries the draft-7 JSON Schema of its
+  // input's wire values, exactly what `z.toJSONSchema` derives from the
+  // compiled `input.wire`. The Jotter fixture's inputs cover references,
+  // enums, files, nullable and optional fields.
+  it('is present on every descriptor and equals the JSON Schema of the compiled input wire', () => {
+    const operations = Object.values(contract.operations)
+    expect(operations.length).toBeGreaterThan(5)
+    for (const operation of operations) {
+      expect(operation.inputJsonSchema, operation.id).toBeDefined()
+      expect(operation.inputJsonSchema, operation.id).toStrictEqual(
+        z.toJSONSchema(operation.input.wire, { target: 'draft-7' })
+      )
+    }
+  })
 })
 
 describe('loadManifest', () => {

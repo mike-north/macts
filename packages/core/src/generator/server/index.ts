@@ -1,16 +1,18 @@
 /**
  * Server package generator.
  *
- * Generates consolidated server packages that combine an API plugin and an MCP
- * plugin into a single package with subpath exports.
+ * Generates an app's server package, `@macts/<app>-server`. The package is
+ * contract-only: its single entry re-exports the app's generated contract
+ * from `@macts/<app>/contract` as `contract`, and it depends on nothing but the
+ * app package. A macts host serves the app from that contract and the app's
+ * manifest, through its own HTTP and MCP adapters, so the package carries no
+ * server or plugin code of its own.
  *
  * @packageDocumentation
  */
 
 import type { AppManifest } from '../../manifest/index.js'
-import { generateApiPlugin } from '../api/index.js'
-import { generateMcpPlugin } from '../mcp/index.js'
-import { createMcpGeneratorContext } from '../mcp/context.js'
+import { contractNames } from '../contract/index.js'
 import { MIT_LICENSE } from '../license.js'
 import { GENERATED_PACKAGE_NODE_ENGINE } from '../package-conventions.js'
 
@@ -41,25 +43,10 @@ export interface GenerateServerPackageResult {
 }
 
 /**
- * Config file paths that should be filtered out from sub-generator output.
- * These are replaced with unified config files for the server package.
- */
-const CONFIG_FILE_PATHS = new Set([
-  'package.json',
-  'tsconfig.json',
-  'tsup.config.ts',
-  'vitest.config.ts',
-  '.gitignore',
-  'api-extractor.json',
-  'api-report/.gitkeep',
-  'temp/.gitkeep',
-])
-
-/**
- * Generate a consolidated server package from a manifest.
+ * Generate a server package from a manifest.
  *
- * Combines an API plugin (at `src/`) and an MCP plugin (at `src/mcp/`) into a
- * single package with subpath exports for `.` (API) and `./mcp` (MCP).
+ * The package holds `src/index.ts`, which re-exports the app's contract as
+ * `contract`, and its package, TypeScript, build and ignore configuration.
  *
  * @param manifest - The app manifest
  * @param options - Generation options
@@ -69,58 +56,16 @@ export function generateServerPackage(
   manifest: AppManifest,
   options: GenerateServerPackageOptions
 ): GenerateServerPackageResult {
-  const { appName, serverPackageName, clientPackageName, version } = options
-  const files: { path: string; content: string }[] = []
-  const errors: string[] = []
+  const { serverPackageName, clientPackageName, version } = options
+  const unscopedName = serverPackageName.replace(/^@[^/]+\//, '')
+  const capitalizedAppName = manifest.app.name.replace(/\s+/g, '')
 
-  try {
-    // 1. Generate API plugin files
-    const apiResult = generateApiPlugin(manifest, {
-      packageName: serverPackageName,
-      version,
-    })
-    errors.push(...apiResult.errors)
-
-    // Keep only source files from the API generator (src/*), skip config files
-    for (const file of apiResult.files) {
-      if (!CONFIG_FILE_PATHS.has(file.path)) {
-        files.push(file)
-      }
-    }
-
-    // 2. Generate MCP plugin files
-    // Pass the client package name as sdkPackageName so the generated sdk.ts
-    // imports from '@macts/{app}' (the client) instead of '@macts/sdk-{app}'
-    const mcpContext = createMcpGeneratorContext({
-      appName,
-      manifest,
-      packageName: serverPackageName,
-      sdkPackageName: clientPackageName,
-      version,
-    })
-    const mcpResult = generateMcpPlugin(mcpContext)
-
-    // Keep only source files from the MCP generator, prefix with 'mcp/'
-    for (const file of mcpResult.files) {
-      if (CONFIG_FILE_PATHS.has(file.path)) {
-        continue
-      }
-
-      // Prefix all src/ files with mcp/ (e.g., src/tools/calendars.ts → src/mcp/tools/calendars.ts)
-      if (file.path.startsWith('src/')) {
-        const relativePath = file.path.slice('src/'.length)
-        files.push({
-          path: `src/mcp/${relativePath}`,
-          content: file.content,
-        })
-      }
-    }
-
-    // 3. Generate unified config files
-    const unscopedName = serverPackageName.replace(/^@[^/]+\//, '')
-    const capitalizedAppName = manifest.app.name.replace(/\s+/g, '')
-
-    files.push({
+  const files: { path: string; content: string }[] = [
+    {
+      path: 'src/index.ts',
+      content: generateIndex(manifest, clientPackageName),
+    },
+    {
       path: 'package.json',
       content: generatePackageJson(
         serverPackageName,
@@ -129,34 +74,32 @@ export function generateServerPackage(
         unscopedName,
         version
       ),
-    })
+    },
+    { path: 'tsconfig.json', content: TSCONFIG_JSON },
+    { path: 'tsup.config.ts', content: TSUP_CONFIG },
+    { path: '.gitignore', content: GITIGNORE },
+    { path: 'LICENSE', content: MIT_LICENSE },
+  ]
 
-    files.push({
-      path: 'tsconfig.json',
-      content: TSCONFIG_JSON,
-    })
+  return { dir: unscopedName, files, errors: [] }
+}
 
-    files.push({
-      path: 'tsup.config.ts',
-      content: TSUP_CONFIG,
-    })
+/** The package entry: the app's contract, re-exported as `contract`. */
+function generateIndex(manifest: AppManifest, clientPackageName: string): string {
+  const { contract } = contractNames(manifest)
+  return `/**
+ * The ${manifest.app.name} server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports \`${contract}\` from \`${clientPackageName}/contract\` as
+ * \`contract\`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
+ *
+ * @packageDocumentation
+ */
 
-    files.push({
-      path: '.gitignore',
-      content: GITIGNORE,
-    })
-
-    files.push({
-      path: 'LICENSE',
-      content: MIT_LICENSE,
-    })
-  } catch (error) {
-    errors.push(error instanceof Error ? error.message : String(error))
-  }
-
-  const dir = serverPackageName.replace(/^@[^/]+\//, '')
-
-  return { dir, files, errors }
+export { ${contract} as contract } from '${clientPackageName}/contract'
+`
 }
 
 /**
@@ -170,13 +113,14 @@ function generatePackageJson(
   version: string | undefined
 ): string {
   const versionStr = version ?? '0.0.0'
-  const typesPath = `./dist/${unscopedName}.d.ts`
+  // tsup emits the entry's declarations beside it.
+  const typesPath = './dist/index.d.ts'
 
   return JSON.stringify(
     {
       name: serverPackageName,
       version: versionStr,
-      description: `Server package for macOS ${capitalizedAppName}.app (API + MCP)`,
+      description: `Server package for macOS ${capitalizedAppName}.app: the contract a macts host serves`,
       license: 'MIT',
       repository: {
         type: 'git',
@@ -189,10 +133,6 @@ function generatePackageJson(
         '.': {
           types: typesPath,
           import: './dist/index.js',
-        },
-        './mcp': {
-          types: './dist/mcp.d.ts',
-          import: './dist/mcp/index.js',
         },
       },
       main: './dist/index.js',
@@ -208,16 +148,9 @@ function generatePackageJson(
         test: 'vitest run',
         typecheck: 'tsc --noEmit',
       },
-      // `@macts/types` carries the MCP plugin type definitions and emits no
-      // runtime code, so it is an ordinary dependency rather than a peer of
-      // `@macts/mcp`. Server packages reference those types in their public
-      // `.d.ts`, and a peer dependency on the MCP server implementation would
-      // both overstate the coupling and drag every server package into
-      // Changesets' peer-dependent major-bump rule.
+      // The app package is the only dependency: the entry re-exports its
+      // contract, and nothing else is imported.
       dependencies: {
-        '@macts/api': 'workspace:*',
-        '@macts/core': 'workspace:*',
-        '@macts/types': 'workspace:*',
         [clientPackageName]: 'workspace:*',
       },
       devDependencies: {
@@ -251,7 +184,6 @@ const TSUP_CONFIG = `import { defineConfig } from 'tsup';
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
-    'mcp/index': 'src/mcp/index.ts',
   },
   format: ['esm'],
   dts: true,

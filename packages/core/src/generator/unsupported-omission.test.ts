@@ -4,7 +4,7 @@
  *
  * The manifest keeps a property the app's dictionary declares but the app
  * cannot provide, with the evidence; every generated surface (the contract,
- * the legacy SDK types, the MCP tool and capability input schemas, the shared
+ * the legacy SDK types, the capability input schemas, the shared
  * create input, and the CLI plugin) leaves it out, on input and output alike.
  *
  * Fields are read structurally (see `./test-support/surface-fields.ts`), not by
@@ -173,15 +173,14 @@ describe('a fixture with properties marked unsupported', () => {
     expect(fieldsOf(lists, 'SDK TagSchema', 'Tag')).toEqual(['name'])
   })
 
-  it('leaves them out of the MCP and capability input schemas', () => {
+  it('leaves them out of the capability input schemas', () => {
     // createNote: its parameters, plus the writable properties not already
     // parameters (priority).
-    expect(fieldsOf(lists, 'MCP createNote input schema', 'Note').sort()).toEqual(
-      ['attachment', 'folderId', 'priority', 'title'].sort()
-    )
-    expect(fieldsOf(lists, 'MCP updateNote input schema', 'Note')).not.toContain('rating')
     expect(fieldsOf(lists, 'capability jotter.notes.create input schema', 'Note').sort()).toEqual(
       ['attachment', 'folderId', 'priority', 'title'].sort()
+    )
+    expect(fieldsOf(lists, 'capability jotter.notes.update input schema', 'Note')).not.toContain(
+      'rating'
     )
   })
 
@@ -233,9 +232,7 @@ describe('a fixture with properties marked unsupported', () => {
           .filter((e) => e.property === property)
           .map((e) => e.surface.split(' ')[0] ?? e.surface)
       )
-    expect(families('rating')).toEqual(
-      new Set(['contract', 'SDK', 'MCP', 'capability', 'create', 'CLI'])
-    )
+    expect(families('rating')).toEqual(new Set(['contract', 'SDK', 'capability', 'create', 'CLI']))
     // A read-only property is an output field only: records, read types, and
     // the CLI's printed fields.
     expect(families('label')).toEqual(new Set(['contract', 'SDK', 'CLI']))

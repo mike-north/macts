@@ -13,9 +13,17 @@ vi.mock('@macts/core', async () => {
     generateConsolidatedPackages: vi.fn(),
     generateClientPackage: vi.fn(),
     generateServerPackage: vi.fn(),
-    writeFiles: vi.fn(),
+    writeGeneratedPackage: vi.fn(),
   }
 })
+
+/** A package write that found a record and pruned nothing. */
+const UNCHANGED: core.GeneratedPackageWriteResult = {
+  emitted: ['src/index.ts'],
+  previousSource: 'record',
+  previous: ['src/index.ts'],
+  pruned: [],
+}
 
 describe('GenerateCommand', () => {
   let stdout: string[]
@@ -95,7 +103,7 @@ describe('GenerateCommand', () => {
         server: { dir: 'calendar-server', files: [{ path: 'src/index.ts', content: '' }] },
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -112,7 +120,7 @@ describe('GenerateCommand', () => {
           appName: 'calendar',
         })
       )
-      expect(core.writeFiles).toHaveBeenCalledTimes(2)
+      expect(core.writeGeneratedPackage).toHaveBeenCalledTimes(2)
       expect(stdout.join('')).toContain('Writing 2 files')
       expect(stdout.join('')).toContain('Generated packages')
     })
@@ -144,7 +152,7 @@ describe('GenerateCommand', () => {
         server: { dir: 'calendar-server', files: [] },
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -167,7 +175,7 @@ describe('GenerateCommand', () => {
         files: [{ path: 'src/index.ts', content: '' }],
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -179,7 +187,7 @@ describe('GenerateCommand', () => {
 
       expect(exitCode).toBe(0)
       expect(core.generateClientPackage).toHaveBeenCalled()
-      expect(core.writeFiles).toHaveBeenCalled()
+      expect(core.writeGeneratedPackage).toHaveBeenCalled()
       expect(stdout.join('')).toContain('Package generated successfully!')
     })
 
@@ -190,7 +198,7 @@ describe('GenerateCommand', () => {
         files: [{ path: 'src/index.ts', content: '' }],
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -238,7 +246,7 @@ describe('GenerateCommand', () => {
         files: [{ path: 'src/index.ts', content: '' }],
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -250,7 +258,7 @@ describe('GenerateCommand', () => {
 
       expect(exitCode).toBe(0)
       expect(core.generateServerPackage).toHaveBeenCalled()
-      expect(core.writeFiles).toHaveBeenCalled()
+      expect(core.writeGeneratedPackage).toHaveBeenCalled()
       expect(stdout.join('')).toContain('Package generated successfully!')
     })
 
@@ -287,7 +295,7 @@ describe('GenerateCommand', () => {
         errors: [],
         diagnostics: [diagnostic, 'second finding'],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -298,7 +306,7 @@ describe('GenerateCommand', () => {
       expect(await command.execute()).toBe(0)
       expect(stderr.join('')).toBe(`warning: ${diagnostic}\nwarning: second finding\n`)
       expect(stdout.join('')).not.toContain('warning')
-      expect(core.writeFiles).toHaveBeenCalledTimes(2)
+      expect(core.writeGeneratedPackage).toHaveBeenCalledTimes(2)
     })
 
     it('prints the diagnostics of client generation', async () => {
@@ -309,7 +317,7 @@ describe('GenerateCommand', () => {
         errors: [],
         diagnostics: [diagnostic],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -328,7 +336,7 @@ describe('GenerateCommand', () => {
         files: [],
         errors: [],
       })
-      vi.mocked(core.writeFiles).mockResolvedValue(undefined)
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
 
       const command = new GenerateCommand()
       command.manifestPath = 'manifests/calendar/app.yaml'
@@ -338,6 +346,83 @@ describe('GenerateCommand', () => {
 
       expect(await command.execute()).toBe(0)
       expect(stderr.join('')).toBe('')
+    })
+  })
+
+  describe('owned-output report', () => {
+    function allTargetCommand(): GenerateCommand {
+      vi.mocked(core.loadManifest).mockResolvedValue(mockManifest)
+      vi.mocked(core.generateConsolidatedPackages).mockReturnValue({
+        client: { dir: 'calendar', files: [{ path: 'src/index.ts', content: '' }] },
+        server: { dir: 'calendar-server', files: [{ path: 'src/index.ts', content: '' }] },
+        errors: [],
+      })
+      const command = new GenerateCommand()
+      command.manifestPath = 'manifests/calendar/app.yaml'
+      command.outDir = '/repo/packages'
+      command.target = 'all'
+      command.context = createTestContext()
+      return command
+    }
+
+    it('writes each package into its own directory', async () => {
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
+
+      expect(await allTargetCommand().execute()).toBe(0)
+      expect(vi.mocked(core.writeGeneratedPackage).mock.calls.map((call) => call[1])).toEqual([
+        '/repo/packages/calendar',
+        '/repo/packages/calendar-server',
+      ])
+    })
+
+    it('names each pruned file on stdout', async () => {
+      vi.mocked(core.writeGeneratedPackage)
+        .mockResolvedValueOnce({
+          ...UNCHANGED,
+          pruned: ['src/cli/commands/events/get.ts', 'src/resources/event.ts'],
+        })
+        .mockResolvedValueOnce(UNCHANGED)
+
+      expect(await allTargetCommand().execute()).toBe(0)
+      const output = stdout.join('')
+      expect(output).toContain('pruned /repo/packages/calendar/src/cli/commands/events/get.ts\n')
+      expect(output).toContain('pruned /repo/packages/calendar/src/resources/event.ts\n')
+      expect(stderr.join('')).toBe('')
+    })
+
+    it('reports a package whose previous set came from generated headers', async () => {
+      vi.mocked(core.writeGeneratedPackage)
+        .mockResolvedValueOnce({
+          ...UNCHANGED,
+          previousSource: 'headers',
+          previous: ['src/client.ts', 'src/types.ts'],
+        })
+        .mockResolvedValueOnce(UNCHANGED)
+
+      expect(await allTargetCommand().execute()).toBe(0)
+      const output = stdout.join('')
+      expect(output).toContain(
+        'bootstrapped owned-output set from headers: 2 files in /repo/packages/calendar\n'
+      )
+      expect(output).not.toContain('files in /repo/packages/calendar-server')
+    })
+
+    it('reports nothing about owned output when a record was found and nothing pruned', async () => {
+      vi.mocked(core.writeGeneratedPackage).mockResolvedValue(UNCHANGED)
+
+      expect(await allTargetCommand().execute()).toBe(0)
+      const output = stdout.join('')
+      expect(output).not.toContain('pruned ')
+      expect(output).not.toContain('bootstrapped')
+    })
+
+    it('fails, naming the cause, when a package cannot be written', async () => {
+      vi.mocked(core.writeGeneratedPackage).mockRejectedValue(
+        new Error('/repo/packages/calendar/.macts-generated.json is not valid JSON')
+      )
+
+      expect(await allTargetCommand().execute()).toBe(1)
+      expect(stderr.join('')).toContain('.macts-generated.json is not valid JSON')
     })
   })
 

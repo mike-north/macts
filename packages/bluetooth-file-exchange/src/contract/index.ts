@@ -95,6 +95,12 @@ const appBrowseOperation: OperationDescriptor<{ readonly device?: string | undef
       device: t.optional(t.string({ description: 'The device to browse' })),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: { device: { type: 'string', description: 'The device to browse' } },
+      additionalProperties: false,
+    },
   }
 
 const appSendOperation: OperationDescriptor<
@@ -110,6 +116,47 @@ const appSendOperation: OperationDescriptor<
     toDevice: t.optional(t.string({ description: 'The device to send the file to' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      file: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            fileSource: {
+              oneOf: [
+                {
+                  type: 'object',
+                  properties: {
+                    kind: { type: 'string', const: 'caller-owned-file' },
+                    path: { type: 'string', minLength: 1 },
+                  },
+                  required: ['kind', 'path'],
+                  additionalProperties: false,
+                },
+                {
+                  type: 'object',
+                  properties: {
+                    kind: { type: 'string', const: 'uploaded-file' },
+                    uploadId: { type: 'string', minLength: 1 },
+                  },
+                  required: ['kind', 'uploadId'],
+                  additionalProperties: false,
+                },
+              ],
+            },
+          },
+          required: ['fileSource'],
+          additionalProperties: false,
+        },
+        description: 'The file(s) to send',
+      },
+      toDevice: { type: 'string', description: 'The device to send the file to' },
+    },
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

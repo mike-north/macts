@@ -5,7 +5,8 @@ import {
   generateConsolidatedPackages,
   generateClientPackage,
   generateServerPackage,
-  writeFiles,
+  writeGeneratedPackage,
+  type GeneratedPackageWriteResult,
 } from '@macts/core'
 
 /**
@@ -15,6 +16,15 @@ import {
  * counts lines with this prefix.
  */
 export const GENERATION_WARNING_PREFIX = 'warning: '
+
+/**
+ * The prefixes of the stdout lines that report how a package's owned output
+ * changed: a file the run deleted because it no longer emits it, and a package
+ * whose previous owned-output set came from generated headers because it had
+ * no record yet. `scripts/regenerate.mjs` passes these lines through.
+ */
+export const PRUNED_FILE_PREFIX = 'pruned '
+export const BOOTSTRAP_REPORT_PREFIX = 'bootstrapped owned-output set from headers: '
 
 /**
  * Command to generate packages from manifests.
@@ -33,12 +43,18 @@ export class GenerateCommand extends Command {
     details: `
       This command generates TypeScript packages from a macts manifest file.
 
+      Each generated package records the files the run emitted in its
+      .macts-generated.json. A file an earlier run emitted that this run no
+      longer emits is deleted, and reported on stdout. Files the generator
+      never emitted, such as a changelog or handwritten tests, are kept.
+
       With --target all (default), generates client and server packages into
       subdirectories of --out-dir (e.g., packages/calendar, packages/calendar-server).
 
       With --target client, generates a single client package (SDK + CLI) into --out-dir.
 
-      With --target server, generates a single server package (API + MCP) into --out-dir.
+      With --target server, generates a single server package into --out-dir. A
+      server package re-exports the app's contract for a macts host to serve.
 
       The manifest should be a YAML file following the macts manifest schema.
 
@@ -141,15 +157,17 @@ export class GenerateCommand extends Command {
     const totalFiles = result.client.files.length + result.server.files.length
     this.context.stdout.write(`Writing ${String(totalFiles)} files...\n`)
 
-    await writeFiles(result.client.files, join(outDir, result.client.dir))
-    await writeFiles(result.server.files, join(outDir, result.server.dir))
+    const clientDir = join(outDir, result.client.dir)
+    const serverDir = join(outDir, result.server.dir)
+    this.reportOwnedOutput(clientDir, await writeGeneratedPackage(result.client.files, clientDir))
+    this.reportOwnedOutput(serverDir, await writeGeneratedPackage(result.server.files, serverDir))
 
     this.context.stdout.write(`Generated packages:\n`)
     this.context.stdout.write(
-      `  Client: ${join(outDir, result.client.dir)} (${String(result.client.files.length)} files)\n`
+      `  Client: ${clientDir} (${String(result.client.files.length)} files)\n`
     )
     this.context.stdout.write(
-      `  Server: ${join(outDir, result.server.dir)} (${String(result.server.files.length)} files)\n`
+      `  Server: ${serverDir} (${String(result.server.files.length)} files)\n`
     )
     this.context.stdout.write(`\nNext steps:\n`)
     this.context.stdout.write(`  pnpm install\n`)
@@ -181,7 +199,7 @@ export class GenerateCommand extends Command {
     }
 
     this.context.stdout.write(`Writing ${String(result.files.length)} files to ${outDir}...\n`)
-    await writeFiles(result.files, outDir)
+    this.reportOwnedOutput(outDir, await writeGeneratedPackage(result.files, outDir))
 
     this.context.stdout.write('Package generated successfully!\n')
     this.context.stdout.write(`\nNext steps:\n`)
@@ -190,6 +208,22 @@ export class GenerateCommand extends Command {
     this.context.stdout.write(`  pnpm build\n`)
 
     return 0
+  }
+
+  /**
+   * Report how writing one package changed its owned output: one line per
+   * file pruned, and one line when the previous set came from generated
+   * headers because the package had no record yet.
+   */
+  private reportOwnedOutput(packageDir: string, result: GeneratedPackageWriteResult): void {
+    if (result.previousSource === 'headers') {
+      this.context.stdout.write(
+        `${BOOTSTRAP_REPORT_PREFIX}${String(result.previous.length)} files in ${packageDir}\n`
+      )
+    }
+    for (const path of result.pruned) {
+      this.context.stdout.write(`${PRUNED_FILE_PREFIX}${join(packageDir, path)}\n`)
+    }
   }
 
   /**
@@ -227,7 +261,7 @@ export class GenerateCommand extends Command {
     }
 
     this.context.stdout.write(`Writing ${String(result.files.length)} files to ${outDir}...\n`)
-    await writeFiles(result.files, outDir)
+    this.reportOwnedOutput(outDir, await writeGeneratedPackage(result.files, outDir))
 
     this.context.stdout.write('Package generated successfully!\n')
     this.context.stdout.write(`\nNext steps:\n`)

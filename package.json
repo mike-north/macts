@@ -17,7 +17,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate": "node scripts/regenerate.mjs",
-    "generate:check": "node scripts/regenerate.mjs && git diff --exit-code",
+    "generate:check": "node scripts/regenerate.mjs && node scripts/check-clean-tree.mjs packages",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish",

@@ -611,6 +611,14 @@ construct canonical errors. On failure:
 | `description`                  | Text describing the operation                                                                                             |
 | `input: ValueType<Input>`      | Always record-shaped                                                                                                      |
 | `output: ValueType<Output>`    | The operation's result                                                                                                    |
+| `inputJsonSchema?`             | `Readonly<Record<string, unknown>>`, the draft-7 JSON Schema of `input.wire` (below)                                      |
+
+`inputJsonSchema` is exactly `z.toJSONSchema(input.wire, { target: 'draft-7' })`.
+It describes wire values, and generated descriptors always carry it. The
+generator computes it in process, from value types built with the same
+constructors the contract uses, and annotates each descriptor's type so the
+declared type is `Readonly<Record<string, unknown>>`, not the literal.
+Adapters never read or serve it; they always derive from `input.wire` (D9).
 
 Every asynchronous client call that reaches the runtime (`invoke`, a
 reference's `resolve`, and a file value's `fetch`) accepts one shared
@@ -658,6 +666,26 @@ one to stderr as `warning: <app>: <position>: …` and still exits 0, and
 errors fail generation. The shipped manifests produce three: Finder's
 `iconViewOptions` and `columnViewOptions`, and System Events'
 `scriptingResult`.
+
+The generator owns its output. Each generated package carries a committed
+`.macts-generated.json` that lists the sorted package-relative paths the last
+run emitted, computed from the emitter's own output, never from a glob. A
+run deletes every path the previous record lists that it no longer emits,
+and removes a directory only when that deletion empties it. A file that is in
+no record, such as a package's `CHANGELOG.md`, its API reports, or a
+handwritten test, is never touched. A package without a record takes the
+files whose leading doc comment carries the generator's "do not edit" notice
+as its previous set; after that run, the record decides. That bootstrap stays
+inside one package: it runs only in a directory holding a `package.json`,
+never looks inside a subdirectory holding its own, and a directory that is
+not yet a package has no previous set. A run widens the record to the
+previous set plus its own files before writing, so an interrupted run leaves
+nothing it wrote outside a record. Removing an
+operation or a resource from a manifest therefore leaves the package as a
+fresh generate would. `pnpm generate:check` regenerates every package and then
+fails on any modified, deleted or untracked file under `packages/`, naming
+each one, so a stale or newly emitted file cannot go unnoticed. The rule is
+recorded in `packages/core/src/generator/owned-output.ts`.
 
 Each operation's permission comes from the manifest route, the same
 derivation the runtime uses, so the registration check holds by construction.
@@ -1414,9 +1442,21 @@ This refactor adopts these items from `phases/12`:
   `z.toJSONSchema(input.wire, { target: 'draft-7' })` and describes **wire**
   values. Wire schemas are pure validators, with no defaults or transforms, so
   input and output forms coincide. A schema JSON Schema can't represent is an
-  error, never an empty schema. An adapter serves the document it derives. A
-  contract may also embed one for consumers that don't run zod, and in this
-  repository a test asserts the two are equal wherever both exist.
+  error, never an empty schema. An adapter serves the document it derives,
+  never a stored one. Every generated descriptor also embeds the document as
+  `inputJsonSchema`, for consumers that don't run zod; adapters never read or
+  serve it. The generator computes it in process from the value types the
+  contract constructs, and `e2e/mcp-contracts`
+  (`test/input-json-schema.integration.test.ts`) asserts, for every operation
+  of every shipped contract, that it is present and equals the document
+  derived from `input.wire`.
+- The capability registry that discovery serves still builds its input
+  schemas from the manifest, independently of `input.wire`
+  ([#188](https://github.com/mike-north/macts/issues/188)). Its MCP tool names
+  must equal the adapter's: `e2e/mcp-contracts`
+  (`test/tool-name-parity.integration.test.ts`) matches every shipped contract
+  operation to its capability by manifest target and asserts that
+  `Capability.mcpToolName` equals `toolNameFor(op.id)`.
 - The independent server `buildCommandSchema` is retired; the runtime validates
   with descriptor schemas.
 
@@ -1559,13 +1599,13 @@ are listed with a single integration owner.
 | `packages/core/src/execution/**`                                                                                         | Execution                           | `Executor` seam                                                                               |
 | `packages/core/src/jxa/coercion.ts`, `types/standardized.ts`                                                             | Value contracts                     | Replaced or deleted                                                                           |
 | `packages/core/src/manifest/**`                                                                                          | Value contracts                     | Nullability/resettability, constraints                                                        |
-| `packages/core/src/generator/**` (incl. `sdk/http-client.ts`, `mcp/`, `cli/`, `server/`)                                 | Value contracts                     | Execution supplies runtime interfaces and test fixtures                                       |
+| `packages/core/src/generator/**` (incl. `sdk/http-client.ts`, `cli/`, `contract/`, `server/`)                            | Value contracts                     | Execution supplies runtime interfaces and test fixtures                                       |
 | `packages/core/src/governance/**`, `permissions/**`                                                                      | Execution                           | Consumed, not forked                                                                          |
 | `packages/runtime/**` (new), including moves from `packages/api/src/keys/**` and `packages/api/src/server/governance/**` | Execution                           |                                                                                               |
 | `packages/api/src/server/**` (incl. `handlers/rpc.ts`, `handlers/validation.ts`, middleware)                             | Execution                           | `rpc.ts` JXA builders move into the native executor                                           |
 | `packages/sdk/**`, `packages/mcp/**`, `packages/cli/**` (handwritten)                                                    | Execution                           |                                                                                               |
 | Root `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, package export maps                                        | Execution (integration owner)       | Value contracts requests changes                                                              |
-| Generated packages (`packages/<app>`, `packages/<app>-server`), API reports of generated packages, generated docs        | Value contracts (generation owner)  | Only via `pnpm generate`; never hand-edited                                                   |
+| Generated packages (`packages/<app>`, `packages/<app>-server`), API reports of generated packages, generated docs        | Value contracts (generation owner)  | Only via `pnpm generate`; never hand-edited. `pnpm generate:check` fails on any drift (D2)    |
 | Value vectors and specimen corpus (expected values)                                                                      | Value contracts                     | e.g. `packages/contracts/src/values/vectors/`                                                 |
 | Parity harness, transport, error, authority, and transfer scenarios                                                      | Execution                           | Runs the value vectors through both factories                                                 |
 

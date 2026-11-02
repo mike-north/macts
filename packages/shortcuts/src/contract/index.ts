@@ -218,6 +218,12 @@ const shortcutListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all shortcuts',
   input: t.record({}),
   output: t.array(shortcutRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const shortcutGetOperation: OperationDescriptor<{ readonly id: string }, Shortcut> = {
@@ -229,6 +235,13 @@ const shortcutGetOperation: OperationDescriptor<{ readonly id: string }, Shortcu
     id: t.string({ description: 'Shortcut identifier' }),
   }),
   output: shortcutRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Shortcut identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const shortcutRunOperation: OperationDescriptor<
@@ -245,6 +258,91 @@ const shortcutRunOperation: OperationDescriptor<
     withInput: t.optional(t.unknown({ description: 'The input to provide to the shortcut' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: { type: 'string', description: 'The shortcut to run' },
+      withInput: {
+        allOf: [
+          { description: 'The input to provide to the shortcut', $ref: '#/definitions/__schema0' },
+        ],
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const folderListFoldersOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
@@ -254,6 +352,12 @@ const folderListFoldersOperation: OperationDescriptor<Record<string, never>, rea
   description: 'List all folders',
   input: t.record({}),
   output: t.array(folderRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
@@ -265,6 +369,13 @@ const folderGetFolderOperation: OperationDescriptor<{ readonly id: string }, Fol
     id: t.string({ description: 'Folder identifier' }),
   }),
   output: folderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Folder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

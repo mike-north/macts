@@ -1924,6 +1924,12 @@ const canvasListCanvasesOperation: OperationDescriptor<Record<string, never>, re
   description: 'List all canvases',
   input: t.record({}),
   output: t.array(canvasRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const canvasGetCanvasOperation: OperationDescriptor<{ readonly id: string }, Canvas> = {
@@ -1935,6 +1941,13 @@ const canvasGetCanvasOperation: OperationDescriptor<{ readonly id: string }, Can
     id: t.string({ description: 'Canvas identifier' }),
   }),
   output: canvasRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Canvas identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const canvasCreateCanvasOperation: OperationDescriptor<CanvasCreateInput, Canvas> = {
@@ -1944,6 +1957,110 @@ const canvasCreateCanvasOperation: OperationDescriptor<CanvasCreateInput, Canvas
   description: 'Create a new canvas',
   input: canvasCreateInputType,
   output: canvasRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: { type: 'string', description: 'Unique identifier' },
+      name: { type: 'string', description: 'Canvas name' },
+      adjustsPages: {
+        type: 'boolean',
+        description: 'Adjust number of pages on the canvas automatically?',
+      },
+      canvasSizeIsMeasuredInPages: {
+        type: 'boolean',
+        description: 'Whether canvas size is reported as multiples of page size',
+      },
+      canvasSize: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y'],
+        additionalProperties: false,
+        description: 'Size of the canvas (page size multiplied by number of pages)',
+      },
+      horizontalPages: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Horizontal pages',
+      },
+      verticalPages: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Vertical pages',
+      },
+      columnAlignment: {
+        type: 'string',
+        enum: ['left', 'center', 'right'],
+        description: 'Column alignment',
+      },
+      rowAlignment: {
+        type: 'string',
+        enum: ['top', 'center', 'bottom'],
+        description: 'Row alignment',
+      },
+      columnSpacing: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Spacing between graphics in a column',
+      },
+      rowSpacing: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Spacing between graphics in a row',
+      },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const graphicListGraphicsOperation: OperationDescriptor<
@@ -1958,6 +2075,13 @@ const graphicListGraphicsOperation: OperationDescriptor<
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
   output: t.array(graphicRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
+    required: ['canvasId'],
+    additionalProperties: false,
+  },
 }
 
 const graphicGetGraphicOperation: OperationDescriptor<{ readonly id: string }, Graphic> = {
@@ -1969,6 +2093,13 @@ const graphicGetGraphicOperation: OperationDescriptor<{ readonly id: string }, G
     id: t.string({ description: 'Graphic identifier' }),
   }),
   output: graphicRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Graphic identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const shapeListShapesOperation: OperationDescriptor<
@@ -1983,6 +2114,13 @@ const shapeListShapesOperation: OperationDescriptor<
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
   output: t.array(shapeRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
+    required: ['canvasId'],
+    additionalProperties: false,
+  },
 }
 
 const shapeGetShapeOperation: OperationDescriptor<{ readonly id: string }, Shape> = {
@@ -1994,6 +2132,13 @@ const shapeGetShapeOperation: OperationDescriptor<{ readonly id: string }, Shape
     id: t.string({ description: 'Shape identifier' }),
   }),
   output: shapeRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Shape identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = {
@@ -2003,6 +2148,200 @@ const shapeCreateShapeOperation: OperationDescriptor<ShapeCreateInput, Shape> = 
   description: 'Create a new shape',
   input: shapeCreateInputType,
   output: shapeRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Name of the shape' },
+      text: { type: 'string', description: 'Text content' },
+      fill: {
+        type: 'string',
+        enum: ['noFill', 'solidFill', 'linearFill', 'radialFill'],
+        description: 'The type of fill for this shape',
+      },
+      fillColor: {
+        type: 'object',
+        properties: {
+          r: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          g: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          b: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+        },
+        required: ['r', 'g', 'b'],
+        additionalProperties: false,
+        description: 'The fill color',
+      },
+      gradientColor: {
+        type: 'object',
+        properties: {
+          r: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          g: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          b: {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+        },
+        required: ['r', 'g', 'b'],
+        additionalProperties: false,
+        description: 'For linear and radial fills, this is the ending color',
+      },
+      gradientAngle: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Angle of a linear gradient fill',
+      },
+      rotation: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'Rotation of the graphic in degrees',
+      },
+      textPlacement: {
+        type: 'string',
+        enum: ['top', 'center', 'bottom'],
+        description: 'Placement of the text inside the shape',
+      },
+      autosizing: {
+        type: 'string',
+        enum: ['overflow', 'full', 'verticallyOnly', 'clip'],
+        description: 'Autosizing behavior of the shape around the text',
+      },
+      sidePadding: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Padding at the left and right of the text space',
+      },
+      verticalPadding: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Padding at the top and bottom of the text space',
+      },
+      canvasId: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Canvas identifier for the shape',
+      },
+      origin: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y'],
+        additionalProperties: false,
+        description: 'Shape origin',
+      },
+      size: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y'],
+        additionalProperties: false,
+        description: 'Shape size',
+      },
+    },
+    required: ['canvasId', 'origin', 'size'],
+    additionalProperties: false,
+  },
 }
 
 const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string }, readonly Line[]> =
@@ -2015,6 +2354,13 @@ const lineListLinesOperation: OperationDescriptor<{ readonly canvasId: string },
       canvasId: t.string({ description: 'Canvas identifier' }),
     }),
     output: t.array(lineRecordType),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
+      required: ['canvasId'],
+      additionalProperties: false,
+    },
   }
 
 const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> = {
@@ -2026,6 +2372,13 @@ const lineGetLineOperation: OperationDescriptor<{ readonly id: string }, Line> =
     id: t.string({ description: 'Line identifier' }),
   }),
   output: lineRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Line identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const layerListLayersOperation: OperationDescriptor<
@@ -2040,6 +2393,13 @@ const layerListLayersOperation: OperationDescriptor<
     canvasId: t.string({ description: 'Canvas identifier' }),
   }),
   output: t.array(layerRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { canvasId: { type: 'string', description: 'Canvas identifier' } },
+    required: ['canvasId'],
+    additionalProperties: false,
+  },
 }
 
 const layerGetLayerOperation: OperationDescriptor<{ readonly name: string }, Layer> = {
@@ -2051,6 +2411,13 @@ const layerGetLayerOperation: OperationDescriptor<{ readonly name: string }, Lay
     name: t.string({ description: 'Layer name' }),
   }),
   output: layerRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Layer name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const layerCreateLayerOperation: OperationDescriptor<LayerCreateInput, Layer> = {
@@ -2060,6 +2427,19 @@ const layerCreateLayerOperation: OperationDescriptor<LayerCreateInput, Layer> = 
   description: 'Create a new layer',
   input: layerCreateInputType,
   output: layerRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Layer name' },
+      locked: { type: 'boolean', description: "Are the layer's graphics locked?" },
+      visible: { type: 'boolean', description: "Are the layer's graphics visible?" },
+      prints: { type: 'boolean', description: "Do the layer's graphics print?" },
+      canvasId: { type: 'string', description: 'Canvas identifier for the layer' },
+    },
+    required: ['name', 'canvasId'],
+    additionalProperties: false,
+  },
 }
 
 const appConnectOperation: OperationDescriptor<
@@ -2075,6 +2455,16 @@ const appConnectOperation: OperationDescriptor<
     to: t.string({ description: 'Destination graphic ID' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      from: { type: 'string', description: 'Source graphic ID' },
+      to: { type: 'string', description: 'Destination graphic ID' },
+    },
+    required: ['from', 'to'],
+    additionalProperties: false,
+  },
 }
 
 const appLayoutOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2084,6 +2474,12 @@ const appLayoutOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: "Layout graphics using the document's Layout Info",
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appExportOperation: OperationDescriptor<
@@ -2100,6 +2496,21 @@ const appExportOperation: OperationDescriptor<
     to: t.string({ description: 'Output file path' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      as: { type: 'string', description: 'File type' },
+      scope: {
+        type: 'string',
+        enum: ['selectedGraphics', 'allGraphics', 'currentCanvas', 'entireDocument'],
+        description: 'Area to export',
+      },
+      to: { type: 'string', description: 'Output file path' },
+    },
+    required: ['as', 'scope', 'to'],
+    additionalProperties: false,
+  },
 }
 
 const appFlipOperation: OperationDescriptor<{ readonly over: Orientation }, undefined> = {
@@ -2111,6 +2522,19 @@ const appFlipOperation: OperationDescriptor<{ readonly over: Orientation }, unde
     over: t.enumeration(orientationMembers, { description: 'Flip orientation' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      over: {
+        type: 'string',
+        enum: ['horizontally', 'vertically'],
+        description: 'Flip orientation',
+      },
+    },
+    required: ['over'],
+    additionalProperties: false,
+  },
 }
 
 const appSlideOperation: OperationDescriptor<{ readonly by: Point }, undefined> = {
@@ -2122,6 +2546,48 @@ const appSlideOperation: OperationDescriptor<{ readonly by: Point }, undefined> 
     by: t.point({ description: 'Vector to slide by' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      by: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y'],
+        additionalProperties: false,
+        description: 'Vector to slide by',
+      },
+    },
+    required: ['by'],
+    additionalProperties: false,
+  },
 }
 
 const appAssembleOperation: OperationDescriptor<
@@ -2136,6 +2602,12 @@ const appAssembleOperation: OperationDescriptor<
     subgraph: t.optional(t.boolean({ description: 'Create as subgraph' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { subgraph: { type: 'boolean', description: 'Create as subgraph' } },
+    additionalProperties: false,
+  },
 }
 
 const appPageAdjustOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2145,6 +2617,12 @@ const appPageAdjustOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'Change the number of pages to fit the current graphics',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appEvaluateJavascriptOperation: OperationDescriptor<{ readonly script: string }, undefined> =
@@ -2157,6 +2635,13 @@ const appEvaluateJavascriptOperation: OperationDescriptor<{ readonly script: str
       script: t.string({ description: 'JavaScript code to evaluate' }),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: { script: { type: 'string', description: 'JavaScript code to evaluate' } },
+      required: ['script'],
+      additionalProperties: false,
+    },
   }
 
 /** Every operation, keyed by its identity. */

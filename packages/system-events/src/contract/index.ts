@@ -3717,6 +3717,12 @@ const appAbortTransactionOperation: OperationDescriptor<Record<string, never>, u
   description: 'Discard the results of a bounded update session with one or more files.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appBeginTransactionOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3726,6 +3732,12 @@ const appBeginTransactionOperation: OperationDescriptor<Record<string, never>, u
   description: 'Begin a bounded update session with one or more files.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appEndTransactionOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3735,6 +3747,12 @@ const appEndTransactionOperation: OperationDescriptor<Record<string, never>, und
   description: 'Apply the results of a bounded update session with one or more files.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appConnectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3744,6 +3762,12 @@ const appConnectOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'connect a configuration or service',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDisconnectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3753,6 +3777,12 @@ const appDisconnectOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'disconnect a configuration or service',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStartOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3762,6 +3792,12 @@ const appStartOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'start the screen saver',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3771,6 +3807,12 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'stop the screen saver',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const diskItemDeleteOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
@@ -3782,6 +3824,13 @@ const diskItemDeleteOperation: OperationDescriptor<{ readonly id: string }, unde
     id: t.string({ description: 'The id.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'The id.' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const appMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
@@ -3793,6 +3842,13 @@ const appMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> 
     to: t.string({ description: 'The new location for the disk item(s).' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'The new location for the disk item(s).' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3802,6 +3858,12 @@ const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Open disk item(s) with the appropriate application.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appLogOutOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3811,6 +3873,12 @@ const appLogOutOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Log out the current user',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRestartOperation: OperationDescriptor<
@@ -3827,6 +3895,17 @@ const appRestartOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      stateSavingPreference: {
+        type: 'boolean',
+        description: 'Is the user defined state saving preference followed?',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appShutDownOperation: OperationDescriptor<
@@ -3843,6 +3922,17 @@ const appShutDownOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      stateSavingPreference: {
+        type: 'boolean',
+        description: 'Is the user defined state saving preference followed?',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appSleepOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3852,6 +3942,12 @@ const appSleepOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Put the computer to sleep',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const uiElementClickOperation: OperationDescriptor<
@@ -3871,6 +3967,18 @@ const uiElementClickOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      at: {
+        type: 'string',
+        description:
+          'when sent to a "process" object, the { x, y } location at which to click, in global coordinates',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appKeyCodeOperation: OperationDescriptor<{ readonly using?: string | undefined }, undefined> =
@@ -3885,6 +3993,17 @@ const appKeyCodeOperation: OperationDescriptor<{ readonly using?: string | undef
       ),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        using: {
+          type: 'string',
+          description: 'modifiers with which the key codes are to be entered',
+        },
+      },
+      additionalProperties: false,
+    },
   }
 
 const appKeystrokeOperation: OperationDescriptor<
@@ -3901,6 +4020,17 @@ const appKeystrokeOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      using: {
+        type: 'string',
+        description: 'modifiers with which the keystrokes are to be entered',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const actionPerformOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3910,6 +4040,12 @@ const actionPerformOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'cause the target process to behave as if the action were applied to its UI element',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const uiElementSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3919,6 +4055,12 @@ const uiElementSelectOperation: OperationDescriptor<Record<string, never>, undef
   description: 'set the selected property of the UI element',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appAttachActionToOperation: OperationDescriptor<{ readonly using: string }, undefined> = {
@@ -3930,6 +4072,15 @@ const appAttachActionToOperation: OperationDescriptor<{ readonly using: string }
     using: t.string({ description: 'a file containing the script to attach' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      using: { type: 'string', description: 'a file containing the script to attach' },
+    },
+    required: ['using'],
+    additionalProperties: false,
+  },
 }
 
 const appAttachedScriptsOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3939,6 +4090,12 @@ const appAttachedScriptsOperation: OperationDescriptor<Record<string, never>, un
   description: 'List the actions attached to a folder',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCancelOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3948,6 +4105,12 @@ const appCancelOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'cause the target process to behave as if the UI element were cancelled',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appConfirmOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3957,6 +4120,12 @@ const appConfirmOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'cause the target process to behave as if the UI element were confirmed',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDecrementOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -3966,6 +4135,12 @@ const appDecrementOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'cause the target process to behave as if the UI element were decremented',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDoFolderActionOperation: OperationDescriptor<
@@ -3990,6 +4165,154 @@ const appDoFolderActionOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      folderActionCode: { type: 'string', description: 'the folder action message to process' },
+      withItemList: {
+        allOf: [
+          {
+            description: 'a list of items for the folder action message to process',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+      withWindowSize: {
+        type: 'object',
+        properties: {
+          x: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          y: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          width: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          height: {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+        },
+        required: ['x', 'y', 'width', 'height'],
+        additionalProperties: false,
+        description: 'the new window size for the folder action message to process',
+      },
+    },
+    required: ['folderActionCode'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appEditActionOfOperation: OperationDescriptor<
@@ -4010,6 +4333,21 @@ const appEditActionOfOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      usingActionName: { type: 'string', description: '...or the name of the action to edit' },
+      usingActionNumber: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'the index number of the action to edit...',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appIncrementOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -4019,6 +4357,12 @@ const appIncrementOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'cause the target process to behave as if the UI element were incremented',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appKeyDownOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -4028,6 +4372,12 @@ const appKeyDownOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'cause the target process to behave as if keys were held down',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appKeyUpOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -4037,6 +4387,12 @@ const appKeyUpOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'cause the target process to behave as if keys were released',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPickOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -4046,6 +4402,12 @@ const appPickOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'cause the target process to behave as if the UI element were picked',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRemoveActionFromOperation: OperationDescriptor<
@@ -4068,6 +4430,21 @@ const appRemoveActionFromOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      usingActionName: { type: 'string', description: '...or the name of the action to remove' },
+      usingActionNumber: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'the index number of the action to remove...',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

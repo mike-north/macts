@@ -2281,6 +2281,17 @@ const appPrintOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      printDialog: { type: 'boolean', description: 'Should the application show the print dialog' },
+      withProperties: { type: 'string', description: 'the print settings' },
+      kind: { type: 'string', description: 'the kind of printout desired' },
+      theme: { type: 'string', description: 'name of theme to use for formatting the printout' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2290,6 +2301,12 @@ const appCloseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Close an object',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCountOperation: OperationDescriptor<{ readonly each: string }, undefined> = {
@@ -2304,6 +2321,19 @@ const appCountOperation: OperationDescriptor<{ readonly each: string }, undefine
     }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      each: {
+        type: 'string',
+        description:
+          "the class of the elements to be counted. Keyword 'each' is optional in AppleScript",
+      },
+    },
+    required: ['each'],
+    additionalProperties: false,
+  },
 }
 
 const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2313,6 +2343,12 @@ const appDeleteOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Delete an element from an object',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDuplicateOperation: OperationDescriptor<{ readonly to?: string | undefined }, undefined> =
@@ -2325,6 +2361,12 @@ const appDuplicateOperation: OperationDescriptor<{ readonly to?: string | undefi
       to: t.optional(t.string({ description: 'the new location for the object(s)' })),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: { to: { type: 'string', description: 'the new location for the object(s)' } },
+      additionalProperties: false,
+    },
   }
 
 const appExistsOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2334,6 +2376,12 @@ const appExistsOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Verify if an object exists',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appMakeOperation: OperationDescriptor<
@@ -2354,6 +2402,98 @@ const appMakeOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      new: {
+        type: 'string',
+        description: "the class of the new element. Keyword 'new' is optional in AppleScript",
+      },
+      at: { type: 'string', description: 'the location at which to insert the element' },
+      withProperties: {
+        allOf: [
+          {
+            description: 'the initial values for the properties of the element',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['new'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const playlistMoveOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
@@ -2365,6 +2505,13 @@ const playlistMoveOperation: OperationDescriptor<{ readonly to: string }, undefi
     to: t.string({ description: 'the new location for the playlist(s)' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'the new location for the playlist(s)' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2374,6 +2521,12 @@ const appOpenOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Open the specified object(s)',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRunOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2383,6 +2536,12 @@ const appRunOperation: OperationDescriptor<Record<string, never>, undefined> = {
   description: 'Run the application',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appQuitOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2392,6 +2551,12 @@ const appQuitOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Quit the application',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSaveOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2401,6 +2566,12 @@ const appSaveOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Save the specified object(s)',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appAddOperation: OperationDescriptor<{ readonly to?: string | undefined }, undefined> = {
@@ -2412,6 +2583,12 @@ const appAddOperation: OperationDescriptor<{ readonly to?: string | undefined },
     to: t.optional(t.string({ description: 'the location of the added file(s)' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'the location of the added file(s)' } },
+    additionalProperties: false,
+  },
 }
 
 const appBackTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2422,6 +2599,12 @@ const appBackTrackOperation: OperationDescriptor<Record<string, never>, undefine
     'reposition to beginning of current track or go to previous track if already at start of current track',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appConvertOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2431,6 +2614,12 @@ const appConvertOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'convert one or more files or tracks',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appDownloadOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2440,6 +2629,12 @@ const appDownloadOperation: OperationDescriptor<Record<string, never>, undefined
   description: 'download a cloud track or playlist',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appExportOperation: OperationDescriptor<
@@ -2455,6 +2650,44 @@ const appExportOperation: OperationDescriptor<
     to: t.optional(t.fileSource({ description: 'the destination of the export' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      as: { type: 'string', description: 'the format to export for a playlist' },
+      to: {
+        type: 'object',
+        properties: {
+          fileSource: {
+            oneOf: [
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'caller-owned-file' },
+                  path: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'path'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'uploaded-file' },
+                  uploadId: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'uploadId'],
+                additionalProperties: false,
+              },
+            ],
+          },
+        },
+        required: ['fileSource'],
+        additionalProperties: false,
+        description: 'the destination of the export',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appFastForwardOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2464,6 +2697,12 @@ const appFastForwardOperation: OperationDescriptor<Record<string, never>, undefi
   description: 'skip forward in a playing track',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appNextTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2473,6 +2712,12 @@ const appNextTrackOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'advance to the next track in the current playlist',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2482,6 +2727,12 @@ const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'pause playback',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPlayOperation: OperationDescriptor<{ readonly once?: boolean | undefined }, undefined> = {
@@ -2493,6 +2744,14 @@ const appPlayOperation: OperationDescriptor<{ readonly once?: boolean | undefine
     once: t.optional(t.boolean({ description: 'If true, play this track once and then stop.' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      once: { type: 'boolean', description: 'If true, play this track once and then stop.' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appPlaypauseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2502,6 +2761,12 @@ const appPlaypauseOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'toggle the playing/paused state of the current track',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2511,6 +2776,12 @@ const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, unde
   description: 'return to the previous track in the current playlist',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const fileTrackRefreshOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2520,6 +2791,12 @@ const fileTrackRefreshOperation: OperationDescriptor<Record<string, never>, unde
   description: 'update file track information from the current information in the track’s file',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appResumeOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2529,6 +2806,12 @@ const appResumeOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'disable fast forward/rewind and resume playback, if playing.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2538,6 +2821,12 @@ const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'reveal and select a track or playlist',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRewindOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2547,6 +2836,12 @@ const appRewindOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'skip backwards in a playing track',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const playlistSearchOperation: OperationDescriptor<
@@ -2563,6 +2858,16 @@ const playlistSearchOperation: OperationDescriptor<
     only: t.optional(t.string({ description: 'area to search (default is all)' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      for: { type: 'string', description: 'the search text' },
+      only: { type: 'string', description: 'area to search (default is all)' },
+    },
+    required: ['for'],
+    additionalProperties: false,
+  },
 }
 
 const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2572,6 +2877,12 @@ const appSelectOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'select the specified object(s)',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2581,6 +2892,12 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'stop playback',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appOpenLocationOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -2590,6 +2907,12 @@ const appOpenLocationOperation: OperationDescriptor<Record<string, never>, undef
   description: 'Opens an iTunes Store or audio stream URL',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

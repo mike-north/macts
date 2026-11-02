@@ -57,6 +57,13 @@ const appGetURLOperation: OperationDescriptor<{ readonly url: string }, undefine
     url: t.string({ description: 'The VNC URL to open' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { url: { type: 'string', description: 'The VNC URL to open' } },
+    required: ['url'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

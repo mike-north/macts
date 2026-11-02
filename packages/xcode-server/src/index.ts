@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Xcode.app.
+ * The Xcode server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `xcodeContract` from `@macts/xcode/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { xcodeApiPlugin as plugin, xcodeApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { xcodeContract as contract } from '@macts/xcode/contract'

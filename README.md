@@ -92,8 +92,8 @@ console.log(event.uid)
 **MCP tools (for AI assistants):**
 
 macts serves each installed app's operations as MCP tools. Install an app's server package (e.g.
-`@macts/calendar-server`) into the macts plugins directory (`~/.macts/plugins`, override with
-`MACTS_HOME`), then start a server:
+`@macts/calendar-server`), which carries the app's contract, into the macts plugins directory
+(`~/.macts/plugins`, override with `MACTS_HOME`), then start a server:
 
 ```bash
 macts mcp install calendar

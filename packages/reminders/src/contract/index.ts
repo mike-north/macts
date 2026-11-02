@@ -398,6 +398,12 @@ const listListOperation: OperationDescriptor<Record<string, never>, readonly Lis
   description: 'List all reminder lists',
   input: t.record({}),
   output: t.array(listRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const listGetOperation: OperationDescriptor<{ readonly id: string }, List> = {
@@ -409,6 +415,13 @@ const listGetOperation: OperationDescriptor<{ readonly id: string }, List> = {
     id: t.string({ description: 'List identifier' }),
   }),
   output: listRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'List identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const listCreateOperation: OperationDescriptor<ListCreateInput, List> = {
@@ -418,6 +431,17 @@ const listCreateOperation: OperationDescriptor<ListCreateInput, List> = {
   description: 'Create a new reminder list',
   input: listCreateInputType,
   output: listRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'List name' },
+      color: { type: 'string', description: 'List color' },
+      emblem: { type: 'string', description: 'The emblem icon name of the list' },
+    },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const reminderListRemindersOperation: OperationDescriptor<
@@ -432,6 +456,13 @@ const reminderListRemindersOperation: OperationDescriptor<
     listId: t.string({ description: 'List identifier' }),
   }),
   output: t.array(reminderRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { listId: { type: 'string', description: 'List identifier' } },
+    required: ['listId'],
+    additionalProperties: false,
+  },
 }
 
 const reminderGetReminderOperation: OperationDescriptor<{ readonly id: string }, Reminder> = {
@@ -443,6 +474,13 @@ const reminderGetReminderOperation: OperationDescriptor<{ readonly id: string },
     id: t.string({ description: 'Reminder identifier' }),
   }),
   output: reminderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Reminder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const reminderCreateReminderOperation: OperationDescriptor<ReminderCreateInput, Reminder> = {
@@ -452,6 +490,62 @@ const reminderCreateReminderOperation: OperationDescriptor<ReminderCreateInput, 
   description: 'Create a new reminder',
   input: reminderCreateInputType,
   output: reminderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'Reminder name' },
+      body: { type: 'string', description: 'Reminder notes' },
+      completed: { type: 'boolean', description: 'Whether the reminder is completed' },
+      dueDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Due date',
+      },
+      remindMeDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'Remind me date',
+      },
+      priority: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Priority (0=none, 1=high, 5=medium, 9=low)',
+      },
+      flagged: { type: 'boolean', description: 'Whether to flag the reminder' },
+      alldayDueDate: {
+        type: 'object',
+        properties: {
+          date: {
+            type: 'string',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+          },
+        },
+        required: ['date'],
+        additionalProperties: false,
+        description: 'The all-day due date of the reminder',
+      },
+      listId: { type: 'string', description: 'List identifier for the reminder' },
+    },
+    required: ['name', 'listId'],
+    additionalProperties: false,
+  },
 }
 
 const reminderDeleteReminderOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
@@ -463,6 +557,13 @@ const reminderDeleteReminderOperation: OperationDescriptor<{ readonly id: string
     id: t.string({ description: 'Reminder identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Reminder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const reminderCompleteReminderOperation: OperationDescriptor<{ readonly id: string }, undefined> = {
@@ -474,6 +575,13 @@ const reminderCompleteReminderOperation: OperationDescriptor<{ readonly id: stri
     id: t.string({ description: 'Reminder identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Reminder identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const reminderShowOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -483,6 +591,12 @@ const reminderShowOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Show the reminder in Reminders.app UI',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const accountListAccountsOperation: OperationDescriptor<
@@ -495,6 +609,12 @@ const accountListAccountsOperation: OperationDescriptor<
   description: 'List all accounts',
   input: t.record({}),
   output: t.array(accountRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

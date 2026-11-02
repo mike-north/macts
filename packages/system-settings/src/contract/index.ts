@@ -124,6 +124,12 @@ const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Reveals a settings pane or an anchor within a pane.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const paneAuthorizeOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -133,6 +139,12 @@ const paneAuthorizeOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'Prompt for authorization for a settings pane. Deprecated: no longer does anything.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const paneTimedLoadOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -143,6 +155,12 @@ const paneTimedLoadOperation: OperationDescriptor<Record<string, never>, undefin
     'Times and loads given settings pane and returns load time. Deprecated: no longer does anything.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

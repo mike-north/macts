@@ -1,3 +1,19 @@
+/**
+ * The macts package generator: turns an app manifest into the files of its
+ * generated packages, and writes them.
+ *
+ * The generator owns its output. Writing a package with
+ * `writeGeneratedPackage` records every path the run emitted in the package's
+ * `.macts-generated.json`, and deletes the paths the previous record held that
+ * this run no longer emits, so a removed operation or resource leaves no file
+ * behind. Files not listed in any record, such as a package's changelog or
+ * handwritten tests, are never touched. A package generated before it had a record takes
+ * the files carrying a generated header as its previous set. The full rule is
+ * in `./owned-output.ts`.
+ *
+ * @packageDocumentation
+ */
+
 // Context
 export { createGeneratorContext, type GeneratorContext, type GeneratorOptions } from './context.js'
 
@@ -45,21 +61,6 @@ export {
   type GeneratedFlag,
 } from './cli/index.js'
 
-// MCP generator
-export {
-  generateMcpPlugin,
-  createMcpGeneratorContext,
-  type CreateMcpContextOptions,
-  type McpGeneratorContext,
-  type GeneratedMcpPlugin,
-  type GeneratedTool,
-  type GeneratedToolFile,
-  // `JsonSchema` is referenced by the public `Capability.inputSchema` /
-  // `outputSchema` and `GeneratedTool.inputSchema` types, so it must be part of
-  // the public API surface to keep those types self-contained for consumers.
-  type JsonSchema,
-} from './mcp/index.js'
-
 // HTTP Client SDK generator
 export {
   generateHttpClientSdk,
@@ -67,18 +68,8 @@ export {
   type GeneratedHttpClientSdk,
 } from './sdk/index.js'
 
-// API plugin generator
-export {
-  generateApiPlugin,
-  type ApiPluginGeneratorOptions,
-  type GenerateApiPluginResult,
-} from './api/index.js'
-
 // Orchestrator
 export {
-  generateAllHttpPackages,
-  type GenerateAllOptions,
-  type GenerateAllResult,
   generateConsolidatedPackages,
   type GenerateConsolidatedOptions,
   type GenerateConsolidatedResult,
@@ -91,7 +82,7 @@ export {
   type GenerateClientPackageResult,
 } from './client/index.js'
 
-// Server package generator (consolidated API + MCP)
+// Server package generator (the contract-only `-server` package)
 export {
   generateServerPackage,
   type GenerateServerPackageOptions,
@@ -103,3 +94,11 @@ export { generateCapabilitiesModule } from './capabilities/index.js'
 
 // File writer
 export { writeFiles } from './write.js'
+
+// Owned output: the record of what a run emitted, and pruning what it no longer emits
+export {
+  writeGeneratedPackage,
+  OWNED_OUTPUT_RECORD_FILE,
+  type GeneratedPackageWriteResult,
+  type OwnedOutputSource,
+} from './owned-output.js'
