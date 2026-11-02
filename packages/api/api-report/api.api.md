@@ -52,6 +52,9 @@ export function createInFlightTracker(): InFlightTracker;
 export function createMultiServer(manifests: AppManifest[], options?: ServerOptions): ServerInstance;
 
 // @public
+export function createReferencesAdapter(runtime: MactsRuntime, options?: HttpAdapterOptions): Hono;
+
+// @public
 export function createServer(manifest: AppManifest, options?: ServerOptions): ServerInstance;
 
 // @public
@@ -102,6 +105,12 @@ export interface LoadedTlsOptions {
 // @public
 export interface RateLimitOptions extends RateLimiterOptions {
     readonly perAddress?: RateLimiterOptions;
+}
+
+// @public
+export interface ResolveReferenceRequest {
+    readonly app: string;
+    readonly reference: unknown;
 }
 
 // @public

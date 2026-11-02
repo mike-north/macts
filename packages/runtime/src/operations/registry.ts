@@ -11,7 +11,8 @@
  * therefore never widen what a credential authorizes.
  *
  * Registration fails closed and atomically: a conflicting or mismatched
- * operation rejects the whole registration, and nothing from it is added.
+ * operation, or an app whose route segment is reserved, rejects the whole
+ * registration, and nothing from it is added.
  *
  * @packageDocumentation
  */
@@ -59,6 +60,52 @@ export interface RegisteredOperation {
 export class OperationRegistrationError extends Error {
   /** Identifies registration failures in logs and serialized errors. */
   override readonly name = 'OperationRegistrationError'
+}
+
+/**
+ * Names that can never be an app's route segment.
+ *
+ * @remarks
+ * Each names a namespace or route that a macts host serves, or will serve,
+ * beside the apps, so an app spelled the same way would collide with it on
+ * some surface:
+ *
+ * - `rpc`: the operation routes, `/api/v1/rpc/<operation id>` over HTTP;
+ * - `introspect`: the operation listings, `/api/v1/introspect` over HTTP,
+ *   which predate the namespace rule and stay under `/api/v1` for
+ *   compatibility;
+ * - `references`: reference resolution (`/references/v1` over HTTP), which
+ *   resolves references of every app;
+ * - `transfers`: binary transfers, which will move file bytes for every app at
+ *   `/transfers/v1` over HTTP. Nothing is served there yet; the name is
+ *   reserved so that no app can claim it first.
+ *
+ * The runtime refuses an app with any of these route segments at registration
+ * (`registerManifest` and `registerContract`), so no host, HTTP or otherwise,
+ * can serve one. A segment is compared after normalization
+ * (`normalizeAppRouteSegment` in `@macts/core`), the spelling every surface
+ * uses.
+ */
+export const RESERVED_APP_ROUTE_SEGMENTS: readonly string[] = Object.freeze([
+  'introspect',
+  'rpc',
+  'references',
+  'transfers',
+])
+
+/**
+ * Refuse an app whose route segment is reserved.
+ *
+ * @throws {@link OperationRegistrationError} when the manifest's app route
+ *   segment is one of {@link RESERVED_APP_ROUTE_SEGMENTS}.
+ */
+function assertAppSegmentNotReserved(manifest: AppManifest): void {
+  const segment = normalizeAppRouteSegment(manifest.app.name)
+  if (RESERVED_APP_ROUTE_SEGMENTS.includes(segment)) {
+    throw new OperationRegistrationError(
+      `App "${manifest.app.name}" cannot be registered: its route segment "${segment}" is reserved for the routes macts serves beside the apps (reserved: ${RESERVED_APP_ROUTE_SEGMENTS.join(', ')})`
+    )
+  }
 }
 
 /** What the manifest alone says about one operation. */
@@ -148,10 +195,12 @@ function toRegisteredOperation(
  *
  * @param manifest - A validated app manifest.
  * @returns One registered operation per route, in command-declaration order.
- * @throws {@link OperationRegistrationError} when a route or permission is not
- *   in operation form.
+ * @throws {@link OperationRegistrationError} when the app's route segment is
+ *   reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}), or a route or permission
+ *   is not in operation form.
  */
 export function operationsFromManifest(manifest: AppManifest): RegisteredOperation[] {
+  assertAppSegmentNotReserved(manifest)
   const inputTypes = new Map<string, ValueType<unknown>>()
   return deriveManifestOperations(manifest).map(({ id, permission, target, command }) => {
     let input = inputTypes.get(target.command)
@@ -196,12 +245,14 @@ function sameTarget(a: OperationTarget, b: OperationTarget): boolean {
  * @param manifest - The validated manifest the contract was generated from.
  * @returns One registered operation per contract descriptor, using the
  *   contract's descriptors.
- * @throws {@link OperationRegistrationError} on any disagreement.
+ * @throws {@link OperationRegistrationError} on any disagreement, or when the
+ *   app's route segment is reserved ({@link RESERVED_APP_ROUTE_SEGMENTS}).
  */
 export function operationsFromContract(
   contract: AppContract<unknown>,
   manifest: AppManifest
 ): RegisteredOperation[] {
+  assertAppSegmentNotReserved(manifest)
   const appSegment = normalizeAppRouteSegment(manifest.app.name)
   if (contract.app !== appSegment) {
     throw new OperationRegistrationError(

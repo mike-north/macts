@@ -12,7 +12,8 @@
  * registry and the phases/13 D6 table:
  *
  * - 200 `{ result }` with wire values
- * - 401 `UNAUTHENTICATED`, 403 `PERMISSION_DENIED` (`required`), 404 `NOT_FOUND`
+ * - 401 `UNAUTHENTICATED` with `WWW-Authenticate: Bearer`, 403
+ *   `PERMISSION_DENIED` (`required`), 404 `NOT_FOUND`
  * - 429 `RATE_LIMITED` with `Retry-After` and `retryAfterSeconds`
  * - 502 `UNEXPECTED_VALUE` for a result that violates the operation's output
  *   contract (D11), with issue paths but no values
@@ -21,11 +22,11 @@
  * a window that opens at the fixed instant lasts the full 60 seconds.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6, D11)
+ * @see https://www.rfc-editor.org/rfc/rfc7235#section-4.1
+ * @see https://www.rfc-editor.org/rfc/rfc6750#section-3
  * @see https://hono.dev/docs/getting-started/nodejs
  */
 
-import type { AddressInfo } from 'node:net'
-import { serve, type ServerType } from '@hono/node-server'
 import { Hono } from 'hono'
 import pino from 'pino'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -43,9 +44,11 @@ import {
   READER_TOKEN,
   WRITER_TOKEN,
   createFakeVerifier,
+  createListenerPool,
   createRecordingExecutor,
   createTestServer,
   errorBody,
+  type Listener,
   type RecordingExecutor,
   type TestServerOptions,
 } from './test-helpers.js'
@@ -56,38 +59,13 @@ const fixedClock = (): Date => new Date('2026-01-15T10:00:00.000Z')
 /** The loopback spellings a socket peer can have, depending on the host's IPv6 setup. */
 const LOOPBACK_ADDRESSES = ['127.0.0.1', '::1', '::ffff:127.0.0.1']
 
-/** A listener started for the current test. */
-interface Listener {
-  /** Base URL of the listener, without a trailing slash. */
-  readonly url: string
-}
+const listeners = createListenerPool()
 
-const openServers: ServerType[] = []
-
-afterEach(async () => {
-  const closing = openServers.splice(0).map(
-    (server) =>
-      new Promise<void>((resolve) => {
-        // Drop keep-alive and any still-open request so close() can finish.
-        if ('closeAllConnections' in server) server.closeAllConnections()
-        server.close(() => {
-          resolve()
-        })
-      })
-  )
-  await Promise.all(closing)
-})
+afterEach(() => listeners.closeAll())
 
 /** Serve `app` on an ephemeral 127.0.0.1 port. */
-async function listen(app: Hono): Promise<Listener> {
-  const server = await new Promise<ServerType>((resolve) => {
-    const started = serve({ fetch: app.fetch, port: 0, hostname: '127.0.0.1' }, () => {
-      resolve(started)
-    })
-  })
-  openServers.push(server)
-  const { port } = server.address() as AddressInfo
-  return { url: `http://127.0.0.1:${String(port)}` }
+function listen(app: Hono): Promise<Listener> {
+  return listeners.listen(app)
 }
 
 /** The full macts server app on a real listener. */
@@ -147,6 +125,8 @@ describe('HTTP listener: responses over a real socket', () => {
     const res = await rpc(listener, 'calendar.events.list')
 
     expect(res.status).toBe(401)
+    // RFC 7235 §4.1: a 401 carries a challenge; RFC 6750 §3 names the scheme.
+    expect(res.headers.get('WWW-Authenticate')).toBe('Bearer')
     expect(await res.json()).toEqual({
       error: {
         code: 'UNAUTHENTICATED',

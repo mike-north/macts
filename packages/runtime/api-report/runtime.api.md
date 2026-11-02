@@ -385,6 +385,9 @@ export interface RegisteredOperation {
 }
 
 // @public
+export const RESERVED_APP_ROUTE_SEGMENTS: readonly string[];
+
+// @public
 export type ResolvedGovernanceContext = GovernanceContext & {
     readonly keyPolicy?: GovernancePolicy | undefined;
 };

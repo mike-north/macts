@@ -146,6 +146,8 @@ describe('authentication (D5 step 1 → 401 UNAUTHENTICATED)', () => {
     })
 
     expect(res.status).toBe(401)
+    // RFC 7235 §4.1: a 401 carries a challenge; RFC 6750 §3 names the scheme.
+    expect(res.headers.get('WWW-Authenticate')).toBe('Bearer')
     const body = await errorBody(res)
     expect(body.error.code).toBe('UNAUTHENTICATED')
     expect(body.error.details).toEqual({ reason })
@@ -171,6 +173,8 @@ describe('permission (D5 step 2 → 403 PERMISSION_DENIED)', () => {
     const res = await post(app, 'calendar.events.create', { summary: 'x' }, READER_TOKEN)
 
     expect(res.status).toBe(403)
+    // The caller is authenticated; only a 401 challenges for credentials.
+    expect(res.headers.get('WWW-Authenticate')).toBeNull()
     const body = await errorBody(res)
     expect(body.error.code).toBe('PERMISSION_DENIED')
     expect(body.error.details).toMatchObject({ required: 'calendar:events:create' })

@@ -84,6 +84,16 @@ const result = await runtime.invoke(
 )
 ```
 
+### Reserved app names
+
+`introspect`, `rpc`, `references`, and `transfers` name routes a macts host
+serves, or will serve, beside the apps (the operation listings, the operation
+routes, reference resolution, and binary transfers), so none of them is ever
+an app's route segment.
+`registerManifest` and `registerContract` throw `OperationRegistrationError`
+for an app whose normalized name is one of them, and register nothing. The
+names are exported as `RESERVED_APP_ROUTE_SEGMENTS`.
+
 ## This Mac's governance
 
 `loadHostGovernance()` composes the governance a host enforces when nobody

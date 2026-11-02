@@ -2,11 +2,20 @@
  * HTTP server for the macts API.
  *
  * Composes a macts runtime (executor, credential verifier, governance, and the
- * per-subject admission limit) with the HTTP adapter, and adds the
- * server-level concerns around it: the unauthenticated `/health` and
+ * per-subject admission limit) with the HTTP adapters, and adds the
+ * server-level concerns around them: the unauthenticated `/health` and
  * `/api/v1` endpoints, CORS, pretty JSON, request logging, in-flight request
- * tracking, TLS, and graceful shutdown. Every operation request is handled by
- * the adapter and runs through the runtime's invocation pipeline.
+ * tracking, TLS, and graceful shutdown.
+ *
+ * The server's routes fall into top-level namespaces, each for one kind of
+ * call (phases/13 D5, D7):
+ *
+ * - `/api/v1`: app operations, `POST /api/v1/rpc/<operation id>`, and the
+ *   unauthenticated listings (`/api/v1` itself and `/api/v1/introspect`);
+ * - `/references/v1`: reference resolution, `POST /references/v1/resolve`.
+ *
+ * Every operation and resolution request runs through the runtime's
+ * invocation pipeline, and both share one per-client-address limit.
  *
  * A server serves the apps registered on its runtime when it is constructed,
  * in either of two ways:
@@ -39,27 +48,30 @@ import {
   type RateLimiterOptions,
 } from '@macts/runtime'
 import { getPackageVersion } from '../package-version.js'
+import { createHttpAdapter } from './adapter.js'
 import {
-  createHttpAdapter,
   DEFAULT_ADDRESS_RATE_LIMIT,
   errorLogFields,
   internalErrorResponse,
   notFoundResponse,
   type ClientAddressResolver,
-} from './adapter.js'
+  type HttpAdapterOptions,
+} from './call-protocol.js'
+import { createReferencesAdapter } from './references-adapter.js'
 import { createInFlightTracker } from './middleware/in-flight.js'
 import { requestLogger } from './middleware/request-logger.js'
 import { loadTlsOptions, type TlsOptions } from './tls.js'
 
+export { createHttpAdapter } from './adapter.js'
 export {
-  createHttpAdapter,
   httpStatusForError,
   defaultClientAddress,
   DEFAULT_ADDRESS_RATE_LIMIT,
   type ClientAddressResolver,
   type HttpAdapterOptions,
   type RpcSuccessResponse,
-} from './adapter.js'
+} from './call-protocol.js'
+export { createReferencesAdapter, type ResolveReferenceRequest } from './references-adapter.js'
 export type { WireErrorEnvelope } from '@macts/contracts'
 export { createInFlightTracker, type InFlightTracker } from './middleware/in-flight.js'
 export { type TlsOptions, type LoadedTlsOptions } from './tls.js'
@@ -74,13 +86,15 @@ const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000
  * Rate limiting for the HTTP server.
  *
  * @remarks
- * Two independent fixed-window limits apply to operation requests:
+ * Two independent fixed-window limits apply to operation and reference
+ * resolution requests:
  *
  * - The top-level `windowMs` and `max` limit calls per verified subject (the
  *   API key). This is the runtime's admission step, after the credential is
  *   verified and before the permission check.
  * - `perAddress` limits requests per client network address, before the
  *   credential is examined, so failed authentication attempts are bounded too.
+ *   Operation and resolution requests from one address share one budget.
  *
  * Both answer `429` with the `RATE_LIMITED` error and a `Retry-After` header.
  */
@@ -107,12 +121,13 @@ export interface AppRegistrar {
    * descriptor against the manifest. The operations validate inputs against
    * the contract's wire schemas.
    *
-   * @throws `OperationRegistrationError` when a descriptor's permission or
-   *   target disagrees with the manifest, names an operation the manifest does
-   *   not expose, an operation id is already registered, a contract for the
-   *   same app is already registered, or the contract's resource table records
-   *   a `get` or `list` operation that is not one of its operations targeting
-   *   that resource.
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS` in `@macts/runtime`), a
+   *   descriptor's permission or target disagrees with the manifest, names an
+   *   operation the manifest does not expose, an operation id is already
+   *   registered, a contract for the same app is already registered, or the
+   *   contract's resource table records a `get` or `list` operation that is not
+   *   one of its operations targeting that resource.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**
@@ -120,8 +135,10 @@ export interface AppRegistrar {
    * contract value types, with inputs validated by each command's request
    * schema.
    *
-   * @throws `OperationRegistrationError` when an operation id is already
-   *   registered or the manifest yields a malformed id or permission.
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS` in `@macts/runtime`), an
+   *   operation id is already registered, or the manifest yields a malformed
+   *   id or permission.
    */
   registerManifest(manifest: AppManifest): void
 }
@@ -417,7 +434,9 @@ export function createMultiServer(
   }
   register?.(registrar)
 
-  const adapter = createHttpAdapter(runtime, {
+  // One per-address limiter for every runtime route, so a client cannot widen
+  // its budget by spreading requests across namespaces.
+  const adapterOptions: HttpAdapterOptions = {
     ...(customLogger === undefined ? {} : { logger: customLogger }),
     ...(clientAddress === undefined ? {} : { clientAddress }),
     addressRateLimiter:
@@ -428,7 +447,9 @@ export function createMultiServer(
             windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
             ...rateLimit?.perAddress,
           }),
-  })
+  }
+  const adapter = createHttpAdapter(runtime, adapterOptions)
+  const references = createReferencesAdapter(runtime, adapterOptions)
 
   const app = new Hono()
 
@@ -477,6 +498,10 @@ export function createMultiServer(
   // Every operation request goes through the adapter, and from it through the
   // runtime's invocation pipeline.
   app.route('/api/v1', adapter)
+
+  // Reference resolution is not an app operation, so it has its own top-level
+  // namespace rather than a segment under `/api/v1` (phases/13 D7).
+  app.route('/references/v1', references)
 
   // Fallbacks, in the same envelope as every other failure.
   app.onError((err) => {
