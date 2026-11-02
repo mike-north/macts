@@ -1267,8 +1267,11 @@ table records it (`ResourceDescriptor.get` and `.list`, chosen when the
 contract is generated); it never re-derives the choice from the manifest, so
 the contract stays the single source of truth. A resource that records no such
 operation is not resolvable, and its references fail with
-`InvalidSelectionError`. A recorded operation id that the contract does not
-register is a contract defect and fails with `InternalError`.
+`InvalidSelectionError`. `registerContract` checks every recorded id when the
+app registers, before anything is added: it must name one of the contract's
+operations, and that operation must target the resource that records it.
+Otherwise the contract is inconsistent and must be regenerated, and
+registration fails with `OperationRegistrationError`, registering nothing.
 
 Resolution runs the full D5 pipeline as that operation, so it can never
 bypass policy:
@@ -1286,14 +1289,20 @@ bypass policy:
    permission, because a container only locates the target and contributes no
    data to the result.
 5. Governance, approval, and audit run exactly as for a direct call of the
-   operation: the same permission string, the same decision, and the same
-   audit record.
+   operation: the same permission string and the same decision. The audit
+   record has the same capability, app, key, and decision as a direct call;
+   it differs only in `argsSummary`, which holds the redacted reference
+   payload. Nested values in that summary are reduced to a key count, so a
+   selector is summarized as an object and the name a name selector looked up
+   is not recorded. Nothing else marks the record as a resolution.
 6. The whole reference is validated with
    `t.reference(contract.resources, resource, cardinality)`, after governance
    as in `invoke` (D11). A malformed reference is a `ValidationError`.
 7. The executor's `resolve` runs (D9).
-8. The result is validated against the operation's `output.wire`. A mismatch
-   is an `UnexpectedValueError`.
+8. The result is validated against the operation's `output.wire`. For an
+   identity collection it must also hold exactly one record per entry, which
+   enforces that no entry is silently dropped. A mismatch is an
+   `UnexpectedValueError`.
 
 **Resolution errors.** A single reference whose identity `id` or name selector
 matches nothing raises `TargetNotFoundError`. An index past the end raises
@@ -1628,14 +1637,14 @@ Live evidence, for a resource the dictionary declares but the running app fails 
 
 Values are validated at every trust boundary, using the same schemas:
 
-| Boundary                      | Check                                                |
-| ----------------------------- | ---------------------------------------------------- |
-| Client `encode`               | Before any network or native call. It catches casts. |
-| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                   |
-| Runtime against `t.reference` | A reference to resolve, after governance (D7).       |
-| Runtime against `output.wire` | A resolution result, before it is returned (D7).     |
-| Native codec inside JXA       | Against the plan, in both directions.                |
-| Client `decode`               | Against the operation's output contract.             |
+| Boundary                      | Check                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Client `encode`               | Before any network or native call. It catches casts.                                                 |
+| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                   |
+| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                       |
+| Runtime against `output.wire` | A resolution result, before it is returned, including one record per identity-collection entry (D7). |
+| Native codec inside JXA       | Against the plan, in both directions.                                                                |
+| Client `decode`               | Against the operation's output contract.                                                             |
 
 Validation failures happen before app mutation.
 
