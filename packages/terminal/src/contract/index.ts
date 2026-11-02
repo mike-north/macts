@@ -380,6 +380,12 @@ const windowListOperation: OperationDescriptor<Record<string, never>, readonly W
   description: 'List items',
   input: t.record({}),
   output: t.array(windowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const tabListOperation: OperationDescriptor<Record<string, never>, readonly Tab[]> = {
@@ -389,6 +395,12 @@ const tabListOperation: OperationDescriptor<Record<string, never>, readonly Tab[
   description: 'List items',
   input: t.record({}),
   output: t.array(tabRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const settingsSetListOperation: OperationDescriptor<
@@ -401,6 +413,12 @@ const settingsSetListOperation: OperationDescriptor<
   description: 'List items',
   input: t.record({}),
   output: t.array(settingsSetRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const windowGetOperation: OperationDescriptor<{ readonly name: string }, Window> = {
@@ -412,6 +430,13 @@ const windowGetOperation: OperationDescriptor<{ readonly name: string }, Window>
     name: t.string({ description: 'Item identifier' }),
   }),
   output: windowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item identifier' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const tabGetOperation: OperationDescriptor<{ readonly name: string }, Tab> = {
@@ -423,6 +448,13 @@ const tabGetOperation: OperationDescriptor<{ readonly name: string }, Tab> = {
     name: t.string({ description: 'Item identifier' }),
   }),
   output: tabRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item identifier' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const settingsSetGetOperation: OperationDescriptor<{ readonly name: string }, SettingsSet> = {
@@ -434,6 +466,13 @@ const settingsSetGetOperation: OperationDescriptor<{ readonly name: string }, Se
     name: t.string({ description: 'Item identifier' }),
   }),
   output: settingsSetRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item identifier' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const appDoScriptOperation: OperationDescriptor<
@@ -449,6 +488,16 @@ const appDoScriptOperation: OperationDescriptor<
     in: t.optional(t.string({ description: 'The window or tab to run the command in' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      command: { type: 'string', description: 'The command to execute' },
+      in: { type: 'string', description: 'The window or tab to run the command in' },
+    },
+    required: ['command'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

@@ -355,6 +355,12 @@ const accountListOperation: OperationDescriptor<Record<string, never>, readonly 
   description: 'List items',
   input: t.record({}),
   output: t.array(accountRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const folderListOperation: OperationDescriptor<Record<string, never>, readonly Folder[]> = {
@@ -364,6 +370,12 @@ const folderListOperation: OperationDescriptor<Record<string, never>, readonly F
   description: 'List items',
   input: t.record({}),
   output: t.array(folderRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const noteListOperation: OperationDescriptor<Record<string, never>, readonly Note[]> = {
@@ -373,6 +385,12 @@ const noteListOperation: OperationDescriptor<Record<string, never>, readonly Not
   description: 'List items',
   input: t.record({}),
   output: t.array(noteRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const attachmentListOperation: OperationDescriptor<Record<string, never>, readonly Attachment[]> = {
@@ -382,6 +400,12 @@ const attachmentListOperation: OperationDescriptor<Record<string, never>, readon
   description: 'List items',
   input: t.record({}),
   output: t.array(attachmentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const accountGetOperation: OperationDescriptor<{ readonly name: string }, Account> = {
@@ -393,6 +417,13 @@ const accountGetOperation: OperationDescriptor<{ readonly name: string }, Accoun
     name: t.string({ description: 'Item name' }),
   }),
   output: accountRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const folderGetOperation: OperationDescriptor<{ readonly name: string }, Folder> = {
@@ -404,6 +435,13 @@ const folderGetOperation: OperationDescriptor<{ readonly name: string }, Folder>
     name: t.string({ description: 'Item name' }),
   }),
   output: folderRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const noteGetOperation: OperationDescriptor<{ readonly name: string }, Note> = {
@@ -415,6 +453,13 @@ const noteGetOperation: OperationDescriptor<{ readonly name: string }, Note> = {
     name: t.string({ description: 'Item name' }),
   }),
   output: noteRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Item name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const attachmentGetAttachmentOperation: OperationDescriptor<{ readonly id: string }, Attachment> = {
@@ -426,6 +471,13 @@ const attachmentGetAttachmentOperation: OperationDescriptor<{ readonly id: strin
     id: t.string({ description: 'Attachment identifier' }),
   }),
   output: attachmentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Attachment identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const noteCreateOperation: OperationDescriptor<NoteCreateInput, Note> = {
@@ -435,6 +487,15 @@ const noteCreateOperation: OperationDescriptor<NoteCreateInput, Note> = {
   description: 'Create a new note',
   input: noteCreateInputType,
   output: noteRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'The name of the note (first line)' },
+      body: { type: 'string', description: 'HTML content of the note' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const noteShowOperation: OperationDescriptor<{ readonly name: string }, undefined> = {
@@ -446,6 +507,13 @@ const noteShowOperation: OperationDescriptor<{ readonly name: string }, undefine
     name: t.string({ description: 'Note name' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Note name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

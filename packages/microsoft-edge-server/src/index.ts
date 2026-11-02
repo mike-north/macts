@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS MicrosoftEdge.app.
+ * The Microsoft Edge server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `microsoftEdgeContract` from `@macts/microsoft-edge/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { microsoftEdgeApiPlugin as plugin, microsoftEdgeApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { microsoftEdgeContract as contract } from '@macts/microsoft-edge/contract'

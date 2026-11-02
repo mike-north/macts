@@ -1239,6 +1239,100 @@ const appMakeOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      new: { type: 'string', description: 'The class of the new object.' },
+      at: { type: 'string', description: 'The location at which to insert the object.' },
+      withData: {
+        allOf: [
+          { description: 'The initial contents of the object.', $ref: '#/definitions/__schema0' },
+        ],
+      },
+      withProperties: {
+        allOf: [
+          {
+            description: 'The initial values for properties of the object.',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['new'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appAddOperation: OperationDescriptor<{ readonly to: string }, undefined> = {
@@ -1250,6 +1344,13 @@ const appAddOperation: OperationDescriptor<{ readonly to: string }, undefined> =
     to: t.string({ description: 'where to add this child to.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { to: { type: 'string', description: 'where to add this child to.' } },
+    required: ['to'],
+    additionalProperties: false,
+  },
 }
 
 const appRemoveOperation: OperationDescriptor<{ readonly from: string }, undefined> = {
@@ -1261,6 +1362,13 @@ const appRemoveOperation: OperationDescriptor<{ readonly from: string }, undefin
     from: t.string({ description: 'where to remove this child from.' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { from: { type: 'string', description: 'where to remove this child from.' } },
+    required: ['from'],
+    additionalProperties: false,
+  },
 }
 
 const appSaveOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1271,6 +1379,12 @@ const appSaveOperation: OperationDescriptor<Record<string, never>, undefined> = 
     'Save all Contacts changes. Also see the unsaved property for the application class.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appActionPropertyOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1281,6 +1395,12 @@ const appActionPropertyOperation: OperationDescriptor<Record<string, never>, und
     'RollOver - Which property this roll over is associated with (Properties can be one of maiden name, phone, email, url, birth date, custom date, related name, aim, icq, jabber, msn, yahoo, address.)',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appActionTitleOperation: OperationDescriptor<
@@ -1300,6 +1420,300 @@ const appActionTitleOperation: OperationDescriptor<
     }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      with: {
+        description: 'property that that was returned from the "action property" handler.',
+        $ref: '#/definitions/__schema0',
+      },
+      for: {
+        description: 'Currently selected person.',
+        type: 'object',
+        properties: {
+          reference: {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        },
+        required: ['reference'],
+        additionalProperties: false,
+      },
+    },
+    required: ['with', 'for'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema1: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema2: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appPerformActionOperation: OperationDescriptor<
@@ -1319,6 +1733,300 @@ const appPerformActionOperation: OperationDescriptor<
     }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      with: {
+        description: 'property that that was returned from the "action property" handler.',
+        $ref: '#/definitions/__schema0',
+      },
+      for: {
+        description: 'Currently selected person.',
+        type: 'object',
+        properties: {
+          reference: {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        },
+        required: ['reference'],
+        additionalProperties: false,
+      },
+    },
+    required: ['with', 'for'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema1: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema2: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appShouldEnableActionOperation: OperationDescriptor<
@@ -1339,6 +2047,300 @@ const appShouldEnableActionOperation: OperationDescriptor<
     }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      with: {
+        description: 'property that that was returned from the "action property" handler.',
+        $ref: '#/definitions/__schema0',
+      },
+      for: {
+        description: 'Currently selected person.',
+        type: 'object',
+        properties: {
+          reference: {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        },
+        required: ['reference'],
+        additionalProperties: false,
+      },
+    },
+    required: ['with', 'for'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema1: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+      __schema2: {
+        anyOf: [
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Address' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'unique identifier for this address.' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'SocialProfile' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
+                type: 'string',
+                description: 'The persistent unique identifier for this profile.',
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: {
+                type: 'string',
+                enum: [
+                  'Address',
+                  'AIMHandle',
+                  'CustomDate',
+                  'Email',
+                  'Group',
+                  'ICQHandle',
+                  'JabberHandle',
+                  'MSNHandle',
+                  'Person',
+                  'Phone',
+                  'RelatedName',
+                  'SocialProfile',
+                  'Url',
+                  'YahooHandle',
+                ],
+              },
+              form: { type: 'string', const: 'selector' },
+              cardinality: { type: 'string', const: 'one' },
+              selector: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
+                    required: ['by', 'name'],
+                    additionalProperties: false,
+                  },
+                  {
+                    type: 'object',
+                    properties: {
+                      by: { type: 'string', const: 'index' },
+                      index: {
+                        type: 'object',
+                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+                        required: ['integer'],
+                        additionalProperties: false,
+                      },
+                    },
+                    required: ['by', 'index'],
+                    additionalProperties: false,
+                  },
+                ],
+              },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'selector'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 /** Every operation, keyed by its identity. */

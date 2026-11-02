@@ -264,15 +264,6 @@ The destination path is accepted as-is — no home-directory expansion, no envir
 </td></tr>
 <tr><td>
 
-[createMcpGeneratorContext(options)](./core.createmcpgeneratorcontext.md)
-
-</td><td>
-
-Create an MCP generator context.
-
-</td></tr>
-<tr><td>
-
 [deriveCapabilities(manifest)](./core.derivecapabilities.md)
 
 </td><td>
@@ -389,26 +380,6 @@ Format a parsed permission back to a string.
 </td></tr>
 <tr><td>
 
-[generateAllHttpPackages(manifest, options)](./core.generateallhttppackages.md)
-
-</td><td>
-
-Generate all HTTP packages (SDK, MCP, CLI, API) from a manifest.
-
-</td></tr>
-<tr><td>
-
-[generateApiPlugin(manifest, options)](./core.generateapiplugin.md)
-
-</td><td>
-
-Generate an API plugin from a manifest.
-
-The API plugin packages up the app manifest and metadata so the core API server can load it and auto-generate RPC endpoints.
-
-</td></tr>
-<tr><td>
-
 [generateApplicationClass(ctx)](./core.generateapplicationclass.md)
 
 </td><td>
@@ -510,15 +481,6 @@ Generate TypeScript type alias for an enum as a string literal union.
 </td><td>
 
 Generate HTTP client SDK from a manifest.
-
-</td></tr>
-<tr><td>
-
-[generateMcpPlugin(context)](./core.generatemcpplugin.md)
-
-</td><td>
-
-Generate an MCP plugin from a manifest.
 
 </td></tr>
 <tr><td>
@@ -1114,15 +1076,6 @@ Result of API key validation.
 </td></tr>
 <tr><td>
 
-[ApiPluginGeneratorOptions](./core.apiplugingeneratoroptions.md)
-
-</td><td>
-
-Options for generating an API plugin.
-
-</td></tr>
-<tr><td>
-
 [AppConnection](./core.appconnection.md)
 
 </td><td>
@@ -1222,47 +1175,11 @@ Coarse-grained permission - CRUD-style groups. Format: `app:resource:crud-operat
 </td></tr>
 <tr><td>
 
-[CreateMcpContextOptions](./core.createmcpcontextoptions.md)
-
-</td><td>
-
-Options for creating MCP generator context.
-
-</td></tr>
-<tr><td>
-
 [FinePermission](./core.finepermission.md)
 
 </td><td>
 
 Fine-grained permission - one per command. Format: `app:resource:operation`
-
-</td></tr>
-<tr><td>
-
-[GenerateAllOptions](./core.generatealloptions.md)
-
-</td><td>
-
-Options for generating all HTTP packages.
-
-</td></tr>
-<tr><td>
-
-[GenerateAllResult](./core.generateallresult.md)
-
-</td><td>
-
-Result of generating all packages.
-
-</td></tr>
-<tr><td>
-
-[GenerateApiPluginResult](./core.generateapipluginresult.md)
-
-</td><td>
-
-Result of generating an API plugin.
 
 </td></tr>
 <tr><td>
@@ -1362,36 +1279,9 @@ Result of HTTP client SDK generation.
 </td></tr>
 <tr><td>
 
-[GeneratedMcpPlugin](./core.generatedmcpplugin.md)
-
-</td><td>
-
-Result of MCP plugin generation.
-
-</td></tr>
-<tr><td>
-
 [GeneratedSchema](./core.generatedschema.md)
 
 </td><td>
-
-</td></tr>
-<tr><td>
-
-[GeneratedTool](./core.generatedtool.md)
-
-</td><td>
-
-A generated MCP tool definition.
-
-</td></tr>
-<tr><td>
-
-[GeneratedToolFile](./core.generatedtoolfile.md)
-
-</td><td>
-
-Generated tool file content.
 
 </td></tr>
 <tr><td>
@@ -1504,7 +1394,7 @@ Options for HTTP client SDK generation.
 
 </td><td>
 
-JSON Schema for MCP tool inputs. Simplified representation matching MCP's JsonSchema interface.
+A JSON Schema object, as capability input and output schemas carry it. Simplified representation matching MCP's JsonSchema interface.
 
 </td></tr>
 <tr><td>
@@ -1541,15 +1431,6 @@ Enum value for JXA coercion (name and four-char code).
 A single resolved RPC route for a manifest command.
 
 A resource-scoped command may resolve to multiple routes if it applies to multiple resource types; each entry carries the resolved resource.
-
-</td></tr>
-<tr><td>
-
-[McpGeneratorContext](./core.mcpgeneratorcontext.md)
-
-</td><td>
-
-Context for MCP generator.
 
 </td></tr>
 <tr><td>

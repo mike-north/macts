@@ -607,6 +607,12 @@ const workflowListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all workflows',
   input: t.record({}),
   output: t.array(workflowRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const workflowGetOperation: OperationDescriptor<{ readonly name: string }, Workflow> = {
@@ -618,6 +624,13 @@ const workflowGetOperation: OperationDescriptor<{ readonly name: string }, Workf
     name: t.string({ description: 'Workflow name' }),
   }),
   output: workflowRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Workflow name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const workflowExecuteOperation: OperationDescriptor<{ readonly workflow: unknown }, undefined> = {
@@ -629,6 +642,86 @@ const workflowExecuteOperation: OperationDescriptor<{ readonly workflow: unknown
     workflow: t.unknown({ description: 'The workflow to execute' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workflow: { description: 'The workflow to execute', $ref: '#/definitions/__schema0' },
+    },
+    required: ['workflow'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const automatorActionListActionsOperation: OperationDescriptor<
@@ -643,6 +736,13 @@ const automatorActionListActionsOperation: OperationDescriptor<
     workflowName: t.string({ description: 'Workflow name' }),
   }),
   output: t.array(automatorActionRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workflowName: { type: 'string', description: 'Workflow name' } },
+    required: ['workflowName'],
+    additionalProperties: false,
+  },
 }
 
 const automatorActionGetActionOperation: OperationDescriptor<
@@ -657,6 +757,13 @@ const automatorActionGetActionOperation: OperationDescriptor<
     id: t.string({ description: 'Action identifier' }),
   }),
   output: automatorActionRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Action identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const appAddOperation: OperationDescriptor<
@@ -675,6 +782,100 @@ const appAddOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      object: {
+        description: 'The Automator action or variable to add',
+        $ref: '#/definitions/__schema0',
+      },
+      to: {
+        description: 'The workflow to which the action or variable is to be added',
+        $ref: '#/definitions/__schema0',
+      },
+      atIndex: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The index at which the action or variable is to be added',
+      },
+    },
+    required: ['object', 'to'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const appRemoveOperation: OperationDescriptor<{ readonly object: unknown }, undefined> = {
@@ -686,6 +887,89 @@ const appRemoveOperation: OperationDescriptor<{ readonly object: unknown }, unde
     object: t.unknown({ description: 'The Automator action or variable to remove' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      object: {
+        description: 'The Automator action or variable to remove',
+        $ref: '#/definitions/__schema0',
+      },
+    },
+    required: ['object'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const variableListVariablesOperation: OperationDescriptor<
@@ -700,6 +984,13 @@ const variableListVariablesOperation: OperationDescriptor<
     workflowName: t.string({ description: 'Workflow name' }),
   }),
   output: t.array(variableRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workflowName: { type: 'string', description: 'Workflow name' } },
+    required: ['workflowName'],
+    additionalProperties: false,
+  },
 }
 
 const variableGetVariableOperation: OperationDescriptor<{ readonly id: string }, Variable> = {
@@ -711,6 +1002,13 @@ const variableGetVariableOperation: OperationDescriptor<{ readonly id: string },
     id: t.string({ description: 'Variable identifier' }),
   }),
   output: variableRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Variable identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const settingListSettingsOperation: OperationDescriptor<
@@ -725,6 +1023,13 @@ const settingListSettingsOperation: OperationDescriptor<
     actionId: t.string({ description: 'Action identifier' }),
   }),
   output: t.array(settingRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { actionId: { type: 'string', description: 'Action identifier' } },
+    required: ['actionId'],
+    additionalProperties: false,
+  },
 }
 
 const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
@@ -739,6 +1044,13 @@ const requiredResourceListRequiredResourcesOperation: OperationDescriptor<
     actionId: t.string({ description: 'Action identifier' }),
   }),
   output: t.array(requiredResourceRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { actionId: { type: 'string', description: 'Action identifier' } },
+    required: ['actionId'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

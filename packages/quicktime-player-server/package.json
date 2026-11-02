@@ -1,7 +1,7 @@
 {
   "name": "@macts/quicktime-player-server",
   "version": "0.2.0",
-  "description": "Server package for macOS QuickTimePlayer.app (API + MCP)",
+  "description": "Server package for macOS QuickTimePlayer.app: the contract a macts host serves",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,16 +14,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/quicktime-player-server.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./mcp": {
-      "types": "./dist/mcp.d.ts",
-      "import": "./dist/mcp/index.js"
     }
   },
   "main": "./dist/index.js",
-  "types": "./dist/quicktime-player-server.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -40,9 +36,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@macts/api": "workspace:*",
-    "@macts/core": "workspace:*",
-    "@macts/types": "workspace:*",
     "@macts/quicktime-player": "workspace:*"
   },
   "devDependencies": {

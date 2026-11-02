@@ -46,7 +46,7 @@ macts generate manifests/calendar/app.yaml --out-dir packages --target all
 This produces:
 
 1. **Client package** (`packages/calendar/`) - TypeScript SDK with HTTP client, CLI plugin, types, and schemas
-2. **Server package** (`packages/calendar-server/`) - API plugin and MCP tools for server-side automation
+2. **Server package** (`packages/calendar-server/`) - re-exports the app's contract (`@macts/calendar/contract`) as `contract`, for a macts host to serve
 
 The generated code includes:
 

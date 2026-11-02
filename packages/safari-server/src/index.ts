@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Safari.app.
+ * The Safari server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `safariContract` from `@macts/safari/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { safariApiPlugin as plugin, safariApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { safariContract as contract } from '@macts/safari/contract'

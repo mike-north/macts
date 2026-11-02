@@ -36,7 +36,7 @@ macts/
     mcp/               # MCP server framework
     api/               # HTTP API server
     calendar/          # Generated client package (SDK + CLI plugin)
-    calendar-server/   # Generated server package (API + MCP plugin)
+    calendar-server/   # Generated server package (the app's contract, for a host)
     ...
 ```
 
@@ -181,7 +181,7 @@ node packages/cli/dist/bin.js generate manifests/{app-name}/app.yaml \
 This creates two directories:
 
 - `packages/{app-name}/` -- client SDK + CLI plugin
-- `packages/{app-name}-server/` -- API plugin + MCP tools
+- `packages/{app-name}-server/` -- re-exports the app's contract for a macts host
 
 #### 6. Build and Test
 
@@ -203,7 +203,7 @@ Spot-check the generated files:
 - `packages/{app-name}/src/types.ts` -- type definitions match the manifest
 - `packages/{app-name}/src/client.ts` -- client methods exist for all resources
 - `packages/{app-name}/src/cli/commands/` -- CLI commands for each operation
-- `packages/{app-name}-server/src/mcp/tools/` -- MCP tools for each resource
+- `packages/{app-name}/src/contract/index.ts` -- one operation descriptor per operation, which hosts serve over HTTP and MCP
 
 #### 8. Create a Changeset
 

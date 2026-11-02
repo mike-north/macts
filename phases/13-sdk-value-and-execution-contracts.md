@@ -611,6 +611,14 @@ construct canonical errors. On failure:
 | `description`                  | Text describing the operation                                                                                             |
 | `input: ValueType<Input>`      | Always record-shaped                                                                                                      |
 | `output: ValueType<Output>`    | The operation's result                                                                                                    |
+| `inputJsonSchema?`             | `Readonly<Record<string, unknown>>`, the draft-7 JSON Schema of `input.wire` (below)                                      |
+
+`inputJsonSchema` is exactly `z.toJSONSchema(input.wire, { target: 'draft-7' })`.
+It describes wire values, and generated descriptors always carry it. The
+generator computes it in process, from value types built with the same
+constructors the contract uses, and annotates each descriptor's type so the
+declared type is `Readonly<Record<string, unknown>>`, not the literal.
+Adapters never read or serve it; they always derive from `input.wire` (D9).
 
 Every asynchronous client call that reaches the runtime (`invoke`, a
 reference's `resolve`, and a file value's `fetch`) accepts one shared
@@ -1429,9 +1437,21 @@ This refactor adopts these items from `phases/12`:
   `z.toJSONSchema(input.wire, { target: 'draft-7' })` and describes **wire**
   values. Wire schemas are pure validators, with no defaults or transforms, so
   input and output forms coincide. A schema JSON Schema can't represent is an
-  error, never an empty schema. An adapter serves the document it derives. A
-  contract may also embed one for consumers that don't run zod, and in this
-  repository a test asserts the two are equal wherever both exist.
+  error, never an empty schema. An adapter serves the document it derives,
+  never a stored one. Every generated descriptor also embeds the document as
+  `inputJsonSchema`, for consumers that don't run zod; adapters never read or
+  serve it. The generator computes it in process from the value types the
+  contract constructs, and `e2e/mcp-contracts`
+  (`test/input-json-schema.integration.test.ts`) asserts, for every operation
+  of every shipped contract, that it is present and equals the document
+  derived from `input.wire`.
+- The capability registry that discovery serves still builds its input
+  schemas from the manifest, independently of `input.wire`
+  ([#188](https://github.com/mike-north/macts/issues/188)). Its MCP tool names
+  must equal the adapter's: `e2e/mcp-contracts`
+  (`test/tool-name-parity.integration.test.ts`) matches every shipped contract
+  operation to its capability by manifest target and asserts that
+  `Capability.mcpToolName` equals `toolNameFor(op.id)`.
 - The independent server `buildCommandSchema` is retired; the runtime validates
   with descriptor schemas.
 
@@ -1574,7 +1594,7 @@ are listed with a single integration owner.
 | `packages/core/src/execution/**`                                                                                         | Execution                           | `Executor` seam                                                                               |
 | `packages/core/src/jxa/coercion.ts`, `types/standardized.ts`                                                             | Value contracts                     | Replaced or deleted                                                                           |
 | `packages/core/src/manifest/**`                                                                                          | Value contracts                     | Nullability/resettability, constraints                                                        |
-| `packages/core/src/generator/**` (incl. `sdk/http-client.ts`, `mcp/`, `cli/`, `server/`)                                 | Value contracts                     | Execution supplies runtime interfaces and test fixtures                                       |
+| `packages/core/src/generator/**` (incl. `sdk/http-client.ts`, `cli/`, `contract/`, `server/`)                            | Value contracts                     | Execution supplies runtime interfaces and test fixtures                                       |
 | `packages/core/src/governance/**`, `permissions/**`                                                                      | Execution                           | Consumed, not forked                                                                          |
 | `packages/runtime/**` (new), including moves from `packages/api/src/keys/**` and `packages/api/src/server/governance/**` | Execution                           |                                                                                               |
 | `packages/api/src/server/**` (incl. `handlers/rpc.ts`, `handlers/validation.ts`, middleware)                             | Execution                           | `rpc.ts` JXA builders move into the native executor                                           |

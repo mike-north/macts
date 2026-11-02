@@ -165,6 +165,14 @@ const appSearchOperation: OperationDescriptor<{ readonly query?: string | undefi
       query: t.optional(t.string({ description: 'The search string to populate Alfred with' })),
     }),
     output: t.none(),
+    inputJsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'The search string to populate Alfred with' },
+      },
+      additionalProperties: false,
+    },
   }
 
 const appActionOperation: OperationDescriptor<
@@ -182,6 +190,20 @@ const appActionOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      items: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'The items to show actions for',
+      },
+      asType: { type: 'string', description: 'An optional type for the items - file, url or text' },
+    },
+    required: ['items'],
+    additionalProperties: false,
+  },
 }
 
 const appBrowseOperation: OperationDescriptor<{ readonly path: string }, undefined> = {
@@ -193,6 +215,13 @@ const appBrowseOperation: OperationDescriptor<{ readonly path: string }, undefin
     path: t.string({ description: 'The path or search string to browse' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { path: { type: 'string', description: 'The path or search string to browse' } },
+    required: ['path'],
+    additionalProperties: false,
+  },
 }
 
 const appRunTriggerOperation: OperationDescriptor<
@@ -213,6 +242,17 @@ const appRunTriggerOperation: OperationDescriptor<
     withArgument: t.optional(t.string({ description: 'An optional argument' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      trigger: { type: 'string', description: 'The identifier of the trigger' },
+      inWorkflow: { type: 'string', description: 'The workflow bundle identifier' },
+      withArgument: { type: 'string', description: 'An optional argument' },
+    },
+    required: ['trigger', 'inWorkflow'],
+    additionalProperties: false,
+  },
 }
 
 const appReloadWorkflowOperation: OperationDescriptor<{ readonly workflow: string }, undefined> = {
@@ -226,6 +266,18 @@ const appReloadWorkflowOperation: OperationDescriptor<{ readonly workflow: strin
     }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workflow: {
+        type: 'string',
+        description: 'The UID (folder name), or the Bundle ID of the workflow to reload',
+      },
+    },
+    required: ['workflow'],
+    additionalProperties: false,
+  },
 }
 
 const appRevealWorkflowOperation: OperationDescriptor<
@@ -252,6 +304,23 @@ const appRevealWorkflowOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workflow: {
+        type: 'string',
+        description: 'The UID (folder name), or the Bundle ID of the workflow to reveal',
+      },
+      configuration: {
+        type: 'boolean',
+        description: 'Optionally open the configuration for this workflow',
+      },
+      details: { type: 'boolean', description: 'Optionally open the details for this workflow' },
+    },
+    required: ['workflow'],
+    additionalProperties: false,
+  },
 }
 
 const appSetConfigurationOperation: OperationDescriptor<
@@ -279,6 +348,22 @@ const appSetConfigurationOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      variable: { type: 'string', description: 'The name of the variable' },
+      toValue: { type: 'string', description: 'The value to set' },
+      inWorkflow: { type: 'string', description: 'The workflow bundle identifier' },
+      exportable: {
+        type: 'boolean',
+        description:
+          "If this environment variable is fine for export, i.e. the Don't Export box is left unchecked (Defaults to Don't Export). This option is ignored for workflow configuration items",
+      },
+    },
+    required: ['variable', 'toValue', 'inWorkflow'],
+    additionalProperties: false,
+  },
 }
 
 const appRemoveConfigurationOperation: OperationDescriptor<
@@ -294,6 +379,16 @@ const appRemoveConfigurationOperation: OperationDescriptor<
     inWorkflow: t.string({ description: 'The workflow bundle identifier' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      variable: { type: 'string', description: 'The name of the variable' },
+      inWorkflow: { type: 'string', description: 'The workflow bundle identifier' },
+    },
+    required: ['variable', 'inWorkflow'],
+    additionalProperties: false,
+  },
 }
 
 const appSetThemeOperation: OperationDescriptor<{ readonly theme: string }, undefined> = {
@@ -305,6 +400,13 @@ const appSetThemeOperation: OperationDescriptor<{ readonly theme: string }, unde
     theme: t.string({ description: 'The name of the theme to switch to' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { theme: { type: 'string', description: 'The name of the theme to switch to' } },
+    required: ['theme'],
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

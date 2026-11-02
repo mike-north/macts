@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Photos.app.
+ * The Photos server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `photosContract` from `@macts/photos/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { photosApiPlugin as plugin, photosApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { photosContract as contract } from '@macts/photos/contract'

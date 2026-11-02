@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS SystemSettings.app.
+ * The System Settings server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `systemSettingsContract` from `@macts/system-settings/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { systemSettingsApiPlugin as plugin, systemSettingsApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { systemSettingsContract as contract } from '@macts/system-settings/contract'

@@ -6,8 +6,8 @@
  * resolution and every generator leave out the resource, its hierarchy
  * entries, and every entry nested under them: routes and the permissions
  * derived from them, the contract, the HTTP client SDK (types, resource
- * clients, client accessors), the CLI plugin, the MCP tools, the
- * capabilities, and the legacy SDK generator. The embedded manifest keeps the
+ * clients, client accessors), the CLI plugin, the capabilities, and the
+ * legacy SDK generator. The embedded manifest keeps the
  * marker, so the omission stays auditable.
  *
  * Each check is run on the same fixture with and without the marker: without
@@ -180,9 +180,6 @@ function surfacesWithConnection(manifest: AppManifest): Set<string> {
     surfaces.add('SDK client accessor')
   }
   if (paths.some((path) => path.includes('commands/connections/'))) surfaces.add('CLI commands')
-  if ([...files.values()].some((content) => content.includes("'macts__viewer__connections_"))) {
-    surfaces.add('MCP tools')
-  }
   if (deriveCapabilities(manifest).some((capability) => capability.resource === 'connections')) {
     surfaces.add('capabilities')
   }
@@ -199,14 +196,12 @@ describe('a resource marked unsupported', () => {
         'permissions',
         'contract',
         'SDK',
-        'MCP',
         'capability',
         'create',
         'CLI',
         'SDK resource client',
         'SDK client accessor',
         'CLI commands',
-        'MCP tools',
         'capabilities',
         'legacy SDK',
       ])

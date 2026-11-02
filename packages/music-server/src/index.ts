@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Music.app.
+ * The Music server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `musicContract` from `@macts/music/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { musicApiPlugin as plugin, musicApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { musicContract as contract } from '@macts/music/contract'

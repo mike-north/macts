@@ -10,7 +10,7 @@
  * @packageDocumentation
  */
 
-import type { JsonSchema } from '../generator/mcp/types.js'
+import type { JsonSchema } from './operation-schema.js'
 import type { RiskClass } from './risk.js'
 
 /**

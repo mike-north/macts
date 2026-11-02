@@ -1457,6 +1457,12 @@ const documentListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all documents',
   input: t.record({}),
   output: t.array(documentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const documentGetOperation: OperationDescriptor<{ readonly id: string }, Document> = {
@@ -1468,6 +1474,13 @@ const documentGetOperation: OperationDescriptor<{ readonly id: string }, Documen
     id: t.string({ description: 'Document name' }),
   }),
   output: documentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Document name' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const documentSaveOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1477,6 +1490,12 @@ const documentSaveOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Save the specified document',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const documentSaveAsOperation: OperationDescriptor<
@@ -1494,6 +1513,20 @@ const documentSaveAsOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      fileName: { type: 'string', description: 'The file name for the document' },
+      fileFormat: {
+        type: 'string',
+        enum: ['document', 'documentFormat97', 'template', 'rtf', 'text', 'html', 'pdf'],
+        description: 'The file format for saving',
+      },
+    },
+    required: ['fileName'],
+    additionalProperties: false,
+  },
 }
 
 const documentCloseOperation: OperationDescriptor<
@@ -1508,6 +1541,14 @@ const documentCloseOperation: OperationDescriptor<
     saving: t.optional(t.boolean({ description: 'Whether to save changes before closing' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      saving: { type: 'boolean', description: 'Whether to save changes before closing' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const documentPrintOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1517,6 +1558,12 @@ const documentPrintOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'Print the specified document',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const documentActivateOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1526,6 +1573,12 @@ const documentActivateOperation: OperationDescriptor<Record<string, never>, unde
   description: 'Activate the specified document window',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1535,6 +1588,12 @@ const appUndoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Undo the last action',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1544,6 +1603,12 @@ const appRedoOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Redo the last undone action',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCopyObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1553,6 +1618,12 @@ const appCopyObjectOperation: OperationDescriptor<Record<string, never>, undefin
   description: 'Copy the selected content to the clipboard',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appCutObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1562,6 +1633,12 @@ const appCutObjectOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Cut the selected content to the clipboard',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPasteObjectOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1571,6 +1648,12 @@ const appPasteObjectOperation: OperationDescriptor<Record<string, never>, undefi
   description: 'Paste content from the clipboard',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appSelectAllOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -1580,6 +1663,12 @@ const appSelectAllOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Select all content in the document',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appFindOperation: OperationDescriptor<
@@ -1600,6 +1689,17 @@ const appFindOperation: OperationDescriptor<
     matchWholeWord: t.optional(t.boolean({ description: 'Whether to match whole words only' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      findText: { type: 'string', description: 'The text to search for' },
+      matchCase: { type: 'boolean', description: 'Whether to match case' },
+      matchWholeWord: { type: 'boolean', description: 'Whether to match whole words only' },
+    },
+    required: ['findText'],
+    additionalProperties: false,
+  },
 }
 
 const appReplaceOperation: OperationDescriptor<
@@ -1620,6 +1720,17 @@ const appReplaceOperation: OperationDescriptor<
     replaceAll: t.optional(t.boolean({ description: 'Whether to replace all occurrences' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      findText: { type: 'string', description: 'The text to search for' },
+      replaceWith: { type: 'string', description: 'The replacement text' },
+      replaceAll: { type: 'boolean', description: 'Whether to replace all occurrences' },
+    },
+    required: ['findText', 'replaceWith'],
+    additionalProperties: false,
+  },
 }
 
 const appInsertTextOperation: OperationDescriptor<
@@ -1635,6 +1746,22 @@ const appInsertTextOperation: OperationDescriptor<
     at: t.optional(t.integer({ description: 'The character position to insert at' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      text: { type: 'string', description: 'The text to insert' },
+      at: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The character position to insert at',
+      },
+    },
+    required: ['text'],
+    additionalProperties: false,
+  },
 }
 
 const appCreateNewDocumentOperation: OperationDescriptor<
@@ -1651,6 +1778,14 @@ const appCreateNewDocumentOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      attachedTemplate: { type: 'string', description: 'Path to template for the new document' },
+    },
+    additionalProperties: false,
+  },
 }
 
 const documentCreateRangeOperation: OperationDescriptor<
@@ -1666,6 +1801,27 @@ const documentCreateRangeOperation: OperationDescriptor<
     end: t.optional(t.integer({ description: 'The ending character position' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      start: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The starting character position',
+      },
+      end: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The ending character position',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

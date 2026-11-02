@@ -135,6 +135,12 @@ const documentListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all system profile documents',
   input: t.record({}),
   output: t.array(documentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const documentGetOperation: OperationDescriptor<{ readonly name: string }, Document> = {
@@ -146,6 +152,13 @@ const documentGetOperation: OperationDescriptor<{ readonly name: string }, Docum
     name: t.string({ description: 'Document name' }),
   }),
   output: documentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Document name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const appSendOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -155,6 +168,12 @@ const appSendOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Send system information to AppleCare',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

@@ -53,7 +53,8 @@ export class GenerateCommand extends Command {
 
       With --target client, generates a single client package (SDK + CLI) into --out-dir.
 
-      With --target server, generates a single server package (API + MCP) into --out-dir.
+      With --target server, generates a single server package into --out-dir. A
+      server package re-exports the app's contract for a macts host to serve.
 
       The manifest should be a YAML file following the macts manifest schema.
 

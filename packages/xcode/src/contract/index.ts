@@ -1539,6 +1539,12 @@ const workspaceDocumentListWorkspaceDocumentsOperation: OperationDescriptor<
   description: 'List all workspace documents',
   input: t.record({}),
   output: t.array(workspaceDocumentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
@@ -1553,6 +1559,13 @@ const workspaceDocumentGetWorkspaceDocumentOperation: OperationDescriptor<
     name: t.string({ description: 'Workspace document name' }),
   }),
   output: workspaceDocumentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Workspace document name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const projectListProjectsOperation: OperationDescriptor<
@@ -1567,6 +1580,13 @@ const projectListProjectsOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.array(projectRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, Project> = {
@@ -1578,6 +1598,13 @@ const projectGetProjectOperation: OperationDescriptor<{ readonly id: string }, P
     id: t.string({ description: 'Project identifier' }),
   }),
   output: projectRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Project identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const schemeListSchemesOperation: OperationDescriptor<
@@ -1592,6 +1619,13 @@ const schemeListSchemesOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.array(schemeRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Scheme> = {
@@ -1603,6 +1637,13 @@ const schemeGetSchemeOperation: OperationDescriptor<{ readonly id: string }, Sch
     id: t.string({ description: 'Scheme identifier' }),
   }),
   output: schemeRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Scheme identifier' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
 }
 
 const runDestinationListRunDestinationsOperation: OperationDescriptor<
@@ -1617,6 +1658,13 @@ const runDestinationListRunDestinationsOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.array(runDestinationRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const runDestinationGetRunDestinationOperation: OperationDescriptor<
@@ -1631,6 +1679,13 @@ const runDestinationGetRunDestinationOperation: OperationDescriptor<
     name: t.string({ description: 'Run destination name' }),
   }),
   output: runDestinationRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Run destination name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentBuildOperation: OperationDescriptor<
@@ -1645,6 +1700,13 @@ const workspaceDocumentBuildOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentCleanOperation: OperationDescriptor<
@@ -1659,6 +1721,13 @@ const workspaceDocumentCleanOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentStopOperation: OperationDescriptor<
@@ -1673,6 +1742,13 @@ const workspaceDocumentStopOperation: OperationDescriptor<
     workspaceName: t.string({ description: 'Workspace document name' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { workspaceName: { type: 'string', description: 'Workspace document name' } },
+    required: ['workspaceName'],
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentRunOperation: OperationDescriptor<
@@ -1697,6 +1773,102 @@ const workspaceDocumentRunOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      withCommandLineArguments: {
+        allOf: [
+          {
+            description: 'Additional command line arguments to pass to the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+      withEnvironmentVariables: {
+        allOf: [
+          {
+            description: 'Additional environment variables to set for the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['workspaceName'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const workspaceDocumentTestOperation: OperationDescriptor<
@@ -1721,6 +1893,102 @@ const workspaceDocumentTestOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      withCommandLineArguments: {
+        allOf: [
+          {
+            description: 'Additional command line arguments to pass to the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+      withEnvironmentVariables: {
+        allOf: [
+          {
+            description: 'Additional environment variables to set for the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['workspaceName'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 const workspaceDocumentAttachOperation: OperationDescriptor<
@@ -1743,6 +2011,26 @@ const workspaceDocumentAttachOperation: OperationDescriptor<
     suspended: t.boolean({ description: 'Whether to start debugging in a suspended state' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      toProcessIdentifier: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'The process identifier (pid) to which to attach',
+      },
+      suspended: {
+        type: 'boolean',
+        description: 'Whether to start debugging in a suspended state',
+      },
+    },
+    required: ['workspaceName', 'toProcessIdentifier', 'suspended'],
+    additionalProperties: false,
+  },
 }
 
 const workspaceDocumentDebugOperation: OperationDescriptor<
@@ -1777,6 +2065,108 @@ const workspaceDocumentDebugOperation: OperationDescriptor<
     ),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      workspaceName: { type: 'string', description: 'Workspace document name' },
+      scheme: { type: 'string', description: 'Scheme name' },
+      runDestinationSpecifier: { type: 'string', description: 'Run destination specifier string' },
+      skipBuilding: {
+        type: 'boolean',
+        description: 'Whether to perform "run without building" rather than "run"',
+      },
+      commandLineArguments: {
+        allOf: [
+          {
+            description: 'Additional command line arguments to pass to the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+      environmentVariables: {
+        allOf: [
+          {
+            description: 'Additional environment variables to set for the action',
+            $ref: '#/definitions/__schema0',
+          },
+        ],
+      },
+    },
+    required: ['workspaceName'],
+    additionalProperties: false,
+    definitions: {
+      __schema0: {
+        anyOf: [
+          { type: 'string' },
+          { type: 'boolean' },
+          { type: 'null' },
+          { type: 'array', items: { $ref: '#/definitions/__schema0' } },
+          {
+            type: 'object',
+            properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+            required: ['integer'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              double: {
+                anyOf: [
+                  { type: 'number' },
+                  { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+                ],
+              },
+            },
+            required: ['double'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              date: {
+                type: 'string',
+                pattern:
+                  '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|[+-]\\d{2}:\\d{2})$',
+              },
+            },
+            required: ['date'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              record: {
+                type: 'object',
+                propertyNames: { type: 'string' },
+                additionalProperties: { $ref: '#/definitions/__schema0' },
+              },
+            },
+            required: ['record'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { reference: { not: {} } },
+            required: ['reference'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { file: { not: {} } },
+            required: ['file'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: { fileSource: { not: {} } },
+            required: ['fileSource'],
+            additionalProperties: false,
+          },
+        ],
+      },
+    },
+  },
 }
 
 /** Every operation, keyed by its identity. */

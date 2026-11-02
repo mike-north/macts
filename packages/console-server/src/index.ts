@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS Console.app.
+ * The Console server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `consoleContract` from `@macts/console/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { consoleApiPlugin as plugin, consoleApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { consoleContract as contract } from '@macts/console/contract'

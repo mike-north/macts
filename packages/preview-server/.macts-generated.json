@@ -5,12 +5,6 @@
     "LICENSE",
     "package.json",
     "src/index.ts",
-    "src/mcp/index.ts",
-    "src/mcp/plugin.ts",
-    "src/mcp/sdk.ts",
-    "src/mcp/tools/documents.ts",
-    "src/mcp/tools/index.ts",
-    "src/plugin.ts",
     "tsconfig.json",
     "tsup.config.ts"
   ]

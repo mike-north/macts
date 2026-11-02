@@ -177,6 +177,12 @@ const appNextTrackOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Skip to the next track.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -186,6 +192,12 @@ const appPreviousTrackOperation: OperationDescriptor<Record<string, never>, unde
   description: 'Skip to the previous track.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPlaypauseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -195,6 +207,12 @@ const appPlaypauseOperation: OperationDescriptor<Record<string, never>, undefine
   description: 'Toggle play/pause.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -204,6 +222,12 @@ const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Pause playback.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPlayOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -213,6 +237,12 @@ const appPlayOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Resume playback.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPlayTrackOperation: OperationDescriptor<
@@ -227,6 +257,12 @@ const appPlayTrackOperation: OperationDescriptor<
     inContext: t.optional(t.string({ description: 'the URI of the context to play in' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { inContext: { type: 'string', description: 'the URI of the context to play in' } },
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

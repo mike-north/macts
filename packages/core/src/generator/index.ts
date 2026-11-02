@@ -61,21 +61,6 @@ export {
   type GeneratedFlag,
 } from './cli/index.js'
 
-// MCP generator
-export {
-  generateMcpPlugin,
-  createMcpGeneratorContext,
-  type CreateMcpContextOptions,
-  type McpGeneratorContext,
-  type GeneratedMcpPlugin,
-  type GeneratedTool,
-  type GeneratedToolFile,
-  // `JsonSchema` is referenced by the public `Capability.inputSchema` /
-  // `outputSchema` and `GeneratedTool.inputSchema` types, so it must be part of
-  // the public API surface to keep those types self-contained for consumers.
-  type JsonSchema,
-} from './mcp/index.js'
-
 // HTTP Client SDK generator
 export {
   generateHttpClientSdk,
@@ -83,18 +68,8 @@ export {
   type GeneratedHttpClientSdk,
 } from './sdk/index.js'
 
-// API plugin generator
-export {
-  generateApiPlugin,
-  type ApiPluginGeneratorOptions,
-  type GenerateApiPluginResult,
-} from './api/index.js'
-
 // Orchestrator
 export {
-  generateAllHttpPackages,
-  type GenerateAllOptions,
-  type GenerateAllResult,
   generateConsolidatedPackages,
   type GenerateConsolidatedOptions,
   type GenerateConsolidatedResult,
@@ -107,7 +82,7 @@ export {
   type GenerateClientPackageResult,
 } from './client/index.js'
 
-// Server package generator (consolidated API + MCP)
+// Server package generator (the contract-only `-server` package)
 export {
   generateServerPackage,
   type GenerateServerPackageOptions,

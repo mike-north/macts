@@ -3,15 +3,14 @@
  *
  * A parent-scoped list (e.g. "list the tabs of a window", "list the schemes of
  * a workspace") is modeled by a list command that declares a required parameter
- * naming the parent scope (e.g. `windowId`). For that one manifest fact, FIVE
+ * naming the parent scope (e.g. `windowId`). For that one manifest fact, FOUR
  * generated surfaces must agree, or the generated packages will not compile or
  * will silently drop the scope:
  *
  *   1. SDK `list()` signature — accepts the required parent param.
  *   2. SDK `list()` body — forwards the param in the request body.
- *   3. MCP tool `inputSchema` — lists the param in `properties` AND `required`.
- *   4. MCP tool handler — destructures the param and passes it to `list(...)`.
- *   5. CLI `list` command — exposes a `--<param>` option and passes it to
+ *   3. Capability `inputSchema` — lists the param in `properties` AND `required`.
+ *   4. CLI `list` command — exposes a `--<param>` option and passes it to
  *      `list(...)`.
  *
  * The bug this guards against (issue #94): the MCP handler and CLI passed a
@@ -28,8 +27,7 @@
  *
  * @see ../../../../manifests/calendar/app.yaml (the proven events.list(calendarId) precedent)
  * @see ./sdk/http-client.ts (generateListMethod — required-param-driven signature)
- * @see ./mcp/index.ts (generateResourceToolHandler — list handler)
- * @see ./mcp/tools.ts (generateResourceOperationSchema — inputSchema.required)
+ * @see ../capabilities/operation-schema.ts (generateResourceOperationSchema — inputSchema.required)
  * @see ./cli/commands.ts (generateListCommand — CLI list args/options)
  */
 
@@ -37,8 +35,7 @@ import { describe, it, expect } from 'vitest'
 import type { AppManifest } from '../manifest/index.js'
 import { generateHttpClientSdk } from './sdk/http-client.js'
 import { generateCliPlugin } from './cli/index.js'
-import { generateMcpPlugin } from './mcp/index.js'
-import { createMcpGeneratorContext } from './mcp/context.js'
+import { generateResourceOperationSchema } from '../capabilities/operation-schema.js'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -178,7 +175,6 @@ const cli = generateCliPlugin(manifest, {
   packageName: '@macts/test-browser',
   sdkPackageName: '@macts/test-browser',
 })
-const mcp = generateMcpPlugin(createMcpGeneratorContext({ appName: 'test-browser', manifest }))
 
 describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () => {
   it('SDK list() signature accepts the parent-scope param', () => {
@@ -194,20 +190,13 @@ describe('parent-scoped list: Tab.list(windowId) coherence across surfaces', () 
     expect(tabClient).not.toContain(`void ${PARENT_SCOPE_PARAM}`)
   })
 
-  it('MCP tool inputSchema lists the parent-scope param as a required property', () => {
-    const tabsTool = fileContent(mcp.files, 'src/tools/tabs.ts')
-    // The inputSchema is emitted as a JSON-style object literal: the param must
-    // appear under both `properties` and the `required` array.
-    expect(tabsTool).toMatch(new RegExp(`"${PARENT_SCOPE_PARAM}"\\s*:\\s*\\{`))
-    expect(tabsTool).toMatch(new RegExp(`"required"\\s*:\\s*\\[[^\\]]*"${PARENT_SCOPE_PARAM}"`))
-  })
-
-  it('MCP tool handler passes the parent-scope param to list()', () => {
-    const tabsTool = fileContent(mcp.files, 'src/tools/tabs.ts')
-    expect(tabsTool).toContain(`return client.tabs.list(${PARENT_SCOPE_PARAM})`)
-    // No void-discard masking the param.
-    expect(tabsTool).not.toContain(`void ${PARENT_SCOPE_PARAM}`)
-    expect(tabsTool).not.toContain('client.tabs.list()')
+  it('capability inputSchema lists the parent-scope param as a required property', () => {
+    const tab = manifest.resources['Tab']
+    const listTabs = manifest.commands['listTabs']
+    if (tab === undefined || listTabs === undefined) throw new Error('fixture is missing Tab')
+    const schema = generateResourceOperationSchema(listTabs, tab)
+    expect(schema.properties).toHaveProperty(PARENT_SCOPE_PARAM)
+    expect(schema.required).toContain(PARENT_SCOPE_PARAM)
   })
 
   it('CLI list command exposes a --window-id option and passes it to list()', () => {
@@ -222,11 +211,6 @@ describe('non-parent-scoped list: Window.list() takes no argument (negative)', (
     const windowClient = fileContent(sdk.files, 'src/resources/window.ts')
     // spec: listWindows declares NO required params
     expect(windowClient).toContain('async list(): Promise<Window[]>')
-  })
-
-  it('MCP tool handler calls list() with no argument', () => {
-    const windowsTool = fileContent(mcp.files, 'src/tools/windows.ts')
-    expect(windowsTool).toContain('client.windows.list()')
   })
 
   it('CLI list command calls list() with no argument and no window-id option', () => {

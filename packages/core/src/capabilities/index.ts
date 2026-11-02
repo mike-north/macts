@@ -24,6 +24,11 @@ export {
 // Capability + registry types
 export type { Capability, CapabilityRegistry } from './types.js'
 
+// `JsonSchema` is referenced by the public `Capability.inputSchema` and
+// `outputSchema` types, so it is part of the public API to keep those types
+// self-contained for consumers.
+export type { JsonSchema } from './operation-schema.js'
+
 // Registry derivation
 export { deriveCapabilities, buildCapabilityRegistry } from './registry.js'
 

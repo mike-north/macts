@@ -155,6 +155,12 @@ const documentListOperation: OperationDescriptor<Record<string, never>, readonly
   description: 'List all open script documents',
   input: t.record({}),
   output: t.array(documentRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const documentGetOperation: OperationDescriptor<{ readonly name: string }, Document> = {
@@ -166,6 +172,13 @@ const documentGetOperation: OperationDescriptor<{ readonly name: string }, Docum
     name: t.string({ description: 'Document name' }),
   }),
   output: documentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { name: { type: 'string', description: 'Document name' } },
+    required: ['name'],
+    additionalProperties: false,
+  },
 }
 
 const documentCreateOperation: OperationDescriptor<DocumentCreateInput, Document> = {
@@ -175,6 +188,19 @@ const documentCreateOperation: OperationDescriptor<DocumentCreateInput, Document
   description: 'Create a new script document',
   input: documentCreateInputType,
   output: documentRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      name: { type: 'string', description: 'The name of the document' },
+      contents: { type: 'string', description: 'Initial script contents' },
+      language: {
+        type: 'string',
+        description: 'The scripting language (AppleScript or JavaScript)',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

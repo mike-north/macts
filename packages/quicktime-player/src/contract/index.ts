@@ -175,6 +175,12 @@ const appOpenURLOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'Open a URL.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPlayOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -184,6 +190,12 @@ const appPlayOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Play the movie.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStartOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -193,6 +205,12 @@ const appStartOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Start the movie recording.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -202,6 +220,12 @@ const appPauseOperation: OperationDescriptor<Record<string, never>, undefined> =
   description: 'Pause the recording.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appResumeOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -211,6 +235,12 @@ const appResumeOperation: OperationDescriptor<Record<string, never>, undefined> 
   description: 'Resume the recording.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -220,6 +250,12 @@ const appStopOperation: OperationDescriptor<Record<string, never>, undefined> = 
   description: 'Stop the movie or recording.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appStepBackwardOperation: OperationDescriptor<
@@ -234,6 +270,20 @@ const appStepBackwardOperation: OperationDescriptor<
     by: t.optional(t.integer({ description: 'number of steps' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      by: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'number of steps',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appStepForwardOperation: OperationDescriptor<
@@ -248,6 +298,20 @@ const appStepForwardOperation: OperationDescriptor<
     by: t.optional(t.integer({ description: 'number of steps' })),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      by: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'number of steps',
+      },
+    },
+    additionalProperties: false,
+  },
 }
 
 const appTrimOperation: OperationDescriptor<
@@ -263,6 +327,42 @@ const appTrimOperation: OperationDescriptor<
     to: t.double({ description: 'end time in seconds' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      from: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'start time in seconds',
+      },
+      to: {
+        type: 'object',
+        properties: {
+          double: {
+            anyOf: [
+              { type: 'number' },
+              { type: 'string', enum: ['NaN', 'Infinity', '-Infinity', '-0'] },
+            ],
+          },
+        },
+        required: ['double'],
+        additionalProperties: false,
+        description: 'end time in seconds',
+      },
+    },
+    required: ['from', 'to'],
+    additionalProperties: false,
+  },
 }
 
 const appPresentOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -272,6 +372,12 @@ const appPresentOperation: OperationDescriptor<Record<string, never>, undefined>
   description: 'Present the document full screen.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appNewMovieRecordingOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -281,6 +387,12 @@ const appNewMovieRecordingOperation: OperationDescriptor<Record<string, never>, 
   description: 'Create a new movie recording document.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appNewAudioRecordingOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -290,6 +402,12 @@ const appNewAudioRecordingOperation: OperationDescriptor<Record<string, never>, 
   description: 'Create a new audio recording document.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appNewScreenRecordingOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -299,6 +417,12 @@ const appNewScreenRecordingOperation: OperationDescriptor<Record<string, never>,
   description: 'Create a new screen recording document.',
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 const appExportOperation: OperationDescriptor<
@@ -314,6 +438,48 @@ const appExportOperation: OperationDescriptor<
     usingSettingsPreset: t.string({ description: 'the name of the export settings preset to use' }),
   }),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      in: {
+        type: 'object',
+        properties: {
+          fileSource: {
+            oneOf: [
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'caller-owned-file' },
+                  path: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'path'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  kind: { type: 'string', const: 'uploaded-file' },
+                  uploadId: { type: 'string', minLength: 1 },
+                },
+                required: ['kind', 'uploadId'],
+                additionalProperties: false,
+              },
+            ],
+          },
+        },
+        required: ['fileSource'],
+        additionalProperties: false,
+        description: 'the destination file',
+      },
+      usingSettingsPreset: {
+        type: 'string',
+        description: 'the name of the export settings preset to use',
+      },
+    },
+    required: ['in', 'usingSettingsPreset'],
+    additionalProperties: false,
+  },
 }
 
 const appShowRemoteHudOperation: OperationDescriptor<Record<string, never>, undefined> = {
@@ -323,6 +489,12 @@ const appShowRemoteHudOperation: OperationDescriptor<Record<string, never>, unde
   description: "Show the document's Remote HUD",
   input: t.record({}),
   output: t.none(),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
 }
 
 /** Every operation, keyed by its identity. */

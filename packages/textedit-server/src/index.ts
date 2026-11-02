@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS TextEdit.app.
+ * The TextEdit server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `textEditContract` from `@macts/textedit/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { textEditApiPlugin as plugin, textEditApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { textEditContract as contract } from '@macts/textedit/contract'

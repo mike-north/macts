@@ -1,9 +1,12 @@
 /**
- * API plugin for macOS SystemEvents.app.
+ * The System Events server package: the app's generated contract, for a
+ * macts host to serve.
+ *
+ * It re-exports `systemEventsContract` from `@macts/system-events/contract` as
+ * `contract`. A host serves the app from this contract and the app's
+ * manifest, so this package carries no other code.
  *
  * @packageDocumentation
  */
 
-// Export as 'plugin' to match API plugin loader convention
-export { systemEventsApiPlugin as plugin, systemEventsApiPlugin } from './plugin.js'
-export type { AppManifest } from '@macts/core'
+export { systemEventsContract as contract } from '@macts/system-events/contract'

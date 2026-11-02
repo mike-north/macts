@@ -1,5 +1,13 @@
 /**
  * Tests for the server package generator.
+ *
+ * A server package is contract-only: its entry re-exports the app's generated
+ * contract as `contract`, and it depends only on the app package. Expected
+ * values follow the generator's module documentation and the contract's naming
+ * rule (`<camelApp>Contract`, phases/13 D2).
+ *
+ * @see ./index.ts
+ * @see ../../../../../phases/13-sdk-value-and-execution-contracts.md §D2
  */
 
 import { describe, it, expect } from 'vitest'
@@ -146,152 +154,102 @@ function createGoogleChromeManifest(): AppManifest {
   }
 }
 
+/** Generate Calendar's server package with the given options. */
+function calendarServer(version?: string) {
+  return generateServerPackage(createCalendarManifest(), {
+    appName: 'calendar',
+    serverPackageName: '@macts/calendar-server',
+    clientPackageName: '@macts/calendar',
+    version,
+  })
+}
+
+/** The content of one generated file. */
+function fileContent(files: readonly { path: string; content: string }[], path: string): string {
+  const file = files.find((f) => f.path === path)
+  if (file === undefined) throw new Error(`${path} was not generated`)
+  return file.content
+}
+
+interface ServerPackageJson {
+  name: string
+  version: string
+  license: string
+  repository: { type: string; url: string; directory: string }
+  publishConfig: { access: string }
+  type: string
+  engines: Record<string, string>
+  exports: Record<string, unknown>
+  main: string
+  types: string
+  dependencies: Record<string, string>
+  peerDependencies?: Record<string, string>
+  scripts: Record<string, string>
+}
+
+function packageJson(files: readonly { path: string; content: string }[]): ServerPackageJson {
+  return JSON.parse(fileContent(files, 'package.json')) as ServerPackageJson
+}
+
 describe('generateServerPackage', () => {
-  it('should return dir based on the unscoped package name', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-      version: '0.1.0',
-    })
-
+  it('returns the dir of the unscoped package name, and no errors', () => {
+    const result = calendarServer('0.1.0')
     expect(result.dir).toBe('calendar-server')
-    expect(result.errors).toHaveLength(0)
+    expect(result.errors).toEqual([])
   })
 
-  it('should include API source files at src/ root', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const filePaths = result.files.map((f) => f.path)
-
-    // API files should be at src/ root
-    expect(filePaths).toContain('src/plugin.ts')
-    expect(filePaths).toContain('src/index.ts')
+  it('emits exactly the entry and the package configuration', () => {
+    expect(
+      calendarServer()
+        .files.map((f) => f.path)
+        .sort()
+    ).toEqual([
+      '.gitignore',
+      'LICENSE',
+      'package.json',
+      'src/index.ts',
+      'tsconfig.json',
+      'tsup.config.ts',
+    ])
   })
 
-  it('should include MCP source files under src/mcp/', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
+  it('emits no MCP or API plugin code', () => {
+    const paths = calendarServer().files.map((f) => f.path)
+    expect(paths.filter((path) => path.startsWith('src/mcp/'))).toEqual([])
+    expect(paths).not.toContain('src/plugin.ts')
+  })
 
-    const filePaths = result.files.map((f) => f.path)
-
-    // MCP files should be under src/mcp/
-    expect(filePaths).toContain('src/mcp/plugin.ts')
-    expect(filePaths).toContain('src/mcp/index.ts')
-    expect(filePaths).toContain('src/mcp/sdk.ts')
-    expect(filePaths).toContain('src/mcp/tools/index.ts')
-
-    // Should have at least one MCP tool file
-    const mcpToolFiles = filePaths.filter(
-      (p) => p.startsWith('src/mcp/tools/') && p !== 'src/mcp/tools/index.ts'
+  it('re-exports the app contract as contract from the app package', () => {
+    const index = fileContent(calendarServer().files, 'src/index.ts')
+    expect(index).toContain(
+      "export { calendarContract as contract } from '@macts/calendar/contract'"
     )
-    expect(mcpToolFiles.length).toBeGreaterThan(0)
+    // The entry exports nothing else.
+    expect(index.match(/^export /gm)).toHaveLength(1)
   })
 
-  it('should not include standalone config files from sub-generators', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
+  it('names the contract of a multi-word app in lower camel case', () => {
+    const result = generateServerPackage(createGoogleChromeManifest(), {
+      appName: 'google-chrome',
+      serverPackageName: '@macts/google-chrome-server',
+      clientPackageName: '@macts/google-chrome',
     })
-
-    const filePaths = result.files.map((f) => f.path)
-
-    // There should be exactly one of each config file (the unified ones)
-    expect(filePaths.filter((p) => p === 'package.json')).toHaveLength(1)
-    expect(filePaths.filter((p) => p === 'tsconfig.json')).toHaveLength(1)
-    expect(filePaths.filter((p) => p === 'tsup.config.ts')).toHaveLength(1)
-    expect(filePaths.filter((p) => p === '.gitignore')).toHaveLength(1)
-
-    // Should not have vitest.config.ts (from MCP generator)
-    expect(filePaths).not.toContain('vitest.config.ts')
-
-    // Should not have nested config files
-    expect(filePaths).not.toContain('src/mcp/package.json')
-  })
-
-  it('should generate MCP sdk.ts that imports from the client package', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const sdkFile = result.files.find((f) => f.path === 'src/mcp/sdk.ts')
-    expect(sdkFile).toBeDefined()
-
-    // Should import from the client package, not the old SDK package
-    expect(sdkFile?.content).toContain("from '@macts/calendar'")
-    expect(sdkFile?.content).not.toContain("from '@macts/sdk-calendar'")
-  })
-
-  it('should generate MCP tool files that import from ../sdk.js', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const mcpToolFiles = result.files.filter(
-      (f) => f.path.startsWith('src/mcp/tools/') && f.path !== 'src/mcp/tools/index.ts'
+    expect(result.dir).toBe('google-chrome-server')
+    expect(fileContent(result.files, 'src/index.ts')).toContain(
+      "export { googleChromeContract as contract } from '@macts/google-chrome/contract'"
     )
-
-    expect(mcpToolFiles.length).toBeGreaterThan(0)
-
-    for (const toolFile of mcpToolFiles) {
-      // Tools import from '../sdk.js' which correctly resolves to src/mcp/sdk.ts
-      expect(toolFile.content).toContain("from '../sdk.js'")
-    }
+    const pkg = packageJson(result.files)
+    expect(pkg.name).toBe('@macts/google-chrome-server')
+    expect(pkg.dependencies).toEqual({ '@macts/google-chrome': 'workspace:*' })
   })
 
-  it('should generate package.json with correct structure', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-      version: '1.2.3',
-    })
-
-    const pkgFile = result.files.find((f) => f.path === 'package.json')
-    expect(pkgFile).toBeDefined()
-    if (!pkgFile) throw new Error('package.json not found')
-
-    const pkg = JSON.parse(pkgFile.content) as {
-      name: string
-      version: string
-      license: string
-      repository: { type: string; url: string; directory: string }
-      publishConfig: { access: string }
-      type: string
-      engines: Record<string, string>
-      exports: Record<string, { types: string; import: string }>
-      dependencies: Record<string, string>
-      peerDependencies: Record<string, string>
-      peerDependenciesMeta: Record<string, { optional: boolean }>
-      scripts: Record<string, string>
-    }
-
+  it('generates package.json with the publishing metadata', () => {
+    const pkg = packageJson(calendarServer('1.2.3').files)
     expect(pkg.name).toBe('@macts/calendar-server')
     expect(pkg.version).toBe('1.2.3')
     expect(pkg.type).toBe('module')
     // Node 22.13.0 is the first 22.x that loads node:sqlite unflagged (phases/13, D1).
     expect(pkg.engines).toEqual({ node: '>=22.13.0' })
-
-    // npm publishing metadata
     expect(pkg.license).toBe('MIT')
     expect(pkg.repository).toEqual({
       type: 'git',
@@ -299,199 +257,50 @@ describe('generateServerPackage', () => {
       directory: 'packages/calendar-server',
     })
     expect(pkg.publishConfig).toEqual({ access: 'public' })
+  })
 
-    // Subpath exports
-    expect(pkg.exports['.']).toEqual({
-      types: './dist/calendar-server.d.ts',
-      import: './dist/index.js',
+  it('exports only ".", in its object form, pointing at the built entry', () => {
+    const pkg = packageJson(calendarServer().files)
+    expect(pkg.exports).toEqual({
+      '.': { types: './dist/index.d.ts', import: './dist/index.js' },
     })
-    expect(pkg.exports['./mcp']).toEqual({
-      types: './dist/mcp.d.ts',
-      import: './dist/mcp/index.js',
-    })
+    expect(pkg.main).toBe('./dist/index.js')
+    expect(pkg.types).toBe('./dist/index.d.ts')
+  })
 
-    // Dependencies
-    expect(pkg.dependencies['@macts/api']).toBe('workspace:*')
-    expect(pkg.dependencies['@macts/core']).toBe('workspace:*')
-    expect(pkg.dependencies['@macts/calendar']).toBe('workspace:*')
-
-    // MCP plugin types come from the zero-runtime @macts/types package, so
-    // they are a plain dependency — server packages must not peer-depend on
-    // the @macts/mcp server implementation.
-    expect(pkg.dependencies['@macts/types']).toBe('workspace:*')
-    expect(pkg.dependencies['@macts/mcp']).toBeUndefined()
+  it('depends only on the app package', () => {
+    const pkg = packageJson(calendarServer().files)
+    expect(pkg.dependencies).toEqual({ '@macts/calendar': 'workspace:*' })
+    // Neither the MCP plugin types nor the server packages are needed any more.
+    expect(pkg.dependencies['@macts/types']).toBeUndefined()
+    expect(pkg.dependencies['@macts/api']).toBeUndefined()
+    expect(pkg.dependencies['@macts/core']).toBeUndefined()
     expect(pkg.peerDependencies).toBeUndefined()
-    expect(pkg.peerDependenciesMeta).toBeUndefined()
   })
 
-  it('should generate package.json with version defaulting to 0.0.0', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const pkgFile = result.files.find((f) => f.path === 'package.json')
-    if (!pkgFile) throw new Error('package.json not found')
-    const pkg = JSON.parse(pkgFile.content) as { version: string }
-    expect(pkg.version).toBe('0.0.0')
+  it('defaults the version to 0.0.0', () => {
+    expect(packageJson(calendarServer().files).version).toBe('0.0.0')
   })
 
-  it('should generate multi-entry tsup.config.ts', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const tsupFile = result.files.find((f) => f.path === 'tsup.config.ts')
-    expect(tsupFile).toBeDefined()
-
-    // Multi-entry config
-    expect(tsupFile?.content).toContain("index: 'src/index.ts'")
-    expect(tsupFile?.content).toContain("'mcp/index': 'src/mcp/index.ts'")
+  it('builds the single entry', () => {
+    const tsup = fileContent(calendarServer().files, 'tsup.config.ts')
+    expect(tsup).toContain("index: 'src/index.ts'")
+    expect(tsup).not.toContain('mcp')
   })
 
-  it('should not include api-extractor configs (server packages are not documented)', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const filePaths = result.files.map((f) => f.path)
-
-    expect(filePaths).not.toContain('api-extractor.json')
-    expect(filePaths).not.toContain('api-extractor.mcp.json')
+  it('includes no api-extractor configuration (server packages are not documented)', () => {
+    const result = calendarServer()
+    const paths = result.files.map((f) => f.path)
+    expect(paths).not.toContain('api-extractor.json')
+    expect(paths).not.toContain('api-report/.gitkeep')
+    expect(paths).not.toContain('temp/.gitkeep')
+    expect(Object.keys(packageJson(result.files).scripts)).not.toContain('api-extractor')
   })
 
-  it('should not include api-extractor scripts in package.json', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const pkgFile = result.files.find((f) => f.path === 'package.json')
-    if (!pkgFile) throw new Error('package.json not found')
-    const pkg = JSON.parse(pkgFile.content) as { scripts: Record<string, string> }
-
-    expect(pkg.scripts['api-extractor']).toBeUndefined()
-    expect(pkg.scripts['api-extractor:ci']).toBeUndefined()
-  })
-
-  it('should have API plugin.ts with manifest content', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const pluginFile = result.files.find((f) => f.path === 'src/plugin.ts')
-    expect(pluginFile).toBeDefined()
-    expect(pluginFile?.content).toContain('calendarApiPlugin')
-    expect(pluginFile?.content).toContain("import type { AppManifest } from '@macts/core'")
-  })
-
-  it('should have MCP plugin.ts with tool references', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const mcpPluginFile = result.files.find((f) => f.path === 'src/mcp/plugin.ts')
-    expect(mcpPluginFile).toBeDefined()
-    expect(mcpPluginFile?.content).toContain('calendarPlugin')
-    expect(mcpPluginFile?.content).toContain("from './tools/index.js'")
-  })
-
-  it('should not have any errors for a valid manifest', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    expect(result.errors).toHaveLength(0)
-  })
-
-  it('should work with apps that have hyphenated names', () => {
-    const manifest = createGoogleChromeManifest()
-
-    const result = generateServerPackage(manifest, {
-      appName: 'google-chrome',
-      serverPackageName: '@macts/google-chrome-server',
-      clientPackageName: '@macts/google-chrome',
-    })
-
-    expect(result.dir).toBe('google-chrome-server')
-    expect(result.errors).toHaveLength(0)
-
-    // MCP sdk should import from the client package
-    const sdkFile = result.files.find((f) => f.path === 'src/mcp/sdk.ts')
-    expect(sdkFile?.content).toContain("from '@macts/google-chrome'")
-
-    // Package name should be correct
-    const pkgFile = result.files.find((f) => f.path === 'package.json')
-    if (!pkgFile) throw new Error('package.json not found')
-    const pkg = JSON.parse(pkgFile.content) as {
-      name: string
-      dependencies: Record<string, string>
-    }
-    expect(pkg.name).toBe('@macts/google-chrome-server')
-    expect(pkg.dependencies['@macts/google-chrome']).toBe('workspace:*')
-  })
-
-  it('should emit a LICENSE file with the MIT license text', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const licenseFiles = result.files.filter((f) => f.path === 'LICENSE')
-    expect(licenseFiles).toHaveLength(1)
-    expect(licenseFiles[0]?.content).toContain('MIT License')
-    expect(licenseFiles[0]?.content).toContain('Copyright (c) 2026 Michael North')
-    expect(licenseFiles[0]?.content).toContain('THE SOFTWARE IS PROVIDED "AS IS"')
-  })
-
-  it('should not include api-extractor placeholder directories', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const filePaths = result.files.map((f) => f.path)
-    expect(filePaths).not.toContain('api-report/.gitkeep')
-    expect(filePaths).not.toContain('temp/.gitkeep')
-  })
-
-  it('should produce MCP tool files that use getClient()', () => {
-    const manifest = createCalendarManifest()
-    const result = generateServerPackage(manifest, {
-      appName: 'calendar',
-      serverPackageName: '@macts/calendar-server',
-      clientPackageName: '@macts/calendar',
-    })
-
-    const mcpToolFiles = result.files.filter(
-      (f) => f.path.startsWith('src/mcp/tools/') && f.path !== 'src/mcp/tools/index.ts'
-    )
-
-    for (const toolFile of mcpToolFiles) {
-      expect(toolFile.content).toContain('getClient()')
-    }
+  it('emits a LICENSE file with the MIT license text', () => {
+    const license = fileContent(calendarServer().files, 'LICENSE')
+    expect(license).toContain('MIT License')
+    expect(license).toContain('Copyright (c) 2026 Michael North')
+    expect(license).toContain('THE SOFTWARE IS PROVIDED "AS IS"')
   })
 })
