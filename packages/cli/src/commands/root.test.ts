@@ -111,7 +111,7 @@ describe('RootCommand', () => {
     })
 
     it('reports apps it cannot serve on stderr, never stdout', async () => {
-      writeInstalledApp(plugins.nodeModules, 'gadgets', { exportsContract: false })
+      writeInstalledApp(plugins.nodeModules, 'gadgets', { hostShape: 'older' })
       writeAppPackage(plugins.nodeModules, 'sprockets')
       const { stdout, stderr, getStdout, getStderr } = createMockStreams()
 
@@ -119,7 +119,7 @@ describe('RootCommand', () => {
 
       expect(exitCode).toBe(0)
       expect(getStderr()).toContain(
-        "Not serving 1 app(s) that failed to register:\n  gadgets: Package @macts/gadgets does not define a './contract' export"
+        "Not serving 1 app(s) that failed to register:\n  gadgets: @macts/gadgets-server is from an older macts and does not export its app's contract. Reinstall it with `macts mcp install gadgets`.\n"
       )
       expect(getStderr()).toContain(
         'sprockets: install @macts/sprockets-server with `macts mcp install sprockets`'
@@ -293,7 +293,7 @@ describe('RootCommand', () => {
 
     it('should register installed apps from their contracts and report them', async () => {
       writeInstalledApp(plugins.nodeModules, 'widgets')
-      writeInstalledApp(plugins.nodeModules, 'gadgets', { exportsContract: false })
+      writeInstalledApp(plugins.nodeModules, 'gadgets', { hostShape: 'older' })
       writeAppPackage(plugins.nodeModules, 'sprockets')
       const { stdout, stderr, getStdout } = createMockStreams()
 
@@ -305,7 +305,7 @@ describe('RootCommand', () => {
       const output = getStdout()
       expect(output).toContain('Serving 1 app(s):\n  widgets\n')
       expect(output).toContain(
-        "Not serving 1 app(s) that failed to register:\n  gadgets: Package @macts/gadgets does not define a './contract' export"
+        "Not serving 1 app(s) that failed to register:\n  gadgets: @macts/gadgets-server is from an older macts and does not export its app's contract. Reinstall it with `macts mcp install gadgets`.\n"
       )
       expect(output).toContain(
         'Not serving 1 app(s) installed without their server package:\n  sprockets: install @macts/sprockets-server with `macts mcp install sprockets`\n'

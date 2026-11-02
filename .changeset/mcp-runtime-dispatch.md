@@ -27,7 +27,7 @@ Other behavior changes:
 - `createDaemon(options)` takes the `adapter` to serve and an optional `verifier` (default: the local key store) in place of `plugins` and `disableApiKeyValidation`.
 - `createDiscoveryTool()` returns an `McpHostTool`.
 - New: `withHostTools(adapter, hostTools)` serves tools that run no operation beside an adapter's operation tools, and refuses duplicate names with `McpToolCompositionError`. `startStdioServer({ adapter, credential })` serves an adapter over stdio. Types `McpHostTool`, `McpHostToolsOptions`, `StdioServer`, and `StdioServerOptions`.
-- Removed: `createMcpServer`, `McpServerOptions`, `requireStartupApiKey`, `authenticateHttpRequest`, `McpAuthErrorCode`, `AuthResult`, `discoverMcpPlugins`, `loadMcpPlugin`, `readMcpPluginCache`, `writeMcpPluginCache`, `invalidateMcpPluginCache`, `PluginDiscoveryResult`, `PluginLoadError`, `CachedPlugin`, and the re-exports of `McpPlugin`, `McpToolDefinition`, and `JsonSchema` (still exported by `@macts/types`).
+- Removed: `createMcpServer`, `McpServerOptions`, `requireStartupApiKey`, `authenticateHttpRequest`, `McpAuthErrorCode`, `AuthResult`, `discoverMcpPlugins`, `loadMcpPlugin`, `readMcpPluginCache`, `writeMcpPluginCache`, `invalidateMcpPluginCache`, `PluginDiscoveryResult`, `PluginLoadError`, `CachedPlugin`, and the re-exports of `McpPlugin`, `McpToolDefinition`, and `JsonSchema`.
 - Removed: the `macts-mcp` bin. Use `macts --mcp`.
 
 `@macts/cli` API changes: `RootCommand` no longer has a `disableApiKeyValidation` property.
