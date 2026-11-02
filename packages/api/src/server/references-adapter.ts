@@ -31,6 +31,9 @@ import {
  * The body of `POST /references/v1/resolve`.
  *
  * @remarks
+ * The body has exactly these fields; a request with any other field is
+ * refused with `VALIDATION_FAILED`.
+ *
  * `reference` is the reference control record exactly as encoding a reference
  * produces it (`{"reference": {…}}`, phases/13 D7), validated by the runtime
  * against the app contract's resource table.
@@ -42,6 +45,14 @@ export interface ResolveReferenceRequest {
   readonly reference: unknown
 }
 
+/**
+ * The only fields a resolution request has. The body is exactly these: a
+ * field this server does not know is refused rather than ignored, so a
+ * request that relies on a later protocol revision never resolves with that
+ * field silently dropped.
+ */
+const RESOLVE_REQUEST_FIELDS: readonly string[] = ['app', 'reference']
+
 /** Whether `value` is a plain JSON object (not `null`, not an array). */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -52,12 +63,14 @@ function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
  *
  * @remarks
  * A framing check only, like refusing a body that is not JSON (phases/13 D6):
- * it establishes which app the call is for and that a reference is present,
- * and nothing about the reference itself. Everything else is the runtime's to
- * judge, after it has verified the caller.
+ * it establishes which app the call is for, that a reference is present, and
+ * that the body has no other fields, and nothing about the reference itself.
+ * Everything else is the runtime's to judge, after it has verified the
+ * caller.
  *
- * @throws `ValidationError` naming each missing or mistyped field when the body
- *   is not an object with a string `app` and a `reference`.
+ * @throws `ValidationError` with one issue per missing, mistyped, or unknown
+ *   field when the body is not exactly an object with a string `app` and a
+ *   `reference`.
  */
 function readResolveRequest(body: unknown): ResolveReferenceRequest {
   if (!isRecord(body)) {
@@ -77,6 +90,14 @@ function readResolveRequest(body: unknown): ResolveReferenceRequest {
       message: 'Required: the reference control record {"reference": {…}}',
     })
   }
+  for (const key of Object.keys(body)) {
+    if (!RESOLVE_REQUEST_FIELDS.includes(key)) {
+      issues.push({
+        path: [key],
+        message: 'Unknown field: a resolution request has only "app" and "reference"',
+      })
+    }
+  }
   if (typeof app !== 'string' || issues.length > 0) {
     throw new ValidationError('Request body is not a reference resolution request', { issues })
   }
@@ -91,8 +112,8 @@ function readResolveRequest(body: unknown): ResolveReferenceRequest {
  * `POST /resolve`. The body is a {@link ResolveReferenceRequest};
  * `Authorization: Bearer <token>` carries the credential; `X-Request-Id`
  * optionally supplies the correlation id. A body that is not JSON, not an
- * object, or lacks a string `app` or a `reference` is answered 400
- * `VALIDATION_FAILED` without calling the runtime.
+ * object, lacks a string `app` or a `reference`, or has any other field is
+ * answered 400 `VALIDATION_FAILED` without calling the runtime.
  *
  * Success is `200 { result }`: the resolved record for a single reference, an
  * array of records (possibly empty) for a collection reference. Failure is the

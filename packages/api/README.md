@@ -538,7 +538,8 @@ X-Request-Id: optional-correlation-id
 ```
 
 `app` is the app's route segment, and `reference` is the reference control
-record exactly as encoding a reference produces it. A single reference
+record exactly as encoding a reference produces it. The body has exactly these
+two fields; any other field is refused rather than ignored. A single reference
 resolves as the resource's `get` operation and a collection reference as its
 `list` operation, so the key needs that operation's permission, and the call
 is governed and audited as that operation.
@@ -553,8 +554,9 @@ array of records (possibly empty) for a collection reference.
 ```
 
 Failures use the same envelope and statuses as the RPC endpoints. A body that
-is not JSON, or lacks a string `app` or a `reference`, is a 400
-`VALIDATION_FAILED`, as are an unknown app and a malformed reference. A missing
+is not JSON, lacks a string `app` or a `reference`, or has any other field is a
+400 `VALIDATION_FAILED`, with one issue per offending field; so are an unknown
+app and a malformed reference. A missing
 target is a 404 `TARGET_NOT_FOUND` (with `entryIndex` for an entry of an
 identity collection), and an invalid index or range is a 400
 `INVALID_SELECTION`. Only `POST` is served; anything else under

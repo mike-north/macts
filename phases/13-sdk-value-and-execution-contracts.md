@@ -1377,7 +1377,10 @@ beside `/api/v1`, never under it (D5, HTTP namespaces). The request body is:
 ```
 
 `app` is the app's route segment, and `reference` is the control record
-exactly as encoding produces it. The route builds the `InvocationContext` as
+exactly as encoding produces it. The body has exactly these two fields: an
+older server refuses a field it does not know rather than ignoring it, so a
+request that depends on a later field never resolves without it. The route
+builds the `InvocationContext` as
 the RPC routes do: the bearer credential from `Authorization`, the request's
 abort signal, and the correlation id from `X-Request-Id`. It then calls
 `resolveReference(app, reference, context)`. It shares the RPC routes'
@@ -1391,9 +1394,10 @@ per-client-address limit, one budget per address across both namespaces.
   `WWW-Authenticate: Bearer`; 403 is `PERMISSION_DENIED` or `POLICY_DENIED`;
   404 is `TARGET_NOT_FOUND`, keeping `entryIndex`; 400 is
   `INVALID_SELECTION` or `VALIDATION_FAILED`; 502 is `UNEXPECTED_VALUE`.
-- **Framing.** A body that is not JSON, is not an object, or lacks a string
-  `app` or a `reference` is answered 400 `VALIDATION_FAILED` before the
-  runtime is called, as an unreadable RPC body is (D6). An unknown app and a
+- **Framing.** A body that is not JSON, is not an object, lacks a string
+  `app` or a `reference`, or has any other field is answered 400
+  `VALIDATION_FAILED` before the runtime is called, as an unreadable RPC body
+  is (D6). Each missing, mistyped, or unknown field is one issue at its path. An unknown app and a
   malformed reference are the runtime's `ValidationError`s.
 - **Routing.** The route answers only `POST`. Any other method, and any other
   path under `/references/v1`, is a route miss (404 `NOT_FOUND`), as in the

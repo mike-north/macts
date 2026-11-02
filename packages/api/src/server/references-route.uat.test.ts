@@ -12,10 +12,12 @@
  * - D7: the route is a top-level namespace beside `/api/v1`; the body is
  *   `{ "app", "reference": {"reference": …} }`; a single reference resolves as
  *   the resource's `get` operation and a collection as its `list` operation,
- *   possibly empty; a missing identity-collection entry is
+ *   possibly empty; an identity collection holds one record per entry, and a
+ *   short result is `UNEXPECTED_VALUE`; a missing identity-collection entry is
  *   `TARGET_NOT_FOUND` with `entryIndex`; a resource without the operation is
  *   `INVALID_SELECTION`; an unknown app or malformed reference is
- *   `VALIDATION_FAILED`.
+ *   `VALIDATION_FAILED`; a body with any field but `app` and `reference` is
+ *   `VALIDATION_FAILED`, one issue per unknown field.
  * - D5: the per-client-address limit applies before the credential is
  *   examined, and the runtime's pipeline governs every resolution.
  * - D6: success is `200 { result }`; failures are the
@@ -165,6 +167,40 @@ describe('POST /references/v1/resolve: granted resolutions', () => {
 
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ result: [] })
+  })
+
+  it('answers an identity collection with one record per entry, in entry order', async () => {
+    const server = await listenServer({
+      executor: resolving(() => Promise.resolve([DUNE_WIRE, FOUNDATION_WIRE])),
+    })
+
+    const res = await resolve(server, libraryBody(TWO_BOOKS), LIBRARIAN_TOKEN)
+
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ result: [DUNE_WIRE, FOUNDATION_WIRE] })
+    expect(server.executor.resolutions[0]?.reference).toEqual(TWO_BOOKS)
+  })
+
+  it('answers 502 UNEXPECTED_VALUE when an identity collection resolves short: no entry is dropped', async () => {
+    // Two entries, one record: the executor dropped an entry instead of
+    // reporting it missing (D7).
+    const server = await listenServer({
+      executor: resolving(() => Promise.resolve([DUNE_WIRE])),
+    })
+
+    const res = await resolve(server, libraryBody(TWO_BOOKS), LIBRARIAN_TOKEN)
+
+    expect(res.status).toBe(502)
+    expect(await res.json()).toEqual({
+      error: {
+        code: 'UNEXPECTED_VALUE',
+        message:
+          'The result of resolving an identity collection as "library.books.list" must hold one record per entry: expected 2 records, received 1.',
+        details: {
+          issues: [{ path: [], message: 'Expected 2 records, one per entry, but received 1' }],
+        },
+      },
+    })
   })
 })
 
@@ -407,6 +443,61 @@ describe('POST /references/v1/resolve: request framing', () => {
       expect(server.verifier.calls()).toBe(0)
     }
   )
+
+  it('answers a body with unknown fields with 400, one issue per field, before the runtime', async () => {
+    const server = await listenServer()
+
+    // The body is exactly { app, reference }: a field from a later protocol
+    // revision must never be silently ignored.
+    const res = await resolve(
+      server,
+      { ...libraryBody(DUNE), hydrate: true, fields: ['title'] },
+      LIBRARIAN_TOKEN
+    )
+
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({
+      error: {
+        code: 'VALIDATION_FAILED',
+        message: 'Request body is not a reference resolution request',
+        details: {
+          issues: [
+            {
+              path: ['hydrate'],
+              message: 'Unknown field: a resolution request has only "app" and "reference"',
+            },
+            {
+              path: ['fields'],
+              message: 'Unknown field: a resolution request has only "app" and "reference"',
+            },
+          ],
+        },
+      },
+    })
+    expect(server.verifier.calls()).toBe(0)
+    expect(server.executor.resolutions).toHaveLength(0)
+  })
+
+  it('reports unknown fields together with missing ones', async () => {
+    const server = await listenServer()
+
+    const res = await resolve(server, { app: 'library', ref: wire(DUNE) }, LIBRARIAN_TOKEN)
+
+    expect(res.status).toBe(400)
+    expect((await errorBody(res)).error.details).toEqual({
+      issues: [
+        {
+          path: ['reference'],
+          message: 'Required: the reference control record {"reference": {…}}',
+        },
+        {
+          path: ['ref'],
+          message: 'Unknown field: a resolution request has only "app" and "reference"',
+        },
+      ],
+    })
+    expect(server.verifier.calls()).toBe(0)
+  })
 
   it('answers an unknown app with 400 VALIDATION_FAILED', async () => {
     const server = await listenServer()
