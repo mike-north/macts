@@ -1,7 +1,7 @@
 /**
  * Integration: no shipped app claims a reserved route segment.
  *
- * `references`, `transfers` and `introspect` name namespaces a macts host
+ * `introspect`, `rpc`, `references` and `transfers` name routes a macts host
  * serves beside the apps, so they are never an app's route segment (phases/13
  * D5, D7). The runtime refuses such an app at registration; this guard catches
  * it earlier, when a manifest is added, for every app in the repository. It
@@ -27,10 +27,11 @@ describe('route segments of every shipped app', () => {
     expect(apps.length).toBeGreaterThan(0)
   })
 
-  it('reserves exactly references, transfers and introspect', () => {
+  it('reserves exactly introspect, rpc, references and transfers', () => {
     expect([...RESERVED_APP_ROUTE_SEGMENTS].sort()).toEqual([
       'introspect',
       'references',
+      'rpc',
       'transfers',
     ])
   })

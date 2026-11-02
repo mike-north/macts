@@ -574,11 +574,13 @@ The listings name operations only, never the reference-resolution route.
 ### Route Namespaces
 
 Each kind of call has its own top-level namespace: `/api/v1` for app
-operations and the listings, `/references/v1` for reference resolution, and
-`/transfers/v1` for binary transfers. `references`, `transfers`, and
-`introspect` are reserved: the runtime refuses to register an app with any of
-them as its route segment. `/api/v1/introspect` is the one non-app segment
-under `/api/v1`, kept for compatibility.
+operations (`/api/v1/rpc/...`) and the listings (`/api/v1/introspect`), and
+`/references/v1` for reference resolution. `/transfers/v1` is reserved for
+binary transfers and not yet served. The listings predate the namespace rule
+and stay under `/api/v1` for compatibility.
+
+`introspect`, `rpc`, `references`, and `transfers` are reserved: the runtime
+refuses to register an app with any of them as its route segment.
 
 ## Error Codes
 

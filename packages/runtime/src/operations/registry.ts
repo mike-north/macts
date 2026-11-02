@@ -66,15 +66,19 @@ export class OperationRegistrationError extends Error {
  * Names that can never be an app's route segment.
  *
  * @remarks
- * Each names a namespace that a macts host serves beside the apps, so an app
- * spelled the same way would collide with it on some surface:
+ * Each names a namespace or route that a macts host serves, or will serve,
+ * beside the apps, so an app spelled the same way would collide with it on
+ * some surface:
  *
+ * - `rpc`: the operation routes, `/api/v1/rpc/<operation id>` over HTTP;
+ * - `introspect`: the operation listings, `/api/v1/introspect` over HTTP,
+ *   which predate the namespace rule and stay under `/api/v1` for
+ *   compatibility;
  * - `references`: reference resolution (`/references/v1` over HTTP), which
  *   resolves references of every app;
- * - `transfers`: binary transfers (`/transfers/v1` over HTTP), which move file
- *   bytes for every app;
- * - `introspect`: the operation listing under `/api/v1`, kept there for
- *   compatibility.
+ * - `transfers`: binary transfers, which will move file bytes for every app at
+ *   `/transfers/v1` over HTTP. Nothing is served there yet; the name is
+ *   reserved so that no app can claim it first.
  *
  * The runtime refuses an app with any of these route segments at registration
  * (`registerManifest` and `registerContract`), so no host, HTTP or otherwise,
@@ -83,9 +87,10 @@ export class OperationRegistrationError extends Error {
  * uses.
  */
 export const RESERVED_APP_ROUTE_SEGMENTS: readonly string[] = Object.freeze([
+  'introspect',
+  'rpc',
   'references',
   'transfers',
-  'introspect',
 ])
 
 /**
@@ -98,7 +103,7 @@ function assertAppSegmentNotReserved(manifest: AppManifest): void {
   const segment = normalizeAppRouteSegment(manifest.app.name)
   if (RESERVED_APP_ROUTE_SEGMENTS.includes(segment)) {
     throw new OperationRegistrationError(
-      `App "${manifest.app.name}" cannot be registered: its route segment "${segment}" is reserved for a namespace macts serves beside the apps (reserved: ${RESERVED_APP_ROUTE_SEGMENTS.join(', ')})`
+      `App "${manifest.app.name}" cannot be registered: its route segment "${segment}" is reserved for the routes macts serves beside the apps (reserved: ${RESERVED_APP_ROUTE_SEGMENTS.join(', ')})`
     )
   }
 }

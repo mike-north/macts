@@ -1067,22 +1067,25 @@ across namespaces.
 **HTTP namespaces.** Each kind of call has its own top-level namespace on the
 HTTP server:
 
-- `/api/v1` holds app operations, `POST /api/v1/rpc/<operation id>`, and the
-  unauthenticated listings;
+- `/api/v1` holds app operations at `POST /api/v1/rpc/<operation id>`, and
+  the unauthenticated listings at `/api/v1` and `/api/v1/introspect`;
 - `/references/v1` holds reference resolution (D7);
-- `/transfers/v1` holds binary transfers (D8).
+- `/transfers/v1` will hold binary transfers (D8). Nothing is served there
+  yet; the namespace is reserved now so that no app can claim it first.
 
 `/references/v1` and `/transfers/v1` are siblings of `/api/v1`, never segments
 under it: `/api/v1` is the namespace of app operations, and these calls are
-not app operations. So that no app is ever spelled like one of these
-namespaces on any surface, `references`, `transfers` and `introspect` are
-reserved: none is ever an app's route segment. The runtime refuses an app with a reserved segment at
-registration (`registerManifest` and `registerContract` raise
+not app operations. Under `/api/v1` itself, `rpc` holds the operations and
+`introspect` the listings. The listings predate this namespace rule and stay
+there for compatibility.
+
+So that no app is ever spelled like one of these namespaces or routes on any
+surface, `introspect`, `rpc`, `references` and `transfers` are reserved: none
+is ever an app's route segment. The runtime refuses an app with a reserved
+segment at registration (`registerManifest` and `registerContract` raise
 `OperationRegistrationError`, and nothing registers), so every host refuses
 it, not only HTTP. The reserved names are exported as
-`RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`. `/api/v1/introspect` is
-the one non-app segment under `/api/v1`. It predates this rule and is kept for
-compatibility.
+`RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`.
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.

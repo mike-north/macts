@@ -77,9 +77,10 @@ const result = await runtime.invoke(
 
 ### Reserved app names
 
-`references`, `transfers`, and `introspect` name namespaces a macts host serves
-beside the apps (reference resolution, binary transfers, and the operation
-listing), so none of them is ever an app's route segment.
+`introspect`, `rpc`, `references`, and `transfers` name routes a macts host
+serves, or will serve, beside the apps (the operation listings, the operation
+routes, reference resolution, and binary transfers), so none of them is ever
+an app's route segment.
 `registerManifest` and `registerContract` throw `OperationRegistrationError`
 for an app whose normalized name is one of them, and register nothing. The
 names are exported as `RESERVED_APP_ROUTE_SEGMENTS`.

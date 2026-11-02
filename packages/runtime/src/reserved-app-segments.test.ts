@@ -3,7 +3,7 @@
  * reserved for a namespace macts serves beside the apps.
  *
  * Expected behavior is written by hand from phases/13: `references`,
- * `transfers` and `introspect` are never app route segments (D5, D7), and
+ * `transfers`, `introspect` and `rpc` are never app route segments (D5, D7), and
  * registration is atomic, so a refused app adds no operations (D5).
  *
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md
@@ -29,7 +29,7 @@ import {
 } from './runtime-test-helpers.js'
 
 /** The reserved segments, spelled out from the decision record. */
-const RESERVED = ['references', 'transfers', 'introspect'] as const
+const RESERVED = ['introspect', 'rpc', 'references', 'transfers'] as const
 
 /** A runtime with the calendar app registered from its manifest. */
 function runtimeWithCalendar(): MactsRuntime {
@@ -99,7 +99,7 @@ function libraryAs(appName: string): {
 }
 
 describe('RESERVED_APP_ROUTE_SEGMENTS', () => {
-  it('names exactly references, transfers and introspect', () => {
+  it('names exactly introspect, rpc, references and transfers', () => {
     expect([...RESERVED_APP_ROUTE_SEGMENTS].sort()).toEqual([...RESERVED].sort())
   })
 })
@@ -144,17 +144,28 @@ describe('registration of a reserved app route segment', () => {
     expect(runtime.operations()).toEqual(before)
   })
 
-  it('compares the normalized segment, so a capitalized name is refused too', () => {
-    const runtime = runtimeWithCalendar()
-    const { manifest, contract } = libraryAs('Introspect')
+  it.each([
+    ['Introspect', 'introspect'],
+    ['RPC', 'rpc'],
+    ['Rpc', 'rpc'],
+    ['References', 'references'],
+    ['TRANSFERS', 'transfers'],
+  ])(
+    'compares the normalized segment, so "%s" is refused as "%s" on both paths',
+    (name, segment) => {
+      const runtime = runtimeWithCalendar()
+      const before = runtime.operations()
+      const { manifest, contract } = libraryAs(name)
 
-    expect(() => {
-      runtime.registerContract(contract, manifest)
-    }).toThrow('its route segment "introspect" is reserved')
-    expect(() => {
-      runtime.registerManifest(manifest)
-    }).toThrow('its route segment "introspect" is reserved')
-  })
+      expect(() => {
+        runtime.registerContract(contract, manifest)
+      }).toThrow(`its route segment "${segment}" is reserved`)
+      expect(() => {
+        runtime.registerManifest(manifest)
+      }).toThrow(`its route segment "${segment}" is reserved`)
+      expect(runtime.operations()).toEqual(before)
+    }
+  )
 
   it('explains why the name is reserved', () => {
     const runtime = runtimeWithCalendar()
@@ -162,7 +173,7 @@ describe('registration of a reserved app route segment', () => {
     expect(() => {
       runtime.registerManifest(libraryAs('transfers').manifest)
     }).toThrow(
-      'App "transfers" cannot be registered: its route segment "transfers" is reserved for a namespace macts serves beside the apps (reserved: references, transfers, introspect)'
+      'App "transfers" cannot be registered: its route segment "transfers" is reserved for the routes macts serves beside the apps (reserved: introspect, rpc, references, transfers)'
     )
   })
 

@@ -7,4 +7,4 @@ The HTTP server resolves references remotely at `POST /references/v1/resolve`, a
 
 Every 401 from the HTTP server now carries `WWW-Authenticate: Bearer`.
 
-Apps named `references`, `transfers`, or `introspect` are refused: `registerManifest` and `registerContract` throw `OperationRegistrationError` and register nothing. The reserved names are exported as `RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`.
+Apps named `introspect`, `rpc`, `references`, or `transfers` are refused: `registerManifest` and `registerContract` throw `OperationRegistrationError` and register nothing. The reserved names are exported as `RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`.
