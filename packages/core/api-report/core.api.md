@@ -7,6 +7,7 @@
 import { IssuePath } from '@macts/contracts';
 import { JsonSchema7Type } from 'zod-to-json-schema';
 import { OperationTarget } from '@macts/contracts';
+import { ReferenceWire } from '@macts/contracts';
 import { ValuePlan } from '@macts/contracts';
 import { WireRecord } from '@macts/contracts';
 import { WireValue } from '@macts/contracts';
@@ -1232,6 +1233,7 @@ export interface ExecutionRequest {
 export interface Executor {
     execute(request: ExecutionRequest): Promise<WireValue>;
     readonly provider: string;
+    resolve(request: ResolutionRequest): Promise<WireValue>;
 }
 
 // @public
@@ -2864,6 +2866,14 @@ export const ResettabilityEvidenceSchema: z.ZodObject<{
     observedAt: z.ZodOptional<z.ZodISODateTime>;
     appVersion: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
+
+// @public
+export interface ResolutionRequest {
+    readonly manifest: AppManifest;
+    readonly outputPlan: ValuePlan;
+    readonly reference: ReferenceWire;
+    readonly signal?: AbortSignal;
+}
 
 // @public
 export function resolveAccessChain(manifest: AppManifest, resourceKey: string): string[];

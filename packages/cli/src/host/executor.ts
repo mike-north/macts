@@ -28,7 +28,12 @@
  * @packageDocumentation
  */
 
-import { createNativeExecutor, type ExecutionRequest, type Executor } from '@macts/core'
+import {
+  createNativeExecutor,
+  type ExecutionRequest,
+  type Executor,
+  type ResolutionRequest,
+} from '@macts/core'
 import type { WireRecord, WireValue } from '@macts/contracts'
 
 /** The environment variable that selects a built-in test executor. */
@@ -39,13 +44,16 @@ export const TEST_STUB_PROVIDER = 'test-stub'
 
 /**
  * The built-in `stub` test executor: it automates no app and answers every
- * operation with a deterministic description of the request it received.
+ * operation and every reference resolution with a deterministic description
+ * of the request it received.
  *
  * @remarks
- * The result is `{ executor: 'test-stub', target, input }`: the operation's
- * manifest target and the validated wire input. A subprocess test can
- * therefore prove that a call passed every runtime step and was dispatched,
- * and which operation and input reached the executor, without any Mac app.
+ * An operation's result is `{ executor: 'test-stub', target, input }`: the
+ * operation's manifest target and the validated wire input. A resolution's
+ * result is `{ executor: 'test-stub', reference }`: the validated reference in
+ * wire form. A subprocess test can therefore prove that a call passed every
+ * runtime step and was dispatched, and what reached the executor, without any
+ * Mac app.
  *
  * @returns An executor whose provider is {@link TEST_STUB_PROVIDER}.
  */
@@ -58,6 +66,18 @@ export function createTestStubExecutor(): Executor {
           ? { command: request.target.command }
           : { command: request.target.command, resource: request.target.resource }
       return Promise.resolve({ executor: TEST_STUB_PROVIDER, target, input: request.input })
+    },
+    /**
+     * Answer a resolution with `{ executor: 'test-stub', reference }`.
+     *
+     * @remarks
+     * The answer describes the request; it is not shaped by
+     * `request.outputPlan`. Resolving through the runtime therefore always
+     * fails output validation with `UnexpectedValueError`, after the call has
+     * passed every earlier step and reached this executor.
+     */
+    resolve(request: ResolutionRequest): Promise<WireValue> {
+      return Promise.resolve({ executor: TEST_STUB_PROVIDER, reference: request.reference })
     },
   }
 }

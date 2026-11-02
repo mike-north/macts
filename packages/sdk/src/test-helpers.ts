@@ -20,7 +20,7 @@
  */
 
 import { z } from 'zod'
-import type { AppManifest, ExecutionRequest, Executor } from '@macts/core'
+import type { AppManifest, ExecutionRequest, Executor, ResolutionRequest } from '@macts/core'
 import {
   INTEGER_LIMITS,
   type AppContract,
@@ -283,25 +283,37 @@ export const SPROCKET_WIRE = { name: 'Sprocket', count: { integer: '7' } } as co
 
 /** An executor that records every request and answers with `respond`. */
 export interface RecordingExecutor extends Executor {
-  /** Every request received, in order. */
+  /** Every execution request received, in order. */
   readonly requests: ExecutionRequest[]
+  /** Every resolution request received, in order. */
+  readonly resolutions: ResolutionRequest[]
 }
 
 /**
  * Build a {@link RecordingExecutor}. By default `get` answers
- * {@link SPROCKET_WIRE} and `list` answers a one-element list of it.
+ * {@link SPROCKET_WIRE} and `list` answers a one-element list of it; likewise
+ * a single reference resolves to {@link SPROCKET_WIRE} and a collection to a
+ * one-element list of it.
  */
 export function createRecordingExecutor(
   respond: (request: ExecutionRequest) => Promise<WireValue> = (request) =>
-    Promise.resolve(request.target.command === 'list' ? [SPROCKET_WIRE] : SPROCKET_WIRE)
+    Promise.resolve(request.target.command === 'list' ? [SPROCKET_WIRE] : SPROCKET_WIRE),
+  respondToResolution: (request: ResolutionRequest) => Promise<WireValue> = (request) =>
+    Promise.resolve(request.reference.cardinality === 'many' ? [SPROCKET_WIRE] : SPROCKET_WIRE)
 ): RecordingExecutor {
   const requests: ExecutionRequest[] = []
+  const resolutions: ResolutionRequest[] = []
   return {
     provider: 'recording-stub',
     requests,
+    resolutions,
     execute(request) {
       requests.push(request)
       return respond(request)
+    },
+    resolve(request) {
+      resolutions.push(request)
+      return respondToResolution(request)
     },
   }
 }

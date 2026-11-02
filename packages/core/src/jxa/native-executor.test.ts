@@ -390,6 +390,29 @@ describe('createNativeExecutor', () => {
       expect(error).toBeInstanceOf(InternalError)
     })
   })
+
+  describe('reference resolution', () => {
+    it('fails every resolution with InternalError and runs no automation', async () => {
+      const run = mockRun()
+      const error = await rejectionOf(
+        createNativeExecutor({ transport: { run } }).resolve({
+          manifest: notes,
+          reference: {
+            resource: 'Note',
+            form: 'selector',
+            cardinality: 'one',
+            selector: { by: 'name', name: 'Groceries' },
+          },
+          outputPlan: PASSTHROUGH_PLAN,
+        })
+      )
+      expect(error).toBeInstanceOf(InternalError)
+      if (!(error instanceof InternalError)) return
+      expect(error.message).toBe('The macOS provider does not resolve references.')
+      expect(error.details).toEqual({})
+      expect(run).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('describeNativeFailure', () => {

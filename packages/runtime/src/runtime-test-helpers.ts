@@ -18,11 +18,16 @@ import type {
   ExecutionRequest,
   Executor,
   GovernancePolicy,
+  ResolutionRequest,
 } from '@macts/core'
 import {
   AuthenticationError,
+  ValueTypes as t,
+  type AnyOperationDescriptor,
+  type AppContract,
   type Authority,
   type Credential,
+  type OperationId,
   type WireValue,
 } from '@macts/contracts'
 import type { CredentialVerifier } from './invocation/verifier.js'
@@ -91,6 +96,159 @@ export const CALENDAR_MANIFEST: AppManifest = {
   },
 }
 
+/**
+ * A small library app for reference resolution: books on shelves, pages, and
+ * stamps.
+ *
+ * Which command resolves each resource's references, and the resulting
+ * operation ids and permissions (hand-derived from the manifest route rules,
+ * `app.resource.commandKey` and `app:resource:commandKey`):
+ *
+ * - `Shelf` (identifier `code`): get `library.shelves.get`, list
+ *   `library.shelves.list`. Shelves contain books.
+ * - `Book` (identifier `isbn`): get `library.books.lookupBook` (the command
+ *   keyed `lookupBook` declares the CRUD shape `get`), list
+ *   `library.books.list`.
+ * - `Page` (no identifier, so selector forms only): list `library.pages.list`,
+ *   and no get.
+ * - `Stamp` (integer identifier `serial`): get `library.stamps.get`, and no
+ *   list.
+ *
+ * `describeBook` reads a book too, but declares no CRUD shape, so it never
+ * resolves references.
+ */
+export const LIBRARY_MANIFEST: AppManifest = {
+  version: '1.0',
+  app: { name: 'Library', bundleId: 'com.example.library', tccEntitlements: [] },
+  resources: {
+    Shelf: {
+      name: 'Shelf',
+      plural: 'Shelves',
+      description: 'A shelf',
+      properties: {},
+      identifiers: [{ property: 'code', primary: true }],
+    },
+    Book: {
+      name: 'Book',
+      plural: 'Books',
+      description: 'A book',
+      properties: {},
+      identifiers: [{ property: 'isbn', primary: true }],
+    },
+    Page: { name: 'Page', plural: 'Pages', description: 'A page', properties: {} },
+    Stamp: {
+      name: 'Stamp',
+      plural: 'Stamps',
+      description: 'A stamp',
+      properties: {},
+      identifiers: [{ property: 'serial', primary: true }],
+    },
+  },
+  enums: {},
+  hierarchy: { children: {} },
+  suites: [],
+  relationships: [],
+  commands: {
+    describeBook: {
+      name: 'describe',
+      description: 'Describe a book',
+      scope: 'resource',
+      resourceType: 'Book',
+      parameters: [{ name: 'isbn', type: 'string', description: 'ISBN', required: true }],
+    },
+    get: {
+      name: 'get',
+      description: 'Get one item',
+      scope: 'resource',
+      resourceType: ['Shelf', 'Stamp'],
+      parameters: [{ name: 'id', type: 'string', description: 'Identifier', required: true }],
+    },
+    lookupBook: {
+      name: 'get',
+      description: 'Get one book',
+      scope: 'resource',
+      resourceType: 'Book',
+      parameters: [{ name: 'isbn', type: 'string', description: 'ISBN', required: true }],
+    },
+    list: {
+      name: 'list',
+      description: 'List items',
+      scope: 'resource',
+      resourceType: ['Shelf', 'Book', 'Page'],
+      parameters: [],
+    },
+  },
+}
+
+/** A shelf record. */
+export const SHELF_RECORD = t.record({ code: t.string(), label: t.string() })
+/** A book record; `pages` is an integer, so its wire form is a control record. */
+export const BOOK_RECORD = t.record({ isbn: t.string(), title: t.string(), pages: t.integer() })
+/** A page record. */
+export const PAGE_RECORD = t.record({ text: t.string() })
+/** A stamp record. */
+export const STAMP_RECORD = t.record({ serial: t.integer() })
+
+/** One library operation descriptor, with an input the tests never exercise. */
+function libraryOperation(
+  id: OperationId,
+  command: string,
+  resource: string,
+  output: AnyOperationDescriptor['output']
+): AnyOperationDescriptor {
+  const [app = '', segment = '', commandSegment = ''] = id.split('.')
+  return {
+    id,
+    permission: `${app}:${segment}:${commandSegment}`,
+    target: { command, resource },
+    description: `${command} ${resource}`,
+    input: t.record({}),
+    output,
+  }
+}
+
+/** The descriptors of {@link LIBRARY_MANIFEST}'s operations, as a generator would emit them. */
+const LIBRARY_OPERATIONS: readonly AnyOperationDescriptor[] = [
+  libraryOperation('library.shelves.get', 'get', 'Shelf', SHELF_RECORD),
+  libraryOperation('library.shelves.list', 'list', 'Shelf', t.array(SHELF_RECORD)),
+  libraryOperation('library.books.lookupBook', 'lookupBook', 'Book', BOOK_RECORD),
+  libraryOperation('library.books.describeBook', 'describeBook', 'Book', t.string()),
+  libraryOperation('library.books.list', 'list', 'Book', t.array(BOOK_RECORD)),
+  libraryOperation('library.pages.list', 'list', 'Page', t.array(PAGE_RECORD)),
+  libraryOperation('library.stamps.get', 'get', 'Stamp', STAMP_RECORD),
+]
+
+/**
+ * A hand-built contract for {@link LIBRARY_MANIFEST}, standing in for a
+ * generated one. Its resource table is the app's reference registry.
+ */
+export function libraryContract(): AppContract<unknown> {
+  return {
+    app: 'library',
+    operations: Object.fromEntries(LIBRARY_OPERATIONS.map((op) => [op.id, op])),
+    resources: {
+      Shelf: {
+        name: 'Shelf',
+        record: SHELF_RECORD,
+        id: t.string(),
+        get: 'library.shelves.get',
+        list: 'library.shelves.list',
+      },
+      Book: {
+        name: 'Book',
+        record: BOOK_RECORD,
+        id: t.string(),
+        get: 'library.books.lookupBook',
+        list: 'library.books.list',
+      },
+      Page: { name: 'Page', record: PAGE_RECORD, list: 'library.pages.list' },
+      Stamp: { name: 'Stamp', record: STAMP_RECORD, id: t.integer(), get: 'library.stamps.get' },
+    },
+    loadManifest: () => Promise.resolve(LIBRARY_MANIFEST),
+    bind: () => ({}),
+  }
+}
+
 /** The fixed instant every test clock reports. */
 export const FIXED_NOW = new Date('2026-03-04T05:06:07.000Z')
 
@@ -123,26 +281,40 @@ export const FORBID_ALL: GovernancePolicy = {
 
 /** An executor that records every request it receives and answers with a canned result. */
 export interface RecordingExecutor extends Executor {
-  /** Every request received, in order. */
+  /** Every execution request received, in order. */
   readonly requests: ExecutionRequest[]
+  /** Every resolution request received, in order. */
+  readonly resolutions: ResolutionRequest[]
 }
 
 /**
  * Build a {@link RecordingExecutor}.
  *
- * @param respond - Produces the result (or throws) for each request; defaults
- *   to a fixed wire value.
+ * @param respond - Produces the result (or throws) for each execution request;
+ *   defaults to a fixed wire value.
+ * @param respondToResolution - Produces the result (or throws) for each
+ *   resolution request; defaults to `{}` for a single reference and `[]` for a
+ *   collection.
  */
 export function createRecordingExecutor(
-  respond: (request: ExecutionRequest) => Promise<WireValue> = () => Promise.resolve({ events: [] })
+  respond: (request: ExecutionRequest) => Promise<WireValue> = () =>
+    Promise.resolve({ events: [] }),
+  respondToResolution: (request: ResolutionRequest) => Promise<WireValue> = (request) =>
+    Promise.resolve(request.reference.cardinality === 'many' ? [] : {})
 ): RecordingExecutor {
   const requests: ExecutionRequest[] = []
+  const resolutions: ResolutionRequest[] = []
   return {
     provider: 'recording-stub',
     requests,
+    resolutions,
     execute(request) {
       requests.push(request)
       return respond(request)
+    },
+    resolve(request) {
+      resolutions.push(request)
+      return respondToResolution(request)
     },
   }
 }

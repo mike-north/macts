@@ -330,6 +330,7 @@ export interface MactsRuntime {
     operations(): readonly RegisteredOperation[];
     registerContract(contract: AppContract<unknown>, manifest: AppManifest): void;
     registerManifest(manifest: AppManifest): void;
+    resolveReference(app: string, reference: unknown, context: InvocationContext): Promise<WireValue>;
 }
 
 // @public

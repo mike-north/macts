@@ -41,7 +41,7 @@ import {
   type OperationTarget,
   type WireValue,
 } from '@macts/contracts'
-import type { ExecutionRequest, Executor } from '../execution/executor.js'
+import type { ExecutionRequest, Executor, ResolutionRequest } from '../execution/executor.js'
 import { isWireValue, JxaExecutionError, MAX_OUTPUT_BYTES, runNativeScript } from './executor.js'
 import {
   NATIVE_CODEC,
@@ -138,6 +138,10 @@ export type NativeRunFailure =
  * stays done: whether it completed the operation is unknown after a mid-run
  * abort.
  *
+ * Reference resolution: the macOS provider does not resolve references.
+ * `resolve` fails every request with `InternalError`, before any automation
+ * runs.
+ *
  * @param options - Time limit and, for tests, the transport.
  * @returns An `Executor` whose provider is `'macos'`.
  */
@@ -182,6 +186,11 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
         throw new InternalError('The operation produced a result that is not valid JSON.', {})
       }
       return value
+    },
+    resolve(_request: ResolutionRequest): Promise<WireValue> {
+      return Promise.reject(
+        new InternalError('The macOS provider does not resolve references.', {})
+      )
     },
   }
 }
