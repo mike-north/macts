@@ -1,17 +1,11 @@
 ---
 '@macts/core': minor
 '@macts/automator': minor
-'@macts/automator-server': minor
 '@macts/calendar': minor
-'@macts/calendar-server': minor
 '@macts/microsoft-edge': minor
-'@macts/microsoft-edge-server': minor
 '@macts/omnigraffle': minor
-'@macts/omnigraffle-server': minor
 '@macts/reminders': minor
-'@macts/reminders-server': minor
 '@macts/xcode': minor
-'@macts/xcode-server': minor
 ---
 
 A command on a nested resource now names its parent in the manifest instead of having it guessed.
@@ -26,4 +20,4 @@ These operations now reach the right collection, where before they addressed one
 
 Xcode workspace documents and Automator workflows, which have no `id` in their apps, are now looked up by name when they are the parent.
 
-Calendar events, Microsoft Edge tabs, OmniGraffle graphics, shapes, lines and layers, and Reminders reminders record the parent they already used, so they behave as before. The generated SDK, CLI and tool signatures are unchanged; each app's embedded manifest now carries the recorded parents.
+Calendar events, Microsoft Edge tabs, OmniGraffle graphics, shapes, lines and layers, and Reminders reminders record the parent they already used, so they behave as before. The generated SDK, CLI and tool signatures are unchanged; each app's contract manifest now carries the recorded parents.
