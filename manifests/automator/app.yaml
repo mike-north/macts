@@ -378,6 +378,9 @@ commands:
     description: List all actions in a workflow
     scope: resource
     resourceType: AutomatorAction
+    parent:
+      resource: Workflow
+      parameter: workflowName
     code: core
     parameters:
       - name: workflowName
@@ -441,6 +444,9 @@ commands:
     description: List all variables in a workflow
     scope: resource
     resourceType: Variable
+    parent:
+      resource: Workflow
+      parameter: workflowName
     code: core
     parameters:
       - name: workflowName
@@ -468,6 +474,9 @@ commands:
     description: List all settings for an action
     scope: resource
     resourceType: Setting
+    parent:
+      resource: AutomatorAction
+      parameter: actionId
     code: core
     parameters:
       - name: actionId
@@ -504,6 +513,9 @@ commands:
     description: List all required resources for an action
     scope: resource
     resourceType: RequiredResource
+    parent:
+      resource: AutomatorAction
+      parameter: actionId
     code: core
     parameters:
       - name: actionId

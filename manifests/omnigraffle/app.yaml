@@ -1029,6 +1029,9 @@ commands:
     description: List all graphics on a canvas
     scope: resource
     resourceType: Graphic
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: core
     parameters:
       - name: canvasId
@@ -1056,6 +1059,9 @@ commands:
     description: List all shapes on a canvas
     scope: resource
     resourceType: Shape
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: core
     parameters:
       - name: canvasId
@@ -1082,6 +1088,9 @@ commands:
     description: Create a new shape
     scope: resource
     resourceType: Shape
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: crel
     parameters:
       - name: canvasId
@@ -1108,6 +1117,9 @@ commands:
     description: List all lines on a canvas
     scope: resource
     resourceType: Line
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: core
     parameters:
       - name: canvasId
@@ -1135,6 +1147,9 @@ commands:
     description: List all layers on a canvas
     scope: resource
     resourceType: Layer
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: core
     parameters:
       - name: canvasId
@@ -1161,6 +1176,9 @@ commands:
     description: Create a new layer
     scope: resource
     resourceType: Layer
+    parent:
+      resource: Canvas
+      parameter: canvasId
     code: crel
     parameters:
       - name: canvasId

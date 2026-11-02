@@ -758,6 +758,9 @@ commands:
     description: List all projects in a workspace
     scope: resource
     resourceType: Project
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: core
     parameters:
       - name: workspaceName
@@ -784,6 +787,9 @@ commands:
     description: List all schemes in a workspace
     scope: resource
     resourceType: Scheme
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: core
     parameters:
       - name: workspaceName
@@ -810,6 +816,9 @@ commands:
     description: List all run destinations in a workspace
     scope: resource
     resourceType: RunDestination
+    parent:
+      resource: WorkspaceDocument
+      parameter: workspaceName
     code: core
     parameters:
       - name: workspaceName

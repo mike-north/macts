@@ -2,6 +2,7 @@ import type { GeneratorContext } from './context.js'
 import type { Resource, HierarchyChild, PropertyType } from '../manifest/index.js'
 import { usableHierarchyChildren, usableProperties } from '../manifest/unsupported.js'
 import { propertyTypeToTs } from './types.js'
+import { hierarchyChildAccessor } from './hierarchy-accessor.js'
 
 export interface GeneratedClass {
   name: string
@@ -74,11 +75,14 @@ export function generateResourceClass(resource: Resource, ctx: GeneratorContext)
 
   // Get child collections from hierarchy
   const childCollections = getChildCollections(resource.name, ctx)
+  // The getter is named by the hierarchy key; the specifier addresses the
+  // app's own spelling of the collection.
   const collectionAccessors = childCollections.map(({ key, child }) => {
     const collectionClass = `${child.resource}Collection`
+    const accessor = hierarchyChildAccessor(ctx.manifest, key, child)
     return `  /** Access ${key} collection */
   get ${key}(): ${collectionClass} {
-    return new ${collectionClass}(this.#executor, this.#specifier.collection('${key}'));
+    return new ${collectionClass}(this.#executor, this.#specifier.collection(${JSON.stringify(accessor)}));
   }`
   })
 

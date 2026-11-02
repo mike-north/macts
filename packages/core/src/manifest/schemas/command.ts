@@ -102,6 +102,35 @@ export const CommandUnsupportedSchema = z
 export type CommandUnsupported = z.infer<typeof CommandUnsupportedSchema>
 
 /**
+ * The parent a resource command's target is reached through: the resource
+ * whose items hold the command's resource as elements, and the command's own
+ * parameter that carries the parent item's identifier.
+ *
+ * A Calendar event exists only inside a calendar, so `getEvent` records
+ * `{ resource: Calendar, parameter: calendarId }`. Native bodies address the
+ * parent resource's collection in the app, the parent item in it by that
+ * resource's identifier targeting, with the identifier read from the named
+ * parameter, and then the command's resource collection under that item.
+ *
+ * The parent is a fact the curator records from the app's dictionary (the
+ * parent's class has the command's resource as an element), never derived:
+ * not from a parameter's name or position, and not from the hierarchy. A
+ * command without a parent addresses its resource's collection at the
+ * application. The manifest schema rejects a parent resource the manifest
+ * does not declare or marks unsupported, and a parameter that is not one of
+ * the command's required parameters.
+ */
+export const CommandParentSchema = z
+  .object({
+    /** The parent resource: a key of `manifest.resources`. */
+    resource: z.string().min(1),
+    /** The command's required parameter that carries the parent's identifier. */
+    parameter: z.string().min(1),
+  })
+  .strict()
+export type CommandParent = z.infer<typeof CommandParentSchema>
+
+/**
  * Schema for a command definition.
  */
 export const CommandSchema = z.object({
@@ -115,6 +144,12 @@ export const CommandSchema = z.object({
   resourceType: z.union([z.string(), z.array(z.string())]).optional(),
   /** Input parameters */
   parameters: z.array(CommandParameterSchema).default([]),
+  /**
+   * The parent the command's target is reached through, as the curator
+   * records it (see {@link CommandParentSchema}). Absent for a command whose
+   * resource is addressed at the application.
+   */
+  parent: CommandParentSchema.optional(),
   /** Return type (void if omitted) */
   returns: z.string().optional(),
   /** AppleScript four-character code */
