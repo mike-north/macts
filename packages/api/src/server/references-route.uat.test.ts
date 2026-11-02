@@ -499,6 +499,57 @@ describe('POST /references/v1/resolve: request framing', () => {
     expect(server.verifier.calls()).toBe(0)
   })
 
+  it('answers no bearer with 401, not 400, even for an unknown app: nothing is disclosed before authentication', async () => {
+    const server = await listenServer()
+
+    const res = await resolve(server, { app: 'nope', reference: wire(DUNE) })
+
+    expect(res.status).toBe(401)
+    expect(res.headers.get('WWW-Authenticate')).toBe('Bearer')
+    const text = await res.text()
+    expect(JSON.parse(text)).toEqual({
+      error: {
+        code: 'UNAUTHENTICATED',
+        message: 'Authentication failed: missing',
+        details: { reason: 'missing' },
+      },
+    })
+    expect(text).not.toContain('Unknown app')
+    expect(text).not.toContain('nope')
+  })
+
+  it('answers a resource from another app with 400 VALIDATION_FAILED at reference.resource', async () => {
+    const server = await listenServer()
+
+    // `Event` is a calendar resource; the library contract has no such
+    // resource, so the reference cannot select an operation of the library.
+    const res = await resolve(
+      server,
+      {
+        app: 'library',
+        reference: wire({ resource: 'Event', form: 'identity', cardinality: 'one', id: 'E-1' }),
+      },
+      LIBRARIAN_TOKEN
+    )
+
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({
+      error: {
+        code: 'VALIDATION_FAILED',
+        message: 'The reference names no resource of the app.',
+        details: {
+          // The runtime reports issue paths relative to the reference control
+          // record it receives (`{"reference": {…}}`), so `reference.resource`
+          // is the body's `reference.reference.resource`.
+          issues: [
+            { path: ['reference', 'resource'], message: 'The library app has no resource "Event"' },
+          ],
+        },
+      },
+    })
+    expect(server.executor.resolutions).toHaveLength(0)
+  })
+
   it('answers an unknown app with 400 VALIDATION_FAILED', async () => {
     const server = await listenServer()
 

@@ -139,8 +139,15 @@ export function createReferencesAdapter(
     serveRuntimeCall(c, transport, { call: 'resolveReference' }, (body, context) => {
       const request = readResolveRequest(body)
       return withSpan('references.resolve', async (span) => {
+        const result = await runtime.resolveReference(request.app, request.reference, context)
+        // `app` is caller-supplied and unbounded. The runtime authenticates the
+        // caller and looks the app up inside `resolveReference`, so only a
+        // resolution that succeeded proves both: the caller was authenticated
+        // and the app is a registered one. Recording it any earlier would let
+        // an unauthenticated caller, or an authenticated one naming apps that
+        // do not exist, put arbitrary values on spans.
         span.setAttribute('references.app', request.app)
-        return runtime.resolveReference(request.app, request.reference, context)
+        return result
       })
     })
   )
