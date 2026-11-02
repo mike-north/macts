@@ -15,8 +15,9 @@
  *   its resource's collection at the application;
  * - an identifier is targeted by id or by matching a working property, as the
  *   manifest's identifier targeting declares;
- * - lists read each item's whole property record in one round trip, falling
- *   back to per-field reads when that record cannot be read;
+ * - lists read each property once across the whole collection and assemble
+ *   records by index, checking that every read covers the same items in the
+ *   same order;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
  * - the request parameter that carries an identifier is distinct from the
@@ -53,6 +54,7 @@ import {
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
+import { NATIVE_CODEC_ERROR_NAME } from './native-codec.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
@@ -251,8 +253,8 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * public names. get, create and update all return a record built here, so
  * the three cannot drift.
  *
- * The read is batched, as a list's is: one `properties()` call, from whose
- * record each usable property is taken under the app's name for it, and
+ * The read is batched across the item's properties: one `properties()` call,
+ * from whose record each usable property is taken under the app's name for it, and
  * stored under its public key. An app's property record need not hold every
  * property it can report (a Finder container's has no `entireContents`), so a
  * usable property absent from the record is read on its own; one the app has
@@ -373,6 +375,27 @@ interface ParentScope {
  * target, so a body-detected miss and an app-reported miss are one failure.
  */
 export const NO_SUCH_OBJECT_ERROR_NUMBER = -1728
+
+/**
+ * Native error numbers that mean a request to the app failed, not that the
+ * addressed property cannot be read: the app is not running (-600), the
+ * connection to it is no longer valid (-609), it did not answer within its
+ * event timeout (-1712), the user cancelled (-128), or this Mac has not
+ * authorized automating it (-1743).
+ *
+ * A body that tolerates an unreadable property (a guarded read, or a fallback
+ * from a read across a collection to per-item reads) must still fail on one of
+ * these: a dead or unauthorized app is a failed operation, never a record that
+ * lacks a field. The executor classifies the same numbers, so this record is
+ * their one source.
+ */
+export const COMMUNICATION_FAILURE_ERROR_NUMBERS = Object.freeze({
+  appNotRunning: -600,
+  connectionInvalid: -609,
+  noReply: -1712,
+  userCancelled: -128,
+  notAuthorized: -1743,
+} as const)
 
 /** Local that holds the parent identifier value inside a body. */
 const PARENT_ID_LOCAL = 'parentId'
@@ -547,9 +570,208 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
   )
 }
 
+/** Local that holds the listed collection's specifier inside a list body. */
+const COLLECTION_LOCAL = 'col'
+/** Local that holds the number of items a list body returns. */
+const COUNT_LOCAL = 'count'
+/** Local that holds the runtime identifier of each listed item, by index. */
+const IDS_LOCAL = 'ids'
+
+/**
+ * The message a list fails with when its collection kept changing while it
+ * was read, so no consistent set of reads could be assembled.
+ */
+const COLLECTION_CHANGED_MESSAGE =
+  'The collection changed while it was being read, so the records cannot be assembled.'
+
+/**
+ * Statements declaring the helpers a list body reads its collection through.
+ * They close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which an
+ * attempt sets before it reads any property.
+ *
+ * - `unassemblable(message)` fails the list with a codec error: the app's
+ *   reads cannot be assembled into records. The error is the codec's encode
+ *   failure, the class for an app result that breaks the operation's
+ *   contract, so it is reported as an unexpected value rather than as an app
+ *   failure, and never as records.
+ * - `Inconsistent(message)` is thrown, never returned, when one attempt's
+ *   reads do not describe the same items: a read gave a number of values
+ *   other than the item count, or the identifiers changed while the attempt
+ *   read. {@link listAttempts} redoes such an attempt.
+ * - `aligned(what, values)` returns `values` when it is an array with one
+ *   element per item, and otherwise throws `Inconsistent`. `what` names the
+ *   read in the message.
+ * - `itemList()` lists the item specifiers once per attempt, on first use,
+ *   checked against the item count. Only reads that fall back to one request
+ *   per item need them.
+ * - `communicationFailed(e)` tells whether a thrown error is one of
+ *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
+ *   guard or fallback may absorb it.
+ * - `readEach(list, name, guarded)` reads one property of every item of
+ *   `list`, one request per item. A guarded read the item cannot answer
+ *   leaves `undefined` at its position, so the record omits that property; an
+ *   unguarded failure, or a communication failure, fails the list.
+ * - `readColumn(what, name)` reads one property across the collection in one
+ *   request. When that request fails other than by a communication failure,
+ *   it falls back to `readEach` with every read guarded.
+ */
+function listReadHelpers(): string {
+  return lines(
+    'var items = null;',
+    'function unassemblable(message) {',
+    `  throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: "encode", path: [], message: message };`,
+    '}',
+    'function Inconsistent(message) { this.message = message; }',
+    '// These error numbers mean a request to the app failed (it quit, the connection broke,',
+    '// it did not answer, the user cancelled, or automation is not authorized), not that a',
+    '// property cannot be read, so no guard or fallback absorbs them.',
+    `var communicationFailures = [${Object.values(COMMUNICATION_FAILURE_ERROR_NUMBERS).map(String).join(', ')}];`,
+    'function communicationFailed(e) {',
+    '  return e !== null && e !== undefined && typeof e.errorNumber === "number" &&',
+    '    communicationFailures.indexOf(e.errorNumber) >= 0;',
+    '}',
+    'function aligned(what, values) {',
+    `  if (!Array.isArray(values) || values.length !== ${COUNT_LOCAL}) {`,
+    '    throw new Inconsistent("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
+    `      " values for " + String(${COUNT_LOCAL}) + " items, so the records cannot be assembled.");`,
+    '  }',
+    '  return values;',
+    '}',
+    'function itemList() {',
+    `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
+    '  return items;',
+    '}',
+    'function readEach(list, name, guarded) {',
+    '  var values = [];',
+    '  for (var i = 0; i < list.length; i++) {',
+    '    if (guarded) {',
+    '      try { values.push(list[i][name]()); } catch (e) {',
+    '        if (communicationFailed(e)) { throw e; }',
+    '        values.push(undefined);',
+    '      }',
+    '    } else {',
+    '      values.push(list[i][name]());',
+    '    }',
+    '  }',
+    '  return values;',
+    '}',
+    'function readColumn(what, name) {',
+    '  var values;',
+    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
+    '    if (communicationFailed(e)) { throw e; }',
+    '    return readEach(itemList(), name, true);',
+    '  }',
+    '  return aligned(what, values);',
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readIdentifiers()`, which reads the runtime
+ * identifier `nativeIdName` of every item, in item order.
+ *
+ * The identifier read is never guarded. When the read across the collection
+ * fails other than by a communication failure (which fails the list at once),
+ * the item specifiers are listed and the identifier is read once per item,
+ * still unguarded, so a misconfigured identifier fails the list with a
+ * real error rather than returning records with no usable id. The listed
+ * specifiers become the attempt's item list.
+ */
+function identifierReader(nativeIdName: string): string {
+  return lines(
+    'function readIdentifiers() {',
+    '  var values;',
+    `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    '    if (communicationFailed(e)) { throw e; }',
+    `    var list = ${COLLECTION_LOCAL}();`,
+    '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
+    '    items = list;',
+    `    return readEach(list, ${literal(nativeIdName)}, false);`,
+    '  }',
+    '  if (!Array.isArray(values)) { unassemblable("Reading the identifiers gave no list, so the records cannot be assembled."); }',
+    '  return values;',
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readAll()`, one attempt at reading the whole list:
+ * the item count, the identifiers, every property, then a check that the
+ * collection did not change meanwhile. It throws `Inconsistent` when it did.
+ *
+ * The item count comes from the identifier read itself when there is one: one
+ * request reads every identifier, and its length is the number of items, so
+ * listing costs no separate count. A resource with no identifier is counted
+ * with one count request (`col.length`). Every property read is checked
+ * against this count.
+ *
+ * A count check catches items added or removed between reads, not items that
+ * swap places, which would pair values from different items. So an attempt
+ * ends by reading the identifiers across the collection again, one more
+ * request, and requires them equal, element by element, to the first read. A
+ * resource with no identifier can only be counted again, so for it the check
+ * is best effort: it catches additions and removals, not reorders.
+ *
+ * Each attempt starts with no item list, so an attempt that falls back to
+ * per-item reads lists the items afresh rather than reusing a list from an
+ * attempt that saw a different collection.
+ */
+function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
+  const changed = `throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)});`
+  if (nativeIdName === undefined) {
+    return lines(
+      'function readAll() {',
+      '  items = null;',
+      `  ${COUNT_LOCAL} = ${COLLECTION_LOCAL}.length;`,
+      `  if (typeof ${COUNT_LOCAL} !== "number") { unassemblable("Counting the items gave no number, so the records cannot be assembled."); }`,
+      ...columnReads.map((read) => `  ${read}`),
+      `  if (${COLLECTION_LOCAL}.length !== ${COUNT_LOCAL}) { ${changed} }`,
+      '}'
+    )
+  }
+  return lines(
+    identifierReader(nativeIdName),
+    'function readAll() {',
+    '  items = null;',
+    `  ${IDS_LOCAL} = readIdentifiers();`,
+    `  ${COUNT_LOCAL} = ${IDS_LOCAL}.length;`,
+    ...columnReads.map((read) => `  ${read}`),
+    '  var again = readIdentifiers();',
+    `  if (again.length !== ${COUNT_LOCAL}) { ${changed} }`,
+    `  for (var j = 0; j < ${COUNT_LOCAL}; j++) {`,
+    `    if (again[j] !== ${IDS_LOCAL}[j]) { ${changed} }`,
+    '  }',
+    '}'
+  )
+}
+
+/**
+ * Statements that run `readAll()` until one attempt is consistent, at most
+ * twice. A collection that changes during the first attempt is read again
+ * from the start; one that changes during the second fails the list through
+ * `unassemblable`, with the reason the last attempt gave, rather than
+ * returning records assembled from reads of different items.
+ */
+function listAttempts(): string {
+  return lines(
+    'function attempt() {',
+    '  try { readAll(); return null; } catch (e) {',
+    '    if (e instanceof Inconsistent) { return e.message; }',
+    '    throw e;',
+    '  }',
+    '}',
+    'var problem = attempt();',
+    'if (problem !== null) { problem = attempt(); }',
+    'if (problem !== null) { unassemblable(problem); }'
+  )
+}
+
 /**
  * List every item of the resource's collection at the application, or, for a
  * command that records a parent, of the collection under the parent item.
+ * Every read goes through the one collection specifier the body binds, so a
+ * list that narrowed its collection (a `whose` filter) would have to narrow
+ * that specifier, and every read would cover the same narrowed items.
  *
  * Each item carries every declared property, the primary identifier (even when
  * it is declared only under `identifiers`), and a canonical `id` mirroring the
@@ -557,19 +779,53 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
  * that value is the working property (`name`), and the declared identifier key
  * is mirrored from it rather than read, because reading it fails.
  *
- * Reads are batched: one `properties()` call per item, so a list costs about
- * one round trip per item rather than one per item per property, which made
- * long lists exceed the time limit. When an item's `properties()` fails (a
- * Calendar calendar's record includes the failing `calendarIdentifier`), the
- * item falls back to per-field reads, each guarded so one failing field cannot
- * empty the item.
+ * Reads go across the collection: within one body, each property is read once
+ * for every item in one request (`col["name"]()`), and the records are
+ * assembled by index. A list therefore costs one request per property, plus
+ * one to read the identifiers again (or count the items again), however many
+ * items it has. Reading every item's record one item at a time cost one
+ * request per item, at seconds each in some apps (a Reminders list of 80
+ * items took over four minutes), and reading the whole property record across
+ * the collection in one request fails in Reminders (-1728), so each property
+ * is its own request.
  *
- * The runtime identifier read is never guarded, in either path: a misconfigured
- * identifier must fail the list with a real error rather than return items with
- * no usable id.
+ * Index assembly is only correct while every read describes the same items in
+ * the same order. Every read is checked against the item count, and the
+ * identifiers are read again after the properties and must not have changed
+ * (see {@link attemptReader}). A collection that changes while it is read is
+ * read once more from the start, and if it changes again the list fails with
+ * a codec error (see {@link listAttempts}): never misaligned records. A
+ * missing value keeps its position in its read: the app reports it as `null`
+ * there, as it does in an item's property record, so it maps to the same
+ * `null` field the per-item record gave; only an `undefined` position is
+ * omitted.
  *
- * Every read, from the record or per field, uses the app's name for the
- * property; every item is keyed by the public names.
+ * A property whose read across the collection fails falls back to one guarded
+ * read per item, for that property alone, so one property the app cannot
+ * read across the collection neither empties a record nor fails the list, and
+ * the other properties stay one request each. Known cases: a Notes note's
+ * `body` cannot be read across the collection (-1741) but can per item, so a
+ * notes list reads it per item. A Calendar calendar's `calendarIdentifier`
+ * fails both ways (-1728 across the collection, -1700 per item), but no list
+ * reads it: the Calendar manifest marks it unsupported, with probe evidence,
+ * and a list reads only usable properties. The fallback is detected at run
+ * time: a property not yet known to fail only across the collection costs
+ * speed, and one that fails both ways is omitted from its records, as it was
+ * when each item's record was read. A communication failure
+ * ({@link COMMUNICATION_FAILURE_ERROR_NUMBERS}) is never either: it always
+ * fails the list. The runtime identifier read is never guarded (see
+ * {@link identifierReader}).
+ *
+ * Index assembly also keeps items that share an identifier apart. A Calendar
+ * calendar can hold several events with the same `uid`, and lists each as a
+ * specifier by that `uid`, so a read through an item's specifier reaches the
+ * first of them every time, while a read across the collection gives each
+ * event its own values. The per-item fallback still reads through those
+ * specifiers, so a property that failed across the collection would still
+ * repeat the first event's value on every event that shares its `uid`.
+ *
+ * Every read uses the app's name for the property, and the collection the
+ * app's name for it; every item is keyed by the public names.
  */
 function buildListBody(
   command: Command,
@@ -598,21 +854,17 @@ function buildListBody(
   )
 
   const native = (p: string): string => nativePropertyName(resource, p)
-  const fastPathPropReads = bestEffortProps.map(
-    (p) =>
-      `if (${member('props', native(p))} !== undefined) { ${member('obj', p)} = ${member('props', native(p))}; }`
+  const columnLocal = (index: number): string => `column${String(index)}`
+  const columnReads = bestEffortProps.map(
+    (p, index) =>
+      `${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
   )
-  const fallbackPropReads = bestEffortProps.map(
-    (p) => `try { ${member('obj', p)} = ${member('item', native(p))}(); } catch (e) {}`
-  )
-  const idReadFast =
-    runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('props', native(runtimeIdProperty))};`
-      : ''
-  const idReadFallback =
-    runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('item', native(runtimeIdProperty))}();`
-      : ''
+  const recordFields = bestEffortProps.map((p, index) => {
+    const value = `${columnLocal(index)}[i]`
+    return `if (${value} !== undefined) { ${member('obj', p)} = ${value}; }`
+  })
+  const idField =
+    runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
   const idAlias =
     identifierAliases && runtimeIdProperty !== undefined
       ? lines(
@@ -627,27 +879,31 @@ function buildListBody(
   // list: an empty list would claim the parent exists and has no items.
   const parentScope = recordedParentScope(command, manifest)
   let parentBinding = ''
-  let collectionExpression = `${member('app', resourcePlural)}()`
+  let collectionExpression = member('app', resourcePlural)
   if (parentScope !== undefined) {
     parentBinding = lines(readParentId(command, parentScope), bindParent(parentScope.parentTarget))
-    collectionExpression = `${member(PARENT_LOCAL, resourcePlural)}()`
+    collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
   const body = lines(
     parentBinding,
-    `var items = ${collectionExpression};`,
+    `var ${COLLECTION_LOCAL} = ${collectionExpression};`,
+    `var ${COUNT_LOCAL} = 0;`,
+    runtimeIdProperty === undefined ? '' : `var ${IDS_LOCAL};`,
+    bestEffortProps.length === 0
+      ? ''
+      : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
+    listReadHelpers(),
+    attemptReader(
+      runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty),
+      columnReads
+    ),
+    listAttempts(),
     'var result = [];',
-    'for (var i = 0; i < items.length; i++) {',
-    'var item = items[i];',
+    `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',
-    'try {',
-    'var props = item.properties();',
-    ...fastPathPropReads,
-    idReadFast,
-    '} catch (e) {',
-    ...fallbackPropReads,
-    idReadFallback,
-    '}',
+    ...recordFields,
+    idField,
     idAlias,
     'result.push(obj);',
     '}',
