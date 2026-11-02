@@ -114,8 +114,8 @@ drift.
 
 The generator also owns which files a generated package contains. Each
 package's `.macts-generated.json` records the files the last run emitted, and
-regenerating deletes any of them the generator no longer emits. Files no
-record lists, such as `CHANGELOG.md` and API reports, are left alone.
+regenerating deletes any of them the generator no longer emits. Files not
+listed in any record, such as `CHANGELOG.md` and API reports, are left alone.
 `generate:check` fails on any modified, deleted or untracked file under
 `packages/`.
 

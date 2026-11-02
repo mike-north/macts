@@ -6,8 +6,8 @@
  * `writeGeneratedPackage` records every path the run emitted in the package's
  * `.macts-generated.json`, and deletes the paths the previous record held that
  * this run no longer emits, so a removed operation or resource leaves no file
- * behind. Files no record lists, such as a package's changelog or handwritten
- * tests, are never touched. A package generated before it had a record takes
+ * behind. Files not listed in any record, such as a package's changelog or
+ * handwritten tests, are never touched. A package generated before it had a record takes
  * the files carrying a generated header as its previous set. The full rule is
  * in `./owned-output.ts`.
  *
