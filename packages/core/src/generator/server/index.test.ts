@@ -265,6 +265,8 @@ describe('generateServerPackage', () => {
       '.': { types: './dist/index.d.ts', import: './dist/index.js' },
     })
     expect(pkg.main).toBe('./dist/index.js')
+    // Regression: the types entry once named `./dist/<package>.d.ts`, which the
+    // build never emits; it must name the declarations tsup writes for the entry.
     expect(pkg.types).toBe('./dist/index.d.ts')
   })
 

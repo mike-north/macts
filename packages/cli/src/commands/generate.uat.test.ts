@@ -196,10 +196,8 @@ describe('macts generate (UAT): owned output', () => {
 
     const first = await generateInto(out, true)
     expect(first.code).toBe(0)
-    // A package written for the first time has no record yet.
-    expect(first.stdout).toContain(
-      `bootstrapped owned-output set from headers: 0 files in ${client}\n`
-    )
+    // A directory that is not yet a package has no previous set to bootstrap.
+    expect(first.stdout).not.toContain('bootstrapped')
     const before = await recorded(client)
 
     await writeFile(join(client, 'CHANGELOG.md'), '# @macts/sketchpad\n')

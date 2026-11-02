@@ -675,7 +675,12 @@ and removes a directory only when that deletion empties it. A file that is in
 no record, such as a package's `CHANGELOG.md`, its API reports, or a
 handwritten test, is never touched. A package without a record takes the
 files whose leading doc comment carries the generator's "do not edit" notice
-as its previous set; after that run, the record decides. Removing an
+as its previous set; after that run, the record decides. That bootstrap stays
+inside one package: it runs only in a directory holding a `package.json`,
+never looks inside a subdirectory holding its own, and a directory that is
+not yet a package has no previous set. A run widens the record to the
+previous set plus its own files before writing, so an interrupted run leaves
+nothing it wrote outside a record. Removing an
 operation or a resource from a manifest therefore leaves the package as a
 fresh generate would. `pnpm generate:check` regenerates every package and then
 fails on any modified, deleted or untracked file under `packages/`, naming

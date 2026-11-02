@@ -19,7 +19,15 @@
  * - **Bootstrap.** A package without a record has never been generated under
  *   this rule. Its previous set is then the files under it whose content opens
  *   with a generated header (see `./generated-header.ts`); a file without that
- *   header is kept. After that first run the record takes over.
+ *   header is kept. After that first run the record takes over. The bootstrap
+ *   is confined to one package: it runs only in a directory that holds a
+ *   `package.json`, and never looks inside a subdirectory that holds its own,
+ *   so a mistaken output directory that contains many packages loses nothing.
+ *   A directory that is not yet a package has no previous set.
+ * - **Interruption.** Before any file is written, the record is widened to
+ *   the previous set plus this run's files, so a run interrupted part way
+ *   leaves every file it may have written in a record, and the next run
+ *   prunes whichever of them it no longer emits.
  *
  * Regenerating after a manifest drops an operation or a resource therefore
  * leaves the package tree as a fresh generate into an empty directory would,
@@ -28,7 +36,7 @@
  * @packageDocumentation
  */
 
-import { mkdir, readFile, readdir, rmdir, unlink, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, open, readFile, readdir, rmdir, unlink, writeFile } from 'node:fs/promises'
 import { isAbsolute, join, posix, sep } from 'node:path'
 import { hasGeneratedHeader } from './generated-header.js'
 import { writeFiles } from './write.js'
@@ -50,10 +58,25 @@ const RECORD_COMMENT =
 const BOOTSTRAP_SKIPPED_DIRECTORIES = new Set(['dist', 'node_modules'])
 
 /**
- * Where a package's previous owned-output set came from: its record, or, for a
- * package without one, the files carrying a generated header.
+ * The file whose presence makes a directory a package. The bootstrap runs only
+ * in a directory that holds one, and treats a subdirectory that holds one as
+ * another package, outside this one.
  */
-export type OwnedOutputSource = 'record' | 'headers'
+const PACKAGE_MANIFEST_FILE = 'package.json'
+
+/**
+ * How much of a file the bootstrap reads to look for a generated header. The
+ * header is the opening comment of a generated file, well inside this prefix;
+ * a file whose header would lie beyond it is kept, never pruned.
+ */
+const HEADER_PREFIX_BYTES = 4096
+
+/**
+ * Where a package's previous owned-output set came from: its record; for a
+ * package without one, the files carrying a generated header; or nowhere, for
+ * a directory that is not yet a package, whose previous set is empty.
+ */
+export type OwnedOutputSource = 'record' | 'headers' | 'none'
 
 /**
  * The outcome of writing one generated package.
@@ -159,10 +182,35 @@ export function stalePaths(previous: readonly string[], emitted: readonly string
   return [...new Set(previous)].filter((path) => !current.has(path)).sort()
 }
 
+/** Whether a path exists, without following a final symbolic link. */
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await lstat(path)
+    return true
+  } catch (error) {
+    if (errorCode(error) === 'ENOENT') return false
+    throw error
+  }
+}
+
+/** The first {@link HEADER_PREFIX_BYTES} of a file, as text. */
+async function readHeaderPrefix(path: string): Promise<string> {
+  const handle = await open(path, 'r')
+  try {
+    const buffer = Buffer.alloc(HEADER_PREFIX_BYTES)
+    const { bytesRead } = await handle.read(buffer, 0, HEADER_PREFIX_BYTES, 0)
+    return buffer.subarray(0, bytesRead).toString('utf-8')
+  } finally {
+    await handle.close()
+  }
+}
+
 /**
  * The package-relative paths of every file under a package whose content
- * opens with a generated header, sorted. Symbolic links and
- * {@link BOOTSTRAP_SKIPPED_DIRECTORIES} are not followed.
+ * opens with a generated header, sorted. Symbolic links,
+ * {@link BOOTSTRAP_SKIPPED_DIRECTORIES}, dot-directories and subdirectories
+ * holding their own {@link PACKAGE_MANIFEST_FILE} (other packages) are not
+ * looked inside.
  */
 export async function findHeaderBearingFiles(packageDir: string): Promise<string[]> {
   const found: string[] = []
@@ -178,10 +226,11 @@ export async function findHeaderBearingFiles(packageDir: string): Promise<string
       const relativePath = relativeDir === '' ? entry.name : `${relativeDir}/${entry.name}`
       if (entry.isDirectory()) {
         if (entry.name.startsWith('.') || BOOTSTRAP_SKIPPED_DIRECTORIES.has(entry.name)) continue
+        if (await pathExists(join(packageDir, relativePath, PACKAGE_MANIFEST_FILE))) continue
         await visit(relativePath)
       } else if (entry.isFile()) {
-        const content = await readFile(join(packageDir, relativePath), 'utf-8')
-        if (hasGeneratedHeader(content)) found.push(relativePath)
+        const prefix = await readHeaderPrefix(join(packageDir, relativePath))
+        if (hasGeneratedHeader(prefix)) found.push(relativePath)
       }
     }
   }
@@ -189,7 +238,11 @@ export async function findHeaderBearingFiles(packageDir: string): Promise<string
   return found.sort()
 }
 
-/** The previous owned-output set of a package: its record, or the bootstrap set. */
+/**
+ * The previous owned-output set of a package: its record; without one, the
+ * bootstrap set when the directory is a package (holds a
+ * {@link PACKAGE_MANIFEST_FILE}); otherwise empty.
+ */
 export async function readPreviousOwnedOutput(
   packageDir: string
 ): Promise<{ readonly source: OwnedOutputSource; readonly files: readonly string[] }> {
@@ -199,9 +252,36 @@ export async function readPreviousOwnedOutput(
     content = await readFile(recordPath, 'utf-8')
   } catch (error) {
     if (errorCode(error) !== 'ENOENT') throw error
+    if (!(await pathExists(join(packageDir, PACKAGE_MANIFEST_FILE)))) {
+      return { source: 'none', files: [] }
+    }
     return { source: 'headers', files: await findHeaderBearingFiles(packageDir) }
   }
   return { source: 'record', files: parseOwnedOutputRecord(content, recordPath) }
+}
+
+/**
+ * Fail when a directory between the package and a path is a symbolic link, so
+ * that deleting the path can never reach outside the package through a link.
+ * The generator writes real directories, so a link there is not its output.
+ */
+async function assertNoLinkedDirectory(packageDir: string, path: string): Promise<void> {
+  const segments = path.split('/').slice(0, -1)
+  for (let index = 1; index <= segments.length; index++) {
+    const directory = segments.slice(0, index).join('/')
+    let isLink: boolean
+    try {
+      isLink = (await lstat(join(packageDir, directory))).isSymbolicLink()
+    } catch (error) {
+      if (errorCode(error) === 'ENOENT') return
+      throw error
+    }
+    if (isLink) {
+      throw new Error(
+        `Refusing to delete "${path}" in ${packageDir}: "${directory}" is a symbolic link.`
+      )
+    }
+  }
 }
 
 /**
@@ -209,6 +289,8 @@ export async function readPreviousOwnedOutput(
  * left empty, up to (never including) the package directory.
  *
  * @returns The paths actually deleted; a path already absent is skipped.
+ * @throws When a directory on a path is a symbolic link; nothing on that path
+ * is deleted.
  */
 export async function pruneOwnedOutput(
   packageDir: string,
@@ -216,8 +298,10 @@ export async function pruneOwnedOutput(
 ): Promise<string[]> {
   const deleted: string[] = []
   for (const path of paths) {
+    const packagePath = toPackagePath(path)
+    await assertNoLinkedDirectory(packageDir, packagePath)
     try {
-      await unlink(join(packageDir, toPackagePath(path)))
+      await unlink(join(packageDir, packagePath))
     } catch (error) {
       if (errorCode(error) === 'ENOENT') continue
       throw error
@@ -239,11 +323,12 @@ export async function pruneOwnedOutput(
 }
 
 /**
- * Write one generated package: its files, then the pruning of what the
- * previous run emitted and this one did not, then its owned-output record.
+ * Write one generated package: a record widened to the previous set plus this
+ * run's files, then the files, then the pruning of what the previous run
+ * emitted and this one did not, then the record of exactly this run's files.
  *
- * The record is written last, so a run interrupted before it finishes leaves
- * the previous record in place and the next run prunes again.
+ * A run interrupted at any point leaves a record listing every file it may
+ * have written, so the next run prunes whatever of them it no longer emits.
  *
  * @param files - Every file the emitter produced for the package, with
  * package-relative paths
@@ -257,13 +342,11 @@ export async function writeGeneratedPackage(
 ): Promise<GeneratedPackageWriteResult> {
   const emitted = ownedOutputPaths(files)
   const previous = await readPreviousOwnedOutput(packageDir)
+  const recordPath = join(packageDir, OWNED_OUTPUT_RECORD_FILE)
+  await mkdir(packageDir, { recursive: true })
+  await writeFile(recordPath, renderOwnedOutputRecord([...previous.files, ...emitted]), 'utf-8')
   await writeFiles(files, packageDir)
   const pruned = await pruneOwnedOutput(packageDir, stalePaths(previous.files, emitted))
-  await mkdir(packageDir, { recursive: true })
-  await writeFile(
-    join(packageDir, OWNED_OUTPUT_RECORD_FILE),
-    renderOwnedOutputRecord(emitted),
-    'utf-8'
-  )
+  await writeFile(recordPath, renderOwnedOutputRecord(emitted), 'utf-8')
   return { emitted, previousSource: previous.source, previous: previous.files, pruned }
 }

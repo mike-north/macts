@@ -13,7 +13,7 @@
  * @see https://github.com/mike-north/macts/issues/179
  */
 
-import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -41,6 +41,9 @@ export {}
 const UNHEADED = `import { Command } from 'clipanion'
 export {}
 `
+
+/** A package's `package.json`, which makes its directory a package. */
+const PACKAGE_JSON = '{ "name": "@macts/example" }\n'
 
 let packageDir: string
 
@@ -241,6 +244,21 @@ describe('findHeaderBearingFiles', () => {
   it('is empty for a package directory that does not exist yet', async () => {
     expect(await findHeaderBearingFiles(join(packageDir, 'missing'))).toEqual([])
   })
+
+  it('does not look inside a subdirectory that is a package of its own', async () => {
+    await plant({
+      'src/index.ts': HEADED,
+      'other/package.json': PACKAGE_JSON,
+      'other/src/x.ts': HEADED,
+    })
+    expect(await findHeaderBearingFiles(packageDir)).toEqual(['src/index.ts'])
+  })
+
+  it('keeps a file whose header lies beyond the prefix it reads', async () => {
+    const longComment = ` * ${'x'.repeat(100)}\n`.repeat(50)
+    await plant({ 'src/long.ts': `/**\n${longComment} * Auto-generated - do not edit.\n */\n` })
+    expect(await findHeaderBearingFiles(packageDir)).toEqual([])
+  })
 })
 
 describe('pruneOwnedOutput', () => {
@@ -271,6 +289,22 @@ describe('pruneOwnedOutput', () => {
 
   it('skips a previously owned path that is already gone', async () => {
     expect(await pruneOwnedOutput(packageDir, ['src/gone.ts'])).toEqual([])
+  })
+
+  it('refuses to delete through a symbolically linked directory, and deletes nothing there', async () => {
+    const outside = await mkdtemp(join(tmpdir(), 'macts-owned-output-outside-'))
+    try {
+      await writeFile(join(outside, 'x.ts'), HEADED, 'utf-8')
+      await mkdir(join(packageDir, 'src'), { recursive: true })
+      await symlink(outside, join(packageDir, 'src/link'))
+
+      await expect(pruneOwnedOutput(packageDir, ['src/link/x.ts'])).rejects.toThrow(
+        'is a symbolic link'
+      )
+      expect(await readFile(join(outside, 'x.ts'), 'utf-8')).toBe(HEADED)
+    } finally {
+      await rm(outside, { recursive: true, force: true })
+    }
   })
 
   it('never deletes the package directory itself', async () => {
@@ -349,18 +383,25 @@ describe('writeGeneratedPackage', () => {
 
   describe('without a record (bootstrap)', () => {
     it('takes the header-bearing files as the previous set, and prunes a stale one', async () => {
-      await plant({ 'src/types.ts': HEADED, 'src/resources/connection.ts': HEADED })
+      await plant({
+        'package.json': PACKAGE_JSON,
+        'src/types.ts': HEADED,
+        'src/resources/connection.ts': HEADED,
+      })
 
       const result = await writeGeneratedPackage(emit(['src/types.ts']), packageDir)
 
       expect(result.previousSource).toBe('headers')
       expect(result.previous).toEqual(['src/resources/connection.ts', 'src/types.ts'])
       expect(result.pruned).toEqual(['src/resources/connection.ts'])
-      expect(await tree()).toEqual([OWNED_OUTPUT_RECORD_FILE, 'src/types.ts'])
+      expect(await tree()).toEqual([OWNED_OUTPUT_RECORD_FILE, 'package.json', 'src/types.ts'])
     })
 
     it('keeps a stale file without a header', async () => {
-      await plant({ 'src/cli/commands/connections/list.ts': UNHEADED })
+      await plant({
+        'package.json': PACKAGE_JSON,
+        'src/cli/commands/connections/list.ts': UNHEADED,
+      })
 
       const result = await writeGeneratedPackage(emit(['src/index.ts']), packageDir)
 
@@ -369,8 +410,40 @@ describe('writeGeneratedPackage', () => {
       expect(await tree()).toContain('src/cli/commands/connections/list.ts')
     })
 
+    it('keeps the files of a package nested inside the package directory', async () => {
+      // A mistaken output directory that holds other packages, such as
+      // `--out-dir packages` for a single app, must not prune those packages.
+      await plant({
+        'package.json': PACKAGE_JSON,
+        'other/package.json': PACKAGE_JSON,
+        'other/src/x.ts': HEADED,
+      })
+
+      const result = await writeGeneratedPackage(emit(['src/index.ts']), packageDir)
+
+      expect(result.previous).toEqual([])
+      expect(result.pruned).toEqual([])
+      expect(await tree()).toContain('other/src/x.ts')
+    })
+
+    it('has no previous set in a directory that is not a package, and prunes nothing', async () => {
+      await plant({ 'calendar/src/types.ts': HEADED, 'src/stale.ts': HEADED })
+
+      const result = await writeGeneratedPackage(emit(['src/index.ts']), packageDir)
+
+      expect(result.previousSource).toBe('none')
+      expect(result.previous).toEqual([])
+      expect(result.pruned).toEqual([])
+      expect(await tree()).toEqual(
+        expect.arrayContaining(['calendar/src/types.ts', 'src/stale.ts'])
+      )
+    })
+
     it('hands over to the record on the next run', async () => {
-      await plant({ 'src/cli/commands/connections/list.ts': UNHEADED })
+      await plant({
+        'package.json': PACKAGE_JSON,
+        'src/cli/commands/connections/list.ts': UNHEADED,
+      })
       await writeGeneratedPackage(
         emit(['src/index.ts', 'src/cli/commands/connections/list.ts']),
         packageDir
@@ -380,6 +453,25 @@ describe('writeGeneratedPackage', () => {
 
       expect(result.previousSource).toBe('record')
       expect(result.pruned).toEqual(['src/cli/commands/connections/list.ts'])
+    })
+  })
+
+  describe('an interrupted run', () => {
+    it('leaves a record of the previous set and every file the run meant to write', async () => {
+      // A file where the run needs a directory makes writing fail part way.
+      await plant({ 'src/old.ts': UNHEADED, lib: 'not a directory\n' })
+      await plantRecord(['src/old.ts'])
+
+      await expect(
+        writeGeneratedPackage(emit(['src/new.ts', 'lib/index.ts']), packageDir)
+      ).rejects.toThrow()
+
+      const record = await readFile(join(packageDir, OWNED_OUTPUT_RECORD_FILE), 'utf-8')
+      expect(parseOwnedOutputRecord(record, 'record')).toEqual([
+        'lib/index.ts',
+        'src/new.ts',
+        'src/old.ts',
+      ])
     })
   })
 

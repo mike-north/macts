@@ -2182,7 +2182,7 @@ export interface OperationVocabulary {
 export const OWNED_OUTPUT_RECORD_FILE = ".macts-generated.json";
 
 // @public
-export type OwnedOutputSource = 'record' | 'headers';
+export type OwnedOutputSource = 'record' | 'headers' | 'none';
 
 // @public
 export function parseApprovalConfig(input: unknown): ParseApprovalConfigResult;

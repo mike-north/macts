@@ -2,8 +2,8 @@
  * Fail when the working tree differs from the committed tree under the given
  * paths, naming every differing file.
  *
- * Usage: `node scripts/check-clean-tree.mjs <path>...`, run from the repository
- * (any directory inside it).
+ * Usage: `node scripts/check-clean-tree.mjs <path>...`, run from any directory
+ * inside the repository. Each path is relative to the repository root.
  *
  * `pnpm generate:check` runs this over `packages` after regenerating, so it
  * catches each way generated output can drift from what is committed: a
@@ -25,8 +25,8 @@ if (paths.length === 0) {
 }
 
 /** Run git, returning its stdout, or end the check when git fails. */
-function git(args) {
-  const run = spawnSync('git', args, { encoding: 'utf-8', maxBuffer: 256 * 1024 * 1024 })
+function git(args, cwd) {
+  const run = spawnSync('git', args, { cwd, encoding: 'utf-8', maxBuffer: 256 * 1024 * 1024 })
   if (run.error !== undefined || run.status !== 0) {
     console.error(`git ${args.join(' ')} failed: ${run.error?.message ?? run.stderr.trim()}`)
     process.exit(2)
@@ -36,7 +36,11 @@ function git(args) {
 
 // `-z` keeps paths verbatim (no quoting). Each entry is `XY <path>`; a rename
 // or copy is followed by one more NUL-terminated field, its source path.
-const status = git(['status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ...paths])
+const root = git(['rev-parse', '--show-toplevel']).trim()
+const status = git(
+  ['status', '--porcelain=v1', '-z', '--untracked-files=all', '--', ...paths],
+  root
+)
 const fields = status.split('\0').filter((field) => field.length > 0)
 const changes = []
 for (let index = 0; index < fields.length; index++) {
@@ -65,7 +69,7 @@ for (const { code, path } of changes) {
 }
 console.error('\nRegenerate with `pnpm generate` and commit the result.')
 
-const diff = git(['--no-pager', 'diff', '--', ...paths])
+const diff = git(['--no-pager', 'diff', '--', ...paths], root)
 if (diff.length > 0) {
   console.error('\nChanges to tracked files:\n')
   process.stderr.write(diff)
