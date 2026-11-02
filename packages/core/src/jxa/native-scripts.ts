@@ -15,8 +15,8 @@
  *   its resource's collection at the application;
  * - an identifier is targeted by id or by matching a working property, as the
  *   manifest's identifier targeting declares;
- * - lists read each item's whole property record in one round trip, falling
- *   back to per-field reads when that record cannot be read;
+ * - lists read each property once across the whole collection and assemble
+ *   records by index, checking that every read covers the same items;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
  * - the request parameter that carries an identifier is distinct from the
@@ -53,6 +53,7 @@ import {
 } from '../manifest/identifier.js'
 import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
+import { NATIVE_CODEC_ERROR_NAME } from './native-codec.js'
 
 /**
  * Everything needed to run one operation natively, derived from the manifest
@@ -251,8 +252,8 @@ function nativePropertyName(resource: Resource | undefined, key: string): string
  * public names. get, create and update all return a record built here, so
  * the three cannot drift.
  *
- * The read is batched, as a list's is: one `properties()` call, from whose
- * record each usable property is taken under the app's name for it, and
+ * The read is batched across the item's properties: one `properties()` call,
+ * from whose record each usable property is taken under the app's name for it, and
  * stored under its public key. An app's property record need not hold every
  * property it can report (a Finder container's has no `entireContents`), so a
  * usable property absent from the record is read on its own; one the app has
@@ -547,9 +548,124 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
   )
 }
 
+/** Local that holds the listed collection's specifier inside a list body. */
+const COLLECTION_LOCAL = 'col'
+/** Local that holds the number of items a list body returns. */
+const COUNT_LOCAL = 'count'
+/** Local that holds the runtime identifier of each listed item, by index. */
+const IDS_LOCAL = 'ids'
+
+/**
+ * Statements declaring the helpers a list body reads its collection through.
+ * They close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which the
+ * body sets before calling any of them.
+ *
+ * - `unassemblable(message)` fails the list with a codec error. A read across
+ *   the collection that does not give one value per item would pair values
+ *   from different items if records were assembled from it by index. The
+ *   error is the codec's encode failure, the class for an app result that
+ *   breaks the operation's contract, so it is reported as an unexpected value
+ *   rather than as an app failure, and never as records.
+ * - `aligned(what, values)` returns `values` when it is an array with one
+ *   element per item, and otherwise fails through `unassemblable`. `what`
+ *   names the read in the message.
+ * - `itemList()` lists the item specifiers, once, on first use. Only reads
+ *   that fall back to one request per item need them.
+ * - `readEach(name, guarded)` reads one property of every item, one request
+ *   per item. A guarded read the item cannot answer leaves `undefined` at its
+ *   position, so the record omits that property; an unguarded failure fails
+ *   the list.
+ * - `readColumn(what, name)` reads one property across the collection in one
+ *   request. When that request fails, it falls back to `readEach` with every
+ *   read guarded.
+ */
+function listReadHelpers(): string {
+  return lines(
+    'var items = null;',
+    'function unassemblable(message) {',
+    `  throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: "encode", path: [], message: message };`,
+    '}',
+    'function aligned(what, values) {',
+    `  if (!Array.isArray(values) || values.length !== ${COUNT_LOCAL}) {`,
+    '    unassemblable("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
+    `      " values for " + String(${COUNT_LOCAL}) + " items, so the records cannot be assembled.");`,
+    '  }',
+    '  return values;',
+    '}',
+    'function itemList() {',
+    `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
+    '  return items;',
+    '}',
+    'function readEach(name, guarded) {',
+    '  var list = itemList();',
+    '  var values = [];',
+    `  for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
+    '    if (guarded) {',
+    '      try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }',
+    '    } else {',
+    '      values.push(list[i][name]());',
+    '    }',
+    '  }',
+    '  return values;',
+    '}',
+    'function readColumn(what, name) {',
+    '  var values;',
+    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) { return readEach(name, true); }`,
+    '  return aligned(what, values);',
+    '}'
+  )
+}
+
+/**
+ * Statements that set {@link COUNT_LOCAL} to the number of listed items and,
+ * for a resource with a runtime identifier, {@link IDS_LOCAL} to each item's
+ * identifier.
+ *
+ * The item count comes from the identifier read itself when there is one: one
+ * request reads every identifier, and its length is the number of items, so
+ * listing costs no separate count. A resource with no identifier is counted
+ * with one count request (`col.length`). Every other read is checked against
+ * this count.
+ *
+ * The identifier read is never guarded. When the read across the collection
+ * fails, the item specifiers are listed and the identifier is read once per
+ * item, still unguarded, so a misconfigured identifier fails the list with a
+ * real error rather than returning records with no usable id.
+ */
+function readListCount(nativeIdName: string | undefined): string {
+  const noCount =
+    'unassemblable("Counting the items gave no number, so the records cannot be assembled.");'
+  if (nativeIdName === undefined) {
+    return lines(
+      `var ${COUNT_LOCAL} = ${COLLECTION_LOCAL}.length;`,
+      `if (typeof ${COUNT_LOCAL} !== "number") { ${noCount} }`
+    )
+  }
+  const notAList =
+    'unassemblable("Reading the identifiers gave no list, so the records cannot be assembled.");'
+  return lines(
+    `var ${COUNT_LOCAL} = 0;`,
+    `var ${IDS_LOCAL};`,
+    'var idsRead = true;',
+    `try { ${IDS_LOCAL} = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) { idsRead = false; }`,
+    'if (idsRead) {',
+    `  if (!Array.isArray(${IDS_LOCAL})) { ${notAList} }`,
+    `  ${COUNT_LOCAL} = ${IDS_LOCAL}.length;`,
+    '} else {',
+    `  items = ${COLLECTION_LOCAL}();`,
+    `  if (!Array.isArray(items)) { ${noCount} }`,
+    `  ${COUNT_LOCAL} = items.length;`,
+    `  ${IDS_LOCAL} = readEach(${literal(nativeIdName)}, false);`,
+    '}'
+  )
+}
+
 /**
  * List every item of the resource's collection at the application, or, for a
  * command that records a parent, of the collection under the parent item.
+ * Every read goes through the one collection specifier the body binds, so a
+ * list that narrowed its collection (a `whose` filter) would have to narrow
+ * that specifier, and every read would cover the same narrowed items.
  *
  * Each item carries every declared property, the primary identifier (even when
  * it is declared only under `identifiers`), and a canonical `id` mirroring the
@@ -557,19 +673,42 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
  * that value is the working property (`name`), and the declared identifier key
  * is mirrored from it rather than read, because reading it fails.
  *
- * Reads are batched: one `properties()` call per item, so a list costs about
- * one round trip per item rather than one per item per property, which made
- * long lists exceed the time limit. When an item's `properties()` fails (a
- * Calendar calendar's record includes the failing `calendarIdentifier`), the
- * item falls back to per-field reads, each guarded so one failing field cannot
- * empty the item.
+ * Reads go across the collection: within one body, each property is read once
+ * for every item in one request (`col["name"]()`), and the records are
+ * assembled by index. A list therefore costs one request per property, however
+ * many items it has. Reading every item's record one item at a time cost one
+ * request per item, at seconds each in some apps (a Reminders list of 80
+ * items took over four minutes), and reading the whole property record across
+ * the collection in one request fails in Reminders (-1728), so each property
+ * is its own request.
  *
- * The runtime identifier read is never guarded, in either path: a misconfigured
- * identifier must fail the list with a real error rather than return items with
- * no usable id.
+ * Index assembly is only correct while every read describes the same items in
+ * the same order, so every read is checked against the item count (see
+ * {@link readListCount}). A read with another number of values fails the list
+ * with a codec error instead of returning misaligned records. A missing value
+ * keeps its position in its read: the app reports it as `null` there, as it
+ * does in an item's property record, so it maps to the same `null` field the
+ * per-item record gave; only an `undefined` position is omitted.
  *
- * Every read, from the record or per field, uses the app's name for the
- * property; every item is keyed by the public names.
+ * A property whose read across the collection fails falls back to one guarded
+ * read per item, for that property alone, so one property the app cannot
+ * read across the collection neither empties a record nor fails the list, and
+ * the other properties stay one request each. Known cases: a Notes note's
+ * `body` cannot be read across the collection (-1741) but can per item, so a
+ * notes list reads it per item. A Calendar calendar's `calendarIdentifier`
+ * fails both ways (-1728 across the collection, -1700 per item), but no list
+ * reads it: calendars are matched by name. The fallback is detected at run
+ * time, so a case not yet known costs speed, never records. The runtime
+ * identifier read is never guarded (see {@link readListCount}).
+ *
+ * Index assembly also keeps items that share an identifier apart. A Calendar
+ * calendar can hold several events with the same `uid`, and lists each as a
+ * specifier by that `uid`, so a read through an item's specifier reaches the
+ * first of them every time, while a read across the collection gives each
+ * event its own values.
+ *
+ * Every read uses the app's name for the property, and the collection the
+ * app's name for it; every item is keyed by the public names.
  */
 function buildListBody(
   command: Command,
@@ -598,21 +737,17 @@ function buildListBody(
   )
 
   const native = (p: string): string => nativePropertyName(resource, p)
-  const fastPathPropReads = bestEffortProps.map(
-    (p) =>
-      `if (${member('props', native(p))} !== undefined) { ${member('obj', p)} = ${member('props', native(p))}; }`
+  const columnLocal = (index: number): string => `column${String(index)}`
+  const columnReads = bestEffortProps.map(
+    (p, index) =>
+      `var ${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
   )
-  const fallbackPropReads = bestEffortProps.map(
-    (p) => `try { ${member('obj', p)} = ${member('item', native(p))}(); } catch (e) {}`
-  )
-  const idReadFast =
-    runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('props', native(runtimeIdProperty))};`
-      : ''
-  const idReadFallback =
-    runtimeIdProperty !== undefined
-      ? `${member('obj', runtimeIdProperty)} = ${member('item', native(runtimeIdProperty))}();`
-      : ''
+  const recordFields = bestEffortProps.map((p, index) => {
+    const value = `${columnLocal(index)}[i]`
+    return `if (${value} !== undefined) { ${member('obj', p)} = ${value}; }`
+  })
+  const idField =
+    runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
   const idAlias =
     identifierAliases && runtimeIdProperty !== undefined
       ? lines(
@@ -627,27 +762,23 @@ function buildListBody(
   // list: an empty list would claim the parent exists and has no items.
   const parentScope = recordedParentScope(command, manifest)
   let parentBinding = ''
-  let collectionExpression = `${member('app', resourcePlural)}()`
+  let collectionExpression = member('app', resourcePlural)
   if (parentScope !== undefined) {
     parentBinding = lines(readParentId(command, parentScope), bindParent(parentScope.parentTarget))
-    collectionExpression = `${member(PARENT_LOCAL, resourcePlural)}()`
+    collectionExpression = member(PARENT_LOCAL, resourcePlural)
   }
 
   const body = lines(
     parentBinding,
-    `var items = ${collectionExpression};`,
+    `var ${COLLECTION_LOCAL} = ${collectionExpression};`,
+    listReadHelpers(),
+    readListCount(runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)),
+    ...columnReads,
     'var result = [];',
-    'for (var i = 0; i < items.length; i++) {',
-    'var item = items[i];',
+    `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',
-    'try {',
-    'var props = item.properties();',
-    ...fastPathPropReads,
-    idReadFast,
-    '} catch (e) {',
-    ...fallbackPropReads,
-    idReadFallback,
-    '}',
+    ...recordFields,
+    idField,
     idAlias,
     'result.push(obj);',
     '}',

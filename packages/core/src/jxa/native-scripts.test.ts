@@ -13,8 +13,10 @@
  *   resource at the application, whatever its parameters are named.
  * - A Calendar calendar's declared identifier fails at run time, so calendars
  *   are matched by `name` (identifier targeting `byProperty`).
- * - Lists read one `properties()` record per item, with a guarded per-field
- *   fallback, and never guard the runtime identifier read.
+ * - Lists read each property once across the collection, with a guarded
+ *   per-item fallback for a property the collection cannot report, and never
+ *   guard the runtime identifier read (the behavior of these bodies against a
+ *   stand-in app is in `native-list-body.test.ts`).
  * - A child is created by appending it to the parent's collection, not with
  *   `make({ at: ... })`.
  * - The request parameter carrying an identifier (`id`, `name`) is distinct
@@ -239,6 +241,34 @@ function listBody(resource: Resource, typed = false): string {
   )
 }
 
+/**
+ * The statement of a list body that reads one property across the collection:
+ * by the app's name, `nativeName`, and described by the public key in the
+ * error a misaligned read raises.
+ */
+function columnRead(key: string, nativeName = key): string {
+  return `readColumn(${JSON.stringify(`the property "${key}"`)}, ${JSON.stringify(nativeName)});`
+}
+
+/**
+ * Whether a list body stores a value read across the collection under the
+ * public key `key`, omitting it where the read left `undefined`.
+ */
+function columnField(key: string): RegExp {
+  const escaped = JSON.stringify(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(
+    `if \\(column(\\d+)\\[i\\] !== undefined\\) \\{ obj\\[${escaped}\\] = column\\1\\[i\\]; \\}`
+  )
+}
+
+/** The statements of a list body that read the runtime identifier `nativeName`, unguarded. */
+function identifierReads(nativeName: string): readonly string[] {
+  return [
+    `try { ids = col[${JSON.stringify(nativeName)}](); } catch (e) { idsRead = false; }`,
+    `ids = readEach(${JSON.stringify(nativeName)}, false);`,
+  ]
+}
+
 /** The Calendar Event resource: 13 properties plus the `uid` identifier. */
 const eventResource: Resource = {
   name: 'Event',
@@ -317,52 +347,60 @@ beforeAll(async () => {
   notes = await loadManifest(manifestPath('notes'))
 })
 
-describe('list bodies: batched reads (issue #89)', () => {
-  it('reads each item through one properties() call', () => {
-    expect(listBody(eventResource)).toContain('var props = item.properties();')
+describe('list bodies: batched reads (issue #89, issue #204)', () => {
+  it("never reads an item's whole property record", () => {
+    expect(listBody(eventResource)).not.toContain('properties()')
   })
 
-  it('copies every non-identifier property from the record in the fast path', () => {
+  it('reads every non-identifier property once across the collection', () => {
     const body = listBody(eventResource)
     for (const prop of Object.keys(eventResource.properties).filter((p) => p !== 'uid')) {
-      expect(body, prop).toContain(
-        `if (props["${prop}"] !== undefined) { obj["${prop}"] = props["${prop}"]; }`
-      )
+      expect(body, prop).toContain(columnRead(prop))
+      expect(body, prop).toMatch(columnField(prop))
     }
   })
 
-  it('falls back to guarded per-field reads for every non-identifier property', () => {
+  it('falls back to guarded per-item reads for a property the collection cannot report', () => {
     const body = listBody(eventResource)
-    expect(body).toContain('} catch (e) {')
-    for (const prop of Object.keys(eventResource.properties).filter((p) => p !== 'uid')) {
-      expect(body, prop).toContain(`try { obj["${prop}"] = item["${prop}"](); } catch (e) {}`)
-    }
+    expect(body).toContain(
+      'try { values = col[name](); } catch (e) { return readEach(name, true); }'
+    )
+    expect(body).toContain(
+      'try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }'
+    )
   })
 
-  it('reads the identifier unguarded in both paths (issue #81)', () => {
+  it('reads the identifier unguarded, across the collection and per item (issue #81)', () => {
     const body = listBody(eventResource)
-    expect(body).toContain('obj["uid"] = props["uid"];')
-    expect(body).toContain('obj["uid"] = item["uid"]();')
-    expect(body).not.toContain('try { obj["uid"] = props["uid"]; } catch')
-    expect(body).not.toContain('try { obj["uid"] = item["uid"](); } catch')
+    for (const read of identifierReads('uid')) expect(body).toContain(read)
+    expect(body).toContain('obj["uid"] = ids[i];')
+    expect(body).not.toContain(columnRead('uid'))
+    expect(body).not.toContain('readEach("uid", true)')
+  })
+
+  it('counts the items by the identifier read and checks every other read against it', () => {
+    const body = listBody(eventResource)
+    expect(body).toContain('count = ids.length;')
+    expect(body).toContain('if (!Array.isArray(values) || values.length !== count) {')
+    expect(body).toContain('for (var i = 0; i < count; i++) {')
   })
 
   it('exposes the identifier under the canonical id key', () => {
     expect(listBody(eventResource)).toContain('obj["id"] = obj["uid"];')
   })
 
-  it('batches byProperty resources too, with both paths', () => {
+  it('batches byProperty resources too', () => {
     const body = listBody(widgetByProperty)
-    expect(body).toContain('var props = item.properties();')
     for (const prop of ['color', 'size', 'active']) {
-      expect(body, prop).toContain(`obj["${prop}"] = props["${prop}"];`)
-      expect(body, prop).toContain(`try { obj["${prop}"] = item["${prop}"](); } catch (e) {}`)
+      expect(body, prop).toContain(columnRead(prop))
+      expect(body, prop).toMatch(columnField(prop))
     }
+    for (const read of identifierReads('name')) expect(body).toContain(read)
     expect(body).toContain('obj["id"] = obj["name"];')
   })
 
   it('lists the top-level collection when there is no parent parameter', () => {
-    expect(listBody(eventResource)).toContain('var items = app["events"]();')
+    expect(listBody(eventResource)).toContain('var col = app["events"];')
   })
 })
 
@@ -458,31 +496,38 @@ describe('usable properties: a property marked unsupported is never read', () =>
     expect(item.used).toEqual(['read entireContents'])
   })
 
-  it('a list falling back to per-field reads reads only usable properties', () => {
-    const item = fakeSpecifier(true, {
-      properties: () => {
-        throw new Error('the property record cannot be read')
+  it('a list falling back to per-item reads reads only usable properties', () => {
+    // The read across the collection fails, so each item is read on its own;
+    // the stand-in item has no entireContents, so its guarded read is omitted.
+    const item = fakeSpecifier(true)
+    const containers = Object.assign(() => [item.specifier], {
+      entireContents: () => {
+        throw new Error('the collection cannot report this property')
       },
     })
-    const app = { containers: () => [item.specifier] }
+    Object.defineProperty(containers, 'length', { value: 1 })
     const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
-    expect(callBody(body, app, {})).toEqual([{}])
+    expect(callBody(body, { containers }, {})).toEqual([{}])
     expect(item.used).toEqual(['read entireContents'])
   })
 
-  it('a list copies only usable fields from the property record', () => {
-    const item = fakeSpecifier(true, {
-      properties: () => ({
-        entireContents: 'contents',
-        expandable: true,
-        expanded: false,
-        completelyExpanded: false,
-        containerWindow: 'window',
-      }),
+  it('a list reads only usable properties across the collection', () => {
+    const reads: string[] = []
+    const column = (name: string, value: unknown) => (): unknown[] => {
+      reads.push(name)
+      return [value]
+    }
+    const containers = Object.assign(() => [], {
+      entireContents: column('entireContents', 'contents'),
+      expandable: column('expandable', true),
+      expanded: column('expanded', false),
+      completelyExpanded: column('completelyExpanded', false),
+      containerWindow: column('containerWindow', 'window'),
     })
-    const app = { containers: () => [item.specifier] }
+    Object.defineProperty(containers, 'length', { value: 1 })
     const body = buildNativeBody(manifest, { command: 'list', resource: 'Container' })
-    expect(callBody(body, app, {})).toEqual([{ entireContents: 'contents' }])
+    expect(callBody(body, { containers }, {})).toEqual([{ entireContents: 'contents' }])
+    expect(reads).toEqual(['entireContents'])
   })
 })
 
@@ -493,13 +538,13 @@ describe('list bodies: typed output returns only declared fields', () => {
   // produce the legacy aliases at all.
   it('omits the id alias for a byId resource', () => {
     const body = listBody(calendarById, true)
-    expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')
+    expect(body).toContain('obj["calendarIdentifier"] = ids[i];')
     expect(body).not.toContain('obj["id"]')
   })
 
   it('leaves the declared identifier absent instead of mirroring the working property', () => {
     const body = listBody(calendarByRuntimeProperty, true)
-    expect(body).toContain('obj["name"] = props["name"];')
+    expect(body).toContain('obj["name"] = ids[i];')
     expect(body).not.toContain('obj["id"]')
     expect(body).not.toContain('obj["calendarIdentifier"] =')
   })
@@ -508,25 +553,25 @@ describe('list bodies: typed output returns only declared fields', () => {
 describe('list bodies: identifier population', () => {
   it('reads a byId primary identifier and aliases it as id', () => {
     const body = listBody(calendarById)
-    expect(body).toContain('obj["calendarIdentifier"] = props["calendarIdentifier"];')
-    expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')
-    expect(body).not.toContain('try { obj["calendarIdentifier"] = item["calendarIdentifier"](); }')
+    for (const read of identifierReads('calendarIdentifier')) expect(body).toContain(read)
+    expect(body).not.toContain('readEach("calendarIdentifier", true)')
+    expect(body).toContain('obj["calendarIdentifier"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["calendarIdentifier"];')
   })
 
   it('sources id from the working property for a byProperty resource', () => {
     const body = listBody(calendarByName)
-    expect(body).toContain('obj["name"] = props["name"];')
-    expect(body).toContain('obj["name"] = item["name"]();')
-    expect(body).not.toContain('try { obj["name"] = item["name"](); }')
+    for (const read of identifierReads('name')) expect(body).toContain(read)
+    expect(body).not.toContain('readEach("name", true)')
+    expect(body).toContain('obj["name"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["name"];')
   })
 
   it('never reads a declared identifier that fails at run time, and mirrors it instead', () => {
     const body = listBody(calendarByRuntimeProperty)
-    expect(body).not.toContain('item["calendarIdentifier"]()')
-    expect(body).not.toContain('props["calendarIdentifier"]')
-    expect(body).toContain('obj["name"] = props["name"];')
+    expect(body).not.toContain('"calendarIdentifier")')
+    expect(body).not.toContain('col["calendarIdentifier"]')
+    expect(body).toContain('obj["name"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["name"];')
     expect(body).toContain('obj["calendarIdentifier"] = obj["name"];')
   })
@@ -541,8 +586,8 @@ describe('list bodies: identifier population', () => {
       },
       identifiers: [{ property: 'calendarIdentifier', primary: true }],
     })
-    expect(body).toContain('obj["calendarIdentifier"] = props["calendarIdentifier"];')
-    expect(body).toContain('obj["calendarIdentifier"] = item["calendarIdentifier"]();')
+    for (const read of identifierReads('calendarIdentifier')) expect(body).toContain(read)
+    expect(body).toContain('obj["calendarIdentifier"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["calendarIdentifier"];')
   })
 
@@ -555,8 +600,10 @@ describe('list bodies: identifier population', () => {
         label: { access: 'rw', type: 'string', description: 'Label', optional: false },
       },
     })
-    expect(body).toContain('obj["label"] = props["label"];')
-    expect(body).toContain('try { obj["label"] = item["label"](); } catch (e) {}')
+    expect(body).toContain(columnRead('label'))
+    expect(body).toMatch(columnField('label'))
+    // With no identifier to count by, the items are counted.
+    expect(body).toContain('var count = col.length;')
     expect(body).not.toContain('obj["id"] =')
   })
 
@@ -568,9 +615,9 @@ describe('list bodies: identifier population', () => {
       }
     )
     const body = buildNativeBody(manifest, { command: 'list', resource: 'Missing' })
-    expect(body).toContain('var items = app["items"]();')
-    expect(body).toContain('obj["name"] = props["name"];')
-    expect(body).toContain('try { obj["name"] = item["name"](); } catch (e) {}')
+    expect(body).toContain('var col = app["items"];')
+    expect(body).toContain(columnRead('name'))
+    expect(body).toMatch(columnField('name'))
     expect(body).not.toContain('obj["id"] =')
   })
 })
@@ -638,7 +685,7 @@ describe('collection accessors', () => {
 
     it('lists the mediaItems collection, never the lowercased name', () => {
       const text = buildNativeBody(photos, { command: 'listMediaItems', resource: 'MediaItem' })
-      expect(text).toContain('var items = app["mediaItems"]();')
+      expect(text).toContain('var col = app["mediaItems"];')
       expect(text).not.toContain('mediaitems')
     })
 
@@ -739,7 +786,7 @@ describe('recorded command parents (issue #165)', () => {
       'BookmarkItem',
       'folderId',
       'app["bookmarkFolders"].byId(parentId)',
-      'var items = parent["bookmarkItems"]();',
+      'var col = parent["bookmarkItems"];',
     ],
     [
       'regression',
@@ -748,7 +795,7 @@ describe('recorded command parents (issue #165)', () => {
       'Project',
       'workspaceName',
       'app["workspaceDocuments"].whose({ "name": parentId })[0]',
-      'var items = parent["projects"]();',
+      'var col = parent["projects"];',
     ],
     [
       'regression',
@@ -757,7 +804,7 @@ describe('recorded command parents (issue #165)', () => {
       'Scheme',
       'workspaceName',
       'app["workspaceDocuments"].whose({ "name": parentId })[0]',
-      'var items = parent["schemes"]();',
+      'var col = parent["schemes"];',
     ],
     [
       'regression',
@@ -766,7 +813,7 @@ describe('recorded command parents (issue #165)', () => {
       'RunDestination',
       'workspaceName',
       'app["workspaceDocuments"].whose({ "name": parentId })[0]',
-      'var items = parent["runDestinations"]();',
+      'var col = parent["runDestinations"];',
     ],
     [
       'regression',
@@ -775,7 +822,7 @@ describe('recorded command parents (issue #165)', () => {
       'AutomatorAction',
       'workflowName',
       'app["workflows"].whose({ "name": parentId })[0]',
-      'var items = parent["automatorActions"]();',
+      'var col = parent["automatorActions"];',
     ],
     [
       'regression',
@@ -784,7 +831,7 @@ describe('recorded command parents (issue #165)', () => {
       'Variable',
       'workflowName',
       'app["workflows"].whose({ "name": parentId })[0]',
-      'var items = parent["variables"]();',
+      'var col = parent["variables"];',
     ],
     [
       'regression',
@@ -793,7 +840,7 @@ describe('recorded command parents (issue #165)', () => {
       'Setting',
       'actionId',
       'app["automatorActions"].byId(parentId)',
-      'var items = parent["settings"]();',
+      'var col = parent["settings"];',
     ],
     [
       'regression',
@@ -802,7 +849,7 @@ describe('recorded command parents (issue #165)', () => {
       'RequiredResource',
       'actionId',
       'app["automatorActions"].byId(parentId)',
-      'var items = parent["requiredResources"]();',
+      'var col = parent["requiredResources"];',
     ],
     // The fifteen commands whose parent was already right, and stays the same.
     [
@@ -812,7 +859,7 @@ describe('recorded command parents (issue #165)', () => {
       'Event',
       'calendarId',
       calendarParent,
-      'var items = parent["events"]();',
+      'var col = parent["events"];',
     ],
     [
       'kept',
@@ -857,7 +904,7 @@ describe('recorded command parents (issue #165)', () => {
       'Tab',
       'windowId',
       'app["windows"].byId(parentId)',
-      'var items = parent["tabs"]();',
+      'var col = parent["tabs"];',
     ],
     [
       'kept',
@@ -875,7 +922,7 @@ describe('recorded command parents (issue #165)', () => {
       'Graphic',
       'canvasId',
       'app["canvases"].byId(parentId)',
-      'var items = parent["graphics"]();',
+      'var col = parent["graphics"];',
     ],
     [
       'kept',
@@ -884,7 +931,7 @@ describe('recorded command parents (issue #165)', () => {
       'Shape',
       'canvasId',
       'app["canvases"].byId(parentId)',
-      'var items = parent["shapes"]();',
+      'var col = parent["shapes"];',
     ],
     [
       'kept',
@@ -902,7 +949,7 @@ describe('recorded command parents (issue #165)', () => {
       'Line',
       'canvasId',
       'app["canvases"].byId(parentId)',
-      'var items = parent["lines"]();',
+      'var col = parent["lines"];',
     ],
     [
       'kept',
@@ -911,7 +958,7 @@ describe('recorded command parents (issue #165)', () => {
       'Layer',
       'canvasId',
       'app["canvases"].byId(parentId)',
-      'var items = parent["layers"]();',
+      'var col = parent["layers"];',
     ],
     [
       'kept',
@@ -929,7 +976,7 @@ describe('recorded command parents (issue #165)', () => {
       'Reminder',
       'listId',
       'app["lists"].byId(parentId)',
-      'var items = parent["reminders"]();',
+      'var col = parent["reminders"];',
     ],
     [
       'kept',
@@ -994,7 +1041,7 @@ describe('commands without a recorded parent', () => {
     expect(get).toContain('var item = app["items"].byId(itemId);')
     expect(get).not.toContain('parent')
     const list = buildNativeBody(manifest, { command: 'list', resource: 'Item' })
-    expect(list).toContain('var items = app["items"]();')
+    expect(list).toContain('var col = app["items"];')
     expect(list).not.toContain('parent')
     const create = buildNativeBody(manifest, { command: 'create', resource: 'Item' })
     expect(create).toContain('item.make();')
@@ -1214,48 +1261,60 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
   })
 
   it('a list addresses the recorded collection', () => {
-    expect(body('list', 'AirPlayDevice')).toContain('var items = app["airplayDevices"]();')
+    expect(body('list', 'AirPlayDevice')).toContain('var col = app["airplayDevices"];')
     expect(body('list', 'AirPlayDevice')).not.toContain('app["airPlayDevices"]')
   })
 
-  it('a list fast path copies each field from the app key into the public key', () => {
+  it('a list reads each field across the collection by the app name into the public key', () => {
     const text = body('list', 'AirPlayDevice')
-    expect(text).toContain('if (props["url"] !== undefined) { obj["uRL"] = props["url"]; }')
-    expect(text).not.toContain('props["uRL"]')
+    expect(text).toContain(columnRead('uRL', 'url'))
+    expect(text).toMatch(columnField('uRL'))
+    expect(text).not.toContain('"uRL")')
   })
 
-  it('a list fallback reads each field by the app name', () => {
+  it('a list reads the runtime identifier by the app name', () => {
     const text = body('list', 'AirPlayDevice')
-    expect(text).toContain('try { obj["uRL"] = item["url"](); } catch (e) {}')
-    expect(text).not.toContain('item["uRL"]')
-  })
-
-  it('a list reads the runtime identifier by the app name, in both paths', () => {
-    const text = body('list', 'AirPlayDevice')
-    expect(text).toContain('obj["mACAddress"] = props["macAddress"];')
-    expect(text).toContain('obj["mACAddress"] = item["macAddress"]();')
-    expect(text).not.toContain('props["mACAddress"]')
-    expect(text).not.toContain('item["mACAddress"]')
+    for (const read of identifierReads('macAddress')) expect(text).toContain(read)
+    expect(text).toContain('obj["mACAddress"] = ids[i];')
+    expect(text).not.toContain('col["mACAddress"]')
+    expect(text).not.toContain('"mACAddress")')
   })
 
   it('a list with identifier aliases mirrors the public identifier key', () => {
     // The alias copies within the returned record, which is keyed publicly.
     const text = body('list', 'AirPlayDevice', false)
-    expect(text).toContain('obj["mACAddress"] = item["macAddress"]();')
+    expect(text).toContain('obj["mACAddress"] = ids[i];')
     expect(text).toContain('obj["id"] = obj["mACAddress"];')
   })
 
-  it('a list returns records keyed by the public names, in both paths', () => {
-    const fast = fakeDevice()
-    const app = { airplayDevices: () => [fast.device] }
-    expect(callBody(body('list', 'AirPlayDevice'), app, {})).toEqual([
+  it('a list returns records keyed by the public names, read across the collection or per item', () => {
+    // Across the collection: the stand-in collection answers only to the
+    // app's spellings, one value per device.
+    const device = fakeDevice()
+    const reads: string[] = []
+    const column = (name: 'macAddress' | 'url' | 'name', value: string) => (): string[] => {
+      reads.push(name)
+      return [value]
+    }
+    // A function's own `name` is read-only, so the columns are defined, not assigned.
+    const airplayDevices = Object.defineProperties(() => [device.device], {
+      macAddress: { value: column('macAddress', 'a1') },
+      url: { value: column('url', 'http://u') },
+      name: { value: column('name', 'Den') },
+    })
+    expect(callBody(body('list', 'AirPlayDevice'), { airplayDevices }, {})).toEqual([
       { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
     ])
+    expect(reads).toEqual(['macAddress', 'url', 'name'])
+    expect(device.reads).toEqual([])
+    // Per item: a collection that answers no property read falls back to
+    // reading each device by the app's names.
     const slow = fakeDevice(true)
     const fallbackApp = { airplayDevices: () => [slow.device] }
     expect(callBody(body('list', 'AirPlayDevice'), fallbackApp, {})).toEqual([
       { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
     ])
+    expect(slow.reads).toEqual(['macAddress', 'url', 'name'])
   })
 
   it('a property-matched lookup matches on the app name of the identifier', () => {
@@ -1273,7 +1332,7 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
     expect(text).toContain(
       'var parent = app["airplayDevices"].whose({ "macAddress": parentId })[0];'
     )
-    expect(text).toContain('var items = parent["streams"]();')
+    expect(text).toContain('var col = parent["streams"];')
   })
 
   it('a get takes each property from the record by the app name into its public key', () => {
@@ -1444,8 +1503,8 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
   it('a byId list reads its identifier by the app name', () => {
     // Stream is addressed by id, so its identifier `uRL` is read, never matched.
     const text = body('listStreams', 'Stream')
-    expect(text).toContain('obj["uRL"] = props["url"];')
-    expect(text).toContain('obj["uRL"] = item["url"]();')
+    for (const read of identifierReads('url')) expect(text).toContain(read)
+    expect(text).toContain('obj["uRL"] = ids[i];')
   })
 })
 
@@ -1495,7 +1554,7 @@ describe('Calendar bodies (shipped manifest)', () => {
     const text = body('listEvents', 'Event')
     expect(text).toContain('var parentId = args["calendarId"];')
     expect(text).toContain('var parent = app["calendars"].whose({ "name": parentId })[0];')
-    expect(text).toContain('var items = parent["events"]();')
+    expect(text).toContain('var col = parent["events"];')
   })
 
   it('createEvent appends the new event to the parent calendar (-10024 regression)', () => {
