@@ -694,9 +694,13 @@ describe('collection accessors', () => {
  *   "tab" elements.
  * - Xcode: "workspace document" has "project", "scheme" and "run
  *   destination" elements; the application has none of the three.
- * - Automator: "workflow" has "Automator action" and "variable"
- *   elements; "Automator action" has "setting" and "required resource"
- *   elements, which the application does not have.
+ * - Automator, from its scripting suite (Automator.scriptSuite, as the app
+ *   ships no static scripting definition): "workflow" has "Automator
+ *   action" and "variable" elements; "Automator action" has "setting" and
+ *   "required resource" elements, which the application does not have.
+ *
+ * Xcode's workspace documents and Automator's workflows have no `id`
+ * property, so each is targeted by name (`whose`), as their manifests declare.
  *
  * Before parents were recorded, the parent was guessed from the parameter's
  * stem, and the eight commands marked `regression` addressed a collection
@@ -743,7 +747,7 @@ describe('recorded command parents (issue #165)', () => {
       'listProjects',
       'Project',
       'workspaceName',
-      'app["workspaceDocuments"].byId(parentId)',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
       'var items = parent["projects"]();',
     ],
     [
@@ -752,7 +756,7 @@ describe('recorded command parents (issue #165)', () => {
       'listSchemes',
       'Scheme',
       'workspaceName',
-      'app["workspaceDocuments"].byId(parentId)',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
       'var items = parent["schemes"]();',
     ],
     [
@@ -761,7 +765,7 @@ describe('recorded command parents (issue #165)', () => {
       'listRunDestinations',
       'RunDestination',
       'workspaceName',
-      'app["workspaceDocuments"].byId(parentId)',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
       'var items = parent["runDestinations"]();',
     ],
     [
@@ -770,7 +774,7 @@ describe('recorded command parents (issue #165)', () => {
       'listActions',
       'AutomatorAction',
       'workflowName',
-      'app["workflows"].byId(parentId)',
+      'app["workflows"].whose({ "name": parentId })[0]',
       'var items = parent["automatorActions"]();',
     ],
     [
@@ -779,7 +783,7 @@ describe('recorded command parents (issue #165)', () => {
       'listVariables',
       'Variable',
       'workflowName',
-      'app["workflows"].byId(parentId)',
+      'app["workflows"].whose({ "name": parentId })[0]',
       'var items = parent["variables"]();',
     ],
     [

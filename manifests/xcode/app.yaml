@@ -62,9 +62,13 @@ resources:
     plural: WorkspaceDocuments
     description: A document that represents a workspace on disk. Workspaces are the top-level container for almost all objects and commands in Xcode
     code: wksd
+    # The dictionary's "workspace document" inherits "document", whose only
+    # identifying property is `name`; the class has no `id` property, so a
+    # workspace document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r

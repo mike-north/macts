@@ -34,9 +34,13 @@ resources:
     plural: Workflows
     description: A series of actions stored in a file
     code: wkfw
+    # Automator's scripting suite (Automator.scriptSuite) defines a workflow
+    # (AMDocument) with `name` and no `id` property, so a workflow is
+    # targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
+        targeting: byProperty
     properties:
       name:
         access: r
