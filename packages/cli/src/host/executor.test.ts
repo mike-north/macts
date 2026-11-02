@@ -5,8 +5,8 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { PASSTHROUGH_PLAN } from '@macts/contracts'
-import type { AppManifest } from '@macts/core'
+import { PASSTHROUGH_PLAN, TargetNotFoundError, type ValuePlan } from '@macts/contracts'
+import type { AppManifest, ExecutionRequest } from '@macts/core'
 import {
   TEST_EXECUTOR_NAMES,
   TEST_STUB_PROVIDER,
@@ -87,19 +87,75 @@ describe('resolveExecutor', () => {
   })
 })
 
-describe('createTestStubExecutor', () => {
-  it('answers with the target and input it received', async () => {
+/** A record plan with one required text field: what a get or create returns. */
+const RECORD_PLAN = {
+  kind: 'record',
+  fields: { name: { value: { kind: 'string' }, presence: 'required' } },
+} as const
+
+/** The plan a list operation returns: an array of records. */
+const LIST_PLAN = { kind: 'array', items: RECORD_PLAN } as const
+
+/** An execution request for `target` whose result has `outputPlan`. */
+function executionRequest(
+  target: ExecutionRequest['target'],
+  outputPlan: ValuePlan,
+  input: ExecutionRequest['input'] = {}
+): ExecutionRequest {
+  return { manifest: MANIFEST, target, input, inputPlan: PASSTHROUGH_PLAN, outputPlan }
+}
+
+/** The rejection of `promise`, failing the test if it resolves. */
+async function rejectionOf(promise: Promise<unknown>): Promise<unknown> {
+  return promise.then(
+    (value: unknown) => {
+      throw new Error(`Expected a rejection, got ${JSON.stringify(value)}`)
+    },
+    (error: unknown) => error
+  )
+}
+
+describe('createTestStubExecutor: execute', () => {
+  it('answers a list operation with an empty array', async () => {
     const executor = createTestStubExecutor()
 
-    const result = await executor.execute({
-      manifest: MANIFEST,
-      target: { command: 'list', resource: 'Widget' },
-      input: { name: 'Sprocket' },
-      inputPlan: PASSTHROUGH_PLAN,
-      outputPlan: PASSTHROUGH_PLAN,
-    })
+    const result = await executor.execute(
+      executionRequest({ command: 'list', resource: 'Widget' }, LIST_PLAN)
+    )
 
     expect(executor.provider).toBe(TEST_STUB_PROVIDER)
+    expect(result).toEqual([])
+  })
+
+  it.each([
+    ['a get', { command: 'get', resource: 'Widget' }, RECORD_PLAN],
+    ['a create', { command: 'make', resource: 'Widget' }, RECORD_PLAN],
+    ['a delete', { command: 'delete', resource: 'Widget' }, { kind: 'none' }],
+  ] as const)('fails %s with TargetNotFoundError naming the resource', async (_, target, plan) => {
+    const error = await rejectionOf(
+      createTestStubExecutor().execute(executionRequest(target, plan))
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect((error as TargetNotFoundError).details).toEqual({ resource: 'Widget' })
+  })
+
+  it('fails an application command with TargetNotFoundError and no resource', async () => {
+    const error = await rejectionOf(
+      createTestStubExecutor().execute(executionRequest({ command: 'quit' }, { kind: 'none' }))
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect((error as TargetNotFoundError).details).toEqual({})
+  })
+
+  it('answers a passthrough operation with the target and input it received', async () => {
+    const result = await createTestStubExecutor().execute(
+      executionRequest({ command: 'list', resource: 'Widget' }, PASSTHROUGH_PLAN, {
+        name: 'Sprocket',
+      })
+    )
+
     expect(result).toEqual({
       executor: 'test-stub',
       target: { command: 'list', resource: 'Widget' },
@@ -107,25 +163,79 @@ describe('createTestStubExecutor', () => {
     })
   })
 
-  it('omits the resource for an application command', async () => {
-    const result = await createTestStubExecutor().execute({
-      manifest: MANIFEST,
-      target: { command: 'quit' },
-      input: {},
-      inputPlan: PASSTHROUGH_PLAN,
-      outputPlan: PASSTHROUGH_PLAN,
-    })
+  it('omits the resource of a passthrough application command', async () => {
+    const result = await createTestStubExecutor().execute(
+      executionRequest({ command: 'quit' }, PASSTHROUGH_PLAN)
+    )
 
     expect(result).toEqual({ executor: 'test-stub', target: { command: 'quit' }, input: {} })
   })
+})
 
-  it('answers a resolution with the reference it received', async () => {
-    const reference = {
-      resource: 'Widget',
-      form: 'selector',
-      cardinality: 'many',
-      selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
-    } as const
+describe('createTestStubExecutor: resolve', () => {
+  const identity = { resource: 'Widget', form: 'identity', id: 'w-1' } as const
+
+  it('resolves a selector collection to an empty array', async () => {
+    const result = await createTestStubExecutor().resolve({
+      manifest: MANIFEST,
+      reference: {
+        resource: 'Widget',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
+      },
+      outputPlan: LIST_PLAN,
+    })
+
+    expect(result).toEqual([])
+  })
+
+  it('resolves an identity collection with no entries to an empty array', async () => {
+    const result = await createTestStubExecutor().resolve({
+      manifest: MANIFEST,
+      reference: { resource: 'Widget', form: 'identity', cardinality: 'many', entries: [] },
+      outputPlan: LIST_PLAN,
+    })
+
+    expect(result).toEqual([])
+  })
+
+  it('fails an identity collection with entries at its first entry (D7)', async () => {
+    const error = await rejectionOf(
+      createTestStubExecutor().resolve({
+        manifest: MANIFEST,
+        reference: {
+          resource: 'Widget',
+          form: 'identity',
+          cardinality: 'many',
+          entries: [
+            { ...identity, cardinality: 'one' },
+            { ...identity, id: 'w-2', cardinality: 'one' },
+          ],
+        },
+        outputPlan: LIST_PLAN,
+      })
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect((error as TargetNotFoundError).details).toEqual({ resource: 'Widget', entryIndex: 0 })
+  })
+
+  it('fails a single reference with TargetNotFoundError', async () => {
+    const error = await rejectionOf(
+      createTestStubExecutor().resolve({
+        manifest: MANIFEST,
+        reference: { ...identity, cardinality: 'one' },
+        outputPlan: RECORD_PLAN,
+      })
+    )
+
+    expect(error).toBeInstanceOf(TargetNotFoundError)
+    expect((error as TargetNotFoundError).details).toEqual({ resource: 'Widget' })
+  })
+
+  it('answers a passthrough resolution with the reference it received', async () => {
+    const reference = { ...identity, cardinality: 'one' } as const
 
     const result = await createTestStubExecutor().resolve({
       manifest: MANIFEST,
@@ -135,12 +245,7 @@ describe('createTestStubExecutor', () => {
 
     expect(result).toEqual({
       executor: 'test-stub',
-      reference: {
-        resource: 'Widget',
-        form: 'selector',
-        cardinality: 'many',
-        selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
-      },
+      reference: { resource: 'Widget', form: 'identity', id: 'w-1', cardinality: 'one' },
     })
   })
 })

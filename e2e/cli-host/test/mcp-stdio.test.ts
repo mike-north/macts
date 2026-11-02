@@ -7,9 +7,10 @@
  * `Client` over `StdioClientTransport`. The macts home is temporary and its
  * plugins directory holds the real built `@macts/notes-server` and
  * `@macts/notes`. `MACTS_TEST_EXECUTOR=stub` selects the built-in test
- * executor, so no app is automated and every dispatched call answers with the
- * target and input that reached the executor. Keys are minted by the CLI into
- * the same macts home.
+ * executor, so no app is automated and every dispatched call answers as an
+ * app with no objects would: a list yields `[]`, which the list's output
+ * contract admits (phases/13 D11). Keys are minted by the CLI into the same
+ * macts home.
  *
  * Expected values are hand-derived:
  *
@@ -57,12 +58,8 @@ const SETUP_TIMEOUT_MS = 90_000
 const LIST_TOOL = 'macts__notes__notes_list'
 const DISCOVERY_TOOL = 'macts__capabilities__discover'
 
-/** The result the stub executor gives for `notes.notes.list` with `{}`. */
-const STUB_LIST_RESULT = {
-  executor: 'test-stub',
-  target: { command: 'list', resource: 'Note' },
-  input: {},
-}
+/** The result the stub executor gives for `notes.notes.list`: an empty list. */
+const STUB_LIST_RESULT: readonly unknown[] = []
 
 let home: MactsHome
 let granted: McpSession
@@ -216,8 +213,6 @@ describe('macts --mcp (UAT): governance fails closed', () => {
           expect(toolDocument(result)).toEqual({
             error: { code: 'INTERNAL', message: 'Governance could not be loaded.', details: {} },
           })
-          // The stub executor's answer never appears: the call stopped at governance.
-          expect(JSON.stringify(result)).not.toContain('test-stub')
           // The runtime's diagnostic for the denial reaches stderr, never the
           // stdout protocol channel.
           await expect

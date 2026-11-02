@@ -235,8 +235,14 @@ Include both the client and server packages in the changeset.
 - Subprocess UATs of the `macts` host commands live in `e2e/cli-host`. They
   run the built CLI against real installed app packages with
   `MACTS_TEST_EXECUTOR=stub`, which makes the host run operations on a
-  built-in test executor that automates no app and answers with the target
-  and input it received. The variable selects a built-in executor by name and
+  built-in test executor that automates no app. It answers as an app with no
+  objects would, so its results pass the runtime's output validation: a list
+  yields `[]`, and an operation that needs an existing object fails with
+  `TARGET_NOT_FOUND`. Under a `passthrough` output plan, which is not
+  validated, it answers with the target and input it received; a test that
+  must see what reached the executor uses a contract with such a plan. The
+  stub's answers are never exempt from validation. The variable selects a
+  built-in executor by name and
   never loads code; an unknown name fails startup, and an active test executor
   is announced on stderr. It is for subprocess tests only: in-process tests
   pass an executor to `createRuntime` instead. Never document it for users.

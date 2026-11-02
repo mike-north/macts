@@ -1038,8 +1038,9 @@ describe('resolveReference: result validation (D11)', () => {
     expect(error).toBeInstanceOf(UnexpectedValueError)
     if (!(error instanceof UnexpectedValueError)) return
     expect(error.code).toBe('UNEXPECTED_VALUE')
+    // D11: an output mismatch means the operation ran, so the message says so.
     expect(error.message).toBe(
-      'The result of resolving a reference as "library.books.lookupBook" does not match its contract.'
+      'The "library.books.lookupBook" operation ran in the app to resolve a reference, but its result does not match its contract; do not assume it had no effect.'
     )
     expect(error.details.issues.map((issue) => issue.path)).toEqual([['pages']])
   })
