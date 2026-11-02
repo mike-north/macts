@@ -59,6 +59,7 @@ import {
   identifierWords,
   isCrudName,
   listMethodParameters,
+  referenceResolutionCommand,
   resolveIdParams,
   resourceCommandEntries,
   resourceHasOperations,
@@ -1034,9 +1035,11 @@ class ContractBuilder {
       if (identifier !== undefined && identifierShape !== undefined) {
         members.push(`id: ${this.#renderer.expression(identifierShape, identifier.description)}`)
       }
-      const commands = resourceCommandEntries(this.#manifest, resourceKey)
-      for (const shape of ['get', 'list'] as const) {
-        const found = findCrudCommand(commands, shape)
+      for (const [shape, cardinality] of [
+        ['get', 'one'],
+        ['list', 'many'],
+      ] as const) {
+        const found = referenceResolutionCommand(this.#manifest, resourceKey, cardinality)
         const operation =
           found === undefined
             ? undefined

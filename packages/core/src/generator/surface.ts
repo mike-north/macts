@@ -15,6 +15,7 @@
  * @packageDocumentation
  */
 
+import type { ReferenceCardinality } from '@macts/contracts'
 import type { AppManifest, Command, CommandParameter, Resource } from '../manifest/index.js'
 import { normalizeResourceRouteSegment } from '../manifest/route.js'
 import { splitIdentifierWords } from '../manifest/lower-camel.js'
@@ -186,6 +187,37 @@ export function findCrudCommand(
   operation: CrudOperation
 ): [string, Command] | undefined {
   return resourceCommands.find(([, cmd]) => cmd.name === operation)
+}
+
+/**
+ * The manifest command that resolves references to a resource: the backing
+ * `get` command ({@link findCrudCommand}) for a single reference, the backing
+ * `list` command for a collection reference.
+ *
+ * @remarks
+ * This is the rule by which a generated contract's resource table names its
+ * `get` and `list` operations, and by which the runtime chooses the operation
+ * a reference resolves as. The choice is structural: a resource command's
+ * `name` declares the CRUD shape it fulfils, and the first applicable command
+ * of that shape, in declaration order, is the one. A resource marked
+ * unsupported has no commands, so nothing resolves references to it.
+ *
+ * @param manifest - A validated app manifest.
+ * @param resourceKey - The manifest resource key the reference names.
+ * @param cardinality - `'one'` for a single reference, `'many'` for a
+ *   collection reference.
+ * @returns The command's key and definition, or `undefined` when the resource
+ *   has no command of that shape.
+ */
+export function referenceResolutionCommand(
+  manifest: AppManifest,
+  resourceKey: string,
+  cardinality: ReferenceCardinality
+): [string, Command] | undefined {
+  return findCrudCommand(
+    resourceCommandEntries(manifest, resourceKey),
+    cardinality === 'one' ? 'get' : 'list'
+  )
 }
 
 /**
