@@ -161,17 +161,16 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        body: {
-          description: 'HTML content of the note',
-          type: 'string',
-        },
         name: {
           description: 'The name of the note (first line)',
           type: 'string',
         },
+        body: {
+          description: 'HTML content of the note',
+          type: 'string',
+        },
       },
       additionalProperties: false,
-      required: ['name'],
     },
   },
   {

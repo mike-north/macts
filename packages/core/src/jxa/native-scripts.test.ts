@@ -1801,6 +1801,20 @@ describe('name-keyed resources are targeted by a working identifier (issue #194)
     )
   })
 
+  it('Notes create forwards a supplied name, then the body, into the new note’s properties', () => {
+    // The dictionary's note class declares `name` read-write (no access
+    // restriction), so it can be set when the note is made.
+    const text = buildNativeBody(notes, { command: 'create', resource: 'Note' })
+    const setup = [
+      'var props = {};',
+      'if (Object.prototype.hasOwnProperty.call(args, "name")) { props["name"] = args["name"]; }',
+      'if (Object.prototype.hasOwnProperty.call(args, "body")) { props["body"] = args["body"]; }',
+      'var item = app["Note"](props);',
+      'item.make();',
+    ].join('\n')
+    expect(text.startsWith(setup)).toBe(true)
+  })
+
   it('Terminal tabs keep their own get, with the `name` parameter', async () => {
     const terminal = await loadManifest(manifestPath('terminal'))
     const tab = planNativeInvocation(terminal, { command: 'getTab', resource: 'Tab' })

@@ -120,8 +120,8 @@ resources:
     description: A document that represents a file on disk
     code: fild
     # The dictionary's file document inherits `document`, whose identifying
-    # property is `name` (it also has `modified`, `file` and `path`); the class has
-    # no `id` property, so a file document is targeted by name, never by id.
+    # property is `name` (it also has `modified`, `file` and `path`); the class
+    # has no `id` property, so a file document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
@@ -154,9 +154,9 @@ resources:
     description: A document that represents a text file on disk
     code: texd
     # The dictionary's text document inherits `file document`, which inherits
-    # `document`; the only identifying property in the chain is `name`, and none of
-    # the classes has an `id` property, so a text document is targeted by name,
-    # never by id.
+    # `document`; the only identifying property in the chain is `name`, and none
+    # of the classes has an `id` property, so a text document is targeted by
+    # name, never by id.
     identifiers:
       - property: name
         primary: true
@@ -209,8 +209,8 @@ resources:
     description: A document that represents a source file on disk
     code: souf
     # The dictionary's source document inherits `text document`; the only
-    # identifying property in the chain is `name`, and none of the classes has an
-    # `id` property, so a source document is targeted by name, never by id.
+    # identifying property in the chain is `name`, and none of the classes has
+    # an `id` property, so a source document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
@@ -329,8 +329,8 @@ resources:
     description: A setting that controls how products are built
     code: asbs
     # The dictionary's build setting class inherits nothing and declares only
-    # `name` and `value`; it has no `id` property, so a build setting is targeted
-    # by name, never by id.
+    # `name` and `value`; it has no `id` property, so a build setting is
+    # targeted by name, never by id.
     identifiers:
       - property: name
         primary: true
@@ -397,8 +397,9 @@ resources:
     description: An object which specifies parameters such as the device and architecture for which to perform a scheme action
     code: rund
     # The dictionary's run destination class inherits nothing and declares
-    # `name`, `architecture`, `platform`, `device` and `companion device`; it has
-    # no `id` property, so a run destination is targeted by name, never by id.
+    # `name`, `architecture`, `platform`, `device` and `companion device`; it
+    # has no `id` property, so a run destination is targeted by name, never by
+    # id.
     identifiers:
       - property: name
         primary: true

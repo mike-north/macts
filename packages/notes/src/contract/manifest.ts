@@ -434,6 +434,12 @@ export const manifest: unknown = {
       resourceType: 'Note',
       parameters: [
         {
+          name: 'name',
+          type: 'string',
+          description: 'The name of the note (first line)',
+          required: false,
+        },
+        {
           name: 'body',
           type: 'string',
           description: 'HTML content of the note',

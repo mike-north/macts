@@ -39,9 +39,9 @@ resources:
         description: Whether the document has been modified since last save
         code: imod
         optional: false
-    # The dictionary's document class inherits `item`, which has only `class` and
-    # `properties`; the class adds `name`, `modified` and `path`; it has no `id` property, so a document is targeted by
-    # name, never by id.
+    # The dictionary's document class inherits `item`, which has only `class`
+    # and `properties`; the class adds `name`, `modified` and `path`; it has no
+    # `id` property, so a document is targeted by name, never by id.
     identifiers:
       - property: name
         primary: true

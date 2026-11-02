@@ -30,7 +30,9 @@ export class SettingsSetResourceClient {
   /**
    * Get a settings set by id.
    */
-  async get(id: string): Promise<SettingsSet> {
-    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string | number): Promise<SettingsSet> {
+    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, {
+      id: { integer: String(id) },
+    })
   }
 }

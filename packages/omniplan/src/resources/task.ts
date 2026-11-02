@@ -30,8 +30,10 @@ export class TaskResourceClient {
   /**
    * Get a task by id.
    */
-  async get(id: string): Promise<Task> {
-    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.get`, { id })
+  async get(id: string | number): Promise<Task> {
+    return this.#http.rpc<Task>(`${this.#app}.${this.#resource}.get`, {
+      id: { integer: String(id) },
+    })
   }
 
   /**

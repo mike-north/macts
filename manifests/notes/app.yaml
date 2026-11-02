@@ -42,9 +42,9 @@ resources:
         description: Whether the account has been upgraded
         code: upgr
         optional: false
-    # The dictionary's account class declares `id` ("the unique identifier of the
-    # account"). A name is neither stable nor unique, so a account is identified by
-    # `id`.
+    # The dictionary's account class declares `id` ("the unique identifier of
+    # the account"). A name is neither stable nor unique, so an account is
+    # identified by `id`.
     identifiers:
       - property: id
         primary: true
@@ -101,8 +101,8 @@ resources:
         code: NTsh
         optional: false
     # The dictionary's folder class declares `id` ("the unique identifier of the
-    # folder"). A name is neither stable nor unique, so a folder is identified by
-    # `id`.
+    # folder"). A name is neither stable nor unique, so a folder is identified
+    # by `id`.
     identifiers:
       - property: id
         primary: true
@@ -362,7 +362,15 @@ commands:
     description: Create a new note
     scope: resource
     resourceType: Note
+    # The dictionary's note class declares `name` with no access restriction,
+    # so it is read-write and can be set at creation:
+    # <property name="name" code="pnam" type="text" description="the name of the
+    # note (normally the first line of the body)"/>
     parameters:
+      - name: name
+        type: string
+        description: The name of the note (first line)
+        required: false
       - name: body
         type: string
         description: HTML content of the note
