@@ -22,16 +22,18 @@ export {
   type LoadedTlsOptions,
 } from './server/index.js'
 
-// HTTP adapter over the runtime
+// HTTP adapters over the runtime: operations and reference resolution
 export {
   createHttpAdapter,
+  createReferencesAdapter,
   httpStatusForError,
   defaultClientAddress,
   DEFAULT_ADDRESS_RATE_LIMIT,
   type ClientAddressResolver,
   type HttpAdapterOptions,
+  type ResolveReferenceRequest,
   type RpcSuccessResponse,
-} from './server/adapter.js'
+} from './server/index.js'
 export type { WireErrorEnvelope } from '@macts/contracts'
 
 // Server-level middleware

@@ -13,9 +13,10 @@ duplicates none of the authorization logic.
 ## Features
 
 - **Operation endpoints from manifests**: `POST /api/v1/rpc/{app}.{resource}.{operation}` for every manifest operation
+- **Remote reference resolution**: `POST /references/v1/resolve` resolves a reference through the same pipeline as the resource's `get` or `list` operation
 - **One invocation pipeline**: authentication, permissions, governance, and input validation run in `@macts/runtime`, identically for every macts surface
 - **Structured errors**: every failure is a `{ "error": { code, message, details } }` envelope with a closed set of codes that `@macts/contracts` clients reconstruct into the same error classes
-- **Rate limiting**: per API key after authentication, and per client address before it
+- **Rate limiting**: per API key after authentication, and per client address before it, across every route that calls the runtime
 - **Pluggable execution**: the native macOS executor by default; inject any `Executor` for tests or alternate providers
 - **Multi-App Support**: Serve multiple macOS apps from a single server instance
 
@@ -416,9 +417,30 @@ Options:
 - `addressRateLimiter` — a `RateLimiter` from `@macts/runtime`, or `false`.
   Default: 300 requests per minute per address.
 
+#### `createReferencesAdapter(runtime, options?)`
+
+The reference-resolution transport over a `MactsRuntime`. `createServer`
+mounts it at `/references/v1`, a top-level namespace beside `/api/v1`.
+
+```typescript
+import { createHttpAdapter, createReferencesAdapter } from '@macts/api/server'
+import { createRateLimiter } from '@macts/runtime'
+import { Hono } from 'hono'
+
+// One limiter, so each client address has one budget across both namespaces.
+const addressRateLimiter = createRateLimiter({ max: 300, windowMs: 60_000 })
+const app = new Hono()
+  .route('/api/v1', createHttpAdapter(runtime, { addressRateLimiter }))
+  .route('/references/v1', createReferencesAdapter(runtime, { addressRateLimiter }))
+```
+
+It registers only `POST /resolve`, which calls `runtime.resolveReference`. It
+takes the same options as `createHttpAdapter`, and reads the credential, abort
+signal, and correlation id the same way.
+
 #### `httpStatusForError(error)`
 
-The HTTP status the adapter uses for a structured error. See
+The HTTP status the adapters use for a structured error. See
 [Error Codes](#error-codes) for the full table.
 
 ## Server Endpoints
@@ -499,12 +521,62 @@ X-Request-Id: optional-correlation-id
 }
 ```
 
+### Reference Resolution (Auth Required)
+
+```bash
+POST /references/v1/resolve
+Authorization: Bearer macts_sk_...
+Content-Type: application/json
+X-Request-Id: optional-correlation-id
+
+{
+  "app": "notes",
+  "reference": {
+    "reference": { "resource": "Note", "form": "identity", "cardinality": "one", "id": "x-coredata://..." }
+  }
+}
+```
+
+`app` is the app's route segment, and `reference` is the reference control
+record exactly as encoding a reference produces it. A single reference
+resolves as the resource's `get` operation and a collection reference as its
+`list` operation, so the key needs that operation's permission, and the call
+is governed and audited as that operation.
+
+**Success Response (200):** the resolved record for a single reference, or an
+array of records (possibly empty) for a collection reference.
+
+```json
+{
+  "result": { ... }
+}
+```
+
+Failures use the same envelope and statuses as the RPC endpoints. A body that
+is not JSON, or lacks a string `app` or a `reference`, is a 400
+`VALIDATION_FAILED`, as are an unknown app and a malformed reference. A missing
+target is a 404 `TARGET_NOT_FOUND` (with `entryIndex` for an entry of an
+identity collection), and an invalid index or range is a 400
+`INVALID_SELECTION`. Only `POST` is served; anything else under
+`/references/v1` is a 404 `NOT_FOUND`.
+
 ### Introspection (No Auth)
 
 ```bash
 GET /api/v1/introspect       # the first app's endpoints, with descriptions, parameters, and returns
 GET /api/v1/introspect/all   # every app's endpoints
 ```
+
+The listings name operations only, never the reference-resolution route.
+
+### Route Namespaces
+
+Each kind of call has its own top-level namespace: `/api/v1` for app
+operations and the listings, `/references/v1` for reference resolution, and
+`/transfers/v1` for binary transfers. `references`, `transfers`, and
+`introspect` are reserved: the runtime refuses to register an app with any of
+them as its route segment. `/api/v1/introspect` is the one non-app segment
+under `/api/v1`, kept for compatibility.
 
 ## Error Codes
 
@@ -513,29 +585,30 @@ The codes and the shape of `details` for each are defined by
 `@macts/contracts` (`ErrorDetailsByCode`), and a client reconstructs the error
 class from `code` with `fromWireErrorEnvelope`. The HTTP status is advisory.
 
-| `code`                       | Status          | Meaning and `details`                                                                                   |
-| ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
-| `VALIDATION_FAILED`          | 400             | The request body or input violated the operation contract. `issues[]`, each `{ path, message, code? }`. |
-| `UNAUTHENTICATED`            | 401             | No usable credential. `reason`: `missing`, `malformed`, `invalid`, `expired`, or `revoked`.             |
-| `RATE_LIMITED`               | 429             | Too many requests. `retryAfterSeconds`; the same value is sent as the `Retry-After` header.             |
-| `PERMISSION_DENIED`          | 403             | The key lacks the permission. `required`, and `hint` / `changelog` when the permission was renamed.     |
-| `POLICY_DENIED`              | 403             | Governance policy forbids the call. `permission`, `layer` (`host` or `key`).                            |
-| `APPROVAL_PENDING`           | 409             | The call needs human confirmation and no approval provider is configured; it did not run.               |
-| `APPROVAL_REJECTED`          | 403             | The call was put to a human and not approved. `permission`, `layer`, `state` (`rejected` or `timeout`). |
-| `TARGET_NOT_FOUND`           | 404             | A singular target does not exist. `resource?`.                                                          |
-| `FILE_NOT_FOUND`             | 404             | A referenced file does not exist. `path?`.                                                              |
-| `INVALID_SELECTION`          | 400             | A range or index selection is invalid. `resource?`.                                                     |
-| `UNEXPECTED_VALUE`           | 502             | The app returned a value outside the operation contract. `issues[]`.                                    |
-| `APP_UNAVAILABLE`            | 503             | The app is not installed or not responding. `app`, `reason`.                                            |
-| `APP_AUTHORIZATION_REQUIRED` | 503             | macOS has not authorized automating the app. `app`.                                                     |
-| `APP_OPERATION_FAILED`       | 502             | The app reported another failure. `app`, `appErrorCode?`.                                               |
-| `TIMEOUT`                    | 504             | The operation exceeded its time budget. `timeoutMs`.                                                    |
-| `CANCELLED`                  | 499             | The caller aborted the request.                                                                         |
-| `TRANSFER_FAILED`            | 400 / 410 / 413 | A transfer was incomplete or unknown (400), expired (410), or too large (413). `reason`.                |
-| `INTERNAL`                   | 500             | An unexpected failure. The message is generic; `correlationId?` echoes `X-Request-Id`.                  |
+| `code`                       | Status          | Meaning and `details`                                                                                                             |
+| ---------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `VALIDATION_FAILED`          | 400             | The request body or input violated the operation contract. `issues[]`, each `{ path, message, code? }`.                           |
+| `UNAUTHENTICATED`            | 401             | No usable credential. `reason`: `missing`, `malformed`, `invalid`, `expired`, or `revoked`; sent with `WWW-Authenticate: Bearer`. |
+| `RATE_LIMITED`               | 429             | Too many requests. `retryAfterSeconds`; the same value is sent as the `Retry-After` header.                                       |
+| `PERMISSION_DENIED`          | 403             | The key lacks the permission. `required`, and `hint` / `changelog` when the permission was renamed.                               |
+| `POLICY_DENIED`              | 403             | Governance policy forbids the call. `permission`, `layer` (`host` or `key`).                                                      |
+| `APPROVAL_PENDING`           | 409             | The call needs human confirmation and no approval provider is configured; it did not run.                                         |
+| `APPROVAL_REJECTED`          | 403             | The call was put to a human and not approved. `permission`, `layer`, `state` (`rejected` or `timeout`).                           |
+| `TARGET_NOT_FOUND`           | 404             | A singular target does not exist. `resource?`, `entryIndex?` for an identity-collection entry.                                    |
+| `FILE_NOT_FOUND`             | 404             | A referenced file does not exist. `path?`.                                                                                        |
+| `INVALID_SELECTION`          | 400             | A range or index selection is invalid. `resource?`.                                                                               |
+| `UNEXPECTED_VALUE`           | 502             | The app returned a value outside the operation contract. `issues[]`.                                                              |
+| `APP_UNAVAILABLE`            | 503             | The app is not installed or not responding. `app`, `reason`.                                                                      |
+| `APP_AUTHORIZATION_REQUIRED` | 503             | macOS has not authorized automating the app. `app`.                                                                               |
+| `APP_OPERATION_FAILED`       | 502             | The app reported another failure. `app`, `appErrorCode?`.                                                                         |
+| `TIMEOUT`                    | 504             | The operation exceeded its time budget. `timeoutMs`.                                                                              |
+| `CANCELLED`                  | 499             | The caller aborted the request.                                                                                                   |
+| `TRANSFER_FAILED`            | 400 / 410 / 413 | A transfer was incomplete or unknown (400), expired (410), or too large (413). `reason`.                                          |
+| `INTERNAL`                   | 500             | An unexpected failure. The message is generic; `correlationId?` echoes `X-Request-Id`.                                            |
 
 `NOT_FOUND` (404) is returned for a request that matches no route, including
-`POST /api/v1/rpc/<unknown operation>`. It is deliberately not one of the codes
+`POST /api/v1/rpc/<unknown operation>` and any method but `POST` on an
+operation or the resolution route. It is deliberately not one of the codes
 above: it means the client and server disagree about the API, and clients treat
 it as a protocol mismatch.
 
