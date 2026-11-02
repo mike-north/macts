@@ -1060,7 +1060,29 @@ table. The HTTP adapter applies a coarse per-client-address request limit
 before calling the runtime, because step 1b never counts failed
 authentication. It answers with the same `RATE_LIMITED` envelope and
 `Retry-After`, and is skipped when the request has no network peer (an
-in-process request).
+in-process request). Every HTTP route that calls the runtime (operations and
+reference resolution) shares one limiter, so one budget covers an address
+across namespaces.
+
+**HTTP namespaces.** Each kind of call has its own top-level namespace on the
+HTTP server:
+
+- `/api/v1` holds app operations, `POST /api/v1/rpc/<operation id>`, and the
+  unauthenticated listings;
+- `/references/v1` holds reference resolution (D7);
+- `/transfers/v1` holds binary transfers (D8).
+
+`/references/v1` and `/transfers/v1` are siblings of `/api/v1`, never segments
+under it: `/api/v1` is the namespace of app operations, and these calls are
+not app operations. So that no app is ever spelled like one of these
+namespaces on any surface, `references`, `transfers` and `introspect` are
+reserved: none is ever an app's route segment. The runtime refuses an app with a reserved segment at
+registration (`registerManifest` and `registerContract` raise
+`OperationRegistrationError`, and nothing registers), so every host refuses
+it, not only HTTP. The reserved names are exported as
+`RESERVED_APP_ROUTE_SEGMENTS` from `@macts/runtime`. `/api/v1/introspect` is
+the one non-app segment under `/api/v1`. It predates this rule and is kept for
+compatibility.
 
 Locality changes only where the pipeline runs. In remote mode the client
 presents the credential over HTTP and the service runs the same pipeline.
@@ -1142,9 +1164,11 @@ narrows `details`.
 | `TransportError`                | `TRANSPORT_FAILED`           | **Client-side only.** The service was unreachable, sent an invalid response, or uses a different protocol.                         | n/a                                               |
 
 **Wire codec.** An error response body is
-`{ "error": { "code", "message", "details" } }`. The error envelope is protocol
-metadata with its own per-code schemas, not the value codec. Its fields are
-strings, booleans, and small integers, which JSON represents exactly.
+`{ "error": { "code", "message", "details" } }`. Over HTTP, a 401 also
+carries `WWW-Authenticate: Bearer` (RFC 7235 §4.1, RFC 6750 §3), and a 429
+carries `Retry-After`. The error envelope is protocol metadata with its own
+per-code schemas, not the value codec. Its fields are strings, booleans, and
+small integers, which JSON represents exactly.
 
 **Route misses.** A request that matches no HTTP route, including
 `POST /rpc/<unregistered id>`, is answered 404 with
@@ -1333,6 +1357,48 @@ Ownership:
 
 The remote route lives in its own namespace, separate from RPC operations and
 transfers.
+
+**Remote route.** The HTTP server resolves references at
+`POST /references/v1/resolve`. `/references/v1` is a top-level namespace
+beside `/api/v1`, never under it (D5, HTTP namespaces). The request body is:
+
+```json
+{
+  "app": "library",
+  "reference": {
+    "reference": {
+      "resource": "Book",
+      "form": "identity",
+      "cardinality": "one",
+      "id": "978-0441013593"
+    }
+  }
+}
+```
+
+`app` is the app's route segment, and `reference` is the control record
+exactly as encoding produces it. The route builds the `InvocationContext` as
+the RPC routes do: the bearer credential from `Authorization`, the request's
+abort signal, and the correlation id from `X-Request-Id`. It then calls
+`resolveReference(app, reference, context)`. It shares the RPC routes'
+per-client-address limit, one budget per address across both namespaces.
+
+- **Success** is `200 { "result": … }`, the same envelope as an operation
+  result. The result is the resolved record for a single reference, and an
+  array of records, possibly empty, for a collection reference.
+- **Failure** is the D6 envelope, with the same statuses and headers as the
+  RPC routes. For example, 401 `UNAUTHENTICATED` carries
+  `WWW-Authenticate: Bearer`; 403 is `PERMISSION_DENIED` or `POLICY_DENIED`;
+  404 is `TARGET_NOT_FOUND`, keeping `entryIndex`; 400 is
+  `INVALID_SELECTION` or `VALIDATION_FAILED`; 502 is `UNEXPECTED_VALUE`.
+- **Framing.** A body that is not JSON, is not an object, or lacks a string
+  `app` or a `reference` is answered 400 `VALIDATION_FAILED` before the
+  runtime is called, as an unreadable RPC body is (D6). An unknown app and a
+  malformed reference are the runtime's `ValidationError`s.
+- **Routing.** The route answers only `POST`. Any other method, and any other
+  path under `/references/v1`, is a route miss (404 `NOT_FOUND`), as in the
+  RPC namespace. The unauthenticated listings (`/api/v1` and
+  `/api/v1/introspect`) list operations only, never this route.
 
 ## D8. Binary Transfer Handle Shapes
 
