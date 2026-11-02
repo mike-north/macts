@@ -1312,10 +1312,11 @@ bypass policy:
    `t.reference(contract.resources, resource, cardinality)`, after governance
    as in `invoke` (D11). A malformed reference is a `ValidationError`.
 7. The executor's `resolve` runs (D9).
-8. The result is validated against the operation's `output.wire`. For an
-   identity collection it must also hold exactly one record per entry, which
-   enforces that no entry is silently dropped. A mismatch is an
-   `UnexpectedValueError`.
+8. The result is validated against the operation's `output.wire`, as every
+   `invoke` result is, unless its output plan is `passthrough` (D11). For an
+   identity collection it must also hold exactly one record per entry,
+   whatever the plan, which enforces that no entry is silently dropped. A
+   mismatch is an `UnexpectedValueError`.
 
 **Resolution errors.** A single reference whose identity `id` or name selector
 matches nothing raises `TargetNotFoundError`. An index past the end raises
@@ -1441,7 +1442,9 @@ execute(request), resolve(request) }`.
 
   It carries no authority, because authorization has already happened.
 
-- `execute` resolves to a `WireValue` or throws canonical errors.
+- `execute` resolves to a `WireValue` or throws canonical errors. The runtime
+  validates that value against the operation's output contract before any
+  adapter emits it (D11).
 - `resolve(request)` resolves one reference (D7). A `ResolutionRequest`
   carries the validated `AppManifest`, the `reference` in wire form (already
   validated by `t.reference` over the app contract's resources), the
@@ -1482,6 +1485,9 @@ through `Executor` first, without waiting. `@macts/contracts` therefore exports
 - The native executor runs every plan through the codec (D4), passthrough
   included, so a derived plan is never silently ignored. Under passthrough
   the codec converts nothing.
+- The runtime does not validate a passthrough result against `output.wire`
+  (D11), because that schema does not describe a value with no wire
+  encoding. Every other result is validated, whichever executor produced it.
 - Generated descriptors never use it. Value contracts replaces each
   passthrough use with derived plans as descriptors land, and removes the
   `passthrough` kind once none remain. A9 acceptance is not met for any
@@ -1658,16 +1664,42 @@ Live evidence, for a resource the dictionary declares but the running app fails 
 
 Values are validated at every trust boundary, using the same schemas:
 
-| Boundary                      | Check                                                                                                |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Client `encode`               | Before any network or native call. It catches casts.                                                 |
-| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                   |
-| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                       |
-| Runtime against `output.wire` | A resolution result, before it is returned, including one record per identity-collection entry (D7). |
-| Native codec inside JXA       | Against the plan, in both directions.                                                                |
-| Client `decode`               | Against the operation's output contract.                                                             |
+| Boundary                      | Check                                                                                                                                                                                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Client `encode`               | Before any network or native call. It catches casts.                                                                                                                                                                                                                                |
+| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                                                                                                                                                                                                                                                  |
+| Runtime against `t.reference` | A reference to resolve, after governance (D7).                                                                                                                                                                                                                                      |
+| Runtime against `output.wire` | Every executor result whose output plan is not `passthrough`, on `invoke` and on resolution, before any adapter (HTTP, MCP, CLI) emits it. It catches executors that don't encode, or encode wrongly. A resolution result also holds one record per identity-collection entry (D7). |
+| Native codec inside JXA       | Against the plan, in both directions.                                                                                                                                                                                                                                               |
+| Client `decode`               | Against the operation's output contract.                                                                                                                                                                                                                                            |
 
-Validation failures happen before app mutation.
+**Output validation.** The runtime's check of `output.wire` is the same for
+every executor: the native executor, a custom one, a remote one, and a test
+stub. Whether it applies is decided by the operation's output plan, which the
+runtime holds, and never by anything an executor sets or declares about
+itself. A `passthrough` result has no wire encoding, so `output.wire` does not
+describe it and it is not checked (D9). The identity-collection count check
+applies whatever the plan.
+
+A result passes these steps in order:
+
+1. The executor returns its result.
+2. The grant-free file observation the native codec produces is replaced by
+   the `file` wire form with its grant (D8). A missed grant therefore fails
+   the next step, which keeps the file design fail-closed.
+3. The result is validated against `output.wire`.
+4. The adapter emits it.
+
+A mismatch is an `UnexpectedValueError`, the same class a client `decode`
+raises (D2). Its issues give paths into the result, and messages built from
+the issue code and the schema's own expectations, but never a received value:
+values may be user content, and the error crosses to remote callers.
+
+Validation failures happen before app mutation. That covers inputs only: an
+output mismatch on a mutating operation means the operation ran. The app's
+state may have changed, and only the result is unusable. The error message
+says so, so a caller never retries a create or a send on the assumption that
+nothing happened.
 
 ---
 
