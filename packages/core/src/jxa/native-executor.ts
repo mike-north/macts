@@ -51,6 +51,7 @@ import {
 } from './native-codec.js'
 import {
   assertRequiredArguments,
+  COMMUNICATION_FAILURE_ERROR_NUMBERS,
   NO_SUCH_OBJECT_ERROR_NUMBER,
   planNativeInvocation,
 } from './native-scripts.js'
@@ -263,16 +264,16 @@ const NativeErrorNumber = {
   /** An index or range selection is invalid for its collection. */
   invalidIndex: -1719,
   /** The operating system has not authorized sending events to the app. */
-  notAuthorized: -1743,
+  notAuthorized: COMMUNICATION_FAILURE_ERROR_NUMBERS.notAuthorized,
   /**
    * The app did not answer an event within its own event timeout, often
    * because a permission prompt is open.
    */
-  noReply: -1712,
+  noReply: COMMUNICATION_FAILURE_ERROR_NUMBERS.noReply,
   /** The app is not running. */
-  appNotRunning: -600,
+  appNotRunning: COMMUNICATION_FAILURE_ERROR_NUMBERS.appNotRunning,
   /** The connection to the app is no longer valid. */
-  connectionInvalid: -609,
+  connectionInvalid: COMMUNICATION_FAILURE_ERROR_NUMBERS.connectionInvalid,
   /**
    * A script-level error. Reported, among other things, when the app cannot be
    * found, with the text "Application can't be found."

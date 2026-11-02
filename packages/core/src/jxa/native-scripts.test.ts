@@ -368,12 +368,16 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
 
   it('falls back to guarded per-item reads for a property the collection cannot report', () => {
     const body = listBody(eventResource)
-    expect(body).toContain(
-      'try { values = col[name](); } catch (e) { return readEach(itemList(), name, true); }'
-    )
-    expect(body).toContain(
-      'try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }'
-    )
+    expect(body).toContain('return readEach(itemList(), name, true);')
+    expect(body).toContain('values.push(undefined);')
+  })
+
+  it('lets no guard or fallback absorb a communication failure', () => {
+    // -600 not running, -609 connection invalid, -1712 no reply, -128 user
+    // cancelled, -1743 not authorized: the request failed, so the list must.
+    const body = listBody(eventResource)
+    expect(body).toContain('var communicationFailures = [-600, -609, -1712, -128, -1743];')
+    expect(body.match(/if \(communicationFailed\(e\)\) \{ throw e; \}/g)).toHaveLength(3)
   })
 
   it('reads the identifier unguarded, across the collection and per item (issue #81)', () => {

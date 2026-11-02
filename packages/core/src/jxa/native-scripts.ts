@@ -376,6 +376,27 @@ interface ParentScope {
  */
 export const NO_SUCH_OBJECT_ERROR_NUMBER = -1728
 
+/**
+ * Native error numbers that mean a request to the app failed, not that the
+ * addressed property cannot be read: the app is not running (-600), the
+ * connection to it is no longer valid (-609), it did not answer within its
+ * event timeout (-1712), the user cancelled (-128), or this Mac has not
+ * authorized automating it (-1743).
+ *
+ * A body that tolerates an unreadable property (a guarded read, or a fallback
+ * from a read across a collection to per-item reads) must still fail on one of
+ * these: a dead or unauthorized app is a failed operation, never a record that
+ * lacks a field. The executor classifies the same numbers, so this record is
+ * their one source.
+ */
+export const COMMUNICATION_FAILURE_ERROR_NUMBERS = Object.freeze({
+  appNotRunning: -600,
+  connectionInvalid: -609,
+  noReply: -1712,
+  userCancelled: -128,
+  notAuthorized: -1743,
+} as const)
+
 /** Local that holds the parent identifier value inside a body. */
 const PARENT_ID_LOCAL = 'parentId'
 /** Local that holds the target item's identifier value inside a body. */
@@ -583,13 +604,16 @@ const COLLECTION_CHANGED_MESSAGE =
  * - `itemList()` lists the item specifiers once per attempt, on first use,
  *   checked against the item count. Only reads that fall back to one request
  *   per item need them.
+ * - `communicationFailed(e)` tells whether a thrown error is one of
+ *   {@link COMMUNICATION_FAILURE_ERROR_NUMBERS}: the request failed, so no
+ *   guard or fallback may absorb it.
  * - `readEach(list, name, guarded)` reads one property of every item of
  *   `list`, one request per item. A guarded read the item cannot answer
  *   leaves `undefined` at its position, so the record omits that property; an
- *   unguarded failure fails the list.
+ *   unguarded failure, or a communication failure, fails the list.
  * - `readColumn(what, name)` reads one property across the collection in one
- *   request. When that request fails, it falls back to `readEach` with every
- *   read guarded.
+ *   request. When that request fails other than by a communication failure,
+ *   it falls back to `readEach` with every read guarded.
  */
 function listReadHelpers(): string {
   return lines(
@@ -598,6 +622,14 @@ function listReadHelpers(): string {
     `  throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: "encode", path: [], message: message };`,
     '}',
     'function Inconsistent(message) { this.message = message; }',
+    '// These error numbers mean a request to the app failed (it quit, the connection broke,',
+    '// it did not answer, the user cancelled, or automation is not authorized), not that a',
+    '// property cannot be read, so no guard or fallback absorbs them.',
+    `var communicationFailures = [${Object.values(COMMUNICATION_FAILURE_ERROR_NUMBERS).map(String).join(', ')}];`,
+    'function communicationFailed(e) {',
+    '  return e !== null && e !== undefined && typeof e.errorNumber === "number" &&',
+    '    communicationFailures.indexOf(e.errorNumber) >= 0;',
+    '}',
     'function aligned(what, values) {',
     `  if (!Array.isArray(values) || values.length !== ${COUNT_LOCAL}) {`,
     '    throw new Inconsistent("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
@@ -613,7 +645,10 @@ function listReadHelpers(): string {
     '  var values = [];',
     '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
-    '      try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }',
+    '      try { values.push(list[i][name]()); } catch (e) {',
+    '        if (communicationFailed(e)) { throw e; }',
+    '        values.push(undefined);',
+    '      }',
     '    } else {',
     '      values.push(list[i][name]());',
     '    }',
@@ -622,7 +657,10 @@ function listReadHelpers(): string {
     '}',
     'function readColumn(what, name) {',
     '  var values;',
-    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) { return readEach(itemList(), name, true); }`,
+    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) {`,
+    '    if (communicationFailed(e)) { throw e; }',
+    '    return readEach(itemList(), name, true);',
+    '  }',
     '  return aligned(what, values);',
     '}'
   )
@@ -633,8 +671,9 @@ function listReadHelpers(): string {
  * identifier `nativeIdName` of every item, in item order.
  *
  * The identifier read is never guarded. When the read across the collection
- * fails, the item specifiers are listed and the identifier is read once per
- * item, still unguarded, so a misconfigured identifier fails the list with a
+ * fails other than by a communication failure (which fails the list at once),
+ * the item specifiers are listed and the identifier is read once per item,
+ * still unguarded, so a misconfigured identifier fails the list with a
  * real error rather than returning records with no usable id. The listed
  * specifiers become the attempt's item list.
  */
@@ -643,6 +682,7 @@ function identifierReader(nativeIdName: string): string {
     'function readIdentifiers() {',
     '  var values;',
     `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    '    if (communicationFailed(e)) { throw e; }',
     `    var list = ${COLLECTION_LOCAL}();`,
     '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
     '    items = list;',
@@ -767,15 +807,22 @@ function listAttempts(): string {
  * `body` cannot be read across the collection (-1741) but can per item, so a
  * notes list reads it per item. A Calendar calendar's `calendarIdentifier`
  * fails both ways (-1728 across the collection, -1700 per item), but no list
- * reads it: calendars are matched by name. The fallback is detected at run
- * time, so a case not yet known costs speed, never records. The runtime
- * identifier read is never guarded (see {@link identifierReader}).
+ * reads it: the Calendar manifest marks it unsupported, with probe evidence,
+ * and a list reads only usable properties. The fallback is detected at run
+ * time: a property not yet known to fail only across the collection costs
+ * speed, and one that fails both ways is omitted from its records, as it was
+ * when each item's record was read. A communication failure
+ * ({@link COMMUNICATION_FAILURE_ERROR_NUMBERS}) is never either: it always
+ * fails the list. The runtime identifier read is never guarded (see
+ * {@link identifierReader}).
  *
  * Index assembly also keeps items that share an identifier apart. A Calendar
  * calendar can hold several events with the same `uid`, and lists each as a
  * specifier by that `uid`, so a read through an item's specifier reaches the
  * first of them every time, while a read across the collection gives each
- * event its own values.
+ * event its own values. The per-item fallback still reads through those
+ * specifiers, so a property that failed across the collection would still
+ * repeat the first event's value on every event that shares its `uid`.
  *
  * Every read uses the app's name for the property, and the collection the
  * app's name for it; every item is keyed by the public names.

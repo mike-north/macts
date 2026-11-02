@@ -35,6 +35,8 @@ import {
   TargetNotFoundError,
   UnexpectedValueError,
   AppOperationError,
+  AppAuthorizationRequiredError,
+  AppUnavailableError,
   type OperationTarget,
   type ValuePlan,
   WIRE_KEYS,
@@ -44,7 +46,7 @@ import { parseManifestYaml } from '../manifest/loader.js'
 import { composeNativeScript } from './executor.js'
 import { NATIVE_CODEC, NATIVE_CODEC_ERROR_NAME } from './native-codec.js'
 import { createNativeExecutor, type NativeTransport } from './native-executor.js'
-import { buildNativeBody } from './native-scripts.js'
+import { buildNativeBody, COMMUNICATION_FAILURE_ERROR_NUMBERS } from './native-scripts.js'
 import { parseNativeOutcome } from './test-support/native-harness.js'
 import { buildPerItemListBody } from './test-support/per-item-list-body.js'
 
@@ -149,6 +151,10 @@ type Row = Readonly<Record<string, unknown>>
 interface Faults {
   /** Reading the property across the collection fails. */
   readonly bulk?: readonly string[]
+  /** The error number a `bulk` read fails with; {@link READ_FAILED} by default. */
+  readonly bulkErrorNumber?: number
+  /** The error number a `perItem` read fails with; {@link READ_FAILED} by default. */
+  readonly perItemErrorNumber?: number
   /**
    * Reading the property of one item fails, and so does that item's whole
    * `properties()` record, which includes it.
@@ -186,10 +192,8 @@ interface FakeApp {
   readonly requests: string[]
 }
 
-function readFailure(): Error {
-  return Object.assign(new Error('The app could not read the property.'), {
-    errorNumber: READ_FAILED,
-  })
+function readFailure(errorNumber = READ_FAILED): Error {
+  return Object.assign(new Error('The app could not read the property.'), { errorNumber })
 }
 
 /** An item specifier answering only to the app's names in `row`. */
@@ -209,7 +213,7 @@ function fakeItem(row: Row, faults: Faults, requests: string[]): object {
         if (typeof key !== 'string' || !Object.hasOwn(row, key)) return undefined
         return () => {
           requests.push(`item ${key}`)
-          if (failing.includes(key)) throw readFailure()
+          if (failing.includes(key)) throw readFailure(faults.perItemErrorNumber)
           return row[key]
         }
       },
@@ -284,7 +288,7 @@ function fakeCollection(
       return () => {
         if (faults.bulk?.includes(key) === true) {
           completed(`column ${key}`)
-          throw readFailure()
+          throw readFailure(faults.bulkErrorNumber)
         }
         const values = rows.map((row) => (Object.hasOwn(row, key) ? row[key] : null))
         completed(`column ${key}`)
@@ -669,6 +673,81 @@ describe('list bodies: a property the app cannot read across the collection', ()
         uID: row['uid'],
         id: row['uid'],
       }))
+    )
+  })
+})
+
+describe('list bodies: a failed request is never taken for an unreadable property', () => {
+  // Each communication failure and the error the executor classifies it as.
+  const FAILURES = [
+    [COMMUNICATION_FAILURE_ERROR_NUMBERS.appNotRunning, AppUnavailableError],
+    [COMMUNICATION_FAILURE_ERROR_NUMBERS.connectionInvalid, AppUnavailableError],
+    [COMMUNICATION_FAILURE_ERROR_NUMBERS.noReply, AppUnavailableError],
+    [COMMUNICATION_FAILURE_ERROR_NUMBERS.userCancelled, AppOperationError],
+    [COMMUNICATION_FAILURE_ERROR_NUMBERS.notAuthorized, AppAuthorizationRequiredError],
+  ] as const
+
+  it.each(FAILURES)(
+    'fails the list when a read across the collection fails with %i, instead of falling back',
+    async (errorNumber, errorClass) => {
+      const { batched, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+        faults: { bulk: ['secret'], bulkErrorNumber: errorNumber },
+        input: SHELF_INPUT,
+      })
+      expect(errorOf(batched)).toBeInstanceOf(errorClass)
+      // No per-item read was tried, and no records were returned without `secret`.
+      expect(batchedRequests).not.toContain('list')
+      expect(batchedRequests.at(-1)).toBe('column secret')
+    }
+  )
+
+  it.each(FAILURES)(
+    'fails the list when a guarded per-item read fails with %i, instead of omitting the field',
+    async (errorNumber, errorClass) => {
+      const { batched } = await listBoth(TASKS, TASK_ROWS, {
+        faults: { bulk: ['secret'], perItem: ['secret'], perItemErrorNumber: errorNumber },
+        input: SHELF_INPUT,
+      })
+      expect(errorOf(batched)).toBeInstanceOf(errorClass)
+    }
+  )
+
+  it.each(FAILURES)(
+    'fails the list when the identifier read across the collection fails with %i, without reading per item',
+    async (errorNumber, errorClass) => {
+      const { batched, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+        faults: { bulk: ['uid'], bulkErrorNumber: errorNumber },
+        input: SHELF_INPUT,
+      })
+      expect(errorOf(batched)).toBeInstanceOf(errorClass)
+      expect(batchedRequests).toEqual(['shelf todos', 'column uid'])
+    }
+  )
+
+  it('still falls back to per-item reads for a property that fails only across the collection (-1741)', async () => {
+    // A Notes note's body fails across the collection with -1741 and reads per item.
+    const { batched, perItem, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+      faults: { bulk: ['secret'], bulkErrorNumber: -1741 },
+      input: SHELF_INPUT,
+    })
+    expect(recordsOf(batched)).toEqual(taskRecords(TASK_ROWS))
+    expect(recordsOf(batched)).toEqual(recordsOf(perItem))
+    expect(batchedRequests).toContain('item secret')
+  })
+
+  it('still omits a property that fails both ways with a number other than a communication failure', async () => {
+    const { batched, perItem } = await listBoth(TASKS, TASK_ROWS, {
+      faults: {
+        bulk: ['secret'],
+        perItem: ['secret'],
+        bulkErrorNumber: -1728,
+        perItemErrorNumber: -1700,
+      },
+      input: SHELF_INPUT,
+    })
+    expect(recordsOf(batched)).toEqual(recordsOf(perItem))
+    expect(recordsOf(batched)).toEqual(
+      taskRecords(TASK_ROWS).map(({ secret: _secret, ...rest }) => rest)
     )
   })
 })
