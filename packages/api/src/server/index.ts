@@ -55,6 +55,7 @@ import {
   internalErrorResponse,
   notFoundResponse,
   type ClientAddressResolver,
+  type HttpAdapterOptions,
 } from './call-protocol.js'
 import { createReferencesAdapter } from './references-adapter.js'
 import { createInFlightTracker } from './middleware/in-flight.js'
@@ -435,7 +436,7 @@ export function createMultiServer(
 
   // One per-address limiter for every runtime route, so a client cannot widen
   // its budget by spreading requests across namespaces.
-  const adapterOptions = {
+  const adapterOptions: HttpAdapterOptions = {
     ...(customLogger === undefined ? {} : { logger: customLogger }),
     ...(clientAddress === undefined ? {} : { clientAddress }),
     addressRateLimiter:
@@ -446,7 +447,7 @@ export function createMultiServer(
             windowMs: DEFAULT_RATE_LIMIT_WINDOW_MS,
             ...rateLimit?.perAddress,
           }),
-  } as const
+  }
   const adapter = createHttpAdapter(runtime, adapterOptions)
   const references = createReferencesAdapter(runtime, adapterOptions)
 
