@@ -174,12 +174,30 @@ function validateExportsTarget(
  * Resolve a subpath in a package's `exports` map to a relative file path,
  * preferring the `"import"` condition (these packages are ESM-only) and
  * falling back to `"default"` when present. Handles both the string and
- * conditions-object forms of an exports entry.
+ * conditions-object forms of an exports entry, and Node's exports sugar for
+ * the `.` export: an `exports` field that is a string, or an object none of
+ * whose keys begins with `.`, is the `.` export itself.
+ *
+ * @see https://nodejs.org/api/packages.html#exports-sugar
  */
 function resolveExportsSubpath(exportsField: unknown, subpath: string): string | null {
+  if (subpath === '.' && isMainExportSugar(exportsField)) {
+    return resolveExportsConditions(exportsField)
+  }
   if (!isRecord(exportsField)) return null
   const entry = exportsField[subpath]
   return resolveExportsConditions(entry)
+}
+
+/**
+ * Whether an `exports` field uses the sugar form that declares only the `.`
+ * export: a string target, or a conditions object with no subpath keys.
+ */
+function isMainExportSugar(exportsField: unknown): boolean {
+  if (typeof exportsField === 'string') return true
+  if (!isRecord(exportsField)) return false
+  const keys = Object.keys(exportsField)
+  return keys.length > 0 && !keys.some((key) => key.startsWith('.'))
 }
 
 /**

@@ -134,6 +134,45 @@ describe('registerInstalledApps', () => {
     expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
   })
 
+  // Regression: a "." export whose target file is missing was reported without
+  // the command that repairs it.
+  it('reports a host package whose "." export points to a missing file with the reinstall command', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', {
+      hostPackageJsonSource: JSON.stringify({
+        name: '@macts/gadgets-server',
+        type: 'module',
+        exports: { '.': { import: './dist/missing.js' } },
+        dependencies: { '@macts/gadgets': '0.0.0' },
+      }),
+    })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toHaveLength(1)
+    const [failure] = report.failed
+    expect(failure?.app).toBe('gadgets')
+    expect(failure?.reason).toContain('points to a missing file')
+    expect(failure?.reason).toMatch(/Reinstall it with `macts mcp install gadgets`\.$/)
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
+  it('registers a host package that declares its "." export with the exports sugar form', async () => {
+    writeInstalledApp(plugins.nodeModules, 'widgets', {
+      hostPackageJsonSource: JSON.stringify({
+        name: '@macts/widgets-server',
+        type: 'module',
+        exports: './index.js',
+        dependencies: { '@macts/widgets': '0.0.0' },
+      }),
+    })
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toEqual([])
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
   it('reports a host package whose app package is not installed, naming the host package and the reinstall command', async () => {
     writeInstalledApp(plugins.nodeModules, 'gadgets')
     plugins.removeAppPackage('gadgets')

@@ -213,7 +213,7 @@ async function loadApp(nodeModules: string, app: string, hostPackage: string): P
 
   const entry = resolvePackageExport(hostDir, hostPackage, HOST_ENTRY_SUBPATH)
   if (!entry.found) {
-    return { ok: false, reason: entry.error }
+    return { ok: false, reason: `${asSentence(entry.error)} ${reinstall}` }
   }
 
   let module: unknown
