@@ -1083,8 +1083,11 @@ surface validates calls against the same descriptors. The function finds each
 installed host package (`@macts/<app>-server`) in the plugins directory,
 resolves the app's contract (`@macts/<app>/contract`) from the host package's
 own location, validates the manifest the contract loads, and calls
-`registerContract(contract, manifest)`. An app that fails to load or register is
-reported with its reason and skipped, and the other apps still register. An app
+`registerContract(contract, manifest)`. An app has at most one registered
+contract, because the contract's resource table is the app's reference
+registry (D7); a second contract for the same app is refused. An app that fails
+to load or register is reported with its reason and skipped, and the other
+apps still register. An app
 installed without its host package is reported at startup, with the command that
 installs it. Manifest registration (`registerManifest`) remains for embedders
 and tests; it runs passthrough descriptors, validated by each command's request
@@ -1113,7 +1116,7 @@ narrows `details`.
 | `PolicyDeniedError`             | `POLICY_DENIED`              | Governance policy forbids the call (`permission`, `layer`)                                                                         | 403                                               |
 | `ApprovalPendingError`          | `APPROVAL_PENDING`           | Held for confirmation with nobody to ask; not executed                                                                             | 409                                               |
 | `ApprovalRejectedError`         | `APPROVAL_REJECTED`          | Held, put to a human, and not approved (`state`)                                                                                   | 403                                               |
-| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist                                                                                                   | 404                                               |
+| `TargetNotFoundError`           | `TARGET_NOT_FOUND`           | A singular target does not exist (`entryIndex` for a missing identity-collection entry)                                            | 404                                               |
 | `FileNotFoundError`             | `FILE_NOT_FOUND`             | A referenced file does not exist or disappeared                                                                                    | 404                                               |
 | `InvalidSelectionError`         | `INVALID_SELECTION`          | A range or index selection is invalid for the collection                                                                           | 400                                               |
 | `AppUnavailableError`           | `APP_UNAVAILABLE`            | The app is not installed or cannot be reached                                                                                      | 503                                               |
@@ -1251,11 +1254,53 @@ wire it received. A binder keeps its client state in `#private` fields, non-enum
 properties, or prototype members. Under the encode strictness rule (D8), an
 own enumerable data property that is not a declared field would make the
 reference fail to encode. Hydration therefore follows the factory, with no separate
-API. Resolution is a runtime-level call executed by
-the provider. A single reference requires the resource's `get` permission, and
-a collection reference requires the resource's `list` permission. A resource
+API.
+
+**Resolution.** Resolution is a runtime-level call,
+`MactsRuntime.resolveReference(app, reference, context)`, executed by the
+provider. `reference` is the wire form, the `{"reference": …}` control record
+that encoding produces, and `context` is the same `InvocationContext` that
+`invoke` takes. A single reference resolves as the target resource's `get`
+operation, and a collection reference as its `list` operation. The operation
+is chosen structurally from the manifest: the resource's first command whose
+CRUD shape (its command `name`) is `get` or `list`. This is the same rule that
+names `get` and `list` in a generated contract's resource table. A resource
 with no corresponding operation is not resolvable, and its references fail
 with `InvalidSelectionError`.
+
+Resolution runs the full D5 pipeline as that operation, so it can never
+bypass policy:
+
+1. The credential is verified, and admission applies.
+2. The app's registered contract is found. An unknown app is a
+   `ValidationError`, like an unknown operation in `invoke`. An app registered
+   from its manifest alone has no resource table and is unknown here.
+3. The reference's `resource` (a key of the contract's resource table) and
+   `cardinality` are read. They select the operation, as an operation id does
+   for `invoke`, so they are checked first, and a malformed one is a
+   `ValidationError`.
+4. The caller's key must hold the operation's permission. Only the target
+   resource's permission is checked. Container traversal needs no container
+   permission, because a container only locates the target and contributes no
+   data to the result.
+5. Governance, approval, and audit run exactly as for a direct call of the
+   operation: the same permission string, the same decision, and the same
+   audit record.
+6. The whole reference is validated with
+   `t.reference(contract.resources, resource, cardinality)`, after governance
+   as in `invoke` (D11). A malformed reference is a `ValidationError`.
+7. The executor's `resolve` runs (D9).
+8. The result is validated against the operation's `output.wire`. A mismatch
+   is an `UnexpectedValueError`.
+
+**Resolution errors.** A single reference whose identity `id` or name selector
+matches nothing raises `TargetNotFoundError`. An index past the end raises
+`InvalidSelectionError`. A collection reference resolves to an array that may
+be empty. A range past the end raises `InvalidSelectionError`. An identity
+collection resolves its entries in order. When an entry's target no longer
+exists, it raises `TargetNotFoundError` whose `entryIndex` detail is that
+entry's zero-based position; the entry is never silently dropped. An identity
+collection with no entries resolves to `[]`.
 
 Ownership:
 
@@ -1360,7 +1405,7 @@ discriminant lets a later rule tell sources apart without changing the shape.
 
 **Executor seam ([#101](https://github.com/mike-north/macts/issues/101)).**
 `packages/core/src/execution/executor.ts` declares `Executor { provider,
-execute(request) }`.
+execute(request), resolve(request) }`.
 
 - An `ExecutionRequest` carries:
   - the validated `AppManifest`
@@ -1373,7 +1418,19 @@ execute(request) }`.
   It carries no authority, because authorization has already happened.
 
 - `execute` resolves to a `WireValue` or throws canonical errors.
-- The native JXA executor is one implementation.
+- `resolve(request)` resolves one reference (D7). A `ResolutionRequest`
+  carries the validated `AppManifest`, the `reference` in wire form (already
+  validated by `t.reference` over the app contract's resources), the
+  `outputPlan` of the operation it resolves as (the resource's `get` output
+  for cardinality `'one'`, its `list` output for `'many'`), and an optional
+  `signal`. Like `ExecutionRequest`, it carries no authority. Container chains
+  are evaluated natively and contribute no data to the result. It follows the
+  D7 error rules: `TargetNotFoundError` for a missing identity or name match,
+  `InvalidSelectionError` for an index or range past the end,
+  `TargetNotFoundError` with `entryIndex` for a missing identity-collection
+  entry, and `[]` for an empty identity collection.
+- The native JXA executor is one implementation. Its `resolve` fails with
+  `InternalError`: the macOS provider does not resolve references.
 - The runtime is constructed with an executor
   (`createRuntime({ executor, … })`), and every adapter dispatches through the
   runtime.
@@ -1569,12 +1626,14 @@ Live evidence, for a resource the dictionary declares but the running app fails 
 
 Values are validated at every trust boundary, using the same schemas:
 
-| Boundary                     | Check                                                |
-| ---------------------------- | ---------------------------------------------------- |
-| Client `encode`              | Before any network or native call. It catches casts. |
-| Runtime against `input.wire` | Catches raw HTTP and MCP requests.                   |
-| Native codec inside JXA      | Against the plan, in both directions.                |
-| Client `decode`              | Against the operation's output contract.             |
+| Boundary                      | Check                                                |
+| ----------------------------- | ---------------------------------------------------- |
+| Client `encode`               | Before any network or native call. It catches casts. |
+| Runtime against `input.wire`  | Catches raw HTTP and MCP requests.                   |
+| Runtime against `t.reference` | A reference to resolve, after governance (D7).       |
+| Runtime against `output.wire` | A resolution result, before it is returned (D7).     |
+| Native codec inside JXA       | Against the plan, in both directions.                |
+| Client `decode`               | Against the operation's output contract.             |
 
 Validation failures happen before app mutation.
 
