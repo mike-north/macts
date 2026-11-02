@@ -1080,20 +1080,20 @@ forgot to supply. Missing and malformed configuration are treated differently:
 `macts --mcp`, and the MCP server of `macts mcp serve`) registers the installed
 apps' generated contracts through one host registration function, so every
 surface validates calls against the same descriptors. The function finds each
-installed host package (`@macts/<app>-server`) in the plugins directory,
-imports it, and reads its `contract` export: the host package is the install
-opt-in and re-exports the contract of the app it serves. Node resolves
-`@macts/<app>` through the host package's own dependencies; the host does not
-locate the app package itself. The function then validates the manifest the
-contract loads and calls `registerContract(contract, manifest)`. A host package
-without a `contract` export was installed by an older macts: it is reported
-with the command that reinstalls it (`macts mcp install <app>`) and skipped,
-with no fallback to another way of finding the contract. Any other app that
-fails to load or register is likewise reported with its reason and skipped, and
-the other apps still register. An app installed without its host package is
-reported at startup, with the command that installs it. Manifest registration (`registerManifest`) remains for embedders
-and tests; it runs passthrough descriptors, validated by each command's request
-schema.
+installed host package (`@macts/<app>-server`) in the plugins directory, imports
+it, and reads its `contract` export: the host package is the install opt-in and
+re-exports the contract of the app it serves. Node resolves `@macts/<app>`
+through the host package's own dependencies; the host does not locate the app
+package itself. The function then validates the manifest the contract loads and
+calls `registerContract(contract, manifest)`. A host package without a
+`contract` export was installed by an older macts: it is reported with the
+command that reinstalls it (`macts mcp install <app>`) and skipped, with no
+fallback to another way of finding the contract. Any other app that fails to
+load or register is likewise reported with its reason and skipped, and the other
+apps still register. An app installed without its host package is reported at
+startup, with the command that installs it. Manifest registration
+(`registerManifest`) remains for embedders and tests; it runs passthrough
+descriptors, validated by each command's request schema.
 
 ## D6. Structured Error Registry, Wire Codec, and Reconstruction
 
