@@ -11,8 +11,9 @@
  *   usable once complete, and consumable exactly once.
  * - **Download links** — short-lived bearer capabilities that deliver one
  *   granted file over HTTP.
- * - **Temporary copies** — files materialized for a local read, which the
- *   caller releases and the store removes when abandoned.
+ * - **Temporary copies** — files materialized for a local read. The store
+ *   mints each copy's path; the caller writes the copy there and releases
+ *   it, and the store removes it when abandoned.
  *
  * ## Guarantees
  *
@@ -28,8 +29,16 @@
  *   decided, so any later consume of that id fails with `unknown-transfer`,
  *   whatever the first call's outcome.
  * - **No secrets at rest or in errors.** Tokens are 32 random bytes and only
- *   their SHA-256 digests are stored. No error message contains a token or
- *   the path of uploaded bytes, and the store does no logging at all.
+ *   their SHA-256 digests are stored. No error message contains a token, an
+ *   upload id, or the path of uploaded bytes: a filesystem failure while
+ *   staging or releasing bytes is reported as a generic `Error` whose
+ *   `cause` keeps the original for local diagnosis only (never surface a
+ *   `cause` to a caller). The store does no logging at all.
+ * - **Confined deletion.** The store deletes only files it named: upload
+ *   bytes at `uploads/<uploadId>`, and temporary copies at paths it minted
+ *   directly inside the canonical copies directory. A copy is deleted only
+ *   if it is still a regular file there; a symlink or directory found in its
+ *   place is never followed or removed.
  * - **Bounded.** Upload size, outstanding uploads, and outstanding upload
  *   bytes per subject are limited (see `limits.ts`).
  *
@@ -37,9 +46,9 @@
  *
  * {@link TransferStore.sweep} removes expired records and the files behind
  * them. It runs when a store is opened and, opportunistically, at most once a
- * minute after a mutating call. Once swept, an expired transfer is unknown. A file that is already gone is not an
- * error; a file that cannot be deleted keeps its record so a later sweep
- * retries it.
+ * minute after a mutating call. Once swept, an expired transfer is unknown.
+ * A file that is already gone is not an error; a file that cannot be
+ * deleted keeps its record so a later sweep retries it.
  *
  * The store moves no bytes over the network and makes no authorization
  * decision beyond subject binding: callers verify the credential and the
@@ -56,6 +65,7 @@ import { getMactsHome } from '../paths.js'
 import { runInTransaction, type SqliteDatabase, type SqliteRow } from '../storage/sqlite.js'
 import { readChunks, type UploadByteSource } from './byte-source.js'
 import {
+  canonicalCopiesDirectory,
   FILE_MODE,
   integerColumn,
   openTransferDatabase,
@@ -164,11 +174,32 @@ export interface DownloadLinkTarget {
   readonly path?: string
 }
 
-/** A temporary copy under the store's lifecycle. */
-export interface RegisteredTemporaryCopy {
+/** Options for {@link TransferStore.allocateTemporaryCopy}. */
+export interface AllocateTemporaryCopyOptions {
+  /**
+   * File name extension for the copy, such as `.pdf`, so apps and tools that
+   * go by extension recognize it: a `.` followed by 1 to 16 ASCII letters or
+   * digits.
+   */
+  readonly extension?: string
+}
+
+/** A temporary copy the store minted, under the store's lifecycle. */
+export interface AllocatedTemporaryCopy {
+  /**
+   * Where to write the copy: a new, empty, owner-only regular file with a
+   * random name, directly inside the store's canonical copies directory.
+   * The path is canonical (no symlinks), so it compares equal to its own
+   * `realpath`.
+   */
+  readonly path: string
   /** When the sweep may remove the copy if it has not been released. */
   readonly expiresAt: Date
-  /** Delete the copy and forget it. Safe to call more than once. */
+  /**
+   * Delete the copy and forget it. Safe to call more than once. Only a
+   * regular file at {@link AllocatedTemporaryCopy.path} is deleted: a symlink
+   * or directory found there instead is neither followed nor removed.
+   */
   release(): Promise<void>
 }
 
@@ -189,12 +220,6 @@ export interface CreateTransferStoreOptions {
 export interface TransferStore {
   /** The bounds this store enforces. */
   readonly limits: TransferLimits
-
-  /**
-   * The directory temporary copies must be created in. The store only ever
-   * deletes copies inside it.
-   */
-  readonly temporaryCopyDirectory: string
 
   /**
    * Issue a grant for a file an authorized operation returned to `subject`.
@@ -224,6 +249,9 @@ export interface TransferStore {
    * Receive an upload's bytes and mark it complete. An upload is received
    * once; an interrupted receive (the source throws or the signal aborts)
    * deletes the partial bytes and leaves the upload awaiting bytes again.
+   * If the process ends mid-receive, nothing can reset the upload: it stays
+   * `receiving` (unreceivable, and holding one of the subject's outstanding
+   * slots) until it expires and the sweep removes it with its partial bytes.
    *
    * @throws TransferError `unknown-transfer` when the upload is unknown,
    *   belongs to another subject, was already received (or is being
@@ -233,6 +261,8 @@ export interface TransferStore {
    *   upload failed. In every case the partial bytes are deleted.
    * @throws The source's own error, or the signal's reason, when the receive
    *   is interrupted.
+   * @throws Error "The transfer store could not stage the upload." when
+   *   writing the bytes to disk fails; the filesystem error is its `cause`.
    */
   receiveUpload(
     subject: string,
@@ -269,14 +299,21 @@ export interface TransferStore {
   redeemDownloadLink(token: string): Promise<DownloadLinkTarget>
 
   /**
-   * Put a temporary copy made for `subject` under the store's lifecycle: the
-   * caller releases it, and the sweep removes it after its lifetime.
-   * Registering the same path again renews it.
+   * Mint a temporary copy for a local read by `subject`: the store creates an
+   * empty file at a fresh path of its own choosing and records it. The
+   * caller writes the copy's bytes there and releases it when done; the
+   * sweep removes it after its lifetime. The store never accepts a
+   * caller-chosen path, so it can only ever delete files it named.
    *
-   * @throws RangeError when `path` is not inside
-   *   {@link TransferStore.temporaryCopyDirectory}.
+   * @throws RangeError when `options.extension` is not a `.` followed by 1 to
+   *   16 ASCII letters or digits.
+   * @throws Error "The transfer store could not create a temporary copy."
+   *   when creating the file fails; the filesystem error is its `cause`.
    */
-  registerTemporaryCopy(subject: string, path: string): Promise<RegisteredTemporaryCopy>
+  allocateTemporaryCopy(
+    subject: string,
+    options?: AllocateTemporaryCopyOptions
+  ): Promise<AllocatedTemporaryCopy>
 
   /**
    * Remove expired grants, download links, and uploads (with their bytes),
@@ -368,6 +405,43 @@ async function removeFile(file: string): Promise<void> {
 }
 
 /**
+ * Run a filesystem step whose errors would name a staged file, replacing any
+ * failure with a generic message. The original error stays as `cause`, for
+ * local diagnosis only.
+ */
+async function withoutPath<T>(step: () => Promise<T>, message: string): Promise<T> {
+  try {
+    return await step()
+  } catch (cause) {
+    throw new Error(message, { cause })
+  }
+}
+
+/** A minted copy's extension: `.` and 1–16 ASCII letters or digits. */
+const COPY_EXTENSION = /^\.[A-Za-z0-9]{1,16}$/
+
+/** A minted copy's file name: a random UUID and an optional extension. */
+const COPY_NAME =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\.[A-Za-z0-9]{1,16})?$/
+
+/**
+ * How many bytes a receive reserves against the subject's outstanding budget
+ * at a time: 1 MiB.
+ *
+ * Each reservation is a write-locked, synced transaction. Reserving per chunk
+ * would mean about 1,600 of them for a 100 MiB upload in 64 KiB chunks,
+ * stalling every other writer of the store meanwhile. Reserving in 1 MiB
+ * steps makes that about 100, while keeping full durability (unlike
+ * `synchronous = NORMAL`, which could lose a recorded consumption on power
+ * loss and so weaken single use). The per-upload size check still runs
+ * before every write. A step is clamped to the subject's remaining budget,
+ * so a receive never rejects itself for headroom it reserved; another
+ * concurrent receive by the same subject can see up to one step of that
+ * headroom as used.
+ */
+const RESERVATION_STEP_BYTES = 1024 * 1024
+
+/**
  * A release function that runs `work` at most once successfully: concurrent
  * and repeated calls share the in-flight attempt, and a failed attempt can be
  * retried.
@@ -383,12 +457,27 @@ function onceSuccessful(work: () => Promise<void>): () => Promise<void> {
   }
 }
 
+/** Whether `error` is a filesystem "no such file or directory". */
+function isMissingFile(error: unknown): boolean {
+  return error instanceof Error && 'code' in error && error.code === 'ENOENT'
+}
+
+/** Message for any filesystem failure while writing an upload's bytes. */
+const STAGE_FAILED = 'The transfer store could not stage the upload.'
+
+function tooLargeForUpload(maxBytes: number): TransferError {
+  return new TransferError(`The upload exceeds its limit of ${String(maxBytes)} bytes.`, {
+    reason: 'too-large',
+  })
+}
+
 class SqliteTransferStore implements TransferStore {
   readonly limits: TransferLimits
-  readonly temporaryCopyDirectory: string
 
   readonly #database: SqliteDatabase
   readonly #paths: TransferPaths
+  /** Canonical path of the copies directory; every minted copy is directly inside it. */
+  readonly #copies: string
   readonly #now: () => Date
   #closed = false
   #lastSweepAt: number | undefined
@@ -396,14 +485,15 @@ class SqliteTransferStore implements TransferStore {
   constructor(
     database: SqliteDatabase,
     paths: TransferPaths,
+    copies: string,
     now: () => Date,
     limits: TransferLimits
   ) {
     this.#database = database
     this.#paths = paths
+    this.#copies = copies
     this.#now = now
     this.limits = limits
-    this.temporaryCopyDirectory = paths.copies
   }
 
   // -- shared helpers -------------------------------------------------------
@@ -602,19 +692,16 @@ class SqliteTransferStore implements TransferStore {
   }
 
   /**
-   * Check that a receive may continue to `nextTotal` bytes, and record that
-   * total so concurrent receives by the same subject see it. Throws when the
-   * upload vanished, was consumed, expired, or would exceed a byte bound.
+   * Reserve room against the subject's outstanding budget for this receive
+   * to reach at least `needed` bytes, and return the new reservation (see
+   * {@link RESERVATION_STEP_BYTES}). Recording it lets concurrent receives by
+   * the same subject see it. Throws when the upload vanished, was consumed,
+   * expired, or `needed` would exceed the subject's budget.
    */
-  #reserveBytes(subject: string, uploadId: string, maxBytes: number, nextTotal: number): void {
+  #reserveBytes(subject: string, uploadId: string, maxBytes: number, needed: number): number {
     const now = this.#nowMs()
-    this.#transaction(() => {
+    return this.#transaction(() => {
       this.#assertStillReceiving(uploadId, now)
-      if (nextTotal > maxBytes) {
-        throw new TransferError(`The upload exceeds its limit of ${String(maxBytes)} bytes.`, {
-          reason: 'too-large',
-        })
-      }
       const others = this.#getRow(
         `SELECT COALESCE(SUM(received_bytes), 0) AS total FROM uploads
          WHERE subject = ? AND upload_id <> ? AND consumed_at IS NULL AND expires_at > ?`,
@@ -624,13 +711,15 @@ class SqliteTransferStore implements TransferStore {
       )
       const othersTotal = others === undefined ? 0 : integerColumn(others, 'total')
       const budget = this.limits.maxOutstandingUploadBytesPerSubject
-      if (othersTotal + nextTotal > budget) {
+      if (othersTotal + needed > budget) {
         throw new TransferError(
           `The upload would exceed the limit of ${String(budget)} bytes across this caller's outstanding uploads.`,
           { reason: 'too-large' }
         )
       }
-      this.#run('UPDATE uploads SET received_bytes = ? WHERE upload_id = ?', nextTotal, uploadId)
+      const reservation = Math.min(maxBytes, needed + RESERVATION_STEP_BYTES, budget - othersTotal)
+      this.#run('UPDATE uploads SET received_bytes = ? WHERE upload_id = ?', reservation, uploadId)
+      return reservation
     })
   }
 
@@ -674,17 +763,27 @@ class SqliteTransferStore implements TransferStore {
     const file = this.#uploadFile(uploadId)
     let handle: fsp.FileHandle | undefined
     let received = 0
+    let reserved = 0
     try {
-      await removeFile(file)
-      handle = await fsp.open(file, 'wx', FILE_MODE)
-      for await (const chunk of readChunks(bytes, options.signal)) {
-        this.#reserveBytes(subject, uploadId, maxBytes, received + chunk.length)
-        await writeAll(handle, chunk)
-        received += chunk.length
-      }
+      await withoutPath(() => removeFile(file), STAGE_FAILED)
+      handle = await withoutPath(() => fsp.open(file, 'wx', FILE_MODE), STAGE_FAILED)
       const opened = handle
+      for await (const chunk of readChunks(bytes, options.signal)) {
+        const next = received + chunk.length
+        if (this.#nowMs() >= expiresAt) {
+          throw expiredTransfer('upload')
+        }
+        if (next > maxBytes) {
+          throw tooLargeForUpload(maxBytes)
+        }
+        if (next > reserved) {
+          reserved = this.#reserveBytes(subject, uploadId, maxBytes, next)
+        }
+        await withoutPath(() => writeAll(opened, chunk), STAGE_FAILED)
+        received = next
+      }
       handle = undefined
-      await opened.close()
+      await withoutPath(() => opened.close(), STAGE_FAILED)
 
       const now = this.#nowMs()
       this.#transaction(() => {
@@ -700,14 +799,19 @@ class SqliteTransferStore implements TransferStore {
       await handle?.close().catch(() => undefined)
       await removeFile(file).catch(() => undefined)
       if (!this.#closed) {
-        // Only an upload this receive still holds is settled: one consumed or
-        // swept meanwhile is left as it is.
-        this.#run(
-          `UPDATE uploads SET state = ?, received_bytes = 0
-           WHERE upload_id = ? AND state = 'receiving'`,
-          isTooLarge(error) ? 'failed' : 'awaiting',
-          uploadId
-        )
+        try {
+          // Only an upload this receive still holds is settled: one consumed
+          // or swept meanwhile is left as it is.
+          this.#run(
+            `UPDATE uploads SET state = ?, received_bytes = 0
+             WHERE upload_id = ? AND state = 'receiving'`,
+            isTooLarge(error) ? 'failed' : 'awaiting',
+            uploadId
+          )
+        } catch {
+          // The caller needs the original failure, not this one. An upload
+          // left `receiving` expires and is swept like any other.
+        }
       }
       throw error
     }
@@ -763,7 +867,10 @@ class SqliteTransferStore implements TransferStore {
       ...(contentType === undefined ? {} : { contentType }),
       size: integerColumn(outcome.row, 'received_bytes'),
       release: onceSuccessful(async () => {
-        await removeFile(file)
+        await withoutPath(
+          () => removeFile(file),
+          'The transfer store could not delete the staged upload.'
+        )
         if (!this.#closed) {
           this.#run('UPDATE uploads SET released = 1 WHERE upload_id = ?', uploadId)
         }
@@ -817,41 +924,87 @@ class SqliteTransferStore implements TransferStore {
 
   // -- temporary copies -----------------------------------------------------
 
-  registerTemporaryCopy(subject: string, copyPath: string): Promise<RegisteredTemporaryCopy> {
-    return this.#thenSweepIfDue(() => this.#registerTemporaryCopy(subject, copyPath))
+  allocateTemporaryCopy(
+    subject: string,
+    options: AllocateTemporaryCopyOptions = {}
+  ): Promise<AllocatedTemporaryCopy> {
+    return this.#thenSweepIfDue(() => this.#allocateTemporaryCopy(subject, options))
   }
 
-  #registerTemporaryCopy(subject: string, copyPath: string): RegisteredTemporaryCopy {
+  async #allocateTemporaryCopy(
+    subject: string,
+    options: AllocateTemporaryCopyOptions
+  ): Promise<AllocatedTemporaryCopy> {
     this.#assertOpen()
     assertSubject(subject)
-    const resolved = path.resolve(copyPath)
-    const relative = path.relative(this.temporaryCopyDirectory, resolved)
-    if (
-      relative === '' ||
-      relative === '..' ||
-      relative.startsWith(`..${path.sep}`) ||
-      path.isAbsolute(relative)
-    ) {
-      throw new RangeError("A temporary copy must be inside the store's temporary copy directory.")
+    const { extension } = options
+    if (extension !== undefined && !COPY_EXTENSION.test(extension)) {
+      throw new RangeError(
+        'A temporary copy extension must be a "." followed by 1 to 16 ASCII letters or digits.'
+      )
     }
 
+    const copyPath = path.join(this.#copies, `${randomUUID()}${extension ?? ''}`)
+    await withoutPath(async () => {
+      const created = await fsp.open(copyPath, 'wx', FILE_MODE)
+      await created.close()
+    }, 'The transfer store could not create a temporary copy.')
+
     const expiresAt = this.#nowMs() + this.limits.temporaryCopyTtlMs
-    this.#run(
-      `INSERT INTO temporary_copies (path, subject, expires_at) VALUES (?, ?, ?)
-       ON CONFLICT(path) DO UPDATE SET subject = excluded.subject, expires_at = excluded.expires_at`,
-      resolved,
-      subject,
-      expiresAt
-    )
+    try {
+      this.#run(
+        'INSERT INTO temporary_copies (path, subject, expires_at) VALUES (?, ?, ?)',
+        copyPath,
+        subject,
+        expiresAt
+      )
+    } catch (error) {
+      await removeFile(copyPath).catch(() => undefined)
+      throw error
+    }
     return {
+      path: copyPath,
       expiresAt: new Date(expiresAt),
       release: onceSuccessful(async () => {
-        await removeFile(resolved)
+        await withoutPath(
+          () => this.#removeCopy(copyPath),
+          'The transfer store could not delete the temporary copy.'
+        )
         if (!this.#closed) {
-          this.#run('DELETE FROM temporary_copies WHERE path = ?', resolved)
+          this.#run('DELETE FROM temporary_copies WHERE path = ?', copyPath)
         }
       }),
     }
+  }
+
+  /**
+   * Delete a minted temporary copy, refusing anything else.
+   *
+   * Only a path directly inside the canonical copies directory, with a name
+   * the store mints, that is still a regular file is deleted. A symlink or
+   * directory in its place is neither followed nor removed (`'refused'`):
+   * the record can be forgotten, but nothing outside the store is touched.
+   * `unlink` never follows a symlink, so a swap after the check is harmless.
+   *
+   * @returns `'removed'` when the copy is gone (including when it already
+   *   was), `'refused'` when the path is not one the store may delete.
+   */
+  async #removeCopy(copyPath: string): Promise<'removed' | 'refused'> {
+    if (path.dirname(copyPath) !== this.#copies || !COPY_NAME.test(path.basename(copyPath))) {
+      return 'refused'
+    }
+    try {
+      const stats = await fsp.lstat(copyPath)
+      if (!stats.isFile()) {
+        return 'refused'
+      }
+      await fsp.unlink(copyPath)
+    } catch (error) {
+      if (!isMissingFile(error)) {
+        throw error
+      }
+    }
+    return 'removed'
   }
 
   // -- lifecycle ------------------------------------------------------------
@@ -887,7 +1040,7 @@ class SqliteTransferStore implements TransferStore {
       .prepare('SELECT path FROM temporary_copies WHERE expires_at <= ?')
       .all(now)
       .map((row) => textColumn(row, 'path'))
-    const copyResults = await Promise.allSettled(copyPaths.map((copy) => removeFile(copy)))
+    const copyResults = await Promise.allSettled(copyPaths.map((copy) => this.#removeCopy(copy)))
 
     this.#assertOpen()
     this.#transaction(() => {
@@ -897,9 +1050,10 @@ class SqliteTransferStore implements TransferStore {
         }
       })
       copyPaths.forEach((copy, index) => {
+        // Removed or refused alike, the record goes; a copy that could not be
+        // deleted keeps its record for the next sweep.
         if (copyResults[index]?.status === 'fulfilled') {
-          // A copy renewed while its file was being removed keeps its record.
-          this.#run('DELETE FROM temporary_copies WHERE path = ? AND expires_at <= ?', copy, now)
+          this.#run('DELETE FROM temporary_copies WHERE path = ?', copy)
         }
       })
     })
@@ -922,6 +1076,8 @@ class SqliteTransferStore implements TransferStore {
  * once; the database serializes their changes.
  *
  * @throws RangeError when a limit override is not a positive integer.
+ * @throws Error when the store's database was created by a newer macts, or
+ *   has a schema version this macts does not recognize; nothing is changed.
  */
 export async function createTransferStore(
   options: CreateTransferStoreOptions = {}
@@ -930,7 +1086,13 @@ export async function createTransferStore(
   const paths = transferPaths(options.home ?? getMactsHome())
   const now = options.now ?? ((): Date => new Date())
   const database = openTransferDatabase(paths)
-  const store = new SqliteTransferStore(database, paths, now, limits)
+  let store: SqliteTransferStore
+  try {
+    store = new SqliteTransferStore(database, paths, canonicalCopiesDirectory(paths), now, limits)
+  } catch (error) {
+    database.close()
+    throw error
+  }
   try {
     await store.sweep()
   } catch (error) {

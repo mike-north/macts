@@ -47,6 +47,18 @@ export class ActivePolicyError extends Error {
 export function addKeyMetadata(metadata: ApiKeyMetadata): void;
 
 // @public
+export interface AllocatedTemporaryCopy {
+    readonly expiresAt: Date;
+    readonly path: string;
+    release(): Promise<void>;
+}
+
+// @public
+export interface AllocateTemporaryCopyOptions {
+    readonly extension?: string;
+}
+
+// @public
 export const ALLOW_ALL_POLICY: GovernancePolicy;
 
 export { ApiKeyMetadata }
@@ -477,12 +489,6 @@ export interface RegisteredOperation {
 }
 
 // @public
-export interface RegisteredTemporaryCopy {
-    readonly expiresAt: Date;
-    release(): Promise<void>;
-}
-
-// @public
 export type ResolvedGovernanceContext = GovernanceContext & {
     readonly keyPolicy?: GovernancePolicy | undefined;
 };
@@ -525,6 +531,7 @@ export interface TransferLimits {
 
 // @public
 export interface TransferStore {
+    allocateTemporaryCopy(subject: string, options?: AllocateTemporaryCopyOptions): Promise<AllocatedTemporaryCopy>;
     close(): void;
     consumeUpload(subject: string, uploadId: string): Promise<ConsumedUpload>;
     createUpload(subject: string, options?: CreateUploadOptions): Promise<CreatedUpload>;
@@ -534,9 +541,7 @@ export interface TransferStore {
     receiveUpload(subject: string, uploadId: string, bytes: UploadByteSource, options?: ReceiveUploadOptions): Promise<ReceivedUpload>;
     redeemDownloadLink(token: string): Promise<DownloadLinkTarget>;
     redeemGrant(subject: string, token: string): Promise<FileGrantRecord>;
-    registerTemporaryCopy(subject: string, path: string): Promise<RegisteredTemporaryCopy>;
     sweep(): Promise<void>;
-    readonly temporaryCopyDirectory: string;
 }
 
 // @public

@@ -8,6 +8,8 @@
 
 export {
   createTransferStore,
+  type AllocatedTemporaryCopy,
+  type AllocateTemporaryCopyOptions,
   type ConsumedUpload,
   type CreatedUpload,
   type CreateTransferStoreOptions,
@@ -19,7 +21,6 @@ export {
   type IssuedFileGrant,
   type ReceivedUpload,
   type ReceiveUploadOptions,
-  type RegisteredTemporaryCopy,
   type TransferStore,
 } from './store.js'
 export type { UploadByteSource } from './byte-source.js'

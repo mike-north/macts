@@ -50,6 +50,14 @@ export const MAX_OUTSTANDING_UPLOADS_PER_SUBJECT = 16
  * {@link MAX_UPLOAD_BYTES} on purpose: a caller may stage a few large files or
  * many small ones, but never 1.6 GiB at once. A write that would exceed it
  * fails with `TransferError` `too-large`, and its partial bytes are deleted.
+ *
+ * Only outstanding uploads count: bytes of uploads that have expired but
+ * not yet been swept, and of consumed uploads not yet released, do not. So
+ * the bytes a subject has on disk are bounded but can briefly exceed this
+ * budget, until the next sweep (at most a minute after expiry, given
+ * activity) or the end of {@link CONSUMED_UPLOAD_RETENTION_MS}. A receive in
+ * progress counts in steps of up to 1 MiB, so a concurrent receive by the
+ * same subject may be refused up to that much early.
  */
 export const MAX_OUTSTANDING_UPLOAD_BYTES_PER_SUBJECT = 512 * MIB
 

@@ -12,6 +12,7 @@
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 import type {
+  AllocatedTemporaryCopy,
   ConsumedUpload,
   CreateTransferStoreOptions,
   DownloadLinkTarget,
@@ -61,3 +62,10 @@ expectType<string | undefined>(consumed.contentType)
 
 // Redeeming a download link takes only the token: it is the capability.
 expectType<Promise<DownloadLinkTarget>>(store.redeemDownloadLink('token'))
+
+// Temporary copies are minted by the store: no caller-chosen path is accepted.
+expectType<Promise<AllocatedTemporaryCopy>>(store.allocateTemporaryCopy('subject'))
+expectType<Promise<AllocatedTemporaryCopy>>(
+  store.allocateTemporaryCopy('subject', { extension: '.pdf' })
+)
+expectNotAssignable<Parameters<TransferStore['allocateTemporaryCopy']>[1]>({ path: '/tmp/x' })

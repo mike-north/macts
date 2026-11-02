@@ -62,9 +62,8 @@ describe('sweep', () => {
     const released = await store.createUpload(ALICE)
     await store.receiveUpload(ALICE, released.uploadId, chunks('used'))
     await (await store.consumeUpload(ALICE, released.uploadId)).release()
-    const oldCopy = join(store.temporaryCopyDirectory, 'old-copy')
+    const oldCopy = (await store.allocateTemporaryCopy(ALICE)).path
     writeFileSync(oldCopy, 'x')
-    await store.registerTemporaryCopy(ALICE, oldCopy)
 
     // Issued at 10:10 — still live at 10:15.
     clock.set('2026-01-15T10:10:00.000Z')
@@ -128,7 +127,7 @@ describe('sweep', () => {
     const { store, clock } = fixture
     const { uploadId } = await store.createUpload(ALICE)
     await store.receiveUpload(ALICE, uploadId, chunks('bytes'))
-    await store.registerTemporaryCopy(ALICE, join(store.temporaryCopyDirectory, 'never-written'))
+    rmSync((await store.allocateTemporaryCopy(ALICE)).path)
     rmSync(uploadFile(uploadId))
 
     clock.advance(60 * MINUTE)

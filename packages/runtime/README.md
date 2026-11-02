@@ -136,6 +136,10 @@ copies that remote file reads and writes rely on.
   `FILE_GRANT_TTL_MS`, and others).
 - Tokens are stored only as SHA-256 hashes, never appear in error messages,
   and are never logged.
+- The store mints every temporary copy's path (`allocateTemporaryCopy()`) and
+  deletes only regular files it named, so cleanup never reaches outside
+  `<macts-home>/transfers/`.
+- A store created by a newer macts is refused, never downgraded.
 
 ## Requirements
 

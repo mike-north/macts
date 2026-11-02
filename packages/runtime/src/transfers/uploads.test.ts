@@ -11,10 +11,11 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { chmodSync, existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { RateLimitedError } from '@macts/contracts'
+import { loadSqlite } from '../storage/sqlite.js'
 import {
   ALICE,
   BOB,
@@ -27,6 +28,20 @@ import {
   rejectionOf,
   useTransferStore,
 } from './transfer-test-helpers.js'
+
+/** The `received_bytes` an upload has on record, read straight from the database. */
+function recordedBytes(home: string, uploadId: string): number {
+  const { DatabaseSync } = loadSqlite()
+  const database = new DatabaseSync(join(home, 'transfers', 'transfers.db'), { readOnly: true })
+  try {
+    const row = database
+      .prepare('SELECT received_bytes FROM uploads WHERE upload_id = ?')
+      .get(uploadId)
+    return Number(row?.['received_bytes'])
+  } finally {
+    database.close()
+  }
+}
 
 /** Upload files currently on disk under the fixture's home. */
 function stagedFiles(home: string): string[] {
@@ -399,6 +414,46 @@ describe('receiveUpload', () => {
     await expectTransferError(fixture.store.consumeUpload(ALICE, uploadId), 'incomplete')
   })
 
+  it('reserves the outstanding budget in 1 MiB steps while receiving, and records the exact size', async () => {
+    const { uploadId } = await fixture.store.createUpload(ALICE)
+    const paused = pausedSource(new Uint8Array(10), new Uint8Array(5))
+    const receiving = fixture.store.receiveUpload(ALICE, uploadId, paused.source)
+    await paused.firstYielded
+
+    // 10 bytes received so far, reserved up to 10 + 1 MiB.
+    expect(recordedBytes(fixture.home, uploadId)).toBe(10 + 1_048_576)
+    paused.release()
+    await expect(receiving).resolves.toMatchObject({ size: 15 })
+    expect(recordedBytes(fixture.home, uploadId)).toBe(15)
+  })
+
+  it.skipIf(process.getuid?.() === 0)(
+    'reports a staging failure without the uploads path or the upload id, and keeps the upload receivable',
+    async () => {
+      const { uploadId } = await fixture.store.createUpload(ALICE)
+      const uploads = join(fixture.home, 'transfers', 'uploads')
+      chmodSync(uploads, 0o500)
+      let error: unknown
+      try {
+        error = await rejectionOf(fixture.store.receiveUpload(ALICE, uploadId, chunks('x')))
+      } finally {
+        chmodSync(uploads, 0o700)
+      }
+
+      expect(error).toBeInstanceOf(Error)
+      if (!(error instanceof Error)) return
+      expect(error.message).toBe('The transfer store could not stage the upload.')
+      expect(error.message).not.toContain(uploads)
+      expect(error.message).not.toContain(uploadId)
+      // The filesystem error is kept for local diagnosis only.
+      expect(error.cause).toBeInstanceOf(Error)
+
+      await expect(
+        fixture.store.receiveUpload(ALICE, uploadId, chunks('retry'))
+      ).resolves.toMatchObject({ size: 5 })
+    }
+  )
+
   it('rejects a chunk that is not a Uint8Array, leaving no partial file', async () => {
     const { uploadId } = await fixture.store.createUpload(ALICE)
     async function* wrongType(): AsyncGenerator {
@@ -518,6 +573,32 @@ describe('consumeUpload', () => {
     expect(existsSync(consumed.path)).toBe(false)
     await expect(consumed.release()).resolves.toBeUndefined()
   })
+
+  it.skipIf(process.getuid?.() === 0)(
+    'release() reports a failed delete without the uploads path or the upload id, and can be retried',
+    async () => {
+      const uploadId = await completedUpload(ALICE)
+      const consumed = await fixture.store.consumeUpload(ALICE, uploadId)
+      const uploads = join(fixture.home, 'transfers', 'uploads')
+      chmodSync(uploads, 0o500)
+      let error: unknown
+      try {
+        error = await rejectionOf(consumed.release())
+      } finally {
+        chmodSync(uploads, 0o700)
+      }
+
+      expect(error).toBeInstanceOf(Error)
+      if (!(error instanceof Error)) return
+      expect(error.message).toBe('The transfer store could not delete the staged upload.')
+      expect(error.message).not.toContain(uploads)
+      expect(error.message).not.toContain(uploadId)
+      expect(error.cause).toBeInstanceOf(Error)
+
+      await expect(consumed.release()).resolves.toBeUndefined()
+      expect(existsSync(consumed.path)).toBe(false)
+    }
+  )
 
   it('release() succeeds when the bytes are already gone', async () => {
     const consumed = await fixture.store.consumeUpload(ALICE, await completedUpload(ALICE))

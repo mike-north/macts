@@ -1340,11 +1340,24 @@ these limits, exported as named constants:
   their retention has passed.
 - `contentType` is a hint only. It is never verified and may be ignored.
 - Only SHA-256 hashes of grant and download link tokens are stored. Tokens are
-  32 random bytes. No error message contains a token, and the store does no
-  logging.
-- Temporary copies live in the store's copy directory, and the store deletes
-  nothing outside its own directories. The caller releases a copy; the sweep
-  removes leftovers after their lifetime.
+  32 random bytes. No error message contains a token, an upload id, or the
+  path of uploaded bytes. A filesystem failure while staging or releasing
+  bytes is reported generically, with the original error kept as its local
+  `cause`. The store does no logging.
+- The store mints every temporary copy's path itself. Each one is a fresh,
+  randomly named, owner-only file created directly inside the canonical
+  (symlink-free) path of the copy directory, optionally with a short
+  alphanumeric extension. The store never accepts a caller-chosen path. It
+  deletes a copy only if the copy is still a regular file at a path it minted,
+  so a symlink or directory found in its place is never followed or removed.
+  The caller writes and releases a copy; the sweep removes leftovers after
+  their lifetime.
+- The database records its schema version. Opening a fresh database creates
+  the schema and the version in one transaction. A database at the current
+  version is used as it is. Any other version, in particular one written by a
+  newer macts, is refused and left untouched, so an older install never
+  downgrades or half-migrates a newer store. Opening waits for other
+  processes' locks rather than failing.
 - The sweep removes expired grants, links, uploads, and temporary copies, with
   their files, and released upload records. It runs when the store opens and
   at most once a minute after a mutating call. Once swept, an expired transfer
