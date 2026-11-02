@@ -12,8 +12,8 @@
  *
  *   1. `calendars.list()` resolves, and each calendar's `color`, when present,
  *      has integer channels in `0..65535`.
- *   2. `calendars.get(name)` of a listed calendar returns that calendar with
- *      the same color the list reported.
+ *   2. `calendars.get(name)` of a uniquely named listed calendar returns that
+ *      calendar with the same color the list reported.
  *
  * ## Why this cannot run in CI
  *
@@ -118,8 +118,12 @@ describe.skipIf(!liveAppsEnabled)('Calendar calendar colors (local only)', () =>
     'gets a listed calendar by name with the color the list reported',
     async () => {
       const calendars = await calendar.calendars.list()
-      const first = calendars[0]
-      if (first === undefined) throw new Error('Calendar has no calendars to read.')
+      // A calendar is found by name, and names can repeat (a Mac can have two
+      // "Birthdays" calendars), so only a uniquely named calendar is compared.
+      const first = calendars.find(
+        (entry) => calendars.filter((other) => other.name === entry.name).length === 1
+      )
+      if (first === undefined) throw new Error('Calendar has no uniquely named calendar to read.')
 
       const fetched = await calendar.calendars.get(first.name)
 

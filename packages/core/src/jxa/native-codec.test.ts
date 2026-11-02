@@ -601,8 +601,8 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         //   65535 * 0.8          = 52428
         //   65535 * 0.02         = 1310.7
         //   65535 * 0.003        = 196.605
-        //   65535 * 0.0004531283378601 = 29.6966...
-        //   sum = 53965.0016... (to the digits carried), nearest integer 53965
+        //   65535 * 0.0004531283378601 = 29.6958...
+        //   sum = 53965.0008..., nearest integer 53965
         expect(encode([0.8234531283378601, 0, 0], RGB)).toEqual(wireOf('53965', '0', '0'))
       })
 
@@ -613,6 +613,26 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
         expect(encode([0.8234531283378601, 0, 0.884809672832489], RGB)).toEqual(
           wireOf('53965', '0', '57986')
         )
+      })
+
+      it('reads a signed zero channel as 0', () => {
+        expect(encode([-0, 0, 0], RGB)).toEqual(wireOf('0', '0', '0'))
+      })
+
+      it('recovers every 16-bit channel from its single-precision bridge reading', () => {
+        // The bridge divides the app's 16-bit channel k by 65535 in single
+        // precision (live Calendar readings are exactly Math.fround(k / 65535)),
+        // so rounding to the nearest integer needs no tolerance: every k comes
+        // back exactly.
+        for (let k = 0; k <= 65535; k++) {
+          const reading = Math.fround(k / 65535)
+          const wire = encode([reading, 0, 0], RGB) as { r: { integer: string } }
+          if (wire.r.integer !== String(k)) {
+            throw new Error(
+              `Channel ${String(k)} read as ${String(reading)} encoded to ${wire.r.integer}`
+            )
+          }
+        }
       })
 
       it('accepts the {r, g, b} and {red, green, blue} spellings', () => {
