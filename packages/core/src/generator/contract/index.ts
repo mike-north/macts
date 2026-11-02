@@ -27,6 +27,7 @@ import {
   ValueTypes as t,
   type RecordField,
   type ReferenceRegistry,
+  type OperationId,
   type ReferenceScope,
   type ValueType,
 } from '@macts/contracts'
@@ -352,6 +353,19 @@ const CONTRACT_BASE_TYPE_IMPORTS = [
  */
 const PERMISSION_SHAPE = /^[^:]+:[^:]+:[^:]+$/
 
+/**
+ * A route string as an operation id. Every resolved route has the three
+ * segments `app.resource.operation`, so anything else is a defect of route
+ * resolution.
+ */
+function operationId(route: string): OperationId {
+  const [app, resource, operation, ...rest] = route.split('.')
+  if (app === undefined || resource === undefined || operation === undefined || rest.length > 0) {
+    throw new Error(`The route ${JSON.stringify(route)} is not app.resource.operation.`)
+  }
+  return `${app}.${resource}.${operation}`
+}
+
 /** Builds the text of one app's contract module. */
 class ContractBuilder {
   readonly errors: string[] = []
@@ -396,16 +410,38 @@ class ContractBuilder {
    * ones read the generated contract.
    */
   #buildRegistry(): ReferenceRegistry {
-    const registry: Record<string, { readonly id?: ValueType<unknown> }> = {}
+    const registry: Record<string, ReferenceRegistry[string]> = {}
     for (const [resourceKey, resource] of usableResources(this.#manifest)) {
       const identifier = this.#identifierProperty(resource)
       const identifierShape = this.#identifiers.get(resourceKey)
+      const routes = this.#resolvingRoutes(resourceKey)
       registry[resourceKey] =
         identifier !== undefined && identifierShape !== undefined
-          ? { id: this.#builder.build(identifierShape, identifier.description) }
-          : {}
+          ? { id: this.#builder.build(identifierShape, identifier.description), ...routes }
+          : routes
     }
     return registry
+  }
+
+  /**
+   * The operations that resolve references to `resourceKey`, by route: its
+   * `get` and `list`, where it has them. The generated table and the
+   * in-process scope both take them from here, so the schemas built in
+   * process (such as `inputJsonSchema`) admit the same references as the
+   * generated value types.
+   */
+  #resolvingRoutes(resourceKey: string): { get?: OperationId; list?: OperationId } {
+    const commands = resourceCommandEntries(this.#manifest, resourceKey)
+    const routes: { get?: OperationId; list?: OperationId } = {}
+    for (const shape of ['get', 'list'] as const) {
+      const found = findCrudCommand(commands, shape)
+      const operation =
+        found === undefined
+          ? undefined
+          : this.#operationsByRoute.get(this.#routeOf(found[0], resourceKey))
+      if (operation !== undefined) routes[shape] = operationId(operation.route.route)
+    }
+    return routes
   }
 
   build(): string {
@@ -1037,16 +1073,8 @@ class ContractBuilder {
       if (identifier !== undefined && identifierShape !== undefined) {
         members.push(`id: ${this.#renderer.expression(identifierShape, identifier.description)}`)
       }
-      const commands = resourceCommandEntries(this.#manifest, resourceKey)
-      for (const shape of ['get', 'list'] as const) {
-        const found = findCrudCommand(commands, shape)
-        const operation =
-          found === undefined
-            ? undefined
-            : this.#operationsByRoute.get(this.#routeOf(found[0], resourceKey))
-        if (operation !== undefined) {
-          members.push(`${shape}: ${stringLiteral(operation.route.route)}`)
-        }
+      for (const [shape, route] of Object.entries(this.#resolvingRoutes(resourceKey))) {
+        members.push(`${shape}: ${stringLiteral(route)}`)
       }
       return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
     })

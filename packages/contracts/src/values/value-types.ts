@@ -256,10 +256,11 @@ export interface ValueTypeConstructors {
    * to `DecodeContext.bindReference`. A materialized {@link ReferenceList} is
    * `t.array(t.reference(scope, resource, 'one'))`.
    *
-   * A reference is resolved through its resource's `get` operation, so
-   * encoding rejects one whose resource has no `get` in the scope's table.
-   * Every container must also be a resource with `get`. Decoding does not
-   * check either, so a reference an operation returned is always bound.
+   * Every resolvable object needs its resolving operation in the scope's
+   * table: the reference and every container need `get`. The wire schema
+   * admits only such resources, so encoding, decoding, the runtime's check
+   * of raw requests, and the derived JSON Schema all apply the rule; a
+   * position whose resource has no `get` admits nothing.
    *
    * The SDK type is the bound reference, which is what decoding produces. An
    * input position can be typed by the data form instead
@@ -288,9 +289,9 @@ export interface ValueTypeConstructors {
    * @remarks
    * As the single-object overload, with collection semantics: identity
    * entries are single identity references to `resource`, and a range
-   * selector has `start <= end`. A collection is resolved through its
-   * resource's `list` operation, so encoding rejects one whose resource has
-   * no `list`.
+   * selector has `start <= end`. A collection needs its resource's `list`
+   * operation, and its identity entries, each a resolvable single
+   * reference, need the resource's `get`.
    *
    * @typeParam T - The member record.
    * @typeParam Id - The SDK type of the resource's identifier.

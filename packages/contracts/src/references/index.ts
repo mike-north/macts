@@ -458,10 +458,12 @@ export type CollectionReferenceVariant<T, Id = unknown, R extends string = strin
  *
  * Each entry also names the operations that resolve references to the
  * resource, where it has them: `get` resolves a single-object reference and
- * `list` a collection. Encoding a reference requires the operation its
- * cardinality resolves through, and a container must be a resource with
- * `get`, because a reference that names a resource without them could never
- * be resolved. An app contract's `resources` table is assignable to this
+ * `list` a collection. Every resolvable object needs its resolving
+ * operation (`get` for a single object, a container, and an
+ * identity-collection entry; `list` for a collection), because a reference
+ * that names a resource without it could never be resolved. Reference value
+ * types enforce this in their wire schema, so every boundary applies it. An
+ * app contract's `resources` table is assignable to this
  * type; reference value types read it through the {@link ReferenceScope}.
  */
 export type ReferenceRegistry = Readonly<

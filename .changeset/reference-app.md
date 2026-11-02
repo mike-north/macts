@@ -33,12 +33,11 @@ Generated contracts type references by direction:
 
 A reference to another resource, or of the other cardinality, no longer type-checks.
 
-Encoding a reference now requires that it can be resolved, and reports a validation issue if it cannot:
+A reference must now name objects that can be resolved, at every level:
 
-- A single reference needs a resource with a `get` operation.
+- A single reference, every container, and every identity-collection entry need a resource with a `get` operation.
 - A collection needs a resource with `list`.
-- Every container needs a resource with `get`.
 
-`ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. Decoding does not apply this check, so every reference an operation returns is still bound.
+`ReferenceRegistry` entries record `get` and `list` for this, and an app contract's `resources` table already has them. The rule is part of the reference wire schema, so it applies everywhere: to encoding, decoding, the runtime's check of raw HTTP and MCP requests, and the JSON Schema of every reference position. That JSON Schema now lists only the resources that can contain a reference, and a position whose resource lacks its operation admits no value (`{"not": {}}`). A violation is reported at the reference itself, or at the `resource` of the offending container or entry.
 
 `ResourceDescriptor.id` now documents the meaning of an identity reference to a resource keyed by name. It resolves to whichever object has that name when it is resolved. When several objects share the name, the app decides which one that is.

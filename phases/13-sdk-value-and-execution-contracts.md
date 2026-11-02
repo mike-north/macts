@@ -1269,11 +1269,26 @@ bound form, which is what decoding produces, and it is assignable to a value
 type of the data form, so generated code types inputs by the data form
 without a second constructor.
 
-**Resolvable targets.** A single reference resolves only through its
-resource's `get` operation, and a collection only through the resource's
-`list`. A container must be a resource with `get`, with no exception. The
-contract's `resources` table already records both operations, so a reference
-value type reads them from its scope, and no further field is needed.
+**Resolvable targets.** Every resolvable object has its resolving operation:
+`get` for a single object, a container, and an identity-collection entry (a
+bound entry is itself a resolvable single reference), and `list` for a
+collection. There is no exception. The contract's `resources` table already
+records both operations, so a reference value type reads them from its scope,
+and no further field is needed.
+
+The rule is part of the wire schema, so one rule serves every boundary. A
+reference position's wire schema admits only resources with the operation the
+position needs. Every container's `resource` admits only resources with
+`get`, and an identity collection admits entries only when its resource has
+`get`. A position whose resource lacks its operation admits nothing; its
+derived JSON Schema is `{"not": {}}`. Otherwise the derived JSON Schema lists
+exactly the admitted container keys, so tool and HTTP schemas advertise them.
+The runtime check of raw HTTP and MCP requests against `input.wire` (D11)
+therefore enforces the rule, and the codecs and the SDK schema apply the same
+predicate. A position's own reference fails at its path. A container or an
+entry fails at its `resource`, for example `[...path, 'container',
+'resource']` or `[...path, 'entries', 0, 'resource']`, at every depth. An
+empty identity collection has no entry to resolve, so it is admitted.
 
 **Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
@@ -1291,16 +1306,11 @@ validates the following:
   collection's end is detectable only at resolution, so it remains an
   `InvalidSelectionError`.
 - A container is a single reference.
-- The target can be resolved. A single reference names a resource with
-  `get`, a collection names a resource with `list`, and every container names
-  a resource with `get`, checked at every depth. A container naming a resource
-  without `get` is an issue at `[...path, 'container', 'resource']`. An
-  identity-collection entry is resolved as a member of its collection, so it
-  needs no `get` of its own.
+- Every level can be resolved, as described under resolvable targets.
 
 Decoding applies the same rules to the strict wire form, which has no `app`
-field. A wire reference carrying `app` is an issue. Decoding does not check
-that the target can be resolved: it binds what an operation returned.
+field. A wire reference carrying `app` is an issue, and so is one whose target
+cannot be resolved.
 
 **Native emission.** A native read emits exactly the wire form above, in
 identity form only:
@@ -1345,15 +1355,21 @@ API. Resolution is a runtime-level call executed by
 the provider. A single reference requires the resource's `get` permission, and
 a collection reference requires the resource's `list` permission.
 
-A reference that names a resource without the operation its cardinality needs,
-or a container without `get`, is handled by who built it:
+A reference whose target, container, or entry lacks its resolving operation
+is rejected wherever it appears, so no bound reference to it ever exists:
 
-- **Built by a caller.** Encoding rejects it with `ValidationError` (D11), so
-  it never reaches the runtime.
-- **Decoded from an operation's output.** This is a defect on our side, never
-  the caller's. The generator emits a reference position only when its target
-  has the operation it resolves through, so such a reference means the
-  contract is wrong. Resolving it fails with `InternalError`.
+- **Built by an SDK caller.** Encoding rejects it with `ValidationError`
+  (D11), so it never reaches the runtime.
+- **Sent in a raw HTTP or MCP request.** The runtime's check against
+  `input.wire` rejects it with `ValidationError` (D11).
+- **Returned by an operation.** This is a defect on our side, never the
+  caller's. The generator emits a reference position only when its target has
+  its resolving operation, so such a reference means the contract is wrong.
+  Decoding rejects the result against the output contract, which the client
+  reports as `UnexpectedValueError`.
+
+Resolution therefore never meets a target without its operation. If it ever
+did, that would be a defect, reported as `InternalError`.
 
 Ownership:
 

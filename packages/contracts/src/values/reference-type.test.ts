@@ -414,7 +414,6 @@ describe('resolvability', () => {
       attachment: { id: t.string() },
     })
   const label = { app: APP, resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' }
-  const attachment = { ...label, resource: 'attachment', id: 'X1' }
   const note = { app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' }
 
   it('requires get for a single-object reference, and explains why', () => {
@@ -466,7 +465,7 @@ describe('resolvability', () => {
     expect(type.sdk.safeParse(nested).success).toBe(false)
   })
 
-  it('checks identity-collection entries as members of their collection only', () => {
+  it('requires get for every identity-collection entry, even of a listable resource', () => {
     const labels = t.reference(scope, 'label', 'many')
     const collection = {
       app: APP,
@@ -475,19 +474,75 @@ describe('resolvability', () => {
       cardinality: 'many',
       entries: [label],
     }
-    expect(labels.encode(collection).ok).toBe(true)
-    expect(labels.sdk.safeParse(collection).success).toBe(true)
+    const result = labels.encode(collection)
+    expect(issuesOf(result)).toEqual([{ path: ['entries', 0, 'resource'], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      'An identity collection of "label" cannot list its entries: the app has no operation ' +
+        'that gets one "label", so an entry could never be resolved.'
+    )
+    expect(labels.sdk.safeParse(collection).success).toBe(false)
+    const wire = {
+      reference: {
+        resource: 'label',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' }],
+      },
+    }
+    expectDecodeIssues(labels, wire, [{ path: ['entries', 0, 'resource'], code: 'unsupported' }])
+    expect(labels.wire.safeParse(wire).success).toBe(false)
+    // With no entries there is nothing to resolve singly, so the empty
+    // collection is admitted alike by the codecs and the schemas.
+    const empty = { ...collection, entries: [] }
+    expect(labels.encode(empty).ok).toBe(true)
+    expect(labels.sdk.safeParse(empty).success).toBe(true)
+    expect(labels.wire.safeParse({ reference: { ...wire.reference, entries: [] } }).success).toBe(
+      true
+    )
   })
 
-  it('is not checked when decoding, so a returned reference is always bound', () => {
+  it('is checked when decoding too, with the same issues, and by the wire schema', () => {
     const { context, received } = recordingContext()
     const type = t.reference(scope, 'attachment', 'one')
     const wire = {
       reference: { resource: 'attachment', form: 'identity', cardinality: 'one', id: 'X1' },
     }
-    expect(type.decode(wire, context).ok).toBe(true)
-    expect(received).toEqual([attachment])
-    expect(type.wire.safeParse(wire).success).toBe(true)
+    const result = type.decode(wire, context)
+    expect(issuesOf(result)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      'The app has no operation that gets one "attachment", so a reference to one cannot be ' +
+        'resolved.'
+    )
+    expect(received).toEqual([])
+    expect(type.wire.safeParse(wire).success).toBe(false)
+    const note = t.reference(scope, 'note', 'one')
+    const inLabel = {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: { resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
+      },
+    }
+    expectDecodeIssues(note, inLabel, [{ path: ['container', 'resource'], code: 'unsupported' }])
+    expect(note.wire.safeParse(inLabel).success).toBe(false)
+  })
+
+  it('advertises only the resolvable keys in the derived JSON Schema', () => {
+    const note = t.reference(scope, 'note', 'one')
+    const schema = JSON.stringify(z.toJSONSchema(note.wire, { target: 'draft-7' }))
+    // Only notes can be got, so only "note" can name a container.
+    expect(schema).toContain('"enum":["note"]')
+    expect(schema).not.toContain('"label"')
+    expect(schema).not.toContain('"attachment"')
+  })
+
+  it('derives a JSON Schema that admits nothing at a position no operation resolves', () => {
+    const attachment = t.reference(scope, 'attachment', 'one')
+    const schema = z.toJSONSchema(attachment.wire, { target: 'draft-7' }) as Record<string, unknown>
+    expect(schema['required']).toEqual(['reference'])
+    expect((schema['properties'] as Record<string, unknown>)['reference']).toEqual({ not: {} })
   })
 })
 

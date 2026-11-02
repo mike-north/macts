@@ -44,13 +44,14 @@
  *   `start <= end` (`start === end` is a valid empty range);
  * - a container is a single-object reference.
  *
- * Encoding alone also requires that every level can be resolved: the
- * reference names a resource with the operation its cardinality resolves
- * through (`get` for one object, `list` for a collection), and every container
- * names a resource with `get`. A reference a caller builds that could never
- * be resolved is rejected before any call. Decoding binds what an operation
- * returned without that check; a returned reference that cannot be resolved
- * is a defect of the contract, reported when it is resolved.
+ * Every resolvable object has its resolving operation: a single-object
+ * reference, every container, and every identity-collection entry name a
+ * resource with `get`, and a collection names a resource with `list`. Both
+ * directions check it, and the wire and SDK schemas admit only the resources
+ * that satisfy it, so the JSON Schema of a position lists exactly the keys it
+ * accepts. A caller-built reference that could never be resolved is rejected
+ * before any call, a raw request carrying one is rejected by the wire schema,
+ * and a returned one can only come from a defect of the contract.
  *
  * Issue paths follow the reference's own data layout (`app`, `id`,
  * `selector`, `entries/<i>`, `container`), which is the same in SDK and wire
@@ -190,16 +191,6 @@ interface Direction<Id, Pos, Tag> {
   id(type: ValueType<unknown>, value: unknown, path: IssuePath, issues: Issues): Id | Invalid
   /** Convert a selector position. */
   position(value: unknown, path: IssuePath, issues: Issues): Position<Pos> | Invalid
-  /**
-   * Whether every level must name a resource it can be resolved through:
-   * the reference itself a resource with the operation its cardinality
-   * resolves through (`get` or `list`), and each container a resource with
-   * `get`. Encoding checks it, because a reference a caller builds that
-   * could never resolve is the caller's mistake. Decoding does not: a
-   * reference an operation returned is bound as it is, and one that cannot
-   * resolve is a defect of the contract, reported when it is resolved.
-   */
-  readonly requiresResolution: boolean
   /** Past participle naming the direction in messages, for example "encoded". */
   readonly verb: string
 }
@@ -250,7 +241,6 @@ const ENCODING: Direction<WireValue, WireValue, WireTag> = {
     if (wire === INVALID || typeof value !== 'number') return INVALID
     return { value, converted: wire }
   },
-  requiresResolution: true,
   verb: 'encoded',
 }
 
@@ -267,7 +257,6 @@ function decoding(context: DecodeContext): Direction<unknown, Integer, AppTag> {
       const integer = POSITION_CODEC.decode(value, path, context, issues)
       return integer === INVALID ? INVALID : { value: integer, converted: integer }
     },
-    requiresResolution: false,
     verb: 'decoded',
   }
 }
@@ -444,9 +433,10 @@ function readHeader<Id, Pos, Tag>(
     issues.push(issue(path, 'invalid-type', cardinalityMessage(want, cardinality)))
     return INVALID
   }
-  if (walk.direction.requiresResolution && !resolvable(entry, want)) {
-    // A container is admitted by its resource, so the issue names that field.
-    const at = want.role === 'container' ? [...path, 'resource'] : path
+  if (!resolvable(entry, want.role, want.cardinality)) {
+    // A container or an entry is admitted by its resource, so the issue names
+    // that field; a position's own reference fails as a whole.
+    const at = want.role === 'reference' ? path : [...path, 'resource']
     issues.push(issue(at, 'unsupported', unresolvableMessage(resource, want)))
     return INVALID
   }
@@ -493,20 +483,38 @@ function readHeader<Id, Pos, Tag>(
 }
 
 /**
- * Whether a level naming a resource with table entry `entry` can be resolved:
- * a single-object reference or a container through the resource's `get`, a
- * collection through its `list`. An identity-collection entry is resolved as
- * a member of its collection, which has already been checked.
+ * The operation that resolves an object at `role` with `cardinality`: every
+ * resolvable object has one. A single-object reference, a container, and an
+ * identity-collection entry (itself a resolvable single reference) resolve
+ * through the resource's `get`; a collection resolves through its `list`.
+ *
+ * This is the one statement of the rule. The walker checks it in both
+ * directions, and the wire and SDK schemas admit only the resources it
+ * allows, so the codecs and the schemas (and the JSON Schemas derived from
+ * them) cannot disagree about it.
  */
-function resolvable(entry: ReferenceRegistry[string], want: Want): boolean {
-  switch (want.role) {
-    case 'entry':
-      return true
-    case 'container':
-      return entry.get !== undefined
-    case 'reference':
-      return (want.cardinality === 'one' ? entry.get : entry.list) !== undefined
-  }
+function resolvingOperation(role: Want['role'], cardinality: ReferenceCardinality): 'get' | 'list' {
+  return role === 'reference' && cardinality === 'many' ? 'list' : 'get'
+}
+
+/** Whether a resource with table entry `entry` can be resolved at `role`; see {@link resolvingOperation}. */
+function resolvable(
+  entry: ReferenceRegistry[string] | undefined,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): boolean {
+  return entry?.[resolvingOperation(role, cardinality)] !== undefined
+}
+
+/** The resources of `registry` that can be resolved at `role`, as a table of the same shape. */
+function resolvableResources(
+  registry: ReferenceRegistry,
+  role: Want['role'],
+  cardinality: ReferenceCardinality
+): ReferenceRegistry {
+  return Object.fromEntries(
+    Object.entries(registry).filter(([, entry]) => resolvable(entry, role, cardinality))
+  )
 }
 
 function unresolvableMessage(resource: string, want: Want): string {
@@ -514,6 +522,12 @@ function unresolvableMessage(resource: string, want: Want): string {
     return (
       `${quote(resource)} cannot be a container: the app has no operation that gets one ` +
       `${quote(resource)}, so the reference could never be resolved within it.`
+    )
+  }
+  if (want.role === 'entry') {
+    return (
+      `An identity collection of ${quote(resource)} cannot list its entries: the app has no ` +
+      `operation that gets one ${quote(resource)}, so an entry could never be resolved.`
     )
   }
   return want.cardinality === 'one'
@@ -870,25 +884,33 @@ function wireSelector(
 }
 
 /**
- * Wire schema of a container: a single-object reference to any resource in
- * the table. Identity branches exist only for resources with an identifier;
- * the selector branch admits every resource, so the union is never empty
- * while the table has a resource.
+ * Wire schema of a container: a single-object reference to a resource in the
+ * table that can be resolved as a container (one with `get`; see
+ * {@link resolvingOperation}). Identity branches exist only for those that
+ * also have an identifier; the selector branch admits every one of them, so
+ * the union is empty only when no resource can contain.
  */
 function wireContainer(registry: ReferenceRegistry): ZodType<ReferenceWire> {
   const schema: ZodType<ReferenceWire> = z.lazy(() => {
-    const [first, ...rest] = Object.keys(registry)
-    if (first === undefined)
-      return z.never({ error: 'The app has no resources to contain a reference.' })
+    const containers = resolvableResources(registry, 'container', 'one')
+    const [first, ...rest] = Object.keys(containers)
+    if (first === undefined) {
+      return z.never({ error: 'The app has no resource that can contain a reference.' })
+    }
     return z.union([
-      ...identified(registry).map(([key, id]) => wireIdentity(key, id.wire, schema)),
+      ...identified(containers).map(([key, id]) => wireIdentity(key, id.wire, schema)),
       wireSelector(z.enum([first, ...rest]), schema),
     ])
   })
   return schema
 }
 
-/** Wire schema of the payload of a reference to `resource` with `cardinality`. */
+/**
+ * Wire schema of the payload of a reference to `resource` with `cardinality`.
+ * It admits only what can be resolved (see {@link resolvingOperation}): a
+ * position whose resource lacks its resolving operation admits nothing, and
+ * an identity collection admits entries only when its resource can be got.
+ */
 function wirePayload(
   registry: ReferenceRegistry,
   resource: string,
@@ -897,14 +919,21 @@ function wirePayload(
   if (!Object.hasOwn(registry, resource)) {
     return z.never({ error: `The app has no resource ${quote(resource)}.` })
   }
+  const entry = registry[resource]
+  if (!resolvable(entry, 'reference', cardinality)) {
+    return z.never({
+      error: unresolvableMessage(resource, unresolvableWant(resource, cardinality)),
+    })
+  }
   const container = wireContainer(registry)
   // A resource without an identifier has no identity forms; the selector
   // branch alone remains, so the union is never empty.
-  const id = registry[resource]?.id
-  const identity = id === undefined ? undefined : wireIdentity(resource, id.wire, container)
+  const id = entry?.id
   if (cardinality === 'one') {
     const selector = wireSelector(z.literal(resource), container)
-    return identity === undefined ? selector : z.union([identity, selector])
+    return id === undefined
+      ? selector
+      : z.union([wireIdentity(resource, id.wire, container), selector])
   }
   const selector = z.strictObject({
     resource: z.literal(resource),
@@ -913,16 +942,31 @@ function wirePayload(
     selector: WIRE_COLLECTION_SELECTOR_SCHEMA,
     container: container.exactOptional(),
   })
-  if (identity === undefined) return selector
+  if (id === undefined) return selector
+  // Entries are single references, so they need `get`; without it only an
+  // empty identity collection is admitted, as the walker admits it.
+  const member = resolvable(entry, 'entry', 'one')
+    ? wireIdentity(resource, id.wire, container)
+    : z.never({ error: unresolvableMessage(resource, entryWant(resource)) })
   return z.union([
     z.strictObject({
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
-      entries: z.array(identity),
+      entries: z.array(member),
     }),
     selector,
   ])
+}
+
+/** What a position's own reference to `resource` with `cardinality` must be, for messages. */
+function unresolvableWant(resource: string, cardinality: ReferenceCardinality): Want {
+  return { resource, cardinality, form: undefined, role: 'reference' }
+}
+
+/** What an identity-collection entry of `resource` must be, for messages. */
+function entryWant(resource: string): Want {
+  return { resource, cardinality: 'one', form: 'identity', role: 'entry' }
 }
 
 /*
@@ -976,16 +1020,14 @@ function sdkSelector(app: string, resource: ZodType<string>, container: ZodType)
 }
 
 /**
- * SDK schema of a container: a single-object reference to a resource with
- * `get`, as encoding requires. Identity branches exist only for those
- * resources that also have an identifier.
+ * SDK schema of a container: a single-object reference to a resource that
+ * can be resolved as a container (see {@link resolvingOperation}). Identity
+ * branches exist only for those resources that also have an identifier.
  */
 function sdkContainer(scope: ReferenceScope): ZodType {
   const { app, resources } = scope
   const schema: ZodType = z.lazy(() => {
-    const containers = Object.fromEntries(
-      Object.entries(resources).filter(([, entry]) => entry.get !== undefined)
-    )
+    const containers = resolvableResources(resources, 'container', 'one')
     const [first, ...rest] = Object.keys(containers)
     if (first === undefined) return z.never()
     return z.union([
@@ -1003,10 +1045,10 @@ function sdkReference(
 ): ZodType {
   const { app, resources } = scope
   if (!Object.hasOwn(resources, resource)) return z.never()
-  const operations = resources[resource]
-  if ((cardinality === 'one' ? operations?.get : operations?.list) === undefined) return z.never()
+  const entry = resources[resource]
+  if (!resolvable(entry, 'reference', cardinality)) return z.never()
   const container = sdkContainer(scope)
-  const id = resources[resource]?.id
+  const id = entry?.id
   const identity = id === undefined ? undefined : sdkIdentity(app, resource, id.sdk, container)
   if (cardinality === 'one') {
     const selector = sdkSelector(app, z.literal(resource), container)
@@ -1027,7 +1069,7 @@ function sdkReference(
       resource: z.literal(resource),
       form: z.literal('identity'),
       cardinality: z.literal('many'),
-      entries: z.array(identity),
+      entries: z.array(resolvable(entry, 'entry', 'one') ? identity : z.never()),
     }),
     selector,
   ])

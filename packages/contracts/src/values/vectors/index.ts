@@ -224,7 +224,7 @@ export const VECTOR_DECODE_CONTEXT: DecodeContext = Object.freeze({
  * Each of those resources has the operations its vectors resolve through:
  * `get` for a single object or a container, `list` for a collection.
  * Attachments have neither, and labels can only be listed, so references to
- * them that could never be resolved are rejected on encode.
+ * them that could never be resolved are rejected in both directions.
  */
 const VECTOR_SCOPE: ReferenceScope = Object.freeze({
   app: VECTOR_APP,
@@ -656,55 +656,6 @@ export const VALUE_VECTORS: readonly ValueVector[] = Object.freeze([
         selector: { by: 'every' },
       },
     },
-  },
-  {
-    // A returned reference is bound as it is; one that cannot be resolved is
-    // a defect of the contract, reported when it is resolved, so only
-    // encoding rejects it.
-    name: 'a returned reference to a resource that cannot be got',
-    see: 'phases/13 §D7',
-    type: attachmentRef,
-    sdk: {
-      app: VECTOR_APP,
-      resource: 'attachment',
-      form: 'identity',
-      cardinality: 'one',
-      id: 'X1',
-      resolve: VECTOR_RESOLVE,
-    },
-    wire: { reference: { resource: 'attachment', form: 'identity', cardinality: 'one', id: 'X1' } },
-    direction: 'decode',
-  },
-  {
-    name: 'a returned reference in a container that cannot be got',
-    see: 'phases/13 §D7',
-    type: noteRef,
-    sdk: {
-      app: VECTOR_APP,
-      resource: 'note',
-      form: 'identity',
-      cardinality: 'one',
-      id: 'N1',
-      container: {
-        app: VECTOR_APP,
-        resource: 'label',
-        form: 'identity',
-        cardinality: 'one',
-        id: 'L1',
-        resolve: VECTOR_RESOLVE,
-      },
-      resolve: VECTOR_RESOLVE,
-    },
-    wire: {
-      reference: {
-        resource: 'note',
-        form: 'identity',
-        cardinality: 'one',
-        id: 'N1',
-        container: { resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
-      },
-    },
-    direction: 'decode',
   },
   {
     name: 'an identity reference with a text id',
@@ -1677,6 +1628,85 @@ export const REJECTION_VECTORS: readonly RejectionVector[] = Object.freeze([
     direction: 'encode',
     expectedIssueCodes: ['unsupported'],
     expectedIssuePaths: [['container', 'resource']],
+  },
+  {
+    name: 'an identity collection entry that cannot be got',
+    see: 'phases/13 §D7',
+    type: labelRefs,
+    input: {
+      app: VECTOR_APP,
+      resource: 'label',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [
+        { app: VECTOR_APP, resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
+      ],
+    },
+    direction: 'encode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['entries', 0, 'resource']],
+  },
+  {
+    // Such an output can only come from a defect of the contract, so the wire
+    // schema and decoding reject it as they reject a raw request carrying it.
+    name: 'a returned reference to a resource that cannot be got',
+    see: 'phases/13 §D7',
+    type: attachmentRef,
+    input: {
+      reference: { resource: 'attachment', form: 'identity', cardinality: 'one', id: 'X1' },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a returned collection of a resource that cannot be listed',
+    see: 'phases/13 §D7',
+    type: attachmentRefs,
+    input: {
+      reference: {
+        resource: 'attachment',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [[]],
+  },
+  {
+    name: 'a returned reference in a container that cannot be got',
+    see: 'phases/13 §D7',
+    type: noteRef,
+    input: {
+      reference: {
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'N1',
+        container: { resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' },
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['container', 'resource']],
+  },
+  {
+    name: 'a returned identity collection entry that cannot be got',
+    see: 'phases/13 §D7',
+    type: labelRefs,
+    input: {
+      reference: {
+        resource: 'label',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' }],
+      },
+    },
+    direction: 'decode',
+    expectedIssueCodes: ['unsupported'],
+    expectedIssuePaths: [['entries', 0, 'resource']],
   },
   {
     name: 'a nested container that cannot be got',
