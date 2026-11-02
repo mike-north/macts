@@ -119,12 +119,29 @@ describe('findCrudCommand', () => {
 })
 
 describe('resolveIdParams', () => {
-  it('takes the first required parameter as the parent scope and the last as the child', () => {
+  it('takes the recorded parent parameter as the parent scope and the next required one as the child', () => {
     const cmd = command({
       name: 'get',
       parameters: [param('calendarId', true), param('verbose', false), param('id', true)],
+      parent: { resource: 'Calendar', parameter: 'calendarId' },
     })
     expect(resolveIdParams(cmd)).toEqual({ parentParam: 'calendarId', childParam: 'id' })
+  })
+
+  it('takes the recorded parent wherever it is declared among the parameters', () => {
+    const cmd = command({
+      name: 'get',
+      parameters: [param('id', true), param('calendarId', true)],
+      parent: { resource: 'Calendar', parameter: 'calendarId' },
+    })
+    expect(resolveIdParams(cmd)).toEqual({ parentParam: 'calendarId', childParam: 'id' })
+  })
+
+  it('infers no parent scope from two required parameters when none is recorded', () => {
+    // Before command.parent, the first of two required parameters was taken as
+    // the parent scope (#165); without a recorded parent there is none.
+    const cmd = command({ name: 'get', parameters: [param('calendarId', true), param('id', true)] })
+    expect(resolveIdParams(cmd)).toEqual({ parentParam: undefined, childParam: 'calendarId' })
   })
 
   it('has no parent scope with one required parameter', () => {
@@ -139,6 +156,15 @@ describe('resolveIdParams', () => {
       parentParam: undefined,
       childParam: 'id',
     })
+  })
+
+  it('falls back to id for the child when the only required parameter is the parent', () => {
+    const cmd = command({
+      name: 'get',
+      parameters: [param('calendarId', true)],
+      parent: { resource: 'Calendar', parameter: 'calendarId' },
+    })
+    expect(resolveIdParams(cmd)).toEqual({ parentParam: 'calendarId', childParam: 'id' })
   })
 })
 

@@ -251,7 +251,7 @@ curl http://localhost:3000/health
 ## Related Packages
 
 - **[@macts/runtime](../runtime/)** - The invocation pipeline every MCP call runs through
-- **[@macts/calendar-server](../calendar-server/)** - Calendar's server package: the contract a macts host serves
+- **`@macts/<app>-server`** - An app's server package, installed with `macts mcp install <app>`: it exports the app's contract, which the MCP server serves
 - **[@macts/core](../core/)** - Core macOS automation framework
 - **[@macts/cli](../cli/)** - Command-line interface for macts
 

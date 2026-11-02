@@ -93,6 +93,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -526,6 +527,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'Workflow',
+        parameter: 'workflowName',
+      },
       code: 'core',
       routeName: 'list',
       permission: 'automator:actions:list',
@@ -604,6 +609,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'Workflow',
+        parameter: 'workflowName',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -636,6 +645,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'AutomatorAction',
+        parameter: 'actionId',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -679,6 +692,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'AutomatorAction',
+        parameter: 'actionId',
+      },
       code: 'core',
       routeName: 'list',
     },

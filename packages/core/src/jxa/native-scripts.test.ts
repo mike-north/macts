@@ -8,7 +8,9 @@
  * preserves:
  *
  * - Calendar events exist only under a calendar, so get/update/delete/list of
- *   an event address it through the parent calendar.
+ *   an event address it through the parent calendar, as the manifest records
+ *   it (`command.parent`); a command with no recorded parent addresses its
+ *   resource at the application, whatever its parameters are named.
  * - A Calendar calendar's declared identifier fails at run time, so calendars
  *   are matched by `name` (identifier targeting `byProperty`).
  * - Lists read one `properties()` record per item, with a guarded per-field
@@ -28,6 +30,7 @@
  *
  * @see ../../../../manifests/calendar/app.yaml
  * @see ../../../../manifests/notes/app.yaml
+ * @see https://github.com/mike-north/macts/issues/165
  * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D4, worker compatibility)
  * @see https://tc39.es/ecma262/2011/#sec-15 (ES5 standard built-in objects)
  * @see https://developer.apple.com/library/archive/releasenotes/InterapplicationCommunication/RN-JavaScriptForAutomation/Articles/OSX10-10.html
@@ -660,35 +663,359 @@ describe('collection accessors', () => {
       properties: {},
     }
 
-    it('addresses a resolved parent and its child by their camel-case accessors', () => {
+    it('addresses a recorded parent and its child by their camel-case accessors', () => {
       const manifest = manifestWith(
         { BookmarkFolder: folder, BookmarkItem: bookmark },
-        { get: resourceCommand('get', 'BookmarkItem', [param('bookmarkFolderId'), param('id')]) }
+        {
+          get: {
+            ...resourceCommand('get', 'BookmarkItem', [param('folderId'), param('id')]),
+            parent: { resource: 'BookmarkFolder', parameter: 'folderId' },
+          },
+        }
       )
       const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
+      expect(text).toContain('var parentId = args["folderId"];')
       expect(text).toContain('app["bookmarkFolders"].byId(parentId)')
       expect(text).toContain('parent["bookmarkItems"].byId(itemId)')
     })
+  })
+})
 
-    it('derives an unmatched parent accessor from the parameter, keeping its case', () => {
-      const manifest = manifestWith(
-        { BookmarkItem: bookmark },
-        { get: resourceCommand('get', 'BookmarkItem', [param('mediaAlbumId'), param('id')]) }
-      )
-      const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
-      expect(text).toContain('app["mediaAlbums"].byId(parentId)')
-    })
+/**
+ * Parents are recorded, never guessed (issue #165). Each expected expression is
+ * written by hand from the manifest's `parent` and the parent resource: its
+ * collection accessor (the plural's lower camel case, as no shipped parent
+ * records a native spelling), and its identifier targeting (a `byId` lookup,
+ * except Calendar's calendars, matched by `name`). The parent's class in the
+ * app's dictionary has the child as an element:
+ *
+ * - Microsoft Edge (a Chromium dictionary, as Google Chrome's): "bookmark
+ *   folder" has "bookmark folder" and "bookmark item" elements; "window" has
+ *   "tab" elements.
+ * - Xcode: "workspace document" has "project", "scheme" and "run
+ *   destination" elements; the application has none of the three.
+ * - Automator, from its scripting suite (Automator.scriptSuite, as the app
+ *   ships no static scripting definition): "workflow" has "Automator
+ *   action" and "variable" elements; "Automator action" has "setting" and
+ *   "required resource" elements, which the application does not have.
+ *
+ * Xcode's workspace documents and Automator's workflows have no `id`
+ * property, so each is targeted by name (`whose`), as their manifests declare.
+ *
+ * Before parents were recorded, the parent was guessed from the parameter's
+ * stem, and the eight commands marked `regression` addressed a collection
+ * their app does not have (`folders`, `workspaceNames`, `workflowNames`,
+ * `actions`).
+ *
+ * @see https://github.com/mike-north/macts/issues/165
+ */
+describe('recorded command parents (issue #165)', () => {
+  const manifests = new Map<string, AppManifest>()
+  beforeAll(async () => {
+    for (const app of [
+      'automator',
+      'calendar',
+      'microsoft-edge',
+      'omnigraffle',
+      'reminders',
+      'xcode',
+    ]) {
+      manifests.set(app, await loadManifest(manifestPath(app)))
+    }
+  })
+  const bodyOf = (app: string, command: string, resource: string): string => {
+    const manifest = manifests.get(app)
+    if (manifest === undefined) throw new Error(`no manifest loaded for ${app}`)
+    return buildNativeBody(manifest, { command, resource })
+  }
 
-    it('spells a parent derived from an acronym parameter by the same rule as a resource', () => {
-      const manifest = manifestWith(
-        { BookmarkItem: bookmark },
-        { get: resourceCommand('get', 'BookmarkItem', [param('URLId'), param('id')]) }
-      )
-      const text = buildNativeBody(manifest, { command: 'get', resource: 'BookmarkItem' })
-      // "URL" is one word: the plural `URLs` is spelled `urls`, never `URLs`.
-      expect(text).toContain('app["urls"].byId(parentId)')
-      expect(text).not.toContain('app["URLs"]')
-    })
+  const calendarParent = 'app["calendars"].whose({ "name": parentId })[0]'
+  const PARENTS = [
+    // The eight commands whose guessed parent did not exist in the app.
+    [
+      'regression',
+      'microsoft-edge',
+      'listBookmarkItems',
+      'BookmarkItem',
+      'folderId',
+      'app["bookmarkFolders"].byId(parentId)',
+      'var items = parent["bookmarkItems"]();',
+    ],
+    [
+      'regression',
+      'xcode',
+      'listProjects',
+      'Project',
+      'workspaceName',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
+      'var items = parent["projects"]();',
+    ],
+    [
+      'regression',
+      'xcode',
+      'listSchemes',
+      'Scheme',
+      'workspaceName',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
+      'var items = parent["schemes"]();',
+    ],
+    [
+      'regression',
+      'xcode',
+      'listRunDestinations',
+      'RunDestination',
+      'workspaceName',
+      'app["workspaceDocuments"].whose({ "name": parentId })[0]',
+      'var items = parent["runDestinations"]();',
+    ],
+    [
+      'regression',
+      'automator',
+      'listActions',
+      'AutomatorAction',
+      'workflowName',
+      'app["workflows"].whose({ "name": parentId })[0]',
+      'var items = parent["automatorActions"]();',
+    ],
+    [
+      'regression',
+      'automator',
+      'listVariables',
+      'Variable',
+      'workflowName',
+      'app["workflows"].whose({ "name": parentId })[0]',
+      'var items = parent["variables"]();',
+    ],
+    [
+      'regression',
+      'automator',
+      'listSettings',
+      'Setting',
+      'actionId',
+      'app["automatorActions"].byId(parentId)',
+      'var items = parent["settings"]();',
+    ],
+    [
+      'regression',
+      'automator',
+      'listRequiredResources',
+      'RequiredResource',
+      'actionId',
+      'app["automatorActions"].byId(parentId)',
+      'var items = parent["requiredResources"]();',
+    ],
+    // The fifteen commands whose parent was already right, and stays the same.
+    [
+      'kept',
+      'calendar',
+      'listEvents',
+      'Event',
+      'calendarId',
+      calendarParent,
+      'var items = parent["events"]();',
+    ],
+    [
+      'kept',
+      'calendar',
+      'getEvent',
+      'Event',
+      'calendarId',
+      calendarParent,
+      'var item = parent["events"].byId(itemId);',
+    ],
+    [
+      'kept',
+      'calendar',
+      'createEvent',
+      'Event',
+      'calendarId',
+      calendarParent,
+      'parent["events"].push(item);',
+    ],
+    [
+      'kept',
+      'calendar',
+      'updateEvent',
+      'Event',
+      'calendarId',
+      calendarParent,
+      'var item = parent["events"].byId(itemId);',
+    ],
+    [
+      'kept',
+      'calendar',
+      'deleteEvent',
+      'Event',
+      'calendarId',
+      calendarParent,
+      'var item = parent["events"].byId(itemId);',
+    ],
+    [
+      'kept',
+      'microsoft-edge',
+      'listTabs',
+      'Tab',
+      'windowId',
+      'app["windows"].byId(parentId)',
+      'var items = parent["tabs"]();',
+    ],
+    [
+      'kept',
+      'microsoft-edge',
+      'createTab',
+      'Tab',
+      'windowId',
+      'app["windows"].byId(parentId)',
+      'parent["tabs"].push(item);',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'listGraphics',
+      'Graphic',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'var items = parent["graphics"]();',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'listShapes',
+      'Shape',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'var items = parent["shapes"]();',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'createShape',
+      'Shape',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'parent["shapes"].push(item);',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'listLines',
+      'Line',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'var items = parent["lines"]();',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'listLayers',
+      'Layer',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'var items = parent["layers"]();',
+    ],
+    [
+      'kept',
+      'omnigraffle',
+      'createLayer',
+      'Layer',
+      'canvasId',
+      'app["canvases"].byId(parentId)',
+      'parent["layers"].push(item);',
+    ],
+    [
+      'kept',
+      'reminders',
+      'listReminders',
+      'Reminder',
+      'listId',
+      'app["lists"].byId(parentId)',
+      'var items = parent["reminders"]();',
+    ],
+    [
+      'kept',
+      'reminders',
+      'createReminder',
+      'Reminder',
+      'listId',
+      'app["lists"].byId(parentId)',
+      'parent["reminders"].push(item);',
+    ],
+  ] as const
+
+  it.each(PARENTS)(
+    '%s: %s %s reaches its target through the recorded parent',
+    (_kind, app, command, resource, parameter, parentTarget, childExpression) => {
+      const text = bodyOf(app, command, resource)
+      expect(text).toContain(`var parentId = args["${parameter}"];`)
+      expect(text).toContain(`var parent = ${parentTarget};`)
+      expect(text).toContain(childExpression)
+    }
+  )
+
+  it('addresses none of the collections the guessed parents named', () => {
+    const guessed = [
+      'app["folders"]',
+      'app["workspaceNames"]',
+      'app["workflowNames"]',
+      'app["actions"]',
+    ]
+    for (const [, app, command, resource] of PARENTS) {
+      const text = bodyOf(app, command, resource)
+      for (const accessor of guessed) expect(text, `${app} ${command}`).not.toContain(accessor)
+    }
+  })
+
+  it('requires the recorded parameter, so a call without it is rejected before anything runs', () => {
+    const manifest = manifests.get('microsoft-edge')
+    if (manifest === undefined) throw new Error('no manifest loaded for microsoft-edge')
+    expect(
+      planNativeInvocation(manifest, { command: 'listBookmarkItems', resource: 'BookmarkItem' })
+        .requiredArguments
+    ).toEqual(['folderId'])
+  })
+})
+
+describe('commands without a recorded parent', () => {
+  const folder: Resource = { name: 'Folder', plural: 'Folders', description: 'f', properties: {} }
+  const item: Resource = { name: 'Item', plural: 'Items', description: 'i', properties: {} }
+
+  it('address their resource at the application, however their parameters are named', () => {
+    // A parameter named for another resource, first of two required ones, is
+    // no parent unless the manifest records it as one.
+    const manifest = manifestWith(
+      { Folder: folder, Item: item },
+      {
+        get: resourceCommand('get', 'Item', [param('folderId'), param('id')]),
+        list: resourceCommand('list', 'Item', [param('folderId')]),
+        create: resourceCommand('create', 'Item', [param('folderId')]),
+      }
+    )
+    const get = buildNativeBody(manifest, { command: 'get', resource: 'Item' })
+    expect(get).toContain('var item = app["items"].byId(itemId);')
+    expect(get).not.toContain('parent')
+    const list = buildNativeBody(manifest, { command: 'list', resource: 'Item' })
+    expect(list).toContain('var items = app["items"]();')
+    expect(list).not.toContain('parent')
+    const create = buildNativeBody(manifest, { command: 'create', resource: 'Item' })
+    expect(create).toContain('item.make();')
+    expect(create).not.toContain('parent')
+  })
+
+  it('throw InternalError when the recorded parent names an undeclared resource', () => {
+    // The manifest schema rejects such a parent; a body never guesses one.
+    const manifest = manifestWith(
+      { Item: item },
+      {
+        list: {
+          ...resourceCommand('list', 'Item', [param('folderId')]),
+          parent: { resource: 'Folder', parameter: 'folderId' },
+        },
+      }
+    )
+    const build = (): string => buildNativeBody(manifest, { command: 'list', resource: 'Item' })
+    expect(build).toThrow(InternalError)
+    // The message names the parent resource, so a bad manifest is diagnosable.
+    expect(build).toThrow('names parent resource "Folder"')
   })
 })
 
@@ -791,12 +1118,14 @@ commands:
     description: list streams
     scope: resource
     resourceType: Stream
+    parent: { resource: AirPlayDevice, parameter: airPlayDeviceId }
     parameters: [{ name: airPlayDeviceId, type: string, description: device, required: true }]
   createStream:
     name: create
     description: create a stream
     scope: resource
     resourceType: Stream
+    parent: { resource: AirPlayDevice, parameter: airPlayDeviceId }
     parameters:
       - { name: airPlayDeviceId, type: string, description: device, required: true }
       - { name: eQ, type: string, description: eq, required: false }
@@ -805,6 +1134,7 @@ commands:
     description: update a stream
     scope: resource
     resourceType: Stream
+    parent: { resource: AirPlayDevice, parameter: airPlayDeviceId }
     parameters:
       - { name: airPlayDeviceId, type: string, description: device, required: true }
       - { name: id, type: string, description: id, required: true }
@@ -938,7 +1268,7 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
   })
 
   it('a parent matched on its identifier is matched by the app name, through its collection', () => {
-    // listStreams' parent parameter `airPlayDeviceId` names AirPlayDevice.
+    // listStreams records AirPlayDevice as its parent, identified by `airPlayDeviceId`.
     const text = body('listStreams', 'Stream')
     expect(text).toContain(
       'var parent = app["airplayDevices"].whose({ "macAddress": parentId })[0];'

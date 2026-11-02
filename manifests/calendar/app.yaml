@@ -731,6 +731,9 @@ commands:
     description: List all events in a calendar
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: core
     parameters:
       - name: calendarId
@@ -744,6 +747,9 @@ commands:
     description: Get an event by ID
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: getd
     parameters:
       - name: calendarId
@@ -761,6 +767,9 @@ commands:
     description: Create a new event
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: crel
     parameters:
       - name: calendarId
@@ -820,6 +829,9 @@ commands:
     description: Update an existing event
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: '????'
     parameters:
       - name: calendarId
@@ -883,6 +895,9 @@ commands:
     description: Delete an event by ID
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: dele
     parameters:
       - name: calendarId

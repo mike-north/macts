@@ -6,7 +6,11 @@ import { HierarchySchema } from './hierarchy.js'
 import { RelationshipSchema } from './relationship.js'
 import { AppMetadataSchema, SuiteSchema, ExtractionMetadataSchema } from './metadata.js'
 import { findDuplicateRoutes } from '../route.js'
-import { findUnsupportedTypeReferences } from '../unsupported.js'
+import {
+  findUnsupportedTypeReferences,
+  isCommandUnsupported,
+  isResourceUnsupported,
+} from '../unsupported.js'
 
 /**
  * Coarse category to fine-grained permissions mapping.
@@ -29,6 +33,58 @@ export const PermissionsSectionSchema = z.record(
   CoarseMappingSchema
 )
 export type PermissionsSection = z.infer<typeof PermissionsSectionSchema>
+
+/** A manifest issue: what is wrong, and where in the manifest. */
+interface ManifestIssue {
+  readonly message: string
+  readonly path: (string | number)[]
+}
+
+/**
+ * The issues of every command's recorded parent (`command.parent`): a parent
+ * that names a resource the manifest does not declare, or names a parameter
+ * that is not one of the command's required parameters, leaves a body nothing
+ * to address the parent by. On a usable command, a parent resource marked
+ * unsupported is an issue too: no generated surface declares it, and the app
+ * has no such collection to reach the target through.
+ */
+function findCommandParentIssues(
+  manifest: Pick<AppManifest, 'resources' | 'commands'>
+): ManifestIssue[] {
+  const issues: ManifestIssue[] = []
+  for (const [commandKey, command] of Object.entries(manifest.commands)) {
+    const parent = command.parent
+    if (parent === undefined) continue
+    const site = `commands.${commandKey}.parent`
+    const resourcePath = ['commands', commandKey, 'parent', 'resource']
+    const resource = Object.hasOwn(manifest.resources, parent.resource)
+      ? manifest.resources[parent.resource]
+      : undefined
+    if (resource === undefined) {
+      issues.push({
+        message: `${site}.resource: "${parent.resource}" is not a resource the manifest declares; name the key of the resource whose items hold the command's target.`,
+        path: resourcePath,
+      })
+    } else if (isResourceUnsupported(resource) && !isCommandUnsupported(command)) {
+      issues.push({
+        message: `${site}.resource: "${parent.resource}" is marked unsupported, so the command's target cannot be reached through it; name another parent, or mark the command unsupported too.`,
+        path: resourcePath,
+      })
+    }
+    const parameter = command.parameters.find((p) => p.name === parent.parameter)
+    if (parameter?.required !== true) {
+      const problem =
+        parameter === undefined
+          ? 'is not a parameter the command declares'
+          : 'is an optional parameter of the command'
+      issues.push({
+        message: `${site}.parameter: "${parent.parameter}" ${problem}; the parent's identifier must be one of the command's required parameters.`,
+        path: ['commands', commandKey, 'parent', 'parameter'],
+      })
+    }
+  }
+  return issues
+}
 
 /**
  * Top-level manifest schema for a macOS application.
@@ -84,6 +140,9 @@ export const AppManifestSchema = z
         message: `${site}: its type names the resource "${resourceKey}", which is marked unsupported, so no generated surface declares it; change the type, or mark ${declaration} unsupported too.`,
         path: [...path],
       })
+    }
+    for (const issue of findCommandParentIssues(data)) {
+      ctx.addIssue({ code: 'custom', ...issue })
     }
   })
 export type AppManifest = z.infer<typeof AppManifestSchema>
