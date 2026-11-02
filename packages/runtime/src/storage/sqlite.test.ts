@@ -1,6 +1,7 @@
 /**
- * Unit tests for the key store's SQLite access: the experimental-warning
- * filter applied when `node:sqlite` is loaded, and the transaction helper.
+ * Unit tests for the runtime's shared SQLite access: the experimental-warning
+ * filter applied when `node:sqlite` is loaded, and the transaction helper,
+ * including its write-lock mode.
  *
  * @see https://nodejs.org/api/sqlite.html
  * @see https://nodejs.org/api/process.html#processemitwarningwarning-options
@@ -8,13 +9,15 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { DatabaseSync } from 'node:sqlite'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import {
   isSqliteExperimentalWarning,
   loadSqlite,
   MINIMUM_NODE_FOR_SQLITE,
   runInTransaction,
+  type SqliteDatabase,
 } from './sqlite.js'
 
 /** The exact notice Node 22 and 24 emit the first time `node:sqlite` loads. */
@@ -88,7 +91,7 @@ describe('loadSqlite', () => {
 })
 
 describe('runInTransaction', () => {
-  let database: DatabaseSync
+  let database: SqliteDatabase
 
   /** Every value currently stored, in insertion order. */
   function storedValues(): string[] {
@@ -162,6 +165,63 @@ describe('runInTransaction', () => {
     })
 
     expect(storedValues()).toEqual(['existing', 'second'])
+  })
+})
+
+describe('runInTransaction write locking', () => {
+  let directory: string
+  let first: SqliteDatabase
+  let second: SqliteDatabase
+
+  beforeEach(() => {
+    const { DatabaseSync } = loadSqlite()
+    directory = mkdtempSync(join(tmpdir(), 'macts-sqlite-'))
+    const file = join(directory, 'locking.db')
+    first = new DatabaseSync(file)
+    first.exec('PRAGMA journal_mode = WAL')
+    first.exec('CREATE TABLE items (value TEXT NOT NULL)')
+    second = new DatabaseSync(file)
+    // Fail at once rather than wait, so a held write lock is observable.
+    second.exec('PRAGMA busy_timeout = 0')
+  })
+
+  afterEach(() => {
+    second.close()
+    first.close()
+    rmSync(directory, { recursive: true, force: true })
+  })
+
+  /** Whether `second` can take the write lock right now. */
+  function secondCanWrite(): boolean {
+    try {
+      second.exec('BEGIN IMMEDIATE')
+      second.exec('ROLLBACK')
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  it('takes no write lock before the first write by default', () => {
+    const observed = runInTransaction(first, () => {
+      first.prepare('SELECT COUNT(*) FROM items').get()
+      return secondCanWrite()
+    })
+    expect(observed).toBe(true)
+  })
+
+  it('takes the write lock when the transaction begins with { immediate: true }', () => {
+    const observed = runInTransaction(
+      first,
+      () => {
+        first.prepare('SELECT COUNT(*) FROM items').get()
+        return secondCanWrite()
+      },
+      { immediate: true }
+    )
+    expect(observed).toBe(false)
+    // Released once the transaction ends.
+    expect(secondCanWrite()).toBe(true)
   })
 })
 
