@@ -7,7 +7,10 @@
  *
  * - `Note` and `Folder` reference each other (a note's `folder`, a folder's
  *   `notes`), which the lazy resource table must allow.
- * - `Tag` has no identifier, so it can be referenced only by selector.
+ * - `Tag` has no identifier, so it can be referenced only by selector, and no
+ *   get operation, so a single tag cannot be referenced at all; tags can be
+ *   listed, so a collection of them can.
+ * - `Folder` can be got and listed, so it can be referenced and can contain.
  * - `Priority` is an enum, named in lower case by a property (`{ enum:
  *   priority }`), so it resolves only by normalized name.
  * - `Note.attachment` is a file property (a file value when read), and
@@ -17,6 +20,8 @@
  * - `updateNote` takes a parent scope (`folderId`, an integer) and the note;
  *   it and `createNote` record the folder as their parent.
  * - `archive` is a non-CRUD resource command with an explicit permission.
+ * - `moveNote` takes a reference parameter (`destination`, a folder), an
+ *   input position typed by the reference's data form.
  * - `quit` is an app command with an optional parameter.
  * - `wordTotal` is an app command with a result, which is nullable by default.
  *
@@ -271,11 +276,32 @@ commands:
           nullable:
             source: curated
             note: null keeps the note archived indefinitely
+  moveNote:
+    name: move
+    description: Move a note to another folder
+    scope: resource
+    resourceType: Note
+    parameters:
+      - name: noteId
+        type: string
+        description: The note to move
+      - name: destination
+        type: { resource: Folder }
+        description: The folder to move the note to
   listFolders:
     name: list
     description: List folders
     scope: resource
     resourceType: Folder
+  getFolder:
+    name: get
+    description: Get a folder
+    scope: resource
+    resourceType: Folder
+    parameters:
+      - name: folderId
+        type: integer
+        description: The folder to read
   listTags:
     name: list
     description: List tags

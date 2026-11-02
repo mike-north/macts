@@ -32,7 +32,7 @@ import type { IssuePath } from '../issues.js'
 import type {
   CollectionReferenceVariant,
   ObjectReferenceVariant,
-  ReferenceRegistry,
+  ReferenceScope,
 } from '../references/index.js'
 import { RGB_CHANNEL_MAX, type Rgb } from './color.js'
 import { INVALID, codecOf, defineValueType, mismatch, type Codec, type Issues } from './codec.js'
@@ -239,30 +239,47 @@ export interface ValueTypeConstructors {
    * {@link IdentityReference} or a {@link SelectorReference}.
    *
    * @remarks
-   * `registry` returns the app's resource table (the app contract's
-   * `resources`), which supplies the identifier value type of `resource` and
-   * of every resource a container can name. It is a thunk so that record
-   * types of mutually referencing resources can compose: constructing the
-   * value type never calls it, while encoding, decoding, and schema use do.
+   * `scope` returns the app the references belong to and its resource table:
+   * the app contract itself (a {@link ReferenceScope}). The table supplies the
+   * identifier value type of `resource` and of every resource a container can
+   * name. It is a thunk so that record types of mutually referencing
+   * resources can compose: constructing the value type never calls it, while
+   * encoding, decoding, and schema use do.
    *
    * On the wire a reference is `{"reference": {…}}` (see {@link ReferenceWire}).
    * Encoding reads only the data fields and never calls `resolve`, so a bound
    * reference and a plain {@link ObjectReferenceData} descriptor encode alike.
-   * Decoding hands the decoded {@link ReferenceData} to
-   * `DecodeContext.bindReference`. A materialized {@link ReferenceList} is
-   * `t.array(t.reference(registry, resource, 'one'))`.
+   * Every level of the reference (its containers and entries too) must name
+   * the scope's `app`; a missing or different `app` is an issue at that
+   * level's `app`, and `app` is never written to the wire. Decoding sets the
+   * scope's `app` at every level and hands the decoded {@link ReferenceData}
+   * to `DecodeContext.bindReference`. A materialized {@link ReferenceList} is
+   * `t.array(t.reference(scope, resource, 'one'))`.
+   *
+   * A reference is resolved through its resource's `get` operation, so
+   * encoding rejects one whose resource has no `get` in the scope's table.
+   * Every container must also be a resource with `get`. Decoding does not
+   * check either, so a reference an operation returned is always bound.
+   *
+   * The SDK type is the bound reference, which is what decoding produces. An
+   * input position can be typed by the data form instead
+   * ({@link ObjectReferenceData}): the value type is assignable to a value
+   * type of the data form, because every bound reference is valid data.
    *
    * @typeParam T - The referenced record.
    * @typeParam Id - The SDK type of the resource's identifier.
-   * @throws `TypeError` when `registry` is not a function, `resource` is not a
-   * non-empty string, or `cardinality` is neither `'one'` nor `'many'`.
+   * @typeParam R - The resource key, inferred from `resource` as a literal.
+   * @throws `TypeError` when `scope` is not a function, `resource` is not a
+   * non-empty string, or `cardinality` is neither `'one'` nor `'many'`; and,
+   * when the value type is used, when `scope` returns something other than an
+   * app and its resource table.
    */
-  reference<T = unknown, Id = unknown>(
-    registry: () => ReferenceRegistry,
-    resource: string,
+  reference<T = unknown, Id = unknown, R extends string = string>(
+    scope: () => ReferenceScope,
+    resource: R,
     cardinality: 'one',
     options?: ValueTypeOptions
-  ): ValueType<ObjectReferenceVariant<T, Id>>
+  ): ValueType<ObjectReferenceVariant<T, Id, R>>
   /**
    * A deferred collection of `resource` objects, in either form: an
    * {@link IdentityCollectionReference} or a
@@ -271,18 +288,21 @@ export interface ValueTypeConstructors {
    * @remarks
    * As the single-object overload, with collection semantics: identity
    * entries are single identity references to `resource`, and a range
-   * selector has `start <= end`.
+   * selector has `start <= end`. A collection is resolved through its
+   * resource's `list` operation, so encoding rejects one whose resource has
+   * no `list`.
    *
    * @typeParam T - The member record.
    * @typeParam Id - The SDK type of the resource's identifier.
+   * @typeParam R - The resource key, inferred from `resource` as a literal.
    * @throws `TypeError` as the single-object overload.
    */
-  reference<T = unknown, Id = unknown>(
-    registry: () => ReferenceRegistry,
-    resource: string,
+  reference<T = unknown, Id = unknown, R extends string = string>(
+    scope: () => ReferenceScope,
+    resource: R,
     cardinality: 'many',
     options?: ValueTypeOptions
-  ): ValueType<CollectionReferenceVariant<T, Id>>
+  ): ValueType<CollectionReferenceVariant<T, Id, R>>
   /**
    * A {@link FileValue} an operation returns: `{"file": {…}}` on the wire.
    *

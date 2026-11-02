@@ -6,7 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
-import { ObjectReferenceVariant } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 
 // @public
 export interface Address {
@@ -67,13 +67,13 @@ export interface AIMHandleUpdateInput {
 // @public
 export interface ContactsClient {
     actionProperty(options?: CallOptions): Promise<void>;
-    actionTitle(_with: unknown, _for: ObjectReferenceVariant<Person, never>, options?: CallOptions): Promise<void>;
+    actionTitle(_with: unknown, _for: ObjectReferenceData<never, 'Person'>, options?: CallOptions): Promise<void>;
     add(to: string, options?: CallOptions): Promise<void>;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown, options?: CallOptions): Promise<void>;
-    performAction(_with: unknown, _for: ObjectReferenceVariant<Person, never>, options?: CallOptions): Promise<void>;
+    performAction(_with: unknown, _for: ObjectReferenceData<never, 'Person'>, options?: CallOptions): Promise<void>;
     remove(from: string, options?: CallOptions): Promise<void>;
     save(options?: CallOptions): Promise<void>;
-    shouldEnableAction(_with: unknown, _for: ObjectReferenceVariant<Person, never>, options?: CallOptions): Promise<void>;
+    shouldEnableAction(_with: unknown, _for: ObjectReferenceData<never, 'Person'>, options?: CallOptions): Promise<void>;
 }
 
 // @public

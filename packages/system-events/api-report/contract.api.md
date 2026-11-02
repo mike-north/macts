@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
 
@@ -128,17 +129,17 @@ export type CheckboxUpdateInput = Record<string, never>;
 
 // @public
 export interface ClassicDomainObject {
-    readonly appleMenuFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly extensionsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly shutdownFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly startupItemsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly systemFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly appleMenuFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly controlPanelsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly controlStripModulesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly extensionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly launcherItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly shutdownFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly startupItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly systemFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
 }
 
 // @public
@@ -222,7 +223,7 @@ export interface DiskCreateInput {
 // @public
 export interface DiskItem {
     readonly busyStatus: boolean | null;
-    readonly container: ObjectReferenceVariant<DiskItem, string> | null;
+    readonly container: ObjectReferenceVariant<DiskItem, string, 'DiskItem'> | null;
     readonly creationDate: Date | null;
     readonly displayedName: string | null;
     readonly id: string;
@@ -265,21 +266,21 @@ export interface DiskUpdateInput {
 
 // @public
 export interface Domain {
-    readonly applicationsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly fontsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly applicationsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly applicationSupportFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly desktopPicturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly folderActionScriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly fontsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
     readonly id: string;
-    readonly libraryFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly libraryFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
     readonly name: string | null;
-    readonly preferencesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly scriptsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly utilitiesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly workflowsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly preferencesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly scriptingAdditionsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly scriptsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly sharedDocumentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly speakableItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly utilitiesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly workflowsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
 }
 
 // @public
@@ -559,17 +560,17 @@ export type NetworkDomainObjectUpdateInput = Record<string, never>;
 
 // @public
 export interface NetworkPreferencesObject {
-    currentLocation: ObjectReferenceVariant<Location, string> | null;
+    currentLocation: ObjectReferenceVariant<Location, string, 'Location'> | null;
 }
 
 // @public
 export interface NetworkPreferencesObjectCreateInput {
-    currentLocation?: ObjectReferenceVariant<Location, string>;
+    currentLocation?: ObjectReferenceData<string, 'Location'>;
 }
 
 // @public
 export interface NetworkPreferencesObjectUpdateInput {
-    currentLocation?: ObjectReferenceVariant<Location, string>;
+    currentLocation?: ObjectReferenceData<string, 'Location'>;
 }
 
 // @public
@@ -726,7 +727,7 @@ export interface ScriptingClass {
     readonly name: string | null;
     readonly pluralName: string | null;
     readonly suiteName: string | null;
-    readonly superclass: ObjectReferenceVariant<ScriptingClass, string> | null;
+    readonly superclass: ObjectReferenceVariant<ScriptingClass, string, 'ScriptingClass'> | null;
 }
 
 // @public
@@ -738,7 +739,7 @@ export type ScriptingClassUpdateInput = Record<string, never>;
 // @public
 export interface ScriptingCommand {
     readonly description: string | null;
-    readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string> | null;
+    readonly directParameter: ObjectReferenceVariant<ScriptingParameter, string, 'ScriptingParameter'> | null;
     readonly hidden: boolean | null;
     readonly id: string;
     readonly name: string | null;
@@ -877,22 +878,22 @@ export type ScrollPageBehaviors = 'jumpToHere' | 'jumpToNextPage';
 // @public
 export interface Service {
     readonly active: boolean | null;
-    currentConfiguration: ObjectReferenceVariant<Configuration, string> | null;
+    currentConfiguration: ObjectReferenceVariant<Configuration, string, 'Configuration'> | null;
     readonly id: string;
-    readonly interface: ObjectReferenceVariant<Interface, string> | null;
+    readonly interface: ObjectReferenceVariant<Interface, string, 'Interface'> | null;
     readonly kind: Integer | null;
     name: string | null;
 }
 
 // @public
 export interface ServiceCreateInput {
-    currentConfiguration?: ObjectReferenceVariant<Configuration, string>;
+    currentConfiguration?: ObjectReferenceData<string, 'Configuration'>;
     name?: string;
 }
 
 // @public
 export interface ServiceUpdateInput {
-    currentConfiguration?: ObjectReferenceVariant<Configuration, string>;
+    currentConfiguration?: ObjectReferenceData<string, 'Configuration'>;
     name?: string;
 }
 
@@ -1103,17 +1104,17 @@ export interface UIElementUpdateInput {
 
 // @public
 export interface UserDomainObject {
-    readonly desktopFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly documentsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly downloadsFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly favoritesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly homeFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly moviesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly musicFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly picturesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly publicFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly sitesFolder: ObjectReferenceVariant<Folder, never> | null;
-    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never> | null;
+    readonly desktopFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly documentsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly downloadsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly favoritesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly homeFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly moviesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly musicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly picturesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly publicFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly sitesFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
+    readonly temporaryItemsFolder: ObjectReferenceVariant<Folder, never, 'Folder'> | null;
 }
 
 // @public

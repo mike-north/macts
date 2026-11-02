@@ -24,6 +24,7 @@ import {
   type CallOptions,
   type ClientRuntime,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -306,7 +307,7 @@ export interface FinderWindow {
    * the list view options for the container window.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never> | null
+  readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never, 'ListViewOptions'> | null
   /**
    * the column view options for the container window.
    * Nullable. No evidence that the app always sets it.
@@ -369,7 +370,7 @@ export interface ListViewOptions {
    * the column that the list view is sorted on.
    * Nullable. No evidence that the app always sets it.
    */
-  sortColumn: ObjectReferenceVariant<Column, never> | null
+  sortColumn: ObjectReferenceVariant<Column, never, 'Column'> | null
   /**
    * Are relative dates (e.g., today, yesterday) shown in the list view?
    * Nullable. No evidence that the app always sets it.
@@ -584,7 +585,7 @@ export interface ListViewOptionsCreateInput {
   /** the size of the text displayed in the list view */
   textSize?: Integer
   /** the column that the list view is sorted on */
-  sortColumn?: ObjectReferenceVariant<Column, never>
+  sortColumn?: ObjectReferenceData<never, 'Column'>
   /** Are relative dates (e.g., today, yesterday) shown in the list view? */
   usesRelativeDates?: boolean
 }
@@ -615,7 +616,7 @@ export interface ListViewOptionsUpdateInput {
    * the column that the list view is sorted on.
    * Cannot be reset: null is rejected.
    */
-  sortColumn?: ObjectReferenceVariant<Column, never>
+  sortColumn?: ObjectReferenceData<never, 'Column'>
   /**
    * Are relative dates (e.g., today, yesterday) shown in the list view?
    * Cannot be reset: null is rejected.
@@ -930,7 +931,11 @@ const finderWindowRecordType: ValueType<FinderWindow> = t.record(
     }),
     iconViewOptions: t.unknown({ description: 'the icon view options for the container window' }),
     listViewOptions: t.nullable(
-      t.reference<ListViewOptions, never>(() => resources, 'ListViewOptions', 'one'),
+      t.reference<ListViewOptions, never, 'ListViewOptions'>(
+        () => finderContract,
+        'ListViewOptions',
+        'one'
+      ),
       { description: 'the list view options for the container window' }
     ),
     columnViewOptions: t.unknown({
@@ -970,7 +975,7 @@ const listViewOptionsRecordType: ValueType<ListViewOptions> = t.record(
       description: 'the size of the text displayed in the list view',
     }),
     sortColumn: t.nullable(
-      t.reference<Column, never>(() => resources, 'Column', 'one'),
+      t.reference<Column, never, 'Column'>(() => finderContract, 'Column', 'one'),
       { description: 'the column that the list view is sorted on' }
     ),
     usesRelativeDates: t.nullable(t.boolean(), {

@@ -26,6 +26,7 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Rgb,
@@ -280,32 +281,32 @@ export interface MessageViewer {
    * The top level Drafts mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly draftsMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level In mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly inbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly inbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Junk mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly junkMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Out mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly outbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly outbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Sent mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly sentMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The top level Trash mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never> | null
+  readonly trashMailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * The column that is currently sorted in the viewer.
    * Nullable. No evidence that the app always sets it.
@@ -375,12 +376,12 @@ export interface Message {
    * The mailbox in which this message is filed.
    * Nullable. No evidence that the app always sets it.
    */
-  mailbox: ObjectReferenceVariant<Mailbox, never> | null
+  mailbox: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Contents of an email message.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly content: ObjectReferenceVariant<RichText, never> | null
+  readonly content: ObjectReferenceVariant<RichText, never, 'RichText'> | null
   /**
    * The date a message was received.
    * Nullable. No evidence that the app always sets it.
@@ -599,12 +600,12 @@ export interface Mailbox {
    * The account property.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly account: ObjectReferenceVariant<Account, string> | null
+  readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null
   /**
    * The container property.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly container: ObjectReferenceVariant<Mailbox, never> | null
+  readonly container: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
 }
 
 /** Class for message rules */
@@ -678,12 +679,12 @@ export interface Rule {
    * If rule matches, copy to this mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  copyMessage: ObjectReferenceVariant<Mailbox, never> | null
+  copyMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * If rule matches, move to this mailbox.
    * Nullable. No evidence that the app always sets it.
    */
-  moveMessage: ObjectReferenceVariant<Mailbox, never> | null
+  moveMessage: ObjectReferenceVariant<Mailbox, never, 'Mailbox'> | null
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1108,7 +1109,7 @@ export interface MessageCreateInput {
   /** The background color of the message */
   backgroundColor?: string
   /** The mailbox in which this message is filed */
-  mailbox?: ObjectReferenceVariant<Mailbox, never>
+  mailbox?: ObjectReferenceData<never, 'Mailbox'>
   /** Indicates whether the message is deleted or not */
   deletedStatus?: boolean
   /** Indicates whether the message is flagged or not */
@@ -1135,7 +1136,7 @@ export interface MessageUpdateInput {
    * The mailbox in which this message is filed.
    * Cannot be reset: null is rejected.
    */
-  mailbox?: ObjectReferenceVariant<Mailbox, never>
+  mailbox?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the message is deleted or not.
    * Cannot be reset: null is rejected.
@@ -1369,9 +1370,9 @@ export interface RuleCreateInput {
   /** Indicates whether all conditions must be met for rule to execute */
   allConditionsMustBeMet?: boolean
   /** If rule matches, copy to this mailbox */
-  copyMessage?: ObjectReferenceVariant<Mailbox, never>
+  copyMessage?: ObjectReferenceData<never, 'Mailbox'>
   /** If rule matches, move to this mailbox */
-  moveMessage?: ObjectReferenceVariant<Mailbox, never>
+  moveMessage?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list
@@ -1460,12 +1461,12 @@ export interface RuleUpdateInput {
    * If rule matches, copy to this mailbox.
    * Cannot be reset: null is rejected.
    */
-  copyMessage?: ObjectReferenceVariant<Mailbox, never>
+  copyMessage?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * If rule matches, move to this mailbox.
    * Cannot be reset: null is rejected.
    */
-  moveMessage?: ObjectReferenceVariant<Mailbox, never>
+  moveMessage?: ObjectReferenceData<never, 'Mailbox'>
   /**
    * Indicates whether the color will be used to highlight the text or background of a message in
    * the message list.
@@ -1669,7 +1670,7 @@ export interface MailClient {
    * @param _for - Specify the account that you wish to check for mail. Does not accept null.
    */
   checkForNewMail(
-    _for?: ObjectReferenceVariant<Account, string>,
+    _for?: ObjectReferenceData<string, 'Account'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -1703,8 +1704,8 @@ export interface MailClient {
    * rule being invoked. Otherwise it will not be specified. Does not accept null.
    */
   performMailActionWithMessages(
-    inMailboxes?: ObjectReferenceVariant<Mailbox, never>,
-    forRule?: ObjectReferenceVariant<Rule, never>,
+    inMailboxes?: ObjectReferenceData<never, 'Mailbox'>,
+    forRule?: ObjectReferenceData<never, 'Rule'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -1712,7 +1713,7 @@ export interface MailClient {
    *
    * @param _with - The account to synchronize. Does not accept null.
    */
-  synchronize(_with: ObjectReferenceVariant<Account, string>, options?: CallOptions): Promise<void>
+  synchronize(_with: ObjectReferenceData<string, 'Account'>, options?: CallOptions): Promise<void>
 }
 
 const richTextRecordType: ValueType<RichText> = t.record(
@@ -1789,27 +1790,27 @@ const outgoingMessageRecordType: ValueType<OutgoingMessage> = t.record(
 const messageViewerRecordType: ValueType<MessageViewer> = t.record(
   {
     draftsMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Drafts mailbox' }
     ),
     inbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level In mailbox' }
     ),
     junkMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Junk mailbox' }
     ),
     outbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Out mailbox' }
     ),
     sentMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Sent mailbox' }
     ),
     trashMailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The top level Trash mailbox' }
     ),
     sortColumn: t.nullable(t.string(), {
@@ -1849,11 +1850,11 @@ const messageRecordType: ValueType<Message> = t.record(
     allHeaders: t.nullable(t.string(), { description: 'All the headers of the message' }),
     backgroundColor: t.nullable(t.string(), { description: 'The background color of the message' }),
     mailbox: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The mailbox in which this message is filed' }
     ),
     content: t.nullable(
-      t.reference<RichText, never>(() => resources, 'RichText', 'one'),
+      t.reference<RichText, never, 'RichText'>(() => mailContract, 'RichText', 'one'),
       { description: 'Contents of an email message' }
     ),
     dateReceived: t.nullable(t.date(), { description: 'The date a message was received' }),
@@ -1971,11 +1972,11 @@ const mailboxRecordType: ValueType<Mailbox> = t.record(
       description: 'The number of unread messages in the mailbox',
     }),
     account: t.nullable(
-      t.reference<Account, string>(() => resources, 'Account', 'one'),
+      t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one'),
       { description: 'The account property' }
     ),
     container: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'The container property' }
     ),
   },
@@ -2021,11 +2022,11 @@ const ruleRecordType: ValueType<Rule> = t.record(
       description: 'Indicates whether all conditions must be met for rule to execute',
     }),
     copyMessage: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'If rule matches, copy to this mailbox' }
     ),
     moveMessage: t.nullable(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one'),
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one'),
       { description: 'If rule matches, move to this mailbox' }
     ),
     highlightTextUsingColor: t.nullable(t.boolean(), {
@@ -2351,7 +2352,7 @@ const messageBounceOperation: OperationDescriptor<Record<string, never>, undefin
 }
 
 const appCheckForNewMailOperation: OperationDescriptor<
-  { readonly for?: ObjectReferenceVariant<Account, string> | undefined },
+  { readonly for?: ObjectReferenceData<string, 'Account'> | undefined },
   undefined
 > = {
   id: 'mail.app.checkForNewMail',
@@ -2360,7 +2361,7 @@ const appCheckForNewMailOperation: OperationDescriptor<
   description: 'Triggers a check for email.',
   input: t.record({
     for: t.optional(
-      t.reference<Account, string>(() => resources, 'Account', 'one', {
+      t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one', {
         description: 'Specify the account that you wish to check for mail',
       })
     ),
@@ -2865,8 +2866,8 @@ const appMailtoOperation: OperationDescriptor<Record<string, never>, undefined> 
 
 const appPerformMailActionWithMessagesOperation: OperationDescriptor<
   {
-    readonly inMailboxes?: ObjectReferenceVariant<Mailbox, never> | undefined
-    readonly forRule?: ObjectReferenceVariant<Rule, never> | undefined
+    readonly inMailboxes?: ObjectReferenceData<never, 'Mailbox'> | undefined
+    readonly forRule?: ObjectReferenceData<never, 'Rule'> | undefined
   },
   undefined
 > = {
@@ -2877,13 +2878,13 @@ const appPerformMailActionWithMessagesOperation: OperationDescriptor<
     'Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.',
   input: t.record({
     inMailboxes: t.optional(
-      t.reference<Mailbox, never>(() => resources, 'Mailbox', 'one', {
+      t.reference<Mailbox, never, 'Mailbox'>(() => mailContract, 'Mailbox', 'one', {
         description:
           'If the script is being executed by the user selecting an item in the scripts menu, this argument will specify the mailboxes that are currently selected. Otherwise it will not be specified.',
       })
     ),
     forRule: t.optional(
-      t.reference<Rule, never>(() => resources, 'Rule', 'one', {
+      t.reference<Rule, never, 'Rule'>(() => mailContract, 'Rule', 'one', {
         description:
           'If the script is being executed by a rule action, this argument will be the rule being invoked. Otherwise it will not be specified.',
       })
@@ -3636,7 +3637,7 @@ const outgoingMessageSendOperation: OperationDescriptor<Record<string, never>, u
 }
 
 const appSynchronizeOperation: OperationDescriptor<
-  { readonly with: ObjectReferenceVariant<Account, string> },
+  { readonly with: ObjectReferenceData<string, 'Account'> },
   undefined
 > = {
   id: 'mail.app.synchronize',
@@ -3644,7 +3645,7 @@ const appSynchronizeOperation: OperationDescriptor<
   target: { command: 'synchronize' },
   description: 'Command to trigger synchronizing of an IMAP account with the server.',
   input: t.record({
-    with: t.reference<Account, string>(() => resources, 'Account', 'one', {
+    with: t.reference<Account, string, 'Account'>(() => mailContract, 'Account', 'one', {
       description: 'The account to synchronize',
     }),
   }),

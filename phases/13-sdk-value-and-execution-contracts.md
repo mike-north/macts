@@ -632,13 +632,13 @@ authority.
 
 **`AppContract<Client>`** has these members:
 
-| Member                                 | Meaning                                                                                                                                                                                                                 |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `app`                                  | Route segment                                                                                                                                                                                                           |
-| `operations`                           | All operation descriptors, keyed by `OperationId`                                                                                                                                                                       |
-| `resources`                            | Per-resource record value type, identifier value type (`id`, present when the resource has a primary identifier property), and the operation ids used to resolve references. This table is the reference registry (D7). |
-| `loadManifest(): Promise<unknown>`     | A lazy dynamic import of the generated manifest module. It is called only by the Mac-side runtime, which validates the result with `AppManifestSchema`, so remote clients never load it.                                |
-| `bind(runtime: ClientRuntime): Client` | A generated, fully type-checked function that maps positional SDK methods onto `runtime.invoke(descriptor, inputRecord)`                                                                                                |
+| Member                                 | Meaning                                                                                                                                                                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app`                                  | Route segment                                                                                                                                                                                                                                                               |
+| `operations`                           | All operation descriptors, keyed by `OperationId`                                                                                                                                                                                                                           |
+| `resources`                            | Per-resource record value type, identifier value type (`id`, present when the resource has a primary identifier property), and the operation ids used to resolve references. This table is the reference registry, and with `app` the contract is the reference scope (D7). |
+| `loadManifest(): Promise<unknown>`     | A lazy dynamic import of the generated manifest module. It is called only by the Mac-side runtime, which validates the result with `AppManifestSchema`, so remote clients never load it.                                                                                    |
+| `bind(runtime: ClientRuntime): Client` | A generated, fully type-checked function that maps positional SDK methods onto `runtime.invoke(descriptor, inputRecord)`                                                                                                                                                    |
 
 **Generated contract.** Each generated app package exports its contract at
 `@macts/<app>/contract`, alongside the `<PascalApp>Client` interface and the
@@ -1221,27 +1221,68 @@ filter, order, and range ("ten most recent") are defined there as well.
 - either `id` (wire-encoded), `entries`, or `selector`, depending on the form
 - an optional `container` reference
 
+It carries no `app` and no label.
+
+**The app.** Every reference names the app it belongs to in its data and
+bound forms: `app`, the `AppContract.app` of the contract it is used with. It
+is present at every level: the reference, each container, and each
+identity-collection entry. The wire form never carries it, because the route
+already names the app. Decoding sets `app` from the contract at every level.
+A hand-built reference must supply it, and the types require it. Encoding
+rejects a reference whose `app` is missing, or differs from the contract's,
+at any level. The issue is at `[...path, 'app']`, so the call fails with
+`ValidationError` before anything is sent. A reference therefore cannot be
+passed to another app's operation.
+
 **Identifier types.** A reference's `id` and every container's `id` are
 wire-encoded by their own resource's identifier value type. A container
 usually belongs to a different resource. The reference value type is built
-as `t.reference(registry, resource, cardinality)`. `registry` is a lazy view
-of the app contract's `resources` table, where each `ResourceDescriptor`
-carries `id` (D2), so generated code builds no parallel table. Laziness lets
-mutually referencing record types compose, and construction never reads the
-table. Many resources have no primary identifier property. Their descriptor
+as `t.reference(scope, resource, cardinality)`. `scope` is a function
+returning a `ReferenceScope`: `{ app, resources }`, the app and its resource
+table. The app contract is assignable to it, so generated code passes
+`() => <app>Contract`. Each `ResourceDescriptor` in the contract's
+`resources` carries `id` (D2), so generated code builds no parallel table.
+The scope is read lazily. Laziness lets mutually referencing record types
+compose, even though the contract is defined after them, and construction
+never reads the scope. Many resources have no primary identifier property. Their descriptor
 has no `id`, so they can be referenced only by selector forms, and an identity
 form naming one is an encode and decode issue. A resource key that is missing from the table, whether at the top
 level or in a container, is an encode and decode issue. A materialized
 `ReferenceList` is `t.array(t.reference(…, 'one'))`, with no constructor of
-its own. A typed reference position accepts both forms of its cardinality.
+its own.
 
-**Encoding.** Encoding reads only the data fields (`resource`, `form`,
+**Typed positions.** A typed reference position accepts both forms of its
+cardinality, and the position fixes the cardinality: a single-object position
+accepts only single-object data, in either form. The resource key is a
+literal type on the data types and on the bound types, so a bound `Mailbox`
+reference is not assignable to an `Account` position, in either direction.
+The two directions use different forms:
+
+- An **output** position holds a bound reference, `ObjectReferenceVariant<R,
+Id, 'Key'>`, which a client decoded and can resolve.
+- An **input** position takes the data form, `ObjectReferenceData<Id, 'Key'>`.
+  A caller can pass a reference it built, by identifier or by selector, or one
+  it received, because every bound reference is assignable to its data form.
+
+`t.reference(…)` builds the same value type for both. Its SDK type is the
+bound form, which is what decoding produces, and it is assignable to a value
+type of the data form, so generated code types inputs by the data form
+without a second constructor.
+
+**Resolvable targets.** A single reference resolves only through its
+resource's `get` operation, and a collection only through the resource's
+`list`. A container must be a resource with `get`, with no exception. The
+contract's `resources` table already records both operations, so a reference
+value type reads them from its scope, and no further field is needed.
+
+**Encoding.** Encoding reads only the data fields (`app`, `resource`, `form`,
 `cardinality`, and `id`, `selector`, `entries`, or `container`). It never
 calls `resolve` or any other live member, so a bound reference and a plain
 descriptor encode alike, whichever client decoded the reference. The encode strictness rule in D8 applies: an undeclared own data property, or
 a field from the other form (a `selector` on an identity reference), is an issue. It
 validates the following:
 
+- `app` equals the contract's, at every level.
 - `resource` and `cardinality` equal the declared ones.
 - Every identity-collection entry is a single identity reference to the same
   resource.
@@ -1250,13 +1291,48 @@ validates the following:
   collection's end is detectable only at resolution, so it remains an
   `InvalidSelectionError`.
 - A container is a single reference.
+- The target can be resolved. A single reference names a resource with
+  `get`, a collection names a resource with `list`, and every container names
+  a resource with `get`, checked at every depth. A container naming a resource
+  without `get` is an issue at `[...path, 'container', 'resource']`. An
+  identity-collection entry is resolved as a member of its collection, so it
+  needs no `get` of its own.
 
-Decoding applies the same rules to the strict wire form.
+Decoding applies the same rules to the strict wire form, which has no `app`
+field. A wire reference carrying `app` is an issue. Decoding does not check
+that the target can be resolved: it binds what an operation returned.
+
+**Native emission.** A native read emits exactly the wire form above, in
+identity form only:
+`{"reference":{resource, form: "identity", cardinality: "one", id, container?}}`.
+`id` is encoded through the plan by the resource's identifier value type.
+Native reads never emit a selector form; selectors are constructed only by
+callers. SDK output types stay `ObjectReference<R>`, with the form left open.
+
+- **Container scoping.** A resource's identity is scoped to its container
+  exactly when its `get` is parent-scoped, meaning the command records a
+  parent. A native read emits a container exactly when resolving the object
+  by id needs that parent. An object that is identified globally but reached
+  only through a container emits no container. Examples are Chrome and Edge
+  tabs, Arc spaces, iTerm sessions, and nested Photos folders. An output
+  position whose target's identity is scoped to its container fails
+  generation. Until outputs to such targets are generated, no native read
+  emits a container.
+- **Name-keyed resources.** A resource whose primary identifier is its name
+  keeps `ResourceDescriptor.id`. Resolving an identity reference to it means
+  the same as a name selector: it resolves to whichever object has that name
+  when it is resolved. When several objects share the name, the app defines
+  which one that is, so the reference does not pin one object. A name-keyed
+  target fails generation only at an output position. Input positions to it
+  are generated. Manifest evidence that a name is the app's identity for a
+  resource is not recorded, so no name-keyed target is exempt at output
+  positions.
 
 **Binding.** References are live objects bound to the client that decoded
 them, via `DecodeContext.bindReference`. The binder receives decoded
-`ReferenceData` (the data-only form of each variant): ids decoded through the
-registry, selector positions as `Integer`, and containers as nested data. It
+`ReferenceData` (the data-only form of each variant): `app` set from the
+contract at every level, ids decoded through the resource table, selector
+positions as `Integer`, and containers as nested data. It
 never receives wire encodings. Each bound reference type is its data form
 plus `Resolvable`, so a bound reference is itself valid encode input. A
 remote `resolve()` sends the reference by re-encoding its data through the
@@ -1267,9 +1343,17 @@ own enumerable data property that is not a declared field would make the
 reference fail to encode. Hydration therefore follows the factory, with no separate
 API. Resolution is a runtime-level call executed by
 the provider. A single reference requires the resource's `get` permission, and
-a collection reference requires the resource's `list` permission. A resource
-with no corresponding operation is not resolvable, and its references fail
-with `InvalidSelectionError`.
+a collection reference requires the resource's `list` permission.
+
+A reference that names a resource without the operation its cardinality needs,
+or a container without `get`, is handled by who built it:
+
+- **Built by a caller.** Encoding rejects it with `ValidationError` (D11), so
+  it never reaches the runtime.
+- **Decoded from an operation's output.** This is a defect on our side, never
+  the caller's. The generator emits a reference position only when its target
+  has the operation it resolves through, so such a reference means the
+  contract is wrong. Resolving it fails with `InternalError`.
 
 Ownership:
 

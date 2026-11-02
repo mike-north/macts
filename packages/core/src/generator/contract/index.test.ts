@@ -143,7 +143,7 @@ describe('generateContract: records', () => {
    * The folder holding the note.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly folder: ObjectReferenceVariant<Folder, Integer> | null
+  readonly folder: ObjectReferenceVariant<Folder, Integer, 'Folder'> | null
   /**
    * The note's attachment.
    * Nullable. No evidence that the app always sets it.
@@ -172,7 +172,7 @@ describe('generateContract: records', () => {
    * The notes in the folder.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly notes: readonly ObjectReferenceVariant<Note, string>[] | null
+  readonly notes: readonly ObjectReferenceVariant<Note, string, 'Note'>[] | null
 `)
     expect(contract).toContain(`  /**
    * The folder's color.
@@ -192,10 +192,10 @@ describe('generateContract: records', () => {
       "  priority: t.optional(t.nullable(t.enumeration(priorityMembers), { description: 'How urgent the note is' })),"
     )
     expect(contract).toContain(
-      "  folder: t.nullable(t.reference<Folder, Integer>(() => resources, 'Folder', 'one'), { description: 'The folder holding the note' }),"
+      "  folder: t.nullable(t.reference<Folder, Integer, 'Folder'>(() => jotterContract, 'Folder', 'one'), { description: 'The folder holding the note' }),"
     )
     expect(contract).toContain(
-      "  notes: t.nullable(t.array(t.reference<Note, string>(() => resources, 'Note', 'one')), { description: 'The notes in the folder' }),"
+      "  notes: t.nullable(t.array(t.reference<Note, string, 'Note'>(() => jotterContract, 'Note', 'one')), { description: 'The notes in the folder' }),"
     )
     expect(contract).toContain(
       "  attachment: t.optional(t.nullable(t.file(), { description: 'The note\\'s attachment' })),"
@@ -219,6 +219,21 @@ describe('generateContract: records', () => {
 })
 
 describe('generateContract: inputs', () => {
+  it('types a reference parameter by its data form, with a literal resource key', () => {
+    // phases/13 §D7: an input position takes the data form, so a caller can
+    // build either form or pass a reference it received, of `Folder` only.
+    expect(contract).toContain(
+      "const noteMoveNoteOperation: OperationDescriptor<{ readonly noteId: string; readonly destination: ObjectReferenceData<Integer, 'Folder'> }, undefined> = {"
+    )
+    expect(contract).toContain(
+      "  move(noteId: string, destination: ObjectReferenceData<Integer, 'Folder'>, options?: CallOptions): Promise<void>"
+    )
+    expect(contract).toContain(
+      "    destination: t.reference<Folder, Integer, 'Folder'>(() => jotterContract, 'Folder', 'one', { description: 'The folder to move the note to' }),"
+    )
+    expect(contract).toContain('  type ObjectReferenceData,\n')
+  })
+
   it('builds the create input from writable properties then create parameters, never nullable', () => {
     // title (rw), priority (rw), rating (rw), then createNote's folderId
     // (required), title (required; overrides the property), attachment (a file

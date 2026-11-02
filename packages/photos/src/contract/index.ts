@@ -111,7 +111,7 @@ export interface Container {
    * This container's parent folder, if any.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly parent: ObjectReferenceVariant<Folder, string> | null
+  readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** An album. A container that holds media items */
@@ -130,7 +130,7 @@ export interface Album {
    * This album's parent folder, if any.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly parent: ObjectReferenceVariant<Folder, string> | null
+  readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** A folder. A container that holds albums and other folders, but not media items */
@@ -149,7 +149,7 @@ export interface Folder {
    * This folder's parent folder, if any.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly parent: ObjectReferenceVariant<Folder, string> | null
+  readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null
 }
 
 /** A set of media items that represents a Moment */
@@ -434,7 +434,7 @@ const containerRecordType: ValueType<Container> = t.record(
     id: t.string({ description: 'The unique ID of this container' }),
     name: t.nullable(t.string(), { description: 'The name of this container' }),
     parent: t.nullable(
-      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      t.reference<Folder, string, 'Folder'>(() => photosContract, 'Folder', 'one'),
       { description: "This container's parent folder, if any" }
     ),
   },
@@ -448,7 +448,7 @@ const albumRecordType: ValueType<Album> = t.record(
     id: t.string({ description: 'The unique ID of this album' }),
     name: t.nullable(t.string(), { description: 'The name of this album' }),
     parent: t.nullable(
-      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      t.reference<Folder, string, 'Folder'>(() => photosContract, 'Folder', 'one'),
       { description: "This album's parent folder, if any" }
     ),
   },
@@ -460,7 +460,7 @@ const folderRecordType: ValueType<Folder> = t.record(
     id: t.string({ description: 'The unique ID of this folder' }),
     name: t.nullable(t.string(), { description: 'The name of this folder' }),
     parent: t.nullable(
-      t.reference<Folder, string>(() => resources, 'Folder', 'one'),
+      t.reference<Folder, string, 'Folder'>(() => photosContract, 'Folder', 'one'),
       { description: "This folder's parent folder, if any" }
     ),
   },

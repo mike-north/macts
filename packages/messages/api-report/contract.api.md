@@ -29,7 +29,7 @@ export interface AccountUpdateInput {
 
 // @public
 export interface Chat {
-    readonly account: ObjectReferenceVariant<Account, string> | null;
+    readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null;
     readonly id: string;
     readonly name: string | null;
 }
@@ -58,7 +58,7 @@ export const messagesContract: AppContract<MessagesClient>;
 
 // @public
 export interface Participant {
-    readonly account: ObjectReferenceVariant<Account, string> | null;
+    readonly account: ObjectReferenceVariant<Account, string, 'Account'> | null;
     readonly firstName: string | null;
     readonly fullName: string | null;
     readonly handle: string | null;

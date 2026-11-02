@@ -23,7 +23,7 @@ import {
   type AppContract,
   type CallOptions,
   type ClientRuntime,
-  type ObjectReferenceVariant,
+  type ObjectReferenceData,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -945,7 +945,7 @@ export interface ContactsClient {
    */
   actionTitle(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<never, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -957,7 +957,7 @@ export interface ContactsClient {
    */
   performAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<never, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -969,7 +969,7 @@ export interface ContactsClient {
    */
   shouldEnableAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<never, 'Person'>,
     options?: CallOptions
   ): Promise<void>
 }
@@ -1404,7 +1404,7 @@ const appActionPropertyOperation: OperationDescriptor<Record<string, never>, und
 }
 
 const appActionTitleOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<never, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.actionTitle',
@@ -1415,7 +1415,7 @@ const appActionTitleOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, never, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -1717,7 +1717,7 @@ const appActionTitleOperation: OperationDescriptor<
 }
 
 const appPerformActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<never, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.performAction',
@@ -1728,7 +1728,7 @@ const appPerformActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, never, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -2030,7 +2030,7 @@ const appPerformActionOperation: OperationDescriptor<
 }
 
 const appShouldEnableActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<never, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.shouldEnableAction',
@@ -2042,7 +2042,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, never, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),

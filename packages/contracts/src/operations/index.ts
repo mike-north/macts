@@ -99,6 +99,12 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
    * Absent when the resource has no identifier. Such a resource can be
    * referenced only by selector forms (name, index, every, or range); an
    * identity reference to it is rejected when encoding and decoding.
+   *
+   * When the identifier is the object's name (a name-keyed resource),
+   * resolving an identity reference has the meaning of a name selector: it
+   * resolves to whatever object has that name when it is resolved. Which
+   * object that is when several share the name is defined by the app, so
+   * such a reference does not pin one particular object.
    */
   readonly id?: ValueType<Id>
   /** Operation that reads one object, used to resolve single references. */
@@ -140,9 +146,10 @@ export interface AppContract<Client> {
    *
    * @remarks
    * This table is the app's reference registry: it is assignable to
-   * {@link ReferenceRegistry}, and reference value types read identifier
-   * types from it (through a lazy thunk), so generated code builds no
-   * parallel table.
+   * {@link ReferenceRegistry}. The contract itself is assignable to
+   * {@link ReferenceScope}, and reference value types read the app and its
+   * identifier types from it through a lazy thunk, so generated code builds
+   * no parallel table.
    */
   readonly resources: Readonly<Record<string, ResourceDescriptor<unknown>>>
   /**

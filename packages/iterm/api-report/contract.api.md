@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Point } from '@macts/contracts';
 import { Rectangle } from '@macts/contracts';
@@ -175,21 +176,21 @@ export interface SessionUpdateInput {
 
 // @public
 export interface Tab {
-    currentSession: ObjectReferenceVariant<Session, string> | null;
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
     index: Integer | null;
     title: string | null;
 }
 
 // @public
 export interface TabCreateInput {
-    currentSession?: ObjectReferenceVariant<Session, string>;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
 
 // @public
 export interface TabUpdateInput {
-    currentSession?: ObjectReferenceVariant<Session, string>;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
     index?: Integer;
     title?: string;
 }
@@ -199,8 +200,8 @@ export interface Window {
     readonly alternateIdentifier: string | null;
     bounds: Rectangle | null;
     readonly closeable: boolean | null;
-    currentSession: ObjectReferenceVariant<Session, string> | null;
-    currentTab: ObjectReferenceVariant<Tab, never> | null;
+    currentSession: ObjectReferenceVariant<Session, string, 'Session'> | null;
+    currentTab: ObjectReferenceVariant<Tab, never, 'Tab'> | null;
     frame: Rectangle | null;
     frontmost: boolean | null;
     hotkeyWindowProfile: string | null;
@@ -222,8 +223,8 @@ export interface Window {
 // @public
 export interface WindowCreateInput {
     bounds?: Rectangle;
-    currentSession?: ObjectReferenceVariant<Session, string>;
-    currentTab?: ObjectReferenceVariant<Tab, never>;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
+    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;
@@ -240,8 +241,8 @@ export interface WindowCreateInput {
 // @public
 export interface WindowUpdateInput {
     bounds?: Rectangle;
-    currentSession?: ObjectReferenceVariant<Session, string>;
-    currentTab?: ObjectReferenceVariant<Tab, never>;
+    currentSession?: ObjectReferenceData<string, 'Session'>;
+    currentTab?: ObjectReferenceData<never, 'Tab'>;
     frame?: Rectangle;
     frontmost?: boolean;
     hotkeyWindowProfile?: string;

@@ -26,6 +26,7 @@ import {
   type FileSource,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type ValueType,
@@ -106,7 +107,7 @@ export interface BrowserWindow {
    * the playlist currently displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  view: ObjectReferenceVariant<Playlist, never> | null
+  view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track representing a video file */
@@ -158,7 +159,7 @@ export interface Playlist {
    * folder which contains this playlist (if any).
    * Nullable. No evidence that the app always sets it.
    */
-  readonly parent: ObjectReferenceVariant<Playlist, never> | null
+  readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
   /**
    * the total size of all tracks (in bytes).
    * Nullable. No evidence that the app always sets it.
@@ -197,7 +198,7 @@ export interface PlaylistWindow {
    * the playlist displayed in the window.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly view: ObjectReferenceVariant<Playlist, never> | null
+  readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null
 }
 
 /** a track residing in a shared library */
@@ -579,7 +580,7 @@ export interface ArtworkUpdateInput {
 /** Input for creating a BrowserWindow. */
 export interface BrowserWindowCreateInput {
   /** the playlist currently displayed in the window */
-  view?: ObjectReferenceVariant<Playlist, never>
+  view?: ObjectReferenceData<never, 'Playlist'>
 }
 
 /** Input for updating a BrowserWindow. Omitted fields are left unchanged. */
@@ -588,7 +589,7 @@ export interface BrowserWindowUpdateInput {
    * the playlist currently displayed in the window.
    * Cannot be reset: null is rejected.
    */
-  view?: ObjectReferenceVariant<Playlist, never>
+  view?: ObjectReferenceData<never, 'Playlist'>
 }
 
 /** Input for creating a FileTrack. */
@@ -1078,7 +1079,7 @@ const browserWindowRecordType: ValueType<BrowserWindow> = t.record(
     id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
       { description: 'the playlist currently displayed in the window' }
     ),
   },
@@ -1111,7 +1112,7 @@ const playlistRecordType: ValueType<Playlist> = t.record(
     }),
     name: t.nullable(t.string(), { description: 'the name of the playlist' }),
     parent: t.nullable(
-      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
       { description: 'folder which contains this playlist (if any)' }
     ),
     size: t.nullable(t.integer(), { description: 'the total size of all tracks (in bytes)' }),
@@ -1129,7 +1130,7 @@ const playlistWindowRecordType: ValueType<PlaylistWindow> = t.record(
     id: t.nullable(t.integer(), { description: 'Unique identifier for this window' }),
     selection: t.nullable(t.string(), { description: 'the selected tracks' }),
     view: t.nullable(
-      t.reference<Playlist, never>(() => resources, 'Playlist', 'one'),
+      t.reference<Playlist, never, 'Playlist'>(() => tvContract, 'Playlist', 'one'),
       { description: 'the playlist displayed in the window' }
     ),
   },

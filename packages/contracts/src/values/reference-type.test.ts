@@ -1,9 +1,9 @@
 /**
- * Unit tests for reference value types, `t.reference(registry, resource,
- * cardinality)`: plans, the lazy resource table, what binders receive, that
- * encoding reads only data, composition into arrays, nullable values, and
- * records (including mutually referencing records), and JSON Schema
- * derivation of the registry-built wire schemas.
+ * Unit tests for reference value types, `t.reference(scope, resource,
+ * cardinality)`: plans, the lazy scope, the app every reference carries, what
+ * binders receive, that encoding reads only data, composition into arrays,
+ * nullable values, and records (including mutually referencing records), and
+ * JSON Schema derivation of the wire schemas built from the resource table.
  *
  * Round trips for each reference shape live in the codec vectors; these tests
  * pin the constructor's own contract. Expected values are written by hand
@@ -18,19 +18,33 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import type { IssuePath } from '../issues.js'
-import type { ReferenceData, ReferenceRegistry } from '../references/index.js'
+import type { ReferenceData, ReferenceRegistry, ReferenceScope } from '../references/index.js'
 import { Integer } from './integer.js'
 import type { CodecResult, DecodeContext, ValueType } from './value-type.js'
 import { ValueTypes as t } from './value-types.js'
 import type { ValueIssueCode } from './value-issues.js'
 import { VECTOR_DECODE_CONTEXT, VECTOR_RESOLVE, sameValueMismatches } from './vectors/index.js'
 
+/** The app the references in these tests belong to. */
+const APP = 'notes'
+
+/**
+ * Every resource can be got and listed, so references to it and containers
+ * of it can be resolved; the resolvability tests use their own tables.
+ */
 const REGISTRY: ReferenceRegistry = {
-  note: { id: t.string() },
-  folder: { id: t.integer() },
-  account: { id: t.string() },
+  note: { id: t.string(), get: 'notes.notes.get', list: 'notes.notes.list' },
+  folder: { id: t.integer(), get: 'notes.folders.get', list: 'notes.folders.list' },
+  account: { id: t.string(), get: 'notes.accounts.get', list: 'notes.accounts.list' },
 }
-const registry = (): ReferenceRegistry => REGISTRY
+
+/** The scope of an app named {@link APP} with the given resource table. */
+function scopeOf(resources: ReferenceRegistry): ReferenceScope {
+  return { app: APP, resources }
+}
+
+const SCOPE = scopeOf(REGISTRY)
+const registry = (): ReferenceScope => SCOPE
 
 /** A decode context that records the data each binder receives. */
 function recordingContext(): { context: DecodeContext; received: ReferenceData[] } {
@@ -80,16 +94,16 @@ function expectDecodeIssues(
   expect(issuesOf(type.decode(wire, VECTOR_DECODE_CONTEXT))).toEqual(issues)
 }
 
-/** A registry thunk that counts its calls. */
-function countingRegistry(table: ReferenceRegistry = REGISTRY): {
-  thunk: () => ReferenceRegistry
+/** A scope thunk that counts its calls. */
+function countingScope(scope: ReferenceScope = SCOPE): {
+  thunk: () => ReferenceScope
   calls: () => number
 } {
   let count = 0
   return {
     thunk: () => {
       count += 1
-      return table
+      return scope
     },
     calls: () => count,
   }
@@ -112,7 +126,7 @@ describe('plan', () => {
 
 describe('the resource table', () => {
   it('is not read when the value type is constructed, described, or composed', () => {
-    const { thunk, calls } = countingRegistry()
+    const { thunk, calls } = countingScope()
     const one = t.reference(thunk, 'note', 'one', { description: 'The note.' })
     const many = t.reference(thunk, 'note', 'many')
     t.array(one)
@@ -122,9 +136,9 @@ describe('the resource table', () => {
   })
 
   it('is read when encoding, decoding, and validating', () => {
-    const { thunk, calls } = countingRegistry()
+    const { thunk, calls } = countingScope()
     const type = t.reference(thunk, 'note', 'one')
-    type.encode({ resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' })
+    type.encode({ app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' })
     expect(calls()).toBe(1)
     type.decode(
       { reference: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } },
@@ -140,7 +154,7 @@ describe('the resource table', () => {
     const type = t.reference(registry, 'calendar', 'one')
     expectEncodeIssues(
       type,
-      { resource: 'calendar', form: 'identity', cardinality: 'one', id: 'C1' },
+      { app: APP, resource: 'calendar', form: 'identity', cardinality: 'one', id: 'C1' },
       [{ path: [], code: 'unsupported' }]
     )
     expectDecodeIssues(
@@ -156,20 +170,324 @@ describe('the resource table', () => {
     expectEncodeIssues(
       type,
       {
+        app: APP,
         resource: 'note',
         form: 'identity',
         cardinality: 'one',
         id: 'N1',
-        container: { resource: 'toString', form: 'identity', cardinality: 'one', id: 'x' },
+        container: {
+          app: APP,
+          resource: 'toString',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'x',
+        },
       },
       [{ path: ['container'], code: 'unsupported' }]
     )
   })
 
   it('rejects a malformed composition', () => {
-    expect(() => t.reference(REGISTRY as never, 'note', 'one')).toThrow(TypeError)
+    expect(() => t.reference(SCOPE as never, 'note', 'one')).toThrow(TypeError)
     expect(() => t.reference(registry, '', 'one')).toThrow(TypeError)
     expect(() => t.reference(registry, 'note', 'some' as never)).toThrow(TypeError)
+  })
+
+  it.each([
+    ['a bare resource table', REGISTRY],
+    ['a scope without an app', { resources: REGISTRY }],
+    ['a scope with an empty app', { app: '', resources: REGISTRY }],
+    ['a scope without resources', { app: APP }],
+    ['undefined', undefined],
+  ])('rejects a scope function returning %s when the scope is first read', (_label, scope) => {
+    // Construction stays lazy: the scope function is called only on use.
+    const type = t.reference(() => scope as never, 'note', 'one')
+    expect(() =>
+      type.encode({ app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' })
+    ).toThrow(TypeError)
+    expect(() =>
+      type.decode(
+        { reference: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } },
+        VECTOR_DECODE_CONTEXT
+      )
+    ).toThrow(TypeError)
+  })
+})
+
+describe('the app', () => {
+  const note = t.reference(registry, 'note', 'one')
+  const notes = t.reference(registry, 'note', 'many')
+  const wireNote = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
+  const sdkNote = { app: APP, ...wireNote } as const
+
+  it('is stamped from the scope on decode, at every level', () => {
+    const { context, received } = recordingContext()
+    valueOf(
+      notes.decode(
+        {
+          reference: {
+            resource: 'note',
+            form: 'identity',
+            cardinality: 'many',
+            entries: [
+              {
+                ...wireNote,
+                container: {
+                  resource: 'folder',
+                  form: 'identity',
+                  cardinality: 'one',
+                  id: { integer: '7' },
+                },
+              },
+            ],
+          },
+        },
+        context
+      )
+    )
+    expect(
+      sameValueMismatches(received, [
+        {
+          app: APP,
+          resource: 'note',
+          form: 'identity',
+          cardinality: 'many',
+          entries: [
+            {
+              ...sdkNote,
+              container: {
+                app: APP,
+                resource: 'folder',
+                form: 'identity',
+                cardinality: 'one',
+                id: 7,
+              },
+            },
+          ],
+        },
+      ])
+    ).toEqual([])
+  })
+
+  it('is never written to the wire, at any level', () => {
+    const wire = valueOf(
+      note.encode({
+        ...sdkNote,
+        container: {
+          app: APP,
+          resource: 'folder',
+          form: 'identity',
+          cardinality: 'one',
+          id: 7,
+          container: {
+            app: APP,
+            resource: 'account',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'A1',
+          },
+        },
+      })
+    )
+    expect(wire).toEqual({
+      reference: {
+        ...wireNote,
+        container: {
+          resource: 'folder',
+          form: 'identity',
+          cardinality: 'one',
+          id: { integer: '7' },
+          container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+        },
+      },
+    })
+    expect(JSON.stringify(wire)).not.toContain('"app"')
+    const entries = valueOf(
+      notes.encode({
+        app: APP,
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [sdkNote],
+      })
+    )
+    expect(JSON.stringify(entries)).not.toContain('"app"')
+  })
+
+  it('is required on encode, at every level', () => {
+    expectEncodeIssues(note, wireNote, [{ path: ['app'], code: 'missing-field' }])
+    expectEncodeIssues(
+      note,
+      {
+        ...sdkNote,
+        container: { resource: 'folder', form: 'identity', cardinality: 'one', id: 7 },
+      },
+      [{ path: ['container', 'app'], code: 'missing-field' }]
+    )
+    expectEncodeIssues(
+      notes,
+      {
+        app: APP,
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [sdkNote, wireNote],
+      },
+      [{ path: ['entries', 1, 'app'], code: 'missing-field' }]
+    )
+    expect(note.sdk.safeParse(wireNote).success).toBe(false)
+  })
+
+  it('must be a string', () => {
+    expectEncodeIssues(note, { ...sdkNote, app: 7 }, [{ path: ['app'], code: 'invalid-type' }])
+  })
+
+  it('rejects a reference of another app before anything else is read, at every level', () => {
+    const message = messagesOf(note.encode({ ...sdkNote, app: 'calendar' }))
+    expect(message).toBe(
+      'Expected a reference to an object of "notes"; received a reference to an object of ' +
+        '"calendar". A reference can be used only with the app it belongs to.'
+    )
+    expectEncodeIssues(note, { ...sdkNote, app: 'calendar' }, [
+      { path: ['app'], code: 'invalid-type' },
+    ])
+    expectEncodeIssues(
+      note,
+      {
+        ...sdkNote,
+        container: {
+          app: 'calendar',
+          resource: 'folder',
+          form: 'identity',
+          cardinality: 'one',
+          id: 7,
+        },
+      },
+      [{ path: ['container', 'app'], code: 'invalid-type' }]
+    )
+    expectEncodeIssues(
+      notes,
+      {
+        app: APP,
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [{ ...sdkNote, app: 'calendar' }],
+      },
+      [{ path: ['entries', 0, 'app'], code: 'invalid-type' }]
+    )
+    expect(note.sdk.safeParse({ ...sdkNote, app: 'calendar' }).success).toBe(false)
+  })
+
+  it('is an undeclared field on the wire', () => {
+    expectDecodeIssues(note, { reference: sdkNote }, [{ path: ['app'], code: 'unknown-field' }])
+    expect(messagesOf(note.decode({ reference: sdkNote }, VECTOR_DECODE_CONTEXT))).toBe(
+      'An identity reference has no "app": the route names the app, so a reference\'s wire ' +
+        'form does not carry it.'
+    )
+    expect(note.wire.safeParse({ reference: sdkNote }).success).toBe(false)
+    expectDecodeIssues(
+      note,
+      {
+        reference: {
+          ...wireNote,
+          container: {
+            app: APP,
+            resource: 'folder',
+            form: 'identity',
+            cardinality: 'one',
+            id: { integer: '7' },
+          },
+        },
+      },
+      [{ path: ['container', 'app'], code: 'unknown-field' }]
+    )
+  })
+})
+
+describe('resolvability', () => {
+  /** Notes can be got and listed, labels only listed, attachments neither. */
+  const scope = (): ReferenceScope =>
+    scopeOf({
+      note: { id: t.string(), get: 'notes.notes.get', list: 'notes.notes.list' },
+      label: { id: t.string(), list: 'notes.labels.list' },
+      attachment: { id: t.string() },
+    })
+  const label = { app: APP, resource: 'label', form: 'identity', cardinality: 'one', id: 'L1' }
+  const attachment = { ...label, resource: 'attachment', id: 'X1' }
+  const note = { app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' }
+
+  it('requires get for a single-object reference, and explains why', () => {
+    const type = t.reference(scope, 'label', 'one')
+    const result = type.encode(label)
+    expect(issuesOf(result)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      'The app has no operation that gets one "label", so a reference to one cannot be resolved.'
+    )
+    expect(type.sdk.safeParse(label).success).toBe(false)
+  })
+
+  it('requires list for a collection, and explains why', () => {
+    const type = t.reference(scope, 'attachment', 'many')
+    const every = {
+      app: APP,
+      resource: 'attachment',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    }
+    const result = type.encode(every)
+    expect(issuesOf(result)).toEqual([{ path: [], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      'The app has no operation that lists "attachment" objects, so a collection of them ' +
+        'cannot be resolved.'
+    )
+    expect(type.sdk.safeParse(every).success).toBe(false)
+    const labels = t.reference(scope, 'label', 'many')
+    expect(labels.encode({ ...every, resource: 'label' }).ok).toBe(true)
+  })
+
+  it('requires get for every container, even one that can be listed', () => {
+    const type = t.reference(scope, 'note', 'one')
+    const inLabel = { ...note, container: label }
+    const result = type.encode(inLabel)
+    expect(issuesOf(result)).toEqual([{ path: ['container', 'resource'], code: 'unsupported' }])
+    expect(messagesOf(result)).toBe(
+      '"label" cannot be a container: the app has no operation that gets one "label", so the ' +
+        'reference could never be resolved within it.'
+    )
+    expect(type.sdk.safeParse(inLabel).success).toBe(false)
+    expect(type.sdk.safeParse({ ...note, container: note }).success).toBe(true)
+    // The rule holds at every depth.
+    const nested = { ...note, container: { ...note, container: label } }
+    expect(issuesOf(type.encode(nested))).toEqual([
+      { path: ['container', 'container', 'resource'], code: 'unsupported' },
+    ])
+    expect(type.sdk.safeParse(nested).success).toBe(false)
+  })
+
+  it('checks identity-collection entries as members of their collection only', () => {
+    const labels = t.reference(scope, 'label', 'many')
+    const collection = {
+      app: APP,
+      resource: 'label',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [label],
+    }
+    expect(labels.encode(collection).ok).toBe(true)
+    expect(labels.sdk.safeParse(collection).success).toBe(true)
+  })
+
+  it('is not checked when decoding, so a returned reference is always bound', () => {
+    const { context, received } = recordingContext()
+    const type = t.reference(scope, 'attachment', 'one')
+    const wire = {
+      reference: { resource: 'attachment', form: 'identity', cardinality: 'one', id: 'X1' },
+    }
+    expect(type.decode(wire, context).ok).toBe(true)
+    expect(received).toEqual([attachment])
+    expect(type.wire.safeParse(wire).success).toBe(true)
   })
 })
 
@@ -202,16 +520,24 @@ describe('binding', () => {
     // Plain data, not wire encodings: no `resolve`, ids and positions decoded.
     expect(
       sameValueMismatches(data, {
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'one',
         selector: { by: 'index', index: 3 },
         container: {
+          app: APP,
           resource: 'folder',
           form: 'identity',
           cardinality: 'one',
           id: 7,
-          container: { resource: 'account', form: 'identity', cardinality: 'one', id: 'A1' },
+          container: {
+            app: APP,
+            resource: 'account',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'A1',
+          },
         },
       })
     ).toEqual([])
@@ -258,6 +584,7 @@ describe('encoding', () => {
 
   it('never calls resolve or any other live member, and ignores function members', () => {
     const reference = {
+      app: APP,
       resource: 'folder',
       form: 'identity',
       cardinality: 'one',
@@ -269,6 +596,7 @@ describe('encoding', () => {
         throw new Error('encode must not call live members')
       },
       container: {
+        app: APP,
         resource: 'account',
         form: 'identity',
         cardinality: 'one',
@@ -293,6 +621,7 @@ describe('encoding', () => {
 
   it('reads data fields of a class-based bound reference, including accessors', () => {
     class BoundFolder {
+      readonly app = APP
       readonly resource = 'folder'
       readonly form = 'identity'
       readonly cardinality = 'one'
@@ -325,6 +654,7 @@ describe('encoding', () => {
   it('omits an absent container and treats an undefined one as absent', () => {
     const wire = valueOf(
       type.encode({
+        app: APP,
         resource: 'folder',
         form: 'identity',
         cardinality: 'one',
@@ -348,13 +678,14 @@ describe('encoding', () => {
     expectEncodeIssues(
       t.reference(registry, 'note', 'many'),
       {
+        app: APP,
         resource: 'note',
         form: 'identity',
         cardinality: 'many',
         entries: [
-          { resource: 'note', form: 'identity', cardinality: 'one', id: 1 },
-          { resource: 'note', form: 'identity', cardinality: 'one', id: 'N2' },
-          { resource: 'note', form: 'identity', cardinality: 'many', entries: [] },
+          { app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 1 },
+          { app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N2' },
+          { app: APP, resource: 'note', form: 'identity', cardinality: 'many', entries: [] },
         ],
       },
       [
@@ -366,7 +697,7 @@ describe('encoding', () => {
 
   it('names the declared and received resources when they differ', () => {
     const message = messagesOf(
-      type.encode({ resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' })
+      type.encode({ app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' })
     )
     expect(message).toContain('"folder"')
     expect(message).toContain('"note"')
@@ -378,37 +709,50 @@ describe('encoding', () => {
     ['an array', [], [{ path: [], code: 'invalid-type' }]],
     [
       'no resource',
-      { form: 'identity', cardinality: 'one', id: 7 },
+      { app: APP, form: 'identity', cardinality: 'one', id: 7 },
       [{ path: ['resource'], code: 'missing-field' }],
     ],
     [
       'an unknown form',
-      { resource: 'folder', form: 'query', cardinality: 'one' },
+      { app: APP, resource: 'folder', form: 'query', cardinality: 'one' },
       [{ path: ['form'], code: 'unknown-enum-member' }],
     ],
     [
       'an identity reference with no id',
-      { resource: 'folder', form: 'identity', cardinality: 'one' },
+      { app: APP, resource: 'folder', form: 'identity', cardinality: 'one' },
       [{ path: ['id'], code: 'missing-field' }],
     ],
     [
       'a collection selector at a single-object position',
-      { resource: 'folder', form: 'selector', cardinality: 'one', selector: { by: 'every' } },
+      {
+        app: APP,
+        resource: 'folder',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'every' },
+      },
       [{ path: ['selector', 'by'], code: 'unknown-enum-member' }],
     ],
     [
       'a name selector with no name',
-      { resource: 'folder', form: 'selector', cardinality: 'one', selector: { by: 'name' } },
+      {
+        app: APP,
+        resource: 'folder',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name' },
+      },
       [{ path: ['selector', 'name'], code: 'missing-field' }],
     ],
     [
       'a container with a wrong id type',
       {
+        app: APP,
         resource: 'folder',
         form: 'identity',
         cardinality: 'one',
         id: 7,
-        container: { resource: 'account', form: 'identity', cardinality: 'one', id: 1 },
+        container: { app: APP, resource: 'account', form: 'identity', cardinality: 'one', id: 1 },
       },
       [{ path: ['container', 'id'], code: 'invalid-type' }],
     ],
@@ -420,11 +764,13 @@ describe('encoding', () => {
 describe('the declared-fields rule', () => {
   const note = t.reference(registry, 'note', 'one')
   const notes = t.reference(registry, 'note', 'many')
-  const identity = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
-  const wireIdentity = { reference: identity }
+  const wirePayload = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
+  const identity = { app: APP, ...wirePayload } as const
+  const wireIdentity = { reference: wirePayload }
 
   it('encodes a class instance by its declared fields, ignoring prototype members and private state', () => {
     class BoundNote {
+      readonly app = APP
       readonly resource = 'note'
       readonly form = 'identity'
       readonly cardinality = 'one'
@@ -460,15 +806,22 @@ describe('the declared-fields rule', () => {
   })
 
   it('names the fields of the form for an unknown key, in both directions', () => {
-    const expected =
-      '"contianer" is not a field of an identity reference (its fields are "resource", "form", ' +
-      '"cardinality", "id", "container").'
-    expect(messagesOf(note.encode({ ...identity, contianer: identity }))).toBe(expected)
+    // The SDK form carries the app; the wire form does not.
+    expect(messagesOf(note.encode({ ...identity, contianer: identity }))).toBe(
+      '"contianer" is not a field of an identity reference (its fields are "app", "resource", ' +
+        '"form", "cardinality", "id", "container").'
+    )
     expect(
       messagesOf(
-        note.decode({ reference: { ...identity, contianer: identity } }, VECTOR_DECODE_CONTEXT)
+        note.decode(
+          { reference: { ...wirePayload, contianer: wirePayload } },
+          VECTOR_DECODE_CONTEXT
+        )
       )
-    ).toBe(expected)
+    ).toBe(
+      '"contianer" is not a field of an identity reference (its fields are "resource", "form", ' +
+        '"cardinality", "id", "container").'
+    )
   })
 
   it.each([
@@ -483,6 +836,7 @@ describe('the declared-fields rule', () => {
       'a selector reference with an id',
       note,
       {
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'one',
@@ -495,13 +849,21 @@ describe('the declared-fields rule', () => {
     [
       'an identity collection with a container',
       notes,
-      { resource: 'note', form: 'identity', cardinality: 'many', entries: [], container: identity },
+      {
+        app: APP,
+        resource: 'note',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [],
+        container: identity,
+      },
       'An identity collection has no "container": each entry carries its own container.',
     ],
     [
       'a name selector with an index',
       note,
       {
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'one',
@@ -517,7 +879,7 @@ describe('the declared-fields rule', () => {
     expect(
       messagesOf(
         note.decode(
-          { reference: { ...identity, selector: { by: 'name', name: 'Inbox' } } },
+          { reference: { ...wirePayload, selector: { by: 'name', name: 'Inbox' } } },
           VECTOR_DECODE_CONTEXT
         )
       )
@@ -536,6 +898,7 @@ describe('the declared-fields rule', () => {
     expectEncodeIssues(
       notes,
       {
+        app: APP,
         resource: 'note',
         form: 'identity',
         cardinality: 'many',
@@ -548,7 +911,7 @@ describe('the declared-fields rule', () => {
   it('still rejects undeclared keys whose value is a function when decoding', () => {
     // Wire values are JSON; a function is never wire data, so decode does not
     // carve out function members the way encode does.
-    expectDecodeIssues(note, { reference: { ...identity, resolve: VECTOR_RESOLVE } }, [
+    expectDecodeIssues(note, { reference: { ...wirePayload, resolve: VECTOR_RESOLVE } }, [
       { path: ['resolve'], code: 'unknown-field' },
     ])
   })
@@ -657,6 +1020,7 @@ describe('decoding', () => {
     )
     expect(
       sameValueMismatches(decoded, {
+        app: APP,
         resource: 'note',
         form: 'identity',
         cardinality: 'many',
@@ -669,13 +1033,15 @@ describe('decoding', () => {
 
 describe('composition', () => {
   const note = t.reference(registry, 'note', 'one')
-  const identity = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
-  const selector = {
+  const identityWire = { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } as const
+  const selectorWire = {
     resource: 'note',
     form: 'selector',
     cardinality: 'one',
     selector: { by: 'name', name: 'Inbox' },
   } as const
+  const identity = { app: APP, ...identityWire } as const
+  const selector = { app: APP, ...selectorWire } as const
 
   it('makes a materialized reference list with t.array, mixing forms', () => {
     const list = t.array(note)
@@ -683,7 +1049,7 @@ describe('composition', () => {
       kind: 'array',
       items: { kind: 'reference', resource: 'note', cardinality: 'one' },
     })
-    const wire = [{ reference: identity }, { reference: selector }]
+    const wire = [{ reference: identityWire }, { reference: selectorWire }]
     expect(sameValueMismatches(valueOf(list.encode([identity, selector])), wire)).toEqual([])
     expect(
       sameValueMismatches(valueOf(list.decode(wire, VECTOR_DECODE_CONTEXT)), [
@@ -703,8 +1069,8 @@ describe('composition', () => {
     })
     expect(valueOf(owner.encode({ primary: null }))).toEqual({ primary: null })
     expect(valueOf(owner.encode({ primary: identity, secondary: selector }))).toEqual({
-      primary: { reference: identity },
-      secondary: { reference: selector },
+      primary: { reference: identityWire },
+      secondary: { reference: selectorWire },
     })
     const decoded = valueOf(owner.decode({ primary: null }, VECTOR_DECODE_CONTEXT))
     expect(Object.hasOwn(decoded, 'secondary')).toBe(false)
@@ -716,9 +1082,13 @@ describe('composition', () => {
   it('composes mutually referencing records through the lazy table', () => {
     const table: Record<
       string,
-      { readonly id: ValueType<unknown>; readonly record: ValueType<unknown> }
+      {
+        readonly id: ValueType<unknown>
+        readonly get: 'notes.notes.get' | 'notes.folders.get'
+        readonly record: ValueType<unknown>
+      }
     > = {}
-    const resources = (): ReferenceRegistry => table
+    const resources = (): ReferenceScope => scopeOf(table)
     const noteRecord = t.record({
       title: t.string(),
       folder: t.reference(resources, 'folder', 'one'),
@@ -728,13 +1098,13 @@ describe('composition', () => {
       notes: t.array(t.reference(resources, 'note', 'one')),
       parent: t.optional(t.reference(resources, 'folder', 'one')),
     })
-    table['note'] = { id: t.string(), record: noteRecord }
-    table['folder'] = { id: t.integer(), record: folderRecord }
+    table['note'] = { id: t.string(), get: 'notes.notes.get', record: noteRecord }
+    table['folder'] = { id: t.integer(), get: 'notes.folders.get', record: folderRecord }
 
     const folder = {
       name: 'Inbox',
-      notes: [{ resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' }],
-      parent: { resource: 'folder', form: 'identity', cardinality: 'one', id: 1 },
+      notes: [{ app: APP, resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' }],
+      parent: { app: APP, resource: 'folder', form: 'identity', cardinality: 'one', id: 1 },
     }
     const wire = {
       name: 'Inbox',
@@ -754,7 +1124,7 @@ describe('composition', () => {
       valueOf(
         noteRecord.encode({
           title: 'Groceries',
-          folder: { resource: 'folder', form: 'identity', cardinality: 'one', id: 2 },
+          folder: { app: APP, resource: 'folder', form: 'identity', cardinality: 'one', id: 2 },
         })
       )
     ).toEqual({
@@ -803,6 +1173,7 @@ describe('schemas', () => {
 
   it('have SDK schemas that accept bound references and reject what encoding rejects', () => {
     const bound = {
+      app: APP,
       resource: 'note',
       form: 'identity',
       cardinality: 'one',
@@ -814,6 +1185,7 @@ describe('schemas', () => {
     expect(notes.sdk.safeParse(bound).success).toBe(false)
     expect(
       notes.sdk.safeParse({
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'many',
@@ -836,10 +1208,17 @@ describe('schemas', () => {
 })
 
 describe('resources without an identifier', () => {
-  const table: ReferenceRegistry = { note: { id: t.string() }, paragraph: {} }
-  const resources = (): ReferenceRegistry => table
-  /** A table in which no resource has an identifier. */
-  const unidentified = (): ReferenceRegistry => ({ paragraph: {}, word: {} })
+  const table: ReferenceRegistry = {
+    note: { id: t.string(), get: 'notes.notes.get', list: 'notes.notes.list' },
+    paragraph: { get: 'notes.paragraphs.get', list: 'notes.paragraphs.list' },
+  }
+  const resources = (): ReferenceScope => scopeOf(table)
+  /** A scope in which no resource has an identifier. */
+  const unidentified = (): ReferenceScope =>
+    scopeOf({
+      paragraph: { get: 'notes.paragraphs.get', list: 'notes.paragraphs.list' },
+      word: { get: 'notes.words.get' },
+    })
 
   /** The `reference` payload schema of a derived draft-7 JSON Schema. */
   const payloadSchema = (type: ValueType<unknown>): Record<string, unknown> => {
@@ -853,7 +1232,7 @@ describe('resources without an identifier', () => {
   it('explains that only selectors can reference them', () => {
     const result = t
       .reference(resources, 'paragraph', 'one')
-      .encode({ resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' })
+      .encode({ app: APP, resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P1' })
     expect(issuesOf(result)).toEqual([{ path: [], code: 'unsupported' }])
     expect(messagesOf(result)).toBe(
       '"paragraph" has no identifier, so it can be referenced only by a selector ' +
@@ -892,6 +1271,11 @@ describe('resources without an identifier', () => {
       selector: { by: 'every' },
       container,
     })
+    /** The SDK form of {@link inParagraph}: the app at both levels. */
+    const sdkInParagraph = (container: Record<string, unknown>) => ({
+      app: APP,
+      ...inParagraph({ app: APP, ...container }),
+    })
     const selected = {
       resource: 'paragraph',
       form: 'selector',
@@ -902,20 +1286,23 @@ describe('resources without an identifier', () => {
     expect(notes.wire.safeParse({ reference: inParagraph(selected) }).success).toBe(true)
     expect(notes.wire.safeParse({ reference: inParagraph(identified) }).success).toBe(false)
     expect(
-      notes.sdk.safeParse(inParagraph({ ...selected, selector: { by: 'index', index: 0 } })).success
+      notes.sdk.safeParse(sdkInParagraph({ ...selected, selector: { by: 'index', index: 0 } }))
+        .success
     ).toBe(true)
-    expect(notes.sdk.safeParse(inParagraph(identified)).success).toBe(false)
+    expect(notes.sdk.safeParse(sdkInParagraph(identified)).success).toBe(false)
   })
 
   it('work when no resource in the table has an identifier', () => {
     const paragraphs = t.reference(unidentified, 'paragraph', 'many')
     const words = t.reference(unidentified, 'word', 'one')
     const word = {
+      app: APP,
       resource: 'word',
       form: 'selector',
       cardinality: 'one',
       selector: { by: 'name', name: 'macts' },
       container: {
+        app: APP,
         resource: 'paragraph',
         form: 'selector',
         cardinality: 'one',
@@ -924,21 +1311,35 @@ describe('resources without an identifier', () => {
     }
     expect(valueOf(words.encode(word))).toEqual({
       reference: {
-        ...word,
-        container: { ...word.container, selector: { by: 'index', index: { integer: '1' } } },
+        resource: 'word',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'macts' },
+        container: {
+          resource: 'paragraph',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'index', index: { integer: '1' } },
+        },
       },
     })
     expectEncodeIssues(
       words,
       {
         ...word,
-        container: { resource: 'paragraph', form: 'identity', cardinality: 'one', id: 'P' },
+        container: {
+          app: APP,
+          resource: 'paragraph',
+          form: 'identity',
+          cardinality: 'one',
+          id: 'P',
+        },
       },
       [{ path: ['container'], code: 'unsupported' }]
     )
     expectEncodeIssues(
       paragraphs,
-      { resource: 'paragraph', form: 'identity', cardinality: 'many', entries: [] },
+      { app: APP, resource: 'paragraph', form: 'identity', cardinality: 'many', entries: [] },
       [{ path: [], code: 'unsupported' }]
     )
     for (const type of [paragraphs, words]) {
@@ -967,12 +1368,19 @@ describe('user-facing messages', () => {
     const type = t.reference(registry, 'note', 'many')
     const results = [
       type.encode({
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'many',
         selector: { by: 'range', start: 3, end: 1 },
       }),
-      type.encode({ resource: 'calendar', form: 'identity', cardinality: 'many', entries: [] }),
+      type.encode({
+        app: APP,
+        resource: 'calendar',
+        form: 'identity',
+        cardinality: 'many',
+        entries: [],
+      }),
       type.decode(
         { reference: { resource: 'note', form: 'identity', cardinality: 'one', id: 'N1' } },
         VECTOR_DECODE_CONTEXT
@@ -986,6 +1394,7 @@ describe('user-facing messages', () => {
   it('explains that an equal start and end is a valid empty range', () => {
     const message = messagesOf(
       t.reference(registry, 'note', 'many').encode({
+        app: APP,
         resource: 'note',
         form: 'selector',
         cardinality: 'many',

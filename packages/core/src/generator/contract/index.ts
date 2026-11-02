@@ -27,6 +27,7 @@ import {
   ValueTypes as t,
   type RecordField,
   type ReferenceRegistry,
+  type ReferenceScope,
   type ValueType,
 } from '@macts/contracts'
 import type {
@@ -359,7 +360,7 @@ class ContractBuilder {
   readonly #resolver: NameResolver
   readonly #renderer: ValueRenderer
   readonly #builder: ValueBuilder
-  #registry: ReferenceRegistry | undefined
+  #scope: ReferenceScope | undefined
   readonly #identifiers = new Map<string, ValueShape>()
   readonly #operations: OperationModel[] = []
   readonly #operationsByRoute = new Map<string, OperationModel>()
@@ -379,18 +380,20 @@ class ContractBuilder {
       enumMembers: (enumKey) => `${lowerCamel(enumKey)}Members`,
       recordInterface: (resourceKey) => resourceKey,
       identifier: (resourceKey) => this.#identifiers.get(resourceKey),
-      resourcesBinding: 'resources',
+      scopeBinding: this.#names.contract,
     })
     this.#builder = new ValueBuilder({
       enumMembers: (enumKey) => enumMembers(this.#manifest.enums[enumKey]?.values ?? []),
-      registry: () => (this.#registry ??= this.#buildRegistry()),
+      scope: () => (this.#scope ??= { app: this.#names.app, resources: this.#buildRegistry() }),
     })
   }
 
   /**
    * The resource table as references read it, built in process: the same
    * resources in the same order as the generated table, each with the
-   * identifier value type the table renders for it.
+   * identifier value type the table renders for it. With the app's route
+   * segment it is the scope the in-process value types read, as the generated
+   * ones read the generated contract.
    */
   #buildRegistry(): ReferenceRegistry {
     const registry: Record<string, { readonly id?: ValueType<unknown> }> = {}
@@ -715,7 +718,7 @@ class ContractBuilder {
   #positional(fields: readonly FieldModel[]): MethodModel['params'] {
     return fields.map((field) => ({
       binding: safeIdentifier(field.name),
-      type: this.#renderer.sdkType(field.shape),
+      type: this.#renderer.sdkType(field.shape, 'input'),
       optional: false,
       doc: fieldDoc(field, ' '),
     }))
@@ -815,7 +818,7 @@ class ContractBuilder {
         const field = this.#parameterField(parameter)
         return {
           binding: bindingName,
-          type: this.#renderer.sdkType(field.shape),
+          type: this.#renderer.sdkType(field.shape, 'input'),
           optional,
           doc: fieldDoc(field, ' '),
         }
@@ -901,7 +904,7 @@ class ContractBuilder {
       const lines = fields.map((field) => {
         const readonly = field.readOnly ? 'readonly ' : ''
         const optional = field.optional ? '?' : ''
-        const type = this.#renderer.sdkType(field.shape)
+        const type = this.#renderer.sdkType(field.shape, 'output')
         return `${docComment(fieldDoc(field), '  ')}  ${readonly}${propertyKey(field.name)}${optional}: ${type}`
       })
       return `${doc}export interface ${resourceKey} {\n${lines.join('\n')}\n}\n`
@@ -928,7 +931,7 @@ class ContractBuilder {
     if (fields.length === 0) return `${doc}export type ${name} = Record<string, never>\n`
     const lines = fields.map(
       (field) =>
-        `${docComment(fieldDoc(field), '  ')}  ${propertyKey(field.name)}${field.optional ? '?' : ''}: ${this.#renderer.sdkType(field.shape)}`
+        `${docComment(fieldDoc(field), '  ')}  ${propertyKey(field.name)}${field.optional ? '?' : ''}: ${this.#renderer.sdkType(field.shape, 'input')}`
     )
     return `${doc}export interface ${name} {\n${lines.join('\n')}\n}\n`
   }
@@ -1063,7 +1066,7 @@ ${entries.join('\n')}
     if (input.kind === 'create') return `${input.resourceKey}CreateInput`
     if (input.fields.length === 0) return 'Record<string, never>'
     const members = input.fields.map((field) => {
-      const type = this.#renderer.sdkType(field.shape)
+      const type = this.#renderer.sdkType(field.shape, 'input')
       // Optional request fields also accept `undefined`, which encodes as
       // absent, so methods can forward optional arguments as they are.
       // (`unknown` already includes it.)
@@ -1083,7 +1086,7 @@ ${entries.join('\n')}
       case 'records':
         return `readonly ${output.resourceKey}[]`
       case 'value':
-        return this.#renderer.sdkType(output.shape)
+        return this.#renderer.sdkType(output.shape, 'output')
     }
   }
 

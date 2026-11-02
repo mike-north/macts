@@ -9,6 +9,7 @@ import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
@@ -109,17 +110,17 @@ export type AudioCDTrackUpdateInput = Record<string, never>;
 // @public
 export interface BrowserWindow {
     readonly selection: string | null;
-    view: ObjectReferenceVariant<Playlist, never> | null;
+    view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public
 export interface BrowserWindowCreateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
+    view?: ObjectReferenceData<never, 'Playlist'>;
 }
 
 // @public
 export interface BrowserWindowUpdateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
+    view?: ObjectReferenceData<never, 'Playlist'>;
 }
 
 // @public
@@ -318,7 +319,7 @@ export interface Playlist {
     readonly duration: Integer | null;
     favorited: boolean | null;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Playlist, never> | null;
+    readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
     readonly size: Integer | null;
     readonly specialKind: string | null;
     readonly time: string | null;
@@ -350,7 +351,7 @@ export interface PlaylistUpdateInput {
 // @public
 export interface PlaylistWindow {
     readonly selection: string | null;
-    readonly view: ObjectReferenceVariant<Playlist, never> | null;
+    readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public

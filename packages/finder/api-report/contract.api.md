@@ -7,6 +7,7 @@
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 
 // @public
@@ -205,7 +206,7 @@ export interface FinderWindow {
     readonly columnViewOptions: unknown;
     currentView: string | null;
     readonly iconViewOptions: unknown;
-    readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never> | null;
+    readonly listViewOptions: ObjectReferenceVariant<ListViewOptions, never, 'ListViewOptions'> | null;
     pathbarVisible: boolean | null;
     sidebarWidth: Integer | null;
     statusbarVisible: boolean | null;
@@ -266,7 +267,7 @@ export interface ListViewOptions {
     calculatesFolderSizes: boolean | null;
     iconSize: string | null;
     showsIconPreview: boolean | null;
-    sortColumn: ObjectReferenceVariant<Column, never> | null;
+    sortColumn: ObjectReferenceVariant<Column, never, 'Column'> | null;
     textSize: Integer | null;
     usesRelativeDates: boolean | null;
 }
@@ -276,7 +277,7 @@ export interface ListViewOptionsCreateInput {
     calculatesFolderSizes?: boolean;
     iconSize?: string;
     showsIconPreview?: boolean;
-    sortColumn?: ObjectReferenceVariant<Column, never>;
+    sortColumn?: ObjectReferenceData<never, 'Column'>;
     textSize?: Integer;
     usesRelativeDates?: boolean;
 }
@@ -286,7 +287,7 @@ export interface ListViewOptionsUpdateInput {
     calculatesFolderSizes?: boolean;
     iconSize?: string;
     showsIconPreview?: boolean;
-    sortColumn?: ObjectReferenceVariant<Column, never>;
+    sortColumn?: ObjectReferenceData<never, 'Column'>;
     textSize?: Integer;
     usesRelativeDates?: boolean;
 }
