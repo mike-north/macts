@@ -14,7 +14,8 @@
  *   `createNote` takes a `file` parameter (a file source when written).
  * - `getNote` identifies a note by the parameter `noteId`, whose name differs
  *   from the note's identifier property `uid`.
- * - `updateNote` takes a parent scope (`folderId`, an integer) and the note.
+ * - `updateNote` takes a parent scope (`folderId`, an integer) and the note;
+ *   it and `createNote` record the folder as their parent.
  * - `archive` is a non-CRUD resource command with an explicit permission.
  * - `quit` is an app command with an optional parameter.
  * - `wordTotal` is an app command with a result, which is nullable by default.
@@ -209,6 +210,9 @@ commands:
     description: Create a note
     scope: resource
     resourceType: Note
+    parent:
+      resource: Folder
+      parameter: folderId
     parameters:
       - name: folderId
         type: integer
@@ -225,6 +229,9 @@ commands:
     description: Update a note
     scope: resource
     resourceType: Note
+    parent:
+      resource: Folder
+      parameter: folderId
     parameters:
       - name: folderId
         type: integer

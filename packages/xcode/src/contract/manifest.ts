@@ -153,6 +153,7 @@ export const manifest: unknown = {
         {
           property: 'name',
           primary: true,
+          targeting: 'byProperty',
         },
       ],
     },
@@ -1072,6 +1073,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -1104,6 +1109,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -1136,6 +1145,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'WorkspaceDocument',
+        parameter: 'workspaceName',
+      },
       code: 'core',
       routeName: 'list',
     },

@@ -927,13 +927,12 @@ resolves only that spelling: the first word lowercased whole and each later
 word capitalized ("media items" is `mediaItems`, "URL tracks" is `urlTracks`).
 Any other spelling, including all lowercase, names no collection. One function,
 `resolveCollectionAccessor` in `manifest/native-accessor.ts`, gives every
-accessor a body uses: the resource's own collection, and the collection a
-nested resource's parent is reached through. Its default applies the bridge's
-rule to the plural with the same acronym-aware word split as the public
-segment (`manifest/lower-camel.ts`), so `URLTracks` gives `urlTracks` and
-`URLs` gives `urls`. A parent known only from an identifier parameter is
-spelled by the same rule from the parameter's stem (`mediaItemId` gives
-`mediaItems`). The default coincides with the public segment, but the two
+accessor a body uses: the resource's own collection, and the collection of
+the parent a command records (D10, command parents). Its default applies the
+bridge's rule to the plural with the same acronym-aware word split as the
+public segment (`manifest/lower-camel.ts`), so `URLTracks` gives `urlTracks`
+and `URLs` gives `urls`. No accessor is spelled from a parameter's name. The
+default coincides with the public segment, but the two
 answer different questions. Where the app's term cannot be derived from the
 plural ("AirPlay devices" is `airplayDevices`, not `airPlayDevices`), the
 spelling recorded in the manifest takes precedence over the default, and
@@ -959,6 +958,16 @@ shipped manifest against the installed app's dictionary with
 
 Known exceptions are listed with their issue, and the test fails when one
 starts resolving.
+
+**Command parents.** A command on a nested resource reaches its target
+through the parent the manifest records for it (`command.parent`), never a
+guessed one. The body binds the parent item, addressed in the parent
+resource's collection by that resource's identifier targeting with the
+identifier read from the recorded parameter, fails as "no such object" when it
+does not exist, and then addresses the command's resource collection under
+it. A command that records no parent addresses its resource's collection at
+the application. The rule, the guard, and its exceptions are in D10 (command
+parents).
 
 **Worker compatibility.** A later executor may run a long-lived automation
 worker (one process per target app, pooled and restartable) instead of one
@@ -1468,7 +1477,7 @@ These remain in #121, to be re-scoped after the value contracts land:
   `zod-to-json-schema` dependency
 - the dead `generator/schemas.ts` / `generateSdk` path
 
-## D10. Positions on Precision, Signed Zero, Classification, and Dates
+## D10. Positions on Precision, Signed Zero, Classification, Dates, and Manifest Evidence
 
 | Topic                                                       | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Evidence still needed (owner)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1541,6 +1550,14 @@ Each record carries dictionary evidence: the source (`dictionary`), the app's bu
 Native bodies resolve every name they address through `resolveCollectionAccessor` and `resolvePropertyAccessor` in `manifest/native-accessor.ts`. A body uses the app's spelling wherever it touches the app (reads, the identifier inside a property match, the record handed to a class constructor, and assignments) and the public key wherever it builds a record for the caller. Get, create and update all return the item's usable properties read this way, so no app spelling reaches the caller: one shared read takes them from a single `properties()` record, by the app's names. It reads on its own, guarded, any usable property the record leaves out (Finder's container record has no `entireContents`), and falls back to a guarded read of each property when the record cannot be read, as a list does. A list's record read takes properties only from the record, and omits one the record leaves out.
 
 The probes (`macts probe`, identifiers and `--nullability`) address the app the same way, through the same two functions, and report every observation under the manifest key, so evidence is recorded against the public name. They never probe a resource marked unsupported, even when asked to: the app has none to read.
+
+### Command parents
+
+**A command's parent is recorded, never guessed.** A command on a nested resource records `parent: { resource, parameter }`: `resource` is the key of the resource whose items hold the command's resource as elements, and `parameter` is the command's own required parameter that carries the parent item's identifier. Calendar's `getEvent` records `{ resource: Calendar, parameter: calendarId }`. The parent is a fact the curator records from the app's dictionary (the parent's class has the child as an element); nothing derives it from a parameter's name or position, or from the hierarchy. The manifest schema rejects a parent resource the manifest does not declare, one marked unsupported on a usable command, and a parameter that is not one of the command's required parameters, naming the command, the field and the value.
+
+Every surface takes the parent from the record. Native bodies address the parent resource's collection (`resolveCollectionAccessor`), the parent item in it by that resource's identifier targeting, and the command's resource collection under that item (D4, command parents); a command with no parent addresses its resource at the application. The generated SDKs, the contract and the CLI take a get, update or delete's parent scope from `parent.parameter`, and the child identifier is the first other required parameter (`resolveIdParams` in `generator/surface.ts`).
+
+**A guard holds every shipped manifest to the rule** (`manifest/command-parents.test.ts`). Every usable list, get, create, update or delete command on a resource the hierarchy nests under another resource, and does not also place at the application (`usableHierarchyChildren` of the top-level entries), records a parent; only those shapes address a collection. A recorded parent must hold the command's resource in the hierarchy. A resource the hierarchy does not place has no parent to record and is not checked. The only exceptions are the nested commands whose parent awaits a design decision, [#173](https://github.com/mike-north/macts/issues/173): Microsoft Edge's `getTab` and `getBookmarkItem`; OmniGraffle's `getGraphic`, `getShape`, `getLine` and `getLayer`; OmniPlan's task, milestone, resource, assignment, dependency, violation and scenario commands; Xcode's `getProject`, `getScheme` and `getRunDestination`; and OmniFocus's `listTasks`, `getTask` and `createTask`. The list is exact: an entry that records a parent, or whose resource becomes a top-level child, fails the guard until it is removed.
 
 ### Unsupported resources
 

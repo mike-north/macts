@@ -514,6 +514,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'List',
+        parameter: 'listId',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -582,6 +586,10 @@ export const manifest: unknown = {
           required: false,
         },
       ],
+      parent: {
+        resource: 'List',
+        parameter: 'listId',
+      },
       code: 'crel',
       routeName: 'create',
     },

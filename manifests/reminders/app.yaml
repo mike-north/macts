@@ -401,6 +401,9 @@ commands:
     description: List all reminders in a list
     scope: resource
     resourceType: Reminder
+    parent:
+      resource: List
+      parameter: listId
     code: core
     parameters:
       - name: listId
@@ -427,6 +430,9 @@ commands:
     description: Create a new reminder
     scope: resource
     resourceType: Reminder
+    parent:
+      resource: List
+      parameter: listId
     code: crel
     parameters:
       - name: listId

@@ -203,11 +203,12 @@ export function findResourceCreateCommand(
  * The request parameter names that identify the target of a get, update, or
  * delete command.
  *
- * Some commands take two required identifiers: a parent scope (for example
- * `calendarId` on `getEvent`) and the child identifier (`id`). The parent scope
- * is the first required parameter and the child identifier the last. With one
- * required parameter it is the child identifier and there is no parent scope;
- * with none, the child identifier is `id`.
+ * A command on a nested resource records its parent (`command.parent`), and
+ * the parent scope is the parameter it names (`calendarId` on `getEvent`).
+ * The child identifier is the first other required parameter (`id`), or `id`
+ * when the command has none. A command that records no parent has no parent
+ * scope, whatever its parameters are named or however many are required:
+ * nothing about the parent is inferred.
  *
  * The names are exactly the `command.parameters` entries the server validates
  * and binds, so every surface sends them under these names.
@@ -216,13 +217,10 @@ export function resolveIdParams(command: Command): {
   parentParam: string | undefined
   childParam: string
 } {
-  const requiredParams = command.parameters.filter((p) => p.required)
-  if (requiredParams.length >= 2) {
-    const parentParam = requiredParams[0]?.name
-    const childParam = requiredParams[requiredParams.length - 1]?.name ?? 'id'
-    return { parentParam, childParam }
-  }
-  return { parentParam: undefined, childParam: requiredParams[0]?.name ?? 'id' }
+  const parentParam = command.parent?.parameter
+  const childParam =
+    command.parameters.find((p) => p.required && p.name !== parentParam)?.name ?? 'id'
+  return { parentParam, childParam }
 }
 
 /**

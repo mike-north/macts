@@ -1,6 +1,7 @@
 import type { GeneratorContext } from './context.js'
 import type { PropertyType } from '../manifest/index.js'
 import { usableHierarchyChildren } from '../manifest/unsupported.js'
+import { hierarchyChildAccessor } from './hierarchy-accessor.js'
 import { propertyTypeToTs } from './types.js'
 
 export interface GeneratedApplication {
@@ -23,13 +24,15 @@ export function generateApplicationClass(ctx: GeneratorContext): GeneratedApplic
   ]
 
   // Generate top-level collection accessors from hierarchy, except for
-  // resources marked unsupported
+  // resources marked unsupported. The getter is named by the hierarchy key;
+  // the specifier addresses the app's own spelling of the collection.
   const topLevelCollections = usableHierarchyChildren(ctx.manifest, ctx.manifest.hierarchy.children)
   const collectionAccessors = topLevelCollections.map(([key, child]) => {
     const collectionClass = `${child.resource}Collection`
+    const accessor = hierarchyChildAccessor(ctx.manifest, key, child)
     return `  /** Access ${key} */
   get ${key}(): ${collectionClass} {
-    return new ${collectionClass}(this.#executor, this.#specifier.collection('${key}'));
+    return new ${collectionClass}(this.#executor, this.#specifier.collection(${JSON.stringify(accessor)}));
   }`
   })
 

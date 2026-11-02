@@ -358,6 +358,34 @@ describe('probeNullability: the presence matrix', () => {
     })
   })
 
+  it('reports a resource under a hierarchy link that names no resource as unreachable, guessing no accessor for the link (#165)', async () => {
+    const manifest: AppManifest = {
+      ...MANIFEST,
+      hierarchy: {
+        children: {
+          folders: {
+            resource: 'Folder',
+            access: 'rw',
+            children: { notes: { resource: 'Note', access: 'rw' } },
+          },
+        },
+      },
+    }
+    const { runner, scripts } = fakeRunner(fakeApp({ notes: [note(0)] }))
+    const result = await probeNullability(manifest, runner, {
+      resources: ['Note'],
+      environment: environment(),
+    })
+    // The link is named by its key, never spelled as a guessed `Folders` accessor.
+    expect(result.resources['Note']).toMatchObject({
+      accessPath: 'Folder/notes',
+      status: 'unreachable',
+      itemsRead: 0,
+    })
+    // Only the version is read: the unresolvable resource is never addressed.
+    expect(scripts).toEqual([APP_VERSION_BODY])
+  })
+
   it('reports an unreachable resource and moves on to the next', async () => {
     const { runner } = fakeRunner(fakeApp({ notes: [note(0)] }))
     const result = await probeNullability(MANIFEST, runner, {

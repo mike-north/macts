@@ -748,6 +748,9 @@ commands:
     description: Create a new event
     scope: resource
     resourceType: Event
+    parent:
+      resource: Calendar
+      parameter: calendarId
     code: crel
     parameters:
       - name: calendarId
@@ -788,11 +791,53 @@ commands:
 | `scope`             | enum            | Yes      | Command scope: `application` or `resource`                           |
 | `resourceType`      | string or array | No       | For resource-scoped commands, which resource type(s) can be targeted |
 | `parameters`        | array           | No       | Input parameters                                                     |
+| `parent`            | object          | No       | The parent the target is reached through (see below)                 |
 | `returns`           | string          | No       | Return type (void if omitted)                                        |
 | `code`              | string          | No       | AppleScript four-character code                                      |
 | `permission`        | string          | No       | Fine-grained permission required (format: `app:resource:operation`)  |
 | `permissionHistory` | array           | No       | History of permission changes for upgrade messages                   |
 | `unsupported`       | object          | No       | Marks a command the running app cannot carry out, with live evidence |
+
+#### Command parents
+
+A command on a nested resource records the parent its target is reached
+through: `resource` is the key of the resource whose items hold the command's
+resource as elements, and `parameter` is the command's own required parameter
+that carries the parent item's identifier.
+
+```yaml
+listBookmarkItems:
+  name: list
+  scope: resource
+  resourceType: BookmarkItem
+  parent:
+    resource: BookmarkFolder
+    parameter: folderId
+  parameters:
+    - name: folderId
+      type: string
+      description: Bookmark folder identifier
+      required: true
+```
+
+The parent is recorded from the app's dictionary (the parent's class has the
+command's resource as an element). It is never derived from a parameter's
+name or position, or from the hierarchy. The command reaches its target
+through the parent resource's collection, the parent item in it (by that
+resource's identifiers), and the command's resource collection under that
+item. A command with no `parent` addresses its resource at the application.
+
+The schema rejects a `parent.resource` the manifest does not declare, one
+marked unsupported on a usable command, and a `parent.parameter` that is not a
+required parameter of the command.
+
+Every list, get, create, update or delete command on a resource that the
+hierarchy nests under another resource, and that is not also a top-level
+child, must record a parent; a test over every shipped manifest enforces it.
+The only exceptions are the nested commands whose parent awaits a design
+decision, tracked in [#173](https://github.com/mike-north/macts/issues/173).
+
+**Schema:** [`CommandParentSchema`](../packages/core/src/manifest/schemas/command.ts)
 
 #### Unsupported commands
 

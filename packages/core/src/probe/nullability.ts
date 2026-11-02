@@ -35,11 +35,7 @@ import type { AppManifest } from '../manifest/schemas/app.js'
 import type { HierarchyChild } from '../manifest/schemas/hierarchy.js'
 import type { PropertyType } from '../manifest/schemas/property.js'
 import type { NullabilityProbeStatus, Resource } from '../manifest/schemas/resource.js'
-import {
-  defaultCollectionAccessor,
-  resolveCollectionAccessor,
-  resolvePropertyAccessor,
-} from '../manifest/native-accessor.js'
+import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { isResourceUnsupported, isUnsupportedProperty } from '../manifest/unsupported.js'
 import {
   VALUE_KINDS,
@@ -861,11 +857,12 @@ export async function probeNullability(
     const resource = manifest.resources[resourceKey]
     if (resource === undefined) continue
     const chain = resolveAccessChain(manifest, resourceKey)
+    // A link that names no resource has no known spelling in the app: the
+    // report names it by its key, and the resource is never addressed (it is
+    // reported unreachable below), so no accessor is guessed from the key.
     const accessors = chain.map((key) => {
       const link = manifest.resources[key]
-      return link === undefined
-        ? defaultCollectionAccessor(`${key}s`)
-        : resolveCollectionAccessor(link)
+      return link === undefined ? key : resolveCollectionAccessor(link)
     })
     const accessPath = accessors.join('/')
     const { read, skipped } = selectProbedProperties(manifest, resource, skipProperties)

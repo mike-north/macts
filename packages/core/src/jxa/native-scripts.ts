@@ -6,8 +6,13 @@
  * `app` is the target application and `args` is the operation's input record.
  * The bodies encode live-app behavior that the manifest alone does not express:
  *
- * - nested resources are addressed through their parent (Calendar events exist
- *   only under a calendar, never as a top-level collection);
+ * - a command on a nested resource reaches its target through the parent the
+ *   manifest records for it (`command.parent`): the parent resource's
+ *   collection, the parent item in it, then the resource's collection under
+ *   that item (Calendar events exist only under a calendar, never as a
+ *   collection of the application). The parent is never inferred from a
+ *   parameter's name or position, and a command that records none addresses
+ *   its resource's collection at the application;
  * - an identifier is targeted by id or by matching a working property, as the
  *   manifest's identifier targeting declares;
  * - lists read each item's whole property record in one round trip, falling
@@ -46,11 +51,7 @@ import {
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
 } from '../manifest/identifier.js'
-import {
-  defaultCollectionAccessor,
-  resolveCollectionAccessor,
-  resolvePropertyAccessor,
-} from '../manifest/native-accessor.js'
+import { resolveCollectionAccessor, resolvePropertyAccessor } from '../manifest/native-accessor.js'
 import { usableProperties } from '../manifest/unsupported.js'
 
 /**
@@ -304,42 +305,6 @@ function buildCommandCallBody(command: Command, resultLocal = false): string {
 // Targeting
 // ---------------------------------------------------------------------------
 
-/** The parent collection a nested resource lives in. */
-interface ParentCollection {
-  readonly resource: Resource | undefined
-  /** Accessor of the parent's collection in the app (see `resolveCollectionAccessor`). */
-  readonly plural: string
-}
-
-/**
- * Resolve the parent collection an identifier parameter refers to.
- *
- * A parameter such as `calendarId` refers to the resource whose primary
- * identifier property starts with `calendar`, or whose name or plural is
- * `calendar`/`calendars`, compared without regard to case. With no matching
- * resource, the accessor is derived from the parameter name itself, by the
- * same rule as a resource's plural (`calendarId` gives `calendars`,
- * `mediaItemId` gives `mediaItems`, `URLId` gives `urls`).
- */
-function resolveParentCollection(manifest: AppManifest, parentIdParam: string): ParentCollection {
-  const paramStem = parentIdParam.endsWith('Id') ? parentIdParam.slice(0, -2) : parentIdParam
-  const paramBase = paramStem.toLowerCase()
-  for (const res of Object.values(manifest.resources)) {
-    const primaryId = resolvePrimaryIdentifierProperty(res)
-    const resNameLower = res.name.toLowerCase()
-    const resPluralLower = res.plural.toLowerCase()
-    if (
-      primaryId?.toLowerCase().startsWith(paramBase) === true ||
-      resNameLower === paramBase ||
-      resPluralLower === paramBase + 's' ||
-      resPluralLower === paramBase
-    ) {
-      return { resource: res, plural: resolveCollectionAccessor(res) }
-    }
-  }
-  return { resource: undefined, plural: defaultCollectionAccessor(`${paramStem}s`) }
-}
-
 /**
  * Expression addressing one item of a top-level collection by identifier.
  *
@@ -388,11 +353,17 @@ export function buildNestedTargetExpression(
   return `${member(parentTarget, childPlural)}.byId(${childIdExpression})`
 }
 
-/** Parent scope of a get, update, or delete on a nested resource. */
+/**
+ * The parent scope of a command on a nested resource, from the parent the
+ * manifest records for it (`command.parent`).
+ */
 interface ParentScope {
   /** The request parameter carrying the parent's identifier. */
   readonly parentIdParam: string
-  /** Expression addressing the parent, reading its identifier from `parentId`. */
+  /**
+   * Expression addressing the parent item in its resource's collection,
+   * reading its identifier from {@link PARENT_ID_LOCAL}.
+   */
   readonly parentTarget: string
 }
 
@@ -442,24 +413,51 @@ function bindParent(parentTarget: string): string {
 }
 
 /**
- * Resolve the parent scope of a get, update, or delete on a nested resource.
+ * The parent scope of a command, from the parent the manifest records for it
+ * (`command.parent`), or `undefined` for a command with none, whose resource
+ * is addressed at the application.
  *
- * A parent scope exists only when the command has at least two required
- * parameters: the first is the parent identifier and a later one is the child
- * identifier. A command with a single required parameter addresses a flat,
- * top-level resource. The parent is targeted honoring its own identifier
- * targeting, so a calendar is matched by name.
+ * The parent item is addressed in its resource's collection
+ * ({@link resolveCollectionAccessor}), by that resource's identifier targeting
+ * ({@link buildTargetExpression}), so a calendar is matched by name. Nothing
+ * about the parent is inferred: not from a parameter's name or position, and
+ * not from the hierarchy.
+ *
+ * @throws `InternalError` when the recorded parent names a resource the
+ *   manifest does not declare. The manifest schema rejects such a parent, so
+ *   reaching this is a macts defect.
  */
-function resolveParentScope(command: Command, manifest: AppManifest): ParentScope | undefined {
-  const requiredParams = command.parameters.filter((p) => p.required)
-  if (requiredParams.length < 2) return undefined
-  const parentParam = requiredParams[0]
-  if (parentParam === undefined) return undefined
-  const parent = resolveParentCollection(manifest, parentParam.name)
-  return {
-    parentIdParam: parentParam.name,
-    parentTarget: buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL),
+function recordedParentScope(command: Command, manifest: AppManifest): ParentScope | undefined {
+  const parent = command.parent
+  if (parent === undefined) return undefined
+  const resource = Object.hasOwn(manifest.resources, parent.resource)
+    ? manifest.resources[parent.resource]
+    : undefined
+  if (resource === undefined) {
+    throw new InternalError(
+      `Command "${command.name}" names parent resource "${parent.resource}", which its app does not declare.`,
+      {}
+    )
   }
+  return {
+    parentIdParam: parent.parameter,
+    parentTarget: buildTargetExpression(
+      resource,
+      resolveCollectionAccessor(resource),
+      PARENT_ID_LOCAL
+    ),
+  }
+}
+
+/**
+ * Statement that reads the parent identifier of `parentScope` into
+ * {@link PARENT_ID_LOCAL}, as the native value the app expects.
+ */
+function readParentId(command: Command, parentScope: ParentScope): string {
+  return `var ${PARENT_ID_LOCAL} = ${argumentValue(
+    parentScope.parentIdParam,
+    findParameter(command, parentScope.parentIdParam)
+  )};`
 }
 
 /** Find a declared parameter by name. */
@@ -490,10 +488,7 @@ function bindTarget(
     )
   }
   return lines(
-    `var ${PARENT_ID_LOCAL} = ${argumentValue(
-      parentScope.parentIdParam,
-      findParameter(command, parentScope.parentIdParam)
-    )};`,
+    readParentId(command, parentScope),
     itemId,
     bindParent(parentScope.parentTarget),
     `var item = ${buildNestedTargetExpression(PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
@@ -553,8 +548,8 @@ function resolveIdentifierParam(command: Command, parentScope: ParentScope | und
 }
 
 /**
- * List every item of a collection, or of the parent's collection when the
- * command carries a required parent identifier.
+ * List every item of the resource's collection at the application, or, for a
+ * command that records a parent, of the collection under the parent item.
  *
  * Each item carries every declared property, the primary identifier (even when
  * it is declared only under `identifiers`), and a canonical `id` mirroring the
@@ -628,21 +623,13 @@ function buildListBody(
         )
       : ''
 
-  // The parent parameter of a list is the first required parameter that is not
-  // one of the listed resource's own properties (`calendarId` for events).
-  const parentParam = command.parameters.find(
-    (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
-  )
   // A parent that does not exist fails as "no such object", never as an empty
   // list: an empty list would claim the parent exists and has no items.
+  const parentScope = recordedParentScope(command, manifest)
   let parentBinding = ''
   let collectionExpression = `${member('app', resourcePlural)}()`
-  if (parentParam !== undefined) {
-    const parent = resolveParentCollection(manifest, parentParam.name)
-    parentBinding = lines(
-      `var ${PARENT_ID_LOCAL} = ${argumentValue(parentParam.name, parentParam)};`,
-      bindParent(buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL))
-    )
+  if (parentScope !== undefined) {
+    parentBinding = lines(readParentId(command, parentScope), bindParent(parentScope.parentTarget))
     collectionExpression = `${member(PARENT_LOCAL, resourcePlural)}()`
   }
 
@@ -668,14 +655,15 @@ function buildListBody(
   )
   return {
     body,
-    identifierArguments: parentParam === undefined ? [] : [parentParam.name],
+    identifierArguments: parentScope === undefined ? [] : [parentScope.parentIdParam],
   }
 }
 
 /**
  * Read one item's usable properties into a record keyed by their public names
- * (see {@link readUsableProperties}). A nested resource is addressed through
- * its parent; a top-level one directly. The item must exist (see
+ * (see {@link readUsableProperties}). A command that records a parent
+ * addresses the item under the parent item; any other addresses it at the
+ * application. The item must exist (see
  * {@link failIfMissing}) before any property is read.
  */
 function buildGetBody(
@@ -684,7 +672,7 @@ function buildGetBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
-  const parentScope = resolveParentScope(command, manifest)
+  const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const bindItem = bindTarget(command, resource, resourcePlural, parentScope, identifierParam)
   const body = lines(bindItem, readUsableProperties(resource, 'item'), 'return obj;')
@@ -702,7 +690,7 @@ function buildDeleteBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
-  const parentScope = resolveParentScope(command, manifest)
+  const parentScope = recordedParentScope(command, manifest)
   const identifierParam = command.parameters.find(
     (p) => p.required && p.name !== parentScope?.parentIdParam
   )?.name
@@ -718,13 +706,12 @@ function buildDeleteBody(
  * Create an item from the supplied parameters and return its usable
  * properties, keyed by their public names, as a get does.
  *
- * When the command has a required parent identifier (the first required
- * parameter that is not one of the resource's own properties, such as
- * `calendarId`), the new item is appended to the parent's collection:
- * `make({ at: ... })` fails with "can't make or move that element into that
- * container", and appending to the parent's collection is the working form.
- * Every other supplied parameter becomes a property of the new item, keyed by
- * the app's name for the property it names.
+ * When the command records a parent (`calendarId` names the calendar an
+ * event is created in), the new item is appended to the resource's collection
+ * under the parent item: `make({ at: ... })` fails with "can't make or move
+ * that element into that container", and appending to the parent's collection
+ * is the working form. Every other supplied parameter becomes a property of
+ * the new item, keyed by the app's name for the property it names.
  */
 function buildCreateBody(
   command: Command,
@@ -733,20 +720,16 @@ function buildCreateBody(
   manifest: AppManifest
 ): ResourceBody {
   const itemClass = member('app', resource?.name ?? 'Item')
-  const parentParam = command.parameters.find(
-    (p) => p.required && !Object.hasOwn(resource?.properties ?? {}, p.name)
-  )
+  const parentScope = recordedParentScope(command, manifest)
 
   const native = (name: string): string => nativePropertyName(resource, name)
-  if (parentParam !== undefined) {
-    const parent = resolveParentCollection(manifest, parentParam.name)
-    const parentTarget = buildTargetExpression(parent.resource, parent.plural, PARENT_ID_LOCAL)
+  if (parentScope !== undefined) {
     const body = lines(
-      `var ${PARENT_ID_LOCAL} = ${argumentValue(parentParam.name, parentParam)};`,
-      bindParent(parentTarget),
+      readParentId(command, parentScope),
+      bindParent(parentScope.parentTarget),
       collectSuppliedParameters(
         'props',
-        command.parameters.filter((p) => p.name !== parentParam.name),
+        command.parameters.filter((p) => p.name !== parentScope.parentIdParam),
         native
       ),
       `var item = ${itemClass}(props);`,
@@ -754,7 +737,7 @@ function buildCreateBody(
       readUsableProperties(resource, 'item'),
       'return obj;'
     )
-    return { body, identifierArguments: [parentParam.name] }
+    return { body, identifierArguments: [parentScope.parentIdParam] }
   }
 
   // TODO(#81 follow-up): top-level `item.make()` has not been verified against a
@@ -786,7 +769,7 @@ function buildUpdateBody(
   resourcePlural: string,
   manifest: AppManifest
 ): ResourceBody {
-  const parentScope = resolveParentScope(command, manifest)
+  const parentScope = recordedParentScope(command, manifest)
   const identifierParam = resolveIdentifierParam(command, parentScope)
   const excluded = new Set([identifierParam, parentScope?.parentIdParam])
   const writableFields = command.parameters.filter((p) => !excluded.has(p.name))
