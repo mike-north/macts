@@ -115,7 +115,13 @@ drift.
 ## One-time bootstrap runbook
 
 Trusted publishing requires a publisher to already exist on npm before CI can
-use it, so the very first release needs a manual bootstrap:
+use it, so the very first release needs a manual bootstrap.
+
+**This also applies after an unpublish.** Removing a package from npm removes
+its trusted-publisher configuration with it, so every affected package becomes a
+first-timer again and CI's publish step will fail with `ENEEDAUTH` — OIDC is
+detected, but there is nothing to authenticate against. Re-run this runbook in
+that situation.
 
 1. Create (or confirm ownership of) the `macts` org on
    [npmjs.com](https://www.npmjs.com/).
@@ -125,23 +131,56 @@ use it, so the very first release needs a manual bootstrap:
 3. Locally, on the versioned commit on `main`:
 
    ```bash
-   npm login
-   pnpm build && pnpm publish -r --access public --no-git-checks && pnpm changeset tag && git push --follow-tags
+   pnpm build
+   pnpm publish:bootstrap --dry-run   # validate versions and preview the plan
+   npm login                          # only needed from here on
+   pnpm publish:bootstrap             # publish
+   pnpm changeset tag && git push --follow-tags
    ```
+
+   `pnpm publish:bootstrap` (`scripts/publish-bootstrap.mjs`) exists because a
+   raw `pnpm publish -r` is a poor fit for this step. It publishes strictly
+   sequentially so npm's browser-based two-factor prompts arrive one at a time
+   rather than all at once; it skips any version already on the registry, so an
+   interrupted run can simply be re-run rather than unwound; it orders
+   dependencies before dependents; and it **refuses to publish anything whose
+   major version is not 0**, checking every package before publishing any so a
+   stray version aborts the run instead of leaving a partial release. That last
+   check is deliberately not overridable by a flag — see "Staying pre-1.0".
+
+   The dry run deliberately comes first: it needs no npm login, so the version
+   gate and the publish plan can both be confirmed before authenticating.
 
 4. Bulk-configure trusted publishers (requires npm CLI >= 11.10, and 2FA
    enabled on your npm account — granular access tokens with 2FA bypass are
    not accepted by the trust endpoints):
 
    ```bash
+   npm whoami   # confirm the session from step 3 is still valid
    for pkg in packages/*/package.json; do
      name=$(node -p "require('./$pkg').name")
      npm trust github "$name" --repo mike-north/macts --file release.yml --allow-publish --yes
    done
    ```
 
-   Verify with `npm trust list <pkg-name>` or by spot-checking a package's
-   settings page on npmjs.com.
+   **Check `npm whoami` first.** Publishing every package takes a while, so
+   step 3's login can lapse before this step starts. An expired session does
+   not announce itself usefully here: every iteration prints a full,
+   plausible-looking "Establishing trust between ..." block and only then
+   fails with `E401 "You must be logged in to publish packages."` — seventy-six
+   times, with no summary. `npm whoami` failing the same way is the tell. Run
+   `npm login` again and re-run the loop.
+
+   Re-running is safe. A package that already has a matching configuration
+   returns `E409 Conflict` instead of creating a duplicate, so an interrupted
+   or partially-failed loop can simply be run again.
+
+   Note that `--allow-publish` grants **both** `createPackage` and
+   `createStagedPackage` (reported as "publish, stage publish"), not publish
+   alone. Pass no permission flag at all if a narrower grant is ever wanted.
+
+   Verify with `npm trust list <pkg-name>` (add `--json` for the permission
+   names) or by spot-checking a package's settings page on npmjs.com.
 
 5. Merge a trivial changeset to confirm CI can publish via OIDC end-to-end —
    check that the resulting npm versions show provenance badges.
@@ -175,11 +214,13 @@ from the bootstrap runbook work at any time:
 
 ```bash
 npm login
-pnpm build && pnpm publish -r --access public --no-git-checks && pnpm changeset tag && git push --follow-tags
+pnpm build && pnpm publish:bootstrap && pnpm changeset tag && git push --follow-tags
 ```
 
-`pnpm publish -r` safely skips any package whose current version is already
-published, so it's safe to re-run.
+Both `pnpm publish:bootstrap` and a raw `pnpm publish -r` skip any package whose
+current version is already published, so either is safe to re-run. Prefer the
+script: it enforces the pre-1.0 version policy and reports per-package failures
+at the end instead of stopping at the first one.
 
 ## Token fallback if OIDC fails
 
