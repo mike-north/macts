@@ -755,10 +755,10 @@ function listAttempts(): string {
  * (see {@link attemptReader}). A collection that changes while it is read is
  * read once more from the start, and if it changes again the list fails with
  * a codec error (see {@link listAttempts}): never misaligned records. A
- * missing value
- * keeps its position in its read: the app reports it as `null` there, as it
- * does in an item's property record, so it maps to the same `null` field the
- * per-item record gave; only an `undefined` position is omitted.
+ * missing value keeps its position in its read: the app reports it as `null`
+ * there, as it does in an item's property record, so it maps to the same
+ * `null` field the per-item record gave; only an `undefined` position is
+ * omitted.
  *
  * A property whose read across the collection fails falls back to one guarded
  * read per item, for that property alone, so one property the app cannot
