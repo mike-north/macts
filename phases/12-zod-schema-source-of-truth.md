@@ -187,9 +187,10 @@ process start.
 - **Dependency surface.** The background material for this phase raises "a
   new zod dependency in every `-server` package" as Option B's cost. In
   practice this is smaller than it sounds:
-  `packages/calendar-server/package.json` already depends on
-  `@macts/calendar` (its `dependencies` block lists `@macts/api`,
-  `@macts/core`, `@macts/types`, `@macts/calendar`), and `@macts/calendar`
+  `packages/calendar-server/package.json` already depended on
+  `@macts/calendar` when this phase was planned (its `dependencies` block
+  then listed `@macts/api`, `@macts/core`, `@macts/types`, `@macts/calendar`;
+  a server package now depends only on its app package), and `@macts/calendar`
   depends on `zod`. Zod is already in every `-server` package's dependency
   graph transitively. What Option B actually costs is turning that into a
   **direct** dependency and a **direct import** inside the tool files

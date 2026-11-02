@@ -48,6 +48,8 @@ export interface AppPackageOptions {
   readonly hostShape?: 'current' | 'older' | 'no-exports'
   /** The body of the host package's `index.js`, replacing the one `hostShape` implies. */
   readonly hostSource?: string
+  /** The raw text of the host package's `package.json`, replacing the valid one. */
+  readonly hostPackageJsonSource?: string
   /**
    * Where the app package is installed relative to its host package:
    * `hoisted` beside it, or `nested` in the host package's own `node_modules`.
@@ -219,6 +221,9 @@ export function writeInstalledApp(
     exports: hostExports(shape),
     dependencies: { [`@macts/${app}`]: '0.0.0' },
   })
+  if (options.hostPackageJsonSource !== undefined) {
+    writeFileSync(join(hostDir, 'package.json'), options.hostPackageJsonSource)
+  }
   writeFileSync(join(hostDir, 'index.js'), options.hostSource ?? hostIndexSource(app, shape))
   if (shape === 'older') writeFileSync(join(hostDir, 'mcp.js'), 'export const plugin = {}\n')
   const appNodeModules =

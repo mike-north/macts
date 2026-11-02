@@ -117,6 +117,23 @@ describe('registerInstalledApps', () => {
     expect(registeredIds()).toEqual([])
   })
 
+  // Regression: an unreadable host package.json was reported as an install from
+  // an older macts, hiding the parse error behind the wrong diagnosis.
+  it('reports a host package whose package.json cannot be parsed as damaged, not as an older install', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', { hostPackageJsonSource: '{ "name": ' })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toHaveLength(1)
+    const [failure] = report.failed
+    expect(failure?.app).toBe('gadgets')
+    expect(failure?.reason).toMatch(/^@macts\/gadgets-server's package\.json cannot be read: /)
+    expect(failure?.reason).toMatch(/Reinstall it with `macts mcp install gadgets`\.$/)
+    expect(failure?.reason).not.toContain('older macts')
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
   it('reports a host package whose app package is not installed, naming the host package and the reinstall command', async () => {
     writeInstalledApp(plugins.nodeModules, 'gadgets')
     plugins.removeAppPackage('gadgets')

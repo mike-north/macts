@@ -198,12 +198,22 @@ async function loadApp(nodeModules: string, app: string, hostPackage: string): P
     }
   }
 
-  const entry = resolvePackageExport(hostDir, hostPackage, HOST_ENTRY_SUBPATH)
-  if (!entry.found) {
+  // A package.json that cannot be read is a damaged install, not an older one:
+  // only a readable package.json without a `.` export marks an older macts.
+  const hostPackageJson = readPackageJson(hostDir)
+  if (!hostPackageJson.ok) {
     return {
       ok: false,
-      reason: declaresSubpath(hostDir, HOST_ENTRY_SUBPATH) ? entry.error : olderHostPackage,
+      reason: `${hostPackage}'s package.json cannot be read: ${asSentence(hostPackageJson.error)} ${reinstall}`,
     }
+  }
+  if (!declaresExport(hostPackageJson.value, HOST_ENTRY_SUBPATH)) {
+    return { ok: false, reason: olderHostPackage }
+  }
+
+  const entry = resolvePackageExport(hostDir, hostPackage, HOST_ENTRY_SUBPATH)
+  if (!entry.found) {
+    return { ok: false, reason: entry.error }
   }
 
   let module: unknown
@@ -300,6 +310,18 @@ function findAppsMissingHost(
         installCommand: `macts mcp install ${app}`,
       }
     })
+}
+
+/** The parsed package.json of the package in `packageDir`, or why it cannot be read. */
+function readPackageJson(
+  packageDir: string
+): { ok: true; value: unknown } | { ok: false; error: string } {
+  try {
+    const value: unknown = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8'))
+    return { ok: true, value }
+  } catch (error) {
+    return { ok: false, error: messageOf(error) }
+  }
 }
 
 /** Whether the package in `packageDir` declares the export `subpath`. */
