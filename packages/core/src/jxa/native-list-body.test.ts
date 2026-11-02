@@ -163,6 +163,20 @@ interface Faults {
    * share one all resolve to the first of them, as Calendar's events do.
    */
   readonly specifiersByUid?: boolean
+  /** The collection's items swap places right after a request (see {@link Change}). */
+  readonly reorder?: Change
+  /** An item joins the collection right after a request (see {@link Change}). */
+  readonly grow?: Change & { readonly row: Row }
+}
+
+/**
+ * A change to the collection while a body reads it: applied right after the
+ * request `after` (as logged in {@link FakeApp.requests}) completes, the first
+ * time only or every time.
+ */
+interface Change {
+  readonly after: string
+  readonly times: 'once' | 'always'
 }
 
 /** A stand-in app and the log of every request a body made to it. */
@@ -223,33 +237,57 @@ const PLANNER_NAMES: readonly string[] = [
  * property across every item, empty or not.
  */
 function fakeCollection(
-  rows: readonly Row[],
+  initialRows: readonly Row[],
   faults: Faults,
   requests: string[],
   names: ReadonlySet<string>
 ): object {
+  // The collection as it is now; `reorder` and `grow` change it between requests.
+  let rows: readonly Row[] = initialRows
+  const applied = new Set<Change>()
+  const due = (change: Change | undefined, request: string): change is Change =>
+    change?.after === request && (change.times === 'always' || !applied.has(change))
+  /** Log `request`, then apply any change due after it. */
+  const completed = (request: string): void => {
+    requests.push(request)
+    if (due(faults.reorder, request)) {
+      applied.add(faults.reorder)
+      rows = [...rows].reverse()
+    }
+    if (due(faults.grow, request)) {
+      applied.add(faults.grow)
+      rows = [...rows, faults.grow.row]
+    }
+  }
   const list = (): object[] => {
-    requests.push('list')
-    const items = rows.map((row) => {
+    const current = rows
+    const items = current.map((row) => {
       const addressed =
-        faults.specifiersByUid === true ? (rows.find((r) => r['uid'] === row['uid']) ?? row) : row
+        faults.specifiersByUid === true
+          ? (current.find((r) => r['uid'] === row['uid']) ?? row)
+          : row
       return fakeItem(addressed, faults, requests)
     })
+    completed('list')
     return faults.shortItems === true ? items.slice(0, -1) : items
   }
   return new Proxy(list, {
     get(target, key, receiver) {
       if (key === 'length') {
-        requests.push('count')
-        return rows.length
+        const count = rows.length
+        completed('count')
+        return count
       }
       if (typeof key !== 'string' || !names.has(key)) {
         return Reflect.get(target, key, receiver) as unknown
       }
       return () => {
-        requests.push(`column ${key}`)
-        if (faults.bulk?.includes(key) === true) throw readFailure()
+        if (faults.bulk?.includes(key) === true) {
+          completed(`column ${key}`)
+          throw readFailure()
+        }
         const values = rows.map((row) => (Object.hasOwn(row, key) ? row[key] : null))
+        completed(`column ${key}`)
         return faults.short?.includes(key) === true ? values.slice(0, -1) : values
       }
     },
@@ -469,7 +507,8 @@ describe('list bodies read each property once across the collection', () => {
     })
     expect(recordsOf(batched)).toEqual(recordsOf(perItem))
     // The identifier read counts the items; then one read per other property,
-    // each by the app's name.
+    // each by the app's name; then exactly one more identifier read, which
+    // confirms no item moved meanwhile.
     expect(batchedRequests).toEqual([
       'shelf todos',
       'column uid',
@@ -478,6 +517,7 @@ describe('list bodies read each property once across the collection', () => {
       'column priority',
       'column url',
       'column secret',
+      'column uid',
     ])
   })
 
@@ -610,6 +650,7 @@ describe('list bodies: a property the app cannot read across the collection', ()
       'item secret',
       'item secret',
       'item secret',
+      'column uid',
     ])
   })
 
@@ -678,6 +719,89 @@ describe('list bodies: the identifier read is never guarded', () => {
       })
     )
     expect(errorOf(result)).toBeInstanceOf(AppOperationError)
+  })
+})
+
+/** The codec error a list fails with when its collection kept changing while it was read. */
+function expectCollectionChanged(error: unknown): void {
+  expect(error).toBeInstanceOf(UnexpectedValueError)
+  expect(error).toMatchObject({
+    details: {
+      issues: [
+        {
+          path: [],
+          message:
+            'The collection changed while it was being read, so the records cannot be assembled.',
+        },
+      ],
+    },
+  })
+}
+
+/** The passthrough records the planner lists for task rows, in row order. */
+function taskRecords(rows: readonly Row[]): readonly Readonly<Record<string, unknown>>[] {
+  return rows.map((row) => ({
+    title: row['title'],
+    done: row['done'],
+    priority: row['priority'],
+    uRL: row['url'],
+    secret: row['secret'],
+    uID: row['uid'],
+    id: row['uid'],
+  }))
+}
+
+describe('list bodies: items that move while the list is read', () => {
+  it('reads again from the start when items swap places, and pairs every value with its item', async () => {
+    // The items reverse right after the first identifier read, so the
+    // properties are read in the new order while the identifiers hold the
+    // old one. Equal lengths hide that; the second identifier read does not.
+    const { batched, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+      faults: { reorder: { after: 'column uid', times: 'once' } },
+      input: SHELF_INPUT,
+    })
+    expect(recordsOf(batched)).toEqual(taskRecords([...TASK_ROWS].reverse()))
+    const attempt = [
+      'column uid',
+      'column title',
+      'column done',
+      'column priority',
+      'column url',
+      'column secret',
+      'column uid',
+    ]
+    expect(batchedRequests).toEqual(['shelf todos', ...attempt, ...attempt])
+  })
+
+  it('fails with a codec error when items swap places during every read', async () => {
+    const { batched, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+      faults: { reorder: { after: 'column uid', times: 'always' } },
+      input: SHELF_INPUT,
+    })
+    expectCollectionChanged(errorOf(batched))
+    // Two attempts of two identifier reads each, never a third attempt.
+    expect(batchedRequests.filter((request) => request === 'column uid')).toHaveLength(4)
+  })
+
+  it('lists the items afresh for a per-item read when the read starts again', async () => {
+    // `secret` is read per item. An item joins right after the first item
+    // list, so the first attempt's identifier check fails; the second attempt
+    // must list four items, not reuse the three-item list, or the new item
+    // would lose its secret.
+    const added: Row = {
+      title: 'Test',
+      done: false,
+      priority: 3,
+      url: 'https://d.example',
+      secret: 's4',
+      uid: 'T4',
+    }
+    const { batched, batchedRequests } = await listBoth(TASKS, TASK_ROWS, {
+      faults: { bulk: ['secret'], grow: { after: 'list', times: 'once', row: added } },
+      input: SHELF_INPUT,
+    })
+    expect(recordsOf(batched)).toEqual(taskRecords([...TASK_ROWS, added]))
+    expect(batchedRequests.filter((request) => request === 'list')).toHaveLength(2)
   })
 })
 
@@ -756,7 +880,7 @@ describe('list bodies: identifier targeting by a working property', () => {
       { color: 'blue', name: 'Archive', id: 'Archive', folderKey: 'Archive' },
     ])
     expect(recordsOf(batched)).toEqual(recordsOf(perItem))
-    expect(batchedRequests).toEqual(['column name', 'column color'])
+    expect(batchedRequests).toEqual(['column name', 'column color', 'column name'])
   })
 
   it('leaves the declared identifier absent from a typed list', async () => {
@@ -781,12 +905,38 @@ describe('list bodies: identifier targeting by a working property', () => {
 })
 
 describe('list bodies: a resource with no identifier', () => {
-  it('counts the items, then reads each property once', async () => {
+  it('counts the items, reads each property once, then counts again', async () => {
     const rows: readonly Row[] = [{ text: 'a' }, { text: null }, { text: 'c' }]
     const { batched, perItem, batchedRequests } = await listBoth(MEMOS, rows)
     expect(recordsOf(batched)).toEqual([{ text: 'a' }, { text: null }, { text: 'c' }])
     expect(recordsOf(batched)).toEqual(recordsOf(perItem))
-    expect(batchedRequests).toEqual(['count', 'column text'])
+    expect(batchedRequests).toEqual(['count', 'column text', 'count'])
+  })
+
+  it('reads again from the start when an item joins during the read', async () => {
+    const rows: readonly Row[] = [{ text: 'a' }, { text: 'b' }]
+    const { batched, batchedRequests } = await listBoth(MEMOS, rows, {
+      faults: { grow: { after: 'column text', times: 'once', row: { text: 'c' } } },
+    })
+    expect(recordsOf(batched)).toEqual([{ text: 'a' }, { text: 'b' }, { text: 'c' }])
+    expect(batchedRequests).toEqual([
+      'count',
+      'column text',
+      'count',
+      'count',
+      'column text',
+      'count',
+    ])
+  })
+
+  it('fails with a codec error when items keep joining during every read', async () => {
+    const rows: readonly Row[] = [{ text: 'a' }, { text: 'b' }]
+    const { batched, batchedRequests } = await listBoth(MEMOS, rows, {
+      faults: { grow: { after: 'column text', times: 'always', row: { text: 'n' } } },
+    })
+    expectCollectionChanged(errorOf(batched))
+    // Read twice, never a third time.
+    expect(batchedRequests.filter((request) => request === 'column text')).toHaveLength(2)
   })
 
   it('returns an empty list when the count is zero', async () => {

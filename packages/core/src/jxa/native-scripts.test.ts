@@ -261,11 +261,17 @@ function columnField(key: string): RegExp {
   )
 }
 
-/** The statements of a list body that read the runtime identifier `nativeName`, unguarded. */
+/**
+ * The statements of a list body that read the runtime identifier
+ * `nativeName`, unguarded, across the collection or per item, before and
+ * after the properties.
+ */
 function identifierReads(nativeName: string): readonly string[] {
   return [
-    `try { ids = col[${JSON.stringify(nativeName)}](); } catch (e) { idsRead = false; }`,
-    `ids = readEach(${JSON.stringify(nativeName)}, false);`,
+    `try { values = col[${JSON.stringify(nativeName)}](); } catch (e) {`,
+    `return readEach(list, ${JSON.stringify(nativeName)}, false);`,
+    'ids = readIdentifiers();',
+    'var again = readIdentifiers();',
   ]
 }
 
@@ -363,7 +369,7 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
   it('falls back to guarded per-item reads for a property the collection cannot report', () => {
     const body = listBody(eventResource)
     expect(body).toContain(
-      'try { values = col[name](); } catch (e) { return readEach(name, true); }'
+      'try { values = col[name](); } catch (e) { return readEach(itemList(), name, true); }'
     )
     expect(body).toContain(
       'try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }'
@@ -375,12 +381,13 @@ describe('list bodies: batched reads (issue #89, issue #204)', () => {
     for (const read of identifierReads('uid')) expect(body).toContain(read)
     expect(body).toContain('obj["uid"] = ids[i];')
     expect(body).not.toContain(columnRead('uid'))
-    expect(body).not.toContain('readEach("uid", true)')
+    expect(body).not.toContain('readEach(list, "uid", true)')
   })
 
   it('counts the items by the identifier read and checks every other read against it', () => {
     const body = listBody(eventResource)
     expect(body).toContain('count = ids.length;')
+    expect(body).toContain('if (again[j] !== ids[j]) {')
     expect(body).toContain('if (!Array.isArray(values) || values.length !== count) {')
     expect(body).toContain('for (var i = 0; i < count; i++) {')
   })
@@ -554,7 +561,7 @@ describe('list bodies: identifier population', () => {
   it('reads a byId primary identifier and aliases it as id', () => {
     const body = listBody(calendarById)
     for (const read of identifierReads('calendarIdentifier')) expect(body).toContain(read)
-    expect(body).not.toContain('readEach("calendarIdentifier", true)')
+    expect(body).not.toContain('readEach(list, "calendarIdentifier", true)')
     expect(body).toContain('obj["calendarIdentifier"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["calendarIdentifier"];')
   })
@@ -562,7 +569,7 @@ describe('list bodies: identifier population', () => {
   it('sources id from the working property for a byProperty resource', () => {
     const body = listBody(calendarByName)
     for (const read of identifierReads('name')) expect(body).toContain(read)
-    expect(body).not.toContain('readEach("name", true)')
+    expect(body).not.toContain('readEach(list, "name", true)')
     expect(body).toContain('obj["name"] = ids[i];')
     expect(body).toContain('obj["id"] = obj["name"];')
   })
@@ -603,7 +610,8 @@ describe('list bodies: identifier population', () => {
     expect(body).toContain(columnRead('label'))
     expect(body).toMatch(columnField('label'))
     // With no identifier to count by, the items are counted.
-    expect(body).toContain('var count = col.length;')
+    expect(body).toContain('count = col.length;')
+    expect(body).toContain('if (col.length !== count) {')
     expect(body).not.toContain('obj["id"] =')
   })
 
@@ -1305,7 +1313,9 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
     expect(callBody(body('list', 'AirPlayDevice'), { airplayDevices }, {})).toEqual([
       { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
     ])
-    expect(reads).toEqual(['macAddress', 'url', 'name'])
+    // The identifier is read again after the properties, to confirm the
+    // collection did not change.
+    expect(reads).toEqual(['macAddress', 'url', 'name', 'macAddress'])
     expect(device.reads).toEqual([])
     // Per item: a collection that answers no property read falls back to
     // reading each device by the app's names.
@@ -1314,7 +1324,7 @@ describe('native spellings: the app is addressed by its own names (issue #165)',
     expect(callBody(body('list', 'AirPlayDevice'), fallbackApp, {})).toEqual([
       { mACAddress: 'a1', uRL: 'http://u', name: 'Den' },
     ])
-    expect(slow.reads).toEqual(['macAddress', 'url', 'name'])
+    expect(slow.reads).toEqual(['macAddress', 'url', 'name', 'macAddress'])
   })
 
   it('a property-matched lookup matches on the app name of the identifier', () => {

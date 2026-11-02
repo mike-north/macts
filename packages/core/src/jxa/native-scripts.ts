@@ -16,7 +16,8 @@
  * - an identifier is targeted by id or by matching a working property, as the
  *   manifest's identifier targeting declares;
  * - lists read each property once across the whole collection and assemble
- *   records by index, checking that every read covers the same items;
+ *   records by index, checking that every read covers the same items in the
+ *   same order;
  * - a child is created inside its parent by appending it to the parent's
  *   collection;
  * - the request parameter that carries an identifier is distinct from the
@@ -556,25 +557,36 @@ const COUNT_LOCAL = 'count'
 const IDS_LOCAL = 'ids'
 
 /**
+ * The message a list fails with when its collection kept changing while it
+ * was read, so no consistent set of reads could be assembled.
+ */
+const COLLECTION_CHANGED_MESSAGE =
+  'The collection changed while it was being read, so the records cannot be assembled.'
+
+/**
  * Statements declaring the helpers a list body reads its collection through.
- * They close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which the
- * body sets before calling any of them.
+ * They close over {@link COLLECTION_LOCAL} and {@link COUNT_LOCAL}, which an
+ * attempt sets before it reads any property.
  *
- * - `unassemblable(message)` fails the list with a codec error. A read across
- *   the collection that does not give one value per item would pair values
- *   from different items if records were assembled from it by index. The
- *   error is the codec's encode failure, the class for an app result that
- *   breaks the operation's contract, so it is reported as an unexpected value
- *   rather than as an app failure, and never as records.
+ * - `unassemblable(message)` fails the list with a codec error: the app's
+ *   reads cannot be assembled into records. The error is the codec's encode
+ *   failure, the class for an app result that breaks the operation's
+ *   contract, so it is reported as an unexpected value rather than as an app
+ *   failure, and never as records.
+ * - `Inconsistent(message)` is thrown, never returned, when one attempt's
+ *   reads do not describe the same items: a read gave a number of values
+ *   other than the item count, or the identifiers changed while the attempt
+ *   read. {@link listAttempts} redoes such an attempt.
  * - `aligned(what, values)` returns `values` when it is an array with one
- *   element per item, and otherwise fails through `unassemblable`. `what`
- *   names the read in the message.
- * - `itemList()` lists the item specifiers, once, on first use. Only reads
- *   that fall back to one request per item need them.
- * - `readEach(name, guarded)` reads one property of every item, one request
- *   per item. A guarded read the item cannot answer leaves `undefined` at its
- *   position, so the record omits that property; an unguarded failure fails
- *   the list.
+ *   element per item, and otherwise throws `Inconsistent`. `what` names the
+ *   read in the message.
+ * - `itemList()` lists the item specifiers once per attempt, on first use,
+ *   checked against the item count. Only reads that fall back to one request
+ *   per item need them.
+ * - `readEach(list, name, guarded)` reads one property of every item of
+ *   `list`, one request per item. A guarded read the item cannot answer
+ *   leaves `undefined` at its position, so the record omits that property; an
+ *   unguarded failure fails the list.
  * - `readColumn(what, name)` reads one property across the collection in one
  *   request. When that request fails, it falls back to `readEach` with every
  *   read guarded.
@@ -585,9 +597,10 @@ function listReadHelpers(): string {
     'function unassemblable(message) {',
     `  throw { name: ${literal(NATIVE_CODEC_ERROR_NAME)}, direction: "encode", path: [], message: message };`,
     '}',
+    'function Inconsistent(message) { this.message = message; }',
     'function aligned(what, values) {',
     `  if (!Array.isArray(values) || values.length !== ${COUNT_LOCAL}) {`,
-    '    unassemblable("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
+    '    throw new Inconsistent("Reading " + what + " gave " + (Array.isArray(values) ? String(values.length) : "no") +',
     `      " values for " + String(${COUNT_LOCAL}) + " items, so the records cannot be assembled.");`,
     '  }',
     '  return values;',
@@ -596,10 +609,9 @@ function listReadHelpers(): string {
     `  if (items === null) { items = aligned("the items", ${COLLECTION_LOCAL}()); }`,
     '  return items;',
     '}',
-    'function readEach(name, guarded) {',
-    '  var list = itemList();',
+    'function readEach(list, name, guarded) {',
     '  var values = [];',
-    `  for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
+    '  for (var i = 0; i < list.length; i++) {',
     '    if (guarded) {',
     '      try { values.push(list[i][name]()); } catch (e) { values.push(undefined); }',
     '    } else {',
@@ -610,53 +622,107 @@ function listReadHelpers(): string {
     '}',
     'function readColumn(what, name) {',
     '  var values;',
-    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) { return readEach(name, true); }`,
+    `  try { values = ${COLLECTION_LOCAL}[name](); } catch (e) { return readEach(itemList(), name, true); }`,
     '  return aligned(what, values);',
     '}'
   )
 }
 
 /**
- * Statements that set {@link COUNT_LOCAL} to the number of listed items and,
- * for a resource with a runtime identifier, {@link IDS_LOCAL} to each item's
- * identifier.
- *
- * The item count comes from the identifier read itself when there is one: one
- * request reads every identifier, and its length is the number of items, so
- * listing costs no separate count. A resource with no identifier is counted
- * with one count request (`col.length`). Every other read is checked against
- * this count.
+ * Statements declaring `readIdentifiers()`, which reads the runtime
+ * identifier `nativeIdName` of every item, in item order.
  *
  * The identifier read is never guarded. When the read across the collection
  * fails, the item specifiers are listed and the identifier is read once per
  * item, still unguarded, so a misconfigured identifier fails the list with a
- * real error rather than returning records with no usable id.
+ * real error rather than returning records with no usable id. The listed
+ * specifiers become the attempt's item list.
  */
-function readListCount(nativeIdName: string | undefined): string {
-  const noCount =
-    'unassemblable("Counting the items gave no number, so the records cannot be assembled.");'
+function identifierReader(nativeIdName: string): string {
+  return lines(
+    'function readIdentifiers() {',
+    '  var values;',
+    `  try { values = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) {`,
+    `    var list = ${COLLECTION_LOCAL}();`,
+    '    if (!Array.isArray(list)) { unassemblable("Listing the items gave no list, so the records cannot be assembled."); }',
+    '    items = list;',
+    `    return readEach(list, ${literal(nativeIdName)}, false);`,
+    '  }',
+    '  if (!Array.isArray(values)) { unassemblable("Reading the identifiers gave no list, so the records cannot be assembled."); }',
+    '  return values;',
+    '}'
+  )
+}
+
+/**
+ * Statements declaring `readAll()`, one attempt at reading the whole list:
+ * the item count, the identifiers, every property, then a check that the
+ * collection did not change meanwhile. It throws `Inconsistent` when it did.
+ *
+ * The item count comes from the identifier read itself when there is one: one
+ * request reads every identifier, and its length is the number of items, so
+ * listing costs no separate count. A resource with no identifier is counted
+ * with one count request (`col.length`). Every property read is checked
+ * against this count.
+ *
+ * A count check catches items added or removed between reads, not items that
+ * swap places, which would pair values from different items. So an attempt
+ * ends by reading the identifiers across the collection again, one more
+ * request, and requires them equal, element by element, to the first read. A
+ * resource with no identifier can only be counted again, so for it the check
+ * is best effort: it catches additions and removals, not reorders.
+ *
+ * Each attempt starts with no item list, so an attempt that falls back to
+ * per-item reads lists the items afresh rather than reusing a list from an
+ * attempt that saw a different collection.
+ */
+function attemptReader(nativeIdName: string | undefined, columnReads: readonly string[]): string {
+  const changed = `throw new Inconsistent(${literal(COLLECTION_CHANGED_MESSAGE)});`
   if (nativeIdName === undefined) {
     return lines(
-      `var ${COUNT_LOCAL} = ${COLLECTION_LOCAL}.length;`,
-      `if (typeof ${COUNT_LOCAL} !== "number") { ${noCount} }`
+      'function readAll() {',
+      '  items = null;',
+      `  ${COUNT_LOCAL} = ${COLLECTION_LOCAL}.length;`,
+      `  if (typeof ${COUNT_LOCAL} !== "number") { unassemblable("Counting the items gave no number, so the records cannot be assembled."); }`,
+      ...columnReads.map((read) => `  ${read}`),
+      `  if (${COLLECTION_LOCAL}.length !== ${COUNT_LOCAL}) { ${changed} }`,
+      '}'
     )
   }
-  const notAList =
-    'unassemblable("Reading the identifiers gave no list, so the records cannot be assembled.");'
   return lines(
-    `var ${COUNT_LOCAL} = 0;`,
-    `var ${IDS_LOCAL};`,
-    'var idsRead = true;',
-    `try { ${IDS_LOCAL} = ${member(COLLECTION_LOCAL, nativeIdName)}(); } catch (e) { idsRead = false; }`,
-    'if (idsRead) {',
-    `  if (!Array.isArray(${IDS_LOCAL})) { ${notAList} }`,
+    identifierReader(nativeIdName),
+    'function readAll() {',
+    '  items = null;',
+    `  ${IDS_LOCAL} = readIdentifiers();`,
     `  ${COUNT_LOCAL} = ${IDS_LOCAL}.length;`,
-    '} else {',
-    `  items = ${COLLECTION_LOCAL}();`,
-    `  if (!Array.isArray(items)) { ${noCount} }`,
-    `  ${COUNT_LOCAL} = items.length;`,
-    `  ${IDS_LOCAL} = readEach(${literal(nativeIdName)}, false);`,
+    ...columnReads.map((read) => `  ${read}`),
+    '  var again = readIdentifiers();',
+    `  if (again.length !== ${COUNT_LOCAL}) { ${changed} }`,
+    `  for (var j = 0; j < ${COUNT_LOCAL}; j++) {`,
+    `    if (again[j] !== ${IDS_LOCAL}[j]) { ${changed} }`,
+    '  }',
     '}'
+  )
+}
+
+/**
+ * Statements that run `readAll()` until one attempt is consistent, at most
+ * twice. A collection that changes during the first attempt is read again
+ * from the start; one that changes during the second fails the list through
+ * `unassemblable`, with the reason the last attempt gave, rather than
+ * returning records assembled from reads of different items.
+ */
+function listAttempts(): string {
+  return lines(
+    'function attempt() {',
+    '  try { readAll(); return null; } catch (e) {',
+    '    if (e instanceof Inconsistent) { return e.message; }',
+    '    throw e;',
+    '  }',
+    '}',
+    'var problem = attempt();',
+    'if (problem !== null) { problem = attempt(); }',
+    'if (problem !== null) { unassemblable(problem); }'
   )
 }
 
@@ -675,17 +741,21 @@ function readListCount(nativeIdName: string | undefined): string {
  *
  * Reads go across the collection: within one body, each property is read once
  * for every item in one request (`col["name"]()`), and the records are
- * assembled by index. A list therefore costs one request per property, however
- * many items it has. Reading every item's record one item at a time cost one
+ * assembled by index. A list therefore costs one request per property, plus
+ * one to read the identifiers again (or count the items again), however many
+ * items it has. Reading every item's record one item at a time cost one
  * request per item, at seconds each in some apps (a Reminders list of 80
  * items took over four minutes), and reading the whole property record across
  * the collection in one request fails in Reminders (-1728), so each property
  * is its own request.
  *
  * Index assembly is only correct while every read describes the same items in
- * the same order, so every read is checked against the item count (see
- * {@link readListCount}). A read with another number of values fails the list
- * with a codec error instead of returning misaligned records. A missing value
+ * the same order. Every read is checked against the item count, and the
+ * identifiers are read again after the properties and must not have changed
+ * (see {@link attemptReader}). A collection that changes while it is read is
+ * read once more from the start, and if it changes again the list fails with
+ * a codec error (see {@link listAttempts}): never misaligned records. A
+ * missing value
  * keeps its position in its read: the app reports it as `null` there, as it
  * does in an item's property record, so it maps to the same `null` field the
  * per-item record gave; only an `undefined` position is omitted.
@@ -699,7 +769,7 @@ function readListCount(nativeIdName: string | undefined): string {
  * fails both ways (-1728 across the collection, -1700 per item), but no list
  * reads it: calendars are matched by name. The fallback is detected at run
  * time, so a case not yet known costs speed, never records. The runtime
- * identifier read is never guarded (see {@link readListCount}).
+ * identifier read is never guarded (see {@link identifierReader}).
  *
  * Index assembly also keeps items that share an identifier apart. A Calendar
  * calendar can hold several events with the same `uid`, and lists each as a
@@ -740,7 +810,7 @@ function buildListBody(
   const columnLocal = (index: number): string => `column${String(index)}`
   const columnReads = bestEffortProps.map(
     (p, index) =>
-      `var ${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
+      `${columnLocal(index)} = readColumn(${literal(`the property "${p}"`)}, ${literal(native(p))});`
   )
   const recordFields = bestEffortProps.map((p, index) => {
     const value = `${columnLocal(index)}[i]`
@@ -771,9 +841,17 @@ function buildListBody(
   const body = lines(
     parentBinding,
     `var ${COLLECTION_LOCAL} = ${collectionExpression};`,
+    `var ${COUNT_LOCAL} = 0;`,
+    runtimeIdProperty === undefined ? '' : `var ${IDS_LOCAL};`,
+    bestEffortProps.length === 0
+      ? ''
+      : `var ${bestEffortProps.map((_p, index) => columnLocal(index)).join(', ')};`,
     listReadHelpers(),
-    readListCount(runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty)),
-    ...columnReads,
+    attemptReader(
+      runtimeIdProperty === undefined ? undefined : native(runtimeIdProperty),
+      columnReads
+    ),
+    listAttempts(),
     'var result = [];',
     `for (var i = 0; i < ${COUNT_LOCAL}; i++) {`,
     'var obj = {};',
