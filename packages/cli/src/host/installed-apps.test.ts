@@ -6,8 +6,13 @@
  * `installed-apps-fixtures.ts` from the manifest route rules
  * (`<app>.<resource segment>.<command>`, permission `<app>:<segment>:<command>`).
  *
- * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D5, D11)
+ * Each host package exports the app's contract as `contract` from its `.`
+ * export; a host package without that export was installed by an older macts
+ * and is reported with the command that reinstalls it (phases/13 D5).
+ *
+ * @see ../../../../phases/13-sdk-value-and-execution-contracts.md (D1, D5, D11)
  * @see https://nodejs.org/api/packages.html#subpath-exports
+ * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -51,8 +56,15 @@ function registeredIds(): string[] {
   return runtime.operations().map((operation) => operation.descriptor.id)
 }
 
+/** The reason D5 gives for a host package installed by an older macts. */
+function olderHostPackageReason(app: string): string {
+  return `@macts/${app}-server is from an older macts and does not export its app's contract. Reinstall it with \`macts mcp install ${app}\`.`
+}
+
 describe('registerInstalledApps', () => {
-  it('registers an installed app from its contract', async () => {
+  it('registers an installed app from the contract its host package exports', async () => {
+    // The app package is hoisted beside its host package: Node finds it by
+    // walking up from the host package's own directory.
     writeInstalledApp(plugins.nodeModules, 'widgets')
 
     const report = await loadAndRegister()
@@ -70,34 +82,148 @@ describe('registerInstalledApps', () => {
     expect(operation?.descriptor.input.plan).toEqual({ kind: 'record', fields: {} })
   })
 
-  it('resolves the contract from an app package nested inside its host package', async () => {
+  it('registers an app whose package is nested inside its host package', async () => {
+    // Only the host package's own node_modules holds @macts/widgets, so only
+    // Node's resolution from the host package can find it.
     writeInstalledApp(plugins.nodeModules, 'widgets', { placement: 'nested' })
 
     const report = await loadAndRegister()
 
     expect(report.failed).toEqual([])
+    expect(report.registered.map((app) => [app.app, app.hostPackage])).toEqual([
+      ['widgets', '@macts/widgets-server'],
+    ])
     expect(registeredIds()).toEqual(['widgets.widgets.list'])
   })
 
-  it('reports and skips an app whose package has no contract export', async () => {
+  it('reports an older host package, which exports no contract, with the reinstall command and registers the other apps', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', { hostShape: 'older' })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toEqual([{ app: 'gadgets', reason: olderHostPackageReason('gadgets') }])
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+    expect(registeredIds()).toEqual(['widgets.widgets.list'])
+  })
+
+  it('reports a host package with no exports map as an older host package', async () => {
+    writeInstalledApp(plugins.nodeModules, 'widgets', { hostShape: 'no-exports' })
+
+    const report = await loadAndRegister()
+
+    expect(report.registered).toEqual([])
+    expect(report.failed).toEqual([{ app: 'widgets', reason: olderHostPackageReason('widgets') }])
+    expect(registeredIds()).toEqual([])
+  })
+
+  // Regression: an unreadable host package.json was reported as an install from
+  // an older macts, hiding the parse error behind the wrong diagnosis.
+  it('reports a host package whose package.json cannot be parsed as damaged, not as an older install', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', { hostPackageJsonSource: '{ "name": ' })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toHaveLength(1)
+    const [failure] = report.failed
+    expect(failure?.app).toBe('gadgets')
+    expect(failure?.reason).toMatch(/^@macts\/gadgets-server's package\.json cannot be read: /)
+    expect(failure?.reason).toMatch(/Reinstall it with `macts mcp install gadgets`\.$/)
+    expect(failure?.reason).not.toContain('older macts')
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
+  // Regression: a "." export whose target file is missing was reported without
+  // the command that repairs it.
+  it('reports a host package whose "." export points to a missing file with the reinstall command', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets', {
+      hostPackageJsonSource: JSON.stringify({
+        name: '@macts/gadgets-server',
+        type: 'module',
+        exports: { '.': { import: './dist/missing.js' } },
+        dependencies: { '@macts/gadgets': '0.0.0' },
+      }),
+    })
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toHaveLength(1)
+    const [failure] = report.failed
+    expect(failure?.app).toBe('gadgets')
+    expect(failure?.reason).toContain('points to a missing file')
+    expect(failure?.reason).toMatch(/Reinstall it with `macts mcp install gadgets`\.$/)
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
+  it('registers a host package that declares its "." export with the exports sugar form', async () => {
+    writeInstalledApp(plugins.nodeModules, 'widgets', {
+      hostPackageJsonSource: JSON.stringify({
+        name: '@macts/widgets-server',
+        type: 'module',
+        exports: './index.js',
+        dependencies: { '@macts/widgets': '0.0.0' },
+      }),
+    })
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toEqual([])
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
+  it('reports a host package whose app package is not installed, naming the host package and the reinstall command', async () => {
+    writeInstalledApp(plugins.nodeModules, 'gadgets')
+    plugins.removeAppPackage('gadgets')
+    writeInstalledApp(plugins.nodeModules, 'widgets')
+
+    const report = await loadAndRegister()
+
+    expect(report.failed).toHaveLength(1)
+    const failure = report.failed[0]
+    expect(failure?.app).toBe('gadgets')
+    expect(failure?.reason).toMatch(/^@macts\/gadgets-server failed to load: /)
+    // Node's own module-not-found message names the missing dependency.
+    expect(failure?.reason).toContain("'@macts/gadgets'")
+    expect(failure?.reason).toMatch(/ Reinstall it with `macts mcp install gadgets`\.$/)
+    expect(report.registered.map((app) => app.app)).toEqual(['widgets'])
+  })
+
+  it('reports a host package whose app package does not export its contract', async () => {
     writeInstalledApp(plugins.nodeModules, 'widgets', { exportsContract: false })
 
     const report = await loadAndRegister()
 
     expect(report.registered).toEqual([])
+    expect(report.failed).toHaveLength(1)
+    expect(report.failed[0]?.reason).toMatch(/^@macts\/widgets-server failed to load: /)
+    expect(report.failed[0]?.reason).toContain("'./contract'")
+    expect(report.failed[0]?.reason).toMatch(/ Reinstall it with `macts mcp install widgets`\.$/)
+    expect(registeredIds()).toEqual([])
+  })
+
+  it('reports a host package whose contract export is not an app contract', async () => {
+    writeInstalledApp(plugins.nodeModules, 'widgets', {
+      hostSource: "export const contract = { app: 'widgets' }\n",
+    })
+
+    const report = await loadAndRegister()
+
     expect(report.failed).toEqual([
       {
         app: 'widgets',
-        reason:
-          'Package @macts/widgets does not define a \'./contract\' export (or none of its conditions include "import" or "default")',
+        reason: "@macts/widgets-server's `contract` export is not an app contract.",
       },
     ])
     expect(registeredIds()).toEqual([])
   })
 
-  it('reports and skips an app whose host package is installed without the app package', async () => {
-    writeInstalledApp(plugins.nodeModules, 'widgets')
-    plugins.removeAppPackage('widgets')
+  it("reports a host package whose contract export is another app's contract", async () => {
+    writeAppPackage(plugins.nodeModules, 'gadgets')
+    writeInstalledApp(plugins.nodeModules, 'widgets', {
+      hostSource: "export { gadgetsContract as contract } from '@macts/gadgets/contract'\n",
+    })
 
     const report = await loadAndRegister()
 
@@ -105,9 +231,10 @@ describe('registerInstalledApps', () => {
       {
         app: 'widgets',
         reason:
-          '@macts/widgets, which @macts/widgets-server depends on, is not installed. Reinstall it with `macts mcp install widgets`.',
+          "@macts/widgets-server's `contract` export is the contract for gadgets, not widgets.",
       },
     ])
+    expect(registeredIds()).toEqual([])
   })
 
   it('reports and skips an app whose manifest fails validation', async () => {
@@ -184,10 +311,10 @@ describe('registerInstalledApps', () => {
     expect(registeredIds()).toEqual(['widgets.widgets.list'])
   })
 
-  it('reports and skips an app whose contract module throws on import, scrubbing the reason', async () => {
+  it('reports and skips an app whose host package throws on import, scrubbing the reason', async () => {
     writeInstalledApp(plugins.nodeModules, 'gadgets', {
-      contractSource:
-        "throw new Error('contract init read macts_sk_eyJhbGciOi.import-secret\\nfrom the environment')\n",
+      hostSource:
+        "throw new Error('host init read macts_sk_eyJhbGciOi.import-secret\\nfrom the environment')\n",
     })
     writeInstalledApp(plugins.nodeModules, 'widgets')
 
@@ -197,7 +324,7 @@ describe('registerInstalledApps', () => {
       {
         app: 'gadgets',
         reason:
-          "@macts/gadgets's contract failed to load: contract init read [redacted credential] from the environment",
+          '@macts/gadgets-server failed to load: host init read [redacted credential] from the environment. Reinstall it with `macts mcp install gadgets`.',
       },
     ])
     expect(report.registered.map((app) => app.app)).toEqual(['widgets'])

@@ -396,6 +396,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'core',
       routeName: 'list',
     },
@@ -434,6 +438,10 @@ export const manifest: unknown = {
           required: false,
         },
       ],
+      parent: {
+        resource: 'Window',
+        parameter: 'windowId',
+      },
       code: 'crel',
       routeName: 'create',
     },
@@ -475,6 +483,10 @@ export const manifest: unknown = {
           required: true,
         },
       ],
+      parent: {
+        resource: 'BookmarkFolder',
+        parameter: 'folderId',
+      },
       code: 'core',
       routeName: 'list',
     },

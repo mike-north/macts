@@ -34,9 +34,8 @@ import type { Property } from './schemas/property.js'
 import type { Resource } from './schemas/resource.js'
 
 /**
- * The bridge's spelling of a collection, derived from a plural: a resource's
- * Pascal case plural, or a plural formed from an identifier parameter's stem
- * (`mediaItem` + `s`).
+ * The bridge's spelling of a collection, derived from a plural in Pascal or
+ * lower camel case, normally a resource's.
  *
  * The bridge's rule, first word lowercased whole and the rest as written, is
  * the manifest's acronym-aware lower camel case ({@link lowerCamel}): a run of

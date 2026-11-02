@@ -373,6 +373,10 @@ export const AppManifestSchema: z.ZodObject<{
                 }, z.core.$strip>], "source">>;
             }, z.core.$strip>>;
         }, z.core.$strip>>>;
+        parent: z.ZodOptional<z.ZodObject<{
+            resource: z.ZodString;
+            parameter: z.ZodString;
+        }, z.core.$strict>>;
         returns: z.ZodOptional<z.ZodString>;
         code: z.ZodOptional<z.ZodString>;
         routeName: z.ZodOptional<z.ZodString>;
@@ -860,6 +864,15 @@ export const CommandParameterSchema: z.ZodObject<{
 }, z.core.$strip>;
 
 // @public
+export type CommandParent = z.infer<typeof CommandParentSchema>;
+
+// @public
+export const CommandParentSchema: z.ZodObject<{
+    resource: z.ZodString;
+    parameter: z.ZodString;
+}, z.core.$strict>;
+
+// @public
 export function commandRouteSegment(commandKey: string, command: Pick<Command, 'routeName'>): string;
 
 // @public
@@ -901,6 +914,10 @@ export const CommandSchema: z.ZodObject<{
             }, z.core.$strip>], "source">>;
         }, z.core.$strip>>;
     }, z.core.$strip>>>;
+    parent: z.ZodOptional<z.ZodObject<{
+        resource: z.ZodString;
+        parameter: z.ZodString;
+    }, z.core.$strict>>;
     returns: z.ZodOptional<z.ZodString>;
     code: z.ZodOptional<z.ZodString>;
     routeName: z.ZodOptional<z.ZodString>;

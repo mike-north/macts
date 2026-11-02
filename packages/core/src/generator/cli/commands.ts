@@ -5,7 +5,7 @@ import type {
 } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
-import { identifierWords, resourceNamespace, safeIdentifier } from '../surface.js'
+import { identifierWords, resolveIdParams, resourceNamespace, safeIdentifier } from '../surface.js'
 
 /**
  * Instance members of Clipanion's \`Command\` base class. A generated option whose
@@ -259,16 +259,16 @@ export function generateGetCommand(
 
   const idParamName = `${toCamelCase(resource.name)}Id`
 
-  // Drive the get() arguments from the GET command's required params (single source of
-  // truth, like list — NOT the resource hierarchy), so the CLI passes exactly what the
-  // SDK get() accepts. By convention the last required param is the child id (rendered
-  // positionally below); the rest are parent-scope params (rendered as --<param> options
-  // and forwarded in manifest order).
+  // Drive the get() arguments from the backing get command (single source of truth,
+  // like list — NOT the resource hierarchy), so the CLI passes exactly what the SDK
+  // get() accepts: the parent the command records, if any, as a --<param> option, then
+  // the child id positionally (see `resolveIdParams`).
   const getCommand = ctx
     .getResourceCommands(hierarchyPath.resourceName)
     .find((cmd) => cmd.name === 'get')
-  const getRequiredParams = (getCommand?.parameters ?? []).filter((p) => p.required)
-  const parentScopeParams = getRequiredParams.slice(0, -1)
+  const parentParamName =
+    getCommand === undefined ? undefined : resolveIdParams(getCommand).parentParam
+  const parentScopeParams = (getCommand?.parameters ?? []).filter((p) => p.name === parentParamName)
   const parentOptions = generateListParamOptions(parentScopeParams)
 
   const content = `import { Command, Option } from 'clipanion';

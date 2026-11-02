@@ -3,9 +3,9 @@
  * scripting dictionaries of the apps installed on this Mac.
  *
  * Bodies name a top-level collection as `app["<accessor>"]`: the resource's
- * own collection, or the collection its parent is reached through. Every such
- * accessor is read from the body text, so a parent spelled from an identifier
- * parameter is checked as well as one matched to a resource. The automation
+ * own collection, or the collection of the parent the command records
+ * (`command.parent`). Every such accessor is read from the body text, so a
+ * parent's collection is checked as well as a route resource's. The automation
  * bridge resolves an accessor only when it is the app's own spelling of a
  * dictionary term: `ObjectSpecifier.hasInstance(app[name])` is true for a
  * resolved name and false for an unknown one.
@@ -65,16 +65,7 @@ const MANIFESTS_DIR = fileURLToPath(new URL('../../../../manifests/', import.met
  * exactly these to fail: an entry that starts resolving, or that no body
  * addresses any more, must be removed here.
  */
-const KNOWN_UNRESOLVED: Readonly<Record<string, string>> = {
-  // Parents spelled from an identifier parameter that names no resource of
-  // the manifest. The manifest must name the parent collection explicitly.
-  // Automator ships no static scripting definition, so the check skips it and
-  // its two entries document the defect without being verified here.
-  'automator: app["workflowNames"]': 'https://github.com/mike-north/macts/issues/165',
-  'automator: app["actions"]': 'https://github.com/mike-north/macts/issues/165',
-  'xcode: app["workspaceNames"]': 'https://github.com/mike-north/macts/issues/165',
-  'microsoft-edge: app["folders"]': 'https://github.com/mike-north/macts/issues/165',
-}
+const KNOWN_UNRESOLVED: Readonly<Record<string, string>> = {}
 
 /** The top-level collection accessors one app's bodies address, with an operation using each. */
 interface AppAccessors {
@@ -234,12 +225,21 @@ describe('collecting the top-level accessors bodies address', () => {
     ...(apps.find((entry) => entry.app === app)?.accessors.keys() ?? []),
   ]
 
-  it('collects a parent spelled from an identifier parameter, not only route resources', () => {
-    // Automator's variables live under a workflow named by `workflowNameId`,
-    // which names no resource; the body addresses app["workflowNames"].
-    expect(accessorsOf('automator')).toEqual(expect.arrayContaining(['workflowNames']))
-    expect(accessorsOf('xcode')).toEqual(expect.arrayContaining(['workspaceNames']))
-    expect(accessorsOf('microsoft-edge')).toEqual(expect.arrayContaining(['folders']))
+  it('collects the collection of a recorded parent, never one spelled from a parameter', () => {
+    // Xcode's projects, schemes and run destinations live under a workspace
+    // document, which their list commands record as the parent, identified by
+    // `workspaceName`; the bodies address app["workspaceDocuments"]. A parent
+    // spelled from the parameter's stem would be app["workspaceNames"], which
+    // Xcode does not have (#165).
+    expect(accessorsOf('xcode')).toEqual(expect.arrayContaining(['workspaceDocuments']))
+    expect(accessorsOf('xcode')).not.toContain('workspaceNames')
+    expect(accessorsOf('automator')).toEqual(
+      expect.arrayContaining(['workflows', 'automatorActions'])
+    )
+    expect(accessorsOf('automator')).not.toContain('workflowNames')
+    expect(accessorsOf('automator')).not.toContain('actions')
+    expect(accessorsOf('microsoft-edge')).toEqual(expect.arrayContaining(['bookmarkFolders']))
+    expect(accessorsOf('microsoft-edge')).not.toContain('folders')
   })
 
   it('collects a parent matched to a resource, and a resource read whole', () => {
@@ -268,10 +268,11 @@ describe('collecting the top-level accessors bodies address', () => {
     // app["requiredResources"]; Automator has neither there (a live read
     // raises -1728), so the manifest marks both commands, and no route, and
     // no body, reaches either collection. Settings and required resources stay
-    // reachable through an action (app["actions"]).
+    // reachable through their recorded parent, an action
+    // (app["automatorActions"]).
     expect(accessorsOf('automator')).not.toContain('settings')
     expect(accessorsOf('automator')).not.toContain('requiredResources')
-    expect(accessorsOf('automator')).toEqual(expect.arrayContaining(['actions']))
+    expect(accessorsOf('automator')).toEqual(expect.arrayContaining(['automatorActions']))
   })
 
   it('skips command calls and class constructors', () => {

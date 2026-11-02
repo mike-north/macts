@@ -6,8 +6,9 @@
  * `"require"`) can never resolve their subpaths. This module reads the
  * package's `exports` map directly instead, applying the constraints Node
  * itself puts on an export target, so a malformed or malicious target cannot
- * point outside the package that declares it. The CLI plugin loader (`./cli`)
- * and the host registration path (`./contract`) both resolve through it.
+ * point outside the package that declares it. The CLI plugin loader (an app
+ * package's `./cli`) and the host registration path (a host package's `.`)
+ * both resolve through it.
  *
  * @see https://nodejs.org/api/packages.html#subpath-exports
  * @see https://nodejs.org/api/esm.html#resolution-algorithm-specification
@@ -46,7 +47,8 @@ export type PackageExportResolution =
  *
  * @param packageDir - Absolute path of the installed package's directory.
  * @param packageName - The package's name, for messages (e.g. `@macts/notes`).
- * @param subpath - The export to resolve, beginning with `./` (e.g. `./contract`).
+ * @param subpath - The export to resolve: `.` or a subpath beginning with `./`
+ *   (e.g. `./cli`).
  * @returns The file URL, or why the export cannot be used.
  */
 export function resolvePackageExport(
@@ -172,12 +174,30 @@ function validateExportsTarget(
  * Resolve a subpath in a package's `exports` map to a relative file path,
  * preferring the `"import"` condition (these packages are ESM-only) and
  * falling back to `"default"` when present. Handles both the string and
- * conditions-object forms of an exports entry.
+ * conditions-object forms of an exports entry, and Node's exports sugar for
+ * the `.` export: an `exports` field that is a string, or an object none of
+ * whose keys begins with `.`, is the `.` export itself.
+ *
+ * @see https://nodejs.org/api/packages.html#exports-sugar
  */
 function resolveExportsSubpath(exportsField: unknown, subpath: string): string | null {
+  if (subpath === '.' && isMainExportSugar(exportsField)) {
+    return resolveExportsConditions(exportsField)
+  }
   if (!isRecord(exportsField)) return null
   const entry = exportsField[subpath]
   return resolveExportsConditions(entry)
+}
+
+/**
+ * Whether an `exports` field uses the sugar form that declares only the `.`
+ * export: a string target, or a conditions object with no subpath keys.
+ */
+function isMainExportSugar(exportsField: unknown): boolean {
+  if (typeof exportsField === 'string') return true
+  if (!isRecord(exportsField)) return false
+  const keys = Object.keys(exportsField)
+  return keys.length > 0 && !keys.some((key) => key.startsWith('.'))
 }
 
 /**

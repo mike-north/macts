@@ -286,6 +286,9 @@ commands:
     description: List all tabs in a window
     scope: resource
     resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
     code: core
     parameters:
       - name: windowId
@@ -312,6 +315,9 @@ commands:
     description: Create a new tab
     scope: resource
     resourceType: Tab
+    parent:
+      resource: Window
+      parameter: windowId
     code: crel
     parameters:
       - name: windowId
@@ -351,6 +357,9 @@ commands:
     description: List all bookmark items in a folder
     scope: resource
     resourceType: BookmarkItem
+    parent:
+      resource: BookmarkFolder
+      parameter: folderId
     code: core
     parameters:
       - name: folderId

@@ -2,8 +2,8 @@
  * Integration: every real contract's descriptors carry the JSON Schema of
  * their input's wire values.
  *
- * Each app package with a manifest is imported at its `/contract` subpath, as a
- * host imports it. For every operation the descriptor's `inputJsonSchema` must
+ * Each app package with a manifest is imported at its `/contract` subpath,
+ * where it exports its generated contract. For every operation the descriptor's `inputJsonSchema` must
  * be present and equal what an adapter derives itself,
  * `z.toJSONSchema(input.wire, { target: 'draft-7' })`. The generator computes
  * the field from value types it builds in process; this checks that they are

@@ -3,9 +3,10 @@
  * a property of all of them.
  *
  * An app is a `manifests/<app>/` directory with an `app.yaml`; its contract is
- * imported from `@macts/<app>/contract`, as a host imports it. Each app package
- * must be a devDependency of this package, so that it is built before the tests
- * run; {@link missingAppDependencies} reports any that are not.
+ * imported from `@macts/<app>/contract`, the subpath at which every app package
+ * exports it (and which the app's host package re-exports as `contract`). Each
+ * app package must be a devDependency of this package, so that it is built
+ * before the tests run; {@link missingAppDependencies} reports any that are not.
  */
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
