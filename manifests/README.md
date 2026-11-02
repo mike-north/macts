@@ -568,6 +568,20 @@ identifiers:
 
 The primary identifier is used for lookups and references. A resource should have exactly one primary identifier.
 
+**Identifier targeting.** A lookup by the primary identifier uses the app's `id` specifier by default. A resource whose primary identifier is `name` must instead declare how it is found, and the manifest guard (`packages/core/src/manifest/name-keyed-targeting.test.ts`) fails when it does not:
+
+- If the app's dictionary declares a real `id` on the class, make `id` the primary identifier and keep `name` as an ordinary property. The `get`, `update` and `delete` identifier parameter is then `id`.
+- If the dictionary shows no `id`, keep `name` and declare `targeting: byProperty`, so the item is matched on `name`. Add a manifest comment citing the dictionary fact: the class, what it inherits, and that it has no `id` property. For an app with no static dictionary (Automator), cite its scripting suite.
+
+```yaml
+identifiers:
+  - property: name
+    primary: true
+    targeting: byProperty
+```
+
+A name-keyed resource whose app dictionary is not available to read is listed in the guard's exception list with a reason, never guessed.
+
 ---
 
 ### Enumerations

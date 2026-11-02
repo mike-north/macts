@@ -33,14 +33,14 @@ const t = ValueTypes
 export interface Account {
   /**
    * The name of the account.
-   * Never null: the primary identifier.
-   */
-  readonly name: string
-  /**
-   * The unique identifier of the account.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: string | null
+  readonly name: string | null
+  /**
+   * The unique identifier of the account.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
   /**
    * Whether the account has been upgraded.
    * Nullable. No evidence that the app always sets it.
@@ -52,14 +52,14 @@ export interface Account {
 export interface Folder {
   /**
    * The name of the folder.
-   * Never null: the primary identifier.
-   */
-  name: string
-  /**
-   * The unique identifier of the folder.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: string | null
+  name: string | null
+  /**
+   * The unique identifier of the folder.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
   /**
    * Whether the folder is shared.
    * Nullable. No evidence that the app always sets it.
@@ -71,12 +71,12 @@ export interface Folder {
 export interface Note {
   /**
    * The name of the note (first line).
-   * Never null: the primary identifier.
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-02).
    */
   name: string
   /**
    * The unique identifier of the note.
-   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   * Never null: the primary identifier.
    */
   readonly id: string
   /**
@@ -91,22 +91,22 @@ export interface Note {
   readonly plaintext: string | null
   /**
    * The creation date of the note.
-   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-02).
    */
   readonly creationDate: Date
   /**
    * The modification date of the note.
-   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-02).
    */
   readonly modificationDate: Date
   /**
    * Whether the note is shared.
-   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-02).
    */
   readonly shared: boolean
   /**
    * Whether the note is password protected.
-   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-01).
+   * Never null: observed in all 60 items (Notes 4.13, macOS 27.2, 2026-11-02).
    */
   readonly passwordProtected: boolean
 }
@@ -194,11 +194,11 @@ export interface AccountResourceClient {
   /** List accounts. */
   list(options?: CallOptions): Promise<readonly Account[]>
   /**
-   * Read the account identified by `name`.
+   * Read the account identified by `id`.
    *
-   * @param name - Item name. Does not accept null.
+   * @param id - Item identifier. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<Account>
+  get(id: string, options?: CallOptions): Promise<Account>
 }
 
 /** A Notes folder */
@@ -206,11 +206,11 @@ export interface FolderResourceClient {
   /** List folders. */
   list(options?: CallOptions): Promise<readonly Folder[]>
   /**
-   * Read the folder identified by `name`.
+   * Read the folder identified by `id`.
    *
-   * @param name - Item name. Does not accept null.
+   * @param id - Item identifier. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<Folder>
+  get(id: string, options?: CallOptions): Promise<Folder>
 }
 
 /** A note */
@@ -218,11 +218,11 @@ export interface NoteResourceClient {
   /** List notes. */
   list(options?: CallOptions): Promise<readonly Note[]>
   /**
-   * Read the note identified by `name`.
+   * Read the note identified by `id`.
    *
-   * @param name - Item name. Does not accept null.
+   * @param id - Item identifier. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<Note>
+  get(id: string, options?: CallOptions): Promise<Note>
   /** Create a note. */
   create(input: NoteCreateInput, options?: CallOptions): Promise<Note>
   /**
@@ -262,8 +262,8 @@ export interface NotesClient {
 
 const accountRecordType: ValueType<Account> = t.record(
   {
-    name: t.string({ description: 'The name of the account' }),
-    id: t.nullable(t.string(), { description: 'The unique identifier of the account' }),
+    name: t.nullable(t.string(), { description: 'The name of the account' }),
+    id: t.string({ description: 'The unique identifier of the account' }),
     upgraded: t.nullable(t.boolean(), { description: 'Whether the account has been upgraded' }),
   },
   { description: 'A Notes account' }
@@ -271,8 +271,8 @@ const accountRecordType: ValueType<Account> = t.record(
 
 const folderRecordType: ValueType<Folder> = t.record(
   {
-    name: t.string({ description: 'The name of the folder' }),
-    id: t.nullable(t.string(), { description: 'The unique identifier of the folder' }),
+    name: t.nullable(t.string(), { description: 'The name of the folder' }),
+    id: t.string({ description: 'The unique identifier of the folder' }),
     shared: t.nullable(t.boolean(), { description: 'Whether the folder is shared' }),
   },
   { description: 'A Notes folder' }
@@ -321,21 +321,21 @@ const resources: AppContract<NotesClient>['resources'] = {
   Account: {
     name: 'Account',
     record: accountRecordType,
-    id: t.string({ description: 'The name of the account' }),
+    id: t.string({ description: 'The unique identifier of the account' }),
     get: 'notes.accounts.get',
     list: 'notes.accounts.list',
   },
   Folder: {
     name: 'Folder',
     record: folderRecordType,
-    id: t.string({ description: 'The name of the folder' }),
+    id: t.string({ description: 'The unique identifier of the folder' }),
     get: 'notes.folders.get',
     list: 'notes.folders.list',
   },
   Note: {
     name: 'Note',
     record: noteRecordType,
-    id: t.string({ description: 'The name of the note (first line)' }),
+    id: t.string({ description: 'The unique identifier of the note' }),
     get: 'notes.notes.get',
     list: 'notes.notes.list',
   },
@@ -408,56 +408,56 @@ const attachmentListOperation: OperationDescriptor<Record<string, never>, readon
   },
 }
 
-const accountGetOperation: OperationDescriptor<{ readonly name: string }, Account> = {
+const accountGetOperation: OperationDescriptor<{ readonly id: string }, Account> = {
   id: 'notes.accounts.get',
   permission: 'notes:accounts:get',
   target: { command: 'get', resource: 'Account' },
-  description: 'Get an item by name',
+  description: 'Get an item by identifier',
   input: t.record({
-    name: t.string({ description: 'Item name' }),
+    id: t.string({ description: 'Item identifier' }),
   }),
   output: accountRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { name: { type: 'string', description: 'Item name' } },
-    required: ['name'],
+    properties: { id: { type: 'string', description: 'Item identifier' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
-const folderGetOperation: OperationDescriptor<{ readonly name: string }, Folder> = {
+const folderGetOperation: OperationDescriptor<{ readonly id: string }, Folder> = {
   id: 'notes.folders.get',
   permission: 'notes:folders:get',
   target: { command: 'get', resource: 'Folder' },
-  description: 'Get an item by name',
+  description: 'Get an item by identifier',
   input: t.record({
-    name: t.string({ description: 'Item name' }),
+    id: t.string({ description: 'Item identifier' }),
   }),
   output: folderRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { name: { type: 'string', description: 'Item name' } },
-    required: ['name'],
+    properties: { id: { type: 'string', description: 'Item identifier' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
-const noteGetOperation: OperationDescriptor<{ readonly name: string }, Note> = {
+const noteGetOperation: OperationDescriptor<{ readonly id: string }, Note> = {
   id: 'notes.notes.get',
   permission: 'notes:notes:get',
   target: { command: 'get', resource: 'Note' },
-  description: 'Get an item by name',
+  description: 'Get an item by identifier',
   input: t.record({
-    name: t.string({ description: 'Item name' }),
+    id: t.string({ description: 'Item identifier' }),
   }),
   output: noteRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { name: { type: 'string', description: 'Item name' } },
-    required: ['name'],
+    properties: { id: { type: 'string', description: 'Item identifier' } },
+    required: ['id'],
     additionalProperties: false,
   },
 }
@@ -535,15 +535,15 @@ function bind(runtime: ClientRuntime): NotesClient {
   return {
     accounts: {
       list: (options) => runtime.invoke(accountListOperation, {}, options),
-      get: (name, options) => runtime.invoke(accountGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(accountGetOperation, { id }, options),
     },
     folders: {
       list: (options) => runtime.invoke(folderListOperation, {}, options),
-      get: (name, options) => runtime.invoke(folderGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(folderGetOperation, { id }, options),
     },
     notes: {
       list: (options) => runtime.invoke(noteListOperation, {}, options),
-      get: (name, options) => runtime.invoke(noteGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(noteGetOperation, { id }, options),
       create: (input, options) => runtime.invoke(noteCreateOperation, input, options),
       show: (name, options) => runtime.invoke(noteShowOperation, { name }, options),
     },

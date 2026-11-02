@@ -28,9 +28,9 @@ export class AccountResourceClient {
   }
 
   /**
-   * Get a account by name.
+   * Get a account by id.
    */
-  async get(name: string): Promise<Account> {
-    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string): Promise<Account> {
+    return this.#http.rpc<Account>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

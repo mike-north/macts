@@ -23,6 +23,7 @@ import {
   type AppContract,
   type CallOptions,
   type ClientRuntime,
+  type Integer,
   type OperationDescriptor,
   type ValueType,
 } from '@macts/contracts'
@@ -33,14 +34,14 @@ const t = ValueTypes
 export interface Window {
   /**
    * The title of the window.
-   * Never null: the primary identifier.
-   */
-  readonly name: string
-  /**
-   * The unique identifier of the window.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: number | null
+  readonly name: string | null
+  /**
+   * The unique identifier of the window.
+   * Never null: the primary identifier.
+   */
+  readonly id: Integer
   /**
    * The position of the window.
    * Nullable. No evidence that the app always sets it.
@@ -111,14 +112,14 @@ export interface Tab {
 export interface SettingsSet {
   /**
    * The name of the settings set.
-   * Never null: the primary identifier.
-   */
-  name: string
-  /**
-   * The unique identifier of the settings set.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly id: number | null
+  name: string | null
+  /**
+   * The unique identifier of the settings set.
+   * Never null: the primary identifier.
+   */
+  readonly id: Integer
   /**
    * The number of rows.
    * Nullable. No evidence that the app always sets it.
@@ -247,11 +248,11 @@ export interface WindowResourceClient {
   /** List windows. */
   list(options?: CallOptions): Promise<readonly Window[]>
   /**
-   * Read the window identified by `name`.
+   * Read the window identified by `id`.
    *
-   * @param name - Item identifier. Does not accept null.
+   * @param id - Item identifier. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<Window>
+  get(id: Integer, options?: CallOptions): Promise<Window>
 }
 
 /** A Terminal tab */
@@ -271,11 +272,11 @@ export interface SettingsSetResourceClient {
   /** List settings sets. */
   list(options?: CallOptions): Promise<readonly SettingsSet[]>
   /**
-   * Read the settings set identified by `name`.
+   * Read the settings set identified by `id`.
    *
-   * @param name - Item identifier. Does not accept null.
+   * @param id - Item identifier. Does not accept null.
    */
-  get(name: string, options?: CallOptions): Promise<SettingsSet>
+  get(id: Integer, options?: CallOptions): Promise<SettingsSet>
 }
 
 /**
@@ -300,8 +301,8 @@ export interface TerminalClient {
 
 const windowRecordType: ValueType<Window> = t.record(
   {
-    name: t.string({ description: 'The title of the window' }),
-    id: t.nullable(t.double(), { description: 'The unique identifier of the window' }),
+    name: t.nullable(t.string(), { description: 'The title of the window' }),
+    id: t.integer({ description: 'The unique identifier of the window' }),
     position: t.nullable(t.string(), { description: 'The position of the window' }),
     visible: t.nullable(t.boolean(), { description: 'Whether the window is visible' }),
     frontmost: t.nullable(t.boolean(), {
@@ -334,8 +335,8 @@ const tabRecordType: ValueType<Tab> = t.record(
 
 const settingsSetRecordType: ValueType<SettingsSet> = t.record(
   {
-    name: t.string({ description: 'The name of the settings set' }),
-    id: t.nullable(t.double(), { description: 'The unique identifier of the settings set' }),
+    name: t.nullable(t.string(), { description: 'The name of the settings set' }),
+    id: t.integer({ description: 'The unique identifier of the settings set' }),
     numberOfRows: t.nullable(t.double(), { description: 'The number of rows' }),
     numberOfColumns: t.nullable(t.double(), { description: 'The number of columns' }),
     fontName: t.nullable(t.string(), { description: 'The name of the font' }),
@@ -353,7 +354,7 @@ const resources: AppContract<TerminalClient>['resources'] = {
   Window: {
     name: 'Window',
     record: windowRecordType,
-    id: t.string({ description: 'The title of the window' }),
+    id: t.integer({ description: 'The unique identifier of the window' }),
     get: 'terminal.windows.get',
     list: 'terminal.windows.list',
   },
@@ -367,7 +368,7 @@ const resources: AppContract<TerminalClient>['resources'] = {
   SettingsSet: {
     name: 'SettingsSet',
     record: settingsSetRecordType,
-    id: t.string({ description: 'The name of the settings set' }),
+    id: t.integer({ description: 'The unique identifier of the settings set' }),
     get: 'terminal.settingsSets.get',
     list: 'terminal.settingsSets.list',
   },
@@ -421,51 +422,67 @@ const settingsSetListOperation: OperationDescriptor<
   },
 }
 
-const windowGetOperation: OperationDescriptor<{ readonly name: string }, Window> = {
+const windowGetOperation: OperationDescriptor<{ readonly id: Integer }, Window> = {
   id: 'terminal.windows.get',
   permission: 'terminal:windows:get',
   target: { command: 'get', resource: 'Window' },
   description: 'Get an item by identifier',
   input: t.record({
-    name: t.string({ description: 'Item identifier' }),
+    id: t.integer({ description: 'Item identifier' }),
   }),
   output: windowRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: { name: { type: 'string', description: 'Item identifier' } },
-    required: ['name'],
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Item identifier',
+      },
+    },
+    required: ['id'],
     additionalProperties: false,
   },
 }
 
-const tabGetOperation: OperationDescriptor<{ readonly name: string }, Tab> = {
-  id: 'terminal.tabs.get',
-  permission: 'terminal:tabs:get',
-  target: { command: 'get', resource: 'Tab' },
-  description: 'Get an item by identifier',
-  input: t.record({
-    name: t.string({ description: 'Item identifier' }),
-  }),
-  output: tabRecordType,
-  inputJsonSchema: {
-    $schema: 'http://json-schema.org/draft-07/schema#',
-    type: 'object',
-    properties: { name: { type: 'string', description: 'Item identifier' } },
-    required: ['name'],
-    additionalProperties: false,
-  },
-}
-
-const settingsSetGetOperation: OperationDescriptor<{ readonly name: string }, SettingsSet> = {
+const settingsSetGetOperation: OperationDescriptor<{ readonly id: Integer }, SettingsSet> = {
   id: 'terminal.settingsSets.get',
   permission: 'terminal:settingsSets:get',
   target: { command: 'get', resource: 'SettingsSet' },
   description: 'Get an item by identifier',
   input: t.record({
-    name: t.string({ description: 'Item identifier' }),
+    id: t.integer({ description: 'Item identifier' }),
   }),
   output: settingsSetRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      id: {
+        type: 'object',
+        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
+        required: ['integer'],
+        additionalProperties: false,
+        description: 'Item identifier',
+      },
+    },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const tabGetTabOperation: OperationDescriptor<{ readonly name: string }, Tab> = {
+  id: 'terminal.tabs.get',
+  permission: 'terminal:tabs:get',
+  target: { command: 'getTab', resource: 'Tab' },
+  description: 'Get an item by identifier',
+  input: t.record({
+    name: t.string({ description: 'Item identifier' }),
+  }),
+  output: tabRecordType,
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
@@ -506,8 +523,8 @@ const operations: AppContract<TerminalClient>['operations'] = {
   'terminal.tabs.list': tabListOperation,
   'terminal.settingsSets.list': settingsSetListOperation,
   'terminal.windows.get': windowGetOperation,
-  'terminal.tabs.get': tabGetOperation,
   'terminal.settingsSets.get': settingsSetGetOperation,
+  'terminal.tabs.get': tabGetTabOperation,
   'terminal.app.doScript': appDoScriptOperation,
 }
 
@@ -516,15 +533,15 @@ function bind(runtime: ClientRuntime): TerminalClient {
   return {
     windows: {
       list: (options) => runtime.invoke(windowListOperation, {}, options),
-      get: (name, options) => runtime.invoke(windowGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(windowGetOperation, { id }, options),
     },
     tabs: {
       list: (options) => runtime.invoke(tabListOperation, {}, options),
-      get: (name, options) => runtime.invoke(tabGetOperation, { name }, options),
+      get: (name, options) => runtime.invoke(tabGetTabOperation, { name }, options),
     },
     settingsSets: {
       list: (options) => runtime.invoke(settingsSetListOperation, {}, options),
-      get: (name, options) => runtime.invoke(settingsSetGetOperation, { name }, options),
+      get: (id, options) => runtime.invoke(settingsSetGetOperation, { id }, options),
     },
     doScript: (command, _in, options) =>
       runtime.invoke(appDoScriptOperation, { command, in: _in }, options),

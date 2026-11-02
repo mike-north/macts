@@ -28,9 +28,9 @@ export class FolderResourceClient {
   }
 
   /**
-   * Get a folder by name.
+   * Get a folder by id.
    */
-  async get(name: string): Promise<Folder> {
-    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string): Promise<Folder> {
+    return this.#http.rpc<Folder>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

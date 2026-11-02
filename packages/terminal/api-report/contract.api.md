@@ -6,13 +6,14 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { Integer } from '@macts/contracts';
 
 // @public
 export interface SettingsSet {
     fontName: string | null;
     fontSize: number | null;
-    readonly id: number | null;
-    name: string;
+    readonly id: Integer;
+    name: string | null;
     numberOfColumns: number | null;
     numberOfRows: number | null;
 }
@@ -28,7 +29,7 @@ export interface SettingsSetCreateInput {
 
 // @public
 export interface SettingsSetResourceClient {
-    get(name: string, options?: CallOptions): Promise<SettingsSet>;
+    get(id: Integer, options?: CallOptions): Promise<SettingsSet>;
     list(options?: CallOptions): Promise<readonly SettingsSet[]>;
 }
 
@@ -90,8 +91,8 @@ export const terminalContract: AppContract<TerminalClient>;
 // @public
 export interface Window {
     readonly frontmost: boolean | null;
-    readonly id: number | null;
-    readonly name: string;
+    readonly id: Integer;
+    readonly name: string | null;
     position: string | null;
     visible: boolean | null;
 }
@@ -104,7 +105,7 @@ export interface WindowCreateInput {
 
 // @public
 export interface WindowResourceClient {
-    get(name: string, options?: CallOptions): Promise<Window>;
+    get(id: Integer, options?: CallOptions): Promise<Window>;
     list(options?: CallOptions): Promise<readonly Window[]>;
 }
 

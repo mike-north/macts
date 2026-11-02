@@ -53,7 +53,7 @@ export interface SettingsSetCreateInput {
 // @public
 export class SettingsSetResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<SettingsSet>;
+    get(id: string): Promise<SettingsSet>;
     list(): Promise<SettingsSet[]>;
 }
 
@@ -157,7 +157,7 @@ export interface WindowCreateInput {
 // @public
 export class WindowResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Window>;
+    get(id: string): Promise<Window>;
     list(): Promise<Window[]>;
 }
 

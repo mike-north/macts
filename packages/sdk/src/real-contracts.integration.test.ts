@@ -155,10 +155,30 @@ describe('local client over the real Notes contract', () => {
     )
   })
 
-  it('rejects a null at a non-null field, naming it (D10: Note name is the primary identifier)', async () => {
+  it('rejects a null at a non-null field, naming it (D10: Note id is the primary identifier)', async () => {
     const token = await keyWith('notes:notes:get')
     const executor = answering({
-      name: null,
+      name: 'Groceries',
+      id: null,
+      body: null,
+      plaintext: null,
+      creationDate: { date: CREATED_AT },
+      modificationDate: { date: MODIFIED_AT },
+      shared: false,
+      passwordProtected: false,
+    })
+    const notes = createLocalClient(notesContract, { token, executor, governance: ALLOW_ALL })
+
+    const error = await rejection(notes.notes.get('x-coredata://note-1'))
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+    expect(error).toMatchObject({ details: { issues: [{ path: ['id'] }] } })
+  })
+
+  it('sends a note get to the executor under the id identifier, not the name (#194)', async () => {
+    const token = await keyWith('notes:notes:get')
+    const executor = answering({
+      name: 'Groceries',
       id: 'x-coredata://note-1',
       body: null,
       plaintext: null,
@@ -169,10 +189,11 @@ describe('local client over the real Notes contract', () => {
     })
     const notes = createLocalClient(notesContract, { token, executor, governance: ALLOW_ALL })
 
-    const error = await rejection(notes.notes.get('Groceries'))
+    const note = await notes.notes.get('x-coredata://note-1')
 
-    expect(error).toBeInstanceOf(UnexpectedValueError)
-    expect(error).toMatchObject({ details: { issues: [{ path: ['name'] }] } })
+    expect(note.id).toBe('x-coredata://note-1')
+    expect(executor.requests[0]?.target).toEqual({ command: 'get', resource: 'Note' })
+    expect(executor.requests[0]?.input).toEqual({ id: 'x-coredata://note-1' })
   })
 
   it('refuses a key without notes:attachments:get, naming the permission', async () => {

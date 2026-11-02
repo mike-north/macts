@@ -28,9 +28,9 @@ export class SettingsSetResourceClient {
   }
 
   /**
-   * Get a settings set by name.
+   * Get a settings set by id.
    */
-  async get(name: string): Promise<SettingsSet> {
-    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { name })
+  async get(id: string): Promise<SettingsSet> {
+    return this.#http.rpc<SettingsSet>(`${this.#app}.${this.#resource}.get`, { id })
   }
 }

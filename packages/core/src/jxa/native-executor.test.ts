@@ -85,12 +85,15 @@ beforeAll(async () => {
 const GET_NOTE: OperationTarget = { command: 'get', resource: 'Note' }
 const LIST_ACCOUNTS: OperationTarget = { command: 'list', resource: 'Account' }
 
+/** The `id` of a Notes note, the identifier its `get` takes. */
+const NOTE_ID = 'x-coredata://00000000-0000-0000-0000-000000000000/ICNote/p1'
+
 /** An execution request against Notes with passthrough plans unless overridden. */
 function request(overrides: Partial<ExecutionRequest> = {}): ExecutionRequest {
   return {
     manifest: notes,
     target: GET_NOTE,
-    input: { name: 'Groceries' },
+    input: { id: NOTE_ID },
     inputPlan: PASSTHROUGH_PLAN,
     outputPlan: PASSTHROUGH_PLAN,
     ...overrides,
@@ -157,7 +160,7 @@ describe('createNativeExecutor', () => {
         {
           bundleId: 'com.apple.Notes',
           body: buildNativeBody(notes, GET_NOTE),
-          input: { name: 'Groceries' },
+          input: { id: NOTE_ID },
           inputPlan: PASSTHROUGH_PLAN,
           outputPlan: PASSTHROUGH_PLAN,
         },
@@ -182,12 +185,12 @@ describe('createNativeExecutor', () => {
     it('executes operations whose plans are not passthrough, passing the plans through', async () => {
       const inputPlan: ValuePlan = {
         kind: 'record',
-        fields: { name: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
+        fields: { id: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
       }
       const run = mockRun().mockResolvedValue({ ok: true, value: { integer: '7' } })
       const result = await createNativeExecutor({ transport: { run } }).execute(
         request({
-          input: { name: 'Groceries', limit: { integer: '3' } },
+          input: { id: NOTE_ID, limit: { integer: '3' } },
           inputPlan,
           outputPlan: INTEGER_PLAN,
         })
@@ -196,7 +199,7 @@ describe('createNativeExecutor', () => {
       const [script] = run.mock.calls[0] ?? []
       expect(script?.inputPlan).toBe(inputPlan)
       expect(script?.outputPlan).toBe(INTEGER_PLAN)
-      expect(script?.input).toEqual({ name: 'Groceries', limit: { integer: '3' } })
+      expect(script?.input).toEqual({ id: NOTE_ID, limit: { integer: '3' } })
     })
 
     it('defaults the time limit to 30000 ms', async () => {
@@ -744,10 +747,10 @@ describe('against the real automation host (no app events)', () => {
       })
       const result = await executor.execute(
         request({
-          input: { name: 'Groceries', limit: { integer: '41' } },
+          input: { id: NOTE_ID, limit: { integer: '41' } },
           inputPlan: {
             kind: 'record',
-            fields: { name: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
+            fields: { id: required(STRING_PLAN), limit: required(INTEGER_PLAN) },
           },
           outputPlan: INTEGER_PLAN,
         })

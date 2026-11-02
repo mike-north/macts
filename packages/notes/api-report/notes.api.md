@@ -19,7 +19,7 @@ export type AccountCreateInput = Record<string, never>;
 // @public
 export class AccountResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Account>;
+    get(id: string): Promise<Account>;
     list(): Promise<Account[]>;
 }
 
@@ -98,7 +98,7 @@ export interface FolderCreateInput {
 // @public
 export class FolderResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
-    get(name: string): Promise<Folder>;
+    get(id: string): Promise<Folder>;
     list(): Promise<Folder[]>;
 }
 
@@ -140,7 +140,7 @@ export interface NoteCreateInput {
 export class NoteResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: NoteCreateInput): Promise<Note>;
-    get(name: string): Promise<Note>;
+    get(id: string): Promise<Note>;
     list(): Promise<Note[]>;
     show(name: string): Promise<void>;
 }

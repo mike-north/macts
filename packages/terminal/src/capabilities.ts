@@ -78,13 +78,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
+        id: {
           description: 'Item identifier',
-          type: 'string',
+          type: 'number',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {
@@ -154,13 +154,13 @@ export const capabilities: readonly CapabilityMetadata[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        name: {
+        id: {
           description: 'Item identifier',
-          type: 'string',
+          type: 'number',
         },
       },
       additionalProperties: false,
-      required: ['name'],
+      required: ['id'],
     },
   },
   {

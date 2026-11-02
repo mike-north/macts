@@ -418,10 +418,10 @@ describe('@macts/notes attachments addressed by id', () => {
     expect(resolveIdParams(get[1])).toEqual({ parentParam: undefined, childParam: 'id' })
   })
 
-  it('keeps the shared name-keyed get for the other resources only', () => {
+  it('keeps the shared get for the other resources, which are identified by id too', () => {
     const shared = notes.commands['get']
     expect(shared?.resourceType).toEqual(['Account', 'Folder', 'Note'])
-    expect(shared?.parameters.map((p) => p.name)).toEqual(['name'])
+    expect(shared?.parameters.map((p) => p.name)).toEqual(['id'])
   })
 
   it('publishes the attachment get under the canonical route and derived permission', () => {
