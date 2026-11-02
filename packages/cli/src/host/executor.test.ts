@@ -118,4 +118,29 @@ describe('createTestStubExecutor', () => {
 
     expect(result).toEqual({ executor: 'test-stub', target: { command: 'quit' }, input: {} })
   })
+
+  it('answers a resolution with the reference it received', async () => {
+    const reference = {
+      resource: 'Widget',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
+    } as const
+
+    const result = await createTestStubExecutor().resolve({
+      manifest: MANIFEST,
+      reference,
+      outputPlan: PASSTHROUGH_PLAN,
+    })
+
+    expect(result).toEqual({
+      executor: 'test-stub',
+      reference: {
+        resource: 'Widget',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'range', start: { integer: '0' }, end: { integer: '2' } },
+      },
+    })
+  })
 })

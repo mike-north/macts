@@ -82,8 +82,12 @@ export interface ErrorDetailsByCode {
     readonly layer: PolicyLayerName
     readonly state: ApprovalRejectionState
   }
-  /** A singular target does not exist. */
-  readonly TARGET_NOT_FOUND: { readonly resource?: string }
+  /**
+   * A singular target does not exist. When the target is an entry of an
+   * identity collection being resolved, `entryIndex` is that entry's
+   * zero-based position in the collection's entries.
+   */
+  readonly TARGET_NOT_FOUND: { readonly resource?: string; readonly entryIndex?: number }
   /** A referenced file does not exist or has disappeared. */
   readonly FILE_NOT_FOUND: { readonly path?: string }
   /** A range or index selection is invalid for the collection it addresses. */

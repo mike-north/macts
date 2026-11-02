@@ -334,6 +334,9 @@ describe('camelCase grants authorize real calls (UAT)', () => {
           requests.push(request)
           return Promise.resolve({ ok: true })
         },
+        resolve() {
+          return Promise.reject(new Error('reference resolution is not exercised here'))
+        },
       },
       governance: { policy: runtimeModule.ALLOW_ALL_POLICY },
     })
@@ -360,6 +363,9 @@ describe('camelCase grants authorize real calls (UAT)', () => {
         execute(request) {
           requests.push(request)
           return Promise.resolve({ ok: true })
+        },
+        resolve() {
+          return Promise.reject(new Error('reference resolution is not exercised here'))
         },
       },
     })

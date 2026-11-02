@@ -9,7 +9,13 @@
 
 import type { Hono } from 'hono'
 import pino from 'pino'
-import type { AppManifest, ExecutionRequest, Executor, GovernancePolicy } from '@macts/core'
+import type {
+  AppManifest,
+  ExecutionRequest,
+  Executor,
+  GovernancePolicy,
+  ResolutionRequest,
+} from '@macts/core'
 import {
   AuthenticationError,
   type AuthenticationFailureReason,
@@ -183,21 +189,36 @@ export function createFakeVerifier(
 
 /** An executor that records every request it receives and answers with `respond`. */
 export interface RecordingExecutor extends Executor {
-  /** Every request received, in order. */
+  /** Every execution request received, in order. */
   readonly requests: ExecutionRequest[]
+  /** Every resolution request received, in order. */
+  readonly resolutions: ResolutionRequest[]
 }
 
-/** Build a {@link RecordingExecutor}; by default every call returns `{ events: [] }`. */
+/**
+ * Build a {@link RecordingExecutor}; by default every execution returns
+ * `{ events: [] }`, a single reference resolves to `{}`, and a collection to
+ * `[]`.
+ */
 export function createRecordingExecutor(
-  respond: (request: ExecutionRequest) => Promise<WireValue> = () => Promise.resolve({ events: [] })
+  respond: (request: ExecutionRequest) => Promise<WireValue> = () =>
+    Promise.resolve({ events: [] }),
+  respondToResolution: (request: ResolutionRequest) => Promise<WireValue> = (request) =>
+    Promise.resolve(request.reference.cardinality === 'many' ? [] : {})
 ): RecordingExecutor {
   const requests: ExecutionRequest[] = []
+  const resolutions: ResolutionRequest[] = []
   return {
     provider: 'recording-stub',
     requests,
+    resolutions,
     execute(request) {
       requests.push(request)
       return respond(request)
+    },
+    resolve(request) {
+      resolutions.push(request)
+      return respondToResolution(request)
     },
   }
 }

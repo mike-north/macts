@@ -9,4 +9,4 @@
  * @packageDocumentation
  */
 
-export type { Executor, ExecutionRequest } from './executor.js'
+export type { Executor, ExecutionRequest, ResolutionRequest } from './executor.js'
