@@ -234,13 +234,22 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   return database
 }
 
+/** The directories the store deletes files in, as canonical paths. */
+export interface CanonicalTransferDirectories {
+  /** Canonical `<home>/transfers/uploads`. */
+  readonly uploads: string
+  /** Canonical `<home>/transfers/copies`. */
+  readonly copies: string
+}
+
 /**
- * The canonical path of the copies directory: every symlink in it resolved
- * (on macOS, `/var/…` becomes `/private/var/…`). Temporary copies are minted
- * directly inside it, and only paths directly inside it are ever deleted.
+ * The canonical paths of the uploads and copies directories: every symlink
+ * in them resolved (on macOS, `/var/…` becomes `/private/var/…`). Upload
+ * bytes and temporary copies live directly inside them, and the store only
+ * ever deletes paths directly inside them.
  */
-export function canonicalCopiesDirectory(paths: TransferPaths): string {
-  return fs.realpathSync(paths.copies)
+export function canonicalDirectories(paths: TransferPaths): CanonicalTransferDirectories {
+  return { uploads: fs.realpathSync(paths.uploads), copies: fs.realpathSync(paths.copies) }
 }
 
 /**

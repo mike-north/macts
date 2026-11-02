@@ -1358,6 +1358,11 @@ these limits, exported as named constants:
   path of uploaded bytes. A filesystem failure while staging or releasing
   bytes is reported generically, with the original error kept as its local
   `cause`. The store does no logging.
+- Upload bytes live directly inside the canonical uploads directory, named by
+  the upload id. Only ids in the exact format the store mints resolve to a
+  path. A record with any other id, such as one from a corrupted or tampered
+  database, is unusable: it is never resolved to a path, so nothing is
+  written or deleted through it.
 - The store mints every temporary copy's path itself. Each one is a fresh,
   randomly named, owner-only file created directly inside the canonical
   (symlink-free) path of the copy directory, optionally with a short

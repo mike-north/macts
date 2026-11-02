@@ -11,7 +11,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { chmodSync, existsSync, readdirSync, readFileSync } from 'node:fs'
+import { chmodSync, existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
 import { join } from 'node:path'
 import { Readable } from 'node:stream'
 import { RateLimitedError } from '@macts/contracts'
@@ -500,7 +500,10 @@ describe('consumeUpload', () => {
 
     const consumed = await fixture.store.consumeUpload(ALICE, uploadId)
 
-    expect(consumed.path).toBe(join(fixture.home, 'transfers', 'uploads', uploadId))
+    // The canonical path: on macOS the temp home is under /var -> /private/var.
+    expect(consumed.path).toBe(
+      join(realpathSync(join(fixture.home, 'transfers', 'uploads')), uploadId)
+    )
     expect(consumed.size).toBe(7)
     expect(consumed.contentType).toBe('application/pdf')
     expect(readFileSync(consumed.path, 'utf8')).toBe('payload')

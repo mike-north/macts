@@ -10,7 +10,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { chmodSync, existsSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { loadSqlite } from '../storage/sqlite.js'
 import {
@@ -168,7 +168,7 @@ describe('sweep', () => {
     await expectTransferError(reopened.redeemGrant(ALICE, grant.token), 'unknown-transfer')
   })
 
-  it('runs before a mutating call at most once a minute', async () => {
+  it('runs after a mutating call, at most once a minute', async () => {
     const { store, clock } = fixture
     // The store was swept when opened, at 10:00:00.
     const early = await store.issueGrant(ALICE, FILE) // expires 10:15:00
@@ -179,8 +179,9 @@ describe('sweep', () => {
     clock.set('2026-01-15T10:15:30.000Z')
     await expectTransferError(store.redeemGrant(ALICE, early.token), 'expired')
 
-    // A mutating call over a minute after the last sweep sweeps first.
-    await store.createUpload(ALICE)
+    // A mutating call over a minute after the last sweep reports on the
+    // records it found (the grant is expired, not unknown), then sweeps.
+    await expectTransferError(store.issueDownloadLink(ALICE, early.token), 'expired')
     await expectTransferError(store.redeemGrant(ALICE, early.token), 'unknown-transfer')
 
     // Thirty seconds later, no sweep yet: the second grant is expired but kept.
@@ -188,9 +189,82 @@ describe('sweep', () => {
     await store.createUpload(ALICE)
     await expectTransferError(store.redeemGrant(ALICE, later.token), 'expired')
 
-    // A full minute after the last sweep, the next mutating call sweeps again.
+    // A full minute after the last sweep, the next mutating call sweeps again
+    // once it finishes.
     clock.set('2026-01-15T10:16:30.000Z')
     await store.createUpload(ALICE)
     await expectTransferError(store.redeemGrant(ALICE, later.token), 'unknown-transfer')
+  })
+})
+
+/**
+ * Regression: the bytes path was built straight from the stored `upload_id`,
+ * so a corrupted or tampered row such as `../victim` could aim the sweep (or
+ * a consume's cleanup) outside `<home>/transfers/uploads`. Only ids in the
+ * exact format the store mints now resolve to a path, and only to a direct
+ * child of the canonical uploads directory.
+ */
+describe('upload records with ids the store never minted', () => {
+  const fixture = useTransferStore()
+
+  /** Insert an upload row straight into the database, bypassing the store. */
+  function plantUpload(uploadId: string, columns: { released: number; consumedAt?: number }): void {
+    const { DatabaseSync } = loadSqlite()
+    const database = new DatabaseSync(join(fixture.home, 'transfers', 'transfers.db'))
+    try {
+      database
+        .prepare(
+          `INSERT INTO uploads (upload_id, subject, max_bytes, created_at, expires_at, state,
+             received_bytes, consumed_at, released)
+           VALUES (?, ?, 10, ?, ?, 'complete', 5, ?, ?)`
+        )
+        .run(
+          uploadId,
+          ALICE,
+          Date.parse('2026-01-15T09:00:00.000Z'),
+          Date.parse('2026-01-15T09:15:00.000Z'),
+          columns.consumedAt ?? null,
+          columns.released
+        )
+    } finally {
+      database.close()
+    }
+  }
+
+  it('never deletes through a planted ../ id, and drops the unusable records', async () => {
+    const transfers = join(fixture.home, 'transfers')
+    // Targets one and two levels above uploads/, and a sibling directory.
+    writeFileSync(join(transfers, 'victim'), 'inside transfers')
+    writeFileSync(join(fixture.home, 'victim'), 'inside home')
+    mkdirSync(join(transfers, 'elsewhere'))
+    writeFileSync(join(transfers, 'elsewhere', 'victim'), 'in a sibling')
+    plantUpload('../victim', { released: 1 })
+    plantUpload('../../victim', { released: 0 })
+    plantUpload('../elsewhere/victim', {
+      released: 0,
+      consumedAt: Date.parse('2026-01-15T09:01:00.000Z'),
+    })
+
+    await fixture.store.sweep()
+
+    expect(readFileSync(join(transfers, 'victim'), 'utf8')).toBe('inside transfers')
+    expect(readFileSync(join(fixture.home, 'victim'), 'utf8')).toBe('inside home')
+    expect(readFileSync(join(transfers, 'elsewhere', 'victim'), 'utf8')).toBe('in a sibling')
+    expect(rowCounts(fixture.home)['uploads']).toBe(0)
+  })
+
+  it('treats a planted id as unknown to receive and consume, touching nothing', async () => {
+    const transfers = join(fixture.home, 'transfers')
+    writeFileSync(join(transfers, 'victim'), 'untouched')
+    fixture.clock.set('2026-01-15T09:05:00.000Z')
+    plantUpload('../victim', { released: 0 })
+
+    await expectTransferError(
+      fixture.store.receiveUpload(ALICE, '../victim', chunks('overwrite')),
+      'unknown-transfer'
+    )
+    await expectTransferError(fixture.store.consumeUpload(ALICE, '../victim'), 'unknown-transfer')
+
+    expect(readFileSync(join(transfers, 'victim'), 'utf8')).toBe('untouched')
   })
 })

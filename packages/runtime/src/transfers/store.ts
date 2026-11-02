@@ -65,7 +65,8 @@ import { getMactsHome } from '../paths.js'
 import { runInTransaction, type SqliteDatabase, type SqliteRow } from '../storage/sqlite.js'
 import { readChunks, type UploadByteSource } from './byte-source.js'
 import {
-  canonicalCopiesDirectory,
+  canonicalDirectories,
+  type CanonicalTransferDirectories,
   FILE_MODE,
   integerColumn,
   openTransferDatabase,
@@ -73,7 +74,6 @@ import {
   optionalTextColumn,
   textColumn,
   transferPaths,
-  type TransferPaths,
 } from './database.js'
 import { resolveTransferLimits, type TransferLimits } from './limits.js'
 import { hashToken, mintToken } from './tokens.js'
@@ -420,9 +420,19 @@ async function withoutPath<T>(step: () => Promise<T>, message: string): Promise<
 /** A minted copy's extension: `.` and 1–16 ASCII letters or digits. */
 const COPY_EXTENSION = /^\.[A-Za-z0-9]{1,16}$/
 
-/** A minted copy's file name: a random UUID and an optional extension. */
-const COPY_NAME =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\.[A-Za-z0-9]{1,16})?$/
+/**
+ * The random identifier the store mints for every upload id and copy name:
+ * a lowercase version-4 UUID, as `crypto.randomUUID()` produces. It has no
+ * path separators or dots, so a name built from it is always one plain path
+ * component.
+ */
+const MINTED_ID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
+
+/** An upload id the store mints. Any other value is not a usable upload. */
+const UPLOAD_ID = new RegExp(`^${MINTED_ID}$`)
+
+/** A minted copy's file name: a minted id and an optional extension. */
+const COPY_NAME = new RegExp(`^${MINTED_ID}(\\.[A-Za-z0-9]{1,16})?$`)
 
 /**
  * How many bytes a receive reserves against the subject's outstanding budget
@@ -475,7 +485,8 @@ class SqliteTransferStore implements TransferStore {
   readonly limits: TransferLimits
 
   readonly #database: SqliteDatabase
-  readonly #paths: TransferPaths
+  /** Canonical path of the uploads directory; all upload bytes are directly inside it. */
+  readonly #uploads: string
   /** Canonical path of the copies directory; every minted copy is directly inside it. */
   readonly #copies: string
   readonly #now: () => Date
@@ -484,14 +495,13 @@ class SqliteTransferStore implements TransferStore {
 
   constructor(
     database: SqliteDatabase,
-    paths: TransferPaths,
-    copies: string,
+    directories: CanonicalTransferDirectories,
     now: () => Date,
     limits: TransferLimits
   ) {
     this.#database = database
-    this.#paths = paths
-    this.#copies = copies
+    this.#uploads = directories.uploads
+    this.#copies = directories.copies
     this.#now = now
     this.limits = limits
   }
@@ -513,8 +523,23 @@ class SqliteTransferStore implements TransferStore {
     }
   }
 
-  #uploadFile(uploadId: string): string {
-    return path.join(this.#paths.uploads, uploadId)
+  /**
+   * Where an upload's bytes live, or `undefined` when `uploadId` is not an id
+   * this store mints.
+   *
+   * Upload ids reach this from callers and from the database, which could be
+   * corrupted or tampered with. Only the exact minted format is accepted, and
+   * the resolved path must be a direct child of the canonical uploads
+   * directory, so no value can aim a write or delete anywhere else. A record
+   * whose id fails is unusable: it is never resolved to a path, so nothing
+   * is ever written or deleted through it.
+   */
+  #uploadFile(uploadId: string): string | undefined {
+    if (!UPLOAD_ID.test(uploadId)) {
+      return undefined
+    }
+    const file = path.resolve(this.#uploads, uploadId)
+    return path.dirname(file) === this.#uploads ? file : undefined
   }
 
   /**
@@ -759,8 +784,11 @@ class SqliteTransferStore implements TransferStore {
     this.#assertOpen()
     assertSubject(subject)
 
-    const { maxBytes, expiresAt } = this.#beginReceive(subject, uploadId)
     const file = this.#uploadFile(uploadId)
+    if (file === undefined) {
+      throw unknownTransfer('upload')
+    }
+    const { maxBytes, expiresAt } = this.#beginReceive(subject, uploadId)
     let handle: fsp.FileHandle | undefined
     let received = 0
     let reserved = 0
@@ -824,6 +852,10 @@ class SqliteTransferStore implements TransferStore {
   async #consumeUpload(subject: string, uploadId: string): Promise<ConsumedUpload> {
     this.#assertOpen()
     assertSubject(subject)
+    const file = this.#uploadFile(uploadId)
+    if (file === undefined) {
+      throw unknownTransfer('upload')
+    }
 
     const now = this.#nowMs()
     // Decided inside one transaction that always commits the consumption;
@@ -854,7 +886,6 @@ class SqliteTransferStore implements TransferStore {
       return { row, failure }
     })
 
-    const file = this.#uploadFile(uploadId)
     if (outcome.failure !== undefined) {
       // Best effort: a file that cannot be deleted now is retried by the sweep.
       await removeFile(file).catch(() => undefined)
@@ -1032,8 +1063,15 @@ class SqliteTransferStore implements TransferStore {
       )
       .all(now, retainedSince)
       .map((row) => textColumn(row, 'upload_id'))
+    // A record whose id is not a minted one is unusable: its record goes,
+    // and nothing on disk is touched for it.
     const uploadResults = await Promise.allSettled(
-      uploadIds.map((uploadId) => removeFile(this.#uploadFile(uploadId)))
+      uploadIds.map(async (uploadId) => {
+        const file = this.#uploadFile(uploadId)
+        if (file !== undefined) {
+          await removeFile(file)
+        }
+      })
     )
 
     const copyPaths = this.#database
@@ -1088,7 +1126,7 @@ export async function createTransferStore(
   const database = openTransferDatabase(paths)
   let store: SqliteTransferStore
   try {
-    store = new SqliteTransferStore(database, paths, canonicalCopiesDirectory(paths), now, limits)
+    store = new SqliteTransferStore(database, canonicalDirectories(paths), now, limits)
   } catch (error) {
     database.close()
     throw error
