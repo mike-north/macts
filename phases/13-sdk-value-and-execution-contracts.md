@@ -1297,14 +1297,58 @@ authorized operation returns the file. It is bound to the authority's subject.
 arbitrary file read. A signed URL is a bearer capability scoped to one
 transfer with a short expiry, and it is never logged.
 
-**Limits and lifecycle.** Execution chooses and documents the following, with
-tests:
+**Limits and lifecycle.** The runtime's transfer store (`@macts/runtime`,
+`transfers/`) records grants, uploads, download links, and temporary copies in
+`<macts-home>/transfers/`, with directories 0700 and files 0600. It enforces
+these limits, exported as named constants:
 
-- size limits
-- TTLs, including URL lifetime
-- completion rules: an upload is unusable until fully received, and an expired
-  or incomplete upload fails with `TransferError`
-- cleanup after use or failure
+| Limit                                          | Default              |
+| ---------------------------------------------- | -------------------- |
+| Largest single upload                          | 100 MiB              |
+| Outstanding uploads per subject                | 16                   |
+| Outstanding upload bytes per subject           | 512 MiB              |
+| Upload lifetime                                | 15 minutes           |
+| Grant lifetime                                 | 15 minutes           |
+| Download link lifetime                         | 5 minutes            |
+| Temporary copy lifetime                        | 60 minutes           |
+| Unreleased bytes of a consumed upload are kept | 15 minutes after use |
+
+- Every lifetime is computed from the store's clock when the transfer is
+  issued. A transfer is usable strictly before its `expiresAt`; at that
+  instant it is already expired.
+- A grant and an `uploadId` are bound to the subject that created them.
+  Another subject presenting one gets `unknown-transfer`, with the same
+  message as an unknown one, so identifiers cannot be probed. A download link
+  is the bearer capability itself and takes no subject.
+- A grant is reusable until it expires; each exchange issues a fresh download
+  link.
+- An upload is outstanding from creation until it is consumed or expires. A
+  subject may hold a bounded number of outstanding uploads and a bounded total
+  of bytes received across them. Creating one more fails with
+  `RateLimitedError`, whose `retryAfterSeconds` is the time until the
+  subject's oldest outstanding upload expires (rounded up, at least 1). A
+  write past either byte bound fails with `too-large`.
+- An upload is unusable until fully received: consuming it earlier fails with
+  `incomplete`. An upload is received once. Bytes over the limit stop the
+  receive, delete the partial file, and fail the upload. An interrupted
+  receive deletes the partial file and leaves the upload awaiting bytes.
+- Uploads are single-use. Consumption is recorded before anything else is
+  decided, so a second consume of the same id fails with `unknown-transfer`,
+  whatever the first call's outcome.
+- A staged upload is deleted after the consuming call, on success or failure:
+  the call releases it. The sweep removes bytes a call never released once
+  their retention has passed.
+- `contentType` is a hint only. It is never verified and may be ignored.
+- Only SHA-256 hashes of grant and download link tokens are stored. Tokens are
+  32 random bytes. No error message contains a token, and the store does no
+  logging.
+- Temporary copies live in the store's copy directory, and the store deletes
+  nothing outside its own directories. The caller releases a copy; the sweep
+  removes leftovers after their lifetime.
+- The sweep removes expired grants, links, uploads, and temporary copies, with
+  their files, and released upload records. It runs when the store opens and
+  at most once a minute after a mutating call. Once swept, an expired transfer
+  is unknown. A file already gone is not an error.
 
 **Decoding and binding.** `t.file()` decodes the strict `file` wire form
 into `FileData` (`path?`, `existence` with `observedAt` as a `Date`, and
