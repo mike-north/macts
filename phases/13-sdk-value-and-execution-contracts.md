@@ -1686,7 +1686,9 @@ A result passes these steps in order:
 1. The executor returns its result.
 2. The grant-free file observation the native codec produces is replaced by
    the `file` wire form with its grant (D8). A missed grant therefore fails
-   the next step, which keeps the file design fail-closed.
+   the next step, which keeps the file design fail-closed. This step is
+   pending the D8 executor wire: until it lands, results go straight from
+   step 1 to step 3.
 3. The result is validated against `output.wire`.
 4. The adapter emits it.
 
