@@ -10,7 +10,7 @@
  * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
  */
 
-import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
+import { expectAssignable, expectNotAssignable, expectNotType, expectType } from 'tsd'
 import type {
   AllocatedTemporaryCopy,
   ConsumedUpload,
@@ -46,9 +46,13 @@ expectNotAssignable<UploadByteSource>(strings)
 // Limits are overridable one at a time and read-only.
 expectAssignable<CreateTransferStoreOptions>({ limits: { maxUploadBytes: 10 } })
 expectNotAssignable<CreateTransferStoreOptions>({ limits: { maxUploadBytes: '10' } })
+// Every bound is read-only. Readonly-ness does not affect assignability, so
+// it is checked with tsd's identity assertions: TransferLimits is identical
+// to its Readonly form and not to its mutable form.
+type Mutable<T> = { -readonly [K in keyof T]: T[K] }
 declare const limits: TransferLimits
-// @ts-expect-error -- limits are read-only
-limits.maxUploadBytes = 1
+expectType<Readonly<TransferLimits>>(limits)
+expectNotType<Mutable<TransferLimits>>(limits)
 
 // A granted file's path is optional, never explicitly undefined.
 expectAssignable<GrantedFile>({ app: 'photos', observedAt: new Date() })
