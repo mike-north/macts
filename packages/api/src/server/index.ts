@@ -109,8 +109,10 @@ export interface AppRegistrar {
    *
    * @throws `OperationRegistrationError` when a descriptor's permission or
    *   target disagrees with the manifest, names an operation the manifest does
-   *   not expose, an operation id is already registered, or a contract for the
-   *   same app is already registered.
+   *   not expose, an operation id is already registered, a contract for the
+   *   same app is already registered, or the contract's resource table records
+   *   a `get` or `list` operation that is not one of its operations targeting
+   *   that resource.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /**

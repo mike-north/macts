@@ -67,6 +67,15 @@ export function createTestStubExecutor(): Executor {
           : { command: request.target.command, resource: request.target.resource }
       return Promise.resolve({ executor: TEST_STUB_PROVIDER, target, input: request.input })
     },
+    /**
+     * Answer a resolution with `{ executor: 'test-stub', reference }`.
+     *
+     * @remarks
+     * The answer describes the request; it is not shaped by
+     * `request.outputPlan`. Resolving through the runtime therefore always
+     * fails output validation with `UnexpectedValueError`, after the call has
+     * passed every earlier step and reached this executor.
+     */
     resolve(request: ResolutionRequest): Promise<WireValue> {
       return Promise.resolve({ executor: TEST_STUB_PROVIDER, reference: request.reference })
     },

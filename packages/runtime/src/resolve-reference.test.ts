@@ -35,7 +35,9 @@ import {
   UnexpectedValueError,
   ValidationError,
   type Authority,
+  type AppContract,
   type InvocationContext,
+  type ResourceDescriptor,
   type ValuePlan,
   type WireValue,
 } from '@macts/contracts'
@@ -60,6 +62,7 @@ import {
 const BOOK_READER_SECRET = 'macts_sk_book-reader-secret-never-logged'
 const SHELF_READER_SECRET = 'macts_sk_shelf-reader-secret-never-logged'
 const LIBRARIAN_SECRET = 'macts_sk_librarian-secret-never-logged'
+const PAGE_LISTER_SECRET = 'macts_sk_page-lister-secret-never-logged'
 
 /** May read one book (the Book get operation) and nothing else. */
 const BOOK_READER: Authority = {
@@ -71,6 +74,8 @@ const SHELF_READER: Authority = {
   subject: 'key_shelf_reader',
   permissions: ['library:shelves:get', 'library:shelves:list'],
 }
+/** May list pages, and nothing else: no book or shelf permission. */
+const PAGE_LISTER: Authority = { subject: 'key_page_lister', permissions: ['library:pages:list'] }
 /** Holds every permission the library app's operations require. */
 const LIBRARIAN: Authority = {
   subject: 'key_librarian',
@@ -204,6 +209,7 @@ function harness(options: HarnessOptions = {}): Harness {
     [BOOK_READER_SECRET]: BOOK_READER,
     [SHELF_READER_SECRET]: SHELF_READER,
     [LIBRARIAN_SECRET]: LIBRARIAN,
+    [PAGE_LISTER_SECRET]: PAGE_LISTER,
   })
   const logger = createSpyLogger()
   const runtime = createRuntime({
@@ -216,6 +222,47 @@ function harness(options: HarnessOptions = {}): Harness {
   runtime.registerContract(libraryContract(), LIBRARY_MANIFEST)
   runtime.registerManifest(CALENDAR_MANIFEST)
   return { runtime, executor, verifier, logger }
+}
+
+/** A runtime with nothing registered, over `executor`, for registration tests. */
+function bareRuntime(executor: RecordingExecutor = createRecordingExecutor()): MactsRuntime {
+  return createRuntime({
+    executor,
+    verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
+    clock: fixedClock,
+    logger: createSpyLogger(),
+    governance: { policy: ALLOW_ALL_POLICY },
+  })
+}
+
+/** The library contract with one resource's descriptor replaced by `change(descriptor)`. */
+function libraryContractWithResource(
+  resource: string,
+  change: (descriptor: ResourceDescriptor<unknown>) => ResourceDescriptor<unknown>
+): AppContract<unknown> {
+  const base = libraryContract()
+  const descriptor = base.resources[resource]
+  if (descriptor === undefined) throw new Error(`the fixture has no ${resource} resource`)
+  return { ...base, resources: { ...base.resources, [resource]: change(descriptor) } }
+}
+
+/**
+ * The library contract cut down to some of its resources: their descriptors,
+ * and only the operations that target them.
+ */
+function libraryContractOf(resources: readonly string[]): AppContract<unknown> {
+  const base = libraryContract()
+  return {
+    ...base,
+    operations: Object.fromEntries(
+      Object.entries(base.operations).filter(([, op]) =>
+        resources.includes(op.target.resource ?? '')
+      )
+    ),
+    resources: Object.fromEntries(
+      Object.entries(base.resources).filter(([key]) => resources.includes(key))
+    ),
+  }
 }
 
 /** A recording executor whose resolutions all answer `result`. */
@@ -327,6 +374,91 @@ describe('resolveReference: allowed resolutions', () => {
     )
 
     expect(executor.resolutions[0]?.signal).toBe(signal)
+  })
+
+  it('resolves a single reference by index selector', async () => {
+    const { runtime, executor } = harness({ executor: resolvingTo(DUNE_WIRE) })
+    const firstBook = {
+      resource: 'Book',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: { integer: '0' } },
+    }
+
+    const result = await runtime.resolveReference(
+      'library',
+      wire(firstBook),
+      as(BOOK_READER_SECRET)
+    )
+
+    expect(result).toEqual(DUNE_WIRE)
+    expect(executor.resolutions[0]?.reference).toEqual({
+      resource: 'Book',
+      form: 'selector',
+      cardinality: 'one',
+      selector: { by: 'index', index: { integer: '0' } },
+    })
+  })
+
+  it('resolves through a two-level container chain with a selector container, needing no container permission', async () => {
+    // Every page of the book named "Dune" on shelf SF-1. PAGE_LISTER holds
+    // only the Page list permission: neither container's is required.
+    const pagesOfDune = {
+      resource: 'Page',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container: {
+        resource: 'Book',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Dune' },
+        container: { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
+      },
+    }
+    const { runtime, executor } = harness({ executor: resolvingTo([{ text: 'Chapter 1' }]) })
+
+    const result = await runtime.resolveReference(
+      'library',
+      wire(pagesOfDune),
+      as(PAGE_LISTER_SECRET)
+    )
+
+    expect(result).toEqual([{ text: 'Chapter 1' }])
+    expect(executor.resolutions[0]?.reference).toEqual({
+      resource: 'Page',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+      container: {
+        resource: 'Book',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Dune' },
+        container: { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
+      },
+    })
+  })
+
+  it('resolves an identity collection to one record per entry, in order', async () => {
+    const foundation = { isbn: '978-0553293357', title: 'Foundation', pages: { integer: '255' } }
+    const { runtime } = harness({ executor: resolvingTo([DUNE_WIRE, foundation]) })
+
+    await expect(
+      runtime.resolveReference('library', wire(TWO_BOOKS), as(LIBRARIAN_SECRET))
+    ).resolves.toEqual([DUNE_WIRE, foundation])
+  })
+
+  it('resolves an identity collection with no entries to [] (D7)', async () => {
+    const { runtime } = harness({ executor: resolvingTo([]) })
+
+    await expect(
+      runtime.resolveReference(
+        'library',
+        wire({ resource: 'Book', form: 'identity', cardinality: 'many', entries: [] }),
+        as(LIBRARIAN_SECRET)
+      )
+    ).resolves.toEqual([])
   })
 
   it('treats an empty collection as a successful result (D7: possibly empty)', async () => {
@@ -859,73 +991,23 @@ describe('resolveReference: resources without a resolving operation (D7)', () =>
     // The contract records Book's get as `library.books.describeBook` here,
     // although the manifest's CRUD-shaped get command is `lookupBook`: the
     // recorded operation is authoritative.
-    const base = libraryContract()
-    const book = base.resources['Book']
-    if (book === undefined) throw new Error('fixture has no Book resource')
-    const contract = {
-      ...base,
-      resources: {
-        ...base.resources,
-        Book: { ...book, get: 'library.books.describeBook' as const },
-      },
-    }
-    const executor = createRecordingExecutor()
-    const runtime = createRuntime({
-      executor,
-      verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
-      clock: fixedClock,
-      logger: createSpyLogger(),
-      governance: { policy: ALLOW_ALL_POLICY },
-    })
+    const contract = libraryContractWithResource('Book', (book) => ({
+      ...book,
+      get: 'library.books.describeBook',
+    }))
+    const executor = resolvingTo('A novel about a desert planet')
+    const runtime = bareRuntime(executor)
     runtime.registerContract(contract, LIBRARY_MANIFEST)
 
-    // Only which operation was chosen matters here, not whether the stub's
-    // answer satisfies its output contract.
-    await runtime
-      .resolveReference(
-        'library',
-        wire({ resource: 'Book', form: 'identity', cardinality: 'one', id: 'b1' }),
-        as(LIBRARIAN_SECRET)
-      )
-      .catch(() => undefined)
-
-    const describe = contract.operations['library.books.describeBook']
-    expect(describe).toBeDefined()
-    expect(executor.resolutions).toHaveLength(1)
-    expect(executor.resolutions[0]?.outputPlan).toEqual(describe?.output.plan)
-  })
-
-  it('fails with InternalError when the contract records a resolving operation it does not register', async () => {
-    const base = libraryContract()
-    const shelf = base.resources['Shelf']
-    if (shelf === undefined) throw new Error('fixture has no Shelf resource')
-    const contract = {
-      ...base,
-      resources: {
-        ...base.resources,
-        Shelf: { ...shelf, get: 'library.shelves.vanished' as const },
-      },
-    }
-    const executor = createRecordingExecutor()
-    const runtime = createRuntime({
-      executor,
-      verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
-      clock: fixedClock,
-      logger: createSpyLogger(),
-      governance: { policy: ALLOW_ALL_POLICY },
-    })
-    runtime.registerContract(contract, LIBRARY_MANIFEST)
-
-    const error = await rejection(
-      runtime.resolveReference(
-        'library',
-        wire({ resource: 'Shelf', form: 'identity', cardinality: 'one', id: 's1' }),
-        as(LIBRARIAN_SECRET)
-      )
+    const result = await runtime.resolveReference(
+      'library',
+      wire({ resource: 'Book', form: 'identity', cardinality: 'one', id: 'b1' }),
+      as(LIBRARIAN_SECRET)
     )
 
-    expect(error).toBeInstanceOf(InternalError)
-    expect(executor.resolutions).toHaveLength(0)
+    expect(result).toBe('A novel about a desert planet')
+    // describeBook's output is a string (LIBRARY_OPERATIONS), not a book record.
+    expect(executor.resolutions[0]?.outputPlan).toEqual({ kind: 'string' })
   })
 
   it('still resolves the operation a resource does have', async () => {
@@ -960,6 +1042,35 @@ describe('resolveReference: result validation (D11)', () => {
       'The result of resolving a reference as "library.books.lookupBook" does not match its contract.'
     )
     expect(error.details.issues.map((issue) => issue.path)).toEqual([['pages']])
+  })
+
+  it('rejects an identity collection result that drops an entry (D7: never dropped)', async () => {
+    // Two entries, one record: the executor omitted an entry instead of
+    // reporting it as TargetNotFoundError with its entryIndex.
+    const { runtime } = harness({ executor: resolvingTo([DUNE_WIRE]) })
+
+    const error = await rejection(
+      runtime.resolveReference('library', wire(TWO_BOOKS), as(LIBRARIAN_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
+    if (!(error instanceof UnexpectedValueError)) return
+    expect(error.message).toBe(
+      'The result of resolving an identity collection as "library.books.list" must hold one record per entry: expected 2 records, received 1.'
+    )
+    expect(error.details.issues).toEqual([
+      { path: [], message: 'Expected 2 records, one per entry, but received 1' },
+    ])
+  })
+
+  it('rejects an identity collection result with more records than entries', async () => {
+    const { runtime } = harness({ executor: resolvingTo([DUNE_WIRE, DUNE_WIRE, DUNE_WIRE]) })
+
+    const error = await rejection(
+      runtime.resolveReference('library', wire(TWO_BOOKS), as(LIBRARIAN_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(UnexpectedValueError)
   })
 
   it('rejects a single record where the list output contract requires an array', async () => {
@@ -1039,6 +1150,8 @@ describe('resolveReference: executor failures (D6)', () => {
     expect(error.message).toBe('The operation failed unexpectedly.')
     expect(error.cause).toBe(cause)
     expect(logger.error.mock.calls[0]?.[0]).toMatchObject({
+      app: 'library',
+      call: 'resolveReference',
       operation: 'library.books.lookupBook',
       provider: 'recording-stub',
     })
@@ -1058,5 +1171,81 @@ describe('registerContract: one contract per app', () => {
       runtime.registerContract(libraryContract(), LIBRARY_MANIFEST)
     }).toThrow('A contract for app "library" is already registered')
     expect(runtime.operations()).toEqual(before)
+  })
+
+  it('refuses a second contract for an app even when its operation ids are all new', async () => {
+    // The two contracts share no operation id, so only the one-contract-per-app
+    // rule can refuse the second.
+    const runtime = bareRuntime(resolvingTo([]))
+    runtime.registerContract(libraryContractOf(['Shelf']), LIBRARY_MANIFEST)
+    const before = runtime.operations()
+
+    expect(() => {
+      runtime.registerContract(libraryContractOf(['Book']), LIBRARY_MANIFEST)
+    }).toThrow('A contract for app "library" is already registered')
+    expect(runtime.operations()).toEqual(before)
+    // Book references stay unknown: the refused contract's resource table never registered.
+    const error = await rejection(
+      runtime.resolveReference('library', wire(EVERY_BOOK), as(LIBRARIAN_SECRET))
+    )
+    expect(error).toBeInstanceOf(ValidationError)
+  })
+
+  it('registers no app when the operation registry refuses the contract', async () => {
+    const runtime = bareRuntime()
+    runtime.registerManifest(LIBRARY_MANIFEST)
+    const before = runtime.operations()
+
+    // Every contract operation id is already registered from the manifest.
+    expect(() => {
+      runtime.registerContract(libraryContract(), LIBRARY_MANIFEST)
+    }).toThrow(OperationRegistrationError)
+    expect(runtime.operations()).toEqual(before)
+
+    const error = await rejection(
+      runtime.resolveReference('library', wire(DUNE_BY_NAME), as(LIBRARIAN_SECRET))
+    )
+    expect(error).toBeInstanceOf(ValidationError)
+    if (!(error instanceof ValidationError)) return
+    expect(error.message).toBe('Unknown app "library".')
+  })
+})
+
+describe('registerContract: recorded resolving operations', () => {
+  it('refuses a contract whose recorded get is not one of its operations, registering nothing', async () => {
+    const contract = libraryContractWithResource('Shelf', (shelf) => ({
+      ...shelf,
+      get: 'library.shelves.vanished',
+    }))
+    const runtime = bareRuntime()
+
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(OperationRegistrationError)
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(
+      'The library contract is inconsistent: resource "Shelf" records "library.shelves.vanished" as its get operation, which is not one of its operations. Regenerate the contract.'
+    )
+    expect(runtime.operations()).toEqual([])
+    const error = await rejection(
+      runtime.resolveReference('library', wire(DUNE_BY_NAME), as(LIBRARIAN_SECRET))
+    )
+    expect(error).toBeInstanceOf(ValidationError)
+  })
+
+  it('refuses a contract whose recorded list targets a different resource', () => {
+    const contract = libraryContractWithResource('Book', (book) => ({
+      ...book,
+      list: 'library.shelves.list',
+    }))
+    const runtime = bareRuntime()
+
+    expect(() => {
+      runtime.registerContract(contract, LIBRARY_MANIFEST)
+    }).toThrow(
+      'The library contract is inconsistent: resource "Book" records "library.shelves.list" as its list operation, which targets resource "Shelf". Regenerate the contract.'
+    )
+    expect(runtime.operations()).toEqual([])
   })
 })

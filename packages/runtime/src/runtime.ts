@@ -175,8 +175,10 @@ export interface MactsRuntime {
    *
    * @throws `OperationRegistrationError` when a descriptor's permission or
    *   target disagrees with the manifest, names an operation the manifest does
-   *   not expose, an id is already registered, or a contract for the same app
-   *   is already registered.
+   *   not expose, an id is already registered, a contract for the same app
+   *   is already registered, or the contract's resource table records a `get`
+   *   or `list` operation that is not one of its operations targeting that
+   *   resource.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /** Every registered operation, in registration order. */
@@ -211,7 +213,8 @@ export interface MactsRuntime {
    * The reference is validated by the app contract's reference value type
    * (`t.reference` over its resource table) after governance, as `invoke`
    * validates input, and the executor's result is validated against the
-   * operation's output contract.
+   * operation's output contract. An identity collection's result must hold
+   * exactly one record per entry, so an entry is never silently dropped.
    *
    * @param app - The app's route segment, as its contract names it (for
    *   example `'notes'`).
@@ -228,10 +231,19 @@ export interface MactsRuntime {
    *   permission, and governance, `TargetNotFoundError` and
    *   `InvalidSelectionError` from the executor unchanged, and
    *   `UnexpectedValueError` when the result violates the operation's output
-   *   contract.
+   *   contract or an identity collection's result does not hold one record per
+   *   entry.
    */
   resolveReference(app: string, reference: unknown, context: InvocationContext): Promise<WireValue>
 }
+
+/**
+ * The registered operations references to one resource resolve as, by
+ * cardinality: the `get` operation the contract records for a single
+ * reference, the `list` operation for a collection. Absent when the contract
+ * records none.
+ */
+type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, RegisteredOperation>>>
 
 /**
  * An app registered from its generated contract: what reference resolution
@@ -240,10 +252,11 @@ export interface MactsRuntime {
 interface RegisteredApp {
   /** The app's contract; its resource table is the app's reference registry. */
   readonly contract: AppContract<unknown>
-  /** The validated manifest the contract was checked against. */
-  readonly manifest: AppManifest
-  /** The operations registered from the contract. */
-  readonly operations: readonly RegisteredOperation[]
+  /**
+   * The operations each resource's references resolve as, keyed by resource
+   * key; checked against the contract's operations when the app registered.
+   */
+  readonly resolving: ReadonlyMap<string, ResolvingOperations>
 }
 
 /** The resource and cardinality a reference names, read before any authorization. */
@@ -619,6 +632,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   async function dispatch(
     operation: RegisteredOperation,
     context: InvocationContext,
+    call: CallLabel,
     run: () => Promise<WireValue>
   ): Promise<WireValue> {
     try {
@@ -632,6 +646,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       log().error(
         {
           err: loggableError(error, context.credential),
+          ...call,
           operation: operation.descriptor.id,
           provider: executor.provider,
         },
@@ -658,7 +673,9 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       outputPlan: descriptor.output.plan,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
-    return dispatch(operation, context, () => executor.execute(request))
+    return dispatch(operation, context, { operation: descriptor.id }, () =>
+      executor.execute(request)
+    )
   }
 
   /**
@@ -704,26 +721,18 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
    * The contract records which operation that is (`ResourceDescriptor.get` and
    * `.list`, chosen when the contract was generated), so the runtime reads it
    * from the contract, the source of truth, and never re-derives it from the
-   * manifest. A resource that records no such operation is not resolvable. A
-   * recorded id that names no registered operation of the app is a contract
-   * defect.
+   * manifest. Registration has already checked every recorded id against the
+   * contract's operations. A resource that records no such operation is not
+   * resolvable.
    */
   function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): RegisteredOperation {
     const { resource, cardinality } = target
-    const descriptor = app.contract.resources[resource]
-    const id = cardinality === 'one' ? descriptor?.get : descriptor?.list
-    if (id === undefined) {
+    const operation = app.resolving.get(resource)?.[cardinality]
+    if (operation === undefined) {
       const shape = cardinality === 'one' ? 'get' : 'list'
       throw new InvalidSelectionError(
         `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
         { resource }
-      )
-    }
-    const operation = app.operations.find(({ descriptor: op }) => op.id === id)
-    if (operation === undefined) {
-      throw new InternalError(
-        `The ${app.contract.app} contract names "${id}" as how "${resource}" references resolve, but registers no such operation.`,
-        {}
       )
     }
     return operation
@@ -749,26 +758,97 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         issues: toValidationIssues(parsed.error.issues),
       })
     }
-    // The schema admits exactly `{ reference: ReferenceWire }` and, being a
-    // pure validator, returns what it accepted. The payload read before
-    // governance is therefore a valid ReferenceWire; the schema's declared
+    // The schema admits exactly `{ reference: ReferenceWire }`; its declared
     // output type (`WireValue`) cannot say so.
-    return target.payload as ReferenceWire
+    return (parsed.data as { readonly reference: ReferenceWire }).reference
   }
 
   /**
    * Validate a resolution result against the output contract of the operation
-   * it resolved as. A mismatch is an app result that violated the contract.
+   * it resolved as, and, for an identity collection, that it holds exactly one
+   * record per entry. A mismatch is an app result that violated the contract.
+   *
+   * @remarks
+   * The count check enforces at the runtime boundary that an identity
+   * collection's entry is never silently dropped (D7): an executor must report
+   * a missing entry as `TargetNotFoundError`, not omit it.
    */
-  function validateResolution(operation: RegisteredOperation, result: WireValue): WireValue {
+  function validateResolution(
+    operation: RegisteredOperation,
+    reference: ReferenceWire,
+    result: WireValue
+  ): WireValue {
+    const id = operation.descriptor.id
     const parsed = operation.descriptor.output.wire.safeParse(result)
     if (!parsed.success) {
       throw new UnexpectedValueError(
-        `The result of resolving a reference as "${operation.descriptor.id}" does not match its contract.`,
+        `The result of resolving a reference as "${id}" does not match its contract.`,
         { issues: toValidationIssues(parsed.error.issues) }
       )
     }
+    if (reference.form === 'identity' && reference.cardinality === 'many') {
+      const expected = reference.entries.length
+      const received = Array.isArray(result) ? result.length : undefined
+      if (received !== expected) {
+        const got = received === undefined ? 'a value that is not an array' : String(received)
+        throw new UnexpectedValueError(
+          `The result of resolving an identity collection as "${id}" must hold one record per entry: expected ${String(expected)} records, received ${got}.`,
+          {
+            issues: [
+              {
+                path: [],
+                message: `Expected ${String(expected)} records, one per entry, but received ${got}`,
+              },
+            ],
+          }
+        )
+      }
+    }
     return result
+  }
+
+  /**
+   * Check that every operation the contract's resource table records as how
+   * a resource's references resolve is one of the contract's operations and
+   * targets that resource, and index them by resource and cardinality.
+   *
+   * @throws {@link OperationRegistrationError} naming the resource, the field,
+   *   and the id, when a recorded id is not one of the contract's operations or
+   *   targets a different resource: the contract is inconsistent and must be
+   *   regenerated.
+   */
+  function resolvingOperationsOf(
+    contract: AppContract<unknown>,
+    operations: readonly RegisteredOperation[]
+  ): Map<string, ResolvingOperations> {
+    const byId = new Map(operations.map((operation) => [operation.descriptor.id, operation]))
+    const resolving = new Map<string, ResolvingOperations>()
+    for (const [resource, descriptor] of Object.entries(contract.resources)) {
+      const entry: Partial<Record<ReferenceCardinality, RegisteredOperation>> = {}
+      for (const [field, cardinality] of [
+        ['get', 'one'],
+        ['list', 'many'],
+      ] as const) {
+        const id = descriptor[field]
+        if (id === undefined) continue
+        const operation = byId.get(id)
+        const targeted = operation?.descriptor.target.resource
+        if (operation === undefined || targeted !== resource) {
+          const problem =
+            operation === undefined
+              ? 'which is not one of its operations'
+              : targeted === undefined
+                ? 'which targets no resource'
+                : `which targets resource "${targeted}"`
+          throw new OperationRegistrationError(
+            `The ${contract.app} contract is inconsistent: resource "${resource}" records "${id}" as its ${field} operation, ${problem}. Regenerate the contract.`
+          )
+        }
+        entry[cardinality] = operation
+      }
+      resolving.set(resource, entry)
+    }
+    return resolving
   }
 
   return {
@@ -783,8 +863,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
           `A contract for app "${contract.app}" is already registered. A runtime serves one contract per app, because that contract's resource table is the app's reference registry; register each app once, or create a separate runtime for a different contract of the same app.`
         )
       }
+      // Checked before anything is added, so a refused contract registers nothing.
+      const resolving = resolvingOperationsOf(contract, operations)
       registry.add(operations)
-      apps.set(contract.app, { contract, manifest, operations })
+      apps.set(contract.app, { contract, resolving })
     },
 
     operations() {
@@ -863,8 +945,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
         outputPlan: operation.descriptor.output.plan,
         ...(context.signal === undefined ? {} : { signal: context.signal }),
       }
-      const result = await dispatch(operation, context, () => executor.resolve(request))
-      return validateResolution(operation, result)
+      const result = await dispatch(operation, context, call, () => executor.resolve(request))
+      return validateResolution(operation, validated, result)
     },
   }
 }
