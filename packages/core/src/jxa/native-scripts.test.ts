@@ -1012,9 +1012,10 @@ describe('commands without a recorded parent', () => {
         },
       }
     )
-    expect(() => buildNativeBody(manifest, { command: 'list', resource: 'Item' })).toThrow(
-      InternalError
-    )
+    const build = (): string => buildNativeBody(manifest, { command: 'list', resource: 'Item' })
+    expect(build).toThrow(InternalError)
+    // The message names the parent resource, so a bad manifest is diagnosable.
+    expect(build).toThrow('names parent resource "Folder"')
   })
 })
 

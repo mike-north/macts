@@ -434,7 +434,10 @@ function recordedParentScope(command: Command, manifest: AppManifest): ParentSco
     ? manifest.resources[parent.resource]
     : undefined
   if (resource === undefined) {
-    throw new InternalError('The command names a parent resource its app does not declare.', {})
+    throw new InternalError(
+      `Command "${command.name}" names parent resource "${parent.resource}", which its app does not declare.`,
+      {}
+    )
   }
   return {
     parentIdParam: parent.parameter,

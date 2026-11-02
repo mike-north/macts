@@ -862,7 +862,7 @@ export const CommandParameterSchema: z.ZodObject<{
     }, z.core.$strip>>;
 }, z.core.$strip>;
 
-// @public (undocumented)
+// @public
 export type CommandParent = z.infer<typeof CommandParentSchema>;
 
 // @public

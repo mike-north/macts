@@ -128,6 +128,12 @@ export const CommandParentSchema = z
     parameter: z.string().min(1),
   })
   .strict()
+
+/**
+ * The parent a command on a nested resource records: the resource whose items
+ * hold the command's resource, and the command's required parameter carrying
+ * the parent item's identifier (see {@link CommandParentSchema}).
+ */
 export type CommandParent = z.infer<typeof CommandParentSchema>
 
 /**
