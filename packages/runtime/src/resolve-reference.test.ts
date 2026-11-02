@@ -855,6 +855,79 @@ describe('resolveReference: resources without a resolving operation (D7)', () =>
     expect(executor.resolutions).toHaveLength(0)
   })
 
+  it('resolves as the operation the contract records, not one re-derived from the manifest', async () => {
+    // The contract records Book's get as `library.books.describeBook` here,
+    // although the manifest's CRUD-shaped get command is `lookupBook`: the
+    // recorded operation is authoritative.
+    const base = libraryContract()
+    const book = base.resources['Book']
+    if (book === undefined) throw new Error('fixture has no Book resource')
+    const contract = {
+      ...base,
+      resources: {
+        ...base.resources,
+        Book: { ...book, get: 'library.books.describeBook' as const },
+      },
+    }
+    const executor = createRecordingExecutor()
+    const runtime = createRuntime({
+      executor,
+      verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
+      clock: fixedClock,
+      logger: createSpyLogger(),
+      governance: { policy: ALLOW_ALL_POLICY },
+    })
+    runtime.registerContract(contract, LIBRARY_MANIFEST)
+
+    // Only which operation was chosen matters here, not whether the stub's
+    // answer satisfies its output contract.
+    await runtime
+      .resolveReference(
+        'library',
+        wire({ resource: 'Book', form: 'identity', cardinality: 'one', id: 'b1' }),
+        as(LIBRARIAN_SECRET)
+      )
+      .catch(() => undefined)
+
+    const describe = contract.operations['library.books.describeBook']
+    expect(describe).toBeDefined()
+    expect(executor.resolutions).toHaveLength(1)
+    expect(executor.resolutions[0]?.outputPlan).toEqual(describe?.output.plan)
+  })
+
+  it('fails with InternalError when the contract records a resolving operation it does not register', async () => {
+    const base = libraryContract()
+    const shelf = base.resources['Shelf']
+    if (shelf === undefined) throw new Error('fixture has no Shelf resource')
+    const contract = {
+      ...base,
+      resources: {
+        ...base.resources,
+        Shelf: { ...shelf, get: 'library.shelves.vanished' as const },
+      },
+    }
+    const executor = createRecordingExecutor()
+    const runtime = createRuntime({
+      executor,
+      verifier: createFakeVerifier({ [LIBRARIAN_SECRET]: LIBRARIAN }),
+      clock: fixedClock,
+      logger: createSpyLogger(),
+      governance: { policy: ALLOW_ALL_POLICY },
+    })
+    runtime.registerContract(contract, LIBRARY_MANIFEST)
+
+    const error = await rejection(
+      runtime.resolveReference(
+        'library',
+        wire({ resource: 'Shelf', form: 'identity', cardinality: 'one', id: 's1' }),
+        as(LIBRARIAN_SECRET)
+      )
+    )
+
+    expect(error).toBeInstanceOf(InternalError)
+    expect(executor.resolutions).toHaveLength(0)
+  })
+
   it('still resolves the operation a resource does have', async () => {
     const { runtime, executor } = harness({ executor: resolvingTo([{ text: 'Chapter 1' }]) })
 

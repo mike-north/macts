@@ -49,7 +49,6 @@ import {
   redactArgs,
   isApprovalCancellation,
   recordApprovalCancellation,
-  referenceResolutionCommand,
   seekApprovalUnlessCancelled,
 } from '@macts/core'
 import {
@@ -202,9 +201,9 @@ export interface MactsRuntime {
    *
    * @remarks
    * The reference resolves as a call of its resource's `get` operation
-   * (cardinality `'one'`) or `list` operation (`'many'`), chosen structurally
-   * from the manifest: the resource's first command whose CRUD shape is `get`
-   * or `list`. The caller's key must hold that operation's permission, and the
+   * (cardinality `'one'`) or `list` operation (`'many'`): the operation the
+   * app contract records for that resource (`ResourceDescriptor.get` and
+   * `.list`), never one re-derived from the manifest. The caller's key must hold that operation's permission, and the
    * call is governed, approved, and audited exactly as a direct call of that
    * operation. Only the target resource's permission is required: containers
    * locate the target and contribute no data, so they need none.
@@ -700,24 +699,31 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   /**
    * The registered operation a reference resolves as: the resource's `get`
    * operation for a single reference, its `list` operation for a collection.
-   * Chosen by manifest target (the resource key and the command the manifest
-   * makes that resource's get or list), never by display name.
+   *
+   * @remarks
+   * The contract records which operation that is (`ResourceDescriptor.get` and
+   * `.list`, chosen when the contract was generated), so the runtime reads it
+   * from the contract, the source of truth, and never re-derives it from the
+   * manifest. A resource that records no such operation is not resolvable. A
+   * recorded id that names no registered operation of the app is a contract
+   * defect.
    */
   function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): RegisteredOperation {
     const { resource, cardinality } = target
-    const command = referenceResolutionCommand(app.manifest, resource, cardinality)?.[0]
-    const operation =
-      command === undefined
-        ? undefined
-        : app.operations.find(
-            ({ descriptor }) =>
-              descriptor.target.command === command && descriptor.target.resource === resource
-          )
-    if (operation === undefined) {
+    const descriptor = app.contract.resources[resource]
+    const id = cardinality === 'one' ? descriptor?.get : descriptor?.list
+    if (id === undefined) {
       const shape = cardinality === 'one' ? 'get' : 'list'
       throw new InvalidSelectionError(
         `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
         { resource }
+      )
+    }
+    const operation = app.operations.find(({ descriptor: op }) => op.id === id)
+    if (operation === undefined) {
+      throw new InternalError(
+        `The ${app.contract.app} contract names "${id}" as how "${resource}" references resolve, but registers no such operation.`,
+        {}
       )
     }
     return operation
@@ -774,7 +780,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       const operations = operationsFromContract(contract, manifest)
       if (apps.has(contract.app)) {
         throw new OperationRegistrationError(
-          `A contract for app "${contract.app}" is already registered`
+          `A contract for app "${contract.app}" is already registered. A runtime serves one contract per app, because that contract's resource table is the app's reference registry; register each app once, or create a separate runtime for a different contract of the same app.`
         )
       }
       registry.add(operations)

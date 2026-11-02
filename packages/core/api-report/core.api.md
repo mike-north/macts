@@ -7,7 +7,6 @@
 import { IssuePath } from '@macts/contracts';
 import { JsonSchema7Type } from 'zod-to-json-schema';
 import { OperationTarget } from '@macts/contracts';
-import { ReferenceCardinality } from '@macts/contracts';
 import { ReferenceWire } from '@macts/contracts';
 import { ValuePlan } from '@macts/contracts';
 import { WireRecord } from '@macts/contracts';
@@ -2821,9 +2820,6 @@ export interface RedactArgsOptions {
 
 // @public
 export const REDACTED_PLACEHOLDER = "[redacted]";
-
-// @public
-export function referenceResolutionCommand(manifest: AppManifest, resourceKey: string, cardinality: ReferenceCardinality): [string, Command] | undefined;
 
 // @public (undocumented)
 export type Relationship = z.infer<typeof RelationshipSchema>;

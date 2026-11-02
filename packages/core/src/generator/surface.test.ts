@@ -17,7 +17,6 @@ import {
   findCrudCommand,
   isCrudName,
   listMethodParameters,
-  referenceResolutionCommand,
   resolveIdParams,
   resourceCommandEntries,
   resourceHasOperations,
@@ -116,61 +115,6 @@ describe('findCrudCommand', () => {
     const found = findCrudCommand(resourceCommandEntries(manifest, 'Event'), 'create')
     expect(found?.[0]).toBe('createEvent')
     expect(findCrudCommand(resourceCommandEntries(manifest, 'Event'), 'delete')).toBeUndefined()
-  })
-})
-
-describe('referenceResolutionCommand', () => {
-  /** Event has a get declared after a non-CRUD command, and two lists. */
-  const resolvable: AppManifest = {
-    ...manifest,
-    commands: {
-      refresh: command({ name: 'refresh', resourceType: 'Event' }),
-      fetchEvent: command({ name: 'get', resourceType: 'Event' }),
-      listEvents: command({ name: 'list', resourceType: 'Event' }),
-      listEventsAgain: command({ name: 'list', resourceType: 'Event' }),
-      lookup: command({ name: 'lookup', resourceType: 'Calendar' }),
-    },
-  }
-
-  it('resolves a single reference with the first get-shaped command, by its command key', () => {
-    expect(referenceResolutionCommand(resolvable, 'Event', 'one')?.[0]).toBe('fetchEvent')
-  })
-
-  it('resolves a collection reference with the first list-shaped command', () => {
-    expect(referenceResolutionCommand(resolvable, 'Event', 'many')?.[0]).toBe('listEvents')
-  })
-
-  it('finds nothing for a resource without a command of that shape', () => {
-    // `lookup` reads a Calendar but declares no CRUD shape, so it never stands in for get.
-    expect(referenceResolutionCommand(resolvable, 'Calendar', 'one')).toBeUndefined()
-    expect(referenceResolutionCommand(resolvable, 'Calendar', 'many')).toBeUndefined()
-    expect(referenceResolutionCommand(resolvable, 'Missing', 'one')).toBeUndefined()
-  })
-
-  it('finds nothing for a resource marked unsupported', () => {
-    const unsupported: AppManifest = {
-      ...resolvable,
-      resources: {
-        ...resolvable.resources,
-        Event: {
-          name: 'Event',
-          plural: 'Events',
-          description: 'An event',
-          properties: {},
-          unsupported: {
-            evidence: {
-              source: 'dictionary',
-              bundleId: 'com.example.fixture',
-              appVersion: '1.0',
-              osVersion: '27.2',
-              term: 'event',
-              finding: 'no-class',
-            },
-          },
-        },
-      },
-    }
-    expect(referenceResolutionCommand(unsupported, 'Event', 'one')).toBeUndefined()
   })
 })
 

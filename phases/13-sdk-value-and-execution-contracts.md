@@ -1261,12 +1261,14 @@ API.
 provider. `reference` is the wire form, the `{"reference": …}` control record
 that encoding produces, and `context` is the same `InvocationContext` that
 `invoke` takes. A single reference resolves as the target resource's `get`
-operation, and a collection reference as its `list` operation. The operation
-is chosen structurally from the manifest: the resource's first command whose
-CRUD shape (its command `name`) is `get` or `list`. This is the same rule that
-names `get` and `list` in a generated contract's resource table. A resource
-with no corresponding operation is not resolvable, and its references fail
-with `InvalidSelectionError`.
+operation, and a collection reference as its `list` operation. The runtime
+reads which operation that is from the registered contract, whose resource
+table records it (`ResourceDescriptor.get` and `.list`, chosen when the
+contract is generated); it never re-derives the choice from the manifest, so
+the contract stays the single source of truth. A resource that records no such
+operation is not resolvable, and its references fail with
+`InvalidSelectionError`. A recorded operation id that the contract does not
+register is a contract defect and fails with `InternalError`.
 
 Resolution runs the full D5 pipeline as that operation, so it can never
 bypass policy:

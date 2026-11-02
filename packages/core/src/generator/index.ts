@@ -92,10 +92,6 @@ export {
 // Capability metadata module generator (per-app machine-readable risk metadata)
 export { generateCapabilitiesModule } from './capabilities/index.js'
 
-// The manifest command a reference to a resource resolves as (shared by the
-// contract generator's resource table and the runtime's reference resolution)
-export { referenceResolutionCommand } from './surface.js'
-
 // File writer
 export { writeFiles } from './write.js'
 
