@@ -19,6 +19,11 @@
  *   calls to injected helpers (object spread, class fields, `async`,
  *   generators, decorators). The built-module test guards this.
  *
+ * Colors are the one place the native form differs in kind from the wire:
+ * natively a color is three fractions in `[0, 1]`, on the wire three integers
+ * in `0..65535`. Encoding rounds `fraction * 65535` to the nearest integer
+ * (ties up) and rejects anything outside `[0, 1]`; decoding divides by 65535.
+ *
  * Plans and semantics follow `phases/13-sdk-value-and-execution-contracts.md`
  * (A2–A4, D3, D4, D9, D10).
  *
@@ -374,26 +379,33 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     }
   }
 
-  /** Validates a 16-bit color channel: an integer from 0 to 65535. */
-  function checkChannel(direction: Direction, value: unknown, path: Path): number {
-    if (typeof value !== 'number' || !Number.isInteger(value) || !inRange(value, 0, CHANNEL_MAX)) {
+  /**
+   * Converts one native color channel to the wire's 16-bit integer.
+   *
+   * @remarks
+   * The automation bridge reports a channel as a fraction in `[0, 1]`. The wire
+   * channel is `Math.round(fraction * 65535)`, so a tie rounds up (`0.5` is
+   * `32768`). A value that is not a finite number in `[0, 1]` fails rather than
+   * being clamped: it means the reading is wrong, and the codec must not hide
+   * that. `name` is the channel's letter, for the message.
+   */
+  function encodeChannel(native: unknown, name: string, path: Path): Record<string, string> {
+    if (typeof native !== 'number' || !Number.isFinite(native) || !inRange(native, 0, 1)) {
       fail(
-        direction,
+        'encode',
         path,
-        'Expected a color channel integer from 0 to 65535, received ' + describeValue(value)
+        'Expected color channel ' +
+          name +
+          ' to be a number from 0 to 1, received ' +
+          describeValue(native)
       )
     }
-    return value
-  }
-
-  /** Encodes one validated 16-bit color channel as an integer. */
-  function encodeChannel(native: unknown, path: Path): Record<string, string> {
-    return encodeInteger(checkChannel('encode', native, path), path)
+    return encodeInteger(Math.round(native * CHANNEL_MAX), path)
   }
 
   /**
-   * Encodes a 16-bit RGB color given as a three-channel list, as `{r, g, b}`,
-   * or as `{red, green, blue}`.
+   * Encodes a native color, three fractions in `[0, 1]` given as a list, as
+   * `{r, g, b}`, or as `{red, green, blue}`, to the wire's 16-bit channels.
    */
   function encodeRgb(native: unknown, path: Path): Record<string, unknown> {
     if (isList(native)) {
@@ -405,9 +417,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
         )
       }
       return {
-        r: encodeChannel(native[0], path.concat([0])),
-        g: encodeChannel(native[1], path.concat([1])),
-        b: encodeChannel(native[2], path.concat([2])),
+        r: encodeChannel(native[0], 'r', path.concat([0])),
+        g: encodeChannel(native[1], 'g', path.concat([1])),
+        b: encodeChannel(native[2], 'b', path.concat([2])),
       }
     }
     if (!isKeyed(native)) {
@@ -418,9 +430,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       ? ['r', 'g', 'b']
       : ['red', 'green', 'blue']
     return {
-      r: encodeChannel(ownValue(native, names[0]), path.concat([names[0]])),
-      g: encodeChannel(ownValue(native, names[1]), path.concat([names[1]])),
-      b: encodeChannel(ownValue(native, names[2]), path.concat([names[2]])),
+      r: encodeChannel(ownValue(native, names[0]), 'r', path.concat([names[0]])),
+      g: encodeChannel(ownValue(native, names[1]), 'g', path.concat([names[1]])),
+      b: encodeChannel(ownValue(native, names[2]), 'b', path.concat([names[2]])),
     }
   }
 
@@ -794,12 +806,9 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Decodes an RGB color to the 16-bit channel list `[r, g, b]`.
-   *
-   * @remarks
-   * This is the bridge form for apps whose interface uses 16-bit channel
-   * lists. Other bridge forms, such as normalized `0..1` components, are
-   * selected per app by future plan data.
+   * Decodes an RGB color to the native list of three fractions `[r, g, b]`,
+   * each `channel / 65535`, so channels 0 and 65535 map exactly to 0 and 1.
+   * This is the form the automation bridge uses for colors.
    */
   function decodeRgb(wire: unknown, path: Path): number[] {
     const members = exactMembers(
@@ -811,7 +820,15 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const channels: number[] = []
     for (const key of ['r', 'g', 'b']) {
       const channelPath = path.concat([key])
-      channels.push(checkChannel('decode', decodeInteger(members[key], channelPath), channelPath))
+      const channel = decodeInteger(members[key], channelPath)
+      if (!inRange(channel, 0, CHANNEL_MAX)) {
+        fail(
+          'decode',
+          channelPath,
+          'Expected a color channel integer from 0 to 65535, received ' + describeValue(channel)
+        )
+      }
+      channels.push(channel / CHANNEL_MAX)
     }
     return channels
   }

@@ -810,6 +810,15 @@ native values for arguments, and native results to wire values, before
   - `__mactsEncode(native, plan)` returns JSON-safe wire values. The output
     contains no raw `NaN`, `Infinity`, or `-0` numbers, no `Date` objects, and
     no `undefined` own properties. Absent optional fields are omitted.
+  - Under an `rgb` plan, the native form is a list of three fractions in
+    `[0, 1]`, which is how the automation bridge reports a color; the wire form
+    stays three integer channels in `0..65535` (A3). `__mactsEncode` produces
+    each wire channel as `Math.round(f * 65535)`, so a tie rounds up (`0.5`
+    becomes `32768`). A channel that is not a finite number in `[0, 1]` fails
+    with an `encode` codec error naming the channel's path; it is never clamped,
+    because an out-of-range reading means the reading is wrong. `__mactsDecode`
+    produces each native fraction as `c / 65535`, so channels `0` and `65535`
+    round-trip exactly. Callers and manifests never convert.
   - Under a `passthrough` plan (D9), both return their argument unchanged.
   - Under a `none` plan, `__mactsEncode` returns `null` whatever the native
     result was, and `__mactsDecode` returns `undefined` (D3).
