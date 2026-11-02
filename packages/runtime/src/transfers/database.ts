@@ -6,8 +6,9 @@
  * - `transfers.db` — the SQLite database of grants, download links, uploads,
  *   and temporary copies;
  * - `uploads/<uploadId>` — the received bytes of each upload;
- * - `copies/` — where temporary copies are placed, so the store only ever
- *   deletes files inside a directory it owns.
+ * - `copies/<uuid>[.ext]` — temporary copies. The store mints every copy's
+ *   path itself, directly inside the canonical (symlink-free) path of this
+ *   directory, so it only ever deletes regular files it named.
  *
  * Directories are private to the user (0700) and files are readable only by
  * the user (0600): uploaded bytes are caller content, and the database maps
@@ -17,12 +18,26 @@
  * Timestamps are integer milliseconds since the Unix epoch. Tokens are never
  * stored, only their SHA-256 digests (see `tokens.ts`).
  *
+ * ## Schema version
+ *
+ * The schema version lives in `PRAGMA user_version`. Opening a database never
+ * rewrites a version it did not just create: a fresh database (version 0)
+ * gets the schema and this version in one transaction; a database at this
+ * version is used as it is; any other version — in particular one written by
+ * a newer macts — is refused, so an older install can never downgrade or
+ * half-migrate a newer store.
+ *
  * @packageDocumentation
  */
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { loadSqlite, type SqliteDatabase, type SqliteRow } from '../storage/sqlite.js'
+import {
+  loadSqlite,
+  runInTransaction,
+  type SqliteDatabase,
+  type SqliteRow,
+} from '../storage/sqlite.js'
 
 /** Mode for every directory the store creates: owner-only access. */
 export const DIRECTORY_MODE = 0o700
@@ -36,8 +51,8 @@ export const FILE_MODE = 0o600
  */
 const BUSY_TIMEOUT_MS = 5000
 
-/** Schema version recorded in `PRAGMA user_version`, for future migrations. */
-const SCHEMA_VERSION = 1
+/** Schema version this code creates and understands, kept in `PRAGMA user_version`. */
+export const TRANSFER_SCHEMA_VERSION = 1
 
 /** Where each part of a store lives under its home. */
 export interface TransferPaths {
@@ -89,8 +104,8 @@ function ensurePrivateFile(file: string): void {
  *   (none yet, or a receive was interrupted), `receiving`, `complete`, or
  *   `failed` (rejected as too large). `consumed_at` is set by the one consume
  *   an upload allows; `released` once its bytes have been deleted after use.
- * - `temporary_copies` — a copy made for a local read, removed when released
- *   or after `expires_at`.
+ * - `temporary_copies` — a copy the store minted for a local read, removed
+ *   when released or after `expires_at`.
  */
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS grants (
@@ -132,9 +147,73 @@ const SCHEMA = `
   );
 `
 
+/** The database's `PRAGMA user_version`. */
+function readSchemaVersion(database: SqliteDatabase): number {
+  const row = database.prepare('PRAGMA user_version').get()
+  return row === undefined ? 0 : integerColumn(row, 'user_version')
+}
+
+/**
+ * Refuse a database whose schema version this code does not understand.
+ *
+ * @throws Error naming both versions: a newer database needs a newer macts,
+ *   and any other unknown version is not a transfer store this code wrote.
+ */
+function assertKnownSchemaVersion(version: number): void {
+  if (version === 0 || version === TRANSFER_SCHEMA_VERSION) {
+    return
+  }
+  if (version > TRANSFER_SCHEMA_VERSION) {
+    throw new Error(
+      `The transfer store was created by a newer version of macts (schema version ${String(version)}); ` +
+        `this version understands schema version ${String(TRANSFER_SCHEMA_VERSION)} and cannot open it. ` +
+        'Upgrade macts to use it.'
+    )
+  }
+  throw new Error(
+    `The transfer store has schema version ${String(version)}, which this version of macts ` +
+      `does not recognize (it understands schema version ${String(TRANSFER_SCHEMA_VERSION)}), so it cannot open it.`
+  )
+}
+
+/**
+ * Create the schema in a fresh database, or check an existing one's version.
+ *
+ * The fresh-database step runs in one immediate transaction and re-reads the
+ * version once it holds the write lock, so two processes opening a new home
+ * at once create the schema exactly once.
+ */
+function prepareSchema(database: SqliteDatabase): void {
+  const version = readSchemaVersion(database)
+  assertKnownSchemaVersion(version)
+  if (version === TRANSFER_SCHEMA_VERSION) {
+    return
+  }
+  runInTransaction(
+    database,
+    () => {
+      const current = readSchemaVersion(database)
+      assertKnownSchemaVersion(current)
+      if (current === 0) {
+        database.exec(SCHEMA)
+        database.exec(`PRAGMA user_version = ${String(TRANSFER_SCHEMA_VERSION)}`)
+      }
+    },
+    { immediate: true }
+  )
+}
+
 /**
  * Prepare the directories and open the database, creating the schema when
- * absent.
+ * the database is fresh.
+ *
+ * The busy timeout is set before anything that takes a lock (switching to
+ * WAL, creating the schema), so a process opening the store while another
+ * holds the lock waits instead of failing.
+ *
+ * @throws Error when the database's schema version is not one this code
+ *   understands (see the module documentation); the database is closed and
+ *   left untouched.
  */
 export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   ensurePrivateDirectory(paths.root)
@@ -145,15 +224,23 @@ export function openTransferDatabase(paths: TransferPaths): SqliteDatabase {
   const { DatabaseSync } = loadSqlite()
   const database = new DatabaseSync(paths.database)
   try {
-    database.exec('PRAGMA journal_mode = WAL')
     database.exec(`PRAGMA busy_timeout = ${String(BUSY_TIMEOUT_MS)}`)
-    database.exec(SCHEMA)
-    database.exec(`PRAGMA user_version = ${String(SCHEMA_VERSION)}`)
+    database.exec('PRAGMA journal_mode = WAL')
+    prepareSchema(database)
   } catch (error) {
     database.close()
     throw error
   }
   return database
+}
+
+/**
+ * The canonical path of the copies directory: every symlink in it resolved
+ * (on macOS, `/var/…` becomes `/private/var/…`). Temporary copies are minted
+ * directly inside it, and only paths directly inside it are ever deleted.
+ */
+export function canonicalCopiesDirectory(paths: TransferPaths): string {
+  return fs.realpathSync(paths.copies)
 }
 
 /**
