@@ -23,13 +23,12 @@ import * as fs from 'node:fs/promises'
 import * as fsSync from 'node:fs'
 import * as path from 'node:path'
 import * as crypto from 'node:crypto'
-import type { DatabaseSync } from 'node:sqlite'
 import type { ApiKeyMetadata, GovernancePolicy } from '@macts/core'
 import { parsePolicy } from '@macts/core'
 import { getLogger } from '../logger.js'
 import { getMactsHome } from '../paths.js'
 import { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
-import { loadSqlite, runInTransaction } from './sqlite.js'
+import { loadSqlite, runInTransaction, type SqliteDatabase } from '../storage/sqlite.js'
 
 /**
  * Default directory for macts configuration.
@@ -58,7 +57,7 @@ const LEGACY_JSON_FILE = path.join(MACTS_DIR, 'api-keys.json')
 const SECRET_ENV_VAR = 'MACTS_API_KEY_SECRET'
 
 /** Singleton database instance */
-let db: DatabaseSync | null = null
+let db: SqliteDatabase | null = null
 
 /** Cached signing secret (indefinite per-process cache) */
 let cachedSigningSecret: string | null = null
@@ -104,7 +103,7 @@ function ensureMactsDir(): void {
 /**
  * Get or create the database connection.
  */
-function getDb(): DatabaseSync {
+function getDb(): SqliteDatabase {
   if (db) {
     return db
   }
@@ -168,7 +167,7 @@ function getDb(): DatabaseSync {
 /**
  * Run schema migrations based on user_version pragma.
  */
-function migrateSchema(database: DatabaseSync): void {
+function migrateSchema(database: SqliteDatabase): void {
   const versionRow = database.prepare('PRAGMA user_version').get() as
     | { user_version: number }
     | undefined
@@ -263,7 +262,7 @@ function decryptRow(row: KeyRow): KeyRow {
  * Auto-migrate an unencrypted row to encrypted form.
  * Called lazily on read when an unencrypted row is encountered.
  */
-function autoEncryptRow(database: DatabaseSync, row: KeyRow): KeyRow {
+function autoEncryptRow(database: SqliteDatabase, row: KeyRow): KeyRow {
   if (row.encrypted === 1) {
     return row
   }
@@ -293,7 +292,7 @@ function autoEncryptRow(database: DatabaseSync, row: KeyRow): KeyRow {
 /**
  * Migrate data from legacy JSON file to SQLite.
  */
-function migrateFromJson(database: DatabaseSync): void {
+function migrateFromJson(database: SqliteDatabase): void {
   if (!fsSync.existsSync(LEGACY_JSON_FILE)) {
     return
   }

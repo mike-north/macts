@@ -1,10 +1,12 @@
 /**
- * SQLite access for the API-key store.
+ * SQLite access for the runtime's persistent stores: the API-key store and the
+ * transfer store.
  *
- * The key store runs on Node's built-in `node:sqlite`, so no native addon is
- * ever built or downloaded when macts is installed. This module is the single
- * place that module is loaded, and it owns the one transaction primitive the
- * store uses.
+ * Both stores run on Node's built-in `node:sqlite`, so no native addon is ever
+ * built or downloaded when macts is installed (phases/13, D1). This module is
+ * the single place that module is referenced or loaded: the stores obtain the
+ * module through {@link loadSqlite} and name its types through the aliases
+ * below, and they share the one transaction primitive, {@link runInTransaction}.
  *
  * ## Why loading is centralized
  *
@@ -21,10 +23,20 @@
  * @packageDocumentation
  */
 
-import type { DatabaseSync } from 'node:sqlite'
+import type { DatabaseSync, SQLOutputValue } from 'node:sqlite'
 
 /** The shape of the built-in `node:sqlite` module. */
 export type SqliteModule = typeof import('node:sqlite')
+
+/** An open, synchronous `node:sqlite` connection. */
+export type SqliteDatabase = DatabaseSync
+
+/**
+ * One result row as `node:sqlite` returns it: column name to value. The
+ * schema, not the type, fixes which columns exist and what they hold, so
+ * readers narrow each value before using it.
+ */
+export type SqliteRow = Record<string, SQLOutputValue>
 
 /** First Node.js release that loads `node:sqlite` without a command-line flag. */
 export const MINIMUM_NODE_FOR_SQLITE = '22.13.0'
@@ -111,7 +123,7 @@ export function loadSqlite(): SqliteModule {
 
   if (loaded === undefined) {
     throw new Error(
-      `The macts API-key store requires Node.js ${MINIMUM_NODE_FOR_SQLITE} or later ` +
+      `macts requires Node.js ${MINIMUM_NODE_FOR_SQLITE} or later ` +
         `for its built-in SQLite support (running ${process.version}).`
     )
   }
@@ -132,12 +144,24 @@ export function loadSqlite(): SqliteModule {
  * `work` must be synchronous — a transaction cannot span an `await` — and
  * transactions do not nest.
  *
+ * By default the transaction is deferred: it takes the write lock at its
+ * first write. A transaction that reads and then writes based on what it read
+ * should pass `{ immediate: true }`, which takes the write lock at the start.
+ * Another connection that wants to write then waits for it (up to the
+ * connection's busy timeout) instead of failing when it tries to upgrade a
+ * read it started concurrently.
+ *
  * @param database - The open connection to run the transaction on.
  * @param work - The statements to apply atomically.
+ * @param options - `immediate` takes the write lock when the transaction begins.
  * @returns Whatever `work` returns.
  */
-export function runInTransaction<T>(database: DatabaseSync, work: () => T): T {
-  database.exec('BEGIN')
+export function runInTransaction<T>(
+  database: SqliteDatabase,
+  work: () => T,
+  options: { readonly immediate?: boolean } = {}
+): T {
+  database.exec(options.immediate === true ? 'BEGIN IMMEDIATE' : 'BEGIN')
   try {
     const result = work()
     database.exec('COMMIT')
