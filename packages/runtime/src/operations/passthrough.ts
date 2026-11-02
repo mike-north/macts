@@ -113,7 +113,8 @@ export function passthroughInputType(requestSchema: z.ZodType): ValueType<unknow
  *
  * @remarks
  * The manifest declares no result contract the runtime can check, so this
- * accepts every JSON value. Result validation against a real contract arrives
- * with generated value types and happens in the client's decode.
+ * accepts every JSON value. Its plan is `passthrough`, so the runtime does
+ * not validate results against it (phases/13 D11); operations registered from
+ * a generated contract are validated against their real output contract.
  */
 export const PASSTHROUGH_OUTPUT_TYPE: ValueType<unknown> = passthroughValueType(jsonValueSchema)

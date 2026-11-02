@@ -35,6 +35,7 @@ import {
   NOTES_MANIFEST,
   READER_TOKEN,
   WRITER_TOKEN,
+  createRecordingExecutor,
   createTestServer,
   errorBody,
   post,
@@ -113,11 +114,17 @@ describe('a server with contract-registered apps', () => {
   })
 
   it('dispatches a valid call with the contract descriptor plans', async () => {
-    const { app, executor } = createTestServer({ manifests: [], register: registerCalendar })
+    // The result conforms to the event record, which the runtime checks (D11).
+    const { app, executor } = createTestServer({
+      manifests: [],
+      register: registerCalendar,
+      executor: createRecordingExecutor(() => Promise.resolve({ uid: 'evt-1' })),
+    })
 
     const res = await post(app, 'calendar.events.create', { summary: 'Standup' }, WRITER_TOKEN)
 
     expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ result: { uid: 'evt-1' } })
     expect(executor.requests).toHaveLength(1)
     expect(executor.requests[0]).toMatchObject({
       target: { command: 'create', resource: 'Event' },

@@ -15,7 +15,10 @@
  * 3. enforce governance policy, auditing the decision and, for a held call,
  *    seeking and recording a human decision;
  * 4. validate the input against the operation's wire contract;
- * 5. hand the authorized, validated request to the executor.
+ * 5. hand the authorized, validated request to the executor;
+ * 6. validate the executor's result against the operation's output contract,
+ *    unless its output plan is `passthrough` (a value with no wire encoding),
+ *    before any adapter emits it.
  *
  * No step can be skipped: there is no trusted-caller mode, and a local caller
  * presents a credential exactly as a remote one does. Every failure is raised
@@ -25,10 +28,9 @@
  * {@link MactsRuntime.resolveReference} runs the same steps, through the same
  * code, as a call of the referenced resource's `get` operation (a single
  * reference) or `list` operation (a collection reference): the same
- * permission, the same governance and approval decision, and the same audit
- * record. Its executor step is `Executor.resolve`, and it then validates the
- * result against that operation's output contract. Resolution is therefore
- * never a way around policy.
+ * permission, the same governance and approval decision, the same audit
+ * record, and the same output validation. Its executor step is
+ * `Executor.resolve`. Resolution is therefore never a way around policy.
  *
  * @packageDocumentation
  */
@@ -80,6 +82,7 @@ import { createKeyStoreVerifier, type CredentialVerifier } from './invocation/ve
 import { hasPermission } from './keys/validator.js'
 import { getLogger } from './logger.js'
 import { toValidationIssues } from './operations/passthrough.js'
+import { toValueFreeIssues } from './operations/value-free-issues.js'
 import {
   OperationRegistrationError,
   OperationRegistry,
@@ -192,9 +195,14 @@ export interface MactsRuntime {
    * @param input - The input record in wire form, as received.
    * @param context - The caller's credential, and optional cancellation and
    *   correlation.
-   * @returns The operation's result in wire form.
+   * @returns The operation's result in wire form, unchanged from the
+   *   executor's.
    * @throws A canonical structured error from `@macts/contracts` for every
-   *   failure.
+   *   failure. `UnexpectedValueError` reports a result that violates the
+   *   operation's output contract (checked unless its output plan is
+   *   `passthrough`): the operation ran in the app, so it may have had an
+   *   effect, and only its result is unusable. The error's issues give
+   *   paths into the result but never its values.
    */
   invoke(id: OperationId, input: unknown, context: InvocationContext): Promise<WireValue>
   /**
@@ -213,7 +221,8 @@ export interface MactsRuntime {
    * The reference is validated by the app contract's reference value type
    * (`t.reference` over its resource table) after governance, as `invoke`
    * validates input, and the executor's result is validated against the
-   * operation's output contract. An identity collection's result must hold
+   * operation's output contract, unless its output plan is `passthrough`, as
+   * `invoke` validates results. An identity collection's result must hold
    * exactly one record per entry, so an entry is never silently dropped.
    *
    * @param app - The app's route segment, as its contract names it (for
@@ -658,8 +667,11 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     }
   }
 
-  /** Step 5 of `invoke`: execute the operation. */
-  function execute(
+  /**
+   * Step 5 of `invoke`: execute the operation, then validate its result
+   * against the operation's output contract ({@link validateOutput}).
+   */
+  async function execute(
     operation: RegisteredOperation,
     input: WireRecord,
     context: InvocationContext
@@ -673,9 +685,10 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       outputPlan: descriptor.output.plan,
       ...(context.signal === undefined ? {} : { signal: context.signal }),
     }
-    return dispatch(operation, context, { operation: descriptor.id }, () =>
+    const result = await dispatch(operation, context, { operation: descriptor.id }, () =>
       executor.execute(request)
     )
+    return validateOutput(operation, result)
   }
 
   /**
@@ -764,14 +777,56 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
+   * Validate an executor result against the operation's output contract
+   * (D11), and return it unchanged when it conforms.
+   *
+   * @remarks
+   * Every result is checked, on `invoke` and on resolution alike, unless the
+   * operation's output plan is `passthrough`: such a value has no wire
+   * encoding, so `output.wire` does not describe it (D9). The skip is decided
+   * by the operation's descriptor, which the runtime holds; nothing an
+   * executor returns or declares about itself can turn the check off.
+   *
+   * A mismatch means the app operation ran: whatever it changed in the app has
+   * happened, and only the result is unusable. The error says so, so a caller
+   * never retries a create or a send on the assumption that nothing happened.
+   * Its issues name paths and expectations but never repeat the result, which
+   * may hold user content and crosses to remote callers.
+   *
+   * @param purpose - Why the operation ran, when it ran on the caller's
+   *   behalf for something other than a direct call (`'to resolve a
+   *   reference'`); named in the error message.
+   */
+  function validateOutput(
+    operation: RegisteredOperation,
+    result: WireValue,
+    purpose?: string
+  ): WireValue {
+    const output = operation.descriptor.output
+    if (output.plan.kind === 'passthrough') {
+      return result
+    }
+    const parsed = output.wire.safeParse(result)
+    if (!parsed.success) {
+      throw new UnexpectedValueError(
+        `The "${operation.descriptor.id}" operation ran in the app${purpose === undefined ? '' : ` ${purpose}`}, but its result does not match its contract; do not assume it had no effect.`,
+        { issues: toValueFreeIssues(parsed.error.issues) }
+      )
+    }
+    return result
+  }
+
+  /**
    * Validate a resolution result against the output contract of the operation
-   * it resolved as, and, for an identity collection, that it holds exactly one
-   * record per entry. A mismatch is an app result that violated the contract.
+   * it resolved as ({@link validateOutput}), and, for an identity collection,
+   * that it holds exactly one record per entry. A mismatch is an app result
+   * that violated the contract.
    *
    * @remarks
    * The count check enforces at the runtime boundary that an identity
    * collection's entry is never silently dropped (D7): an executor must report
-   * a missing entry as `TargetNotFoundError`, not omit it.
+   * a missing entry as `TargetNotFoundError`, not omit it. It applies whatever
+   * the output plan, because it is about the reference, not the record shape.
    */
   function validateResolution(
     operation: RegisteredOperation,
@@ -779,13 +834,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     result: WireValue
   ): WireValue {
     const id = operation.descriptor.id
-    const parsed = operation.descriptor.output.wire.safeParse(result)
-    if (!parsed.success) {
-      throw new UnexpectedValueError(
-        `The result of resolving a reference as "${id}" does not match its contract.`,
-        { issues: toValidationIssues(parsed.error.issues) }
-      )
-    }
+    validateOutput(operation, result, 'to resolve a reference')
     if (reference.form === 'identity' && reference.cardinality === 'many') {
       const expected = reference.entries.length
       const received = Array.isArray(result) ? result.length : undefined
