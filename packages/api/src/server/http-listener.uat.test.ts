@@ -15,11 +15,13 @@
  * - 401 `UNAUTHENTICATED` with `WWW-Authenticate: Bearer`, 403
  *   `PERMISSION_DENIED` (`required`), 404 `NOT_FOUND`
  * - 429 `RATE_LIMITED` with `Retry-After` and `retryAfterSeconds`
+ * - 502 `UNEXPECTED_VALUE` for a result that violates the operation's output
+ *   contract (D11), with issue paths but no values
  *
  * Time is fixed by the rate limiters' injected clock, so `Retry-After` is exact:
  * a window that opens at the fixed instant lasts the full 60 seconds.
  *
- * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6)
+ * @see phases/13-sdk-value-and-execution-contracts.md (D5, D6, D11)
  * @see https://www.rfc-editor.org/rfc/rfc7235#section-4.1
  * @see https://www.rfc-editor.org/rfc/rfc6750#section-3
  * @see https://hono.dev/docs/getting-started/nodejs
@@ -28,7 +30,13 @@
 import { Hono } from 'hono'
 import pino from 'pino'
 import { afterEach, describe, expect, it } from 'vitest'
-import { OperationCancelledError, type WireValue } from '@macts/contracts'
+import {
+  OperationCancelledError,
+  ValueTypes as t,
+  type AnyOperationDescriptor,
+  type AppContract,
+  type WireValue,
+} from '@macts/contracts'
 import { createRateLimiter, createRuntime, type RateLimiter } from '@macts/runtime'
 import { createHttpAdapter } from './adapter.js'
 import {
@@ -42,8 +50,8 @@ import {
   errorBody,
   type Listener,
   type RecordingExecutor,
+  type TestServerOptions,
 } from './test-helpers.js'
-import type { AppOptions } from './index.js'
 
 /** A fixed clock: every window opens at this instant. */
 const fixedClock = (): Date => new Date('2026-01-15T10:00:00.000Z')
@@ -62,9 +70,7 @@ function listen(app: Hono): Promise<Listener> {
 
 /** The full macts server app on a real listener. */
 async function listenServer(
-  options: Omit<AppOptions, 'executor' | 'verifier'> & {
-    executor?: RecordingExecutor
-  } = {}
+  options: Omit<TestServerOptions, 'verifier'> = {}
 ): Promise<Listener & { executor: RecordingExecutor }> {
   const { app, executor } = createTestServer(options)
   return { ...(await listen(app)), executor }
@@ -169,6 +175,79 @@ describe('HTTP listener: responses over a real socket', () => {
       error: { code: 'NOT_FOUND', message: 'No such route.', details: {} },
     })
     expect(listener.executor.requests).toHaveLength(0)
+  })
+})
+
+/**
+ * A calendar contract whose list operation returns typed event records, so
+ * the runtime checks every result against it (D11). Ids, permission, and
+ * target are hand-derived from the test calendar manifest.
+ */
+function typedCalendarContract(): AppContract<unknown> {
+  const event = t.record({
+    uid: t.string(),
+    status: t.enumeration(['confirmed', 'cancelled']),
+  })
+  const list: AnyOperationDescriptor = {
+    id: 'calendar.events.list',
+    permission: 'calendar:events:list',
+    target: { command: 'list', resource: 'Event' },
+    description: 'List events',
+    input: t.record({}),
+    output: t.array(event),
+  }
+  return {
+    app: 'calendar',
+    operations: { [list.id]: list },
+    resources: { Event: { name: 'Event', record: event, id: t.string(), list: list.id } },
+    loadManifest: () => Promise.resolve(CALENDAR_MANIFEST),
+    bind: () => ({}),
+  }
+}
+
+describe('HTTP listener: results that violate the output contract', () => {
+  it('answers 502 UNEXPECTED_VALUE, says the operation ran, and echoes no value', async () => {
+    // Distinctive strings stand in for user content in the app's result: an
+    // undeclared key, an undeclared enum member, and a wrongly typed value.
+    const SECRET_KEY = 'secret-key-7f3a'
+    const SECRET_STATUS = 'secret-status-7f3a'
+    const executor = createRecordingExecutor(() =>
+      Promise.resolve([{ uid: 'evt-1', status: SECRET_STATUS, [SECRET_KEY]: 'secret-value-7f3a' }])
+    )
+    const listener = await listenServer({
+      manifests: [],
+      register: (registrar) => {
+        registrar.registerContract(typedCalendarContract(), CALENDAR_MANIFEST)
+      },
+      executor,
+    })
+
+    const res = await rpc(listener, 'calendar.events.list', READER_TOKEN)
+
+    // D6: UNEXPECTED_VALUE is an upstream result the service could not use.
+    expect(res.status).toBe(502)
+    const text = await res.text()
+    const body = JSON.parse(text) as { error: { code: string; message: string; details: unknown } }
+    expect(body.error.code).toBe('UNEXPECTED_VALUE')
+    expect(body.error.message).toBe(
+      'The "calendar.events.list" operation ran in the app, but its result does not match its contract; do not assume it had no effect.'
+    )
+    expect(body.error.details).toEqual({
+      issues: [
+        {
+          path: [0, 'status'],
+          message: 'Expected one of "confirmed" | "cancelled".',
+          code: 'invalid_value',
+        },
+        {
+          path: [0],
+          message: 'The record has 1 key its contract does not declare.',
+          code: 'unrecognized_keys',
+        },
+      ],
+    })
+    expect(text).not.toContain('secret')
+    expect(executor.requests).toHaveLength(1)
   })
 })
 

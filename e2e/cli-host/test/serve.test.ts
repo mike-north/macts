@@ -5,8 +5,8 @@
  * plugins directory holds two real built app pairs: `@macts/notes-server` with
  * `@macts/notes`, and `@macts/reminders-server` with `@macts/reminders`.
  * `MACTS_TEST_EXECUTOR=stub` selects the built-in test
- * executor, so no app is automated and every dispatched call answers with
- * the target and input that reached the executor. Keys are minted by the CLI
+ * executor, so no app is automated and every dispatched call answers as an
+ * app with no objects would: a list yields `[]`. Keys are minted by the CLI
  * itself, into the same macts home the server verifies against. Everything is
  * asserted over real HTTP.
  *
@@ -25,6 +25,13 @@
  *   details } }` envelope; a missing permission is 403 `PERMISSION_DENIED`
  *   whose details name the required permission and a hint; invalid input is
  *   400 `VALIDATION_FAILED` with `details.issues`. Success is `200 { result }`.
+ * - From the Notes contract: `notes.notes.get` requires `notes:notes:get`,
+ *   targets command `get` on resource `Note`, and takes `{ name }`. The test
+ *   executor has no objects, so it fails a get with `TargetNotFoundError`
+ *   naming the resource, which phases/13 D6 maps to 404 `TARGET_NOT_FOUND`.
+ * - From phases/13 D11: the runtime validates every result against the
+ *   operation's output contract before the HTTP adapter emits it, so a list
+ *   result reaches the caller only when it conforms; `[]` always does.
  * - From phases/13 D9: the test executor is selected by name, announced on
  *   stderr, named as the executor provider in the startup report, and an
  *   unknown name fails startup. It appears in contributor docs, never in user
@@ -56,12 +63,14 @@ let home: MactsHome
 let server: ServeProcess
 let grantedToken: string
 let remindersToken: string
+let getterToken: string
 let otherToken: string
 
 beforeAll(async () => {
   home = createMactsHome()
   grantedToken = await createKey(home, 'notes:notes:list')
   remindersToken = await createKey(home, 'reminders:lists:list')
+  getterToken = await createKey(home, 'notes:notes:get')
   otherToken = await createKey(home, 'notes:accounts:list')
   server = await startServe(home, await freePort(), { MACTS_TEST_EXECUTOR: 'stub' })
 }, SETUP_TIMEOUT_MS)
@@ -108,24 +117,29 @@ describe('macts --serve (UAT): operations', () => {
     const { status, json } = await call('notes.notes.list', {}, grantedToken)
 
     expect(status).toBe(200)
-    expect(json).toEqual({
-      result: {
-        executor: 'test-stub',
-        target: { command: 'list', resource: 'Note' },
-        input: {},
-      },
-    })
+    expect(json).toEqual({ result: [] })
   })
 
   it('dispatches a granted call to a second installed app', async () => {
+    // The key holds only the Reminders permission, so a 200 proves the call
+    // was routed to the Reminders operation and dispatched.
     const { status, json } = await call('reminders.lists.list', {}, remindersToken)
 
     expect(status).toBe(200)
+    expect(json).toEqual({ result: [] })
+  })
+
+  it('answers a get with 404 TARGET_NOT_FOUND, since the test executor automates no app', async () => {
+    // A get needs an existing object; the stub has none, so the call reaches
+    // the executor and fails with the canonical not-found envelope.
+    const { status, json } = await call('notes.notes.get', { name: 'Groceries' }, getterToken)
+
+    expect(status).toBe(404)
     expect(json).toEqual({
-      result: {
-        executor: 'test-stub',
-        target: { command: 'list', resource: 'List' },
-        input: {},
+      error: {
+        code: 'TARGET_NOT_FOUND',
+        message: 'The test executor automates no app, so the target does not exist.',
+        details: { resource: 'Note' },
       },
     })
   })
