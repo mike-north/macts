@@ -160,8 +160,10 @@ export interface MactsRuntime {
    * Register every operation an app manifest exposes, with passthrough value
    * types.
    *
-   * @throws `OperationRegistrationError` when an operation id is already
-   *   registered or the manifest yields a malformed id or permission.
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), an operation id is already
+   *   registered, or the manifest yields a malformed id or permission. A
+   *   refused registration adds nothing.
    */
   registerManifest(manifest: AppManifest): void
   /**
@@ -173,12 +175,13 @@ export interface MactsRuntime {
    * against which {@link MactsRuntime.resolveReference} validates references,
    * so an app has at most one registered contract.
    *
-   * @throws `OperationRegistrationError` when a descriptor's permission or
+   * @throws `OperationRegistrationError` when the app's route segment is
+   *   reserved (`RESERVED_APP_ROUTE_SEGMENTS`), a descriptor's permission or
    *   target disagrees with the manifest, names an operation the manifest does
    *   not expose, an id is already registered, a contract for the same app
    *   is already registered, or the contract's resource table records a `get`
    *   or `list` operation that is not one of its operations targeting that
-   *   resource.
+   *   resource. A refused registration adds nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
   /** Every registered operation, in registration order. */

@@ -51,6 +51,7 @@ export {
   operationsFromContract,
   operationsFromManifest,
   OperationRegistrationError,
+  RESERVED_APP_ROUTE_SEGMENTS,
   type RegisteredOperation,
 } from './operations/registry.js'
 export { buildCommandSchema, buildSchemaRegistry } from './operations/request-schema.js'

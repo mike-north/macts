@@ -26,6 +26,8 @@ const MANIFEST_FILE = 'app.yaml'
 
 /** The parts of an app's contract these tests read. */
 export interface RealContract {
+  /** The app's route segment, as the contract names it. */
+  readonly app: string
   readonly operations: Readonly<Record<OperationId, AnyOperationDescriptor>>
 }
 
@@ -45,11 +47,13 @@ export const APP_NAMES: readonly string[] = readdirSync(MANIFESTS_DIR, { withFil
   .map((entry) => entry.name)
   .sort()
 
-/** Whether a value is a contract: an object with an `operations` table. */
+/** Whether a value is a contract: an object with an `app` name and an `operations` table. */
 function isContract(value: unknown): value is RealContract {
   return (
     typeof value === 'object' &&
     value !== null &&
+    'app' in value &&
+    typeof value.app === 'string' &&
     'operations' in value &&
     typeof value.operations === 'object' &&
     value.operations !== null
