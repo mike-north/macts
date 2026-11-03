@@ -4,6 +4,17 @@
  * Provides JWT-based API keys with fine-grained permission control.
  * Keys support both fine-grained and coarse CRUD-style permissions.
  *
+ * The token is the grant. A key's permissions and expiry are signed into its
+ * token when it is issued, and validation reads them only from the token. The
+ * stored record is the receipt of what was issued plus the key's status
+ * (active, revoked, or missing when no record is stored). `createApiKey` is the
+ * only way to store a key, and it stores exactly the grant it signed; the
+ * record's permissions and expiry cannot be edited afterwards, so they match
+ * the grant `createApiKey` signed. To narrow what a key may do, set its per-key
+ * governance policy with `setKeyPolicy`: the policy intersects with the host
+ * policy and is resolved per request. To shorten or otherwise change a key's
+ * grant, revoke the key with `revokeKey` and issue a new one.
+ *
  * @example
  * ```typescript
  * import {
@@ -84,14 +95,16 @@ export { TtlCache } from './cache.js'
 export { deriveEncryptionKey, encrypt, decrypt } from './encryption.js'
 
 // Storage
+//
+// Nothing here writes a key's grant: records are stored only by `createApiKey`,
+// which stores exactly what it signed, and a stored record can only be renamed,
+// revoked or deleted afterwards.
 export {
   closeKeyStore,
   getSigningSecret,
   setSigningSecret,
   generateSecret,
   loadKeyMetadata,
-  saveKeyMetadata,
-  addKeyMetadata,
   updateKeyMetadata,
   getKeyMetadata,
   revokeKey,
@@ -107,4 +120,4 @@ export {
   listKeyPolicyIds,
   KeyPolicyError,
 } from './storage.js'
-export type { KeyRecordStatus } from './storage.js'
+export type { KeyMetadataUpdate, KeyRecordStatus } from './storage.js'

@@ -10,6 +10,7 @@ import * as path from 'node:path'
 import * as os from 'node:os'
 import { loadSqlite } from './sqlite.js'
 import type { ApiKeyMetadata, GovernancePolicy, PolicyDisposition } from '@macts/core'
+import type { KeyMetadataUpdate } from './storage.js'
 
 /** Raw database access, for tests that inspect or corrupt the file behind the store. */
 const { DatabaseSync } = loadSqlite()
@@ -200,15 +201,18 @@ describe('storage integration', () => {
     })
 
     describe('updateKeyMetadata', () => {
-      it('should merge partial updates', () => {
-        storage.addKeyMetadata(createTestMetadata())
+      /** A stored key with a grant on every field, so any change to it is visible. */
+      const storedKey = (): ApiKeyMetadata =>
+        createTestMetadata({ expiresAt: new Date('2024-12-31T23:59:59Z') })
 
-        const updated = storage.updateKeyMetadata('key_test123', {
-          name: 'Updated Name',
-        })
+      it('should rename a key and leave its grant unchanged', () => {
+        storage.addKeyMetadata(storedKey())
 
-        expect(updated?.name).toBe('Updated Name')
-        expect(updated?.permissions).toEqual(['calendar:events:list', 'calendar:events:get'])
+        const updated = storage.updateKeyMetadata('key_test123', { name: 'Updated Name' })
+
+        const expected = { ...storedKey(), name: 'Updated Name' }
+        expect(updated).toEqual(expected)
+        expect(storage.getKeyMetadata('key_test123')).toEqual(expected)
       })
 
       it('should return undefined for non-existent key', () => {
@@ -218,33 +222,77 @@ describe('storage integration', () => {
         expect(updated).toBeUndefined()
       })
 
-      it('should handle undefined vs explicit null for expiresAt', () => {
-        const metadata = createTestMetadata({
-          expiresAt: new Date('2024-12-31'),
-        })
-        storage.addKeyMetadata(metadata)
+      it('should return the stored record unchanged for an empty update', () => {
+        storage.addKeyMetadata(storedKey())
 
-        // Update with undefined should not change expiresAt
-        storage.updateKeyMetadata('key_test123', { name: 'New Name' })
-        let retrieved = storage.getKeyMetadata('key_test123')
-        expect(retrieved?.expiresAt).toBeDefined()
-
-        // Update with explicit undefined clears expiresAt
-        storage.updateKeyMetadata('key_test123', { expiresAt: undefined })
-        retrieved = storage.getKeyMetadata('key_test123')
-        // Note: In current implementation, undefined keeps existing value
-        // This tests the actual behavior
+        expect(storage.updateKeyMetadata('key_test123', {})).toEqual(storedKey())
       })
 
-      it('should update permissions array', () => {
-        storage.addKeyMetadata(createTestMetadata())
+      /**
+       * A key's grant lives in its signed token, so the stored record must keep
+       * describing that token. These are the fields a JavaScript caller, which
+       * the type does not reach, might still try to change.
+       */
+      const refusedUpdates: [field: string, value: unknown][] = [
+        ['permissions', ['calendar:*:*']],
+        ['originalPermissions', ['calendar:*:*']],
+        ['expiresAt', new Date('2099-01-01T00:00:00Z')],
+        ['revoked', true],
+        ['createdAt', new Date('2020-01-01T00:00:00Z')],
+        ['keyPrefix', 'other...'],
+        ['id', 'key_other'],
+      ]
 
-        storage.updateKeyMetadata('key_test123', {
-          permissions: ['new:permission:one'],
-        })
+      it.each(refusedUpdates)(
+        'should reject an update to %s and leave the stored record unchanged',
+        (field, value) => {
+          storage.addKeyMetadata(storedKey())
+          const update = { name: 'Renamed', [field]: value } as unknown as KeyMetadataUpdate
 
-        const retrieved = storage.getKeyMetadata('key_test123')
-        expect(retrieved?.permissions).toEqual(['new:permission:one'])
+          expect(() => storage.updateKeyMetadata('key_test123', update)).toThrow(
+            new TypeError(
+              `updateKeyMetadata can change only "name", not "${field}". ` +
+                "A key's permissions and expiry are fixed by its token: to narrow a key, set its policy; " +
+                'to change its grant, revoke it and issue a new one.'
+            )
+          )
+          expect(storage.getKeyMetadata('key_test123')).toEqual(storedKey())
+        }
+      )
+
+      it('should reject a refused field even when the key does not exist', () => {
+        const update = { permissions: [] } as unknown as KeyMetadataUpdate
+
+        expect(() => storage.updateKeyMetadata('key_nonexistent', update)).toThrow(TypeError)
+      })
+
+      it('should leave revocation to revokeKey', () => {
+        storage.addKeyMetadata(storedKey())
+        const update = { revoked: true } as unknown as KeyMetadataUpdate
+
+        expect(() => storage.updateKeyMetadata('key_test123', update)).toThrow(TypeError)
+        expect(storage.getKeyRecordStatus('key_test123')).toBe('active')
+      })
+
+      it('should reject a name that is not a string', () => {
+        storage.addKeyMetadata(storedKey())
+        const update = { name: 42 } as unknown as KeyMetadataUpdate
+
+        expect(() => storage.updateKeyMetadata('key_test123', update)).toThrow(
+          new TypeError('updateKeyMetadata expects "name" to be a string.')
+        )
+        expect(storage.getKeyMetadata('key_test123')).toEqual(storedKey())
+      })
+
+      it('should reject an update that is not an object', () => {
+        storage.addKeyMetadata(storedKey())
+
+        for (const update of [null, 'Renamed', ['name']]) {
+          expect(() =>
+            storage.updateKeyMetadata('key_test123', update as unknown as KeyMetadataUpdate)
+          ).toThrow(new TypeError('updateKeyMetadata expects an object of fields to update.'))
+        }
+        expect(storage.getKeyMetadata('key_test123')).toEqual(storedKey())
       })
     })
 
@@ -262,32 +310,6 @@ describe('storage integration', () => {
       it('should return false for non-existent key', () => {
         const deleted = storage.deleteKeyMetadata('key_nonexistent')
         expect(deleted).toBe(false)
-      })
-    })
-
-    describe('saveKeyMetadata (replace all)', () => {
-      it('should replace all keys atomically', () => {
-        storage.addKeyMetadata(createTestMetadata({ id: 'key_1' }))
-        storage.addKeyMetadata(createTestMetadata({ id: 'key_2' }))
-
-        storage.saveKeyMetadata([
-          createTestMetadata({ id: 'key_new1' }),
-          createTestMetadata({ id: 'key_new2' }),
-        ])
-
-        const keys = storage.loadKeyMetadata()
-        expect(keys).toHaveLength(2)
-        expect(keys.find((k) => k.id === 'key_1')).toBeUndefined()
-        expect(keys.find((k) => k.id === 'key_new1')).toBeDefined()
-      })
-
-      it('should handle empty array (deletes all)', () => {
-        storage.addKeyMetadata(createTestMetadata({ id: 'key_1' }))
-
-        storage.saveKeyMetadata([])
-
-        const keys = storage.loadKeyMetadata()
-        expect(keys).toHaveLength(0)
       })
     })
   })
@@ -671,51 +693,13 @@ describe('storage integration', () => {
       expect(storage.listKeyPolicyIds()).toEqual([])
     })
 
-    /**
-     * Regression: replacing the key set left policy rows for the discarded keys
-     * behind. They stayed visible through getKeyPolicy()/listKeyPolicyIds(), and
-     * a later key issued with the same id silently inherited the old policy —
-     * unpredictable in both directions (an unexpected grant, or an unexplained
-     * restriction).
-     */
-    describe('replacing the key set', () => {
-      it('should remove policies belonging to discarded keys', () => {
-        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
-        storage.setKeyPolicy('key_a', policyFor('forbidden'))
-        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
-
-        // key_a is dropped from the set.
-        storage.saveKeyMetadata([createTestMetadata('key_b')])
-
-        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
-        expect(storage.listKeyPolicyIds()).toEqual(['key_b'])
-      })
-
-      it('should keep the policy of a key that survives the replacement', () => {
-        storage.saveKeyMetadata([createTestMetadata('key_a'), createTestMetadata('key_b')])
-        storage.setKeyPolicy('key_b', policyFor('confirm-first'))
-
-        storage.saveKeyMetadata([createTestMetadata('key_b')])
-
-        expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
-      })
-
-      it('should remove every policy when the key set is cleared', () => {
-        storage.saveKeyMetadata([createTestMetadata('key_a')])
-        storage.setKeyPolicy('key_a', policyFor('forbidden'))
-
-        storage.saveKeyMetadata([])
-
-        expect(storage.getKeyPolicy('key_a')).toBeUndefined()
-        expect(storage.listKeyPolicyIds()).toEqual([])
-      })
-
+    describe('removing a key', () => {
       it('should not let a re-issued key id inherit the old key’s policy', () => {
-        storage.saveKeyMetadata([createTestMetadata('key_reused')])
+        storage.addKeyMetadata(createTestMetadata('key_reused'))
         storage.setKeyPolicy('key_reused', policyFor('forbidden'))
 
         // The key is removed, then the same id is issued again later.
-        storage.saveKeyMetadata([])
+        storage.deleteKeyMetadata('key_reused')
         storage.addKeyMetadata(createTestMetadata('key_reused'))
 
         expect(storage.getKeyPolicy('key_reused')).toBeUndefined()
@@ -731,6 +715,7 @@ describe('storage integration', () => {
 
         expect(storage.getKeyPolicy('key_a')).toBeUndefined()
         expect(storage.getKeyPolicy('key_b')?.apps[0]?.disposition).toBe('confirm-first')
+        expect(storage.listKeyPolicyIds()).toEqual(['key_b'])
       })
     })
 

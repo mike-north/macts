@@ -146,8 +146,7 @@ function getDb(): DatabaseSync {
   // No `user_version` migration is needed: `CREATE TABLE IF NOT EXISTS` runs on
   // every open, so a database created before per-key policies existed picks the
   // table up the next time it is opened. A key's policy is removed with the key
-  // rather than left as an orphan, whether it goes through
-  // {@link deleteKeyMetadata} or through a {@link saveKeyMetadata} replacement.
+  // by {@link deleteKeyMetadata} rather than left as an orphan.
   db.exec(`
     CREATE TABLE IF NOT EXISTS api_key_policies (
       key_id TEXT PRIMARY KEY,
@@ -492,67 +491,15 @@ export function loadKeyMetadata(): ApiKeyMetadata[] {
 }
 
 /**
- * Save key metadata to storage (replaces all keys).
+ * Store the record of a newly issued key.
  *
- * Any per-key governance policy belonging to a key that is not in `keys` is
- * removed in the same transaction, so a discarded key cannot leave a policy
- * behind for a future key with the same id to inherit.
+ * Internal to the package: `createApiKey` is the only caller, and it passes
+ * exactly the grant it signed into the token, so the stored record always
+ * matches the token. It is deliberately not exported from the package entry
+ * point; a public way to insert arbitrary records would let a stored grant
+ * differ from the token it describes.
  *
- * Note: This is provided for API compatibility but is less efficient than
- * individual operations. Prefer addKeyMetadata, updateKeyMetadata, etc.
- *
- * @param keys - Array of key metadata to save
- */
-export function saveKeyMetadata(keys: ApiKeyMetadata[]): void {
-  const database = getDb()
-
-  const deleteAll = database.prepare('DELETE FROM api_keys')
-  const insert = database.prepare(`
-    INSERT INTO api_keys
-    (id, name, permissions, original_permissions, created_at, expires_at, revoked, key_prefix, encrypted)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
-  `)
-  // Run after the replacement rows are in place, so "orphan" means "not in the
-  // key set this call just established". The tables carry no foreign keys (this
-  // schema has never enabled them), so referential cleanup is explicit here, as
-  // it is in deleteKeyMetadata.
-  const dropOrphanedPolicies = database.prepare(
-    'DELETE FROM api_key_policies WHERE key_id NOT IN (SELECT id FROM api_keys)'
-  )
-
-  runInTransaction(database, () => {
-    deleteAll.run()
-    for (const key of keys) {
-      const encrypted = encryptRow(
-        JSON.stringify(key.permissions),
-        JSON.stringify(key.originalPermissions),
-        key.keyPrefix
-      )
-      insert.run(
-        key.id,
-        key.name,
-        encrypted.permissions,
-        encrypted.originalPermissions,
-        key.createdAt.getTime(),
-        key.expiresAt ? key.expiresAt.getTime() : null,
-        key.revoked ? 1 : 0,
-        encrypted.keyPrefix
-      )
-    }
-    // Replacing the key set discards keys; their policies go with them, in the
-    // same transaction. Left behind, a policy would stay visible through
-    // getKeyPolicy()/listKeyPolicyIds() and would be silently inherited by any
-    // later key issued with the same id.
-    dropOrphanedPolicies.run()
-  })
-  // Any key may have been removed or had its revocation changed.
-  clearKeyStatusCache()
-}
-
-/**
- * Add key metadata to storage.
- *
- * @param metadata - Key metadata to add
+ * @param metadata - The issued key's metadata
  */
 export function addKeyMetadata(metadata: ApiKeyMetadata): void {
   const database = getDb()
@@ -582,89 +529,87 @@ export function addKeyMetadata(metadata: ApiKeyMetadata): void {
 }
 
 /**
- * Update key metadata by ID.
+ * The fields of a stored key record that may change after the key is issued.
+ *
+ * Only the display name. A key's permissions and expiry are carried by its
+ * signed token and fixed when it is issued; the stored record is the receipt of
+ * that grant, so the grant cannot be edited. To narrow what a key may do, set
+ * its policy with {@link setKeyPolicy}. To change its grant, revoke it with
+ * {@link revokeKey} and issue a new one.
+ *
+ * Every other `ApiKeyMetadata` field is declared as `never`, derived from
+ * `ApiKeyMetadata` itself, so a value that carries one is a type error even
+ * when it is not a fresh object literal (a variable holding
+ * `{ name, permissions }`, or a `Partial<ApiKeyMetadata>`), and a field added
+ * to `ApiKeyMetadata` later is refused the same way.
+ */
+export interface KeyMetadataUpdate extends Readonly<
+  Partial<Record<Exclude<keyof ApiKeyMetadata, 'name'>, never>>
+> {
+  /** A new human-readable name for the key. */
+  readonly name?: string
+}
+
+/** The only field an update may carry, checked at runtime for JavaScript callers. */
+const UPDATABLE_KEY_FIELD = 'name'
+
+/**
+ * Validate an update that may not have been type-checked, and return the new
+ * name it carries, if any.
+ *
+ * `name` is read exactly once, so the value checked is the value written.
+ *
+ * @returns The new name, or `undefined` when the update leaves the name as is.
+ * @throws TypeError when `updates` is not an object, names a field other than
+ *   `name`, or carries a `name` that is not a string.
+ */
+function readKeyMetadataUpdate(updates: unknown): string | undefined {
+  if (typeof updates !== 'object' || updates === null || Array.isArray(updates)) {
+    throw new TypeError('updateKeyMetadata expects an object of fields to update.')
+  }
+  const refused = Object.keys(updates).filter((field) => field !== UPDATABLE_KEY_FIELD)
+  if (refused.length > 0) {
+    const fields = refused.map((field) => `"${field}"`).join(', ')
+    throw new TypeError(
+      `updateKeyMetadata can change only "name", not ${fields}. ` +
+        "A key's permissions and expiry are fixed by its token: to narrow a key, set its policy; " +
+        'to change its grant, revoke it and issue a new one.'
+    )
+  }
+  const name: unknown = (updates as { name?: unknown }).name
+  if (name !== undefined && typeof name !== 'string') {
+    throw new TypeError('updateKeyMetadata expects "name" to be a string.')
+  }
+  return name
+}
+
+/**
+ * Rename a stored key.
+ *
+ * Only the fields of {@link KeyMetadataUpdate} can change. Revoking a key is
+ * {@link revokeKey}; a key's permissions, expiry, creation time and prefix
+ * describe the issued token and never change.
  *
  * @param keyId - Key ID to update
- * @param updates - Partial metadata to merge
- * @returns Updated metadata, or undefined if not found
+ * @param updates - The fields to change; omitted fields keep their value
+ * @returns The stored metadata after the update, or undefined if not found
+ * @throws TypeError when `updates` holds anything other than a string `name`;
+ *   nothing is written.
  */
 export function updateKeyMetadata(
   keyId: string,
-  updates: Partial<ApiKeyMetadata>
+  updates: KeyMetadataUpdate
 ): ApiKeyMetadata | undefined {
-  const database = getDb()
+  const name = readKeyMetadataUpdate(updates)
 
-  // Get existing key
-  const existingRow = database.prepare('SELECT * FROM api_keys WHERE id = ?').get(keyId) as
-    | KeyRow
-    | undefined
-
-  if (!existingRow) {
-    return undefined
+  if (name !== undefined) {
+    const result = getDb().prepare('UPDATE api_keys SET name = ? WHERE id = ?').run(name, keyId)
+    if (result.changes === 0) {
+      return undefined
+    }
   }
 
-  // Decrypt existing row to get current plaintext values for merging
-  const existing = decryptRow(existingRow)
-
-  // Merge updates (all values are plaintext at this point)
-  const mergedPermissions =
-    updates.permissions !== undefined ? JSON.stringify(updates.permissions) : existing.permissions
-  const mergedOriginalPermissions =
-    updates.originalPermissions !== undefined
-      ? JSON.stringify(updates.originalPermissions)
-      : existing.original_permissions
-  const mergedKeyPrefix = updates.keyPrefix ?? existing.key_prefix
-
-  // Encrypt the merged values
-  const encrypted = encryptRow(mergedPermissions, mergedOriginalPermissions, mergedKeyPrefix)
-
-  const updatedName = updates.name ?? existing.name
-  const updatedCreatedAt =
-    updates.createdAt !== undefined ? updates.createdAt.getTime() : existing.created_at
-  const updatedExpiresAt =
-    updates.expiresAt !== undefined ? updates.expiresAt.getTime() : existing.expires_at
-  const updatedRevoked =
-    updates.revoked !== undefined ? (updates.revoked ? 1 : 0) : existing.revoked
-
-  // Update in database (always write as encrypted)
-  database
-    .prepare(
-      `
-    UPDATE api_keys SET
-      name = ?,
-      permissions = ?,
-      original_permissions = ?,
-      created_at = ?,
-      expires_at = ?,
-      revoked = ?,
-      key_prefix = ?,
-      encrypted = 1
-    WHERE id = ?
-  `
-    )
-    .run(
-      updatedName,
-      encrypted.permissions,
-      encrypted.originalPermissions,
-      updatedCreatedAt,
-      updatedExpiresAt,
-      updatedRevoked,
-      encrypted.keyPrefix,
-      keyId
-    )
-  invalidateKeyStatus(keyId)
-
-  // Return metadata from plaintext values (avoid extra decrypt)
-  return {
-    id: existing.id,
-    name: updatedName,
-    permissions: JSON.parse(mergedPermissions) as string[],
-    originalPermissions: JSON.parse(mergedOriginalPermissions) as string[],
-    createdAt: new Date(updatedCreatedAt),
-    expiresAt: updatedExpiresAt !== null ? new Date(updatedExpiresAt) : undefined,
-    revoked: updatedRevoked === 1,
-    keyPrefix: mergedKeyPrefix,
-  }
+  return getKeyMetadata(keyId)
 }
 
 /**
