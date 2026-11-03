@@ -1533,8 +1533,11 @@ plus identity collections whose entries are in it:
   object is `TargetNotFoundError` naming the referenced resource.
 - An identity collection of such references takes its entries as a list of
   single references, so each is found the same way, all before any record is
-  read, and read the same way, in entry order, in one automation process. A
-  missing entry is `TargetNotFoundError` with `entryIndex`, the first missing
+  read, and read the same way, in entry order, in one automation process. The
+  result is validated against the `list` item plan although it is read with
+  the get record read; that is correct because the two plans are equal for
+  every resource with both, which a test over every shipped contract
+  enforces. A missing entry is `TargetNotFoundError` with `entryIndex`, the first missing
   entry. An identity collection with no entries is authorized, governed and
   audited like any other resolution, as a call of the resource's `list`
   (resolution, steps 1 to 6, below), and then resolves to `[]` with no
