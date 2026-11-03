@@ -454,6 +454,7 @@ class ContractBuilder {
   readonly #identifiers = new Map<string, ValueShape>()
   readonly #operations: OperationModel[] = []
   readonly #operationsByRoute = new Map<string, OperationModel>()
+  #operationsDerived = false
   readonly #privateBindings = new Set<string>(['t', 'resources', 'operations', 'bind'])
   /**
    * The local names the module gives the paging types of `@macts/contracts`:
@@ -535,6 +536,7 @@ class ContractBuilder {
    * contract generated from this manifest has exactly these plans.
    */
   resourcePlans(): ResourcePlanTable {
+    this.#deriveOperations()
     const registry: Record<string, ReferenceRegistry[string]> = {}
     for (const { resourceKey, resource } of this.#tableResources()) {
       const id = this.#identifierValueType(resourceKey, resource)
@@ -645,6 +647,11 @@ class ContractBuilder {
   }
 
   #deriveOperations(): void {
+    // The resource table reads which operations resolve each resource from
+    // the derived operations, so derivation runs once, before the first
+    // reader, whether that is `build` or `resourcePlans`.
+    if (this.#operationsDerived) return
+    this.#operationsDerived = true
     const used = new Set<string>()
     for (const route of resolveManifestRoutes(this.#manifest)) {
       const binding = uniqueName(

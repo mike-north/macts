@@ -32,6 +32,7 @@ import {
   CONTRACT_MODULE_PATH,
   collectContractDiagnostics,
   contractNames,
+  contractResourcePlans,
   generateContract,
   type GeneratedContract,
 } from './index.js'
@@ -963,5 +964,21 @@ describe('real app manifests', () => {
       const json = text.slice(text.indexOf('export const manifest: unknown = ') + 33)
       expect(AppManifestSchema.parse(JSON.parse(json))).toEqual(manifest)
     }
+  })
+})
+
+describe('contractResourcePlans', () => {
+  // Registration checks a contract's resource plans against these. Computed
+  // before the builder derived its operations, the table found no resolving
+  // operation for any resource and came out empty, so registration refused
+  // every generated contract as listing undeclared resources.
+  it('gives the plans of exactly the resources the generated table lists', () => {
+    const plans = contractResourcePlans(jotterManifest())
+    // Note and Folder are got and listed, Tag only listed; Sticker has neither.
+    expect(Object.keys(plans).sort()).toEqual(['Folder', 'Note', 'Tag'])
+    // Note is identified by `uid` and Folder by `folderId`; Tag has no identifier.
+    expect(plans['Note']?.id).toBeDefined()
+    expect(plans['Folder']?.id).toBeDefined()
+    expect(plans['Tag']).toEqual({})
   })
 })
