@@ -914,6 +914,9 @@ function boundClient(): { client: unknown; calls: RecordedCall[] } {
       calls.push({ operation, input, options })
       return Promise.resolve(valueOf(operation.output.decode(cannedWire(operation), TEST_CONTEXT)))
     },
+    resolve() {
+      return Promise.reject(new Error('the generated client never resolves references itself'))
+    },
   }
   return { client: contract.bind(runtime), calls }
 }

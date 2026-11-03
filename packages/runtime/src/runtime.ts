@@ -66,6 +66,7 @@ import {
   UnexpectedValueError,
   ValidationError,
   ValueTypes,
+  resolvingOperationKey,
   type AppContract,
   type Authority,
   type Credential,
@@ -287,6 +288,9 @@ interface ReferenceTarget {
  * operation is not yet known.
  */
 type CallLabel = Readonly<Record<string, string>>
+
+/** Both reference cardinalities, each resolving as the operation `resolvingOperationKey` names. */
+const REFERENCE_CARDINALITIES: readonly ReferenceCardinality[] = ['one', 'many']
 
 /** Whether `value` is a plain record (not `null`, not an array). */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -745,7 +749,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const { resource, cardinality } = target
     const operation = app.resolving.get(resource)?.[cardinality]
     if (operation === undefined) {
-      const shape = cardinality === 'one' ? 'get' : 'list'
+      const shape = resolvingOperationKey(cardinality)
       throw new InvalidSelectionError(
         `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
         { resource }
@@ -888,10 +892,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const resolving = new Map<string, ResolvingOperations>()
     for (const [resource, descriptor] of Object.entries(contract.resources)) {
       const entry: Partial<Record<ReferenceCardinality, RegisteredOperation>> = {}
-      for (const [field, cardinality] of [
-        ['get', 'one'],
-        ['list', 'many'],
-      ] as const) {
+      for (const cardinality of REFERENCE_CARDINALITIES) {
+        const field = resolvingOperationKey(cardinality)
         const id = descriptor[field]
         if (id === undefined) continue
         const operation = byId.get(id)
