@@ -497,9 +497,13 @@ class ContractBuilder {
    */
   #buildRegistry(): ReferenceRegistry {
     const registry: Record<string, ReferenceRegistry[string]> = {}
-    for (const { resourceKey, resource, routes } of this.#tableResources()) {
+    for (const { resourceKey, resource, routes, parent } of this.#tableResources()) {
       const id = this.#identifierValueType(resourceKey, resource)
-      registry[resourceKey] = id !== undefined ? { id, ...routes } : routes
+      registry[resourceKey] = {
+        ...(id === undefined ? {} : { id }),
+        ...routes,
+        ...(parent === undefined ? {} : { parent }),
+      }
     }
     return registry
   }
@@ -516,18 +520,48 @@ class ContractBuilder {
    * a container and an identity-collection entry through `get`. A reference
    * value type pointing at such a resource rejects every reference to it, as
    * one naming no resource of the app.
+   *
+   * `parent` is the resource the recorded `get` finds the resource within
+   * (D10, command parents), when it records one: a reference to the resource
+   * then needs an identity reference to that parent as its container
+   * (phases/13 D7, "Resolvable targets").
    */
   #tableResources(): {
     resourceKey: string
     resource: Resource
     routes: { get?: OperationId; list?: OperationId }
+    parent: string | undefined
   }[] {
     return usableResources(this.#manifest).flatMap(([resourceKey, resource]) => {
       const routes = this.#resolvingRoutes(resourceKey)
-      return routes.get === undefined && routes.list === undefined
-        ? []
-        : [{ resourceKey, resource, routes }]
+      if (routes.get === undefined && routes.list === undefined) return []
+      const parent =
+        routes.get === undefined
+          ? undefined
+          : resolvingCommand(this.#manifest, resourceKey, 'get')?.[1].parent?.resource
+      return [{ resourceKey, resource, routes, parent }]
     })
+  }
+
+  /**
+   * Fail generation when a parent-scoped resource's parent could not be its
+   * container: the parent must be a table resource with `get` and an
+   * identifier, since the container is an identity reference resolved through
+   * that `get`. Otherwise no reference to the resource could ever be valid.
+   */
+  #checkParents(): void {
+    const table = new Map(this.#tableResources().map((entry) => [entry.resourceKey, entry]))
+    for (const { resourceKey, parent } of table.values()) {
+      if (parent === undefined) continue
+      const found = table.get(parent)
+      const identified =
+        found !== undefined && this.#identifierValueType(parent, found.resource) !== undefined
+      if (found?.routes.get === undefined || !identified) {
+        this.errors.push(
+          `${this.#names.app}: resources.${resourceKey}: the app gets a ${resourceKey} only within its ${parent}, but references cannot name a ${parent} by its identifier and resolve it through a get, so no reference to a ${resourceKey} could be resolved (phases/13 D7, resolvable targets).`
+        )
+      }
+    }
   }
 
   /**
@@ -603,6 +637,7 @@ class ContractBuilder {
     const enumTuples = this.#renderEnumTuples()
 
     this.#checkNames(namespaces, appMethods)
+    this.#checkParents()
 
     return [
       this.#renderHeader(),
@@ -1410,7 +1445,7 @@ class ContractBuilder {
 
   #renderResourceTable(): string {
     const resources = this.#tableResources()
-    const typeEntries = resources.map(({ resourceKey, resource, routes }) => {
+    const typeEntries = resources.map(({ resourceKey, resource, routes, parent }) => {
       const identifierShape = this.#identifiers.get(resourceKey)
       const identified =
         this.#identifierProperty(resource) !== undefined && identifierShape !== undefined
@@ -1423,11 +1458,12 @@ class ContractBuilder {
         ...Object.entries(routes).map(
           ([field, route]) => `readonly ${field}: ${stringLiteral(route)}`
         ),
+        ...(parent === undefined ? [] : [`readonly parent: ${stringLiteral(parent)}`]),
       ]
       const type = present.length === 0 ? descriptor : `${descriptor} & { ${present.join('; ')} }`
       return `  ${propertyKey(resourceKey)}: ${type}`
     })
-    const valueEntries = resources.map(({ resourceKey, resource, routes }) => {
+    const valueEntries = resources.map(({ resourceKey, resource, routes, parent }) => {
       const members = [
         `name: ${stringLiteral(resourceKey)}`,
         `record: ${this.#recordBinding(resourceKey)}`,
@@ -1440,6 +1476,7 @@ class ContractBuilder {
       for (const [field, route] of Object.entries(routes)) {
         members.push(`${field}: ${stringLiteral(route)}`)
       }
+      if (parent !== undefined) members.push(`parent: ${stringLiteral(parent)}`)
       return `  ${propertyKey(resourceKey)}: {\n${members.map((m) => `    ${m},`).join('\n')}\n  },`
     })
     const { contract, resources: typeName } = this.#names
@@ -1450,8 +1487,9 @@ class ContractBuilder {
     return `/**
  * The type of the resource table of {@link ${contract}}: every resource a
  * reference can name, keyed by manifest resource key, with its record type,
- * its identifier type (when it has one), and the operations that resolve
- * references to it. A client created from the contract carries it, so
+ * its identifier type (when it has one), the operations that resolve
+ * references to it, and, for a resource the app finds only within another,
+ * that parent resource. A client created from the contract carries it, so
  * \`bindReference\` admits only references the contract can resolve.
  */
 export type ${typeName} = ${type}

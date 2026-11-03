@@ -1405,3 +1405,84 @@ describe('registerContract: resource plans', () => {
     expect(runtime.operations()).toEqual([])
   })
 })
+
+describe('resolveReference: a parent-scoped resource', () => {
+  /**
+   * The library with books found only within a shelf: its table names
+   * `parent: 'Shelf'` for Book, as a generated table does for a resource
+   * whose get records a parent (phases/13 D7, "Resolvable targets").
+   */
+  function shelvedBooks(executor: RecordingExecutor): MactsRuntime {
+    const runtime = createRuntime({
+      executor,
+      verifier: createFakeVerifier({ [BOOK_READER_SECRET]: BOOK_READER }),
+      clock: fixedClock,
+      logger: createSpyLogger(),
+      governance: { policy: ALLOW_ALL_POLICY },
+    })
+    runtime.registerContract(
+      libraryContractWithResource('Book', (descriptor) => ({ ...descriptor, parent: 'Shelf' })),
+      LIBRARY_MANIFEST
+    )
+    return runtime
+  }
+
+  it("hands the executor the reference with its parent's identity container, as the book's get", async () => {
+    const executor = resolvingTo(DUNE_WIRE)
+
+    const result = await shelvedBooks(executor).resolveReference(
+      'library',
+      wire(DUNE_ON_SHELF),
+      // Holds only the book get's permission, which the resolution needs.
+      as(BOOK_READER_SECRET)
+    )
+
+    expect(result).toEqual(DUNE_WIRE)
+    expect(executor.requests).toHaveLength(0)
+    expect(
+      executor.resolutions.map(({ reference, outputPlan }) => ({ reference, outputPlan }))
+    ).toEqual([
+      {
+        reference: {
+          resource: 'Book',
+          form: 'identity',
+          cardinality: 'one',
+          id: '978-0441013593',
+          container: { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
+        },
+        outputPlan: BOOK_PLAN,
+      },
+    ])
+  })
+
+  it('rejects one without its container with ValidationError, before the executor', async () => {
+    const executor = resolvingTo(DUNE_WIRE)
+
+    const error = await rejection(
+      shelvedBooks(executor).resolveReference('library', wire(DUNE_BY_NAME), as(BOOK_READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(executor.resolutions).toHaveLength(0)
+  })
+
+  it('rejects a selector container, which supplies no shelf identifier', async () => {
+    const executor = resolvingTo(DUNE_WIRE)
+    const onSomeShelf = {
+      ...DUNE_ON_SHELF,
+      container: {
+        resource: 'Shelf',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'Science fiction' },
+      },
+    }
+
+    const error = await rejection(
+      shelvedBooks(executor).resolveReference('library', wire(onSomeShelf), as(BOOK_READER_SECRET))
+    )
+
+    expect(error).toBeInstanceOf(ValidationError)
+    expect(executor.resolutions).toHaveLength(0)
+  })
+})

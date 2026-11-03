@@ -9,7 +9,10 @@
  * read the table to say which reference data a client can bind, because a
  * reference is resolvable only through the operation its resource records
  * for its cardinality (`resolvingOperationKey`): `get` for a single object,
- * a container, and an identity-collection entry; `list` for a collection.
+ * a container, and an identity-collection entry; `list` for a collection. A
+ * resource whose entry names a `parent` is found only within an object of
+ * that parent, so data referencing it must carry an identity reference to
+ * the parent as its container.
  *
  * A table whose keys are not known (the default {@link ResourceTable}, used by
  * a contract that declares no table type) admits any reference data, with
@@ -145,9 +148,9 @@ export type ResourceIdOf<
     : never
 
 /**
- * The `container` of resolvable reference data: single-object reference data
- * to a resource with `get`, whose own container is likewise, or a reference
- * a client bound.
+ * The `container` of resolvable reference data to a resource found at the
+ * application: optional, and single-object reference data to a resource with
+ * `get`, whose own container is likewise, or a reference a client bound.
  *
  * @remarks
  * A bound reference's resource is not a literal type, but a client decoded it
@@ -161,16 +164,73 @@ export interface ResolvableContainment<Resources extends ResourceTable> {
 }
 
 /**
+ * The resource that resource `Key` of `Resources` is found within, when its
+ * entry names one (a literal `parent`), and `never` otherwise.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Key - The resource key.
+ */
+export type ResourceParentOf<
+  Resources extends ResourceTable,
+  Key extends string,
+> = Key extends keyof Resources
+  ? Resources[Key] extends { readonly parent: infer Parent extends string }
+    ? string extends Parent
+      ? never
+      : Parent
+    : never
+  : never
+
+/**
+ * The `container` of resolvable reference data to a resource found only
+ * within an object of `Parent`: required, and an identity reference to that
+ * object, as data whose own container follows its resource's rule, or as a
+ * reference a client bound.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Parent - The parent resource key.
+ */
+export interface ResolvableParentContainment<
+  Resources extends ResourceTable,
+  Parent extends string,
+> {
+  /** The parent object, which supplies the identifier the resource's `get` needs. */
+  readonly container: Parent extends ResolvableResourceKey<Resources, 'one'>
+    ?
+        | (IdentityReferenceData<ResourceIdOf<Resources, Parent>, Parent> &
+            ResolvableContainmentOf<Resources, Parent>)
+        | IdentityReference<unknown, unknown, Parent>
+    : never
+}
+
+/**
+ * The containment rule of reference data to resource `Key`: the parent's
+ * identity container ({@link ResolvableParentContainment}) when `Key` is
+ * parent-scoped, and an optional resolvable container
+ * ({@link ResolvableContainment}) otherwise.
+ *
+ * @typeParam Resources - The contract's resource table type.
+ * @typeParam Key - The resource key.
+ */
+export type ResolvableContainmentOf<Resources extends ResourceTable, Key extends string> = [
+  ResourceParentOf<Resources, Key>,
+] extends [never]
+  ? ResolvableContainment<Resources>
+  : ResolvableParentContainment<Resources, ResourceParentOf<Resources, Key>>
+
+/**
  * Data of a single-object reference to `Resources` that a client can resolve:
  * the resource has `get`, and so does that of every container, at every
- * level.
+ * level, and a parent-scoped resource carries its parent's identity
+ * container.
  *
  * @typeParam Resources - The contract's resource table type.
  */
 export type ResolvableObjectReferenceData<Resources extends ResourceTable> = {
   [Key in ResolvableResourceKey<Resources, 'one'>]:
-    | (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> & ResolvableContainment<Resources>)
-    | (SelectorReferenceData<Key> & ResolvableContainment<Resources>)
+    | (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> &
+        ResolvableContainmentOf<Resources, Key>)
+    | (SelectorReferenceData<Key> & ResolvableContainmentOf<Resources, Key>)
 }[ResolvableResourceKey<Resources, 'one'>]
 
 /**
@@ -186,10 +246,10 @@ export type ResolvableCollectionReferenceData<Resources extends ResourceTable> =
     | (Key extends ResolvableResourceKey<Resources, 'one'>
         ? IdentityCollectionReferenceData<ResourceIdOf<Resources, Key>, Key> & {
             readonly entries: readonly (IdentityReferenceData<ResourceIdOf<Resources, Key>, Key> &
-              ResolvableContainment<Resources>)[]
+              ResolvableContainmentOf<Resources, Key>)[]
           }
         : never)
-    | (SelectorCollectionReferenceData<Key> & ResolvableContainment<Resources>)
+    | (SelectorCollectionReferenceData<Key> & ResolvableContainmentOf<Resources, Key>)
 }[ResolvableResourceKey<Resources, 'many'>]
 
 /**

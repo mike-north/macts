@@ -465,9 +465,16 @@ export type CollectionReferenceVariant<T, Id = unknown, R extends string = strin
  * operation (`get` for a single object, a container, and an
  * identity-collection entry; `list` for a collection), because a reference
  * that names a resource without it could never be resolved. Reference value
- * types enforce this in their wire schema, so every boundary applies it. An
- * app contract's `resources` table is assignable to this
- * type; reference value types read it through the {@link ReferenceScope}.
+ * types enforce this in their wire schema, so every boundary applies it.
+ *
+ * An entry names its `parent` when the resource is parent-scoped: its `get`
+ * finds one only within an object of the parent resource, by that object's
+ * identifier. Every reference to such a resource that resolves through its
+ * `get` or `list` must carry, as its container, an identity reference to that
+ * parent, which is itself resolvable; one without it could never be resolved.
+ *
+ * An app contract's `resources` table is assignable to this type; reference
+ * value types read it through the {@link ReferenceScope}.
  */
 export type ReferenceRegistry = Readonly<
   Record<
@@ -476,6 +483,7 @@ export type ReferenceRegistry = Readonly<
       readonly id?: ValueType<unknown>
       readonly get?: OperationId
       readonly list?: OperationId
+      readonly parent?: string
     }
   >
 >

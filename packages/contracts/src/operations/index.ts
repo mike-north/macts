@@ -25,10 +25,13 @@ export type {
   ClientBrand,
   ResolvableCollectionReferenceData,
   ResolvableContainment,
+  ResolvableContainmentOf,
   ResolvableObjectReferenceData,
+  ResolvableParentContainment,
   ResolvableReferenceData,
   ResolvableResourceKey,
   ResourceIdOf,
+  ResourceParentOf,
   ResourceRecordOf,
   ResourceTable,
 } from './resource-table.js'
@@ -156,6 +159,20 @@ export interface ResourceDescriptor<RecordType, Id = unknown> {
   readonly get?: OperationId
   /** Operation that lists objects, used to resolve collection references. */
   readonly list?: OperationId
+  /**
+   * The resource whose objects contain this one, when the app gets one of
+   * this resource only within such an object: its `get` takes the parent
+   * object's identifier along with the object's own.
+   *
+   * @remarks
+   * Absent for a resource the app gets at the application. A reference to a
+   * parent-scoped resource, wherever it is resolved through `get` or `list`
+   * (a position's own reference, a container, or an identity-collection
+   * entry), must carry as its container an identity reference to an object of
+   * this resource, which supplies the parent identifier. Encoding, the wire
+   * schema and `bindReference` reject one without it.
+   */
+  readonly parent?: string
 }
 
 /**
