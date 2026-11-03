@@ -22,10 +22,12 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type Rgb,
   type ValueType,
 } from '@macts/contracts'
@@ -1099,9 +1101,11 @@ export interface DocumentResourceClient {
 
 /**
  * The Microsoft Word client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link microsoftWordContract}.
+ * commands. A client factory creates one from {@link microsoftWordContract}. Its type carries the
+ * contract's resource table, {@link MicrosoftWordResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface MicrosoftWordClient {
+export interface MicrosoftWordClient extends ClientBrand<MicrosoftWordResources> {
   /** A Microsoft Word document */
   readonly documents: DocumentResourceClient
   /** Undo the last action */
@@ -1168,21 +1172,6 @@ const saveFormatMembers = [
   'pdf',
 ] as const
 
-/** The members of {@link ParagraphAlignment}, for its value type. */
-const paragraphAlignmentMembers = ['left', 'center', 'right', 'justify'] as const
-
-/** The members of {@link UnderlineType}, for its value type. */
-const underlineTypeMembers = ['none', 'single', 'double', 'dotted', 'dashed'] as const
-
-/** The members of {@link FieldType}, for its value type. */
-const fieldTypeMembers = [
-  'fieldAddin',
-  'fieldDate',
-  'fieldHyperlink',
-  'fieldPageNumber',
-  'fieldRef',
-] as const
-
 const documentRecordType: ValueType<Document> = t.record(
   {
     name: t.string({ description: 'The name of the document' }),
@@ -1208,191 +1197,30 @@ const documentRecordType: ValueType<Document> = t.record(
   { description: 'A Microsoft Word document' }
 )
 
-const paragraphRecordType: ValueType<Paragraph> = t.record(
-  {
-    alignment: t.nullable(t.enumeration(paragraphAlignmentMembers), {
-      description: 'The alignment for the paragraph',
-    }),
-    firstLineIndent: t.nullable(t.double(), {
-      description: 'The first-line or hanging indent value in points',
-    }),
-    leftIndent: t.nullable(t.double(), { description: 'The left indent in points' }),
-    rightIndent: t.nullable(t.double(), { description: 'The right indent in points' }),
-    lineSpacing: t.nullable(t.double(), { description: 'The line spacing in points' }),
-    spaceAfter: t.nullable(t.double(), {
-      description: 'The spacing in points after the paragraph',
-    }),
-    spaceBefore: t.nullable(t.double(), {
-      description: 'The spacing in points before the paragraph',
-    }),
-    pageBreakBefore: t.nullable(t.boolean(), {
-      description: 'Whether a page break is forced before the paragraph',
-    }),
-    keepTogether: t.nullable(t.boolean(), {
-      description: 'Whether all lines remain on the same page',
-    }),
-    keepWithNext: t.nullable(t.boolean(), {
-      description: 'Whether paragraph stays with next paragraph',
-    }),
-    paragraphId: t.integer({ description: 'The paragraph ID' }),
-    content: t.nullable(t.string(), { description: 'The text content of the paragraph' }),
-  },
-  { description: 'A single paragraph in a document' }
-)
-
-const textRangeRecordType: ValueType<TextRange> = t.record(
-  {
-    content: t.nullable(t.string(), { description: 'The text in the range' }),
-    bold: t.nullable(t.boolean(), { description: 'Whether the text is formatted as bold' }),
-    italic: t.nullable(t.boolean(), { description: 'Whether the text is formatted as italic' }),
-    underline: t.nullable(t.enumeration(underlineTypeMembers), {
-      description: 'The underline type',
-    }),
-    fontSize: t.nullable(t.double(), { description: 'The font size in points' }),
-    fontName: t.nullable(t.string(), { description: 'The font name' }),
-    start: t.nullable(t.integer(), { description: 'The starting character position' }),
-    end: t.nullable(t.integer(), { description: 'The ending character position' }),
-  },
-  { description: 'A contiguous area in a document' }
-)
-
-const selectionRecordType: ValueType<Selection> = t.record(
-  {
-    content: t.nullable(t.string(), { description: 'The text in the selection' }),
-    bold: t.nullable(t.boolean(), { description: 'Whether the selection is formatted as bold' }),
-    italic: t.nullable(t.boolean(), {
-      description: 'Whether the selection is formatted as italic',
-    }),
-    fontSize: t.nullable(t.double(), { description: 'The font size of the selection in points' }),
-    fontName: t.nullable(t.string(), { description: 'The font name of the selection' }),
-    start: t.nullable(t.integer(), {
-      description: 'The starting character position of the selection',
-    }),
-    end: t.nullable(t.integer(), { description: 'The ending character position of the selection' }),
-    selectionType: t.nullable(t.string(), {
-      description: 'The type of selection (e.g., text, table, graphic)',
-    }),
-  },
-  { description: 'The current selection in a document' }
-)
-
-const tableRecordType: ValueType<Table> = t.record(
-  {
-    rowCount: t.nullable(t.integer(), { description: 'The number of rows in the table' }),
-    columnCount: t.nullable(t.integer(), { description: 'The number of columns in the table' }),
-    allowAutoFit: t.nullable(t.boolean(), {
-      description: 'Whether the table is allowed to autofit',
-    }),
-    borders: t.nullable(t.boolean(), { description: 'Whether the table has borders' }),
-  },
-  { description: 'A table in a document' }
-)
-
-const rowRecordType: ValueType<Row> = t.record(
-  {
-    height: t.nullable(t.double(), { description: 'The height of the row in points' }),
-    allowBreakAcrossPages: t.nullable(t.boolean(), {
-      description: 'Whether the row can break across pages',
-    }),
-    headingFormat: t.nullable(t.boolean(), {
-      description: 'Whether the row is formatted as a heading',
-    }),
-  },
-  { description: 'A row in a table' }
-)
-
-const columnRecordType: ValueType<Column> = t.record(
-  {
-    width: t.nullable(t.double(), { description: 'The width of the column in points' }),
-    preferredWidth: t.nullable(t.double(), { description: 'The preferred width of the column' }),
-  },
-  { description: 'A column in a table' }
-)
-
-const cellRecordType: ValueType<Cell> = t.record(
-  {
-    content: t.nullable(t.string(), { description: 'The text content of the cell' }),
-    width: t.nullable(t.double(), { description: 'The width of the cell in points' }),
-    height: t.nullable(t.double(), { description: 'The height of the cell in points' }),
-    verticalAlignment: t.nullable(t.string(), {
-      description: 'The vertical alignment of text in the cell',
-    }),
-    rowIndex: t.nullable(t.integer(), { description: 'The row index of the cell' }),
-    columnIndex: t.nullable(t.integer(), { description: 'The column index of the cell' }),
-  },
-  { description: 'A cell in a table' }
-)
-
-const fontRecordType: ValueType<Font> = t.record(
-  {
-    bold: t.nullable(t.boolean(), { description: 'Whether the font is bold' }),
-    italic: t.nullable(t.boolean(), { description: 'Whether the font is italic' }),
-    underline: t.nullable(t.enumeration(underlineTypeMembers), {
-      description: 'The underline type',
-    }),
-    size: t.nullable(t.double(), { description: 'The font size in points' }),
-    name: t.nullable(t.string(), { description: 'The font name' }),
-    color: t.nullable(t.rgb(), { description: 'The font color' }),
-    subscript: t.nullable(t.boolean(), { description: 'Whether the font is subscript' }),
-    superscript: t.nullable(t.boolean(), { description: 'Whether the font is superscript' }),
-    strikethrough: t.nullable(t.boolean(), { description: 'Whether the font has strikethrough' }),
-    allCaps: t.nullable(t.boolean(), { description: 'Whether the font is all caps' }),
-  },
-  { description: 'Font formatting properties' }
-)
-
-const pageSetupRecordType: ValueType<PageSetup> = t.record(
-  {
-    topMargin: t.nullable(t.double(), { description: 'The top margin in points' }),
-    bottomMargin: t.nullable(t.double(), { description: 'The bottom margin in points' }),
-    leftMargin: t.nullable(t.double(), { description: 'The left margin in points' }),
-    rightMargin: t.nullable(t.double(), { description: 'The right margin in points' }),
-    pageHeight: t.nullable(t.double(), { description: 'The page height in points' }),
-    pageWidth: t.nullable(t.double(), { description: 'The page width in points' }),
-    orientation: t.nullable(t.string(), {
-      description: 'The page orientation (portrait or landscape)',
-    }),
-    paperSize: t.nullable(t.string(), { description: 'The paper size' }),
-  },
-  { description: 'Page setup properties for a document or section' }
-)
-
-const sectionRecordType: ValueType<Section> = t.record(
-  {
-    sectionIndex: t.nullable(t.integer(), { description: 'The index of the section' }),
-    protectedForForms: t.nullable(t.boolean(), {
-      description: 'Whether the section is protected for forms',
-    }),
-  },
-  { description: 'A section in a document' }
-)
-
-const bookmarkRecordType: ValueType<Bookmark> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The name of the bookmark' }),
-    start: t.nullable(t.integer(), { description: 'The starting character position' }),
-    end: t.nullable(t.integer(), { description: 'The ending character position' }),
-  },
-  { description: 'A bookmark in a document' }
-)
-
-const fieldRecordType: ValueType<Field> = t.record(
-  {
-    fieldType: t.nullable(t.enumeration(fieldTypeMembers), { description: 'The field type' }),
-    fieldCode: t.nullable(t.string(), { description: 'The field code' }),
-    fieldText: t.nullable(t.string(), { description: 'The field text' }),
-    locked: t.nullable(t.boolean(), { description: 'Whether the field is locked' }),
-    showCodes: t.nullable(t.boolean(), { description: 'Whether field codes are displayed' }),
-  },
-  { description: 'A field in a document' }
-)
+/**
+ * The type of the resource table of {@link microsoftWordContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type MicrosoftWordResources = Readonly<{
+  Document: ResourceDescriptor<Document, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'microsoft-word.documents.get'
+    readonly list: 'microsoft-word.documents.list'
+  }
+}>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link MicrosoftWordResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<MicrosoftWordClient>['resources'] = {
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -1400,56 +1228,7 @@ const resources: AppContract<MicrosoftWordClient>['resources'] = {
     get: 'microsoft-word.documents.get',
     list: 'microsoft-word.documents.list',
   },
-  Paragraph: {
-    name: 'Paragraph',
-    record: paragraphRecordType,
-    id: t.integer({ description: 'The paragraph ID' }),
-  },
-  TextRange: {
-    name: 'TextRange',
-    record: textRangeRecordType,
-  },
-  Selection: {
-    name: 'Selection',
-    record: selectionRecordType,
-  },
-  Table: {
-    name: 'Table',
-    record: tableRecordType,
-  },
-  Row: {
-    name: 'Row',
-    record: rowRecordType,
-  },
-  Column: {
-    name: 'Column',
-    record: columnRecordType,
-  },
-  Cell: {
-    name: 'Cell',
-    record: cellRecordType,
-  },
-  Font: {
-    name: 'Font',
-    record: fontRecordType,
-  },
-  PageSetup: {
-    name: 'PageSetup',
-    record: pageSetupRecordType,
-  },
-  Section: {
-    name: 'Section',
-    record: sectionRecordType,
-  },
-  Bookmark: {
-    name: 'Bookmark',
-    record: bookmarkRecordType,
-  },
-  Field: {
-    name: 'Field',
-    record: fieldRecordType,
-  },
-}
+} satisfies MicrosoftWordResources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'microsoft-word.documents.list',
@@ -1883,7 +1662,7 @@ function bind(runtime: ClientRuntime): MicrosoftWordClient {
  * The Microsoft Word contract. Pass it to a client factory to obtain a
  * {@link MicrosoftWordClient}.
  */
-export const microsoftWordContract: AppContract<MicrosoftWordClient> = {
+export const microsoftWordContract: AppContract<MicrosoftWordClient, MicrosoftWordResources> = {
   app: 'microsoft-word',
   operations,
   resources,

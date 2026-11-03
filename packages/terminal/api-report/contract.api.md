@@ -6,7 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface SettingsSet {
@@ -78,7 +81,7 @@ export interface TabUpdateInput {
 }
 
 // @public
-export interface TerminalClient {
+export interface TerminalClient extends ClientBrand<TerminalResources> {
     doScript(command: string, _in?: string, options?: CallOptions): Promise<void>;
     readonly settingsSets: SettingsSetResourceClient;
     readonly tabs: TabResourceClient;
@@ -86,7 +89,26 @@ export interface TerminalClient {
 }
 
 // @public
-export const terminalContract: AppContract<TerminalClient>;
+export const terminalContract: AppContract<TerminalClient, TerminalResources>;
+
+// @public
+export type TerminalResources = Readonly<{
+    Window: ResourceDescriptor<Window, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.windows.get';
+        readonly list: 'terminal.windows.list';
+    };
+    Tab: ResourceDescriptor<Tab, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.tabs.get';
+        readonly list: 'terminal.tabs.list';
+    };
+    SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'terminal.settingsSets.get';
+        readonly list: 'terminal.settingsSets.list';
+    };
+}>;
 
 // @public
 export interface Window {

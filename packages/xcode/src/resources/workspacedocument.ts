@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { WorkspaceDocument } from '../types.js'
 
@@ -23,8 +24,8 @@ export class WorkspaceDocumentResourceClient {
   /**
    * List all workspace documents, as one page.
    */
-  async list(): Promise<{ items: WorkspaceDocument[] }> {
-    return this.#http.rpc<{ items: WorkspaceDocument[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<WorkspaceDocument>> {
+    return this.#http.rpc<Page<WorkspaceDocument>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

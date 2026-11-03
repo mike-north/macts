@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -240,9 +241,7 @@ export type ProjectCreateInput = Record<string, never>;
 export class ProjectResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Project>;
-    list(workspaceName: string): Promise<{
-        items: Project[];
-    }>;
+    list(workspaceName: string): Promise<Page<Project>>;
 }
 
 // @public (undocumented)
@@ -294,9 +293,7 @@ export type RunDestinationCreateInput = Record<string, never>;
 export class RunDestinationResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(name: string): Promise<RunDestination>;
-    list(workspaceName: string): Promise<{
-        items: RunDestination[];
-    }>;
+    list(workspaceName: string): Promise<Page<RunDestination>>;
 }
 
 // @public (undocumented)
@@ -356,9 +353,7 @@ export type SchemeCreateInput = Record<string, never>;
 export class SchemeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Scheme>;
-    list(workspaceName: string): Promise<{
-        items: Scheme[];
-    }>;
+    list(workspaceName: string): Promise<Page<Scheme>>;
 }
 
 // @public (undocumented)
@@ -528,9 +523,7 @@ export class WorkspaceDocumentResourceClient {
     clean(workspaceName: string): Promise<void>;
     debug(workspaceName: string, scheme?: string, runDestinationSpecifier?: string, skipBuilding?: boolean, commandLineArguments?: unknown, environmentVariables?: unknown): Promise<void>;
     get(name: string): Promise<WorkspaceDocument>;
-    list(): Promise<{
-        items: WorkspaceDocument[];
-    }>;
+    list(): Promise<Page<WorkspaceDocument>>;
     run(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;
     stop(workspaceName: string): Promise<void>;
     test(workspaceName: string, withCommandLineArguments?: unknown, withEnvironmentVariables?: unknown): Promise<void>;

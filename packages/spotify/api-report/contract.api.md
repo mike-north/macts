@@ -6,13 +6,14 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 
 // @public
 export type PlayerState = 'stopped' | 'playing' | 'paused';
 
 // @public
-export interface SpotifyClient {
+export interface SpotifyClient extends ClientBrand<SpotifyResources> {
     nextTrack(options?: CallOptions): Promise<void>;
     pause(options?: CallOptions): Promise<void>;
     play(options?: CallOptions): Promise<void>;
@@ -22,7 +23,10 @@ export interface SpotifyClient {
 }
 
 // @public
-export const spotifyContract: AppContract<SpotifyClient>;
+export const spotifyContract: AppContract<SpotifyClient, SpotifyResources>;
+
+// @public
+export type SpotifyResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Track {

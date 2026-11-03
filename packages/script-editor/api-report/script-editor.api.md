@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -47,9 +48,7 @@ export class DocumentResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: DocumentCreateInput): Promise<Document>;
     get(name: string): Promise<Document>;
-    list(): Promise<{
-        items: Document[];
-    }>;
+    list(): Promise<Page<Document>>;
 }
 
 // @public (undocumented)

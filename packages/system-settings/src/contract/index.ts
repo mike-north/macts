@@ -22,9 +22,9 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -76,46 +76,35 @@ export interface PaneResourceClient {
 
 /**
  * The System Settings client: one namespace per resource that has operations, plus the app's own
- * commands. A client factory creates one from {@link systemSettingsContract}.
+ * commands. A client factory creates one from {@link systemSettingsContract}. Its type carries the
+ * contract's resource table, {@link SystemSettingsResources}, so references can be bound to it by
+ * resource; the brand has no runtime member.
  */
-export interface SystemSettingsClient {
+export interface SystemSettingsClient extends ClientBrand<SystemSettingsResources> {
   /** A settings pane. */
   readonly panes: PaneResourceClient
   /** Reveals a settings pane or an anchor within a pane. */
   reveal(options?: CallOptions): Promise<void>
 }
 
-const paneRecordType: ValueType<Pane> = t.record(
-  {
-    id: t.string({ description: 'The id of the settings pane.' }),
-    name: t.nullable(t.string(), { description: 'The name of the settings pane.' }),
-  },
-  { description: 'A settings pane.' }
-)
-
-const anchorRecordType: ValueType<Anchor> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The name of the anchor.' }),
-  },
-  { description: 'An anchor within a settings pane.' }
-)
+/**
+ * The type of the resource table of {@link systemSettingsContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type SystemSettingsResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link SystemSettingsResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<SystemSettingsClient>['resources'] = {
-  Pane: {
-    name: 'Pane',
-    record: paneRecordType,
-    id: t.string({ description: 'The id of the settings pane.' }),
-  },
-  Anchor: {
-    name: 'Anchor',
-    record: anchorRecordType,
-  },
-}
+const resources = {} satisfies SystemSettingsResources
 
 const appRevealOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'system-settings.app.reveal',
@@ -185,7 +174,7 @@ function bind(runtime: ClientRuntime): SystemSettingsClient {
  * The System Settings contract. Pass it to a client factory to obtain a
  * {@link SystemSettingsClient}.
  */
-export const systemSettingsContract: AppContract<SystemSettingsClient> = {
+export const systemSettingsContract: AppContract<SystemSettingsClient, SystemSettingsResources> = {
   app: 'system-settings',
   operations,
   resources,

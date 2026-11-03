@@ -19,6 +19,7 @@ import {
 import { usableProperties, usableResources } from '../../manifest/unsupported.js'
 import { propertyTypeToTs } from '../types.js'
 import { SDK_GENERATED_NOTICE } from '../generated-header.js'
+import { pagingTypeNames } from '../contract/index.js'
 import {
   appCommandEntries,
   commandMethodParameters,
@@ -704,6 +705,7 @@ function generateResourceClient(
     }
   }
 
+  const pagingNames = pagingTypeNames(manifest)
   const crudMethods = [
     listCmd
       ? generateListMethod(
@@ -711,7 +713,8 @@ function generateResourceClient(
           listCmd[1],
           resourceName,
           pluralWords,
-          listOperationPages(listCmd[1], resource)
+          listOperationPages(listCmd[1], resource),
+          pagingNames
         )
       : '',
     getCmd
@@ -783,12 +786,18 @@ export class ${resourceName}ResourceClient {
   const typesImportLine =
     typeImports.length > 0 ? `\nimport type { ${typeImports.join(', ')} } from '../types.js';` : ''
 
+  // A list returns the contract's page type, so the client's pages cannot
+  // drift from the contract's.
+  const contractsImportLine = listCmd
+    ? `import type { ${localImport('Page', pagingNames.page)} } from '@macts/contracts';\n`
+    : ''
+
   return `/**
  * ${resourceName} client for ${manifest.app.name} SDK.
  * ${SDK_GENERATED_NOTICE}
  */
 
-import type { HttpClient } from '../client.js';${typesImportLine}
+${contractsImportLine}import type { HttpClient } from '../client.js';${typesImportLine}
 
 /**
  * Client for ${resource.description.toLowerCase()}.
@@ -823,18 +832,19 @@ ${methodBody}
  * The doc comment of a list under a command parent says it lists the items of
  * one parent.
  *
- * Every list returns one page, `{ items, nextCursor? }`. A list that pages
- * (see `listOperationPages`) takes a trailing `page` argument whose
- * `pageSize` is sent in its integer wire form and whose `cursor` is sent as
- * given. Any other list takes no paging argument and its page holds every
- * item.
+ * Every list returns one page, of the contract's `Page` type, which the file
+ * imports under the local name `pagingNames.page`. A list that pages (see
+ * `listOperationPages`) takes a trailing `page` argument whose `pageSize` is
+ * sent in its integer wire form and whose `cursor` is sent as given. Any
+ * other list takes no paging argument and its page holds every item.
  */
 function generateListMethod(
   routeSegment: string,
   command: Command,
   resourceName: string,
   pluralWords: string,
-  paged: boolean
+  paged: boolean,
+  pagingNames: { readonly page: string }
 ): string {
   const requiredParams = listMethodParameters(command)
   const page = uniquePageBinding(requiredParams.map((p) => safeIdentifier(p.name)))
@@ -856,9 +866,7 @@ function generateListMethod(
     )
   }
   const bodyArg = bodyProps.length === 0 ? '' : `, { ${bodyProps.join(', ')} }`
-  const returnType = paged
-    ? `{ items: ${resourceName}[]; nextCursor?: string }`
-    : `{ items: ${resourceName}[] }`
+  const returnType = `${pagingNames.page}<${resourceName}>`
   // A list under a command parent returns that parent's items, not all of them.
   const scope =
     command.parent === undefined
@@ -878,6 +886,11 @@ ${doc}
     return this.#http.rpc<${returnType}>(\`\${this.#app}.\${this.#resource}.${routeSegment}\`${bodyArg});
   }
 `
+}
+
+/** An import specifier of `imported` under the local name `local`. */
+function localImport(imported: string, local: string): string {
+  return imported === local ? imported : `${imported} as ${local}`
 }
 
 /** The name of a list method's paging argument: `page`, unless a parameter already uses it. */
@@ -1142,6 +1155,7 @@ function generatePackageJson(options: HttpClientGeneratorOptions, appName: strin
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
+      '@macts/contracts': 'workspace:*',
       zod: 'catalog:',
     },
     devDependencies: {

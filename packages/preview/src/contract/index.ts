@@ -22,9 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -78,9 +80,11 @@ export interface DocumentResourceClient {
 
 /**
  * The Preview client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link previewContract}.
+ * A client factory creates one from {@link previewContract}. Its type carries the contract's
+ * resource table, {@link PreviewResources}, so references can be bound to it by resource; the brand
+ * has no runtime member.
  */
-export interface PreviewClient {
+export interface PreviewClient extends ClientBrand<PreviewResources> {
   /** A Preview document */
   readonly documents: DocumentResourceClient
 }
@@ -97,11 +101,29 @@ const documentRecordType: ValueType<Document> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link previewContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<PreviewClient>['resources'] = {
+export type PreviewResources = Readonly<{
+  Document: ResourceDescriptor<Document, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'preview.documents.get'
+    readonly list: 'preview.documents.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link PreviewResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Document: {
     name: 'Document',
     record: documentRecordType,
@@ -109,7 +131,7 @@ const resources: AppContract<PreviewClient>['resources'] = {
     get: 'preview.documents.get',
     list: 'preview.documents.list',
   },
-}
+} satisfies PreviewResources
 
 const documentListOperation: OperationDescriptor<Record<string, never>, Page<Document>> = {
   id: 'preview.documents.list',
@@ -164,7 +186,7 @@ function bind(runtime: ClientRuntime): PreviewClient {
  * The Preview contract. Pass it to a client factory to obtain a
  * {@link PreviewClient}.
  */
-export const previewContract: AppContract<PreviewClient> = {
+export const previewContract: AppContract<PreviewClient, PreviewResources> = {
   app: 'preview',
   operations,
   resources,

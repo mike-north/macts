@@ -22,10 +22,10 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -110,9 +110,11 @@ export type TrackUpdateInput = Record<string, never>
 
 /**
  * The Spotify client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link spotifyContract}.
+ * A client factory creates one from {@link spotifyContract}. Its type carries the contract's
+ * resource table, {@link SpotifyResources}, so references can be bound to it by resource; the brand
+ * has no runtime member.
  */
-export interface SpotifyClient {
+export interface SpotifyClient extends ClientBrand<SpotifyResources> {
   /** Skip to the next track. */
   nextTrack(options?: CallOptions): Promise<void>
   /** Skip to the previous track. */
@@ -131,44 +133,24 @@ export interface SpotifyClient {
   playTrack(inContext?: string, options?: CallOptions): Promise<void>
 }
 
-/** The members of {@link PlayerState}, for its value type. */
-const playerStateMembers = ['stopped', 'playing', 'paused'] as const
-
-const trackRecordType: ValueType<Track> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The name of the track' }),
-    artist: t.nullable(t.string(), { description: 'The artist of the track' }),
-    album: t.nullable(t.string(), { description: 'The album of the track' }),
-    albumArtist: t.nullable(t.string(), { description: 'The album artist of the track' }),
-    discNumber: t.nullable(t.integer(), { description: 'The disc number of the track' }),
-    duration: t.nullable(t.integer(), { description: 'The duration of the track in milliseconds' }),
-    playedCount: t.nullable(t.integer(), {
-      description: 'Number of times this track has been played',
-    }),
-    trackNumber: t.nullable(t.integer(), { description: 'The track number' }),
-    spotifyUrl: t.nullable(t.string(), { description: 'The Spotify URL for the track' }),
-    id: t.string({ description: 'The unique identifier of the track' }),
-    artworkUrl: t.nullable(t.string(), { description: 'The URL of the track artwork' }),
-    artwork: t.nullable(t.string(), { description: 'The track artwork' }),
-    playerState: t.nullable(t.enumeration(playerStateMembers), {
-      description: 'The current player state',
-    }),
-  },
-  { description: 'The currently playing track' }
-)
+/**
+ * The type of the resource table of {@link spotifyContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type SpotifyResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link SpotifyResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<SpotifyClient>['resources'] = {
-  Track: {
-    name: 'Track',
-    record: trackRecordType,
-    id: t.string({ description: 'The unique identifier of the track' }),
-  },
-}
+const resources = {} satisfies SpotifyResources
 
 const appNextTrackOperation: OperationDescriptor<Record<string, never>, undefined> = {
   id: 'spotify.app.nextTrack',
@@ -292,7 +274,7 @@ function bind(runtime: ClientRuntime): SpotifyClient {
  * The Spotify contract. Pass it to a client factory to obtain a
  * {@link SpotifyClient}.
  */
-export const spotifyContract: AppContract<SpotifyClient> = {
+export const spotifyContract: AppContract<SpotifyClient, SpotifyResources> = {
   app: 'spotify',
   operations,
   resources,

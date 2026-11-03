@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -51,9 +52,7 @@ export class CanvasResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CanvasCreateInput): Promise<Canvas>;
     get(id: string): Promise<Canvas>;
-    list(): Promise<{
-        items: Canvas[];
-    }>;
+    list(): Promise<Page<Canvas>>;
 }
 
 // @public (undocumented)
@@ -244,9 +243,7 @@ export interface GraphicCreateInput {
 export class GraphicResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Graphic>;
-    list(canvasId: string): Promise<{
-        items: Graphic[];
-    }>;
+    list(canvasId: string): Promise<Page<Graphic>>;
 }
 
 // @public (undocumented)
@@ -456,9 +453,7 @@ export class LayerResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: LayerCreateInput): Promise<Layer>;
     get(name: string): Promise<Layer>;
-    list(canvasId: string): Promise<{
-        items: Layer[];
-    }>;
+    list(canvasId: string): Promise<Page<Layer>>;
 }
 
 // @public (undocumented)
@@ -508,9 +503,7 @@ export interface LineCreateInput {
 export class LineResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<Line>;
-    list(canvasId: string): Promise<{
-        items: Line[];
-    }>;
+    list(canvasId: string): Promise<Page<Line>>;
 }
 
 // @public (undocumented)
@@ -652,9 +645,7 @@ export class ShapeResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: ShapeCreateInput): Promise<Shape>;
     get(id: string): Promise<Shape>;
-    list(canvasId: string): Promise<{
-        items: Shape[];
-    }>;
+    list(canvasId: string): Promise<Page<Shape>>;
 }
 
 // @public (undocumented)

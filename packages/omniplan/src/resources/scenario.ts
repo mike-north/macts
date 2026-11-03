@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Scenario } from '../types.js'
 
@@ -23,8 +24,8 @@ export class ScenarioResourceClient {
   /**
    * List all scenarios, as one page.
    */
-  async list(): Promise<{ items: Scenario[] }> {
-    return this.#http.rpc<{ items: Scenario[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Scenario>> {
+    return this.#http.rpc<Page<Scenario>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

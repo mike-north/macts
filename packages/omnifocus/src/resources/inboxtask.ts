@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { InboxTask, InboxTaskCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class InboxTaskResourceClient {
   /**
    * List all inbox tasks, as one page.
    */
-  async list(): Promise<{ items: InboxTask[] }> {
-    return this.#http.rpc<{ items: InboxTask[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<InboxTask>> {
+    return this.#http.rpc<Page<InboxTask>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

@@ -6,9 +6,12 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Attendee {
@@ -33,7 +36,7 @@ export interface Calendar {
 }
 
 // @public
-export interface CalendarClient {
+export interface CalendarClient extends ClientBrand<CalendarResources> {
     readonly calendars: CalendarResourceClient;
     readonly events: EventResourceClient;
     reloadCalendars(options?: CallOptions): Promise<void>;
@@ -42,7 +45,7 @@ export interface CalendarClient {
 }
 
 // @public
-export const calendarContract: AppContract<CalendarClient>;
+export const calendarContract: AppContract<CalendarClient, CalendarResources>;
 
 // @public
 export interface CalendarCreateInput {
@@ -61,6 +64,20 @@ export interface CalendarResourceClient {
     get(id: string, options?: CallOptions): Promise<Calendar>;
     list(options?: CallOptions): Promise<Page<Calendar>>;
 }
+
+// @public
+export type CalendarResources = Readonly<{
+    Calendar: ResourceDescriptor<Calendar, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.calendars.get';
+        readonly list: 'calendar.calendars.list';
+    };
+    Event: ResourceDescriptor<Event_2, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'calendar.events.get';
+        readonly list: 'calendar.events.list';
+    };
+}>;
 
 // @public
 export interface CalendarUpdateInput {

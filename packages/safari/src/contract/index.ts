@@ -22,9 +22,9 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -109,9 +109,11 @@ export interface TabUpdateInput {
 
 /**
  * The Safari client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link safariContract}.
+ * client factory creates one from {@link safariContract}. Its type carries the contract's resource
+ * table, {@link SafariResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface SafariClient {
+export interface SafariClient extends ClientBrand<SafariResources> {
   /**
    * Add a new Reading List item with the given URL. Allows a custom title and preview text to be
    * specified.
@@ -158,47 +160,24 @@ export interface SafariClient {
   showCreditCardSettings(options?: CallOptions): Promise<void>
 }
 
-const documentRecordType: ValueType<Document> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The document name' }),
-    id: t.string({ description: 'The unique identifier of the document' }),
-    url: t.nullable(t.string(), { description: 'The current URL' }),
-  },
-  { description: 'A Safari document (window)' }
-)
-
-const tabRecordType: ValueType<Tab> = t.record(
-  {
-    name: t.nullable(t.string(), { description: 'The tab name' }),
-    id: t.string({ description: 'The unique identifier of the tab' }),
-    url: t.nullable(t.string(), { description: 'The tab URL' }),
-    source: t.nullable(t.string(), {
-      description: 'The HTML source of the web page currently loaded in the tab',
-    }),
-    text: t.nullable(t.string(), {
-      description: 'The text of the web page currently loaded in the tab',
-    }),
-  },
-  { description: 'A Safari tab' }
-)
+/**
+ * The type of the resource table of {@link safariContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type SafariResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link SafariResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<SafariClient>['resources'] = {
-  Document: {
-    name: 'Document',
-    record: documentRecordType,
-    id: t.string({ description: 'The unique identifier of the document' }),
-  },
-  Tab: {
-    name: 'Tab',
-    record: tabRecordType,
-    id: t.string({ description: 'The unique identifier of the tab' }),
-  },
-}
+const resources = {} satisfies SafariResources
 
 const appAddReadingListItemOperation: OperationDescriptor<
   { readonly andPreviewText?: string | undefined; readonly withTitle?: string | undefined },
@@ -440,7 +419,7 @@ function bind(runtime: ClientRuntime): SafariClient {
  * The Safari contract. Pass it to a client factory to obtain a
  * {@link SafariClient}.
  */
-export const safariContract: AppContract<SafariClient> = {
+export const safariContract: AppContract<SafariClient, SafariResources> = {
   app: 'safari',
   operations,
   resources,

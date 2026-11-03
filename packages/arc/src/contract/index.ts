@@ -22,11 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type Integer,
   type ObjectReferenceVariant,
   type OperationDescriptor,
-  type ValueType,
 } from '@macts/contracts'
 
 const t = ValueTypes
@@ -235,9 +235,11 @@ export type SpaceUpdateInput = Record<string, never>
 
 /**
  * The Arc client: one namespace per resource that has operations, plus the app's own commands. A
- * client factory creates one from {@link arcContract}.
+ * client factory creates one from {@link arcContract}. Its type carries the contract's resource
+ * table, {@link ArcResources}, so references can be bound to it by resource; the brand has no
+ * runtime member.
  */
-export interface ArcClient {
+export interface ArcClient extends ClientBrand<ArcResources> {
   /**
    * Make a new object.
    *
@@ -273,85 +275,24 @@ export interface ArcClient {
   focus(options?: CallOptions): Promise<void>
 }
 
-const windowRecordType: ValueType<Window> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier of the window.' }),
-    name: t.nullable(t.string(), { description: 'The full title of the window.' }),
-    index: t.nullable(t.integer(), {
-      description: 'The index of the window, ordered front to back.',
-    }),
-    closeable: t.nullable(t.boolean(), { description: 'Whether the window has a close box.' }),
-    minimizable: t.nullable(t.boolean(), { description: 'Whether the window can be minimized.' }),
-    minimized: t.nullable(t.boolean(), {
-      description: 'Whether the window is currently minimized.',
-    }),
-    resizable: t.nullable(t.boolean(), { description: 'Whether the window can be resized.' }),
-    visible: t.nullable(t.boolean(), { description: 'Whether the window is currently visible.' }),
-    zoomable: t.nullable(t.boolean(), { description: 'Whether the window can be zoomed.' }),
-    zoomed: t.nullable(t.boolean(), { description: 'Whether the window is currently zoomed.' }),
-    activeTab: t.nullable(
-      t.reference<Tab, string, 'Tab'>(() => arcContract, 'Tab', 'one'),
-      { description: 'Returns the currently selected tab' }
-    ),
-    activeSpace: t.nullable(
-      t.reference<Space, string, 'Space'>(() => arcContract, 'Space', 'one'),
-      { description: 'Returns the currently active space' }
-    ),
-    incognito: t.nullable(t.boolean(), {
-      description: 'Whether the window is an incognito window.',
-    }),
-    mode: t.nullable(t.string(), {
-      description:
-        "Represents the mode of the window which can be 'normal' or 'incognito', can be set only once during creation of the window.",
-    }),
-  },
-  { description: "An application's window" }
-)
-
-const tabRecordType: ValueType<Tab> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier of the tab.' }),
-    title: t.nullable(t.string(), { description: 'The full title of the tab.' }),
-    uRL: t.nullable(t.string(), { description: 'The url of the tab.' }),
-    loading: t.nullable(t.boolean(), { description: 'Is loading?' }),
-    location: t.nullable(t.string(), {
-      description:
-        "Represents the location of the tab in the sidebar. Can be 'topApp', 'pinned', or 'unpinned'.",
-    }),
-  },
-  { description: "A window's tab" }
-)
-
-const spaceRecordType: ValueType<Space> = t.record(
-  {
-    id: t.string({ description: 'The unique identifier of the space.' }),
-    title: t.nullable(t.string(), { description: 'The full title of the space.' }),
-  },
-  { description: 'A space' }
-)
+/**
+ * The type of the resource table of {@link arcContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
+ */
+export type ArcResources = Readonly<Record<never, never>>
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The resource table: the implementation of {@link ArcResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
  */
-const resources: AppContract<ArcClient>['resources'] = {
-  Window: {
-    name: 'Window',
-    record: windowRecordType,
-    id: t.string({ description: 'The unique identifier of the window.' }),
-  },
-  Tab: {
-    name: 'Tab',
-    record: tabRecordType,
-    id: t.string({ description: 'The unique identifier of the tab.' }),
-  },
-  Space: {
-    name: 'Space',
-    record: spaceRecordType,
-    id: t.string({ description: 'The unique identifier of the space.' }),
-  },
-}
+const resources = {} satisfies ArcResources
 
 const appMakeOperation: OperationDescriptor<
   { readonly new: string; readonly withProperties?: unknown },
@@ -633,7 +574,7 @@ function bind(runtime: ClientRuntime): ArcClient {
  * The Arc contract. Pass it to a client factory to obtain a
  * {@link ArcClient}.
  */
-export const arcContract: AppContract<ArcClient> = {
+export const arcContract: AppContract<ArcClient, ArcResources> = {
   app: 'arc',
   operations,
   resources,

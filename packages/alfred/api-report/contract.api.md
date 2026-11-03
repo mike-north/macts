@@ -6,9 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
-export interface AlfredClient {
+export interface AlfredClient extends ClientBrand<AlfredResources> {
     action(items: readonly string[], asType?: string, options?: CallOptions): Promise<void>;
     browse(path: string, options?: CallOptions): Promise<void>;
     reloadWorkflow(workflow: string, options?: CallOptions): Promise<void>;
@@ -21,7 +22,10 @@ export interface AlfredClient {
 }
 
 // @public
-export const alfredContract: AppContract<AlfredClient>;
+export const alfredContract: AppContract<AlfredClient, AlfredResources>;
+
+// @public
+export type AlfredResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Application {

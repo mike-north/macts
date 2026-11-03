@@ -6,8 +6,11 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -99,7 +102,7 @@ export interface NoteResourceClient {
 }
 
 // @public
-export interface NotesClient {
+export interface NotesClient extends ClientBrand<NotesResources> {
     readonly accounts: AccountResourceClient;
     readonly attachments: AttachmentResourceClient;
     readonly folders: FolderResourceClient;
@@ -107,7 +110,31 @@ export interface NotesClient {
 }
 
 // @public
-export const notesContract: AppContract<NotesClient>;
+export const notesContract: AppContract<NotesClient, NotesResources>;
+
+// @public
+export type NotesResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.accounts.get';
+        readonly list: 'notes.accounts.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.folders.get';
+        readonly list: 'notes.folders.list';
+    };
+    Note: ResourceDescriptor<Note, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.notes.get';
+        readonly list: 'notes.notes.list';
+    };
+    Attachment: ResourceDescriptor<Attachment, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'notes.attachments.get';
+        readonly list: 'notes.attachments.list';
+    };
+}>;
 
 // @public
 export interface NoteUpdateInput {

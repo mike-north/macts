@@ -6,6 +6,7 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
@@ -230,7 +231,7 @@ export interface MailboxUpdateInput {
 }
 
 // @public
-export interface MailClient {
+export interface MailClient extends ClientBrand<MailResources> {
     checkForNewMail(options?: CallOptions): Promise<void>;
     _delete(options?: CallOptions): Promise<void>;
     duplicate(to?: string, withProperties?: unknown, options?: CallOptions): Promise<void>;
@@ -246,7 +247,10 @@ export interface MailClient {
 }
 
 // @public
-export const mailContract: AppContract<MailClient>;
+export const mailContract: AppContract<MailClient, MailResources>;
+
+// @public
+export type MailResources = Readonly<Record<never, never>>;
 
 // @public
 export interface Message {

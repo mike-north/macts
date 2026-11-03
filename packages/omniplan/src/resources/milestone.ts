@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Milestone, MilestoneCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class MilestoneResourceClient {
   /**
    * List all milestones, as one page.
    */
-  async list(): Promise<{ items: Milestone[] }> {
-    return this.#http.rpc<{ items: Milestone[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Milestone>> {
+    return this.#http.rpc<Page<Milestone>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

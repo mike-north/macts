@@ -6,11 +6,14 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
 import { Rgb } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Folder {
@@ -59,13 +62,27 @@ export interface ShortcutResourceClient {
 }
 
 // @public
-export interface ShortcutsClient {
+export interface ShortcutsClient extends ClientBrand<ShortcutsResources> {
     readonly folders: FolderResourceClient;
     readonly shortcuts: ShortcutResourceClient;
 }
 
 // @public
-export const shortcutsContract: AppContract<ShortcutsClient>;
+export const shortcutsContract: AppContract<ShortcutsClient, ShortcutsResources>;
+
+// @public
+export type ShortcutsResources = Readonly<{
+    Shortcut: ResourceDescriptor<Shortcut, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'shortcuts.shortcuts.get';
+        readonly list: 'shortcuts.shortcuts.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'shortcuts.folders.get';
+        readonly list: 'shortcuts.folders.list';
+    };
+}>;
 
 // @public
 export interface ShortcutUpdateInput {

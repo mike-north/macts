@@ -6,7 +6,10 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export type DetailLevel = 'mini' | 'basic' | 'full';
@@ -36,13 +39,22 @@ export interface DocumentUpdateInput {
 }
 
 // @public
-export interface SystemInformationClient {
+export interface SystemInformationClient extends ClientBrand<SystemInformationResources> {
     readonly documents: DocumentResourceClient;
     send(options?: CallOptions): Promise<void>;
 }
 
 // @public
-export const systemInformationContract: AppContract<SystemInformationClient>;
+export const systemInformationContract: AppContract<SystemInformationClient, SystemInformationResources>;
+
+// @public
+export type SystemInformationResources = Readonly<{
+    Document: ResourceDescriptor<Document, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'system-information.documents.get';
+        readonly list: 'system-information.documents.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Page } from '@macts/contracts';
 import { z } from 'zod';
 
 // @public
@@ -84,9 +85,7 @@ export class CalendarResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     create(input: CalendarCreateInput): Promise<Calendar>;
     get(id: string): Promise<Calendar>;
-    list(): Promise<{
-        items: Calendar[];
-    }>;
+    list(): Promise<Page<Calendar>>;
 }
 
 // @public (undocumented)
@@ -187,9 +186,7 @@ export class EventResourceClient {
     create(input: EventCreateInput): Promise<Event_2>;
     delete(calendarId: string, id: string): Promise<void>;
     get(calendarId: string, id: string): Promise<Event_2>;
-    list(calendarId: string): Promise<{
-        items: Event_2[];
-    }>;
+    list(calendarId: string): Promise<Page<Event_2>>;
     show(): Promise<void>;
     update(calendarId: string, id: string, input: EventUpdateInput): Promise<Event_2>;
 }

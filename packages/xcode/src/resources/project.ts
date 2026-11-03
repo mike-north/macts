@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Project } from '../types.js'
 
@@ -23,10 +24,8 @@ export class ProjectResourceClient {
   /**
    * List the projects of one workspace document, as one page.
    */
-  async list(workspaceName: string): Promise<{ items: Project[] }> {
-    return this.#http.rpc<{ items: Project[] }>(`${this.#app}.${this.#resource}.list`, {
-      workspaceName,
-    })
+  async list(workspaceName: string): Promise<Page<Project>> {
+    return this.#http.rpc<Page<Project>>(`${this.#app}.${this.#resource}.list`, { workspaceName })
   }
 
   /**

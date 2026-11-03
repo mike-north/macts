@@ -6,10 +6,13 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Album {
@@ -132,7 +135,7 @@ export type MomentCreateInput = Record<string, never>;
 export type MomentUpdateInput = Record<string, never>;
 
 // @public
-export interface PhotosClient {
+export interface PhotosClient extends ClientBrand<PhotosResources> {
     add(mediaItems: readonly string[], to: string, options?: CallOptions): Promise<void>;
     readonly albums: AlbumResourceClient;
     _delete(target: string, options?: CallOptions): Promise<void>;
@@ -152,7 +155,26 @@ export interface PhotosClient {
 }
 
 // @public
-export const photosContract: AppContract<PhotosClient>;
+export const photosContract: AppContract<PhotosClient, PhotosResources>;
+
+// @public
+export type PhotosResources = Readonly<{
+    MediaItem: ResourceDescriptor<MediaItem, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.mediaItems.get';
+        readonly list: 'photos.mediaItems.list';
+    };
+    Album: ResourceDescriptor<Album, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.albums.get';
+        readonly list: 'photos.albums.list';
+    };
+    Folder: ResourceDescriptor<Folder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'photos.folders.get';
+        readonly list: 'photos.folders.list';
+    };
+}>;
 
 // (No @packageDocumentation comment for this package)
 

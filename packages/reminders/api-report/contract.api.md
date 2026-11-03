@@ -6,9 +6,12 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface Account {
@@ -99,14 +102,32 @@ export interface ReminderResourceClient {
 }
 
 // @public
-export interface RemindersClient {
+export interface RemindersClient extends ClientBrand<RemindersResources> {
     readonly accounts: AccountResourceClient;
     readonly lists: ListResourceClient;
     readonly reminders: ReminderResourceClient;
 }
 
 // @public
-export const remindersContract: AppContract<RemindersClient>;
+export const remindersContract: AppContract<RemindersClient, RemindersResources>;
+
+// @public
+export type RemindersResources = Readonly<{
+    Account: ResourceDescriptor<Account, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'reminders.accounts.list';
+    };
+    List: ResourceDescriptor<List, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.lists.get';
+        readonly list: 'reminders.lists.list';
+    };
+    Reminder: ResourceDescriptor<Reminder, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'reminders.reminders.get';
+        readonly list: 'reminders.reminders.list';
+    };
+}>;
 
 // @public
 export interface ReminderUpdateInput {

@@ -6,14 +6,18 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 
 // @public
-export interface ScreenSharingClient {
+export interface ScreenSharingClient extends ClientBrand<ScreenSharingResources> {
     getURL(url: string, options?: CallOptions): Promise<void>;
 }
 
 // @public
-export const screenSharingContract: AppContract<ScreenSharingClient>;
+export const screenSharingContract: AppContract<ScreenSharingClient, ScreenSharingResources>;
+
+// @public
+export type ScreenSharingResources = Readonly<Record<never, never>>;
 
 // (No @packageDocumentation comment for this package)
 

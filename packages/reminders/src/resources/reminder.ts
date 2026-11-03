@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Reminder, ReminderCreateInput } from '../types.js'
 
@@ -27,15 +28,12 @@ export class ReminderResourceClient {
   async list(
     listId: string,
     page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: Reminder[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: Reminder[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-        listId,
-      }
-    )
+  ): Promise<Page<Reminder>> {
+    return this.#http.rpc<Page<Reminder>>(`${this.#app}.${this.#resource}.list`, {
+      ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
+      ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
+      listId,
+    })
   }
 
   /**

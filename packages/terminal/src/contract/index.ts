@@ -22,9 +22,11 @@ import {
   ValueTypes,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type ClientRuntime,
   type OperationDescriptor,
   type Page,
+  type ResourceDescriptor,
   type ValueType,
 } from '@macts/contracts'
 
@@ -281,9 +283,11 @@ export interface SettingsSetResourceClient {
 
 /**
  * The Terminal client: one namespace per resource that has operations, plus the app's own commands.
- * A client factory creates one from {@link terminalContract}.
+ * A client factory creates one from {@link terminalContract}. Its type carries the contract's
+ * resource table, {@link TerminalResources}, so references can be bound to it by resource; the
+ * brand has no runtime member.
  */
-export interface TerminalClient {
+export interface TerminalClient extends ClientBrand<TerminalResources> {
   /** A Terminal window */
   readonly windows: WindowResourceClient
   /** A Terminal tab */
@@ -346,11 +350,39 @@ const settingsSetRecordType: ValueType<SettingsSet> = t.record(
 )
 
 /**
- * Every resource, keyed by manifest resource key: its record, its identifier
- * (when it has one), and the operations that resolve references to it. This
- * table is also the registry that reference value types read, lazily.
+ * The type of the resource table of {@link terminalContract}: every resource a
+ * reference can name, keyed by manifest resource key, with its record type,
+ * its identifier type (when it has one), and the operations that resolve
+ * references to it. A client created from the contract carries it, so
+ * `bindReference` admits only references the contract can resolve.
  */
-const resources: AppContract<TerminalClient>['resources'] = {
+export type TerminalResources = Readonly<{
+  Window: ResourceDescriptor<Window, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.windows.get'
+    readonly list: 'terminal.windows.list'
+  }
+  Tab: ResourceDescriptor<Tab, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.tabs.get'
+    readonly list: 'terminal.tabs.list'
+  }
+  SettingsSet: ResourceDescriptor<SettingsSet, string> & {
+    readonly id: ValueType<string>
+    readonly get: 'terminal.settingsSets.get'
+    readonly list: 'terminal.settingsSets.list'
+  }
+}>
+
+/**
+ * The resource table: the implementation of {@link TerminalResources}, which
+ * declares it, so the two are one table. It lists each resource that records
+ * a `get` or a `list`. A resource with neither is left out, because no
+ * reference to it can be resolved at any position or in any form (phases/13
+ * D7, "Resolvable targets"). This table is also the registry that reference
+ * value types read, lazily.
+ */
+const resources = {
   Window: {
     name: 'Window',
     record: windowRecordType,
@@ -372,7 +404,7 @@ const resources: AppContract<TerminalClient>['resources'] = {
     get: 'terminal.settingsSets.get',
     list: 'terminal.settingsSets.list',
   },
-}
+} satisfies TerminalResources
 
 const windowListOperation: OperationDescriptor<Record<string, never>, Page<Window>> = {
   id: 'terminal.windows.list',
@@ -533,7 +565,7 @@ function bind(runtime: ClientRuntime): TerminalClient {
  * The Terminal contract. Pass it to a client factory to obtain a
  * {@link TerminalClient}.
  */
-export const terminalContract: AppContract<TerminalClient> = {
+export const terminalContract: AppContract<TerminalClient, TerminalResources> = {
   app: 'terminal',
   operations,
   resources,

@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Task, TaskCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class TaskResourceClient {
   /**
    * List all tasks, as one page.
    */
-  async list(): Promise<{ items: Task[] }> {
-    return this.#http.rpc<{ items: Task[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Task>> {
+    return this.#http.rpc<Page<Task>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

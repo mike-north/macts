@@ -6,8 +6,11 @@
 
 import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
+import { ClientBrand } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
 import { Page } from '@macts/contracts';
+import { ResourceDescriptor } from '@macts/contracts';
+import { ValueType } from '@macts/contracts';
 
 // @public
 export interface AutomatorAction {
@@ -61,7 +64,7 @@ export interface AutomatorActionUpdateInput {
 }
 
 // @public
-export interface AutomatorClient {
+export interface AutomatorClient extends ClientBrand<AutomatorResources> {
     add(object: unknown, to: unknown, atIndex?: Integer, options?: CallOptions): Promise<void>;
     readonly automatorActions: AutomatorActionResourceClient;
     remove(object: unknown, options?: CallOptions): Promise<void>;
@@ -72,7 +75,34 @@ export interface AutomatorClient {
 }
 
 // @public
-export const automatorContract: AppContract<AutomatorClient>;
+export const automatorContract: AppContract<AutomatorClient, AutomatorResources>;
+
+// @public
+export type AutomatorResources = Readonly<{
+    Workflow: ResourceDescriptor<Workflow, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.workflows.get';
+        readonly list: 'automator.workflows.list';
+    };
+    AutomatorAction: ResourceDescriptor<AutomatorAction, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.automatorActions.get';
+        readonly list: 'automator.automatorActions.list';
+    };
+    Variable: ResourceDescriptor<Variable, string> & {
+        readonly id: ValueType<string>;
+        readonly get: 'automator.variables.get';
+        readonly list: 'automator.variables.list';
+    };
+    Setting: ResourceDescriptor<Setting, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.settings.list';
+    };
+    RequiredResource: ResourceDescriptor<RequiredResource, string> & {
+        readonly id: ValueType<string>;
+        readonly list: 'automator.requiredResources.list';
+    };
+}>;
 
 // @public
 export interface RequiredResource {

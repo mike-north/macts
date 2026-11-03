@@ -3,6 +3,7 @@
  * Auto-generated - do not edit.
  */
 
+import type { Page } from '@macts/contracts'
 import type { HttpClient } from '../client.js'
 import type { Window, WindowCreateInput } from '../types.js'
 
@@ -23,8 +24,8 @@ export class WindowResourceClient {
   /**
    * List all windows, as one page.
    */
-  async list(): Promise<{ items: Window[] }> {
-    return this.#http.rpc<{ items: Window[] }>(`${this.#app}.${this.#resource}.list`)
+  async list(): Promise<Page<Window>> {
+    return this.#http.rpc<Page<Window>>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

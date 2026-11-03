@@ -25,7 +25,9 @@ import {
   InternalError,
   type AppContract,
   type CallOptions,
+  type ClientBrand,
   type InvocationContext,
+  type ResourceTable,
 } from '@macts/contracts'
 import {
   createBearerCredential,
@@ -87,12 +89,13 @@ type Setup = { readonly ok: true } | { readonly ok: false; readonly cause: unkno
  *
  * @param app - The app's generated contract.
  * @param options - The token, and optional governance and executor.
- * @returns The app's client.
+ * @returns The app's client. Its type also carries the contract's resource
+ *   table, which `bindReference` reads; the client has no member for it.
  */
-export function createClient<Client>(
-  app: AppContract<Client>,
+export function createClient<Client, Resources extends ResourceTable>(
+  app: AppContract<Client, Resources>,
   options: LocalClientOptions
-): Client {
+): Client & ClientBrand<Resources> {
   const credential = createBearerCredential(options.token)
   const runtime = createRuntime({
     executor: options.executor ?? createNativeExecutor(),
