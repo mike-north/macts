@@ -1580,6 +1580,42 @@ Selectors and collections address the app through mechanisms other than an
 identifier lookup, and container chains need the parent's own addressing, so
 each is a separate extension of this scope.
 
+The provider resolves references (resolution, below) within the same scope,
+plus identity collections whose entries are in it:
+
+- A single identity reference with no container, to a top-level resource with
+  an identifier, resolves to its object's record. The object is found by the
+  codec exactly as an input reference is converted: the resolution script
+  takes the reference as its input at a single reference position, so there
+  is no second addressing. Its body reads the object with the get body's
+  record read, and the result is encoded by the request's `outputPlan` in the
+  automation process, as `execute` encodes an operation result. A missing
+  object is `TargetNotFoundError` naming the referenced resource.
+- An identity collection of such references takes its entries as a list of
+  single references, so each is found the same way, all before any record is
+  read, and read the same way, in entry order, in one automation process. The
+  result is validated against the `list` item plan although it is read with
+  the get record read. That is correct because, for every resource with both,
+  the get record plan equals the list item plan and the get body reads the
+  same properties as the list body; a test over every shipped contract
+  enforces both. A missing entry is `TargetNotFoundError` with `entryIndex`,
+  the first missing entry.
+- An identity collection with no entries resolves to `[]` without starting an
+  automation process. Permission, governance, approval and audit still run
+  for it, as for any resolution: the runtime runs them as the resource's
+  `list` (resolution, steps 1 to 6, below) before the executor is called, and
+  only the automation process is skipped.
+- Every other reference fails as `InternalError` whose message names the form
+  the provider does not resolve, before any automation runs: every selector
+  form; a reference, or an identity-collection entry, with a container; and a
+  reference to a resource that is not top-level, has no identifier, has no
+  `get`, or has no entry in `resourcePlans`. Whether the resource is in scope
+  is read from the script's reference table, the one the codec reads, so
+  resolution and conversion share one boundary.
+
+Identity collections at operation positions still do not convert: only
+resolution reads them, entry by entry.
+
 **Binding.** References are live objects bound to the client that decoded
 them, via `DecodeContext.bindReference`. The binder receives decoded
 `ReferenceData` (the data-only form of each variant): `app` set from the
@@ -1886,10 +1922,12 @@ execute(request), resolve(request) }`.
   `InvalidSelectionError` for an index or range past the end,
   `TargetNotFoundError` with `entryIndex` for a missing identity-collection
   entry, and `[]` for an empty identity collection.
-- The native JXA executor is one implementation. Its `resolve` fails with
-  `InternalError`: the macOS provider does not resolve references. It does
-  convert references at operation positions, within the scope in D7 (native
-  conversion scope).
+- The native JXA executor is one implementation. It converts references at
+  operation positions, and its `resolve` resolves references, within the
+  scope in D7 (native conversion scope): single identity references with no
+  container to top-level resources with an identifier, and identity
+  collections of them. It fails every other reference as `InternalError`,
+  before any automation runs.
 - **Resource plans.** `ResourcePlanTable` is
   `Readonly<Record<string, { readonly id?: ValuePlan }>>`, keyed by manifest
   resource key and declared in `@macts/contracts` next to `ValuePlan`. `id` is

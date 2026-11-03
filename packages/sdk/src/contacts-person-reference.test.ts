@@ -18,7 +18,6 @@
  * @see ../../../phases/13-sdk-value-and-execution-contracts.md (D4, D7, D9)
  */
 
-import { createContext, runInContext } from 'node:vm'
 import { afterAll, describe, expect, it, vi } from 'vitest'
 import {
   NATIVE_CODEC,
@@ -27,7 +26,7 @@ import {
   type NativeScript,
   type NativeTransport,
 } from '@macts/core'
-import { composeNativeScript, parseNativeOutcome } from '@macts/core/testing'
+import { standInTransport } from '@macts/core/testing'
 import {
   AppUnavailableError,
   InternalError,
@@ -113,26 +112,6 @@ function standInContacts() {
     shouldEnableAction: command('shouldEnableAction', true),
   }
   return { app, person, commands }
-}
-
-/**
- * A transport that evaluates the composed script against `app` in an isolated
- * context, and keeps every script it ran in `scripts`.
- */
-function standInTransport(app: object, scripts: NativeScript[] = []): NativeTransport {
-  return {
-    run(script) {
-      scripts.push(script)
-      const context = createContext({
-        ObjC: { import: () => undefined },
-        Application: () => app,
-      })
-      const stdout: unknown = runInContext(composeNativeScript(script, NATIVE_CODEC), context)
-      const outcome = parseNativeOutcome(String(stdout))
-      if (typeof outcome === 'string') throw new Error(`malformed outcome: ${outcome}`)
-      return Promise.resolve(outcome)
-    },
-  }
 }
 
 /** A Contacts client allowed to call `id`, whose executor uses `transport`. */

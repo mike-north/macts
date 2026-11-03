@@ -1,6 +1,7 @@
 /**
  * Native invocation bodies: the automation-process JavaScript that carries out
- * one manifest-defined operation against a target app.
+ * one manifest-defined operation against a target app, or reads the records a
+ * resolved reference denotes.
  *
  * Each body is a function body run as `(app, args, page)` (see
  * `NativeScript.body`): `app` is the target application, `args` is the
@@ -290,8 +291,7 @@ function readOutputProperties(
   resource: Resource | undefined,
   itemLocal: string
 ): string {
-  const keys =
-    resource === undefined ? ['name'] : outputProperties(manifest, resource).map(([key]) => key)
+  const keys = itemReadKeys(manifest, resource)
   const native = (key: string): string => nativePropertyName(resource, key)
   const readOnItsOwn = (key: string): string =>
     `try { ${member('obj', key)} = ${member(itemLocal, native(key))}(); } catch (e) {}`
@@ -307,6 +307,61 @@ function readOutputProperties(
     ...keys.map(readOnItsOwn),
     '}'
   )
+}
+
+/**
+ * The public keys of the properties one item's record read takes
+ * ({@link readOutputProperties}): the resource's properties that its output
+ * record declares (`outputProperties`), or `name` for a body with no resource.
+ */
+function itemReadKeys(manifest: AppManifest, resource: Resource | undefined): string[] {
+  return resource === undefined
+    ? ['name']
+    : outputProperties(manifest, resource).map(([key]) => key)
+}
+
+/**
+ * The public keys a list body reads for each item: the list's output
+ * properties ({@link resolveListOutputProperties}), less those the output
+ * record leaves out (`omittedOutputProperties`). The identifier is never left
+ * out, so it is always read.
+ */
+function listReadKeys(manifest: AppManifest, resource: Resource | undefined): string[] {
+  const omitted: ReadonlyMap<string, unknown> =
+    resource === undefined ? new Map() : omittedOutputProperties(manifest, resource)
+  return resolveListOutputProperties(resource).filter((key) => !omitted.has(key))
+}
+
+/** The record keys the native bodies read for one resource, by body. */
+export interface NativeReadKeys {
+  /** What a get (and a resolved reference) reads from one item. */
+  readonly get: readonly string[]
+  /** What a list reads across the collection, for each item. */
+  readonly list: readonly string[]
+}
+
+/**
+ * The record keys a get body and a list body read for `resource`.
+ *
+ * @remarks
+ * A resolved identity collection is read with the get body's record read but
+ * validated against the list's item plan, so the two must read the same keys.
+ * They do while the resource's primary identifier is one of its usable
+ * properties: a list also reads the identifier when it is not
+ * ({@link resolveListOutputProperties}). Both leave out the same fields, the
+ * ones the output record does not declare (`omittedOutputProperties`). A list
+ * never reads a declared identifier its targeting matches by another
+ * property, and a get's guarded read of it yields nothing, so that key is in
+ * both sets yet in neither record.
+ *
+ * @param manifest - The validated manifest of the resource's app.
+ * @param resource - The resource definition from the manifest.
+ */
+export function nativeReadKeys(
+  manifest: AppManifest,
+  resource: Resource | undefined
+): NativeReadKeys {
+  return { get: itemReadKeys(manifest, resource), list: listReadKeys(manifest, resource) }
 }
 
 /**
@@ -1097,9 +1152,7 @@ function buildListBody(
 ): ResourceBody {
   // The identifier is always read; every other property is read only when the
   // output record declares it (see `outputProperties`).
-  const omitted: ReadonlyMap<string, unknown> =
-    resource === undefined ? new Map() : omittedOutputProperties(manifest, resource)
-  const allPropNames = resolveListOutputProperties(resource).filter((p) => !omitted.has(p))
+  const allPropNames = listReadKeys(manifest, resource)
   const targeting = resolveIdentifierTargeting(resource)
   const runtimeIdProperty = targeting?.property
   const declaredIdProperty = resolvePrimaryIdentifierProperty(resource)
@@ -1329,6 +1382,77 @@ function buildUpdateBody(
     'return obj;'
   )
   return { body, identifierArguments: identifierArgumentsOf(parentScope, identifierParam) }
+}
+
+// ---------------------------------------------------------------------------
+// Reference resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * The input key under which a resolution body receives the app's object a
+ * single reference names, already found by the codec.
+ */
+export const RESOLUTION_TARGET_ARGUMENT = 'target'
+
+/**
+ * The input key under which a resolution body receives the app's objects an
+ * identity collection's entries name, already found by the codec, in entry
+ * order.
+ */
+export const RESOLUTION_ENTRIES_ARGUMENT = 'entries'
+
+/**
+ * Build the body that reads the record, or records, a resolved reference
+ * denotes.
+ *
+ * @remarks
+ * The body never addresses the app itself. The codec decodes the reference
+ * into the app's objects before the body runs, exactly as it converts a
+ * reference an operation takes as input ({@link referenceAddressing}), so the
+ * object a reference resolves to is the one the resource's get finds, and a
+ * missing one fails before any property is read. The body then reads each
+ * object with the get body's record read ({@link readOutputProperties}), so a
+ * resolved record is the record a get of the same identifier returns.
+ *
+ * - `'one'`: the object at `args.target`, read into one record.
+ * - `'many'`: each object of the list at `args.entries`, read into one record
+ *   per object, in entry order.
+ *
+ * @param manifest - The validated manifest of the target app.
+ * @param resourceKey - The manifest key of the referenced resource.
+ * @param cardinality - Whether one object or a list of objects is read.
+ * @throws `InternalError` when the manifest does not declare `resourceKey`.
+ */
+export function buildResolutionBody(
+  manifest: AppManifest,
+  resourceKey: string,
+  cardinality: 'one' | 'many'
+): string {
+  const resource = Object.hasOwn(manifest.resources, resourceKey)
+    ? manifest.resources[resourceKey]
+    : undefined
+  if (resource === undefined) {
+    throw new InternalError('The reference does not match any resource of its app.', {})
+  }
+  if (cardinality === 'one') {
+    return lines(
+      `var item = ${argument(RESOLUTION_TARGET_ARGUMENT)};`,
+      readOutputProperties(manifest, resource, 'item'),
+      'return obj;'
+    )
+  }
+  return lines(
+    'function readRecord(item) {',
+    readOutputProperties(manifest, resource, 'item'),
+    'return obj;',
+    '}',
+    `var targets = ${argument(RESOLUTION_ENTRIES_ARGUMENT)};`,
+    'var result = [];',
+    'for (var i = 0; i < targets.length; i++) {',
+    'result.push(readRecord(targets[i]));',
+    '}',
+    'return result;'
+  )
 }
 
 /** The identifier keys a targeted body reads: the parent's (if any) and the item's. */
