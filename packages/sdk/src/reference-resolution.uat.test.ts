@@ -62,6 +62,7 @@ import {
   closeKeyStore,
   createApiKey,
   createLogger,
+  deleteKeyMetadata,
   revokeKey,
   setLogger,
   type GovernanceContext,
@@ -160,6 +161,19 @@ async function revokedKey(): Promise<string> {
 }
 
 /**
+ * A correctly signed key holding every library permission whose stored record
+ * is deleted before it is used, so the key store no longer knows it.
+ */
+async function unknownKey(): Promise<string> {
+  const key = await createApiKey({
+    name: 'Deleted reference resolution test',
+    permissions: [...ALL_PERMISSIONS],
+  })
+  deleteKeyMetadata(key.keyId)
+  return key.token
+}
+
+/**
  * Tokens the key store does not accept, with the reason verification gives
  * for each (phases/13 D5).
  */
@@ -170,6 +184,7 @@ const REJECTED_TOKENS = [
     reason: 'malformed',
   },
   { name: 'a revoked key', token: revokedKey, reason: 'revoked' },
+  { name: 'a signed key with no stored record', token: unknownKey, reason: 'invalid' },
 ] as const
 
 /** The books the library holds, in wire form, by ISBN. */
