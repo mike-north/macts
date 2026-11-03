@@ -1972,7 +1972,8 @@ reads windows:
   of that shape, holds more items than the window's size, or says more items
   remain after an empty page is an `UnexpectedValueError`.
 - The native body reads the length, checks the anchor and reads the page in
-  one request. An offset equal to the length gives an empty page with no
+  one automation process. Inside it, each read is its own app request (the
+  length, the anchor, the identifiers, one per property), as below. An offset equal to the length gives an empty page with no
   cursor. The item at `offset - 1` must still have the anchor's identifier;
   if it is missing or different, the read is `COLLECTION_CHANGED`.
 - How the body reads a page's items is the resource's page read,
