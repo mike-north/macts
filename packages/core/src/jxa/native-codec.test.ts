@@ -1432,6 +1432,130 @@ describe.each(IMPLEMENTATIONS)('%s', (_label, { decode, encode }) => {
     })
   })
 
+  // D4, two-phase decode: the whole input converts before the app is used.
+  // Every marker and validation failure happens with no access to the app,
+  // so an unconvertible value fails before anything reaches it, wherever it
+  // sits in the input. The app below fails the test on any access at all.
+  describe('reference decode: nothing reaches the app before the whole input converted', () => {
+    const FILE: ValuePlan = { kind: 'file' }
+    const FILE_SOURCE: ValuePlan = { kind: 'file-source' }
+
+    /**
+     * An application that fails the test on any read, call, or inspection of
+     * its members: decoding may hold it, but must not use it.
+     */
+    function untouchableApp(): object {
+      const touched = (): never => {
+        throw new Error('the application was used before the input converted')
+      }
+      return new Proxy(
+        {},
+        {
+          get: touched,
+          has: touched,
+          set: touched,
+          ownKeys: touched,
+          getOwnPropertyDescriptor: touched,
+          defineProperty: touched,
+          deleteProperty: touched,
+          getPrototypeOf: touched,
+        }
+      )
+    }
+
+    const untouchable = (): NativeCodecEnvironment => ({
+      app: untouchableApp(),
+      references: REFERENCES,
+    })
+
+    it.each([
+      ['a file', FILE, 'file'],
+      ['a file source', FILE_SOURCE, 'file-source'],
+    ])(
+      'fails %s value after a reference with the unsupported marker, before using the app',
+      (_label, laterPlan, kind) => {
+        const plan = recordOf({ for: required(PERSON_REF), file: required(laterPlan) })
+        expectCodecError(
+          () => decode({ for: identity('Person', 'p-1'), file: '/tmp/a' }, plan, untouchable()),
+          { direction: 'decode', path: ['file'], unsupportedKind: kind }
+        )
+      }
+    )
+
+    it.each([
+      ['a file', FILE, 'file'],
+      ['a file source', FILE_SOURCE, 'file-source'],
+    ])(
+      'fails %s value before a reference with the unsupported marker, before using the app',
+      (_label, earlierPlan, kind) => {
+        const plan = recordOf({ file: required(earlierPlan), for: required(PERSON_REF) })
+        expectCodecError(
+          () => decode({ file: '/tmp/a', for: identity('Person', 'p-1') }, plan, untouchable()),
+          { direction: 'decode', path: ['file'], unsupportedKind: kind }
+        )
+      }
+    )
+
+    it('fails an invalid value after a reference as invalid, before using the app', () => {
+      const plan = recordOf({ for: required(PERSON_REF), count: required(INTEGER) })
+      expectCodecError(
+        () => decode({ for: identity('Person', 'p-1'), count: 'seven' }, plan, untouchable()),
+        { direction: 'decode', path: ['count'] }
+      )
+    })
+
+    it('fails an unsupported reference after convertible ones, before using the app', () => {
+      expectCodecError(
+        () =>
+          decode(
+            [
+              identity('Person', 'p-1'),
+              identity('Person', 'p-2'),
+              selector('Person', { by: 'index', index: { integer: '0' } }),
+            ],
+            arrayOf(PERSON_REF),
+            untouchable()
+          ),
+        { direction: 'decode', path: [2], unsupportedKind: 'reference' }
+      )
+    })
+
+    it('fails a selector reference with the unsupported marker, before using the app', () => {
+      expectCodecError(
+        () => decode(selector('Person', { by: 'name', name: 'Ada' }), PERSON_REF, untouchable()),
+        { direction: 'decode', path: [], unsupportedKind: 'reference' }
+      )
+    })
+
+    it('puts each addressed object at its own position, in input order', () => {
+      // Phase two replaces each pending address where phase one left it.
+      const app = standInApp()
+      const plan = recordOf({
+        first: required(PERSON_REF),
+        count: required(INTEGER),
+        second: required(PERSON_REF),
+      })
+      const decoded = decode(
+        {
+          first: identity('Person', 'p-1'),
+          count: { integer: '3' },
+          second: identity('Person', 'p-2'),
+        },
+        plan,
+        environment(app)
+      )
+      expect(ownValue(decoded, 'first')).toBe(app.people.objects[0])
+      expect(ownValue(decoded, 'count')).toBe(3)
+      expect(ownValue(decoded, 'second')).toBe(app.people.objects[1])
+      expect(app.calls).toEqual([
+        'people.byId("p-1")',
+        'Person p-1.exists()',
+        'people.byId("p-2")',
+        'Person p-2.exists()',
+      ])
+    })
+  })
+
   describe('reference encode', () => {
     it('encodes an object as the identity reference that finds it again', () => {
       const app = standInApp()

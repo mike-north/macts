@@ -200,9 +200,9 @@ export interface NativeCodecEnvironment {
  * decode of `input` against `inputPlan`, then `body`, then encode of its
  * result against `outputPlan`, all inside one try/catch that yields a
  * {@link NativeOutcome}. Decoding and encoding receive `{ app, references }`,
- * because converting a reference addresses the app. Creating the application
- * object sends the app nothing, so a decode failure still means no command was
- * sent.
+ * because converting a reference addresses the app. No member of the app is
+ * read or called until the whole input has converted, so an input value that
+ * cannot convert fails before the app receives any event.
  */
 export interface NativeScript {
   /** Bundle identifier of the target application. */

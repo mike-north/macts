@@ -845,9 +845,14 @@ native values for arguments, and native results to wire values, before
   `lookup: 'byProperty'` addresses the first match of
   `app[collection].whose({ [property]: id })`. Only a resource whose resolving
   get records no parent (D10, command parents) has `addressing`.
-  - Decoding converts the reference's `id` by the `id` plan, addresses the
-    object, and requires its `exists()` to be `true`. A miss throws the codec
-    error with `missingResource`, before any command uses the object.
+  - Decoding runs in two phases. The first converts the whole input with no
+    access to the application: the reference's form, its resource's `id` plan
+    and `addressing`, and its `id` are checked and converted there, and the
+    reference becomes a pending address. Every validation failure and every
+    `unsupportedKind` failure, at any position, happens in this phase. Only
+    then does the second phase address each pending address's object, in
+    input order, and require its `exists()` to be `true`. A miss throws the
+    codec error with `missingResource`, before any command uses the object.
   - Encoding reads the object's identifier as `native[property]()`, converts
     it by the `id` plan, and emits
     `{ reference: { resource, form: 'identity', cardinality: 'one', id } }`.
@@ -912,11 +917,27 @@ as JSON string literals passed to `JSON.parse`, never as object literals: a
 field. The bundle ID is a JSON string literal, and the application object has
 `includeStandardAdditions` set before the body runs, as the bridge has always
 set it. The application object is created before the input is decoded,
-because decoding a reference addresses the app. Creating it sends the app no
-command, and the body runs only after the whole input decoded, so a decode
-failure still means no command was sent. `composeNativeScript` and
-`parseNativeOutcome` are exported, so a transport that runs scripts in a host
-of its own composes them and reads their output the same way. The script is passed to `osascript` without shell interpolation
+because finding a referenced object needs it.
+
+**Nothing reaches the app before the input converted.** No member of the
+application, or of any object it hands out, is read or called until every
+input value has converted. Creating the application object and setting
+`includeStandardAdditions` on it are the only uses before that point. Decoding's
+first phase converts the whole input without touching the application; only
+its second phase finds referenced objects and checks they exist; only then
+does the body run and send its command. So a value that cannot convert, a
+file, a file source, a reference form the provider cannot convert yet, or an
+invalid value, fails before the app receives any event, wherever it sits in
+the input. An app that is not installed fails at creation, as
+`AppUnavailableError` (`not-installed`), whatever the input holds.
+
+The transport seam is `NativeTransport`, with `runNativeScript` as the
+built-in implementation. `composeNativeScript` and `parseNativeOutcome` are
+not public API: tests in other packages reach them through
+`@macts/core/testing`, an internal test-support entry that is outside the API
+report and not covered by semantic versioning.
+
+The script is passed to `osascript` without shell interpolation
 (`execFile` with an argument vector, script on stdin), so values never cross a
 shell.
 

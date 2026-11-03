@@ -18,6 +18,14 @@
  *   objects it touches are the ones it is given: the application in its
  *   environment, and app objects at reference positions, whose members it
  *   calls to address an object and to read its identifier.
+ * - **Nothing reaches the app before the input converted.** Decoding runs in
+ *   two phases. The first converts the whole input without reading or calling
+ *   any member of the application: every validation failure and every
+ *   unsupported-kind failure happens there, and a reference it can convert
+ *   becomes a pending address. Only the second phase uses the application, to
+ *   find each pending address's object and check that it exists. So a value
+ *   that cannot convert fails before the app receives anything, wherever it
+ *   sits in the input.
  * - **Transpile-stable.** It avoids syntax that a build step could lower into
  *   calls to injected helpers (object spread, class fields, `async`,
  *   generators, decorators). The built-module test guards this.
@@ -128,6 +136,18 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   type Fields = Readonly<Record<string, FieldPlan>>
   type Env = NativeCodecEnvironment | undefined
   type ReferencePlan = Extract<ValuePlan, { readonly kind: 'reference' }>
+  /**
+   * A reference that converted in decoding's first phase and is yet to be
+   * found in the app: the addressing and decoded identifier of its object.
+   * It stands at the reference's position until the second phase replaces
+   * it with the object.
+   */
+  interface PendingAddress {
+    readonly pendingAddress: true
+    readonly resource: string
+    readonly addressing: NativeAddressing
+    readonly id: unknown
+  }
   /** An object of the automation bridge: the application, or one of its objects. */
   type HostObject = Readonly<Record<string, unknown>>
 
@@ -706,20 +726,12 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
    * a missing target, before any command uses it.
    */
   function addressObject(
-    app: unknown,
+    app: HostObject,
     addressing: NativeAddressing,
     id: unknown,
     resource: string,
     path: Path
   ): HostObject {
-    if (!isHostObject(app)) {
-      return failUnsupported(
-        'decode',
-        path,
-        'reference',
-        'References have no conversion without an application to address'
-      )
-    }
     const expected = 'the application to have a collection ' + quote(addressing.collection)
     const collection = app[addressing.collection]
     if (!isHostObject(collection)) {
@@ -748,13 +760,20 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   /**
-   * Decodes a reference to the app's object it names. Converted: a single
-   * identity reference, with no container, to a resource the app finds at the
-   * application by its identifier. Its `id` is decoded by the resource's
-   * identifier plan. Every other reference, including selectors and
-   * collections, fails as unsupported; a malformed one fails as invalid.
+   * Decodes a reference, in decoding's first phase, to the pending address of
+   * the app's object it names. Converted: a single identity reference, with no
+   * container, to a resource the app finds at the application by its
+   * identifier. Its `id` is decoded by the resource's identifier plan. Every
+   * other reference, including selectors and collections, fails as
+   * unsupported; a malformed one fails as invalid. The application is not
+   * used: only whether there is one to address is checked.
    */
-  function decodeReference(wire: unknown, plan: ReferencePlan, env: Env, path: Path): unknown {
+  function decodeReference(
+    wire: unknown,
+    plan: ReferencePlan,
+    env: Env,
+    path: Path
+  ): PendingAddress {
     const payload = controlPayload(wire, KEY_REFERENCE, 'a reference', path)
     if (!isKeyed(payload)) {
       return fail('decode', path, 'Expected a reference, received ' + describeValue(payload))
@@ -805,13 +824,59 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     if (!hasOwn(payload, 'id')) fail('decode', path, 'Missing required field "id"')
     const plans = referencePlansOf('decode', env, plan.resource, path)
     const id = decodeValue(payload['id'], plans.id, path.concat(['id']), env)
-    return addressObject(
-      env === undefined ? undefined : env.app,
-      plans.addressing,
-      id,
-      plan.resource,
-      path
-    )
+    if (env === undefined || !isHostObject(env.app)) {
+      return failUnsupported(
+        'decode',
+        path,
+        'reference',
+        'References have no conversion without an application to address'
+      )
+    }
+    return { pendingAddress: true, resource: plan.resource, addressing: plans.addressing, id }
+  }
+
+  /**
+   * Decoding's second phase: replaces each pending address that the first
+   * phase left in `value`, which `plan` describes, with the app's object it
+   * names, in input order. The records and lists are the ones the first phase
+   * built, so they are updated in place. A missing object fails as a missing
+   * target.
+   */
+  function resolvePending(value: unknown, plan: ValuePlan, path: Path, env: Env): unknown {
+    switch (plan.kind) {
+      case 'reference': {
+        if (!isPendingAddress(value) || env === undefined || !isHostObject(env.app)) {
+          return fail('decode', path, 'Expected a converted reference')
+        }
+        return addressObject(env.app, value.addressing, value.id, value.resource, path)
+      }
+      case 'array': {
+        if (!Array.isArray(value)) return value
+        const items: unknown[] = value
+        for (let i = 0; i < items.length; i++) {
+          items[i] = resolvePending(items[i], plan.items, path.concat([i]), env)
+        }
+        return items
+      }
+      case 'record': {
+        if (!isKeyed(value)) return value
+        for (const key of Object.keys(plan.fields)) {
+          const field = plan.fields[key]
+          if (field === undefined || !hasOwn(value, key)) continue
+          setOwn(value, key, resolvePending(value[key], field.value, path.concat([key]), env))
+        }
+        return value
+      }
+      case 'nullable':
+        return value === null ? null : resolvePending(value, plan.value, path, env)
+      default:
+        return value
+    }
+  }
+
+  /** Whether a value is a {@link PendingAddress} left by decoding's first phase. */
+  function isPendingAddress(value: unknown): value is PendingAddress {
+    return isKeyed(value) && value['pendingAddress'] === true
   }
 
   /**
@@ -1252,7 +1317,7 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
   }
 
   return {
-    decode: (wire, plan, env) => decodeValue(wire, plan, [], env),
+    decode: (wire, plan, env) => resolvePending(decodeValue(wire, plan, [], env), plan, [], env),
     encode: (native, plan, env) => encodeValue(native, plan, [], env),
     literals: {
       errorName: ERROR_NAME,
