@@ -39,6 +39,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "The unique identifier of the account"'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T17:59:10.000Z'
+        bundleId: com.apple.reminders
+        appVersion: '7.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the accounts at the application, at page sizes 25, 2 and 1. The collection held one account, so no page continued past the first.'
     properties:
       name:
         access: r
@@ -74,6 +83,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "The unique identifier of the list"'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T17:59:10.000Z'
+        bundleId: com.apple.reminders
+        appVersion: '7.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the lists at the application: a first page of 25, and pages of 2 continued by cursor to the last list, each read as a range of the collection.'
     properties:
       name:
         access: rw
@@ -143,6 +161,15 @@ resources:
           unique:
             source: sdef
             note: 'The app''s scripting dictionary describes the property as "The unique identifier of the reminder"'
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-11-03T17:59:10.000Z'
+        bundleId: com.apple.reminders
+        appVersion: '7.0'
+        osVersion: '27.2'
+        note: 'Read-only pages of the reminders of a list: a first page of 25 continued by cursor, and pages of 2 continued by cursor, each read as a range of the collection.'
     properties:
       name:
         access: rw

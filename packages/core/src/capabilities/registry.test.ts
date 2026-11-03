@@ -194,7 +194,7 @@ describe('deriveCapabilities — paging inputs on real manifests', () => {
     '../../../../manifests/reminders/app.yaml'
   )
 
-  it('shows pageSize and cursor on reminders.reminders.list, whose id is claimed unique', async () => {
+  it('shows pageSize and cursor on reminders.reminders.list, whose id is claimed unique and whose range reads passed', async () => {
     const caps = deriveCapabilities(await loadManifest(REMINDERS_MANIFEST))
     const schema = caps.find((c) => c.name === 'reminders.reminders.list')?.inputSchema
 

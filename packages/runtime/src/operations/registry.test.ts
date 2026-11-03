@@ -308,16 +308,40 @@ describe('operationsFromContract', () => {
   })
 })
 
+/** A range read marker for a fixture resource whose range reads passed. */
+const RANGE_READ_PASSED = {
+  supported: true,
+  evidence: {
+    source: 'probe',
+    observedAt: '2026-01-15T10:30:00.000Z',
+    bundleId: 'com.apple.iCal',
+    appVersion: '1.0',
+    osVersion: '27.2',
+  },
+} as const
+
 describe('operationsFromContract: paging agrees with the manifest', () => {
-  /** CALENDAR with the calendar identifier entry replaced by `identifier`. */
+  /**
+   * CALENDAR with the calendar identifier entry replaced by `identifier`, and
+   * the calendar's range read marker set to `rangeRead`: by default one that
+   * passed, and none for `null`.
+   */
   function calendarWith(
-    identifier: NonNullable<AppManifest['resources'][string]['identifiers']>[number]
+    identifier: NonNullable<AppManifest['resources'][string]['identifiers']>[number],
+    rangeRead: AppManifest['resources'][string]['rangeRead'] | null = RANGE_READ_PASSED
   ): AppManifest {
     const calendar = CALENDAR.resources['Calendar']
     if (calendar === undefined) throw new Error('fixture lost its Calendar')
     return {
       ...CALENDAR,
-      resources: { ...CALENDAR.resources, Calendar: { ...calendar, identifiers: [identifier] } },
+      resources: {
+        ...CALENDAR.resources,
+        Calendar: {
+          ...calendar,
+          identifiers: [identifier],
+          ...(rangeRead === null ? {} : { rangeRead }),
+        },
+      },
     }
   }
 
@@ -348,8 +372,20 @@ describe('operationsFromContract: paging agrees with the manifest', () => {
 
   it('refuses a list that takes the paging inputs when its identifier is not claimed unique', () => {
     expect(() => operationsFromContract(contractWith([pagedList]), CALENDAR)).toThrow(
-      'Contract operation "calendar.calendars.list" takes the paging inputs, but the manifest says it does not page: its resource\'s primary identifier is not claimed unique. Regenerate the contract.'
+      'Contract operation "calendar.calendars.list" takes the paging inputs, but the manifest says it does not page: its resource\'s primary identifier is not claimed unique, or its range reads are not known to work. Regenerate the contract.'
     )
+  })
+
+  it('refuses a list that takes the paging inputs when its unique identifier has no range read recorded', () => {
+    const manifest = calendarWith(
+      { property: 'calendarIdentifier', primary: true, ...UNIQUE },
+      null
+    )
+
+    expect(() => operationsFromContract(contractWith([pagedList]), manifest)).toThrow(
+      /takes the paging inputs, but the manifest says it does not page/
+    )
+    expect(operationsFromContract(contractWith([wholeList]), manifest)).toHaveLength(1)
   })
 
   it('refuses a list without the paging inputs when the manifest says it pages', () => {

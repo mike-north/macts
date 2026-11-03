@@ -21,7 +21,7 @@
 import { describe, it, expect } from 'vitest'
 import { generateCliPlugin } from './index.js'
 import type { AppManifest } from '../../manifest/index.js'
-import { UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
+import { RANGE_READ_SUPPORTED, UNIQUE_CLAIM } from '../../manifest/test-support/unique-claim.js'
 
 /** Build a minimal manifest exercising each generator code path under test. */
 function buildManifest(): AppManifest {
@@ -52,6 +52,7 @@ function buildManifest(): AppManifest {
           shared: { access: 'rw', type: 'boolean', description: 'Is shared', optional: true },
         },
         identifiers: [{ property: 'calendarIdentifier', primary: true, ...UNIQUE_CLAIM }],
+        ...RANGE_READ_SUPPORTED,
       },
       Folder: {
         name: 'Folder',

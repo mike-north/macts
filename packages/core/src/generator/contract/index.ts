@@ -713,8 +713,9 @@ class ContractBuilder {
 
   /**
    * Whether the route is a list that pages (see `listOperationPages`): a list
-   * whose resource's primary identifier is claimed unique. Any other list
-   * takes no paging inputs and returns its whole collection as one page.
+   * whose resource's primary identifier is claimed unique and whose app is
+   * known to read ranges of its collection. Any other list takes no paging
+   * inputs and returns its whole collection as one page.
    */
   #pages(route: ManifestRoute): boolean {
     return listOperationPages(route.command, route.resource)

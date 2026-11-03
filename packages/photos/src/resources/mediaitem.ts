@@ -21,19 +21,10 @@ export class MediaItemResourceClient {
   }
 
   /**
-   * List media items, one page at a time. When the result has a `nextCursor`,
-   * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
+   * List all media items, as one page.
    */
-  async list(
-    page: { pageSize?: number; cursor?: string } = {}
-  ): Promise<{ items: MediaItem[]; nextCursor?: string }> {
-    return this.#http.rpc<{ items: MediaItem[]; nextCursor?: string }>(
-      `${this.#app}.${this.#resource}.list`,
-      {
-        ...(page.pageSize === undefined ? {} : { pageSize: { integer: String(page.pageSize) } }),
-        ...(page.cursor === undefined ? {} : { cursor: page.cursor }),
-      }
-    )
+  async list(): Promise<{ items: MediaItem[] }> {
+    return this.#http.rpc<{ items: MediaItem[] }>(`${this.#app}.${this.#resource}.list`)
   }
 
   /**

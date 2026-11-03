@@ -46,12 +46,8 @@ export interface AutomatorActionCreateInput {
 export class AutomatorActionResourceClient {
     constructor(http: HttpClient, app: string, resource: string);
     get(id: string): Promise<AutomatorAction>;
-    list(workflowName: string, page?: {
-        pageSize?: number;
-        cursor?: string;
-    }): Promise<{
+    list(workflowName: string): Promise<{
         items: AutomatorAction[];
-        nextCursor?: string;
     }>;
 }
 

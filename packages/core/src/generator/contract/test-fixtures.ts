@@ -11,7 +11,8 @@
  *   get operation, so a single tag cannot be referenced at all; tags can be
  *   listed, so a collection of them can.
  * - `Folder` can be got and listed, so it can be referenced and can contain.
- * - `Note.uid` is claimed unique, so the note list pages; `Folder.folderId`
+ * - `Note.uid` is claimed unique and notes record a supported range read, so
+ *   the note list pages; `Folder.folderId`
  *   makes no uniqueness claim and `Tag` has no identifier, so their lists
  *   return their whole collection as one page.
  * - `Priority` is an enum, named in lower case by a property (`{ enum:
@@ -140,6 +141,14 @@ resources:
           unique:
             source: sdef
             note: The dictionary describes uid as the note's unique identifier
+    rangeRead:
+      supported: true
+      evidence:
+        source: probe
+        observedAt: '2026-10-31T12:00:00.000Z'
+        bundleId: com.example.jotter
+        appVersion: '2.1'
+        osVersion: '27.2'
   Folder:
     name: Folder
     plural: Folders

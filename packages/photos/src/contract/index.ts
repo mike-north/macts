@@ -278,14 +278,8 @@ export type MomentUpdateInput = Record<string, never>
 
 /** A media item, such as a photo or video */
 export interface MediaItemResourceClient {
-  /**
-   * List media items, one page at a time.
-   *
-   * @param page - The page size, and the cursor that continues from the previous page.
-   * @returns One page of results. When `nextCursor` is present, more remain: call again with the
-   * same arguments and that cursor.
-   */
-  list(page?: PageRequest, options?: CallOptions): Promise<Page<MediaItem>>
+  /** List media items, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<MediaItem>>
   /**
    * Read the media item identified by `id`.
    *
@@ -534,32 +528,20 @@ const resources: AppContract<PhotosClient>['resources'] = {
   },
 }
 
-const mediaItemListMediaItemsOperation: OperationDescriptor<PageRequest, Page<MediaItem>> = {
+const mediaItemListMediaItemsOperation: OperationDescriptor<
+  Record<string, never>,
+  Page<MediaItem>
+> = {
   id: 'photos.mediaItems.list',
   permission: 'photos:mediaItems:list',
   target: { command: 'listMediaItems', resource: 'MediaItem' },
   description: 'List all media items',
-  input: t.record({
-    ...t.pageInputs(),
-  }),
+  input: t.record({}),
   output: t.page(mediaItemRecordType),
   inputJsonSchema: {
     $schema: 'http://json-schema.org/draft-07/schema#',
     type: 'object',
-    properties: {
-      pageSize: {
-        type: 'object',
-        properties: { integer: { type: 'string', pattern: '^(100|[1-9][0-9]?)$' } },
-        required: ['integer'],
-        additionalProperties: false,
-        description: 'The most items to return, from 1 to 100. Defaults to 25.',
-      },
-      cursor: {
-        type: 'string',
-        description:
-          'The nextCursor of the previous page, sent with the same other inputs, to read the next page. Omit it to read the first page.',
-      },
-    },
+    properties: {},
     additionalProperties: false,
   },
 }
@@ -1012,8 +994,7 @@ const operations: AppContract<PhotosClient>['operations'] = {
 function bind(runtime: ClientRuntime): PhotosClient {
   return {
     mediaItems: {
-      list: (page, options) =>
-        runtime.invoke(mediaItemListMediaItemsOperation, { ...page }, options),
+      list: (options) => runtime.invoke(mediaItemListMediaItemsOperation, {}, options),
       get: (id, options) => runtime.invoke(mediaItemGetMediaItemOperation, { id }, options),
       duplicate: (id, options) => runtime.invoke(mediaItemDuplicateOperation, { id }, options),
     },
