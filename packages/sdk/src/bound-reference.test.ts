@@ -1,6 +1,6 @@
 /**
  * Unit tests for binding decoded references to a client and resolving them,
- * through `createCodecClientRuntime` with a recording transport (no runtime,
+ * through `createCodecClient` with a recording transport (no runtime,
  * no network).
  *
  * Expected values are written by hand from phases/13:
@@ -18,6 +18,14 @@
  * - D11: the client decodes a resolution result with the output contract of
  *   the resource's `get` or `list` operation; a mismatch is
  *   `UnexpectedValueError`.
+ * - D7 Caller-built references: `bindReference(client, data)` encodes the
+ *   data through the app's reference value type and decodes it with the
+ *   client's own decode context, so the result is a reference the client
+ *   could have decoded; binding sends nothing; it rebinds a reference bound
+ *   to another client of the same app; everything encoding rejects (another
+ *   app at any level, a malformed or other-form field, a target, container,
+ *   or entry without its resolving operation) is `ValidationError` with the
+ *   encode issues.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D7, D8, D11)
  */
@@ -31,9 +39,10 @@ import {
   type AppContract,
   type CallOptions,
   type ReferenceData,
+  type ResourceDescriptor,
   type WireValue,
 } from '@macts/contracts'
-import { createCodecClientRuntime, type ClientApp } from './codec-runtime.js'
+import { bindReference, createCodecClient } from './codec-runtime.js'
 import {
   DUNE_ISBN,
   DUNE_MESSIAH_ISBN,
@@ -43,7 +52,7 @@ import {
   libraryContract,
   type LibraryClient,
 } from './library-fixture.js'
-import { rejection } from './test-helpers.js'
+import { rejection, thrownBy } from './test-helpers.js'
 
 /** One request a transport received. */
 interface Sent {
@@ -55,18 +64,18 @@ interface Sent {
 /** A library client over a transport that records what it is sent and answers `answer`. */
 function recordingClient(
   answer: (sent: Sent) => unknown,
-  app: ClientApp = libraryContract
+  app: AppContract<LibraryClient> = libraryContract
 ): { client: LibraryClient; sent: Sent[] } {
   const sent: Sent[] = []
   const record = (request: Sent): Promise<unknown> => {
     sent.push(request)
     return Promise.resolve(answer(request))
   }
-  const runtime = createCodecClientRuntime(app, {
+  const client = createCodecClient(app, {
     invoke: (_operation, wire, options) => record({ kind: 'invoke', wire, options }),
     resolve: (wire, options) => record({ kind: 'resolve', wire, options }),
   })
-  return { client: libraryContract.bind(runtime), sent }
+  return { client, sent }
 }
 
 /**
@@ -340,7 +349,7 @@ describe('resolving bound references', () => {
 
   it('raises InternalError when the contract records a resolving operation it does not contain', async () => {
     // Inconsistent: the resource table names a get the operations lack.
-    const inconsistent: ClientApp = {
+    const inconsistent: AppContract<LibraryClient> = {
       ...libraryContract,
       operations: Object.fromEntries(
         Object.entries(libraryContract.operations).filter(([id]) => id !== 'library.shelves.get')
@@ -367,7 +376,7 @@ describe('resolving bound references', () => {
     const listOperation = libraryContract.operations['library.books.list']
     const getOperation = libraryContract.operations['library.books.get']
     if (listOperation === undefined || getOperation === undefined) throw new Error('fixture')
-    const inconsistent: Pick<AppContract<unknown>, 'app' | 'resources' | 'operations'> = {
+    const inconsistent: AppContract<LibraryClient> = {
       ...libraryContract,
       operations: {
         ...libraryContract.operations,
@@ -383,5 +392,263 @@ describe('resolving bound references', () => {
     const error = await rejection(book.sequels.resolve())
 
     expect(error).toBeInstanceOf(InternalError)
+  })
+})
+
+/** A library resource-table entry with its `get` or `list` operation removed. */
+function withoutOperation(
+  entry: ResourceDescriptor<unknown> | undefined,
+  key: 'get' | 'list'
+): ResourceDescriptor<unknown> {
+  if (entry === undefined) throw new Error('fixture')
+  const { name, record, id, get, list } = entry
+  return {
+    name,
+    record,
+    ...(id === undefined ? {} : { id }),
+    ...(key === 'get' || get === undefined ? {} : { get }),
+    ...(key === 'list' || list === undefined ? {} : { list }),
+  }
+}
+
+/** The library contract with one resource's `get` or `list` operation removed from its table. */
+function libraryWithout(resource: string, key: 'get' | 'list'): AppContract<LibraryClient> {
+  return {
+    ...libraryContract,
+    resources: {
+      ...libraryContract.resources,
+      [resource]: withoutOperation(libraryContract.resources[resource], key),
+    },
+  }
+}
+
+/** A reference to Dune by its ISBN, built by hand as a caller would. */
+const DUNE_REFERENCE: ReferenceData = {
+  app: 'library',
+  resource: 'Book',
+  form: 'identity',
+  cardinality: 'one',
+  id: DUNE_ISBN,
+}
+
+/** The science-fiction shelf within the downtown branch, built by hand. */
+const SHELF_IN_DOWNTOWN: ReferenceData = {
+  app: 'library',
+  resource: 'Shelf',
+  form: 'identity',
+  cardinality: 'one',
+  id: 'SF-1',
+  container: { app: 'library', resource: 'Branch', form: 'identity', cardinality: 'one', id: 'DT' },
+}
+
+/** One reference that binding must reject, with the issue paths encoding reports for it. */
+interface RejectedCase {
+  readonly name: string
+  readonly reference: unknown
+  readonly paths: readonly (readonly (string | number)[])[]
+  /** The contract the client is created from, when it is not the library contract. */
+  readonly contract?: AppContract<LibraryClient>
+}
+
+const REJECTED: readonly RejectedCase[] = [
+  {
+    name: 'another app at the top level',
+    reference: { ...DUNE_REFERENCE, app: 'bookstore' },
+    paths: [['app']],
+  },
+  {
+    name: 'another app in a container',
+    reference: {
+      ...SHELF_IN_DOWNTOWN,
+      container: {
+        app: 'bookstore',
+        resource: 'Branch',
+        form: 'identity',
+        cardinality: 'one',
+        id: 'DT',
+      },
+    },
+    paths: [['container', 'app']],
+  },
+  {
+    name: 'another app in an identity-collection entry',
+    reference: {
+      app: 'library',
+      resource: 'Book',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [{ ...DUNE_REFERENCE, app: 'bookstore' }],
+    },
+    paths: [['entries', 0, 'app']],
+  },
+  {
+    name: 'no resource and no cardinality',
+    reference: { app: 'library', resource: '', form: 'identity', cardinality: 'some', id: 'x' },
+    paths: [['resource'], ['cardinality']],
+  },
+  {
+    // D8 strictness: a field of the other form is an undeclared own field.
+    name: 'an identity reference carrying a selector',
+    reference: { ...DUNE_REFERENCE, selector: { by: 'name', name: 'Dune' } },
+    paths: [['selector']],
+  },
+  {
+    // A branch has a get but no list, so a collection of branches could never resolve.
+    name: 'a collection of a resource without a list operation',
+    reference: {
+      app: 'library',
+      resource: 'Branch',
+      form: 'selector',
+      cardinality: 'many',
+      selector: { by: 'every' },
+    },
+    paths: [[]],
+  },
+  {
+    name: 'a container whose resource has no get operation',
+    reference: SHELF_IN_DOWNTOWN,
+    paths: [['container', 'resource']],
+    contract: libraryWithout('Branch', 'get'),
+  },
+  {
+    name: 'an identity-collection entry whose resource has no get operation',
+    reference: {
+      app: 'library',
+      resource: 'Book',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [DUNE_REFERENCE],
+    },
+    paths: [['entries', 0, 'resource']],
+    contract: libraryWithout('Book', 'get'),
+  },
+]
+
+describe('bindReference', () => {
+  it('binds caller-built data at every level, sending nothing', () => {
+    const { client, sent } = recordingClient(() => SCIENCE_FICTION_WIRE)
+
+    const shelf = bindReference(client, SHELF_IN_DOWNTOWN)
+
+    expect(shelf).toEqual(SHELF_IN_DOWNTOWN)
+    expect(Object.keys(shelf)).toEqual([
+      'app',
+      'resource',
+      'form',
+      'cardinality',
+      'id',
+      'container',
+    ])
+    expect(typeof shelf.resolve).toBe('function')
+    expect(shelf.cardinality === 'one' ? typeof shelf.container?.resolve : undefined).toBe(
+      'function'
+    )
+    expect(sent).toHaveLength(0)
+  })
+
+  it('binds a reference that resolves through the client, sending its canonical wire form', async () => {
+    const { client, sent } = recordingClient(() => SCIENCE_FICTION_WIRE)
+
+    const resolved = await bindReference(client, SHELF_IN_DOWNTOWN).resolve()
+
+    expect(resolved).toEqual(SCIENCE_FICTION_WIRE)
+    expect(sent).toEqual([
+      {
+        kind: 'resolve',
+        wire: {
+          reference: {
+            resource: 'Shelf',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'SF-1',
+            container: { resource: 'Branch', form: 'identity', cardinality: 'one', id: 'DT' },
+          },
+        },
+        options: undefined,
+      },
+    ])
+  })
+
+  it('binds a collection whose entries are each bound to the client', async () => {
+    const { client, sent } = recordingClient(() => DUNE_WIRE)
+    const sequels: ReferenceData = {
+      app: 'library',
+      resource: 'Book',
+      form: 'identity',
+      cardinality: 'many',
+      entries: [DUNE_REFERENCE],
+    }
+
+    const bound = bindReference(client, sequels)
+    const entries = bound.cardinality === 'many' && bound.form === 'identity' ? bound.entries : []
+    const first = await entries[0]?.resolve()
+
+    expect(bound).toEqual(sequels)
+    expect(first).toMatchObject({ isbn: DUNE_ISBN, title: 'Dune' })
+    expect(sent).toEqual([
+      {
+        kind: 'resolve',
+        wire: {
+          reference: { resource: 'Book', form: 'identity', cardinality: 'one', id: DUNE_ISBN },
+        },
+        options: undefined,
+      },
+    ])
+  })
+
+  it('rebinds a reference bound to another client of the same app', async () => {
+    const first = await decodedBook()
+    const second = recordingClient(() => SCIENCE_FICTION_WIRE)
+
+    const rebound = bindReference(second.client, first.book.shelf)
+    const resolved = await rebound.resolve()
+
+    expect(rebound).toEqual(first.book.shelf)
+    expect(rebound).not.toBe(first.book.shelf)
+    expect(resolved).toEqual(SCIENCE_FICTION_WIRE)
+    // Only the operation call that decoded the book reached the first client.
+    expect(first.sent.map((request) => request.kind)).toEqual(['invoke'])
+    expect(second.sent).toEqual([
+      { kind: 'resolve', wire: { reference: SHELF_IN_BRANCH }, options: undefined },
+    ])
+  })
+
+  describe('raises ValidationError with the encode issues, sending nothing, for', () => {
+    it.each(REJECTED)('$name', ({ reference, paths, contract }) => {
+      const { client, sent } = recordingClient(() => DUNE_WIRE, contract)
+
+      // A caller that bypassed the static types.
+      const error = thrownBy(() => bindReference(client, reference as ReferenceData))
+
+      expect(error).toBeInstanceOf(ValidationError)
+      if (!(error instanceof ValidationError)) return
+      expect(error.message).toBe('The library reference to bind failed validation.')
+      expect(error.details.issues.map((issue) => issue.path)).toEqual(paths)
+      expect(sent).toHaveLength(0)
+    })
+  })
+
+  it('raises TypeError for a value that is not a client made by either factory', async () => {
+    const { client } = recordingClient(() => DUNE_WIRE)
+    const decoded = (await decodedBook()).book
+
+    // A copy of a client has the same members but was not made by a factory.
+    for (const notAClient of [{}, { ...client }, libraryContract, decoded.shelf]) {
+      expect(() => bindReference(notAClient, DUNE_REFERENCE)).toThrow(TypeError)
+    }
+    // @ts-expect-error -- a caller that bypassed the static types
+    expect(() => bindReference('library', DUNE_REFERENCE)).toThrow(TypeError)
+  })
+
+  it('raises InternalError when a contract binds one client object over two runtimes', () => {
+    const shared = libraryContract.bind({
+      invoke: () => Promise.reject(new Error('unused')),
+      resolve: () => Promise.reject(new Error('unused')),
+    })
+    const sharing: AppContract<LibraryClient> = { ...libraryContract, bind: () => shared }
+    recordingClient(() => DUNE_WIRE, sharing)
+
+    // Recording it again would resolve the first client's references under the second runtime.
+    expect(() => recordingClient(() => DUNE_WIRE, sharing)).toThrow(InternalError)
   })
 })

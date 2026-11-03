@@ -20,6 +20,15 @@
  * never a replay of wire the client once received, and it decodes the result
  * with the output contract of the operation the reference resolves as.
  *
+ * It also binds references a caller built to a client, with
+ * {@link bindReference} (phases/13 D7, "Caller-built references"). Binding is
+ * the same encode then decode, with no call between: the data is encoded
+ * through the app's reference value type, which rejects anything a client
+ * could not resolve, and the wire form is decoded with the client's own
+ * decode context. The binder finds that context, and the client's contract,
+ * in a registry private to this module, filled in when a client is created,
+ * so a client carries no member beyond the app's operations.
+ *
  * It depends only on `@macts/contracts`, because the remote entry point uses it
  * and must never load the Mac-side runtime.
  *
@@ -38,15 +47,22 @@ import {
   type CallOptions,
   type ClientRuntime,
   type CodecResult,
+  type CollectionReferenceVariant,
   type DecodeContext,
+  type ObjectReferenceVariant,
   type OperationDescriptor,
   type OperationId,
   type ReferenceCardinality,
+  type ReferenceData,
   type ValidationIssue,
   type ValueType,
   type WireValue,
 } from '@macts/contracts'
-import { bindReference, type ReferenceResolver } from './bound-reference.js'
+import {
+  bindDecodedReference,
+  isBoundReference,
+  type ReferenceResolver,
+} from './bound-reference.js'
 
 /**
  * Runs one operation whose input is already in wire form and returns the raw
@@ -90,7 +106,7 @@ export interface ClientTransport {
  * each resource's references resolve; and its operations, whose output
  * contracts decode resolution results.
  */
-export type ClientApp = Pick<AppContract<unknown>, 'app' | 'resources' | 'operations'>
+type ClientApp = Pick<AppContract<unknown>, 'app' | 'resources' | 'operations'>
 
 /**
  * Build the decode context a client binds decoded values to.
@@ -104,7 +120,7 @@ export type ClientApp = Pick<AppContract<unknown>, 'app' | 'resources' | 'operat
  */
 function createDecodeContext(resolve: ReferenceResolver): DecodeContext {
   return {
-    bindReference: (data) => bindReference(data, resolve),
+    bindReference: (data) => bindDecodedReference(data, resolve),
     bindFile: () => {
       throw new InternalError('This client does not support file values.', {})
     },
@@ -186,13 +202,25 @@ interface ReferenceTarget {
   readonly cardinality: ReferenceCardinality
 }
 
-/** The error for a reference to resolve that fails its contract. */
-function invalidReference(app: ClientApp, issues: readonly ValidationIssue[]): ValidationError {
-  return new ValidationError(`The ${app.app} reference to resolve failed validation.`, { issues })
+/**
+ * What a client is doing with a reference whose data it validates: resolving
+ * it, or binding it to itself. It names the reference in error messages.
+ */
+type ReferencePurpose = 'resolve' | 'bind'
+
+/** The error for a reference to resolve or bind that fails its contract. */
+function invalidReference(
+  app: ClientApp,
+  purpose: ReferencePurpose,
+  issues: readonly ValidationIssue[]
+): ValidationError {
+  return new ValidationError(`The ${app.app} reference to ${purpose} failed validation.`, {
+    issues,
+  })
 }
 
 /**
- * Read the resource and cardinality of a reference to resolve.
+ * Read the resource and cardinality of a reference to resolve or bind.
  *
  * @remarks
  * The static types guarantee both, but a caller can bypass them. They select
@@ -201,9 +229,13 @@ function invalidReference(app: ClientApp, issues: readonly ValidationIssue[]): V
  *
  * @throws `ValidationError` naming each missing or malformed field.
  */
-function readReferenceTarget(app: ClientApp, reference: unknown): ReferenceTarget {
+function readReferenceTarget(
+  app: ClientApp,
+  purpose: ReferencePurpose,
+  reference: unknown
+): ReferenceTarget {
   if (typeof reference !== 'object' || reference === null || Array.isArray(reference)) {
-    throw invalidReference(app, [
+    throw invalidReference(app, purpose, [
       { path: [], message: `Expected a reference to an object of "${app.app}"` },
     ])
   }
@@ -217,7 +249,7 @@ function readReferenceTarget(app: ClientApp, reference: unknown): ReferenceTarge
     issues.push({ path: ['cardinality'], message: 'Expected the cardinality "one" or "many"' })
   }
   if (typeof resource !== 'string' || resource === '' || issues.length > 0) {
-    throw invalidReference(app, issues)
+    throw invalidReference(app, purpose, issues)
   }
   // `issues` is empty, so the cardinality is one of the two.
   return { resource, cardinality: cardinality === 'one' ? 'one' : 'many' }
@@ -235,18 +267,24 @@ function referenceValueType(app: ClientApp, target: ReferenceTarget): ValueType<
 }
 
 /**
- * Encode a reference to resolve into its canonical wire form, from its data
- * fields alone.
+ * Encode a reference to resolve or bind into its canonical wire form, from
+ * its data fields alone.
  *
  * @throws `ValidationError` listing every issue when the reference violates
  *   the app's reference contract, including an `app` other than the client's
- *   at any level (the issue is at that level's `app`).
+ *   at any level (the issue is at that level's `app`) and a target, container,
+ *   or entry whose resource has no resolving operation.
  */
-function encodeReference(app: ClientApp, target: ReferenceTarget, reference: unknown): WireValue {
+function encodeReference(
+  app: ClientApp,
+  purpose: ReferencePurpose,
+  target: ReferenceTarget,
+  reference: unknown
+): WireValue {
   const type = referenceValueType(app, target)
   const encoded = runCodec(`The reference contract of "${app.app}"`, () => type.encode(reference))
   if (!encoded.ok) {
-    throw invalidReference(app, encoded.issues)
+    throw invalidReference(app, purpose, encoded.issues)
   }
   return encoded.value
 }
@@ -278,20 +316,17 @@ function resolvingOperation(app: ClientApp, target: ReferenceTarget): AnyOperati
   return operation
 }
 
+/** A client runtime and the decode context it binds every decoded value with. */
+interface CodecClientRuntime {
+  readonly runtime: ClientRuntime
+  readonly decodeContext: DecodeContext
+}
+
 /**
  * Build a client runtime for one app that encodes values, hands them to
  * `transport`, and decodes the results.
- *
- * @param app - The app's contract (its app, resource table, and operations).
- * @param transport - The locality-specific steps that run operations and
- *   resolve references.
- * @returns The runtime a generated contract's `bind` turns into an app client,
- *   and that every reference it decodes is bound to.
  */
-export function createCodecClientRuntime(
-  app: ClientApp,
-  transport: ClientTransport
-): ClientRuntime {
+function buildCodecClientRuntime(app: ClientApp, transport: ClientTransport): CodecClientRuntime {
   const runtime: ClientRuntime = {
     async invoke<Input, Output>(
       operation: OperationDescriptor<Input, Output>,
@@ -303,8 +338,8 @@ export function createCodecClientRuntime(
       return decodeOutput(operation, result, decodeContext)
     },
     async resolve(reference, options) {
-      const target = readReferenceTarget(app, reference)
-      const wire = encodeReference(app, target, reference)
+      const target = readReferenceTarget(app, 'resolve', reference)
+      const wire = encodeReference(app, 'resolve', target, reference)
       const operation = resolvingOperation(app, target)
       const result = await transport.resolve(wire, options)
       return decodeOutput(
@@ -319,5 +354,131 @@ export function createCodecClientRuntime(
   const decodeContext = createDecodeContext((reference, options) =>
     runtime.resolve(reference, options)
   )
-  return runtime
+  return { runtime, decodeContext }
+}
+
+/** What {@link bindReference} reads from a client: its app, and how it binds decoded values. */
+interface ClientBinding {
+  readonly app: ClientApp
+  readonly decodeContext: DecodeContext
+}
+
+/**
+ * Every client created by {@link createCodecClient}, with what binding a
+ * reference to it needs.
+ *
+ * @remarks
+ * Kept here, keyed weakly by the client object, so a client carries no member
+ * beyond its app's operations (phases/13 D7, "Caller-built references") and a
+ * discarded client is not kept alive.
+ */
+const clientBindings = new WeakMap<object, ClientBinding>()
+
+/** Whether `value` can key a `WeakMap`: an object or a function. */
+function isObject(value: unknown): value is object {
+  return (typeof value === 'object' && value !== null) || typeof value === 'function'
+}
+
+/**
+ * Create an app's client whose calls encode values, hand them to `transport`,
+ * and decode the results, and record it so references can be bound to it.
+ *
+ * @param app - The app's contract.
+ * @param transport - The locality-specific steps that run operations and
+ *   resolve references.
+ * @returns The client the contract's `bind` builds on the runtime; every
+ *   reference it decodes, or that {@link bindReference} binds to it, resolves
+ *   through that runtime.
+ * @throws `InternalError` when the contract's `bind` returns a client that
+ *   was already created over another runtime. Recording it again would make
+ *   references bound to the earlier client resolve under this one's
+ *   credential.
+ */
+export function createCodecClient<Client>(
+  app: AppContract<Client>,
+  transport: ClientTransport
+): Client {
+  const { runtime, decodeContext } = buildCodecClientRuntime(app, transport)
+  const client = app.bind(runtime)
+  if (isObject(client)) {
+    if (clientBindings.has(client)) {
+      throw new InternalError(
+        `The ${app.app} contract's bind returned a client that already belongs to another runtime.`,
+        {}
+      )
+    }
+    clientBindings.set(client, { app, decodeContext })
+  }
+  return client
+}
+
+/**
+ * Bind a reference to `client`: reference data the caller built, or a
+ * reference bound to another client of the same app.
+ *
+ * @remarks
+ * The data is encoded through the app's reference value type,
+ * `t.reference(() => contract, data.resource, data.cardinality)`, and the
+ * wire form is decoded with the client's own decode context. The result is
+ * therefore indistinguishable from a reference the client decoded: its
+ * `resolve()`, and that of every container and entry in it, hydrates through
+ * `client` (phases/13 D7, "Caller-built references").
+ *
+ * Binding is synchronous and makes no call. Encoding reads only the data
+ * fields, so a reference bound to another client of the same app is rebound,
+ * not copied with its old client. Whether the target exists is learned only
+ * when the result is resolved.
+ *
+ * @example
+ * ```typescript
+ * import { bindReference, createClient, resolveClientOptions } from '@macts/sdk'
+ * import { notesContract } from '@macts/notes/contract'
+ *
+ * const notes = createClient(notesContract, resolveClientOptions())
+ * const groceries = bindReference(notes, {
+ *   app: 'notes',
+ *   resource: 'Note',
+ *   form: 'selector',
+ *   cardinality: 'one',
+ *   selector: { by: 'name', name: 'Groceries' },
+ * })
+ * const note = await groceries.resolve()
+ * ```
+ *
+ * @param client - A client created by `createClient` from `@macts/sdk` or
+ *   `@macts/sdk/local`.
+ * @param data - The reference to bind.
+ * @returns The reference bound to `client`.
+ * @throws `TypeError` when `client` is not a client created by either
+ *   factory.
+ * @throws `ValidationError` listing every issue the encoding raises: an `app`
+ *   other than the client's at any level, a malformed field or a field of the
+ *   other form, and a target, container, or entry whose resource has no
+ *   resolving operation.
+ */
+export function bindReference(
+  client: object,
+  data: ReferenceData
+): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
+  const binding = clientBindings.get(client)
+  if (binding === undefined) {
+    throw new TypeError(
+      'bindReference expects a client created by createClient from @macts/sdk or @macts/sdk/local.'
+    )
+  }
+  const { app, decodeContext } = binding
+  const target = readReferenceTarget(app, 'bind', data)
+  const wire = encodeReference(app, 'bind', target, data)
+  const decoded = runCodec(`The reference contract of "${app.app}"`, () =>
+    referenceValueType(app, target).decode(wire, decodeContext)
+  )
+  // A reference that encoded always decodes, and the client's decode context
+  // always binds it, so anything else is a defect of the reference contract.
+  if (!decoded.ok || !isBoundReference(decoded.value)) {
+    throw new InternalError(
+      `The ${app.app} reference contract did not decode a reference it encoded.`,
+      {}
+    )
+  }
+  return decoded.value
 }

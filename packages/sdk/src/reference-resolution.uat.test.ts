@@ -26,6 +26,11 @@
  *   a valid empty range resolving to `[]`.
  * - D7 The app: a reference from another app is `ValidationError` at
  *   `["app"]`, before any request.
+ * - D7 Caller-built references: `bindReference`, from the entry point that
+ *   created the client, binds a reference built by hand so that it resolves
+ *   through that client exactly as `ClientRuntime.resolve` does; binding
+ *   sends nothing; another app at any level is `ValidationError` at that
+ *   level's `app`; a reference decoded by one client rebinds to another.
  * - D11: a result violating the output contract is `UnexpectedValueError`.
  * - D6: an abort is `OperationCancelledError`.
  *
@@ -55,7 +60,9 @@ import {
   setLogger,
   type GovernanceContext,
 } from '@macts/runtime'
+import { bindReference as bindRemoteReference } from './index.js'
 import { createClient as createLocalClient } from './local-client.js'
+import { bindReference as bindLocalReference } from './local.js'
 import { createClient as createRemoteClient } from './remote.js'
 import {
   DOWNTOWN_WIRE,
@@ -72,7 +79,12 @@ import {
   type Book,
   type LibraryClient,
 } from './library-fixture.js'
-import { createRecordingExecutor, rejection, type RecordingExecutor } from './test-helpers.js'
+import {
+  createRecordingExecutor,
+  rejection,
+  thrownBy,
+  type RecordingExecutor,
+} from './test-helpers.js'
 
 // The key store resolves MACTS_HOME when its module loads, so the temporary
 // home must be in place before any import runs.
@@ -191,6 +203,8 @@ interface Harness {
 /** One way of building a library client. */
 interface Factory {
   readonly name: string
+  /** `bindReference` as the factory's own entry point exports it. */
+  readonly bindReference: typeof bindLocalReference
   build(
     permissions: readonly string[],
     respond: (request: ResolutionRequest) => Promise<WireValue>
@@ -199,6 +213,7 @@ interface Factory {
 
 const local: Factory = {
   name: 'local client (@macts/sdk/local)',
+  bindReference: bindLocalReference,
   async build(permissions, respond) {
     const executor = createRecordingExecutor(() => Promise.resolve(DUNE_WIRE), respond)
     const client = createLocalClient(libraryContract, {
@@ -216,6 +231,7 @@ const local: Factory = {
 
 const remote: Factory = {
   name: 'remote client (@macts/sdk) over a real listener',
+  bindReference: bindRemoteReference,
   async build(permissions, respond) {
     const executor = createRecordingExecutor(() => Promise.resolve(DUNE_WIRE), respond)
     const app = createApp([], {
@@ -461,6 +477,63 @@ describe.each([local, remote])('reference resolution: $name', (factory) => {
     })
   })
 
+  describe('binds each reference built by hand, then resolves it through the client', () => {
+    it.each(RESOLVES)('$name', async ({ reference, payload, answer, expected }) => {
+      const harness = await factory.build(ALL_PERMISSIONS, () => Promise.resolve(answer))
+      const { client, executor } = harness
+
+      const bound = factory.bindReference(client, reference)
+      // Binding makes no request.
+      expect(harness.sent()).toBe(0)
+      const resolved = await bound.resolve()
+
+      expect(bound).toEqual(reference)
+      expect(resolved).toEqual(expected)
+      expect(onlyResolution(executor).reference).toEqual(payload)
+      expect(executor.requests).toHaveLength(0)
+    })
+  })
+
+  describe('refuses to bind a reference from another app, sending nothing', () => {
+    it.each([
+      { at: 'the top level', reference: { ...DUNE, app: 'bookstore' }, path: ['app'] },
+      {
+        at: 'a nested container',
+        reference: {
+          app: 'library',
+          resource: 'Book',
+          form: 'selector',
+          cardinality: 'one',
+          selector: { by: 'index', index: position(0) },
+          container: {
+            app: 'library',
+            resource: 'Shelf',
+            form: 'identity',
+            cardinality: 'one',
+            id: 'SF-1',
+            container: {
+              app: 'bookstore',
+              resource: 'Branch',
+              form: 'identity',
+              cardinality: 'one',
+              id: 'DT',
+            },
+          },
+        } satisfies ReferenceData,
+        path: ['container', 'container', 'app'],
+      },
+    ])('at $at', async ({ reference, path }) => {
+      const harness = await factory.build(ALL_PERMISSIONS, libraryResolution)
+
+      const error = thrownBy(() => factory.bindReference(harness.client, reference))
+
+      expect(error).toBeInstanceOf(ValidationError)
+      if (!(error instanceof ValidationError)) return
+      expect(error.details.issues.map((issue) => issue.path)).toEqual([path])
+      expect(harness.sent()).toBe(0)
+    })
+  })
+
   it('raises TargetNotFoundError when the target does not exist', async () => {
     const { client } = await factory.build(ALL_PERMISSIONS, () =>
       Promise.reject(new TargetNotFoundError('No book has that ISBN.', { resource: 'Book' }))
@@ -611,5 +684,26 @@ describe.each([local, remote])('reference resolution: $name', (factory) => {
 
     expect(error).toBeInstanceOf(OperationCancelledError)
     expect(executor.resolutions).toHaveLength(0)
+  })
+})
+
+describe('rebinding a reference across localities', () => {
+  it('resolves a reference the local client decoded through the remote client it is bound to', async () => {
+    const localHarness = await local.build(ALL_PERMISSIONS, libraryResolution)
+    const remoteHarness = await remote.build(ALL_PERMISSIONS, libraryResolution)
+    const book = await localHarness.client.books.get()
+
+    const shelf = bindRemoteReference(remoteHarness.client, book.shelf)
+    expect(remoteHarness.sent()).toBe(0)
+    const resolved = await shelf.resolve()
+
+    expect(resolved).toEqual(SCIENCE_FICTION_WIRE)
+    expect(remoteHarness.sent()).toBe(1)
+    expect(remoteHarness.executor.resolutions.map((request) => request.reference)).toEqual([
+      { resource: 'Shelf', form: 'identity', cardinality: 'one', id: 'SF-1' },
+    ])
+    // The local client ran only the operation that decoded the book.
+    expect(localHarness.executor.requests).toHaveLength(1)
+    expect(localHarness.executor.resolutions).toHaveLength(0)
   })
 })

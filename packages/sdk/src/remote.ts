@@ -35,7 +35,7 @@ import {
   type CallOptions,
   type OperationId,
 } from '@macts/contracts'
-import { createCodecClientRuntime, type ClientTransport } from './codec-runtime.js'
+import { createCodecClient, type ClientTransport } from './codec-runtime.js'
 
 /** Options for a client that runs operations on a macts service. */
 export interface RemoteClientOptions {
@@ -282,5 +282,5 @@ export function createClient<Client>(
       post(resolveEndpoint(root), { app: app.app, reference }, callOptions),
   }
 
-  return app.bind(createCodecClientRuntime(app, transport))
+  return createCodecClient(app, transport)
 }

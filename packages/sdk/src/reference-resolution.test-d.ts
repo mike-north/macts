@@ -8,6 +8,12 @@
  * runtime's own `resolve` takes the data form of any reference and yields
  * `unknown`, because the contract, not the call site, knows the record type.
  *
+ * `bindReference(client, data)` binds a caller-built reference, or one bound
+ * to another client, to a client. Both entry points export the same function.
+ * It takes the data form of any reference and returns a bound reference of
+ * either cardinality, whose `resolve()` yields a record or an array of
+ * records.
+ *
  * Invalid usage is expressed with `expectNotAssignable` rather than
  * `expectError`, because `src/**` is also compiled by `tsc --noEmit`.
  *
@@ -17,12 +23,14 @@
 import { expectNotAssignable, expectType } from 'tsd'
 import type {
   ClientRuntime,
+  CollectionReferenceVariant,
   IdentityReference,
   ObjectReferenceVariant,
   ReferenceData,
 } from '@macts/contracts'
 import type { Book, LibraryClient, Shelf } from './library-fixture.js'
 import * as remote from './index.js'
+import * as local from './local.js'
 
 declare const client: LibraryClient
 declare const runtime: ClientRuntime
@@ -56,3 +64,19 @@ expectType<Promise<unknown>>(runtime.resolve(book.shelf))
 
 // A reference's resolving operation is named by its cardinality.
 expectType<'get' | 'list'>(remote.resolvingOperationKey('one'))
+
+// Both entry points export the same binder.
+expectType<typeof remote.bindReference>(local.bindReference)
+
+// Binding takes any reference's data, bound or built by hand, and returns a bound reference.
+expectType<ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>>(
+  remote.bindReference(client, reference)
+)
+expectType<ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>>(
+  local.bindReference(client, book.shelf)
+)
+expectType<Promise<unknown>>(remote.bindReference(client, reference).resolve())
+
+// A client is an object; a primitive is not, and is not reference data either.
+expectNotAssignable<Parameters<typeof remote.bindReference>[0]>('library')
+expectNotAssignable<Parameters<typeof remote.bindReference>[1]>({ app: 'library' })

@@ -220,7 +220,7 @@ function bindObject(
  * @param resolver - The resolving client.
  * @returns The bound reference.
  */
-export function bindReference(
+export function bindDecodedReference(
   data: ReferenceData,
   resolver: ReferenceResolver
 ): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
@@ -228,4 +228,14 @@ export function bindReference(
   return data.form === 'identity'
     ? new BoundIdentityCollectionReference(data, resolver)
     : new BoundSelectorCollectionReference(data, resolver)
+}
+
+/**
+ * Whether `value` is a reference this module bound: one that a client
+ * decoded, of either cardinality and form.
+ */
+export function isBoundReference(
+  value: unknown
+): value is ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown> {
+  return value instanceof ClientBoundReference
 }

@@ -33,7 +33,7 @@ import {
   loadHostGovernance,
   type GovernanceContext,
 } from '@macts/runtime'
-import { createCodecClientRuntime, type ClientTransport } from './codec-runtime.js'
+import { createCodecClient, type ClientTransport } from './codec-runtime.js'
 
 /** Options for a client that runs operations on this Mac. */
 export interface LocalClientOptions {
@@ -145,5 +145,5 @@ export function createClient<Client>(
     },
   }
 
-  return app.bind(createCodecClientRuntime(app, transport))
+  return createCodecClient(app, transport)
 }
