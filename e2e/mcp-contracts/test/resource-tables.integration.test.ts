@@ -16,8 +16,9 @@
  *
  * The api-report check reads each app's committed `contract.api.md`, which
  * API Extractor writes from the contract's public declarations: the table's
- * type is exported as `<App>Resources`, so the report shows it and has no
- * forgotten-export warning for the table.
+ * type is exported as `<App>Resources`, so the report shows it, and no type
+ * the contract's declarations name is left unexported (no forgotten-export
+ * warning at all).
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D7)
  * @see https://api-extractor.com/pages/messages/ae-forgotten-export/
@@ -73,7 +74,8 @@ describe('the resource table of every real contract', () => {
 
   it.each(APP_NAMES)('is declared by an exported type in the %s api-report', (app) => {
     const report = readFileSync(`${PACKAGES_DIR}${app}/api-report/contract.api.md`, 'utf-8')
-    expect(report).not.toMatch(/ae-forgotten-export\) The symbol "resources"/)
+    // No type the contract's declarations name is left unexported.
+    expect(report).not.toMatch(/ae-forgotten-export/)
     expect(report).toMatch(/^export type \w+Resources = Readonly<[{R]/m)
     expect(report).toMatch(/^export const \w+Contract: AppContract<\w+Client, \w+Resources>;$/m)
   })

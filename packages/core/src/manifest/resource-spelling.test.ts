@@ -137,7 +137,7 @@ function contractSpellings(manifest: AppManifest): Spelling[] {
   if (content === undefined) throw new Error('the contract has no contract module')
   const source = parse(CONTRACT_MODULE_PATH, content)
   const found = accessorMembers(source, 'contract accessor')
-  // `const resources = { <Key>: { …, get: '<id>', list: '<id>' } } as const satisfies …`
+  // `const resources = { <Key>: { …, get: '<id>', list: '<id>' } } satisfies <App>Resources`
   walk(source, (node) => {
     if (!ts.isVariableDeclaration(node) || !ts.isIdentifier(node.name)) return
     if (node.name.text !== 'resources' || node.initializer === undefined) return
