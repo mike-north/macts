@@ -22,10 +22,17 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { createNativeExecutor, type AppManifest } from '@macts/core'
+import {
+  createNativeExecutor,
+  type AppManifest,
+  type GovernancePolicy,
+  type NativeScript,
+} from '@macts/core'
 import { standInTransport } from '@macts/core/testing'
 import {
   InternalError,
+  PermissionDeniedError,
+  PolicyDeniedError,
   TargetNotFoundError,
   type AppContract,
   type Authority,
@@ -33,10 +40,13 @@ import {
 } from '@macts/contracts'
 import { ALLOW_ALL_POLICY } from './governance/active-policy.js'
 import { createBearerCredential } from './invocation/credential.js'
+import type { GovernanceContext } from './governance/context.js'
 import { createRuntime, type MactsRuntime } from './runtime.js'
 import {
+  FIXED_NOW,
   LIBRARY_MANIFEST,
   createFakeVerifier,
+  createMemoryAuditWriter,
   fixedClock,
   libraryContract,
 } from './runtime-test-helpers.js'
@@ -47,6 +57,30 @@ const READER_SECRET = 'macts_sk_native-resolution-reader-never-logged'
 const READER: Authority = {
   subject: 'key_native_reader',
   permissions: ['library:books:lookupBook', 'library:books:list'],
+}
+
+const BOOK_GETTER_SECRET = 'macts_sk_native-resolution-getter-never-logged'
+
+/** May read one book, but not list books, so it cannot resolve a book collection. */
+const BOOK_GETTER: Authority = {
+  subject: 'key_native_book_getter',
+  permissions: ['library:books:lookupBook'],
+}
+
+/** The library app is allowed, except listing books (the book list operation). */
+const FORBID_BOOK_LIST: GovernancePolicy = {
+  version: '1',
+  defaultDisposition: 'forbidden',
+  apps: [
+    {
+      app: 'library',
+      disposition: 'allowed',
+      operations: [{ operation: 'list', disposition: 'forbidden', tags: [] }],
+      restrictions: { pathsAllow: [], pathsDeny: [], urlsAllow: [], urlsDeny: [] },
+      tags: [],
+    },
+  ],
+  tags: [],
 }
 
 /**
@@ -95,14 +129,21 @@ function standInLibrary(books: readonly (typeof DUNE)[]) {
   return { books: { byId: (isbn: unknown) => byIsbn.get(String(isbn)) ?? absent } }
 }
 
+/** What a test varies about the runtime under test. */
+interface NativeRuntimeOptions {
+  readonly governance?: GovernanceContext
+  /** Receives every script the native executor runs. */
+  readonly scripts?: NativeScript[]
+}
+
 /** A runtime with the library contract registered over the native executor. */
-function nativeRuntime(app: object): MactsRuntime {
+function nativeRuntime(app: object, options: NativeRuntimeOptions = {}): MactsRuntime {
   const runtime = createRuntime({
-    executor: createNativeExecutor({ transport: standInTransport(app) }),
-    verifier: createFakeVerifier({ [READER_SECRET]: READER }),
+    executor: createNativeExecutor({ transport: standInTransport(app, options.scripts) }),
+    verifier: createFakeVerifier({ [READER_SECRET]: READER, [BOOK_GETTER_SECRET]: BOOK_GETTER }),
     clock: fixedClock,
     logger: { error: () => undefined, warn: () => undefined, info: () => undefined },
-    governance: { policy: ALLOW_ALL_POLICY },
+    governance: options.governance ?? { policy: ALLOW_ALL_POLICY },
   })
   const contract: AppContract<unknown> = libraryContract()
   runtime.registerContract(contract, LIBRARY_WITH_BOOK_PROPERTIES)
@@ -155,10 +196,65 @@ describe('resolveReference with the native executor', () => {
     ).resolves.toEqual([wireBook(FOUNDATION), wireBook(DUNE)])
   })
 
-  it('resolves an empty identity collection to []', async () => {
-    const runtime = nativeRuntime(standInLibrary([DUNE]))
+  it('resolves an empty identity collection to [], audited as the book list, running no automation', async () => {
+    const writer = createMemoryAuditWriter()
+    const scripts: NativeScript[] = []
+    const runtime = nativeRuntime(standInLibrary([DUNE]), {
+      governance: { policy: ALLOW_ALL_POLICY, writer },
+      scripts,
+    })
 
     await expect(runtime.resolveReference('library', books(), CONTEXT)).resolves.toEqual([])
+
+    // Authorized, governed and audited as a call of the book list (D7), and
+    // only then answered without starting an automation process.
+    expect(writer.records).toEqual([
+      expect.objectContaining({
+        capability: 'library:books:list',
+        app: 'library',
+        apiKeyId: 'key_native_reader',
+        decision: 'allowed',
+        timestamp: FIXED_NOW,
+      }),
+    ])
+    expect(scripts).toEqual([])
+  })
+
+  it('refuses an empty identity collection to a key without the book list permission', async () => {
+    const writer = createMemoryAuditWriter()
+    const scripts: NativeScript[] = []
+    const runtime = nativeRuntime(standInLibrary([DUNE]), {
+      governance: { policy: ALLOW_ALL_POLICY, writer },
+      scripts,
+    })
+
+    const error = await rejectionOf(
+      runtime.resolveReference('library', books(), {
+        credential: createBearerCredential(BOOK_GETTER_SECRET),
+      })
+    )
+
+    expect(error).toBeInstanceOf(PermissionDeniedError)
+    if (!(error instanceof PermissionDeniedError)) return
+    expect(error.details).toMatchObject({ required: 'library:books:list' })
+    expect(scripts).toEqual([])
+  })
+
+  it('refuses an empty identity collection the policy forbids, auditing the denial', async () => {
+    const writer = createMemoryAuditWriter()
+    const scripts: NativeScript[] = []
+    const runtime = nativeRuntime(standInLibrary([DUNE]), {
+      governance: { policy: FORBID_BOOK_LIST, writer },
+      scripts,
+    })
+
+    const error = await rejectionOf(runtime.resolveReference('library', books(), CONTEXT))
+
+    expect(error).toBeInstanceOf(PolicyDeniedError)
+    expect(writer.records.map((record) => [record.capability, record.decision])).toEqual([
+      ['library:books:list', 'denied'],
+    ])
+    expect(scripts).toEqual([])
   })
 
   it('fails with TargetNotFoundError naming the book when none has the ISBN', async () => {

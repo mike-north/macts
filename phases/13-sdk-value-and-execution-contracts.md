@@ -1535,8 +1535,10 @@ plus identity collections whose entries are in it:
   single references, so each is found the same way, all before any record is
   read, and read the same way, in entry order, in one automation process. A
   missing entry is `TargetNotFoundError` with `entryIndex`, the first missing
-  entry. An identity collection with no entries resolves to `[]` without
-  running anything.
+  entry. An identity collection with no entries is authorized, governed and
+  audited like any other resolution, as a call of the resource's `list`
+  (resolution, steps 1 to 6, below), and then resolves to `[]` with no
+  automation run: the executor answers it without starting a process.
 - Every other reference fails as `InternalError` whose message names the form
   the provider does not resolve, before any automation runs: every selector
   form; a reference, or an identity-collection entry, with a container; and a

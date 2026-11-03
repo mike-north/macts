@@ -218,7 +218,8 @@ export function createNativeExecutor(options: NativeExecutorOptions = {}): Execu
       const unresolvable = unresolvableForm(manifest, reference, references)
       if (unresolvable !== undefined) throw new InternalError(unresolvable, {})
       // An identity collection with no entries names no object, so there is
-      // nothing to address and nothing to read.
+      // nothing to address and nothing to read. The runtime has already
+      // authorized, governed and audited the call before it reached here.
       if (resolution.entryCount === 0) return []
 
       const get = resolvingCommand(manifest, reference.resource, 'get')
