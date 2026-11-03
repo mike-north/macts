@@ -639,8 +639,8 @@ export const manifest: unknown = {
           unique: true,
           evidence: {
             unique: {
-              source: 'sdef',
-              note: 'The app\'s scripting dictionary describes the property as "the id of the item as a hexadecimal string. This id does not change over time."',
+              source: 'curated',
+              note: "The application's playlists collection lists each playlist object once; a repeated entry arises only for a track inside a playlist, which is why Track is not unique. A read-only list of every playlist on Music 1.7.2 (macOS 27.2), 2026-11-03, found 3 playlists with 3 distinct persistent IDs, as did each source's playlists. The dictionary describes the property as an id that does not change over time, which is about persistence, not uniqueness.",
             },
           },
         },
