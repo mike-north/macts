@@ -336,6 +336,7 @@ if (result.valid) {
 - `INVALID_SIGNATURE`: JWT signature verification failed
 - `EXPIRED`: Token has passed its expiration time
 - `REVOKED`: Token has been revoked
+- `UNKNOWN_KEY`: Token is correctly signed, but the key store holds no record for it (the key was deleted or never stored)
 - `MALFORMED_PAYLOAD`: Token payload doesn't match expected structure
 
 #### `validateAndCheckPermission(token, requiredPermission, permissionHistory?)`
