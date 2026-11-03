@@ -14,7 +14,7 @@ export class SearchPlaylistCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  playlistId = Option.String({ required: true })
+  playlistId = Option.String({ name: 'persistent-id', required: true })
   for = Option.String('--for', { required: true, description: 'the search text' })
   only = Option.String('--only', {
     required: false,

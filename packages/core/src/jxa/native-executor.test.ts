@@ -169,17 +169,28 @@ describe('createNativeExecutor', () => {
     })
 
     it('adds the legacy identifier aliases to list items only for passthrough output', async () => {
+      // Calendar calendars have no `id` field of their own, so a passthrough
+      // list mirrors their working identifier (`name`) under `id`. (A Notes
+      // account has its own `id`, which the alias never overwrites.)
+      const calendar = await loadManifest(
+        fileURLToPath(new URL('../../../../manifests/calendar/app.yaml', import.meta.url))
+      )
+      const listCalendars: OperationTarget = { command: 'list', resource: 'Calendar' }
       const run = mockRun().mockResolvedValue({ ok: true, value: [] })
       const executor = createNativeExecutor({ transport: { run } })
       const typedOutput: ValuePlan = { kind: 'array', items: { kind: 'unknown' } }
 
-      await executor.execute(request({ target: LIST_ACCOUNTS, input: {} }))
-      await executor.execute(request({ target: LIST_ACCOUNTS, input: {}, outputPlan: typedOutput }))
+      const listRequest = { manifest: calendar, target: listCalendars, input: {} }
+      await executor.execute(request(listRequest))
+      await executor.execute(request({ ...listRequest, outputPlan: typedOutput }))
 
       const [passthrough, typed] = run.mock.calls.map(([script]) => script.body)
-      expect(passthrough).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: true }))
-      expect(typed).toBe(buildNativeBody(notes, LIST_ACCOUNTS, { identifierAliases: false }))
-      expect(passthrough).not.toBe(typed)
+      expect(passthrough).toBe(
+        buildNativeBody(calendar, listCalendars, { identifierAliases: true })
+      )
+      expect(typed).toBe(buildNativeBody(calendar, listCalendars, { identifierAliases: false }))
+      expect(passthrough).toContain('obj["id"] = obj["name"];')
+      expect(typed).not.toContain('obj["id"] =')
     })
 
     it('reads a page window with the paged list body, encoding items by the item plan and the window facts as plain data', async () => {

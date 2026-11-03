@@ -42,7 +42,7 @@ export interface ApiKeyPayload {
 }
 
 // @public
-export type ApiKeyValidationErrorCode = 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'MALFORMED_PAYLOAD';
+export type ApiKeyValidationErrorCode = 'INVALID_FORMAT' | 'INVALID_SIGNATURE' | 'EXPIRED' | 'REVOKED' | 'UNKNOWN_KEY' | 'MALFORMED_PAYLOAD';
 
 // @public
 export interface ApiKeyValidationFailure {
@@ -788,8 +788,10 @@ export interface CliGeneratorContext {
     getResource(name: string): Resource | undefined;
     getResourceCommands(resourceName: string): Command[];
     getResources(): Resource[];
+    isOperationAvailable(cmd: Command, resourceName: string | undefined): boolean;
     // (undocumented)
     manifest: AppManifest;
+    omittedInputs(cmd: Command, resourceName: string | undefined): ReadonlySet<string>;
     // (undocumented)
     options: CliGeneratorOptions;
 }
@@ -2953,6 +2955,9 @@ export function resolveActivePolicyPath(home: string): string;
 
 // @public
 export function resolveApprovalConfigPath(home: string): string;
+
+// @public
+export function resolveCanonicalIdentifierSource(resource: Resource | undefined): string | undefined;
 
 // @public
 export function resolveCommandRoutes(manifest: AppManifest, commandKey: string, command: Command): ManifestRoute[];

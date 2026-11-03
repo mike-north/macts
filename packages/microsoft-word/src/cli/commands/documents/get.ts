@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a document by ID.
+ * Get a document by name.
  */
 export class GetDocumentCommand extends Command {
   static override paths = [['microsoft-word', 'documents', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a document by ID',
+    description: 'Get a document by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  documentId = Option.String({ required: true })
+  documentId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

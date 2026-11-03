@@ -175,6 +175,17 @@ export function identifierWords(identifier: string): string {
 }
 
 /**
+ * A noun phrase with its indefinite article, for generated prose: `a note`,
+ * `an event`, `an AIM handle`. The article follows the noun's first letter.
+ *
+ * @param noun - The noun phrase, such as {@link identifierWords} produces.
+ * @returns The phrase prefixed with `a` or `an`.
+ */
+export function withArticle(noun: string): string {
+  return `${/^[aeiou]/i.test(noun) ? 'an' : 'a'} ${noun}`
+}
+
+/**
  * The backing command for a CRUD shape among a resource's commands: the first,
  * in declaration order, whose `name` is `operation`. Returns `undefined` when
  * the manifest declares no such command, so the client has no such method.
@@ -186,6 +197,23 @@ export function findCrudCommand(
   operation: CrudOperation
 ): [string, Command] | undefined {
   return resourceCommands.find(([, cmd]) => cmd.name === operation)
+}
+
+/**
+ * The command whose operation resolves references to a resource: its first
+ * usable `get` (single references, containers, and identity-collection
+ * entries) or `list` (collections), as a `[commandKey, command]` pair.
+ *
+ * It is the one place this choice is made. The contract's resource table
+ * records the operations of these commands, and the input satisfiability
+ * judgment asks whether a `get` exists, so the two cannot disagree.
+ */
+export function resolvingCommand(
+  manifest: AppManifest,
+  resourceName: string,
+  shape: 'get' | 'list'
+): [string, Command] | undefined {
+  return findCrudCommand(resourceCommandEntries(manifest, resourceName), shape)
 }
 
 /**

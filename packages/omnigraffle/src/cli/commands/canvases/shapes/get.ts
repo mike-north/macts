@@ -14,7 +14,7 @@ export class GetShapeCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  shapeId = Option.String({ required: true })
+  shapeId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -25,6 +25,7 @@ import {
   type ClientRuntime,
   type FileValue,
   type Integer,
+  type ObjectReferenceData,
   type ObjectReferenceVariant,
   type OperationDescriptor,
   type Page,
@@ -77,17 +78,21 @@ export interface WorkspaceDocument {
    * The workspace's scheme that will be used for scheme actions.
    * Nullable. No evidence that the app always sets it.
    */
-  activeScheme: ObjectReferenceVariant<Scheme, string> | null
+  activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null
   /**
    * The workspace's run destination that will be used for scheme actions.
    * Nullable. No evidence that the app always sets it.
    */
-  activeRunDestination: ObjectReferenceVariant<RunDestination, string> | null
+  activeRunDestination: ObjectReferenceVariant<RunDestination, string, 'RunDestination'> | null
   /**
    * The scheme action result for the last scheme action command issued to the workspace document.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string> | null
+  readonly lastSchemeActionResult: ObjectReferenceVariant<
+    SchemeActionResult,
+    string,
+    'SchemeActionResult'
+  > | null
 }
 
 /** A document that represents a file on disk */
@@ -238,7 +243,7 @@ export interface Target {
    * The project that contains this target.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly project: ObjectReferenceVariant<Project, string> | null
+  readonly project: ObjectReferenceVariant<Project, string, 'Project'> | null
 }
 
 /**
@@ -326,12 +331,12 @@ export interface RunDestination {
    * The physical or virtual device which this run destination targets.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly device: ObjectReferenceVariant<Device, string> | null
+  readonly device: ObjectReferenceVariant<Device, string, 'Device'> | null
   /**
    * If the run destination's device has a companion, this is that device.
    * Nullable. No evidence that the app always sets it.
    */
-  readonly companionDevice: ObjectReferenceVariant<Device, string> | null
+  readonly companionDevice: ObjectReferenceVariant<Device, string, 'Device'> | null
 }
 
 /** A device which can be used as the target for a scheme action, as part of a run destination */
@@ -531,9 +536,9 @@ export interface TestFailure {
 /** Input for creating a WorkspaceDocument. */
 export interface WorkspaceDocumentCreateInput {
   /** The workspace's scheme that will be used for scheme actions */
-  activeScheme?: ObjectReferenceVariant<Scheme, string>
+  activeScheme?: ObjectReferenceData<string, 'Scheme'>
   /** The workspace's run destination that will be used for scheme actions */
-  activeRunDestination?: ObjectReferenceVariant<RunDestination, string>
+  activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>
 }
 
 /** Input for updating a WorkspaceDocument. Omitted fields are left unchanged. */
@@ -542,12 +547,12 @@ export interface WorkspaceDocumentUpdateInput {
    * The workspace's scheme that will be used for scheme actions.
    * Cannot be reset: null is rejected.
    */
-  activeScheme?: ObjectReferenceVariant<Scheme, string>
+  activeScheme?: ObjectReferenceData<string, 'Scheme'>
   /**
    * The workspace's run destination that will be used for scheme actions.
    * Cannot be reset: null is rejected.
    */
-  activeRunDestination?: ObjectReferenceVariant<RunDestination, string>
+  activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>
 }
 
 /** Input for creating a FileDocument. */
@@ -1154,15 +1159,23 @@ const workspaceDocumentRecordType: ValueType<WorkspaceDocument> = t.record(
       description: 'Whether the workspace document has finished loading after being opened',
     }),
     activeScheme: t.nullable(
-      t.reference<Scheme, string>(() => resources, 'Scheme', 'one'),
+      t.reference<Scheme, string, 'Scheme'>(() => xcodeContract, 'Scheme', 'one'),
       { description: "The workspace's scheme that will be used for scheme actions" }
     ),
     activeRunDestination: t.nullable(
-      t.reference<RunDestination, string>(() => resources, 'RunDestination', 'one'),
+      t.reference<RunDestination, string, 'RunDestination'>(
+        () => xcodeContract,
+        'RunDestination',
+        'one'
+      ),
       { description: "The workspace's run destination that will be used for scheme actions" }
     ),
     lastSchemeActionResult: t.nullable(
-      t.reference<SchemeActionResult, string>(() => resources, 'SchemeActionResult', 'one'),
+      t.reference<SchemeActionResult, string, 'SchemeActionResult'>(
+        () => xcodeContract,
+        'SchemeActionResult',
+        'one'
+      ),
       {
         description:
           'The scheme action result for the last scheme action command issued to the workspace document',
@@ -1241,7 +1254,7 @@ const targetRecordType: ValueType<Target> = t.record(
     id: t.string({ description: 'The unique identifier for the target' }),
     name: t.nullable(t.string(), { description: 'The name of this target' }),
     project: t.nullable(
-      t.reference<Project, string>(() => resources, 'Project', 'one'),
+      t.reference<Project, string, 'Project'>(() => xcodeContract, 'Project', 'one'),
       { description: 'The project that contains this target' }
     ),
   },
@@ -1301,11 +1314,11 @@ const runDestinationRecordType: ValueType<RunDestination> = t.record(
       description: 'The identifier of the platform which this run destination targets',
     }),
     device: t.nullable(
-      t.reference<Device, string>(() => resources, 'Device', 'one'),
+      t.reference<Device, string, 'Device'>(() => xcodeContract, 'Device', 'one'),
       { description: 'The physical or virtual device which this run destination targets' }
     ),
     companionDevice: t.nullable(
-      t.reference<Device, string>(() => resources, 'Device', 'one'),
+      t.reference<Device, string, 'Device'>(() => xcodeContract, 'Device', 'one'),
       { description: "If the run destination's device has a companion, this is that device" }
     ),
   },

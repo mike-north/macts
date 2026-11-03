@@ -14,7 +14,7 @@ export class GetListCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  listId = Option.String({ required: true })
+  listId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

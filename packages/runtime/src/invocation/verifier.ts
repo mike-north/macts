@@ -57,6 +57,9 @@ const REASON_BY_VALIDATION_CODE: Readonly<
   INVALID_SIGNATURE: 'invalid',
   EXPIRED: 'expired',
   REVOKED: 'revoked',
+  // A correctly signed key with no stored record cannot be verified against
+  // the store; it gets the same answer as a bad signature.
+  UNKNOWN_KEY: 'invalid',
 }
 
 /** Build the canonical error for an authentication failure. */
@@ -85,7 +88,8 @@ function authorityFromPayload(payload: ApiKeyPayload): Authority {
  * The default verifier: macts API keys checked against the local key store.
  *
  * @remarks
- * Delegates to `validateApiKey` for format, signature, expiry, and revocation,
+ * Delegates to `validateApiKey` for format, signature, expiry, and the key's
+ * stored record (revoked, or missing because it was deleted or never stored),
  * and maps its result onto the canonical failure reasons. An empty secret is
  * reported as `missing` without consulting the store.
  *

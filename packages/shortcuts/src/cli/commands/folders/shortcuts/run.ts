@@ -15,7 +15,7 @@ export class RunShortcutCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   folderId = Option.String('--folder-id', { required: true, description: 'Folder ID' })
-  shortcutId = Option.String({ required: true })
+  shortcutId = Option.String({ name: 'id', required: true })
   id = Option.String('--id', { required: true, description: 'The shortcut to run' })
   withInput = Option.String('--with-input', {
     required: false,

@@ -52,6 +52,7 @@ import type { Resource } from '../manifest/schemas/resource.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
+  resolveCanonicalIdentifierSource,
   resolveIdentifierTargeting,
   resolveListOutputProperties,
   resolvePrimaryIdentifierProperty,
@@ -342,30 +343,48 @@ export function buildTargetExpression(
   resourcePlural: string,
   valueExpression: string
 ): string {
-  const collection = member('app', resourcePlural)
+  return lookupInCollection(resource, member('app', resourcePlural), valueExpression)
+}
+
+/**
+ * Expression addressing one child item under a parent specifier, by the
+ * child resource's identifier targeting, in the same two forms as
+ * {@link buildTargetExpression}:
+ *
+ * - `byId`: `<parentTarget>["<childPlural>"].byId(<childId>)`;
+ * - `byProperty`: `<parentTarget>["<childPlural>"].whose({ "<property>": <childId> })[0]`.
+ *
+ * Calendar events are reachable only this way. `app.events.byId(uid)` builds a
+ * specifier that fails with "no such object" when used, because events are not
+ * a top-level collection; the parent-scoped form is readable, settable, and
+ * deletable. A Music track is matched by its persistent ID under its playlist,
+ * because its numeric id belongs to its entry in that one playlist.
+ */
+export function buildNestedTargetExpression(
+  resource: Resource | undefined,
+  parentTarget: string,
+  childPlural: string,
+  childIdExpression: string
+): string {
+  return lookupInCollection(resource, member(parentTarget, childPlural), childIdExpression)
+}
+
+/**
+ * Expression addressing the item of `collection` whose identifier is
+ * `valueExpression`, in the form the resource's identifier targeting selects.
+ * A resource with no identifier takes the `byId` form.
+ */
+function lookupInCollection(
+  resource: Resource | undefined,
+  collection: string,
+  valueExpression: string
+): string {
   const targeting = resolveIdentifierTargeting(resource)
   if (targeting?.strategy === 'byProperty') {
     const property = nativePropertyName(resource, targeting.property)
     return `${collection}.whose({ ${literal(property)}: ${valueExpression} })[0]`
   }
   return `${collection}.byId(${valueExpression})`
-}
-
-/**
- * Expression addressing one child item under a parent specifier:
- * `<parentTarget>["<childPlural>"].byId(<childId>)`.
- *
- * Calendar events are reachable only this way. `app.events.byId(uid)` builds a
- * specifier that fails with "no such object" when used, because events are not
- * a top-level collection; the parent-scoped form is readable, settable, and
- * deletable.
- */
-export function buildNestedTargetExpression(
-  parentTarget: string,
-  childPlural: string,
-  childIdExpression: string
-): string {
-  return `${member(parentTarget, childPlural)}.byId(${childIdExpression})`
 }
 
 /**
@@ -527,7 +546,7 @@ function bindTarget(
     readParentId(command, parentScope),
     itemId,
     bindParent(parentScope.parentTarget),
-    `var item = ${buildNestedTargetExpression(PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
+    `var item = ${buildNestedTargetExpression(resource, PARENT_LOCAL, resourcePlural, ITEM_ID_LOCAL)};`,
     failIfMissing('item')
   )
 }
@@ -1051,10 +1070,15 @@ function buildListBody(
   })
   const idField =
     runtimeIdProperty !== undefined ? `${member('obj', runtimeIdProperty)} = ${IDS_LOCAL}[i];` : ''
+  // The canonical alias is left out when the resource has its own `id` field
+  // (see resolveCanonicalIdentifierSource), so it never overwrites that field.
+  const aliasSource = resolveCanonicalIdentifierSource(resource)
   const idAlias =
     identifierAliases && runtimeIdProperty !== undefined
       ? lines(
-          `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', runtimeIdProperty)};`,
+          aliasSource === undefined
+            ? ''
+            : `${member('obj', CANONICAL_IDENTIFIER_KEY)} = ${member('obj', aliasSource)};`,
           declaredIdProperty !== undefined && declaredIdProperty !== runtimeIdProperty
             ? `${member('obj', declaredIdProperty)} = ${member('obj', runtimeIdProperty)};`
             : ''

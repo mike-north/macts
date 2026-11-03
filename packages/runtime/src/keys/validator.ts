@@ -14,14 +14,11 @@ import type {
   PermissionHistoryEntry,
 } from '@macts/core'
 import { hasPermission, checkPermission, checkPermissions, isValidPermission } from '@macts/core'
-import { getSigningSecret, isKeyRevoked } from './storage.js'
-import { TtlCache } from './cache.js'
+import { getKeyRecordStatus, getSigningSecret, type KeyRecordStatus } from './storage.js'
+import { cacheKeyStatus, getCachedKeyStatus } from './key-status-cache.js'
 
 /** API key prefix */
 const KEY_PREFIX = 'macts_sk_'
-
-/** Cache for revocation checks (5-second TTL) */
-const revocationCache = new TtlCache<boolean>(5000)
 
 /**
  * Validate an API key token.
@@ -30,7 +27,18 @@ const revocationCache = new TtlCache<boolean>(5000)
  * 1. Token format (must start with macts_sk_)
  * 2. JWT signature
  * 3. Expiration (if set)
- * 4. Revocation status
+ * 4. Payload structure
+ * 5. Stored record: the key store must hold an unrevoked record for the key.
+ *    A signature alone never makes a key valid; a key with no stored record
+ *    (deleted, or never stored) fails with `UNKNOWN_KEY`, and a revoked one
+ *    with `REVOKED`.
+ *
+ * The stored status is cached per process for at most five seconds. Revoking,
+ * updating, or deleting a key through this process's key store drops its
+ * cached status, so the next validation here sees the change at once. A change
+ * made by another process (for example the CLI, while a server runs) is seen
+ * here once the cached status expires, within five seconds. A missing record
+ * is never cached.
  *
  * @param token - The API key token to validate
  * @returns Validation result with payload if valid
@@ -92,14 +100,16 @@ export async function validateApiKey(token: string): Promise<ApiKeyValidationRes
 
   const apiKeyPayload = payload as unknown as ApiKeyPayload
 
-  // Check revocation (with cache)
-  const keyId = apiKeyPayload.sub
-  let revoked = revocationCache.get(keyId)
-  if (revoked === undefined) {
-    revoked = isKeyRevoked(keyId)
-    revocationCache.set(keyId, revoked)
+  const status = storedKeyStatus(apiKeyPayload.sub)
+  if (status === 'missing') {
+    // Same detail as the other refusals: the key is not usable, nothing more.
+    return {
+      valid: false,
+      error: 'Token is not recognized',
+      errorCode: 'UNKNOWN_KEY',
+    }
   }
-  if (revoked) {
+  if (status === 'revoked') {
     return {
       valid: false,
       error: 'Token has been revoked',
@@ -111,6 +121,24 @@ export async function validateApiKey(token: string): Promise<ApiKeyValidationRes
     valid: true,
     payload: apiKeyPayload,
   }
+}
+
+/**
+ * The stored status of `keyId`, served from the per-process cache when fresh.
+ *
+ * Only statuses backed by a stored record are cached; `missing` is returned
+ * uncached so a key without a record is checked against the store every time.
+ */
+function storedKeyStatus(keyId: string): KeyRecordStatus {
+  const cached = getCachedKeyStatus(keyId)
+  if (cached !== undefined) {
+    return cached
+  }
+  const status = getKeyRecordStatus(keyId)
+  if (status !== 'missing') {
+    cacheKeyStatus(keyId, status)
+  }
+  return status
 }
 
 /**

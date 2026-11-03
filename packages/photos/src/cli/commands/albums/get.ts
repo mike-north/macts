@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a album by ID.
+ * Get an album by ID.
  */
 export class GetAlbumCommand extends Command {
   static override paths = [['photos', 'albums', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a album by ID',
+    description: 'Get an album by ID',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  albumId = Option.String({ required: true })
+  albumId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

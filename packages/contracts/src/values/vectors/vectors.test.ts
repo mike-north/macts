@@ -22,6 +22,7 @@ import { VALUE_ISSUE_CODES } from '../value-issues.js'
 import {
   REJECTION_VECTORS,
   VALUE_VECTORS,
+  VECTOR_APP,
   VECTOR_DECODE_CONTEXT as context,
   sameValueMismatches,
 } from './index.js'
@@ -71,6 +72,16 @@ describe('value vectors', () => {
     if (!(vector.sdk instanceof Date))
       throw new Error('a vector with epoch milliseconds holds a Date')
     expect(vector.sdk.getTime()).toBe(vector.epochMilliseconds)
+  })
+
+  it('never carries the app of a reference on the wire', () => {
+    // A reference names its app in its SDK form only: the route names the app.
+    const references = VALUE_VECTORS.filter((vector) => vector.type.plan.kind === 'reference')
+    expect(references.length).toBeGreaterThan(0)
+    for (const vector of references) {
+      expect(JSON.stringify(vector.wire)).not.toContain('"app"')
+      expect(JSON.stringify(vector.sdk)).toContain(`"app":"${VECTOR_APP}"`)
+    }
   })
 
   it('cites the contract and names each vector uniquely', () => {

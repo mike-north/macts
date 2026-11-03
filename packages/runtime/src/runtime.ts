@@ -77,6 +77,7 @@ import {
   ValueTypes,
   isPageValueType,
   referenceResultType,
+  resolvingOperationKey,
   type AppContract,
   type Authority,
   type Credential,
@@ -202,12 +203,25 @@ export interface MactsRuntime {
    *   resource. A refused registration adds nothing.
    */
   registerContract(contract: AppContract<unknown>, manifest: AppManifest): void
-  /** Every registered operation, in registration order. */
+  /**
+   * Every registered operation, in registration order, including one marked
+   * `unavailable`: a surface built from this list leaves those out, and
+   * `invoke` answers them as unknown.
+   */
   operations(): readonly RegisteredOperation[]
-  /** The operation registered under `id`, if any. */
+  /**
+   * The operation registered under `id`, if any, including one marked
+   * `unavailable`.
+   */
   operation(id: OperationId): RegisteredOperation | undefined
   /**
    * Run one operation through the full invocation pipeline.
+   *
+   * An operation marked `unavailable` (one whose required input admits no
+   * value, D7) is answered exactly as an unknown id: the same
+   * `ValidationError`, after the credential is verified and the call admitted,
+   * and before permission, governance or approval, so no human is ever asked
+   * to approve a call that cannot run.
    *
    * @param id - The operation to run.
    * @param input - The input record in wire form, as received.
@@ -231,7 +245,9 @@ export interface MactsRuntime {
    * The reference resolves as a call of its resource's `get` operation
    * (cardinality `'one'`) or `list` operation (`'many'`): the operation the
    * app contract records for that resource (`ResourceDescriptor.get` and
-   * `.list`), never one re-derived from the manifest. The caller's key must hold that operation's permission, and the
+   * `.list`), never one re-derived from the manifest. A resource whose
+   * recorded operation is marked `unavailable` is not resolvable, as if it
+   * recorded none. The caller's key must hold that operation's permission, and the
    * call is governed, approved, and audited exactly as a direct call of that
    * operation. Only the target resource's permission is required: containers
    * locate the target and contribute no data, so they need none.
@@ -265,12 +281,23 @@ export interface MactsRuntime {
 }
 
 /**
- * The registered operations references to one resource resolve as, by
- * cardinality: the `get` operation the contract records for a single
+ * The ids of the registered operations references to one resource resolve as,
+ * by cardinality: the `get` operation the contract records for a single
  * reference, the `list` operation for a collection. Absent when the contract
  * records none.
  */
-type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, ResolvingOperation>>>
+type ResolvingOperations = Readonly<Partial<Record<ReferenceCardinality, ResolvingEntry>>>
+
+/**
+ * What a contract records for one cardinality of a resource's references: the
+ * id of the operation they resolve as, looked up when a reference is resolved
+ * (so an operation marked `unavailable` is not resolvable), and the value type
+ * of what the resolution returns ({@link referenceResultType}).
+ */
+interface ResolvingEntry {
+  readonly id: OperationId
+  readonly result: ValueType<unknown>
+}
 
 /**
  * The operation a reference resolves as, and the value type of what the
@@ -335,8 +362,9 @@ interface RegisteredApp {
   /** The app's contract; its resource table is the app's reference registry. */
   readonly contract: AppContract<unknown>
   /**
-   * The operations each resource's references resolve as, keyed by resource
-   * key; checked against the contract's operations when the app registered.
+   * The ids of the operations each resource's references resolve as, keyed by
+   * resource key; checked against the contract's operations when the app
+   * registered.
    */
   readonly resolving: ReadonlyMap<string, ResolvingOperations>
 }
@@ -357,6 +385,9 @@ interface ReferenceTarget {
  * operation is not yet known.
  */
 type CallLabel = Readonly<Record<string, string>>
+
+/** Both reference cardinalities, each resolving as the operation `resolvingOperationKey` names. */
+const REFERENCE_CARDINALITIES: readonly ReferenceCardinality[] = ['one', 'many']
 
 /** Whether `value` is a plain record (not `null`, not an array). */
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -393,6 +424,17 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   const registry = new OperationRegistry()
   /** Apps registered from a contract, keyed by the contract's app segment. */
   const apps = new Map<string, RegisteredApp>()
+
+  /**
+   * The operation a call names, if it can run: registered under `id` and not
+   * marked `unavailable`. Every entry that runs an operation finds it here, so
+   * an operation no input can call (D7) is answered exactly as one that is not
+   * registered, before its permission, governance or approval is consulted.
+   */
+  function callableOperation(id: OperationId): RegisteredOperation | undefined {
+    const operation = registry.get(id)
+    return operation?.descriptor.unavailable === undefined ? operation : undefined
+  }
 
   /** Details for an internal failure, carrying the caller's correlation id when given. */
   function internalDetails(context: InvocationContext): { correlationId?: string } {
@@ -892,34 +934,38 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   }
 
   /**
-   * The registered operation a reference resolves as: the resource's `get`
-   * operation for a single reference, its `list` operation for a collection.
+   * The registered operation a reference resolves as, with the value type of
+   * what it returns: the resource's `get` operation for a single reference,
+   * its `list` operation for a collection (whose result is an array of the
+   * page's items, see {@link referenceResultType}).
    *
    * @remarks
    * The contract records which operation that is (`ResourceDescriptor.get` and
    * `.list`, chosen when the contract was generated), so the runtime reads it
    * from the contract, the source of truth, and never re-derives it from the
    * manifest. Registration has already checked every recorded id against the
-   * contract's operations. A resource that records no such operation is not
-   * resolvable.
+   * contract's operations. The operation is found through the same lookup as
+   * `invoke`'s ({@link callableOperation}), so a resource that records no such
+   * operation, or one marked `unavailable`, is not resolvable.
    */
   function resolvingOperation(app: RegisteredApp, target: ReferenceTarget): ResolvingOperation {
     const { resource, cardinality } = target
-    const operation = app.resolving.get(resource)?.[cardinality]
-    if (operation === undefined) {
-      const shape = cardinality === 'one' ? 'get' : 'list'
+    const entry = app.resolving.get(resource)?.[cardinality]
+    const operation = entry === undefined ? undefined : callableOperation(entry.id)
+    if (entry === undefined || operation === undefined) {
+      const shape = resolvingOperationKey(cardinality)
       throw new InvalidSelectionError(
         `References to "${resource}" cannot be resolved: the ${app.contract.app} app has no ${shape} operation for it.`,
         { resource }
       )
     }
-    return operation
+    return { operation, result: entry.result }
   }
 
   /**
    * Validate the whole reference with the app contract's reference value type,
-   * `t.reference(resources, resource, cardinality)`, and return its payload in
-   * wire form.
+   * `t.reference(() => contract, resource, cardinality)`, whose scope is the
+   * contract (its app and resource table), and return its payload in wire form.
    */
   function validateReference(
     app: RegisteredApp,
@@ -928,8 +974,8 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
   ): ReferenceWire {
     const type =
       target.cardinality === 'one'
-        ? ValueTypes.reference(() => app.contract.resources, target.resource, 'one')
-        : ValueTypes.reference(() => app.contract.resources, target.resource, 'many')
+        ? ValueTypes.reference(() => app.contract, target.resource, 'one')
+        : ValueTypes.reference(() => app.contract, target.resource, 'many')
     const parsed = type.wire.safeParse(reference)
     if (!parsed.success) {
       throw new ValidationError('The reference failed validation.', {
@@ -1055,11 +1101,9 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
     const byId = new Map(operations.map((operation) => [operation.descriptor.id, operation]))
     const resolving = new Map<string, ResolvingOperations>()
     for (const [resource, descriptor] of Object.entries(contract.resources)) {
-      const entry: Partial<Record<ReferenceCardinality, ResolvingOperation>> = {}
-      for (const [field, cardinality] of [
-        ['get', 'one'],
-        ['list', 'many'],
-      ] as const) {
+      const entry: Partial<Record<ReferenceCardinality, ResolvingEntry>> = {}
+      for (const cardinality of REFERENCE_CARDINALITIES) {
+        const field = resolvingOperationKey(cardinality)
         const id = descriptor[field]
         if (id === undefined) continue
         const operation = byId.get(id)
@@ -1084,7 +1128,7 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
             { cause: error }
           )
         }
-        entry[cardinality] = { operation, result }
+        entry[cardinality] = { id, result }
       }
       resolving.set(resource, entry)
     }
@@ -1125,11 +1169,12 @@ export function createRuntime(options: CreateRuntimeOptions): MactsRuntime {
       const authority = await verify(context, { operation: id })
       admit(authority, context, { operation: id })
 
-      const operation = registry.get(id)
+      const operation = callableOperation(id)
       if (operation === undefined) {
         // An unknown operation is a caller error (a mistyped or stale id), not
         // an internal failure and not an authorization outcome, so it reports
-        // as a validation failure of the request as a whole.
+        // as a validation failure of the request as a whole. An operation
+        // marked unavailable can never run, so it is answered the same way.
         throw new ValidationError(`Unknown operation "${id}".`, {
           issues: [{ path: [], message: `No operation is registered with id "${id}"` }],
         })

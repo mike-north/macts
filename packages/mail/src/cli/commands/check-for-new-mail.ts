@@ -13,18 +13,13 @@ export class CheckForNewMailCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  for = Option.String('--for', {
-    required: false,
-    description: 'Specify the account that you wish to check for mail',
-  })
+
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)
 
     try {
       const client = getClient()
-      await client.checkForNewMail(
-        this.for as unknown as Parameters<typeof client.checkForNewMail>[0]
-      )
+      await client.checkForNewMail()
 
       const output = formatter.formatSuccess('checkForNewMail completed successfully')
       this.context.stdout.write(output + '\n')

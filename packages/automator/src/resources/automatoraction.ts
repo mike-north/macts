@@ -21,7 +21,7 @@ export class AutomatorActionResourceClient {
   }
 
   /**
-   * List automator actions, one page at a time. When the result has a `nextCursor`,
+   * List the automator actions of one workflow, one page at a time. When the result has a `nextCursor`,
    * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
   async list(

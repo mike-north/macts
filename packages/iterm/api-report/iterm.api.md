@@ -508,7 +508,6 @@ export interface Tab {
 
 // @public
 export interface TabCreateInput {
-    currentSession?: Session;
     index?: number;
     title?: string;
 }
@@ -575,8 +574,6 @@ export interface WindowCreateInput {
         width: number;
         height: number;
     };
-    currentSession?: Session;
-    currentTab?: Tab;
     frame?: {
         x: number;
         y: number;

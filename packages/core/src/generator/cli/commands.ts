@@ -4,10 +4,16 @@ import type {
   CommandParameter,
 } from '../../manifest/index.js'
 import { PAGE_SIZE_LIMITS } from '@macts/contracts'
-import { listOperationPages } from '../../manifest/index.js'
+import { listOperationPages, resolvePrimaryIdentifierProperty } from '../../manifest/index.js'
 import { usableProperties } from '../../manifest/unsupported.js'
 import type { CliGeneratorContext, HierarchyPath, ParentParam } from './context.js'
-import { identifierWords, resolveIdParams, resourceNamespace, safeIdentifier } from '../surface.js'
+import {
+  identifierWords,
+  resolveIdParams,
+  resourceNamespace,
+  safeIdentifier,
+  withArticle,
+} from '../surface.js'
 
 /**
  * Instance members of Clipanion's \`Command\` base class. A generated option whose
@@ -27,6 +33,46 @@ const CLIPANION_RESERVED_MEMBERS = new Set(['path', 'cli', 'context', 'help'])
 function safeParamProperty(paramName: string, commandName: string): string {
   if (!CLIPANION_RESERVED_MEMBERS.has(paramName)) return paramName
   return `${toCamelCase(commandName)}${toPascalCase(paramName)}`
+}
+
+/**
+ * The identifier a caller gives to address one item of a resource: the
+ * resource's primary identifier property, which every lookup of one item
+ * matches, whatever the get command calls its parameter (Calendar's get takes
+ * `id` and matches a calendar's `name`). A resource that declares no
+ * identifier is addressed by its get command's identifier parameter. With
+ * neither, the identifier is unknown and `undefined` is returned.
+ */
+function addressingIdentifier(
+  resource: Resource,
+  getCommand: ManifestCommand | undefined
+): string | undefined {
+  return (
+    resolvePrimaryIdentifierProperty(resource) ??
+    (getCommand === undefined ? undefined : resolveIdParams(getCommand).childParam)
+  )
+}
+
+/**
+ * An identifier in help prose, as {@link identifierWords} writes it, except
+ * that a bare `id` is written `ID`: `persistentID` → `persistent ID`, `name` →
+ * `name`, `id` → `ID`.
+ */
+function identifierProse(identifier: string): string {
+  const words = identifierWords(identifier)
+  return words === 'id' ? 'ID' : words
+}
+
+/**
+ * The declaration of the positional argument that carries an item's
+ * identifier. Its label in usage is the identifier in kebab case
+ * (`<persistent-id>`, `<name>`, `<id>`), so help shows what to pass. When the
+ * identifier is unknown, usage shows the property name, as it always did.
+ */
+function identifierPositional(property: string, identifier: string | undefined): string {
+  return identifier === undefined
+    ? `  ${property} = Option.String({ required: true });`
+    : `  ${property} = Option.String({ name: '${toKebabCase(identifier)}', required: true });`
 }
 
 /**
@@ -201,11 +247,19 @@ export function generateCreateCommand(
   // Build parameter options for parent IDs
   const parentOptions = generateParentOptions(hierarchyPath.parentParams)
 
-  // Build flag options for writable properties
-  const propertyFlags = generatePropertyFlags(resource, ctx)
+  // Build flag options for writable properties, except inputs left out
+  // because they admit no value
+  const createCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'create')
+  const omitted =
+    createCommand === undefined
+      ? new Set<string>()
+      : ctx.omittedInputs(createCommand, hierarchyPath.resourceName)
+  const propertyFlags = generatePropertyFlags(resource, ctx, omitted)
 
   // Build create input object
-  const createInput = generateCreateInput(resource)
+  const createInput = generateCreateInput(resource, omitted)
 
   const needsTypanion = propertyFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -292,24 +346,28 @@ export function generateGetCommand(
     getCommand === undefined ? undefined : resolveIdParams(getCommand).parentParam
   const parentScopeParams = (getCommand?.parameters ?? []).filter((p) => p.name === parentParamName)
   const parentOptions = generateListParamOptions(parentScopeParams)
+  // A get command is generated only when a get command backs it, so its
+  // identifier parameter is always known here.
+  const identifier = addressingIdentifier(resource, getCommand) ?? 'id'
+  const summary = `Get ${withArticle(identifierWords(resource.name))} by ${identifierProse(identifier)}`
 
   const content = `import { Command, Option } from 'clipanion';
 import { getClient } from '${sdkImportPath}';
 import { createFormatter } from '${outputImportPath}';
 
 /**
- * Get a ${identifierWords(resource.name)} by ID.
+ * ${summary}.
  */
 export class Get${resource.name}Command extends Command {
   static override paths = [[${cliPath.map((p) => JSON.stringify(p)).join(', ')}]];
 
   static override usage = Command.Usage({
-    description: 'Get a ${identifierWords(resource.name)} by ID',
+    description: '${summary}',
   });
 
   json = Option.Boolean('--json', { description: 'Output as JSON' });
 ${parentOptions}
-  ${idParamName} = Option.String({ required: true });
+${identifierPositional(idParamName, identifier)}
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false);
@@ -359,8 +417,13 @@ export function generateAppCommand(
     return 0
   })
 
-  // Build parameter flags
-  const paramFlags = sortedParams.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
+  // Build parameter flags. An input left out because it admits no value has
+  // no flag and no positional argument.
+  const omitted = ctx.omittedInputs(cmd, undefined)
+  const paramFlags = sortedParams
+    .filter((p) => !omitted.has(p.name))
+    .map((p) => generateParameterFlag(p, ctx, cmd.name))
+    .join('\n')
 
   // Use safe identifier for method name (e.g., 'delete' → '_delete', 'export' → '_export')
   const safeMethodName = safeIdentifier(cmd.name)
@@ -370,12 +433,12 @@ export function generateAppCommand(
   // values as broad primitives (string/boolean) which may not structurally overlap the
   // SDK's narrower types (enums, Date, number, arrays), so we assert via \`unknown\`.
   // The RPC layer validates/coerces the value at runtime.
-  const methodArgs = sortedParams
-    .map(
-      (p, i) =>
-        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof client.${safeMethodName}>[${String(i)}]`
-    )
-    .join(', ')
+  const methodArgs = positionalArgs(
+    sortedParams,
+    omitted,
+    (p, i) =>
+      `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof client.${safeMethodName}>[${String(i)}]`
+  )
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -454,14 +517,22 @@ export function generateResourceCommand(
     hierarchyPath.parentParams.filter((p) => p.name !== idParamName && !paramNames.has(p.name))
   )
 
-  // Build parameter flags for command parameters
-  const paramFlags = cmd.parameters.map((p) => generateParameterFlag(p, ctx, cmd.name)).join('\n')
+  // Build parameter flags for command parameters, except inputs left out
+  // because they admit no value
+  const omitted = ctx.omittedInputs(cmd, hierarchyPath.resourceName)
+  const paramFlags = cmd.parameters
+    .filter((p) => !omitted.has(p.name))
+    .map((p) => generateParameterFlag(p, ctx, cmd.name))
+    .join('\n')
 
   // Only declare the implicit resource-ID option when no command parameter already
   // declares an identifier of the same name (otherwise we emit a duplicate field).
+  const getCommand = ctx
+    .getResourceCommands(hierarchyPath.resourceName)
+    .find((c) => c.name === 'get')
   const idOption = paramNames.has(idParamName)
     ? ''
-    : `  ${idParamName} = Option.String({ required: true });\n`
+    : `${identifierPositional(idParamName, addressingIdentifier(resource, getCommand))}\n`
 
   const needsTypanion = paramFlags.includes('t.isEnum')
   const content = `import { Command, Option } from 'clipanion';${needsTypanion ? "\nimport * as t from 'typanion';" : ''}
@@ -485,7 +556,7 @@ ${parentOptions}${idOption}${paramFlags}
 
     try {
       const client = getClient();
-      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
+      await client.${resourceAccess}.${safeIdentifier(cmd.name)}(${generateResourceCommandArgs(cmd, omitted, `client.${resourceAccess}.${safeIdentifier(cmd.name)}`)});
 
       const output = formatter.formatSuccess('${cmd.name} completed successfully');
       this.context.stdout.write(output + '\\n');
@@ -516,7 +587,11 @@ ${parentOptions}${idOption}${paramFlags}
  * primitives (string/boolean) which may not structurally overlap the SDK's narrower
  * types (enums, Date, number, arrays); the RPC layer validates/coerces at runtime.
  */
-function generateResourceCommandArgs(cmd: ManifestCommand, methodRef: string): string {
+function generateResourceCommandArgs(
+  cmd: ManifestCommand,
+  omitted: ReadonlySet<string>,
+  methodRef: string
+): string {
   if (cmd.parameters.length === 0) return ''
 
   const sorted = [...cmd.parameters].sort((a, b) => {
@@ -525,11 +600,27 @@ function generateResourceCommandArgs(cmd: ManifestCommand, methodRef: string): s
     return 0
   })
 
-  return sorted
-    .map(
-      (p, i) =>
-        `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
-    )
+  return positionalArgs(
+    sorted,
+    omitted,
+    (p, i) =>
+      `this.${safeParamProperty(p.name, cmd.name)} as unknown as Parameters<typeof ${methodRef}>[${String(i)}]`
+  )
+}
+
+/**
+ * The positional arguments of an SDK method call, in signature order. A
+ * parameter left out of the operation's input has no flag and no position:
+ * the SDK method does not take it either.
+ */
+function positionalArgs(
+  params: readonly CommandParameter[],
+  omitted: ReadonlySet<string>,
+  render: (param: CommandParameter, index: number) => string
+): string {
+  return params
+    .filter((p) => !omitted.has(p.name))
+    .map((p, i) => render(p, i))
     .join(', ')
 }
 
@@ -567,11 +658,15 @@ function generateListParamOptions(params: CommandParameter[]): string {
   )
 }
 
-function generatePropertyFlags(resource: Resource, ctx: CliGeneratorContext): string {
+function generatePropertyFlags(
+  resource: Resource,
+  ctx: CliGeneratorContext,
+  omitted: ReadonlySet<string>
+): string {
   const flags: string[] = []
 
   for (const [propName, prop] of usableProperties(resource)) {
-    if (prop.access !== 'rw') continue
+    if (prop.access !== 'rw' || omitted.has(propName)) continue
 
     const flagName = toKebabCase(propName)
     const required = !prop.optional
@@ -635,11 +730,11 @@ function generateListFieldMapping(resource: Resource, indent = '        '): stri
   return fields.join('\n')
 }
 
-function generateCreateInput(resource: Resource): string {
+function generateCreateInput(resource: Resource, omitted: ReadonlySet<string>): string {
   const fields: string[] = []
 
   for (const [propName, prop] of usableProperties(resource)) {
-    if (prop.access === 'rw') {
+    if (prop.access === 'rw' && !omitted.has(propName)) {
       fields.push(`        ${propName}: this.${propName},`)
     }
   }

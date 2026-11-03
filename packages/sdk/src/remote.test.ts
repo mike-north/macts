@@ -250,25 +250,6 @@ describe('remote client: values', () => {
     expect(error.details.issues[0]?.path).toEqual(['items', 1, 'count'])
   })
 
-  it('refuses reference values in a result with InternalError', async () => {
-    const referencing: ValueType<Widget> = {
-      ...GET.output,
-      decode: (wire, context) => ({
-        ok: true,
-        value: context.bindReference(wire as never) as unknown as Widget,
-      }),
-    }
-    const { fetch } = fakeFetch(() => json({ result: SPROCKET_WIRE }))
-    const contract = fixtureContract({ get: { ...GET, output: referencing } })
-
-    const error = await rejection(
-      createClient(contract, { token: TOKEN, url: URL_ROOT, fetch }).widgets.get('w-1')
-    )
-
-    expect(error).toBeInstanceOf(InternalError)
-    expect(error).toMatchObject({ message: 'This client does not support reference values.' })
-  })
-
   it('refuses file values in a result with InternalError', async () => {
     const filing: ValueType<Widget> = {
       ...GET.output,

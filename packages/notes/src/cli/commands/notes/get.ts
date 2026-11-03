@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a note by ID.
+ * Get a note by name.
  */
 export class GetNoteCommand extends Command {
   static override paths = [['notes', 'notes', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a note by ID',
+    description: 'Get a note by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  noteId = Option.String({ required: true })
+  noteId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

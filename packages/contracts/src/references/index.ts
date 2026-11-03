@@ -20,17 +20,34 @@
  * integrity.
  *
  * Every concrete reference exists in two forms. Its **data** form
- * ({@link ReferenceData}) is what a reference denotes: resource, form,
- * cardinality, and the identifier, entries, or selector, plus any container.
+ * ({@link ReferenceData}) is what a reference denotes: the app it belongs to,
+ * resource, form, cardinality, and the identifier, entries, or selector, plus
+ * any container.
  * Its **bound** form adds {@link Resolvable}: it is the data form of a
  * reference that a client decoded, so it hydrates through that client. A
  * bound reference is assignable to its data form, so anything that accepts
  * data (encoding in particular) accepts a bound reference unchanged.
  *
+ * Typed positions use the two forms by direction. An output position holds a
+ * bound reference ({@link ObjectReferenceVariant}), because a client decoded
+ * it. An input position takes the data form ({@link ObjectReferenceData}), so
+ * a caller can pass either a reference it built (an identifier or a selector)
+ * or one it received. At a typed position the resource key is a literal type
+ * and the cardinality is fixed, so a reference to another resource, or of the
+ * other cardinality, does not type-check.
+ *
+ * A reference names its app because resource keys repeat across apps (many
+ * apps have a `document`): a reference to one app's object must never be
+ * accepted where another app's reference is expected. The app is part of the
+ * data form only. The wire form leaves it out, because the route a reference
+ * travels on already names the app; decoding supplies it from the app
+ * contract.
+ *
  * @packageDocumentation
  */
 
 import type { CallOptions } from '../call-options.js'
+import type { OperationId } from '../operations/index.js'
 import type { Integer } from '../values/integer.js'
 import type { ValueType } from '../values/value-type.js'
 import { ValueTypes, isPageValueType } from '../values/value-types.js'
@@ -61,10 +78,16 @@ export interface Resolvable<Result> {
  * @remarks
  * Resolving yields the object's record, or fails with a target-not-found error
  * if nothing matches. Duplicate-name behavior is app-defined.
+ *
+ * @typeParam T - The referenced record.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
  */
-export interface ObjectReference<T> extends Resolvable<T> {
+export interface ObjectReference<T, R extends string = string> extends Resolvable<T> {
+  /** The app the referenced object belongs to: its contract's `app`. */
+  readonly app: string
   /** The manifest resource key of the referenced object. */
-  readonly resource: string
+  readonly resource: R
   /** How the object is denoted. */
   readonly form: ReferenceForm
   /** Always `'one'`. */
@@ -78,10 +101,18 @@ export interface ObjectReference<T> extends Resolvable<T> {
  * Membership is determined when the reference is resolved. Resolving yields an
  * array that may be empty; an invalid range fails with an invalid-selection
  * error, never with an empty result.
+ *
+ * @typeParam T - The member record.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
  */
-export interface CollectionReference<T> extends Resolvable<readonly T[]> {
+export interface CollectionReference<T, R extends string = string> extends Resolvable<
+  readonly T[]
+> {
+  /** The app the collection's members belong to: its contract's `app`. */
+  readonly app: string
   /** The manifest resource key of the collection's members. */
-  readonly resource: string
+  readonly resource: R
   /** How the members are denoted. */
   readonly form: ReferenceForm
   /** Always `'many'`. */
@@ -154,10 +185,17 @@ export type CollectionSelector = EverySelector | RangeSelector
  * identifier value type decodes it.
  *
  * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
  */
-export interface IdentityReferenceData<Id = unknown> {
+export interface IdentityReferenceData<Id = unknown, R extends string = string> {
+  /**
+   * The app the reference belongs to: the `app` of the contract it is used
+   * with. It is not carried on the wire.
+   */
+  readonly app: string
   /** The manifest resource key of the referenced object. */
-  readonly resource: string
+  readonly resource: R
   /** Always `'identity'`. */
   readonly form: 'identity'
   /** Always `'one'`. */
@@ -168,10 +206,20 @@ export interface IdentityReferenceData<Id = unknown> {
   readonly container?: ObjectReferenceData
 }
 
-/** Data form of one object denoted by a selection rule. */
-export interface SelectorReferenceData {
+/**
+ * Data form of one object denoted by a selection rule.
+ *
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
+ */
+export interface SelectorReferenceData<R extends string = string> {
+  /**
+   * The app the reference belongs to: the `app` of the contract it is used
+   * with. It is not carried on the wire.
+   */
+  readonly app: string
   /** The manifest resource key of the referenced object. */
-  readonly resource: string
+  readonly resource: R
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** Always `'one'`. */
@@ -191,22 +239,39 @@ export interface SelectorReferenceData {
  * own when its identity is scoped to one.
  *
  * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
  */
-export interface IdentityCollectionReferenceData<Id = unknown> {
+export interface IdentityCollectionReferenceData<Id = unknown, R extends string = string> {
+  /**
+   * The app the reference belongs to: the `app` of the contract it is used
+   * with. It is not carried on the wire.
+   */
+  readonly app: string
   /** The manifest resource key of the collection's members. */
-  readonly resource: string
+  readonly resource: R
   /** Always `'identity'`. */
   readonly form: 'identity'
   /** Always `'many'`. */
   readonly cardinality: 'many'
   /** The identified members, in order. */
-  readonly entries: readonly IdentityReferenceData<Id>[]
+  readonly entries: readonly IdentityReferenceData<Id, R>[]
 }
 
-/** Data form of a deferred collection denoted by a selection rule. */
-export interface SelectorCollectionReferenceData {
+/**
+ * Data form of a deferred collection denoted by a selection rule.
+ *
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
+ */
+export interface SelectorCollectionReferenceData<R extends string = string> {
+  /**
+   * The app the reference belongs to: the `app` of the contract it is used
+   * with. It is not carried on the wire.
+   */
+  readonly app: string
   /** The manifest resource key of the collection's members. */
-  readonly resource: string
+  readonly resource: R
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** Always `'many'`. */
@@ -217,13 +282,38 @@ export interface SelectorCollectionReferenceData {
   readonly container?: ObjectReferenceData
 }
 
-/** Data form of a single-object reference, of either form. */
-export type ObjectReferenceData = IdentityReferenceData | SelectorReferenceData
+/**
+ * Data form of a single-object reference, of either form.
+ *
+ * @remarks
+ * This is what a typed single-object input position accepts: a caller can
+ * build either form, and a bound reference to the same resource (an
+ * {@link ObjectReferenceVariant}) is assignable to it. The resource key is a
+ * literal type at a typed position, so a reference to another resource is
+ * not.
+ *
+ * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
+ */
+export type ObjectReferenceData<Id = unknown, R extends string = string> =
+  | IdentityReferenceData<Id, R>
+  | SelectorReferenceData<R>
 
-/** Data form of a collection reference, of either form. */
-export type CollectionReferenceData =
-  | IdentityCollectionReferenceData
-  | SelectorCollectionReferenceData
+/**
+ * Data form of a collection reference, of either form.
+ *
+ * @remarks
+ * The collection counterpart of {@link ObjectReferenceData}: what a typed
+ * collection input position accepts.
+ *
+ * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
+ */
+export type CollectionReferenceData<Id = unknown, R extends string = string> =
+  | IdentityCollectionReferenceData<Id, R>
+  | SelectorCollectionReferenceData<R>
 
 /**
  * Data form of any reference: what a reference denotes, with no ability to
@@ -232,8 +322,9 @@ export type CollectionReferenceData =
  * @remarks
  * This is what decoding hands to `DecodeContext.bindReference`, with
  * identifiers decoded through the app's resource table, selector positions as
- * `Integer`, and containers as nested data. It is also exactly what encoding
- * reads: every bound reference is assignable to its data form.
+ * `Integer`, containers as nested data, and `app` set from the app contract at
+ * every level. It is also exactly what encoding reads: every bound reference
+ * is assignable to its data form.
  */
 export type ReferenceData = ObjectReferenceData | CollectionReferenceData
 
@@ -242,9 +333,14 @@ export type ReferenceData = ObjectReferenceData | CollectionReferenceData
  *
  * @remarks
  * Its data form ({@link IdentityReferenceData}) plus {@link Resolvable}.
+ *
+ * @typeParam T - The referenced record.
+ * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
  */
-export interface IdentityReference<T, Id = unknown>
-  extends IdentityReferenceData<Id>, ObjectReference<T> {
+export interface IdentityReference<T, Id = unknown, R extends string = string>
+  extends IdentityReferenceData<Id, R>, ObjectReference<T, R> {
   /** Always `'identity'`. */
   readonly form: 'identity'
   /** The object's container, bound to the same client. */
@@ -257,8 +353,13 @@ export interface IdentityReference<T, Id = unknown>
  *
  * @remarks
  * Its data form ({@link SelectorReferenceData}) plus {@link Resolvable}.
+ *
+ * @typeParam T - The referenced record.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
  */
-export interface SelectorReference<T> extends SelectorReferenceData, ObjectReference<T> {
+export interface SelectorReference<T, R extends string = string>
+  extends SelectorReferenceData<R>, ObjectReference<T, R> {
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** The container the rule is evaluated in, bound to the same client. */
@@ -273,13 +374,18 @@ export interface SelectorReference<T> extends SelectorReferenceData, ObjectRefer
  * Its entries are an explicit, ordered list that callers edit by reordering or
  * replacing entries, unlike a selector collection, which callers edit by
  * changing the rule. Its data form is {@link IdentityCollectionReferenceData}.
+ *
+ * @typeParam T - The member record.
+ * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
  */
-export interface IdentityCollectionReference<T, Id = unknown>
-  extends IdentityCollectionReferenceData<Id>, CollectionReference<T> {
+export interface IdentityCollectionReference<T, Id = unknown, R extends string = string>
+  extends IdentityCollectionReferenceData<Id, R>, CollectionReference<T, R> {
   /** Always `'identity'`. */
   readonly form: 'identity'
   /** The identified members, in order, each bound to the same client. */
-  readonly entries: readonly IdentityReference<T, Id>[]
+  readonly entries: readonly IdentityReference<T, Id, R>[]
 }
 
 /**
@@ -289,9 +395,13 @@ export interface IdentityCollectionReference<T, Id = unknown>
  * @remarks
  * Its data form ({@link SelectorCollectionReferenceData}) plus
  * {@link Resolvable}.
+ *
+ * @typeParam T - The member record.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
  */
-export interface SelectorCollectionReference<T>
-  extends SelectorCollectionReferenceData, CollectionReference<T> {
+export interface SelectorCollectionReference<T, R extends string = string>
+  extends SelectorCollectionReferenceData<R>, CollectionReference<T, R> {
   /** Always `'selector'`. */
   readonly form: 'selector'
   /** The container the rule is evaluated in, bound to the same client. */
@@ -299,25 +409,28 @@ export interface SelectorCollectionReference<T>
 }
 
 /**
- * What a typed single-object reference position holds: a bound reference to
- * one `T`, in either form.
+ * What a typed single-object output position holds: a bound reference to one
+ * `T`, in either form.
  *
  * @remarks
- * A typed position accepts both forms of its cardinality, so its value is
- * this union rather than one form. Narrow on `form` to reach the identifier or
+ * A typed position holds both forms of its cardinality, so its value is this
+ * union rather than one form. An input position takes the data form instead
+ * ({@link ObjectReferenceData}), to which this type is assignable. Narrow on `form` to reach the identifier or
  * the selector. Broad consumers that only resolve can use
  * {@link ObjectReference} instead.
  *
  * @typeParam T - The referenced record.
  * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the referenced object, as a literal
+ *   type where the position is typed.
  */
-export type ObjectReferenceVariant<T, Id = unknown> =
-  | IdentityReference<T, Id>
-  | SelectorReference<T>
+export type ObjectReferenceVariant<T, Id = unknown, R extends string = string> =
+  | IdentityReference<T, Id, R>
+  | SelectorReference<T, R>
 
 /**
- * What a typed collection reference position holds: a bound deferred
- * collection of `T`, in either form.
+ * What a typed collection output position holds: a bound deferred collection
+ * of `T`, in either form.
  *
  * @remarks
  * The collection counterpart of {@link ObjectReferenceVariant}. Broad
@@ -325,10 +438,12 @@ export type ObjectReferenceVariant<T, Id = unknown> =
  *
  * @typeParam T - The member record.
  * @typeParam Id - The SDK type of the resource's identifier.
+ * @typeParam R - The manifest resource key of the collection's members, as a
+ *   literal type where the position is typed.
  */
-export type CollectionReferenceVariant<T, Id = unknown> =
-  | IdentityCollectionReference<T, Id>
-  | SelectorCollectionReference<T>
+export type CollectionReferenceVariant<T, Id = unknown, R extends string = string> =
+  | IdentityCollectionReference<T, Id, R>
+  | SelectorCollectionReference<T, R>
 
 /**
  * What a reference value type needs to know about every resource a reference
@@ -340,11 +455,70 @@ export type CollectionReferenceVariant<T, Id = unknown> =
  * to that resource. A resource without an identifier (`id` absent) can be
  * referenced only by selector forms: name, index, every, or range. A reference's
  * containers usually belong to other resources, so the table covers every
- * resource of the app, not only the one a position declares. An app
- * contract's `resources` table is assignable to this type, so generated code
- * passes that table rather than building a parallel one.
+ * resource of the app, not only the one a position declares.
+ *
+ * Each entry also names the operations that resolve references to the
+ * resource, where it has them: `get` resolves a single-object reference and
+ * `list` a collection. Every resolvable object needs its resolving
+ * operation (`get` for a single object, a container, and an
+ * identity-collection entry; `list` for a collection), because a reference
+ * that names a resource without it could never be resolved. Reference value
+ * types enforce this in their wire schema, so every boundary applies it. An
+ * app contract's `resources` table is assignable to this
+ * type; reference value types read it through the {@link ReferenceScope}.
  */
-export type ReferenceRegistry = Readonly<Record<string, { readonly id?: ValueType<unknown> }>>
+export type ReferenceRegistry = Readonly<
+  Record<
+    string,
+    {
+      readonly id?: ValueType<unknown>
+      readonly get?: OperationId
+      readonly list?: OperationId
+    }
+  >
+>
+
+/**
+ * What a reference value type needs to know about the app its references
+ * belong to: the app and its resource table.
+ *
+ * @remarks
+ * `app` is the app contract's `app`. Decoding stamps it on every reference,
+ * container, and entry it produces, and encoding rejects a reference whose
+ * `app` differs, at any level, before any call is made. `resources` is the
+ * {@link ReferenceRegistry}, which also admits a resource as a container only
+ * when it has `get`. An app contract is assignable to this type, so
+ * generated code passes the contract itself rather than building a parallel
+ * description of the app.
+ */
+export interface ReferenceScope {
+  /** The app's route segment, for example `'calendar'`. */
+  readonly app: string
+  /** The app's resource table. */
+  readonly resources: ReferenceRegistry
+}
+
+/**
+ * The field of a resource's table entry ({@link ReferenceRegistry}, and so
+ * `ResourceDescriptor`) that names the operation a reference of
+ * `cardinality` resolves as: `get` for a single object, `list` for a
+ * collection.
+ *
+ * @remarks
+ * This is the one statement of which operation resolves a reference. Every
+ * resolvable object is a reference of one of the two cardinalities: a
+ * container and an identity-collection entry are single-object references, so
+ * they resolve through `get` like any other. Reference value types use it to
+ * admit only resolvable references, the runtime to pick the operation a
+ * resolution runs as, and clients to pick the output contract a resolution's
+ * result is decoded with.
+ *
+ * @param cardinality - The cardinality of the reference being resolved.
+ * @returns `'get'` for `'one'`, `'list'` for `'many'`.
+ */
+export function resolvingOperationKey(cardinality: ReferenceCardinality): 'get' | 'list' {
+  return cardinality === 'one' ? 'get' : 'list'
+}
 
 /**
  * The value type of what a reference resolves to, from the output of the

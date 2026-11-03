@@ -14,7 +14,7 @@ export class GetTagCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  tagId = Option.String({ required: true })
+  tagId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

@@ -47,9 +47,7 @@ export interface BrowserWindow {
 }
 
 // @public
-export interface BrowserWindowCreateInput {
-    view?: Playlist;
-}
+export type BrowserWindowCreateInput = Record<string, never>;
 
 // @public (undocumented)
 export const BrowserWindowSchema: z.ZodObject<{

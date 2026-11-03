@@ -1,0 +1,44 @@
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
+
+/**
+ * List emails.
+ */
+export class ListEmailsCommand extends Command {
+  static override paths = [['contacts', 'people', 'emails', 'list']]
+
+  static override usage = Command.Usage({
+    description: 'List emails',
+  })
+
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  personId = Option.String('--person-id', {
+    required: true,
+    description: 'Identifier of the person',
+  })
+
+  async execute(): Promise<number> {
+    const formatter = createFormatter(this.json ?? false)
+
+    try {
+      const client = getClient()
+      const page = await client.emails.list(this.personId)
+
+      const output = formatter.formatList(
+        page.items.map((item) => ({
+          id: item.id,
+          label: item.label,
+          value: item.value,
+        }))
+      )
+
+      this.context.stdout.write(output + '\n')
+      return 0
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
+    }
+  }
+}

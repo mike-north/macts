@@ -5,8 +5,14 @@
 ```ts
 
 import { AppContract } from '@macts/contracts';
+import { CollectionReferenceVariant } from '@macts/contracts';
 import { Executor } from '@macts/core';
 import { GovernanceContext } from '@macts/runtime';
+import { ObjectReferenceVariant } from '@macts/contracts';
+import { ReferenceData } from '@macts/contracts';
+
+// @public
+export function bindReference(client: object, data: ReferenceData): ObjectReferenceVariant<unknown> | CollectionReferenceVariant<unknown>;
 
 // @public
 export function createClient<Client>(app: AppContract<Client>, options: LocalClientOptions): Client;

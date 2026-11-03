@@ -13,7 +13,7 @@ export class ExecuteWorkflowCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  workflowId = Option.String({ required: true })
+  workflowId = Option.String({ name: 'name', required: true })
   workflow = Option.String('--workflow', { required: true, description: 'The workflow to execute' })
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

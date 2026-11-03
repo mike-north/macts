@@ -13,7 +13,7 @@ export class MovePlaylistCommand extends Command {
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
-  playlistId = Option.String({ required: true })
+  playlistId = Option.String({ name: 'persistent-id', required: true })
   to = Option.String('--to', {
     required: true,
     description: 'the new location for the playlist(s)',

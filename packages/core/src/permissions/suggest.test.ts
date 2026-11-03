@@ -12,7 +12,11 @@ import {
   explainInvalidPermission,
   listKnownPermissions,
 } from './suggest.js'
+import { resolve } from 'node:path'
+import { loadManifest } from '../manifest/loader.js'
 import type { AppManifest } from '../manifest/schemas/index.js'
+
+const MANIFESTS_DIR = resolve(process.cwd(), '../../manifests')
 
 const PHOTOS = [
   'photos:mediaItems:list',
@@ -163,5 +167,43 @@ describe('listKnownPermissions', () => {
       'photos:app:*',
       'photos:*:*',
     ])
+  })
+})
+
+describe('listKnownPermissions of the shipped manifests', () => {
+  it('leaves out the permission of an operation that cannot be called', async () => {
+    // manifests/mail/app.yaml: `synchronize` requires `with`, an `account`, and
+    // Mail has no `get` for accounts, so the input admits no value and the
+    // operation can never be called (phases/13 D7, "Resolvable targets").
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'mail', 'app.yaml'))
+    )
+    expect(known).not.toContain('mail:app:synchronize')
+    // The app's other application commands stay, so the list is not vacuous.
+    expect(known).toContain('mail:app:*')
+  })
+
+  it('keeps the permissions of operations whose required reference has a get', async () => {
+    // manifests/contacts/app.yaml: `actionTitle`, `performAction` and
+    // `shouldEnableAction` require `for`, a `person`, and `people.get` gets one.
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'contacts', 'app.yaml'))
+    )
+    for (const permission of [
+      'contacts:app:actionTitle',
+      'contacts:app:performAction',
+      'contacts:app:shouldEnableAction',
+    ]) {
+      expect(known).toContain(permission)
+    }
+  })
+
+  it('keeps the permission of an operation whose unsatisfiable input is optional', async () => {
+    // manifests/mail/app.yaml: `checkForNewMail` takes an optional `for`, an
+    // `account`; it stays callable without it.
+    const known = listKnownPermissions(
+      await loadManifest(resolve(MANIFESTS_DIR, 'mail', 'app.yaml'))
+    )
+    expect(known).toContain('mail:app:checkForNewMail')
   })
 })

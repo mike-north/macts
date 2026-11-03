@@ -42,18 +42,14 @@ export interface ArtworkUpdateInput {
 export interface BrowserWindow {
     readonly id: Integer | null;
     readonly selection: string | null;
-    view: ObjectReferenceVariant<Playlist, never> | null;
+    view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public
-export interface BrowserWindowCreateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
-}
+export type BrowserWindowCreateInput = Record<string, never>;
 
 // @public
-export interface BrowserWindowUpdateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
-}
+export type BrowserWindowUpdateInput = Record<string, never>;
 
 // @public
 export type EMdK = 'homeVideo' | 'movie' | 'tVShow' | 'unknown';
@@ -111,7 +107,7 @@ export interface Playlist {
     readonly duration: Integer | null;
     readonly id: Integer | null;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Playlist, never> | null;
+    readonly parent: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
     readonly size: Integer | null;
     readonly specialKind: string | null;
     readonly time: string | null;
@@ -140,7 +136,7 @@ export interface PlaylistUpdateInput {
 export interface PlaylistWindow {
     readonly id: Integer | null;
     readonly selection: string | null;
-    readonly view: ObjectReferenceVariant<Playlist, never> | null;
+    readonly view: ObjectReferenceVariant<Playlist, never, 'Playlist'> | null;
 }
 
 // @public

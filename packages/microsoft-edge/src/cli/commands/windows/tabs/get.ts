@@ -14,7 +14,7 @@ export class GetTabCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  tabId = Option.String({ required: true })
+  tabId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

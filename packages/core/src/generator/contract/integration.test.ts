@@ -133,6 +133,25 @@ export async function usage(): Promise<void> {
   await client.notes.update(Integer.validate(7), 'N1', { title: 'Renamed' })
   await client.notes.create({ folderId: Integer.validate(7), title: 'New' })
   await client.notes.archive('N1')
+
+  // A reference parameter takes the data form (D7): a caller can build either
+  // form, or pass a reference it received, of the declared resource only.
+  await client.notes.move('N1', { app: 'jotter', resource: 'Folder', form: 'selector', cardinality: 'one', selector: { by: 'name', name: 'Inbox' } })
+  await client.notes.move('N1', { app: 'jotter', resource: 'Folder', form: 'identity', cardinality: 'one', id: Integer.validate(7) })
+  if (note.folder !== null) await client.notes.move('N1', note.folder)
+  const listedNote = (await client.folders.list()).items[0]?.notes?.[0]
+  if (listedNote !== undefined) {
+    // @ts-expect-error -- a reference to a note is not a reference to a folder
+    await client.notes.move('N1', listedNote)
+  }
+  // @ts-expect-error -- a hand-built reference names the declared resource
+  await client.notes.move('N1', { app: 'jotter', resource: 'Note', form: 'identity', cardinality: 'one', id: 'N2' })
+  // @ts-expect-error -- the position holds one folder, not a collection
+  await client.notes.move('N1', { app: 'jotter', resource: 'Folder', form: 'selector', cardinality: 'many', selector: { by: 'every' } })
+  // @ts-expect-error -- a folder's identifier is an Integer
+  await client.notes.move('N1', { app: 'jotter', resource: 'Folder', form: 'identity', cardinality: 'one', id: 7 })
+  // @ts-expect-error -- a reference names its app
+  await client.notes.move('N1', { resource: 'Folder', form: 'identity', cardinality: 'one', id: Integer.validate(7) })
   await client.notes.archive('N1', new Date())
   await client.quit()
   await client.quit(true)
@@ -188,8 +207,13 @@ export async function usage(): Promise<void> {
   // @ts-expect-error -- create requires the create command's required parameters
   await client.notes.create({ title: 'No folder' })
   // @ts-expect-error -- Tag has no identifier, so it cannot be referenced by identity
-  const owner: NonNullable<Folder['owner']> = { resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x', resolve: () => Promise.reject(new Error('unused')) }
+  const owner: NonNullable<Folder['owner']> = { app: 'jotter', resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x', resolve: () => Promise.reject(new Error('unused')) }
   void owner
+  // @ts-expect-error -- a reference names the app it belongs to
+  const appless: NonNullable<Note['folder']> = { resource: 'Folder', form: 'identity', cardinality: 'one', id: Integer.validate(7), resolve: () => Promise.reject(new Error('unused')) }
+  void appless
+  const inJotter: NonNullable<Note['folder']> = { app: 'jotter', resource: 'Folder', form: 'identity', cardinality: 'one', id: Integer.validate(7), resolve: () => Promise.reject(new Error('unused')) }
+  void inJotter
 }
 `
 
@@ -302,7 +326,9 @@ describe('operations', () => {
     'jotter.notes.updateNote',
     'jotter.notes.deleteNote',
     'jotter.notes.archive',
+    'jotter.notes.moveNote',
     'jotter.folders.listFolders',
+    'jotter.folders.getFolder',
     'jotter.tags.listTags',
     'jotter.app.quit',
     'jotter.app.wordTotal',
@@ -332,7 +358,9 @@ describe('operations', () => {
       'jotter.notes.updateNote': 'jotter:notes:updateNote',
       'jotter.notes.deleteNote': 'jotter:notes:deleteNote',
       'jotter.notes.archive': 'jotter:notes:write',
+      'jotter.notes.moveNote': 'jotter:notes:moveNote',
       'jotter.folders.listFolders': 'jotter:folders:listFolders',
+      'jotter.folders.getFolder': 'jotter:folders:getFolder',
       'jotter.tags.listTags': 'jotter:tags:listTags',
       'jotter.app.quit': 'jotter:app:quit',
       'jotter.app.wordTotal': 'jotter:app:wordTotal',
@@ -398,14 +426,53 @@ describe('operations', () => {
 
 describe('resources', () => {
   it('list every resource with its record, identifier, and resolving operations', () => {
-    const { Note, Folder } = contract.resources
+    const { Note, Folder, Tag } = contract.resources
     expect(Note?.name).toBe('Note')
     expect(Note?.get).toBe('jotter.notes.getNote')
     expect(Note?.list).toBe('jotter.notes.listNotes')
-    expect(Folder?.get).toBeUndefined()
+    expect(Folder?.get).toBe('jotter.folders.getFolder')
     expect(Folder?.list).toBe('jotter.folders.listFolders')
+    expect(Tag?.get).toBeUndefined()
+    expect(Tag?.list).toBe('jotter.tags.listTags')
     expect(Note?.id?.encode('N1')).toEqual({ ok: true, value: 'N1' })
     expect(Folder?.id?.encode(Integer.validate(7))).toEqual({ ok: true, value: { integer: '7' } })
+  })
+
+  it('are read by references with the app of the contract: the app on every SDK reference, never on the wire', () => {
+    // The scope of the generated reference types is the contract itself, so a
+    // reference belongs to the contract's app.
+    expect(contract.app).toBe('jotter')
+    const record = resourceRecord('Note')
+    const encoded = valueOf(record.encode(sampleNote({ id: Integer.validate(7) })))
+    expect(JSON.stringify(encoded)).not.toContain('"app"')
+    const decoded = valueOf(record.decode(NOTE_WIRE, TEST_CONTEXT)) as Record<string, unknown>
+    expect(decoded['folder']).toMatchObject({ app: 'jotter', resource: 'Folder' })
+  })
+
+  it('reject a reference of another app, or one without an app, when encoding', () => {
+    const record = resourceRecord('Note')
+    const foreign = {
+      ...sampleNote({ id: Integer.validate(7) }),
+      folder: { app: 'notes', resource: 'Folder', form: 'identity', cardinality: 'one', id: 7 },
+    }
+    const appless = {
+      ...sampleNote({ id: Integer.validate(7) }),
+      folder: { resource: 'Folder', form: 'identity', cardinality: 'one', id: 7 },
+    }
+    const foreignResult = record.encode(foreign)
+    expect(foreignResult.ok).toBe(false)
+    if (!foreignResult.ok) {
+      expect(foreignResult.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+        { path: ['folder', 'app'], code: 'invalid-type' },
+      ])
+    }
+    const applessResult = record.encode(appless)
+    expect(applessResult.ok).toBe(false)
+    if (!applessResult.ok) {
+      expect(applessResult.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+        { path: ['folder', 'app'], code: 'missing-field' },
+      ])
+    }
   })
 
   it('omit the identifier of a resource that has none', () => {
@@ -431,25 +498,70 @@ describe('resources', () => {
     }
   })
 
-  it('reject identity references to a resource without an identifier, and accept selectors', () => {
+  it('reject references to a resource the contract cannot resolve them through', () => {
     const folder = resourceRecord('Folder')
     // `color` is required and nullable: it must be present, and null is data (A4).
     const base = { folderId: Integer.validate(7), title: 'Inbox', notes: [], color: null }
     const byIdentity = {
       ...base,
-      owner: { resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x' },
+      owner: { app: 'jotter', resource: 'Tag', form: 'identity', cardinality: 'one', id: 'x' },
     }
     const byName = {
       ...base,
       owner: {
+        app: 'jotter',
         resource: 'Tag',
         form: 'selector',
         cardinality: 'one',
         selector: { by: 'name', name: 'x' },
       },
     }
-    expect(folder.encode(byIdentity).ok).toBe(false)
-    expect(folder.encode(byName).ok).toBe(true)
+    const issues = (value: unknown) => {
+      const result = folder.encode(value)
+      return result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }))
+    }
+    // Tag has no identifier, so it has no identity form; and it has no get
+    // operation, so even a selector to one could never be resolved.
+    expect(issues(byIdentity)).toEqual([{ path: ['owner'], code: 'unsupported' }])
+    expect(issues(byName)).toEqual([{ path: ['owner'], code: 'unsupported' }])
+    // A collection of tags can be listed, so a selector collection encodes.
+    const tags = t.reference(() => contract, 'Tag', 'many')
+    expect(
+      tags.encode({
+        app: 'jotter',
+        resource: 'Tag',
+        form: 'selector',
+        cardinality: 'many',
+        selector: { by: 'every' },
+      }).ok
+    ).toBe(true)
+  })
+
+  it('admit as containers only resources the contract can get', () => {
+    const note = t.reference(() => contract, 'Note', 'one')
+    const inFolder = {
+      app: 'jotter',
+      resource: 'Note',
+      form: 'identity',
+      cardinality: 'one',
+      id: 'N1',
+      container: { app: 'jotter', resource: 'Folder', form: 'identity', cardinality: 'one', id: 7 },
+    }
+    expect(note.encode(inFolder).ok).toBe(true)
+    const inTag = {
+      ...inFolder,
+      container: {
+        app: 'jotter',
+        resource: 'Tag',
+        form: 'selector',
+        cardinality: 'one',
+        selector: { by: 'name', name: 'x' },
+      },
+    }
+    const result = note.encode(inTag)
+    expect(result.ok ? [] : result.issues.map(({ path, code }) => ({ path, code }))).toEqual([
+      { path: ['container', 'resource'], code: 'unsupported' },
+    ])
   })
 })
 
@@ -519,6 +631,7 @@ describe('bind', () => {
       'delete',
       'get',
       'list',
+      'move',
       'update',
     ])
   })
@@ -571,6 +684,7 @@ describe('encoding', () => {
       title: 'Hello',
       priority: 'high',
       folder: {
+        app: 'jotter',
         resource: 'Folder',
         form: 'identity',
         cardinality: 'one',
@@ -720,6 +834,7 @@ function bindObject(data: ObjectReferenceData): ObjectReferenceVariant<unknown> 
   const container = data.container === undefined ? {} : { container: bindObject(data.container) }
   return data.form === 'identity'
     ? {
+        app: data.app,
         resource: data.resource,
         form: 'identity',
         cardinality: 'one',
@@ -728,6 +843,7 @@ function bindObject(data: ObjectReferenceData): ObjectReferenceVariant<unknown> 
         ...container,
       }
     : {
+        app: data.app,
         resource: data.resource,
         form: 'selector',
         cardinality: 'one',
@@ -765,7 +881,13 @@ function sampleNote(folder: { id: unknown }): Record<string, unknown> {
   return {
     uid: 'N1',
     title: 'Hello',
-    folder: { resource: 'Folder', form: 'identity', cardinality: 'one', id: folder.id },
+    folder: {
+      app: 'jotter',
+      resource: 'Folder',
+      form: 'identity',
+      cardinality: 'one',
+      id: folder.id,
+    },
     created: new Date('2026-01-02T03:04:05.000Z'),
     wordCount: Integer.validate(12),
   }
@@ -818,6 +940,9 @@ function boundClient(): { client: unknown; calls: RecordedCall[] } {
     invoke(operation, input, options) {
       calls.push({ operation, input, options })
       return Promise.resolve(valueOf(operation.output.decode(cannedWire(operation), TEST_CONTEXT)))
+    },
+    resolve() {
+      return Promise.reject(new Error('the generated client never resolves references itself'))
     },
   }
   return { client: contract.bind(runtime), calls }

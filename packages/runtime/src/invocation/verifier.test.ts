@@ -5,7 +5,8 @@
  * with `createApiKey`, revoked with `revokeKey`, and verified through the
  * unchanged `validateApiKey`. Expected reasons come from the phases/13 D5
  * pipeline table: `missing`, `malformed` (`INVALID_FORMAT`,
- * `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`), `expired`, `revoked`.
+ * `MALFORMED_PAYLOAD`), `invalid` (`INVALID_SIGNATURE`, and `UNKNOWN_KEY` for a
+ * correctly signed key with no stored record), `expired`, `revoked`.
  *
  * @see https://www.rfc-editor.org/rfc/rfc7519#section-4.1.4 (JWT `exp`, seconds since the epoch)
  */
@@ -16,7 +17,7 @@ import { afterAll, describe, expect, it, vi } from 'vitest'
 import * as jose from 'jose'
 import { AuthenticationError, type AuthenticationFailureReason } from '@macts/contracts'
 import { createApiKey } from '../keys/generator.js'
-import { closeKeyStore, getSigningSecret, revokeKey } from '../keys/storage.js'
+import { closeKeyStore, deleteKeyMetadata, getSigningSecret, revokeKey } from '../keys/storage.js'
 import { validateApiKey } from '../keys/validator.js'
 import { assertValidationFailure } from '../keys/validation-test-helpers.js'
 import { createBearerCredential } from './credential.js'
@@ -153,5 +154,12 @@ describe('createKeyStoreVerifier', () => {
     expect(revokeKey(created.keyId)).toBe(true)
 
     await expectAuthenticationFailure(created.token, 'revoked')
+  })
+
+  it('reports a deleted key (UNKNOWN_KEY) as invalid', async () => {
+    const created = await createApiKey({ name: 'Deleted', permissions: ['calendar:events:list'] })
+    expect(deleteKeyMetadata(created.keyId)).toBe(true)
+
+    await expectAuthenticationFailure(created.token, 'invalid')
   })
 })

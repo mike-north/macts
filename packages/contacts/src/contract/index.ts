@@ -23,8 +23,9 @@ import {
   type AppContract,
   type CallOptions,
   type ClientRuntime,
-  type ObjectReferenceVariant,
+  type ObjectReferenceData,
   type OperationDescriptor,
+  type Page,
   type ValueType,
 } from '@macts/contracts'
 
@@ -137,7 +138,7 @@ export interface CustomDate {
 export interface Email {
   /**
    * Unique identifier for this email.
-   * Never null: observed in all 32 items (Contacts 14.0, macOS 27.2, 2026-11-01).
+   * Never null: the primary identifier.
    */
   readonly id: string
   /**
@@ -155,10 +156,25 @@ export interface Email {
 /** A Group Record in the address book database */
 export interface Group {
   /**
+   * Unique and persistent identifier for this record.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
+  /**
    * The name of this group.
    * Nullable. No evidence that the app always sets it.
    */
   name: string | null
+  /**
+   * When the contact was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: Date | null
+  /**
+   * When the contact was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
 }
 
 /** User name for ICQ instant messaging. */
@@ -221,6 +237,21 @@ export interface MSNHandle {
 /** A person in the address book database. */
 export interface Person {
   /**
+   * Unique and persistent identifier for this record.
+   * Never null: the primary identifier.
+   */
+  readonly id: string
+  /**
+   * When the contact was created.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly creationDate: Date | null
+  /**
+   * When the contact was last modified.
+   * Nullable. No evidence that the app always sets it.
+   */
+  readonly modificationDate: Date | null
+  /**
    * The Nickname of this person.
    * Nullable. Observed missing in 22 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
@@ -241,11 +272,6 @@ export interface Person {
    */
   suffix: string | null
   /**
-   * Person information in vCard format, this always returns a card in version 3.0 format.
-   * Nullable. No evidence that the app always sets it.
-   */
-  readonly vcard: string | null
-  /**
    * The home page of this person.
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
@@ -254,7 +280,7 @@ export interface Person {
    * The birth date of this person.
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
-  birthDate: string | null
+  birthDate: Date | null
   /**
    * The phonetic version of the Last name of this person.
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
@@ -275,11 +301,6 @@ export interface Person {
    * Nullable. Observed missing in 23 of 23 items (Contacts 14.0, macOS 27.2, 2026-11-01).
    */
   department: string | null
-  /**
-   * Image for person.
-   * Nullable. No evidence that the app always sets it.
-   */
-  image: string | null
   /**
    * First/Last name of the person, uses the name display order preference setting in Contacts.
    * Nullable. No evidence that the app always sets it.
@@ -326,7 +347,7 @@ export interface Person {
 export interface Phone {
   /**
    * Unique identifier for this phone.
-   * Never null: observed in all 48 items (Contacts 14.0, macOS 27.2, 2026-11-01).
+   * Never null: the primary identifier.
    */
   readonly id: string
   /**
@@ -651,7 +672,7 @@ export interface PersonCreateInput {
   /** The home page of this person. */
   homePage?: string
   /** The birth date of this person. */
-  birthDate?: string
+  birthDate?: Date
   /** The phonetic version of the Last name of this person. */
   phoneticLastName?: string
   /** The title of this person. */
@@ -660,8 +681,6 @@ export interface PersonCreateInput {
   phoneticMiddleName?: string
   /** Department that this person works for. */
   department?: string
-  /** Image for person. */
-  image?: string
   /** Notes for this person. */
   note?: string
   /** Is the current record a company or a person. */
@@ -709,7 +728,7 @@ export interface PersonUpdateInput {
    * The birth date of this person.
    * Cannot be reset: null is rejected.
    */
-  birthDate?: string
+  birthDate?: Date
   /**
    * The phonetic version of the Last name of this person.
    * Cannot be reset: null is rejected.
@@ -730,11 +749,6 @@ export interface PersonUpdateInput {
    * Cannot be reset: null is rejected.
    */
   department?: string
-  /**
-   * Image for person.
-   * Cannot be reset: null is rejected.
-   */
-  image?: string
   /**
    * Notes for this person.
    * Cannot be reset: null is rejected.
@@ -896,11 +910,96 @@ export interface YahooHandleUpdateInput {
   value?: string
 }
 
+/** Address for the given record. */
+export interface AddressResourceClient {
+  /**
+   * List addresses, as one page holding all of them.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   */
+  list(personId: string, options?: CallOptions): Promise<Page<Address>>
+  /**
+   * Read the address identified by `id` within `personId`.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   * @param id - Identifier of the address. Does not accept null.
+   */
+  get(personId: string, id: string, options?: CallOptions): Promise<Address>
+}
+
+/** Email address for a person. */
+export interface EmailResourceClient {
+  /**
+   * List emails, as one page holding all of them.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   */
+  list(personId: string, options?: CallOptions): Promise<Page<Email>>
+  /**
+   * Read the email identified by `id` within `personId`.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   * @param id - Identifier of the email address. Does not accept null.
+   */
+  get(personId: string, id: string, options?: CallOptions): Promise<Email>
+}
+
+/** A Group Record in the address book database */
+export interface GroupResourceClient {
+  /** List groups, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Group>>
+  /**
+   * Read the group identified by `id`.
+   *
+   * @param id - Identifier of the group. Does not accept null.
+   */
+  get(id: string, options?: CallOptions): Promise<Group>
+}
+
+/** A person in the address book database. */
+export interface PersonResourceClient {
+  /** List people, as one page holding all of them. */
+  list(options?: CallOptions): Promise<Page<Person>>
+  /**
+   * Read the person identified by `id`.
+   *
+   * @param id - Identifier of the person. Does not accept null.
+   */
+  get(id: string, options?: CallOptions): Promise<Person>
+}
+
+/** Phone number for a person. */
+export interface PhoneResourceClient {
+  /**
+   * List phones, as one page holding all of them.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   */
+  list(personId: string, options?: CallOptions): Promise<Page<Phone>>
+  /**
+   * Read the phone identified by `id` within `personId`.
+   *
+   * @param personId - Identifier of the person. Does not accept null.
+   * @param id - Identifier of the phone number. Does not accept null.
+   */
+  get(personId: string, id: string, options?: CallOptions): Promise<Phone>
+}
+
 /**
  * The Contacts client: one namespace per resource that has operations, plus the app's own commands.
  * A client factory creates one from {@link contactsContract}.
  */
 export interface ContactsClient {
+  /** Address for the given record. */
+  readonly addresses: AddressResourceClient
+  /** Email address for a person. */
+  readonly emails: EmailResourceClient
+  /** A Group Record in the address book database */
+  readonly groups: GroupResourceClient
+  /** A person in the address book database. */
+  readonly people: PersonResourceClient
+  /** Phone number for a person. */
+  readonly phones: PhoneResourceClient
   /**
    * Create a new object.
    *
@@ -945,7 +1044,7 @@ export interface ContactsClient {
    */
   actionTitle(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -957,7 +1056,7 @@ export interface ContactsClient {
    */
   performAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
   /**
@@ -969,7 +1068,7 @@ export interface ContactsClient {
    */
   shouldEnableAction(
     _with: unknown,
-    _for: ObjectReferenceVariant<Person, never>,
+    _for: ObjectReferenceData<string, 'Person'>,
     options?: CallOptions
   ): Promise<void>
 }
@@ -1026,7 +1125,10 @@ const emailRecordType: ValueType<Email> = t.record(
 
 const groupRecordType: ValueType<Group> = t.record(
   {
+    id: t.string({ description: 'Unique and persistent identifier for this record.' }),
     name: t.nullable(t.string(), { description: 'The name of this group.' }),
+    creationDate: t.nullable(t.date(), { description: 'When the contact was created.' }),
+    modificationDate: t.nullable(t.date(), { description: 'When the contact was last modified.' }),
   },
   { description: 'A Group Record in the address book database' }
 )
@@ -1060,16 +1162,15 @@ const msnHandleRecordType: ValueType<MSNHandle> = t.record(
 
 const personRecordType: ValueType<Person> = t.record(
   {
+    id: t.string({ description: 'Unique and persistent identifier for this record.' }),
+    creationDate: t.nullable(t.date(), { description: 'When the contact was created.' }),
+    modificationDate: t.nullable(t.date(), { description: 'When the contact was last modified.' }),
     nickname: t.nullable(t.string(), { description: 'The Nickname of this person.' }),
     organization: t.nullable(t.string(), { description: 'Organization that employs this person.' }),
     maidenName: t.nullable(t.string(), { description: 'The Maiden name of this person.' }),
     suffix: t.nullable(t.string(), { description: 'The Suffix of this person.' }),
-    vcard: t.nullable(t.string(), {
-      description:
-        'Person information in vCard format, this always returns a card in version 3.0 format.',
-    }),
     homePage: t.nullable(t.string(), { description: 'The home page of this person.' }),
-    birthDate: t.nullable(t.string(), { description: 'The birth date of this person.' }),
+    birthDate: t.nullable(t.date(), { description: 'The birth date of this person.' }),
     phoneticLastName: t.nullable(t.string(), {
       description: 'The phonetic version of the Last name of this person.',
     }),
@@ -1078,7 +1179,6 @@ const personRecordType: ValueType<Person> = t.record(
       description: 'The Phonetic version of the Middle name of this person.',
     }),
     department: t.nullable(t.string(), { description: 'Department that this person works for.' }),
-    image: t.nullable(t.string(), { description: 'Image for person.' }),
     name: t.nullable(t.string(), {
       description:
         'First/Last name of the person, uses the name display order preference setting in Contacts.',
@@ -1161,6 +1261,8 @@ const resources: AppContract<ContactsClient>['resources'] = {
     name: 'Address',
     record: addressRecordType,
     id: t.string({ description: 'unique identifier for this address.' }),
+    get: 'contacts.addresses.get',
+    list: 'contacts.addresses.list',
   },
   AIMHandle: {
     name: 'AIMHandle',
@@ -1173,10 +1275,16 @@ const resources: AppContract<ContactsClient>['resources'] = {
   Email: {
     name: 'Email',
     record: emailRecordType,
+    id: t.string({ description: 'Unique identifier for this email' }),
+    get: 'contacts.emails.get',
+    list: 'contacts.emails.list',
   },
   Group: {
     name: 'Group',
     record: groupRecordType,
+    id: t.string({ description: 'Unique and persistent identifier for this record.' }),
+    get: 'contacts.groups.get',
+    list: 'contacts.groups.list',
   },
   ICQHandle: {
     name: 'ICQHandle',
@@ -1193,10 +1301,16 @@ const resources: AppContract<ContactsClient>['resources'] = {
   Person: {
     name: 'Person',
     record: personRecordType,
+    id: t.string({ description: 'Unique and persistent identifier for this record.' }),
+    get: 'contacts.people.get',
+    list: 'contacts.people.list',
   },
   Phone: {
     name: 'Phone',
     record: phoneRecordType,
+    id: t.string({ description: 'Unique identifier for this phone' }),
+    get: 'contacts.phones.get',
+    list: 'contacts.phones.list',
   },
   RelatedName: {
     name: 'RelatedName',
@@ -1214,6 +1328,204 @@ const resources: AppContract<ContactsClient>['resources'] = {
   YahooHandle: {
     name: 'YahooHandle',
     record: yahooHandleRecordType,
+  },
+}
+
+const personListPeopleOperation: OperationDescriptor<Record<string, never>, Page<Person>> = {
+  id: 'contacts.people.list',
+  permission: 'contacts:people:list',
+  target: { command: 'listPeople', resource: 'Person' },
+  description: 'List every person',
+  input: t.record({}),
+  output: t.page(personRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const personGetPersonOperation: OperationDescriptor<{ readonly id: string }, Person> = {
+  id: 'contacts.people.get',
+  permission: 'contacts:people:get',
+  target: { command: 'getPerson', resource: 'Person' },
+  description: 'Get a person by identifier',
+  input: t.record({
+    id: t.string({ description: 'Identifier of the person' }),
+  }),
+  output: personRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Identifier of the person' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const groupListGroupsOperation: OperationDescriptor<Record<string, never>, Page<Group>> = {
+  id: 'contacts.groups.list',
+  permission: 'contacts:groups:list',
+  target: { command: 'listGroups', resource: 'Group' },
+  description: 'List every group',
+  input: t.record({}),
+  output: t.page(groupRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {},
+    additionalProperties: false,
+  },
+}
+
+const groupGetGroupOperation: OperationDescriptor<{ readonly id: string }, Group> = {
+  id: 'contacts.groups.get',
+  permission: 'contacts:groups:get',
+  target: { command: 'getGroup', resource: 'Group' },
+  description: 'Get a group by identifier',
+  input: t.record({
+    id: t.string({ description: 'Identifier of the group' }),
+  }),
+  output: groupRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { id: { type: 'string', description: 'Identifier of the group' } },
+    required: ['id'],
+    additionalProperties: false,
+  },
+}
+
+const emailListEmailsOperation: OperationDescriptor<{ readonly personId: string }, Page<Email>> = {
+  id: 'contacts.emails.list',
+  permission: 'contacts:emails:list',
+  target: { command: 'listEmails', resource: 'Email' },
+  description: 'List the email addresses of a person',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+  }),
+  output: t.page(emailRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    required: ['personId'],
+    additionalProperties: false,
+  },
+}
+
+const emailGetEmailOperation: OperationDescriptor<
+  { readonly personId: string; readonly id: string },
+  Email
+> = {
+  id: 'contacts.emails.get',
+  permission: 'contacts:emails:get',
+  target: { command: 'getEmail', resource: 'Email' },
+  description: 'Get one email address of a person by its identifier',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+    id: t.string({ description: 'Identifier of the email address' }),
+  }),
+  output: emailRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      id: { type: 'string', description: 'Identifier of the email address' },
+    },
+    required: ['personId', 'id'],
+    additionalProperties: false,
+  },
+}
+
+const phoneListPhonesOperation: OperationDescriptor<{ readonly personId: string }, Page<Phone>> = {
+  id: 'contacts.phones.list',
+  permission: 'contacts:phones:list',
+  target: { command: 'listPhones', resource: 'Phone' },
+  description: 'List the phone numbers of a person',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+  }),
+  output: t.page(phoneRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    required: ['personId'],
+    additionalProperties: false,
+  },
+}
+
+const phoneGetPhoneOperation: OperationDescriptor<
+  { readonly personId: string; readonly id: string },
+  Phone
+> = {
+  id: 'contacts.phones.get',
+  permission: 'contacts:phones:get',
+  target: { command: 'getPhone', resource: 'Phone' },
+  description: 'Get one phone number of a person by its identifier',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+    id: t.string({ description: 'Identifier of the phone number' }),
+  }),
+  output: phoneRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      id: { type: 'string', description: 'Identifier of the phone number' },
+    },
+    required: ['personId', 'id'],
+    additionalProperties: false,
+  },
+}
+
+const addressListAddressesOperation: OperationDescriptor<
+  { readonly personId: string },
+  Page<Address>
+> = {
+  id: 'contacts.addresses.list',
+  permission: 'contacts:addresses:list',
+  target: { command: 'listAddresses', resource: 'Address' },
+  description: 'List the addresses of a person',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+  }),
+  output: t.page(addressRecordType),
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: { personId: { type: 'string', description: 'Identifier of the person' } },
+    required: ['personId'],
+    additionalProperties: false,
+  },
+}
+
+const addressGetAddressOperation: OperationDescriptor<
+  { readonly personId: string; readonly id: string },
+  Address
+> = {
+  id: 'contacts.addresses.get',
+  permission: 'contacts:addresses:get',
+  target: { command: 'getAddress', resource: 'Address' },
+  description: 'Get one address of a person by its identifier',
+  input: t.record({
+    personId: t.string({ description: 'Identifier of the person' }),
+    id: t.string({ description: 'Identifier of the address' }),
+  }),
+  output: addressRecordType,
+  inputJsonSchema: {
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    type: 'object',
+    properties: {
+      personId: { type: 'string', description: 'Identifier of the person' },
+      id: { type: 'string', description: 'Identifier of the address' },
+    },
+    required: ['personId', 'id'],
+    additionalProperties: false,
   },
 }
 
@@ -1404,7 +1716,7 @@ const appActionPropertyOperation: OperationDescriptor<Record<string, never>, und
 }
 
 const appActionTitleOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.actionTitle',
@@ -1415,7 +1727,7 @@ const appActionTitleOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -1433,39 +1745,63 @@ const appActionTitleOperation: OperationDescriptor<
         type: 'object',
         properties: {
           reference: {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Person' },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
+            anyOf: [
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
                   },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'selector' },
+                  cardinality: { type: 'string', const: 'one' },
+                  selector: {
+                    oneOf: [
+                      {
                         type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
+                        properties: {
+                          by: { type: 'string', const: 'name' },
+                          name: { type: 'string' },
+                        },
+                        required: ['by', 'name'],
                         additionalProperties: false,
                       },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
+                      {
+                        type: 'object',
+                        properties: {
+                          by: { type: 'string', const: 'index' },
+                          index: {
+                            type: 'object',
+                            properties: {
+                              integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' },
+                            },
+                            required: ['integer'],
+                            additionalProperties: false,
+                          },
+                        },
+                        required: ['by', 'index'],
+                        additionalProperties: false,
+                      },
+                    ],
                   },
-                ],
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'selector'],
+                additionalProperties: false,
               },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
+            ],
           },
         },
         required: ['reference'],
@@ -1561,12 +1897,24 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
@@ -1576,25 +1924,34 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -1645,12 +2002,24 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
@@ -1660,25 +2029,34 @@ const appActionTitleOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -1717,7 +2095,7 @@ const appActionTitleOperation: OperationDescriptor<
 }
 
 const appPerformActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.performAction',
@@ -1728,7 +2106,7 @@ const appPerformActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -1746,39 +2124,63 @@ const appPerformActionOperation: OperationDescriptor<
         type: 'object',
         properties: {
           reference: {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Person' },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
+            anyOf: [
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
                   },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'selector' },
+                  cardinality: { type: 'string', const: 'one' },
+                  selector: {
+                    oneOf: [
+                      {
                         type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
+                        properties: {
+                          by: { type: 'string', const: 'name' },
+                          name: { type: 'string' },
+                        },
+                        required: ['by', 'name'],
                         additionalProperties: false,
                       },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
+                      {
+                        type: 'object',
+                        properties: {
+                          by: { type: 'string', const: 'index' },
+                          index: {
+                            type: 'object',
+                            properties: {
+                              integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' },
+                            },
+                            required: ['integer'],
+                            additionalProperties: false,
+                          },
+                        },
+                        required: ['by', 'index'],
+                        additionalProperties: false,
+                      },
+                    ],
                   },
-                ],
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'selector'],
+                additionalProperties: false,
               },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
+            ],
           },
         },
         required: ['reference'],
@@ -1874,12 +2276,24 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
@@ -1889,25 +2303,34 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -1958,12 +2381,24 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
@@ -1973,25 +2408,34 @@ const appPerformActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2030,7 +2474,7 @@ const appPerformActionOperation: OperationDescriptor<
 }
 
 const appShouldEnableActionOperation: OperationDescriptor<
-  { readonly with: unknown; readonly for: ObjectReferenceVariant<Person, never> },
+  { readonly with: unknown; readonly for: ObjectReferenceData<string, 'Person'> },
   undefined
 > = {
   id: 'contacts.app.shouldEnableAction',
@@ -2042,7 +2486,7 @@ const appShouldEnableActionOperation: OperationDescriptor<
     with: t.unknown({
       description: 'property that that was returned from the "action property" handler.',
     }),
-    for: t.reference<Person, never>(() => resources, 'Person', 'one', {
+    for: t.reference<Person, string, 'Person'>(() => contactsContract, 'Person', 'one', {
       description: 'Currently selected person.',
     }),
   }),
@@ -2060,39 +2504,63 @@ const appShouldEnableActionOperation: OperationDescriptor<
         type: 'object',
         properties: {
           reference: {
-            type: 'object',
-            properties: {
-              resource: { type: 'string', const: 'Person' },
-              form: { type: 'string', const: 'selector' },
-              cardinality: { type: 'string', const: 'one' },
-              selector: {
-                oneOf: [
-                  {
-                    type: 'object',
-                    properties: { by: { type: 'string', const: 'name' }, name: { type: 'string' } },
-                    required: ['by', 'name'],
-                    additionalProperties: false,
+            anyOf: [
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'identity' },
+                  cardinality: { type: 'string', const: 'one' },
+                  id: {
+                    type: 'string',
+                    description: 'Unique and persistent identifier for this record.',
                   },
-                  {
-                    type: 'object',
-                    properties: {
-                      by: { type: 'string', const: 'index' },
-                      index: {
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'id'],
+                additionalProperties: false,
+              },
+              {
+                type: 'object',
+                properties: {
+                  resource: { type: 'string', const: 'Person' },
+                  form: { type: 'string', const: 'selector' },
+                  cardinality: { type: 'string', const: 'one' },
+                  selector: {
+                    oneOf: [
+                      {
                         type: 'object',
-                        properties: { integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' } },
-                        required: ['integer'],
+                        properties: {
+                          by: { type: 'string', const: 'name' },
+                          name: { type: 'string' },
+                        },
+                        required: ['by', 'name'],
                         additionalProperties: false,
                       },
-                    },
-                    required: ['by', 'index'],
-                    additionalProperties: false,
+                      {
+                        type: 'object',
+                        properties: {
+                          by: { type: 'string', const: 'index' },
+                          index: {
+                            type: 'object',
+                            properties: {
+                              integer: { type: 'string', pattern: '^(0|-?[1-9][0-9]*)$' },
+                            },
+                            required: ['integer'],
+                            additionalProperties: false,
+                          },
+                        },
+                        required: ['by', 'index'],
+                        additionalProperties: false,
+                      },
+                    ],
                   },
-                ],
+                  container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+                },
+                required: ['resource', 'form', 'cardinality', 'selector'],
+                additionalProperties: false,
               },
-              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
-            },
-            required: ['resource', 'form', 'cardinality', 'selector'],
-            additionalProperties: false,
+            ],
           },
         },
         required: ['reference'],
@@ -2188,12 +2656,24 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
             },
@@ -2203,25 +2683,34 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema1' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2272,12 +2761,24 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: { type: 'string', const: 'SocialProfile' },
+              resource: { type: 'string', const: 'Email' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this email' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Group' },
               form: { type: 'string', const: 'identity' },
               cardinality: { type: 'string', const: 'one' },
               id: {
                 type: 'string',
-                description: 'The persistent unique identifier for this profile.',
+                description: 'Unique and persistent identifier for this record.',
               },
               container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
             },
@@ -2287,25 +2788,34 @@ const appShouldEnableActionOperation: OperationDescriptor<
           {
             type: 'object',
             properties: {
-              resource: {
+              resource: { type: 'string', const: 'Person' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: {
                 type: 'string',
-                enum: [
-                  'Address',
-                  'AIMHandle',
-                  'CustomDate',
-                  'Email',
-                  'Group',
-                  'ICQHandle',
-                  'JabberHandle',
-                  'MSNHandle',
-                  'Person',
-                  'Phone',
-                  'RelatedName',
-                  'SocialProfile',
-                  'Url',
-                  'YahooHandle',
-                ],
+                description: 'Unique and persistent identifier for this record.',
               },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', const: 'Phone' },
+              form: { type: 'string', const: 'identity' },
+              cardinality: { type: 'string', const: 'one' },
+              id: { type: 'string', description: 'Unique identifier for this phone' },
+              container: { allOf: [{ $ref: '#/definitions/__schema2' }] },
+            },
+            required: ['resource', 'form', 'cardinality', 'id'],
+            additionalProperties: false,
+          },
+          {
+            type: 'object',
+            properties: {
+              resource: { type: 'string', enum: ['Address', 'Email', 'Group', 'Person', 'Phone'] },
               form: { type: 'string', const: 'selector' },
               cardinality: { type: 'string', const: 'one' },
               selector: {
@@ -2345,6 +2855,16 @@ const appShouldEnableActionOperation: OperationDescriptor<
 
 /** Every operation, keyed by its identity. */
 const operations: AppContract<ContactsClient>['operations'] = {
+  'contacts.people.list': personListPeopleOperation,
+  'contacts.people.get': personGetPersonOperation,
+  'contacts.groups.list': groupListGroupsOperation,
+  'contacts.groups.get': groupGetGroupOperation,
+  'contacts.emails.list': emailListEmailsOperation,
+  'contacts.emails.get': emailGetEmailOperation,
+  'contacts.phones.list': phoneListPhonesOperation,
+  'contacts.phones.get': phoneGetPhoneOperation,
+  'contacts.addresses.list': addressListAddressesOperation,
+  'contacts.addresses.get': addressGetAddressOperation,
   'contacts.app.make': appMakeOperation,
   'contacts.app.add': appAddOperation,
   'contacts.app.remove': appRemoveOperation,
@@ -2358,6 +2878,30 @@ const operations: AppContract<ContactsClient>['operations'] = {
 /** Build the client on top of a factory-supplied runtime. */
 function bind(runtime: ClientRuntime): ContactsClient {
   return {
+    addresses: {
+      list: (personId, options) =>
+        runtime.invoke(addressListAddressesOperation, { personId }, options),
+      get: (personId, id, options) =>
+        runtime.invoke(addressGetAddressOperation, { personId, id }, options),
+    },
+    emails: {
+      list: (personId, options) => runtime.invoke(emailListEmailsOperation, { personId }, options),
+      get: (personId, id, options) =>
+        runtime.invoke(emailGetEmailOperation, { personId, id }, options),
+    },
+    groups: {
+      list: (options) => runtime.invoke(groupListGroupsOperation, {}, options),
+      get: (id, options) => runtime.invoke(groupGetGroupOperation, { id }, options),
+    },
+    people: {
+      list: (options) => runtime.invoke(personListPeopleOperation, {}, options),
+      get: (id, options) => runtime.invoke(personGetPersonOperation, { id }, options),
+    },
+    phones: {
+      list: (personId, options) => runtime.invoke(phoneListPhonesOperation, { personId }, options),
+      get: (personId, id, options) =>
+        runtime.invoke(phoneGetPhoneOperation, { personId, id }, options),
+    },
     make: (_new, at, withData, withProperties, options) =>
       runtime.invoke(appMakeOperation, { new: _new, at, withData, withProperties }, options),
     add: (to, options) => runtime.invoke(appAddOperation, { to }, options),

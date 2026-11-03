@@ -4,6 +4,7 @@
  */
 
 import type { HttpClient } from '../client.js'
+import type { Playlist } from '../types.js'
 
 /**
  * Client for a list of tracks/streams.
@@ -17,6 +18,20 @@ export class PlaylistResourceClient {
     this.#http = http
     this.#app = app
     this.#resource = resource
+  }
+
+  /**
+   * List all playlists, as one page.
+   */
+  async list(): Promise<{ items: Playlist[] }> {
+    return this.#http.rpc<{ items: Playlist[] }>(`${this.#app}.${this.#resource}.list`)
+  }
+
+  /**
+   * Get a playlist by persistentID.
+   */
+  async get(persistentID: string): Promise<Playlist> {
+    return this.#http.rpc<Playlist>(`${this.#app}.${this.#resource}.get`, { persistentID })
   }
 
   /**

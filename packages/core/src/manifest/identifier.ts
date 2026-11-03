@@ -19,7 +19,7 @@
  */
 
 import type { Identifier, IdentifierTargeting, Resource } from './schemas/resource.js'
-import { usableProperties } from './unsupported.js'
+import { hasUsableProperty, usableProperties } from './unsupported.js'
 
 /**
  * The canonical key under which every generated surface exposes a resource's
@@ -129,6 +129,31 @@ export function resolveIdentifierTargeting(
   const property =
     strategy === 'byProperty' ? (entry.runtimeProperty ?? entry.property) : entry.property
   return { strategy, property }
+}
+
+/**
+ * Resolve the property whose value a resource's records mirror under
+ * {@link CANONICAL_IDENTIFIER_KEY}, or `undefined` when they carry no alias.
+ *
+ * The alias mirrors the runtime targeting property: the value sibling
+ * operations accept as the lookup (for a `byProperty` resource its working
+ * property, not the declared identifier). There is no alias when the resource
+ * declares no identifier, or when it has a usable property literally named
+ * `id`: that key is then a regular field with its own value and type, and an
+ * alias would overwrite it (a Music track's numeric `id` with its persistent
+ * ID). Every surface that writes or types the alias takes it from here, so the
+ * records a list returns and the read types that describe them agree.
+ *
+ * @param resource - The resource definition from the manifest, or `undefined`.
+ * @returns The property to mirror under `id`, or `undefined` for no alias.
+ */
+export function resolveCanonicalIdentifierSource(
+  resource: Resource | undefined
+): string | undefined {
+  if (resource === undefined || hasUsableProperty(resource, CANONICAL_IDENTIFIER_KEY)) {
+    return undefined
+  }
+  return resolveIdentifierTargeting(resource)?.property
 }
 
 /**

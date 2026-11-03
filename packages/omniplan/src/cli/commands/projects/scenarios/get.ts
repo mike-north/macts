@@ -14,7 +14,7 @@ export class GetScenarioCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  scenarioId = Option.String({ required: true })
+  scenarioId = Option.String({ name: 'id', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

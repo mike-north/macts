@@ -15,7 +15,7 @@ import { PageRequest } from '@macts/contracts';
 export interface Album {
     readonly id: string;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Folder, string> | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
@@ -38,7 +38,7 @@ export interface AlbumUpdateInput {
 export interface Container {
     readonly id: string;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Folder, string> | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public
@@ -55,7 +55,7 @@ export interface ContainerUpdateInput {
 export interface Folder {
     readonly id: string;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Folder, string> | null;
+    readonly parent: ObjectReferenceVariant<Folder, string, 'Folder'> | null;
 }
 
 // @public

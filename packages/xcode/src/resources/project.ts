@@ -21,7 +21,7 @@ export class ProjectResourceClient {
   }
 
   /**
-   * List projects, one page at a time. When the result has a `nextCursor`,
+   * List the projects of one workspace document, one page at a time. When the result has a `nextCursor`,
    * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
   async list(

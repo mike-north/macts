@@ -318,3 +318,13 @@ export async function rejection(promise: Promise<unknown>): Promise<unknown> {
     (error: unknown) => error
   )
 }
+
+/** Call `run`, expecting it to throw, and return what it threw. */
+export function thrownBy(run: () => unknown): unknown {
+  try {
+    run()
+  } catch (error) {
+    return error
+  }
+  throw new Error('expected the call to throw')
+}

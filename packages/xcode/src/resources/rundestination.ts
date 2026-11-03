@@ -21,7 +21,7 @@ export class RunDestinationResourceClient {
   }
 
   /**
-   * List all run destinations, as one page.
+   * List the run destinations of one workspace document, as one page.
    */
   async list(workspaceName: string): Promise<{ items: RunDestination[] }> {
     return this.#http.rpc<{ items: RunDestination[] }>(`${this.#app}.${this.#resource}.list`, {

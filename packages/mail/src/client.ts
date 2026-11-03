@@ -7,7 +7,6 @@
 
 import { OutgoingMessageResourceClient } from './resources/outgoingmessage.js'
 import { MessageResourceClient } from './resources/message.js'
-import type { Account, Mailbox, Rule } from './types.js'
 
 /**
  * Client configuration options.
@@ -134,8 +133,8 @@ export class MailClient {
   /**
    * Triggers a check for email.
    */
-  async checkForNewMail(_for?: Account): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.checkForNewMail', { for: _for })
+  async checkForNewMail(): Promise<void> {
+    await this.#httpClient.rpc<undefined>('mail.app.checkForNewMail', {})
   }
 
   /**
@@ -176,17 +175,7 @@ export class MailClient {
   /**
    * Script handler invoked by rules and menus that execute AppleScripts. The direct parameter of this handler is a list of messages being acted upon.
    */
-  async performMailActionWithMessages(inMailboxes?: Mailbox, forRule?: Rule): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.performMailActionWithMessages', {
-      inMailboxes,
-      forRule,
-    })
-  }
-
-  /**
-   * Command to trigger synchronizing of an IMAP account with the server.
-   */
-  async synchronize(_with: Account): Promise<void> {
-    await this.#httpClient.rpc<undefined>('mail.app.synchronize', { with: _with })
+  async performMailActionWithMessages(): Promise<void> {
+    await this.#httpClient.rpc<undefined>('mail.app.performMailActionWithMessages', {})
   }
 }

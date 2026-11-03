@@ -3,18 +3,18 @@ import { getClient } from '../../sdk.js'
 import { createFormatter } from '../../output/index.js'
 
 /**
- * Get a account by ID.
+ * Get an account by name.
  */
 export class GetAccountCommand extends Command {
   static override paths = [['notes', 'accounts', 'get']]
 
   static override usage = Command.Usage({
-    description: 'Get a account by ID',
+    description: 'Get an account by name',
   })
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
 
-  accountId = Option.String({ required: true })
+  accountId = Option.String({ name: 'name', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

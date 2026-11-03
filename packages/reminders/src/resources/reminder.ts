@@ -21,7 +21,7 @@ export class ReminderResourceClient {
   }
 
   /**
-   * List reminders, one page at a time. When the result has a `nextCursor`,
+   * List the reminders of one list, one page at a time. When the result has a `nextCursor`,
    * more remain: call again with the same arguments and `{ cursor: nextCursor }`.
    */
   async list(

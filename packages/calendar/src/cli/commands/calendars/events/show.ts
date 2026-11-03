@@ -14,7 +14,7 @@ export class ShowEventCommand extends Command {
 
   json = Option.Boolean('--json', { description: 'Output as JSON' })
   calendarId = Option.String('--calendar-id', { required: true, description: 'Calendar ID' })
-  eventId = Option.String({ required: true })
+  eventId = Option.String({ name: 'uid', required: true })
 
   async execute(): Promise<number> {
     const formatter = createFormatter(this.json ?? false)

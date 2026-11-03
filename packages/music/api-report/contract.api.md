@@ -9,7 +9,9 @@ import { CallOptions } from '@macts/contracts';
 import { FileSource } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
+import { Page } from '@macts/contracts';
 
 // @public
 export interface AirPlayDevice {
@@ -109,17 +111,17 @@ export type AudioCDTrackUpdateInput = Record<string, never>;
 // @public
 export interface BrowserWindow {
     readonly selection: string | null;
-    view: ObjectReferenceVariant<Playlist, never> | null;
+    view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
 // @public
 export interface BrowserWindowCreateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
+    view?: ObjectReferenceData<string, 'Playlist'>;
 }
 
 // @public
 export interface BrowserWindowUpdateInput {
-    view?: ObjectReferenceVariant<Playlist, never>;
+    view?: ObjectReferenceData<string, 'Playlist'>;
 }
 
 // @public
@@ -306,6 +308,7 @@ export interface MusicClient {
     save(options?: CallOptions): Promise<void>;
     select(options?: CallOptions): Promise<void>;
     stop(options?: CallOptions): Promise<void>;
+    readonly tracks: TrackResourceClient;
 }
 
 // @public
@@ -317,8 +320,10 @@ export interface Playlist {
     disliked: boolean | null;
     readonly duration: Integer | null;
     favorited: boolean | null;
+    readonly id: Integer | null;
+    readonly index: Integer | null;
     name: string | null;
-    readonly parent: ObjectReferenceVariant<Playlist, never> | null;
+    readonly persistentID: string;
     readonly size: Integer | null;
     readonly specialKind: string | null;
     readonly time: string | null;
@@ -335,6 +340,8 @@ export interface PlaylistCreateInput {
 
 // @public
 export interface PlaylistResourceClient {
+    get(persistentID: string, options?: CallOptions): Promise<Playlist>;
+    list(options?: CallOptions): Promise<Page<Playlist>>;
     move(to: string, options?: CallOptions): Promise<void>;
     search(_for: string, only?: string, options?: CallOptions): Promise<void>;
 }
@@ -350,7 +357,7 @@ export interface PlaylistUpdateInput {
 // @public
 export interface PlaylistWindow {
     readonly selection: string | null;
-    readonly view: ObjectReferenceVariant<Playlist, never> | null;
+    readonly view: ObjectReferenceVariant<Playlist, string, 'Playlist'> | null;
 }
 
 // @public
@@ -441,6 +448,8 @@ export interface Track {
     gapless: boolean | null;
     genre: string | null;
     grouping: string | null;
+    readonly id: Integer | null;
+    readonly index: Integer | null;
     readonly kind: string | null;
     longDescription: string | null;
     lyrics: string | null;
@@ -449,6 +458,8 @@ export interface Track {
     movement: string | null;
     movementCount: Integer | null;
     movementNumber: Integer | null;
+    name: string | null;
+    readonly persistentID: string;
     playedCount: Integer | null;
     playedDate: Date | null;
     readonly purchaserAccount: string | null;
@@ -513,6 +524,7 @@ export interface TrackCreateInput {
     movement?: string;
     movementCount?: Integer;
     movementNumber?: Integer;
+    name?: string;
     playedCount?: Integer;
     playedDate?: Date;
     rating?: Integer;
@@ -534,6 +546,12 @@ export interface TrackCreateInput {
     volumeAdjustment?: Integer;
     work?: string;
     year?: Integer;
+}
+
+// @public
+export interface TrackResourceClient {
+    get(playlistId: string, persistentID: string, options?: CallOptions): Promise<Track>;
+    list(playlistId: string, options?: CallOptions): Promise<Page<Track>>;
 }
 
 // @public
@@ -570,6 +588,7 @@ export interface TrackUpdateInput {
     movement?: string;
     movementCount?: Integer;
     movementNumber?: Integer;
+    name?: string;
     playedCount?: Integer;
     playedDate?: Date;
     rating?: Integer;

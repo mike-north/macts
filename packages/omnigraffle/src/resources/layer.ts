@@ -21,7 +21,7 @@ export class LayerResourceClient {
   }
 
   /**
-   * List all layers, as one page.
+   * List the layers of one canvas, as one page.
    */
   async list(canvasId: string): Promise<{ items: Layer[] }> {
     return this.#http.rpc<{ items: Layer[] }>(`${this.#app}.${this.#resource}.list`, { canvasId })

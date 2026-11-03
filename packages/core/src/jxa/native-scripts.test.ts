@@ -660,9 +660,23 @@ describe('target expressions', () => {
   })
 
   it('addresses a nested child through its parent', () => {
-    expect(buildNestedTargetExpression('parent', 'events', 'itemId')).toBe(
+    expect(buildNestedTargetExpression(eventResource, 'parent', 'events', 'itemId')).toBe(
       'parent["events"].byId(itemId)'
     )
+  })
+
+  it('matches a nested child on its targeting property for byProperty (#213)', () => {
+    // A child keyed byProperty was addressed parent[...].byId(<value>), which
+    // looked a Music track's persistent ID up as a numeric id and found nothing.
+    expect(buildNestedTargetExpression(widgetByProperty, 'parent', 'widgets', 'itemId')).toBe(
+      'parent["widgets"].whose({ "name": itemId })[0]'
+    )
+  })
+
+  it('matches a nested child on runtimeProperty when one is declared', () => {
+    expect(
+      buildNestedTargetExpression(calendarByRuntimeProperty, 'parent', 'calendars', 'itemId')
+    ).toBe('parent["calendars"].whose({ "name": itemId })[0]')
   })
 })
 
@@ -1640,6 +1654,146 @@ describe('Calendar bodies (shipped manifest)', () => {
     expect(text).toContain('var item = app["Calendar"](props);')
     expect(text).toContain('item.make();')
   })
+})
+
+// Contacts reads (#213). Expected text comes from the Contacts 14.0
+// dictionary: people and groups are elements of the application and inherit
+// the `entry` class's `id`; email, phone and address are elements of a person
+// and carry their own `id`. Every lookup is the app's id specifier.
+describe('Contacts read bodies (shipped manifest, #213)', () => {
+  let contacts: AppManifest
+  beforeAll(async () => {
+    contacts = await loadManifest(manifestPath('contacts'))
+  })
+  const body = (command: string, resource: string, identifierAliases = false): string =>
+    buildNativeBody(contacts, { command, resource }, { identifierAliases })
+
+  it.each([
+    ['listPeople', 'Person', 'people'],
+    ['listGroups', 'Group', 'groups'],
+  ])('%s lists the %s collection at the application by id', (command, resource, collection) => {
+    const text = body(command, resource)
+    expect(text).toContain(`var col = app["${collection}"];`)
+    for (const read of identifierReads('id')) expect(text).toContain(read)
+    expect(text).toContain('obj["id"] = ids[i];')
+    expect(text).not.toContain('parent')
+  })
+
+  it.each([
+    ['getPerson', 'Person', 'people'],
+    ['getGroup', 'Group', 'groups'],
+  ])('%s looks the %s up by id at the application', (command, resource, collection) => {
+    const text = body(command, resource)
+    expect(text).toContain('var itemId = args["id"];')
+    expect(text).toContain(`var item = app["${collection}"].byId(itemId);`)
+    expect(text).toContain('if (!item.exists()) {')
+    expect(text).not.toContain('whose(')
+  })
+
+  it('listPeople reads the inherited entry dates and the birth date across the collection', () => {
+    const text = body('listPeople', 'Person')
+    for (const prop of ['creationDate', 'modificationDate', 'birthDate', 'firstName', 'lastName']) {
+      expect(text, prop).toContain(columnRead(prop))
+      expect(text, prop).toMatch(columnField(prop))
+    }
+  })
+
+  it.each([
+    ['listEmails', 'Email', 'emails'],
+    ['listPhones', 'Phone', 'phones'],
+    ['listAddresses', 'Address', 'addresses'],
+  ])(
+    '%s lists the %s collection under the person given by personId',
+    (command, resource, collection) => {
+      const text = body(command, resource)
+      expect(text).toContain('var parentId = args["personId"];')
+      expect(text).toContain('var parent = app["people"].byId(parentId);')
+      expect(text).toContain(`var col = parent["${collection}"];`)
+      expect(text).not.toContain(`app["${collection}"]`)
+      for (const read of identifierReads('id')) expect(text).toContain(read)
+    }
+  )
+
+  it.each([
+    ['getEmail', 'Email', 'emails'],
+    ['getPhone', 'Phone', 'phones'],
+    ['getAddress', 'Address', 'addresses'],
+  ])('%s looks the %s up by id under its person', (command, resource, collection) => {
+    const text = body(command, resource)
+    expect(text).toContain('var parentId = args["personId"];')
+    expect(text).toContain('var itemId = args["id"];')
+    expect(text).toContain('var parent = app["people"].byId(parentId);')
+    expect(text).toContain(`var item = parent["${collection}"].byId(itemId);`)
+    // Addressed at the application, these fail with -1728 on Contacts 14.0.
+    expect(text).not.toContain(`app["${collection}"]`)
+  })
+
+  it('a person list mirrors no canonical alias over the id the person already has', () => {
+    expect(body('listPeople', 'Person', true)).not.toContain('obj["id"] = obj[')
+  })
+})
+
+// Music reads (#213). Playlists and tracks are matched by `persistentID`
+// (the dictionary's `item` class: "This id does not change over time"), not
+// by the numeric `id`, which belongs to a track's entry in one playlist.
+// Tracks are read under a playlist; the library playlist holds every track.
+describe('Music read bodies (shipped manifest, #213)', () => {
+  let music: AppManifest
+  beforeAll(async () => {
+    music = await loadManifest(manifestPath('music'))
+  })
+  const body = (command: string, resource: string, identifierAliases = false): string =>
+    buildNativeBody(music, { command, resource }, { identifierAliases })
+
+  it('listPlaylists lists playlists at the application, identified by persistent ID', () => {
+    const text = body('listPlaylists', 'Playlist')
+    expect(text).toContain('var col = app["playlists"];')
+    for (const read of identifierReads('persistentID')) expect(text).toContain(read)
+    expect(text).toContain('obj["persistentID"] = ids[i];')
+    // The numeric id is an ordinary property, read across the collection.
+    expect(text).toContain(columnRead('id'))
+    expect(text).toMatch(columnField('id'))
+  })
+
+  it('getPlaylist matches the playlist on its persistent ID', () => {
+    const text = body('getPlaylist', 'Playlist')
+    expect(text).toContain('var itemId = args["persistentID"];')
+    expect(text).toContain('var item = app["playlists"].whose({ "persistentID": itemId })[0];')
+    expect(text).toContain('if (!item.exists()) {')
+    expect(text).not.toContain('.byId(')
+  })
+
+  it('listTracks lists the tracks of the playlist given by playlistId', () => {
+    const text = body('listTracks', 'Track')
+    expect(text).toContain('var parentId = args["playlistId"];')
+    expect(text).toContain('var parent = app["playlists"].whose({ "persistentID": parentId })[0];')
+    expect(text).toContain('var col = parent["tracks"];')
+    expect(text).not.toContain('app["tracks"]')
+    for (const read of identifierReads('persistentID')) expect(text).toContain(read)
+  })
+
+  it('getTrack matches the track on its persistent ID under its playlist', () => {
+    const text = body('getTrack', 'Track')
+    expect(text).toContain('var parentId = args["playlistId"];')
+    expect(text).toContain('var itemId = args["persistentID"];')
+    expect(text).toContain('var parent = app["playlists"].whose({ "persistentID": parentId })[0];')
+    expect(text).toContain('var item = parent["tracks"].whose({ "persistentID": itemId })[0];')
+    expect(text).not.toContain('.byId(')
+  })
+
+  it.each([
+    ['listPlaylists', 'Playlist'],
+    ['listTracks', 'Track'],
+  ])(
+    '%s never overwrites the numeric id with the persistent ID as a canonical alias',
+    (command, resource) => {
+      // A passthrough list wrote obj["id"] = obj["persistentID"], replacing
+      // the integer id field with a hexadecimal string.
+      const text = body(command, resource, true)
+      expect(text).not.toContain('obj["id"] = obj["persistentID"];')
+      expect(text).toMatch(columnField('id'))
+    }
+  )
 })
 
 // A missing target, or a missing parent of a scoped operation, is a missing

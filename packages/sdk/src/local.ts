@@ -7,6 +7,10 @@
  * runtime exactly as the macts service would; there is no shortcut for local
  * callers.
  *
+ * `bindReference(client, data)` binds a reference the caller built, or one
+ * bound to another client of the same app, to a client from either entry
+ * point; it is the same function `@macts/sdk` exports.
+ *
  * Like `@macts/sdk`, this entry point re-exports every public symbol of
  * `@macts/contracts` (error classes, value types, and their helpers). Both
  * entry points export the same bindings, so `instanceof` checks and branded
@@ -23,3 +27,4 @@
 
 export * from '@macts/contracts'
 export { createClient, type LocalClientOptions } from './local-client.js'
+export { bindReference } from './codec-runtime.js'

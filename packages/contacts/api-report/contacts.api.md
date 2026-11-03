@@ -31,6 +31,15 @@ export interface AddressCreateInput {
     zip?: string;
 }
 
+// @public
+export class AddressResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(personId: string, id: string): Promise<Address>;
+    list(personId: string): Promise<{
+        items: Address[];
+    }>;
+}
+
 // @public (undocumented)
 export const AddressSchema: z.ZodObject<{
     city: z.ZodString;
@@ -95,9 +104,14 @@ export class ContactsClient {
     actionProperty(): Promise<void>;
     actionTitle(_with: unknown, _for: Person): Promise<void>;
     add(to: string): Promise<void>;
+    readonly addresses: AddressResourceClient;
+    readonly emails: EmailResourceClient;
+    readonly groups: GroupResourceClient;
     get http(): HttpClient;
     make(_new: string, at?: string, withData?: unknown, withProperties?: unknown): Promise<void>;
+    readonly people: PersonResourceClient;
     performAction(_with: unknown, _for: Person): Promise<void>;
+    readonly phones: PhoneResourceClient;
     remove(from: string): Promise<void>;
     save(): Promise<void>;
     shouldEnableAction(_with: unknown, _for: Person): Promise<void>;
@@ -152,6 +166,15 @@ export interface EmailCreateInput {
     value?: string;
 }
 
+// @public
+export class EmailResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(personId: string, id: string): Promise<Email>;
+    list(personId: string): Promise<{
+        items: Email[];
+    }>;
+}
+
 // @public (undocumented)
 export const EmailSchema: z.ZodObject<{
     id: z.ZodString;
@@ -164,6 +187,9 @@ export type EmailUpdateInput = Partial<EmailCreateInput>;
 
 // @public
 export interface Group {
+    creationDate: Date;
+    id: string;
+    modificationDate: Date;
     name: string;
 }
 
@@ -172,9 +198,21 @@ export interface GroupCreateInput {
     name?: string;
 }
 
+// @public
+export class GroupResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<Group>;
+    list(): Promise<{
+        items: Group[];
+    }>;
+}
+
 // @public (undocumented)
 export const GroupSchema: z.ZodObject<{
+    id: z.ZodString;
     name: z.ZodString;
+    creationDate: z.ZodString;
+    modificationDate: z.ZodString;
 }, z.core.$strip>;
 
 // @public
@@ -260,16 +298,18 @@ export type MSNHandleUpdateInput = Partial<MSNHandleCreateInput>;
 
 // @public
 export interface Person {
-    birthDate: string;
+    birthDate: Date;
     company: boolean;
+    creationDate: Date;
     department: string;
     firstName: string;
     homePage: string;
-    image: string;
+    id: string;
     jobTitle: string;
     lastName: string;
     maidenName: string;
     middleName: string;
+    modificationDate: Date;
     name: string;
     nickname: string;
     note: string;
@@ -279,17 +319,15 @@ export interface Person {
     phoneticMiddleName: string;
     suffix: string;
     title: string;
-    vcard: string;
 }
 
 // @public
 export interface PersonCreateInput {
-    birthDate?: string;
+    birthDate?: Date;
     company?: boolean;
     department?: string;
     firstName?: string;
     homePage?: string;
-    image?: string;
     jobTitle?: string;
     lastName?: string;
     maidenName?: string;
@@ -304,20 +342,30 @@ export interface PersonCreateInput {
     title?: string;
 }
 
+// @public
+export class PersonResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(id: string): Promise<Person>;
+    list(): Promise<{
+        items: Person[];
+    }>;
+}
+
 // @public (undocumented)
 export const PersonSchema: z.ZodObject<{
+    id: z.ZodString;
+    creationDate: z.ZodString;
+    modificationDate: z.ZodString;
     nickname: z.ZodString;
     organization: z.ZodString;
     maidenName: z.ZodString;
     suffix: z.ZodString;
-    vcard: z.ZodString;
     homePage: z.ZodString;
     birthDate: z.ZodString;
     phoneticLastName: z.ZodString;
     title: z.ZodString;
     phoneticMiddleName: z.ZodString;
     department: z.ZodString;
-    image: z.ZodString;
     name: z.ZodString;
     note: z.ZodString;
     company: z.ZodBoolean;
@@ -342,6 +390,15 @@ export interface Phone {
 export interface PhoneCreateInput {
     label?: string;
     value?: string;
+}
+
+// @public
+export class PhoneResourceClient {
+    constructor(http: HttpClient, app: string, resource: string);
+    get(personId: string, id: string): Promise<Phone>;
+    list(personId: string): Promise<{
+        items: Phone[];
+    }>;
 }
 
 // @public (undocumented)

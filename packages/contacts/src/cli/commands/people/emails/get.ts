@@ -1,0 +1,44 @@
+import { Command, Option } from 'clipanion'
+import { getClient } from '../../../sdk.js'
+import { createFormatter } from '../../../output/index.js'
+
+/**
+ * Get an email by ID.
+ */
+export class GetEmailCommand extends Command {
+  static override paths = [['contacts', 'people', 'emails', 'get']]
+
+  static override usage = Command.Usage({
+    description: 'Get an email by ID',
+  })
+
+  json = Option.Boolean('--json', { description: 'Output as JSON' })
+  personId = Option.String('--person-id', {
+    required: true,
+    description: 'Identifier of the person',
+  })
+
+  emailId = Option.String({ name: 'id', required: true })
+
+  async execute(): Promise<number> {
+    const formatter = createFormatter(this.json ?? false)
+
+    try {
+      const client = getClient()
+      const item = await client.emails.get(this.personId, this.emailId)
+
+      const output = formatter.format({
+        id: item.id,
+        label: item.label,
+        value: item.value,
+      })
+
+      this.context.stdout.write(output + '\n')
+      return 0
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.context.stderr.write(formatter.formatError(message) + '\n')
+      return 1
+    }
+  }
+}

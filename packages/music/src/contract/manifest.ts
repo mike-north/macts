@@ -522,6 +522,28 @@ export const manifest: unknown = {
       description: 'a list of tracks/streams',
       code: 'cPly',
       properties: {
+        id: {
+          access: 'r',
+          type: 'integer',
+          description: 'the id of the item',
+          code: 'ID  ',
+          optional: false,
+        },
+        index: {
+          access: 'r',
+          type: 'integer',
+          description: 'the index of the item in internal application order',
+          code: 'pidx',
+          optional: false,
+        },
+        persistentID: {
+          access: 'r',
+          type: 'string',
+          description:
+            'the id of the item as a hexadecimal string. This id does not change over time.',
+          code: 'pPIS',
+          optional: false,
+        },
         description: {
           access: 'rw',
           type: 'string',
@@ -565,6 +587,20 @@ export const manifest: unknown = {
           description: 'folder which contains this playlist (if any)',
           code: 'pPlP',
           optional: false,
+          unsupported: {
+            reason:
+              'The app fails the read for a playlist that is in no folder instead of reporting a missing value.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-03T03:16:26.771Z',
+              bundleId: 'com.apple.Music',
+              appVersion: '1.7.2',
+              osVersion: '27.2',
+              sampleSize: 3,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
         },
         size: {
           access: 'r',
@@ -595,6 +631,13 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'persistentID',
+          primary: true,
+          targeting: 'byProperty',
+        },
+      ],
     },
     PlaylistWindow: {
       name: 'PlaylistWindow',
@@ -700,6 +743,35 @@ export const manifest: unknown = {
       description: 'playable audio source',
       code: 'cTrk',
       properties: {
+        id: {
+          access: 'r',
+          type: 'integer',
+          description: 'the id of the item',
+          code: 'ID  ',
+          optional: false,
+        },
+        index: {
+          access: 'r',
+          type: 'integer',
+          description: 'the index of the item in internal application order',
+          code: 'pidx',
+          optional: false,
+        },
+        name: {
+          access: 'rw',
+          type: 'string',
+          description: 'the name of the item',
+          code: 'pnam',
+          optional: false,
+        },
+        persistentID: {
+          access: 'r',
+          type: 'string',
+          description:
+            'the id of the item as a hexadecimal string. This id does not change over time.',
+          code: 'pPIS',
+          optional: false,
+        },
         album: {
           access: 'rw',
           type: 'string',
@@ -1203,6 +1275,13 @@ export const manifest: unknown = {
           optional: false,
         },
       },
+      identifiers: [
+        {
+          property: 'persistentID',
+          primary: true,
+          targeting: 'byProperty',
+        },
+      ],
     },
     URLTrack: {
       name: 'URLTrack',
@@ -1914,6 +1993,74 @@ export const manifest: unknown = {
   },
   relationships: [],
   commands: {
+    listPlaylists: {
+      name: 'list',
+      description: 'List every playlist',
+      scope: 'resource',
+      resourceType: 'Playlist',
+      parameters: [],
+      routeName: 'list',
+    },
+    getPlaylist: {
+      name: 'get',
+      description: 'Get a playlist by its persistent ID',
+      scope: 'resource',
+      resourceType: 'Playlist',
+      parameters: [
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+      ],
+      routeName: 'get',
+    },
+    listTracks: {
+      name: 'list',
+      description:
+        'List the tracks of a playlist; the library playlist holds every track in the library',
+      scope: 'resource',
+      resourceType: 'Track',
+      parameters: [
+        {
+          name: 'playlistId',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Playlist',
+        parameter: 'playlistId',
+      },
+      routeName: 'list',
+    },
+    getTrack: {
+      name: 'get',
+      description: 'Get a track of a playlist by its persistent ID',
+      scope: 'resource',
+      resourceType: 'Track',
+      parameters: [
+        {
+          name: 'playlistId',
+          type: 'string',
+          description: 'Persistent ID of the playlist',
+          required: true,
+        },
+        {
+          name: 'persistentID',
+          type: 'string',
+          description: 'Persistent ID of the track',
+          required: true,
+        },
+      ],
+      parent: {
+        resource: 'Playlist',
+        parameter: 'playlistId',
+      },
+      routeName: 'get',
+    },
     print: {
       name: 'print',
       description: 'Print the specified object(s)',

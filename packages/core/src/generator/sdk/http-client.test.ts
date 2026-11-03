@@ -326,6 +326,55 @@ describe('generateHttpClientSdk', () => {
     expect(indexContent).not.toContain('GhostResourceClient')
   })
 
+  // Regression (#213): a list under a command parent was documented as "List
+  // all <plural>", though it returns only the items of the parent it is given.
+  it("documents a list under a command parent as listing one parent's items", () => {
+    const manifestWithParent: AppManifest = {
+      ...testManifest,
+      resources: {
+        ...testManifest.resources,
+        Box: {
+          name: 'Box',
+          plural: 'Boxes',
+          description: 'A box of items',
+          properties: {
+            id: { access: 'r', type: 'string', description: 'ID', optional: false },
+          },
+          identifiers: [{ property: 'id', primary: true }],
+        },
+      },
+      commands: {
+        listBoxes: {
+          name: 'list',
+          description: 'List all boxes',
+          scope: 'resource',
+          resourceType: 'Box',
+          parameters: [],
+          permission: 'testapp:boxes:list',
+        },
+        listItems: {
+          name: 'list',
+          description: 'List the items of a box',
+          scope: 'resource',
+          resourceType: 'Item',
+          parent: { resource: 'Box', parameter: 'boxId' },
+          parameters: [{ name: 'boxId', type: 'string', description: 'Box ID', required: true }],
+          permission: 'testapp:items:list',
+        },
+      },
+    }
+    const result = generateHttpClientSdk(manifestWithParent, { packageName: '@macts/sdk-testapp' })
+    const items = findFile(result.files, 'src/resources/item.ts').content
+    expect(items).toContain(
+      'async list(boxId: string, page: { pageSize?: number; cursor?: string } = {}): Promise<{ items: Item[]; nextCursor?: string }>'
+    )
+    expect(items).toContain('List the items of one box, one page at a time.')
+    expect(items).not.toContain('List all items.')
+    // A list with no parent still lists everything.
+    const boxes = findFile(result.files, 'src/resources/box.ts').content
+    expect(boxes).toContain('List all boxes, as one page.')
+  })
+
   // Regression: a resource command parameter typed as an enum (e.g. `Status`) makes the
   // generated method reference that type, so it must be imported from '../types.js'.
   // Previously the resource-file import was hardcoded to the resource's own

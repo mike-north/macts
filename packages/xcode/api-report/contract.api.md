@@ -8,6 +8,7 @@ import { AppContract } from '@macts/contracts';
 import { CallOptions } from '@macts/contracts';
 import { FileValue } from '@macts/contracts';
 import { Integer } from '@macts/contracts';
+import { ObjectReferenceData } from '@macts/contracts';
 import { ObjectReferenceVariant } from '@macts/contracts';
 import { Page } from '@macts/contracts';
 import { PageRequest } from '@macts/contracts';
@@ -200,8 +201,8 @@ export interface ResolvedBuildSettingUpdateInput {
 // @public
 export interface RunDestination {
     readonly architecture: string | null;
-    readonly companionDevice: ObjectReferenceVariant<Device, string> | null;
-    readonly device: ObjectReferenceVariant<Device, string> | null;
+    readonly companionDevice: ObjectReferenceVariant<Device, string, 'Device'> | null;
+    readonly device: ObjectReferenceVariant<Device, string, 'Device'> | null;
     readonly name: string;
     readonly platform: string | null;
 }
@@ -294,7 +295,7 @@ export interface SourceDocumentUpdateInput {
 export interface Target {
     readonly id: string;
     name: string | null;
-    readonly project: ObjectReferenceVariant<Project, string> | null;
+    readonly project: ObjectReferenceVariant<Project, string, 'Project'> | null;
 }
 
 // @public
@@ -367,10 +368,10 @@ export interface TextDocumentUpdateInput {
 
 // @public
 export interface WorkspaceDocument {
-    activeRunDestination: ObjectReferenceVariant<RunDestination, string> | null;
-    activeScheme: ObjectReferenceVariant<Scheme, string> | null;
+    activeRunDestination: ObjectReferenceVariant<RunDestination, string, 'RunDestination'> | null;
+    activeScheme: ObjectReferenceVariant<Scheme, string, 'Scheme'> | null;
     readonly file: FileValue | null;
-    readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string> | null;
+    readonly lastSchemeActionResult: ObjectReferenceVariant<SchemeActionResult, string, 'SchemeActionResult'> | null;
     readonly loaded: boolean | null;
     readonly modified: boolean | null;
     readonly name: string;
@@ -379,8 +380,8 @@ export interface WorkspaceDocument {
 
 // @public
 export interface WorkspaceDocumentCreateInput {
-    activeRunDestination?: ObjectReferenceVariant<RunDestination, string>;
-    activeScheme?: ObjectReferenceVariant<Scheme, string>;
+    activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>;
+    activeScheme?: ObjectReferenceData<string, 'Scheme'>;
 }
 
 // @public
@@ -398,8 +399,8 @@ export interface WorkspaceDocumentResourceClient {
 
 // @public
 export interface WorkspaceDocumentUpdateInput {
-    activeRunDestination?: ObjectReferenceVariant<RunDestination, string>;
-    activeScheme?: ObjectReferenceVariant<Scheme, string>;
+    activeRunDestination?: ObjectReferenceData<string, 'RunDestination'>;
+    activeScheme?: ObjectReferenceData<string, 'Scheme'>;
 }
 
 // @public

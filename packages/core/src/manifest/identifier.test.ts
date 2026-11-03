@@ -16,6 +16,7 @@ import { UNIQUE_CLAIM } from './test-support/unique-claim.js'
 import {
   CANONICAL_IDENTIFIER_KEY,
   listOperationPages,
+  resolveCanonicalIdentifierSource,
   resolveIdentifierTargeting,
   resolvePrimaryIdentifierProperty,
   resolveListOutputProperties,
@@ -268,5 +269,84 @@ describe('listOperationPages', () => {
       identifiers: [{ property: 'id', primary: true, ...UNIQUE_CLAIM }],
     })
     expect(listOperationPages(command, resource)).toBe(false)
+  })
+})
+
+describe('resolveCanonicalIdentifierSource', () => {
+  const numericId = {
+    access: 'r' as const,
+    type: 'integer' as const,
+    description: 'Numeric id of an entry in one playlist',
+    optional: false,
+  }
+  const persistentID = {
+    access: 'r' as const,
+    type: 'string' as const,
+    description: 'Persistent ID',
+    optional: false,
+  }
+
+  it('mirrors the runtime targeting property when the resource has no id field', () => {
+    const resource = makeResource({
+      properties: { name: { access: 'rw', type: 'string', description: 'Name', optional: false } },
+      identifiers: [
+        {
+          property: 'calendarIdentifier',
+          primary: true,
+          targeting: 'byProperty',
+          runtimeProperty: 'name',
+        },
+      ],
+    })
+    expect(resolveCanonicalIdentifierSource(resource)).toBe('name')
+  })
+
+  // Regression (#213): a Music track has a numeric `id` and is identified by
+  // `persistentID`; the alias overwrote the integer `id` with the hex string.
+  it('gives no alias when the resource has its own usable id property', () => {
+    const resource = makeResource({
+      properties: { id: numericId, persistentID },
+      identifiers: [{ property: 'persistentID', primary: true, targeting: 'byProperty' }],
+    })
+    expect(resolveCanonicalIdentifierSource(resource)).toBeUndefined()
+  })
+
+  it('gives no alias for a resource identified by its own id property', () => {
+    const resource = makeResource({
+      properties: { id: persistentID },
+      identifiers: [{ property: 'id', primary: true }],
+    })
+    expect(resolveCanonicalIdentifierSource(resource)).toBeUndefined()
+  })
+
+  it('mirrors the identifier when an id property is marked unsupported', () => {
+    const resource = makeResource({
+      properties: {
+        uid: persistentID,
+        id: {
+          ...numericId,
+          unsupported: {
+            reason: 'Every read fails.',
+            evidence: {
+              source: 'probe',
+              observedAt: '2026-11-01T06:05:32.244Z',
+              bundleId: 'com.example.app',
+              appVersion: '1.0',
+              osVersion: '27.2',
+              sampleSize: 3,
+              failedReads: 3,
+              errorNumbers: [-1728],
+            },
+          },
+        },
+      },
+      identifiers: [{ property: 'uid', primary: true }],
+    })
+    expect(resolveCanonicalIdentifierSource(resource)).toBe('uid')
+  })
+
+  it('gives no alias when no identifier is declared, or for no resource', () => {
+    expect(resolveCanonicalIdentifierSource(makeResource({}))).toBeUndefined()
+    expect(resolveCanonicalIdentifierSource(undefined)).toBeUndefined()
   })
 })
