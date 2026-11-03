@@ -15,18 +15,37 @@
  * the hand-built library contract (`Branch` records `get` but no `list`) and
  * a declared catalog table with the shapes no real contract here has.
  *
- * Invalid calls are marked `@ts-expect-error`, which both `tsc --noEmit` and
- * tsd enforce: an invalid call that type-checks fails the build. Each invalid
- * reference is declared first, so the call, and the error reported at its
- * argument, fits on the one line the directive covers.
+ * Invalid data is expressed with `expectNotAssignable` against
+ * `ResolvableReferenceData` of the contract's table, the constraint
+ * `bindReference` places on its data, as the other type tests here do.
+ * `expectError` is not used because `src/**` is also compiled by
+ * `tsc --noEmit`, which would reject the erroneous call it wraps.
+ *
+ * A few calls are kept as `@ts-expect-error` to show that `bindReference`
+ * itself applies that constraint with the client's own table (an unknown key,
+ * a key without `get` bound as one) and accepts only a client from a factory.
+ * Both `tsc --noEmit` and tsd enforce the directive: an invalid call that
+ * type-checks fails the build. Each such reference is declared first, so the
+ * call, and the error reported at its argument, fits on the one line the
+ * directive covers.
  *
  * @see phases/13-sdk-value-and-execution-contracts.md (D7)
  */
 
 import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
-import { calendarContract, type Calendar, type Event } from '@macts/calendar/contract'
-import { contactsContract } from '@macts/contacts/contract'
-import { musicContract, type BrowserWindow, type Playlist } from '@macts/music/contract'
+import {
+  calendarContract,
+  type Calendar,
+  type CalendarResources,
+  type Event,
+} from '@macts/calendar/contract'
+import type { ContactsResources } from '@macts/contacts/contract'
+import {
+  musicContract,
+  type BrowserWindow,
+  type MusicResources,
+  type Playlist,
+} from '@macts/music/contract'
 import { notesContract, type Note, type NotesResources } from '@macts/notes/contract'
 import type {
   AppContract,
@@ -59,7 +78,6 @@ import {
 const options = { token: 'macts_sk_example', url: 'http://localhost:8372' }
 const notes = remote.createClient(notesContract, options)
 const calendar = local.createClient(calendarContract, { token: options.token })
-const contacts = remote.createClient(contactsContract, options)
 const music = remote.createClient(musicContract, options)
 const library = remote.createClient(libraryContract, options)
 
@@ -184,10 +202,12 @@ const unknownKey = {
   cardinality: 'one',
   selector: { by: 'name', name: 'x' },
 } as const
+expectNotAssignable<ResolvableReferenceData<NotesResources>>(unknownKey)
 // @ts-expect-error -- `Notebook` is not a resource of the notes contract
 bindReference(notes, unknownKey)
 
-// A key with neither `get` nor `list`, bound as either cardinality.
+// A key with neither `get` nor `list`, which the generated table leaves out,
+// as either cardinality.
 const attendee = {
   app: 'calendar',
   resource: 'Attendee',
@@ -202,11 +222,8 @@ const attendees = {
   cardinality: 'many',
   selector: { by: 'every' },
 } as const
-// @ts-expect-error -- `Attendee` records no `get`
-bindReference(calendar, attendee)
-// @ts-expect-error -- `Attendee` records no `list`
-bindReference(calendar, attendees)
-expectNotAssignable<ResolvableReferenceData<typeof calendarContract.resources>>(attendee)
+expectNotAssignable<ResolvableReferenceData<CalendarResources>>(attendee)
+expectNotAssignable<ResolvableReferenceData<CalendarResources>>(attendees)
 
 // A key with `get` but no `list`, bound as `'many'`.
 const branches = {
@@ -216,8 +233,7 @@ const branches = {
   cardinality: 'many',
   selector: { by: 'every' },
 } as const
-// @ts-expect-error -- `Branch` records no `list`
-bindReference(library, branches)
+expectNotAssignable<ResolvableReferenceData<LibraryResources>>(branches)
 expectAssignable<ResolvableReferenceData<LibraryResources>>({
   ...branches,
   cardinality: 'one',
@@ -225,12 +241,15 @@ expectAssignable<ResolvableReferenceData<LibraryResources>>({
 } as const)
 
 // A container whose resource has no `get`, at the first level and nested.
-const inProfile = {
+const personByName = {
   app: 'contacts',
   resource: 'Person',
   form: 'selector',
   cardinality: 'one',
   selector: { by: 'name', name: 'Ann' },
+} as const
+const inProfile = {
+  ...personByName,
   container: {
     app: 'contacts',
     resource: 'SocialProfile',
@@ -239,14 +258,14 @@ const inProfile = {
     id: 'p1',
   },
 } as const
-// @ts-expect-error -- `SocialProfile` records no `get`, so it cannot be a container
-bindReference(contacts, inProfile)
+expectNotAssignable<ResolvableReferenceData<ContactsResources>>(inProfile)
+// Control: the same reference without the container is resolvable.
+expectAssignable<ResolvableReferenceData<ContactsResources>>(personByName)
 const nestedInAttendee = {
   ...events,
   container: { ...events.container, container: attendee },
 } as const
-// @ts-expect-error -- `Attendee` records no `get`, so it cannot be a container at any level
-bindReference(calendar, nestedInAttendee)
+expectNotAssignable<ResolvableReferenceData<CalendarResources>>(nestedInAttendee)
 
 // An identity reference to a resource without an identifier.
 const airPlayById = {
@@ -256,8 +275,7 @@ const airPlayById = {
   cardinality: 'one',
   id: 'x',
 } as const
-// @ts-expect-error -- `AirPlayDevice` records no `get` (and no identifier)
-bindReference(music, airPlayById)
+expectNotAssignable<ResolvableReferenceData<MusicResources>>(airPlayById)
 
 // An identifier of the wrong type.
 const noteByNumber = {
@@ -267,8 +285,9 @@ const noteByNumber = {
   cardinality: 'one',
   id: 7,
 } as const
-// @ts-expect-error -- a note's identifier is a string
-bindReference(notes, noteByNumber)
+expectNotAssignable<ResolvableReferenceData<NotesResources>>(noteByNumber)
+// Control: with a string identifier it is resolvable.
+expectAssignable<ResolvableReferenceData<NotesResources>>({ ...noteByNumber, id: 'N1' } as const)
 
 // --- A declared table with the shapes no real contract here has -----------
 
@@ -345,12 +364,13 @@ const itemsInTag = {
   selector: { by: 'every' },
   container: oneTag,
 } as const
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(oneTag)
 // @ts-expect-error -- `Tag` records no `get`
 bindReference(catalog, oneTag)
-// @ts-expect-error -- the entries of a `Tag` collection would resolve through `get`
-bindReference(catalog, tagEntries)
-// @ts-expect-error -- `Tag` records no `get`, so it cannot be a container
-bindReference(catalog, itemsInTag)
+// The entries of a `Tag` collection would resolve through `get`.
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(tagEntries)
+// `Tag` records no `get`, so it cannot be a container.
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(itemsInTag)
 // A resource with neither operation.
 const aisles = {
   app: 'catalog',
@@ -359,15 +379,12 @@ const aisles = {
   cardinality: 'many',
   selector: { by: 'every' },
 } as const
-// @ts-expect-error -- `Aisle` records no `list`
-bindReference(catalog, aisles)
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(aisles)
 const oneAisle = { ...aisles, cardinality: 'one', selector: { by: 'name', name: 'A1' } } as const
-// @ts-expect-error -- `Aisle` records no `get`
-bindReference(catalog, oneAisle)
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(oneAisle)
 // A resource absent from the table.
 const shelves = { ...aisles, resource: 'Shelf' } as const
-// @ts-expect-error -- the table has no `Shelf`
-bindReference(catalog, shelves)
+expectNotAssignable<ResolvableReferenceData<CatalogResources>>(shelves)
 
 // --- A contract that declares no table type --------------------------------
 
