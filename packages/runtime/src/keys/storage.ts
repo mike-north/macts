@@ -736,6 +736,10 @@ export type KeyRecordStatus = 'active' | 'revoked' | 'missing'
  * validation. It always reads the database; validation's per-process cache sits
  * in front of it.
  *
+ * This reports a stored record's status; it is not an authorization check. A
+ * key may be used only when its token also verifies, which `validateApiKey`
+ * decides.
+ *
  * @param keyId - Key ID to look up (the token's `sub` claim)
  * @returns The key's {@link KeyRecordStatus}
  */
@@ -755,10 +759,11 @@ export function getKeyRecordStatus(keyId: string): KeyRecordStatus {
  * Check whether a key id has a stored record that is marked revoked.
  *
  * @remarks
- * This answers only "is there a revoked record". It does not say whether a key
- * may be used: a key with no stored record is not revoked, but validation
- * refuses it. Use {@link getKeyRecordStatus} to tell active, revoked and
- * missing keys apart.
+ * Never use this to decide whether a key may be used. It returns `false` for a
+ * key with no stored record, which validation refuses. It answers only "is
+ * there a stored record marked revoked". Use `validateApiKey` to authorize a
+ * key, and {@link getKeyRecordStatus} to tell active, revoked and missing keys
+ * apart.
  *
  * @deprecated Use {@link getKeyRecordStatus}; `isKeyRevoked(id)` equals
  *   `getKeyRecordStatus(id) === 'revoked'`.

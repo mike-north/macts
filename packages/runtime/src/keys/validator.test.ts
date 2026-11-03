@@ -197,6 +197,18 @@ describe('validateApiKey', () => {
       assertValidationFailure(result)
       expect(result.errorCode).toBe('INVALID_SIGNATURE')
     })
+
+    it('should never look up the key store for a token whose signature does not verify', async () => {
+      const token = await createTestToken(
+        { permissions: ['calendar:events:list'] },
+        { secret: 'different-secret-key' }
+      )
+
+      const result = await validateApiKey(token)
+
+      assertValidationFailure(result)
+      expect(storage.getKeyRecordStatus).not.toHaveBeenCalled()
+    })
   })
 
   describe('negative cases - expiration', () => {
