@@ -31,7 +31,7 @@ import type { FieldPlan, IssuePath, ValuePlan } from '@macts/contracts'
 export type NativeCodecDirection = 'decode' | 'encode'
 
 /**
- * The object the codec throws when a value violates its plan.
+ * The object the codec throws when it cannot convert a value.
  *
  * @remarks
  * It is a plain object rather than an `Error`, so it crosses the automation
@@ -40,12 +40,22 @@ export type NativeCodecDirection = 'decode' | 'encode'
  * and list positions as numbers, `[]` for the value itself. Inside dynamic
  * content, a record's path steps are the user's keys; the envelope is not a
  * step. `message` is user-facing.
+ *
+ * There are two causes, and `unsupportedKind` tells them apart:
+ *
+ * - The value violates its plan (a fractional value at an integer position).
+ *   `unsupportedKind` is absent: the fault is the value's.
+ * - The plan has a kind the codec has no conversion for (`reference`, `file`,
+ *   `file-source`, or a kind it does not recognize). `unsupportedKind` holds
+ *   that kind: the fault is the codec's, whatever the value is.
  */
 export interface NativeCodecError {
   readonly name: string
   readonly direction: NativeCodecDirection
   readonly path: IssuePath
   readonly message: string
+  /** The plan kind the codec cannot convert, when that is why it failed. */
+  readonly unsupportedKind?: string
 }
 
 /**
@@ -247,6 +257,23 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
     const error: NativeCodecError = { name: ERROR_NAME, direction, path: path.slice(), message }
     // The contract (phases/13 D4) requires a plain object marked by `name`,
     // not an Error instance, so it crosses process serialization intact.
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
+    throw error
+  }
+
+  /**
+   * Throws the codec failure for a plan kind the codec has no conversion for,
+   * marked with that kind so it is never mistaken for a value that violates
+   * its plan.
+   */
+  function failUnsupported(direction: Direction, path: Path, kind: string, message: string): never {
+    const error: NativeCodecError = {
+      name: ERROR_NAME,
+      direction,
+      path: path.slice(),
+      message,
+      unsupportedKind: kind,
+    }
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw error
   }
@@ -616,13 +643,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'reference':
       case 'file':
       case 'file-source':
-        return fail(
+        return failUnsupported(
           'encode',
           path,
+          kind,
           unconvertedKindName(kind) + ' values have no conversion in this codec'
         )
       default:
-        return fail('encode', path, 'Unrecognized value plan kind ' + quote(kind))
+        return failUnsupported('encode', path, kind, 'Unrecognized value plan kind ' + quote(kind))
     }
   }
 
@@ -945,13 +973,14 @@ export function createNativeCodecFunctions(): NativeCodecFunctions {
       case 'reference':
       case 'file':
       case 'file-source':
-        return fail(
+        return failUnsupported(
           'decode',
           path,
+          kind,
           unconvertedKindName(kind) + ' values have no conversion in this codec'
         )
       default:
-        return fail('decode', path, 'Unrecognized value plan kind ' + quote(kind))
+        return failUnsupported('decode', path, kind, 'Unrecognized value plan kind ' + quote(kind))
     }
   }
 

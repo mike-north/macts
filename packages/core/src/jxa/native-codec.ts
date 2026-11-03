@@ -62,6 +62,9 @@ export const NATIVE_CODEC_ERROR_NAME = 'MactsCodecError'
  *   `name` is {@link NATIVE_CODEC_ERROR_NAME} and which also carries
  *   `direction`, `path`, and `message`. Examples are a fractional value at an
  *   integer position, or an integer outside the supported domain.
+ * - When the plan has a kind the codec cannot convert, either function throws
+ *   the same object with `unsupportedKind` set to that kind, whatever the
+ *   value is.
  */
 export interface NativeCodec {
   /** In-process JavaScript defining the decode and encode functions. */
@@ -96,7 +99,7 @@ function buildPrelude(factorySource: string): string {
  * that run inside the automation process are the same code that the
  * package's unit tests exercise in Node. It implements every value plan kind
  * except `reference`, `file`, and `file-source`, which fail with a codec
- * error saying they have no conversion in this codec.
+ * error marked with the unsupported kind.
  *
  * Conversions follow the value contracts: integers are canonical decimal
  * text within the safe-integer domain, numbers in dynamic content are always
@@ -139,9 +142,12 @@ export interface NativeScript {
  * - `app`: the application or the automation bridge raised an error.
  *   `errorNumber` is the bridge's numeric error code when one was provided; the
  *   executor maps it to a canonical structured error.
- * - `codec`: a value violated its plan. On `encode` this means the app returned
- *   something the contract does not allow; on `decode` it means a bridge form
- *   could not be produced from already-validated input.
+ * - `codec`: the codec could not convert a value. Without `unsupportedKind`,
+ *   the value violated its plan: on `encode` the app returned something the
+ *   contract does not allow, and on `decode` a bridge form could not be
+ *   produced from already-validated input. With `unsupportedKind`, the plan
+ *   has a kind the codec has no conversion for, so no value at that position
+ *   could be converted.
  */
 export type NativeFailure =
   | { readonly source: 'app'; readonly message: string; readonly errorNumber?: number }
@@ -150,6 +156,8 @@ export type NativeFailure =
       readonly direction: 'decode' | 'encode'
       readonly path: IssuePath
       readonly message: string
+      /** The plan kind the codec cannot convert, when that is why it failed. */
+      readonly unsupportedKind?: string
     }
 
 /** What the automation process reports for one {@link NativeScript}. */

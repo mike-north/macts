@@ -1998,6 +1998,7 @@ export type NativeFailure = {
     readonly direction: 'decode' | 'encode';
     readonly path: IssuePath;
     readonly message: string;
+    readonly unsupportedKind?: string;
 };
 
 // @public
